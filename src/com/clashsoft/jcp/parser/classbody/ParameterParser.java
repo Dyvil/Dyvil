@@ -3,6 +3,7 @@ package com.clashsoft.jcp.parser.classbody;
 import com.clashsoft.jcp.SyntaxException;
 import com.clashsoft.jcp.Token;
 import com.clashsoft.jcp.ast.member.Parameter;
+import com.clashsoft.jcp.ast.member.Type;
 import com.clashsoft.jcp.ast.member.methods.Method;
 import com.clashsoft.jcp.parser.JCP;
 import com.clashsoft.jcp.parser.Parser;
@@ -12,7 +13,7 @@ public class ParameterParser extends Parser
 	private Method method;
 	
 	private String name;
-	private String type;
+	private Type type;
 	
 	public ParameterParser(Method method)
 	{
@@ -32,7 +33,8 @@ public class ParameterParser extends Parser
 		}
 		else if (this.type == null)
 		{
-			this.type = value;
+			this.type = new Type();
+			jcp.pushParser(new TypeParser(this.type, ","));
 		}
 		else if (this.name == null)
 		{

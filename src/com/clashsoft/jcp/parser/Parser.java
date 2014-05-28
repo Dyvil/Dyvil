@@ -51,24 +51,6 @@ public abstract class Parser
 		return false;
 	}
 	
-	public final void parse(JCP jcp, String code)
-	{
-		// Create a list of raw tokens
-		Token token = JCPHelper.tokenize(code);
-		while (token.next() != null)
-		{
-			try
-			{
-				jcp.parser.parse(jcp, token.value, token);
-			}
-			catch (SyntaxException ex)
-			{
-				ex.print(System.err, code, token);
-			}
-			token = token.next();
-		}
-	}
-	
 	public void begin(JCP jcp) throws SyntaxException
 	{
 	}

@@ -1,10 +1,10 @@
 package com.clashsoft.jcp.parser.classbody;
 
-import com.clashsoft.jcp.JCPHelper;
 import com.clashsoft.jcp.SyntaxException;
 import com.clashsoft.jcp.Token;
 import com.clashsoft.jcp.ast.ClassBody;
 import com.clashsoft.jcp.ast.annotation.Annotation;
+import com.clashsoft.jcp.ast.member.Type;
 import com.clashsoft.jcp.ast.member.Variable;
 import com.clashsoft.jcp.ast.member.methods.Constructor;
 import com.clashsoft.jcp.ast.member.methods.Method;
@@ -22,7 +22,7 @@ public class ClassBodyParser extends Parser
 	
 	private int			mode;
 	private String		name;
-	private String		type;
+	private Type		type;
 	
 	private Variable	variable	= new Variable();
 	private Method		method		= new Method();
@@ -39,10 +39,6 @@ public class ClassBodyParser extends Parser
 		else if (this.checkModifier(value))
 		{
 			;
-		}
-		else if (JCPHelper.isPrimitiveType(value))
-		{
-			this.type = value;
 		}
 		else if ("(".equals(value))
 		{
@@ -92,7 +88,8 @@ public class ClassBodyParser extends Parser
 		else if (value.startsWith("@"))
 		{
 			this.mode = ANNOTATION;
-			this.type = value;
+			this.type = new Type();
+			
 		}
 		else if ("throws".equals(value))
 		{

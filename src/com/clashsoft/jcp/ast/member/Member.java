@@ -10,7 +10,7 @@ public abstract class Member
 	private int				modifiers;
 	
 	private String			name;
-	private String			type;
+	private Type			type;
 	
 	private List<Annotation>	annotations	= new LinkedList();
 	
@@ -18,7 +18,7 @@ public abstract class Member
 	{
 	}
 	
-	public Member(String name, String type, int modifiers)
+	public Member(String name, Type type, int modifiers)
 	{
 		this.name = name;
 		this.type = type;
@@ -30,7 +30,7 @@ public abstract class Member
 		this.name = name;
 	}
 	
-	public void setType(String type)
+	public void setType(Type type)
 	{
 		this.type = type;
 	}
@@ -50,7 +50,7 @@ public abstract class Member
 		return this.name;
 	}
 	
-	public String getType()
+	public Type getType()
 	{
 		return this.type;
 	}

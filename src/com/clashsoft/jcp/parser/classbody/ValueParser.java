@@ -2,6 +2,7 @@ package com.clashsoft.jcp.parser.classbody;
 
 import com.clashsoft.jcp.SyntaxException;
 import com.clashsoft.jcp.Token;
+import com.clashsoft.jcp.ast.member.Type;
 import com.clashsoft.jcp.ast.member.Value;
 import com.clashsoft.jcp.parser.JCP;
 import com.clashsoft.jcp.parser.Parser;
@@ -16,7 +17,7 @@ public class ValueParser extends Parser
 	private Value			value;
 	private String			endOn;
 	
-	private String			type;
+	private Type			type;
 	
 	public ValueParser(Value value, String endOn)
 	{
@@ -41,7 +42,7 @@ public class ValueParser extends Parser
 		}
 		else if (this.mode == TYPE)
 		{
-			// jcp.pushParser(new TypeParser("("));
+			jcp.pushParser(new TypeParser(this.type, "("));
 		}
 	}
 	

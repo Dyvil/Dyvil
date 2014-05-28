@@ -1,5 +1,7 @@
 package com.clashsoft.jcp.ast.member.methods;
 
+import com.clashsoft.jcp.ast.member.Type;
+
 
 public class Constructor extends Method
 {	
@@ -8,12 +10,12 @@ public class Constructor extends Method
 	}
 	
 	@Override
-	public void setType(String type)
+	public void setType(Type type)
 	{
 	}
 	
 	@Override
-	public String getType()
+	public Type getType()
 	{
 		return null;
 	}

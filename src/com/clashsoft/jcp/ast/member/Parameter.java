@@ -6,7 +6,7 @@ public class Parameter extends Member
 	{
 	}
 	
-	public Parameter(String name, String type, int modifiers)
+	public Parameter(String name, Type type, int modifiers)
 	{
 		super(name, type, modifiers);
 	}

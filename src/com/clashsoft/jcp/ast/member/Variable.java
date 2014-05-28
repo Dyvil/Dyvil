@@ -1,15 +1,14 @@
 package com.clashsoft.jcp.ast.member;
 
-
 public class Variable extends Member implements IField
 {
-	private Value	value = new Value();
+	private Value	value;
 	
 	public Variable()
 	{
 	}
 	
-	public Variable(String name, String type, int modifiers, Value value)
+	public Variable(String name, Type type, int modifiers, Value value)
 	{
 		super(name, type, modifiers);
 		this.setValue(value);
