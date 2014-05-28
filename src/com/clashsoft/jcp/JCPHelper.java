@@ -1,8 +1,6 @@
 package com.clashsoft.jcp;
 
 import java.lang.reflect.Modifier;
-import java.util.LinkedList;
-import java.util.List;
 
 public class JCPHelper
 {	

@@ -8,17 +8,15 @@ import com.clashsoft.jcp.parser.Parser;
 
 public class ValueParser extends Parser
 {
-	private static Object	NULL	= new Object();
+	public static final int	TYPE		= 1;
+	public static final int	PARAMETERS	= 2;
 	
-	public static final int TYPE = 1;
-	public static final int PARAMETERS = 2;
-	
-	private int mode;
+	private int				mode;
 	
 	private Value			value;
 	private String			endOn;
 	
-	private String type;
+	private String			type;
 	
 	public ValueParser(Value value, String endOn)
 	{
@@ -43,7 +41,7 @@ public class ValueParser extends Parser
 		}
 		else if (this.mode == TYPE)
 		{
-			//jcp.pushParser(new TypeParser("("));
+			// jcp.pushParser(new TypeParser("("));
 		}
 	}
 	

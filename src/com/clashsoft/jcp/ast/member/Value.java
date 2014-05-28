@@ -2,23 +2,25 @@ package com.clashsoft.jcp.ast.member;
 
 public class Value
 {
-	public static final byte OBJECT = 0;
-	public static final byte BOOLEAN = 1;
-	public static final byte BYTE = 2;
-	public static final byte SHORT = 3;
-	public static final byte CHAR = 4;
-	public static final byte INTEGER = 5;
-	public static final byte LONG = 6;
-	public static final byte FLOAT = 7;
-	public static final byte DOUBLE = 8;
+	public static final byte	OBJECT	= 0;
+	public static final byte	BOOLEAN	= 1;
+	public static final byte	BYTE	= 2;
+	public static final byte	SHORT	= 3;
+	public static final byte	CHAR	= 4;
+	public static final byte	INTEGER	= 5;
+	public static final byte	LONG	= 6;
+	public static final byte	FLOAT	= 7;
+	public static final byte	DOUBLE	= 8;
 	
-	private byte type;
+	private byte				type;
 	
-	private Object object;
+	private Object				object;
 	
-	private boolean booleanValue;
-	private long intValue;
-	private double floatValue;
+	private boolean				booleanValue;
+	private int					intValue;
+	private long				longValue;
+	private float				floatValue;
+	private double				doubleValue;
 	
 	public void setObject(Object value)
 	{
@@ -56,16 +58,10 @@ public class Value
 		this.intValue = i;
 	}
 	
-	public void setInt(long i)
-	{
-		this.type = INTEGER;
-		this.intValue = i;
-	}
-	
 	public void setLong(long l)
 	{
 		this.type = LONG;
-		this.intValue = l;
+		this.longValue = l;
 	}
 	
 	public void setFloat(float f)
@@ -74,16 +70,10 @@ public class Value
 		this.floatValue = f;
 	}
 	
-	public void setFloat(double f)
-	{
-		this.type = FLOAT;
-		this.floatValue = f;
-	}
-	
 	public void setDouble(double d)
 	{
 		this.type = DOUBLE;
-		this.floatValue = d;
+		this.doubleValue = d;
 	}
 	
 	public Object getObject()
@@ -91,6 +81,10 @@ public class Value
 		return this.object;
 	}
 	
+	public byte getType()
+	{
+		return this.type;
+	}
 	
 	public boolean getBoolean()
 	{
@@ -99,11 +93,21 @@ public class Value
 	
 	public int getInt()
 	{
-		return (int) this.intValue;
+		return this.intValue;
+	}
+	
+	public long getLong()
+	{
+		return this.longValue;
 	}
 	
 	public float getFloat()
 	{
-		return (float) this.floatValue;
+		return this.floatValue;
+	}
+	
+	public double getDouble()
+	{
+		return this.doubleValue;
 	}
 }
