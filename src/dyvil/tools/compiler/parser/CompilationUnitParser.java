@@ -7,8 +7,6 @@ import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.ClassDecl;
 import dyvil.tools.compiler.ast.CompilationUnit;
-import dyvil.tools.compiler.ast.PackageDecl;
-import dyvil.tools.compiler.ast.imports.SimpleImport;
 
 public class CompilationUnitParser extends Parser
 {
@@ -26,9 +24,7 @@ public class CompilationUnitParser extends Parser
 		
 		if ("package".equals(value))
 		{
-			PackageDecl packageDecl = new PackageDecl();
-			this.unit.setPackageDecl(packageDecl);
-			jcp.pushParser(new PackageParser(packageDecl));
+			jcp.pushParser(new PackageParser(this.unit));
 			return;
 		}
 		else if ("import".equals(value))

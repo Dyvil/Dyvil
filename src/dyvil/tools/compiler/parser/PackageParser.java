@@ -4,16 +4,17 @@ import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
+import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.PackageDecl;
 
 public class PackageParser extends Parser
 {
-	public StringBuilder	buffer	= new StringBuilder();
-	public PackageDecl		packageDecl;
+	protected CompilationUnit unit; 
+	private StringBuilder	buffer	= new StringBuilder();
 	
-	public PackageParser(PackageDecl packageDecl)
+	public PackageParser(CompilationUnit unit)
 	{
-		this.packageDecl = packageDecl;
+		this.unit = unit;
 	}
 	
 	@Override
@@ -32,6 +33,6 @@ public class PackageParser extends Parser
 	@Override
 	public void end(ParserManager jcp)
 	{
-		this.packageDecl.setPackage(this.buffer.toString());
+		this.unit.setPackageDecl(new PackageDecl(this.buffer.toString()));
 	}
 }

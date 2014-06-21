@@ -1,13 +1,17 @@
 package dyvil.tools.compiler.ast;
 
-
 public class PackageDecl
 {
 	private String thePackage;
 	
-	public void setPackage(String s)
+	public PackageDecl(String thePackage)
 	{
-		this.thePackage = s;
+		this.thePackage = thePackage;
+	}
+	
+	public void setPackage(String thePackage)
+	{
+		this.thePackage = thePackage;
 	}
 	
 	public String getPackage()
