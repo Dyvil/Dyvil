@@ -4,21 +4,17 @@ import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
-import dyvil.tools.compiler.ast.ImportDecl;
+import dyvil.tools.compiler.ast.imports.SimpleImport;
 
 public class ImportParser extends Parser
 {
-	public static final int	PACKAGE		= 1;
-	public static final int	ASTERISK	= 2;
+	private StringBuilder	buffer	= new StringBuilder();
 	
-	private int				mode;
-	private StringBuilder	buffer		= new StringBuilder();
+	private SimpleImport	simpleImport;
 	
-	private ImportDecl		importDecl;
-	
-	public ImportParser(ImportDecl importDecl)
+	public ImportParser(SimpleImport simpleImport)
 	{
-		this.importDecl = importDecl;
+		this.simpleImport = simpleImport;
 	}
 	
 	@Override
@@ -28,35 +24,8 @@ public class ImportParser extends Parser
 		{
 			jcp.popParser();
 		}
-		else if ("static".equals(value))
-		{
-			if (this.mode == 0)
-			{
-				this.importDecl.setStatic();
-			}
-			else
-			{
-				throw new SyntaxException("import.static.invalid");
-			}
-		}
-		else if ("*".equals(value))
-		{
-			if (this.mode == PACKAGE)
-			{
-				this.mode = ASTERISK;
-				this.importDecl.setAsterisk();
-			}
-			else
-			{
-				throw new SyntaxException("import.asterisk.invalid");
-			}
-		}
 		else
 		{
-			if (this.mode == ASTERISK)
-			{
-				throw new SyntaxException("import.package.invalid");
-			}
 			this.buffer.append(value);
 		}
 	}
@@ -64,6 +33,6 @@ public class ImportParser extends Parser
 	@Override
 	public void end(ParserManager jcp)
 	{
-		this.importDecl.setImport(this.buffer.toString());
+		this.simpleImport.setImport(this.buffer.toString());
 	}
 }

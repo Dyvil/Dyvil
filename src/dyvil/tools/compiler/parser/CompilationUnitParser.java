@@ -7,8 +7,8 @@ import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.ClassDecl;
 import dyvil.tools.compiler.ast.CompilationUnit;
-import dyvil.tools.compiler.ast.ImportDecl;
 import dyvil.tools.compiler.ast.PackageDecl;
+import dyvil.tools.compiler.ast.imports.SimpleImport;
 
 public class CompilationUnitParser extends Parser
 {
@@ -33,9 +33,9 @@ public class CompilationUnitParser extends Parser
 		}
 		else if ("import".equals(value))
 		{
-			ImportDecl importDecl = new ImportDecl();
-			this.unit.addImportDecl(importDecl);
-			jcp.pushParser(new ImportParser(importDecl));
+			SimpleImport simpleImport = new SimpleImport();
+			this.unit.addImportDecl(simpleImport);
+			jcp.pushParser(new ImportParser(simpleImport));
 			return;
 		}
 		else if (CSSource.isClass(value))
