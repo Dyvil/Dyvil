@@ -34,4 +34,10 @@ public class PackageImport implements IImport
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean isClassName(String name)
+	{
+		return false;
+	}
 }

@@ -1,18 +1,12 @@
 package dyvil.tools.compiler.ast.member;
 
-import java.util.LinkedList;
-import java.util.List;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
-
-public abstract class Member
+public abstract class Member extends Annotatable
 {
 	private int					modifiers;
 	
 	private String				name;
 	private Type				type;
-	
-	private List<Annotation>	annotations	= new LinkedList();
 	
 	protected Member()
 	{
@@ -40,11 +34,6 @@ public abstract class Member
 		this.modifiers = modifiers;
 	}
 	
-	public boolean addAnnotation(Annotation annotation)
-	{
-		return this.annotations.add(annotation);
-	}
-	
 	public String getName()
 	{
 		return this.name;
@@ -58,10 +47,5 @@ public abstract class Member
 	public int getModifiers()
 	{
 		return this.modifiers;
-	}
-	
-	public List<Annotation> getAnnotations()
-	{
-		return this.annotations;
 	}
 }

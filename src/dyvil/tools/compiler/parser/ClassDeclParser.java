@@ -4,21 +4,24 @@ import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
-import dyvil.tools.compiler.ast.ClassDecl;
+import dyvil.tools.compiler.ast.CompilationUnit;
+import dyvil.tools.compiler.ast.classes.AbstractClass;
+import dyvil.tools.compiler.ast.classes.Annotation;
+import dyvil.tools.compiler.ast.classes.Interface;
 import dyvil.tools.compiler.parser.classbody.ClassBodyParser;
 
 public class ClassDeclParser extends Parser
 {
-	public static final int	NAME		= 0;
-	public static final int	SUPERCLASS	= 1;
-	public static final int	INTERFACES	= 2;
+	public static final int		NAME			= 0;
+	public static final int		SUPERCLASSES	= 1;
 	
-	public ClassDecl classDecl;
-	public int				mode;
+	protected CompilationUnit	unit;
+	private int					mode;
+	private AbstractClass		theClassDecl;
 	
-	public ClassDeclParser(ClassDecl classDecl)
+	public ClassDeclParser(CompilationUnit unit)
 	{
-		this.classDecl = classDecl;
+		this.unit = unit;
 	}
 	
 	@Override
@@ -28,27 +31,25 @@ public class ClassDeclParser extends Parser
 		{
 		case "class":
 			this.mode = NAME;
-			classDecl.setType(ClassDecl.CLASS);
+			this.theClassDecl = new dyvil.tools.compiler.ast.classes.Class();
 			return;
 		case "interface":
 			this.mode = NAME;
-			classDecl.setType(ClassDecl.INTERFACE);
+			this.theClassDecl = new Interface();
 			return;
 		case "enum":
 			this.mode = NAME;
-			classDecl.setType(ClassDecl.ENUM);
+			this.theClassDecl = new dyvil.tools.compiler.ast.classes.Enum();
 			return;
-		case "@interface":
+		case "annotation":
 			this.mode = NAME;
-			classDecl.setType(ClassDecl.ANNOTATION);
+			this.theClassDecl = new Annotation();
 			return;
 		case "extends":
-			this.mode = SUPERCLASS;
-			return;
-		case "implements":
-			this.mode = INTERFACES;
+			this.mode = SUPERCLASSES;
 			return;
 		case "{":
+			this.theClassDecl.setModifiers(this.modifiers);
 			jcp.pushParser(new ClassBodyParser());
 			return;
 		}
@@ -56,17 +57,9 @@ public class ClassDeclParser extends Parser
 		switch (this.mode)
 		{
 		case NAME:
-			classDecl.setName(value);
-		case SUPERCLASS:
-			classDecl.setSuperClass(value);
-		case INTERFACES:
-			classDecl.addInterface(value);
+			this.theClassDecl.setName(value);
+		case SUPERCLASSES:
+			this.theClassDecl.addSuperClass(value);
 		}
-	}
-	
-	@Override
-	public void end(ParserManager jcp)
-	{
-		this.classDecl.setModifiers(this.modifiers);
 	}
 }

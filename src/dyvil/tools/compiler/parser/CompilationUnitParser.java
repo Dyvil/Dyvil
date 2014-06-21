@@ -5,7 +5,6 @@ import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
-import dyvil.tools.compiler.ast.ClassDecl;
 import dyvil.tools.compiler.ast.CompilationUnit;
 
 public class CompilationUnitParser extends Parser
@@ -15,6 +14,20 @@ public class CompilationUnitParser extends Parser
 	public CompilationUnitParser(CompilationUnit unit)
 	{
 		this.unit = unit;
+	}
+	
+	/**
+	 * Expands the class name from the simple name to the full name, with package.<p>
+	 * Example:
+	 * name = "String" -> "java.lang.String"
+	 * name = "Random" -> "java.util.Random"
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public String resolveClass(String name)
+	{
+		return name;
 	}
 	
 	@Override
@@ -34,9 +47,8 @@ public class CompilationUnitParser extends Parser
 		}
 		else if (CSSource.isClass(value))
 		{
-			ClassDecl classDecl = new ClassDecl();
-			this.unit.setClassDecl(classDecl);
-			jcp.pushParser(new ClassDeclParser(classDecl));
+			jcp.pushParser(new ClassDeclParser(this.unit));
+			return;
 		}
 		else
 		{

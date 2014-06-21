@@ -3,13 +3,14 @@ package dyvil.tools.compiler.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.imports.IImport;
 
 public class CompilationUnit
 {
 	private PackageDecl		packageDecl;
 	private List<IImport>	imports	= new ArrayList();
-	private ClassDecl		classDecl;
+	private AbstractClass		abstractClass;
 	
 	public PackageDecl getPackageDecl()
 	{
@@ -21,9 +22,9 @@ public class CompilationUnit
 		return this.imports;
 	}
 	
-	public ClassDecl getClassDecl()
+	public AbstractClass getClassDecl()
 	{
-		return this.classDecl;
+		return this.abstractClass;
 	}
 	
 	public void setPackageDecl(PackageDecl packageDecl)
@@ -36,8 +37,8 @@ public class CompilationUnit
 		this.imports.add(iimport);
 	}
 	
-	public void setClassDecl(ClassDecl classDecl)
+	public void setClassDecl(AbstractClass abstractClass)
 	{
-		this.classDecl = classDecl;
+		this.abstractClass = abstractClass;
 	}
 }

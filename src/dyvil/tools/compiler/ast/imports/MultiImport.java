@@ -33,4 +33,10 @@ public class MultiImport extends PackageImport
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean isClassName(String name)
+	{
+		return this.containsClass(name);
+	}
 }

@@ -24,4 +24,10 @@ public class SimpleImport implements IImport
 	{
 		return this.theImport.equals(className);
 	}
+	
+	@Override
+	public boolean isClassName(String name)
+	{
+		return this.theImport.endsWith(name);
+	}
 }
