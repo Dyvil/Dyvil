@@ -4,6 +4,15 @@ public class PackageImport implements IImport
 {
 	protected String thePackage;
 	
+	public PackageImport()
+	{
+	}
+	
+	public PackageImport(String thePackage)
+	{
+		this.thePackage = thePackage;
+	}
+	
 	public void setPackage(String thePackage)
 	{
 		this.thePackage = thePackage;

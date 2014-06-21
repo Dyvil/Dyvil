@@ -33,9 +33,7 @@ public class CompilationUnitParser extends Parser
 		}
 		else if ("import".equals(value))
 		{
-			SimpleImport simpleImport = new SimpleImport();
-			this.unit.addImportDecl(simpleImport);
-			jcp.pushParser(new ImportParser(simpleImport));
+			jcp.pushParser(new ImportParser(this.unit));
 			return;
 		}
 		else if (CSSource.isClass(value))
