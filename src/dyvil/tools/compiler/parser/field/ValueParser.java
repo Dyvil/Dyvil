@@ -1,11 +1,10 @@
-package dyvil.tools.compiler.parser.classbody;
+package dyvil.tools.compiler.parser.field;
 
 import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
-import dyvil.tools.compiler.ast.member.Type;
-import dyvil.tools.compiler.ast.member.Value;
+import dyvil.tools.compiler.ast.field.Value;
 
 public class ValueParser extends Parser
 {
@@ -16,8 +15,6 @@ public class ValueParser extends Parser
 	
 	private Value			value;
 	private String			endOn;
-	
-	private Type			type;
 	
 	public ValueParser(Value value, String endOn)
 	{
@@ -42,7 +39,7 @@ public class ValueParser extends Parser
 		}
 		else if (this.mode == TYPE)
 		{
-			jcp.pushParser(new TypeParser(this.type, "("));
+			// jcp.pushParser(new TypeParser(this.value));
 		}
 	}
 	

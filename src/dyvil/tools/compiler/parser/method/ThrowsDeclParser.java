@@ -1,11 +1,11 @@
-package dyvil.tools.compiler.parser.classbody;
+package dyvil.tools.compiler.parser.method;
 
 import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
-import dyvil.tools.compiler.ast.member.methods.IThrower;
-import dyvil.tools.compiler.ast.member.methods.ThrowsDecl;
+import dyvil.tools.compiler.ast.api.IThrower;
+import dyvil.tools.compiler.ast.method.ThrowsDecl;
 
 public class ThrowsDeclParser extends Parser
 {	

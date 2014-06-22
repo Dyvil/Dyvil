@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser;
+package dyvil.tools.compiler.parser.classes;
 
 import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
@@ -6,9 +6,8 @@ import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
-import dyvil.tools.compiler.ast.classes.Annotation;
+import dyvil.tools.compiler.ast.classes.AnnotationClass;
 import dyvil.tools.compiler.ast.classes.Interface;
-import dyvil.tools.compiler.parser.classbody.ClassBodyParser;
 
 public class ClassDeclParser extends Parser
 {
@@ -43,7 +42,7 @@ public class ClassDeclParser extends Parser
 			return;
 		case "annotation":
 			this.mode = NAME;
-			this.theClassDecl = new Annotation();
+			this.theClassDecl = new AnnotationClass();
 			return;
 		case "extends":
 			this.mode = SUPERCLASSES;

@@ -6,6 +6,9 @@ import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.CompilationUnit;
+import dyvil.tools.compiler.parser.classes.ClassDeclParser;
+import dyvil.tools.compiler.parser.imports.ImportParser;
+import dyvil.tools.compiler.parser.imports.PackageParser;
 
 public class CompilationUnitParser extends Parser
 {

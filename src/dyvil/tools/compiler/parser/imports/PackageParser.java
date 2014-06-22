@@ -1,16 +1,17 @@
-package dyvil.tools.compiler.parser;
+package dyvil.tools.compiler.parser.imports;
 
 import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.CompilationUnit;
-import dyvil.tools.compiler.ast.PackageDecl;
+import dyvil.tools.compiler.ast.imports.PackageDecl;
 
 public class PackageParser extends Parser
 {
-	protected CompilationUnit unit; 
-	private StringBuilder	buffer	= new StringBuilder();
+	protected CompilationUnit	unit;
+	
+	private StringBuilder		buffer	= new StringBuilder();
 	
 	public PackageParser(CompilationUnit unit)
 	{

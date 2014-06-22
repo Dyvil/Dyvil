@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser;
+package dyvil.tools.compiler.parser.imports;
 
 import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.imports.SimpleImport;
 public class ImportParser extends Parser
 {
 	protected CompilationUnit	unit;
+	
 	private int					mode;
 	private IImport				theImport;
 	private StringBuilder		buffer	= new StringBuilder();

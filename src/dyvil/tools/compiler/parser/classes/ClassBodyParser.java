@@ -1,33 +1,39 @@
-package dyvil.tools.compiler.parser.classbody;
+package dyvil.tools.compiler.parser.classes;
+
+import java.lang.reflect.Constructor;
 
 import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
-import dyvil.tools.compiler.ast.ClassBody;
-import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.member.Type;
-import dyvil.tools.compiler.ast.member.Variable;
-import dyvil.tools.compiler.ast.member.methods.Constructor;
-import dyvil.tools.compiler.ast.member.methods.Method;
+import dyvil.tools.compiler.ast.api.IImplementable;
+import dyvil.tools.compiler.ast.classes.AbstractClass;
+import dyvil.tools.compiler.ast.classes.ClassBody;
+import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.codeblock.CodeBlockParser;
+import dyvil.tools.compiler.parser.field.ValueParser;
+import dyvil.tools.compiler.parser.method.ParameterListParser;
+import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
 
 public class ClassBodyParser extends Parser
 {
-	public static int	VARIABLE	= 1;
-	public static int	METHOD		= 2;
-	public static int	CONSTRUCTOR	= 3;
-	public static int	ANNOTATION	= 4;
+	public static int		VARIABLE	= 1;
+	public static int		METHOD		= 2;
+	public static int		CONSTRUCTOR	= 3;
+	public static int		ANNOTATION	= 4;
 	
-	private ClassBody	body;
+	protected AbstractClass	theClass;
 	
-	private int			mode;
-	private String		name;
-	private Type		type;
+	private int				mode;
+	private String			name;
+	private IImplementable	implementable;
 	
-	private Variable	variable	= new Variable();
-	private Method		method		= new Method();
-	private Constructor	constructor	= new Constructor();
-	private Annotation	annotation	= new Annotation();
+	public ClassBodyParser(AbstractClass theClass)
+	{
+		this.theClass = theClass;
+	}
 	
 	@Override
 	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
@@ -50,30 +56,15 @@ public class ClassBodyParser extends Parser
 			{
 				this.name = token.prev().value();
 				
-				if (this.type != null)
-				{
-					this.mode = METHOD;
-					jcp.pushParser(new ParameterParser(this.method));
-				}
-				else
-				{
-					this.mode = CONSTRUCTOR;
-					jcp.pushParser(new ParameterParser(this.constructor));
-				}
+				this.type = this.body.getType();
+				this.mode = METHOD;
+				jcp.pushParser(new ParameterListParser(this.impl));
 			}
 		}
 		else if ("{".equals(value))
 		{
-			if (this.type != null)
-			{
-				this.mode = METHOD;
-				jcp.pushParser(new ImplementationParser(this.method));
-			}
-			else
-			{
-				this.mode = CONSTRUCTOR;
-				jcp.pushParser(new ImplementationParser(this.constructor));
-			}
+			this.mode = METHOD;
+			jcp.pushParser(new CodeBlockParser(this.method));
 		}
 		else if ("}".equals(value))
 		{
@@ -88,7 +79,7 @@ public class ClassBodyParser extends Parser
 		else if (value.startsWith("@"))
 		{
 			this.mode = ANNOTATION;
-			this.type = new Type();
+			this.type = new AbstractClass();
 			
 		}
 		else if ("throws".equals(value))
