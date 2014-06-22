@@ -1,20 +1,21 @@
-package dyvil.tools.compiler.ast.member.methods;
+package dyvil.tools.compiler.ast.method;
 
 import java.util.*;
 
-import dyvil.tools.compiler.ast.member.Implementation;
-import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.member.Parameter;
+import dyvil.tools.compiler.ast.api.IImplementable;
+import dyvil.tools.compiler.ast.api.IParameterized;
+import dyvil.tools.compiler.ast.api.IThrower;
+import dyvil.tools.compiler.ast.codeblock.CodeBlock;
 
 public class Method extends Member implements IThrower, IParameterized, IImplementable
 {
-	private Implementation implementation;
+	private CodeBlock implementation;
 	
 	private Map<String, Parameter> parameters = new HashMap();
 	private List<ThrowsDecl> throwsDecl = new LinkedList();
 	
 	@Override
-	public void setImplementation(Implementation implementation)
+	public void setImplementation(CodeBlock implementation)
 	{
 		this.implementation = implementation;
 	}
@@ -31,7 +32,7 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 		return this.throwsDecl.add(throwsDecl);
 	}
 	
-	public Implementation getImplementation()
+	public CodeBlock getImplementation()
 	{
 		return this.implementation;
 	}

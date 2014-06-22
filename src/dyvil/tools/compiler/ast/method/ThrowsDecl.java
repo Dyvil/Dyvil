@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.member.methods;
+package dyvil.tools.compiler.ast.method;
 
 import clashsoft.cslib.src.SyntaxException;
 

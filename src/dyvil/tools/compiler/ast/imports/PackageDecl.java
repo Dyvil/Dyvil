@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast;
+package dyvil.tools.compiler.ast.imports;
 
 public class PackageDecl
 {

@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.member;
+package dyvil.tools.compiler.ast.field;
 
 public class Value
 {

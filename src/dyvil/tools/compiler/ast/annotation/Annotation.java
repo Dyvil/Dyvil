@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import clashsoft.cslib.src.SyntaxException;
-import dyvil.tools.compiler.ast.member.Variable;
+import dyvil.tools.compiler.ast.field.Variable;
 
 public class Annotation
 {
