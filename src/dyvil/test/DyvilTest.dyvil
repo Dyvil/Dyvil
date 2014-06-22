@@ -6,10 +6,6 @@ import java.util.Random;
 import java.lang.;
 // Import multiple classes
 import java.awt.{Color, Image};
-// Import a static field
-import java.test.Test.var1;
-// Import a static method
-import java.test.Test.setVar1(int);
 
 // Line comment
 /* Block comment
@@ -28,11 +24,11 @@ public class DyvilTest
     public int<> intarray = {};
     public float<> array = { 1, 2, 3 } + { 4.5, 5, 6.2 }; // Returns {1, 2, 3, 4.5, 5, 6.2}
     
-    public new() =
+    public new()
     {
     }
     
-    public new(int var1, float var2) =
+    public new(int var1, float var2)
     {
         this.var1 = var1;
         this.var2 = var2;
@@ -40,35 +36,35 @@ public class DyvilTest
         intarray<0> = var1;
     }
     
-    public {int, int} getVars() =
+    public {int, int} getVars()
     {
         return {var1, var2}
     }
     
-    public {int, float} getVars2(int i) =
+    public {int, float} getVars2(int i)
     {
         return {var1, var2 + i};
     }
     
-    public float opDouble(float f, func op) =
+    public float opDouble(float f, func op)
     {
         return double.(func)(f);
     }
     
-    public func[float; float, func] getOpDoubleFunc() =
+    public func[float; float, func] getOpDoubleFunc()
     {
         return .opDouble;
     }
     
-    public func[void] getVoidFunc() =
+    public func[void] getVoidFunc()
     {
         return .printName;
     }
     
-    public property name
+    public property String name
     {
-        get:               { return this.name; }
-        set (String name): { this.name = name; }
+        get: { return this.name; }
+        set: { this.name = name; }
     }
     
     public void printName(PrintStream stream)
@@ -79,17 +75,17 @@ public class DyvilTest
 
 public class GenericTest[T; U, V; W]
 {
-    public Type getT() =
+    public Type getT()
     {
         return T;
     }
     
-    public {Type, Type} getUV() =
+    public {Type, Type} getUV()
     {
         return {U, V};
     }
     
-    public Type getW() =
+    public Type getW()
     {
         return W;
     }
@@ -107,5 +103,10 @@ public enum EnumTest
 
 // Interface
 public interface InterfaceTest
+{
+}
+
+// Annotation
+public annotation AnnotationTest
 {
 }
