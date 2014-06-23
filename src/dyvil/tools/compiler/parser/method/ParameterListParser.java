@@ -9,10 +9,14 @@ import dyvil.tools.compiler.ast.method.Parameter;
 import dyvil.tools.compiler.parser.type.TypeParser;
 
 public class ParameterListParser extends Parser
-{	
-	private IParameterized parameterized;
+{
+	public static final int	TYPE		= 0;
+	public static final int	NAME		= 1;
+	public static final int	POST_NAME	= 2;
 	
-	private Parameter parameter;
+	private IParameterized	parameterized;
+	
+	private Parameter		parameter;
 	
 	public ParameterListParser(IParameterized parameterized)
 	{
@@ -30,19 +34,25 @@ public class ParameterListParser extends Parser
 		}
 		else if (",".equals(value) || ";".equals(value) || ":".equals(value))
 		{
-			this.parameter.setSeperator(value.charAt(0));
-			this.parameterized.addParameter(this.parameter);
-			return true;
+			if (this.mode == POST_NAME)
+			{
+				this.parameter.setSeperator(value.charAt(0));
+				this.parameterized.addParameter(this.parameter);
+				this.mode = TYPE;
+				return true;
+			}
 		}
-		else if (this.parameter.getType() == null)
+		else if (this.mode == TYPE)
 		{
-			jcp.pushParser(new TypeParser(this.parameterized));
+			this.parameter = new Parameter();
+			jcp.pushParser(new TypeParser(this.parameter), token);
+			this.mode = NAME;
 			return true;
 		}
-		else if (this.parameter.getName() == null)
+		else if (this.mode == NAME)
 		{
 			this.parameter.setName(value);
-			return true;
+			this.mode = POST_NAME;
 		}
 		return false;
 	}
