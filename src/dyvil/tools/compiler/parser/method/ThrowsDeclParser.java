@@ -21,16 +21,26 @@ public class ThrowsDeclParser extends Parser
 	{
 		if ("{".equals(value) || ";".equals(value))
 		{
-			jcp.popParser(token);
-			return true;
+			if (this.mode == 1)
+			{
+				jcp.popParser(token);
+				return true;				
+			}
+			throw new SyntaxException("Invalid throws delcaration!");
 		}
 		else if (",".equals(token))
 		{
-			return true;
+			if (this.mode == 1)
+			{
+				this.mode = 0;
+				return true;
+			}
+			throw new SyntaxException("Invalid comma");
 		}
 		else if (token.type() == IToken.TYPE_IDENTIFIER)
 		{
 			this.thrower.addThrows(new ThrowsDecl(value));
+			this.mode = 1;
 			return true;
 		}
 		return false;
