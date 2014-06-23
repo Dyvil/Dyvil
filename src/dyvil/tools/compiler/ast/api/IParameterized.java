@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.api;
 
-import java.util.List;
+import java.util.Map;
 
 import dyvil.tools.compiler.ast.method.Parameter;
 
@@ -8,5 +8,5 @@ public interface IParameterized extends ITyped
 {
 	public boolean addParameter(Parameter parameter);
 	
-	public List<Parameter> getParameters();
+	public Map<String, Parameter> getParameters();
 }

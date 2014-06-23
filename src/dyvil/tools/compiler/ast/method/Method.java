@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.method;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import dyvil.tools.compiler.ast.api.IImplementable;
 import dyvil.tools.compiler.ast.api.IParameterized;
@@ -9,10 +12,10 @@ import dyvil.tools.compiler.ast.codeblock.CodeBlock;
 
 public class Method extends Member implements IThrower, IParameterized, IImplementable
 {
-	private CodeBlock implementation;
+	private CodeBlock				implementation;
 	
-	private Map<String, Parameter> parameters = new HashMap();
-	private List<ThrowsDecl> throwsDecl = new LinkedList();
+	private Map<String, Parameter>	parameters			= new HashMap();
+	private List<ThrowsDecl>		throwsDeclarations	= new ArrayList();
 	
 	@Override
 	public void setImplementation(CodeBlock implementation)
@@ -29,7 +32,7 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 	@Override
 	public boolean addThrowsDecl(ThrowsDecl throwsDecl)
 	{
-		return this.throwsDecl.add(throwsDecl);
+		return this.throwsDeclarations.add(throwsDecl);
 	}
 	
 	public CodeBlock getImplementation()
@@ -37,6 +40,7 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 		return this.implementation;
 	}
 	
+	@Override
 	public Map<String, Parameter> getParameters()
 	{
 		return this.parameters;
@@ -44,6 +48,6 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 	
 	public List<ThrowsDecl> getThrowsDecl()
 	{
-		return this.throwsDecl;
+		return this.throwsDeclarations;
 	}
 }

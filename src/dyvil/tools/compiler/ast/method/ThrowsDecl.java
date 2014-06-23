@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.method;
 
-import clashsoft.cslib.src.SyntaxException;
 
 public class ThrowsDecl
 {
@@ -11,12 +10,8 @@ public class ThrowsDecl
 		
 	}
 	
-	public void setException(String exception) throws SyntaxException
+	public void setException(String exception)
 	{
-		if (this.exception != null)
-		{
-			throw new SyntaxException("throwsdecl.exception.set", exception);
-		}
 		this.exception = exception;
 	}
 	

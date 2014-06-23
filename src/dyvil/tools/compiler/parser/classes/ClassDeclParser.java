@@ -49,7 +49,7 @@ public class ClassDeclParser extends Parser
 			return;
 		case "{":
 			this.theClassDecl.setModifiers(this.modifiers);
-			jcp.pushParser(new ClassBodyParser());
+			jcp.pushParser(new ClassBodyParser(this.theClassDecl));
 			return;
 		}
 		
