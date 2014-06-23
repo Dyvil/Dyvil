@@ -4,20 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import clashsoft.cslib.src.SyntaxException;
+import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.type.Type;
 
-public class Annotation
+public class Annotation implements ITyped
 {
-	private String type;
+	private Type type;
 	
 	private Map<String, Variable> parameters = new HashMap();
 	
-	public void setType(String type) throws SyntaxException
+	@Override
+	public void setType(Type type)
 	{
-		if (this.type != null)
-		{
-			throw new SyntaxException("annotation.type.set", type);
-		}
 		this.type = type;
 	}
 	
@@ -27,7 +26,8 @@ public class Annotation
 		this.parameters.put(key, var);
 	}
 	
-	public String getType()
+	@Override
+	public Type getType()
 	{
 		return this.type;
 	}

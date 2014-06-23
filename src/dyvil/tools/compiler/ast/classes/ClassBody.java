@@ -8,8 +8,19 @@ import dyvil.tools.compiler.ast.method.Method;
 
 public class ClassBody
 {
+	private AbstractClass			theClass;
 	private Map<String, Variable>	variables	= new HashMap();
 	private Map<String, Method>		methods		= new HashMap();
+	
+	public ClassBody(AbstractClass theClass)
+	{
+		this.theClass = theClass;
+	}
+	
+	public AbstractClass getTheClass()
+	{
+		return this.theClass;
+	}
 	
 	public void addVariable(Variable var)
 	{

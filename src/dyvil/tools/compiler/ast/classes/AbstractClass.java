@@ -5,8 +5,10 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IAnnotatable;
+import dyvil.tools.compiler.ast.api.IModified;
+import dyvil.tools.compiler.ast.api.INamed;
 
-public abstract class AbstractClass implements IAnnotatable
+public abstract class AbstractClass implements INamed, IModified, IAnnotatable
 {
 	public static final int		CLASS			= 1;
 	public static final int		OBJECT			= 2;
@@ -29,11 +31,13 @@ public abstract class AbstractClass implements IAnnotatable
 		this.type = type;
 	}
 	
+	@Override
 	public void setModifiers(int modifiers)
 	{
 		this.modifiers = modifiers;
 	}
 	
+	@Override
 	public void setName(String name)
 	{
 		this.name = name;
@@ -45,9 +49,9 @@ public abstract class AbstractClass implements IAnnotatable
 	}
 	
 	@Override
-	public boolean addAnnotation(Annotation annotation)
+	public void setAnnotations(List<Annotation> annotations)
 	{
-		return this.annotations.add(annotation);
+		this.annotations = annotations;
 	}
 	
 	public void setBody(ClassBody body)
@@ -60,11 +64,13 @@ public abstract class AbstractClass implements IAnnotatable
 		return this.type;
 	}
 	
+	@Override
 	public int getModifiers()
 	{
 		return this.modifiers;
 	}
 	
+	@Override
 	public String getName()
 	{
 		return this.name;

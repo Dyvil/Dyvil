@@ -6,26 +6,26 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class Variable extends Member implements IField
 {
-	private Value	value;
+	private Object	value;
 	
 	public Variable()
 	{
 	}
 	
-	public Variable(String name, Type type, int modifiers, Value value)
+	public Variable(String name, Type type, int modifiers, Object value)
 	{
 		super(name, type, modifiers);
-		this.setValue(value);
+		this.value = value;
 	}
 	
 	@Override
-	public void setValue(Value value)
+	public void setValue(Object value)
 	{
 		this.value = value;
 	}
 	
 	@Override
-	public Value getValue()
+	public Object getValue()
 	{
 		return this.value;
 	}

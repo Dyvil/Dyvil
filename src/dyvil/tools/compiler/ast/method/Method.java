@@ -18,23 +18,24 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 	private List<ThrowsDecl>		throwsDeclarations	= new ArrayList();
 	
 	@Override
+	public void setParameters(Map<String, Parameter> parameters)
+	{
+		this.parameters = parameters;
+	}
+	
+	@Override
 	public void setImplementation(CodeBlock implementation)
 	{
 		this.implementation = implementation;
 	}
 	
 	@Override
-	public boolean addParameter(Parameter parameter)
+	public void setThrows(List<ThrowsDecl> throwsDecls)
 	{
-		return this.parameters.put(parameter.getName(), parameter) != null;
+		this.throwsDeclarations = throwsDecls;
 	}
 	
 	@Override
-	public boolean addThrowsDecl(ThrowsDecl throwsDecl)
-	{
-		return this.throwsDeclarations.add(throwsDecl);
-	}
-	
 	public CodeBlock getImplementation()
 	{
 		return this.implementation;
@@ -46,7 +47,8 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 		return this.parameters;
 	}
 	
-	public List<ThrowsDecl> getThrowsDecl()
+	@Override
+	public List<ThrowsDecl> getThrows()
 	{
 		return this.throwsDeclarations;
 	}

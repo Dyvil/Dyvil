@@ -6,7 +6,12 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 
 public interface IAnnotatable
 {
-	public boolean addAnnotation(Annotation annotation);
-
+	public void setAnnotations(List<Annotation> annotations);
+	
 	public List<Annotation> getAnnotations();
+	
+	public default boolean addAnnotation(Annotation annotation)
+	{
+		return this.getAnnotations().add(annotation);
+	}
 }

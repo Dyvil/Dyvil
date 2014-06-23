@@ -6,7 +6,12 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public interface ITypeList
 {
-	public void addType(Type type);
+	public void setTypes(List<Type> types);
 	
 	public List<Type> getTypes();
+	
+	public default boolean addType(Type type)
+	{
+		return this.getTypes().add(type);
+	}
 }

@@ -4,10 +4,12 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IAnnotatable;
+import dyvil.tools.compiler.ast.api.IModified;
+import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 
-public abstract class Member implements ITyped, IAnnotatable
+public abstract class Member implements INamed, ITyped, IModified, IAnnotatable
 {
 	private int					modifiers;
 	
@@ -26,6 +28,7 @@ public abstract class Member implements ITyped, IAnnotatable
 		this.modifiers = modifiers;
 	}
 	
+	@Override
 	public void setName(String name)
 	{
 		this.name = name;
@@ -37,11 +40,19 @@ public abstract class Member implements ITyped, IAnnotatable
 		this.type = type;
 	}
 	
+	@Override
 	public void setModifiers(int modifiers)
 	{
 		this.modifiers = modifiers;
 	}
 	
+	@Override
+	public void setAnnotations(List<Annotation> annotations)
+	{
+		this.annotations = annotations;
+	}
+	
+	@Override
 	public String getName()
 	{
 		return this.name;
@@ -53,6 +64,7 @@ public abstract class Member implements ITyped, IAnnotatable
 		return this.type;
 	}
 	
+	@Override
 	public int getModifiers()
 	{
 		return this.modifiers;
@@ -62,11 +74,5 @@ public abstract class Member implements ITyped, IAnnotatable
 	public List<Annotation> getAnnotations()
 	{
 		return this.annotations;
-	}
-	
-	@Override
-	public boolean addAnnotation(Annotation annotation)
-	{
-		return this.annotations.add(annotation);
 	}
 }

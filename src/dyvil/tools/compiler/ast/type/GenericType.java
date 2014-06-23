@@ -15,9 +15,9 @@ public class GenericType extends Type implements ITypeList
 	}
 	
 	@Override
-	public void addType(Type type)
+	public void setTypes(List<Type> types)
 	{
-		this.generics.add(type);
+		this.generics = types;
 	}
 	
 	@Override
