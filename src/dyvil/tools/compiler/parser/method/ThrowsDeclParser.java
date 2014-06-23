@@ -27,7 +27,7 @@ public class ThrowsDeclParser extends Parser
 			{
 				throw new SyntaxException("throwsdecl.invalid.comma");
 			}
-			this.thrower.addThrowsDecl(new ThrowsDecl(this.exception));
+			this.thrower.addThrows(new ThrowsDecl(this.exception));
 			this.exception = null;
 		}
 		else

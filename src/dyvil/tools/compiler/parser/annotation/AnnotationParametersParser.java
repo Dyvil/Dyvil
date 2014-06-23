@@ -8,14 +8,14 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.parser.field.ValueParser;
 
-public class AnnotationParser extends Parser
+public class AnnotationParametersParser extends Parser
 {
 	private Annotation annotation;
 	private Variable parameter;
 	
 	private String name;
 	
-	public AnnotationParser(Annotation annotation)
+	public AnnotationParametersParser(Annotation annotation)
 	{
 		this.annotation = annotation;
 	}
@@ -41,7 +41,7 @@ public class AnnotationParser extends Parser
 			}
 			else
 			{
-				jcp.pushParser(new ValueParser(this.parameter.getValue(), ","));
+				jcp.pushParser(new ValueParser(this.parameter));
 			}
 		}
 	}

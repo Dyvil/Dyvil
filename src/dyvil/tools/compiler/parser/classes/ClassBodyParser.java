@@ -1,130 +1,182 @@
 package dyvil.tools.compiler.parser.classes;
 
-import java.lang.reflect.Constructor;
+import java.util.LinkedList;
 
 import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
+import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IImplementable;
+import dyvil.tools.compiler.ast.api.IThrower;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.method.Method;
-import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.annotation.AnnotationParametersParser;
 import dyvil.tools.compiler.parser.codeblock.CodeBlockParser;
 import dyvil.tools.compiler.parser.field.ValueParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
+import dyvil.tools.compiler.parser.type.TypeParser;
 
 public class ClassBodyParser extends Parser
 {
-	public static int		VARIABLE	= 1;
-	public static int		METHOD		= 2;
-	public static int		CONSTRUCTOR	= 3;
-	public static int		ANNOTATION	= 4;
+	public static int				VARIABLE		= 1;
+	public static int				METHOD			= 2;
+	public static int				POST_METHOD		= 3;
+	public static int				ANNOTATION		= 4;
+	public static int				POST_ANNOTATION	= 5;
 	
-	protected AbstractClass	theClass;
+	protected AbstractClass			theClass;
 	
-	private int				mode;
-	private String			name;
-	private IImplementable	implementable;
+	private int						mode;
+	private LinkedList<Annotation>	annotations		= new LinkedList();
+	private ClassBody				classBody;
+	private Member					member;
 	
 	public ClassBodyParser(AbstractClass theClass)
 	{
 		this.theClass = theClass;
+		
+		this.classBody = new ClassBody(this.theClass);
+		this.theClass.setBody(this.classBody);
 	}
 	
 	@Override
-	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public void parse(ParserManager pm, String value, IToken token) throws SyntaxException
 	{
-		if (";".equals(value))
+		if (this.checkModifier(value))
 		{
-			jcp.popParser();
-		}
-		else if (this.checkModifier(value))
-		{
-			;
 		}
 		else if ("(".equals(value))
 		{
-			if (this.mode == ANNOTATION)
+			if (this.mode == 0)
 			{
-				jcp.pushParser(new AnnotationParser(this.annotation));
+				this.mode = METHOD;
+				
+				Method method = new Method();
+				method.setName(token.prev().value());
+				pm.pushParser(new ParameterListParser(method));
+				
+				this.member = method;
+				this.classBody.addMethod(method);
+			}
+			else if (this.mode == ANNOTATION)
+			{
+				pm.pushParser(new AnnotationParametersParser(this.annotations.getLast()));
 			}
 			else
 			{
-				this.name = token.prev().value();
-				
-				this.type = this.body.getType();
-				this.mode = METHOD;
-				jcp.pushParser(new ParameterListParser(this.impl));
+				throw new SyntaxException("Misplaced opening parenthesis!");
+			}
+		}
+		else if (")".equals(value))
+		{
+			if (this.mode == METHOD)
+			{
+				this.mode = POST_METHOD;
+			}
+			else
+			{
+				throw new SyntaxException("Misplaced closing parenthesis!");
 			}
 		}
 		else if ("{".equals(value))
 		{
-			this.mode = METHOD;
-			jcp.pushParser(new CodeBlockParser(this.method));
-		}
-		else if ("}".equals(value))
-		{
-			jcp.popParser();
-		}
-		else if ("=".equals(value))
-		{
-			this.mode = VARIABLE;
-			
-			jcp.pushParser(new ValueParser(this.variable.getValue(), ";"));
-		}
-		else if (value.startsWith("@"))
-		{
-			this.mode = ANNOTATION;
-			this.type = new AbstractClass();
-			
-		}
-		else if ("throws".equals(value))
-		{
-			if (this.type != null)
+			if (this.mode == POST_METHOD)
 			{
-				this.mode = METHOD;
-				jcp.pushParser(new ThrowsDeclParser(this.method));
+				pm.pushParser(new CodeBlockParser((IImplementable) this.member));
 			}
 			else
 			{
-				this.mode = CONSTRUCTOR;
-				jcp.pushParser(new ThrowsDeclParser(this.constructor));
+				throw new SyntaxException("Misplaced opening curly brackets!");
 			}
 		}
-		else
+		else if ("}".equals(value))
 		{
-			this.name = value;
+			if (this.mode == 0)
+			{
+				pm.popParser();
+			}
+			else if (this.mode == POST_METHOD)
+			{
+				this.mode = 0;
+			}
+			else
+			{
+				throw new SyntaxException("Misplaced closing curly brackets!");
+			}
 		}
-	}
-	
-	public void addMember() throws SyntaxException
-	{
-		if (this.mode == VARIABLE)
+		else if ("=".equals(value))
 		{
-			this.variable.setName(this.name);
-			this.variable.setType(this.type);
-			this.body.addVariable(this.variable);
-			this.variable = new Variable();
+			if (this.mode == 0)
+			{
+				this.mode = VARIABLE;
+				
+				Variable variable = new Variable();
+				variable.setName(token.prev().value());
+				pm.pushParser(new ValueParser(variable));
+				variable.setAnnotations(this.annotations);
+				
+				this.member = variable;
+				this.annotations = new LinkedList();
+				this.classBody.addVariable(variable);
+			}
+			else
+			{
+				throw new SyntaxException("Misplaced equals sign!");
+			}
 		}
-		else if (this.mode == METHOD)
+		else if (";".equals(value))
 		{
-			this.method.setName(this.name);
-			this.method.setType(this.type);
-			this.body.addMethod(this.method);
-			this.method = new Method();
+			if (this.mode == 0)
+			{
+				throw new SyntaxException("Misplaced semicolon!");
+			}
+			else
+			{
+				this.mode = 0;
+			}
 		}
-		else if (this.mode == CONSTRUCTOR)
+		else if ("@".equals(value))
 		{
-			this.body.addConstructor(this.constructor);
-			this.constructor = new Constructor();
+			if (this.mode == 0)
+			{
+				this.mode = ANNOTATION;
+				
+				Annotation annotation = new Annotation();
+				pm.pushParser(new TypeParser(annotation));
+				
+				this.annotations.add(annotation);
+			}
+			else
+			{
+				throw new SyntaxException("Misplated @ sign!");
+			}
 		}
-		else if (this.mode == ANNOTATION)
+		else if ("throws".equals(value))
 		{
-			
+			if (this.mode == POST_METHOD)
+			{
+				pm.pushParser(new ThrowsDeclParser((IThrower) this.member));
+			}
+			else
+			{
+				throw new SyntaxException("Invalid token 'throws'");
+			}
+		}
+		else if ("default".equals(value))
+		{
+			if (this.mode == POST_ANNOTATION)
+			{
+				// TODO
+			}
+			else
+			{
+				throw new SyntaxException("Invalid token 'default'");
+			}
 		}
 	}
 }
