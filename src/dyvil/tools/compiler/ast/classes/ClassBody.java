@@ -12,7 +12,11 @@ public class ClassBody
 	private Map<String, Variable>	variables	= new HashMap();
 	private Map<String, Method>		methods		= new HashMap();
 	
-	public ClassBody(AbstractClass theClass)
+	public ClassBody()
+	{
+	}
+	
+	public void setTheClass(AbstractClass theClass)
 	{
 		this.theClass = theClass;
 	}

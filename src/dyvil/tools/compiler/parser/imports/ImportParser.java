@@ -25,11 +25,12 @@ public class ImportParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
 	{
 		if (";".equals(value))
 		{
 			jcp.popParser();
+			return true;
 		}
 		else if ("{".equals(value))
 		{
@@ -40,6 +41,17 @@ public class ImportParser extends Parser
 			
 			this.mode = 1;
 			this.theImport = new MultiImport();
+			return true;
+		}
+		else if ("}".equals(value))
+		{
+			this.mode = 2;
+			return true;
+		}
+		else if (".".equals(value) && token.next().equals(";"))
+		{
+			this.theImport = new PackageImport();
+			return true;
 		}
 		else if (this.mode == 1)
 		{
@@ -48,20 +60,15 @@ public class ImportParser extends Parser
 				if (token.type() != Token.TYPE_IDENTIFIER)
 					throw new SyntaxException("Invalid Import");
 				((MultiImport) this.theImport).addClass(value);
+				return true;
 			}
-		}
-		else if ("}".equals(value))
-		{
-			this.mode = 2;
-		}
-		else if (".".equals(value) && token.next().equals(";"))
-		{
-			this.theImport = new PackageImport();
 		}
 		else
 		{
 			this.buffer.append(value);
+			return true;
 		}
+		return false;
 	}
 	
 	@Override

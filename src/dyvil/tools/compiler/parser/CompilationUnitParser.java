@@ -34,28 +34,24 @@ public class CompilationUnitParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
 	{
-		int mod;
-		
+		// TODO Modifiers
 		if ("package".equals(value))
 		{
 			jcp.pushParser(new PackageParser(this.unit));
-			return;
+			return true;
 		}
 		else if ("import".equals(value))
 		{
 			jcp.pushParser(new ImportParser(this.unit));
-			return;
+			return true;
 		}
 		else if (CSSource.isClass(value))
 		{
 			jcp.pushParser(new ClassDeclParser(this.unit));
-			return;
+			return true;
 		}
-		else
-		{
-			this.checkModifier(value);
-		}
+		return false;
 	}
 }

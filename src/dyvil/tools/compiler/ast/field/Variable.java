@@ -12,10 +12,19 @@ public class Variable extends Member implements IField
 	{
 	}
 	
-	public Variable(String name, Type type, int modifiers, Object value)
+	public Variable(String name)
+	{
+		super(name);
+	}
+	
+	public Variable(String name, Type type)
+	{
+		super(name, type);
+	}
+	
+	public Variable(String name, Type type, int modifiers)
 	{
 		super(name, type, modifiers);
-		this.value = value;
 	}
 	
 	@Override

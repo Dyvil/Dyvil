@@ -4,6 +4,6 @@ public class Enum extends AbstractClass
 {
 	public Enum()
 	{
-		super(INTERFACE);
+		super(ENUM, new ClassBody());
 	}
 }

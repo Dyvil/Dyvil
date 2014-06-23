@@ -20,28 +20,30 @@ public class ParameterListParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
 	{
 		if (")".equals(value))
 		{
-			this.parameterized.addParameter(this.parameter);
 			jcp.popParser();
-		}
-		else if (this.checkModifier(value))
-		{
-		}
-		else if (this.parameter.getType() == null)
-		{
-			jcp.pushParser(new TypeParser(this.parameterized));
-		}
-		else if (this.parameter.getName() == null)
-		{
-			this.parameter.setName(value);
+			this.parameterized.addParameter(this.parameter);
+			return true;
 		}
 		else if (",".equals(value) || ";".equals(value) || ":".equals(value))
 		{
 			this.parameter.setSeperator(value.charAt(0));
 			this.parameterized.addParameter(this.parameter);
+			return true;
 		}
+		else if (this.parameter.getType() == null)
+		{
+			jcp.pushParser(new TypeParser(this.parameterized));
+			return true;
+		}
+		else if (this.parameter.getName() == null)
+		{
+			this.parameter.setName(value);
+			return true;
+		}
+		return false;
 	}
 }

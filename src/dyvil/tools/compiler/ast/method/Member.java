@@ -21,10 +21,20 @@ public abstract class Member implements INamed, ITyped, IModified, IAnnotatable
 	{
 	}
 	
-	public Member(String name, Type type, int modifiers)
+	public Member(String name)
+	{
+		this.name = name;
+	}
+	
+	public Member(String name, Type type)
 	{
 		this.name = name;
 		this.type = type;
+	}
+	
+	public Member(String name, Type type, int modifiers)
+	{
+		this(name, type);
 		this.modifiers = modifiers;
 	}
 	

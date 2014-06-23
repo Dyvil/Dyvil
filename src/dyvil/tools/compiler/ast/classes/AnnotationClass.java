@@ -4,6 +4,6 @@ public class AnnotationClass extends AbstractClass
 {
 	public AnnotationClass()
 	{
-		super(ANNOTATION);
+		super(ANNOTATION, new ClassBody());
 	}
 }

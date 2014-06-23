@@ -10,10 +10,9 @@ import dyvil.tools.compiler.parser.field.ValueParser;
 
 public class AnnotationParametersParser extends Parser
 {
-	private Annotation annotation;
-	private Variable parameter;
+	protected Annotation annotation;
 	
-	private String name;
+	private Variable parameter;
 	
 	public AnnotationParametersParser(Annotation annotation)
 	{
@@ -21,28 +20,24 @@ public class AnnotationParametersParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxException
 	{
 		if (",".equals(value))
 		{
-			this.parameter.setName(this.name);
 			this.annotation.addParameter(this.parameter);
-			this.parameter = new Variable();
+			return true;
 		}
 		else if (")".equals(value))
 		{
-			jcp.popParser();
+			pm.popParser(token);
+			return true;
 		}
-		else if (!"=".equals(value))
+		else if ("=".equals(value))
 		{
-			if (this.name == null)
-			{
-				this.name = value;
-			}
-			else
-			{
-				jcp.pushParser(new ValueParser(this.parameter));
-			}
+			this.parameter = new Variable(token.prev().value());
+			pm.pushParser(new ValueParser(this.parameter));
+			return true;
 		}
+		return false;
 	}
 }

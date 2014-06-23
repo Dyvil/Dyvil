@@ -11,28 +11,28 @@ public class ThrowsDeclParser extends Parser
 {	
 	private IThrower thrower;
 	
-	private String exception;
-	
 	public ThrowsDeclParser(IThrower thrower)
 	{
 		this.thrower = thrower;
 	}
 	
 	@Override
-	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
 	{
-		if (",".equals(value))
+		if ("{".equals(value) || ";".equals(value))
 		{
-			if (this.exception == null)
-			{
-				throw new SyntaxException("throwsdecl.invalid.comma");
-			}
-			this.thrower.addThrows(new ThrowsDecl(this.exception));
-			this.exception = null;
+			jcp.popParser(token);
+			return true;
 		}
-		else
+		else if (",".equals(token))
 		{
-			this.exception = value;
+			return true;
 		}
+		else if (token.type() == IToken.TYPE_IDENTIFIER)
+		{
+			this.thrower.addThrows(new ThrowsDecl(value));
+			return true;
+		}
+		return false;
 	}
 }

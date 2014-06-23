@@ -16,19 +16,19 @@ public abstract class AbstractClass implements INamed, IModified, IAnnotatable
 	public static final int		ENUM			= 4;
 	public static final int		ANNOTATION		= 5;
 	
+	private String				name;
 	private int					type;
 	private int					modifiers;
-	
-	private String				name;
+	private ClassBody			body;
 	
 	private List<String>		superClasses	= new ArrayList();
 	private List<Annotation>	annotations		= new ArrayList();
 	
-	private ClassBody			body;
-	
-	protected AbstractClass(int type)
+	protected AbstractClass(int type, ClassBody body)
 	{
 		this.type = type;
+		this.body = body;
+		this.body.setTheClass(this);
 	}
 	
 	@Override
@@ -52,11 +52,6 @@ public abstract class AbstractClass implements INamed, IModified, IAnnotatable
 	public void setAnnotations(List<Annotation> annotations)
 	{
 		this.annotations = annotations;
-	}
-	
-	public void setBody(ClassBody body)
-	{
-		this.body = body;
 	}
 	
 	public int getType()

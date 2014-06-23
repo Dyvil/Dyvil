@@ -19,7 +19,7 @@ public class PackageParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
 	{
 		if (";".equals(value))
 		{
@@ -29,6 +29,7 @@ public class PackageParser extends Parser
 		{
 			this.buffer.append(value);
 		}
+		return true;
 	}
 	
 	@Override

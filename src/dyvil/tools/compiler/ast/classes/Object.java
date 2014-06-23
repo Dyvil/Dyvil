@@ -4,6 +4,6 @@ public class Object extends AbstractClass
 {
 	public Object()
 	{
-		super(OBJECT);
+		super(OBJECT, new ClassBody());
 	}
 }

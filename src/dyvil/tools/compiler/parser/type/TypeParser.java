@@ -28,25 +28,25 @@ public class TypeParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager pm, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxException
 	{
 		if (this.mode == NAME)
 		{
 			if (token.next().equals("["))
 			{
 				this.type = new GenericType(value);
-				this.mode = 1;
+				this.mode = GENERICS;
 			}
 			else
 			{
 				this.type = new Type(value);
-				this.mode = 2;
+				this.mode = ARRAY;
+				if (!token.next().equals("<"))
+				{
+					pm.popParser();
+				}
 			}
-			
-			if (!token.next().equals("<"))
-			{
-				pm.popParser();
-			}
+			return true;
 		}
 		else if ("[".equals(value))
 		{
@@ -63,6 +63,7 @@ public class TypeParser extends Parser
 				throw new SyntaxException("Misplaced Construct!");
 			}
 			pm.pushParser(new TypeListParser((GenericType) this.type));
+			return true;
 		}
 		else if ("]".equals(value))
 		{
@@ -83,6 +84,7 @@ public class TypeParser extends Parser
 			{
 				pm.popParser();
 			}
+			return true;
 		}
 		else if ("<".equals(value))
 		{
@@ -94,6 +96,7 @@ public class TypeParser extends Parser
 			this.mode = ARRAY2;
 			this.arrayDimensions++;
 			this.arrayDimensions2++;
+			return true;
 		}
 		else if (">".equals(value))
 		{
@@ -102,12 +105,18 @@ public class TypeParser extends Parser
 				throw new SyntaxException("Misplaced Construct!");
 			}
 			
+			this.mode = ARRAY;
 			this.arrayDimensions2--;
-			if (this.arrayDimensions2 == 0)
+			if (!token.next().equals("<"))
 			{
-				pm.popParser();
+				if (this.arrayDimensions2 == 0)
+				{
+					pm.popParser();
+				}
 			}
+			return true;
 		}
+		return false;
 	}
 	
 	@Override

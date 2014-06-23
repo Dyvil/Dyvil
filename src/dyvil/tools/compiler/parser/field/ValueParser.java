@@ -23,25 +23,29 @@ public class ValueParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
 	{
 		if (this.parsePrimitive(value, token))
 		{
 			jcp.popParser();
+			return true;
 		}
 		else if ("new".equals(value))
 		{
 			this.mode = TYPE;
+			return true;
 		}
 		else if (this.mode == TYPE)
 		{
-			jcp.pushParser(new TypeParser(this.field));
 			this.mode = PARAMETERS;
+			jcp.pushParser(new TypeParser(this.field));
+			return true;
 		}
 		else if (this.mode == PARAMETERS)
 		{
 			
 		}
+		return false;
 	}
 	
 	public boolean parsePrimitive(String value, IToken token) throws SyntaxException

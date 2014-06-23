@@ -39,18 +39,14 @@ public class ClassBodyParser extends Parser
 	public ClassBodyParser(AbstractClass theClass)
 	{
 		this.theClass = theClass;
-		
-		this.classBody = new ClassBody(this.theClass);
-		this.theClass.setBody(this.classBody);
+		this.classBody = theClass.getBody();
 	}
 	
 	@Override
-	public void parse(ParserManager pm, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxException
 	{
-		if (this.checkModifier(value))
-		{
-		}
-		else if ("(".equals(value))
+		// TODO Modifiers
+		if ("(".equals(value))
 		{
 			if (this.mode == 0)
 			{
@@ -71,6 +67,7 @@ public class ClassBodyParser extends Parser
 			{
 				throw new SyntaxException("Misplaced opening parenthesis!");
 			}
+			return true;
 		}
 		else if (")".equals(value))
 		{
@@ -82,6 +79,7 @@ public class ClassBodyParser extends Parser
 			{
 				throw new SyntaxException("Misplaced closing parenthesis!");
 			}
+			return true;
 		}
 		else if ("{".equals(value))
 		{
@@ -93,6 +91,7 @@ public class ClassBodyParser extends Parser
 			{
 				throw new SyntaxException("Misplaced opening curly brackets!");
 			}
+			return true;
 		}
 		else if ("}".equals(value))
 		{
@@ -108,6 +107,7 @@ public class ClassBodyParser extends Parser
 			{
 				throw new SyntaxException("Misplaced closing curly brackets!");
 			}
+			return true;
 		}
 		else if ("=".equals(value))
 		{
@@ -128,6 +128,7 @@ public class ClassBodyParser extends Parser
 			{
 				throw new SyntaxException("Misplaced equals sign!");
 			}
+			return true;
 		}
 		else if (";".equals(value))
 		{
@@ -139,6 +140,7 @@ public class ClassBodyParser extends Parser
 			{
 				this.mode = 0;
 			}
+			return true;
 		}
 		else if ("@".equals(value))
 		{
@@ -155,28 +157,24 @@ public class ClassBodyParser extends Parser
 			{
 				throw new SyntaxException("Misplated @ sign!");
 			}
+			return true;
 		}
 		else if ("throws".equals(value))
 		{
 			if (this.mode == POST_METHOD)
 			{
 				pm.pushParser(new ThrowsDeclParser((IThrower) this.member));
-			}
-			else
-			{
-				throw new SyntaxException("Invalid token 'throws'");
+				return true;
 			}
 		}
 		else if ("default".equals(value))
 		{
 			if (this.mode == POST_ANNOTATION)
 			{
-				// TODO
-			}
-			else
-			{
-				throw new SyntaxException("Invalid token 'default'");
+				// TODO Annotation Defaults
+				return true;
 			}
 		}
+		return false;
 	}
 }

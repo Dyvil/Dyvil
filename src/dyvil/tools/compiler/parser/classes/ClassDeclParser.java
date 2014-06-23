@@ -24,41 +24,53 @@ public class ClassDeclParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
 	{
-		switch (value)
+		if ("class".equals(value))
 		{
-		case "class":
 			this.mode = NAME;
 			this.theClassDecl = new dyvil.tools.compiler.ast.classes.Class();
-			return;
-		case "interface":
+			return true;
+		}
+		else if ("interface".equals(value))
+		{
 			this.mode = NAME;
 			this.theClassDecl = new Interface();
-			return;
-		case "enum":
+			return true;
+		}
+		else if ("enum".equals(value))
+		{
 			this.mode = NAME;
 			this.theClassDecl = new dyvil.tools.compiler.ast.classes.Enum();
-			return;
-		case "annotation":
+			return true;
+		}
+		else if ("annotation".equals(value))
+		{
 			this.mode = NAME;
 			this.theClassDecl = new AnnotationClass();
-			return;
-		case "extends":
-			this.mode = SUPERCLASSES;
-			return;
-		case "{":
-			this.theClassDecl.setModifiers(this.modifiers);
-			jcp.pushParser(new ClassBodyParser(this.theClassDecl));
-			return;
+			return true;
 		}
-		
-		switch (this.mode)
+		else if ("extends".equals(value))
 		{
-		case NAME:
-			this.theClassDecl.setName(value);
-		case SUPERCLASSES:
-			this.theClassDecl.addSuperClass(value);
+			this.mode = SUPERCLASSES;
+			return true;
 		}
+		else if ("{".equals(value))
+		{
+			// TODO Modifiers
+			jcp.pushParser(new ClassBodyParser(this.theClassDecl));
+			return true;
+		}
+		else if (this.mode == NAME)
+		{
+			this.theClassDecl.setName(value);
+			return true;
+		}
+		else if (this.mode == SUPERCLASSES)
+		{			
+			this.theClassDecl.addSuperClass(value);
+			return true;
+		}
+		return false;
 	}
 }

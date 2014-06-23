@@ -19,21 +19,24 @@ public class TypeListParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public void parse(ParserManager pm, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxException
 	{
 		if (")".equals(value))
 		{
-			this.typeList.addType(this.type);
 			pm.popParser();
+			this.typeList.addType(this.type);
+			return true;
 		}
 		else if (",".equals(value) || ";".equals(value) || ":".equals(value))
 		{
 			this.type.setSeperator(value.charAt(0));
 			this.typeList.addType(this.type);
+			return true;
 		}
 		else
 		{
 			pm.pushParser(new TypeParser(this));
+			return true;
 		}
 	}
 
