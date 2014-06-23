@@ -4,7 +4,9 @@ import clashsoft.cslib.src.SyntaxException;
 import clashsoft.cslib.src.parser.IToken;
 import clashsoft.cslib.src.parser.Parser;
 import clashsoft.cslib.src.parser.ParserManager;
-import dyvil.tools.compiler.ast.field.Value;
+import clashsoft.cslib.src.parser.Token;
+import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.parser.type.TypeParser;
 
 public class ValueParser extends Parser
 {
@@ -13,25 +15,19 @@ public class ValueParser extends Parser
 	
 	private int				mode;
 	
-	private Value			value;
-	private String			endOn;
+	private IField			field;
 	
-	public ValueParser(Value value, String endOn)
+	public ValueParser(IField field)
 	{
-		this.value = value;
-		this.endOn = endOn;
+		this.field = field;
 	}
 	
 	@Override
 	public void parse(ParserManager jcp, String value, IToken token) throws SyntaxException
 	{
-		if (this.endOn.equals(value))
+		if (this.parsePrimitive(value, token))
 		{
 			jcp.popParser();
-		}
-		else if (parsePrimitive(value))
-		{
-			return;
 		}
 		else if ("new".equals(value))
 		{
@@ -39,69 +35,72 @@ public class ValueParser extends Parser
 		}
 		else if (this.mode == TYPE)
 		{
-			// jcp.pushParser(new TypeParser(this.value));
+			jcp.pushParser(new TypeParser(this.field));
+			this.mode = PARAMETERS;
+		}
+		else if (this.mode == PARAMETERS)
+		{
+			
 		}
 	}
 	
-	public boolean parsePrimitive(String token)
+	public boolean parsePrimitive(String value, IToken token) throws SyntaxException
 	{
-		// Boolean
-		if ("true".equals(token))
+		if ("null".equals(value))
 		{
-			this.value.setBoolean(true);
+			this.field.setValue(null);
+		}
+		// Boolean
+		else if ("true".equals(value))
+		{
+			this.field.setValue(Boolean.TRUE);
 			return true;
 		}
-		else if ("false".equals(token))
+		else if ("false".equals(value))
 		{
-			this.value.setBoolean(false);
+			this.field.setValue(Boolean.FALSE);
 			return true;
 		}
 		// String
-		else if (token.startsWith("\"") && token.endsWith("\""))
+		else if (token.type() == Token.TYPE_STRING)
 		{
-			String string = token.substring(1, token.length() - 1);
-			this.value.setObject(string);
+			String string = value.substring(1, value.length() - 1);
+			this.field.setValue(string);
 			return true;
 		}
 		// Char
-		else if (token.startsWith("'") && token.endsWith("'"))
+		else if (token.type() == Token.TYPE_CHAR)
 		{
-			char c = token.charAt(1);
-			this.value.setChar(c);
+			char c = value.charAt(1);
+			this.field.setValue(Character.valueOf(c));
 			return true;
 		}
-		// Float
-		else if (token.endsWith("F"))
+		else if (token.type() == Token.TYPE_INT)
 		{
-			String s = token.replace("_|F", "");
-			this.value.setFloat(Float.parseFloat(s));
-		}
-		// Double
-		else if (token.endsWith("D"))
-		{
-			String s = token.replace("_|D", "");
-			this.value.setDouble(Double.parseDouble(s));
-		}
-		// Long
-		else if (token.endsWith("L"))
-		{
-			if (token.startsWith("0x"))
+			if (token.next().equals("L"))
 			{
-				String s = token.replace("0x|_|L", "");
-				this.value.setLong(Long.parseLong(s, 16));
-			}
-			else if (token.startsWith("0b"))
-			{
-				String s = token.replace("0b|_|L", "");
-				this.value.setLong(Long.parseLong(s, 2));
+				this.field.setValue(Long.valueOf(value));
 			}
 			else
 			{
-				String s = token.replace("_|L", "");
-				this.value.setLong(Long.parseLong(s));
+				this.field.setValue(Integer.valueOf(value));
 			}
 		}
-		// Integer
+		// Float
+		else if (token.type() == Token.TYPE_FLOAT)
+		{
+			if (token.next().equals("D"))
+			{
+				this.field.setValue(Double.valueOf(value));
+			}
+			else
+			{
+				this.field.setValue(Float.valueOf(value));
+			}
+		}
+		else if (token.type() == Token.TYPE_FLOAT_HEX)
+		{
+		}
 		return false;
 	}
 }
