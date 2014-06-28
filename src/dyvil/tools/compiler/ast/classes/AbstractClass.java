@@ -7,15 +7,10 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IAnnotatable;
 import dyvil.tools.compiler.ast.api.IModified;
 import dyvil.tools.compiler.ast.api.INamed;
+import dyvil.tools.compiler.util.Classes;
 
 public abstract class AbstractClass implements INamed, IModified, IAnnotatable
 {
-	public static final int		CLASS			= 1;
-	public static final int		OBJECT			= 2;
-	public static final int		INTERFACE		= 3;
-	public static final int		ENUM			= 4;
-	public static final int		ANNOTATION		= 5;
-	
 	private String				name;
 	private int					type;
 	private int					modifiers;
@@ -29,6 +24,31 @@ public abstract class AbstractClass implements INamed, IModified, IAnnotatable
 		this.type = type;
 		this.body = body;
 		this.body.setTheClass(this);
+	}
+	
+	public static AbstractClass create(int type)
+	{
+		if (type == Classes.CLASS)
+		{
+			return new DefaultClass();
+		}
+		else if (type == Classes.OBJECT)
+		{
+			return new ObjectClass();
+		}
+		else if (type == Classes.INTERFACE)
+		{
+			return new InterfaceClass();
+		}
+		else if (type == Classes.ENUM)
+		{
+			return new EnumClass();
+		}
+		else if (type == Classes.ANNOTATION)
+		{
+			return new AnnotationClass();
+		}
+		return null;
 	}
 	
 	@Override

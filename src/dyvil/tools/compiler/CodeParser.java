@@ -1,9 +1,9 @@
 package dyvil.tools.compiler;
 
-import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.parser.CompilationUnitParser;
+import dyvil.tools.compiler.parser.ParserManager;
 
 public class CodeParser extends ParserManager
 {

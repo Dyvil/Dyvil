@@ -1,13 +1,11 @@
 package dyvil.tools.compiler.parser.classes;
 
-import clashsoft.cslib.src.SyntaxException;
-import clashsoft.cslib.src.parser.IToken;
-import clashsoft.cslib.src.parser.Parser;
-import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
-import dyvil.tools.compiler.ast.classes.AnnotationClass;
-import dyvil.tools.compiler.ast.classes.Interface;
+import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserManager;
 
 public class ClassDeclParser extends Parser
 {
@@ -18,39 +16,16 @@ public class ClassDeclParser extends Parser
 	private int					mode;
 	private AbstractClass		theClassDecl;
 	
-	public ClassDeclParser(CompilationUnit unit)
+	public ClassDeclParser(CompilationUnit unit, AbstractClass decl)
 	{
 		this.unit = unit;
+		this.theClassDecl = decl;
 	}
 	
 	@Override
 	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
 	{
-		if ("class".equals(value))
-		{
-			this.mode = NAME;
-			this.theClassDecl = new dyvil.tools.compiler.ast.classes.Class();
-			return true;
-		}
-		else if ("interface".equals(value))
-		{
-			this.mode = NAME;
-			this.theClassDecl = new Interface();
-			return true;
-		}
-		else if ("enum".equals(value))
-		{
-			this.mode = NAME;
-			this.theClassDecl = new dyvil.tools.compiler.ast.classes.Enum();
-			return true;
-		}
-		else if ("annotation".equals(value))
-		{
-			this.mode = NAME;
-			this.theClassDecl = new AnnotationClass();
-			return true;
-		}
-		else if ("extends".equals(value))
+		if ("extends".equals(value))
 		{
 			this.mode = SUPERCLASSES;
 			return true;

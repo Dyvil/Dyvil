@@ -1,14 +1,13 @@
 package dyvil.tools.compiler.parser;
 
-import clashsoft.cslib.src.CSSource;
-import clashsoft.cslib.src.SyntaxException;
-import clashsoft.cslib.src.parser.IToken;
-import clashsoft.cslib.src.parser.Parser;
-import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.CompilationUnit;
+import dyvil.tools.compiler.ast.classes.AbstractClass;
+import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.classes.ClassDeclParser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
+import dyvil.tools.compiler.util.Classes;
 
 public class CompilationUnitParser extends Parser
 {
@@ -37,6 +36,7 @@ public class CompilationUnitParser extends Parser
 	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
 	{
 		// TODO Modifiers
+		int i = 0;
 		if ("package".equals(value))
 		{
 			jcp.pushParser(new PackageParser(this.unit));
@@ -47,9 +47,11 @@ public class CompilationUnitParser extends Parser
 			jcp.pushParser(new ImportParser(this.unit));
 			return true;
 		}
-		else if (CSSource.isClass(value))
+		else if ((i = Classes.parse(value)) != -1)
 		{
-			jcp.pushParser(new ClassDeclParser(this.unit));
+			AbstractClass c = AbstractClass.create(i);
+			this.unit.addClass(c);
+			jcp.pushParser(new ClassDeclParser(this.unit, c));
 			return true;
 		}
 		return false;

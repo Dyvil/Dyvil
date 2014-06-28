@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.parser.field;
 
-import clashsoft.cslib.src.SyntaxException;
-import clashsoft.cslib.src.parser.IToken;
-import clashsoft.cslib.src.parser.Parser;
-import clashsoft.cslib.src.parser.ParserManager;
-import clashsoft.cslib.src.parser.Token;
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.lexer.token.Token;
+import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.type.TypeParser;
 
 public class ValueParser extends Parser

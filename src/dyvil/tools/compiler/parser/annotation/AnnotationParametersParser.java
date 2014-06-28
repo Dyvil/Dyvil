@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.parser.annotation;
 
-import clashsoft.cslib.src.SyntaxException;
-import clashsoft.cslib.src.parser.IToken;
-import clashsoft.cslib.src.parser.Parser;
-import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.field.ValueParser;
 
 public class AnnotationParametersParser extends Parser

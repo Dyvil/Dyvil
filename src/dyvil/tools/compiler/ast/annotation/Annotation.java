@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.annotation;
 import java.util.HashMap;
 import java.util.Map;
 
-import clashsoft.cslib.src.SyntaxException;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.type.Type;
@@ -20,10 +19,9 @@ public class Annotation implements ITyped
 		this.type = type;
 	}
 	
-	public void addParameter(Variable var) throws SyntaxException
+	public void addParameter(Variable var)
 	{
-		String key = var.getName();
-		this.parameters.put(key, var);
+		this.parameters.put(var.getName(), var);
 	}
 	
 	@Override

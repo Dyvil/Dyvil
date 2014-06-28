@@ -2,10 +2,6 @@ package dyvil.tools.compiler.parser.classes;
 
 import java.util.LinkedList;
 
-import clashsoft.cslib.src.SyntaxException;
-import clashsoft.cslib.src.parser.IToken;
-import clashsoft.cslib.src.parser.Parser;
-import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IImplementable;
 import dyvil.tools.compiler.ast.api.IThrower;
@@ -14,6 +10,10 @@ import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.annotation.AnnotationParametersParser;
 import dyvil.tools.compiler.parser.codeblock.CodeBlockParser;
 import dyvil.tools.compiler.parser.field.ValueParser;

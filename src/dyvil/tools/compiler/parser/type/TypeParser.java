@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.parser.type;
 
-import clashsoft.cslib.src.SyntaxException;
-import clashsoft.cslib.src.parser.IToken;
-import clashsoft.cslib.src.parser.Parser;
-import clashsoft.cslib.src.parser.ParserManager;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserManager;
 
 public class TypeParser extends Parser
 {
