@@ -3,6 +3,7 @@ package dyvil.tools.compiler;
 import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.parser.CompilationUnitParser;
+import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
 public class CodeParser extends ParserManager
@@ -13,14 +14,18 @@ public class CodeParser extends ParserManager
 	
 	private CodeParser()
 	{
+		super();
+	}
+	
+	private CodeParser(Parser parser)
+	{
+		super(parser);
 	}
 	
 	public static CompilationUnit compilationUnit(String code)
 	{
 		unit = new CompilationUnit();
-		CodeParser jcp = new CodeParser();
-		jcp.currentParser = new CompilationUnitParser(unit);
-		jcp.parse(code);
+		new CodeParser(new CompilationUnitParser(unit)).parse(code);
 		CompilationUnit cu = unit;
 		unit = null;
 		return cu;
