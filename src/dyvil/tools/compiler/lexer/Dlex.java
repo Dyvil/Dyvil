@@ -7,13 +7,13 @@ import dyvil.tools.compiler.lexer.token.Token;
 
 import static dyvil.tools.compiler.lexer.token.IToken.*;
 
-public class Lexer implements Iterable<IToken>, Iterator<IToken>
+public class Dlex implements Iterable<IToken>, Iterator<IToken>
 {
 	protected final String	code;
 	protected IToken		first;
 	protected IToken		current;
 	
-	public Lexer(String code)
+	public Dlex(String code)
 	{
 		this.code = code;
 	}

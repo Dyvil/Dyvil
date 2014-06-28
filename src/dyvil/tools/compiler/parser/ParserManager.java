@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser;
 
 import java.io.PrintStream;
 
-import dyvil.tools.compiler.lexer.Lexer;
+import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.SyntaxException;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
@@ -65,7 +65,7 @@ public class ParserManager
 	 */
 	public void parse(String code)
 	{
-		Lexer lexer = new Lexer(code);
+		Dlex lexer = new Dlex(code);
 		lexer.tokenize();
 		this.parse(code, lexer.next());
 	}
