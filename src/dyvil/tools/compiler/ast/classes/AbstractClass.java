@@ -48,6 +48,10 @@ public abstract class AbstractClass implements INamed, IModified, IAnnotatable
 		{
 			return new AnnotationClass();
 		}
+		else if (type == Classes.MODULE)
+		{
+			return new ModuleClass();
+		}
 		return null;
 	}
 	
