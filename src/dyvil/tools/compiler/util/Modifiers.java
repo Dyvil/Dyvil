@@ -11,10 +11,18 @@ public class Modifiers
 		
 		if ((mod & PUBLIC) != 0)
 			sb.append("public ");
-		if ((mod & PROTECTED) != 0)
-			sb.append("protected ");
-		if ((mod & PRIVATE) != 0)
-			sb.append("private ");
+		
+		if ((mod & DERIVED) != 0)
+		{
+			sb.append("derived ");
+		}
+		else
+		{
+			if ((mod & PROTECTED) != 0)
+				sb.append("protected ");
+			if ((mod & PRIVATE) != 0)
+				sb.append("private ");
+		}
 		
 		/* Canonical order */
 		if ((mod & ABSTRACT) != 0)
@@ -50,13 +58,18 @@ public class Modifiers
 		return "";
 	}
 	
+	public static final int	PACKAGE				= 0x00000000;
 	public static final int	PUBLIC				= 0x00000001;
 	public static final int	PRIVATE				= 0x00000002;
 	public static final int	PROTECTED			= 0x00000004;
+	// Dyvil derived
+	public static final int	DERIVED				= PRIVATE | PROTECTED;
+	
 	public static final int	STATIC				= 0x00000008;
 	public static final int	FINAL				= 0x00000010;
 	// Dyvil const
 	public static final int	CONST				= STATIC | FINAL;
+	
 	public static final int	SYNCHRONIZED		= 0x00000020;
 	public static final int	VOLATILE			= 0x00000040;
 	public static final int	TRANSIENT			= 0x00000080;
@@ -86,12 +99,16 @@ public class Modifiers
 	{
 		switch (mod)
 		{
+		case "package":
+			return PACKAGE;
 		case "public":
 			return PUBLIC;
 		case "private":
 			return PRIVATE;
 		case "protected":
 			return PROTECTED;
+		case "derived":
+			return DERIVED;
 		case "static":
 			return STATIC;
 		case "final":
@@ -116,26 +133,27 @@ public class Modifiers
 	{
 		switch (mod)
 		{
+		case "package":
+			return PACKAGE;
 		case "public":
 			return PUBLIC;
 		case "private":
 			return PRIVATE;
 		case "protected":
 			return PROTECTED;
+		case "derived":
+			return DERIVED;
 		}
 		return 0;
 	}
 	
 	public static int parseClassModifier(String mod)
 	{
+		int i = parseAccessModifier(mod);
+		if (i != 0)
+			return i;
 		switch (mod)
 		{
-		case "public":
-			return PUBLIC;
-		case "private":
-			return PRIVATE;
-		case "protected":
-			return PROTECTED;
 		case "static":
 			return STATIC;
 		case "final":
@@ -148,14 +166,11 @@ public class Modifiers
 	
 	public static int parseInterfaceModifier(String mod)
 	{
+		int i = parseAccessModifier(mod);
+		if (i != 0)
+			return i;
 		switch (mod)
 		{
-		case "public":
-			return PUBLIC;
-		case "private":
-			return PRIVATE;
-		case "protected":
-			return PROTECTED;
 		case "static":
 			return STATIC;
 		case "strictfp":
@@ -166,14 +181,11 @@ public class Modifiers
 	
 	public static int parseFieldModifier(String mod)
 	{
+		int i = parseAccessModifier(mod);
+		if (i != 0)
+			return i;
 		switch (mod)
 		{
-		case "public":
-			return PUBLIC;
-		case "private":
-			return PRIVATE;
-		case "protected":
-			return PROTECTED;
 		case "static":
 			return STATIC;
 		case "final":
@@ -190,14 +202,11 @@ public class Modifiers
 	
 	public static int parseMethodModifier(String mod)
 	{
+		int i = parseAccessModifier(mod);
+		if (i != 0)
+			return i;
 		switch (mod)
 		{
-		case "public":
-			return PUBLIC;
-		case "private":
-			return PRIVATE;
-		case "protected":
-			return PROTECTED;
 		case "static":
 			return STATIC;
 		case "final":
