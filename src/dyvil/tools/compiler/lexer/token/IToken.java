@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.lexer.token;
 
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 
 public interface IToken
 {
@@ -21,23 +21,23 @@ public interface IToken
 	public byte	TYPE_LINE_COMMENT	= 11;
 	public byte	TYPE_BLOCK_COMMENT	= 12;
 	
-	public String value() throws SyntaxException;
+	public String value() throws SyntaxError;
 	
-	public byte type() throws SyntaxException;
+	public byte type() throws SyntaxError;
 	
-	public boolean equals(String value) throws SyntaxException;
+	public boolean equals(String value) throws SyntaxError;
 	
-	public boolean isType(byte type) throws SyntaxException;
+	public boolean isType(byte type) throws SyntaxError;
 	
-	public int index() throws SyntaxException;
+	public int index() throws SyntaxError;
 	
-	public int start() throws SyntaxException;
+	public int start() throws SyntaxError;
 	
-	public int end() throws SyntaxException;
+	public int end() throws SyntaxError;
 	
-	public IToken prev() throws SyntaxException;
+	public IToken prev() throws SyntaxError;
 	
-	public IToken next() throws SyntaxException;
+	public IToken next() throws SyntaxError;
 	
 	public boolean hasPrev();
 	

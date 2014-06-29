@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -28,7 +28,7 @@ public class TypeParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		if (this.mode == NAME)
 		{
@@ -52,15 +52,15 @@ public class TypeParser extends Parser
 		{
 			if (this.mode == NAME)
 			{
-				throw new SyntaxException("Invalid Type: Generics specified before the name!");
+				throw new SyntaxError("Invalid Type: Generics specified before the name!");
 			}
 			else if (this.mode == ARRAY)
 			{
-				throw new SyntaxException("Invalid Type: Genrics specified after array dimensions!");
+				throw new SyntaxError("Invalid Type: Genrics specified after array dimensions!");
 			}
 			else if (this.mode == ARRAY2)
 			{
-				throw new SyntaxException("Misplaced Construct!");
+				throw new SyntaxError("Misplaced Construct!");
 			}
 			pm.pushParser(new TypeListParser((GenericType) this.type));
 			return true;
@@ -69,15 +69,15 @@ public class TypeParser extends Parser
 		{
 			if (this.mode == NAME)
 			{
-				throw new SyntaxException("Invalid Type: Generics specified before the name!");
+				throw new SyntaxError("Invalid Type: Generics specified before the name!");
 			}
 			else if (this.mode == ARRAY)
 			{
-				throw new SyntaxException("Invalid Type: Generics specified after array dimensions!");
+				throw new SyntaxError("Invalid Type: Generics specified after array dimensions!");
 			}
 			else if (this.mode == ARRAY2)
 			{
-				throw new SyntaxException("Misplaced Construct!");
+				throw new SyntaxError("Misplaced Construct!");
 			}
 			
 			if (!token.next().equals("<"))
@@ -90,7 +90,7 @@ public class TypeParser extends Parser
 		{
 			if (this.mode == NAME)
 			{
-				throw new SyntaxException("Invalid Type: Array dimensions specified before the name!");
+				throw new SyntaxError("Invalid Type: Array dimensions specified before the name!");
 			}
 			
 			this.mode = ARRAY2;
@@ -102,7 +102,7 @@ public class TypeParser extends Parser
 		{
 			if (this.mode != ARRAY2)
 			{
-				throw new SyntaxException("Misplaced Construct!");
+				throw new SyntaxError("Misplaced Construct!");
 			}
 			
 			this.mode = ARRAY;

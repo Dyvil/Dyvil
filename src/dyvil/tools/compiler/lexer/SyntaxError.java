@@ -5,26 +5,26 @@ import java.util.Arrays;
 
 import dyvil.tools.compiler.lexer.token.IToken;
 
-public class SyntaxException extends Exception
+public class SyntaxError extends Exception
 {
 	private static final long	serialVersionUID	= -2234451954260010124L;
 	
-	public SyntaxException()
+	public SyntaxError()
 	{
 		super();
 	}
 	
-	public SyntaxException(String message)
+	public SyntaxError(String message)
 	{
 		super(message);
 	}
 	
-	public SyntaxException(String message, Object... args)
+	public SyntaxError(String message, Object... args)
 	{
 		this(message);
 	}
 	
-	public SyntaxException(Throwable cause)
+	public SyntaxError(Throwable cause)
 	{
 		super(cause);
 	}
@@ -51,12 +51,12 @@ public class SyntaxException extends Exception
 			
 			out.println(line);
 			
-			char[] chars = new char[token.start()];
+			char[] chars = new char[prevNL - token.start()];
 			Arrays.fill(chars, ' ');
 			out.print(chars);
-			out.print('^');
+			out.println('^');
 		}
-		catch (SyntaxException ex)
+		catch (SyntaxError ex)
 		{
 			out.println("Invalid Token!");
 		}

@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 
 public abstract class Parser<T>
@@ -8,7 +8,7 @@ public abstract class Parser<T>
 	public static final Parser	rootParser	= new Parser()
 											{
 												@Override
-												public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxException
+												public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 												{
 													return false;
 												}
@@ -54,7 +54,7 @@ public abstract class Parser<T>
 	{
 	}
 	
-	public abstract boolean parse(ParserManager pm, String value, IToken token) throws SyntaxException;
+	public abstract boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError;
 	
 	public void end(ParserManager pm)
 	{

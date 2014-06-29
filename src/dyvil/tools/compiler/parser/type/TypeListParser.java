@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.api.ITypeList;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -19,7 +19,7 @@ public class TypeListParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		if (")".equals(value))
 		{

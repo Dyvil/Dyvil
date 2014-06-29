@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.annotation;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -20,7 +20,7 @@ public class AnnotationParametersParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		if (",".equals(value))
 		{

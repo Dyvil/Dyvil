@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.method;
 
 import dyvil.tools.compiler.ast.api.IThrower;
 import dyvil.tools.compiler.ast.method.ThrowsDecl;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -17,7 +17,7 @@ public class ThrowsDeclParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
 	{
 		if ("{".equals(value) || ";".equals(value))
 		{
@@ -26,7 +26,7 @@ public class ThrowsDeclParser extends Parser
 				jcp.popParser(token);
 				return true;				
 			}
-			throw new SyntaxException("Invalid throws delcaration!");
+			throw new SyntaxError("Invalid throws delcaration!");
 		}
 		else if (",".equals(token))
 		{
@@ -35,7 +35,7 @@ public class ThrowsDeclParser extends Parser
 				this.mode = 0;
 				return true;
 			}
-			throw new SyntaxException("Invalid comma");
+			throw new SyntaxError("Invalid comma");
 		}
 		else if (token.type() == IToken.TYPE_IDENTIFIER)
 		{

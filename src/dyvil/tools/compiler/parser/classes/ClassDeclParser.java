@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -23,7 +23,7 @@ public class ClassDeclParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
 	{
 		if ("extends".equals(value))
 		{

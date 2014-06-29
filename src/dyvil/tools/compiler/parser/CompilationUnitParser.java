@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser;
 
 import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.classes.ClassDeclParser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
@@ -39,7 +39,7 @@ public class CompilationUnitParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
 	{
 		// TODO Modifiers
 		int i = 0;
@@ -47,7 +47,7 @@ public class CompilationUnitParser extends Parser
 		{
 			if (this.mode != PACKAGE)
 			{
-				throw new SyntaxException("The package must be declared at the beginning of the class file.");
+				throw new SyntaxError("The package must be declared at the beginning of the class file.");
 			}
 			
 			jcp.pushParser(new PackageParser(this.unit));
@@ -58,7 +58,7 @@ public class CompilationUnitParser extends Parser
 		{
 			if (this.mode == PACKAGE)
 			{
-				throw new SyntaxException("Missing package declaration!");
+				throw new SyntaxError("Missing package declaration!");
 			}
 			else
 			{
@@ -71,7 +71,7 @@ public class CompilationUnitParser extends Parser
 		{
 			if (this.mode == PACKAGE)
 			{
-				throw new SyntaxException("Missing package declaration!");
+				throw new SyntaxError("Missing package declaration!");
 			}
 			else
 			{

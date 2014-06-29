@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.MultiImport;
 import dyvil.tools.compiler.ast.imports.PackageImport;
 import dyvil.tools.compiler.ast.imports.SimpleImport;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
@@ -25,7 +25,7 @@ public class ImportParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
 	{
 		if (";".equals(value))
 		{
@@ -35,9 +35,9 @@ public class ImportParser extends Parser
 		else if ("{".equals(value))
 		{
 			if (this.mode == 1)
-				throw new SyntaxException("Cannot make nested MultiImports");
+				throw new SyntaxError("Cannot make nested MultiImports");
 			if (this.mode == 2)
-				throw new SyntaxException("Cannot make multiple MultiImports at the same time.");
+				throw new SyntaxError("Cannot make multiple MultiImports at the same time.");
 			
 			this.mode = 1;
 			this.theImport = new MultiImport();
@@ -58,7 +58,7 @@ public class ImportParser extends Parser
 			if (!",".equals(value))
 			{
 				if (token.type() != Token.TYPE_IDENTIFIER)
-					throw new SyntaxException("Invalid Import");
+					throw new SyntaxError("Invalid Import");
 				((MultiImport) this.theImport).addClass(value);
 				return true;
 			}

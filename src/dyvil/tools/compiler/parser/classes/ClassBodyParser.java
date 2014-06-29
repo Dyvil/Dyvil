@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.method.Method;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -43,7 +43,7 @@ public class ClassBodyParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		// TODO Modifiers
 		if ("(".equals(value))
@@ -65,7 +65,7 @@ public class ClassBodyParser extends Parser
 			}
 			else
 			{
-				throw new SyntaxException("Misplaced opening parenthesis!");
+				throw new SyntaxError("Misplaced opening parenthesis!");
 			}
 			return true;
 		}
@@ -77,7 +77,7 @@ public class ClassBodyParser extends Parser
 			}
 			else
 			{
-				throw new SyntaxException("Misplaced closing parenthesis!");
+				throw new SyntaxError("Misplaced closing parenthesis!");
 			}
 			return true;
 		}
@@ -89,7 +89,7 @@ public class ClassBodyParser extends Parser
 			}
 			else
 			{
-				throw new SyntaxException("Misplaced opening curly brackets!");
+				throw new SyntaxError("Misplaced opening curly brackets!");
 			}
 			return true;
 		}
@@ -105,7 +105,7 @@ public class ClassBodyParser extends Parser
 			}
 			else
 			{
-				throw new SyntaxException("Misplaced closing curly brackets!");
+				throw new SyntaxError("Misplaced closing curly brackets!");
 			}
 			return true;
 		}
@@ -126,7 +126,7 @@ public class ClassBodyParser extends Parser
 			}
 			else
 			{
-				throw new SyntaxException("Misplaced equals sign!");
+				throw new SyntaxError("Misplaced equals sign!");
 			}
 			return true;
 		}
@@ -134,7 +134,7 @@ public class ClassBodyParser extends Parser
 		{
 			if (this.mode == 0)
 			{
-				throw new SyntaxException("Misplaced semicolon!");
+				throw new SyntaxError("Misplaced semicolon!");
 			}
 			else
 			{
@@ -155,7 +155,7 @@ public class ClassBodyParser extends Parser
 			}
 			else
 			{
-				throw new SyntaxException("Misplated @ sign!");
+				throw new SyntaxError("Misplated @ sign!");
 			}
 			return true;
 		}

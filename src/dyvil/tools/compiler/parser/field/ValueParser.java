@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.field;
 
 import dyvil.tools.compiler.ast.api.IField;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
@@ -23,7 +23,7 @@ public class ValueParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
 	{
 		if (this.parsePrimitive(value, token))
 		{
@@ -48,7 +48,7 @@ public class ValueParser extends Parser
 		return false;
 	}
 	
-	public boolean parsePrimitive(String value, IToken token) throws SyntaxException
+	public boolean parsePrimitive(String value, IToken token) throws SyntaxError
 	{
 		if ("null".equals(value))
 		{

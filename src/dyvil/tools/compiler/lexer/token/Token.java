@@ -2,7 +2,7 @@ package dyvil.tools.compiler.lexer.token;
 
 import java.util.Objects;
 
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 
 public class Token implements IToken
 {
@@ -40,7 +40,7 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public byte type() throws SyntaxException
+	public byte type() throws SyntaxError
 	{
 		return this.type;
 	}
@@ -52,7 +52,7 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public boolean isType(byte type) throws SyntaxException
+	public boolean isType(byte type) throws SyntaxError
 	{
 		return this.type == type;
 	}

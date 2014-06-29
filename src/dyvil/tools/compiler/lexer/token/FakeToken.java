@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.lexer.token;
 
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 
 public class FakeToken implements IToken
 {
@@ -8,63 +8,63 @@ public class FakeToken implements IToken
 	private IToken	next;
 	
 	@Override
-	public String value() throws SyntaxException
+	public String value() throws SyntaxError
 	{
-		throw new SyntaxException("No token!");
+		throw new SyntaxError("No token!");
 	}
 	
 	@Override
-	public byte type() throws SyntaxException
+	public byte type() throws SyntaxError
 	{
-		throw new SyntaxException("No token!");
+		throw new SyntaxError("No token!");
 	}
 	
 	@Override
-	public boolean equals(String value) throws SyntaxException
+	public boolean equals(String value) throws SyntaxError
 	{
-		throw new SyntaxException("No token!");
+		throw new SyntaxError("No token!");
 	}
 	
 	@Override
-	public boolean isType(byte type) throws SyntaxException
+	public boolean isType(byte type) throws SyntaxError
 	{
-		throw new SyntaxException("No token!");
+		throw new SyntaxError("No token!");
 	}
 	
 	@Override
-	public int index() throws SyntaxException
+	public int index() throws SyntaxError
 	{
-		throw new SyntaxException("No token!");
+		throw new SyntaxError("No token!");
 	}
 	
 	@Override
-	public int start() throws SyntaxException
+	public int start() throws SyntaxError
 	{
-		throw new SyntaxException("No token!");
+		throw new SyntaxError("No token!");
 	}
 	
 	@Override
-	public int end() throws SyntaxException
+	public int end() throws SyntaxError
 	{
-		throw new SyntaxException("No token!");
+		throw new SyntaxError("No token!");
 	}
 	
 	@Override
-	public IToken next() throws SyntaxException
+	public IToken next() throws SyntaxError
 	{
 		if (this.next == null)
 		{
-			throw new SyntaxException("No next token!");
+			throw new SyntaxError("No next token!");
 		}
 		return this.next;
 	}
 	
 	@Override
-	public IToken prev() throws SyntaxException
+	public IToken prev() throws SyntaxError
 	{
 		if (this.prev == null)
 		{
-			throw new SyntaxException("No prev token!");
+			throw new SyntaxError("No prev token!");
 		}
 		return this.prev;
 	}

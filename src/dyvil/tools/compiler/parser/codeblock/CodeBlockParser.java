@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.codeblock;
 
 import dyvil.tools.compiler.ast.api.IImplementable;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -16,7 +16,7 @@ public class CodeBlockParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxException
+	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
 	{
 		// TODO
 		return false;

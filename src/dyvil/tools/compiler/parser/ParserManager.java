@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser;
 import java.io.PrintStream;
 
 import dyvil.tools.compiler.lexer.Dlex;
-import dyvil.tools.compiler.lexer.SyntaxException;
+import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 
@@ -53,9 +53,9 @@ public class ParserManager
 	 * Starts parsing the given {@link String Code} {@code code}. The code is
 	 * tokenized using {@link CSSource#tokenize(String)} and then
 	 * {@link #parse(IToken)} is called on each token. When a
-	 * {@link SyntaxException} occurs, it gets printed to the standard error
+	 * {@link SyntaxError} occurs, it gets printed to the standard error
 	 * output {@link System#err} using
-	 * {@link SyntaxException#print(PrintStream, String, IToken)}
+	 * {@link SyntaxError#print(PrintStream, String, IToken)}
 	 * 
 	 * @see Token
 	 * @see CSSource#tokenize(String)
@@ -108,14 +108,14 @@ public class ParserManager
 				{
 					this.parseToken(token.value(), token);
 				}
-				catch (SyntaxException ex)
+				catch (SyntaxError ex)
 				{
 					ex.print(System.err, code, token);
 				}
 				token = token.next();
 			}
 		}
-		catch (SyntaxException ex)
+		catch (SyntaxError ex)
 		{
 			ex.print(System.err, code, token);
 		}
@@ -145,14 +145,14 @@ public class ParserManager
 	 *            the value of the token
 	 * @param token
 	 *            the token
-	 * @throws SyntaxException
+	 * @throws SyntaxError
 	 *             syntax errors
 	 */
-	public void parseToken(String value, IToken token) throws SyntaxException
+	public void parseToken(String value, IToken token) throws SyntaxError
 	{
 		if (!this.currentParser.parse(this, value, token))
 		{
-			throw new SyntaxException("Invalid token '" + value + "'");
+			throw new SyntaxError("Invalid token '" + value + "'");
 		}
 	}
 	
@@ -162,10 +162,10 @@ public class ParserManager
 	 * @see Parser#parse(ParserManager, String, IToken)
 	 * @param parser
 	 *            the parser
-	 * @throws SyntaxException
+	 * @throws SyntaxError
 	 *             syntax errors
 	 */
-	public void pushParser(Parser parser) throws SyntaxException
+	public void pushParser(Parser parser) throws SyntaxError
 	{
 		if (this.currentParser != null)
 		{
@@ -183,16 +183,16 @@ public class ParserManager
 	 * @see Parser#parse(ParserManager, String, IToken)
 	 * @param parser
 	 *            the parser
-	 * @throws SyntaxException
+	 * @throws SyntaxError
 	 *             syntax errors
 	 */
-	public void pushParser(Parser parser, IToken token) throws SyntaxException
+	public void pushParser(Parser parser, IToken token) throws SyntaxError
 	{
 		this.pushParser(parser);
 		this.currentParser.parse(this, token.value(), token);
 	}
 	
-	public void popParser() throws SyntaxException
+	public void popParser() throws SyntaxError
 	{
 		if (this.currentParser != null)
 		{
@@ -201,7 +201,7 @@ public class ParserManager
 		}
 	}
 	
-	public void popParser(IToken token) throws SyntaxException
+	public void popParser(IToken token) throws SyntaxError
 	{
 		this.popParser();
 		if (this.currentParser != null)

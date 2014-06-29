@@ -371,7 +371,7 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 			this.current = current.next();
 			return current;
 		}
-		catch (SyntaxException ex)
+		catch (SyntaxError ex)
 		{
 			ex.print(System.err, this.code, this.current);
 			return null;
@@ -390,7 +390,7 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 			next.setPrev(prev);
 			this.current = next;
 		}
-		catch (SyntaxException ex)
+		catch (SyntaxError ex)
 		{
 			ex.print(System.err, this.code, this.current);
 		}
@@ -411,7 +411,7 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 			
 			this.current = this.first;
 		}
-		catch (SyntaxException ex)
+		catch (SyntaxError ex)
 		{
 		}
 		
