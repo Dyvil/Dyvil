@@ -248,10 +248,6 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 		{
 			return TYPE_CHAR;
 		}
-		else if (c == '#')
-		{
-			return TYPE_LINE_COMMENT;
-		}
 		else if (c == '/')
 		{
 			char n = code.charAt(i + 1);
@@ -259,8 +255,17 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 				return TYPE_BLOCK_COMMENT;
 			else if (n == '/')
 				return TYPE_LINE_COMMENT;
-			return getMode(c, code, i + 1);
+			else
+				return TYPE_SYMBOL;
 		}
+		else if (c == '@')
+		{
+			char n = code.charAt(i + 1);
+			if (n == '"')
+				return TYPE_STRING;
+			else
+				return TYPE_IDENTIFIER;
+		}	
 		else if (isDigit(c))
 		{
 			return TYPE_INT;
@@ -342,7 +347,7 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 	
 	protected static boolean isIdentifierPart(char c)
 	{
-		return c == '_' || isLetter(c);
+		return c == '_' || c == '@' || c == '$' || isLetter(c);
 	}
 	
 	@Override
