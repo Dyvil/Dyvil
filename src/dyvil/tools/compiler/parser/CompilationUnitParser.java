@@ -11,7 +11,12 @@ import dyvil.tools.compiler.util.Classes;
 
 public class CompilationUnitParser extends Parser
 {
-	private CompilationUnit unit;
+	private static final int	PACKAGE	= 0;
+	private static final int	IMPORT	= 1;
+	private static final int	CLASS	= 2;
+	
+	private CompilationUnit		unit;
+	private int					modifiers;
 	
 	public CompilationUnitParser(CompilationUnit unit)
 	{
@@ -19,10 +24,11 @@ public class CompilationUnitParser extends Parser
 	}
 	
 	/**
-	 * Expands the class name from the simple name to the full name, with package.<p>
-	 * Example:
-	 * name = "String" -> "java.lang.String"
-	 * name = "Random" -> "java.util.Random"
+	 * Expands the class name from the simple name to the full name, with
+	 * package.
+	 * <p>
+	 * Example: name = "String" -> "java.lang.String" name = "Random" ->
+	 * "java.util.Random"
 	 * 
 	 * @param name
 	 * @return
@@ -39,20 +45,44 @@ public class CompilationUnitParser extends Parser
 		int i = 0;
 		if ("package".equals(value))
 		{
+			if (this.mode != PACKAGE)
+			{
+				throw new SyntaxException("The package must be declared at the beginning of the class file.");
+			}
+			
 			jcp.pushParser(new PackageParser(this.unit));
+			this.mode = IMPORT;
 			return true;
 		}
 		else if ("import".equals(value))
 		{
-			jcp.pushParser(new ImportParser(this.unit));
-			return true;
+			if (this.mode == PACKAGE)
+			{
+				throw new SyntaxException("Missing package declaration!");
+			}
+			else
+			{
+				this.mode = CLASS;
+				jcp.pushParser(new ImportParser(this.unit));
+				return true;
+			}
 		}
 		else if ((i = Classes.parse(value)) != -1)
 		{
-			AbstractClass c = AbstractClass.create(i);
-			this.unit.addClass(c);
-			jcp.pushParser(new ClassDeclParser(this.unit, c));
-			return true;
+			if (this.mode == PACKAGE)
+			{
+				throw new SyntaxException("Missing package declaration!");
+			}
+			else
+			{
+				AbstractClass c = AbstractClass.create(i);
+				c.setModifiers(this.modifiers);
+				this.modifiers = 0;
+				this.unit.addClass(c);
+				
+				jcp.pushParser(new ClassDeclParser(this.unit, c));
+				return true;
+			}
 		}
 		return false;
 	}
