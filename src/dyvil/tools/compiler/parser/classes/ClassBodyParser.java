@@ -20,6 +20,7 @@ import dyvil.tools.compiler.parser.field.ValueParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.util.Modifiers;
 
 public class ClassBodyParser extends Parser
 {
@@ -31,7 +32,7 @@ public class ClassBodyParser extends Parser
 	
 	protected AbstractClass			theClass;
 	
-	private int						mode;
+	private int modifiers;
 	private LinkedList<Annotation>	annotations		= new LinkedList();
 	private ClassBody				classBody;
 	private Member					member;
@@ -46,7 +47,12 @@ public class ClassBodyParser extends Parser
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		// TODO Modifiers
-		if ("(".equals(value))
+		int i = 0;
+		if ((i = Modifiers.parseModifier(value)) != 0)
+		{
+			this.modifiers |= i;
+		}
+		else if ("(".equals(value))
 		{
 			if (this.mode == 0)
 			{
@@ -54,10 +60,14 @@ public class ClassBodyParser extends Parser
 				
 				Method method = new Method();
 				method.setName(token.prev().value());
-				pm.pushParser(new ParameterListParser(method));
+				method.setModifiers(this.modifiers);
+				method.setAnnotations(this.annotations);
 				
 				this.member = method;
 				this.classBody.addMethod(method);
+				this.reset();
+				
+				pm.pushParser(new ParameterListParser(method));
 			}
 			else if (this.mode == ANNOTATION)
 			{
@@ -117,12 +127,13 @@ public class ClassBodyParser extends Parser
 				
 				Variable variable = new Variable();
 				variable.setName(token.prev().value());
-				pm.pushParser(new ValueParser(variable));
 				variable.setAnnotations(this.annotations);
 				
 				this.member = variable;
-				this.annotations = new LinkedList();
 				this.classBody.addVariable(variable);
+				this.reset();
+				
+				pm.pushParser(new ValueParser(variable));
 			}
 			else
 			{
@@ -149,9 +160,9 @@ public class ClassBodyParser extends Parser
 				this.mode = ANNOTATION;
 				
 				Annotation annotation = new Annotation();
-				pm.pushParser(new TypeParser(annotation));
-				
 				this.annotations.add(annotation);
+				
+				pm.pushParser(new TypeParser(annotation));
 			}
 			else
 			{
@@ -176,5 +187,10 @@ public class ClassBodyParser extends Parser
 			}
 		}
 		return false;
+	}
+	
+	private void reset()
+	{
+		this.annotations = new LinkedList();
 	}
 }

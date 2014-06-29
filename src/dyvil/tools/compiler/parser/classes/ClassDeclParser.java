@@ -32,7 +32,6 @@ public class ClassDeclParser extends Parser
 		}
 		else if ("{".equals(value))
 		{
-			// TODO Modifiers
 			jcp.pushParser(new ClassBodyParser(this.theClassDecl));
 			return true;
 		}
