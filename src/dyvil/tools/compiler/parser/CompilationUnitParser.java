@@ -8,6 +8,7 @@ import dyvil.tools.compiler.parser.classes.ClassDeclParser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
 import dyvil.tools.compiler.util.Classes;
+import dyvil.tools.compiler.util.Modifiers;
 
 public class CompilationUnitParser extends Parser
 {
@@ -23,25 +24,9 @@ public class CompilationUnitParser extends Parser
 		this.unit = unit;
 	}
 	
-	/**
-	 * Expands the class name from the simple name to the full name, with
-	 * package.
-	 * <p>
-	 * Example: name = "String" -> "java.lang.String" name = "Random" ->
-	 * "java.util.Random"
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public String resolveClass(String name)
-	{
-		return name;
-	}
-	
 	@Override
 	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
 	{
-		// TODO Modifiers
 		int i = 0;
 		if ("package".equals(value))
 		{
@@ -66,6 +51,10 @@ public class CompilationUnitParser extends Parser
 				jcp.pushParser(new ImportParser(this.unit));
 				return true;
 			}
+		}
+		else if ((i = Modifiers.parseClassModifier(value)) != -1)
+		{
+			this.modifiers |= i;
 		}
 		else if ((i = Classes.parse(value)) != -1)
 		{
