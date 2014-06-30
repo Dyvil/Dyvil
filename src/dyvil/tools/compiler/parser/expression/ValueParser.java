@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
@@ -36,7 +37,7 @@ public class ValueParser extends Parser
 		else if (this.mode == TYPE)
 		{
 			this.mode = PARAMETERS;
-			jcp.pushParser(new TypeParser(this.field));
+			jcp.pushParser(new TypeParser((ITyped) this.field));
 			return true;
 		}
 		else if ("(".equals(token))
@@ -44,7 +45,6 @@ public class ValueParser extends Parser
 			if (this.mode == PARAMETERS)
 			{
 				jcp.pushParser(new ValueListParser());
-				
 			}
 		}
 		return false;

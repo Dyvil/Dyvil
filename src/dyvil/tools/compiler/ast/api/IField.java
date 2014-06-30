@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.api;
 
-public interface IField extends ITyped
+public interface IField
 {
 	public static final Object NULL = new Object();
 	

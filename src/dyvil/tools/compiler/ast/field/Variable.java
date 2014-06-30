@@ -1,10 +1,11 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.type.Type;
 
-public class Variable extends Member implements IField
+public class Variable extends Member implements IField, ITyped
 {
 	private Object	value;
 	

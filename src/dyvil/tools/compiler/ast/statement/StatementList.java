@@ -3,9 +3,11 @@ package dyvil.tools.compiler.ast.statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StatementList implements IStatement
+import dyvil.tools.compiler.ast.api.IImplementable;
+
+public class StatementList implements IStatement, IImplementable
 {
-	private List<IStatement> statements = new ArrayList();
+	private List<IStatement>	statements	= new ArrayList();
 	
 	public void addStatement(IStatement statement)
 	{
@@ -15,5 +17,17 @@ public class StatementList implements IStatement
 	public List<IStatement> getStatements()
 	{
 		return this.statements;
+	}
+	
+	@Override
+	public void setStatement(IStatement statement)
+	{
+		this.statements.add(statement);
+	}
+	
+	@Override
+	public IStatement getStatement()
+	{
+		return this.statements.get(this.statements.size() - 1);
 	}
 }
