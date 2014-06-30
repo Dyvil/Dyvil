@@ -15,10 +15,10 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.annotation.AnnotationParametersParser;
-import dyvil.tools.compiler.parser.codeblock.CodeBlockParser;
-import dyvil.tools.compiler.parser.field.ValueParser;
+import dyvil.tools.compiler.parser.expression.ValueParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
+import dyvil.tools.compiler.parser.statement.StatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 
@@ -88,7 +88,7 @@ public class ClassBodyParser extends Parser
 		{
 			if (this.mode == POST_METHOD)
 			{
-				pm.pushParser(new CodeBlockParser((IImplementable) this.member));
+				pm.pushParser(new StatementParser((IImplementable) this.member));
 				return true;
 			}
 		}

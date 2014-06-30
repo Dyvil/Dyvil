@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser.codeblock;
+package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.api.IImplementable;
 import dyvil.tools.compiler.lexer.SyntaxError;
@@ -6,11 +6,11 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
-public class CodeBlockParser extends Parser
+public class StatementParser extends Parser
 {
 	private IImplementable implementable;
 	
-	public CodeBlockParser(IImplementable implementable)
+	public StatementParser(IImplementable implementable)
 	{
 		this.implementable = implementable;
 	}

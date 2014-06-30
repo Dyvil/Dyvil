@@ -6,7 +6,7 @@ import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.parser.field.ValueParser;
+import dyvil.tools.compiler.parser.expression.ValueParser;
 
 public class AnnotationParametersParser extends Parser
 {
