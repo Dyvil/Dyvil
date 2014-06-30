@@ -68,56 +68,42 @@ public class ClassBodyParser extends Parser
 				this.reset();
 				
 				pm.pushParser(new ParameterListParser(method));
+				return true;
 			}
 			else if (this.mode == ANNOTATION)
 			{
 				pm.pushParser(new AnnotationParametersParser(this.annotations.getLast()));
+				return true;
 			}
-			else
-			{
-				throw new SyntaxError("Misplaced opening parenthesis!");
-			}
-			return true;
 		}
 		else if (")".equals(value))
 		{
 			if (this.mode == METHOD)
 			{
 				this.mode = POST_METHOD;
+				return true;
 			}
-			else
-			{
-				throw new SyntaxError("Misplaced closing parenthesis!");
-			}
-			return true;
 		}
 		else if ("{".equals(value))
 		{
 			if (this.mode == POST_METHOD)
 			{
 				pm.pushParser(new CodeBlockParser((IImplementable) this.member));
+				return true;
 			}
-			else
-			{
-				throw new SyntaxError("Misplaced opening curly brackets!");
-			}
-			return true;
 		}
 		else if ("}".equals(value))
 		{
 			if (this.mode == 0)
 			{
 				pm.popParser();
+				return true;
 			}
 			else if (this.mode == POST_METHOD)
 			{
 				this.mode = 0;
+				return true;
 			}
-			else
-			{
-				throw new SyntaxError("Misplaced closing curly brackets!");
-			}
-			return true;
 		}
 		else if ("=".equals(value))
 		{
@@ -134,24 +120,16 @@ public class ClassBodyParser extends Parser
 				this.reset();
 				
 				pm.pushParser(new ValueParser(variable));
+				return true;
 			}
-			else
-			{
-				throw new SyntaxError("Misplaced equals sign!");
-			}
-			return true;
 		}
 		else if (";".equals(value))
 		{
-			if (this.mode == 0)
-			{
-				throw new SyntaxError("Misplaced semicolon!");
-			}
-			else
+			if (this.mode != 0)
 			{
 				this.mode = 0;
+				return true;
 			}
-			return true;
 		}
 		else if ("@".equals(value))
 		{
@@ -163,12 +141,8 @@ public class ClassBodyParser extends Parser
 				this.annotations.add(annotation);
 				
 				pm.pushParser(new TypeParser(annotation));
-			}
-			else
-			{
-				throw new SyntaxError("Misplated @ sign!");
-			}
 			return true;
+			}
 		}
 		else if ("throws".equals(value))
 		{
