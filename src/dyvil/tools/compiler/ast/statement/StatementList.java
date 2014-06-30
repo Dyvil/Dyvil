@@ -1,9 +1,9 @@
-package dyvil.tools.compiler.ast.codeblock;
+package dyvil.tools.compiler.ast.statement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CodeBlock
+public class StatementList implements IStatement
 {
 	private List<IStatement> statements = new ArrayList();
 	

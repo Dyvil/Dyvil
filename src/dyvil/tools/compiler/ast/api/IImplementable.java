@@ -1,15 +1,15 @@
 package dyvil.tools.compiler.ast.api;
 
-import dyvil.tools.compiler.ast.codeblock.CodeBlock;
+import dyvil.tools.compiler.ast.statement.IStatement;
 
 public interface IImplementable
 {
-	public void setCodeBlock(CodeBlock block);
+	public void setStatement(IStatement statement);
 	
-	public CodeBlock getCodeBlock();
+	public IStatement getStatement();
 	
-	public default boolean hasCodeBlock()
+	public default boolean hasStatement()
 	{
-		return this.getCodeBlock() != null;
+		return this.getStatement() != null;
 	}
 }

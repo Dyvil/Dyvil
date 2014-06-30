@@ -8,11 +8,11 @@ import java.util.Map;
 import dyvil.tools.compiler.ast.api.IImplementable;
 import dyvil.tools.compiler.ast.api.IParameterized;
 import dyvil.tools.compiler.ast.api.IThrower;
-import dyvil.tools.compiler.ast.codeblock.CodeBlock;
+import dyvil.tools.compiler.ast.statement.IStatement;
 
 public class Method extends Member implements IThrower, IParameterized, IImplementable
 {
-	private CodeBlock				codeBlock;
+	private IStatement				statement;
 	
 	private Map<String, Parameter>	parameters			= new HashMap();
 	private List<ThrowsDecl>		throwsDeclarations	= new ArrayList();
@@ -24,9 +24,9 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 	}
 	
 	@Override
-	public void setCodeBlock(CodeBlock implementation)
+	public void setStatement(IStatement implementation)
 	{
-		this.codeBlock = implementation;
+		this.statement = implementation;
 	}
 	
 	@Override
@@ -36,9 +36,9 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 	}
 	
 	@Override
-	public CodeBlock getCodeBlock()
+	public IStatement getStatement()
 	{
-		return this.codeBlock;
+		return this.statement;
 	}
 	
 	@Override
