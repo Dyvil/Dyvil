@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.codeblock.CodeBlock;
 
 public class Method extends Member implements IThrower, IParameterized, IImplementable
 {
-	private CodeBlock				implementation;
+	private CodeBlock				codeBlock;
 	
 	private Map<String, Parameter>	parameters			= new HashMap();
 	private List<ThrowsDecl>		throwsDeclarations	= new ArrayList();
@@ -24,9 +24,9 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 	}
 	
 	@Override
-	public void setImplementation(CodeBlock implementation)
+	public void setCodeBlock(CodeBlock implementation)
 	{
-		this.implementation = implementation;
+		this.codeBlock = implementation;
 	}
 	
 	@Override
@@ -36,9 +36,9 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 	}
 	
 	@Override
-	public CodeBlock getImplementation()
+	public CodeBlock getCodeBlock()
 	{
-		return this.implementation;
+		return this.codeBlock;
 	}
 	
 	@Override

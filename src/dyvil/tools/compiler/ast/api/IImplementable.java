@@ -4,12 +4,12 @@ import dyvil.tools.compiler.ast.codeblock.CodeBlock;
 
 public interface IImplementable
 {
-	public void setImplementation(CodeBlock implementation);
+	public void setCodeBlock(CodeBlock block);
 	
-	public CodeBlock getImplementation();
+	public CodeBlock getCodeBlock();
 	
-	public default boolean hasImplementation()
+	public default boolean hasCodeBlock()
 	{
-		return this.getImplementation() != null;
+		return this.getCodeBlock() != null;
 	}
 }

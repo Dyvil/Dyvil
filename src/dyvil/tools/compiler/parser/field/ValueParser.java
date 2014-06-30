@@ -13,8 +13,6 @@ public class ValueParser extends Parser
 	public static final int	TYPE		= 1;
 	public static final int	PARAMETERS	= 2;
 	
-	private int				mode;
-	
 	private IField			field;
 	
 	public ValueParser(IField field)
@@ -41,9 +39,13 @@ public class ValueParser extends Parser
 			jcp.pushParser(new TypeParser(this.field));
 			return true;
 		}
-		else if (this.mode == PARAMETERS)
+		else if ("(".equals(token))
 		{
-			
+			if (this.mode == PARAMETERS)
+			{
+				jcp.pushParser(new ValueListParser());
+				
+			}
 		}
 		return false;
 	}
