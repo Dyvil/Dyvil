@@ -61,6 +61,16 @@ public class DyvilTest
         return .printName;
     }
     
+    public String asString(Object o)
+    {
+        return o => String;
+    }
+    
+    public boolean instanceOfString(Object o)
+    {
+        return o :> String;
+    }
+    
     public property String name
     {
         get: { return this.name; }
