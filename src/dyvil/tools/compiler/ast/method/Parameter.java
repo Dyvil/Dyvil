@@ -2,10 +2,9 @@ package dyvil.tools.compiler.ast.method;
 
 import dyvil.tools.compiler.ast.type.Type;
 
-
 public class Parameter extends Member
 {
-	private char seperator;
+	private char	seperator;
 	
 	public Parameter()
 	{

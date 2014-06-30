@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.util;
 
-import java.lang.reflect.Modifier;
-
 public class Modifiers
 {
 	public static String toString(int mod)
@@ -74,11 +72,14 @@ public class Modifiers
 	public static final int	VOLATILE			= 0x00000040;
 	public static final int	TRANSIENT			= 0x00000080;
 	public static final int	NATIVE				= 0x00000100;
+	
 	// Non-Dyvil modifiers
 	static final int		INTERFACE			= 0x00000200;
 	static final int		ABSTRACT			= 0x00000400;
-	// Strictfp
+	
+	// strictfp
 	public static final int	STRICT				= 0x00000800;
+	
 	// No real modifiers
 	public static final int	BRIDGE				= 0x00000040;
 	public static final int	VARARGS				= 0x00000080;
@@ -86,14 +87,16 @@ public class Modifiers
 	public static final int	ANNOTATION			= 0x00002000;
 	public static final int	ENUM				= 0x00004000;
 	public static final int	MANDATED			= 0x00008000;
+	// Dyvil lazy
+	public static final int	LAZY				= 0x00010000;
 	
-	public static final int	ACCESS_MODIFIERS	= Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE;
-	public static final int	CLASS_MODIFIERS		= Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL | Modifier.STRICT;
-	public static final int	INTERFACE_MODIFIERS	= Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE | Modifier.STATIC | Modifier.STRICT;
+	public static final int	ACCESS_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE;
+	public static final int	CLASS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | STRICT;
+	public static final int	INTERFACE_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE | STATIC | STRICT;
 	
-	public static final int	FIELD_MODIFIERS		= Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL | Modifier.TRANSIENT | Modifier.VOLATILE;
-	public static final int	METHOD_MODIFIERS	= Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL | Modifier.SYNCHRONIZED | Modifier.NATIVE | Modifier.STRICT;
-	public static final int	PARAMETER_MODIFIERS	= Modifier.STATIC | Modifier.FINAL;
+	public static final int	FIELD_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | TRANSIENT | VOLATILE | LAZY;
+	public static final int	METHOD_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | SYNCHRONIZED | NATIVE | STRICT;
+	public static final int	PARAMETER_MODIFIERS	= STATIC | FINAL;
 	
 	public static int parseModifier(String mod)
 	{
@@ -125,6 +128,8 @@ public class Modifiers
 			return NATIVE;
 		case "strictfp":
 			return STRICT;
+		case "lazy":
+			return LAZY;
 		}
 		return 0;
 	}
@@ -196,6 +201,8 @@ public class Modifiers
 			return VOLATILE;
 		case "transient":
 			return TRANSIENT;
+		case "lazy":
+			return LAZY;
 		}
 		return 0;
 	}
