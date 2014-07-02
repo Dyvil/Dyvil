@@ -5,8 +5,10 @@ import dyvil.lang.Number;
 
 public class IntConst extends Int
 {
-	private static IntConst[] constTable = new IntConst[constantTableSize];
-	static {
+	private static IntConst[]	constTable	= new IntConst[constantTableSize];
+	
+	static
+	{
 		for (int i = 0; i < constantTableSize; i++)
 		{
 			constTable[i] = new IntConst(i);
@@ -23,6 +25,18 @@ public class IntConst extends Int
 		if (value >= 0 && value < constantTableSize)
 			return constTable[value];
 		return new IntConst(value);
+	}
+	
+	@Override
+	public Number $neg$()
+	{
+		return get(-this.value);
+	}
+	
+	@Override
+	public Number $inv$()
+	{
+		return get(~this.value);
 	}
 	
 	@Override
@@ -48,31 +62,31 @@ public class IntConst extends Int
 	{
 		return get(1 / this.value);
 	}
-
+	
 	@Override
 	public Int $add$(int i)
 	{
 		return get(this.value + i);
 	}
-
+	
 	@Override
 	public Int $sub$(int i)
 	{
 		return get(this.value - i);
 	}
-
+	
 	@Override
 	public Int $mul$(int i)
 	{
 		return get(this.value * i);
 	}
-
+	
 	@Override
 	public Int $div$(int i)
 	{
 		return get(this.value / i);
 	}
-
+	
 	@Override
 	public Int $mod$(int i)
 	{

@@ -1,10 +1,10 @@
 package dyvil.lang;
 
-public abstract class Int extends Number
+public abstract class Float extends Number
 {
-	protected int value;
+	protected float value;
 	
-	protected Int(int value)
+	protected Float(float value)
 	{
 		this.value = value;
 	}
@@ -30,7 +30,7 @@ public abstract class Int extends Number
 	@Override
 	public int intValue()
 	{
-		return this.value;
+		return (int) this.value;
 	}
 	
 	@Override
@@ -42,7 +42,7 @@ public abstract class Int extends Number
 	@Override
 	public float floatValue()
 	{
-		return (float) this.value;
+		return this.value;
 	}
 	
 	@Override

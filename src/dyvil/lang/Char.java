@@ -1,10 +1,10 @@
 package dyvil.lang;
 
-public abstract class Int extends Number
+public abstract class Char extends Number
 {
-	protected int value;
+	protected char value;
 	
-	protected Int(int value)
+	protected Char(char value)
 	{
 		this.value = value;
 	}
@@ -24,13 +24,13 @@ public abstract class Int extends Number
 	@Override
 	public char charValue()
 	{
-		return (char) this.value;
+		return this.value;
 	}
 	
 	@Override
 	public int intValue()
 	{
-		return this.value;
+		return (int) this.value;
 	}
 	
 	@Override

@@ -1,10 +1,10 @@
 package dyvil.lang;
 
-public abstract class Int extends Number
+public abstract class Byte extends Number
 {
-	protected int value;
+	protected byte value;
 	
-	protected Int(int value)
+	protected Byte(byte value)
 	{
 		this.value = value;
 	}
@@ -12,7 +12,7 @@ public abstract class Int extends Number
 	@Override
 	public byte byteValue()
 	{
-		return (byte) this.value;
+		return this.value;
 	}
 	
 	@Override
@@ -30,7 +30,7 @@ public abstract class Int extends Number
 	@Override
 	public int intValue()
 	{
-		return this.value;
+		return (int) this.value;
 	}
 	
 	@Override

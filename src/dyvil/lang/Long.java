@@ -1,10 +1,10 @@
 package dyvil.lang;
 
-public abstract class Int extends Number
+public abstract class Long extends Number
 {
-	protected int value;
+	protected long value;
 	
-	protected Int(int value)
+	protected Long(long value)
 	{
 		this.value = value;
 	}
@@ -30,13 +30,13 @@ public abstract class Int extends Number
 	@Override
 	public int intValue()
 	{
-		return this.value;
+		return (int) this.value;
 	}
 	
 	@Override
 	public long longValue()
 	{
-		return (long) this.value;
+		return this.value;
 	}
 	
 	@Override

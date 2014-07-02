@@ -16,6 +16,20 @@ public class IntRef extends Int
 	}
 	
 	@Override
+	public Number $neg$()
+	{
+		this.value = -this.value;
+		return this;
+	}
+	
+	@Override
+	public Number $inv$()
+	{
+		this.value = ~this.value;
+		return this;
+	}
+	
+	@Override
 	public Number $inc$()
 	{
 		this.value++;
@@ -42,35 +56,35 @@ public class IntRef extends Int
 		this.value = 1 / this.value;
 		return this;
 	}
-
+	
 	@Override
 	public IntRef $add$(int i)
 	{
 		this.value += i;
 		return this;
 	}
-
+	
 	@Override
 	public IntRef $sub$(int i)
 	{
 		this.value -= i;
 		return this;
 	}
-
+	
 	@Override
 	public IntRef $mul$(int i)
 	{
 		this.value *= i;
 		return this;
 	}
-
+	
 	@Override
 	public IntRef $div$(int i)
 	{
 		this.value /= i;
 		return this;
 	}
-
+	
 	@Override
 	public IntRef $mod$(int i)
 	{

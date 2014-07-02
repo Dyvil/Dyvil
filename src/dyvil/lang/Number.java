@@ -1,17 +1,30 @@
 package dyvil.lang;
 
-import dyvil.lang.primitive.IntConst;
-
 public abstract class Number
 {
-	protected static int constantTableSize = 128;
+	protected static int	constantTableSize	= 128;
+	
+	// Primitive value getters
+	
+	public abstract byte byteValue();
+	
+	public abstract short shortValue();
+	
+	public abstract char charValue();
 	
 	public abstract int intValue();
 	
-	public Int toInt()
-	{
-		return IntConst.get(this.intValue());
-	}
+	public abstract long longValue();
+	
+	public abstract float floatValue();
+	
+	public abstract double doubleValue();
+	
+	// Unary operators
+	
+	public abstract Number $neg$();
+	
+	public abstract Number $inv$();
 	
 	public abstract Number $inc$();
 	

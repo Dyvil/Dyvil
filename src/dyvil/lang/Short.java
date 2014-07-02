@@ -1,10 +1,10 @@
 package dyvil.lang;
 
-public abstract class Int extends Number
+public abstract class Short extends Number
 {
-	protected int value;
+	protected short value;
 	
-	protected Int(int value)
+	protected Short(short value)
 	{
 		this.value = value;
 	}
@@ -18,7 +18,7 @@ public abstract class Int extends Number
 	@Override
 	public short shortValue()
 	{
-		return (short) this.value;
+		return this.value;
 	}
 	
 	@Override
@@ -30,7 +30,7 @@ public abstract class Int extends Number
 	@Override
 	public int intValue()
 	{
-		return this.value;
+		return (short) this.value;
 	}
 	
 	@Override
