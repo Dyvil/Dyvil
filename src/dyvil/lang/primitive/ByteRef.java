@@ -2,16 +2,16 @@ package dyvil.lang.primitive;
 
 import dyvil.lang.Number;
 
-public class IntRef extends dyvil.lang.Int
+public class ByteRef extends dyvil.lang.Byte
 {
-	protected IntRef(int value)
+	protected ByteRef(byte value)
 	{
 		super(value);
 	}
 	
-	public static final IntRef get(int value)
+	public static final ByteRef get(byte value)
 	{
-		return new IntRef(value);
+		return new ByteRef(value);
 	}
 	
 	@Override
@@ -24,22 +24,19 @@ public class IntRef extends dyvil.lang.Int
 	@Override
 	public Number set$(short v)
 	{
-		this.value = v;
-		return this;
+		return ShortRef.get(v);
 	}
 	
 	@Override
 	public Number set$(char v)
 	{
-		this.value = v;
-		return this;
+		return CharRef.get(v);
 	}
 	
 	@Override
 	public Number set$(int v)
 	{
-		this.value = v;
-		return this;
+		return IntRef.get(v);
 	}
 	
 	@Override

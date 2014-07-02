@@ -2,61 +2,57 @@ package dyvil.lang.primitive;
 
 import dyvil.lang.Number;
 
-public class IntRef extends dyvil.lang.Int
+public class DoubleConst extends dyvil.lang.Double
 {
-	protected IntRef(int value)
+	protected DoubleConst(double value)
 	{
 		super(value);
 	}
 	
-	public static final IntRef get(int value)
+	public static DoubleConst get(double value)
 	{
-		return new IntRef(value);
+		return ConstPool.getDouble(value);
 	}
 	
 	@Override
 	public Number set$(byte v)
 	{
-		this.value = v;
-		return this;
+		return get(v);
 	}
 	
 	@Override
 	public Number set$(short v)
 	{
-		this.value = v;
-		return this;
+		return get(v);
 	}
 	
 	@Override
 	public Number set$(char v)
 	{
-		this.value = v;
-		return this;
+		return get(v);
 	}
 	
 	@Override
 	public Number set$(int v)
 	{
-		this.value = v;
-		return this;
+		return get(v);
 	}
 	
 	@Override
 	public Number set$(long v)
 	{
-		return LongRef.get(v);
+		return get(v);
 	}
 	
 	@Override
 	public Number set$(float v)
 	{
-		return FloatRef.get(v);
+		return get(v);
 	}
 	
 	@Override
 	public Number set$(double v)
 	{
-		return DoubleRef.get(v);
+		return get(v);
 	}
 }

@@ -1,20 +1,9 @@
 package dyvil.lang.primitive;
 
-import dyvil.lang.Int;
 import dyvil.lang.Number;
 
-public class IntConst extends Int
+public class IntConst extends dyvil.lang.Int
 {
-	private static IntConst[]	constTable	= new IntConst[constantTableSize];
-	
-	static
-	{
-		for (int i = 0; i < constantTableSize; i++)
-		{
-			constTable[i] = new IntConst(i);
-		}
-	}
-	
 	protected IntConst(int value)
 	{
 		super(value);
@@ -22,92 +11,48 @@ public class IntConst extends Int
 	
 	public static IntConst get(int value)
 	{
-		if (value >= 0 && value < constantTableSize)
-			return constTable[value];
-		return new IntConst(value);
+		return ConstPool.getInt(value);
 	}
 	
 	@Override
-	public Number $neg$()
+	public Number set$(byte v)
 	{
-		return get(-this.value);
+		return get(v);
 	}
 	
 	@Override
-	public Number $inv$()
+	public Number set$(short v)
 	{
-		return get(~this.value);
+		return get(v);
 	}
 	
 	@Override
-	public Number $inc$()
+	public Number set$(char v)
 	{
-		return get(this.value + 1);
+		return get(v);
 	}
 	
 	@Override
-	public Number $dec$()
+	public Number set$(int v)
 	{
-		return get(this.value - 1);
+		return get(v);
 	}
 	
 	@Override
-	public Number $sqr$()
+	public Number set$(long v)
 	{
-		return get(this.value * this.value);
+		return LongConst.get(v);
 	}
 	
 	@Override
-	public Number $rec$()
+	public Number set$(float v)
 	{
-		return get(1 / this.value);
+		return FloatConst.get(v);
 	}
 	
 	@Override
-	public Int $add$(int i)
+	public Number set$(double v)
 	{
-		return get(this.value + i);
-	}
-	
-	@Override
-	public Int $sub$(int i)
-	{
-		return get(this.value - i);
-	}
-	
-	@Override
-	public Int $mul$(int i)
-	{
-		return get(this.value * i);
-	}
-	
-	@Override
-	public Int $div$(int i)
-	{
-		return get(this.value / i);
-	}
-	
-	@Override
-	public Int $mod$(int i)
-	{
-		return get(this.value % i);
-	}
-	
-	@Override
-	public Number $bsl$(int i)
-	{
-		return get(this.value << i);
-	}
-	
-	@Override
-	public Number $bsr$(int i)
-	{
-		return get(this.value >> i);
-	}
-	
-	@Override
-	public Number $usr$(int i)
-	{
-		return get(this.value >>> i);
+		return DoubleConst.get(v);
 	}
 }
