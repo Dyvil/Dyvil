@@ -2,15 +2,18 @@ package dyvil.lang.primitive;
 
 public class ConstPool
 {
-	protected static int		constantTableSize	= 128;
+	protected static int			constantTableSize	= 128;
 	
-	private static ByteConst[] byteConstants = new ByteConst[constantTableSize];
-	private static ShortConst[] shortConstants = new ShortConst[constantTableSize];
-	private static CharConst[] charConstants = new CharConst[constantTableSize];
-	private static IntConst[]	intConstants		= new IntConst[constantTableSize];
-	private static LongConst[] longConstants = new LongConst[constantTableSize];
-	private static FloatConst[] floatConstants = new FloatConst[constantTableSize];
-	private static DoubleConst[] doubleConstants = new DoubleConst[constantTableSize];
+	private static BooleanConst		trueConstant		= new BooleanConst(true);
+	private static BooleanConst		falseConstant		= new BooleanConst(false);
+	
+	private static ByteConst[]		byteConstants		= new ByteConst[constantTableSize];
+	private static ShortConst[]		shortConstants		= new ShortConst[constantTableSize];
+	private static CharConst[]		charConstants		= new CharConst[constantTableSize];
+	private static IntConst[]		intConstants		= new IntConst[constantTableSize];
+	private static LongConst[]		longConstants		= new LongConst[constantTableSize];
+	private static FloatConst[]		floatConstants		= new FloatConst[constantTableSize];
+	private static DoubleConst[]	doubleConstants		= new DoubleConst[constantTableSize];
 	
 	static
 	{
@@ -24,6 +27,11 @@ public class ConstPool
 			floatConstants[i] = new FloatConst(i);
 			doubleConstants[i] = new DoubleConst(i);
 		}
+	}
+	
+	public static BooleanConst getBoolean(boolean value)
+	{
+		return value ? trueConstant : falseConstant;
 	}
 	
 	public static ByteConst getByte(byte value)
