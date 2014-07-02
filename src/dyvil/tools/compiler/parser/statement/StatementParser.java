@@ -2,6 +2,7 @@ package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IImplementable;
+import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
@@ -17,6 +18,7 @@ public class StatementParser extends Parser implements IImplementable, IField
 	private static final int	THEN	= 2;
 	private static final int	ELSE	= 3;
 	private static final int	FOR		= 4;
+	private static final int	FOR_2	= 5;
 	
 	protected IImplementable	implementable;
 	private IStatement			statement;
@@ -41,21 +43,15 @@ public class StatementParser extends Parser implements IImplementable, IField
 			jcp.pushParser(new StatementParser(statement));
 			return true;
 		}
-		else if ("if".equals(value))
-		{
-			if (this.mode == 0)
-			{
-				IfStatement statement = new IfStatement();
-				this.addStatement(statement);
-				this.mode = IF;
-				return true;
-			}
-		}
 		else if ("(".equals(value))
 		{
 			if (this.mode == IF)
 			{
 				jcp.pushParser(new ValueParser(this));
+				return true;
+			}
+			else if (this.mode == FOR)
+			{
 				return true;
 			}
 		}
@@ -66,6 +62,21 @@ public class StatementParser extends Parser implements IImplementable, IField
 				this.mode = THEN;
 				return true;
 			}
+			else if (this.mode == FOR)
+			{
+				this.mode = FOR_2;
+				return true;
+			}
+		}
+		else if ("if".equals(value))
+		{
+			if (this.mode == 0)
+			{
+				IfStatement statement = new IfStatement();
+				this.addStatement(statement);
+				this.mode = IF;
+				return true;
+			}
 		}
 		else if ("else".equals(value))
 		{
@@ -73,6 +84,16 @@ public class StatementParser extends Parser implements IImplementable, IField
 			{
 				this.mode = ELSE;
 				jcp.pushParser(new StatementParser(this));
+				return true;
+			}
+		}
+		else if ("for".equals(value))
+		{
+			if (this.mode == 0)
+			{
+				ForStatement statement = new ForStatement();
+				this.addStatement(statement);
+				this.mode = FOR;
 				return true;
 			}
 		}
@@ -105,6 +126,10 @@ public class StatementParser extends Parser implements IImplementable, IField
 		else if (this.mode == ELSE)
 		{
 			((IfStatement) this.statement).setElseThen(statement);
+		}
+		else if (this.mode == FOR_2)
+		{
+			((ForStatement) this.statement).setThen(statement);
 		}
 	}
 	
