@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Long extends Number
+public abstract class Long implements Number
 {
 	protected long	value;
 	

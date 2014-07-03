@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Float extends Number
+public abstract class Float implements Number
 {
 	protected float	value;
 	

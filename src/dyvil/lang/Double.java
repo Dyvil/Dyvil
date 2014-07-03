@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Double extends Number
+public abstract class Double implements Number
 {
 	protected double	value;
 	

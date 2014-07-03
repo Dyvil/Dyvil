@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Byte extends Number
+public abstract class Byte implements Number
 {
 	protected byte	value;
 	

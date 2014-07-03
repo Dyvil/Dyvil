@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Int extends Number
+public abstract class Int implements Number
 {
 	protected int	value;
 	

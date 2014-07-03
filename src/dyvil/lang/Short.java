@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Short extends Number
+public abstract class Short implements Number
 {
 	protected short	value;
 	

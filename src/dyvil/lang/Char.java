@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Char extends Number
+public abstract class Char implements Number
 {
 	protected char	value;
 	
