@@ -158,6 +158,24 @@ public abstract class Short implements Number
 	}
 	
 	@Override
+	public Number or$(byte v)
+	{
+		return this.set$(this.value | v);
+	}
+	
+	@Override
+	public Number and$(byte v)
+	{
+		return this.set$(this.value & v);
+	}
+	
+	@Override
+	public Number xor$(byte v)
+	{
+		return this.set$(this.value ^ v);
+	}
+	
+	@Override
 	public Number bsl$(byte v)
 	{
 		return this.set$(this.value << v);
@@ -241,6 +259,24 @@ public abstract class Short implements Number
 	public Number mod$(short v)
 	{
 		return this.set$(this.value % v);
+	}
+	
+	@Override
+	public Number or$(short v)
+	{
+		return this.set$(this.value | v);
+	}
+	
+	@Override
+	public Number and$(short v)
+	{
+		return this.set$(this.value & v);
+	}
+	
+	@Override
+	public Number xor$(short v)
+	{
+		return this.set$(this.value ^ v);
 	}
 	
 	@Override
@@ -330,6 +366,24 @@ public abstract class Short implements Number
 	}
 	
 	@Override
+	public Number or$(char v)
+	{
+		return this.set$(this.value | v);
+	}
+	
+	@Override
+	public Number and$(char v)
+	{
+		return this.set$(this.value & v);
+	}
+	
+	@Override
+	public Number xor$(char v)
+	{
+		return this.set$(this.value ^ v);
+	}
+	
+	@Override
 	public Number bsl$(char v)
 	{
 		return this.set$(this.value << v);
@@ -416,6 +470,24 @@ public abstract class Short implements Number
 	}
 	
 	@Override
+	public Number or$(int v)
+	{
+		return this.set$(this.value | v);
+	}
+	
+	@Override
+	public Number and$(int v)
+	{
+		return this.set$(this.value & v);
+	}
+	
+	@Override
+	public Number xor$(int v)
+	{
+		return this.set$(this.value ^ v);
+	}
+	
+	@Override
 	public Number bsl$(int v)
 	{
 		return this.set$(this.value << v);
@@ -499,6 +571,24 @@ public abstract class Short implements Number
 	public Number mod$(long v)
 	{
 		return this.set$(this.value % v);
+	}
+	
+	@Override
+	public Number or$(long v)
+	{
+		return this.set$(this.value | v);
+	}
+	
+	@Override
+	public Number and$(long v)
+	{
+		return this.set$(this.value & v);
+	}
+	
+	@Override
+	public Number xor$(long v)
+	{
+		return this.set$(this.value ^ v);
 	}
 	
 	@Override

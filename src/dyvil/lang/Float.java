@@ -159,23 +159,38 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	public Number or$(byte v)
+	{
+		return this;
+	}
+	
+	@Override
+	public Number and$(byte v)
+	{
+		return this;
+	}
+	
+	@Override
+	public Number xor$(byte v)
+	{
+		return this;
+	}
+	
+	@Override
 	public Number bsl$(byte v)
 	{
-		// Unsupported
 		return this;
 	}
 	
 	@Override
 	public Number bsr$(byte v)
 	{
-		// Unsupported
 		return this;
 	}
 	
 	@Override
 	public Number usr$(byte v)
 	{
-		// Unsupported
 		return this;
 	}
 	
@@ -248,23 +263,38 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	public Number or$(short v)
+	{
+		return this;
+	}
+	
+	@Override
+	public Number and$(short v)
+	{
+		return this;
+	}
+	
+	@Override
+	public Number xor$(short v)
+	{
+		return this;
+	}
+	
+	@Override
 	public Number bsl$(short v)
 	{
-		// Unsupported
 		return this;
 	}
 	
 	@Override
 	public Number bsr$(short v)
 	{
-		// Unsupported
 		return this;
 	}
 	
 	@Override
 	public Number usr$(short v)
 	{
-		// Unsupported
 		return this;
 	}
 	
@@ -337,23 +367,38 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	public Number or$(char v)
+	{
+		return this;
+	}
+	
+	@Override
+	public Number and$(char v)
+	{
+		return this;
+	}
+	
+	@Override
+	public Number xor$(char v)
+	{
+		return this;
+	}
+	
+	@Override
 	public Number bsl$(char v)
 	{
-		// Unsupported
 		return this;
 	}
 	
 	@Override
 	public Number bsr$(char v)
 	{
-		// Unsupported
 		return this;
 	}
 	
 	@Override
 	public Number usr$(char v)
 	{
-		// Unsupported
 		return this;
 	}
 	
@@ -426,23 +471,38 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	public Number or$(int v)
+	{
+		return this;
+	}
+	
+	@Override
+	public Number and$(int v)
+	{
+		return this;
+	}
+	
+	@Override
+	public Number xor$(int v)
+	{
+		return this;
+	}
+	
+	@Override
 	public Number bsl$(int v)
 	{
-		// Unsupported
 		return this;
 	}
 	
 	@Override
 	public Number bsr$(int v)
 	{
-		// Unsupported
 		return this;
 	}
 	
 	@Override
 	public Number usr$(int v)
 	{
-		// Unsupported
 		return this;
 	}
 	
@@ -515,23 +575,38 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	public Number or$(long v)
+	{
+		return this;
+	}
+	
+	@Override
+	public Number and$(long v)
+	{
+		return this;
+	}
+	
+	@Override
+	public Number xor$(long v)
+	{
+		return this;
+	}
+	
+	@Override
 	public Number bsl$(long v)
 	{
-		// Unsupported
 		return this;
 	}
 	
 	@Override
 	public Number bsr$(long v)
 	{
-		// Unsupported
 		return this;
 	}
 	
 	@Override
 	public Number usr$(long v)
 	{
-		// Unsupported
 		return this;
 	}
 	
