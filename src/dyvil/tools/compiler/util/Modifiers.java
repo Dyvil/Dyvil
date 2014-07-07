@@ -50,6 +50,14 @@ public class Modifiers
 			sb.append("strictfp ");
 		if ((mod & INTERFACE) != 0)
 			sb.append("interface ");
+		if ((mod & LAZY) != 0)
+			sb.append("lazy ");
+		if ((mod & INLINE) != 0)
+			sb.append("inline ");
+		if ((mod & IMPLICIT) != 0)
+			sb.append("implicit ");
+		if ((mod & BYREF) != 0)
+			sb.append("ref ");
 		
 		if ((len = sb.length()) > 0) /* trim trailing space */
 			return sb.toString().substring(0, len - 1);
@@ -60,20 +68,26 @@ public class Modifiers
 	public static final int	PUBLIC				= 0x00000001;
 	public static final int	PRIVATE				= 0x00000002;
 	public static final int	PROTECTED			= 0x00000004;
-	// Dyvil derived
+	
+	/**
+	 * Dyvil derived access modifier
+	 */
 	public static final int	DERIVED				= PRIVATE | PROTECTED;
 	
 	public static final int	STATIC				= 0x00000008;
 	public static final int	FINAL				= 0x00000010;
-	// Dyvil const
+	
+	/**
+	 * Dyvil constant modifier
+	 */
 	public static final int	CONST				= STATIC | FINAL;
 	
 	public static final int	SYNCHRONIZED		= 0x00000020;
 	public static final int	VOLATILE			= 0x00000040;
+	public static final int	BRIDGE				= 0x00000040;
 	public static final int	TRANSIENT			= 0x00000080;
+	public static final int	VARARGS				= 0x00000080;
 	public static final int	NATIVE				= 0x00000100;
-	
-	// Non-Dyvil modifiers
 	static final int		INTERFACE			= 0x00000200;
 	static final int		ABSTRACT			= 0x00000400;
 	
@@ -81,22 +95,38 @@ public class Modifiers
 	public static final int	STRICT				= 0x00000800;
 	
 	// No real modifiers
-	public static final int	BRIDGE				= 0x00000040;
-	public static final int	VARARGS				= 0x00000080;
 	public static final int	SYNTHETIC			= 0x00001000;
 	public static final int	ANNOTATION			= 0x00002000;
 	public static final int	ENUM				= 0x00004000;
 	public static final int	MANDATED			= 0x00008000;
-	// Dyvil lazy
+	
+	/**
+	 * Dyvil lazy modifier
+	 */
 	public static final int	LAZY				= 0x00010000;
+	
+	/**
+	 * Dyvil inline modifier
+	 */
+	public static final int	INLINE				= 0x00020000;
+	
+	/**
+	 * Dyvil implicit modifier
+	 */
+	public static final int	IMPLICIT			= 0x00040000;
+	
+	/**
+	 * Dyvil Call-By-Reference modifier
+	 */
+	public static final int	BYREF				= 0x00100000;
 	
 	public static final int	ACCESS_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE;
 	public static final int	CLASS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | STRICT;
 	public static final int	INTERFACE_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE | STATIC | STRICT;
 	
 	public static final int	FIELD_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | TRANSIENT | VOLATILE | LAZY;
-	public static final int	METHOD_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | SYNCHRONIZED | NATIVE | STRICT;
-	public static final int	PARAMETER_MODIFIERS	= STATIC | FINAL;
+	public static final int	METHOD_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT;
+	public static final int	PARAMETER_MODIFIERS	= FINAL | IMPLICIT | BYREF;
 	
 	public static int parseModifier(String mod)
 	{
@@ -130,6 +160,12 @@ public class Modifiers
 			return STRICT;
 		case "lazy":
 			return LAZY;
+		case "inline":
+			return INLINE;
+		case "implicit":
+			return IMPLICIT;
+		case "ref":
+			return BYREF;
 		}
 		return 0;
 	}
@@ -226,6 +262,10 @@ public class Modifiers
 			return NATIVE;
 		case "strictfp":
 			return STRICT;
+		case "inline":
+			return INLINE;
+		case "implicit":
+			return IMPLICIT;
 		}
 		return 0;
 	}
@@ -238,6 +278,10 @@ public class Modifiers
 			return FINAL;
 		case "const":
 			return CONST;
+		case "implicit":
+			return IMPLICIT;
+		case "ref":
+			return BYREF;
 		}
 		return 0;
 	}
