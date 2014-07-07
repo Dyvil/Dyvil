@@ -124,12 +124,12 @@ public class Modifiers
 	/**
 	 * Dyvil implicit modifier
 	 */
-	public static final int	IMPLICIT			= 0x00040000;
+	public static final int	IMPLICIT			= 0x00020000;
 	
 	/**
 	 * Dyvil Call-By-Reference modifier
 	 */
-	public static final int	BYREF				= 0x00100000;
+	public static final int	BYREF				= 0x00040000;
 	
 	public static final int	ACCESS_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE;
 	public static final int	CLASS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | STRICT;
