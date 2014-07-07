@@ -13,4 +13,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
 public @interface implicit
-{}
+{
+	public Class[] classes() default {};
+}
