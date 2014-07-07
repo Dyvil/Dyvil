@@ -53,12 +53,12 @@ public class DyvilTest
     
     public func[float; float, func] getOpDoubleFunc()
     {
-        return .opDouble;
+        return this::opDouble;
     }
     
     public func[void] getVoidFunc()
     {
-        return .printName;
+        return this::printName;
     }
     
     public String asString(Object o)
