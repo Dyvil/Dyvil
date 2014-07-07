@@ -91,13 +91,24 @@ public class Modifiers
 	static final int		INTERFACE			= 0x00000200;
 	static final int		ABSTRACT			= 0x00000400;
 	
-	// strictfp
+	/**
+	 * Strictfp modifier. This is used for classes and methods and marks that
+	 * floating point numbers (floats and doubles) have to be handled specially.
+	 */
 	public static final int	STRICT				= 0x00000800;
 	
-	// No real modifiers
+	/**
+	 * Synthetic modifier. This is used for fields of inner classes that hold
+	 * the outer class.
+	 */
 	public static final int	SYNTHETIC			= 0x00001000;
 	public static final int	ANNOTATION			= 0x00002000;
 	public static final int	ENUM				= 0x00004000;
+	
+	/**
+	 * Mandated modifier. This is used for constructors of inner classes that
+	 * have the outer class as a parameter.
+	 */
 	public static final int	MANDATED			= 0x00008000;
 	
 	/**
@@ -108,7 +119,7 @@ public class Modifiers
 	/**
 	 * Dyvil inline modifier
 	 */
-	public static final int	INLINE				= 0x00020000;
+	public static final int	INLINE				= 0x00010000;
 	
 	/**
 	 * Dyvil implicit modifier
