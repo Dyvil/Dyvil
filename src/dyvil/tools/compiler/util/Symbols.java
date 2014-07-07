@@ -67,6 +67,7 @@ public class Symbols
 		switch (s)
 		{
 		case "$set":
+		case "set":
 			return "=";
 			
 		case "$eq":
@@ -83,21 +84,30 @@ public class Symbols
 			return ">=";
 			
 		case "$add":
+		case "add":
 			return "+";
 		case "$sub":
+		case "substract":
+		case "remove":
 			return "-";
 		case "$mul":
+		case "multiply":
 			return "*";
 		case "$div":
+		case "divide":
 			return "/";
 		case "$mod":
+		case "modulo":
 			return "%";
 			
 		case "$and":
+		case "and":
 			return "&";
 		case "$or":
+		case "or":
 			return "|";
 		case "$xor":
+		case "xor":
 			return "^";
 			
 		case "$bsl":
@@ -108,15 +118,21 @@ public class Symbols
 			return ">>>";
 			
 		case "$neg":
+		case "negate":
 			return "-";
 		case "$inv":
+		case "invert":
 			return "~";
 		case "$inc":
+		case "increment":
 			return "++";
 		case "$dec":
+		case "decrement":
 			return "--";
 		case "$sqr":
+		case "square":
 			return "**";
+			
 			// case "$rev": return "//";
 		}
 		return s;
