@@ -22,6 +22,15 @@ public class Symbols
 		case ">=":
 			return "$ge";
 			
+		case "->":
+			return "$arr";
+		case "<-":
+			return "$arl";
+		case "=>":
+			return "$cst";
+		case ":>":
+			return "$iof";
+			
 		case "+":
 			return "$add";
 		case "-":
@@ -82,6 +91,15 @@ public class Symbols
 			return ">";
 		case "$ge":
 			return ">=";
+			
+		case "$arr":
+			return "->";
+		case "$arl":
+			return "<-";
+		case "$cst":
+			return "=>";
+		case "$iof":
+			return ":>";
 			
 		case "$add":
 		case "add":
