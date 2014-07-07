@@ -70,7 +70,7 @@ public class Modifiers
 	public static final int	PROTECTED			= 0x00000004;
 	
 	/**
-	 * Dyvil derived access modifier
+	 * Dyvil derived access modifier.
 	 */
 	public static final int	DERIVED				= PRIVATE | PROTECTED;
 	
@@ -78,7 +78,8 @@ public class Modifiers
 	public static final int	FINAL				= 0x00000010;
 	
 	/**
-	 * Dyvil constant modifier
+	 * Dyvil constant modifier. This modifier is just a shortcut for
+	 * {@code static final}.
 	 */
 	public static final int	CONST				= STATIC | FINAL;
 	
@@ -112,22 +113,30 @@ public class Modifiers
 	public static final int	MANDATED			= 0x00008000;
 	
 	/**
-	 * Dyvil lazy modifier
+	 * Dyvil lazy modifier. If a field is marked with this modifier, it is going
+	 * to be evaluated / calculated every time it is demanded and is thus not
+	 * saved in the memory. This behavior can be compared with a method without
+	 * parameters.
 	 */
 	public static final int	LAZY				= 0x00010000;
 	
 	/**
-	 * Dyvil inline modifier
+	 * Dyvil inline modifier. If a method is marked with this modifier, it will
+	 * be inlined by the compiler to reduce method call overhead.
 	 */
 	public static final int	INLINE				= 0x00010000;
 	
 	/**
-	 * Dyvil implicit modifier
+	 * Dyvil implicit modifier. If a method is marked with this modifier, it is
+	 * a method that can be called on any Object and virtually has the instance
+	 * as the first parameter.
 	 */
 	public static final int	IMPLICIT			= 0x00020000;
 	
 	/**
-	 * Dyvil Call-By-Reference modifier
+	 * Dyvil ref modifier. This is used to mark that a parameter is
+	 * Call-By-Reference. If a parameter doesn't have this flag, it is
+	 * Call-By-Value.
 	 */
 	public static final int	BYREF				= 0x00040000;
 	
@@ -137,7 +146,7 @@ public class Modifiers
 	
 	public static final int	FIELD_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | TRANSIENT | VOLATILE | LAZY;
 	public static final int	METHOD_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT;
-	public static final int	PARAMETER_MODIFIERS	= FINAL | IMPLICIT | BYREF;
+	public static final int	PARAMETER_MODIFIERS	= FINAL | BYREF;
 	
 	public static int parseModifier(String mod)
 	{
@@ -289,8 +298,6 @@ public class Modifiers
 			return FINAL;
 		case "const":
 			return CONST;
-		case "implicit":
-			return IMPLICIT;
 		case "ref":
 			return BYREF;
 		}
