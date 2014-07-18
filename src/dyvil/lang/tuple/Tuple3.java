@@ -2,6 +2,9 @@ package dyvil.lang.tuple;
 
 import java.util.Objects;
 
+import dyvil.lang.annotation.alias;
+
+@alias("Triple")
 public class Tuple3<A, B, C>
 {
 	public A _1;

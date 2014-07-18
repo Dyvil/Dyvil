@@ -2,6 +2,9 @@ package dyvil.lang.tuple;
 
 import java.util.Objects;
 
+import dyvil.lang.annotation.alias;
+
+@alias("Pair")
 public class Tuple2<A, B>
 {
 	public A _1;
