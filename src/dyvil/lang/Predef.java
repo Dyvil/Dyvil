@@ -11,7 +11,7 @@ public class Predef
 	 * @param b
 	 * @return
 	 */
-	public static @implicit <A, B> Tuple2<A, B> $arr(A a, B b)
+	public static @implicit <A, B> Tuple2<A, B> $minus$greater(A a, B b)
 	{
 		return new Tuple2(a, b);
 	}
@@ -22,7 +22,7 @@ public class Predef
 	 * @param b
 	 * @return
 	 */
-	public static @implicit <A, B> Tuple2<B, A> $arl(A a, B b)
+	public static @implicit <A, B> Tuple2<B, A> $less$minus(A a, B b)
 	{
 		return new Tuple2(b, a);
 	}
@@ -31,14 +31,14 @@ public class Predef
 	 * Returns true if the given {@code T t} is an instance of the given
 	 * {@link Class} {@code c}.
 	 * 
-	 * @dyvil :>
+	 * @dyvil <:
 	 * @param t
 	 *            the object
 	 * @param c
 	 *            the class
 	 * @return true, if t is an instance of c
 	 */
-	public static @implicit <T> boolean $iof(T t, Class c)
+	public static @implicit <T> boolean $less$colon(T t, Class c)
 	{
 		return t == null ? false : c.isAssignableFrom(t.getClass());
 	}
@@ -46,14 +46,14 @@ public class Predef
 	/**
 	 * Casts the given {@code T t} to the given {@link Class} {@code c}.
 	 * 
-	 * @dyvil =>
+	 * @dyvil :>
 	 * @param t
 	 *            the object
 	 * @param c
 	 *            the class
 	 * @return t as an instance of c
 	 */
-	public static @implicit <T, U> U $cst(T t, Class<U> c)
+	public static @implicit <T, U> U $colon$greater(T t, Class<U> c)
 	{
 		return t == null ? (U) null : c.cast(t);
 	}
