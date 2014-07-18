@@ -40,11 +40,26 @@ public class Predef
 	 */
 	public static @implicit <T> boolean $less$colon(T t, Class c)
 	{
-		return t == null ? false : c.isAssignableFrom(t.getClass());
+		return t == null ? false : c.isInstance(t);
 	}
 	
 	/**
-	 * Casts the given {@code T t} to the given {@link Class} {@code c}.
+	 * Casts the given {@code T t} to the given type {@code U}.
+	 * 
+	 * @dyvil :>
+	 * @param t
+	 *            the object
+	 * @param c
+	 *            the class
+	 * @return t as an instance of c
+	 */
+	public static @implicit <T, U> U $colon$greater(T t)
+	{
+		return (U) t;
+	}
+	
+	/**
+	 * Casts the given {@code T t} to the given {@link Class} {@code c} of type {@code U}.
 	 * 
 	 * @dyvil :>
 	 * @param t
