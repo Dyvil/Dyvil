@@ -1,5 +1,7 @@
 package dyvil.lang.tuple;
 
+import java.util.Objects;
+
 public class Tuple7<A, B, C, D, E, F, G>
 {
 	public A _1;
@@ -19,5 +21,22 @@ public class Tuple7<A, B, C, D, E, F, G>
 		this._5 = e;
 		this._6 = f;
 		this._7 = g;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof Tuple7)
+		{
+			Tuple7 that = (Tuple7) obj;
+			return this._1 == that._1 && this._2 == that._2 && this._3 == that._3 && this._4 == that._4 && this._5 == that._5 && this._6 == that._6 && this._7 == that._7;
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(_1, _2, _3, _4, _5, _6, _7);
 	}
 }
