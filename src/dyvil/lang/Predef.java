@@ -5,6 +5,33 @@ import dyvil.lang.tuple.Tuple2;
 
 public class Predef
 {
+	public static int hash(Object o)
+	{
+		return o == null ? 0 : o.hashCode();
+	}
+	
+	public static int hash(Object... args)
+	{
+		if (args == null)
+		{
+			return 0;
+		}
+		
+		int result = 1;
+		
+		for (Object element : args)
+		{
+			result = 31 * result + (element == null ? 0 : element.hashCode());
+		}
+		
+		return result;
+	}
+	
+	public static @implicit int $hash$hash(Object o)
+	{
+		return hash(o);
+	}
+	
 	/**
 	 * @dyvil ->
 	 * @param a
@@ -59,7 +86,8 @@ public class Predef
 	}
 	
 	/**
-	 * Casts the given {@code T t} to the given {@link Class} {@code c} of type {@code U}.
+	 * Casts the given {@code T t} to the given {@link Class} {@code c} of type
+	 * {@code U}.
 	 * 
 	 * @dyvil :>
 	 * @param t
