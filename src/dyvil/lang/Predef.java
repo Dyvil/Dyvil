@@ -72,4 +72,9 @@ public class Predef
 	{
 		return t == null ? (U) null : c.cast(t);
 	}
+	
+	public static @implicit java.lang.String $plus(Object o, String s)
+	{
+		return java.lang.String.valueOf(o) + s;
+	}
 }
