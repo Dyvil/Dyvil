@@ -29,4 +29,10 @@ public class Tuple2<A, B>
 	{
 		return Objects.hash(_1, _2);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "(" + _1 + "," + _2 + ")";
+	}
 }

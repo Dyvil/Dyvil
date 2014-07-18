@@ -37,4 +37,10 @@ public class Tuple6<A, B, C, D, E, F>
 	{
 		return Objects.hash(_1, _2, _3, _4, _5, _6);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + "," + _6 + ")";
+	}
 }

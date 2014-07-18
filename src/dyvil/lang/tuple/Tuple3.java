@@ -31,4 +31,10 @@ public class Tuple3<A, B, C>
 	{
 		return Objects.hash(_1, _2, _3);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "(" + _1 + "," + _2 + "," + _3 + ")";
+	}
 }

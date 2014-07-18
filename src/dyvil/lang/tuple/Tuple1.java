@@ -27,4 +27,10 @@ public final class Tuple1<A>
 	{
 		return Objects.hashCode(this._1);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "(" + _1 + ")";
+	}
 }

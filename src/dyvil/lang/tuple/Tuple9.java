@@ -43,4 +43,10 @@ public class Tuple9<A, B, C, D, E, F, G, H, I>
 	{
 		return Objects.hash(_1, _2, _3, _4, _5, _6, _7, _8, _9);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + "," + _6 + "," + _7 + "," + _8 + "," + _9 + ")";
+	}
 }

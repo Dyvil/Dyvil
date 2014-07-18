@@ -35,4 +35,10 @@ public class Tuple5<A, B, C, D, E>
 	{
 		return Objects.hash(_1, _2, _3, _4, _5);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + ")";
+	}
 }
