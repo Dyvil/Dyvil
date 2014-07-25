@@ -8,10 +8,8 @@ import java.lang.;
 import java.awt.{Color, Image};
 
 // Line comment
-/* Block comment
- * public - Everyone can use the member
- * private - Only this class / instance can use the member
- * inherited - This class and subclasses can use the member
+/* 
+ * Block comment
  */
 
 // Usual class
@@ -19,10 +17,10 @@ public class DyvilTest
 {
     public int var1 = 3;
     public float var2 = 4.0;
-    public double double = 4.000000000000000000000001;
+    public double d = 4.000000000000000000000001;
     public String name = "DyvilTest";
-    public int<> intarray = {};
-    public float<> array = { 1, 2, 3 } + { 4.5, 5, 6.2 }; // Returns {1, 2, 3, 4.5, 5, 6.2}
+    public int[] intarray = {};
+    public float[] array = { 1, 2, 3 } + { 4.5, 5, 6.2 }; // Returns {1, 2, 3, 4.5, 5, 6.2}
     
     public new()
     {
@@ -68,17 +66,17 @@ public class DyvilTest
         return (var1, var2 + i);
     }
     
-    public float opDouble(float f, func op)
+    public float opDouble(float f, (float) => float op)
     {
-        return func(f);
+        return op(f);
     }
     
-    public func[float; float, func] getOpDoubleFunc()
+    public (float, (float) => float) => float getOpDoubleFunc()
     {
         return this::opDouble;
     }
     
-    public func[void] getVoidFunc()
+    public () => void getVoidFunc()
     {
         return this::printName;
     }
@@ -105,7 +103,7 @@ public class DyvilTest
     }
 }
 
-public class GenericTest[T; U, V; W]
+public class GenericTest<T; U, V; W>
 {
     public Type getT()
     {

@@ -32,7 +32,7 @@ public class TypeParser extends Parser
 	{
 		if (this.mode == NAME)
 		{
-			if (token.next().equals("["))
+			if (token.next().equals("<"))
 			{
 				this.type = new GenericType(value);
 				this.mode = GENERICS;
@@ -41,14 +41,14 @@ public class TypeParser extends Parser
 			{
 				this.type = new Type(value);
 				this.mode = ARRAY;
-				if (!token.next().equals("<"))
+				if (!token.next().equals("["))
 				{
 					pm.popParser();
 				}
 			}
 			return true;
 		}
-		else if ("[".equals(value))
+		else if ("<".equals(value))
 		{
 			if (this.mode == NAME)
 			{
@@ -65,7 +65,7 @@ public class TypeParser extends Parser
 			pm.pushParser(new TypeListParser((GenericType) this.type));
 			return true;
 		}
-		else if ("]".equals(value))
+		else if (">".equals(value))
 		{
 			if (this.mode == NAME)
 			{
@@ -86,7 +86,7 @@ public class TypeParser extends Parser
 			}
 			return true;
 		}
-		else if ("<".equals(value))
+		else if ("[".equals(value))
 		{
 			if (this.mode == NAME)
 			{
@@ -98,7 +98,7 @@ public class TypeParser extends Parser
 			this.arrayDimensions2++;
 			return true;
 		}
-		else if (">".equals(value))
+		else if ("]".equals(value))
 		{
 			if (this.mode != ARRAY2)
 			{
@@ -107,7 +107,7 @@ public class TypeParser extends Parser
 			
 			this.mode = ARRAY;
 			this.arrayDimensions2--;
-			if (!token.next().equals("<"))
+			if (!token.next().equals("["))
 			{
 				if (this.arrayDimensions2 == 0)
 				{
