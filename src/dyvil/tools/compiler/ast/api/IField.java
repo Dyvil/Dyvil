@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.api;
 
+import dyvil.tools.compiler.ast.value.IValue;
+
 public interface IField
 {
-	public static final Object NULL = new Object();
+	public void setValue(IValue value);
 	
-	public void setValue(Object value);
-	
-	public Object getValue();
+	public IValue getValue();
 	
 	public default boolean hasValue()
 	{
