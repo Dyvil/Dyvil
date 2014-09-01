@@ -2,6 +2,7 @@ package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
@@ -59,37 +60,36 @@ public class ValueParser extends Parser
 		// Boolean
 		else if ("true".equals(value))
 		{
-			this.field.setValue(Boolean.TRUE);
+			this.field.setValue(BooleanValue.of(true));
 			return true;
 		}
 		else if ("false".equals(value))
 		{
-			this.field.setValue(Boolean.FALSE);
+			this.field.setValue(BooleanValue.of(false));
 			return true;
 		}
 		// String
 		else if (token.type() == Token.TYPE_STRING)
 		{
 			String string = value.substring(1, value.length() - 1);
-			this.field.setValue(string);
+			this.field.setValue(new StringValue(string));
 			return true;
 		}
 		// Char
 		else if (token.type() == Token.TYPE_CHAR)
 		{
-			char c = value.charAt(1);
-			this.field.setValue(Character.valueOf(c));
+			this.field.setValue(new CharValue(value));
 			return true;
 		}
 		else if (token.type() == Token.TYPE_INT)
 		{
 			if (token.next().equals("L"))
 			{
-				this.field.setValue(Long.valueOf(value));
+				this.field.setValue(new LongValue(value));
 			}
 			else
 			{
-				this.field.setValue(Integer.valueOf(value));
+				this.field.setValue(new IntValue(value));
 			}
 		}
 		// Float
@@ -97,11 +97,11 @@ public class ValueParser extends Parser
 		{
 			if (token.next().equals("D"))
 			{
-				this.field.setValue(Double.valueOf(value));
+				this.field.setValue(new DoubleValue(value));
 			}
 			else
 			{
-				this.field.setValue(Float.valueOf(value));
+				this.field.setValue(new FloatValue(value));
 			}
 		}
 		else if (token.type() == Token.TYPE_FLOAT_HEX)

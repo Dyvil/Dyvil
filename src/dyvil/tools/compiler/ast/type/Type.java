@@ -5,6 +5,16 @@ import dyvil.tools.compiler.ast.classes.AbstractClass;
 
 public class Type
 {
+	public static Type		VOID	= new Type("void");
+	public static Type		INT		= new Type("int");
+	public static Type		LONG	= new Type("long");
+	public static Type		FLOAT	= new Type("float");
+	public static Type		DOUBLE	= new Type("double");
+	public static Type		CHAR	= new Type("char");
+	public static Type		BOOL	= new Type("boolean");
+	
+	public static Type		STRING	= new Type("java.lang.String");
+	
 	private AbstractClass	theClass;
 	private char			seperator;
 	private int				arrayDimensions;

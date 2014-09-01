@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.tools.compiler.ast.api.IField;
-import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 
-public class Variable extends Member implements IField, ITyped
+public class Variable extends Member implements IField
 {
-	private Object	value;
+	private IValue	value;
 	
 	public Variable()
 	{
@@ -29,13 +29,13 @@ public class Variable extends Member implements IField, ITyped
 	}
 	
 	@Override
-	public void setValue(Object value)
+	public void setValue(IValue value)
 	{
 		this.value = value;
 	}
 	
 	@Override
-	public Object getValue()
+	public IValue getValue()
 	{
 		return this.value;
 	}

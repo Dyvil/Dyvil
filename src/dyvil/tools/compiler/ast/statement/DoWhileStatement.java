@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public class DoWhileStatement implements IStatement, IField
 {
 	private IStatement	then;
-	private Object		condition;
+	private IValue		condition;
 	
 	public DoWhileStatement()
 	{
@@ -17,7 +18,7 @@ public class DoWhileStatement implements IStatement, IField
 	}
 	
 	@Override
-	public void setValue(Object value)
+	public void setValue(IValue value)
 	{
 		this.condition = value;
 	}
@@ -28,7 +29,7 @@ public class DoWhileStatement implements IStatement, IField
 	}
 	
 	@Override
-	public Object getValue()
+	public IValue getValue()
 	{
 		return this.condition;
 	}

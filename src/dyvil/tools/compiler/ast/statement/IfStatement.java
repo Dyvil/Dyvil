@@ -1,10 +1,11 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public class IfStatement implements IStatement, IField
 {
-	private Object		condition;
+	private IValue		condition;
 	private IStatement	then;
 	private IStatement	elseThen;
 	
@@ -13,7 +14,7 @@ public class IfStatement implements IStatement, IField
 	}
 	
 	@Override
-	public void setValue(Object condition)
+	public void setValue(IValue condition)
 	{
 		this.condition = condition;
 	}
@@ -29,7 +30,7 @@ public class IfStatement implements IStatement, IField
 	}
 	
 	@Override
-	public Object getValue()
+	public IValue getValue()
 	{
 		return this.condition;
 	}
