@@ -1,9 +1,13 @@
 package dyvil.tools.compiler.ast.type;
 
 import dyvil.tools.compiler.CodeParser;
+import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IClassContext;
+import dyvil.tools.compiler.ast.method.IMethod;
 
-public class Type
+public class Type implements IClassContext
 {
 	public static Type		VOID	= new Type("void");
 	public static Type		INT		= new Type("int");
@@ -15,7 +19,7 @@ public class Type
 	
 	public static Type		STRING	= new Type("java.lang.String");
 	
-	private AbstractClass	theClass;
+	private IClass	theClass;
 	private char			seperator;
 	private int				arrayDimensions;
 	
@@ -44,7 +48,7 @@ public class Type
 		this.arrayDimensions = dimensions;
 	}
 	
-	public AbstractClass getAbstractClass()
+	public IClass getTheClass()
 	{
 		return this.theClass;
 	}
@@ -62,5 +66,23 @@ public class Type
 	public int getArrayDimensions()
 	{
 		return this.arrayDimensions;
+	}
+
+	@Override
+	public IClass resolveClass(String name)
+	{
+		return this.theClass.resolveClass(name);
+	}
+
+	@Override
+	public IField resolveField(String name)
+	{
+		return this.theClass.resolveField(name);
+	}
+
+	@Override
+	public IMethod resolveMethod(String name, Type... args)
+	{
+		return this.theClass.resolveMethod(name, args);
 	}
 }

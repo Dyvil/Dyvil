@@ -42,7 +42,7 @@ public class ClassDeclParser extends Parser
 		}
 		else if (this.mode == SUPERCLASSES)
 		{			
-			this.theClassDecl.addSuperClass(value);
+			this.theClassDecl.addSuperClass(this.theClassDecl.resolveClass(value));
 			return true;
 		}
 		return false;

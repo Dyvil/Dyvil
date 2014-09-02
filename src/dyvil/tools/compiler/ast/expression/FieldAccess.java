@@ -1,20 +1,20 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
 public class FieldAccess implements IValue
 {
 	public Object instance;
-	public Variable field;
+	public Field field;
 	
-	public FieldAccess(Variable field)
+	public FieldAccess(Field field)
 	{
 		this(null, field);
 	}
 	
-	public FieldAccess(Object instance, Variable field)
+	public FieldAccess(Object instance, Field field)
 	{
 		this.instance = instance;
 		this.field = field;

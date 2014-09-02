@@ -5,25 +5,25 @@ import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public class Variable extends Member implements IField
+public class Field extends Member implements IField
 {
 	private IValue	value;
 	
-	public Variable()
+	public Field()
 	{
 	}
 	
-	public Variable(String name)
+	public Field(String name)
 	{
 		super(name);
 	}
 	
-	public Variable(String name, Type type)
+	public Field(String name, Type type)
 	{
 		super(name, type);
 	}
 	
-	public Variable(String name, Type type, int modifiers)
+	public Field(String name, Type type, int modifiers)
 	{
 		super(name, type, modifiers);
 	}

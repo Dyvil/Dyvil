@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dyvil.tools.compiler.ast.api.ITyped;
-import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class Annotation implements ITyped
 {
 	private Type type;
 	
-	private Map<String, Variable> parameters = new HashMap();
+	private Map<String, Field> parameters = new HashMap();
 	
 	@Override
 	public void setType(Type type)
@@ -19,7 +19,7 @@ public class Annotation implements ITyped
 		this.type = type;
 	}
 	
-	public void addParameter(Variable var)
+	public void addParameter(Field var)
 	{
 		this.parameters.put(var.getName(), var);
 	}
@@ -30,7 +30,7 @@ public class Annotation implements ITyped
 		return this.type;
 	}
 	
-	public Map<String, Variable> getParameters()
+	public Map<String, Field> getParameters()
 	{
 		return this.parameters;
 	}

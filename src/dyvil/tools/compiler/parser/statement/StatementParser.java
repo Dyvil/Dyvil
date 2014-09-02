@@ -1,7 +1,8 @@
 package dyvil.tools.compiler.parser.statement;
 
-import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IImplementable;
+import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.context.IMethodContext;
 import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.IfStatement;
@@ -13,7 +14,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.expression.ValueParser;
 
-public class StatementParser extends Parser implements IImplementable, IField
+public class StatementParser extends Parser implements IImplementable, IValued
 {
 	private static final int	IF		= 1;
 	private static final int	THEN	= 2;
@@ -21,11 +22,13 @@ public class StatementParser extends Parser implements IImplementable, IField
 	private static final int	FOR		= 4;
 	private static final int	FOR_2	= 5;
 	
+	protected IMethodContext context;
 	protected IImplementable	implementable;
 	private IStatement			statement;
 	
-	public StatementParser(IImplementable implementable)
+	public StatementParser(IMethodContext context, IImplementable implementable)
 	{
+		this.context = context;
 		this.implementable = implementable;
 	}
 	
@@ -41,14 +44,14 @@ public class StatementParser extends Parser implements IImplementable, IField
 		{
 			StatementList statement = new StatementList();
 			this.addStatement(statement);
-			jcp.pushParser(new StatementParser(statement));
+			jcp.pushParser(new StatementParser(this.context, statement));
 			return true;
 		}
 		else if ("(".equals(value))
 		{
 			if (this.mode == IF)
 			{
-				jcp.pushParser(new ValueParser(this));
+				jcp.pushParser(new ValueParser(this.context, this));
 				return true;
 			}
 			else if (this.mode == FOR)
@@ -84,7 +87,7 @@ public class StatementParser extends Parser implements IImplementable, IField
 			if (this.mode == THEN)
 			{
 				this.mode = ELSE;
-				jcp.pushParser(new StatementParser(this));
+				jcp.pushParser(new StatementParser(this.context, this));
 				return true;
 			}
 		}

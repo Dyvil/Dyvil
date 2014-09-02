@@ -5,9 +5,10 @@ import java.util.LinkedList;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IImplementable;
 import dyvil.tools.compiler.ast.api.IThrower;
-import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
-import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IMethodContext;
+import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.lexer.SyntaxError;
@@ -30,14 +31,14 @@ public class ClassBodyParser extends Parser
 	public static int				ANNOTATION		= 4;
 	public static int				POST_ANNOTATION	= 5;
 	
-	protected AbstractClass			theClass;
+	protected IClass				theClass;
 	
-	private int modifiers;
+	private int						modifiers;
 	private LinkedList<Annotation>	annotations		= new LinkedList();
 	private ClassBody				classBody;
 	private Member					member;
 	
-	public ClassBodyParser(AbstractClass theClass)
+	public ClassBodyParser(IClass theClass)
 	{
 		this.theClass = theClass;
 		this.classBody = theClass.getBody();
@@ -72,7 +73,7 @@ public class ClassBodyParser extends Parser
 			}
 			else if (this.mode == ANNOTATION)
 			{
-				pm.pushParser(new AnnotationParametersParser(this.annotations.getLast()));
+				pm.pushParser(new AnnotationParametersParser(this.theClass, this.annotations.getLast()));
 				return true;
 			}
 		}
@@ -88,7 +89,7 @@ public class ClassBodyParser extends Parser
 		{
 			if (this.mode == POST_METHOD)
 			{
-				pm.pushParser(new StatementParser((IImplementable) this.member));
+				pm.pushParser(new StatementParser((IMethodContext) this.member, (IImplementable) this.member));
 				return true;
 			}
 		}
@@ -111,7 +112,7 @@ public class ClassBodyParser extends Parser
 			{
 				this.mode = VARIABLE;
 				
-				Variable variable = new Variable();
+				Field variable = new Field();
 				variable.setName(token.prev().value());
 				variable.setAnnotations(this.annotations);
 				
@@ -119,7 +120,7 @@ public class ClassBodyParser extends Parser
 				this.classBody.addVariable(variable);
 				this.reset();
 				
-				pm.pushParser(new ValueParser(variable));
+				pm.pushParser(new ValueParser(this.theClass, variable));
 				return true;
 			}
 		}
@@ -141,7 +142,7 @@ public class ClassBodyParser extends Parser
 				this.annotations.add(annotation);
 				
 				pm.pushParser(new TypeParser(annotation));
-			return true;
+				return true;
 			}
 		}
 		else if ("throws".equals(value))

@@ -1,7 +1,8 @@
 package dyvil.tools.compiler.parser.annotation;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.context.IClassContext;
+import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -10,12 +11,14 @@ import dyvil.tools.compiler.parser.expression.ValueParser;
 
 public class AnnotationParametersParser extends Parser
 {
+	protected IClassContext context;
 	protected Annotation annotation;
 	
-	private Variable parameter;
+	private Field parameter;
 	
-	public AnnotationParametersParser(Annotation annotation)
+	public AnnotationParametersParser(IClassContext context, Annotation annotation)
 	{
+		this.context = context;
 		this.annotation = annotation;
 	}
 	
@@ -34,8 +37,8 @@ public class AnnotationParametersParser extends Parser
 		}
 		else if ("=".equals(value))
 		{
-			this.parameter = new Variable(token.prev().value());
-			pm.pushParser(new ValueParser(this.parameter));
+			this.parameter = new Field(token.prev().value());
+			pm.pushParser(new ValueParser(this.context, this.parameter));
 			return true;
 		}
 		return false;

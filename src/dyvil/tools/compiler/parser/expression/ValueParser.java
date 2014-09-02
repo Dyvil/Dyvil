@@ -1,7 +1,8 @@
 package dyvil.tools.compiler.parser.expression;
 
-import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.context.IClassContext;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -15,9 +16,9 @@ public class ValueParser extends Parser
 	public static final int	TYPE		= 1;
 	public static final int	PARAMETERS	= 2;
 	
-	private IField			field;
+	private IValued			field;
 	
-	public ValueParser(IField field)
+	public ValueParser(IClassContext context, IValued field)
 	{
 		this.field = field;
 	}
@@ -81,6 +82,7 @@ public class ValueParser extends Parser
 			this.field.setValue(new CharValue(value));
 			return true;
 		}
+		// Int
 		else if (token.type() == Token.TYPE_INT)
 		{
 			if (token.next().equals("L"))
@@ -90,6 +92,28 @@ public class ValueParser extends Parser
 			else
 			{
 				this.field.setValue(new IntValue(value));
+			}
+		}
+		else if (token.type() == Token.TYPE_INT_BIN)
+		{
+			if (token.next().equals("L"))
+			{
+				this.field.setValue(new LongValue(value, 2));
+			}
+			else
+			{
+				this.field.setValue(new IntValue(value, 2));
+			}
+		}
+		else if (token.type() == Token.TYPE_INT_HEX)
+		{
+			if (token.next().equals("L"))
+			{
+				this.field.setValue(new LongValue(value, 16));
+			}
+			else
+			{
+				this.field.setValue(new IntValue(value, 16));
 			}
 		}
 		// Float
@@ -107,6 +131,7 @@ public class ValueParser extends Parser
 		else if (token.type() == Token.TYPE_FLOAT_HEX)
 		{
 		}
+		
 		return false;
 	}
 }

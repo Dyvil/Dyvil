@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.IAnnotatable;
-import dyvil.tools.compiler.ast.api.IModified;
-import dyvil.tools.compiler.ast.api.INamed;
+import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.Classes;
 
-public abstract class AbstractClass implements INamed, IModified, IAnnotatable
+public abstract class AbstractClass implements IClass
 {
 	private String				name;
 	private int					type;
 	private int					modifiers;
 	private ClassBody			body;
 	
-	private List<String>		superClasses	= new ArrayList();
+	private List<IClass>		superClasses	= new ArrayList();
 	private List<Annotation>	annotations		= new ArrayList();
 	
 	protected AbstractClass(int type, ClassBody body)
@@ -67,11 +67,6 @@ public abstract class AbstractClass implements INamed, IModified, IAnnotatable
 		this.name = name;
 	}
 	
-	public void addSuperClass(String superClass)
-	{
-		this.superClasses.add(superClass);
-	}
-	
 	@Override
 	public void setAnnotations(List<Annotation> annotations)
 	{
@@ -95,7 +90,8 @@ public abstract class AbstractClass implements INamed, IModified, IAnnotatable
 		return this.name;
 	}
 	
-	public List<String> getSuperClasses()
+	@Override
+	public List<IClass> getSuperClasses()
 	{
 		return this.superClasses;
 	}
@@ -106,8 +102,30 @@ public abstract class AbstractClass implements INamed, IModified, IAnnotatable
 		return this.annotations;
 	}
 	
+	@Override
 	public ClassBody getBody()
 	{
 		return this.body;
+	}
+	
+	@Override
+	public IClass resolveClass(String name)
+	{
+		// FIXME
+		return null;
+	}
+	
+	@Override
+	public IField resolveField(String name)
+	{
+		// FIXME
+		return this.body.getField(name);
+	}
+	
+	@Override
+	public IMethod resolveMethod(String name, Type... args)
+	{
+		// FIXME
+		return this.body.getMethod(name, args);
 	}
 }

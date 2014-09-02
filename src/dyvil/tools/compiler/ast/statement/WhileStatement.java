@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public class WhileStatement implements IStatement, IField
+public class WhileStatement implements IStatement, IValued
 {
 	private IValue		condition;
 	private IStatement	then;

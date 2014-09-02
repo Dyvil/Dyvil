@@ -1,24 +1,19 @@
 package dyvil.tools.compiler.ast.method;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import dyvil.tools.compiler.ast.api.IImplementable;
-import dyvil.tools.compiler.ast.api.IParameterized;
-import dyvil.tools.compiler.ast.api.IThrower;
 import dyvil.tools.compiler.ast.statement.IStatement;
 
-public class Method extends Member implements IThrower, IParameterized, IImplementable
+public class Method extends Member implements IMethod
 {
-	private IStatement				statement;
+	private IStatement			statement;
 	
-	private Map<String, Parameter>	parameters			= new HashMap();
-	private List<ThrowsDecl>		throwsDeclarations	= new ArrayList();
+	private List<Parameter>		parameters			= new ArrayList();
+	private List<ThrowsDecl>	throwsDeclarations	= new ArrayList();
 	
 	@Override
-	public void setParameters(Map<String, Parameter> parameters)
+	public void setParameters(List<Parameter> parameters)
 	{
 		this.parameters = parameters;
 	}
@@ -42,7 +37,7 @@ public class Method extends Member implements IThrower, IParameterized, IImpleme
 	}
 	
 	@Override
-	public Map<String, Parameter> getParameters()
+	public List<Parameter> getParameters()
 	{
 		return this.parameters;
 	}

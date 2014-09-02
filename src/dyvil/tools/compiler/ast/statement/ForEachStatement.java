@@ -1,17 +1,17 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.field.Field;
 
 public class ForEachStatement extends WhileStatement
 {
-	private Variable variable;
+	private Field variable;
 	private Object iterable;
 	
 	public ForEachStatement()
 	{
 	}
 	
-	public void setVariable(Variable variable)
+	public void setVariable(Field variable)
 	{
 		this.variable = variable;
 	}
@@ -21,7 +21,7 @@ public class ForEachStatement extends WhileStatement
 		this.iterable = iterable;
 	}
 	
-	public Variable getVariable()
+	public Field getVariable()
 	{
 		return this.variable;
 	}
