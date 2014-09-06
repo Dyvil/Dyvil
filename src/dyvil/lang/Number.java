@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import dyvil.lang.annotation.prefix;
+
 public interface Number
 {
 	// Primitive value getters
@@ -20,9 +22,9 @@ public interface Number
 	
 	// Unary operators
 	
-	public Number neg$();
+	public @prefix Number neg$();
 	
-	public Number inv$();
+	public @prefix Number inv$();
 	
 	public Number inc$();
 	
