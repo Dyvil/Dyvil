@@ -46,6 +46,18 @@ public class ClassBody
 		return this.fields.get(name);
 	}
 	
+	public IMethod getMethod(String name)
+	{
+		for (IMethod method : this.methods)
+		{
+			if (name.equals(method.getName()))
+			{
+				return method;
+			}
+		}
+		return null;
+	}
+	
 	public IMethod getMethod(String name, Type... args)
 	{
 		for (IMethod method : this.methods)

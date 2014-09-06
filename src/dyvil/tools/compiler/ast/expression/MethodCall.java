@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.util.Modifiers;
@@ -10,15 +10,15 @@ import dyvil.tools.compiler.util.Modifiers;
 public class MethodCall implements IValue
 {
 	public IValue instance;
-	public Method descriptor;
+	public IMethod descriptor;
 	public List<IValue> args;
 	
-	public MethodCall(Method descriptor, List<IValue> args)
+	public MethodCall(IMethod descriptor, List<IValue> args)
 	{
 		this(null, descriptor, args);
 	}
 	
-	public MethodCall(IValue instance, Method descriptor, List<IValue> args)
+	public MethodCall(IValue instance, IMethod descriptor, List<IValue> args)
 	{
 		if (descriptor.hasModifier(Modifiers.IMPLICIT))
 		{

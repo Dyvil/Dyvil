@@ -123,6 +123,12 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
+	public IMethod resolveMethodName(String name)
+	{
+		return this.body.getMethod(name);
+	}
+	
+	@Override
 	public IMethod resolveMethod(String name, Type... args)
 	{
 		// FIXME

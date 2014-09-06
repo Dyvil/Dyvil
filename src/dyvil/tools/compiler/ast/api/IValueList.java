@@ -2,13 +2,15 @@ package dyvil.tools.compiler.ast.api;
 
 import java.util.List;
 
+import dyvil.tools.compiler.ast.value.IValue;
+
 public interface IValueList
 {
-	public void setValues(List<Object> list);
+	public void setValues(List<IValue> list);
 	
-	public List<Object> getValues();
+	public List<IValue> getValues();
 	
-	public default void addValue(Object value)
+	public default void addValue(IValue value)
 	{
 		this.getValues().add(value);
 	}

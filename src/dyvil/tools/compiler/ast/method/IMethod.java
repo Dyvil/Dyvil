@@ -45,6 +45,12 @@ public interface IMethod extends INamed, ITyped, IModified, IAnnotatable, IThrow
 	}
 	
 	@Override
+	public default IMethod resolveMethodName(String name)
+	{
+		return this.getType().resolveMethodName(name);
+	}
+	
+	@Override
 	public default IMethod resolveMethod(String name, Type... args)
 	{
 		return this.getType().resolveMethod(name, args);
