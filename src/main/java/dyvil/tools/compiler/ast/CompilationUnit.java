@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.config.Formatting;
 
 public class CompilationUnit implements IContext
 {
@@ -44,11 +45,44 @@ public class CompilationUnit implements IContext
 	{
 		this.classes.add(type);
 	}
-
+	
 	@Override
 	public IClass resolveClass(String name)
 	{
 		// FIXME
 		return null;
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder buffer = new StringBuilder();
+		
+		this.packageDecl.toString("", buffer);
+		if (Formatting.Package.newLine)
+		{
+			buffer.append('\n');
+		}
+		
+		for (IImport iimport : this.imports)
+		{
+			iimport.toString("", buffer);
+		}
+		if (Formatting.Import.newLine)
+		{
+			buffer.append('\n');
+		}
+		
+		for (IClass iclass : this.classes)
+		{
+			iclass.toString("", buffer);
+			
+			if (Formatting.Class.newLine)
+			{
+				buffer.append('\n');
+			}
+		}
+		
+		return buffer.toString();
 	}
 }

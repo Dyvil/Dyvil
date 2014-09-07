@@ -5,17 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.type.Type;
 
-public class ClassBody
+public class ClassBody implements IASTObject
 {
-	private AbstractClass			theClass;
-	private Map<String, IField>		fields	= new HashMap();
-	private List<IMethod>	methods		= new ArrayList();
+	private AbstractClass		theClass;
+	private Map<String, IField>	fields	= new HashMap();
+	private List<IMethod>		methods	= new ArrayList();
 	
 	public ClassBody()
 	{}
@@ -38,7 +39,7 @@ public class ClassBody
 	
 	public void addMethod(Method method)
 	{
-		this.methods.add( method);
+		this.methods.add(method);
 	}
 	
 	public IField getField(String name)
@@ -68,5 +69,11 @@ public class ClassBody
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		
 	}
 }

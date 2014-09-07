@@ -38,8 +38,8 @@ public class PackageImport implements IImport
 	}
 	
 	@Override
-	public String toString()
+	public void toString(String prefix, StringBuilder buffer)
 	{
-		return "import " + this.thePackage + ";";
+		buffer.append(prefix).append("import ").append(this.thePackage).append(";\n");
 	}
 }

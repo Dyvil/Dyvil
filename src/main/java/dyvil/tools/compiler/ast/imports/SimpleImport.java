@@ -32,8 +32,8 @@ public class SimpleImport implements IImport
 	}
 	
 	@Override
-	public String toString()
+	public void toString(String prefix, StringBuilder buffer)
 	{
-		return "import " + this.theImport + ";";
+		buffer.append(prefix).append("import ").append(this.theImport).append(";\n");
 	}
 }

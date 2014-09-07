@@ -65,6 +65,7 @@ public class Dyvilc
 		else
 		{
 			CompilationUnit unit = CodeParser.compilationUnit(readFile(source));
+			System.out.println(unit);
 			this.compilationUnits.put(source, unit);
 		}
 	}

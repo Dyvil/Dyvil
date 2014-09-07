@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.imports;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
+
+import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class MultiImport extends PackageImport
 {
@@ -47,27 +49,10 @@ public class MultiImport extends PackageImport
 	}
 	
 	@Override
-	public String toString()
+	public void toString(String prefix, StringBuilder buffer)
 	{
-		StringBuilder builder = new StringBuilder(20);
-		builder.append("import ").append(this.thePackage).append('{');
-		
-		Iterator<String> iterator = this.theClasses.iterator();
-		while (iterator.hasNext())
-		{
-			String s = iterator.next();
-			builder.append(s);
-			
-			if (iterator.hasNext())
-			{
-				builder.append(", ");
-			}
-			else
-			{
-				break;
-			}
-		}
-		builder.append("};");
-		return builder.toString();
+		buffer.append(prefix).append("import ").append(this.thePackage).append(Formatting.Import.multiImportStart);
+		ParserUtil.toString(this.theClasses, (String s) -> s, Formatting.Import.multiImportSeperator, buffer);
+		buffer.append(Formatting.Import.multiImportEnd).append(';');
 	}
 }

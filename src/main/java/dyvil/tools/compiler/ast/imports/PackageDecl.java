@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.imports;
 
-public class PackageDecl
+import dyvil.tools.compiler.ast.api.IASTObject;
+
+public class PackageDecl implements IASTObject
 {
 	private String thePackage;
 	
@@ -20,8 +22,8 @@ public class PackageDecl
 	}
 	
 	@Override
-	public String toString()
+	public void toString(String prefix, StringBuilder buffer)
 	{
-		return "package " + this.thePackage + ";";
+		buffer.append(prefix).append("package ").append(this.thePackage).append(";\n");
 	}
 }

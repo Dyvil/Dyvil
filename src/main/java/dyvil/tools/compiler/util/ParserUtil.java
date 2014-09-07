@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.util;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -35,5 +38,27 @@ public class ParserUtil
 			types[i] = values.get(i).getType();
 		}
 		return types;
+	}
+	
+	public static <T> void toString(Collection<T> list, Function<T, String> function, String seperator, StringBuilder buffer)
+	{
+		if (!list.isEmpty())
+		{
+			Iterator<T> iterator = list.iterator();
+			while (true)
+			{
+				T o = iterator.next();
+				buffer.append(function.apply(o));
+				
+				if (iterator.hasNext())
+				{
+					buffer.append(seperator);
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
 	}
 }

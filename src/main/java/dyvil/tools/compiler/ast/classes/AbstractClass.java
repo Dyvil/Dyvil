@@ -7,7 +7,10 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Classes;
+import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public abstract class AbstractClass implements IClass
 {
@@ -91,6 +94,12 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
+	public String getGenericName()
+	{
+		return this.name;
+	}
+	
+	@Override
 	public List<IClass> getSuperClasses()
 	{
 		return this.superClasses;
@@ -133,5 +142,23 @@ public abstract class AbstractClass implements IClass
 	{
 		// FIXME
 		return this.body.getMethod(name, args);
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(prefix).append(Modifiers.toString(this.modifiers)).append(' ');
+		buffer.append(Classes.toString(this.type)).append(' ');
+		buffer.append(this.getGenericName());
+		
+		if (!this.superClasses.isEmpty())
+		{
+			buffer.append(" extends ");
+			ParserUtil.toString(this.superClasses, (IClass i) -> i.getGenericName(), Formatting.Class.superClassesSeperator, buffer);
+		}
+		
+		buffer.append(Formatting.Class.bodyStart);
+		this.body.toString(Formatting.Class.bodyIndent, buffer);
+		buffer.append(Formatting.Class.bodyEnd);
 	}
 }

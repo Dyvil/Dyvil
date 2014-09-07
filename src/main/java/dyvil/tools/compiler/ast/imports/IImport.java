@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.imports;
 
-public interface IImport
+import dyvil.tools.compiler.ast.api.IASTObject;
+
+public interface IImport extends IASTObject
 {
 	public boolean imports(String path);
 	
