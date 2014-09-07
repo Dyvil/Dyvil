@@ -23,6 +23,8 @@ public interface IToken
 	
 	public String value() throws SyntaxError;
 	
+	public Object object() throws SyntaxError;
+	
 	public byte type() throws SyntaxError;
 	
 	public boolean equals(String value) throws SyntaxError;

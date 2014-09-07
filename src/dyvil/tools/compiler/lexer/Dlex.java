@@ -24,7 +24,7 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 		int len = code.length();
 		
 		StringBuilder buf = new StringBuilder(20);
-		Token first = new Token(-1, "", (byte) 0, -1, -1);
+		Token first = new Token(-1, "", (byte) 0, null, -1, -1);
 		Token prev = first;
 		int start = 0;
 		
@@ -265,7 +265,7 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 				return TYPE_STRING;
 			else
 				return TYPE_IDENTIFIER;
-		}	
+		}
 		else if (isDigit(c))
 		{
 			return TYPE_INT;
@@ -287,7 +287,7 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 	
 	private static Token addToken(Token prev, String s, byte type, int start, int end)
 	{
-		Token t = new Token(prev.index() + 1, s, type, start, end);
+		Token t = new Token(prev.index() + 1, s, type, parse(type, s), start, end);
 		prev.setNext(t);
 		t.setPrev(prev);
 		return t;
@@ -412,11 +412,46 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 			this.current = this.first;
 		}
 		catch (SyntaxError ex)
-		{
-		}
+		{}
 		
 		buf.setCharAt(buf.length() - 1, ']');
 		
 		return buf.toString();
+	}
+	
+	public static Object parse(byte type, String value)
+	{
+		switch (type)
+		{
+		case TYPE_IDENTIFIER:
+			return value;
+		case TYPE_SYMBOL:
+			return value;
+		case TYPE_BRACKET:
+			return value;
+			
+		case TYPE_INT:
+			return Integer.parseInt(value);
+		case TYPE_INT_HEX:
+			return Integer.parseInt(value, 16);
+		case TYPE_INT_BIN:
+			return Integer.parseInt(value, 2);
+			
+		case TYPE_FLOAT:
+			return Float.parseFloat(value);
+		case TYPE_FLOAT_HEX:
+			return Float.parseFloat(value); // FIXME
+			
+		case TYPE_STRING:
+			return value.substring(1, value.length() - 1);
+		case TYPE_CHAR:
+			return Character.valueOf(value.charAt(1));
+			
+		case TYPE_LINE_COMMENT:
+			return null;
+		case TYPE_BLOCK_COMMENT:
+			return null;
+		}
+		return null;
 	}
 }

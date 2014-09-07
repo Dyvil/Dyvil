@@ -10,25 +10,30 @@ public class Token implements IToken
 	private IToken			next;
 	
 	private int				index;
-	private final String	value;
+	
 	private final byte		type;
+	private final String	value;
+	private final Object object;
+	
 	private final int		start;
 	private final int		end;
 	
-	public Token(int index, String value, byte type, String code)
+	public Token(int index, String value, byte type, Object object, String code)
 	{
 		this.index = index;
 		this.value = value;
 		this.type = type;
+		this.object = object;
 		this.start = code.indexOf(value);
 		this.end = this.start + value.length();
 	}
 	
-	public Token(int index, String value, byte type, int start, int end)
+	public Token(int index, String value, byte type, Object object, int start, int end)
 	{
 		this.index = index;
 		this.value = value;
 		this.type = type;
+		this.object = object;
 		this.start = start;
 		this.end = end;
 	}
@@ -37,6 +42,12 @@ public class Token implements IToken
 	public String value()
 	{
 		return this.value;
+	}
+	
+	@Override
+	public Object object() throws SyntaxError
+	{
+		return this.object;
 	}
 	
 	@Override
