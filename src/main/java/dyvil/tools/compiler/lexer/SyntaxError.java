@@ -9,6 +9,8 @@ public class SyntaxError extends Exception
 {
 	private static final long	serialVersionUID	= -2234451954260010124L;
 	
+	public String suggestion;
+	
 	public SyntaxError()
 	{
 		super();
@@ -19,9 +21,10 @@ public class SyntaxError extends Exception
 		super(message);
 	}
 	
-	public SyntaxError(String message, Object... args)
+	public SyntaxError(String message, String suggestion)
 	{
-		this(message);
+		super(message);
+		this.suggestion = suggestion;
 	}
 	
 	public SyntaxError(Throwable cause)
@@ -29,9 +32,25 @@ public class SyntaxError extends Exception
 		super(cause);
 	}
 	
+	public String getSuggestion()
+	{
+		return this.suggestion;
+	}
+	
 	public void print(PrintStream out, String code, IToken token)
 	{
-		out.println("Syntax error at " + token + ": " + this.getMessage());
+		String message = this.getMessage();
+		String suggestion = this.getSuggestion();
+		StringBuilder builder = new StringBuilder("Syntax error at ");
+		
+		builder.append(token);
+		if (message != null) {
+			builder.append(": ").append(message);
+		}
+		if (suggestion != null) {
+			builder.append(" - ").append(suggestion);
+		}
+		out.println(builder.toString());
 		
 		try
 		{

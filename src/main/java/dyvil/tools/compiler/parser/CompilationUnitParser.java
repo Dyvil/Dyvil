@@ -33,7 +33,7 @@ public class CompilationUnitParser extends Parser
 			}
 			else if ("import".equals(value))
 			{
-				throw new SyntaxError("Missing package declaration!");
+				throw new SyntaxError("Missing package declaration!", "Add a package declaration");
 			}
 		}
 		if (this.isInMode(IMPORT))

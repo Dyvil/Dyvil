@@ -152,7 +152,7 @@ public class ParserManager
 	{
 		if (!this.currentParser.parse(this, value, token))
 		{
-			throw new SyntaxError("Invalid token '" + value + "'");
+			throw new SyntaxError("Invalid token '" + value + "'", "Delete this token");
 		}
 	}
 	
