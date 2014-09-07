@@ -15,11 +15,12 @@ import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
-public class ValueParser extends Parser implements IValued, IValueList
+public class ExpressionParser extends Parser implements IValued, IValueList
 {
+	public static final int	VALUE			= 0;
 	public static final int	TYPE			= 1;
 	public static final int	PARAMETERS		= 2;
-	public static final int	PARAMETERS_END	= 3;
+	public static final int	PARAMETERS_END	= 4;
 	
 	protected IClassContext	context;
 	protected IValued		field;
@@ -28,8 +29,7 @@ public class ValueParser extends Parser implements IValued, IValueList
 	
 	private List<IValue>	arguments		= new ArrayList();
 	
-	
-	public ValueParser(IClassContext context, IValued field)
+	public ExpressionParser(IClassContext context, IValued field)
 	{
 		this.context = context;
 		this.field = field;

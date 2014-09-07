@@ -13,7 +13,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.parser.expression.ValueParser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
@@ -24,7 +24,7 @@ public class ClassBodyParser extends Parser implements ITyped
 	public static int	TYPE			= 1;
 	public static int	FIELD			= 2;
 	public static int	METHOD			= 4;
-	public static int	POST_METHOD		= 8;
+	public static int	POST_METHOD			= 4;
 	public static int	ANNOTATION		= 16;
 	public static int	POST_ANNOTATION	= 32;
 	
@@ -98,7 +98,7 @@ public class ClassBodyParser extends Parser implements ITyped
 		{
 			if ("=".equals(value))
 			{
-				pm.pushParser(new ValueParser(this.theClass, this.field));
+				pm.pushParser(new ExpressionParser(this.theClass, this.field));
 				return true;
 			}
 			else if (";".equals(value))
@@ -109,14 +109,16 @@ public class ClassBodyParser extends Parser implements ITyped
 		}
 		if (this.isInMode(METHOD))
 		{
-			if (token.isType(Token.TYPE_BRACKET))
+			if ("(".equals(value))
 			{
+				pm.pushParser(new ParameterListParser(this.method));
 				return true;
 			}
-			
-			pm.pushParser(new ParameterListParser(this.method), token);
-			this.mode = POST_METHOD;
-			return true;
+			else if (")".equals(value))
+			{
+				this.mode = POST_METHOD;
+				return true;
+			}
 		}
 		if (this.isInMode(POST_METHOD))
 		{
@@ -128,7 +130,7 @@ public class ClassBodyParser extends Parser implements ITyped
 			// TODO default
 			else if ("=".equals(value))
 			{
-				// TODO Method Body
+				pm.pushParser(new ExpressionParser(this.method, this.method));
 				return true;
 			}
 			else if (";".equals(value))

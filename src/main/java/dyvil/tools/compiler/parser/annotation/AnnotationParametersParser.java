@@ -7,7 +7,7 @@ import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.parser.expression.ValueParser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 
 public class AnnotationParametersParser extends Parser
 {
@@ -38,7 +38,7 @@ public class AnnotationParametersParser extends Parser
 		else if ("=".equals(value))
 		{
 			this.parameter = new Field(token.prev().value());
-			pm.pushParser(new ValueParser(this.context, this.parameter));
+			pm.pushParser(new ExpressionParser(this.context, this.parameter));
 			return true;
 		}
 		return false;

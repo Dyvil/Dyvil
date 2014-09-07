@@ -3,11 +3,12 @@ package dyvil.tools.compiler.ast.statement;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public class ForStatement extends WhileStatement
 {
 	private List<Field>	variables;
-	private IStatement		action;
+	private IValue		action;
 	
 	public ForStatement()
 	{
@@ -18,7 +19,7 @@ public class ForStatement extends WhileStatement
 		this.variables = variables;
 	}
 	
-	public void setAction(IStatement action)
+	public void setAction(IValue action)
 	{
 		this.action = action;
 	}
@@ -33,7 +34,7 @@ public class ForStatement extends WhileStatement
 		this.variables.add(variable);
 	}
 	
-	public IStatement getAction()
+	public IValue getAction()
 	{
 		return this.action;
 	}

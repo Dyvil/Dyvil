@@ -10,7 +10,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class ValueListParser extends Parser implements IValued
+public class ExpressionListParser extends Parser implements IValued
 {
 	protected IClassContext	context;
 	protected IValueList	valueList;
@@ -20,7 +20,7 @@ public class ValueListParser extends Parser implements IValued
 	 */
 	private IValue			value;
 	
-	public ValueListParser(IClassContext context, IValueList valueList)
+	public ExpressionListParser(IClassContext context, IValueList valueList)
 	{
 		this.context = context;
 		this.valueList = valueList;
@@ -31,7 +31,7 @@ public class ValueListParser extends Parser implements IValued
 	{
 		if (this.mode == 0)
 		{
-			pm.pushParser(new ValueParser(this.context, this), token);
+			pm.pushParser(new ExpressionParser(this.context, this), token);
 			this.mode = 1;
 		}
 		else

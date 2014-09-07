@@ -8,5 +8,5 @@ public class Main
     public int i = 3;
     public float j;
     
-    public void bar(int j);
+    public int three() = 3;
 }

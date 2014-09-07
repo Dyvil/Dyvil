@@ -1,16 +1,16 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public class WhileStatement implements IStatement, IValued
+public class WhileStatement implements IValue, IValued
 {
-	private IValue		condition;
-	private IStatement	then;
+	private IValue	condition;
+	private IValue	then;
 	
 	public WhileStatement()
-	{
-	}
+	{}
 	
 	@Override
 	public void setValue(IValue value)
@@ -18,7 +18,7 @@ public class WhileStatement implements IStatement, IValued
 		this.condition = value;
 	}
 	
-	public void setThen(IStatement then)
+	public void setThen(IValue then)
 	{
 		this.then = then;
 	}
@@ -29,7 +29,7 @@ public class WhileStatement implements IStatement, IValued
 		return this.condition;
 	}
 	
-	public IStatement getThen()
+	public IValue getThen()
 	{
 		return this.then;
 	}
@@ -38,5 +38,23 @@ public class WhileStatement implements IStatement, IValued
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		// TODO
+	}
+	
+	@Override
+	public boolean isConstant()
+	{
+		return false;
+	}
+	
+	@Override
+	public IValue fold()
+	{
+		return this;
+	}
+	
+	@Override
+	public Type getType()
+	{
+		return this.then.getType();
 	}
 }

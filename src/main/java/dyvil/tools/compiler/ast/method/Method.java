@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import dyvil.tools.compiler.ast.statement.IStatement;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 
 public class Method extends Member implements IMethod
 {
-	private IStatement			statement;
+	private IValue				statement;
 	
 	private List<Parameter>		parameters			= new ArrayList();
 	private List<ThrowsDecl>	throwsDeclarations	= new ArrayList();
@@ -21,9 +21,9 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void setStatement(IStatement implementation)
+	public void setValue(IValue statement)
 	{
-		this.statement = implementation;
+		this.statement = statement;
 	}
 	
 	@Override
@@ -33,7 +33,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IStatement getStatement()
+	public IValue getValue()
 	{
 		return this.statement;
 	}
@@ -76,15 +76,12 @@ public class Method extends Member implements IMethod
 		}
 		buffer.append(Formatting.Method.parametersEnd);
 		
-		IStatement statement = this.getStatement();
+		IValue statement = this.getValue();
 		if (statement != null)
 		{
 			buffer.append(Formatting.Method.signatureBodySeperator);
 			statement.toString(prefix, buffer);
 		}
-		else
-		{
-			buffer.append(';');
-		}
+		buffer.append(';');
 	}
 }

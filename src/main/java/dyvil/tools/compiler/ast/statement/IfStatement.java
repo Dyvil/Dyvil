@@ -1,14 +1,15 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 
-public class IfStatement implements IStatement, IValued
+public class IfStatement implements IValue, IValued
 {
 	private IValue		condition;
-	private IStatement	then;
-	private IStatement	elseThen;
+	private IValue	then;
+	private IValue	elseThen;
 	
 	public IfStatement()
 	{
@@ -20,12 +21,12 @@ public class IfStatement implements IStatement, IValued
 		this.condition = condition;
 	}
 	
-	public void setThen(IStatement then)
+	public void setThen(IValue then)
 	{
 		this.then = then;
 	}
 	
-	public void setElseThen(IStatement elseThen)
+	public void setElseThen(IValue elseThen)
 	{
 		this.elseThen = elseThen;
 	}
@@ -36,12 +37,12 @@ public class IfStatement implements IStatement, IValued
 		return this.condition;
 	}
 	
-	public IStatement getThen()
+	public IValue getThen()
 	{
 		return this.then;
 	}
 	
-	public IStatement getElseThen()
+	public IValue getElseThen()
 	{
 		return this.elseThen;
 	}
@@ -53,5 +54,23 @@ public class IfStatement implements IStatement, IValued
 		this.condition.toString(prefix, buffer);
 		buffer.append(Formatting.Statements.ifEnd);
 		// TODO Body
+	}
+
+	@Override
+	public boolean isConstant()
+	{
+		return false;
+	}
+
+	@Override
+	public IValue fold()
+	{
+		return this;
+	}
+
+	@Override
+	public Type getType()
+	{
+		return this.getThen().getType();
 	}
 }

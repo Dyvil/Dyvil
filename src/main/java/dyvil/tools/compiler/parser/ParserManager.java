@@ -53,8 +53,8 @@ public class ParserManager
 	 * Starts parsing the given {@link String Code} {@code code}. The code is
 	 * tokenized using {@link CSSource#tokenize(String)} and then
 	 * {@link #parse(IToken)} is called on each token. When a
-	 * {@link SyntaxError} occurs, it gets printed to the standard error
-	 * output {@link System#err} using
+	 * {@link SyntaxError} occurs, it gets printed to the standard error output
+	 * {@link System#err} using
 	 * {@link SyntaxError#print(PrintStream, String, IToken)}
 	 * 
 	 * @see Token
@@ -69,7 +69,7 @@ public class ParserManager
 		lexer.tokenize();
 		this.parse(code, lexer.next());
 	}
-		
+	
 	public final void parse(String code, IToken first)
 	{
 		IToken token = first;
@@ -150,7 +150,17 @@ public class ParserManager
 	 */
 	public void parseToken(String value, IToken token) throws SyntaxError
 	{
-		if (!this.currentParser.parse(this, value, token))
+		boolean parsed;
+		try
+		{
+			parsed = this.currentParser.parse(this, value, token);
+		}
+		catch (Exception ex)
+		{
+			throw new SyntaxError("Failed to parse token '" + value + "'");
+		}
+		
+		if (!parsed)
 		{
 			throw new SyntaxError("Invalid token '" + value + "'", "Delete this token");
 		}
