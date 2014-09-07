@@ -5,6 +5,8 @@ import com.clashsoft.jcp.{foo, bar};
 
 public class Main
 {
-    public int i;
+    public int i = 3;
     public float j;
+    
+    public void bar(int j);
 }

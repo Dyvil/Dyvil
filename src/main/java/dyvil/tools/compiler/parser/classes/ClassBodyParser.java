@@ -62,31 +62,44 @@ public class ClassBodyParser extends Parser implements ITyped
 			}
 			else if (token.isType(Token.TYPE_IDENTIFIER))
 			{
-				if ((token.next().equals("=") || token.next().equals(";")))
+				if (token.next().equals("="))
 				{
 					this.mode = FIELD;
 					this.field.setName(value);
 					this.classBody.addVariable(field);
+					return true;
+				}
+				else if (token.next().equals(";"))
+				{
+					this.mode = FIELD;
+					this.field.setName(value);
+					this.classBody.addVariable(this.field);
+					this.reset();
+					return true;
 				}
 				else if (token.next().isType(Token.TYPE_BRACKET))
 				{
 					this.mode = METHOD;
 					this.method.setName(value);
 					this.classBody.addMethod(this.method);
+					return true;
 				}
-				
+			}
+			else if (";".equals(value))
+			{
+				this.reset();
 				return true;
 			}
-			else
-			{
-				pm.pushParser(new TypeParser(this), token);
-			}
+			
+			pm.pushParser(new TypeParser(this), token);
+			return true;
 		}
 		if (this.isInMode(FIELD))
 		{
 			if ("=".equals(value))
 			{
 				pm.pushParser(new ValueParser(this.theClass, this.field));
+				return true;
 			}
 			else if (";".equals(value))
 			{
@@ -96,6 +109,11 @@ public class ClassBodyParser extends Parser implements ITyped
 		}
 		if (this.isInMode(METHOD))
 		{
+			if (token.isType(Token.TYPE_BRACKET))
+			{
+				return true;
+			}
+			
 			pm.pushParser(new ParameterListParser(this.method), token);
 			this.mode = POST_METHOD;
 			return true;

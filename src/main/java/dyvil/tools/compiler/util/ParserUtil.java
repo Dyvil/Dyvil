@@ -26,7 +26,7 @@ public class ParserUtil
 			return false;
 		}
 		char c = value.charAt(0);
-		return c == ',' || c == ';';
+		return c == ',' || c == ';' || c == ':';
 	}
 	
 	public static Type[] getTypes(List<IValue> values)

@@ -59,9 +59,7 @@ public class Modifiers
 		if ((mod & BYREF) != 0)
 			sb.append("ref ");
 		
-		if ((len = sb.length()) > 0) /* trim trailing space */
-			return sb.toString().substring(0, len - 1);
-		return "";
+		return sb.toString();
 	}
 	
 	public static final int	PACKAGE				= 0x00000000;
