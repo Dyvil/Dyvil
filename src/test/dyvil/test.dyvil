@@ -1,0 +1,14 @@
+package com.clashsoft.test;
+
+import java.util.;
+import com.clashsoft.jcp.;
+
+public class Main
+{
+    public int i;
+    public float j;
+    
+    public static void main(String[] args)
+    {
+    }
+}
