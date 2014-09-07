@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.api.ITyped;
-import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
@@ -13,11 +13,9 @@ public class TypeParser extends Parser
 	public static final int	NAME		= 0;
 	public static final int	GENERICS	= 1;
 	public static final int	ARRAY		= 2;
-	public static final int	ARRAY2		= 3;
 	
 	protected ITyped		typed;
 	
-	private int				mode;
 	private Type			type;
 	private int				arrayDimensions;
 	private int				arrayDimensions2;
@@ -30,91 +28,66 @@ public class TypeParser extends Parser
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (this.mode == NAME)
+		if (this.isInMode(NAME))
 		{
-			if (token.next().equals("<"))
+			if ("<".equals(value))
 			{
-				this.type = new GenericType(value);
 				this.mode = GENERICS;
+				return true;
+			}
+			else if ("[".equals(value))
+			{
+				this.mode = ARRAY;
+				this.arrayDimensions++;
+				this.arrayDimensions2++;
+				return true;
+			}
+			else if (token.isType(Token.TYPE_IDENTIFIER))
+			{
+				this.mode = GENERICS | ARRAY;
+				this.type = new Type(value);
+				return true;
 			}
 			else
 			{
-				this.type = new Type(value);
-				this.mode = ARRAY;
-				if (!token.next().equals("["))
-				{
-					pm.popParser();
-				}
+				pm.popParser(token);
+				return true;
 			}
-			return true;
 		}
-		else if ("<".equals(value))
+		if (this.isInMode(ARRAY))
 		{
-			if (this.mode == NAME)
+			if ("]".equals(value))
 			{
-				throw new SyntaxError("Invalid Type: Generics specified before the name!");
-			}
-			else if (this.mode == ARRAY)
-			{
-				throw new SyntaxError("Invalid Type: Genrics specified after array dimensions!");
-			}
-			else if (this.mode == ARRAY2)
-			{
-				throw new SyntaxError("Misplaced Construct!");
-			}
-			pm.pushParser(new TypeListParser((GenericType) this.type));
-			return true;
-		}
-		else if (">".equals(value))
-		{
-			if (this.mode == NAME)
-			{
-				throw new SyntaxError("Invalid Type: Generics specified before the name!");
-			}
-			else if (this.mode == ARRAY)
-			{
-				throw new SyntaxError("Invalid Type: Generics specified after array dimensions!");
-			}
-			else if (this.mode == ARRAY2)
-			{
-				throw new SyntaxError("Misplaced Construct!");
-			}
-			
-			if (!token.next().equals("<"))
-			{
-				pm.popParser();
-			}
-			return true;
-		}
-		else if ("[".equals(value))
-		{
-			if (this.mode == NAME)
-			{
-				throw new SyntaxError("Invalid Type: Array dimensions specified before the name!");
-			}
-			
-			this.mode = ARRAY2;
-			this.arrayDimensions++;
-			this.arrayDimensions2++;
-			return true;
-		}
-		else if ("]".equals(value))
-		{
-			if (this.mode != ARRAY2)
-			{
-				throw new SyntaxError("Misplaced Construct!");
-			}
-			
-			this.mode = ARRAY;
-			this.arrayDimensions2--;
-			if (!token.next().equals("["))
-			{
+				this.arrayDimensions2--;
 				if (this.arrayDimensions2 == 0)
 				{
 					pm.popParser();
 				}
+				return true;
 			}
-			return true;
+			else if ("[".equals(value))
+			{
+				this.arrayDimensions++;
+				this.arrayDimensions2++;
+				return true;
+			}
+			else
+			{
+				pm.popParser(token);
+				return true;
+			}
+		}
+		if (this.isInMode(GENERICS))
+		{
+			if (">".equals(value))
+			{
+				this.mode = ARRAY;
+				return true;
+			}
+			else
+			{
+				// TODO Generics
+			}
 		}
 		return false;
 	}
