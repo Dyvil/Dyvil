@@ -4,14 +4,14 @@ import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.config.Formatting;
 
 public class Field extends Member implements IField
 {
 	private IValue	value;
 	
 	public Field()
-	{
-	}
+	{}
 	
 	public Field(String name)
 	{
@@ -38,5 +38,18 @@ public class Field extends Member implements IField
 	public IValue getValue()
 	{
 		return this.value;
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		super.toString(prefix, buffer);
+		
+		IValue value = this.getValue();
+		if (value != null)
+		{
+			buffer.append(Formatting.Field.keyValueSeperator).append(value.toString());
+		}
+		buffer.append(";\n");
 	}
 }

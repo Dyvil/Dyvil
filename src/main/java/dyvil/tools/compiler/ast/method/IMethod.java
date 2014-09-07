@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IMethodContext;
 import dyvil.tools.compiler.ast.type.Type;
 
-public interface IMethod extends INamed, ITyped, IModified, IAnnotatable, IThrower, IParameterized, IImplementable, IMethodContext
+public interface IMethod extends IASTObject, INamed, ITyped, IModified, IAnnotatable, IThrower, IParameterized, IImplementable, IMethodContext
 {
 	public default boolean hasSignature(String name, Type... types)
 	{

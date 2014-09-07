@@ -1,21 +1,20 @@
 package dyvil.tools.compiler.ast.method;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.IAnnotatable;
-import dyvil.tools.compiler.ast.api.IModified;
-import dyvil.tools.compiler.ast.api.INamed;
-import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.util.Modifiers;
 
-public abstract class Member implements INamed, ITyped, IModified, IAnnotatable
+public abstract class Member implements IASTObject, INamed, ITyped, IModified, IAnnotatable
 {
 	private int					modifiers;
 	
 	private Type				type;
 	private String				name;
-	private List<Annotation>	annotations;
+	private List<Annotation>	annotations = new ArrayList();
 	
 	protected Member()
 	{
@@ -84,5 +83,19 @@ public abstract class Member implements INamed, ITyped, IModified, IAnnotatable
 	public List<Annotation> getAnnotations()
 	{
 		return this.annotations;
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		for (Annotation annotation : this.annotations)
+		{
+			annotation.toString(prefix, buffer);
+			buffer.append('\n');
+		}
+		
+		buffer.append(Modifiers.toString(this.getModifiers())).append(' ');
+		buffer.append(this.getType()).append(' ');
+		buffer.append(this.getName());
 	}
 }

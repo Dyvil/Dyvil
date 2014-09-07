@@ -25,4 +25,20 @@ public class Formatting
 		
 		public static boolean	newLine					= true;
 	}
+	
+	public static class Type
+	{
+		public static String	array	= "[]";
+	}
+	
+	public static class Field
+	{
+		public static String	keyValueSeperator	= " = ";
+	}
+	
+	public static class Method
+	{
+		public static String	parametersStart	= "(";
+		public static String	parametersEnd	= ")";
+	}
 }

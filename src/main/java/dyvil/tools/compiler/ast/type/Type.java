@@ -1,11 +1,13 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IClassContext;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.config.Formatting;
 
-public class Type implements IClassContext
+public class Type implements IASTObject, IClassContext
 {
 	public static Type	VOID	= new Type("void");
 	public static Type	INT		= new Type("int");
@@ -18,18 +20,20 @@ public class Type implements IClassContext
 	public static Type	STRING	= new Type("java.lang.String");
 	public static Type	CLASS	= new Type("java.lang.Class");
 	
+	private String name;
 	private IClass		theClass;
 	private char		seperator;
 	private int			arrayDimensions;
 	
 	public Type(String name)
 	{
-		// FIXME
+		this.name = name;
 	}
 	
 	public Type(IClass iclass)
 	{
 		this.theClass = iclass;
+		this.name = iclass.getName();
 	}
 	
 	public void setClass(IClass theClass)
@@ -89,5 +93,15 @@ public class Type implements IClassContext
 	public IMethod resolveMethod(String name, Type... args)
 	{
 		return this.theClass.resolveMethod(name, args);
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(prefix).append(this.name);
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append(Formatting.Type.array);
+		}
 	}
 }

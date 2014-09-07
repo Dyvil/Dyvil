@@ -1,9 +1,11 @@
 package dyvil.tools.compiler.ast.method;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.statement.IStatement;
+import dyvil.tools.compiler.config.Formatting;
 
 public class Method extends Member implements IMethod
 {
@@ -46,5 +48,32 @@ public class Method extends Member implements IMethod
 	public List<ThrowsDecl> getThrows()
 	{
 		return this.throwsDeclarations;
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		super.toString(prefix, buffer);
+		
+		buffer.append(Formatting.Method.parametersStart);
+		if (!this.parameters.isEmpty())
+		{
+			Iterator<Parameter> iterator = this.parameters.iterator();
+			while (true)
+			{
+				Parameter parameter = iterator.next();
+				parameter.toString("", buffer);
+				
+				if (iterator.hasNext())
+				{
+					buffer.append(parameter.getSeperator());
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+		buffer.append(Formatting.Method.parametersEnd);
 	}
 }
