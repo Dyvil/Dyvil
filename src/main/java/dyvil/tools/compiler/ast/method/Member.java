@@ -94,7 +94,8 @@ public abstract class Member implements IASTObject, INamed, ITyped, IModified, I
 			buffer.append('\n');
 		}
 		
-		buffer.append(Modifiers.toString(this.getModifiers())).append(' ');
+		buffer.append(prefix);
+		buffer.append(Modifiers.toString(this.getModifiers()));
 		buffer.append(this.getType()).append(' ');
 		buffer.append(this.getName());
 	}

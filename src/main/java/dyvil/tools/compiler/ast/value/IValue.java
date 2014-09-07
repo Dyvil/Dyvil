@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.ast.value;
 
+import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.type.Type;
 
-public interface IValue
+public interface IValue extends IASTObject
 {
 	public static IValue	NULL	= new IValue()
 									{
@@ -22,6 +23,12 @@ public interface IValue
 										public Type getType()
 										{
 											return Type.VOID;
+										}
+										
+										@Override
+										public void toString(String prefix, StringBuilder buffer)
+										{
+											buffer.append(prefix).append("null");
 										}
 									};
 	

@@ -33,4 +33,10 @@ public class DoubleValue implements IValue
 	{
 		return Type.DOUBLE;
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(prefix).append(this.value);
+	}
 }

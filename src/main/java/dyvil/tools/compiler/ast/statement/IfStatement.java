@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.config.Formatting;
 
 public class IfStatement implements IStatement, IValued
 {
@@ -43,5 +44,14 @@ public class IfStatement implements IStatement, IValued
 	public IStatement getElseThen()
 	{
 		return this.elseThen;
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(prefix).append(Formatting.Statements.ifStart);
+		this.condition.toString(prefix, buffer);
+		buffer.append(Formatting.Statements.ifEnd);
+		// TODO Body
 	}
 }

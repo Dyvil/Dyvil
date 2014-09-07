@@ -48,8 +48,8 @@ public class Field extends Member implements IField
 		IValue value = this.getValue();
 		if (value != null)
 		{
-			buffer.append(Formatting.Field.keyValueSeperator).append(value.toString());
+			value.toString(Formatting.Field.keyValueSeperator, buffer);
 		}
-		buffer.append(";\n");
+		buffer.append(';');
 	}
 }

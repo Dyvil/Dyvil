@@ -20,7 +20,7 @@ public class Formatting
 	{
 		public static String	superClassesSeperator	= ", ";
 		public static String	bodyStart				= "\n{\n";
-		public static String	bodyEnd					= "\n}\n";
+		public static String	bodyEnd					= "}\n";
 		public static String	bodyIndent				= "\t";
 		
 		public static boolean	newLine					= true;
@@ -38,7 +38,14 @@ public class Formatting
 	
 	public static class Method
 	{
-		public static String	parametersStart	= "(";
-		public static String	parametersEnd	= ")";
+		public static String	parametersStart			= "(";
+		public static String	parametersEnd			= ")";
+		public static String	signatureBodySeperator	= " = ";
+	}
+	
+	public static class Statements
+	{
+		public static String ifStart = "if (";
+		public static String ifEnd = ")";
 	}
 }

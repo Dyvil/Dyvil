@@ -30,4 +30,10 @@ public class StatementList implements IStatement, IImplementable
 	{
 		return this.statements.get(this.statements.size() - 1);
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		// TODO
+	}
 }

@@ -33,4 +33,10 @@ public class VariableAccess implements IValue
 	{
 		return this.variable.getType();
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		// TODO
+	}
 }

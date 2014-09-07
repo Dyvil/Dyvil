@@ -60,4 +60,10 @@ public class MethodCall implements IValue
 	{
 		return this.descriptor.getType();
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		// TODO
+	}
 }

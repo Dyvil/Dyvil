@@ -33,4 +33,10 @@ public class WhileStatement implements IStatement, IValued
 	{
 		return this.then;
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		// TODO
+	}
 }

@@ -59,6 +59,7 @@ public class CompilationUnit implements IContext
 		StringBuilder buffer = new StringBuilder();
 		
 		this.packageDecl.toString("", buffer);
+		buffer.append('\n');
 		if (Formatting.Package.newLine)
 		{
 			buffer.append('\n');
@@ -67,6 +68,7 @@ public class CompilationUnit implements IContext
 		for (IImport iimport : this.imports)
 		{
 			iimport.toString("", buffer);
+			buffer.append('\n');
 		}
 		if (Formatting.Import.newLine)
 		{

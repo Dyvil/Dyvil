@@ -75,5 +75,16 @@ public class Method extends Member implements IMethod
 			}
 		}
 		buffer.append(Formatting.Method.parametersEnd);
+		
+		IStatement statement = this.getStatement();
+		if (statement != null)
+		{
+			buffer.append(Formatting.Method.signatureBodySeperator);
+			statement.toString(prefix, buffer);
+		}
+		else
+		{
+			buffer.append(';');
+		}
 	}
 }

@@ -24,6 +24,6 @@ public class PackageDecl implements IASTObject
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append("package ").append(this.thePackage).append(";\n");
+		buffer.append(prefix).append("package ").append(this.thePackage).append(";");
 	}
 }

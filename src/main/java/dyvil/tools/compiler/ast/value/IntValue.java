@@ -38,4 +38,10 @@ public class IntValue implements IValue
 	{
 		return Type.INT;
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(prefix).append(this.value);
+	}
 }

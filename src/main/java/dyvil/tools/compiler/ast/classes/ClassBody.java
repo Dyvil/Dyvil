@@ -75,13 +75,18 @@ public class ClassBody implements IASTObject
 		for (IField field : this.fields.values())
 		{
 			field.toString(prefix, buffer);
+			buffer.append('\n');
 		}
 		
-		buffer.append('\n');
-		
-		for (IMethod method : this.methods)
+		if (!this.methods.isEmpty())
 		{
-			method.toString(prefix, buffer);
+			buffer.append("\n");
+			
+			for (IMethod method : this.methods)
+			{
+				method.toString(prefix, buffer);
+				buffer.append('\n');
+			}
 		}
 	}
 }

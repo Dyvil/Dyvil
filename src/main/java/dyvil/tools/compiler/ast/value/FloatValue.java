@@ -33,4 +33,10 @@ public class FloatValue implements IValue
 	{
 		return Type.FLOAT;
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(prefix).append(this.value);
+	}
 }

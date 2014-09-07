@@ -33,4 +33,10 @@ public class DoWhileStatement implements IStatement, IValued
 	{
 		return this.condition;
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		// TODO
+	}
 }

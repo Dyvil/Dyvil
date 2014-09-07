@@ -38,4 +38,10 @@ public class LongValue implements IValue
 	{
 		return Type.LONG;
 	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(prefix).append(this.value);
+	}
 }

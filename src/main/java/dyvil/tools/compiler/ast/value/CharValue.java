@@ -33,4 +33,10 @@ public class CharValue implements IValue
 	{
 		return Type.CHAR;
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(prefix).append(this.value);
+	}
 }

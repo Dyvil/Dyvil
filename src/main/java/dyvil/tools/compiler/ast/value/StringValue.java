@@ -28,4 +28,10 @@ public class StringValue implements IValue
 	{
 		return Type.STRING;
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(prefix).append(this.value);
+	}
 }

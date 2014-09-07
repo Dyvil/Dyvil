@@ -37,4 +37,10 @@ public class FieldAccess implements IValue
 	{
 		return this.field.getType();
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		// TODO
+	}
 }

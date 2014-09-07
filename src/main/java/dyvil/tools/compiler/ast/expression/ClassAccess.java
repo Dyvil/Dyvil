@@ -30,5 +30,10 @@ public class ClassAccess implements IValue
 	{
 		return null;
 	}
-	
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		// TODO
+	}
 }

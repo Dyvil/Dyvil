@@ -20,7 +20,7 @@ public class Type implements IASTObject, IClassContext
 	public static Type	STRING	= new Type("java.lang.String");
 	public static Type	CLASS	= new Type("java.lang.Class");
 	
-	private String name;
+	private String		name;
 	private IClass		theClass;
 	private char		seperator;
 	private int			arrayDimensions;
@@ -58,7 +58,7 @@ public class Type implements IASTObject, IClassContext
 	
 	public String getName()
 	{
-		return this.theClass == null ? null : this.theClass.getName();
+		return this.name;
 	}
 	
 	public char getSeperator()
@@ -93,6 +93,14 @@ public class Type implements IASTObject, IClassContext
 	public IMethod resolveMethod(String name, Type... args)
 	{
 		return this.theClass.resolveMethod(name, args);
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder buffer = new StringBuilder();
+		this.toString("", buffer);
+		return buffer.toString();
 	}
 	
 	@Override

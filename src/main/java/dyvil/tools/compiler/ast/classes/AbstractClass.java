@@ -147,7 +147,7 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append(Modifiers.toString(this.modifiers)).append(' ');
+		buffer.append(prefix).append(Modifiers.toString(this.modifiers));
 		buffer.append(Classes.toString(this.type)).append(' ');
 		buffer.append(this.getGenericName());
 		
