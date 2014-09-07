@@ -1,0 +1,12 @@
+jar_name = "DyvilTest.jar"
+jar_group = "dyvil.test"
+jar_version = "1.0.0"
+
+source_dir = "src"
+output_dir = "bin"
+
+main_type = "dyvil.test.DyvilTest"
+
+include = [ "dyvil.test." ]
+
+libraries = []

@@ -31,7 +31,7 @@ public class SyntaxError extends Exception
 	
 	public void print(PrintStream out, String code, IToken token)
 	{
-		out.println("Syntax error at token " + token);
+		out.println("Syntax error at token " + token + ": " + this.getMessage());
 		
 		try
 		{
@@ -51,7 +51,7 @@ public class SyntaxError extends Exception
 			
 			out.println(line);
 			
-			char[] chars = new char[prevNL - token.start()];
+			char[] chars = new char[token.start() - prevNL];
 			Arrays.fill(chars, ' ');
 			out.print(chars);
 			out.println('^');
