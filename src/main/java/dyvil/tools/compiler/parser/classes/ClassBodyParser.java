@@ -1,171 +1,137 @@
 package dyvil.tools.compiler.parser.classes;
 
-import java.util.LinkedList;
-
-import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.IImplementable;
-import dyvil.tools.compiler.ast.api.IThrower;
+import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IMethodContext;
 import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.method.Member;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.parser.annotation.AnnotationParametersParser;
 import dyvil.tools.compiler.parser.expression.ValueParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
-import dyvil.tools.compiler.parser.statement.StatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class ClassBodyParser extends Parser
+public class ClassBodyParser extends Parser implements ITyped
 {
-	public static int				VARIABLE		= 1;
-	public static int				METHOD			= 2;
-	public static int				POST_METHOD		= 3;
-	public static int				ANNOTATION		= 4;
-	public static int				POST_ANNOTATION	= 5;
+	public static int	TYPE			= 1;
+	public static int	FIELD			= 2;
+	public static int	METHOD			= 4;
+	public static int	POST_METHOD		= 8;
+	public static int	ANNOTATION		= 16;
+	public static int	POST_ANNOTATION	= 32;
 	
-	protected IClass				theClass;
+	protected IClass	theClass;
+	protected ClassBody	classBody;
 	
-	private int						modifiers;
-	private LinkedList<Annotation>	annotations		= new LinkedList();
-	private ClassBody				classBody;
-	private Member					member;
+	private IField		field;
+	private IMethod		method;
 	
 	public ClassBodyParser(IClass theClass)
 	{
 		this.theClass = theClass;
 		this.classBody = theClass.getBody();
+		this.reset();
+	}
+	
+	private void reset()
+	{
+		this.mode = TYPE | ANNOTATION;
+		this.field = new Field();
+		this.method = new Method();
 	}
 	
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		// TODO Modifiers
 		int i = 0;
-		if ((i = Modifiers.parseModifier(value)) != 0)
+		if (this.isInMode(TYPE))
 		{
-			this.modifiers |= i;
-		}
-		else if ("(".equals(value))
-		{
-			if (this.mode == 0)
+			if ((i = Modifiers.parseModifier(value)) != -1)
 			{
-				this.mode = METHOD;
+				this.field.addModifier(i);
+				this.method.addModifier(i);
+				return true;
+			}
+			else if (token.isType(Token.TYPE_IDENTIFIER))
+			{
+				if ((token.next().equals("=") || token.next().equals(";")))
+				{
+					this.mode = FIELD;
+					this.field.setName(value);
+					this.classBody.addVariable(field);
+				}
+				else if (token.next().isType(Token.TYPE_BRACKET))
+				{
+					this.mode = METHOD;
+					this.method.setName(value);
+					this.classBody.addMethod(this.method);
+				}
 				
-				Method method = new Method();
-				method.setName(token.prev().value());
-				method.setModifiers(this.modifiers);
-				method.setAnnotations(this.annotations);
-				
-				this.member = method;
-				this.classBody.addMethod(method);
+				return true;
+			}
+			else
+			{
+				pm.pushParser(new TypeParser(this), token);
+			}
+		}
+		if (this.isInMode(FIELD))
+		{
+			if ("=".equals(value))
+			{
+				pm.pushParser(new ValueParser(this.theClass, this.field));
+			}
+			else if (";".equals(value))
+			{
 				this.reset();
-				
-				pm.pushParser(new ParameterListParser(method));
-				return true;
-			}
-			else if (this.mode == ANNOTATION)
-			{
-				pm.pushParser(new AnnotationParametersParser(this.theClass, this.annotations.getLast()));
 				return true;
 			}
 		}
-		else if (")".equals(value))
+		if (this.isInMode(METHOD))
 		{
-			if (this.mode == METHOD)
-			{
-				this.mode = POST_METHOD;
-				return true;
-			}
+			pm.pushParser(new ParameterListParser(this.method), token);
+			this.mode = POST_METHOD;
+			return true;
 		}
-		else if ("{".equals(value))
+		if (this.isInMode(POST_METHOD))
 		{
-			if (this.mode == POST_METHOD)
+			if ("throws".equals(value))
 			{
-				pm.pushParser(new StatementParser((IMethodContext) this.member, (IImplementable) this.member));
+				pm.pushParser(new ThrowsDeclParser(this.method));
 				return true;
 			}
-		}
-		else if ("}".equals(value))
-		{
-			if (this.mode == 0)
+			// TODO default
+			else if ("=".equals(value))
 			{
-				pm.popParser();
+				// TODO Method Body
 				return true;
 			}
-			else if (this.mode == POST_METHOD)
+			else if (";".equals(value))
 			{
-				this.mode = 0;
-				return true;
-			}
-		}
-		else if ("=".equals(value))
-		{
-			if (this.mode == 0)
-			{
-				this.mode = VARIABLE;
-				
-				Field variable = new Field();
-				variable.setName(token.prev().value());
-				variable.setAnnotations(this.annotations);
-				
-				this.member = variable;
-				this.classBody.addVariable(variable);
 				this.reset();
-				
-				pm.pushParser(new ValueParser(this.theClass, variable));
-				return true;
-			}
-		}
-		else if (";".equals(value))
-		{
-			if (this.mode != 0)
-			{
-				this.mode = 0;
-				return true;
-			}
-		}
-		else if ("@".equals(value))
-		{
-			if (this.mode == 0)
-			{
-				this.mode = ANNOTATION;
-				
-				Annotation annotation = new Annotation();
-				this.annotations.add(annotation);
-				
-				pm.pushParser(new TypeParser(annotation));
-				return true;
-			}
-		}
-		else if ("throws".equals(value))
-		{
-			if (this.mode == POST_METHOD)
-			{
-				pm.pushParser(new ThrowsDeclParser((IThrower) this.member));
-				return true;
-			}
-		}
-		else if ("default".equals(value))
-		{
-			if (this.mode == POST_ANNOTATION)
-			{
-				// TODO Annotation Defaults
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	private void reset()
+	@Override
+	public void setType(Type type)
 	{
-		this.annotations = new LinkedList();
+		this.field.setType(type);
+		this.method.setType(type);
+	}
+	
+	@Override
+	public Type getType()
+	{
+		return null;
 	}
 }

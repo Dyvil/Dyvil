@@ -7,8 +7,4 @@ public class Main
 {
     public int i;
     public float j;
-    
-    public static void main(String[] args)
-    {
-    }
 }
