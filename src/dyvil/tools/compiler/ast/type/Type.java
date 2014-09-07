@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
-import dyvil.tools.compiler.CodeParser;
 import dyvil.tools.compiler.ast.api.IField;
-import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IClassContext;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -26,17 +24,17 @@ public class Type implements IClassContext
 	
 	public Type(String name)
 	{
-		this.setName(name);
+		// FIXME
 	}
 	
-	public void setClass(AbstractClass theClass)
+	public Type(IClass iclass)
+	{
+		this.theClass = iclass;
+	}
+	
+	public void setClass(IClass theClass)
 	{
 		this.theClass = theClass;
-	}
-	
-	public void setName(String name)
-	{
-		this.theClass = CodeParser.resolveClass(name);
 	}
 	
 	public void setSeperator(char seperator)
