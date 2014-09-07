@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.MultiImport;
 import dyvil.tools.compiler.ast.imports.PackageImport;
-import dyvil.tools.compiler.ast.imports.SimpleImport;
 import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
@@ -13,11 +12,13 @@ import dyvil.tools.compiler.parser.ParserManager;
 
 public class ImportParser extends Parser
 {
+	public static int			MULTIIMPORT_START	= 1;
+	public static int			MULTIIMPORT_END		= 2;
+	
 	protected CompilationUnit	unit;
 	
-	private int					mode;
 	private IImport				theImport;
-	private StringBuilder		buffer	= new StringBuilder();
+	private StringBuilder		buffer				= new StringBuilder();
 	
 	public ImportParser(CompilationUnit unit)
 	{
@@ -25,48 +26,60 @@ public class ImportParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		if (";".equals(value))
 		{
-			jcp.popParser();
+			pm.popParser();
 			return true;
 		}
-		else if ("{".equals(value))
+		else if (this.mode == 0)
 		{
-			if (this.mode == 1)
-				throw new SyntaxError("Cannot make nested MultiImports");
-			if (this.mode == 2)
-				throw new SyntaxError("Cannot make multiple MultiImports at the same time.");
-			
-			this.mode = 1;
-			this.theImport = new MultiImport();
-			return true;
-		}
-		else if ("}".equals(value))
-		{
-			this.mode = 2;
-			return true;
-		}
-		else if (".".equals(value) && token.next().equals(";"))
-		{
-			this.theImport = new PackageImport();
-			return true;
-		}
-		else if (this.mode == 1)
-		{
-			if (!",".equals(value))
+			if ("{".equals(value))
 			{
-				if (token.type() != Token.TYPE_IDENTIFIER)
-					throw new SyntaxError("Invalid Import");
-				((MultiImport) this.theImport).addClass(value);
+				this.mode = MULTIIMPORT_START;
+				this.theImport = new MultiImport(this.buffer.toString());
+				this.buffer.delete(0, this.buffer.length());
+				return true;
+			}
+			else if (".;".equals(value))
+			{
+				this.theImport = new PackageImport(this.buffer.toString());
+				pm.popParser();
+				return true;
+			}
+			else if (token.isType(Token.TYPE_IDENTIFIER) || ".".equals(value))
+			{
+				this.buffer.append(value);
 				return true;
 			}
 		}
-		else
+		else if (this.mode == MULTIIMPORT_START)
 		{
-			this.buffer.append(value);
-			return true;
+			if (",".equals(value))
+			{
+				if (this.buffer.length() > 0)
+				{
+					((MultiImport) this.theImport).addClass(this.buffer.toString());
+					this.buffer.delete(0, this.buffer.length());
+					return true;
+				}				
+			}
+			else if ("}".equals(value))
+			{
+				this.mode = MULTIIMPORT_END;
+				
+				if (this.buffer.length() > 0)
+				{
+					((MultiImport) this.theImport).addClass(this.buffer.toString());
+				}
+				return true;
+			}
+			else if (token.isType(Token.TYPE_IDENTIFIER) || ".".equals(value))
+			{
+				this.buffer.append(value);
+				return true;
+			}
 		}
 		return false;
 	}
@@ -74,15 +87,6 @@ public class ImportParser extends Parser
 	@Override
 	public void end(ParserManager pm)
 	{
-		if (this.theImport == null)
-		{
-			this.theImport = new SimpleImport(this.buffer.toString());
-		}
-		else
-		{
-			((PackageImport) this.theImport).setPackage(this.buffer.toString());
-		}
-		
 		this.unit.addImport(this.theImport);
 	}
 }

@@ -50,6 +50,15 @@ public abstract class Parser<T>
 		return this.mode;
 	}
 	
+	public boolean isInMode(int mode)
+	{
+		if (mode == 0)
+		{
+			return this.mode == 0;
+		}
+		return (this.mode & mode) == mode;
+	}
+	
 	public void begin(ParserManager pm)
 	{
 	}

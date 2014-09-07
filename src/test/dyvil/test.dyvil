@@ -1,7 +1,7 @@
 package com.clashsoft.test;
 
 import java.util.;
-import com.clashsoft.jcp.;
+import com.clashsoft.jcp.{foo, bar};
 
 public class Main
 {

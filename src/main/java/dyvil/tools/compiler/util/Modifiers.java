@@ -187,7 +187,7 @@ public class Modifiers
 		case "ref":
 			return BYREF;
 		}
-		return 0;
+		return -1;
 	}
 	
 	public static int parseAccessModifier(String mod)
@@ -205,13 +205,13 @@ public class Modifiers
 		case "derived":
 			return DERIVED;
 		}
-		return 0;
+		return -1;
 	}
 	
 	public static int parseClassModifier(String mod)
 	{
 		int i = parseAccessModifier(mod);
-		if (i != 0)
+		if (i != -1)
 			return i;
 		switch (mod)
 		{
@@ -222,13 +222,13 @@ public class Modifiers
 		case "strictfp":
 			return STRICT;
 		}
-		return 0;
+		return -1;
 	}
 	
 	public static int parseInterfaceModifier(String mod)
 	{
 		int i = parseAccessModifier(mod);
-		if (i != 0)
+		if (i != -1)
 			return i;
 		switch (mod)
 		{
@@ -237,13 +237,13 @@ public class Modifiers
 		case "strictfp":
 			return STRICT;
 		}
-		return 0;
+		return -1;
 	}
 	
 	public static int parseFieldModifier(String mod)
 	{
 		int i = parseAccessModifier(mod);
-		if (i != 0)
+		if (i != -1)
 			return i;
 		switch (mod)
 		{
@@ -260,13 +260,13 @@ public class Modifiers
 		case "lazy":
 			return LAZY;
 		}
-		return 0;
+		return -1;
 	}
 	
 	public static int parseMethodModifier(String mod)
 	{
 		int i = parseAccessModifier(mod);
-		if (i != 0)
+		if (i != -1)
 			return i;
 		switch (mod)
 		{
@@ -287,7 +287,7 @@ public class Modifiers
 		case "implicit":
 			return IMPLICIT;
 		}
-		return 0;
+		return -1;
 	}
 	
 	public static int parseParameterModifier(String mod)
@@ -301,6 +301,6 @@ public class Modifiers
 		case "ref":
 			return BYREF;
 		}
-		return 0;
+		return -1;
 	}
 }

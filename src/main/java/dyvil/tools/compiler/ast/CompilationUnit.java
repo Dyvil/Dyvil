@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.classes.AbstractClass;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 
-public class CompilationUnit
+public class CompilationUnit implements IContext
 {
 	private PackageDecl			packageDecl;
 	private List<IImport>		imports	= new ArrayList();
@@ -41,5 +43,12 @@ public class CompilationUnit
 	public void addClass(AbstractClass type)
 	{
 		this.classes.add(type);
+	}
+
+	@Override
+	public IClass resolveClass(String name)
+	{
+		// FIXME
+		return null;
 	}
 }

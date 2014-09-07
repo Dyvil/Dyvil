@@ -7,6 +7,11 @@ public class MultiImport extends PackageImport
 {
 	public Set<String> theClasses = new HashSet();
 	
+	public MultiImport(String basePackage)
+	{
+		super(basePackage);
+	}
+	
 	public void addClass(String name)
 	{
 		this.theClasses.add(name);
