@@ -30,4 +30,10 @@ public class SimpleImport implements IImport
 	{
 		return this.theImport.endsWith(name);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "import " + this.theImport + ";";
+	}
 }

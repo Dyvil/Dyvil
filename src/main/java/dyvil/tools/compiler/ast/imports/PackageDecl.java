@@ -18,4 +18,10 @@ public class PackageDecl
 	{
 		return this.thePackage;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "package " + this.thePackage + ";";
+	}
 }

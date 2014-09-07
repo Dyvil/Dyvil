@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class MultiImport extends PackageImport
@@ -43,5 +44,30 @@ public class MultiImport extends PackageImport
 	public boolean isClassName(String name)
 	{
 		return this.containsClass(name);
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder(20);
+		builder.append("import ").append(this.thePackage).append('{');
+		
+		Iterator<String> iterator = this.theClasses.iterator();
+		while (iterator.hasNext())
+		{
+			String s = iterator.next();
+			builder.append(s);
+			
+			if (iterator.hasNext())
+			{
+				builder.append(", ");
+			}
+			else
+			{
+				break;
+			}
+		}
+		builder.append("};");
+		return builder.toString();
 	}
 }

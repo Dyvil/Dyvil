@@ -36,4 +36,10 @@ public class PackageImport implements IImport
 	{
 		return false;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "import " + this.thePackage + ";";
+	}
 }
