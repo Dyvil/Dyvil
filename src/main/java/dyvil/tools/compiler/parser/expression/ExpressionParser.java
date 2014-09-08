@@ -3,9 +3,9 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.context.IClassContext;
-import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.IfStatement;
+import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.SyntaxError;
@@ -60,11 +60,11 @@ public class ExpressionParser extends Parser
 			else if ("{".equals(value))
 			{
 				this.mode = VALUE_2;
-				this.value = new ValueList();
+				this.value = new StatementList();
 				
 				if (!token.next().equals("}"))
 				{
-					pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value));
+					pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value, true));
 				}
 				return true;
 			}
@@ -79,7 +79,14 @@ public class ExpressionParser extends Parser
 		}
 		if (this.isInMode(STATEMENT))
 		{
-			if ("if".equals(value))
+			if ("return".equals(value))
+			{
+				ReturnStatement statement = new ReturnStatement();
+				this.addStatement(statement);
+				pm.pushParser(new ExpressionParser(this.context, statement));
+				return true;
+			}
+			else if ("if".equals(value))
 			{
 				IfStatement statement = new IfStatement();
 				this.addStatement(statement);

@@ -14,7 +14,7 @@ public class ExpressionListParser extends Parser implements IValued
 {
 	protected IClassContext	context;
 	protected IValueList	valueList;
-	protected boolean statements;
+	protected boolean		statements;
 	
 	public ExpressionListParser(IClassContext context, IValueList valueList)
 	{

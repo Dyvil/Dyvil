@@ -13,7 +13,17 @@ public class Main
     
     public int three() = 3;
     
-    public void foo() = { };
+    public Object foo() = return null;
     
-    public void bar() = if (true) { 1; 2; 3; } else 1;
+    public void bar() =
+    {
+    	if (true)
+    	{
+    		return 9
+    	}
+    	else
+    	{
+    		return 1
+    	}
+    };
 }
