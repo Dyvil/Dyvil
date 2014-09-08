@@ -47,7 +47,8 @@ public class Formatting
 	public static class Statements
 	{
 		public static String	ifStart	= "if (";
-		public static String	ifEnd	= ")";
+		public static String	ifEnd	= ") ";
+		public static String	ifElse	= " else ";
 	}
 	
 	public static class Expression
