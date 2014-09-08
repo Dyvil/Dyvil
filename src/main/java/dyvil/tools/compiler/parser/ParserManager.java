@@ -155,9 +155,13 @@ public class ParserManager
 		{
 			parsed = this.currentParser.parse(this, value, token);
 		}
+		catch(SyntaxError error)
+		{
+			throw error;
+		}
 		catch (Exception ex)
 		{
-			throw new SyntaxError("Failed to parse token '" + value + "'");
+			throw new SyntaxError("Failed to parse token '" + value + "': " + ex.getMessage());
 		}
 		
 		if (!parsed)

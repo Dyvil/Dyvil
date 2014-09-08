@@ -110,6 +110,7 @@ public class ExpressionParser extends Parser
 		if ("null".equals(value))
 		{
 			this.value = IValue.NULL;
+			return true;
 		}
 		// Boolean
 		else if ("true".equals(value))
