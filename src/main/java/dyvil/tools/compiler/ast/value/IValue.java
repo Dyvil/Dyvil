@@ -23,7 +23,7 @@ public interface IValue extends IASTObject
 										@Override
 										public void toString(String prefix, StringBuilder buffer)
 										{
-											buffer.append(prefix).append("null");
+											buffer.append("null");
 										}
 									};
 	

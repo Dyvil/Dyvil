@@ -65,11 +65,11 @@ public class IfStatement implements IStatement
 		this.condition = this.condition.fold();
 		if (BooleanValue.TRUE.equals(this.condition))
 		{
-			return this.then;
+			return this.then.fold();
 		}
 		if (BooleanValue.FALSE.equals(this.condition))
 		{
-			return this.elseThen;
+			return this.elseThen.fold();
 		}
 		return this;
 	}
