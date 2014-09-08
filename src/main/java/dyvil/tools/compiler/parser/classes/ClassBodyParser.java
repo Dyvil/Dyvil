@@ -130,7 +130,7 @@ public class ClassBodyParser extends Parser implements ITyped
 			// TODO default
 			else if ("=".equals(value))
 			{
-				pm.pushParser(new ExpressionParser(this.method, this.method));
+				pm.pushParser(new ExpressionParser(this.method, this.method, true));
 				return true;
 			}
 			else if (";".equals(value))

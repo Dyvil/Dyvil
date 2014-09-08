@@ -40,16 +40,6 @@ public abstract class Parser<T>
 		}
 	}
 	
-	public void setMode(int mode)
-	{
-		this.mode = mode;
-	}
-	
-	public int getMode()
-	{
-		return this.mode;
-	}
-	
 	public boolean isInMode(int mode)
 	{
 		if (mode == 0)

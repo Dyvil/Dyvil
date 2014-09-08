@@ -9,4 +9,8 @@ public class Main
     public float j;
     
     public int three() = 3;
+    
+    public void foo() = { };
+    
+    public void bar() = if (true) 3;
 }

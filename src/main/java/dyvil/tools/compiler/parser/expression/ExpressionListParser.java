@@ -14,11 +14,7 @@ public class ExpressionListParser extends Parser implements IValued
 {
 	protected IClassContext	context;
 	protected IValueList	valueList;
-	
-	/**
-	 * Current Value to parse.
-	 */
-	private IValue			value;
+	protected boolean statements;
 	
 	public ExpressionListParser(IClassContext context, IValueList valueList)
 	{
@@ -26,38 +22,41 @@ public class ExpressionListParser extends Parser implements IValued
 		this.valueList = valueList;
 	}
 	
+	public ExpressionListParser(IClassContext context, IValueList valueList, boolean statements)
+	{
+		this.context = context;
+		this.valueList = valueList;
+		this.statements = statements;
+	}
+	
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		if (this.mode == 0)
 		{
-			pm.pushParser(new ExpressionParser(this.context, this), token);
 			this.mode = 1;
+			pm.pushParser(new ExpressionParser(this.context, this, this.statements), token);
+			return true;
 		}
-		else
+		else if (ParserUtil.isSeperatorChar(value))
 		{
 			this.mode = 0;
-			this.valueList.addValue(this.value);
-			this.value = null;
-			
-			// End of Value List
-			if (!ParserUtil.isSeperatorChar(value))
-			{
-				pm.popParser(token);
-			}
+			return true;
 		}
-		return false;
+		
+		pm.popParser(token);
+		return true;
 	}
 	
 	@Override
 	public void setValue(IValue value)
 	{
-		this.value = value;
+		this.valueList.addValue(value);
 	}
 	
 	@Override
 	public IValue getValue()
 	{
-		return this.value;
+		return null;
 	}
 }

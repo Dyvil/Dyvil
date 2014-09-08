@@ -1,60 +1,108 @@
 package dyvil.tools.compiler.parser.expression;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValued;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IClassContext;
+import dyvil.tools.compiler.ast.expression.ValueList;
+import dyvil.tools.compiler.ast.statement.IStatement;
+import dyvil.tools.compiler.ast.statement.IfStatement;
+import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.parser.statement.IfStatementParser;
 
-public class ExpressionParser extends Parser implements IValued, IValueList
+public class ExpressionParser extends Parser
 {
-	public static final int	VALUE			= 0;
-	public static final int	TYPE			= 1;
-	public static final int	PARAMETERS		= 2;
-	public static final int	PARAMETERS_END	= 4;
+	public static final int	VALUE			= 1;
+	public static final int	VALUE_2			= 2;
+	public static final int	STATEMENT		= 4;
+	public static final int	TYPE			= 8;
+	public static final int	PARAMETERS		= 16;
+	public static final int	PARAMETERS_2	= 32;
+	
+	public static final int	IF				= 1;
+	public static final int	ELSE			= 2;
 	
 	protected IClassContext	context;
 	protected IValued		field;
+	protected boolean		statements;
 	
 	private IValue			value;
 	
-	private List<IValue>	arguments		= new ArrayList();
-	
 	public ExpressionParser(IClassContext context, IValued field)
 	{
+		this.mode = VALUE;
 		this.context = context;
 		this.field = field;
+	}
+	
+	public ExpressionParser(IClassContext context, IValued field, boolean statements)
+	{
+		this.mode = VALUE | (statements ? STATEMENT : 0);
+		this.context = context;
+		this.field = field;
+		this.statements = statements;
 	}
 	
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		IField field;
-		IClass iclass;
-		if (this.parsePrimitive(value, token))
+		if (this.isInMode(VALUE))
 		{
-			return true;
+			if (this.parsePrimitive(value, token))
+			{
+				return true;
+			}
+			else if ("{".equals(value))
+			{
+				this.mode = VALUE_2;
+				this.value = new ValueList();
+				
+				if (!token.next().equals("}"))
+				{
+					pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value));
+				}
+				return true;
+			}
 		}
-		else
+		if (this.isInMode(VALUE_2))
+		{
+			if ("}".equals(value))
+			{
+				pm.popParser();
+				return true;
+			}
+		}
+		if (this.isInMode(STATEMENT))
+		{
+			if ("if".equals(value))
+			{
+				IfStatement statement = new IfStatement();
+				this.addStatement(statement);
+				pm.pushParser(new IfStatementParser(this.context, statement));
+				return true;
+			}
+		}
+		
+		if (this.value != null)
 		{
 			pm.popParser(token);
 			return true;
 		}
+		return false;
 	}
 	
 	@Override
 	public void end(ParserManager pm)
 	{
-		this.field.setValue(this.value);
+		if (this.value != null)
+		{
+			this.field.setValue(this.value);
+		}
 	}
 	
 	public boolean parsePrimitive(String value, IToken token) throws SyntaxError
@@ -115,27 +163,18 @@ public class ExpressionParser extends Parser implements IValued, IValueList
 		return false;
 	}
 	
-	@Override
-	public void setValues(List<IValue> list)
+	public void addStatement(IStatement statement)
 	{
-		this.arguments = list;
-	}
-	
-	@Override
-	public List<IValue> getValues()
-	{
-		return this.arguments;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		this.arguments.set(0, value);
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.arguments.get(0);
+		if (this.value == null)
+		{
+			this.value = statement;
+		}
+		else
+		{
+			StatementList list = new StatementList();
+			list.addValue(this.value);
+			list.addStatement(statement);
+			this.value = list;
+		}
 	}
 }

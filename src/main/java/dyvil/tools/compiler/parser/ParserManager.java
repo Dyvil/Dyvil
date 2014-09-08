@@ -199,7 +199,7 @@ public class ParserManager
 	public void pushParser(Parser parser, IToken token) throws SyntaxError
 	{
 		this.pushParser(parser);
-		this.currentParser.parse(this, token.value(), token);
+		this.parseToken(token.value(), token);
 	}
 	
 	public void popParser() throws SyntaxError
@@ -216,7 +216,7 @@ public class ParserManager
 		this.popParser();
 		if (this.currentParser != null)
 		{
-			this.currentParser.parse(this, token.value(), token);
+			this.parseToken(token.value(), token);
 		}
 	}
 }
