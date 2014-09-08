@@ -13,7 +13,7 @@ public class Token implements IToken
 	
 	private final byte		type;
 	private final String	value;
-	private final Object object;
+	private final Object	object;
 	
 	private final int		start;
 	private final int		end;
@@ -106,6 +106,35 @@ public class Token implements IToken
 			this.next.setPrev(this);
 		}
 		return this.next;
+	}
+	
+	@Override
+	public boolean match(Object object) throws SyntaxError
+	{
+		if (object instanceof String)
+		{
+			return this.equals((String) object);
+		}
+		else if (object instanceof Number)
+		{
+			return this.isType(((Number) object).byteValue());
+		}
+		return this.equals(object);
+	}
+	
+	@Override
+	public boolean match(Object... objects) throws SyntaxError
+	{
+		IToken token = this;
+		for (Object object : objects)
+		{
+			if (!token.match(objects))
+			{
+				return false;
+			}
+			token = token.next();
+		}
+		return true;
 	}
 	
 	@Override

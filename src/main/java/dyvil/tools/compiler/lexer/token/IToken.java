@@ -41,6 +41,10 @@ public interface IToken
 	
 	public IToken next() throws SyntaxError;
 	
+	public boolean match(Object object) throws SyntaxError;
+	
+	public boolean match(Object... objects) throws SyntaxError;
+	
 	public boolean hasPrev();
 	
 	public boolean hasNext();

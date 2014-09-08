@@ -76,6 +76,18 @@ public class FakeToken implements IToken
 	}
 	
 	@Override
+	public boolean match(Object object) throws SyntaxError
+	{
+		throw new SyntaxError("No token!");
+	}
+	
+	@Override
+	public boolean match(Object... objects) throws SyntaxError
+	{
+		throw new SyntaxError("No token!");
+	}
+	
+	@Override
 	public void setIndex(int index)
 	{
 	}
