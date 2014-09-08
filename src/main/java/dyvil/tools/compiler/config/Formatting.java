@@ -41,11 +41,17 @@ public class Formatting
 		public static String	parametersStart			= "(";
 		public static String	parametersEnd			= ")";
 		public static String	signatureBodySeperator	= " = ";
+		public static String	indent					= "\t";
 	}
 	
 	public static class Statements
 	{
-		public static String ifStart = "if (";
-		public static String ifEnd = ")";
+		public static String	ifStart	= "if (";
+		public static String	ifEnd	= ")";
+	}
+	
+	public static class Expression
+	{
+		public static String	emptyExpression	= "{ }";
 	}
 }

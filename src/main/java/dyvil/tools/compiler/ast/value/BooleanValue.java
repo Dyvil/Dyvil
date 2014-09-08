@@ -40,6 +40,6 @@ public class BooleanValue implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append(this.value);
+		buffer.append(this.value);
 	}
 }

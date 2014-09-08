@@ -86,6 +86,7 @@ public class ClassBody implements IASTObject
 			{
 				method.toString(prefix, buffer);
 				buffer.append('\n');
+				buffer.append('\n');
 			}
 		}
 	}
