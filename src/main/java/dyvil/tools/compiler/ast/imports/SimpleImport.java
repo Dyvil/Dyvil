@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
+import dyvil.tools.compiler.CompilerState;
+
 public class SimpleImport implements IImport
 {
 	private String			theImport;
@@ -30,6 +32,10 @@ public class SimpleImport implements IImport
 	{
 		return this.theImport.endsWith(name);
 	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

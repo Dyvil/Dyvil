@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -10,7 +12,7 @@ import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.config.Formatting;
 
-public class CompilationUnit implements IContext
+public class CompilationUnit implements IASTObject, IContext
 {
 	private PackageDecl			packageDecl;
 	private List<IImport>		imports	= new ArrayList();
@@ -54,10 +56,25 @@ public class CompilationUnit implements IContext
 	}
 	
 	@Override
+	public void applyState(CompilerState state)
+	{
+		for (AbstractClass aclass : this.classes)
+		{
+			aclass.applyState(state);
+		}
+	}
+	
+	@Override
 	public String toString()
 	{
 		StringBuilder buffer = new StringBuilder();
-		
+		this.toString("", buffer);
+		return buffer.toString();
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
 		this.packageDecl.toString("", buffer);
 		buffer.append('\n');
 		if (Formatting.Package.newLine)
@@ -84,7 +101,5 @@ public class CompilationUnit implements IContext
 				buffer.append('\n');
 			}
 		}
-		
-		return buffer.toString();
 	}
 }

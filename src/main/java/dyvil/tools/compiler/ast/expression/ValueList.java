@@ -25,12 +25,6 @@ public class ValueList implements IValue, IValueList
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return false;
-	}
-	
-	@Override
 	public IValue fold()
 	{
 		return this;

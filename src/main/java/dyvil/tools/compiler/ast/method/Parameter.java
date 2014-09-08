@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class Parameter extends Member
@@ -30,4 +31,8 @@ public class Parameter extends Member
 	{
 		return this.seperator;
 	}
+
+	@Override
+	public void applyState(CompilerState state)
+	{}
 }

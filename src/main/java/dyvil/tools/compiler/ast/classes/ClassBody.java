@@ -1,10 +1,9 @@
 package dyvil.tools.compiler.ast.classes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -13,7 +12,7 @@ import dyvil.tools.compiler.ast.type.Type;
 public class ClassBody implements IASTObject
 {
 	private AbstractClass		theClass;
-	private Map<String, IField>	fields	= new HashMap();
+	private List<IField>	fields	= new ArrayList();
 	private List<IMethod>		methods	= new ArrayList();
 	
 	public ClassBody()
@@ -31,8 +30,7 @@ public class ClassBody implements IASTObject
 	
 	public void addVariable(IField var)
 	{
-		String key = var.getName();
-		this.fields.put(key, var);
+		this.fields.add(var);
 	}
 	
 	public void addMethod(IMethod method)
@@ -42,7 +40,14 @@ public class ClassBody implements IASTObject
 	
 	public IField getField(String name)
 	{
-		return this.fields.get(name);
+		for (IField field : this.fields)
+		{
+			if (name.equals(field.getName()))
+			{
+				return field;
+			}
+		}
+		return null;
 	}
 	
 	public IMethod getMethod(String name)
@@ -70,9 +75,23 @@ public class ClassBody implements IASTObject
 	}
 	
 	@Override
+	public void applyState(CompilerState state)
+	{
+		for (IField field : this.fields)
+		{
+			field.applyState(state);
+		}
+		
+		for (IMethod method : this.methods)
+		{
+			method.applyState(state);
+		}
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (IField field : this.fields.values())
+		for (IField field : this.fields)
 		{
 			field.toString(prefix, buffer);
 			buffer.append('\n');

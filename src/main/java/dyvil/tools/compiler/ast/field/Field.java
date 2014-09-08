@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.type.Type;
@@ -38,6 +39,18 @@ public class Field extends Member implements IField
 	public IValue getValue()
 	{
 		return this.value;
+	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{
+		if (state == CompilerState.FOLD_CONSTANTS)
+		{
+			if (this.value != null)
+			{
+				this.value = this.value.fold();
+			}
+		}
 	}
 	
 	@Override

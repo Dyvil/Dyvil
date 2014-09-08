@@ -41,12 +41,6 @@ public class WhileStatement implements IStatement, IValued
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return false;
-	}
-	
-	@Override
 	public IValue fold()
 	{
 		return this;

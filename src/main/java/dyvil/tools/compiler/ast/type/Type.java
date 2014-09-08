@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -94,6 +95,10 @@ public class Type implements IASTObject, IClassContext
 	{
 		return this.theClass.resolveMethod(name, args);
 	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{}
 	
 	@Override
 	public String toString()

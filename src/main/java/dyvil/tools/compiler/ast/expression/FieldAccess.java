@@ -21,12 +21,6 @@ public class FieldAccess implements IValue
 	}
 
 	@Override
-	public boolean isConstant()
-	{
-		return this.field.getValue().isConstant();
-	}
-
-	@Override
 	public IValue fold()
 	{
 		return this;

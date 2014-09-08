@@ -14,12 +14,6 @@ public class ClassAccess implements IValue
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return true;
-	}
-	
-	@Override
 	public IValue fold()
 	{
 		return this;

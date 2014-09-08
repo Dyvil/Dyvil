@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.classes;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -142,6 +143,12 @@ public abstract class AbstractClass implements IClass
 	{
 		// FIXME
 		return this.body.getMethod(name, args);
+	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{
+		this.body.applyState(state);
 	}
 	
 	@Override

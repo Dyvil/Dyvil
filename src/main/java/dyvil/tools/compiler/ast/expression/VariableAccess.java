@@ -21,12 +21,6 @@ public class VariableAccess implements IValue
 	{
 		return this;
 	}
-	
-	@Override
-	public boolean isConstant()
-	{
-		return this.variable.getValue().isConstant();
-	}
 
 	@Override
 	public Type getType()

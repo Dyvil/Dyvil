@@ -60,15 +60,18 @@ public class IfStatement implements IStatement
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return this.condition.isConstant();
-	}
-	
-	@Override
 	public IValue fold()
 	{
-		return BooleanValue.TRUE.equals(this.condition) ? this.then : this.elseThen;
+		this.condition = this.condition.fold();
+		if (BooleanValue.TRUE.equals(this.condition))
+		{
+			return this.then;
+		}
+		if (BooleanValue.FALSE.equals(this.condition))
+		{
+			return this.elseThen;
+		}
+		return this;
 	}
 	
 	@Override

@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class FloatValue implements IValue
 {
-	public float value;
+	public float	value;
 	
 	public FloatValue(String value)
 	{
@@ -15,19 +15,13 @@ public class FloatValue implements IValue
 	{
 		this.value = value;
 	}
-
-	@Override
-	public boolean isConstant()
-	{
-		return true;
-	}
-
+	
 	@Override
 	public IValue fold()
 	{
 		return this;
 	}
-
+	
 	@Override
 	public Type getType()
 	{

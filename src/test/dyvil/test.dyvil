@@ -5,12 +5,15 @@ import com.clashsoft.jcp.{foo, bar};
 
 public class Main
 {
-    public int i = 3;
-    public float j;
+	public int i = 12;
+    public int j = 0b1101;
+    public int k = 0xFFFF;
+    
+    public float f = 1.5F;
     
     public int three() = 3;
     
     public void foo() = { };
     
-    public void bar() = if (true) 3;
+    public void bar() = if (true) { 1; 2; 3; } else 1;
 }

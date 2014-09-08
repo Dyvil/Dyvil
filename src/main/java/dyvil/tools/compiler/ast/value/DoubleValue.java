@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class DoubleValue implements IValue
 {
-	public double value;
+	public double	value;
 	
 	public DoubleValue(String value)
 	{
@@ -15,19 +15,13 @@ public class DoubleValue implements IValue
 	{
 		this.value = value;
 	}
-
-	@Override
-	public boolean isConstant()
-	{
-		return true;
-	}
-
+	
 	@Override
 	public IValue fold()
 	{
 		return this;
 	}
-
+	
 	@Override
 	public Type getType()
 	{

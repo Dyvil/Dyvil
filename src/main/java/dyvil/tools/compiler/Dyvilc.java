@@ -15,6 +15,7 @@ public class Dyvilc
 	public static Dyvilc				instance;
 	
 	protected CompilerConfig			config;
+	protected CompilerState				state;
 	
 	public Map<File, CompilationUnit>	compilationUnits	= new HashMap();
 	
@@ -47,6 +48,13 @@ public class Dyvilc
 		System.out.println("Compiling " + this.config.sourceDir.getAbsolutePath() + " to " + this.config.outputDir.getAbsolutePath());
 		
 		this.compile(this.config.sourceDir, this.config.outputDir);
+		
+		for (CompilationUnit unit : this.compilationUnits.values())
+		{	
+			unit.applyState(CompilerState.FOLD_CONSTANTS);
+			
+			System.out.println(unit);
+		}
 	}
 	
 	public void compile(File source, File output)
@@ -65,7 +73,6 @@ public class Dyvilc
 		else
 		{
 			CompilationUnit unit = CodeParser.compilationUnit(readFile(source));
-			System.out.println(unit);
 			this.compilationUnits.put(source, unit);
 		}
 	}

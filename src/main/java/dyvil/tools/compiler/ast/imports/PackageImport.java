@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
+import dyvil.tools.compiler.CompilerState;
+
 public class PackageImport implements IImport
 {
 	protected String thePackage;
@@ -36,6 +38,10 @@ public class PackageImport implements IImport
 	{
 		return false;
 	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

@@ -30,23 +30,6 @@ public class MethodCall implements IValue
 		this.descriptor = descriptor;
 		this.args = args;
 	}
-	
-	@Override
-	public boolean isConstant()
-	{
-		if (!this.instance.isConstant())
-		{
-			return false;
-		}
-		for (IValue arg : this.args)
-		{
-			if (!arg.isConstant())
-			{
-				return false;
-			}
-		}
-		return false;
-	}
 
 	@Override
 	public IValue fold()

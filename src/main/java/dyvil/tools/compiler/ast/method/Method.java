@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 
@@ -48,6 +49,18 @@ public class Method extends Member implements IMethod
 	public List<ThrowsDecl> getThrows()
 	{
 		return this.throwsDeclarations;
+	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{
+		if (state == CompilerState.FOLD_CONSTANTS)
+		{
+			if (this.statement != null)
+			{
+				this.statement = this.statement.fold();
+			}
+		}
 	}
 	
 	@Override

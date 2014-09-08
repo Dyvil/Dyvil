@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.imports;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IASTObject;
 
 public class PackageDecl implements IASTObject
@@ -20,6 +21,10 @@ public class PackageDecl implements IASTObject
 	{
 		return this.thePackage;
 	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
