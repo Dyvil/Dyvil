@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 
-public class ForEachStatement extends WhileStatement
+public class ForEachStatement implements IStatement
 {
 	private Field variable;
 	private Object iterable;
@@ -30,4 +32,27 @@ public class ForEachStatement extends WhileStatement
 	{
 		return this.iterable;
 	}
+
+	@Override
+	public boolean isConstant()
+	{
+		return false;
+	}
+
+	@Override
+	public IValue fold()
+	{
+		return this;
+	}
+
+	@Override
+	public Type getType()
+	{
+		// FIXME
+		return null;
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{}
 }

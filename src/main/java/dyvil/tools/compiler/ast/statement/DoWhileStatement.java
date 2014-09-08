@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public class DoWhileStatement implements IValue, IValued
+public class DoWhileStatement implements IStatement, IValued
 {
 	private IValue	then;
 	private IValue		condition;

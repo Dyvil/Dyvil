@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public class WhileStatement implements IValue, IValued
+public class WhileStatement implements IStatement, IValued
 {
 	private IValue	condition;
 	private IValue	then;
