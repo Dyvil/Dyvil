@@ -33,6 +33,8 @@ public interface IToken
 	
 	public int index() throws SyntaxError;
 	
+	public int line() throws SyntaxError;
+	
 	public int start() throws SyntaxError;
 	
 	public int end() throws SyntaxError;

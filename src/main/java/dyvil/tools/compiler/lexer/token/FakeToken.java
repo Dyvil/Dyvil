@@ -44,6 +44,12 @@ public class FakeToken implements IToken
 	}
 	
 	@Override
+	public int line() throws SyntaxError
+	{
+		throw new SyntaxError("No token!");
+	}
+	
+	@Override
 	public int start() throws SyntaxError
 	{
 		throw new SyntaxError("No token!");

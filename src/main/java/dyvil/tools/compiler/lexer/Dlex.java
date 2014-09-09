@@ -23,9 +23,10 @@ public class Dlex implements Iterable<IToken>
 		int len = code.length();
 		
 		StringBuilder buf = new StringBuilder(20);
-		Token first = new Token(-1, "", (byte) 0, null, -1, -1);
+		Token first = new Token(-1, "", (byte) 0, null, 0, -1, -1);
 		Token prev = first;
 		int start = 0;
+		int lineNumber = 1;
 		int i;
 		
 		char l = 0;
@@ -41,7 +42,11 @@ public class Dlex implements Iterable<IToken>
 			{
 				start = i;
 				
-				if (isWhitespace(c))
+				if (c == '\n')
+				{
+					lineNumber++;
+				}
+				else if (isWhitespace(c))
 				{
 					continue;
 				}
@@ -62,14 +67,9 @@ public class Dlex implements Iterable<IToken>
 			}
 			else if (mode == TYPE_SYMBOL)
 			{
-				if (isSymbol(c))
-				{
-					buf.append(c);
-				}
-				else
-				{
-					addToken = true;
-				}
+				buf.append(c);
+				addToken = true;
+				reparse = false;
 			}
 			else if (mode == TYPE_BRACKET)
 			{
@@ -219,7 +219,7 @@ public class Dlex implements Iterable<IToken>
 			
 			if (addToken)
 			{
-				prev = addToken(prev, buf, mode, start, i);
+				prev = addToken(prev, buf, mode, lineNumber, start, i);
 				addToken = false;
 				mode = 0;
 				
@@ -236,7 +236,7 @@ public class Dlex implements Iterable<IToken>
 		
 		if (buf.length() > 0)
 		{
-			addToken(prev, buf, mode, start, i);
+			addToken(prev, buf, mode, lineNumber, start, i);
 		}
 		
 		this.first = first.next();
@@ -290,19 +290,19 @@ public class Dlex implements Iterable<IToken>
 		return 0;
 	}
 	
-	private static Token addToken(Token prev, String s, byte type, int start, int end)
+	private static Token addToken(Token prev, String s, byte type, int line, int start, int end)
 	{
-		Token t = new Token(prev.index() + 1, s, type, parse(type, s), start, end);
+		Token t = new Token(prev.index() + 1, s, type, parse(type, s), line, start, end);
 		prev.setNext(t);
 		t.setPrev(prev);
 		return t;
 	}
 	
-	private static Token addToken(Token prev, StringBuilder buf, byte type, int start, int end)
+	private static Token addToken(Token prev, StringBuilder buf, byte type, int line, int start, int end)
 	{
 		String s = buf.toString();
 		buf.delete(0, buf.length());
-		return addToken(prev, s, type, start, end);
+		return addToken(prev, s, type, line, start, end);
 	}
 	
 	protected static boolean isWhitespace(char c)

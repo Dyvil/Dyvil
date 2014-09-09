@@ -15,25 +15,18 @@ public class Token implements IToken
 	private final String	value;
 	private final Object	object;
 	
+	private final int		lineNumber;
 	private final int		start;
 	private final int		end;
 	
-	public Token(int index, String value, byte type, Object object, String code)
+	public Token(int index, String value, byte type, Object object, int lineNumber, int start, int end)
 	{
 		this.index = index;
 		this.value = value;
 		this.type = type;
 		this.object = object;
-		this.start = code.indexOf(value);
-		this.end = this.start + value.length();
-	}
-	
-	public Token(int index, String value, byte type, Object object, int start, int end)
-	{
-		this.index = index;
-		this.value = value;
-		this.type = type;
-		this.object = object;
+		
+		this.lineNumber = lineNumber;
 		this.start = start;
 		this.end = end;
 	}
@@ -72,6 +65,12 @@ public class Token implements IToken
 	public int index()
 	{
 		return this.index;
+	}
+	
+	@Override
+	public int line() throws SyntaxError
+	{
+		return this.lineNumber;
 	}
 	
 	@Override
@@ -170,6 +169,6 @@ public class Token implements IToken
 	@Override
 	public String toString()
 	{
-		return "Token #" + this.index + ": \"" + this.value + "\" (" + this.start + "-" + this.end + ")";
+		return "Token #" + this.index + ": \"" + this.value + "\" (line " + this.lineNumber + ")";
 	}
 }
