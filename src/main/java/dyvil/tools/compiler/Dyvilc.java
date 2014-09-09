@@ -3,11 +3,17 @@ package dyvil.tools.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.config.CompilerConfig;
+import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.config.ConfigParser;
 
 public class Dyvilc
@@ -70,10 +76,25 @@ public class Dyvilc
 				this.compile(new File(source, s), new File(output, s));
 			}
 		}
-		else
+		else if (source.getName().endsWith(".dyvil"))
 		{
 			CompilationUnit unit = CodeParser.compilationUnit(readFile(source));
 			this.compilationUnits.put(source, unit);
+		}
+		else
+		{
+			final List<IToken> tokens = new ArrayList();
+			CodeParser.instance.parse(new Parser() {
+
+				@Override
+				public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+				{
+					tokens.add(token);
+					return true;
+				}
+				
+			}, readFile(source));
+			System.out.println(tokens);
 		}
 	}
 	
