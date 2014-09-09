@@ -46,6 +46,6 @@ public class PackageImport implements IImport
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append("import ").append(this.thePackage).append(";");
+		buffer.append(prefix).append("import ").append(this.thePackage).append("_;");
 	}
 }

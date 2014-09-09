@@ -1,7 +1,8 @@
 package com.clashsoft.test;
 
-import java.util.;
-import com.clashsoft.jcp.{foo, bar};
+import java.awt.Button;
+import java.util._;
+import java.io.{Console, File};
 
 public class Main
 {

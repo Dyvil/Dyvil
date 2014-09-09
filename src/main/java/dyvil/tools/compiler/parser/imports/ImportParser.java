@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.MultiImport;
 import dyvil.tools.compiler.ast.imports.PackageImport;
+import dyvil.tools.compiler.ast.imports.SimpleImport;
 import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
@@ -30,6 +31,10 @@ public class ImportParser extends Parser
 	{
 		if (";".equals(value))
 		{
+			if (this.theImport == null && this.buffer.length() > 0)
+			{
+				this.theImport = new SimpleImport(this.buffer.toString());
+			}
 			pm.popParser();
 			return true;
 		}
@@ -42,10 +47,9 @@ public class ImportParser extends Parser
 				this.buffer.delete(0, this.buffer.length());
 				return true;
 			}
-			else if (".;".equals(value))
+			else if ("_".equals(value))
 			{
 				this.theImport = new PackageImport(this.buffer.toString());
-				pm.popParser();
 				return true;
 			}
 			else if (token.isType(Token.TYPE_IDENTIFIER) || ".".equals(value))
@@ -63,7 +67,7 @@ public class ImportParser extends Parser
 					((MultiImport) this.theImport).addClass(this.buffer.toString());
 					this.buffer.delete(0, this.buffer.length());
 					return true;
-				}				
+				}
 			}
 			else if ("}".equals(value))
 			{
@@ -87,6 +91,9 @@ public class ImportParser extends Parser
 	@Override
 	public void end(ParserManager pm)
 	{
-		this.unit.addImport(this.theImport);
+		if (this.theImport != null)
+		{
+			this.unit.addImport(this.theImport);
+		}
 	}
 }
