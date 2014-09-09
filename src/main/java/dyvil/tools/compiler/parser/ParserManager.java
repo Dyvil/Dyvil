@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser;
 import java.io.PrintStream;
 
 import dyvil.tools.compiler.lexer.Dlex;
+import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
 import dyvil.tools.compiler.lexer.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
@@ -67,52 +68,52 @@ public class ParserManager
 	{
 		Dlex lexer = new Dlex(code);
 		lexer.tokenize();
-		this.parse(code, lexer.next());
+		this.parse(code, lexer);
 	}
 	
-	public final void parse(String code, IToken first)
+	public final void parse(String code, Dlex lexer)
 	{
-		IToken token = first;
+		IToken token = null;
 		try
 		{
+			TokenIterator iterator = lexer.iterator();
 			boolean removed = false;
-			while (token.hasNext())
+			
+			while (iterator.hasNext())
 			{
-				IToken next = token.next();
+				token = iterator.next();
 				if (!this.retainToken(token.value(), token))
 				{
-					IToken prev = token.prev();
-					prev.setNext(next);
-					next.setPrev(prev);
+					iterator.remove();
 					removed = true;
 				}
-				token = next;
 			}
 			
 			if (removed)
 			{
-				token = first;
 				int index = 0;
-				while (token.hasNext())
+				
+				iterator.reset();
+				while (iterator.hasNext())
 				{
+					token = iterator.next();
 					token.setIndex(index);
-					token = token.next();
 					index++;
 				}
 			}
 			
-			token = first;
-			while (token.hasNext())
+			iterator.reset();
+			while (iterator.hasNext())
 			{
 				try
 				{
+					token = iterator.next();
 					this.parseToken(token.value(), token);
 				}
 				catch (SyntaxError ex)
 				{
 					ex.print(System.err, code, token);
 				}
-				token = token.next();
 			}
 		}
 		catch (SyntaxError ex)
@@ -155,7 +156,7 @@ public class ParserManager
 		{
 			parsed = this.currentParser.parse(this, value, token);
 		}
-		catch(SyntaxError error)
+		catch (SyntaxError error)
 		{
 			throw error;
 		}

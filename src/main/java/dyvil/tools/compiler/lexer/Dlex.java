@@ -1,17 +1,16 @@
 package dyvil.tools.compiler.lexer;
 
+import static dyvil.tools.compiler.lexer.token.IToken.*;
+
 import java.util.Iterator;
 
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 
-import static dyvil.tools.compiler.lexer.token.IToken.*;
-
-public class Dlex implements Iterable<IToken>, Iterator<IToken>
+public class Dlex implements Iterable<IToken>
 {
 	protected final String	code;
 	protected IToken		first;
-	protected IToken		current;
 	
 	public Dlex(String code)
 	{
@@ -27,13 +26,14 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 		Token first = new Token(-1, "", (byte) 0, null, -1, -1);
 		Token prev = first;
 		int start = 0;
+		int i;
 		
 		char l = 0;
 		char c = 0;
 		byte mode = 0;
 		boolean addToken = false;
 		boolean reparse = true;
-		for (int i = 0; i < len; ++i, l = c)
+		for (i = 0; i < len; ++i, l = c)
 		{
 			c = code.charAt(i);
 			
@@ -234,8 +234,12 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 			}
 		}
 		
+		if (buf.length() > 0)
+		{
+			addToken(prev, buf, mode, start, i);
+		}
+		
 		this.first = first.next();
-		this.current = this.first;
 	}
 	
 	private static byte getMode(char c, String code, int i)
@@ -261,6 +265,7 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 		else if (c == '@')
 		{
 			char n = code.charAt(i + 1);
+			// @"string"
 			if (n == '"')
 				return TYPE_STRING;
 			else
@@ -270,7 +275,7 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 		{
 			return TYPE_INT;
 		}
-		else if (isIdentifierPart(c))
+		else if (isIdentifierStart(c))
 		{
 			return TYPE_IDENTIFIER;
 		}
@@ -312,7 +317,7 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 	
 	protected static boolean isSymbol(char c)
 	{
-		return c >= '!' && c <= '~' && !isBracket(c) && !isDigit(c) && !isIdentifierPart(c);
+		return c == '.' || c == ',' || c == ';';
 	}
 	
 	protected static boolean isDigit(char c)
@@ -345,54 +350,69 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 	}
 	
+	protected static boolean isIdentifierStart(char c)
+	{
+		return isIdentifierPart(c) && !isDigit(c);
+	}
+	
 	protected static boolean isIdentifierPart(char c)
 	{
-		return c == '_' || c == '@' || c == '$' || isLetter(c);
+		return c >= '!' && c <= '~' && !isSymbol(c) && !isBracket(c);
 	}
 	
 	@Override
-	public Iterator<IToken> iterator()
+	public TokenIterator iterator()
 	{
-		return this;
+		return new TokenIterator();
 	}
 	
-	@Override
-	public boolean hasNext()
+	public class TokenIterator implements Iterator<IToken>
 	{
-		return this.current.hasNext();
-	}
-	
-	@Override
-	public IToken next()
-	{
-		try
+		protected IToken	next	= Dlex.this.first;
+		
+		public void reset()
 		{
-			IToken current = this.current;
-			this.current = current.next();
-			return current;
+			this.next = Dlex.this.first;
 		}
-		catch (SyntaxError ex)
+		
+		@Override
+		public boolean hasNext()
 		{
-			ex.print(System.err, this.code, this.current);
-			return null;
+			return this.next instanceof Token;
 		}
-	}
-	
-	@Override
-	public void remove()
-	{
-		try
+		
+		@Override
+		public IToken next()
 		{
-			IToken prev = this.current.prev();
-			IToken next = this.current.next();
-			
-			prev.setNext(next);
-			next.setPrev(prev);
-			this.current = next;
+			try
+			{
+				IToken next = this.next;
+				this.next = next.next();
+				return next;
+			}
+			catch (SyntaxError ex)
+			{
+				ex.print(System.err, Dlex.this.code, this.next);
+				return null;
+			}
 		}
-		catch (SyntaxError ex)
+		
+		@Override
+		public void remove()
 		{
-			ex.print(System.err, this.code, this.current);
+			try
+			{
+				IToken prev = this.next.prev();
+				IToken next = this.next.next();
+				
+				prev.setNext(next);
+				next.setPrev(prev);
+				this.next = next;
+			}
+			catch (SyntaxError ex)
+			{
+				ex.print(System.err, Dlex.this.code, this.next);
+			}
 		}
 	}
 	
@@ -408,8 +428,6 @@ public class Dlex implements Iterable<IToken>, Iterator<IToken>
 				buf.append(token.value());
 				buf.append(',');
 			}
-			
-			this.current = this.first;
 		}
 		catch (SyntaxError ex)
 		{}
