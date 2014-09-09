@@ -52,6 +52,11 @@ public class ClassBodyParser extends Parser implements ITyped
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		int i = 0;
+		if ("}".equals(value))
+		{
+			pm.popParser(token);
+			return true;
+		}
 		if (this.isInMode(TYPE))
 		{
 			if ((i = Modifiers.parseModifier(value)) != -1)

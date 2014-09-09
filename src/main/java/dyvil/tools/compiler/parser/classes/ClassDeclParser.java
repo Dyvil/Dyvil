@@ -90,7 +90,6 @@ public class ClassDeclParser extends Parser
 			if ("}".equals(value))
 			{
 				jcp.popParser();
-				this.mode = 0;
 				return true;
 			}
 		}

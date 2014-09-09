@@ -162,7 +162,12 @@ public class ParserManager
 		}
 		catch (Exception ex)
 		{
-			throw new SyntaxError("Failed to parse token '" + value + "': " + ex.getMessage());
+			String message = ex.getMessage();
+			if (message == null)
+			{
+				message = ex.getClass().getName();
+			}
+			throw new SyntaxError("Failed to parse token '" + value + "': " + message);
 		}
 		
 		if (!parsed)
