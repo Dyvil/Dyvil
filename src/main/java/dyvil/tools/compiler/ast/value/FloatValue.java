@@ -31,6 +31,6 @@ public class FloatValue implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.value);
+		buffer.append(this.value).append('F');
 	}
 }
