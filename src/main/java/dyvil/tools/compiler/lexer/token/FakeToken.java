@@ -20,7 +20,7 @@ public class FakeToken implements IToken
 	}
 	
 	@Override
-	public byte type() throws SyntaxError
+	public int type() throws SyntaxError
 	{
 		throw new SyntaxError("No token!");
 	}
@@ -32,7 +32,7 @@ public class FakeToken implements IToken
 	}
 	
 	@Override
-	public boolean isType(byte type) throws SyntaxError
+	public boolean isType(int type) throws SyntaxError
 	{
 		throw new SyntaxError("No token!");
 	}

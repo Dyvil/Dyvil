@@ -9,7 +9,7 @@ public class SyntaxError extends Exception
 {
 	private static final long	serialVersionUID	= -2234451954260010124L;
 	
-	public String suggestion;
+	public String				suggestion;
 	
 	public SyntaxError()
 	{
@@ -44,10 +44,12 @@ public class SyntaxError extends Exception
 		StringBuilder builder = new StringBuilder("Syntax error at ");
 		
 		builder.append(token);
-		if (message != null) {
+		if (message != null)
+		{
 			builder.append(": ").append(message);
 		}
-		if (suggestion != null) {
+		if (suggestion != null)
+		{
 			builder.append(" - ").append(suggestion);
 		}
 		out.println(builder.toString());

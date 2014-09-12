@@ -131,41 +131,37 @@ public class ExpressionParser extends Parser
 			return true;
 		}
 		// String
-		else if (token.type() == Token.TYPE_STRING)
+		else if (token.isType(Token.TYPE_STRING))
 		{
 			this.value = new StringValue((String) token.object());
 			return true;
 		}
 		// Char
-		else if (token.type() == Token.TYPE_CHAR)
+		else if (token.isType(Token.TYPE_CHAR))
 		{
 			this.value = new CharValue((Character) token.object());
 			return true;
 		}
 		// Int
-		else if (token.type() == Token.TYPE_INT || token.type() == Token.TYPE_INT_BIN || token.type() == Token.TYPE_INT_HEX)
+		else if (token.isType(Token.TYPE_INT))
 		{
-			if (token.next().equals("L"))
-			{
-				this.value = new LongValue((Long) token.object());
-			}
-			else
-			{
-				this.value = new IntValue((Integer) token.object());
-			}
+			this.value = new IntValue((Integer) token.object());
+			return true;
+		}
+		else if (token.isType(Token.TYPE_LONG))
+		{
+			this.value = new LongValue((Long) token.object());
 			return true;
 		}
 		// Float
-		else if (token.type() == Token.TYPE_FLOAT || token.type() == Token.TYPE_FLOAT_HEX)
+		else if (token.isType(Token.TYPE_FLOAT))
 		{
-			if (token.next().equals("D"))
-			{
-				this.value = new DoubleValue((Double) token.object());
-			}
-			else
-			{
-				this.value = new FloatValue((Float) token.object());
-			}
+			this.value = new FloatValue((Float) token.object());
+			return true;
+		}
+		else if (token.isType(Token.TYPE_DOUBLE))
+		{
+			this.value = new DoubleValue((Double) token.object());
 			return true;
 		}
 		return false;

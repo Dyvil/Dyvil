@@ -76,25 +76,10 @@ public class Dyvilc
 				this.compile(new File(source, s), new File(output, s));
 			}
 		}
-		else if (source.getName().endsWith(".dyvil"))
+		else
 		{
 			CompilationUnit unit = CodeParser.compilationUnit(readFile(source));
 			this.compilationUnits.put(source, unit);
-		}
-		else
-		{
-			final List<IToken> tokens = new ArrayList();
-			CodeParser.instance.parse(new Parser() {
-
-				@Override
-				public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
-				{
-					tokens.add(token);
-					return true;
-				}
-				
-			}, readFile(source));
-			System.out.println(tokens);
 		}
 	}
 	

@@ -11,7 +11,7 @@ public class Token implements IToken
 	
 	private int				index;
 	
-	private final byte		type;
+	private final int		type;
 	private final String	value;
 	private final Object	object;
 	
@@ -19,7 +19,7 @@ public class Token implements IToken
 	private final int		start;
 	private final int		end;
 	
-	public Token(int index, String value, byte type, Object object, int lineNumber, int start, int end)
+	public Token(int index, String value, int type, Object object, int lineNumber, int start, int end)
 	{
 		this.index = index;
 		this.value = value;
@@ -44,7 +44,7 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public byte type() throws SyntaxError
+	public int type() throws SyntaxError
 	{
 		return this.type;
 	}
@@ -56,9 +56,9 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public boolean isType(byte type) throws SyntaxError
+	public boolean isType(int type) throws SyntaxError
 	{
-		return this.type == type;
+		return (this.type & type) == type;
 	}
 	
 	@Override
