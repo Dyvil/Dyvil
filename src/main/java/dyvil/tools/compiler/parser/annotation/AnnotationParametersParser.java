@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser.annotation;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.context.IClassContext;
 import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;

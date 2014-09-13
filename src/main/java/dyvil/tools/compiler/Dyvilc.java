@@ -3,17 +3,12 @@ package dyvil.tools.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.config.CompilerConfig;
-import dyvil.tools.compiler.lexer.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.config.ConfigParser;
 
 public class Dyvilc
@@ -32,21 +27,13 @@ public class Dyvilc
 	
 	public static void main(String[] args)
 	{
-		File file = new File(args[0]);
-		try
-		{
-			String s = new String(Files.readAllBytes(file.toPath()));
-			
-			CompilerConfig config = new CompilerConfig();
-			CodeParser.instance.parse(new ConfigParser(config), s);
-			
-			instance = new Dyvilc(config);
-			instance.compile();
-		}
-		catch (IOException ex)
-		{
-			ex.printStackTrace();
-		}
+		CodeFile file = new CodeFile(args[0]);
+		
+		CompilerConfig config = new CompilerConfig();
+		CodeParser.instance.parse(file, new ConfigParser(config));
+		
+		instance = new Dyvilc(config);
+		instance.compile();
 	}
 	
 	public void compile()
@@ -56,7 +43,7 @@ public class Dyvilc
 		this.compile(this.config.sourceDir, this.config.outputDir);
 		
 		for (CompilationUnit unit : this.compilationUnits.values())
-		{	
+		{
 			unit.applyState(CompilerState.FOLD_CONSTANTS);
 			
 			System.out.println(unit);
@@ -73,12 +60,12 @@ public class Dyvilc
 		{
 			for (String s : source.list())
 			{
-				this.compile(new File(source, s), new File(output, s));
+				this.compile(new CodeFile(source, s), new File(output, s));
 			}
 		}
 		else
 		{
-			CompilationUnit unit = CodeParser.compilationUnit(readFile(source));
+			CompilationUnit unit = CodeParser.compilationUnit((CodeFile) source);
 			this.compilationUnits.put(source, unit);
 		}
 	}

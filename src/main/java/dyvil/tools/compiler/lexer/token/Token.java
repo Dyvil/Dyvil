@@ -2,7 +2,8 @@ package dyvil.tools.compiler.lexer.token;
 
 import java.util.Objects;
 
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 
 public class Token implements IToken
 {
@@ -15,17 +16,19 @@ public class Token implements IToken
 	private final String	value;
 	private final Object	object;
 	
+	private final CodeFile file;
 	private final int		lineNumber;
 	private final int		start;
 	private final int		end;
 	
-	public Token(int index, String value, int type, Object object, int lineNumber, int start, int end)
+	public Token(int index, String value, int type, Object object, CodeFile file, int lineNumber, int start, int end)
 	{
 		this.index = index;
 		this.value = value;
 		this.type = type;
 		this.object = object;
 		
+		this.file = file;
 		this.lineNumber = lineNumber;
 		this.start = start;
 		this.end = end;
@@ -68,19 +71,31 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public int line() throws SyntaxError
+	public CodeFile getFile()
+	{
+		return this.file;
+	}
+	
+	@Override
+	public String getText()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public int getLineNumber()
 	{
 		return this.lineNumber;
 	}
 	
 	@Override
-	public int start()
+	public int getStart()
 	{
 		return this.start;
 	}
 	
 	@Override
-	public int end()
+	public int getEnd()
 	{
 		return this.end;
 	}
@@ -90,7 +105,7 @@ public class Token implements IToken
 	{
 		if (this.prev == null)
 		{
-			this.prev = new FakeToken();
+			this.prev = new FakeToken(this.file);
 			this.prev.setNext(this);
 		}
 		return this.prev;
@@ -101,7 +116,7 @@ public class Token implements IToken
 	{
 		if (this.next == null)
 		{
-			this.next = new FakeToken();
+			this.next = new FakeToken(this.file);
 			this.next.setPrev(this);
 		}
 		return this.next;

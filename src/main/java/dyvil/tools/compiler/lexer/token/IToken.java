@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.lexer.token;
 
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public interface IToken
+public interface IToken extends ICodePosition
 {
 	// MODIFIERS
 	public int	MOD_DEC				= 0x00000000;
@@ -42,12 +43,6 @@ public interface IToken
 	public boolean isType(int type) throws SyntaxError;
 	
 	public int index() throws SyntaxError;
-	
-	public int line() throws SyntaxError;
-	
-	public int start() throws SyntaxError;
-	
-	public int end() throws SyntaxError;
 	
 	public IToken prev() throws SyntaxError;
 	

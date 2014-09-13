@@ -4,26 +4,27 @@ import static dyvil.tools.compiler.lexer.token.IToken.*;
 
 import java.util.Iterator;
 
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 
 public class Dlex implements Iterable<IToken>
 {
-	protected final String	code;
+	protected final CodeFile file;
 	protected IToken		first;
 	
-	public Dlex(String code)
+	public Dlex(CodeFile file)
 	{
-		this.code = code;
+		this.file = file;
 	}
 	
 	public void tokenize()
 	{
-		String code = this.code;
+		String code = this.file.getCode();
 		int len = code.length();
 		
 		StringBuilder buf = new StringBuilder(20);
-		Token first = new Token(-1, "", (byte) 0, null, 0, -1, -1);
+		Token first = new Token(-1, "", (byte) 0, null, null, 0, -1, -1);
 		Token prev = first;
 		int start = 0;
 		int lineNumber = 1;
@@ -306,15 +307,15 @@ public class Dlex implements Iterable<IToken>
 		return 0;
 	}
 	
-	private static Token addToken(Token prev, String s, int type, int line, int start, int end)
+	private Token addToken(Token prev, String s, int type, int line, int start, int end)
 	{
-		Token t = new Token(prev.index() + 1, s, type, parse(type, s), line, start, end);
+		Token t = new Token(prev.index() + 1, s, type, parse(type, s), this.file, line, start, end);
 		prev.setNext(t);
 		t.setPrev(prev);
 		return t;
 	}
 	
-	private static Token addToken(Token prev, StringBuilder buf, int type, int line, int start, int end)
+	private Token addToken(Token prev, StringBuilder buf, int type, int line, int start, int end)
 	{
 		String s = buf.toString();
 		buf.delete(0, buf.length());
@@ -403,7 +404,7 @@ public class Dlex implements Iterable<IToken>
 			}
 			catch (SyntaxError ex)
 			{
-				ex.print(System.err, Dlex.this.code, this.next);
+				ex.print(System.err);
 				return null;
 			}
 		}
@@ -422,7 +423,7 @@ public class Dlex implements Iterable<IToken>
 			}
 			catch (SyntaxError ex)
 			{
-				ex.print(System.err, Dlex.this.code, this.next);
+				ex.print(System.err);
 			}
 		}
 	}

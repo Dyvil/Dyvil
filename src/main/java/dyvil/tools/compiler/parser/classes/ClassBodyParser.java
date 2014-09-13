@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;

@@ -1,16 +1,21 @@
 package dyvil.tools.compiler.parser;
 
-import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
+import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 
 public class ParserManager
 {
 	protected Parser	currentParser;
+	
+	public CodeFile		file;
+	public List<Marker>	markers;
 	
 	public ParserManager()
 	{
@@ -32,48 +37,37 @@ public class ParserManager
 		this.currentParser.begin(this);
 	}
 	
-	/**
-	 * Sets the current parser to the given {@link Parser} {@code parser} and
-	 * starts parsing the {@link String Code} {@code code}.
-	 * 
-	 * @see Parser#begin(ParserManager)
-	 * @see #parse(String)
-	 * @param parser
-	 *            the parser
-	 * @param code
-	 *            the code
-	 */
-	public final void parse(Parser parser, String code)
+	public final void parse(CodeFile file, Parser parser)
 	{
 		this.currentParser = parser;
 		parser.begin(this);
-		this.parse(code);
+		this.parse(file);
 	}
 	
-	/**
-	 * Starts parsing the given {@link String Code} {@code code}. The code is
-	 * tokenized using {@link CSSource#tokenize(String)} and then
-	 * {@link #parse(IToken)} is called on each token. When a
-	 * {@link SyntaxError} occurs, it gets printed to the standard error output
-	 * {@link System#err} using
-	 * {@link SyntaxError#print(PrintStream, String, IToken)}
-	 * 
-	 * @see Token
-	 * @see CSSource#tokenize(String)
-	 * @see #parse(IToken)
-	 * @param code
-	 *            the code.
-	 */
-	public void parse(String code)
+	public void parse(CodeFile file)
 	{
-		Dlex lexer = new Dlex(code);
+		this.file = file;
+		this.markers = new ArrayList();
+		
+		Dlex lexer = new Dlex(file);
 		lexer.tokenize();
-		this.parse(code, lexer);
+		this.parse(file, lexer);
+		
+		if (!this.markers.isEmpty())
+		{
+			System.err.println("Markers in File " + file.getName());
+			
+			for (Marker marker : this.markers)
+			{
+				marker.print(System.err);
+			}
+		}
 	}
 	
-	public final void parse(String code, Dlex lexer)
+	public final void parse(CodeFile file, Dlex lexer)
 	{
 		IToken token = null;
+		
 		try
 		{
 			TokenIterator iterator = lexer.iterator();
@@ -82,7 +76,7 @@ public class ParserManager
 			while (iterator.hasNext())
 			{
 				token = iterator.next();
-				if (!this.retainToken(token.value(), token))
+				if (!this.retainToken(token.getText(), token))
 				{
 					iterator.remove();
 					removed = true;
@@ -112,13 +106,13 @@ public class ParserManager
 				}
 				catch (SyntaxError ex)
 				{
-					ex.print(System.err, code, token);
+					this.markers.add(ex);
 				}
 			}
 		}
-		catch (SyntaxError ex)
+		catch (Exception ex)
 		{
-			ex.print(System.err, code, token);
+			ex.printStackTrace();
 		}
 	}
 	
@@ -167,12 +161,12 @@ public class ParserManager
 			{
 				message = ex.getClass().getName();
 			}
-			throw new SyntaxError("Failed to parse token '" + value + "': " + message);
+			throw new SyntaxError(token, "Failed to parse token '" + value + "': " + message);
 		}
 		
 		if (!parsed)
 		{
-			throw new SyntaxError("Invalid token '" + value + "'", "Delete this token");
+			throw new SyntaxError(token, "Invalid token '" + value + "'", "Delete this token");
 		}
 	}
 	

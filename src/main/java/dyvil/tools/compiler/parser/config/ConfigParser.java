@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser.config;
 import java.io.File;
 
 import dyvil.tools.compiler.config.CompilerConfig;
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;

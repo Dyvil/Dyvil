@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.MultiImport;
 import dyvil.tools.compiler.ast.imports.PackageImport;
 import dyvil.tools.compiler.ast.imports.SimpleImport;
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;

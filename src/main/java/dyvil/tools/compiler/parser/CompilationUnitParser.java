@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser;
 
 import dyvil.tools.compiler.ast.CompilationUnit;
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.classes.ClassDeclParser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
@@ -33,7 +33,7 @@ public class CompilationUnitParser extends Parser
 			}
 			else if ("import".equals(value))
 			{
-				throw new SyntaxError("Missing package declaration!", "Add a package declaration");
+				throw new SyntaxError(token, "Missing package declaration!", "Add a package declaration");
 			}
 		}
 		if (this.isInMode(IMPORT))

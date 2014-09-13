@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 
 public abstract class Parser<T>

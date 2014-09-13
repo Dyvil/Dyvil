@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.value.*;
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;

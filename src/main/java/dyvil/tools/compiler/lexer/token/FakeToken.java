@@ -1,64 +1,84 @@
 package dyvil.tools.compiler.lexer.token;
 
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 
 public class FakeToken implements IToken
 {
-	private IToken	prev;
-	private IToken	next;
+	private CodeFile	file;
+	
+	private IToken		prev;
+	private IToken		next;
+	
+	public FakeToken(CodeFile file)
+	{
+		this.file = file;
+	}
 	
 	@Override
 	public String value() throws SyntaxError
 	{
-		throw new SyntaxError("No token!");
+		throw new SyntaxError(this, "No token!");
 	}
 	
 	@Override
 	public Object object() throws SyntaxError
 	{
-		throw new SyntaxError("No token!");
+		throw new SyntaxError(this, "No token!");
 	}
 	
 	@Override
 	public int type() throws SyntaxError
 	{
-		throw new SyntaxError("No token!");
+		throw new SyntaxError(this, "No token!");
 	}
 	
 	@Override
 	public boolean equals(String value) throws SyntaxError
 	{
-		throw new SyntaxError("No token!");
+		throw new SyntaxError(this, "No token!");
 	}
 	
 	@Override
 	public boolean isType(int type) throws SyntaxError
 	{
-		throw new SyntaxError("No token!");
+		throw new SyntaxError(this, "No token!");
 	}
 	
 	@Override
 	public int index() throws SyntaxError
 	{
-		throw new SyntaxError("No token!");
+		throw new SyntaxError(this, "No token!");
 	}
 	
 	@Override
-	public int line() throws SyntaxError
+	public CodeFile getFile()
 	{
-		throw new SyntaxError("No token!");
+		return this.file;
 	}
 	
 	@Override
-	public int start() throws SyntaxError
+	public String getText()
 	{
-		throw new SyntaxError("No token!");
+		return "";
 	}
 	
 	@Override
-	public int end() throws SyntaxError
+	public int getLineNumber()
 	{
-		throw new SyntaxError("No token!");
+		return -1;
+	}
+	
+	@Override
+	public int getStart()
+	{
+		return -1;
+	}
+	
+	@Override
+	public int getEnd()
+	{
+		return -1;
 	}
 	
 	@Override
@@ -66,7 +86,7 @@ public class FakeToken implements IToken
 	{
 		if (this.next == null)
 		{
-			throw new SyntaxError("No next token!");
+			throw new SyntaxError(this, "No next token!");
 		}
 		return this.next;
 	}
@@ -76,7 +96,7 @@ public class FakeToken implements IToken
 	{
 		if (this.prev == null)
 		{
-			throw new SyntaxError("No prev token!");
+			throw new SyntaxError(this, "No prev token!");
 		}
 		return this.prev;
 	}
@@ -84,19 +104,18 @@ public class FakeToken implements IToken
 	@Override
 	public boolean match(Object object) throws SyntaxError
 	{
-		throw new SyntaxError("No token!");
+		throw new SyntaxError(this, "No token!");
 	}
 	
 	@Override
 	public boolean match(Object... objects) throws SyntaxError
 	{
-		throw new SyntaxError("No token!");
+		throw new SyntaxError(this, "No token!");
 	}
 	
 	@Override
 	public void setIndex(int index)
-	{
-	}
+	{}
 	
 	@Override
 	public void setPrev(IToken token)

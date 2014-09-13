@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.lexer.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
