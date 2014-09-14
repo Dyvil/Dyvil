@@ -375,16 +375,28 @@ public class Dlex implements Iterable<IToken>
 	@Override
 	public TokenIterator iterator()
 	{
-		return new TokenIterator();
+		return new TokenIterator(this.first);
 	}
 	
-	public class TokenIterator implements Iterator<IToken>
+	public static class TokenIterator implements Iterator<IToken>
 	{
-		protected IToken	next	= Dlex.this.first;
+		protected IToken first;
+		protected IToken	next;
+		
+		public TokenIterator(IToken first)
+		{
+			this.first = first;
+			this.next = first;
+		}
 		
 		public void reset()
 		{
-			this.next = Dlex.this.first;
+			this.next = this.first;
+		}
+		
+		public void jump(IToken next)
+		{
+			this.next = next;
 		}
 		
 		@Override

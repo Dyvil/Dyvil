@@ -17,6 +17,8 @@ public class ParserManager
 	public CodeFile		file;
 	public List<Marker>	markers;
 	
+	protected IToken	lastToken;
+	
 	public ParserManager()
 	{
 		this(Parser.rootParser);
@@ -102,11 +104,19 @@ public class ParserManager
 				try
 				{
 					token = iterator.next();
-					this.parseToken(token.value(), token);
+					this.parseToken(this.currentParser, token);
 				}
 				catch (SyntaxError ex)
 				{
-					this.markers.add(ex);
+					if (this.lastToken != null)
+					{
+						iterator.jump(this.lastToken);
+						this.lastToken = null;
+					}
+					else
+					{
+						this.markers.add(ex);
+					}
 				}
 			}
 		}
@@ -131,24 +141,13 @@ public class ParserManager
 		return true;
 	}
 	
-	/**
-	 * Parses the given {@link IToken} {@code token}. You can override this
-	 * method to sort out comments.
-	 * 
-	 * @see Parser#parse(ParserManager, String, IToken)
-	 * @param value
-	 *            the value of the token
-	 * @param token
-	 *            the token
-	 * @throws SyntaxError
-	 *             syntax errors
-	 */
-	public void parseToken(String value, IToken token) throws SyntaxError
+	protected void parseToken(Parser parser, IToken token) throws SyntaxError
 	{
+		String value = token.value();
 		boolean parsed;
 		try
 		{
-			parsed = this.currentParser.parse(this, value, token);
+			parsed = parser.parse(this, value, token);
 		}
 		catch (SyntaxError error)
 		{
@@ -170,6 +169,12 @@ public class ParserManager
 		}
 	}
 	
+	public void tryParse(Parser parser, IToken start) throws SyntaxError
+	{
+		this.lastToken = start;
+		this.pushParser(parser, start);
+	}
+	
 	/**
 	 * Adds the given {@link Parser} {@code parser} to the stack.
 	 * 
@@ -179,7 +184,7 @@ public class ParserManager
 	 * @throws SyntaxError
 	 *             syntax errors
 	 */
-	public void pushParser(Parser parser) throws SyntaxError
+	public void pushParser(Parser parser)
 	{
 		if (this.currentParser != null)
 		{
@@ -203,10 +208,10 @@ public class ParserManager
 	public void pushParser(Parser parser, IToken token) throws SyntaxError
 	{
 		this.pushParser(parser);
-		this.parseToken(token.value(), token);
+		this.parseToken(parser, token);
 	}
 	
-	public void popParser() throws SyntaxError
+	public void popParser()
 	{
 		if (this.currentParser != null)
 		{
@@ -220,7 +225,7 @@ public class ParserManager
 		this.popParser();
 		if (this.currentParser != null)
 		{
-			this.parseToken(token.value(), token);
+			this.parseToken(this.currentParser, token);
 		}
 	}
 }
