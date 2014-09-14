@@ -3,46 +3,28 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.api.INamed;
+import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.config.Formatting;
 
-public class MethodCall implements IValue
+public class MethodCall implements IValue, INamed, IValueList
 {
-	public IValue instance;
-	public IMethod descriptor;
-	public List<IValue> args;
+	protected IValue		instance;
+	protected String		name;
+	protected List<IValue>	arguments;
 	
-	public MethodCall()
-	{
-	}
+	public IMethod			descriptor;
 	
-	public MethodCall(IMethod descriptor, List<IValue> args)
-	{
-		this(null, descriptor, args);
-	}
-	
-	public MethodCall(IValue instance, IMethod descriptor, List<IValue> args)
-	{
-		if (descriptor.hasModifier(Modifiers.IMPLICIT))
-		{
-			args.add(0, instance);
-			instance = null;
-		}
-		
-		this.instance = instance;
-		this.descriptor = descriptor;
-		this.args = args;
-	}
-
 	@Override
 	public IValue fold()
 	{
 		// TODO Constant Folding
 		return this;
 	}
-
+	
 	@Override
 	public Type getType()
 	{
@@ -52,10 +34,37 @@ public class MethodCall implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		// TODO
+		buffer.append('.').append(this.name);
+		buffer.append(Formatting.Method.parametersStart);
+		// TODO Args
+		buffer.append(Formatting.Method.parametersEnd);
 	}
-
+	
 	@Override
 	public void applyState(CompilerState state)
 	{}
+	
+	@Override
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public String getName()
+	{
+		return this.name;
+	}
+	
+	@Override
+	public void setValues(List<IValue> list)
+	{
+		this.arguments = list;
+	}
+	
+	@Override
+	public List<IValue> getValues()
+	{
+		return this.arguments;
+	}
 }

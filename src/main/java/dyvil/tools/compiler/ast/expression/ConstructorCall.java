@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.config.Formatting;
 
 public class ConstructorCall implements IValue, ITyped, IValueList
 {
@@ -26,9 +27,9 @@ public class ConstructorCall implements IValue, ITyped, IValueList
 	{
 		buffer.append("new ");
 		this.type.toString("", buffer);
-		buffer.append('(');
+		buffer.append(Formatting.Method.parametersStart);
 		// TODO Args
-		buffer.append(')');
+		buffer.append(Formatting.Method.parametersEnd);
 	}
 	
 	@Override
