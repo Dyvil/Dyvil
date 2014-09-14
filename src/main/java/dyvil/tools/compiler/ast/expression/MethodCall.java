@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -12,6 +13,10 @@ public class MethodCall implements IValue
 	public IValue instance;
 	public IMethod descriptor;
 	public List<IValue> args;
+	
+	public MethodCall()
+	{
+	}
 	
 	public MethodCall(IMethod descriptor, List<IValue> args)
 	{
@@ -49,4 +54,8 @@ public class MethodCall implements IValue
 	{
 		// TODO
 	}
+
+	@Override
+	public void applyState(CompilerState state)
+	{}
 }

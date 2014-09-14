@@ -35,7 +35,7 @@ public class ExpressionListParser extends Parser implements IValued
 		if (this.mode == 0)
 		{
 			this.mode = 1;
-			pm.pushParser(new ExpressionParser(this.context, this, this.statements), token);
+			pm.tryParse(new ExpressionParser(this.context, this, this.statements), token);
 			return true;
 		}
 		else if (ParserUtil.isSeperatorChar(value))

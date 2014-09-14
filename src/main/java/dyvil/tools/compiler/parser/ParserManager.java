@@ -111,6 +111,7 @@ public class ParserManager
 					if (this.lastToken != null)
 					{
 						iterator.jump(this.lastToken);
+						this.popParser();
 						this.lastToken = null;
 					}
 					else

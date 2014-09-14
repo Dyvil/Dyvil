@@ -10,9 +10,9 @@ import dyvil.tools.compiler.parser.ParserManager;
 
 public class TypeParser extends Parser
 {
-	public static final int	NAME		= 0;
-	public static final int	GENERICS	= 1;
-	public static final int	ARRAY		= 2;
+	public static final int	NAME		= 1;
+	public static final int	GENERICS	= 2;
+	public static final int	ARRAY		= 4;
 	
 	protected ITyped		typed;
 	
@@ -22,6 +22,7 @@ public class TypeParser extends Parser
 	
 	public TypeParser(ITyped typed)
 	{
+		this.mode = NAME;
 		this.typed = typed;
 	}
 	

@@ -14,7 +14,9 @@ public class Main
     
     public int three() = 3;
     
-    public Object foo() = return null;
+    public Object foo() = new Object();
+    
+    public String foo1() = new Something(1, 2, 3);
     
     public void bar() =
     {
