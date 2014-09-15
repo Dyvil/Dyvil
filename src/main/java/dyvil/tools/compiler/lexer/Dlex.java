@@ -116,6 +116,18 @@ public class Dlex implements Iterable<IToken>
 					{
 						buf.append(c);
 					}
+					else if (c == 'f' || c == 'F')
+					{
+						type = TYPE_FLOAT;
+						addToken = true;
+						reparse = false;
+					}
+					else if (c == 'd' || c == 'D')
+					{
+						type = TYPE_FLOAT;
+						addToken = true;
+						reparse = false;
+					}
 					else
 					{
 						addToken = true;

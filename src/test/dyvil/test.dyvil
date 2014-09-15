@@ -14,7 +14,7 @@ public class Main
     
     public String a() = "abc" + "d" + "e";
     
-    public int b() = 1 + 2 * 3;
+    public float f() = 1F + 0.5F;
     
-    public Object foo() = new Object();
+    public int b() = 1 + 2 * 3;
 }
