@@ -12,21 +12,7 @@ public class Main
     
     public float f = 1.5F;
     
-    public int three() = 3;
+    public String abcd() = "abc".+("d");
     
     public Object foo() = new Object();
-    
-    public String foo1() = new Something(1, 2, 3);
-    
-    public void bar() =
-    {
-    	if (true)
-    	{
-    		return 9
-    	}
-    	else
-    	{
-    		return 1
-    	}
-    };
 }

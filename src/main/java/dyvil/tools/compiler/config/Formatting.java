@@ -40,6 +40,7 @@ public class Formatting
 	{
 		public static String	parametersStart			= "(";
 		public static String	parametersEnd			= ")";
+		public static String	parameterSeperator		= ", ";
 		public static String	signatureBodySeperator	= " = ";
 		public static String	indent					= "\t";
 	}

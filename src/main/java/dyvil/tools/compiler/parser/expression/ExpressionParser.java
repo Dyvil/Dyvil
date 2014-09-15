@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.context.IClassContext;
 import dyvil.tools.compiler.ast.expression.ConstructorCall;
+import dyvil.tools.compiler.ast.expression.MethodCall;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
@@ -21,10 +22,11 @@ public class ExpressionParser extends Parser
 {
 	public static final int	VALUE			= 1;
 	public static final int	VALUE_2			= 2;
-	public static final int	STATEMENT		= 4;
-	public static final int	TYPE			= 8;
-	public static final int	PARAMETERS		= 16;
-	public static final int	PARAMETERS_2	= 32;
+	public static final int	ACCESS			= 4;
+	public static final int	STATEMENT		= 8;
+	public static final int	TYPE			= 16;
+	public static final int	PARAMETERS		= 32;
+	public static final int	PARAMETERS_2	= 64;
 	
 	protected IClassContext	context;
 	protected IValued		field;
@@ -75,28 +77,16 @@ public class ExpressionParser extends Parser
 				pm.pushParser(new TypeParser(call));
 				return true;
 			}
+			else if (".".equals(value))
+			{
+				this.mode = ACCESS;
+				return true;
+			}
 		}
 		if (this.isInMode(VALUE_2))
 		{
 			if ("}".equals(value))
 			{
-				return true;
-			}
-		}
-		if (this.isInMode(PARAMETERS))
-		{
-			if ("(".equals(value))
-			{
-				pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value));
-				this.mode = PARAMETERS_2;
-				return true;
-			}
-		}
-		if (this.isInMode(PARAMETERS_2))
-		{
-			if (")".equals(value))
-			{
-				// TODO Rest of the line...
 				return true;
 			}
 		}
@@ -114,6 +104,37 @@ public class ExpressionParser extends Parser
 				IfStatement statement = new IfStatement();
 				this.addStatement(statement);
 				pm.pushParser(new IfStatementParser(this.context, statement));
+				return true;
+			}
+		}
+		if (this.isInMode(ACCESS))
+		{
+			MethodCall call = new MethodCall(this.value, value);
+			this.value = call;
+			this.mode = PARAMETERS;
+			return true;
+		}
+		if (this.isInMode(PARAMETERS))
+		{
+			if ("(".equals(value))
+			{
+				pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value));
+				this.mode = PARAMETERS_2;
+				return true;
+			}
+		}
+		if (this.isInMode(PARAMETERS_2))
+		{
+			if (")".equals(value))
+			{
+				if (token.next().equals("."))
+				{
+					this.mode = ACCESS;
+				}
+				else
+				{
+					pm.popParser();
+				}
 				return true;
 			}
 		}

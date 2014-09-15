@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.api.IValueList;
@@ -8,7 +9,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 
 public abstract class Call implements IValue, IValueList
 {
-	protected List<IValue>	arguments;
+	protected List<IValue>	arguments = new ArrayList();
 	
 	protected boolean		isSugarCall;
 	
@@ -39,5 +40,15 @@ public abstract class Call implements IValue, IValueList
 	public List<IValue> getValues()
 	{
 		return this.arguments;
+	}
+	
+	public void setSugarCall(boolean isSugarCall)
+	{
+		this.isSugarCall = isSugarCall;
+	}
+	
+	public boolean isSugarCall()
+	{
+		return this.isSugarCall;
 	}
 }
