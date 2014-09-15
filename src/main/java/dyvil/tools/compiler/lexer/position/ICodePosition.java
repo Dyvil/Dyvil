@@ -36,4 +36,14 @@ public interface ICodePosition
 		int nextNL = this.getNextNewline();
 		return this.getFile().getCode().substring(prevNL, nextNL);
 	}
+	
+	public default ICodePosition to(ICodePosition end)
+	{
+		CodeFile file = this.getFile();
+		if (file != end.getFile())
+		{
+			throw new IllegalArgumentException("Cannot connect two CodePosition from different files.");
+		}
+		return new CodePosition(file, end.getLineNumber(), this.getStart(), end.getEnd());
+	}
 }
