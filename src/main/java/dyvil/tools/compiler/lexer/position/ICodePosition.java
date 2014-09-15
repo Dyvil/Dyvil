@@ -37,6 +37,11 @@ public interface ICodePosition
 		return this.getFile().getCode().substring(prevNL, nextNL);
 	}
 	
+	public default ICodePosition raw()
+	{
+		return new CodePosition(this.getFile(), this.getLineNumber(), this.getStart(), this.getEnd());
+	}
+	
 	public default ICodePosition to(ICodePosition end)
 	{
 		CodeFile file = this.getFile();
