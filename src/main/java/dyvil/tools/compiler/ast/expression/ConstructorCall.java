@@ -1,22 +1,13 @@
 package dyvil.tools.compiler.ast.expression;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.ITyped;
-import dyvil.tools.compiler.ast.api.IValueList;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 
-public class ConstructorCall implements IValue, ITyped, IValueList
+public class ConstructorCall extends Call implements ITyped
 {
-	protected Type			type;
-	protected List<IValue>	arguments	= new ArrayList();
-	
-	public IMethod			descriptor;
+	protected Type	type;
 	
 	@Override
 	public void applyState(CompilerState state)
@@ -27,15 +18,16 @@ public class ConstructorCall implements IValue, ITyped, IValueList
 	{
 		buffer.append("new ");
 		this.type.toString("", buffer);
-		buffer.append(Formatting.Method.parametersStart);
-		// TODO Args
-		buffer.append(Formatting.Method.parametersEnd);
-	}
-	
-	@Override
-	public IValue fold()
-	{
-		return this;
+		if (this.isSugarCall)
+		{
+			this.arguments.get(0).toString("", buffer);
+		}
+		else
+		{
+			buffer.append(Formatting.Method.parametersStart);
+			// TODO Args
+			buffer.append(Formatting.Method.parametersEnd);
+		}
 	}
 	
 	@Override
@@ -48,17 +40,5 @@ public class ConstructorCall implements IValue, ITyped, IValueList
 	public void setType(Type type)
 	{
 		this.type = type;
-	}
-	
-	@Override
-	public void setValues(List<IValue> list)
-	{
-		this.arguments = list;
-	}
-	
-	@Override
-	public List<IValue> getValues()
-	{
-		return this.arguments;
 	}
 }
