@@ -31,6 +31,6 @@ public class CharValue implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.value);
+		buffer.append('\'').append(this.value).append('\'');
 	}
 }
