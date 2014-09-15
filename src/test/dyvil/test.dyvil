@@ -12,7 +12,9 @@ public class Main
     
     public float f = 1.5F;
     
-    public String abcd() = "abc".+("d");
+    public String a() = "abc" + "d" + "e";
+    
+    public int b() = 1 + 2 * 3;
     
     public Object foo() = new Object();
 }

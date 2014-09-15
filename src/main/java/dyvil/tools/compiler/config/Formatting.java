@@ -41,6 +41,11 @@ public class Formatting
 		public static String	parametersStart			= "(";
 		public static String	parametersEnd			= ")";
 		public static String	parameterSeperator		= ", ";
+		
+		public static boolean	convertSugarCalls		= true;
+		public static String	sugarCallStart			= " ";
+		public static String	sugarCallEnd			= " ";
+		
 		public static String	signatureBodySeperator	= " = ";
 		public static String	indent					= "\t";
 	}

@@ -32,9 +32,16 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.isSugarCall)
+		if (this.isSugarCall && !Formatting.Method.convertSugarCalls)
 		{
-			buffer.append(' ').append(this.name);
+			if (this.instance != null)
+			{
+				this.instance.toString("", buffer);
+			}
+			
+			buffer.append(Formatting.Method.sugarCallStart);
+			buffer.append(this.name);
+			buffer.append(Formatting.Method.sugarCallEnd);
 			this.arguments.get(0).toString("", buffer);
 		}
 		else
@@ -51,7 +58,7 @@ public class MethodCall extends Call implements INamed, IValued
 				buffer.append(Formatting.Method.parametersStart);
 				Iterator<IValue> iterator = this.arguments.iterator();
 				while (true)
-				{	
+				{
 					IValue value = iterator.next();
 					value.toString("", buffer);
 					if (iterator.hasNext())
@@ -88,7 +95,14 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		this.instance = value;
+		if (this.isSugarCall)
+		{
+			this.arguments.add(value);
+		}
+		else
+		{
+			this.instance = value;
+		}
 	}
 	
 	@Override

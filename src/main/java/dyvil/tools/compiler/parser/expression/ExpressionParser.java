@@ -23,10 +23,11 @@ public class ExpressionParser extends Parser
 	public static final int	VALUE			= 1;
 	public static final int	VALUE_2			= 2;
 	public static final int	ACCESS			= 4;
-	public static final int	STATEMENT		= 8;
-	public static final int	TYPE			= 16;
-	public static final int	PARAMETERS		= 32;
-	public static final int	PARAMETERS_2	= 64;
+	public static final int	SUGARCALL		= 8;
+	public static final int	STATEMENT		= 16;
+	public static final int	TYPE			= 32;
+	public static final int	PARAMETERS		= 64;
+	public static final int	PARAMETERS_2	= 128;
 	
 	protected IClassContext	context;
 	protected IValued		field;
@@ -52,6 +53,11 @@ public class ExpressionParser extends Parser
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
+		if (this.mode == 0)
+		{
+			pm.popParser(token);
+			return true;
+		}
 		if (this.isInMode(VALUE))
 		{
 			if (this.parsePrimitive(value, token))
@@ -81,6 +87,10 @@ public class ExpressionParser extends Parser
 			{
 				this.mode = ACCESS;
 				return true;
+			}
+			else if (token.isType(Token.TYPE_IDENTIFIER))
+			{
+				this.mode = SUGARCALL;
 			}
 		}
 		if (this.isInMode(VALUE_2))
@@ -112,6 +122,15 @@ public class ExpressionParser extends Parser
 			MethodCall call = new MethodCall(this.value, value);
 			this.value = call;
 			this.mode = PARAMETERS;
+			return true;
+		}
+		if (this.isInMode(SUGARCALL))
+		{
+			MethodCall call = new MethodCall(this.value, value);
+			call.setSugarCall(true);
+			this.value = call;
+			pm.pushParser(new ExpressionParser(this.context, call));
+			this.mode = 0;
 			return true;
 		}
 		if (this.isInMode(PARAMETERS))
