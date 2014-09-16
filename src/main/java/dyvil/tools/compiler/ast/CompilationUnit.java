@@ -13,9 +13,11 @@ import dyvil.tools.compiler.config.Formatting;
 
 public class CompilationUnit extends ASTObject implements IContext
 {
-	private PackageDecl			packageDecl;
-	private List<IImport>		imports	= new ArrayList();
-	private List<AbstractClass>	classes	= new ArrayList();
+	public long						loadingTime	= System.currentTimeMillis();
+	
+	protected PackageDecl			packageDecl;
+	protected List<IImport>			imports		= new ArrayList();
+	protected List<AbstractClass>	classes		= new ArrayList();
 	
 	public PackageDecl getPackageDecl()
 	{
@@ -70,7 +72,7 @@ public class CompilationUnit extends ASTObject implements IContext
 		this.toString("", buffer);
 		return buffer.toString();
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

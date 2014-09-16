@@ -18,6 +18,7 @@ public class CodeParser extends ParserManager
 	{
 		CompilationUnit unit = new CompilationUnit();
 		instance.parse(file, new CompilationUnitParser(unit));
+		unit.loadingTime = System.currentTimeMillis() - unit.loadingTime;
 		return unit;
 	}
 }

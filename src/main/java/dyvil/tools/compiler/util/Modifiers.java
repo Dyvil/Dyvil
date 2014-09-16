@@ -50,6 +50,7 @@ public enum Modifiers
 			break;
 		case CLASS_TYPE:
 			m = readClassTypeModifier(mod);
+			break;
 		case CLASS:
 			if ((m = readAccessModifier(mod)) == -1)
 				m = readClassModifier(mod);

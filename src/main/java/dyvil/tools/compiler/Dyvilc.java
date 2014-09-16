@@ -46,6 +46,7 @@ public class Dyvilc
 		{
 			unit.applyState(CompilerState.FOLD_CONSTANTS);
 			
+			System.out.println("Compiled in " + unit.loadingTime + " ms");
 			System.out.println(unit);
 		}
 	}
