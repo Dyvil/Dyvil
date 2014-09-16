@@ -42,6 +42,7 @@ public class Formatting
 	
 	public static class Method
 	{
+		public static String	emptyParameters			= "( )";
 		public static String	parametersStart			= "(";
 		public static String	parametersEnd			= ")";
 		public static String	parameterSeperator		= ", ";
@@ -65,6 +66,7 @@ public class Formatting
 	{
 		public static String	emptyExpression	= "{ }";
 		
+		public static boolean	convertTuples	= true;
 		public static String	emptyTuple		= "( )";
 		public static String	tupleStart		= "(";
 		public static String	tupleEnd		= ")";

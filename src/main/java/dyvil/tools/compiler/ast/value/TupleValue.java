@@ -23,7 +23,6 @@ public class TupleValue extends ASTObject implements IValue, IValueList
 	@Override
 	public IValue fold()
 	{
-		// TODO Fold Tuple1 to the raw value
 		if (this.values.size() == 1)
 		{
 			return this.values.get(0);

@@ -68,9 +68,9 @@ public class Method extends Member implements IMethod
 	{
 		super.toString(prefix, buffer);
 		
-		buffer.append(Formatting.Method.parametersStart);
 		if (!this.parameters.isEmpty())
 		{
+			buffer.append(Formatting.Method.parametersStart);
 			Iterator<Parameter> iterator = this.parameters.iterator();
 			while (true)
 			{
@@ -86,8 +86,12 @@ public class Method extends Member implements IMethod
 					break;
 				}
 			}
+			buffer.append(Formatting.Method.parametersEnd);
 		}
-		buffer.append(Formatting.Method.parametersEnd);
+		else
+		{
+			buffer.append(Formatting.Method.emptyParameters);
+		}
 		
 		IValue statement = this.getValue();
 		if (statement != null)

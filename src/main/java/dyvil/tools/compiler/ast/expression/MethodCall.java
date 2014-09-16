@@ -73,6 +73,10 @@ public class MethodCall extends Call implements INamed, IValued
 				}
 				buffer.append(Formatting.Method.parametersEnd);
 			}
+			else
+			{
+				buffer.append(Formatting.Method.emptyParameters);
+			}
 		}
 	}
 	
