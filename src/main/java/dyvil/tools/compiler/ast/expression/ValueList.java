@@ -12,7 +12,7 @@ import dyvil.tools.compiler.config.Formatting;
 
 public class ValueList extends ASTObject implements IValue, IValueList
 {
-	protected List<IValue>	values	= new ArrayList();
+	protected List<IValue>	values	= new ArrayList(3);
 	
 	@Override
 	public void setValues(List<IValue> list)
@@ -24,6 +24,12 @@ public class ValueList extends ASTObject implements IValue, IValueList
 	public List<IValue> getValues()
 	{
 		return this.values;
+	}
+	
+	@Override
+	public void addValue(IValue value)
+	{
+		this.values.add(value);
 	}
 	
 	@Override

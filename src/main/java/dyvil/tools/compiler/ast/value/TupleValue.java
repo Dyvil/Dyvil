@@ -12,7 +12,25 @@ import dyvil.tools.compiler.config.Formatting;
 
 public class TupleValue extends ASTObject implements IValue, IValueList
 {
-	private List<IValue>	values	= new ArrayList();
+	private List<IValue>	values	= new ArrayList(3);
+
+	@Override
+	public void setValues(List<IValue> list)
+	{
+		this.values = list;
+	}
+	
+	@Override
+	public List<IValue> getValues()
+	{
+		return this.values;
+	}
+	
+	@Override
+	public void addValue(IValue value)
+	{
+		this.values.add(value);
+	}
 	
 	@Override
 	public boolean isConstant()
@@ -68,17 +86,4 @@ public class TupleValue extends ASTObject implements IValue, IValueList
 			buffer.append(Formatting.Expression.tupleEnd);
 		}
 	}
-	
-	@Override
-	public void setValues(List<IValue> list)
-	{
-		this.values = list;
-	}
-	
-	@Override
-	public List<IValue> getValues()
-	{
-		return this.values;
-	}
-	
 }

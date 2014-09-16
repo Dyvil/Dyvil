@@ -13,15 +13,14 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public abstract class Member extends ASTObject implements INamed, ITyped, IModified, IAnnotatable
 {
-	protected int					modifiers;
+	protected int				modifiers;
 	
 	protected Type				type;
-	protected String				name;
-	protected List<Annotation>	annotations = new ArrayList();
+	protected String			name;
+	protected List<Annotation>	annotations	= new ArrayList(1);
 	
 	protected Member()
-	{
-	}
+	{}
 	
 	public Member(String name)
 	{
@@ -59,9 +58,33 @@ public abstract class Member extends ASTObject implements INamed, ITyped, IModif
 	}
 	
 	@Override
+	public void addModifier(int mod)
+	{
+		this.modifiers |= mod;
+	}
+	
+	@Override
+	public void removeModifier(int mod)
+	{
+		this.modifiers &= ~mod;
+	}
+	
+	@Override
+	public boolean hasModifier(int mod)
+	{
+		return (this.modifiers & mod) == mod;
+	}
+	
+	@Override
 	public void setAnnotations(List<Annotation> annotations)
 	{
 		this.annotations = annotations;
+	}
+	
+	@Override
+	public void addAnnotation(Annotation annotation)
+	{
+		this.annotations.add(annotation);
 	}
 	
 	@Override

@@ -25,4 +25,10 @@ public class GenericType extends Type implements ITypeList
 	{
 		return this.generics;
 	}
+	
+	@Override
+	public void addType(Type type)
+	{
+		this.generics.add(type);
+	}
 }

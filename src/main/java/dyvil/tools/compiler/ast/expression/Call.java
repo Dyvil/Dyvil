@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 
 public abstract class Call extends ASTObject implements IValue, IValueList
 {
-	protected List<IValue>	arguments = new ArrayList();
+	protected List<IValue>	arguments = new ArrayList(3);
 	
 	protected boolean		isSugarCall;
 	
@@ -47,6 +47,12 @@ public abstract class Call extends ASTObject implements IValue, IValueList
 	public List<IValue> getValues()
 	{
 		return this.arguments;
+	}
+	
+	@Override
+	public void addValue(IValue value)
+	{
+		this.arguments.add(value);
 	}
 	
 	public void setSugarCall(boolean isSugarCall)

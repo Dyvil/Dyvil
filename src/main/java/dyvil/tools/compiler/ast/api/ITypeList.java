@@ -10,8 +10,8 @@ public interface ITypeList
 	
 	public List<Type> getTypes();
 	
-	public default boolean addType(Type type)
+	public default void addType(Type type)
 	{
-		return this.getTypes().add(type);
+		this.getTypes().add(type);
 	}
 }

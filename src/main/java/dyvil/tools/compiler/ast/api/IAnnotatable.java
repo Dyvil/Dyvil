@@ -10,8 +10,8 @@ public interface IAnnotatable
 	
 	public List<Annotation> getAnnotations();
 	
-	public default boolean addAnnotation(Annotation annotation)
+	public default void addAnnotation(Annotation annotation)
 	{
-		return this.getAnnotations().add(annotation);
+		this.getAnnotations().add(annotation);
 	}
 }

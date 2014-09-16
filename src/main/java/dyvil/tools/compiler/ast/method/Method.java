@@ -13,13 +13,25 @@ public class Method extends Member implements IMethod
 {
 	private IValue				statement;
 	
-	private List<Parameter>		parameters			= new ArrayList();
-	private List<ThrowsDecl>	throwsDeclarations	= new ArrayList();
+	private List<Parameter>		parameters			= new ArrayList(3);
+	private List<ThrowsDecl>	throwsDeclarations	= new ArrayList(1);
 	
 	@Override
 	public void setParameters(List<Parameter> parameters)
 	{
 		this.parameters = parameters;
+	}
+
+	@Override
+	public List<Parameter> getParameters()
+	{
+		return this.parameters;
+	}
+	
+	@Override
+	public void addParameter(Parameter parameter)
+	{
+		this.parameters.add(parameter);
 	}
 	
 	@Override
@@ -35,21 +47,21 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IValue getValue()
-	{
-		return this.statement;
-	}
-	
-	@Override
-	public List<Parameter> getParameters()
-	{
-		return this.parameters;
-	}
-	
-	@Override
 	public List<ThrowsDecl> getThrows()
 	{
 		return this.throwsDeclarations;
+	}
+	
+	@Override
+	public void addThrows(ThrowsDecl throwsDecl)
+	{
+		this.throwsDeclarations.add(throwsDecl);
+	}
+	
+	@Override
+	public IValue getValue()
+	{
+		return this.statement;
 	}
 	
 	@Override

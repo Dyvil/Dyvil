@@ -10,8 +10,8 @@ public interface IThrower
 	
 	public List<ThrowsDecl> getThrows();
 	
-	public default boolean addThrows(ThrowsDecl throwsDecl)
+	public default void addThrows(ThrowsDecl throwsDecl)
 	{
-		return this.getThrows().add(throwsDecl);
+		this.getThrows().add(throwsDecl);
 	}
 }
