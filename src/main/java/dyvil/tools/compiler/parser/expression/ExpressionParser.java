@@ -26,11 +26,13 @@ public class ExpressionParser extends Parser
 	public static final int	TUPLE_END		= 4;
 	
 	public static final int	ACCESS			= 8;
-	public static final int	SUGARCALL		= 16;
-	public static final int	STATEMENT		= 32;
-	public static final int	TYPE			= 64;
-	public static final int	PARAMETERS		= 128;
-	public static final int	PARAMETERS_2	= 256;
+	public static final int	DOT_ACCESS		= 16;
+	public static final int	SUGARACCESS		= 32;
+	
+	public static final int	STATEMENT		= 64;
+	public static final int	TYPE			= 128;
+	public static final int	PARAMETERS		= 256;
+	public static final int	PARAMETERS_2	= 512;
 	
 	protected IClassContext	context;
 	protected IValued		field;
@@ -97,15 +99,7 @@ public class ExpressionParser extends Parser
 				pm.pushParser(new TypeParser(call));
 				return true;
 			}
-			else if (".".equals(value))
-			{
-				this.mode = ACCESS;
-				return true;
-			}
-			else if (token.isType(Token.TYPE_IDENTIFIER))
-			{
-				this.mode = SUGARCALL;
-			}
+			this.mode = ACCESS;
 		}
 		if (this.isInMode(VALUE_2))
 		{
@@ -118,16 +112,7 @@ public class ExpressionParser extends Parser
 		{
 			if (")".equals(value))
 			{
-				IToken next = token.next();
-				if (next.equals("."))
-				{
-					this.mode = ACCESS;
-					return true;
-				}
-				else if (next.isType(Token.TYPE_IDENTIFIER))
-				{
-					this.mode = SUGARCALL;
-				}
+				this.mode = ACCESS;
 				return true;
 			}
 		}
@@ -150,6 +135,18 @@ public class ExpressionParser extends Parser
 		}
 		if (this.isInMode(ACCESS))
 		{
+			if (".".equals(value))
+			{
+				this.mode = DOT_ACCESS;
+				return true;
+			}
+			else if (token.isType(Token.TYPE_IDENTIFIER))
+			{
+				this.mode = SUGARACCESS;
+			}
+		}
+		if (this.isInMode(DOT_ACCESS))
+		{
 			if (token.next().equals("("))
 			{
 				MethodCall call = new MethodCall(this.value, value);
@@ -165,7 +162,7 @@ public class ExpressionParser extends Parser
 				return true;
 			}
 		}
-		if (this.isInMode(SUGARCALL))
+		if (this.isInMode(SUGARACCESS))
 		{
 			MethodCall call = new MethodCall(this.value, value);
 			call.setSugarCall(true);
@@ -187,16 +184,7 @@ public class ExpressionParser extends Parser
 		{
 			if (")".equals(value))
 			{
-				IToken next = token.next();
-				if (next.equals("."))
-				{
-					this.mode = ACCESS;
-					return true;
-				}
-				else if (next.isType(Token.TYPE_IDENTIFIER))
-				{
-					this.mode = SUGARCALL;
-				}
+				this.mode = ACCESS;
 				return true;
 			}
 		}

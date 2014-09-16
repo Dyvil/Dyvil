@@ -18,7 +18,7 @@ public class Main
     
     public int size() = ((1, 2, 3) size) + 1;
     
-    public int length() = "abc" get length;
+    public int length() = "abc" get "length";
     
     public String a() = "abc" + "d" + "e" length;
     
