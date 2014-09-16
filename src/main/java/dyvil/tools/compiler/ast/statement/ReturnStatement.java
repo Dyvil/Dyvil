@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public class ReturnStatement implements IStatement, IValued
+public class ReturnStatement extends ASTObject implements IStatement, IValued
 {
 	protected IValue	value;
 	

@@ -3,12 +3,14 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 
-public class ValueList implements IValue, IValueList
+public class ValueList extends ASTObject implements IValue, IValueList
 {
 	protected List<IValue>	values	= new ArrayList();
 	
@@ -45,6 +47,10 @@ public class ValueList implements IValue, IValueList
 		}
 		return this.values.get(this.values.size() - 1).getType();
 	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

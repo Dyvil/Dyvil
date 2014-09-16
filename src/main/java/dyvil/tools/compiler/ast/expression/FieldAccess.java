@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
@@ -8,7 +9,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 
-public class FieldAccess implements IValue, INamed, IValued
+public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 {
 	protected IValue	instance;
 	protected String	name;
@@ -45,35 +46,6 @@ public class FieldAccess implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		if (this.isSugarAccess && !Formatting.Field.convertSugarAccess)
-		{
-			if (this.instance != null)
-			{
-				this.instance.toString("", buffer);
-				buffer.append(Formatting.Field.sugarAccessStart);
-			}
-			
-			buffer.append(this.name);
-			buffer.append(Formatting.Field.sugarAccessEnd);
-		}
-		else
-		{
-			if (this.instance != null)
-			{
-				this.instance.toString("", buffer);
-				buffer.append('.');
-			}
-			buffer.append(this.name);
-		}
-	}
-	
-	@Override
-	public void applyState(CompilerState state)
-	{}
-	
-	@Override
 	public void setName(String name)
 	{
 		this.name = name;
@@ -105,5 +77,34 @@ public class FieldAccess implements IValue, INamed, IValued
 	public boolean isSugarAccess()
 	{
 		return this.isSugarAccess;
+	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		if (this.isSugarAccess && !Formatting.Field.convertSugarAccess)
+		{
+			if (this.instance != null)
+			{
+				this.instance.toString("", buffer);
+				buffer.append(Formatting.Field.sugarAccessStart);
+			}
+			
+			buffer.append(this.name);
+			buffer.append(Formatting.Field.sugarAccessEnd);
+		}
+		else
+		{
+			if (this.instance != null)
+			{
+				this.instance.toString("", buffer);
+				buffer.append('.');
+			}
+			buffer.append(this.name);
+		}
 	}
 }

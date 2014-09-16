@@ -1,20 +1,11 @@
-package dyvil.tools.compiler.ast.expression;
+package dyvil.tools.compiler.ast.value;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.IValue;
 
-public class ClassAccess extends ASTObject implements IValue
+public class ThisValue extends ASTObject implements IValue
 {
-	public IClass iclass;
-	
-	public ClassAccess(IClass iclass)
-	{
-		this.iclass = iclass;
-	}
-	
 	@Override
 	public boolean isConstant()
 	{
@@ -30,17 +21,17 @@ public class ClassAccess extends ASTObject implements IValue
 	@Override
 	public Type getType()
 	{
+		// FIXME
 		return null;
 	}
 	
 	@Override
 	public void applyState(CompilerState state)
-	{
-	}
-
+	{}
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		// TODO
+		buffer.append("this");
 	}
 }

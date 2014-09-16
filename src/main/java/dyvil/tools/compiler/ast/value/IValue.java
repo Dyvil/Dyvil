@@ -6,39 +6,6 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public interface IValue extends IASTObject
 {
-	public static IValue	NULL	= new IValue()
-									{
-										@Override
-										public IValue fold()
-										{
-											return this;
-										}
-										
-										@Override
-										public boolean isConstant()
-										{
-											return true;
-										}
-										
-										@Override
-										public Type getType()
-										{
-											return Type.VOID;
-										}
-										
-										@Override
-										public String toString()
-										{
-											return "null";
-										}
-										
-										@Override
-										public void toString(String prefix, StringBuilder buffer)
-										{
-											buffer.append("null");
-										}
-									};
-	
 	public boolean isConstant();
 	
 	public IValue fold();

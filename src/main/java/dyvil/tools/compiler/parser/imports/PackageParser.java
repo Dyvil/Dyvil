@@ -12,7 +12,8 @@ public class PackageParser extends Parser
 {
 	protected CompilationUnit	unit;
 	
-	private StringBuilder		buffer	= new StringBuilder();
+	private PackageDecl			packageDeclaration;
+	private StringBuilder		buffer				= new StringBuilder();
 	
 	public PackageParser(CompilationUnit unit)
 	{
@@ -24,20 +25,23 @@ public class PackageParser extends Parser
 	{
 		if (";".equals(value))
 		{
+			this.packageDeclaration.expandPosition(token);
+			this.packageDeclaration.setPackage(this.buffer.toString());
+			this.unit.setPackageDecl(this.packageDeclaration);
+			
 			jcp.popParser();
 			return true;
 		}
 		else if (token.isType(Token.TYPE_IDENTIFIER) || ".".equals(value))
 		{
+			if (this.packageDeclaration == null)
+			{
+				this.packageDeclaration = new PackageDecl(token, null);
+			}
+			
 			this.buffer.append(value);
 			return true;
 		}
 		return false;
-	}
-	
-	@Override
-	public void end(ParserManager jcp)
-	{
-		this.unit.setPackageDecl(new PackageDecl(this.buffer.toString()));
 	}
 }

@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class CodeFile extends File
+import dyvil.tools.compiler.lexer.position.ICodePosition;
+
+public class CodeFile extends File implements ICodePosition
 {
 	private static final long	serialVersionUID	= 130988432718494125L;
 	
@@ -59,5 +61,35 @@ public class CodeFile extends File
 			this.load();
 		}
 		return this.code.length();
+	}
+
+	@Override
+	public CodeFile getFile()
+	{
+		return this;
+	}
+
+	@Override
+	public String getText()
+	{
+		return this.getCode();
+	}
+
+	@Override
+	public int getLineNumber()
+	{
+		return 0;
+	}
+
+	@Override
+	public int getStart()
+	{
+		return 0;
+	}
+
+	@Override
+	public int getEnd()
+	{
+		return this.getLength() - 1;
 	}
 }

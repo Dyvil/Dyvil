@@ -1,10 +1,13 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.config.Formatting;
 
-public class WhileStatement implements IStatement, IValued
+public class WhileStatement extends ASTObject implements IStatement, IValued
 {
 	private IValue	condition;
 	private IValue	then;
@@ -53,8 +56,21 @@ public class WhileStatement implements IStatement, IValued
 	}
 	
 	@Override
+	public void applyState(CompilerState state)
+	{
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		// TODO
+		buffer.append(Formatting.Statements.whileStart);
+		this.condition.toString(prefix, buffer);
+		buffer.append(Formatting.Statements.whileEnd);
+		
+		if (this.then != null)
+		{
+			buffer.append(' ');
+			this.then.toString(prefix, buffer);
+		}
 	}
 }

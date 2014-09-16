@@ -1,10 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public class DoWhileStatement implements IStatement, IValued
+public class DoWhileStatement extends ASTObject implements IStatement, IValued
 {
 	private IValue	then;
 	private IValue		condition;
@@ -52,6 +54,10 @@ public class DoWhileStatement implements IStatement, IValued
 	{
 		return this.then.getType();
 	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

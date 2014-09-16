@@ -1,10 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public class ForEachStatement implements IStatement
+public class ForEachStatement extends ASTObject implements IStatement
 {
 	private Field variable;
 	private Object iterable;
@@ -48,11 +50,17 @@ public class ForEachStatement implements IStatement
 	@Override
 	public Type getType()
 	{
-		// FIXME
+		// TODO
 		return null;
 	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
-	{}
+	{
+		//TODO
+	}
 }

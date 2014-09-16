@@ -55,6 +55,7 @@ public class MethodCall extends Call implements INamed, IValued
 			
 			if (!this.arguments.isEmpty())
 			{
+				// TODO Special seperators, named arguments
 				buffer.append(Formatting.Method.parametersStart);
 				Iterator<IValue> iterator = this.arguments.iterator();
 				while (true)
@@ -63,7 +64,6 @@ public class MethodCall extends Call implements INamed, IValued
 					value.toString("", buffer);
 					if (iterator.hasNext())
 					{
-						// TODO Special seperators, named arguments
 						buffer.append(Formatting.Method.parameterSeperator);
 					}
 					else

@@ -3,11 +3,12 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public abstract class Call implements IValue, IValueList
+public abstract class Call extends ASTObject implements IValue, IValueList
 {
 	protected List<IValue>	arguments = new ArrayList();
 	

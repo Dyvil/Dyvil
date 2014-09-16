@@ -120,6 +120,13 @@ public abstract class AbstractClass extends ASTObject implements IClass
 	}
 	
 	@Override
+	public boolean isStatic()
+	{
+		// FIXME
+		return false;
+	}
+	
+	@Override
 	public IClass resolveClass(String name)
 	{
 		// FIXME

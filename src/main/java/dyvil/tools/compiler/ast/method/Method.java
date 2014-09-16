@@ -7,6 +7,7 @@ import java.util.List;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.Modifiers;
 
 public class Method extends Member implements IMethod
 {
@@ -49,6 +50,12 @@ public class Method extends Member implements IMethod
 	public List<ThrowsDecl> getThrows()
 	{
 		return this.throwsDeclarations;
+	}
+	
+	@Override
+	public boolean isStatic()
+	{
+		return this.hasModifier(Modifiers.STATIC);
 	}
 	
 	@Override

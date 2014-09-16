@@ -10,6 +10,8 @@ import dyvil.tools.compiler.config.Formatting;
 
 public class Type extends ASTObject implements IClassContext
 {
+	public static Type	NONE	= new Type((String) null);
+	
 	public static Type	VOID	= new Type("void");
 	public static Type	INT		= new Type("int");
 	public static Type	LONG	= new Type("long");
@@ -70,6 +72,12 @@ public class Type extends ASTObject implements IClassContext
 	public int getArrayDimensions()
 	{
 		return this.arrayDimensions;
+	}
+	
+	@Override
+	public boolean isStatic()
+	{
+		return this.theClass.isStatic();
 	}
 	
 	@Override
