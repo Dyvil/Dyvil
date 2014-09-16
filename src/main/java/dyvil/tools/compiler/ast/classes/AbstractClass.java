@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -13,7 +14,7 @@ import dyvil.tools.compiler.util.Classes;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public abstract class AbstractClass implements IClass
+public abstract class AbstractClass extends ASTObject implements IClass
 {
 	private String				name;
 	private int					type;

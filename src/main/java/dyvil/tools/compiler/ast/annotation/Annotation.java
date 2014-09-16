@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IASTObject;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.type.Type;
 
-public class Annotation implements IASTObject, ITyped
+public class Annotation extends ASTObject implements ITyped
 {
 	private Type type;
 	

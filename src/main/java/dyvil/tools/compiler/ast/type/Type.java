@@ -1,14 +1,14 @@
 package dyvil.tools.compiler.ast.type;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IASTObject;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IClassContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.config.Formatting;
 
-public class Type implements IASTObject, IClassContext
+public class Type extends ASTObject implements IClassContext
 {
 	public static Type	VOID	= new Type("void");
 	public static Type	INT		= new Type("int");

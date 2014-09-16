@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 
-public class SimpleImport implements IImport
+public class SimpleImport extends ASTObject implements IImport
 {
 	private String			theImport;
 	

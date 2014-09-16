@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.value;
 
+import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.type.Type;
 
-public class StringValue implements IValue
+public class StringValue extends ASTObject implements IValue
 {
 	public String value;
 	
@@ -21,6 +23,11 @@ public class StringValue implements IValue
 	public Type getType()
 	{
 		return Type.STRING;
+	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{
 	}
 	
 	@Override

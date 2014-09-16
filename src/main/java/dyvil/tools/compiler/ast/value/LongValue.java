@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.value;
 
+import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.type.Type;
 
-public class LongValue implements IValue
+public class LongValue extends ASTObject implements IValue
 {
 	public long	value;
 	
@@ -31,6 +33,11 @@ public class LongValue implements IValue
 	public Type getType()
 	{
 		return Type.LONG;
+	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{
 	}
 	
 	@Override

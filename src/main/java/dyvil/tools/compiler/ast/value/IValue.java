@@ -21,6 +21,12 @@ public interface IValue extends IASTObject
 										}
 										
 										@Override
+										public String toString()
+										{
+											return "null";
+										}
+										
+										@Override
 										public void toString(String prefix, StringBuilder buffer)
 										{
 											buffer.append("null");
@@ -32,5 +38,6 @@ public interface IValue extends IASTObject
 	public Type getType();
 	
 	@Override
-	public default void applyState(CompilerState state) {}
+	public default void applyState(CompilerState state)
+	{}
 }

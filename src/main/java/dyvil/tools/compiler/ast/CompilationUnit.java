@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -12,7 +11,7 @@ import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.config.Formatting;
 
-public class CompilationUnit implements IASTObject, IContext
+public class CompilationUnit extends ASTObject implements IContext
 {
 	private PackageDecl			packageDecl;
 	private List<IImport>		imports	= new ArrayList();

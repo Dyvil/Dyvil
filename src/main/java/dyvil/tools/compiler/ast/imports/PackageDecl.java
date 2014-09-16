@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IASTObject;
+import dyvil.tools.compiler.ast.ASTObject;
 
-public class PackageDecl implements IASTObject
+public class PackageDecl extends ASTObject
 {
 	private String thePackage;
 	

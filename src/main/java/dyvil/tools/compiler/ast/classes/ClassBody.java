@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IASTObject;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 
-public class ClassBody implements IASTObject
+public class ClassBody extends ASTObject
 {
 	private AbstractClass		theClass;
 	private List<IField>	fields	= new ArrayList();

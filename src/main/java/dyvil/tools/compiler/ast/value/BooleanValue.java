@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.value;
 
+import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.type.Type;
 
-public class BooleanValue implements IValue
+public class BooleanValue extends ASTObject implements IValue
 {
 	public static BooleanValue TRUE = new BooleanValue(true);
 	public static BooleanValue FALSE = new BooleanValue(false);
@@ -30,6 +32,10 @@ public class BooleanValue implements IValue
 	{
 		return Type.BOOL;
 	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
