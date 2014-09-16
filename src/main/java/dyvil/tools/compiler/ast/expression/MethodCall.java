@@ -37,9 +37,9 @@ public class MethodCall extends Call implements INamed, IValued
 			if (this.instance != null)
 			{
 				this.instance.toString("", buffer);
+				buffer.append(Formatting.Method.sugarCallStart);
 			}
 			
-			buffer.append(Formatting.Method.sugarCallStart);
 			buffer.append(this.name);
 			buffer.append(Formatting.Method.sugarCallEnd);
 			this.arguments.get(0).toString("", buffer);

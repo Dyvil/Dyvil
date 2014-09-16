@@ -170,7 +170,13 @@ public class ParserManager
 		}
 	}
 	
-	public void tryParse(Parser parser, IToken start) throws SyntaxError
+	public void pushTryParser(Parser parser, IToken token)
+	{
+		this.lastToken = token;
+		this.pushParser(parser);
+	}
+	
+	public void pushTryParserParse(Parser parser, IToken start) throws SyntaxError
 	{
 		this.lastToken = start;
 		this.pushParser(parser, start);

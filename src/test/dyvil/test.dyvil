@@ -12,7 +12,9 @@ public class Main
     
     public float f = 1.5F;
     
-    public String a() = "abc" + "d" + "e";
+    public int length() = "abc" get length;
+    
+    public String a() = "abc" + "d" + "e" length;
     
     public float f() = 1F + 0.5F;
     

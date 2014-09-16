@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.context.IClassContext;
 import dyvil.tools.compiler.ast.expression.ConstructorCall;
+import dyvil.tools.compiler.ast.expression.FieldAccess;
 import dyvil.tools.compiler.ast.expression.MethodCall;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.IfStatement;
@@ -119,18 +120,28 @@ public class ExpressionParser extends Parser
 		}
 		if (this.isInMode(ACCESS))
 		{
-			MethodCall call = new MethodCall(this.value, value);
-			this.value = call;
-			this.mode = PARAMETERS;
-			return true;
+			if (token.next().equals("("))
+			{
+				MethodCall call = new MethodCall(this.value, value);
+				this.value = call;
+				this.mode = PARAMETERS;
+				return true;
+			}
+			else
+			{
+				FieldAccess access = new FieldAccess(this.value, value);
+				this.value = access;
+				this.mode = VALUE;
+				return true;
+			}
 		}
 		if (this.isInMode(SUGARCALL))
 		{
 			MethodCall call = new MethodCall(this.value, value);
 			call.setSugarCall(true);
 			this.value = call;
-			pm.pushParser(new ExpressionParser(this.context, call));
 			this.mode = 0;
+			pm.pushTryParser(new ExpressionParser(this.context, call), token.next());
 			return true;
 		}
 		if (this.isInMode(PARAMETERS))
@@ -146,13 +157,15 @@ public class ExpressionParser extends Parser
 		{
 			if (")".equals(value))
 			{
-				if (token.next().equals("."))
+				IToken next = token.next();
+				if (next.equals("."))
 				{
 					this.mode = ACCESS;
+					return true;
 				}
-				else
+				else if (next.isType(Token.TYPE_IDENTIFIER))
 				{
-					pm.popParser();
+					this.mode = SUGARCALL;
 				}
 				return true;
 			}

@@ -1,23 +1,29 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.api.INamed;
+import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.config.Formatting;
 
-public class FieldAccess implements IValue
+public class FieldAccess implements IValue, INamed, IValued
 {
-	public IValue instance;
-	public IField field;
+	protected IValue	instance;
+	protected String	name;
 	
-	public FieldAccess(IField field)
-	{
-		this(null, field);
-	}
+	protected boolean	isSugarAccess;
 	
-	public FieldAccess(IValue instance, IField field)
+	public IField		field;
+	
+	public FieldAccess()
+	{}
+	
+	public FieldAccess(IValue instance, String name)
 	{
 		this.instance = instance;
-		this.field = field;
+		this.name = name;
 	}
 	
 	@Override
@@ -25,13 +31,13 @@ public class FieldAccess implements IValue
 	{
 		return false;
 	}
-
+	
 	@Override
 	public IValue fold()
 	{
 		return this;
 	}
-
+	
 	@Override
 	public Type getType()
 	{
@@ -41,6 +47,63 @@ public class FieldAccess implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		// TODO
+		if (this.isSugarAccess && !Formatting.Field.convertSugarAccess)
+		{
+			if (this.instance != null)
+			{
+				this.instance.toString("", buffer);
+				buffer.append(Formatting.Field.sugarAccessStart);
+			}
+			
+			buffer.append(this.name);
+			buffer.append(Formatting.Field.sugarAccessEnd);
+		}
+		else
+		{
+			if (this.instance != null)
+			{
+				this.instance.toString("", buffer);
+				buffer.append('.');
+			}
+			buffer.append(this.name);
+		}
+	}
+	
+	@Override
+	public void applyState(CompilerState state)
+	{}
+	
+	@Override
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public String getName()
+	{
+		return this.name;
+	}
+	
+	@Override
+	public void setValue(IValue value)
+	{
+		this.instance = value;
+	}
+	
+	@Override
+	public IValue getValue()
+	{
+		return this.instance;
+	}
+	
+	public void setSugarAccess(boolean isSugarAccess)
+	{
+		this.isSugarAccess = isSugarAccess;
+	}
+	
+	public boolean isSugarAccess()
+	{
+		return this.isSugarAccess;
 	}
 }

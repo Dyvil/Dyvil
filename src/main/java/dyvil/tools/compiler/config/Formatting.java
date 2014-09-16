@@ -34,6 +34,10 @@ public class Formatting
 	public static class Field
 	{
 		public static String	keyValueSeperator	= " = ";
+		
+		public static boolean	convertSugarAccess	= true;
+		public static String	sugarAccessStart	= " ";
+		public static String	sugarAccessEnd		= " ";
 	}
 	
 	public static class Method
