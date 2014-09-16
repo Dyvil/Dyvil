@@ -36,20 +36,26 @@ public class DoWhileStatement implements IStatement, IValued
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public boolean isConstant()
 	{
-		// TODO
+		return false;
 	}
-
+	
 	@Override
 	public IValue fold()
 	{
 		return this;
 	}
-
+	
 	@Override
 	public Type getType()
 	{
 		return this.then.getType();
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		// TODO
 	}
 }

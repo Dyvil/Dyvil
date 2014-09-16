@@ -17,6 +17,12 @@ public class VariableAccess implements IValue
 	}
 	
 	@Override
+	public boolean isConstant()
+	{
+		return false;
+	}
+	
+	@Override
 	public IValue fold()
 	{
 		return this;

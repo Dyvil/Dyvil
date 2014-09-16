@@ -32,6 +32,12 @@ public class ForEachStatement implements IStatement
 	{
 		return this.iterable;
 	}
+	
+	@Override
+	public boolean isConstant()
+	{
+		return false;
+	}
 
 	@Override
 	public IValue fold()

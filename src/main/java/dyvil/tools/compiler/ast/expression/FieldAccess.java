@@ -19,6 +19,12 @@ public class FieldAccess implements IValue
 		this.instance = instance;
 		this.field = field;
 	}
+	
+	@Override
+	public boolean isConstant()
+	{
+		return false;
+	}
 
 	@Override
 	public IValue fold()

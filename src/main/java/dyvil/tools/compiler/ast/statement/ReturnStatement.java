@@ -23,6 +23,12 @@ public class ReturnStatement implements IStatement, IValued
 	{
 		return this.value;
 	}
+
+	@Override
+	public boolean isConstant()
+	{
+		return false;
+	}
 	
 	@Override
 	public IValue fold()

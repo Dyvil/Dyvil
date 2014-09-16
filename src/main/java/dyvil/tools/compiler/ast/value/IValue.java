@@ -15,6 +15,12 @@ public interface IValue extends IASTObject
 										}
 										
 										@Override
+										public boolean isConstant()
+										{
+											return true;
+										}
+										
+										@Override
 										public Type getType()
 										{
 											return Type.VOID;
@@ -32,6 +38,8 @@ public interface IValue extends IASTObject
 											buffer.append("null");
 										}
 									};
+	
+	public boolean isConstant();
 	
 	public IValue fold();
 	

@@ -45,18 +45,9 @@ public class IfStatement implements IStatement
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public boolean isConstant()
 	{
-		buffer.append(Formatting.Statements.ifStart);
-		this.condition.toString(prefix, buffer);
-		buffer.append(Formatting.Statements.ifEnd);
-		this.then.toString(prefix, buffer);
-		
-		if (this.elseThen != null)
-		{
-			buffer.append(Formatting.Statements.ifElse);
-			this.elseThen.toString(prefix, buffer);
-		}
+		return false;
 	}
 	
 	@Override
@@ -78,5 +69,20 @@ public class IfStatement implements IStatement
 	public Type getType()
 	{
 		return this.getThen().getType();
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(Formatting.Statements.ifStart);
+		this.condition.toString(prefix, buffer);
+		buffer.append(Formatting.Statements.ifEnd);
+		this.then.toString(prefix, buffer);
+		
+		if (this.elseThen != null)
+		{
+			buffer.append(Formatting.Statements.ifElse);
+			this.elseThen.toString(prefix, buffer);
+		}
 	}
 }

@@ -16,6 +16,12 @@ public abstract class Call implements IValue, IValueList
 	public IMethod			descriptor;
 	
 	@Override
+	public boolean isConstant()
+	{
+		return false;
+	}
+	
+	@Override
 	public IValue fold()
 	{
 		for (int i = 0; i < this.arguments.size(); i++)

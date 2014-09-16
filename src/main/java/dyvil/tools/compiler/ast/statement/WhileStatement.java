@@ -35,9 +35,9 @@ public class WhileStatement implements IStatement, IValued
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public boolean isConstant()
 	{
-		// TODO
+		return false;
 	}
 	
 	@Override
@@ -50,5 +50,11 @@ public class WhileStatement implements IStatement, IValued
 	public Type getType()
 	{
 		return this.then.getType();
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		// TODO
 	}
 }

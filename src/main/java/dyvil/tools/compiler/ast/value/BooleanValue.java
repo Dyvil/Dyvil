@@ -20,6 +20,12 @@ public class BooleanValue extends ASTObject implements IValue
 	{
 		this.value = value;
 	}
+
+	@Override
+	public boolean isConstant()
+	{
+		return true;
+	}
 	
 	@Override
 	public IValue fold()

@@ -19,6 +19,12 @@ public class FloatValue extends ASTObject implements IValue
 	}
 	
 	@Override
+	public boolean isConstant()
+	{
+		return true;
+	}
+	
+	@Override
 	public IValue fold()
 	{
 		return this;
