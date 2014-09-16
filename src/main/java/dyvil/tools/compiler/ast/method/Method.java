@@ -75,6 +75,11 @@ public class Method extends Member implements IMethod
 	{
 		super.toString(prefix, buffer);
 		
+		buffer.append(Modifiers.METHOD.toString(this.modifiers));
+		this.type.toString("", buffer);
+		buffer.append(' ');
+		buffer.append(this.name);
+		
 		if (!this.parameters.isEmpty())
 		{
 			buffer.append(Formatting.Method.parametersStart);

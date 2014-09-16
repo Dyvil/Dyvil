@@ -11,9 +11,9 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class ClassBody extends ASTObject
 {
-	private AbstractClass		theClass;
+	private AbstractClass	theClass;
 	private List<IField>	fields	= new ArrayList();
-	private List<IMethod>		methods	= new ArrayList();
+	private List<IMethod>	methods	= new ArrayList();
 	
 	public ClassBody()
 	{}

@@ -31,7 +31,7 @@ public class ParameterListParser extends Parser
 		if (this.isInMode(TYPE))
 		{
 			int i = 0;
-			if ((i = Modifiers.parseParameterModifier(value)) != -1)
+			if ((i = Modifiers.PARAMETER.parse(value)) != -1)
 			{
 				this.parameter.addModifier(i);
 				return true;

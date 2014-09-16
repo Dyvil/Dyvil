@@ -59,7 +59,7 @@ public class ClassBodyParser extends Parser implements ITyped
 		}
 		if (this.isInMode(TYPE))
 		{
-			if ((i = Modifiers.parseModifier(value)) != -1)
+			if ((i = Modifiers.FIELD_OR_METHOD.parse(value)) != -1)
 			{
 				this.field.addModifier(i);
 				this.method.addModifier(i);

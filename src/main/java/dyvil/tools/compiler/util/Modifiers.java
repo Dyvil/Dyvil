@@ -1,12 +1,184 @@
 package dyvil.tools.compiler.util;
 
-public class Modifiers
+public enum Modifiers
 {
-	public static String toString(int mod)
+	ACCESS, CLASS_TYPE, CLASS, INTERFACE, FIELD, METHOD, FIELD_OR_METHOD, PARAMETER;
+	
+	public String toString(int mod)
 	{
 		StringBuilder sb = new StringBuilder();
-		int len;
-		
+		switch (this)
+		{
+		case ACCESS:
+			writeAccessModifiers(mod, sb);
+			break;
+		case CLASS_TYPE:
+			writeClassTypeModifiers(mod, sb);
+		case CLASS:
+			writeAccessModifiers(mod, sb);
+			writeClassModifiers(mod, sb);
+			break;
+		case INTERFACE:
+			writeAccessModifiers(mod, sb);
+			writeInterfaceModifiers(mod, sb);
+			break;
+		case FIELD_OR_METHOD:
+			writeAccessModifiers(mod, sb);
+			writeFieldOrMethodModifiers(mod, sb);
+		case FIELD:
+			writeAccessModifiers(mod, sb);
+			writeFieldModifiers(mod, sb);
+			break;
+		case METHOD:
+			writeAccessModifiers(mod, sb);
+			writeMethodModifiers(mod, sb);
+			break;
+		case PARAMETER:
+			writeParameterModifier(mod, sb);
+			break;
+		}
+		return sb.toString();
+	}
+	
+	public int parse(String mod)
+	{
+		int m = 0;
+		switch (this)
+		{
+		case ACCESS:
+			m = readAccessModifier(mod);
+			break;
+		case CLASS_TYPE:
+			m = readClassTypeModifier(mod);
+		case CLASS:
+			if ((m = readAccessModifier(mod)) == -1)
+				m = readClassModifier(mod);
+			break;
+		case INTERFACE:
+			if ((m = readAccessModifier(mod)) == -1)
+				m = readInterfaceModifier(mod);
+			break;
+		case FIELD_OR_METHOD:
+			if ((m = readAccessModifier(mod)) == -1)
+				if ((m = readFieldModifier(mod)) == -1)
+					m = readMethodModifier(mod);
+		case FIELD:
+			if ((m = readAccessModifier(mod)) == -1)
+				m = readFieldModifier(mod);
+			break;
+		case METHOD:
+			if ((m = readAccessModifier(mod)) == -1)
+				m = readMethodModifier(mod);
+			break;
+		case PARAMETER:
+			if ((m = readAccessModifier(mod)) == -1)
+				m = readParameterModifier(mod);
+			break;
+		}
+		return m;
+	}
+	
+	public static final int	PACKAGE					= 0x00000000;
+	public static final int	PUBLIC					= 0x00000001;
+	public static final int	PRIVATE					= 0x00000002;
+	public static final int	PROTECTED				= 0x00000004;
+	
+	/**
+	 * Dyvil derived access modifier.
+	 */
+	public static final int	DERIVED					= PRIVATE | PROTECTED;
+	
+	public static final int	STATIC					= 0x00000008;
+	public static final int	FINAL					= 0x00000010;
+	
+	/**
+	 * Dyvil constant modifier. This modifier is just a shortcut for
+	 * {@code static final}.
+	 */
+	public static final int	CONST					= STATIC | FINAL;
+	
+	public static final int	SYNCHRONIZED			= 0x00000020;
+	public static final int	VOLATILE				= 0x00000040;
+	public static final int	BRIDGE					= 0x00000040;
+	public static final int	TRANSIENT				= 0x00000080;
+	public static final int	VARARGS					= 0x00000080;
+	public static final int	NATIVE					= 0x00000100;
+	
+	public static final int	INTERFACE_CLASS			= 0x00000200;
+	public static final int	ABSTRACT				= 0x00000400;
+	
+	/**
+	 * Strictfp modifier. This is used for classes and methods and marks that
+	 * floating point numbers (floats and doubles) have to be handled specially.
+	 */
+	public static final int	STRICT					= 0x00000800;
+	
+	/**
+	 * Synthetic modifier. This is used for fields of inner classes that hold
+	 * the outer class.
+	 */
+	public static final int	SYNTHETIC				= 0x00001000;
+	public static final int	ANNOTATION				= 0x00002000;
+	public static final int	ENUM_CLASS				= 0x00004000;
+	
+	/**
+	 * Mandated modifier. This is used for constructors of inner classes that
+	 * have the outer class as a parameter.
+	 */
+	public static final int	MANDATED				= 0x00008000;
+	
+	/**
+	 * Dyvil lazy modifier. If a field is marked with this modifier, it is going
+	 * to be evaluated / calculated every time it is demanded and is thus not
+	 * saved in the memory. This behavior can be compared with a method without
+	 * parameters.
+	 */
+	public static final int	LAZY					= 0x00010000;
+	
+	/**
+	 * Dyvil inline modifier. If a method is marked with this modifier, it will
+	 * be inlined by the compiler to reduce method call overhead.
+	 */
+	public static final int	INLINE					= 0x00010000;
+	
+	/**
+	 * Dyvil object modifier. If a class is marked with this modifier, it is a
+	 * singleton object class.
+	 */
+	public static final int	OBJECT_CLASS			= 0x00010000;
+	
+	/**
+	 * Dyvil implicit modifier. If a method is marked with this modifier, it is
+	 * a method that can be called on any Object and virtually has the instance
+	 * as the first parameter.
+	 */
+	public static final int	IMPLICIT				= 0x00020000;
+	
+	/**
+	 * Dyvil module modifier. If a class is marked with this modifier, it is a
+	 * module class.
+	 */
+	public static final int	MODULE					= 0x00020000;
+	
+	/**
+	 * Dyvil ref modifier. This is used to mark that a parameter is
+	 * Call-By-Reference. If a parameter doesn't have this flag, it is
+	 * Call-By-Value.
+	 */
+	public static final int	BYREF					= 0x00040000;
+	
+	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM_CLASS | OBJECT_CLASS | MODULE;
+	public static final int	ACCESS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE;
+	public static final int	MEMBER_MODIFIERS		= ACCESS_MODIFIERS | STATIC | FINAL;
+	public static final int	CLASS_MODIFIERS			= MEMBER_MODIFIERS | ABSTRACT | STRICT;
+	public static final int	INTERFACE_MODIFIERS		= ACCESS_MODIFIERS | ABSTRACT | STATIC | STRICT;
+	
+	public static final int	FIELD_MODIFIERS			= MEMBER_MODIFIERS | TRANSIENT | VOLATILE | LAZY | SYNTHETIC;
+	public static final int	METHOD_MODIFIERS		= MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT | BRIDGE | VARARGS | MANDATED;
+	public static final int	PARAMETER_MODIFIERS		= FINAL | BYREF;
+	
+	private static void writeAccessModifiers(int mod, StringBuilder sb)
+	{
 		if ((mod & PUBLIC) != 0)
 			sb.append("public ");
 		
@@ -21,11 +193,76 @@ public class Modifiers
 			if ((mod & PRIVATE) != 0)
 				sb.append("private ");
 		}
-		
-		/* Canonical order */
+	}
+	
+	private static void writeClassTypeModifiers(int mod, StringBuilder sb)
+	{
+		if (mod == 0)
+			sb.append("class ");
+		else if ((mod & INTERFACE_CLASS) != 0)
+			sb.append("interface ");
+		else if ((mod & ANNOTATION) != 0)
+			sb.append("annotation ");
+		else if ((mod & ENUM_CLASS) != 0)
+			sb.append("enum ");
+		else if ((mod & OBJECT_CLASS) != 0)
+			sb.append("object ");
+		else if ((mod & MODULE) != 0)
+			sb.append("module ");
+		else
+			sb.append("class ");
+	}
+	
+	private static void writeClassModifiers(int mod, StringBuilder sb)
+	{
+		if ((mod & STATIC) != 0)
+			sb.append("static ");
 		if ((mod & ABSTRACT) != 0)
 			sb.append("abstract ");
+		if ((mod & FINAL) != 0)
+			sb.append("final ");
+		if ((mod & STRICT) != 0)
+			sb.append("strictfp ");
+	}
+	
+	private static void writeInterfaceModifiers(int mod, StringBuilder sb)
+	{
+		if ((mod & STATIC) != 0)
+			sb.append("static ");
+		if ((mod & ABSTRACT) != 0)
+			sb.append("abstract ");
+		if ((mod & STRICT) != 0)
+			sb.append("strictfp ");
+	}
+	
+	private static void writeFieldOrMethodModifiers(int mod, StringBuilder sb)
+	{
+		if ((mod & STATIC) != 0)
+			sb.append("static ");
+		if ((mod & FINAL) != 0)
+			sb.append("final ");
 		
+		if ((mod & TRANSIENT) != 0)
+			sb.append("transient ");
+		if ((mod & VOLATILE) != 0)
+			sb.append("volatile ");
+		if ((mod & LAZY) != 0)
+			sb.append("lazy ");
+		
+		if ((mod & SYNCHRONIZED) != 0)
+			sb.append("synchronized ");
+		if ((mod & NATIVE) != 0)
+			sb.append("native ");
+		if ((mod & STRICT) != 0)
+			sb.append("strictfp ");
+		if ((mod & INLINE) != 0)
+			sb.append("inline ");
+		if ((mod & IMPLICIT) != 0)
+			sb.append("implicit ");
+	}
+	
+	private static void writeFieldModifiers(int mod, StringBuilder sb)
+	{
 		if ((mod & CONST) != 0)
 		{
 			sb.append("const ");
@@ -42,153 +279,38 @@ public class Modifiers
 			sb.append("transient ");
 		if ((mod & VOLATILE) != 0)
 			sb.append("volatile ");
+		if ((mod & LAZY) != 0)
+			sb.append("lazy ");
+	}
+	
+	private static void writeMethodModifiers(int mod, StringBuilder sb)
+	{
+		if ((mod & STATIC) != 0)
+			sb.append("static ");
+		if ((mod & FINAL) != 0)
+			sb.append("final ");
+		
 		if ((mod & SYNCHRONIZED) != 0)
 			sb.append("synchronized ");
 		if ((mod & NATIVE) != 0)
 			sb.append("native ");
 		if ((mod & STRICT) != 0)
 			sb.append("strictfp ");
-		if ((mod & INTERFACE) != 0)
-			sb.append("interface ");
-		if ((mod & LAZY) != 0)
-			sb.append("lazy ");
 		if ((mod & INLINE) != 0)
 			sb.append("inline ");
 		if ((mod & IMPLICIT) != 0)
 			sb.append("implicit ");
+	}
+	
+	private static void writeParameterModifier(int mod, StringBuilder sb)
+	{
+		if ((mod & FINAL) != 0)
+			sb.append("final ");
 		if ((mod & BYREF) != 0)
 			sb.append("ref ");
-		
-		return sb.toString();
 	}
 	
-	public static final int	PACKAGE				= 0x00000000;
-	public static final int	PUBLIC				= 0x00000001;
-	public static final int	PRIVATE				= 0x00000002;
-	public static final int	PROTECTED			= 0x00000004;
-	
-	/**
-	 * Dyvil derived access modifier.
-	 */
-	public static final int	DERIVED				= PRIVATE | PROTECTED;
-	
-	public static final int	STATIC				= 0x00000008;
-	public static final int	FINAL				= 0x00000010;
-	
-	/**
-	 * Dyvil constant modifier. This modifier is just a shortcut for
-	 * {@code static final}.
-	 */
-	public static final int	CONST				= STATIC | FINAL;
-	
-	public static final int	SYNCHRONIZED		= 0x00000020;
-	public static final int	VOLATILE			= 0x00000040;
-	public static final int	BRIDGE				= 0x00000040;
-	public static final int	TRANSIENT			= 0x00000080;
-	public static final int	VARARGS				= 0x00000080;
-	public static final int	NATIVE				= 0x00000100;
-	static final int		INTERFACE			= 0x00000200;
-	static final int		ABSTRACT			= 0x00000400;
-	
-	/**
-	 * Strictfp modifier. This is used for classes and methods and marks that
-	 * floating point numbers (floats and doubles) have to be handled specially.
-	 */
-	public static final int	STRICT				= 0x00000800;
-	
-	/**
-	 * Synthetic modifier. This is used for fields of inner classes that hold
-	 * the outer class.
-	 */
-	public static final int	SYNTHETIC			= 0x00001000;
-	public static final int	ANNOTATION			= 0x00002000;
-	public static final int	ENUM				= 0x00004000;
-	
-	/**
-	 * Mandated modifier. This is used for constructors of inner classes that
-	 * have the outer class as a parameter.
-	 */
-	public static final int	MANDATED			= 0x00008000;
-	
-	/**
-	 * Dyvil lazy modifier. If a field is marked with this modifier, it is going
-	 * to be evaluated / calculated every time it is demanded and is thus not
-	 * saved in the memory. This behavior can be compared with a method without
-	 * parameters.
-	 */
-	public static final int	LAZY				= 0x00010000;
-	
-	/**
-	 * Dyvil inline modifier. If a method is marked with this modifier, it will
-	 * be inlined by the compiler to reduce method call overhead.
-	 */
-	public static final int	INLINE				= 0x00010000;
-	
-	/**
-	 * Dyvil implicit modifier. If a method is marked with this modifier, it is
-	 * a method that can be called on any Object and virtually has the instance
-	 * as the first parameter.
-	 */
-	public static final int	IMPLICIT			= 0x00020000;
-	
-	/**
-	 * Dyvil ref modifier. This is used to mark that a parameter is
-	 * Call-By-Reference. If a parameter doesn't have this flag, it is
-	 * Call-By-Value.
-	 */
-	public static final int	BYREF				= 0x00040000;
-	
-	public static final int	ACCESS_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE;
-	public static final int	CLASS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | STRICT;
-	public static final int	INTERFACE_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE | STATIC | STRICT;
-	
-	public static final int	FIELD_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | TRANSIENT | VOLATILE | LAZY;
-	public static final int	METHOD_MODIFIERS	= PUBLIC | PROTECTED | PRIVATE | STATIC | FINAL | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT;
-	public static final int	PARAMETER_MODIFIERS	= FINAL | BYREF;
-	
-	public static int parseModifier(String mod)
-	{
-		switch (mod)
-		{
-		case "package":
-			return PACKAGE;
-		case "public":
-			return PUBLIC;
-		case "private":
-			return PRIVATE;
-		case "protected":
-			return PROTECTED;
-		case "derived":
-			return DERIVED;
-		case "static":
-			return STATIC;
-		case "final":
-			return FINAL;
-		case "const":
-			return CONST;
-		case "synchronized":
-			return SYNCHRONIZED;
-		case "volatile":
-			return VOLATILE;
-		case "transient":
-			return TRANSIENT;
-		case "native":
-			return NATIVE;
-		case "strictfp":
-			return STRICT;
-		case "lazy":
-			return LAZY;
-		case "inline":
-			return INLINE;
-		case "implicit":
-			return IMPLICIT;
-		case "ref":
-			return BYREF;
-		}
-		return -1;
-	}
-	
-	public static int parseAccessModifier(String mod)
+	private static int readAccessModifier(String mod)
 	{
 		switch (mod)
 		{
@@ -206,15 +328,34 @@ public class Modifiers
 		return -1;
 	}
 	
-	public static int parseClassModifier(String mod)
+	private static int readClassTypeModifier(String mod)
 	{
-		int i = parseAccessModifier(mod);
-		if (i != -1)
-			return i;
+		switch (mod)
+		{
+		case "class":
+			return 0;
+		case "interface":
+			return INTERFACE_CLASS;
+		case "annotation":
+			return ANNOTATION;
+		case "enum":
+			return ENUM_CLASS;
+		case "object":
+			return OBJECT_CLASS;
+		case "module":
+			return MODULE;
+		}
+		return -1;
+	}
+	
+	private static int readClassModifier(String mod)
+	{
 		switch (mod)
 		{
 		case "static":
 			return STATIC;
+		case "abstract":
+			return ABSTRACT;
 		case "final":
 			return FINAL;
 		case "strictfp":
@@ -223,11 +364,8 @@ public class Modifiers
 		return -1;
 	}
 	
-	public static int parseInterfaceModifier(String mod)
+	private static int readInterfaceModifier(String mod)
 	{
-		int i = parseAccessModifier(mod);
-		if (i != -1)
-			return i;
 		switch (mod)
 		{
 		case "static":
@@ -238,11 +376,8 @@ public class Modifiers
 		return -1;
 	}
 	
-	public static int parseFieldModifier(String mod)
+	private static int readFieldModifier(String mod)
 	{
-		int i = parseAccessModifier(mod);
-		if (i != -1)
-			return i;
 		switch (mod)
 		{
 		case "static":
@@ -251,21 +386,18 @@ public class Modifiers
 			return FINAL;
 		case "const":
 			return CONST;
-		case "volatile":
-			return VOLATILE;
 		case "transient":
 			return TRANSIENT;
+		case "volatile":
+			return VOLATILE;
 		case "lazy":
 			return LAZY;
 		}
 		return -1;
 	}
 	
-	public static int parseMethodModifier(String mod)
+	private static int readMethodModifier(String mod)
 	{
-		int i = parseAccessModifier(mod);
-		if (i != -1)
-			return i;
 		switch (mod)
 		{
 		case "static":
@@ -288,14 +420,14 @@ public class Modifiers
 		return -1;
 	}
 	
-	public static int parseParameterModifier(String mod)
+	private static int readParameterModifier(String mod)
 	{
 		switch (mod)
 		{
 		case "final":
 			return FINAL;
 		case "const":
-			return CONST;
+			return FINAL;
 		case "ref":
 			return BYREF;
 		}

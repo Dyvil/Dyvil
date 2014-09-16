@@ -2,12 +2,12 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.util.Classes;
 import dyvil.tools.compiler.util.Modifiers;
 
 public class ClassDeclParser extends Parser
@@ -35,14 +35,14 @@ public class ClassDeclParser extends Parser
 		if (this.isInMode(MODIFIERS))
 		{
 			int i = 0;
-			if ((i = Modifiers.parseClassModifier(value)) != -1)
+			if ((i = Modifiers.CLASS.parse(value)) != -1)
 			{
 				this.modifiers |= i;
 				return true;
 			}
-			else if ((i = Classes.parse(value)) != -1)
+			else if ((i = Modifiers.CLASS_TYPE.parse(value)) != -1)
 			{
-				this.theClassDecl = AbstractClass.create(i);
+				this.theClassDecl = new AbstractClass(i, new ClassBody());
 				this.theClassDecl.setModifiers(this.modifiers);
 				this.unit.addClass(this.theClassDecl);
 				

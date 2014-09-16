@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.Modifiers;
 
 public class Field extends Member implements IField
 {
@@ -58,7 +59,12 @@ public class Field extends Member implements IField
 	{
 		super.toString(prefix, buffer);
 		
-		IValue value = this.getValue();
+		buffer.append(Modifiers.FIELD.toString(this.modifiers));
+		this.type.toString("", buffer);
+		buffer.append(' ');
+		buffer.append(this.name);
+		
+		IValue value = this.value;
 		if (value != null)
 		{
 			buffer.append(Formatting.Field.keyValueSeperator);

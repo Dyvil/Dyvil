@@ -10,15 +10,14 @@ import dyvil.tools.compiler.ast.api.IModified;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.util.Modifiers;
 
 public abstract class Member extends ASTObject implements INamed, ITyped, IModified, IAnnotatable
 {
-	private int					modifiers;
+	protected int					modifiers;
 	
-	private Type				type;
-	private String				name;
-	private List<Annotation>	annotations = new ArrayList();
+	protected Type				type;
+	protected String				name;
+	protected List<Annotation>	annotations = new ArrayList();
 	
 	protected Member()
 	{
@@ -99,8 +98,5 @@ public abstract class Member extends ASTObject implements INamed, ITyped, IModif
 		}
 		
 		buffer.append(prefix);
-		buffer.append(Modifiers.toString(this.getModifiers()));
-		buffer.append(this.getType()).append(' ');
-		buffer.append(this.getName());
 	}
 }

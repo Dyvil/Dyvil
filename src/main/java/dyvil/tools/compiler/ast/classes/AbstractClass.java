@@ -10,11 +10,10 @@ import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.Classes;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public abstract class AbstractClass extends ASTObject implements IClass
+public class AbstractClass extends ASTObject implements IClass
 {
 	private String				name;
 	private int					type;
@@ -24,40 +23,11 @@ public abstract class AbstractClass extends ASTObject implements IClass
 	private List<IClass>		superClasses	= new ArrayList();
 	private List<Annotation>	annotations		= new ArrayList();
 	
-	protected AbstractClass(int type, ClassBody body)
+	public AbstractClass(int type, ClassBody body)
 	{
 		this.type = type;
 		this.body = body;
 		this.body.setTheClass(this);
-	}
-	
-	public static AbstractClass create(int type)
-	{
-		if (type == Classes.CLASS)
-		{
-			return new DefaultClass();
-		}
-		else if (type == Classes.OBJECT)
-		{
-			return new ObjectClass();
-		}
-		else if (type == Classes.INTERFACE)
-		{
-			return new InterfaceClass();
-		}
-		else if (type == Classes.ENUM)
-		{
-			return new EnumClass();
-		}
-		else if (type == Classes.ANNOTATION)
-		{
-			return new AnnotationClass();
-		}
-		else if (type == Classes.MODULE)
-		{
-			return new ModuleClass();
-		}
-		return null;
 	}
 	
 	@Override
@@ -162,8 +132,8 @@ public abstract class AbstractClass extends ASTObject implements IClass
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append(Modifiers.toString(this.modifiers));
-		buffer.append(Classes.toString(this.type)).append(' ');
+		buffer.append(prefix).append(Modifiers.CLASS.toString(this.modifiers));
+		buffer.append(Modifiers.CLASS_TYPE.toString(this.type)).append(' ');
 		buffer.append(this.getGenericName());
 		
 		if (!this.superClasses.isEmpty())
