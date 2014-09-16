@@ -12,6 +12,12 @@ public class Main
     
     public float f = 1.5F;
     
+    public Tuple tuple() = (1, 2);
+    
+    public Tuple foldTuple() = (1);
+    
+    public int size() = ((1, 2, 3) size) + 1;
+    
     public int length() = "abc" get length;
     
     public String a() = "abc" + "d" + "e" length;

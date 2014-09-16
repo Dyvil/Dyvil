@@ -64,5 +64,10 @@ public class Formatting
 	public static class Expression
 	{
 		public static String	emptyExpression	= "{ }";
+		
+		public static String	emptyTuple		= "( )";
+		public static String	tupleStart		= "(";
+		public static String	tupleEnd		= ")";
+		public static String	tupleSeperator	= ", ";
 	}
 }

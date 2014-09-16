@@ -23,12 +23,14 @@ public class ExpressionParser extends Parser
 {
 	public static final int	VALUE			= 1;
 	public static final int	VALUE_2			= 2;
-	public static final int	ACCESS			= 4;
-	public static final int	SUGARCALL		= 8;
-	public static final int	STATEMENT		= 16;
-	public static final int	TYPE			= 32;
-	public static final int	PARAMETERS		= 64;
-	public static final int	PARAMETERS_2	= 128;
+	public static final int	TUPLE_END		= 4;
+	
+	public static final int	ACCESS			= 8;
+	public static final int	SUGARCALL		= 16;
+	public static final int	STATEMENT		= 32;
+	public static final int	TYPE			= 64;
+	public static final int	PARAMETERS		= 128;
+	public static final int	PARAMETERS_2	= 256;
 	
 	protected IClassContext	context;
 	protected IValued		field;
@@ -65,6 +67,17 @@ public class ExpressionParser extends Parser
 			{
 				return true;
 			}
+			else if ("(".equals(value))
+			{
+				this.mode = TUPLE_END;
+				this.value = new TupleValue();
+				
+				if (!token.next().equals(")"))
+				{
+					pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value));
+				}
+				return true;
+			}
 			else if ("{".equals(value))
 			{
 				this.mode = VALUE_2;
@@ -98,6 +111,23 @@ public class ExpressionParser extends Parser
 		{
 			if ("}".equals(value))
 			{
+				return true;
+			}
+		}
+		if (this.isInMode(TUPLE_END))
+		{
+			if (")".equals(value))
+			{
+				IToken next = token.next();
+				if (next.equals("."))
+				{
+					this.mode = ACCESS;
+					return true;
+				}
+				else if (next.isType(Token.TYPE_IDENTIFIER))
+				{
+					this.mode = SUGARCALL;
+				}
 				return true;
 			}
 		}
