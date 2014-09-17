@@ -81,14 +81,17 @@ public class CompilationUnit extends ASTObject implements IContext
 			buffer.append('\n');
 		}
 		
-		for (IImport iimport : this.imports)
+		if (!this.imports.isEmpty())
 		{
-			iimport.toString("", buffer);
-			buffer.append('\n');
-		}
-		if (Formatting.Import.newLine)
-		{
-			buffer.append('\n');
+			for (IImport iimport : this.imports)
+			{
+				iimport.toString("", buffer);
+				buffer.append('\n');
+			}
+			if (Formatting.Import.newLine)
+			{
+				buffer.append('\n');
+			}
 		}
 		
 		for (IClass iclass : this.classes)

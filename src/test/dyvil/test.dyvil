@@ -1,14 +1,10 @@
 package com.clashsoft.test;
 
-import java.awt.Button;
-import java.util._;
-import java.io.{Console, File};
-
 public class Main
 {
-	public int i = 12;
-    public int j = 0b1101;
-    public int k = 0xFFFF;
-    
-    public int b() = 2 + 2 * 3;
+	public static void main(String[] args) =
+	{
+		println "abc";
+		return;
+	};
 }

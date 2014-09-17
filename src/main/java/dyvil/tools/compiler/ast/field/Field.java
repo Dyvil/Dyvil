@@ -45,7 +45,10 @@ public class Field extends Member implements IField
 	@Override
 	public Field applyState(CompilerState state)
 	{
-		this.value = this.value.applyState(state);
+		if (this.value != null)
+		{
+			this.value = this.value.applyState(state);
+		}
 		return this;
 	}
 	
