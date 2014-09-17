@@ -34,12 +34,6 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return this.field.getType();
@@ -80,8 +74,10 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public FieldAccess applyState(CompilerState state)
+	{
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

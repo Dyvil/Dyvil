@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class CharValue extends ASTObject implements IValue
 {
-	public char value;
+	public char	value;
 	
 	public CharValue(String value)
 	{
@@ -17,19 +17,13 @@ public class CharValue extends ASTObject implements IValue
 	{
 		this.value = value;
 	}
-
+	
 	@Override
 	public boolean isConstant()
 	{
 		return true;
 	}
-
-	@Override
-	public IValue fold()
-	{
-		return this;
-	}
-
+	
 	@Override
 	public Type getType()
 	{
@@ -37,8 +31,10 @@ public class CharValue extends ASTObject implements IValue
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public CharValue applyState(CompilerState state)
+	{
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

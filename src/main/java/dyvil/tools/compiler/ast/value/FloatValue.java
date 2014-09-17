@@ -25,20 +25,15 @@ public class FloatValue extends ASTObject implements IValue
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return Type.FLOAT;
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
+	public FloatValue applyState(CompilerState state)
 	{
+		return this;
 	}
 	
 	@Override

@@ -33,6 +33,8 @@ public class Parameter extends Member
 	}
 
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public Parameter applyState(CompilerState state)
+	{
+		return this;
+	}
 }

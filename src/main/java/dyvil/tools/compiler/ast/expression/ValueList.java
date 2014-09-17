@@ -39,12 +39,6 @@ public class ValueList extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		if (this.values == null || this.values.isEmpty())
@@ -55,8 +49,11 @@ public class ValueList extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public IValue applyState(CompilerState state)
+	{
+		this.values.replaceAll(v -> v.applyState(state));
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

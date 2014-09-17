@@ -35,8 +35,10 @@ public class SimpleImport extends ASTObject implements IImport
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public SimpleImport applyState(CompilerState state)
+	{
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

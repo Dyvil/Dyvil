@@ -44,20 +44,16 @@ public class WhileStatement extends ASTObject implements IStatement, IValued
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return this.then.getType();
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
+	public WhileStatement applyState(CompilerState state)
 	{
+		this.condition = this.condition.applyState(state);
+		return this;
 	}
 	
 	@Override

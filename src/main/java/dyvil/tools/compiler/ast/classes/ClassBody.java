@@ -75,17 +75,12 @@ public class ClassBody extends ASTObject
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
+	public ClassBody applyState(CompilerState state)
 	{
-		for (IField field : this.fields)
-		{
-			field.applyState(state);
-		}
+		this.fields.replaceAll(f -> f.applyState(state));
+		this.methods.replaceAll(m -> m.applyState(state));
 		
-		for (IMethod method : this.methods)
-		{
-			method.applyState(state);
-		}
+		return this;
 	}
 	
 	@Override

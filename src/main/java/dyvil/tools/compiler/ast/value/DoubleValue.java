@@ -25,20 +25,15 @@ public class DoubleValue extends ASTObject implements IValue
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return Type.DOUBLE;
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
+	public DoubleValue applyState(CompilerState state)
 	{
+		return this;
 	}
 	
 	@Override

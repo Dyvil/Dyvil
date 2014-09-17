@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.value.IValue;
 
@@ -11,12 +12,15 @@ public class StatementList extends ValueList implements IStatement
 	}
 	
 	@Override
-	public IValue fold()
+	public IValue applyState(CompilerState state)
 	{
-		if (this.values.size() == 1)
+		if (state == CompilerState.FOLD_CONSTANTS)
 		{
-			return this.values.get(0).fold();
+			if (this.values.size() == 1)
+			{
+				return this.values.get(0);
+			}
 		}
-		return this;
+		return super.applyState(state);
 	}
 }

@@ -13,20 +13,16 @@ public class NullValue extends ASTObject implements IValue
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return Type.NONE;
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public NullValue applyState(CompilerState state)
+	{
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

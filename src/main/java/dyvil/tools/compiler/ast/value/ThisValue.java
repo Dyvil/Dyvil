@@ -13,12 +13,6 @@ public class ThisValue extends ASTObject implements IValue
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		// FIXME
@@ -26,8 +20,10 @@ public class ThisValue extends ASTObject implements IValue
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public ThisValue applyState(CompilerState state)
+	{
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

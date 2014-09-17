@@ -57,12 +57,10 @@ public class CompilationUnit extends ASTObject implements IContext
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
+	public CompilationUnit applyState(CompilerState state)
 	{
-		for (AbstractClass aclass : this.classes)
-		{
-			aclass.applyState(state);
-		}
+		this.classes.replaceAll(c -> c.applyState(state));
+		return this;
 	}
 	
 	@Override

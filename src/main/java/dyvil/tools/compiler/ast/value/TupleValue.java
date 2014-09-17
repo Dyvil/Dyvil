@@ -13,7 +13,7 @@ import dyvil.tools.compiler.config.Formatting;
 public class TupleValue extends ASTObject implements IValue, IValueList
 {
 	private List<IValue>	values	= new ArrayList(3);
-
+	
 	@Override
 	public void setValues(List<IValue> list)
 	{
@@ -39,16 +39,6 @@ public class TupleValue extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		if (this.values.size() == 1)
-		{
-			return this.values.get(0);
-		}
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		// TODO Type
@@ -56,8 +46,18 @@ public class TupleValue extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public IValue applyState(CompilerState state)
+	{
+		if (state == CompilerState.FOLD_CONSTANTS)
+		{
+			if (this.values.size() == 1)
+			{
+				return this.values.get(0).applyState(state);
+			}
+		}
+		this.values.replaceAll(v -> v.applyState(state));
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

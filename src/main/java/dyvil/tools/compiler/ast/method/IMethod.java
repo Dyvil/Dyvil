@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.method;
 
 import java.util.List;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IMethodContext;
@@ -9,6 +10,9 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public interface IMethod extends IASTObject, INamed, ITyped, IValued, IModified, IAnnotatable, IThrower, IParameterized, IMethodContext
 {
+	@Override
+	public IMethod applyState(CompilerState state);
+	
 	public default boolean hasSignature(String name, Type... types)
 	{
 		if (name.equals(this.getName()))

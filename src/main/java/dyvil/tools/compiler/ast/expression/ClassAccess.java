@@ -22,20 +22,15 @@ public class ClassAccess extends ASTObject implements IValue
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return null;
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
+	public ClassAccess applyState(CompilerState state)
 	{
+		return this;
 	}
 
 	@Override

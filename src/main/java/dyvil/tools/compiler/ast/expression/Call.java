@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -23,17 +24,9 @@ public abstract class Call extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue fold()
+	public Call applyState(CompilerState state)
 	{
-		for (int i = 0; i < this.arguments.size(); i++)
-		{
-			IValue value = this.arguments.get(i);
-			IValue value1 = value.fold();
-			if (value != value1)
-			{
-				this.arguments.set(i, value1);
-			}
-		}
+		this.arguments.replaceAll(a -> a.applyState(state));
 		return this;
 	}
 	

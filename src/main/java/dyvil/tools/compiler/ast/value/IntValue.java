@@ -28,12 +28,6 @@ public class IntValue extends ASTObject implements IValue
 	{
 		return true;
 	}
-
-	@Override
-	public IValue fold()
-	{
-		return this;
-	}
 	
 	@Override
 	public Type getType()
@@ -42,8 +36,10 @@ public class IntValue extends ASTObject implements IValue
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public IntValue applyState(CompilerState state)
+	{
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

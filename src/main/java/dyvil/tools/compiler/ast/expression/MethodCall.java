@@ -30,6 +30,44 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public String getName()
+	{
+		return this.name;
+	}
+	
+	@Override
+	public void setValue(IValue value)
+	{
+		if (this.isSugarCall)
+		{
+			this.arguments.add(value);
+		}
+		else
+		{
+			this.instance = value;
+		}
+	}
+	
+	@Override
+	public IValue getValue()
+	{
+		return this.instance;
+	}
+	
+	@Override
+	public MethodCall applyState(CompilerState state)
+	{
+		// TODO Operator precedence
+		return this;
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.isSugarCall && !Formatting.Method.convertSugarCalls)
@@ -78,40 +116,5 @@ public class MethodCall extends Call implements INamed, IValued
 				buffer.append(Formatting.Method.emptyParameters);
 			}
 		}
-	}
-	
-	@Override
-	public void applyState(CompilerState state)
-	{}
-	
-	@Override
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-	
-	@Override
-	public String getName()
-	{
-		return this.name;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		if (this.isSugarCall)
-		{
-			this.arguments.add(value);
-		}
-		else
-		{
-			this.instance = value;
-		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.instance;
 	}
 }

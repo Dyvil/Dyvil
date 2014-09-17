@@ -34,7 +34,7 @@ public abstract class ASTObject implements IASTObject
 	}
 	
 	@Override
-	public abstract void applyState(CompilerState state);
+	public abstract IASTObject applyState(CompilerState state);
 	
 	@Override
 	public String toString()

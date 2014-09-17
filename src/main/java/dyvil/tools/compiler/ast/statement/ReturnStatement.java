@@ -18,23 +18,17 @@ public class ReturnStatement extends ASTObject implements IStatement, IValued
 	{
 		this.value = value;
 	}
-
+	
 	@Override
 	public IValue getValue()
 	{
 		return this.value;
 	}
-
+	
 	@Override
 	public boolean isConstant()
 	{
 		return false;
-	}
-	
-	@Override
-	public IValue fold()
-	{
-		return this.value;
 	}
 	
 	@Override
@@ -44,15 +38,14 @@ public class ReturnStatement extends ASTObject implements IStatement, IValued
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
+	public IValue applyState(CompilerState state)
 	{
+		this.value = this.value.applyState(state);
 		if (state == CompilerState.FOLD_CONSTANTS)
 		{
-			if (this.value != null)
-			{
-				this.value = this.value.fold();
-			}
+			return this.value;
 		}
+		return this;
 	}
 	
 	@Override

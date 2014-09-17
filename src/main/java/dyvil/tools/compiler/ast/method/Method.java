@@ -71,15 +71,10 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
+	public Method applyState(CompilerState state)
 	{
-		if (state == CompilerState.FOLD_CONSTANTS)
-		{
-			if (this.statement != null)
-			{
-				this.statement = this.statement.fold();
-			}
-		}
+		this.statement = this.statement.applyState(state);
+		return this;
 	}
 	
 	@Override

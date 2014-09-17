@@ -43,15 +43,10 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
+	public Field applyState(CompilerState state)
 	{
-		if (state == CompilerState.FOLD_CONSTANTS)
-		{
-			if (this.value != null)
-			{
-				this.value = this.value.fold();
-			}
-		}
+		this.value = this.value.applyState(state);
+		return this;
 	}
 	
 	@Override

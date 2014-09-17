@@ -29,8 +29,10 @@ public class PackageDecl extends ASTObject
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public PackageDecl applyState(CompilerState state)
+	{
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

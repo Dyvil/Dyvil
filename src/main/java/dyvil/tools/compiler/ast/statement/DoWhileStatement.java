@@ -44,20 +44,18 @@ public class DoWhileStatement extends ASTObject implements IStatement, IValued
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return this.then.getType();
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public DoWhileStatement applyState(CompilerState state)
+	{
+		this.condition = this.condition.applyState(state);
+		this.then = this.then.applyState(state);
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

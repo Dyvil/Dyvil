@@ -124,9 +124,10 @@ public class AbstractClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
+	public AbstractClass applyState(CompilerState state)
 	{
-		this.body.applyState(state);
+		this.body = this.body.applyState(state);
+		return this;
 	}
 	
 	@Override

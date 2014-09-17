@@ -105,8 +105,10 @@ public class Type extends ASTObject implements IClassContext
 	}
 	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public Type applyState(CompilerState state)
+	{
+		return this;
+	}
 	
 	@Override
 	public String toString()

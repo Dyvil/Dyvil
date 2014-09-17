@@ -8,11 +8,8 @@ public interface IValue extends IASTObject
 {
 	public boolean isConstant();
 	
-	public IValue fold();
-	
 	public Type getType();
 	
 	@Override
-	public default void applyState(CompilerState state)
-	{}
+	public IValue applyState(CompilerState state);
 }

@@ -53,29 +53,31 @@ public class IfStatement extends ASTObject implements IStatement
 	}
 	
 	@Override
-	public IValue fold()
-	{
-		this.condition = this.condition.fold();
-		if (BooleanValue.TRUE.equals(this.condition))
-		{
-			return this.then.fold();
-		}
-		if (BooleanValue.FALSE.equals(this.condition))
-		{
-			return this.elseThen.fold();
-		}
-		return this;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return this.getThen().getType();
 	}
-
+	
 	@Override
-	public void applyState(CompilerState state)
-	{}
+	public IValue applyState(CompilerState state)
+	{
+		this.condition = this.condition.applyState(state);
+		this.then = this.then.applyState(state);
+		this.elseThen = this.elseThen.applyState(state);
+		
+		if (state == CompilerState.FOLD_CONSTANTS)
+		{
+			if (BooleanValue.TRUE.equals(this.condition))
+			{
+				return this.then;
+			}
+			if (BooleanValue.FALSE.equals(this.condition))
+			{
+				return this.elseThen;
+			}
+		}
+		return this;
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
