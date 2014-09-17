@@ -31,10 +31,11 @@ public class ImportParser extends Parser
 	{
 		if (";".equals(value))
 		{
-			if (this.theImport == null && this.buffer.length() > 0)
+			if (this.theImport instanceof SimpleImport)
 			{
-				this.theImport = new SimpleImport(this.buffer.toString());
+				((SimpleImport) this.theImport).setImport(this.buffer.toString());
 			}
+			this.theImport.expandPosition(token.prev());
 			pm.popParser();
 			return true;
 		}
@@ -43,16 +44,21 @@ public class ImportParser extends Parser
 			if ("{".equals(value))
 			{
 				this.mode = MULTIIMPORT_START;
-				this.theImport = new MultiImport(this.buffer.toString());
+				this.theImport = new MultiImport(token, this.buffer.toString());
 				this.buffer.delete(0, this.buffer.length());
 				return true;
 			}
 			else if ("_".equals(value))
 			{
-				this.theImport = new PackageImport(this.buffer.toString());
+				this.theImport = new PackageImport(token, this.buffer.toString());
 				return true;
 			}
-			else if (token.isType(Token.TYPE_IDENTIFIER) || ".".equals(value))
+			else if (this.theImport == null)
+			{
+				this.theImport = new SimpleImport(token);
+			}
+			
+			if (token.isType(Token.TYPE_IDENTIFIER) || ".".equals(value))
 			{
 				this.buffer.append(value);
 				return true;

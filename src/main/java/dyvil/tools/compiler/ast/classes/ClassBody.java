@@ -8,22 +8,25 @@ import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassBody extends ASTObject
 {
-	private AbstractClass	theClass;
+	private IClass	theClass;
 	private List<IField>	fields	= new ArrayList();
 	private List<IMethod>	methods	= new ArrayList();
 	
-	public ClassBody()
-	{}
+	public ClassBody(ICodePosition position)
+	{
+		this.position = position;
+	}
 	
-	public void setTheClass(AbstractClass theClass)
+	public void setTheClass(IClass theClass)
 	{
 		this.theClass = theClass;
 	}
 	
-	public AbstractClass getTheClass()
+	public IClass getTheClass()
 	{
 		return this.theClass;
 	}

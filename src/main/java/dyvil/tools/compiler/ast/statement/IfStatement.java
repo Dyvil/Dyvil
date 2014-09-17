@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.BooleanValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class IfStatement extends ASTObject implements IStatement
 {
@@ -13,8 +14,10 @@ public class IfStatement extends ASTObject implements IStatement
 	private IValue	then;
 	private IValue	elseThen;
 	
-	public IfStatement()
-	{}
+	public IfStatement(ICodePosition position)
+	{
+		this.position = position;
+	}
 	
 	public void setCondition(IValue condition)
 	{

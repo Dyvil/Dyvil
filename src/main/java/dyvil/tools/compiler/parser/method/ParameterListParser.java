@@ -26,7 +26,7 @@ public class ParameterListParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		if (this.isInMode(TYPE))
 		{
@@ -38,12 +38,12 @@ public class ParameterListParser extends Parser
 			}
 			else if (")".equals(value))
 			{
-				jcp.popParser();
+				pm.popParser(token);
 				return true;
 			}
 			
 			this.mode = NAME;
-			jcp.pushParser(new TypeParser(this.parameter), token);
+			pm.pushParser(new TypeParser(this.parameter), token);
 			return true;
 		}
 		if (this.isInMode(NAME))
@@ -56,13 +56,13 @@ public class ParameterListParser extends Parser
 			else if (ParserUtil.isSeperatorChar(value))
 			{
 				this.parameter.setSeperator(value.charAt(0));
-				this.end(jcp);
+				this.end(pm);
 				this.mode = TYPE;
 				return true;
 			}
 			else if (")".equals(value))
 			{
-				jcp.popParser(token);
+				pm.popParser(token);
 				return true;
 			}
 		}

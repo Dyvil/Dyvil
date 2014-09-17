@@ -8,13 +8,14 @@ public class PackageDecl extends ASTObject
 {
 	private String thePackage;
 	
-	public PackageDecl()
+	public PackageDecl(ICodePosition position)
 	{
+		this.position = position;
 	}
 	
 	public PackageDecl(ICodePosition position, String thePackage)
 	{
-		super(position);
+		this.position = position;
 		this.thePackage = thePackage;
 	}
 	

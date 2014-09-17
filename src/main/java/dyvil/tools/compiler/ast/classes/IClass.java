@@ -19,5 +19,7 @@ public interface IClass extends IASTObject, INamed, IModified, IAnnotatable, ICl
 	
 	public List<IClass> getSuperClasses();
 	
+	public void setBody(ClassBody body);
+	
 	public ClassBody getBody();
 }

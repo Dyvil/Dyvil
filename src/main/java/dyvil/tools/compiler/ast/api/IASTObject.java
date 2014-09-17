@@ -9,6 +9,8 @@ public interface IASTObject
 	
 	public ICodePosition getPosition();
 	
+	public void expandPosition(ICodePosition position);
+	
 	public IASTObject applyState(CompilerState state);
 	
 	public void toString(String prefix, StringBuilder buffer);

@@ -6,10 +6,16 @@ import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ConstructorCall extends Call implements ITyped
 {
 	protected Type	type;
+	
+	public ConstructorCall(ICodePosition position)
+	{
+		super(position);
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

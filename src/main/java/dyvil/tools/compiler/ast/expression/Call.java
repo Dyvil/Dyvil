@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class Call extends ASTObject implements IValue, IValueList
 {
@@ -16,6 +17,11 @@ public abstract class Call extends ASTObject implements IValue, IValueList
 	protected boolean		isSugarCall;
 	
 	public IMethod			descriptor;
+	
+	public Call(ICodePosition position)
+	{
+		this.position = position;
+	}
 	
 	@Override
 	public boolean isConstant()

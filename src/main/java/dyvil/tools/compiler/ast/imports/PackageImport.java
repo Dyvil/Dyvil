@@ -2,13 +2,15 @@ package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class PackageImport extends ASTObject implements IImport
 {
 	protected String thePackage;
 	
-	public PackageImport(String thePackage)
+	public PackageImport(ICodePosition position, String thePackage)
 	{
+		this.position = position;
 		this.thePackage = thePackage;
 	}
 	

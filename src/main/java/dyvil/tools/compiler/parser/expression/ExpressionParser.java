@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.context.IClassContext;
 import dyvil.tools.compiler.ast.expression.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.FieldAccess;
 import dyvil.tools.compiler.ast.expression.MethodCall;
-import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
@@ -83,7 +82,7 @@ public class ExpressionParser extends Parser
 			else if ("{".equals(value))
 			{
 				this.mode = VALUE_2;
-				this.value = new StatementList();
+				this.value = new StatementList(token);
 				
 				if (!token.next().equals("}"))
 				{
@@ -93,7 +92,7 @@ public class ExpressionParser extends Parser
 			}
 			else if ("new".equals(value))
 			{
-				ConstructorCall call = new ConstructorCall();
+				ConstructorCall call = new ConstructorCall(token);
 				this.mode = PARAMETERS;
 				this.value = call;
 				pm.pushParser(new TypeParser(call));
@@ -105,6 +104,7 @@ public class ExpressionParser extends Parser
 		{
 			if ("}".equals(value))
 			{
+				this.value.expandPosition(token);
 				return true;
 			}
 		}
@@ -112,6 +112,7 @@ public class ExpressionParser extends Parser
 		{
 			if (")".equals(value))
 			{
+				this.value.expandPosition(token);
 				this.mode = ACCESS;
 				return true;
 			}
@@ -120,15 +121,15 @@ public class ExpressionParser extends Parser
 		{
 			if ("return".equals(value))
 			{
-				ReturnStatement statement = new ReturnStatement();
-				this.addStatement(statement);
+				ReturnStatement statement = new ReturnStatement(token);
+				this.value = statement;
 				pm.pushParser(new ExpressionParser(this.context, statement));
 				return true;
 			}
 			else if ("if".equals(value))
 			{
-				IfStatement statement = new IfStatement();
-				this.addStatement(statement);
+				IfStatement statement = new IfStatement(token);
+				this.value = statement;
 				pm.pushParser(new IfStatementParser(this.context, statement));
 				return true;
 			}
@@ -149,14 +150,14 @@ public class ExpressionParser extends Parser
 		{
 			if (token.next().equals("("))
 			{
-				MethodCall call = new MethodCall(this.value, value);
+				MethodCall call = new MethodCall(token, this.value, value);
 				this.value = call;
 				this.mode = PARAMETERS;
 				return true;
 			}
 			else
 			{
-				FieldAccess access = new FieldAccess(this.value, value);
+				FieldAccess access = new FieldAccess(token, this.value, value);
 				this.value = access;
 				this.mode = VALUE;
 				return true;
@@ -164,7 +165,7 @@ public class ExpressionParser extends Parser
 		}
 		if (this.isInMode(SUGARACCESS))
 		{
-			MethodCall call = new MethodCall(this.value, value);
+			MethodCall call = new MethodCall(token, this.value, value);
 			call.setSugarCall(true);
 			this.value = call;
 			this.mode = 0;
@@ -184,6 +185,7 @@ public class ExpressionParser extends Parser
 		{
 			if (")".equals(value))
 			{
+				this.value.expandPosition(token);
 				this.mode = ACCESS;
 				return true;
 			}
@@ -191,6 +193,7 @@ public class ExpressionParser extends Parser
 		
 		if (this.value != null)
 		{
+			this.value.expandPosition(token);
 			pm.popParser(token);
 			return true;
 		}
@@ -268,20 +271,5 @@ public class ExpressionParser extends Parser
 			return true;
 		}
 		return false;
-	}
-	
-	public void addStatement(IStatement statement)
-	{
-		if (this.value == null)
-		{
-			this.value = statement;
-		}
-		else
-		{
-			StatementList list = new StatementList();
-			list.addValue(this.value);
-			list.addStatement(statement);
-			this.value = list;
-		}
 	}
 }

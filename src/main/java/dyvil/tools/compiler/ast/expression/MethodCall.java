@@ -8,17 +8,21 @@ import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class MethodCall extends Call implements INamed, IValued
 {
 	protected IValue	instance;
 	protected String	name;
 	
-	public MethodCall()
-	{}
-	
-	public MethodCall(IValue instance, String name)
+	public MethodCall(ICodePosition position)
 	{
+		super(position);
+	}
+	
+	public MethodCall(ICodePosition position, IValue instance, String name)
+	{
+		super(position);
 		this.instance = instance;
 		this.name = name;
 	}

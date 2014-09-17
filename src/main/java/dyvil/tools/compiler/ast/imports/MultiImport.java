@@ -4,15 +4,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public class MultiImport extends PackageImport
 {
 	public Set<String> theClasses = new HashSet();
 	
-	public MultiImport(String basePackage)
+	public MultiImport(ICodePosition position, String basePackage)
 	{
-		super(basePackage);
+		super(position, basePackage);
 	}
 	
 	public void addClass(String name)

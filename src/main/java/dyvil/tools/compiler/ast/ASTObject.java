@@ -8,14 +8,6 @@ public abstract class ASTObject implements IASTObject
 {
 	protected ICodePosition	position;
 	
-	public ASTObject()
-	{}
-	
-	public ASTObject(ICodePosition position)
-	{
-		this.position = position;
-	}
-	
 	@Override
 	public void setPosition(ICodePosition position)
 	{
@@ -28,9 +20,13 @@ public abstract class ASTObject implements IASTObject
 		return this.position;
 	}
 	
+	@Override
 	public void expandPosition(ICodePosition position)
 	{
-		this.position = this.position.to(position);
+		if (this.position != null)
+		{
+			this.position = this.position.to(position);
+		}
 	}
 	
 	@Override

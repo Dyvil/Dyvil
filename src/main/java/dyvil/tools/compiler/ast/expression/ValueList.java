@@ -9,10 +9,16 @@ import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ValueList extends ASTObject implements IValue, IValueList
 {
 	protected List<IValue>	values	= new ArrayList(3);
+	
+	public ValueList(ICodePosition position)
+	{
+		this.position = position;
+	}
 	
 	@Override
 	public void setValues(List<IValue> list)

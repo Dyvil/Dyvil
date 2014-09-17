@@ -8,12 +8,18 @@ import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Annotation extends ASTObject implements ITyped
 {
-	private Type type;
+	private Type				type;
 	
-	private Map<String, Field> parameters = new HashMap();
+	private Map<String, Field>	parameters	= new HashMap();
+	
+	public Annotation(ICodePosition position)
+	{
+		this.position = position;
+	}
 	
 	@Override
 	public void setType(Type type)
@@ -42,7 +48,7 @@ public class Annotation extends ASTObject implements ITyped
 	{
 		return this;
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

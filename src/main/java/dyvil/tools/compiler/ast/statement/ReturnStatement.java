@@ -5,13 +5,16 @@ import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ReturnStatement extends ASTObject implements IStatement, IValued
 {
 	protected IValue	value;
 	
-	public ReturnStatement()
-	{}
+	public ReturnStatement(ICodePosition position)
+	{
+		this.position = position;
+	}
 	
 	@Override
 	public void setValue(IValue value)

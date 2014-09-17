@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -23,11 +24,11 @@ public class AbstractClass extends ASTObject implements IClass
 	private List<IClass>		superClasses	= new ArrayList();
 	private List<Annotation>	annotations		= new ArrayList();
 	
-	public AbstractClass(int type, ClassBody body)
+	public AbstractClass(ICodePosition position, int type, ClassBody body)
 	{
+		this.position = position;
 		this.type = type;
 		this.body = body;
-		this.body.setTheClass(this);
 	}
 	
 	@Override
@@ -81,6 +82,12 @@ public class AbstractClass extends ASTObject implements IClass
 	public List<Annotation> getAnnotations()
 	{
 		return this.annotations;
+	}
+	
+	@Override
+	public void setBody(ClassBody body)
+	{
+		this.body = body;
 	}
 	
 	@Override

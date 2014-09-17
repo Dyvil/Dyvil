@@ -2,7 +2,6 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
-import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
@@ -42,7 +41,7 @@ public class ClassDeclParser extends Parser
 			}
 			else if ((i = Modifiers.CLASS_TYPE.parse(value)) != -1)
 			{
-				this.theClassDecl = new AbstractClass(i, new ClassBody());
+				this.theClassDecl = new AbstractClass(token, i, null);
 				this.theClassDecl.setModifiers(this.modifiers);
 				this.unit.addClass(this.theClassDecl);
 				
@@ -89,6 +88,7 @@ public class ClassDeclParser extends Parser
 		{
 			if ("}".equals(value))
 			{
+				this.theClassDecl.expandPosition(token);
 				jcp.popParser();
 				return true;
 			}

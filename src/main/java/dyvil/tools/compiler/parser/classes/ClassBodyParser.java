@@ -24,9 +24,9 @@ public class ClassBodyParser extends Parser implements ITyped
 	public static int	TYPE			= 1;
 	public static int	FIELD			= 2;
 	public static int	METHOD			= 4;
-	public static int	POST_METHOD			= 4;
+	public static int	METHOD_END		= 8;
 	public static int	ANNOTATION		= 16;
-	public static int	POST_ANNOTATION	= 32;
+	public static int	ANNOTATION_END	= 32;
 	
 	protected IClass	theClass;
 	protected ClassBody	classBody;
@@ -37,7 +37,6 @@ public class ClassBodyParser extends Parser implements ITyped
 	public ClassBodyParser(IClass theClass)
 	{
 		this.theClass = theClass;
-		this.classBody = theClass.getBody();
 		this.reset();
 	}
 	
@@ -52,9 +51,17 @@ public class ClassBodyParser extends Parser implements ITyped
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		int i = 0;
+		if (this.classBody == null)
+		{
+			this.classBody = new ClassBody(token);
+			this.classBody.setTheClass(this.theClass);
+			this.theClass.setBody(this.classBody);
+		}
+		
 		if ("}".equals(value))
 		{
 			pm.popParser(token);
+			this.classBody.expandPosition(token.prev());
 			return true;
 		}
 		if (this.isInMode(TYPE))
@@ -67,14 +74,15 @@ public class ClassBodyParser extends Parser implements ITyped
 			}
 			else if (token.isType(Token.TYPE_IDENTIFIER))
 			{
-				if (token.next().equals("="))
+				IToken next = token.next();
+				if (next.equals("="))
 				{
 					this.mode = FIELD;
 					this.field.setName(value);
 					this.classBody.addVariable(field);
 					return true;
 				}
-				else if (token.next().equals(";"))
+				else if (next.equals(";"))
 				{
 					this.mode = FIELD;
 					this.field.setName(value);
@@ -82,7 +90,7 @@ public class ClassBodyParser extends Parser implements ITyped
 					this.reset();
 					return true;
 				}
-				else if (token.next().isType(Token.TYPE_BRACKET))
+				else if (next.isType(Token.TYPE_BRACKET))
 				{
 					this.mode = METHOD;
 					this.method.setName(value);
@@ -121,11 +129,11 @@ public class ClassBodyParser extends Parser implements ITyped
 			}
 			else if (")".equals(value))
 			{
-				this.mode = POST_METHOD;
+				this.mode = METHOD_END;
 				return true;
 			}
 		}
-		if (this.isInMode(POST_METHOD))
+		if (this.isInMode(METHOD_END))
 		{
 			if ("throws".equals(value))
 			{

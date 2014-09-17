@@ -21,7 +21,7 @@ public class Method extends Member implements IMethod
 	{
 		this.parameters = parameters;
 	}
-
+	
 	@Override
 	public List<Parameter> getParameters()
 	{
@@ -73,7 +73,10 @@ public class Method extends Member implements IMethod
 	@Override
 	public Method applyState(CompilerState state)
 	{
-		this.statement = this.statement.applyState(state);
+		if (this.statement != null)
+		{
+			this.statement = this.statement.applyState(state);
+		}
 		return this;
 	}
 	

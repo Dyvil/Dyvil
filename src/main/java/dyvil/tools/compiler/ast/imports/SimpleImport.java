@@ -2,13 +2,20 @@ package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class SimpleImport extends ASTObject implements IImport
 {
 	private String			theImport;
 	
-	public SimpleImport(String theImport)
+	public SimpleImport(ICodePosition position)
 	{
+		this.position = position;
+	}
+	
+	public SimpleImport(ICodePosition position, String theImport)
+	{
+		this.position = position;
 		this.theImport = theImport;
 	}
 	

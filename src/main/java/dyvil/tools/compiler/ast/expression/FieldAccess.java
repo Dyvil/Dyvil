@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 {
@@ -18,11 +19,14 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 	
 	public IField		field;
 	
-	public FieldAccess()
-	{}
-	
-	public FieldAccess(IValue instance, String name)
+	public FieldAccess(ICodePosition position)
 	{
+		this.position = position;
+	}
+	
+	public FieldAccess(ICodePosition position, IValue instance, String name)
+	{
+		this.position = position;
 		this.instance = instance;
 		this.name = name;
 	}
