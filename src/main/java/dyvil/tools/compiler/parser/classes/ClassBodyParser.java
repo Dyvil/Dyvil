@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.parser.classes;
 
+import java.util.List;
+
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.api.IAnnotatable;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.classes.ClassBody;
@@ -13,26 +17,27 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class ClassBodyParser extends Parser implements ITyped
+public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 {
-	public static int	TYPE			= 1;
-	public static int	FIELD			= 2;
-	public static int	METHOD			= 4;
-	public static int	METHOD_END		= 8;
-	public static int	ANNOTATION		= 16;
-	public static int	ANNOTATION_END	= 32;
+	public static int			TYPE			= 1;
+	public static int			FIELD			= 2;
+	public static int			METHOD			= 4;
+	public static int			METHOD_END		= 8;
+	public static int			ANNOTATION		= 16;
+	public static int			ANNOTATION_END	= 32;
 	
-	protected IClass	theClass;
-	protected ClassBody	classBody;
+	protected IClass			theClass;
+	protected ClassBody			classBody;
 	
-	private IField		field;
-	private IMethod		method;
+	private IField				field;
+	private IMethod				method;
 	
 	public ClassBodyParser(IClass theClass)
 	{
@@ -71,6 +76,10 @@ public class ClassBodyParser extends Parser implements ITyped
 				this.field.addModifier(i);
 				this.method.addModifier(i);
 				return true;
+			}
+			else if (value.indexOf('@') == 0)
+			{
+				pm.pushParser(new AnnotationParser(this.theClass, this), token);
 			}
 			else if (token.isType(Token.TYPE_IDENTIFIER))
 			{
@@ -166,5 +175,23 @@ public class ClassBodyParser extends Parser implements ITyped
 	public Type getType()
 	{
 		return null;
+	}
+	
+	@Override
+	public void setAnnotations(List<Annotation> annotations)
+	{
+	}
+	
+	@Override
+	public List<Annotation> getAnnotations()
+	{
+		return null;
+	}
+	
+	@Override
+	public void addAnnotation(Annotation annotation)
+	{
+		this.field.addAnnotation(annotation);
+		this.method.addAnnotation(annotation);
 	}
 }

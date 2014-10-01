@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.config.Formatting;
 
 public class ParserUtil
 {
@@ -59,6 +60,37 @@ public class ParserUtil
 					break;
 				}
 			}
+		}
+	}
+	
+	public static void parametersToString(List<IValue> parameters, StringBuilder buffer, boolean empty, boolean named)
+	{
+		if (parameters.isEmpty())
+		{
+			if (empty)
+			{
+				buffer.append(Formatting.Method.emptyParameters);
+			}
+		}
+		else
+		{
+			// TODO Special seperators, named arguments
+			buffer.append(Formatting.Method.parametersStart);
+			Iterator<IValue> iterator = parameters.iterator();
+			while (true)
+			{
+				IValue value = iterator.next();
+				value.toString("", buffer);
+				if (iterator.hasNext())
+				{
+					buffer.append(Formatting.Method.parameterSeperator);
+				}
+				else
+				{
+					break;
+				}
+			}
+			buffer.append(Formatting.Method.parametersEnd);
 		}
 	}
 }

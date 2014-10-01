@@ -12,7 +12,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassBody extends ASTObject
 {
-	private IClass	theClass;
+	private IClass			theClass;
 	private List<IField>	fields	= new ArrayList();
 	private List<IMethod>	methods	= new ArrayList();
 	
@@ -89,16 +89,18 @@ public class ClassBody extends ASTObject
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (IField field : this.fields)
+		if (!this.fields.isEmpty())
 		{
-			field.toString(prefix, buffer);
+			for (IField field : this.fields)
+			{
+				field.toString(prefix, buffer);
+				buffer.append('\n');
+			}
 			buffer.append('\n');
 		}
 		
 		if (!this.methods.isEmpty())
 		{
-			buffer.append("\n");
-			
 			for (IMethod method : this.methods)
 			{
 				method.toString(prefix, buffer);

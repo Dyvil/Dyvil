@@ -113,6 +113,7 @@ public abstract class Member extends ASTObject implements IMember
 	{
 		for (Annotation annotation : this.annotations)
 		{
+			buffer.append(prefix);
 			annotation.toString(prefix, buffer);
 			buffer.append('\n');
 		}
