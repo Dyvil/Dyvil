@@ -37,4 +37,11 @@ public class Parameter extends Member
 	{
 		return this;
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		this.type.toString("", buffer);
+		buffer.append(' ').append(this.name);
+	}
 }
