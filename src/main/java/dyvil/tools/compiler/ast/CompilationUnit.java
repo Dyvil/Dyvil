@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 
 public class CompilationUnit extends ASTObject implements IContext
@@ -53,6 +56,30 @@ public class CompilationUnit extends ASTObject implements IContext
 	public IClass resolveClass(String name)
 	{
 		// FIXME
+		return null;
+	}
+	
+	@Override
+	public boolean isStatic()
+	{
+		return false;
+	}
+
+	@Override
+	public IField resolveField(String name)
+	{
+		return null;
+	}
+
+	@Override
+	public IMethod resolveMethodName(String name)
+	{
+		return null;
+	}
+
+	@Override
+	public IMethod resolveMethod(String name, Type... args)
+	{
 		return null;
 	}
 	

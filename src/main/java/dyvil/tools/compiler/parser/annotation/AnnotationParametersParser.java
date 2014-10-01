@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.annotation;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.context.IClassContext;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -11,12 +11,12 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 
 public class AnnotationParametersParser extends Parser
 {
-	protected IClassContext context;
+	protected IContext context;
 	protected Annotation annotation;
 	
 	private Field parameter;
 	
-	public AnnotationParametersParser(IClassContext context, Annotation annotation)
+	public AnnotationParametersParser(IContext context, Annotation annotation)
 	{
 		this.context = context;
 		this.annotation = annotation;

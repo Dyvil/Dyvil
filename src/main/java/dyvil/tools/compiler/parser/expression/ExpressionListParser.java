@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValued;
-import dyvil.tools.compiler.ast.context.IClassContext;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -12,17 +12,17 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class ExpressionListParser extends Parser implements IValued
 {
-	protected IClassContext	context;
+	protected IContext	context;
 	protected IValueList	valueList;
 	protected boolean		statements;
 	
-	public ExpressionListParser(IClassContext context, IValueList valueList)
+	public ExpressionListParser(IContext context, IValueList valueList)
 	{
 		this.context = context;
 		this.valueList = valueList;
 	}
 	
-	public ExpressionListParser(IClassContext context, IValueList valueList, boolean statements)
+	public ExpressionListParser(IContext context, IValueList valueList, boolean statements)
 	{
 		this.context = context;
 		this.valueList = valueList;

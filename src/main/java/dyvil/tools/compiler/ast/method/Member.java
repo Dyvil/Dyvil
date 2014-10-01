@@ -5,13 +5,10 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.IAnnotatable;
-import dyvil.tools.compiler.ast.api.IModified;
-import dyvil.tools.compiler.ast.api.INamed;
-import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.type.Type;
 
-public abstract class Member extends ASTObject implements INamed, ITyped, IModified, IAnnotatable
+public abstract class Member extends ASTObject implements IMember
 {
 	protected int				modifiers;
 	

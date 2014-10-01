@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValued;
-import dyvil.tools.compiler.ast.context.IClassContext;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.FieldAccess;
 import dyvil.tools.compiler.ast.expression.MethodCall;
@@ -33,20 +33,20 @@ public class ExpressionParser extends Parser
 	public static final int	PARAMETERS		= 256;
 	public static final int	PARAMETERS_2	= 512;
 	
-	protected IClassContext	context;
+	protected IContext	context;
 	protected IValued		field;
 	protected boolean		statements;
 	
 	private IValue			value;
 	
-	public ExpressionParser(IClassContext context, IValued field)
+	public ExpressionParser(IContext context, IValued field)
 	{
 		this.mode = VALUE;
 		this.context = context;
 		this.field = field;
 	}
 	
-	public ExpressionParser(IClassContext context, IValued field, boolean statements)
+	public ExpressionParser(IContext context, IValued field, boolean statements)
 	{
 		this.mode = VALUE | (statements ? STATEMENT : 0);
 		this.context = context;

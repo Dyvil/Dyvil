@@ -6,9 +6,9 @@ import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.api.IAnnotatable;
 import dyvil.tools.compiler.ast.api.IModified;
 import dyvil.tools.compiler.ast.api.INamed;
-import dyvil.tools.compiler.ast.context.IClassContext;
+import dyvil.tools.compiler.ast.context.IContext;
 
-public interface IClass extends IASTObject, INamed, IModified, IAnnotatable, IClassContext
+public interface IClass extends IASTObject, INamed, IModified, IAnnotatable, IContext
 {
 	public default void addSuperClass(IClass superClass)
 	{

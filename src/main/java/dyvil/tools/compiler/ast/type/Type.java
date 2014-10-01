@@ -4,11 +4,11 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IClassContext;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.config.Formatting;
 
-public class Type extends ASTObject implements IClassContext
+public class Type extends ASTObject implements IContext
 {
 	public static Type	NONE	= new Type((String) null);
 	

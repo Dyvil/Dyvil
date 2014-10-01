@@ -5,10 +5,10 @@ import java.util.List;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IMethodContext;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
-public interface IMethod extends IASTObject, INamed, ITyped, IValued, IModified, IAnnotatable, IThrower, IParameterized, IMethodContext
+public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParameterized, IContext
 {
 	@Override
 	public IMethod applyState(CompilerState state);

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.api.IValued;
-import dyvil.tools.compiler.ast.context.IClassContext;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -16,10 +16,10 @@ public class IfStatementParser extends Parser implements IValued
 	public static final int	THEN	= 2;
 	public static final int	ELSE	= 3;
 	
-	protected IClassContext	context;
+	protected IContext	context;
 	protected IfStatement	statement;
 	
-	public IfStatementParser(IClassContext context, IfStatement statement)
+	public IfStatementParser(IContext context, IfStatement statement)
 	{
 		this.context = context;
 		this.statement = statement;

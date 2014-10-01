@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.api.IValueList;
-import dyvil.tools.compiler.ast.context.IClassContext;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -10,7 +10,7 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 
 public class StatementListParser extends ExpressionListParser
 {
-	public StatementListParser(IClassContext context, IValueList valueList)
+	public StatementListParser(IContext context, IValueList valueList)
 	{
 		super(context, valueList, true);
 	}
