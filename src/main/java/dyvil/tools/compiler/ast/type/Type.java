@@ -74,6 +74,11 @@ public class Type extends ASTObject implements IContext
 		return this.arrayDimensions;
 	}
 	
+	public boolean isArrayType()
+	{
+		return this.arrayDimensions > 0;
+	}
+	
 	@Override
 	public boolean isStatic()
 	{

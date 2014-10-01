@@ -8,11 +8,10 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.util.ParserUtil;
 
 public class ExpressionListParser extends Parser implements IValued
 {
-	protected IContext	context;
+	protected IContext		context;
 	protected IValueList	valueList;
 	protected boolean		statements;
 	
@@ -38,8 +37,14 @@ public class ExpressionListParser extends Parser implements IValued
 			pm.pushTryParserParse(new ExpressionParser(this.context, this, this.statements), token);
 			return true;
 		}
-		else if (ParserUtil.isSeperatorChar(value))
+		else if (";".equals(value))
+		{	
+			this.mode = 0;
+			return true;
+		}
+		else if (",".equals(value))
 		{
+			this.valueList.setIsArray(true);
 			this.mode = 0;
 			return true;
 		}

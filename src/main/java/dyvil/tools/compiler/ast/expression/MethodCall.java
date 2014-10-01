@@ -64,6 +64,16 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
+	public void setIsArray(boolean isArray)
+	{}
+	
+	@Override
+	public boolean isArray()
+	{
+		return false;
+	}
+	
+	@Override
 	public MethodCall applyState(CompilerState state)
 	{
 		// TODO Operator precedence
@@ -93,7 +103,7 @@ public class MethodCall extends Call implements INamed, IValued
 				buffer.append('.');
 			}
 			buffer.append(this.name);
-			ParserUtil.parametersToString(this.arguments, buffer, !this.isSugarCall, false);
+			ParserUtil.parametersToString(this.arguments, buffer, !this.isSugarCall);
 		}
 	}
 }

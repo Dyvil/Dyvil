@@ -64,4 +64,14 @@ public class ConstructorCall extends Call implements ITyped
 	{
 		this.type = type;
 	}
+	
+	@Override
+	public void setIsArray(boolean isArray)
+	{}
+	
+	@Override
+	public boolean isArray()
+	{
+		return false;
+	}
 }

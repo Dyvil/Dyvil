@@ -14,4 +14,8 @@ public interface IValueList
 	{
 		this.getValues().add(value);
 	}
+	
+	public void setIsArray(boolean isArray);
+	
+	public boolean isArray();
 }

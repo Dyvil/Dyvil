@@ -74,5 +74,10 @@ public class Formatting
 		public static String	tupleStart		= "(";
 		public static String	tupleEnd		= ")";
 		public static String	tupleSeperator	= ", ";
+		
+		public static String emptyArray = "{ }";
+		public static String arrayStart = "{ ";
+		public static String arrayEnd = " }";
+		public static String arraySeperator = ", ";
 	}
 }

@@ -77,7 +77,7 @@ public class AbstractClass extends ASTObject implements IClass
 	{
 		return this.superClasses;
 	}
-
+	
 	@Override
 	public List<Annotation> getAnnotations()
 	{
@@ -140,14 +140,15 @@ public class AbstractClass extends ASTObject implements IClass
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append(Modifiers.CLASS.toString(this.modifiers));
-		buffer.append(Modifiers.CLASS_TYPE.toString(this.type)).append(' ');
+		buffer.append(prefix);
+		buffer.append(Modifiers.CLASS.toString(this.modifiers));
+		buffer.append(Modifiers.CLASS_TYPE.toString(this.type));
 		buffer.append(this.getGenericName());
 		
 		if (!this.superClasses.isEmpty())
 		{
 			buffer.append(" extends ");
-			ParserUtil.toString(this.superClasses, (IClass i) -> i.getGenericName(), Formatting.Class.superClassesSeperator, buffer);
+			ParserUtil.toString(this.superClasses, (IClass o) -> o.getGenericName(), Formatting.Class.superClassesSeperator, buffer);
 		}
 		
 		buffer.append(Formatting.Class.bodyStart);

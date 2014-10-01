@@ -50,6 +50,16 @@ public class Annotation extends ASTObject implements ITyped, IValueList
 	}
 	
 	@Override
+	public void setIsArray(boolean isArray)
+	{}
+	
+	@Override
+	public boolean isArray()
+	{
+		return false;
+	}
+	
+	@Override
 	public Annotation applyState(CompilerState state)
 	{
 		return this;
@@ -59,6 +69,6 @@ public class Annotation extends ASTObject implements ITyped, IValueList
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.name);
-		ParserUtil.parametersToString(this.parameters, buffer, false, true);
+		ParserUtil.parametersToString(this.parameters, buffer, false);
 	}
 }

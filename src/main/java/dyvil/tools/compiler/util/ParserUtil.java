@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 
+import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
@@ -63,7 +64,51 @@ public class ParserUtil
 		}
 	}
 	
-	public static void parametersToString(List<IValue> parameters, StringBuilder buffer, boolean empty, boolean named)
+	public static void listToString(Collection<String> list, String seperator, StringBuilder buffer)
+	{
+		if (!list.isEmpty())
+		{
+			Iterator<String> iterator = list.iterator();
+			while (true)
+			{
+				String o = iterator.next();
+				buffer.append(o);
+				
+				if (iterator.hasNext())
+				{
+					buffer.append(seperator);
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+	
+	public static void astToString(Collection list, String seperator, StringBuilder buffer)
+	{
+		if (!list.isEmpty())
+		{
+			Iterator iterator = list.iterator();
+			while (true)
+			{
+				IASTObject o = (IASTObject) iterator.next();
+				o.toString("", buffer);
+				
+				if (iterator.hasNext())
+				{
+					buffer.append(seperator);
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+	
+	public static void parametersToString(List<IValue> parameters, StringBuilder buffer, boolean empty)
 	{
 		if (parameters.isEmpty())
 		{

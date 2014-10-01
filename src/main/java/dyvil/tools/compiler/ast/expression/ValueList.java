@@ -10,10 +10,13 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class ValueList extends ASTObject implements IValue, IValueList
 {
 	protected List<IValue>	values	= new ArrayList(3);
+	
+	protected boolean		isArray;
 	
 	public ValueList(ICodePosition position)
 	{
@@ -36,6 +39,18 @@ public class ValueList extends ASTObject implements IValue, IValueList
 	public void addValue(IValue value)
 	{
 		this.values.add(value);
+	}
+	
+	@Override
+	public void setIsArray(boolean isArray)
+	{
+		this.isArray = isArray;
+	}
+	
+	@Override
+	public boolean isArray()
+	{
+		return this.isArray;
 	}
 	
 	@Override
@@ -65,24 +80,36 @@ public class ValueList extends ASTObject implements IValue, IValueList
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		int size = this.values.size();
-		if (size == 0)
-		{
-			buffer.append(Formatting.Expression.emptyExpression);
-		}
-		else if (size == 1)
-		{
-			this.values.get(0).toString("", buffer);
+		if (this.isArray)
+		{	
+			if (size == 0)
+			{
+				buffer.append(Formatting.Expression.emptyArray);
+			}
+			else
+			{
+				buffer.append(Formatting.Expression.arrayStart);
+				ParserUtil.astToString(this.values, Formatting.Expression.arraySeperator, buffer);
+				buffer.append(Formatting.Expression.arrayEnd);
+			}
 		}
 		else
 		{
-			buffer.append('\n').append(prefix).append('{').append('\n');
-			for (IValue value : this.values)
+			if (size == 0)
 			{
-				buffer.append(prefix).append(Formatting.Method.indent);
-				value.toString("", buffer);
-				buffer.append(";\n");
+				buffer.append(Formatting.Expression.emptyExpression);
 			}
-			buffer.append(prefix).append('}');
+			else
+			{
+				buffer.append('\n').append(prefix).append('{').append('\n');
+				for (IValue value : this.values)
+				{
+					buffer.append(prefix).append(Formatting.Method.indent);
+					value.toString("", buffer);
+					buffer.append(";\n");
+				}
+				buffer.append(prefix).append('}');
+			}
 		}
 	}
 }

@@ -53,7 +53,7 @@ public class MultiImport extends PackageImport
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(prefix).append("import ").append(this.thePackage).append(Formatting.Import.multiImportStart);
-		ParserUtil.toString(this.theClasses, (String s) -> s, Formatting.Import.multiImportSeperator, buffer);
+		ParserUtil.listToString(this.theClasses, Formatting.Import.multiImportSeperator, buffer);
 		buffer.append(Formatting.Import.multiImportEnd).append(';');
 	}
 }

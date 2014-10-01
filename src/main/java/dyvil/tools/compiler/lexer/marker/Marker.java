@@ -10,7 +10,7 @@ public abstract class Marker extends Exception
 	
 	public String				suggestion;
 	
-	public ICodePosition			position;
+	public ICodePosition		position;
 	
 	public Marker(ICodePosition position)
 	{
@@ -57,13 +57,24 @@ public abstract class Marker extends Exception
 			builder.append(" - ").append(suggestion);
 		}
 		
-		builder.append('\n').append(this.position.getCurrentLine()).append('\n');
+		String code = this.position.getFile().getCode();
 		int prevNL = this.position.getPrevNewline();
 		int nextNL = this.position.getNextNewline();
+		String line = code.substring(prevNL, nextNL);
 		
-		for (int i = this.position.getStart() - prevNL - 1; i >= 0; i--)
+		builder.append('\n').append(line).append('\n');
+		
+		for (int i = prevNL; i < this.position.getStart(); i++)
 		{
-			builder.append(' ');
+			char c = code.charAt(i);
+			if (c == '\t')
+			{
+				builder.append('\t');
+			}
+			else
+			{
+				builder.append(' ');
+			}
 		}
 		builder.append('^');
 	}

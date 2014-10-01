@@ -33,7 +33,9 @@ public class ExpressionParser extends Parser
 	public static final int	PARAMETERS		= 256;
 	public static final int	PARAMETERS_2	= 512;
 	
-	protected IContext	context;
+	public static final int ARRAY_2 = 1024;
+	
+	protected IContext		context;
 	protected IValued		field;
 	protected boolean		statements;
 	
