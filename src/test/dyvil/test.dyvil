@@ -4,6 +4,7 @@ public class Main
 {
 	public static void main(String[] args) =
 	{
+		4 + 3 * 4;
         println({ 1, 2, 3, 4 });
         return;
 	};

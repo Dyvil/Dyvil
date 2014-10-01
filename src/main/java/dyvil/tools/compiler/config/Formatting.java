@@ -57,9 +57,9 @@ public class Formatting
 	
 	public static class Statements
 	{
-		public static String	ifStart	= "if (";
-		public static String	ifEnd	= ") ";
-		public static String	ifElse	= " else ";
+		public static String	ifStart		= "if (";
+		public static String	ifEnd		= ") ";
+		public static String	ifElse		= " else ";
 		
 		public static String	whileStart	= "while (";
 		public static String	whileEnd	= ") ";
@@ -75,9 +75,9 @@ public class Formatting
 		public static String	tupleEnd		= ")";
 		public static String	tupleSeperator	= ", ";
 		
-		public static String emptyArray = "{ }";
-		public static String arrayStart = "{ ";
-		public static String arrayEnd = " }";
-		public static String arraySeperator = ", ";
+		public static String	emptyArray		= "{ }";
+		public static String	arrayStart		= "{ ";
+		public static String	arrayEnd		= " }";
+		public static String	arraySeperator	= ", ";
 	}
 }
