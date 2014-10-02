@@ -13,6 +13,7 @@ public class TypeParser extends Parser
 	public static final int	NAME		= 1;
 	public static final int	GENERICS	= 2;
 	public static final int	ARRAY		= 4;
+	public static final int	TUPLE_TYPE	= 8;
 	
 	protected ITyped		typed;
 	
@@ -31,6 +32,14 @@ public class TypeParser extends Parser
 	{
 		if (this.isInMode(NAME))
 		{
+			if ("(".equals(value))
+			{
+				TupleType type = new TupleType();
+				pm.pushParser(new TypeListParser(type));
+				this.type = type;
+				this.mode = TUPLE_TYPE;
+				return true;
+			}
 			if ("<".equals(value))
 			{
 				this.mode = GENERICS;
@@ -52,6 +61,14 @@ public class TypeParser extends Parser
 			else
 			{
 				pm.popParser(token);
+				return true;
+			}
+		}
+		if (this.isInMode(TUPLE_TYPE))
+		{
+			if (")".equals(value))
+			{
+				pm.popParser();
 				return true;
 			}
 		}

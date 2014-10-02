@@ -2,6 +2,9 @@ package com.clashsoft.test;
 
 public class Main
 {
+	public int i = 0;
+	public int j = 0;
+	
 	public static void main(String[] args) =
 	{
 		4 + 3 * 4;
@@ -9,7 +12,5 @@ public class Main
         return;
 	};
 	
-	@Override
-	@SuppressWarnings("none")
-	public @implicit int foo() = 0;
+	public (int, int) getVars() = (i, j);
 }

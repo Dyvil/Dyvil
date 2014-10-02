@@ -37,16 +37,19 @@ public class ExpressionListParser extends Parser implements IValued
 			pm.pushTryParserParse(new ExpressionParser(this.context, this, this.statements), token);
 			return true;
 		}
-		else if (";".equals(value))
-		{	
-			this.mode = 0;
-			return true;
-		}
-		else if (",".equals(value))
+		if (this.mode == 1)
 		{
-			this.valueList.setIsArray(true);
-			this.mode = 0;
-			return true;
+			if (";".equals(value))
+			{
+				this.mode = 0;
+				return true;
+			}
+			else if (",".equals(value))
+			{
+				this.valueList.setIsArray(true);
+				this.mode = 0;
+				return true;
+			}
 		}
 		
 		pm.popParser(token);

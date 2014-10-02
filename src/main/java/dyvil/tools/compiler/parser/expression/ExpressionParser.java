@@ -105,6 +105,7 @@ public class ExpressionParser extends Parser
 			if ("}".equals(value))
 			{
 				this.value.expandPosition(token);
+				this.mode = ACCESS;
 				return true;
 			}
 		}
