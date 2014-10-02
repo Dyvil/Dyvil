@@ -28,6 +28,9 @@ public class Type extends ASTObject implements IContext
 	private char		seperator;
 	private int			arrayDimensions;
 	
+	public Type()
+	{}
+	
 	public Type(String name)
 	{
 		this.name = name;

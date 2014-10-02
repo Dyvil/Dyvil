@@ -1,12 +1,10 @@
 package dyvil.tools.compiler.ast.expression;
 
-import java.util.Iterator;
-
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class ConstructorCall extends Call implements ITyped
 {
@@ -26,30 +24,9 @@ public class ConstructorCall extends Call implements ITyped
 		{
 			this.arguments.get(0).toString("", buffer);
 		}
-		else if (!this.arguments.isEmpty())
-		{
-			// TODO Special seperators, named arguments
-			buffer.append(Formatting.Method.parametersStart);
-			Iterator<IValue> iterator = this.arguments.iterator();
-			while (true)
-			{
-				IValue value = iterator.next();
-				value.toString("", buffer);
-				
-				if (iterator.hasNext())
-				{
-					buffer.append(Formatting.Method.parametersEnd);
-				}
-				else
-				{
-					break;
-				}
-			}
-			buffer.append(Formatting.Method.parametersEnd);
-		}
 		else
 		{
-			buffer.append(Formatting.Method.emptyParameters);
+			ParserUtil.parametersToString(this.arguments, buffer, true);
 		}
 	}
 	

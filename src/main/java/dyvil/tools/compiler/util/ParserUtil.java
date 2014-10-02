@@ -108,7 +108,7 @@ public class ParserUtil
 		}
 	}
 	
-	public static void parametersToString(List<IValue> parameters, StringBuilder buffer, boolean empty)
+	public static void parametersToString(Collection<? extends IASTObject> parameters, StringBuilder buffer, boolean empty)
 	{
 		if (parameters.isEmpty())
 		{
@@ -121,10 +121,10 @@ public class ParserUtil
 		{
 			// TODO Special seperators, named arguments
 			buffer.append(Formatting.Method.parametersStart);
-			Iterator<IValue> iterator = parameters.iterator();
+			Iterator<? extends IASTObject> iterator = parameters.iterator();
 			while (true)
 			{
-				IValue value = iterator.next();
+				IASTObject value = iterator.next();
 				value.toString("", buffer);
 				if (iterator.hasNext())
 				{

@@ -161,6 +161,7 @@ public class ParserManager
 			{
 				message = ex.getClass().getName();
 			}
+			ex.printStackTrace();
 			throw new SyntaxError(token, "Failed to parse token '" + value + "': " + message);
 		}
 		
