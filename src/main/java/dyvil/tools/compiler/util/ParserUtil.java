@@ -108,19 +108,24 @@ public class ParserUtil
 		}
 	}
 	
-	public static void parametersToString(Collection<? extends IASTObject> parameters, StringBuilder buffer, boolean empty)
+	public static void parametersToString(Collection<? extends IASTObject> parameters, StringBuilder buffer, boolean writeEmpty)
+	{
+		parametersToString(parameters, buffer, writeEmpty, Formatting.Method.emptyParameters, Formatting.Method.parametersStart, Formatting.Method.parameterSeperator, Formatting.Method.parametersEnd);
+	}
+	
+	public static void parametersToString(Collection<? extends IASTObject> parameters, StringBuilder buffer, boolean writeEmpty, String empty, String start, String seperator, String end)
 	{
 		if (parameters.isEmpty())
 		{
-			if (empty)
+			if (writeEmpty)
 			{
-				buffer.append(Formatting.Method.emptyParameters);
+				buffer.append(empty);
 			}
 		}
 		else
 		{
 			// TODO Special seperators, named arguments
-			buffer.append(Formatting.Method.parametersStart);
+			buffer.append(start);
 			Iterator<? extends IASTObject> iterator = parameters.iterator();
 			while (true)
 			{
@@ -128,14 +133,14 @@ public class ParserUtil
 				value.toString("", buffer);
 				if (iterator.hasNext())
 				{
-					buffer.append(Formatting.Method.parameterSeperator);
+					buffer.append(seperator);
 				}
 				else
 				{
 					break;
 				}
 			}
-			buffer.append(Formatting.Method.parametersEnd);
+			buffer.append(end);
 		}
 	}
 }

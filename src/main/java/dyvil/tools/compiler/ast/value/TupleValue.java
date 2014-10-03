@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.value;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
@@ -9,6 +8,7 @@ import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class TupleValue extends ASTObject implements IValue, IValueList
 {
@@ -72,28 +72,6 @@ public class TupleValue extends ASTObject implements IValue, IValueList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.values.isEmpty())
-		{
-			buffer.append(Formatting.Expression.emptyTuple);
-		}
-		else
-		{
-			buffer.append(Formatting.Expression.tupleStart);
-			Iterator<IValue> iterator = this.values.iterator();
-			while (true)
-			{
-				IValue value = iterator.next();
-				value.toString("", buffer);
-				if (iterator.hasNext())
-				{
-					buffer.append(Formatting.Expression.tupleSeperator);
-				}
-				else
-				{
-					break;
-				}
-			}
-			buffer.append(Formatting.Expression.tupleEnd);
-		}
+		ParserUtil.parametersToString(this.values, buffer, true, Formatting.Expression.emptyTuple, Formatting.Expression.tupleStart, Formatting.Expression.tupleSeperator, Formatting.Expression.tupleEnd);
 	}
 }
