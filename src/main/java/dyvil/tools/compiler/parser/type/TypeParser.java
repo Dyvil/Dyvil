@@ -14,6 +14,8 @@ public class TypeParser extends Parser
 	public static final int	GENERICS	= 2;
 	public static final int	ARRAY		= 4;
 	public static final int	TUPLE_TYPE	= 8;
+	public static final int	LAMBDA_TYPE	= 16;
+	public static final int	LAMBDA_END	= 32;
 	
 	protected ITyped		typed;
 	
@@ -30,6 +32,11 @@ public class TypeParser extends Parser
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
+		if (this.mode == -1)
+		{
+			pm.popParser();
+			return true;
+		}
 		if (this.isInMode(NAME))
 		{
 			if ("(".equals(value))
@@ -68,9 +75,28 @@ public class TypeParser extends Parser
 		{
 			if (")".equals(value))
 			{
+				if (token.next().equals("=>"))
+				{
+					TupleType tupleType = (TupleType) this.type;
+					this.type = new LambdaType(tupleType);
+					this.mode = LAMBDA_TYPE;
+					return true;
+				}
+				
 				pm.popParser();
 				return true;
 			}
+		}
+		if (this.isInMode(LAMBDA_TYPE))
+		{
+			pm.pushParser(new TypeParser((LambdaType) this.type));
+			this.mode = LAMBDA_END;
+			return true;
+		}
+		if (this.isInMode(LAMBDA_END))
+		{
+			pm.popParser(token);
+			return true;
 		}
 		if (this.isInMode(ARRAY))
 		{

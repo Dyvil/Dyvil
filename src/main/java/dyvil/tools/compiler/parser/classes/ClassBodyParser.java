@@ -26,18 +26,19 @@ import dyvil.tools.compiler.util.Modifiers;
 
 public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 {
-	public static int			TYPE			= 1;
-	public static int			FIELD			= 2;
-	public static int			METHOD			= 4;
-	public static int			METHOD_END		= 8;
-	public static int			ANNOTATION		= 16;
-	public static int			ANNOTATION_END	= 32;
+	public static int	TYPE			= 1;
+	public static int	NAME			= 2;
+	public static int	FIELD			= 4;
+	public static int	METHOD			= 8;
+	public static int	METHOD_END		= 16;
+	public static int	ANNOTATION		= 32;
+	public static int	ANNOTATION_END	= 128;
 	
-	protected IClass			theClass;
-	protected ClassBody			classBody;
+	protected IClass	theClass;
+	protected ClassBody	classBody;
 	
-	private IField				field;
-	private IMethod				method;
+	private IField		field;
+	private IMethod		method;
 	
 	public ClassBodyParser(IClass theClass)
 	{
@@ -80,8 +81,18 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 			else if (value.indexOf('@') == 0)
 			{
 				pm.pushParser(new AnnotationParser(this.theClass, this), token);
+				return true;
 			}
-			else if (token.isType(Token.TYPE_IDENTIFIER))
+			else
+			{
+				pm.pushParser(new TypeParser(this), token);
+				this.mode = NAME;
+				return true;
+			}
+		}
+		if (this.isInMode(NAME))
+		{
+			if (token.isType(Token.TYPE_IDENTIFIER))
 			{
 				IToken next = token.next();
 				if (next.equals("="))
@@ -178,8 +189,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	
 	@Override
 	public void setAnnotations(List<Annotation> annotations)
-	{
-	}
+	{}
 	
 	@Override
 	public List<Annotation> getAnnotations()

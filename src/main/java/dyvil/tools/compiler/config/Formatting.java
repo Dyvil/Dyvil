@@ -79,5 +79,7 @@ public class Formatting
 		public static String	arrayStart		= "{ ";
 		public static String	arrayEnd		= " }";
 		public static String	arraySeperator	= ", ";
+		
+		public static String	lambdaSeperator	= " => ";
 	}
 }

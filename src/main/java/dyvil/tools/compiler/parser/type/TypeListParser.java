@@ -23,8 +23,8 @@ public class TypeListParser extends Parser implements ITyped
 	{
 		if (this.mode == 0)
 		{
-			pm.pushParser(new TypeParser(this), token);
 			this.mode = 1;
+			pm.pushParser(new TypeParser(this), token);
 			return true;
 		}
 		if (this.mode == 1)

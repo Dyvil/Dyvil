@@ -9,14 +9,14 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class TupleType extends Type implements ITypeList
 {
-	public List<Type> types = new ArrayList(2);
-
+	public List<Type>	types	= new ArrayList(2);
+	
 	@Override
 	public void setTypes(List<Type> types)
 	{
 		this.types = types;
 	}
-
+	
 	@Override
 	public List<Type> getTypes()
 	{
