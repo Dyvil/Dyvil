@@ -32,7 +32,7 @@ public abstract class Call extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public Call applyState(CompilerState state, IContext context)
+	public IValue applyState(CompilerState state, IContext context)
 	{
 		this.arguments.replaceAll(a -> a.applyState(state, context));
 		return this;

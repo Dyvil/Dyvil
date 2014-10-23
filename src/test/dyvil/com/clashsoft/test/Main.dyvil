@@ -11,14 +11,13 @@ public class Main
 	
 	public static void main(String[] args) =
 	{
-		4 + 3 * 4;
-        println({ 1, 2, 3, 4 });
-        return;
+        println(f(i));
+        println(j);
 	};
 	
-	public (int, int) getVars() = (i, j);
+	public int f(int x) = x;
 	
-	public (int) => int getIntFunc() = { };
-	
-	public (int, int) => long getLongFunc() = { };
+	public void println(int i) =
+	{
+	}
 }

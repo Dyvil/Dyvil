@@ -1,15 +1,18 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 
-public class Parameter extends Member
+public class Parameter extends Member implements IField
 {
 	private char	seperator;
 	
 	public Parameter()
 	{
+		super(null);
 	}
 	
 	public Parameter(String name, Type type, int modifiers)
@@ -19,7 +22,7 @@ public class Parameter extends Member
 	
 	public Parameter(String name, Type type, int modifiers, char seperator)
 	{
-		super(name, type, modifiers);
+		super(null, name, type, modifiers);
 		this.seperator = seperator;
 	}
 	
@@ -44,5 +47,15 @@ public class Parameter extends Member
 	{
 		this.type.toString("", buffer);
 		buffer.append(' ').append(this.name);
+	}
+
+	@Override
+	public void setValue(IValue value)
+	{}
+
+	@Override
+	public IValue getValue()
+	{
+		return null;
 	}
 }

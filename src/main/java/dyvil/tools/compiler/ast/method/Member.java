@@ -6,33 +6,39 @@ import java.util.List;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IMember;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.Type;
 
 public abstract class Member extends ASTObject implements IMember
 {
 	protected int				modifiers;
 	
+	protected IClass theClass;
 	protected Type				type;
 	protected String			name;
 	protected List<Annotation>	annotations	= new ArrayList(1);
 	
-	protected Member()
-	{}
-	
-	public Member(String name)
+	protected Member(IClass iclass)
 	{
+		this.theClass = iclass;
+	}
+	
+	public Member(IClass iclass, String name)
+	{
+		this.theClass = iclass;
 		this.name = name;
 	}
 	
-	public Member(String name, Type type)
+	public Member(IClass iclass, String name, Type type)
 	{
+		this.theClass = iclass;
 		this.name = name;
 		this.type = type;
 	}
 	
-	public Member(String name, Type type, int modifiers)
+	public Member(IClass iclass, String name, Type type, int modifiers)
 	{
-		this(name, type);
+		this(iclass, name, type);
 		this.modifiers = modifiers;
 	}
 	

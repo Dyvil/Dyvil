@@ -49,8 +49,8 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	private void reset()
 	{
 		this.mode = TYPE | ANNOTATION;
-		this.field = new Field();
-		this.method = new Method();
+		this.field = new Field(this.theClass);
+		this.method = new Method(this.theClass);
 	}
 	
 	@Override

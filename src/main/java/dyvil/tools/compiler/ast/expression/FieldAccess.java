@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class FieldAccess extends ASTObject implements IValue, INamed, IValued
@@ -81,6 +82,14 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 	@Override
 	public FieldAccess applyState(CompilerState state, IContext context)
 	{
+		if (state == CompilerState.RESOLVE)
+		{
+			this.field = context.resolveField(this.name);
+			if (this.field == null)
+			{
+				state.addMarker(new SyntaxError(this.position, "'" + this.name + "' cannot be resolved to a field"));
+			}
+		}
 		return this;
 	}
 	

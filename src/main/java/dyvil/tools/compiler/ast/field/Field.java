@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.field;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
@@ -13,22 +14,24 @@ public class Field extends Member implements IField
 {
 	private IValue	value;
 	
-	public Field()
-	{}
-	
-	public Field(String name)
+	public Field(IClass iclass)
 	{
-		super(name);
+		super(iclass);
 	}
 	
-	public Field(String name, Type type)
+	public Field(IClass iclass, String name)
 	{
-		super(name, type);
+		super(iclass, name);
 	}
 	
-	public Field(String name, Type type, int modifiers)
+	public Field(IClass iclass, String name, Type type)
 	{
-		super(name, type, modifiers);
+		super(iclass, name, type);
+	}
+	
+	public Field(IClass iclass, String name, Type type, int modifiers)
+	{
+		super(iclass, name, type, modifiers);
 	}
 	
 	@Override

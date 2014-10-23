@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -76,17 +77,32 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public MethodCall applyState(CompilerState state, IContext context)
+	public IValue applyState(CompilerState state, IContext context)
 	{
 		super.applyState(state, context);
 		
 		if (state == CompilerState.RESOLVE)
 		{
+			if (this.instance != null)
+			{
+				context = this.instance.getType();
+			}
+			
 			this.descriptor = context.resolveMethod(this.name, this.getTypes());
 			if (this.descriptor == null)
 			{
-				state.addMarker(new SyntaxError(this.position, "Method Call cannot be resolved"));
-				return null;
+				// This might be a field access instead of a method call
+				IField field = context.resolveField(this.name);
+				if (field != null)
+				{
+					// Yes it is, convert this method call to a field access
+					FieldAccess fieldAccess = new FieldAccess(this.position, this.instance, this.name);
+					fieldAccess.field = field;
+					fieldAccess.isSugarAccess = this.isSugarCall;
+					return fieldAccess;
+				}
+				
+				state.addMarker(new SyntaxError(this.position, "'" + this.name + "' cannot be resolved to a method"));
 			}
 		}
 		// TODO Operator precedence

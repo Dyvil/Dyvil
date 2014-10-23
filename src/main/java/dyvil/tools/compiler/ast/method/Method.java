@@ -5,7 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Modifiers;
@@ -16,6 +19,11 @@ public class Method extends Member implements IMethod
 	
 	private List<Parameter>		parameters			= new ArrayList(3);
 	private List<ThrowsDecl>	throwsDeclarations	= new ArrayList(1);
+	
+	public Method(IClass iclass)
+	{
+		super(iclass);
+	}
 	
 	@Override
 	public void setParameters(List<Parameter> parameters)
@@ -69,6 +77,38 @@ public class Method extends Member implements IMethod
 	public boolean isStatic()
 	{
 		return this.hasModifier(Modifiers.STATIC);
+	}
+	
+	@Override
+	public IClass resolveClass(String name)
+	{
+		return this.theClass.resolveClass(name);
+	}
+	
+	@Override
+	public IField resolveField(String name)
+	{
+		for (Parameter param : this.parameters)
+		{
+			if (param.name.equals(name))
+			{
+				return param;
+			}
+		}
+		
+		return this.theClass.resolveField(name);
+	}
+	
+	@Override
+	public IMethod resolveMethodName(String name)
+	{
+		return this.theClass.resolveMethodName(name);
+	}
+	
+	@Override
+	public IMethod resolveMethod(String name, Type... args)
+	{
+		return this.theClass.resolveMethod(name, args);
 	}
 	
 	@Override

@@ -37,7 +37,7 @@ public class Formatting
 	{
 		public static String	keyValueSeperator	= " = ";
 		
-		public static boolean	convertSugarAccess	= false;
+		public static boolean	convertSugarAccess	= true;
 		public static String	sugarAccessStart	= " ";
 		public static String	sugarAccessEnd		= " ";
 	}
