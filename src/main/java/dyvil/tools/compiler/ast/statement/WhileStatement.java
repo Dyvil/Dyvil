@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
@@ -50,9 +51,9 @@ public class WhileStatement extends ASTObject implements IStatement, IValued
 	}
 	
 	@Override
-	public WhileStatement applyState(CompilerState state)
+	public WhileStatement applyState(CompilerState state, IContext context)
 	{
-		this.condition = this.condition.applyState(state);
+		this.condition = this.condition.applyState(state, null);
 		return this;
 	}
 	

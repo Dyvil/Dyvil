@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.value;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IASTObject;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
 public interface IValue extends IASTObject
@@ -11,5 +12,5 @@ public interface IValue extends IASTObject
 	public Type getType();
 	
 	@Override
-	public IValue applyState(CompilerState state);
+	public IValue applyState(CompilerState state, IContext context);
 }

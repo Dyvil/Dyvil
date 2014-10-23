@@ -5,8 +5,10 @@ import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -33,7 +35,7 @@ public class PackageImport extends ASTObject implements IImport
 	}
 	
 	@Override
-	public PackageImport applyState(CompilerState state)
+	public PackageImport applyState(CompilerState state, IContext context)
 	{
 		if (state == CompilerState.RESOLVE)
 		{
@@ -51,7 +53,7 @@ public class PackageImport extends ASTObject implements IImport
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append("import ").append(this.packageName).append("_;");
+		buffer.append(prefix).append("import ").append(this.packageName).append(Formatting.Import.packageImportEnd).append(';');
 	}
 	
 	@Override
@@ -63,7 +65,7 @@ public class PackageImport extends ASTObject implements IImport
 	@Override
 	public IClass resolveClass(String name)
 	{
-		return null;
+		return this.pack.resolveClass(name);
 	}
 	
 	@Override

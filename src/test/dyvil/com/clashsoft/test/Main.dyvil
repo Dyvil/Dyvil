@@ -1,6 +1,8 @@
 package com.clashsoft.test;
 
 import com.clashsoft.test.Util;
+import com.clashsoft.test._;
+import com.clashsoft.test.{Util, Main};
 
 public class Main
 {

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.BooleanValue;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -62,11 +63,11 @@ public class IfStatement extends ASTObject implements IStatement
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state)
+	public IValue applyState(CompilerState state, IContext context)
 	{
-		this.condition = this.condition.applyState(state);
-		this.then = this.then.applyState(state);
-		this.elseThen = this.elseThen.applyState(state);
+		this.condition = this.condition.applyState(state, context);
+		this.then = this.then.applyState(state, context);
+		this.elseThen = this.elseThen.applyState(state, context);
 		
 		if (state == CompilerState.FOLD_CONSTANTS)
 		{

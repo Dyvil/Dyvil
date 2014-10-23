@@ -7,6 +7,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -65,23 +66,22 @@ public class ClassBody extends ASTObject
 		return null;
 	}
 	
-	public IMethod getMethod(String name, Type... args)
+	public void getMethod(List<IMethod> list, String name, Type... args)
 	{
 		for (IMethod method : this.methods)
 		{
 			if (method.hasSignature(name, args))
 			{
-				return method;
+				list.add(method);
 			}
 		}
-		return null;
 	}
 	
 	@Override
-	public ClassBody applyState(CompilerState state)
+	public ClassBody applyState(CompilerState state, IContext context)
 	{
-		this.fields.replaceAll(f -> f.applyState(state));
-		this.methods.replaceAll(m -> m.applyState(state));
+		this.fields.replaceAll(f -> f.applyState(state, context));
+		this.methods.replaceAll(m -> m.applyState(state, context));
 		
 		return this;
 	}

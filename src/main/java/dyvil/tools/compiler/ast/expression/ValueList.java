@@ -6,6 +6,7 @@ import java.util.List;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValueList;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
@@ -70,9 +71,9 @@ public class ValueList extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state)
+	public IValue applyState(CompilerState state, IContext context)
 	{
-		this.values.replaceAll(v -> v.applyState(state));
+		this.values.replaceAll(v -> v.applyState(state, context));
 		return this;
 	}
 	

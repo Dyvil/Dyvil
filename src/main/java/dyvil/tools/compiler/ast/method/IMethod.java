@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.Type;
 public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParameterized, IContext
 {
 	@Override
-	public IMethod applyState(CompilerState state);
+	public IMethod applyState(CompilerState state, IContext context);
 	
 	public default boolean hasSignature(String name, Type... types)
 	{

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -41,9 +42,9 @@ public class ReturnStatement extends ASTObject implements IStatement, IValued
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state)
+	public IValue applyState(CompilerState state, IContext context)
 	{
-		this.value = this.value.applyState(state);
+		this.value = this.value.applyState(state, context);
 		if (state == CompilerState.FOLD_CONSTANTS)
 		{
 			return this.value;

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
@@ -49,10 +50,10 @@ public class ForEachStatement extends ASTObject implements IStatement
 	}
 	
 	@Override
-	public ForEachStatement applyState(CompilerState state)
+	public ForEachStatement applyState(CompilerState state, IContext context)
 	{
-		this.variable = this.variable.applyState(state);
-		this.iterable = this.iterable.applyState(state);
+		this.variable = this.variable.applyState(state, context);
+		this.iterable = this.iterable.applyState(state, context);
 		return this;
 	}
 

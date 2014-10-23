@@ -13,8 +13,9 @@ import dyvil.tools.compiler.parser.ParserManager;
 
 public class ImportParser extends Parser
 {
-	public static int			MULTIIMPORT_START	= 1;
-	public static int			MULTIIMPORT_END		= 2;
+	public static final int		PACKAGEIMPORT		= 1;
+	public static final int		MULTIIMPORT_START	= 2;
+	public static final int		MULTIIMPORT_END		= 4;
 	
 	protected CompilationUnit	unit;
 	
@@ -53,12 +54,22 @@ public class ImportParser extends Parser
 				this.theImport = new PackageImport(token, this.buffer.toString());
 				return true;
 			}
-			else if (this.theImport == null)
+			else if (".".equals(value))
+			{
+				IToken next = token.next();
+				if (!next.equals("_") && !next.equals("{"))
+				{
+					this.buffer.append(value);
+				}
+				return true;
+			}
+			
+			if (this.theImport == null)
 			{
 				this.theImport = new SimpleImport(token);
 			}
 			
-			if (token.isType(Token.TYPE_IDENTIFIER) || ".".equals(value))
+			if (token.isType(Token.TYPE_IDENTIFIER))
 			{
 				this.buffer.append(value);
 				return true;

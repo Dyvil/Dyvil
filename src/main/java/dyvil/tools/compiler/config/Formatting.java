@@ -9,8 +9,10 @@ public class Formatting
 	
 	public static class Import
 	{
+		public static String	packageImportEnd		= "._";
+		
 		public static String	multiImportSeperator	= ", ";
-		public static String	multiImportStart		= "{";
+		public static String	multiImportStart		= ".{";
 		public static String	multiImportEnd			= "}";
 		
 		public static boolean	newLine					= true;

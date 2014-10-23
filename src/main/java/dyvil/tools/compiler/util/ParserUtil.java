@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.type.Type;
@@ -12,6 +13,8 @@ import dyvil.tools.compiler.config.Formatting;
 
 public class ParserUtil
 {
+	public static Predicate<?>	ISNULL	= a -> a == null;
+	
 	public static boolean isEscapeChar(String value)
 	{
 		if (value.length() != 1)

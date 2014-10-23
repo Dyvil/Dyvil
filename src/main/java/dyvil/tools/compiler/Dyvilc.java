@@ -54,7 +54,7 @@ public class Dyvilc
 			state.rootPackage = Package.rootPackage;
 			state.file = unit.getFile();
 			
-			unit.applyState(state);
+			unit.applyState(state, null);
 			
 			System.out.println("Compiled in " + unit.loadingTime + " ms");
 			System.out.println(unit);

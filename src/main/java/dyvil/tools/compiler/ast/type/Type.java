@@ -85,35 +85,55 @@ public class Type extends ASTObject implements IContext
 	@Override
 	public boolean isStatic()
 	{
+		if (this.theClass == null)
+		{
+			return false;
+		}
 		return this.theClass.isStatic();
 	}
 	
 	@Override
 	public IClass resolveClass(String name)
 	{
+		if (this.theClass == null)
+		{
+			return null;
+		}
 		return this.theClass.resolveClass(name);
 	}
 	
 	@Override
 	public IField resolveField(String name)
 	{
+		if (this.theClass == null)
+		{
+			return null;
+		}
 		return this.theClass.resolveField(name);
 	}
 	
 	@Override
 	public IMethod resolveMethodName(String name)
 	{
+		if (this.theClass == null)
+		{
+			return null;
+		}
 		return this.theClass.resolveMethodName(name);
 	}
 	
 	@Override
 	public IMethod resolveMethod(String name, Type... args)
 	{
+		if (this.theClass == null)
+		{
+			return null;
+		}
 		return this.theClass.resolveMethod(name, args);
 	}
 	
 	@Override
-	public Type applyState(CompilerState state)
+	public Type applyState(CompilerState state, IContext context)
 	{
 		return this;
 	}

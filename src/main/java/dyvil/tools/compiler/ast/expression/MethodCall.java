@@ -3,9 +3,11 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -74,8 +76,19 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public MethodCall applyState(CompilerState state)
+	public MethodCall applyState(CompilerState state, IContext context)
 	{
+		super.applyState(state, context);
+		
+		if (state == CompilerState.RESOLVE)
+		{
+			this.descriptor = context.resolveMethod(this.name, this.getTypes());
+			if (this.descriptor == null)
+			{
+				state.addMarker(new SyntaxError(this.position, "Method Call cannot be resolved"));
+				return null;
+			}
+		}
 		// TODO Operator precedence
 		return this;
 	}

@@ -6,6 +6,7 @@ import java.util.List;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValueList;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -56,16 +57,16 @@ public class TupleValue extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state)
+	public IValue applyState(CompilerState state, IContext context)
 	{
 		if (state == CompilerState.FOLD_CONSTANTS)
 		{
 			if (this.values.size() == 1)
 			{
-				return this.values.get(0).applyState(state);
+				return this.values.get(0).applyState(state, context);
 			}
 		}
-		this.values.replaceAll(v -> v.applyState(state));
+		this.values.replaceAll(v -> v.applyState(state, context));
 		return this;
 	}
 	

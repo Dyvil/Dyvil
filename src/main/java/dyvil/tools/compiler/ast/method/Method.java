@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Modifiers;
@@ -71,11 +72,11 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public Method applyState(CompilerState state)
+	public Method applyState(CompilerState state, IContext context)
 	{
 		if (this.statement != null)
 		{
-			this.statement = this.statement.applyState(state);
+			this.statement = this.statement.applyState(state, this);
 		}
 		return this;
 	}

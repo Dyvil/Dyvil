@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -102,41 +103,85 @@ public class AbstractClass extends ASTObject implements IClass
 	@Override
 	public boolean isStatic()
 	{
-		// FIXME
 		return false;
 	}
 	
 	@Override
 	public IClass resolveClass(String name)
 	{
-		// FIXME
-		return null;
+		return this.unit.resolveClass(name);
 	}
 	
 	@Override
 	public IField resolveField(String name)
 	{
-		// FIXME
-		return this.body.getField(name);
+		// Own fields
+		IField field = this.body.getField(name);
+		if (field != null)
+		{
+			return field;
+		}
+		
+		// Inherited Fields
+		for (IClass iclass : this.superClasses)
+		{
+			field = iclass.resolveField(name);
+			if (field != null)
+			{
+				return field;
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override
 	public IMethod resolveMethodName(String name)
 	{
-		return this.body.getMethod(name);
+		// Own methods
+		IMethod method = this.body.getMethod(name);
+		if (method != null)
+		{
+			return method;
+		}
+		
+		for (IClass iclass : this.superClasses)
+		{
+			method = iclass.resolveMethodName(name);
+			if (method != null)
+			{
+				return method;
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override
 	public IMethod resolveMethod(String name, Type... args)
 	{
-		// FIXME
-		return this.body.getMethod(name, args);
+		// Own methods
+		List<IMethod> list = new ArrayList();
+		this.body.getMethod(list, name, args);
+		
+		for (IClass iclass : this.superClasses)
+		{
+			IMethod method = iclass.resolveMethod(name, args);
+			if (method != null)
+			{
+				list.add(method);
+			}
+		}
+		
+		// TODO Static, Accessibility, Ambiguity
+		
+		return list.isEmpty() ? null : list.get(0);
 	}
 	
 	@Override
-	public AbstractClass applyState(CompilerState state)
+	public AbstractClass applyState(CompilerState state, IContext context)
 	{
-		this.body = this.body.applyState(state);
+		this.body = this.body.applyState(state, this);
 		return this;
 	}
 	

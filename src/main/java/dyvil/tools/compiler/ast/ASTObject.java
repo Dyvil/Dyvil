@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IASTObject;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class ASTObject implements IASTObject
@@ -30,7 +31,7 @@ public abstract class ASTObject implements IASTObject
 	}
 	
 	@Override
-	public abstract IASTObject applyState(CompilerState state);
+	public abstract IASTObject applyState(CompilerState state, IContext context);
 	
 	@Override
 	public String toString()

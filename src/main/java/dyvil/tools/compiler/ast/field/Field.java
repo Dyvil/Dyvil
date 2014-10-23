@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.field;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.Member;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
@@ -43,11 +44,11 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public Field applyState(CompilerState state)
+	public Field applyState(CompilerState state, IContext context)
 	{
 		if (this.value != null)
 		{
-			this.value = this.value.applyState(state);
+			this.value = this.value.applyState(state, context);
 		}
 		return this;
 	}

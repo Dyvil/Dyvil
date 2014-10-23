@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.value;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class FloatValue extends ASTObject implements IValue
@@ -31,7 +32,7 @@ public class FloatValue extends ASTObject implements IValue
 	}
 	
 	@Override
-	public FloatValue applyState(CompilerState state)
+	public FloatValue applyState(CompilerState state, IContext context)
 	{
 		return this;
 	}

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.value;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class NullValue extends ASTObject implements IValue
@@ -19,7 +20,7 @@ public class NullValue extends ASTObject implements IValue
 	}
 	
 	@Override
-	public NullValue applyState(CompilerState state)
+	public NullValue applyState(CompilerState state, IContext context)
 	{
 		return this;
 	}

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class Parameter extends Member
@@ -33,7 +34,7 @@ public class Parameter extends Member
 	}
 
 	@Override
-	public Parameter applyState(CompilerState state)
+	public Parameter applyState(CompilerState state, IContext context)
 	{
 		return this;
 	}

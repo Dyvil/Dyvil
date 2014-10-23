@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
@@ -50,10 +51,10 @@ public class DoWhileStatement extends ASTObject implements IStatement, IValued
 	}
 	
 	@Override
-	public DoWhileStatement applyState(CompilerState state)
+	public DoWhileStatement applyState(CompilerState state, IContext context)
 	{
-		this.condition = this.condition.applyState(state);
-		this.then = this.then.applyState(state);
+		this.condition = this.condition.applyState(state, context);
+		this.then = this.then.applyState(state, context);
 		return this;
 	}
 	

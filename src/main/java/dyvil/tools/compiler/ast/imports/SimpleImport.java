@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -47,7 +48,7 @@ public class SimpleImport extends ASTObject implements IImport
 	}
 	
 	@Override
-	public SimpleImport applyState(CompilerState state)
+	public SimpleImport applyState(CompilerState state, IContext context)
 	{
 		if (state == CompilerState.RESOLVE)
 		{

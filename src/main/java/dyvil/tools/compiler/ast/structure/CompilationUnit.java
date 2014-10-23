@@ -73,6 +73,7 @@ public class CompilationUnit extends ASTObject implements IContext
 	@Override
 	public IClass resolveClass(String name)
 	{
+		// Own classes
 		for (AbstractClass aclass : this.classes)
 		{
 			if (name.equals(aclass.getName()))
@@ -81,6 +82,17 @@ public class CompilationUnit extends ASTObject implements IContext
 			}
 		}
 		
+		// Imported Classes
+		for (IImport i : this.imports)
+		{
+			IClass c = i.resolveClass(name);
+			if (c != null)
+			{
+				return c;
+			}
+		}
+		
+		// Package classes
 		return this.pack.resolveClass(name);
 	}
 	
@@ -109,7 +121,7 @@ public class CompilationUnit extends ASTObject implements IContext
 	}
 	
 	@Override
-	public CompilationUnit applyState(CompilerState state)
+	public CompilationUnit applyState(CompilerState state, IContext context)
 	{
 		if (state == CompilerState.RESOLVE)
 		{
@@ -130,10 +142,10 @@ public class CompilationUnit extends ASTObject implements IContext
 			
 			for (IImport i : this.imports)
 			{
-				i.applyState(state);
+				i.applyState(state, this);
 			}
 		}
-		this.classes.replaceAll(c -> c.applyState(state));
+		this.classes.replaceAll(c -> c.applyState(state, this));
 		return this;
 	}
 	

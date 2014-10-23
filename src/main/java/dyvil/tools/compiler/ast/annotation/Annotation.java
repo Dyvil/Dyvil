@@ -7,6 +7,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.api.IValueList;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -60,7 +61,7 @@ public class Annotation extends ASTObject implements ITyped, IValueList
 	}
 	
 	@Override
-	public Annotation applyState(CompilerState state)
+	public Annotation applyState(CompilerState state, IContext context)
 	{
 		return this;
 	}

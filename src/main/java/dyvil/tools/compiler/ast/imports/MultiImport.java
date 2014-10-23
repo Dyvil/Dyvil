@@ -5,6 +5,7 @@ import java.util.Set;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -31,9 +32,9 @@ public class MultiImport extends PackageImport
 	}
 	
 	@Override
-	public MultiImport applyState(CompilerState state)
+	public MultiImport applyState(CompilerState state, IContext context)
 	{
-		super.applyState(state);
+		super.applyState(state, context);
 		if (state == CompilerState.RESOLVE)
 		{
 			if (this.pack == null)
