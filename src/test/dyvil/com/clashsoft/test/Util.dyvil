@@ -1,0 +1,6 @@
+package com.clashsoft.test;
+
+public class Util
+{
+	public int i = 0;
+}

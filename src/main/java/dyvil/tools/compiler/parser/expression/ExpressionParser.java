@@ -2,13 +2,13 @@ package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValued;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.FieldAccess;
 import dyvil.tools.compiler.ast.expression.MethodCall;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.imports;
 
-import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;

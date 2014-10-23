@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.annotation;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IAnnotatable;
-import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;

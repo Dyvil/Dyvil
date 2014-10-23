@@ -6,7 +6,8 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
-import dyvil.tools.compiler.ast.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.config.ConfigParser;
@@ -38,20 +39,31 @@ public class Dyvilc
 	
 	public void compile()
 	{
-		System.out.println("Compiling " + this.config.sourceDir.getAbsolutePath() + " to " + this.config.outputDir.getAbsolutePath());
+		File sourceDir = this.config.sourceDir;
+		File outputDir = this.config.outputDir;
+		System.out.println("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
 		
-		this.compile(this.config.sourceDir, this.config.outputDir);
+		for (String s : sourceDir.list())
+		{
+			this.compile(new CodeFile(sourceDir, s), new File(outputDir, s), Package.rootPackage);
+		}
 		
 		for (CompilationUnit unit : this.compilationUnits.values())
 		{
-			unit.applyState(CompilerState.FOLD_CONSTANTS);
+			CompilerState state = CompilerState.RESOLVE;
+			state.rootPackage = Package.rootPackage;
+			state.file = unit.getFile();
+			
+			unit.applyState(state);
 			
 			System.out.println("Compiled in " + unit.loadingTime + " ms");
 			System.out.println(unit);
+			
+			state.file.printMarkers();
 		}
 	}
 	
-	public void compile(File source, File output)
+	public void compile(File source, File output, Package pack)
 	{
 		if (!source.exists())
 		{
@@ -59,14 +71,15 @@ public class Dyvilc
 		}
 		else if (source.isDirectory())
 		{
+			String name = source.getName();
 			for (String s : source.list())
 			{
-				this.compile(new CodeFile(source, s), new File(output, s));
+				this.compile(new CodeFile(source, s), new File(output, s), pack.createSubPackage(name));
 			}
 		}
 		else
 		{
-			CompilationUnit unit = CodeParser.compilationUnit((CodeFile) source);
+			CompilationUnit unit = CodeParser.compilationUnit(pack, (CodeFile) source);
 			this.compilationUnits.put(source, unit);
 		}
 	}

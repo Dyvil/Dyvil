@@ -1,12 +1,8 @@
 package dyvil.tools.compiler.parser;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 
@@ -15,7 +11,6 @@ public class ParserManager
 	protected Parser	currentParser;
 	
 	public CodeFile		file;
-	public List<Marker>	markers;
 	
 	protected IToken	lastToken;
 	
@@ -49,21 +44,10 @@ public class ParserManager
 	public void parse(CodeFile file)
 	{
 		this.file = file;
-		this.markers = new ArrayList();
 		
 		Dlex lexer = new Dlex(file);
 		lexer.tokenize();
 		this.parse(file, lexer);
-		
-		if (!this.markers.isEmpty())
-		{
-			System.err.println("Markers in File " + file.getName());
-			
-			for (Marker marker : this.markers)
-			{
-				marker.print(System.err);
-			}
-		}
 	}
 	
 	public final void parse(CodeFile file, Dlex lexer)
@@ -116,7 +100,7 @@ public class ParserManager
 					}
 					else
 					{
-						this.markers.add(ex);
+						this.file.markers.add(ex);
 					}
 				}
 			}

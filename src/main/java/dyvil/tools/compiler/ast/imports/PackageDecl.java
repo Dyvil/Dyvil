@@ -6,7 +6,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class PackageDecl extends ASTObject
 {
-	private String thePackage;
+	public String	thePackage;
 	
 	public PackageDecl(ICodePosition position)
 	{

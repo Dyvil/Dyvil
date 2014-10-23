@@ -1,5 +1,7 @@
 package com.clashsoft.test;
 
+import com.clashsoft.test.Util;
+
 public class Main
 {
 	public int i = 0;

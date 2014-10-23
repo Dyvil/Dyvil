@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.context;
+package dyvil.tools.compiler.ast.structure;
 
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;

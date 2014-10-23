@@ -3,7 +3,10 @@ package dyvil.tools.compiler.lexer;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class CodeFile extends File implements ICodePosition
@@ -11,6 +14,8 @@ public class CodeFile extends File implements ICodePosition
 	private static final long	serialVersionUID	= 130988432718494125L;
 	
 	private String				code;
+	
+	public List<Marker>			markers				= new ArrayList();
 	
 	public CodeFile(File parent, String child)
 	{
@@ -25,12 +30,6 @@ public class CodeFile extends File implements ICodePosition
 	public CodeFile(String pathname)
 	{
 		super(pathname);
-	}
-	
-	@Override
-	public boolean isDirectory()
-	{
-		return false;
 	}
 	
 	public void load()
@@ -62,34 +61,42 @@ public class CodeFile extends File implements ICodePosition
 		}
 		return this.code.length();
 	}
-
+	
 	@Override
 	public CodeFile getFile()
 	{
 		return this;
 	}
-
+	
 	@Override
 	public String getText()
 	{
 		return this.getCode();
 	}
-
+	
 	@Override
 	public int getLineNumber()
 	{
 		return 0;
 	}
-
+	
 	@Override
 	public int getStart()
 	{
 		return 0;
 	}
-
+	
 	@Override
 	public int getEnd()
 	{
 		return this.getLength() - 1;
+	}
+	
+	public void printMarkers()
+	{
+		for (Marker m : this.markers)
+		{
+			m.print(System.err);
+		}
 	}
 }

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValued;
-import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;

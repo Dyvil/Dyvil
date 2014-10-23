@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.parser.imports;
 
-import dyvil.tools.compiler.ast.CompilationUnit;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.MultiImport;
 import dyvil.tools.compiler.ast.imports.PackageImport;
 import dyvil.tools.compiler.ast.imports.SimpleImport;
+import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
@@ -33,7 +33,7 @@ public class ImportParser extends Parser
 		{
 			if (this.theImport instanceof SimpleImport)
 			{
-				((SimpleImport) this.theImport).setImport(this.buffer.toString());
+				((SimpleImport) this.theImport).setImport(this.buffer.toString(), token.prev().value());
 			}
 			this.theImport.expandPosition(token.prev());
 			pm.popParser();

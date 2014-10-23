@@ -3,13 +3,17 @@ package dyvil.tools.compiler.ast.imports;
 import java.util.HashSet;
 import java.util.Set;
 
+import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public class MultiImport extends PackageImport
 {
-	public Set<String> theClasses = new HashSet();
+	public Set<String>	classNames	= new HashSet();
+	public Set<IClass>	classes;
 	
 	public MultiImport(ICodePosition position, String basePackage)
 	{
@@ -18,42 +22,60 @@ public class MultiImport extends PackageImport
 	
 	public void addClass(String name)
 	{
-		this.theClasses.add(name);
+		this.classNames.add(name);
 	}
 	
 	public boolean containsClass(String name)
 	{
-		return this.theClasses.contains(name);
+		return this.classNames.contains(name);
 	}
 	
 	@Override
-	public boolean imports(String path)
+	public MultiImport applyState(CompilerState state)
 	{
-		int index = path.lastIndexOf('.');
-		if (index != -1)
+		super.applyState(state);
+		if (state == CompilerState.RESOLVE)
 		{
-			String packageName = path.substring(0, index);
-			if (!this.thePackage.equals(path))
+			if (this.pack == null)
 			{
-				return false;
+				return this;
 			}
-			String className = path.substring(index + 1);
-			return this.theClasses.contains(className);
+			
+			this.classes = new HashSet(this.classNames.size());
+			for (String s : this.classNames)
+			{
+				IClass c = this.pack.resolveClass(s);
+				if (c == null)
+				{
+					state.addMarker(new SyntaxError(this.position, "Class '" + s + "' could not be resolved."));
+				}
+				else
+				{
+					this.classes.add(c);
+				}
+			}
 		}
-		return false;
-	}
-	
-	@Override
-	public boolean isClassName(String name)
-	{
-		return this.containsClass(name);
+		return this;
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append("import ").append(this.thePackage).append(Formatting.Import.multiImportStart);
-		ParserUtil.listToString(this.theClasses, Formatting.Import.multiImportSeperator, buffer);
+		buffer.append(prefix).append("import ").append(this.packageName).append(Formatting.Import.multiImportStart);
+		ParserUtil.listToString(this.classNames, Formatting.Import.multiImportSeperator, buffer);
 		buffer.append(Formatting.Import.multiImportEnd).append(';');
+	}
+	
+	@Override
+	public IClass resolveClass(String name)
+	{
+		for (IClass c : this.classes)
+		{
+			if (name.equals(c.getName()))
+			{
+				return c;
+			}
+		}
+		return null;
 	}
 }

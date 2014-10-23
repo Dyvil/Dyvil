@@ -4,8 +4,8 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
 
 public class Type extends ASTObject implements IContext

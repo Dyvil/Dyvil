@@ -5,7 +5,7 @@ import java.util.List;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
 public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParameterized, IContext

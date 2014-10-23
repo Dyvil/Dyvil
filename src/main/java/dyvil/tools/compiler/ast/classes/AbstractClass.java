@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -16,17 +17,19 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class AbstractClass extends ASTObject implements IClass
 {
-	private String				name;
-	private int					type;
-	private int					modifiers;
-	private ClassBody			body;
+	protected String			name;
+	protected int				type;
+	protected int				modifiers;
+	protected CompilationUnit	unit;
+	protected ClassBody			body;
 	
-	private List<IClass>		superClasses	= new ArrayList();
-	private List<Annotation>	annotations		= new ArrayList();
+	protected List<IClass>		superClasses	= new ArrayList();
+	protected List<Annotation>	annotations		= new ArrayList();
 	
-	public AbstractClass(ICodePosition position, int type, ClassBody body)
+	public AbstractClass(ICodePosition position, CompilationUnit unit, int type, ClassBody body)
 	{
 		this.position = position;
+		this.unit = unit;
 		this.type = type;
 		this.body = body;
 	}

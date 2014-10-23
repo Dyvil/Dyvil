@@ -2,55 +2,85 @@ package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class PackageImport extends ASTObject implements IImport
 {
-	protected String thePackage;
+	public Package		pack;
 	
-	public PackageImport(ICodePosition position, String thePackage)
+	protected String	packageName;
+	
+	public PackageImport(ICodePosition position, String packageName)
 	{
 		this.position = position;
-		this.thePackage = thePackage;
+		this.packageName = packageName;
 	}
 	
 	public void setPackage(String thePackage)
 	{
-		this.thePackage = thePackage;
+		this.packageName = thePackage;
 	}
 	
 	public String getPackage()
 	{
-		return this.thePackage;
-	}
-	
-	@Override
-	public boolean imports(String path)
-	{
-		int index = path.lastIndexOf('.');
-		if (index != -1)
-		{
-			String s1 = path.substring(0, index);
-			return this.thePackage.equals(path);
-		}
-		return false;
-	}
-	
-	@Override
-	public boolean isClassName(String name)
-	{
-		return false;
+		return this.packageName;
 	}
 	
 	@Override
 	public PackageImport applyState(CompilerState state)
 	{
+		if (state == CompilerState.RESOLVE)
+		{
+			Package pack = state.rootPackage.resolvePackage(this.packageName);
+			if (pack == null)
+			{
+				state.addMarker(new SyntaxError(this.position, "Package could not be resolved"));
+			}
+			
+			this.pack = pack;
+		}
 		return this;
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append("import ").append(this.thePackage).append("_;");
+		buffer.append(prefix).append("import ").append(this.packageName).append("_;");
+	}
+	
+	@Override
+	public boolean isStatic()
+	{
+		return false;
+	}
+	
+	@Override
+	public IClass resolveClass(String name)
+	{
+		return null;
+	}
+	
+	@Override
+	public IField resolveField(String name)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public IMethod resolveMethodName(String name)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public IMethod resolveMethod(String name, Type... args)
+	{
+		throw new UnsupportedOperationException();
 	}
 }
