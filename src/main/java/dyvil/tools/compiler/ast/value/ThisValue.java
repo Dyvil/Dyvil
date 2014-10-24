@@ -4,7 +4,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ThisValue extends ASTObject implements IValue
@@ -36,7 +36,7 @@ public class ThisValue extends ASTObject implements IValue
 		{
 			if (context.isStatic())
 			{
-				state.addMarker(new SyntaxError(this.position, "'this' cannot be accessed in a static context"));
+				state.addMarker(new SemanticError(this.position, "'this' cannot be accessed in a static context"));
 			}
 		}
 		return this;

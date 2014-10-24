@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -79,6 +79,11 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public IValue applyState(CompilerState state, IContext context)
 	{
+		if (this.instance != null)
+		{
+			this.instance = this.instance.applyState(state, context);
+		}
+		
 		super.applyState(state, context);
 		
 		if (state == CompilerState.RESOLVE)
@@ -107,7 +112,7 @@ public class MethodCall extends Call implements INamed, IValued
 					return fieldAccess;
 				}
 				
-				state.addMarker(new SyntaxError(this.position, "'" + this.name + "' cannot be resolved to a method"));
+				state.addMarker(new SemanticError(this.position, "'" + this.name + "' cannot be resolved to a method"));
 			}
 		}
 		// TODO Operator precedence

@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Type extends ASTObject implements IContext
@@ -123,7 +123,7 @@ public class Type extends ASTObject implements IContext
 				this.theClass = context.resolveClass(this.name);
 				if (this.theClass == null)
 				{
-					state.addMarker(new SyntaxError(this.position, "The type '" + this.name + "' could not be resolved."));
+					state.addMarker(new SemanticError(this.position, "The type '" + this.name + "' could not be resolved."));
 				}
 			}
 		}

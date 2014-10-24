@@ -8,9 +8,12 @@ import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Warning;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Modifiers;
 
 public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 {
@@ -82,12 +85,27 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 	@Override
 	public FieldAccess applyState(CompilerState state, IContext context)
 	{
+		if (this.instance != null)
+		{
+			this.instance = this.instance.applyState(state, context);
+		}
+		
 		if (state == CompilerState.RESOLVE)
 		{
+			if (this.instance != null)
+			{
+				context = this.instance.getType();
+			}
+			
 			this.field = context.resolveField(this.name);
 			if (this.field == null)
 			{
-				state.addMarker(new SyntaxError(this.position, "'" + this.name + "' cannot be resolved to a field"));
+				state.addMarker(new SemanticError(this.position, "'" + this.name + "' cannot be resolved to a field"));
+			}
+			else if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
+			{
+				state.addMarker(new Warning(this.position, "'" + this.name + "' is a static field and should be accessed in a static way"));
+				this.instance = null;
 			}
 		}
 		return this;

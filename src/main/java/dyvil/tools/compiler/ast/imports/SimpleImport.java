@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class SimpleImport extends ASTObject implements IImport
@@ -55,14 +55,14 @@ public class SimpleImport extends ASTObject implements IImport
 			Package pack = state.rootPackage.resolvePackage(this.packageName);
 			if (pack == null)
 			{
-				state.addMarker(new SyntaxError(this.position, "Package could not be resolved", "Remove this import"));
+				state.addMarker(new SemanticError(this.position, "'" + this.packageName + "' could not be resolved to a package", "Remove this import"));
 				return this;
 			}
 			
 			IClass iclass = pack.resolveClass(this.className);
 			if (iclass == null)
 			{
-				state.addMarker(new SyntaxError(this.position, "Class could not be resolved", "Remove this import"));
+				state.addMarker(new SemanticError(this.position, "'" + this.className + "' could not be resolved to a class", "Remove this import"));
 			}
 			
 			this.theClass = iclass;

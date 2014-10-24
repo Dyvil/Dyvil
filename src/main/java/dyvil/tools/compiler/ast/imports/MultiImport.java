@@ -7,7 +7,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -48,7 +48,7 @@ public class MultiImport extends PackageImport
 				IClass c = this.pack.resolveClass(s);
 				if (c == null)
 				{
-					state.addMarker(new SyntaxError(this.position, "Class '" + s + "' could not be resolved."));
+					state.addMarker(new SemanticError(this.position, "'" + s + "' could not be resolved to a class"));
 				}
 				else
 				{

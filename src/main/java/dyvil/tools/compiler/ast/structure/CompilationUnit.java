@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 
 public class CompilationUnit extends ASTObject implements IContext
@@ -136,13 +136,13 @@ public class CompilationUnit extends ASTObject implements IContext
 			case 0: // OK
 				break;
 			case 1: // Missing package decl.
-				state.addMarker(new SyntaxError(new CodePosition((CodeFile) this.position, 1, 0, 1), "Missing Package Declaration", "Add 'package " + this.pack.name + ";' at the beginning of the file."));
+				state.addMarker(new SemanticError(new CodePosition((CodeFile) this.position, 1, 0, 1), "Missing Package Declaration", "Add 'package " + this.pack.name + ";' at the beginning of the file."));
 				break;
 			case 2: // Invalid package decl.
-				state.addMarker(new SyntaxError(this.packageDecl.getPosition(), "Invalid Package Declaration", "Change the package declaration to '" + this.pack.name + "'."));
+				state.addMarker(new SemanticError(this.packageDecl.getPosition(), "Invalid Package Declaration", "Change the package declaration to '" + this.pack.name + "'."));
 				break;
 			case 3: // Package decl. in default package
-				state.addMarker(new SyntaxError(this.packageDecl.getPosition(), "Invalid Package Declaration", "Remove the package declaration."));
+				state.addMarker(new SemanticError(this.packageDecl.getPosition(), "Invalid Package Declaration", "Remove the package declaration."));
 				break;
 			}
 			

@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class PackageImport extends ASTObject implements IImport
@@ -42,7 +42,7 @@ public class PackageImport extends ASTObject implements IImport
 			Package pack = state.rootPackage.resolvePackage(this.packageName);
 			if (pack == null)
 			{
-				state.addMarker(new SyntaxError(this.position, "Package could not be resolved"));
+				state.addMarker(new SemanticError(this.position, "'" + this.packageName + "' could not be resolved to a package"));
 			}
 			
 			this.pack = pack;

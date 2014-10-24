@@ -28,6 +28,7 @@ public class StatementList extends ValueList implements IStatement
 				return this.values.get(0);
 			}
 		}
-		return super.applyState(state, context);
+		this.values.replaceAll(v -> v.applyState(state, context));
+		return this;
 	}
 }
