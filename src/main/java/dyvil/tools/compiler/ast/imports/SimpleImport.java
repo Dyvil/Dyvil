@@ -83,6 +83,12 @@ public class SimpleImport extends ASTObject implements IImport
 	}
 	
 	@Override
+	public Type getThisType()
+	{
+		return null;
+	}
+	
+	@Override
 	public IClass resolveClass(String name)
 	{
 		if (this.className.equals(name))

@@ -63,6 +63,12 @@ public class PackageImport extends ASTObject implements IImport
 	}
 	
 	@Override
+	public Type getThisType()
+	{
+		return null;
+	}
+	
+	@Override
 	public IClass resolveClass(String name)
 	{
 		if (this.pack == null)

@@ -68,6 +68,10 @@ public class ExpressionParser extends Parser
 			{
 				return true;
 			}
+			else if ("this".equals(value)) {
+				this.value = new ThisValue(token, this.context.getThisType());
+				return true;
+			}
 			else if ("(".equals(value))
 			{
 				this.mode = TUPLE_END;
@@ -219,15 +223,6 @@ public class ExpressionParser extends Parser
 		if ("null".equals(value))
 		{
 			this.value = new NullValue();
-			return true;
-		}
-		else if ("this".equals(value))
-		{
-			if (this.context.isStatic())
-			{
-				throw new SyntaxError(token, "Cannot access 'this' in a static context");
-			}
-			this.value = new ThisValue();
 			return true;
 		}
 		// Boolean

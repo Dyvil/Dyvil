@@ -4,9 +4,19 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ThisValue extends ASTObject implements IValue
 {
+	public Type type;
+	
+	public ThisValue(ICodePosition position, Type type)
+	{
+		this.position = position;
+		this.type = type;
+	}
+	
 	@Override
 	public boolean isConstant()
 	{
@@ -16,13 +26,19 @@ public class ThisValue extends ASTObject implements IValue
 	@Override
 	public Type getType()
 	{
-		// FIXME
-		return null;
+		return this.type;
 	}
 	
 	@Override
 	public ThisValue applyState(CompilerState state, IContext context)
 	{
+		if (state == CompilerState.RESOLVE)
+		{
+			if (context.isStatic())
+			{
+				state.addMarker(new SyntaxError(this.position, "'this' cannot be accessed in a static context"));
+			}
+		}
 		return this;
 	}
 	

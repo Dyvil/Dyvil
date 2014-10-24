@@ -4,5 +4,5 @@ public class Util
 {
 	public static int	x	= 0;
 	
-	public static int bar(int x) = x;
+	public static int bar(int x) = this.x;
 }

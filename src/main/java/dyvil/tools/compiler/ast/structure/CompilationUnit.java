@@ -69,6 +69,18 @@ public class CompilationUnit extends ASTObject implements IContext
 		
 		this.pack.addClass(type);
 	}
+
+	@Override
+	public boolean isStatic()
+	{
+		return false;
+	}
+	
+	@Override
+	public Type getThisType()
+	{
+		return null;
+	}
 	
 	@Override
 	public IClass resolveClass(String name)
@@ -94,12 +106,6 @@ public class CompilationUnit extends ASTObject implements IContext
 		
 		// Package classes
 		return this.pack.resolveClass(name);
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return false;
 	}
 	
 	@Override

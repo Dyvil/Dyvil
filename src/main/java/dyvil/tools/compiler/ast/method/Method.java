@@ -80,6 +80,12 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public Type getThisType()
+	{
+		return this.theClass.getThisType();
+	}
+	
+	@Override
 	public IClass resolveClass(String name)
 	{
 		return this.theClass.resolveClass(name);

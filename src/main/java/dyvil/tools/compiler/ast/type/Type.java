@@ -12,18 +12,18 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Type extends ASTObject implements IContext
 {
-	public static Type	NONE	= new Type(null, null);
+	public static Type	NONE	= new Type(null);
 	
-	public static Type	VOID	= new Type("void", null);
-	public static Type	INT		= new Type("int", null);
-	public static Type	LONG	= new Type("long", null);
-	public static Type	FLOAT	= new Type("float", null);
-	public static Type	DOUBLE	= new Type("double", null);
-	public static Type	CHAR	= new Type("char", null);
-	public static Type	BOOL	= new Type("boolean", null);
+	public static Type	VOID	= new Type("void");
+	public static Type	INT		= new Type("int");
+	public static Type	LONG	= new Type("long");
+	public static Type	FLOAT	= new Type("float");
+	public static Type	DOUBLE	= new Type("double");
+	public static Type	CHAR	= new Type("char");
+	public static Type	BOOL	= new Type("boolean");
 	
-	public static Type	STRING	= new Type("java.lang.String", null);
-	public static Type	CLASS	= new Type("java.lang.Class", null);
+	public static Type	STRING	= new Type("java.lang.String");
+	public static Type	CLASS	= new Type("java.lang.Class");
 	
 	private String		name;
 	private IClass		theClass;
@@ -32,6 +32,17 @@ public class Type extends ASTObject implements IContext
 	
 	protected Type()
 	{}
+	
+	protected Type(String name)
+	{
+		this.name = name;
+	}
+	
+	public Type(String name, IClass iclass)
+	{
+		this.name = name;
+		this.theClass = iclass;
+	}
 	
 	public Type(String name, ICodePosition position)
 	{
@@ -116,6 +127,12 @@ public class Type extends ASTObject implements IContext
 				}
 			}
 		}
+		return this;
+	}
+	
+	@Override
+	public Type getThisType()
+	{
 		return this;
 	}
 	

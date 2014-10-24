@@ -94,6 +94,12 @@ public class Package implements IContext
 		return true;
 	}
 	
+	@Override
+	public Type getThisType()
+	{
+		return null;
+	}
+	
 	public Package resolvePackage(String name)
 	{
 		for (Package pack : rootPackage.subPackages)
