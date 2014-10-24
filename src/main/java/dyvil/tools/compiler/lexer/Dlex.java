@@ -10,8 +10,8 @@ import dyvil.tools.compiler.lexer.token.Token;
 
 public class Dlex implements Iterable<IToken>
 {
-	protected final CodeFile file;
-	protected IToken		first;
+	protected final CodeFile	file;
+	protected IToken			first;
 	
 	public Dlex(CodeFile file)
 	{
@@ -135,7 +135,7 @@ public class Dlex implements Iterable<IToken>
 				}
 				else if (subtype == MOD_BIN)
 				{
-					if (c == 'b' ||isBinDigit(c))
+					if (c == 'b' || isBinDigit(c))
 					{
 						buf.append(c);
 					}
@@ -392,7 +392,7 @@ public class Dlex implements Iterable<IToken>
 	
 	public static class TokenIterator implements Iterator<IToken>
 	{
-		protected IToken first;
+		protected IToken	first;
 		protected IToken	next;
 		
 		public TokenIterator(IToken first)

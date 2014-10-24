@@ -1,8 +1,11 @@
 package dyvil.tools.compiler;
 
+import java.util.List;
+
+import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.ast.structure.Package;
 
 public enum CompilerState
 {
@@ -18,6 +21,10 @@ public enum CompilerState
 	 * Resolves packages, classes, methods and field names.
 	 */
 	RESOLVE,
+	/**
+	 * Checks types.
+	 */
+	TYPECHECK,
 	/**
 	 * Obfuscates the code.
 	 */
@@ -49,10 +56,27 @@ public enum CompilerState
 	/**
 	 * Generates the Dyvildoc files.
 	 */
-	DYVILDOC, ;
+	DYVILDOC,
+	DEBUG;
 	
-	public Package	rootPackage;
 	public CodeFile	file;
+	
+	public void apply(List<CompilationUnit> units, IContext context)
+	{
+		System.out.println("Applying State " + this.name());
+		long now = System.nanoTime();
+		
+		for (CompilationUnit unit : units)
+		{
+			this.file = unit.getFile();
+			unit.applyState(this, context);
+		}
+		
+		now = System.nanoTime() - now;
+		float n = now / 1000000F;
+		float f = (float) n / units.size();
+		System.out.println(String.format("Finished State %s (%.1f ms, %.1f ms/CU, %.2f CU/s)", this.name(), n, f, 1000F / f));
+	}
 	
 	public void addMarker(Marker marker)
 	{

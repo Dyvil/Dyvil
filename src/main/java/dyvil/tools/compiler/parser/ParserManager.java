@@ -38,33 +38,33 @@ public class ParserManager
 	{
 		this.currentParser = parser;
 		parser.begin(this);
-		this.parse(file);
+		TokenIterator tokens = this.tokenize(file);
+		this.parse(file, tokens);
 	}
 	
-	public void parse(CodeFile file)
+	public final TokenIterator tokenize(CodeFile file)
 	{
 		this.file = file;
 		
 		Dlex lexer = new Dlex(file);
 		lexer.tokenize();
-		this.parse(file, lexer);
+		return lexer.iterator();
 	}
 	
-	public final void parse(CodeFile file, Dlex lexer)
+	public final void parse(CodeFile file, TokenIterator tokens)
 	{
 		IToken token = null;
 		
 		try
 		{
-			TokenIterator iterator = lexer.iterator();
 			boolean removed = false;
 			
-			while (iterator.hasNext())
+			while (tokens.hasNext())
 			{
-				token = iterator.next();
+				token = tokens.next();
 				if (!this.retainToken(token.getText(), token))
 				{
-					iterator.remove();
+					tokens.remove();
 					removed = true;
 				}
 			}
@@ -73,28 +73,28 @@ public class ParserManager
 			{
 				int index = 0;
 				
-				iterator.reset();
-				while (iterator.hasNext())
+				tokens.reset();
+				while (tokens.hasNext())
 				{
-					token = iterator.next();
+					token = tokens.next();
 					token.setIndex(index);
 					index++;
 				}
 			}
 			
-			iterator.reset();
-			while (iterator.hasNext())
+			tokens.reset();
+			while (tokens.hasNext())
 			{
 				try
 				{
-					token = iterator.next();
+					token = tokens.next();
 					this.parseToken(this.currentParser, token);
 				}
 				catch (SyntaxError ex)
 				{
 					if (this.lastToken != null)
 					{
-						iterator.jump(this.lastToken);
+						tokens.jump(this.lastToken);
 						this.popParser();
 						this.lastToken = null;
 					}

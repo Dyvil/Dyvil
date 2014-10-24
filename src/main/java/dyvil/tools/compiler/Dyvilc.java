@@ -3,23 +3,24 @@ package dyvil.tools.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.config.ConfigParser;
 
 public class Dyvilc
 {
-	public static Dyvilc				instance;
+	public static Dyvilc						instance;
 	
-	protected CompilerConfig			config;
-	protected CompilerState				state;
+	protected CompilerConfig					config;
+	protected CompilerState						state;
 	
-	public Map<File, CompilationUnit>	compilationUnits	= new HashMap();
+	public static ParserManager					parser				= new ParserManager();
 	
 	public Dyvilc(CompilerConfig config)
 	{
@@ -31,7 +32,7 @@ public class Dyvilc
 		CodeFile file = new CodeFile(args[0]);
 		
 		CompilerConfig config = new CompilerConfig();
-		CodeParser.instance.parse(file, new ConfigParser(config));
+		parser.parse(file, new ConfigParser(config));
 		
 		instance = new Dyvilc(config);
 		instance.compile();
@@ -41,6 +42,7 @@ public class Dyvilc
 	{
 		File sourceDir = this.config.sourceDir;
 		File outputDir = this.config.outputDir;
+		Package root = Package.rootPackage;
 		System.out.println("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
 		
 		for (String s : sourceDir.list())
@@ -48,18 +50,18 @@ public class Dyvilc
 			this.compile(new CodeFile(sourceDir, s), new File(outputDir, s), Package.rootPackage);
 		}
 		
-		for (CompilationUnit unit : this.compilationUnits.values())
+		List<CompilationUnit> units = new ArrayList(root.subPackages.size());
+		for (Package pack : root.subPackages)
 		{
-			CompilerState state = CompilerState.RESOLVE;
-			state.rootPackage = Package.rootPackage;
-			state.file = unit.getFile();
-			
-			unit.applyState(state, null);
-			
-			System.out.println("Compiled in " + unit.loadingTime + " ms");
-			System.out.println(unit);
-			
-			state.file.printMarkers();
+			for (CompilationUnit unit : pack.units)
+			{
+				units.add(unit);
+			}
+		}
+		
+		for (CompilerState state : CompilerState.values())
+		{
+			state.apply(units, null);
 		}
 	}
 	
@@ -79,8 +81,8 @@ public class Dyvilc
 		}
 		else
 		{
-			CompilationUnit unit = CodeParser.compilationUnit(pack, (CodeFile) source);
-			this.compilationUnits.put(source, unit);
+			CompilationUnit unit = new CompilationUnit(pack, (CodeFile) source);
+			pack.addCompilationUnit(unit);
 		}
 	}
 	

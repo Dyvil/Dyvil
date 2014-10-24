@@ -52,7 +52,7 @@ public class SimpleImport extends ASTObject implements IImport
 	{
 		if (state == CompilerState.RESOLVE)
 		{
-			Package pack = state.rootPackage.resolvePackage(this.packageName);
+			Package pack = Package.rootPackage.resolvePackage(this.packageName);
 			if (pack == null)
 			{
 				state.addMarker(new SemanticError(this.position, "'" + this.packageName + "' could not be resolved to a package", "Remove this import"));

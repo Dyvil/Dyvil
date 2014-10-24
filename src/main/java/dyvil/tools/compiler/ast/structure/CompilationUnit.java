@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.Dyvilc;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
@@ -14,23 +15,29 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
+import dyvil.tools.compiler.parser.CompilationUnitParser;
 
 public class CompilationUnit extends ASTObject implements IContext
 {
-	public long						loadingTime	= System.currentTimeMillis();
+	public long							loadingTime	= System.currentTimeMillis();
 	
-	public final Package			pack;
+	public final String					name;
+	public final Package				pack;
+	protected transient TokenIterator	tokens;
 	
-	protected PackageDecl			packageDecl;
-	protected List<IImport>			imports		= new ArrayList();
-	protected List<AbstractClass>	classes		= new ArrayList();
+	protected PackageDecl				packageDecl;
+	protected List<IImport>				imports		= new ArrayList();
+	protected List<AbstractClass>		classes		= new ArrayList();
 	
 	public CompilationUnit(Package pack, CodeFile file)
 	{
 		this.position = file;
 		this.pack = pack;
+		this.name = pack.fullName + "." + file.getName();
 	}
 	
 	public CodeFile getFile()
@@ -40,7 +47,7 @@ public class CompilationUnit extends ASTObject implements IContext
 	
 	public PackageDecl getPackageDecl()
 	{
-		return packageDecl;
+		return this.packageDecl;
 	}
 	
 	public List<IImport> getImportDecls()
@@ -63,13 +70,12 @@ public class CompilationUnit extends ASTObject implements IContext
 		this.imports.add(iimport);
 	}
 	
-	public void addClass(AbstractClass type)
+	public void addClass(AbstractClass iclass)
 	{
-		this.classes.add(type);
-		
-		this.pack.addClass(type);
+		this.classes.add(iclass);
+		this.pack.classes.add(iclass);
 	}
-
+	
 	@Override
 	public boolean isStatic()
 	{
@@ -129,7 +135,33 @@ public class CompilationUnit extends ASTObject implements IContext
 	@Override
 	public CompilationUnit applyState(CompilerState state, IContext context)
 	{
-		if (state == CompilerState.RESOLVE)
+		if (state == CompilerState.TOKENIZE)
+		{
+			this.tokens = Dyvilc.parser.tokenize(this.getFile());
+			return this;
+		}
+		else if (state == CompilerState.PARSE)
+		{
+			Dyvilc.parser.pushParser(new CompilationUnitParser(this));
+			Dyvilc.parser.parse(this.getFile(), this.tokens);
+			this.tokens = null;
+			return this;
+		}
+		else if (state == CompilerState.DEBUG)
+		{
+			List<Marker> markers = this.getFile().markers;
+			int size = markers.size();
+			if (size > 0)
+			{
+				System.out.println("Markers in Compilation Unit " + this.name + ": " + size);
+				for (Marker marker : this.getFile().markers)
+				{
+					marker.print(System.err);
+				}
+			}
+			return this;
+		}
+		else if (state == CompilerState.RESOLVE)
 		{
 			switch (this.pack.check(this.packageDecl))
 			{

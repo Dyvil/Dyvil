@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -11,14 +12,15 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class Package implements IContext
 {
-	public static Package	rootPackage	= new Package(null, null);
+	public static Package			rootPackage	= new Package(null, null);
 	
-	public Package			parent;
-	public String			name;
-	public String			fullName;
+	public Package					parent;
+	public String					name;
+	public String					fullName;
 	
-	public List<IClass>		classes		= new ArrayList();
-	public List<Package>	subPackages	= new ArrayList();
+	public List<CompilationUnit>	units		= new ArrayList();
+	public List<AbstractClass>		classes		= new ArrayList();
+	public List<Package>			subPackages	= new ArrayList();
 	
 	public Package(Package parent, String name)
 	{
@@ -34,7 +36,12 @@ public class Package implements IContext
 		}
 	}
 	
-	public void addClass(IClass iclass)
+	public void addCompilationUnit(CompilationUnit unit)
+	{
+		this.units.add(unit);
+	}
+	
+	public void addClass(AbstractClass iclass)
 	{
 		this.classes.add(iclass);
 	}
