@@ -9,12 +9,14 @@ public class Main extends Util
 	
 	public static void main(String[] args) =
 	{
-		this.println(x);
-        println(foo(i));
-        println(bar(j));
+		instance.self().getSelf().getThis().i;
 	};
 	
-	public int foo(int x) = x;
+	public static Main instance = new Main();
 	
-	public void println(int i) = {};
+	public Main self() = this;
+	
+	public Main getSelf() = this;
+	
+	public Main getThis() = this;
 }

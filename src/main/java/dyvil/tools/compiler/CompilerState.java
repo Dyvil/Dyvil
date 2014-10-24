@@ -18,13 +18,13 @@ public enum CompilerState
 	 */
 	PARSE,
 	/**
-	 * Resolves packages, classes, methods and field names.
+	 * Resolves packages, classes and types.
+	 */
+	RESOLVE_TYPES,
+	/**
+	 * Resolves methods and field names.
 	 */
 	RESOLVE,
-	/**
-	 * Checks types.
-	 */
-	TYPECHECK,
 	/**
 	 * Obfuscates the code.
 	 */
@@ -56,8 +56,7 @@ public enum CompilerState
 	/**
 	 * Generates the Dyvildoc files.
 	 */
-	DYVILDOC,
-	DEBUG;
+	DYVILDOC, DEBUG;
 	
 	public CodeFile	file;
 	
@@ -69,7 +68,13 @@ public enum CompilerState
 		for (CompilationUnit unit : units)
 		{
 			this.file = unit.getFile();
-			unit.applyState(this, context);
+			try
+			{
+				unit.applyState(this, context);
+			}
+			catch (Exception ex)
+			{
+			}
 		}
 		
 		now = System.nanoTime() - now;

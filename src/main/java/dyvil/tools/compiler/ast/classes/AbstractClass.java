@@ -133,6 +133,11 @@ public class AbstractClass extends ASTObject implements IClass
 	@Override
 	public IClass resolveClass(String name)
 	{
+		if (this.name.equals(name))
+		{
+			return this;
+		}
+		
 		return this.unit.resolveClass(name);
 	}
 	

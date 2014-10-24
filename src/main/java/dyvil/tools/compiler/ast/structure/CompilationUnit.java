@@ -161,7 +161,7 @@ public class CompilationUnit extends ASTObject implements IContext
 			}
 			return this;
 		}
-		else if (state == CompilerState.RESOLVE)
+		else if (state == CompilerState.RESOLVE_TYPES)
 		{
 			switch (this.pack.check(this.packageDecl))
 			{

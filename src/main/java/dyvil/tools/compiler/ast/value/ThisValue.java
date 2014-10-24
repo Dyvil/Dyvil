@@ -32,7 +32,7 @@ public class ThisValue extends ASTObject implements IValue
 	@Override
 	public ThisValue applyState(CompilerState state, IContext context)
 	{
-		if (state == CompilerState.RESOLVE)
+		if (state == CompilerState.RESOLVE_TYPES)
 		{
 			if (context.isStatic())
 			{

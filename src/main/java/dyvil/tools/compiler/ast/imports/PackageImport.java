@@ -37,7 +37,7 @@ public class PackageImport extends ASTObject implements IImport
 	@Override
 	public PackageImport applyState(CompilerState state, IContext context)
 	{
-		if (state == CompilerState.RESOLVE)
+		if (state == CompilerState.RESOLVE_TYPES)
 		{
 			Package pack = Package.rootPackage.resolvePackage(this.packageName);
 			if (pack == null)

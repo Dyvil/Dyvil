@@ -98,7 +98,7 @@ public class Type extends ASTObject implements IContext
 			return this;
 		}
 		
-		if (state == CompilerState.RESOLVE)
+		if (state == CompilerState.RESOLVE_TYPES)
 		{
 			if (this.theClass == null)
 			{

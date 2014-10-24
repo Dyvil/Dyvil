@@ -35,7 +35,7 @@ public class MultiImport extends PackageImport
 	public MultiImport applyState(CompilerState state, IContext context)
 	{
 		super.applyState(state, context);
-		if (state == CompilerState.RESOLVE)
+		if (state == CompilerState.RESOLVE_TYPES)
 		{
 			if (this.pack == null)
 			{
