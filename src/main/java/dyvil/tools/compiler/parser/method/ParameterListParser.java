@@ -2,6 +2,7 @@ package dyvil.tools.compiler.parser.method;
 
 import dyvil.tools.compiler.ast.api.IParameterized;
 import dyvil.tools.compiler.ast.method.Parameter;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
@@ -16,12 +17,14 @@ public class ParameterListParser extends Parser
 	public static final int	TYPE		= 0;
 	public static final int	NAME		= 1;
 	
-	private IParameterized	parameterized;
+	protected IContext context;
+	protected IParameterized	parameterized;
 	
 	private Parameter		parameter	= new Parameter();
 	
-	public ParameterListParser(IParameterized parameterized)
+	public ParameterListParser(IContext context, IParameterized parameterized)
 	{
+		this.context = context;
 		this.parameterized = parameterized;
 	}
 	
@@ -43,7 +46,7 @@ public class ParameterListParser extends Parser
 			}
 			
 			this.mode = NAME;
-			pm.pushParser(new TypeParser(this.parameter), token);
+			pm.pushParser(new TypeParser(this.context, this.parameter), token);
 			return true;
 		}
 		if (this.isInMode(NAME))

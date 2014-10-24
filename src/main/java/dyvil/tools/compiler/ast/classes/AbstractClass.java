@@ -24,7 +24,7 @@ public class AbstractClass extends ASTObject implements IClass
 	protected CompilationUnit	unit;
 	protected ClassBody			body;
 	
-	protected List<IClass>		superClasses	= new ArrayList();
+	protected List<Type>		superClasses	= new ArrayList();
 	protected List<Annotation>	annotations		= new ArrayList();
 	
 	public AbstractClass(ICodePosition position, CompilationUnit unit, int type, ClassBody body)
@@ -53,7 +53,7 @@ public class AbstractClass extends ASTObject implements IClass
 		this.annotations = annotations;
 	}
 	
-	public int getType()
+	public int getClassType()
 	{
 		return this.type;
 	}
@@ -77,9 +77,27 @@ public class AbstractClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public List<IClass> getSuperClasses()
+	public List<Type> getTypes()
 	{
 		return this.superClasses;
+	}
+	
+	@Override
+	public List<Type> getSuperClasses()
+	{
+		return this.superClasses;
+	}
+	
+	@Override
+	public void setTypes(List<Type> types)
+	{
+		this.superClasses = types;
+	}
+	
+	@Override
+	public void addType(Type type)
+	{
+		this.superClasses.add(type);
 	}
 	
 	@Override
@@ -123,9 +141,9 @@ public class AbstractClass extends ASTObject implements IClass
 		}
 		
 		// Inherited Fields
-		for (IClass iclass : this.superClasses)
+		for (Type type : this.superClasses)
 		{
-			field = iclass.resolveField(name);
+			field = type.resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -145,9 +163,9 @@ public class AbstractClass extends ASTObject implements IClass
 			return method;
 		}
 		
-		for (IClass iclass : this.superClasses)
+		for (Type type : this.superClasses)
 		{
-			method = iclass.resolveMethodName(name);
+			method = type.resolveMethodName(name);
 			if (method != null)
 			{
 				return method;
@@ -164,9 +182,9 @@ public class AbstractClass extends ASTObject implements IClass
 		List<IMethod> list = new ArrayList();
 		this.body.getMethod(list, name, args);
 		
-		for (IClass iclass : this.superClasses)
+		for (Type type : this.superClasses)
 		{
-			IMethod method = iclass.resolveMethod(name, args);
+			IMethod method = type.resolveMethod(name, args);
 			if (method != null)
 			{
 				list.add(method);
@@ -181,6 +199,7 @@ public class AbstractClass extends ASTObject implements IClass
 	@Override
 	public AbstractClass applyState(CompilerState state, IContext context)
 	{
+		this.superClasses.replaceAll(t -> t.applyState(state, context));
 		this.body = this.body.applyState(state, this);
 		return this;
 	}
@@ -196,7 +215,7 @@ public class AbstractClass extends ASTObject implements IClass
 		if (!this.superClasses.isEmpty())
 		{
 			buffer.append(" extends ");
-			ParserUtil.toString(this.superClasses, (IClass o) -> o.getGenericName(), Formatting.Class.superClassesSeperator, buffer);
+			ParserUtil.astToString(this.superClasses, Formatting.Class.superClassesSeperator, buffer);
 		}
 		
 		buffer.append(Formatting.Class.bodyStart);

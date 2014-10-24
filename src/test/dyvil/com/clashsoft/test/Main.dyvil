@@ -1,23 +1,20 @@
 package com.clashsoft.test;
 
 import com.clashsoft.test.Util;
-import com.clashsoft.test._;
-import com.clashsoft.test.{Util, Main};
 
-public class Main
+public class Main extends Util
 {
 	public int i = 0;
 	public int j = 0;
 	
 	public static void main(String[] args) =
 	{
-        println(f(i));
-        println(j);
+		println(x);
+        println(foo(i));
+        println(bar(j));
 	};
 	
-	public int f(int x) = x;
+	public int foo(int x) = x;
 	
-	public void println(int i) =
-	{
-	}
+	public void println(int i) = {};
 }

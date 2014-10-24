@@ -7,39 +7,36 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Type extends ASTObject implements IContext
 {
-	public static Type	NONE	= new Type((String) null);
+	public static Type	NONE	= new Type(null, null);
 	
-	public static Type	VOID	= new Type("void");
-	public static Type	INT		= new Type("int");
-	public static Type	LONG	= new Type("long");
-	public static Type	FLOAT	= new Type("float");
-	public static Type	DOUBLE	= new Type("double");
-	public static Type	CHAR	= new Type("char");
-	public static Type	BOOL	= new Type("boolean");
+	public static Type	VOID	= new Type("void", null);
+	public static Type	INT		= new Type("int", null);
+	public static Type	LONG	= new Type("long", null);
+	public static Type	FLOAT	= new Type("float", null);
+	public static Type	DOUBLE	= new Type("double", null);
+	public static Type	CHAR	= new Type("char", null);
+	public static Type	BOOL	= new Type("boolean", null);
 	
-	public static Type	STRING	= new Type("java.lang.String");
-	public static Type	CLASS	= new Type("java.lang.Class");
+	public static Type	STRING	= new Type("java.lang.String", null);
+	public static Type	CLASS	= new Type("java.lang.Class", null);
 	
 	private String		name;
 	private IClass		theClass;
 	private char		seperator;
 	private int			arrayDimensions;
 	
-	public Type()
+	protected Type()
 	{}
 	
-	public Type(String name)
+	public Type(String name, ICodePosition position)
 	{
 		this.name = name;
-	}
-	
-	public Type(IClass iclass)
-	{
-		this.theClass = iclass;
-		this.name = iclass.getName();
+		this.position = position;
 	}
 	
 	public void setClass(IClass theClass)
@@ -80,6 +77,46 @@ public class Type extends ASTObject implements IContext
 	public boolean isArrayType()
 	{
 		return this.arrayDimensions > 0;
+	}
+	
+	@Override
+	public Type applyState(CompilerState state, IContext context)
+	{
+		if (this.position == null)
+		{
+			return this;
+		}
+		
+		if (state == CompilerState.RESOLVE)
+		{
+			if (this.theClass == null)
+			{
+				switch (this.name)
+				{
+				case "void":
+					return VOID;
+				case "int":
+					return INT;
+				case "long":
+					return LONG;
+				case "float":
+					return FLOAT;
+				case "double":
+					return DOUBLE;
+				case "char":
+					return CHAR;
+				case "bool":
+					return BOOL;
+				}
+				
+				this.theClass = context.resolveClass(this.name);
+				if (this.theClass == null)
+				{
+					state.addMarker(new SyntaxError(this.position, "The type '" + this.name + "' could not be resolved."));
+				}
+			}
+		}
+		return this;
 	}
 	
 	@Override
@@ -133,12 +170,6 @@ public class Type extends ASTObject implements IContext
 	}
 	
 	@Override
-	public Type applyState(CompilerState state, IContext context)
-	{
-		return this;
-	}
-	
-	@Override
 	public int hashCode()
 	{
 		final int prime = 31;
@@ -147,7 +178,7 @@ public class Type extends ASTObject implements IContext
 		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
 		return result;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -181,7 +212,7 @@ public class Type extends ASTObject implements IContext
 		}
 		return true;
 	}
-
+	
 	@Override
 	public String toString()
 	{
@@ -198,5 +229,6 @@ public class Type extends ASTObject implements IContext
 		{
 			buffer.append(Formatting.Type.array);
 		}
+		// TODO Generics
 	}
 }

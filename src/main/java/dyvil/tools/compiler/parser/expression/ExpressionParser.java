@@ -95,7 +95,7 @@ public class ExpressionParser extends Parser
 				ConstructorCall call = new ConstructorCall(token);
 				this.mode = PARAMETERS;
 				this.value = call;
-				pm.pushParser(new TypeParser(call));
+				pm.pushParser(new TypeParser(this.context, call));
 				return true;
 			}
 			this.mode = ACCESS;

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.api.ITypeList;
 import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -10,11 +11,14 @@ import dyvil.tools.compiler.parser.ParserManager;
 
 public class TypeListParser extends Parser implements ITyped
 {
+	protected IContext	context;
 	protected ITypeList	typeList;
+	
 	private Type		type;
 	
-	public TypeListParser(ITypeList typeList)
+	public TypeListParser(IContext context, ITypeList typeList)
 	{
+		this.context = context;
 		this.typeList = typeList;
 	}
 	
@@ -24,7 +28,7 @@ public class TypeListParser extends Parser implements ITyped
 		if (this.mode == 0)
 		{
 			this.mode = 1;
-			pm.pushParser(new TypeParser(this), token);
+			pm.pushParser(new TypeParser(this.context, this), token);
 			return true;
 		}
 		if (this.mode == 1)

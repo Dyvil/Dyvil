@@ -2,5 +2,7 @@ package com.clashsoft.test;
 
 public class Util
 {
-	public int i = 0;
+	public static int	x	= 0;
+	
+	public static int bar(int x) = x;
 }

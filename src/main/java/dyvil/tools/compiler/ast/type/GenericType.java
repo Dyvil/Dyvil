@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.api.ITypeList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class GenericType extends Type implements ITypeList
 {
 	public List<Type>	generics	= new ArrayList();
 	
-	public GenericType(String name)
+	public GenericType(String name, ICodePosition position)
 	{
-		super(name);
+		super(name, position);
 	}
 	
 	@Override

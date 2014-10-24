@@ -88,7 +88,12 @@ public class MethodCall extends Call implements INamed, IValued
 				context = this.instance.getType();
 			}
 			
-			this.descriptor = context.resolveMethod(this.name, this.getTypes());
+			try
+			{
+				this.descriptor = context.resolveMethod(this.name, this.getTypes());
+			}
+			catch (Exception ex)
+			{}
 			if (this.descriptor == null)
 			{
 				// This might be a field access instead of a method call

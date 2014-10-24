@@ -13,7 +13,7 @@ public abstract class Member extends ASTObject implements IMember
 {
 	protected int				modifiers;
 	
-	protected IClass theClass;
+	protected IClass			theClass;
 	protected Type				type;
 	protected String			name;
 	protected List<Annotation>	annotations	= new ArrayList(1);

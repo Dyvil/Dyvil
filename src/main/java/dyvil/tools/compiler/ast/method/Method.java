@@ -114,6 +114,8 @@ public class Method extends Member implements IMethod
 	@Override
 	public Method applyState(CompilerState state, IContext context)
 	{
+		this.type = this.type.applyState(state, context);
+		
 		if (this.statement != null)
 		{
 			this.statement = this.statement.applyState(state, this);

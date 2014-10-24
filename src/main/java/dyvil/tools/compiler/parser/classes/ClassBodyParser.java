@@ -85,7 +85,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 			}
 			else
 			{
-				pm.pushParser(new TypeParser(this), token);
+				pm.pushParser(new TypeParser(this.theClass, this), token);
 				this.mode = NAME;
 				return true;
 			}
@@ -124,7 +124,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				return true;
 			}
 			
-			pm.pushParser(new TypeParser(this), token);
+			pm.pushParser(new TypeParser(this.theClass, this), token);
 			return true;
 		}
 		if (this.isInMode(FIELD))
@@ -144,7 +144,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 		{
 			if ("(".equals(value))
 			{
-				pm.pushParser(new ParameterListParser(this.method));
+				pm.pushParser(new ParameterListParser(this.theClass, this.method));
 				return true;
 			}
 			else if (")".equals(value))

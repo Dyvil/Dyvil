@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.LambdaType;
+import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -17,15 +20,17 @@ public class TypeParser extends Parser
 	public static final int	LAMBDA_TYPE	= 16;
 	public static final int	LAMBDA_END	= 32;
 	
+	protected IContext		context;
 	protected ITyped		typed;
 	
 	private Type			type;
 	private int				arrayDimensions;
 	private int				arrayDimensions2;
 	
-	public TypeParser(ITyped typed)
+	public TypeParser(IContext context, ITyped typed)
 	{
 		this.mode = NAME;
+		this.context = context;
 		this.typed = typed;
 	}
 	
@@ -42,7 +47,7 @@ public class TypeParser extends Parser
 			if ("(".equals(value))
 			{
 				TupleType type = new TupleType();
-				pm.pushParser(new TypeListParser(type));
+				pm.pushParser(new TypeListParser(this.context, type));
 				this.type = type;
 				this.mode = TUPLE_TYPE;
 				return true;
@@ -62,7 +67,7 @@ public class TypeParser extends Parser
 			else if (token.isType(Token.TYPE_IDENTIFIER))
 			{
 				this.mode = GENERICS | ARRAY;
-				this.type = new Type(value);
+				this.type = new Type(value, token);
 				return true;
 			}
 			else
@@ -89,7 +94,7 @@ public class TypeParser extends Parser
 		}
 		if (this.isInMode(LAMBDA_TYPE))
 		{
-			pm.pushParser(new TypeParser((LambdaType) this.type));
+			pm.pushParser(new TypeParser(this.context, (LambdaType) this.type));
 			this.mode = LAMBDA_END;
 			return true;
 		}
