@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -20,9 +22,10 @@ public class Dyvilc
 	public static Dyvilc		instance;
 	
 	protected CompilerConfig	config;
-	protected CompilerState		state;
+	public Set<CompilerState>	states		= new TreeSet();
 	
 	public static ParserManager	parser		= new ParserManager();
+	public static boolean debug;
 	
 	public Dyvilc(CompilerConfig config)
 	{
@@ -31,21 +34,63 @@ public class Dyvilc
 	
 	public static void main(String[] args)
 	{
-		CodeFile file = new CodeFile(args[0]);
+		
+		int i = 0;
+		CodeFile file = new CodeFile(args[i++]);
 		
 		CompilerConfig config = new CompilerConfig();
 		parser.parse(file, new ConfigParser(config));
 		
 		instance = new Dyvilc(config);
-		instance.compile();
+		for (int j = i; j < args.length; j++)
+		{
+			instance.addStates(args[j]);
+		}
+		
+		instance.run();
 	}
 	
-	public void compile()
+	public void addStates(String s)
+	{
+		switch (s)
+		{
+		case "compile":
+			this.states.add(CompilerState.TOKENIZE);
+			this.states.add(CompilerState.PARSE);
+			this.states.add(CompilerState.RESOLVE_TYPES);
+			this.states.add(CompilerState.RESOLVE);
+			this.states.add(CompilerState.OPERATOR_PRECEDENCE);
+			this.states.add(CompilerState.FOLD_CONSTANTS);
+			this.states.add(CompilerState.CONVERT);
+			this.states.add(CompilerState.COMPILE);
+			break;
+		case "optimize":
+			this.states.add(CompilerState.OPTIMIZE);
+			break;
+		case "obfuscate":
+			this.states.add(CompilerState.OBFUSCATE);
+			break;
+		case "doc":
+			this.states.add(CompilerState.DYVILDOC);
+			break;
+		case "decompile":
+			this.states.add(CompilerState.DECOMPILE);
+			break;
+		case "debug":
+			this.states.add(CompilerState.DEBUG);
+			debug = true;
+			break;
+		}
+	}
+	
+	public void run()
 	{
 		File sourceDir = this.config.sourceDir;
 		File outputDir = this.config.outputDir;
 		Package root = Package.rootPackage;
 		System.out.println("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
+		System.out.println("Applying States " + this.states);
+		System.out.println();
 		
 		for (String s : sourceDir.list())
 		{
@@ -61,7 +106,7 @@ public class Dyvilc
 			}
 		}
 		
-		for (CompilerState state : CompilerState.values())
+		for (CompilerState state : this.states)
 		{
 			state.apply(units, null);
 		}

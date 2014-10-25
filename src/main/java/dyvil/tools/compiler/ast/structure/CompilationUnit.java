@@ -23,8 +23,6 @@ import dyvil.tools.compiler.parser.CompilationUnitParser;
 
 public class CompilationUnit extends ASTObject implements IContext
 {
-	public long							loadingTime	= System.currentTimeMillis();
-	
 	public final String					name;
 	public final Package				pack;
 	protected transient TokenIterator	tokens;
@@ -147,23 +145,6 @@ public class CompilationUnit extends ASTObject implements IContext
 			this.tokens = null;
 			return this;
 		}
-		else if (state == CompilerState.DEBUG)
-		{
-			synchronized (this)
-			{
-				List<Marker> markers = this.getFile().markers;
-				int size = markers.size();
-				if (size > 0)
-				{
-					System.out.println("Markers in Compilation Unit " + this.name + ": " + size);
-					for (Marker marker : this.getFile().markers)
-					{
-						marker.print(System.err);
-					}
-				}
-			}
-			return this;
-		}
 		else if (state == CompilerState.RESOLVE_TYPES)
 		{
 			switch (this.pack.check(this.packageDecl))
@@ -185,6 +166,30 @@ public class CompilationUnit extends ASTObject implements IContext
 			{
 				i.applyState(state, this);
 			}
+		}
+		else if (state == CompilerState.COMPILE)
+		{
+			// TODO COMPILE
+			
+			synchronized (this)
+			{
+				List<Marker> markers = this.getFile().markers;
+				int size = markers.size();
+				if (size > 0)
+				{
+					System.out.println("Markers in Compilation Unit " + this.name + ": " + size);
+					for (Marker marker : this.getFile().markers)
+					{
+						marker.print(System.err);
+					}
+				}
+			}
+			return this;
+		}
+		else if (state == CompilerState.DEBUG)
+		{
+			System.out.println(this.getFile() + ":");
+			System.out.println(this);
 		}
 		this.classes.replaceAll(c -> c.applyState(state, this));
 		return this;

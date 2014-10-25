@@ -62,8 +62,12 @@ public enum CompilerState
 	
 	public void apply(List<CompilationUnit> units, IContext context)
 	{
-		System.out.println("Applying State " + this.name());
-		long now = System.nanoTime();
+		long now = 0L;
+		if (Dyvilc.debug)
+		{
+			System.out.println("Applying State " + this.name());
+			now = System.nanoTime();
+		}
 		
 		for (CompilationUnit unit : units)
 		{
@@ -73,14 +77,16 @@ public enum CompilerState
 				unit.applyState(this, context);
 			}
 			catch (Exception ex)
-			{
-			}
+			{}
 		}
 		
-		now = System.nanoTime() - now;
-		float n = now / 1000000F;
-		float f = (float) n / units.size();
-		System.out.println(String.format("Finished State %s (%.1f ms, %.1f ms/CU, %.2f CU/s)", this.name(), n, f, 1000F / f));
+		if (Dyvilc.debug)
+		{
+			now = System.nanoTime() - now;
+			float n = now / 1000000F;
+			float f = (float) n / units.size();
+			System.out.println(String.format("Finished State %s (%.1f ms, %.1f ms/CU, %.2f CU/s)", this.name(), n, f, 1000F / f));
+		}
 	}
 	
 	public void addMarker(Marker marker)
