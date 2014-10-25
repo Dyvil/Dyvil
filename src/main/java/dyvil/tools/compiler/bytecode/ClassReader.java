@@ -16,7 +16,8 @@ public class ClassReader extends ClassVisitor
 {
 	protected BytecodeClass	bclass;
 	
-	public static File		rtJar;
+	public static File		javaRTJar;
+	public static File		dyvilRTJar;
 	
 	public ClassReader(BytecodeClass bclass)
 	{
@@ -33,8 +34,11 @@ public class ClassReader extends ClassVisitor
 			int index1 = s.lastIndexOf(':', index);
 			int index2 = s.indexOf(':', index + 1);
 			String s1 = s.substring(index1 + 1, index2);
-			rtJar = new File(s1);
+			javaRTJar = new File(s1);
 		}
+		
+		// TODO Actually use the installed Dyvil Runtime Library
+		dyvilRTJar = new File("bin");
 	}
 	
 	public static String classFile(String name)

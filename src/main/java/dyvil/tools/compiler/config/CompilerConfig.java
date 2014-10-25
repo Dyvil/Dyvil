@@ -23,7 +23,8 @@ public class CompilerConfig
 	
 	public CompilerConfig()
 	{
-		this.libraryFiles.add(ClassReader.rtJar);
+		this.libraryFiles.add(ClassReader.javaRTJar);
+		this.libraryFiles.add(ClassReader.dyvilRTJar);
 	}
 	
 	public void addLibraryFile(File libraryFile)
