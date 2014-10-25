@@ -12,23 +12,25 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Type extends ASTObject implements IContext
 {
-	public static Type	NONE	= new Type(null);
+	public static Type[]	EMPTY_TYPES	= new Type[0];
 	
-	public static Type	VOID	= new Type("void");
-	public static Type	INT		= new Type("int");
-	public static Type	LONG	= new Type("long");
-	public static Type	FLOAT	= new Type("float");
-	public static Type	DOUBLE	= new Type("double");
-	public static Type	CHAR	= new Type("char");
-	public static Type	BOOL	= new Type("boolean");
+	public static Type		NONE		= new Type(null);
 	
-	public static Type	STRING	= new Type("java.lang.String");
-	public static Type	CLASS	= new Type("java.lang.Class");
+	public static Type		VOID		= new PrimitiveType("void");
+	public static Type		INT			= new PrimitiveType("int");
+	public static Type		LONG		= new PrimitiveType("long");
+	public static Type		FLOAT		= new PrimitiveType("float");
+	public static Type		DOUBLE		= new PrimitiveType("double");
+	public static Type		CHAR		= new PrimitiveType("char");
+	public static Type		BOOL		= new PrimitiveType("boolean");
 	
-	private String		name;
-	private IClass		theClass;
-	private char		seperator;
-	private int			arrayDimensions;
+	public static Type		STRING		= new Type("java.lang.String");
+	public static Type		CLASS		= new Type("java.lang.Class");
+	
+	public String			name;
+	public IClass			theClass;
+	private char			seperator;
+	private int				arrayDimensions;
 	
 	protected Type()
 	{}
@@ -72,14 +74,9 @@ public class Type extends ASTObject implements IContext
 		this.arrayDimensions = dimensions;
 	}
 	
-	public IClass getTheClass()
+	public boolean isResolved()
 	{
-		return this.theClass;
-	}
-	
-	public String getName()
-	{
-		return this.name;
+		return this.theClass == null;
 	}
 	
 	public char getSeperator()
@@ -107,32 +104,39 @@ public class Type extends ASTObject implements IContext
 		
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
-			if (this.theClass == null)
+			Type type = this.resolve(context);
+			if (!type.isResolved())
 			{
-				switch (this.name)
-				{
-				case "void":
-					return VOID;
-				case "int":
-					return INT;
-				case "long":
-					return LONG;
-				case "float":
-					return FLOAT;
-				case "double":
-					return DOUBLE;
-				case "char":
-					return CHAR;
-				case "bool":
-					return BOOL;
-				}
-				
-				this.theClass = context.resolveClass(this.name);
-				if (this.theClass == null)
-				{
-					state.addMarker(new SemanticError(this.position, "The type '" + this.name + "' could not be resolved."));
-				}
+				state.addMarker(new SemanticError(this.position, "The type '" + this.name + "' could not be resolved."));
 			}
+			return type;
+		}
+		return this;
+	}
+	
+	public Type resolve(IContext context)
+	{
+		if (this.theClass != null)
+		{
+			switch (this.name)
+			{
+			case "void":
+				return VOID;
+			case "int":
+				return INT;
+			case "long":
+				return LONG;
+			case "float":
+				return FLOAT;
+			case "double":
+				return DOUBLE;
+			case "char":
+				return CHAR;
+			case "bool":
+				return BOOL;
+			}
+			
+			this.theClass = context.resolveClass(this.name);
 		}
 		return this;
 	}

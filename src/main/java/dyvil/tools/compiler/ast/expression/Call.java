@@ -18,7 +18,7 @@ public abstract class Call extends ASTObject implements IValue, IValueList
 	
 	protected boolean		isSugarCall;
 	
-	public IMethod			descriptor;
+	public IMethod			method;
 	
 	public Call(ICodePosition position)
 	{

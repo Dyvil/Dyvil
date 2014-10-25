@@ -32,7 +32,7 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public Type getType()
 	{
-		return this.descriptor.getType();
+		return this.method.getType();
 	}
 	
 	@Override
@@ -95,12 +95,12 @@ public class MethodCall extends Call implements INamed, IValued
 			
 			try
 			{
-				this.descriptor = context.resolveMethod(this.name, this.getTypes());
+				this.method = context.resolveMethod(this.name, this.getTypes());
 			}
 			catch (Exception ex)
 			{}
 			
-			if (this.descriptor == null)
+			if (this.method == null)
 			{
 				// This might be a field access instead of a method call
 				IField field = context.resolveField(this.name);

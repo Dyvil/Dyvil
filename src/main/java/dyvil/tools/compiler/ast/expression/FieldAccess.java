@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -83,7 +84,7 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public FieldAccess applyState(CompilerState state, IContext context)
+	public IValue applyState(CompilerState state, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -100,6 +101,15 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 			this.field = context.resolveField(this.name);
 			if (this.field == null)
 			{
+				IMethod method = context.resolveMethod(this.name, Type.EMPTY_TYPES);
+				if (method != null)
+				{
+					MethodCall call = new MethodCall(this.position, this.instance, this.name);
+					call.method = method;
+					call.isSugarCall = true;
+					return call;
+				}
+				
 				state.addMarker(new SemanticError(this.position, "'" + this.name + "' cannot be resolved to a field"));
 			}
 			else if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
