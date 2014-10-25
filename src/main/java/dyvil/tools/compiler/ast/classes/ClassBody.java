@@ -22,6 +22,12 @@ public class ClassBody extends ASTObject
 		this.position = position;
 	}
 	
+	public ClassBody(ICodePosition position, IClass iclass)
+	{
+		this.position = position;
+		this.theClass = iclass;
+	}
+	
 	public void setTheClass(IClass theClass)
 	{
 		this.theClass = theClass;
@@ -32,7 +38,7 @@ public class ClassBody extends ASTObject
 		return this.theClass;
 	}
 	
-	public void addVariable(IField var)
+	public void addField(IField var)
 	{
 		this.fields.add(var);
 	}

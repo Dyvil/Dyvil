@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.bytecode.ClassReader;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -17,12 +18,14 @@ public class Type extends ASTObject implements IContext
 	public static Type		NONE		= new Type(null);
 	
 	public static Type		VOID		= new PrimitiveType("void");
+	public static Type		BOOL		= new PrimitiveType("boolean");
+	public static Type		BYTE		= new PrimitiveType("byte");
+	public static Type		SHORT		= new PrimitiveType("short");
+	public static Type		CHAR		= new PrimitiveType("char");
 	public static Type		INT			= new PrimitiveType("int");
 	public static Type		LONG		= new PrimitiveType("long");
 	public static Type		FLOAT		= new PrimitiveType("float");
 	public static Type		DOUBLE		= new PrimitiveType("double");
-	public static Type		CHAR		= new PrimitiveType("char");
-	public static Type		BOOL		= new PrimitiveType("boolean");
 	
 	public static Type		STRING		= new Type("java.lang.String");
 	public static Type		CLASS		= new Type("java.lang.Class");
@@ -57,6 +60,28 @@ public class Type extends ASTObject implements IContext
 		this.name = name;
 		this.theClass = iclass;
 		this.position = position;
+	}
+	
+	public static Type fromInternal(String internal)
+	{
+		switch (internal.charAt(0)) {
+		case 'Z': return BOOL;
+		case 'B': return BYTE;
+		case 'S': return SHORT;
+		case 'C': return CHAR;
+		case 'I': return INT;
+		case 'J': return LONG;
+		case 'F': return FLOAT;
+		case 'D': return DOUBLE;
+		case 'L':
+			int l = internal.length()-1;
+			if (internal.charAt(l) == ';')
+			{
+				internal = internal.substring(1, l);
+			}
+		}
+		
+		return new Type(ClassReader.internalToPackage(internal));
 	}
 	
 	public void setClass(IClass theClass)

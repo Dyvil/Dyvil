@@ -99,14 +99,14 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				{
 					this.mode = FIELD;
 					this.field.setName(value);
-					this.classBody.addVariable(field);
+					this.classBody.addField(field);
 					return true;
 				}
 				else if (next.equals(";"))
 				{
 					this.mode = FIELD;
 					this.field.setName(value);
-					this.classBody.addVariable(this.field);
+					this.classBody.addField(this.field);
 					this.reset();
 					return true;
 				}

@@ -27,6 +27,9 @@ public class AbstractClass extends ASTObject implements IClass
 	protected List<Type>		superClasses	= new ArrayList();
 	protected List<Annotation>	annotations		= new ArrayList();
 	
+	public AbstractClass()
+	{}
+	
 	public AbstractClass(ICodePosition position, CompilationUnit unit, int type, ClassBody body)
 	{
 		this.position = position;

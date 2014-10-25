@@ -7,10 +7,7 @@ public class Main extends Util
 	public int i = 0;
 	public int j = 0;
 	
-	public static void main(String[] args) =
-	{
-		Main.instance;
-	};
+	public static void main(String[] args) = Main.instance;
 	
 	public static void instance() = { };
 }

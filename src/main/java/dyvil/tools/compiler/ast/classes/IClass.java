@@ -10,7 +10,10 @@ public interface IClass extends IASTObject, INamed, IModified, ITypeList, IAnnot
 {
 	public default void addSuperClass(Type superClass)
 	{
-		this.getSuperClasses().add(superClass);
+		if (superClass != null)
+		{
+			this.getSuperClasses().add(superClass);
+		}
 	}
 	
 	public String getGenericName();
