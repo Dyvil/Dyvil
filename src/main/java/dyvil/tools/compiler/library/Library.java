@@ -4,10 +4,14 @@ import java.io.File;
 import java.io.InputStream;
 
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.bytecode.ClassReader;
 
 public abstract class Library
 {
-	public File	file;
+	public static Library	dyvilLibrary	= load(ClassReader.dyvilRTJar);
+	public static Library	javaLibrary		= load(ClassReader.javaRTJar);
+	
+	public File				file;
 	
 	protected Library(File file)
 	{

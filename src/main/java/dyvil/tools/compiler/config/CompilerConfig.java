@@ -4,33 +4,37 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.bytecode.ClassReader;
 import dyvil.tools.compiler.library.Library;
 
 public class CompilerConfig
 {
-	public String		jarName;
-	public String		jarGroup;
-	public String		jarVersion;
+	public String			jarName;
+	public String			jarGroup;
+	public String			jarVersion;
 	
-	public File			sourceDir;
-	public File			outputDir;
-	public List<Library>	libraries	= new ArrayList();
+	public File				sourceDir;
+	public File				outputDir;
+	public List<Library>	libraries		= new ArrayList();
 	
-	public List<String>	includedFiles	= new ArrayList();
-	public List<String>	excludedFiles	= new ArrayList();
+	public List<String>		includedFiles	= new ArrayList();
+	public List<String>		excludedFiles	= new ArrayList();
 	
-	public String		mainType;
+	public String			mainType;
 	
 	public CompilerConfig()
 	{
-		this.addLibrary(ClassReader.javaRTJar);
-		this.addLibrary(ClassReader.dyvilRTJar);
+		this.addLibrary(Library.dyvilLibrary);
+		this.addLibrary(Library.javaLibrary);
 	}
 	
-	public void addLibrary(File libraryFile)
+	public void addLibraryFile(File file)
 	{
-		this.libraries.add(Library.load(libraryFile));
+		this.libraries.add(Library.load(file));
+	}
+	
+	public void addLibrary(Library library)
+	{
+		this.libraries.add(library);
 	}
 	
 	public void includeFile(String fileName)

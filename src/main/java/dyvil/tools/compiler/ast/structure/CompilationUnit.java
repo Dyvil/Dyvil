@@ -28,8 +28,8 @@ public class CompilationUnit extends ASTObject implements IContext
 	protected transient TokenIterator	tokens;
 	
 	protected PackageDecl				packageDecl;
-	protected List<IImport>				imports		= new ArrayList();
-	protected List<AbstractClass>		classes		= new ArrayList();
+	protected List<IImport>				imports	= new ArrayList();
+	protected List<AbstractClass>		classes	= new ArrayList();
 	
 	public CompilationUnit(Package pack, CodeFile file)
 	{
@@ -98,18 +98,33 @@ public class CompilationUnit extends ASTObject implements IContext
 			}
 		}
 		
+		IClass iclass;
+		
 		// Imported Classes
 		for (IImport i : this.imports)
 		{
-			IClass c = i.resolveClass(name);
-			if (c != null)
+			iclass = i.resolveClass(name);
+			if (iclass != null)
 			{
-				return c;
+				return iclass;
 			}
 		}
 		
-		// Package classes
-		return this.pack.resolveClass(name);
+		// Package Classes
+		iclass = this.pack.resolveClass(name);
+		if (iclass != null) {
+			return iclass;
+		}
+		
+		// Standart Dyvil Classes
+		iclass = Package.dyvilLang.resolveClass(name);
+		if (iclass != null)
+		{
+			return iclass;
+		}
+		
+		// Standart Java Classes
+		return Package.javaLang.resolveClass(name);
 	}
 	
 	@Override

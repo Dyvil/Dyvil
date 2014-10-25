@@ -16,6 +16,9 @@ public class Package implements IContext
 {
 	public static Package			rootPackage	= new Package(null, null);
 	
+	public static Package			dyvilLang	= Library.dyvilLibrary.resolvePackage("dyvil.lang");
+	public static Package			javaLang	= Library.javaLibrary.resolvePackage("java.lang");
+	
 	public Package					parent;
 	public String					name;
 	public String					fullName;

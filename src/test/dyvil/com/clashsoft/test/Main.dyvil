@@ -2,8 +2,6 @@ package com.clashsoft.test;
 
 import com.clashsoft.test.Util;
 
-import java.lang.Integer;
-
 public class Main extends Util
 {
 	public int i = 0;
