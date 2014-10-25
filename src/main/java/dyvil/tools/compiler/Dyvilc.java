@@ -10,7 +10,6 @@ import java.util.TreeSet;
 
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.bytecode.ClassReader;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -22,7 +21,7 @@ public class Dyvilc
 	
 	public static Dyvilc		instance;
 	
-	protected CompilerConfig	config;
+	public CompilerConfig		config;
 	public Set<CompilerState>	states		= new TreeSet();
 	
 	public static ParserManager	parser		= new ParserManager();
@@ -37,9 +36,6 @@ public class Dyvilc
 	{
 		int i = 0;
 		CodeFile file = new CodeFile(args[i++]);
-		
-		File rtFile = ClassReader.getRTFile();
-		System.out.println(ClassReader.loadClass(rtFile, "java.lang.String", false));
 		
 		CompilerConfig config = new CompilerConfig();
 		parser.parse(file, new ConfigParser(config));

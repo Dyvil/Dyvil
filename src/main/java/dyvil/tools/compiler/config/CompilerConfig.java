@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.bytecode.ClassReader;
+
 public class CompilerConfig
 {
 	public String		jarName;
@@ -18,6 +20,11 @@ public class CompilerConfig
 	public List<String>	excludedFiles	= new ArrayList();
 	
 	public String		mainType;
+	
+	public CompilerConfig()
+	{
+		this.libraryFiles.add(ClassReader.rtJar);
+	}
 	
 	public void addLibraryFile(File libraryFile)
 	{

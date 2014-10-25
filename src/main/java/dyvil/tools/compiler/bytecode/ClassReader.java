@@ -1,12 +1,14 @@
 package dyvil.tools.compiler.bytecode;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipFile;
 
-import org.objectweb.asm.*;
-
+import jdk.internal.org.objectweb.asm.*;
 import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 
@@ -14,13 +16,15 @@ public class ClassReader extends ClassVisitor
 {
 	protected BytecodeClass	bclass;
 	
+	public static File		rtJar;
+	
 	public ClassReader(BytecodeClass bclass)
 	{
 		super(Opcodes.ASM5);
 		this.bclass = bclass;
 	}
 	
-	public static File getRTFile()
+	static
 	{
 		String s = System.getProperty("sun.boot.class.path");
 		int index = s.indexOf("rt.jar");
@@ -29,9 +33,13 @@ public class ClassReader extends ClassVisitor
 			int index1 = s.lastIndexOf(':', index);
 			int index2 = s.indexOf(':', index + 1);
 			String s1 = s.substring(index1 + 1, index2);
-			return new File(s1);
+			rtJar = new File(s1);
 		}
-		return null;
+	}
+	
+	public static String classFile(String name)
+	{
+		return name.replace('.', '/') + ".class";
 	}
 	
 	public static String packageToInternal(String name)
@@ -44,25 +52,73 @@ public class ClassReader extends ClassVisitor
 		return name.replace('/', '.');
 	}
 	
-	public static IClass loadClass(File file, String name, boolean decompile)
+	public static Object getChildren(File parent, String child)
 	{
-		try (JarFile jarFile = new JarFile(file))
+		if (parent.isDirectory())
+		{
+			return new File(parent, child);
+		}
+		else if (parent.getPath().endsWith(".jar"))
+		{
+			try (JarFile jarFile = new JarFile(parent, false, ZipFile.OPEN_READ))
+			{
+				return jarFile.getJarEntry(child);
+			}
+			catch (IOException ex)
+			{}
+		}
+		return null;
+	}
+	
+	public static InputStream getInputStream(File parent, String child)
+	{
+		if (parent.isDirectory())
+		{
+			try
+			{
+				return new FileInputStream(new File(parent, child));
+			}
+			catch (IOException ex)
+			{
+				return null;
+			}
+		}
+		else if (parent.getPath().endsWith(".jar"))
+		{
+			try (JarFile jarFile = new JarFile(parent, false, ZipFile.OPEN_READ))
+			{
+				JarEntry entry = jarFile.getJarEntry(child);
+				return jarFile.getInputStream(entry);
+			}
+			catch (IOException ex)
+			{
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	public static IClass loadClass(InputStream is, boolean decompile)
+	{
+		if (is == null)
+		{
+			return null;
+		}
+		
+		try
 		{
 			BytecodeClass bclass = new BytecodeClass();
-			name = packageToInternal(name) + ".class";
-			JarEntry entry = jarFile.getJarEntry(name);
-			InputStream is = jarFile.getInputStream(entry);
-			
-			org.objectweb.asm.ClassReader reader = new org.objectweb.asm.ClassReader(is);
+			jdk.internal.org.objectweb.asm.ClassReader reader = new jdk.internal.org.objectweb.asm.ClassReader(is);
 			ClassReader visitor = new ClassReader(bclass);
 			reader.accept(visitor, 0);
 			
 			return bclass;
 		}
-		catch (Exception ex)
+		catch (IOException ex)
 		{
 			ex.printStackTrace();
 		}
+		
 		return null;
 	}
 	
@@ -110,6 +166,5 @@ public class ClassReader extends ClassVisitor
 	
 	@Override
 	public void visitEnd()
-	{
-	}
+	{}
 }

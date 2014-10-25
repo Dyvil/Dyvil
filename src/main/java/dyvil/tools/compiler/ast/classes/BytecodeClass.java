@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.ClassReader;
 
@@ -33,6 +34,10 @@ public class BytecodeClass extends AbstractClass
 	
 	public void visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
+		Method method = new Method(this);
+		method.setName(name);
+		method.setModifiers(access);
 		
+		this.body.addMethod(method);
 	}
 }

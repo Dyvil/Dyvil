@@ -1,14 +1,16 @@
 package dyvil.tools.compiler.ast.structure;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.Dyvilc;
 import dyvil.tools.compiler.ast.api.IField;
-import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.bytecode.ClassReader;
 
 public class Package implements IContext
 {
@@ -17,22 +19,29 @@ public class Package implements IContext
 	public Package					parent;
 	public String					name;
 	public String					fullName;
+	public String					internalName;
 	
 	public List<CompilationUnit>	units		= new ArrayList();
-	public List<AbstractClass>		classes		= new ArrayList();
+	public List<IClass>				classes		= new ArrayList();
 	public List<Package>			subPackages	= new ArrayList();
 	
 	public Package(Package parent, String name)
 	{
 		this.name = name;
 		this.parent = parent;
-		if (parent == null || parent.fullName == null)
+		
+		if (parent == null || parent.name == null)
 		{
-			this.fullName = name;
+			if (name != null)
+			{
+				this.fullName = name;
+				this.internalName = ClassReader.packageToInternal(name) + "/";
+			}
 		}
 		else
 		{
 			this.fullName = parent.fullName + "." + name;
+			this.internalName = parent.internalName + name + "/";
 		}
 	}
 	
@@ -41,7 +50,7 @@ public class Package implements IContext
 		this.units.add(unit);
 	}
 	
-	public void addClass(AbstractClass iclass)
+	public void addClass(IClass iclass)
 	{
 		this.classes.add(iclass);
 	}
@@ -113,6 +122,24 @@ public class Package implements IContext
 		{
 			if (name.equals(pack.fullName))
 			{
+				return pack;
+			}
+		}
+		
+		String internalName = ClassReader.packageToInternal(name);
+		for (File library : Dyvilc.instance.config.libraryFiles)
+		{
+			if (library.isDirectory())
+			{
+				File file = new File(library, internalName);
+				Package pack = new FilePackage(rootPackage, name, file);
+				rootPackage.addSubPackage(pack);
+				return pack;
+			}
+			else if (library.getPath().endsWith(".jar"))
+			{
+				Package pack = new JarPackage(rootPackage, name, library);
+				rootPackage.addSubPackage(pack);
 				return pack;
 			}
 		}

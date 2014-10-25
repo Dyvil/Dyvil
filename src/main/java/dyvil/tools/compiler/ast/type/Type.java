@@ -64,24 +64,44 @@ public class Type extends ASTObject implements IContext
 	
 	public static Type fromInternal(String internal)
 	{
-		switch (internal.charAt(0)) {
-		case 'Z': return BOOL;
-		case 'B': return BYTE;
-		case 'S': return SHORT;
-		case 'C': return CHAR;
-		case 'I': return INT;
-		case 'J': return LONG;
-		case 'F': return FLOAT;
-		case 'D': return DOUBLE;
+		int len = internal.length();
+		int arrayDimensions = 0;
+		int i = 0;
+		while (i < len && internal.charAt(i) == '[')
+		{
+			arrayDimensions++;
+			i++;
+		}
+		
+		switch (internal.charAt(i))
+		{
+		case 'Z':
+			return BOOL;
+		case 'B':
+			return BYTE;
+		case 'S':
+			return SHORT;
+		case 'C':
+			return CHAR;
+		case 'I':
+			return INT;
+		case 'J':
+			return LONG;
+		case 'F':
+			return FLOAT;
+		case 'D':
+			return DOUBLE;
 		case 'L':
-			int l = internal.length()-1;
+			int l = len - 1;
 			if (internal.charAt(l) == ';')
 			{
-				internal = internal.substring(1, l);
+				internal = internal.substring(i + 1, l);
 			}
 		}
 		
-		return new Type(ClassReader.internalToPackage(internal));
+		Type type = new Type(ClassReader.internalToPackage(internal));
+		type.arrayDimensions = arrayDimensions;
+		return type;
 	}
 	
 	public void setClass(IClass theClass)
@@ -101,7 +121,7 @@ public class Type extends ASTObject implements IContext
 	
 	public boolean isResolved()
 	{
-		return this.theClass == null;
+		return this.theClass != null;
 	}
 	
 	public char getSeperator()
@@ -132,7 +152,7 @@ public class Type extends ASTObject implements IContext
 			Type type = this.resolve(context);
 			if (!type.isResolved())
 			{
-				state.addMarker(new SemanticError(this.position, "The type '" + this.name + "' could not be resolved."));
+				state.addMarker(new SemanticError(this.position, "'" + this.name + "' cannot be resolved to a type"));
 			}
 			return type;
 		}
@@ -141,7 +161,7 @@ public class Type extends ASTObject implements IContext
 	
 	public Type resolve(IContext context)
 	{
-		if (this.theClass != null)
+		if (this.theClass == null)
 		{
 			switch (this.name)
 			{

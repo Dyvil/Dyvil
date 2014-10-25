@@ -59,7 +59,7 @@ public class ClassAccess extends ASTObject implements IValue
 					return call;
 				}
 				
-				state.addMarker(new SemanticError(this.position, "The type '" + name + "' could not be resolved."));
+				state.addMarker(new SemanticError(this.position, "'" + name + "' cannot be resolved to a type"));
 			}
 		}
 		return this;

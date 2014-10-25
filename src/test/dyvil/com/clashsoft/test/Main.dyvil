@@ -2,12 +2,14 @@ package com.clashsoft.test;
 
 import com.clashsoft.test.Util;
 
+import java.lang.Integer;
+
 public class Main extends Util
 {
 	public int i = 0;
 	public int j = 0;
 	
-	public static void main(String[] args) = Main.instance;
+	public static void main(String[] args) = { Integer.MIN_VALUE };
 	
 	public static void instance() = { };
 }
