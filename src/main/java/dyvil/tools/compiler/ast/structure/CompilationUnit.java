@@ -149,14 +149,17 @@ public class CompilationUnit extends ASTObject implements IContext
 		}
 		else if (state == CompilerState.DEBUG)
 		{
-			List<Marker> markers = this.getFile().markers;
-			int size = markers.size();
-			if (size > 0)
+			synchronized (this)
 			{
-				System.out.println("Markers in Compilation Unit " + this.name + ": " + size);
-				for (Marker marker : this.getFile().markers)
+				List<Marker> markers = this.getFile().markers;
+				int size = markers.size();
+				if (size > 0)
 				{
-					marker.print(System.err);
+					System.out.println("Markers in Compilation Unit " + this.name + ": " + size);
+					for (Marker marker : this.getFile().markers)
+					{
+						marker.print(System.err);
+					}
 				}
 			}
 			return this;

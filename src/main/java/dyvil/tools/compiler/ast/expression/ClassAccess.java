@@ -26,7 +26,7 @@ public class ClassAccess extends ASTObject implements IValue
 	@Override
 	public Type getType()
 	{
-		return Type.CLASS;
+		return this.type;
 	}
 	
 	@Override
