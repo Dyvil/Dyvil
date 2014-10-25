@@ -34,7 +34,7 @@ public class ExpressionListParser extends Parser implements IValued
 		if (this.mode == 0)
 		{
 			this.mode = 1;
-			pm.pushTryParserParse(new ExpressionParser(this.context, this, this.statements), token);
+			pm.pushTryParser(new ExpressionParser(this.context, this, this.statements), token, true);
 			return true;
 		}
 		if (this.mode == 1)
@@ -52,7 +52,7 @@ public class ExpressionListParser extends Parser implements IValued
 			}
 		}
 		
-		pm.popParser(token);
+		pm.popParser(true);
 		return true;
 	}
 	

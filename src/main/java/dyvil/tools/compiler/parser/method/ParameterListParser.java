@@ -41,12 +41,12 @@ public class ParameterListParser extends Parser
 			}
 			else if (")".equals(value))
 			{
-				pm.popParser(token);
+				pm.popParser(true);
 				return true;
 			}
 			
 			this.mode = NAME;
-			pm.pushParser(new TypeParser(this.context, this.parameter), token);
+			pm.pushParser(new TypeParser(this.context, this.parameter), true);
 			return true;
 		}
 		if (this.isInMode(NAME))
@@ -65,7 +65,7 @@ public class ParameterListParser extends Parser
 			}
 			else if (")".equals(value))
 			{
-				pm.popParser(token);
+				pm.popParser(true);
 				return true;
 			}
 		}

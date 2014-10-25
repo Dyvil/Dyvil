@@ -15,12 +15,14 @@ import dyvil.tools.compiler.parser.config.ConfigParser;
 
 public class Dyvilc
 {
-	public static Dyvilc						instance;
+	public static final boolean	parseStack	= false;
 	
-	protected CompilerConfig					config;
-	protected CompilerState						state;
+	public static Dyvilc		instance;
 	
-	public static ParserManager					parser				= new ParserManager();
+	protected CompilerConfig	config;
+	protected CompilerState		state;
+	
+	public static ParserManager	parser		= new ParserManager();
 	
 	public Dyvilc(CompilerConfig config)
 	{

@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.expression.ClassAccess;
 import dyvil.tools.compiler.ast.expression.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.FieldAccess;
 import dyvil.tools.compiler.ast.expression.MethodCall;
@@ -9,6 +11,7 @@ import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -18,7 +21,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 
-public class ExpressionParser extends Parser
+public class ExpressionParser extends Parser implements ITyped
 {
 	public static final int	VALUE			= 1;
 	public static final int	VALUE_2			= 2;
@@ -59,7 +62,7 @@ public class ExpressionParser extends Parser
 	{
 		if (this.mode == 0)
 		{
-			pm.popParser(token);
+			pm.popParser(true);
 			return true;
 		}
 		if (this.isInMode(VALUE))
@@ -68,7 +71,8 @@ public class ExpressionParser extends Parser
 			{
 				return true;
 			}
-			else if ("this".equals(value)) {
+			else if ("this".equals(value))
+			{
 				this.value = new ThisValue(token, this.context.getThisType());
 				return true;
 			}
@@ -100,6 +104,12 @@ public class ExpressionParser extends Parser
 				this.mode = PARAMETERS;
 				this.value = call;
 				pm.pushParser(new TypeParser(this.context, call));
+				return true;
+			}
+			else if (token.isType(Token.TYPE_IDENTIFIER))
+			{
+				pm.pushParser(new TypeParser(this.context, this), true);
+				this.mode = ACCESS;
 				return true;
 			}
 			this.mode = ACCESS;
@@ -203,7 +213,7 @@ public class ExpressionParser extends Parser
 		if (this.value != null)
 		{
 			this.value.expandPosition(token);
-			pm.popParser(token);
+			pm.popParser(true);
 			return true;
 		}
 		return false;
@@ -271,5 +281,17 @@ public class ExpressionParser extends Parser
 			return true;
 		}
 		return false;
+	}
+	
+	@Override
+	public void setType(Type type)
+	{
+		this.value = new ClassAccess(type.getPosition(), type);
+	}
+	
+	@Override
+	public Type getType()
+	{
+		return null;
 	}
 }

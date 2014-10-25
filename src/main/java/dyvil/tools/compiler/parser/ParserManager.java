@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser;
 
+import dyvil.tools.compiler.Dyvilc;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
@@ -8,11 +9,13 @@ import dyvil.tools.compiler.lexer.token.IToken;
 
 public class ParserManager
 {
-	protected Parser	currentParser;
+	protected Parser		currentParser;
 	
-	public CodeFile		file;
+	public CodeFile			file;
 	
-	protected IToken	lastToken;
+	protected TokenIterator	tokens;
+	protected IToken		currentToken;
+	protected IToken		jumpBackToken;
 	
 	public ParserManager()
 	{
@@ -54,6 +57,7 @@ public class ParserManager
 	public final void parse(CodeFile file, TokenIterator tokens)
 	{
 		IToken token = null;
+		this.tokens = tokens;
 		
 		try
 		{
@@ -85,23 +89,29 @@ public class ParserManager
 			tokens.reset();
 			while (tokens.hasNext())
 			{
+				Parser parser = this.currentParser;
+				token = this.currentToken = tokens.next();
 				try
 				{
-					token = tokens.next();
-					this.parseToken(this.currentParser, token);
+					this.parseToken(parser, token);
 				}
 				catch (SyntaxError ex)
 				{
-					if (this.lastToken != null)
+					if (this.jumpBackToken != null)
 					{
-						tokens.jump(this.lastToken);
+						tokens.jump(this.jumpBackToken);
 						this.popParser();
-						this.lastToken = null;
+						this.jumpBackToken = null;
 					}
 					else
 					{
 						this.file.markers.add(ex);
 					}
+				}
+				
+				if (Dyvilc.parseStack)
+				{
+					System.out.println(token + ":\t\t" + parser.name);
 				}
 			}
 		}
@@ -157,26 +167,22 @@ public class ParserManager
 	
 	public void pushTryParser(Parser parser, IToken token)
 	{
-		this.lastToken = token;
-		this.pushParser(parser);
+		this.jumpBackToken = token;
+		this.pushParser(parser, false);
 	}
 	
-	public void pushTryParserParse(Parser parser, IToken start) throws SyntaxError
+	public void pushTryParser(Parser parser, IToken token, boolean reparse) throws SyntaxError
 	{
-		this.lastToken = start;
-		this.pushParser(parser, start);
+		this.jumpBackToken = token;
+		this.pushParser(parser, reparse);
 	}
 	
-	/**
-	 * Adds the given {@link Parser} {@code parser} to the stack.
-	 * 
-	 * @see Parser#parse(ParserManager, String, IToken)
-	 * @param parser
-	 *            the parser
-	 * @throws SyntaxError
-	 *             syntax errors
-	 */
 	public void pushParser(Parser parser)
+	{
+		this.pushParser(parser, false);
+	}
+	
+	public void pushParser(Parser parser, boolean reparse)
 	{
 		if (this.currentParser != null)
 		{
@@ -184,40 +190,31 @@ public class ParserManager
 		}
 		this.currentParser = parser;
 		parser.begin(this);
+		if (reparse)
+		{
+			this.tokens.jump(this.currentToken);
+		}
 	}
 	
-	/**
-	 * Adds the given {@link Parser} {@code parser} to the stack and makes it
-	 * parse the given {@link IToken} {@code token}.
-	 * 
-	 * @see #pushParser(Parser)
-	 * @see Parser#parse(ParserManager, String, IToken)
-	 * @param parser
-	 *            the parser
-	 * @throws SyntaxError
-	 *             syntax errors
-	 */
-	public void pushParser(Parser parser, IToken token) throws SyntaxError
+	public void popParser() throws SyntaxError
 	{
-		this.pushParser(parser);
-		this.parseToken(parser, token);
+		this.popParser(false);
 	}
 	
-	public void popParser()
+	public void popParser(boolean reparse) throws SyntaxError
 	{
+		// Drop the jumpback token since the tryparser has completed
+		// successfully.
+		this.jumpBackToken = null;
 		if (this.currentParser != null)
 		{
 			this.currentParser.end(this);
 			this.currentParser = this.currentParser.getParent();
 		}
-	}
-	
-	public void popParser(IToken token) throws SyntaxError
-	{
-		this.popParser();
-		if (this.currentParser != null)
+		
+		if (reparse)
 		{
-			this.parseToken(this.currentParser, token);
+			this.tokens.jump(this.currentToken);
 		}
 	}
 }

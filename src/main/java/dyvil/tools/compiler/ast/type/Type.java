@@ -50,6 +50,13 @@ public class Type extends ASTObject implements IContext
 		this.position = position;
 	}
 	
+	public Type(String name, IClass iclass, ICodePosition position)
+	{
+		this.name = name;
+		this.theClass = iclass;
+		this.position = position;
+	}
+	
 	public void setClass(IClass theClass)
 	{
 		this.theClass = theClass;

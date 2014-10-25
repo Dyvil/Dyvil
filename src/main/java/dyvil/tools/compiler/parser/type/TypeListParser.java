@@ -28,12 +28,12 @@ public class TypeListParser extends Parser implements ITyped
 		if (this.mode == 0)
 		{
 			this.mode = 1;
-			pm.pushParser(new TypeParser(this.context, this), token);
+			pm.pushParser(new TypeParser(this.context, this), true);
 			return true;
 		}
 		if (this.mode == 1)
 		{
-			if (",".equals(value) || ";".equals(value) || ":".equals(value))
+			if (",".equals(value) || ";".equals(value))
 			{
 				this.type.setSeperator(value.charAt(0));
 				this.typeList.addType(this.type);
@@ -42,7 +42,7 @@ public class TypeListParser extends Parser implements ITyped
 			}
 		}
 		
-		pm.popParser(token);
+		pm.popParser(true);
 		this.typeList.addType(this.type);
 		return true;
 	}

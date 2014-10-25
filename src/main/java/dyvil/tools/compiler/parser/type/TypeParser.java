@@ -37,11 +37,6 @@ public class TypeParser extends Parser
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (this.mode == -1)
-		{
-			pm.popParser();
-			return true;
-		}
 		if (this.isInMode(NAME))
 		{
 			if ("(".equals(value))
@@ -52,27 +47,25 @@ public class TypeParser extends Parser
 				this.mode = TUPLE_TYPE;
 				return true;
 			}
-			if ("<".equals(value))
-			{
-				this.mode = GENERICS;
-				return true;
-			}
-			else if ("[".equals(value))
-			{
-				this.mode = ARRAY;
-				this.arrayDimensions++;
-				this.arrayDimensions2++;
-				return true;
-			}
 			else if (token.isType(Token.TYPE_IDENTIFIER))
 			{
-				this.mode = GENERICS | ARRAY;
+				// TODO package.class
 				this.type = new Type(value, token);
-				return true;
-			}
-			else
-			{
-				pm.popParser(token);
+				
+				IToken next = token.next();
+				if (next.equals("<"))
+				{
+					this.mode = GENERICS;
+				}
+				else if (next.equals("["))
+				{
+					this.mode = ARRAY;
+				}
+				else
+				{
+					pm.popParser();
+				}
+				
 				return true;
 			}
 		}
@@ -100,7 +93,7 @@ public class TypeParser extends Parser
 		}
 		if (this.isInMode(LAMBDA_END))
 		{
-			pm.popParser(token);
+			pm.popParser(true);
 			return true;
 		}
 		if (this.isInMode(ARRAY))
@@ -122,12 +115,16 @@ public class TypeParser extends Parser
 			}
 			else
 			{
-				pm.popParser(token);
+				pm.popParser(true);
 				return true;
 			}
 		}
 		if (this.isInMode(GENERICS))
 		{
+			if ("<".equals(value))
+			{
+				return true;
+			}
 			if (">".equals(value))
 			{
 				this.mode = ARRAY;
@@ -144,7 +141,10 @@ public class TypeParser extends Parser
 	@Override
 	public void end(ParserManager pm)
 	{
-		this.type.setArrayDimensions(this.arrayDimensions);
+		if (this.type != null)
+		{
+			this.type.setArrayDimensions(this.arrayDimensions);
+		}
 		this.typed.setType(this.type);
 	}
 }

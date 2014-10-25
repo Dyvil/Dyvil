@@ -23,7 +23,7 @@ public class ThrowsDeclParser extends Parser
 		{
 			if (this.mode == 1)
 			{
-				jcp.popParser(token);
+				jcp.popParser(true);
 				return true;				
 			}
 			throw new SyntaxError(token, "Invalid throws delcaration!");

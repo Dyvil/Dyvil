@@ -21,7 +21,7 @@ public class StatementListParser extends ExpressionListParser
 		if (this.mode == 0)
 		{
 			this.mode = 1;
-			pm.pushParser(new ExpressionParser(this.context, this, true), token);
+			pm.pushParser(new ExpressionParser(this.context, this, true), true);
 			return true;
 		}
 		else if (";".equals(value))
@@ -30,7 +30,7 @@ public class StatementListParser extends ExpressionListParser
 			return true;
 		}
 		
-		pm.popParser(token);
+		pm.popParser(true);
 		return true;
 	}
 }

@@ -99,6 +99,7 @@ public class MethodCall extends Call implements INamed, IValued
 			}
 			catch (Exception ex)
 			{}
+			
 			if (this.descriptor == null)
 			{
 				// This might be a field access instead of a method call

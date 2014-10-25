@@ -50,7 +50,7 @@ public class CompilationUnitParser extends Parser
 		if (this.isInMode(CLASS))
 		{
 			this.mode = CLASS;
-			jcp.pushParser(new ClassDeclParser(this.unit), token);
+			jcp.pushParser(new ClassDeclParser(this.unit), true);
 			return true;
 		}
 		return false;

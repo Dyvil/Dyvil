@@ -127,7 +127,6 @@ public class ParserUtil
 		}
 		else
 		{
-			// TODO Special seperators, named arguments
 			buffer.append(start);
 			Iterator<? extends IASTObject> iterator = parameters.iterator();
 			while (true)

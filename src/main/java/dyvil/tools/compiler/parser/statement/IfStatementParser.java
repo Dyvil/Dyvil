@@ -45,13 +45,13 @@ public class IfStatementParser extends Parser implements IValued
 			}
 			else
 			{
-				pm.pushParser(new ExpressionParser(this.context, this), token);
+				pm.pushParser(new ExpressionParser(this.context, this), true);
 				return true;
 			}
 		}
 		if (this.mode == THEN)
 		{
-			pm.pushParser(new ExpressionParser(this.context, this, true), token);
+			pm.pushParser(new ExpressionParser(this.context, this, true), true);
 			return true;
 		}
 		if (this.mode == ELSE)
@@ -65,7 +65,7 @@ public class IfStatementParser extends Parser implements IValued
 		
 		if (this.statement.getThen() != null)
 		{
-			pm.popParser(token);
+			pm.popParser(true);
 			return true;
 		}
 		return false;

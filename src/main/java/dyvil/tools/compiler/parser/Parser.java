@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser;
 
+import dyvil.tools.compiler.Dyvilc;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 
@@ -14,17 +15,27 @@ public abstract class Parser<T>
 												}
 											};
 	
-	private Parser				parent;
 	protected int				mode;
+	
+	public Parser				parent;
+	public String				name;
 	
 	public Parser()
 	{
 		this.parent = rootParser;
+		if (Dyvilc.parseStack)
+		{
+			this.name = this.computeName();
+		}
 	}
 	
 	public Parser(Parser parent)
 	{
 		this.parent = parent;
+		if (Dyvilc.parseStack)
+		{
+			this.name = parent.name + "." + this.computeName();
+		}
 	}
 	
 	public Parser getParent()
@@ -32,11 +43,26 @@ public abstract class Parser<T>
 		return this.parent;
 	}
 	
+	protected String computeName()
+	{
+		String s = this.getClass().getSimpleName();
+		int index = s.indexOf("Parser");
+		if (index != -1)
+		{
+			s = s.substring(0, index);
+		}
+		return s.toLowerCase();
+	}
+	
 	public void setParent(Parser parent)
 	{
 		if (parent != null)
 		{
 			this.parent = parent;
+			if (Dyvilc.parseStack)
+			{
+				this.name = parent.name + "." + this.computeName();
+			}
 		}
 	}
 	
@@ -50,12 +76,10 @@ public abstract class Parser<T>
 	}
 	
 	public void begin(ParserManager pm)
-	{
-	}
+	{}
 	
 	public abstract boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError;
 	
 	public void end(ParserManager pm)
-	{
-	}
+	{}
 }
