@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.bytecode.ClassReader;
+import dyvil.tools.compiler.library.Library;
 
 public class CompilerConfig
 {
@@ -14,7 +15,7 @@ public class CompilerConfig
 	
 	public File			sourceDir;
 	public File			outputDir;
-	public List<File>	libraryFiles	= new ArrayList();
+	public List<Library>	libraries	= new ArrayList();
 	
 	public List<String>	includedFiles	= new ArrayList();
 	public List<String>	excludedFiles	= new ArrayList();
@@ -23,13 +24,13 @@ public class CompilerConfig
 	
 	public CompilerConfig()
 	{
-		this.libraryFiles.add(ClassReader.javaRTJar);
-		this.libraryFiles.add(ClassReader.dyvilRTJar);
+		this.addLibrary(ClassReader.javaRTJar);
+		this.addLibrary(ClassReader.dyvilRTJar);
 	}
 	
-	public void addLibraryFile(File libraryFile)
+	public void addLibrary(File libraryFile)
 	{
-		this.libraryFiles.add(libraryFile);
+		this.libraries.add(Library.load(libraryFile));
 	}
 	
 	public void includeFile(String fileName)
@@ -72,7 +73,7 @@ public class CompilerConfig
 		builder.append(", jarVersion=").append(this.jarVersion);
 		builder.append(", sourceDir=").append(this.sourceDir);
 		builder.append(", outputDir=").append(this.outputDir);
-		builder.append(", libraryFiles=").append(this.libraryFiles);
+		builder.append(", libraryFiles=").append(this.libraries);
 		builder.append(", includedFiles=").append(this.includedFiles);
 		builder.append(", excludedFiles=").append(this.excludedFiles);
 		builder.append(", mainType=").append(this.mainType).append("]");

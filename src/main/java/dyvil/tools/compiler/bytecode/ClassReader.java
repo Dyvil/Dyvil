@@ -104,11 +104,6 @@ public class ClassReader extends ClassVisitor
 	
 	public static IClass loadClass(InputStream is, boolean decompile)
 	{
-		if (is == null)
-		{
-			return null;
-		}
-		
 		try
 		{
 			BytecodeClass bclass = new BytecodeClass();

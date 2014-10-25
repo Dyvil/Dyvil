@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.structure;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +10,7 @@ import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.ClassReader;
+import dyvil.tools.compiler.library.Library;
 
 public class Package implements IContext
 {
@@ -127,18 +127,11 @@ public class Package implements IContext
 		}
 		
 		String internalName = ClassReader.packageToInternal(name);
-		for (File library : Dyvilc.instance.config.libraryFiles)
+		for (Library library : Dyvilc.instance.config.libraries)
 		{
-			if (library.isDirectory())
+			Package pack = library.resolvePackage(name);
+			if (pack != null)
 			{
-				File file = new File(library, internalName);
-				Package pack = new FilePackage(rootPackage, name, file);
-				rootPackage.addSubPackage(pack);
-				return pack;
-			}
-			else if (library.getPath().endsWith(".jar"))
-			{
-				Package pack = new JarPackage(rootPackage, name, library);
 				rootPackage.addSubPackage(pack);
 				return pack;
 			}

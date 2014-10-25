@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.config.ConfigParser;
 
@@ -39,6 +40,11 @@ public class Dyvilc
 		
 		CompilerConfig config = new CompilerConfig();
 		parser.parse(file, new ConfigParser(config));
+		
+		for (Library library : config.libraries)
+		{
+			library.loadLibrary();
+		}
 		
 		instance = new Dyvilc(config);
 		for (int j = i; j < args.length; j++)
