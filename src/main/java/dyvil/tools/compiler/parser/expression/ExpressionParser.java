@@ -69,10 +69,12 @@ public class ExpressionParser extends Parser implements ITyped
 		{
 			if (this.parsePrimitive(value, token))
 			{
+				this.mode = ACCESS;
 				return true;
 			}
 			else if ("this".equals(value))
 			{
+				this.mode = ACCESS;
 				this.value = new ThisValue(token, this.context.getThisType());
 				return true;
 			}
@@ -108,8 +110,8 @@ public class ExpressionParser extends Parser implements ITyped
 			}
 			else if (token.isType(Token.TYPE_IDENTIFIER))
 			{
-				pm.pushParser(new TypeParser(this.context, this), true);
 				this.mode = ACCESS;
+				pm.pushParser(new TypeParser(this.context, this), true);
 				return true;
 			}
 			this.mode = ACCESS;
