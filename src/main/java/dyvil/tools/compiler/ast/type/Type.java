@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.bytecode.ClassReader;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -32,13 +31,13 @@ public class Type extends ASTObject implements IContext
 	
 	public String			name;
 	public IClass			theClass;
-	private char			seperator;
-	private int				arrayDimensions;
+	public char				seperator;
+	public int				arrayDimensions;
 	
-	protected Type()
+	public Type()
 	{}
 	
-	protected Type(String name)
+	public Type(String name)
 	{
 		this.name = name;
 	}
@@ -60,48 +59,6 @@ public class Type extends ASTObject implements IContext
 		this.name = name;
 		this.theClass = iclass;
 		this.position = position;
-	}
-	
-	public static Type fromInternal(String internal)
-	{
-		int len = internal.length();
-		int arrayDimensions = 0;
-		int i = 0;
-		while (i < len && internal.charAt(i) == '[')
-		{
-			arrayDimensions++;
-			i++;
-		}
-		
-		switch (internal.charAt(i))
-		{
-		case 'Z':
-			return BOOL;
-		case 'B':
-			return BYTE;
-		case 'S':
-			return SHORT;
-		case 'C':
-			return CHAR;
-		case 'I':
-			return INT;
-		case 'J':
-			return LONG;
-		case 'F':
-			return FLOAT;
-		case 'D':
-			return DOUBLE;
-		case 'L':
-			int l = len - 1;
-			if (internal.charAt(l) == ';')
-			{
-				internal = internal.substring(i + 1, l);
-			}
-		}
-		
-		Type type = new Type(ClassReader.internalToPackage(internal));
-		type.arrayDimensions = arrayDimensions;
-		return type;
 	}
 	
 	public void setClass(IClass theClass)

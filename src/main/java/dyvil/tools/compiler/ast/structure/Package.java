@@ -9,8 +9,8 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.bytecode.ClassReader;
 import dyvil.tools.compiler.library.Library;
+import dyvil.tools.compiler.util.ClassFormat;
 
 public class Package implements IContext
 {
@@ -38,7 +38,7 @@ public class Package implements IContext
 			if (name != null)
 			{
 				this.fullName = name;
-				this.internalName = ClassReader.packageToInternal(name) + "/";
+				this.internalName = ClassFormat.packageToInternal(name) + "/";
 			}
 		}
 		else
@@ -129,7 +129,7 @@ public class Package implements IContext
 			}
 		}
 		
-		String internalName = ClassReader.packageToInternal(name);
+		String internalName = ClassFormat.packageToInternal(name);
 		for (Library library : Dyvilc.instance.config.libraries)
 		{
 			Package pack = library.resolvePackage(name);

@@ -12,7 +12,7 @@ import java.util.zip.ZipEntry;
 
 import dyvil.tools.compiler.ast.structure.ExternalPackage;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.bytecode.ClassReader;
+import dyvil.tools.compiler.util.ClassFormat;
 
 public class JarLibrary extends Library
 {
@@ -50,7 +50,7 @@ public class JarLibrary extends Library
 	@Override
 	public Package resolvePackage(String name)
 	{
-		String internalName = ClassReader.packageToInternal(name);
+		String internalName = ClassFormat.packageToInternal(name);
 		if (this.packages.contains(internalName))
 		{
 			return new ExternalPackage(Package.rootPackage, name, this);

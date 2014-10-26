@@ -7,7 +7,7 @@ import java.io.InputStream;
 
 import dyvil.tools.compiler.ast.structure.ExternalPackage;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.bytecode.ClassReader;
+import dyvil.tools.compiler.util.ClassFormat;
 
 public class FileLibrary extends Library
 {
@@ -23,7 +23,7 @@ public class FileLibrary extends Library
 	@Override
 	public Package resolvePackage(String name)
 	{
-		File file = new File(this.file, ClassReader.packageToInternal(name));
+		File file = new File(this.file, ClassFormat.packageToInternal(name));
 		if (file.exists())
 		{
 			return new ExternalPackage(Package.rootPackage, name, this);

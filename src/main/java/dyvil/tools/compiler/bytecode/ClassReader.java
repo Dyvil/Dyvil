@@ -41,21 +41,6 @@ public class ClassReader extends ClassVisitor
 		dyvilRTJar = new File("bin");
 	}
 	
-	public static String classFile(String name)
-	{
-		return name.replace('.', '/') + ".class";
-	}
-	
-	public static String packageToInternal(String name)
-	{
-		return name.replace('.', '/');
-	}
-	
-	public static String internalToPackage(String name)
-	{
-		return name.replace('/', '.');
-	}
-	
 	public static Object getChildren(File parent, String child)
 	{
 		if (parent.isDirectory())
@@ -165,5 +150,6 @@ public class ClassReader extends ClassVisitor
 	
 	@Override
 	public void visitEnd()
-	{}
+	{
+	}
 }
