@@ -10,7 +10,7 @@ public class StringConst extends dyvil.lang.String
 	}
 	
 	@Override
-	public String $set(char[] value)
+	public String $eq(char[] value)
 	{
 		return new StringConst(value);
 	}

@@ -22,257 +22,257 @@ public interface Number
 	
 	// Unary operators
 	
-	public @prefix Number neg$();
+	public @prefix Number $minus();
 	
-	public @prefix Number inv$();
+	public @prefix Number $tilde();
 	
-	public Number inc$();
+	public Number $plus$plus();
 	
-	public Number dec$();
+	public Number $minus$minus();
 	
-	public Number sqr$();
+	public Number sqr();
 	
-	public Number rec$();
+	public Number sqrt();
 	
 	// byte operators
 	
-	public Number set$(byte v);
+	public Number $eq(byte v);
 	
-	public boolean eq$(byte v);
+	public boolean $eq$eq(byte v);
 	
-	public boolean ue$(byte v);
+	public boolean $bang$eq(byte v);
 	
-	public boolean st$(byte v);
+	public boolean $less(byte v);
 	
-	public boolean se$(byte v);
+	public boolean $less$eq(byte v);
 	
-	public boolean gt$(byte v);
+	public boolean $greater(byte v);
 	
-	public boolean ge$(byte v);
+	public boolean $greater$eq(byte v);
 	
-	public Number add$(byte v);
+	public Number $plus(byte v);
 	
-	public Number sub$(byte v);
+	public Number $minus(byte v);
 	
-	public Number mul$(byte v);
+	public Number $times(byte v);
 	
-	public Number div$(byte v);
+	public Number $div(byte v);
 	
-	public Number mod$(byte v);
+	public Number $percent(byte v);
 	
-	public Number and$(byte v);
+	public Number $amp(byte v);
 	
-	public Number or$(byte v);
+	public Number $bar(byte v);
 	
-	public Number xor$(byte v);
+	public Number $up(byte v);
 	
-	public Number bsl$(byte v);
+	public Number $less$less(byte v);
 	
-	public Number bsr$(byte v);
+	public Number $greater$greater(byte v);
 	
-	public Number usr$(byte v);
+	public Number $greater$greater$greater(byte v);
 	
 	// short operators
 	
-	public Number set$(short v);
+	public Number $eq(short v);
 	
-	public boolean eq$(short v);
+	public boolean $eq$eq(short v);
 	
-	public boolean ue$(short v);
+	public boolean $bang$eq(short v);
 	
-	public boolean st$(short v);
+	public boolean $less(short v);
 	
-	public boolean se$(short v);
+	public boolean $less$eq(short v);
 	
-	public boolean gt$(short v);
+	public boolean $greater(short v);
 	
-	public boolean ge$(short v);
+	public boolean $greater$eq(short v);
 	
-	public Number add$(short v);
+	public Number $plus(short v);
 	
-	public Number sub$(short v);
+	public Number $minus(short v);
 	
-	public Number mul$(short v);
+	public Number $times(short v);
 	
-	public Number div$(short v);
+	public Number $div(short v);
 	
-	public Number mod$(short v);
+	public Number $percent(short v);
 	
-	public Number and$(short v);
+	public Number $amp(short v);
 	
-	public Number or$(short v);
+	public Number $bar(short v);
 	
-	public Number xor$(short v);
+	public Number $up(short v);
 	
-	public Number bsl$(short v);
+	public Number $less$less(short v);
 	
-	public Number bsr$(short v);
+	public Number $greater$greater(short v);
 	
-	public Number usr$(short v);
+	public Number $greater$greater$greater(short v);
 	
 	// char operators
 	
-	public Number set$(char v);
+	public Number $eq(char v);
 	
-	public boolean eq$(char v);
+	public boolean $eq$eq(char v);
 	
-	public boolean ue$(char v);
+	public boolean $bang$eq(char v);
 	
-	public boolean st$(char v);
+	public boolean $less(char v);
 	
-	public boolean se$(char v);
+	public boolean $less$eq(char v);
 	
-	public boolean gt$(char v);
+	public boolean $greater(char v);
 	
-	public boolean ge$(char v);
+	public boolean $greater$eq(char v);
 	
-	public Number add$(char v);
+	public Number $plus(char v);
 	
-	public Number sub$(char v);
+	public Number $minus(char v);
 	
-	public Number mul$(char v);
+	public Number $times(char v);
 	
-	public Number div$(char v);
+	public Number $div(char v);
 	
-	public Number mod$(char v);
+	public Number $percent(char v);
 	
-	public Number and$(char v);
+	public Number $amp(char v);
 	
-	public Number or$(char v);
+	public Number $bar(char v);
 	
-	public Number xor$(char v);
+	public Number $up(char v);
 	
-	public Number bsl$(char v);
+	public Number $less$less(char v);
 	
-	public Number bsr$(char v);
+	public Number $greater$greater(char v);
 	
-	public Number usr$(char v);
+	public Number $greater$greater$greater(char v);
 	
 	// int operators
 	
-	public Number set$(int v);
+	public Number $eq(int v);
 	
-	public boolean eq$(int v);
+	public boolean $eq$eq(int v);
 	
-	public boolean ue$(int v);
+	public boolean $bang$eq(int v);
 	
-	public boolean st$(int v);
+	public boolean $less(int v);
 	
-	public boolean se$(int v);
+	public boolean $less$eq(int v);
 	
-	public boolean gt$(int v);
+	public boolean $greater(int v);
 	
-	public boolean ge$(int v);
+	public boolean $greater$eq(int v);
 	
-	public Number add$(int v);
+	public Number $plus(int v);
 	
-	public Number sub$(int v);
+	public Number $minus(int v);
 	
-	public Number mul$(int v);
+	public Number $times(int v);
 	
-	public Number div$(int v);
+	public Number $div(int v);
 	
-	public Number mod$(int v);
+	public Number $percent(int v);
 	
-	public Number and$(int v);
+	public Number $amp(int v);
 	
-	public Number or$(int v);
+	public Number $bar(int v);
 	
-	public Number xor$(int v);
+	public Number $up(int v);
 	
-	public Number bsl$(int v);
+	public Number $less$less(int v);
 	
-	public Number bsr$(int v);
+	public Number $greater$greater(int v);
 	
-	public Number usr$(int v);
+	public Number $greater$greater$greater(int v);
 	
 	// long operators
 	
-	public Number set$(long v);
+	public Number $eq(long v);
 	
-	public boolean eq$(long v);
+	public boolean $eq$eq(long v);
 	
-	public boolean ue$(long v);
+	public boolean $bang$eq(long v);
 	
-	public boolean st$(long v);
+	public boolean $less(long v);
 	
-	public boolean se$(long v);
+	public boolean $less$eq(long v);
 	
-	public boolean gt$(long v);
+	public boolean $greater(long v);
 	
-	public boolean ge$(long v);
+	public boolean $greater$eq(long v);
 	
-	public Number add$(long v);
+	public Number $plus(long v);
 	
-	public Number sub$(long v);
+	public Number $minus(long v);
 	
-	public Number mul$(long v);
+	public Number $times(long v);
 	
-	public Number div$(long v);
+	public Number $div(long v);
 	
-	public Number mod$(long v);
+	public Number $percent(long v);
 	
-	public Number and$(long v);
+	public Number $amp(long v);
 	
-	public Number or$(long v);
+	public Number $bar(long v);
 	
-	public Number xor$(long v);
+	public Number $up(long v);
 	
-	public Number bsl$(long v);
+	public Number $less$less(long v);
 	
-	public Number bsr$(long v);
+	public Number $greater$greater(long v);
 	
-	public Number usr$(long v);
+	public Number $greater$greater$greater(long v);
 	
 	// float operators
 	
-	public Number set$(float v);
+	public Number $eq(float v);
 	
-	public boolean eq$(float v);
+	public boolean $eq$eq(float v);
 	
-	public boolean ue$(float v);
+	public boolean $bang$eq(float v);
 	
-	public boolean st$(float v);
+	public boolean $less(float v);
 	
-	public boolean se$(float v);
+	public boolean $less$eq(float v);
 	
-	public boolean gt$(float v);
+	public boolean $greater(float v);
 	
-	public boolean ge$(float v);
+	public boolean $greater$eq(float v);
 	
-	public Number add$(float v);
+	public Number $plus(float v);
 	
-	public Number sub$(float v);
+	public Number $minus(float v);
 	
-	public Number mul$(float v);
+	public Number $times(float v);
 	
-	public Number div$(float v);
+	public Number $div(float v);
 	
-	public Number mod$(float v);
+	public Number $percent(float v);
 	
 	// double operators
 	
-	public Number set$(double v);
+	public Number $eq(double v);
 	
-	public boolean eq$(double v);
+	public boolean $eq$eq(double v);
 	
-	public boolean ue$(double v);
+	public boolean $bang$eq(double v);
 	
-	public boolean st$(double v);
+	public boolean $less(double v);
 	
-	public boolean se$(double v);
+	public boolean $less$eq(double v);
 	
-	public boolean gt$(double v);
+	public boolean $greater(double v);
 	
-	public boolean ge$(double v);
+	public boolean $greater$eq(double v);
 	
-	public Number add$(double v);
+	public Number $plus(double v);
 	
-	public Number sub$(double v);
+	public Number $minus(double v);
 	
-	public Number mul$(double v);
+	public Number $times(double v);
 	
-	public Number div$(double v);
+	public Number $div(double v);
 	
-	public Number mod$(double v);
+	public Number $percent(double v);
 }

@@ -15,7 +15,7 @@ public class BooleanRef extends dyvil.lang.Boolean
 	}
 	
 	@Override
-	public Boolean set$(boolean v)
+	public Boolean $eq(boolean v)
 	{
 		this.value = v;
 		return this;

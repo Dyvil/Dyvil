@@ -25,7 +25,7 @@ public class ArrayConst extends Array
 	}
 
 	@Override
-	public Array $set(Object[] data)
+	public Array $eq(Object[] data)
 	{
 		return get(data);
 	}

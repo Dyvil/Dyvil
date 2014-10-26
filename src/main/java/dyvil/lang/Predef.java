@@ -1,5 +1,6 @@
 package dyvil.lang;
 
+import dyvil.lang.annotation.bytecode;
 import dyvil.lang.annotation.implicit;
 import dyvil.lang.tuple.Tuple2;
 
@@ -65,7 +66,8 @@ public class Predef
 	 *            the class
 	 * @return true, if t is an instance of c
 	 */
-	public static @implicit <T> boolean $less$colon(T t, Class c)
+	@bytecode("t instanceof c")
+	public static @implicit <T> boolean $less$colon(T t, Class<?> c)
 	{
 		return t == null ? false : c.isInstance(t);
 	}
@@ -80,6 +82,7 @@ public class Predef
 	 *            the class
 	 * @return t as an instance of c
 	 */
+	@bytecode("(U)t")
 	public static @implicit <T, U> U $colon$greater(T t)
 	{
 		return (U) t;
@@ -96,11 +99,13 @@ public class Predef
 	 *            the class
 	 * @return t as an instance of c
 	 */
+	@bytecode("(c)t")
 	public static @implicit <T, U> U $colon$greater(T t, Class<U> c)
 	{
 		return t == null ? (U) null : c.cast(t);
 	}
 	
+	@bytecode("+")
 	public static @implicit java.lang.String $plus(Object o, String s)
 	{
 		return java.lang.String.valueOf(o) + s;

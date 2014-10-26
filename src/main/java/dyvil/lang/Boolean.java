@@ -1,45 +1,52 @@
 package dyvil.lang;
 
 import dyvil.lang.annotation.bytecode;
+import dyvil.lang.annotation.prefix;
 
 public abstract class Boolean
 {
-	protected boolean value;
+	protected boolean	value;
 	
 	protected Boolean(boolean value)
 	{
 		this.value = value;
 	}
 	
-	public abstract Boolean set$(boolean v);
+	public abstract Boolean $eq(boolean v);
+	
+	@bytecode("!")
+	public @prefix Boolean $bang()
+	{
+		return this.$eq(!this.value);
+	}
 	
 	@bytecode("==")
-	public boolean eq$(boolean v)
+	public boolean $eq$eq(boolean v)
 	{
 		return this.value == v;
 	}
 	
 	@bytecode("!=")
-	public boolean ue$(boolean v)
+	public boolean $bang$eq(boolean v)
 	{
 		return this.value != v;
 	}
 	
 	@bytecode("|")
-	public Boolean or$(boolean v)
+	public Boolean $bar(boolean v)
 	{
-		return this.set$(this.value || v);
+		return this.$eq(this.value || v);
 	}
 	
 	@bytecode("&")
-	public Boolean and$(boolean v)
+	public Boolean $amp(boolean v)
 	{
-		return this.set$(this.value && v);
+		return this.$eq(this.value && v);
 	}
 	
 	@bytecode("^")
-	public Boolean xor$(boolean v)
+	public Boolean $up(boolean v)
 	{
-		return this.set$(this.value ^ v);
+		return this.$eq(this.value ^ v);
 	}
 }

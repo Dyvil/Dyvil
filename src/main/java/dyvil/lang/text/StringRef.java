@@ -10,7 +10,7 @@ public class StringRef extends dyvil.lang.String
 	}
 	
 	@Override
-	public String $set(char[] value)
+	public String $eq(char[] value)
 	{
 		this.value = value;
 		return this;

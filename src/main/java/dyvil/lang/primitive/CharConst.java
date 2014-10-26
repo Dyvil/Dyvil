@@ -15,43 +15,43 @@ public class CharConst extends dyvil.lang.Char
 	}
 	
 	@Override
-	public Number set$(byte v)
+	public Number $eq(byte v)
 	{
 		return get((char) v);
 	}
 	
 	@Override
-	public Number set$(short v)
+	public Number $eq(short v)
 	{
 		return get((char) v);
 	}
 	
 	@Override
-	public Number set$(char v)
+	public Number $eq(char v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number set$(int v)
+	public Number $eq(int v)
 	{
 		return IntConst.get(v);
 	}
 	
 	@Override
-	public Number set$(long v)
+	public Number $eq(long v)
 	{
 		return LongConst.get(v);
 	}
 	
 	@Override
-	public Number set$(float v)
+	public Number $eq(float v)
 	{
 		return FloatConst.get(v);
 	}
 	
 	@Override
-	public Number set$(double v)
+	public Number $eq(double v)
 	{
 		return DoubleConst.get(v);
 	}

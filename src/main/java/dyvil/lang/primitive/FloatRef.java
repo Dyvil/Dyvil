@@ -15,49 +15,49 @@ public class FloatRef extends dyvil.lang.Float
 	}
 	
 	@Override
-	public Number set$(byte v)
+	public Number $eq(byte v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number set$(short v)
+	public Number $eq(short v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number set$(char v)
+	public Number $eq(char v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number set$(int v)
+	public Number $eq(int v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number set$(long v)
+	public Number $eq(long v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number set$(float v)
+	public Number $eq(float v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number set$(double v)
+	public Number $eq(double v)
 	{
 		return DoubleRef.get(v);
 	}

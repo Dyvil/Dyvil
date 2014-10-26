@@ -15,46 +15,46 @@ public class CharRef extends dyvil.lang.Char
 	}
 	
 	@Override
-	public Number set$(byte v)
+	public Number $eq(byte v)
 	{
 		this.value = (char) v;
 		return this;
 	}
 	
 	@Override
-	public Number set$(short v)
+	public Number $eq(short v)
 	{
 		this.value = (char) v;
 		return this;
 	}
 	
 	@Override
-	public Number set$(char v)
+	public Number $eq(char v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number set$(int v)
+	public Number $eq(int v)
 	{
 		return IntRef.get(v);
 	}
 	
 	@Override
-	public Number set$(long v)
+	public Number $eq(long v)
 	{
 		return LongRef.get(v);
 	}
 	
 	@Override
-	public Number set$(float v)
+	public Number $eq(float v)
 	{
 		return FloatRef.get(v);
 	}
 	
 	@Override
-	public Number set$(double v)
+	public Number $eq(double v)
 	{
 		return DoubleRef.get(v);
 	}

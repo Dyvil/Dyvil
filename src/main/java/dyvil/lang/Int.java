@@ -54,694 +54,694 @@ public abstract class Int implements Number
 	// Unary operators
 	
 	@Override
-	public Number neg$()
+	public Number $minus()
 	{
-		return this.set$(-this.value);
+		return this.$eq(-this.value);
 	}
 	
 	@Override
-	public Number inv$()
+	public Number $tilde()
 	{
-		return this.set$(~this.value);
+		return this.$eq(~this.value);
 	}
 	
 	@Override
-	public Number inc$()
+	public Number $plus$plus()
 	{
-		return this.set$(this.value + 1);
+		return this.$eq(this.value + 1);
 	}
 	
 	@Override
-	public Number dec$()
+	public Number $minus$minus()
 	{
-		return this.set$(this.value - 1);
+		return this.$eq(this.value - 1);
 	}
 	
 	@Override
-	public Number sqr$()
+	public Number sqr()
 	{
-		return this.set$(this.value * this.value);
+		return this.$eq(this.value * this.value);
 	}
 	
 	@Override
-	public Number rec$()
+	public Number sqrt()
 	{
-		return this.set$(1 / this.value);
+		return this.$eq(1 / this.value);
 	}
 	
 	// byte operators
 	
 	@Override
-	public boolean eq$(byte b)
+	public boolean $eq$eq(byte b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean ue$(byte b)
+	public boolean $bang$eq(byte b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
-	public boolean st$(byte b)
+	public boolean $less(byte b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
-	public boolean se$(byte b)
+	public boolean $less$eq(byte b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean gt$(byte b)
+	public boolean $greater(byte b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
-	public boolean ge$(byte b)
+	public boolean $greater$eq(byte b)
 	{
 		return this.value >= b;
 	}
 	
 	@Override
-	public Number add$(byte v)
+	public Number $plus(byte v)
 	{
-		return this.set$(this.value + v);
+		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number sub$(byte v)
+	public Number $minus(byte v)
 	{
-		return this.set$(this.value - v);
+		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number mul$(byte v)
+	public Number $times(byte v)
 	{
-		return this.set$(this.value * v);
+		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number div$(byte v)
+	public Number $div(byte v)
 	{
-		return this.set$(this.value / v);
+		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number mod$(byte v)
+	public Number $percent(byte v)
 	{
-		return this.set$(this.value % v);
+		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number or$(byte v)
+	public Number $bar(byte v)
 	{
-		return this.set$(this.value | v);
+		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	public Number and$(byte v)
+	public Number $amp(byte v)
 	{
-		return this.set$(this.value & v);
+		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	public Number xor$(byte v)
+	public Number $up(byte v)
 	{
-		return this.set$(this.value ^ v);
+		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	public Number bsl$(byte v)
+	public Number $less$less(byte v)
 	{
-		return this.set$(this.value << v);
+		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	public Number bsr$(byte v)
+	public Number $greater$greater(byte v)
 	{
-		return this.set$(this.value >> v);
+		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	public Number usr$(byte v)
+	public Number $greater$greater$greater(byte v)
 	{
-		return this.set$(this.value >>> v);
+		return this.$eq(this.value >>> v);
 	}
 	
 	// short operators
 	
 	@Override
-	public boolean eq$(short b)
+	public boolean $eq$eq(short b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean ue$(short b)
+	public boolean $bang$eq(short b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
-	public boolean st$(short b)
+	public boolean $less(short b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
-	public boolean se$(short b)
+	public boolean $less$eq(short b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean gt$(short b)
+	public boolean $greater(short b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
-	public boolean ge$(short b)
+	public boolean $greater$eq(short b)
 	{
 		return this.value >= b;
 	}
 	
 	@Override
-	public Number add$(short v)
+	public Number $plus(short v)
 	{
-		return this.set$(this.value + v);
+		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number sub$(short v)
+	public Number $minus(short v)
 	{
-		return this.set$(this.value - v);
+		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number mul$(short v)
+	public Number $times(short v)
 	{
-		return this.set$(this.value * v);
+		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number div$(short v)
+	public Number $div(short v)
 	{
-		return this.set$(this.value / v);
+		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number mod$(short v)
+	public Number $percent(short v)
 	{
-		return this.set$(this.value % v);
+		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number or$(short v)
+	public Number $bar(short v)
 	{
-		return this.set$(this.value | v);
+		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	public Number and$(short v)
+	public Number $amp(short v)
 	{
-		return this.set$(this.value & v);
+		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	public Number xor$(short v)
+	public Number $up(short v)
 	{
-		return this.set$(this.value ^ v);
+		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	public Number bsl$(short v)
+	public Number $less$less(short v)
 	{
-		return this.set$(this.value << v);
+		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	public Number bsr$(short v)
+	public Number $greater$greater(short v)
 	{
-		return this.set$(this.value >> v);
+		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	public Number usr$(short v)
+	public Number $greater$greater$greater(short v)
 	{
-		return this.set$(this.value >>> v);
+		return this.$eq(this.value >>> v);
 	}
 	
 	// char operators
 	
 	@Override
-	public boolean eq$(char b)
+	public boolean $eq$eq(char b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean ue$(char b)
+	public boolean $bang$eq(char b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
-	public boolean st$(char b)
+	public boolean $less(char b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
-	public boolean se$(char b)
+	public boolean $less$eq(char b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean gt$(char b)
+	public boolean $greater(char b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
-	public boolean ge$(char b)
+	public boolean $greater$eq(char b)
 	{
 		return this.value >= b;
 	}
 	
 	@Override
-	public Number add$(char v)
+	public Number $plus(char v)
 	{
-		return this.set$(this.value + v);
+		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number sub$(char v)
+	public Number $minus(char v)
 	{
-		return this.set$(this.value - v);
+		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number mul$(char v)
+	public Number $times(char v)
 	{
-		return this.set$(this.value * v);
+		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number div$(char v)
+	public Number $div(char v)
 	{
-		return this.set$(this.value / v);
+		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number mod$(char v)
+	public Number $percent(char v)
 	{
-		return this.set$(this.value % v);
+		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number or$(char v)
+	public Number $bar(char v)
 	{
-		return this.set$(this.value | v);
+		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	public Number and$(char v)
+	public Number $amp(char v)
 	{
-		return this.set$(this.value & v);
+		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	public Number xor$(char v)
+	public Number $up(char v)
 	{
-		return this.set$(this.value ^ v);
+		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	public Number bsl$(char v)
+	public Number $less$less(char v)
 	{
-		return this.set$(this.value << v);
+		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	public Number bsr$(char v)
+	public Number $greater$greater(char v)
 	{
-		return this.set$(this.value >> v);
+		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	public Number usr$(char v)
+	public Number $greater$greater$greater(char v)
 	{
-		return this.set$(this.value >>> v);
+		return this.$eq(this.value >>> v);
 	}
 	
 	// int operators
 	
 	@Override
-	public boolean eq$(int b)
+	public boolean $eq$eq(int b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean ue$(int b)
+	public boolean $bang$eq(int b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
-	public boolean st$(int b)
+	public boolean $less(int b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
-	public boolean se$(int b)
+	public boolean $less$eq(int b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean gt$(int b)
+	public boolean $greater(int b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
-	public boolean ge$(int b)
+	public boolean $greater$eq(int b)
 	{
 		return this.value >= b;
 	}
 	
 	@Override
-	public Number add$(int v)
+	public Number $plus(int v)
 	{
-		return this.set$(this.value + v);
+		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number sub$(int v)
+	public Number $minus(int v)
 	{
-		return this.set$(this.value - v);
+		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number mul$(int v)
+	public Number $times(int v)
 	{
-		return this.set$(this.value * v);
+		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number div$(int v)
+	public Number $div(int v)
 	{
-		return this.set$(this.value / v);
+		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number mod$(int v)
+	public Number $percent(int v)
 	{
-		return this.set$(this.value % v);
+		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number or$(int v)
+	public Number $bar(int v)
 	{
-		return this.set$(this.value | v);
+		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	public Number and$(int v)
+	public Number $amp(int v)
 	{
-		return this.set$(this.value & v);
+		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	public Number xor$(int v)
+	public Number $up(int v)
 	{
-		return this.set$(this.value ^ v);
+		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	public Number bsl$(int v)
+	public Number $less$less(int v)
 	{
-		return this.set$(this.value << v);
+		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	public Number bsr$(int v)
+	public Number $greater$greater(int v)
 	{
-		return this.set$(this.value >> v);
+		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	public Number usr$(int v)
+	public Number $greater$greater$greater(int v)
 	{
-		return this.set$(this.value >>> v);
+		return this.$eq(this.value >>> v);
 	}
 	
 	// long operators
 	
 	@Override
-	public boolean eq$(long b)
+	public boolean $eq$eq(long b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean ue$(long b)
+	public boolean $bang$eq(long b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
-	public boolean st$(long b)
+	public boolean $less(long b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
-	public boolean se$(long b)
+	public boolean $less$eq(long b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean gt$(long b)
+	public boolean $greater(long b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
-	public boolean ge$(long b)
+	public boolean $greater$eq(long b)
 	{
 		return this.value >= b;
 	}
 	
 	@Override
-	public Number add$(long v)
+	public Number $plus(long v)
 	{
-		return this.set$(this.value + v);
+		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number sub$(long v)
+	public Number $minus(long v)
 	{
-		return this.set$(this.value - v);
+		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number mul$(long v)
+	public Number $times(long v)
 	{
-		return this.set$(this.value * v);
+		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number div$(long v)
+	public Number $div(long v)
 	{
-		return this.set$(this.value / v);
+		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number mod$(long v)
+	public Number $percent(long v)
 	{
-		return this.set$(this.value % v);
+		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number or$(long v)
+	public Number $bar(long v)
 	{
-		return this.set$(this.value | v);
+		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	public Number and$(long v)
+	public Number $amp(long v)
 	{
-		return this.set$(this.value & v);
+		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	public Number xor$(long v)
+	public Number $up(long v)
 	{
-		return this.set$(this.value ^ v);
+		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	public Number bsl$(long v)
+	public Number $less$less(long v)
 	{
-		return this.set$(this.value << v);
+		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	public Number bsr$(long v)
+	public Number $greater$greater(long v)
 	{
-		return this.set$(this.value >> v);
+		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	public Number usr$(long v)
+	public Number $greater$greater$greater(long v)
 	{
-		return this.set$(this.value >>> v);
+		return this.$eq(this.value >>> v);
 	}
 	
 	// float operators
 	
 	@Override
-	public boolean eq$(float b)
+	public boolean $eq$eq(float b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean ue$(float b)
+	public boolean $bang$eq(float b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
-	public boolean st$(float b)
+	public boolean $less(float b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
-	public boolean se$(float b)
+	public boolean $less$eq(float b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean gt$(float b)
+	public boolean $greater(float b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
-	public boolean ge$(float b)
+	public boolean $greater$eq(float b)
 	{
 		return this.value >= b;
 	}
 	
 	@Override
-	public Number add$(float v)
+	public Number $plus(float v)
 	{
-		return this.set$(this.value + v);
+		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number sub$(float v)
+	public Number $minus(float v)
 	{
-		return this.set$(this.value - v);
+		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number mul$(float v)
+	public Number $times(float v)
 	{
-		return this.set$(this.value * v);
+		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number div$(float v)
+	public Number $div(float v)
 	{
-		return this.set$(this.value / v);
+		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number mod$(float v)
+	public Number $percent(float v)
 	{
-		return this.set$(this.value % v);
+		return this.$eq(this.value % v);
 	}
 	
 	// double operators
 	
 	@Override
-	public boolean eq$(double b)
+	public boolean $eq$eq(double b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean ue$(double b)
+	public boolean $bang$eq(double b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
-	public boolean st$(double b)
+	public boolean $less(double b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
-	public boolean se$(double b)
+	public boolean $less$eq(double b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	public boolean gt$(double b)
+	public boolean $greater(double b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
-	public boolean ge$(double b)
+	public boolean $greater$eq(double b)
 	{
 		return this.value >= b;
 	}
 	
 	@Override
-	public Number add$(double v)
+	public Number $plus(double v)
 	{
-		return this.set$(this.value + v);
+		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number sub$(double v)
+	public Number $minus(double v)
 	{
-		return this.set$(this.value - v);
+		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number mul$(double v)
+	public Number $times(double v)
 	{
-		return this.set$(this.value * v);
+		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number div$(double v)
+	public Number $div(double v)
 	{
-		return this.set$(this.value / v);
+		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number mod$(double v)
+	public Number $percent(double v)
 	{
-		return this.set$(this.value % v);
+		return this.$eq(this.value % v);
 	}
 }

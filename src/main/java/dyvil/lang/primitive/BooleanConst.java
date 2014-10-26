@@ -15,7 +15,7 @@ public class BooleanConst extends dyvil.lang.Boolean
 	}
 	
 	@Override
-	public Boolean set$(boolean v)
+	public Boolean $eq(boolean v)
 	{
 		return get(v);
 	}

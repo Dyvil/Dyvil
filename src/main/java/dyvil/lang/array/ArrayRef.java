@@ -25,7 +25,7 @@ public class ArrayRef extends Array
 	}
 	
 	@Override
-	public Array $set(Object[] data)
+	public Array $eq(Object[] data)
 	{
 		this.data = data;
 		return this;
