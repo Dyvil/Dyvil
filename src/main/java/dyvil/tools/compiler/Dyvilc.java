@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
@@ -45,6 +46,8 @@ public class Dyvilc
 		{
 			library.loadLibrary();
 		}
+		
+		Type.init();
 		
 		instance = new Dyvilc(config);
 		for (int j = i; j < args.length; j++)

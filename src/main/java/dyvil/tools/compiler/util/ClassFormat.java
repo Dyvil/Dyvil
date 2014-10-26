@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.util;
 
+import dyvil.tools.compiler.ast.api.ITypeList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.Parameter;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class ClassFormat
@@ -81,11 +81,19 @@ public class ClassFormat
 	public static void readMethodType(String internal, IMethod method)
 	{
 		String methodName = method.getName();
-		int params = 0;
 		int index = internal.indexOf(')');
+		
+		readTypeList(internal, 1, index, method);
+		
+		Type t = internalToType(internal.substring(index + 1));
+		method.setType(t);
+	}
+	
+	protected static void readTypeList(String internal, int start, int end, ITypeList list)
+	{
 		int arrayDimensions = 0;
 		
-		for (int i = 1; i < index; i++)
+		for (int i = start; i < end; i++)
 		{
 			char c = internal.charAt(i);
 			if (c == '[')
@@ -94,27 +102,23 @@ public class ClassFormat
 			}
 			else if (c == 'L')
 			{
-				int end = internal.indexOf(';', i);
-				String s = internal.substring(i + 1, end);
+				int end1 = internal.indexOf(';', i);
+				
+				String s = internal.substring(i + 1, end1);
 				Type type = internalToType2(s);
 				type.arrayDimensions = arrayDimensions;
 				arrayDimensions = 0;
-				method.addParameter(new Parameter("par" + params, type, 0));
-				params++;
-				i = end;
+				list.addType(type);
+				i = end1;
 			}
 			else
 			{
 				Type type = parseBaseType(c);
 				type.arrayDimensions = arrayDimensions;
 				arrayDimensions = 0;
-				method.addParameter(new Parameter("par" + params, type, 0));
-				params++;
+				list.addType(type);
 			}
 		}
-		
-		Type t = internalToType(internal.substring(index + 1));
-		method.setType(t);
 	}
 	
 	protected static Type internalToType2(String internal)

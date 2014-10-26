@@ -27,7 +27,7 @@ public class BytecodeClass extends AbstractClass
 		Field field = new Field(this);
 		field.setName(name);
 		field.setModifiers(access);
-		field.setType(ClassFormat.internalToType(signature == null ? desc : signature));
+		field.setType(ClassFormat.internalToType(desc));
 		this.body.addField(field);
 	}
 	
@@ -36,7 +36,7 @@ public class BytecodeClass extends AbstractClass
 		Method method = new Method(this);
 		method.setName(name);
 		method.setModifiers(access);
-		ClassFormat.readMethodType(signature == null ? desc : signature, method);
+		ClassFormat.readMethodType(desc, method);
 		
 		this.body.addMethod(method);
 	}

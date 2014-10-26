@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -20,19 +21,31 @@ public class Type extends ASTObject implements IContext
 	public static Type		BOOL		= new PrimitiveType("boolean");
 	public static Type		BYTE		= new PrimitiveType("byte");
 	public static Type		SHORT		= new PrimitiveType("short");
-	public static Type		CHAR		= new PrimitiveType("char");
+	public static Type		CHAR		= new PrimitiveType("char"); 
 	public static Type		INT			= new PrimitiveType("int");
 	public static Type		LONG		= new PrimitiveType("long");
 	public static Type		FLOAT		= new PrimitiveType("float");
 	public static Type		DOUBLE		= new PrimitiveType("double");
 	
-	public static Type		STRING		= new Type("java.lang.String");
-	public static Type		CLASS		= new Type("java.lang.Class");
+	public static Type		STRING		= new StringType("java.lang.String");
 	
 	public String			name;
 	public IClass			theClass;
 	public char				seperator;
 	public int				arrayDimensions;
+	
+	public static void init()
+	{
+		BOOL.theClass = Package.dyvilLang.resolveClass("Boolean");
+		BYTE.theClass = Package.dyvilLang.resolveClass("Byte");
+		SHORT.theClass = Package.dyvilLang.resolveClass("Short");
+		CHAR.theClass = Package.dyvilLang.resolveClass("Char");
+		INT.theClass = Package.dyvilLang.resolveClass("Int");
+		LONG.theClass = Package.dyvilLang.resolveClass("Long");
+		FLOAT.theClass = Package.dyvilLang.resolveClass("Float");
+		DOUBLE.theClass = Package.dyvilLang.resolveClass("Double");
+		STRING.theClass = Package.javaLang.resolveClass("String");
+	}
 	
 	public Type()
 	{}
@@ -136,6 +149,8 @@ public class Type extends ASTObject implements IContext
 				return CHAR;
 			case "bool":
 				return BOOL;
+			case "java.lang.String":
+				return STRING;
 			}
 			
 			this.theClass = context.resolveClass(this.name);

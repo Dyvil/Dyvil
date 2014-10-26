@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.method.Parameter;
 import dyvil.tools.compiler.ast.type.Type;
 
-public interface IParameterized extends ITyped
+public interface IParameterized extends ITyped, ITypeList
 {
 	public void setParameters(List<Parameter> parameters);
 	
@@ -25,5 +26,34 @@ public interface IParameterized extends ITyped
 			types[i] = parameters.get(i).getType();
 		}
 		return types;
+	}
+	
+	@Override
+	public default List<Type> getTypes()
+	{
+		List<Parameter> parameters = this.getParameters();
+		List<Type> types = new ArrayList(parameters.size());
+		for (Parameter param : parameters)
+		{
+			types.add(param.getType());
+		}
+		return types;
+	}
+	
+	@Override
+	public default void setTypes(List<Type> types)
+	{
+		int index = 0;
+		for (Type type : types)
+		{
+			this.addParameter(new Parameter("par" + index, type, 0));
+		}
+	}
+	
+	@Override
+	public default void addType(Type type)
+	{
+		int index = this.getParameters().size();
+		this.addParameter(new Parameter("par" + index, type, 0));
 	}
 }
