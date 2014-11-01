@@ -61,7 +61,7 @@ public class Token implements IToken
 	@Override
 	public boolean isType(int type) throws SyntaxError
 	{
-		return (this.type & type) == type;
+		return (this.type & type) != 0;
 	}
 	
 	@Override

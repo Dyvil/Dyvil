@@ -39,6 +39,7 @@ public class ExpressionParser extends Parser implements ITyped
 	protected IContext		context;
 	protected IValued		field;
 	protected boolean		statements;
+	protected boolean		lazy;
 	
 	private IValue			value;
 	
@@ -60,11 +61,17 @@ public class ExpressionParser extends Parser implements ITyped
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (this.mode == 0)
+		if (this.mode == 0 || ";".equals(value) || (")".equals(value) && !this.isInMode(PARAMETERS_2)))
 		{
 			pm.popParser(true);
 			return true;
 		}
+		else if (this.lazy && this.value != null)
+		{
+			pm.popParser(true);
+			return true;
+		}
+		
 		if (this.isInMode(VALUE))
 		{
 			if (this.parsePrimitive(value, token))
@@ -158,39 +165,44 @@ public class ExpressionParser extends Parser implements ITyped
 				this.mode = DOT_ACCESS;
 				return true;
 			}
-			else if (token.next().equals("("))
-			{
-				this.mode = DOT_ACCESS;
-			}
-			else if (token.isType(Token.TYPE_IDENTIFIER))
-			{
-				this.mode = SUGARACCESS;
-			}
+			this.mode = DOT_ACCESS;
 		}
 		if (this.isInMode(DOT_ACCESS))
 		{
-			if (token.next().equals("("))
+			IToken next = token.next();
+			if (next.equals("("))
 			{
 				MethodCall call = new MethodCall(token, this.value, value);
 				this.value = call;
 				this.mode = PARAMETERS;
 				return true;
 			}
+			else if (!next.isType(Token.TYPE_IDENTIFIER | Token.TYPE_BRACKET | Token.TYPE_SYMBOL))
+			{
+				MethodCall call = new MethodCall(token, this.value, value);
+				this.value = call;
+				ExpressionParser parser = new ExpressionParser(this.context, call);
+				parser.lazy = true;
+				pm.pushParser(parser);
+				return true;
+			}
 			else
 			{
 				FieldAccess access = new FieldAccess(token, this.value, value);
 				this.value = access;
-				this.mode = VALUE;
+				this.mode = ACCESS;
 				return true;
 			}
 		}
 		if (this.isInMode(SUGARACCESS))
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
-			call.setSugarCall(true);
+			call.setSugar(true);
 			this.value = call;
 			this.mode = 0;
-			pm.pushTryParser(new ExpressionParser(this.context, call), token.next());
+			ExpressionParser parser = new ExpressionParser(this.context, call);
+			parser.lazy = true;
+			pm.pushTryParser(parser, token.next());
 			return true;
 		}
 		if (this.isInMode(PARAMETERS))

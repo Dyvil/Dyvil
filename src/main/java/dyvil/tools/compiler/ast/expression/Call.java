@@ -5,6 +5,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -12,7 +13,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public abstract class Call extends ASTObject implements IValue, IValueList
+public abstract class Call extends ASTObject implements IValue, IValueList, IAccess
 {
 	protected List<IValue>	arguments	= new ArrayList(3);
 	
@@ -32,7 +33,7 @@ public abstract class Call extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state, IContext context)
+	public IAccess applyState(CompilerState state, IContext context)
 	{
 		this.arguments.replaceAll(a -> a.applyState(state, context));
 		return this;
@@ -71,13 +72,8 @@ public abstract class Call extends ASTObject implements IValue, IValueList
 		return types;
 	}
 	
-	public void setSugarCall(boolean isSugarCall)
+	public void setSugar(boolean sugar)
 	{
-		this.isSugarCall = isSugarCall;
-	}
-	
-	public boolean isSugarCall()
-	{
-		return this.isSugarCall;
+		this.isSugarCall = sugar;
 	}
 }

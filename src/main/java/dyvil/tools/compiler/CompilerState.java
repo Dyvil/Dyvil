@@ -26,6 +26,10 @@ public enum CompilerState
 	 */
 	RESOLVE,
 	/**
+	 * Checks for semantical errors.
+	 */
+	CHECK,
+	/**
 	 * Obfuscates the code.
 	 */
 	OBFUSCATE,
@@ -56,7 +60,11 @@ public enum CompilerState
 	/**
 	 * Generates the Dyvildoc files.
 	 */
-	DYVILDOC, DEBUG;
+	DYVILDOC,
+	/**
+	 * Prints the AST.
+	 */
+	DEBUG;
 	
 	public CodeFile	file;
 	

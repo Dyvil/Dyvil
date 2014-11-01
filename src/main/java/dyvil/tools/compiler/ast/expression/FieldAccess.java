@@ -1,7 +1,11 @@
 package dyvil.tools.compiler.ast.expression;
 
+import java.util.Collections;
+import java.util.List;
+
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
@@ -11,17 +15,19 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.marker.Warning;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.AccessResolver;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class FieldAccess extends ASTObject implements IValue, INamed, IValued
+public class FieldAccess extends ASTObject implements IValue, INamed, IValued, IAccess
 {
 	protected IValue	instance;
 	protected String	name;
 	
-	protected boolean	isSugarAccess;
+	protected boolean dotless;
 	
 	public IField		field;
 	
@@ -73,58 +79,59 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 		return this.instance;
 	}
 	
-	public void setSugarAccess(boolean isSugarAccess)
-	{
-		this.isSugarAccess = isSugarAccess;
-	}
-	
-	public boolean isSugarAccess()
-	{
-		return this.isSugarAccess;
-	}
-	
 	@Override
 	public IValue applyState(CompilerState state, IContext context)
 	{
-		if (this.instance != null)
-		{
-			this.instance = this.instance.applyState(state, context);
-		}
-		
 		if (state == CompilerState.RESOLVE)
 		{
-			if (this.instance != null)
-			{
-				context = this.instance.getType();
-			}
-			
-			this.field = context.resolveField(this.name);
-			if (this.field == null)
-			{
-				IMethod method = context.resolveMethod(this.name, Type.EMPTY_TYPES);
-				if (method != null)
-				{
-					MethodCall call = new MethodCall(this.position, this.instance, this.name);
-					call.method = method;
-					call.isSugarCall = true;
-					return call;
-				}
-				
-				state.addMarker(new SemanticError(this.position, "'" + this.name + "' cannot be resolved to a field"));
-			}
-			else if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
+			return AccessResolver.resolve(context, this);
+		}
+		else if (state == CompilerState.CHECK)
+		{
+			if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
 			{
 				state.addMarker(new Warning(this.position, "'" + this.name + "' is a static field and should be accessed in a static way"));
 				this.instance = null;
 			}
 		}
+		else if (this.instance != null)
+		{
+			this.instance = this.instance.applyState(state, context);
+		}
 		return this;
+	}
+	
+	@Override
+	public boolean resolve(IContext context)
+	{
+		this.field = context.resolveField(this.name);
+		return this.field != null;
+	}
+	
+	@Override
+	public IAccess resolve2(IContext context)
+	{
+		IMethod method = context.resolveMethod(this.name, Type.EMPTY_TYPES);
+		if (method != null)
+		{
+			MethodCall call = new MethodCall(this.position, this.instance, this.name);
+			call.method = method;
+			call.isSugarCall = true;
+			return call;
+		}
+		return this;
+	}
+	
+	@Override
+	public Marker getResolveError()
+	{
+		return new SemanticError(this.position, "'" + this.name + "' could not be resolved to a field");
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.isSugarAccess && !Formatting.Field.convertSugarAccess)
+		if (this.dotless && !Formatting.Field.convertSugarAccess)
 		{
 			if (this.instance != null)
 			{
@@ -133,7 +140,6 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 			}
 			
 			buffer.append(this.name);
-			buffer.append(Formatting.Field.sugarAccessEnd);
 		}
 		else
 		{
@@ -144,5 +150,25 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued
 			}
 			buffer.append(this.name);
 		}
+	}
+	
+	@Override
+	public void setValues(List<IValue> list)
+	{}
+	
+	@Override
+	public void setIsArray(boolean isArray)
+	{}
+	
+	@Override
+	public boolean isArray()
+	{
+		return false;
+	}
+	
+	@Override
+	public List<IValue> getValues()
+	{
+		return Collections.EMPTY_LIST;
 	}
 }

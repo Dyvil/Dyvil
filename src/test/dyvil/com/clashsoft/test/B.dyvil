@@ -1,0 +1,6 @@
+package com.clashsoft.test;
+
+public class B
+{
+	public static C b() = {};
+}

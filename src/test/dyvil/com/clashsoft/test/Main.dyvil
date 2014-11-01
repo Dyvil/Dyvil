@@ -1,13 +1,11 @@
 package com.clashsoft.test;
 
-import com.clashsoft.test.Util;
-
-public class Main extends Util
+public class Main
 {
 	public int i = 0;
 	public int j = 0;
 	
-	public static void main(String[] args) = "Hello" + "World";
+	public static void main(String[] args) = A a b c;
 	
 	public static void instance() = { };
 }

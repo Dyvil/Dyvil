@@ -1,8 +1,12 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -13,6 +17,25 @@ public class ConstructorCall extends Call implements ITyped
 	public ConstructorCall(ICodePosition position)
 	{
 		super(position);
+	}
+	
+	@Override
+	public boolean resolve(IContext context)
+	{
+		// TODO
+		return false;
+	}
+	
+	@Override
+	public IAccess resolve2(IContext context)
+	{
+		return this;
+	}
+	
+	@Override
+	public Marker getResolveError()
+	{
+		return null;
 	}
 	
 	@Override
@@ -51,4 +74,26 @@ public class ConstructorCall extends Call implements ITyped
 	{
 		return false;
 	}
+
+	@Override
+	public IValue getValue()
+	{
+		return null;
+	}
+
+	@Override
+	public void setValue(IValue value)
+	{}
+
+	@Override
+	public void setName(String name)
+	{}
+
+	@Override
+	public String getName()
+	{
+		return null;
+	}
+	
+	
 }
