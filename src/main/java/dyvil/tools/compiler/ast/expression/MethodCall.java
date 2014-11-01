@@ -14,6 +14,7 @@ import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.AccessResolver;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Symbols;
 
 public class MethodCall extends Call implements INamed, IValued
 {
@@ -29,7 +30,7 @@ public class MethodCall extends Call implements INamed, IValued
 	{
 		super(position);
 		this.instance = instance;
-		this.name = name;
+		this.name = Symbols.expand(name);
 	}
 	
 	@Override
@@ -53,7 +54,14 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		this.instance = value;
+		if (this.isSugarCall)
+		{
+			this.arguments.add(value);
+		}
+		else
+		{
+			this.instance = value;
+		}
 	}
 	
 	@Override

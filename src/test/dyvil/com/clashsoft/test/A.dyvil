@@ -2,5 +2,5 @@ package com.clashsoft.test;
 
 public class A
 {
-	public static B a() = {};
+	public static void a(B b);
 }

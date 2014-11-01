@@ -5,7 +5,7 @@ public class Main
 	public int i = 0;
 	public int j = 0;
 	
-	public static void main(String[] args) = A a b c;
+	public static void main(String[] args) = 3 + 4;
 	
 	public static void instance() = { };
 }

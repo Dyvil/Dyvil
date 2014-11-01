@@ -58,6 +58,14 @@ public class AccessResolver
 			{
 				context = a.getType();
 			}
+			else
+			{
+				IValue value = iaccess.getValue();
+				if (value != null)
+				{
+					context = value.getType();
+				}
+			}
 			
 			if (!iaccess.resolve(context))
 			{

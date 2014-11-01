@@ -1,56 +1,66 @@
 package dyvil.tools.compiler.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Symbols
 {
-	public static String expand(String s)
+	public static Map<Character, String>	symbolMap		= new HashMap();
+	public static Map<String, Character>	replacementMap	= new HashMap();
+	
+	static
 	{
-		switch (s)
-		{
-		case "=": return "$eq";
-		case ">": return "$greater";
-		case "<": return "$less";
-		case "+": return "$plus";
-		case "-": return "$minus";
-		case "*": return "$times";
-		case "/": return "$div";
-		case "!": return "$bang";
-		case "@": return "$at";
-		case "#": return "$hash";
-		case "%": return "$percent";
-		case "^": return "$up";
-		case "&": return "$amp";
-		case "~": return "$tilde";
-		case "?": return "$qmark";
-		case "|": return "$bar";
-		case "\\": return "$bslash";
-		case ":": return "$colon";
-		}
-		return s;
+		addReplacement('=', "eq");
+		addReplacement('>', "greater");
+		addReplacement('<', "less");
+		addReplacement('+', "plus");
+		addReplacement('-', "minus");
+		addReplacement('*', "times");
+		addReplacement('/', "div");
+		addReplacement('!', "bang");
+		addReplacement('@', "at");
+		addReplacement('#', "hash");
+		addReplacement('%', "percent");
+		addReplacement('^', "up");
+		addReplacement('&', "amp");
+		addReplacement('~', "tilde");
+		addReplacement('?', "qmark");
+		addReplacement('|', "bar");
+		addReplacement('\\', "bslash");
+		addReplacement(':', "colon");
 	}
 	
-	public static String contract(String s)
+	private static void addReplacement(char symbol, String replacement)
 	{
-		switch (s)
+		Character c = symbol;
+		symbolMap.put(c, replacement);
+		replacementMap.put(replacement, c);
+	}
+	
+	private static boolean isSymbol(char c)
+	{
+		return c == '=' || c == '>' || c == '<' || c == '+' || c == '-' || c == '*' || c == '/' || c == '!' || c == '@' || c == '#' || c == '%' || c == '^' || c == '&' || c == '~' || c == '?' || c == '|' || c == '\\' || c == ':';
+	}
+	
+	public static String expand(String s)
+	{
+		int len = s.length();
+		StringBuilder builder = new StringBuilder(len);
+		for (int i = 0; i < len; i++)
 		{
-		case "$eq": return "=";
-		case "$greater": return ">";
-		case "$less": return "<";
-		case "$plus": return "+";
-		case "$minus": return "-";
-		case "$times": return "*";
-		case "$div": return "/";
-		case "$bang": return "!";
-		case "$at": return "@";
-		case "$hash": return "#";
-		case "$percent": return "%";
-		case "$up": return "^";
-		case "$amp": return "&";
-		case "$tilde": return "~";
-		case "$qmark": return "?";
-		case "$bar": return "|";
-		case "$bslash": return "\\";
-		case "$colon": return ":";
+			char c = s.charAt(i);
+			if (isSymbol(c))
+			{
+				String replacement = symbolMap.get(c);
+				builder.append('$');
+				builder.append(replacement);
+			}
+			else
+			{
+				builder.append(c);
+			}
 		}
-		return s;
+		
+		return builder.toString();
 	}
 }

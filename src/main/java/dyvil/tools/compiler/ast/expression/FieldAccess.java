@@ -21,13 +21,14 @@ import dyvil.tools.compiler.lexer.marker.Warning;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.AccessResolver;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Symbols;
 
 public class FieldAccess extends ASTObject implements IValue, INamed, IValued, IAccess
 {
 	protected IValue	instance;
 	protected String	name;
 	
-	protected boolean dotless;
+	protected boolean	dotless;
 	
 	public IField		field;
 	
@@ -40,7 +41,7 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	{
 		this.position = position;
 		this.instance = instance;
-		this.name = name;
+		this.name = Symbols.expand(name);
 	}
 	
 	@Override

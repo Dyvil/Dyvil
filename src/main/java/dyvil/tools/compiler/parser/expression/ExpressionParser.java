@@ -29,7 +29,6 @@ public class ExpressionParser extends Parser implements ITyped
 	
 	public static final int	ACCESS			= 8;
 	public static final int	DOT_ACCESS		= 16;
-	public static final int	SUGARACCESS		= 32;
 	
 	public static final int	STATEMENT		= 64;
 	public static final int	TYPE			= 128;
@@ -180,7 +179,9 @@ public class ExpressionParser extends Parser implements ITyped
 			else if (!next.isType(Token.TYPE_IDENTIFIER | Token.TYPE_BRACKET | Token.TYPE_SYMBOL))
 			{
 				MethodCall call = new MethodCall(token, this.value, value);
+				call.setSugar(true);
 				this.value = call;
+				
 				ExpressionParser parser = new ExpressionParser(this.context, call);
 				parser.lazy = true;
 				pm.pushParser(parser);
@@ -193,17 +194,6 @@ public class ExpressionParser extends Parser implements ITyped
 				this.mode = ACCESS;
 				return true;
 			}
-		}
-		if (this.isInMode(SUGARACCESS))
-		{
-			MethodCall call = new MethodCall(token, this.value, value);
-			call.setSugar(true);
-			this.value = call;
-			this.mode = 0;
-			ExpressionParser parser = new ExpressionParser(this.context, call);
-			parser.lazy = true;
-			pm.pushTryParser(parser, token.next());
-			return true;
 		}
 		if (this.isInMode(PARAMETERS))
 		{
