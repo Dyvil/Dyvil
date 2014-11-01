@@ -63,4 +63,46 @@ public class Symbols
 		
 		return builder.toString();
 	}
+	
+	public static String contract(String s)
+	{
+		int len = s.length();
+		StringBuilder builder = new StringBuilder(len);
+		for (int i = 0; i < len; i++)
+		{
+			char c = s.charAt(i);
+			if (c == '$')
+			{
+				int index = indexOfNonLetter(s, i + 1, len);
+				String s1 = s.substring(i + 1, index);
+				if (s1.isEmpty())
+				{
+					builder.append('$');
+					i++;
+					continue;
+				}
+				builder.append(replacementMap.get(s1).charValue());
+				i = index - 1;
+			}
+			else
+			{
+				builder.append(c);
+			}
+		}
+		return builder.toString();
+	}
+	
+	private static int indexOfNonLetter(String s, int start, int end)
+	{
+		for (; start < end; start++)
+		{
+			char c = s.charAt(start);
+			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+			{
+				continue;
+			}
+			return start;
+		}
+		return end;
+	}
 }

@@ -35,11 +35,12 @@ public class Formatting
 	
 	public static class Field
 	{
-		public static String	keyValueSeperator	= " = ";
+		public static String	keyValueSeperator		= " = ";
 		
-		public static boolean	convertSugarAccess	= true;
-		public static String	sugarAccessStart	= " ";
-		public static String	sugarAccessEnd		= " ";
+		public static boolean	convertQualifiedNames	= false;
+		public static boolean	convertSugarAccess		= false;
+		public static String	sugarAccessStart		= " ";
+		public static String	sugarAccessEnd			= " ";
 	}
 	
 	public static class Method
@@ -49,7 +50,8 @@ public class Formatting
 		public static String	parametersEnd			= ")";
 		public static String	parameterSeperator		= ", ";
 		
-		public static boolean	convertSugarCalls		= true;
+		public static boolean	convertQualifiedNames	= false;
+		public static boolean	convertSugarCalls		= false;
 		public static String	sugarCallStart			= " ";
 		public static String	sugarCallEnd			= " ";
 		

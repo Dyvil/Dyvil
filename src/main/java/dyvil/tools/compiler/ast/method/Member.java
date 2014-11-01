@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.util.Symbols;
 
 public abstract class Member extends ASTObject implements IMember
 {
@@ -16,6 +17,7 @@ public abstract class Member extends ASTObject implements IMember
 	protected IClass			theClass;
 	protected Type				type;
 	protected String			name;
+	protected String			qualifiedName;
 	protected List<Annotation>	annotations	= new ArrayList(1);
 	
 	protected Member(IClass iclass)
@@ -27,12 +29,14 @@ public abstract class Member extends ASTObject implements IMember
 	{
 		this.theClass = iclass;
 		this.name = name;
+		this.qualifiedName = Symbols.expand(name);
 	}
 	
 	public Member(IClass iclass, String name, Type type)
 	{
 		this.theClass = iclass;
 		this.name = name;
+		this.qualifiedName = Symbols.expand(name);
 		this.type = type;
 	}
 	
@@ -46,6 +50,13 @@ public abstract class Member extends ASTObject implements IMember
 	public void setName(String name)
 	{
 		this.name = name;
+		this.qualifiedName = Symbols.expand(name);
+	}
+	
+	public void setQualifiedName(String name)
+	{
+		this.qualifiedName = name;
+		this.name = Symbols.contract(name);
 	}
 	
 	@Override
@@ -93,7 +104,7 @@ public abstract class Member extends ASTObject implements IMember
 	@Override
 	public String getName()
 	{
-		return this.name;
+		return this.qualifiedName;
 	}
 	
 	@Override

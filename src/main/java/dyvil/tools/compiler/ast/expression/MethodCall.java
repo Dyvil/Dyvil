@@ -20,6 +20,7 @@ public class MethodCall extends Call implements INamed, IValued
 {
 	protected IValue	instance;
 	protected String	name;
+	protected String	qualifiedName;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -30,7 +31,8 @@ public class MethodCall extends Call implements INamed, IValued
 	{
 		super(position);
 		this.instance = instance;
-		this.name = Symbols.expand(name);
+		this.name = name;
+		this.qualifiedName = Symbols.expand(name);
 	}
 	
 	@Override
@@ -42,13 +44,13 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public void setName(String name)
 	{
-		this.name = name;
+		this.qualifiedName = name;
 	}
 	
 	@Override
 	public String getName()
 	{
-		return this.name;
+		return this.qualifiedName;
 	}
 	
 	@Override
@@ -99,7 +101,7 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public boolean resolve(IContext context)
 	{
-		this.method = context.resolveMethod(this.name, this.getTypes());
+		this.method = context.resolveMethod(this.qualifiedName, this.getTypes());
 		return this.method != null;
 	}
 	
@@ -108,10 +110,10 @@ public class MethodCall extends Call implements INamed, IValued
 	{
 		if (this.arguments.isEmpty())
 		{
-			IField field = context.resolveField(this.name);
+			IField field = context.resolveField(this.qualifiedName);
 			if (field != null)
 			{
-				FieldAccess access = new FieldAccess(this.position, this.instance, this.name);
+				FieldAccess access = new FieldAccess(this.position, this.instance, this.qualifiedName);
 				access.field = field;
 				return access;
 			}
@@ -122,7 +124,7 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public Marker getResolveError()
 	{
-		return new SemanticError(this.position, "'" + this.name + "' could not be resolved to a method");
+		return new SemanticError(this.position, "'" + this.qualifiedName + "' could not be resolved to a method");
 	}
 	
 	@Override
@@ -136,7 +138,15 @@ public class MethodCall extends Call implements INamed, IValued
 				buffer.append(Formatting.Method.sugarCallStart);
 			}
 			
-			buffer.append(this.name);
+			if (Formatting.Method.convertQualifiedNames)
+			{
+				buffer.append(this.qualifiedName);
+			}
+			else
+			{
+				buffer.append(this.name);
+			}
+			
 			buffer.append(Formatting.Method.sugarCallEnd);
 			this.arguments.get(0).toString("", buffer);
 		}
@@ -147,7 +157,16 @@ public class MethodCall extends Call implements INamed, IValued
 				this.instance.toString("", buffer);
 				buffer.append('.');
 			}
-			buffer.append(this.name);
+			
+			if (Formatting.Method.convertQualifiedNames)
+			{
+				buffer.append(this.qualifiedName);
+			}
+			else
+			{
+				buffer.append(this.name);
+			}
+			
 			ParserUtil.parametersToString(this.arguments, buffer, !this.isSugarCall);
 		}
 	}

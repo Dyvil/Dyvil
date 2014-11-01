@@ -140,7 +140,15 @@ public class Method extends Member implements IMethod
 			this.type.toString("", buffer);
 			buffer.append(' ');
 		}
-		buffer.append(this.name);
+		
+		if (Formatting.Method.convertQualifiedNames)
+		{
+			buffer.append(this.qualifiedName);
+		}
+		else
+		{
+			buffer.append(this.name);
+		}
 		
 		if (!this.parameters.isEmpty())
 		{

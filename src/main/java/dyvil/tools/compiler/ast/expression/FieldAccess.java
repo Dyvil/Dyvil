@@ -27,6 +27,7 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 {
 	protected IValue	instance;
 	protected String	name;
+	protected String	qualifiedName;
 	
 	protected boolean	dotless;
 	
@@ -41,7 +42,8 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	{
 		this.position = position;
 		this.instance = instance;
-		this.name = Symbols.expand(name);
+		this.name = name;
+		this.qualifiedName = Symbols.expand(name);
 	}
 	
 	@Override
@@ -59,13 +61,13 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	@Override
 	public void setName(String name)
 	{
-		this.name = name;
+		this.qualifiedName = name;
 	}
 	
 	@Override
 	public String getName()
 	{
-		return this.name;
+		return this.qualifiedName;
 	}
 	
 	@Override
@@ -91,7 +93,7 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 		{
 			if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
 			{
-				state.addMarker(new Warning(this.position, "'" + this.name + "' is a static field and should be accessed in a static way"));
+				state.addMarker(new Warning(this.position, "'" + this.qualifiedName + "' is a static field and should be accessed in a static way"));
 				this.instance = null;
 			}
 		}
@@ -105,17 +107,17 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	@Override
 	public boolean resolve(IContext context)
 	{
-		this.field = context.resolveField(this.name);
+		this.field = context.resolveField(this.qualifiedName);
 		return this.field != null;
 	}
 	
 	@Override
 	public IAccess resolve2(IContext context)
 	{
-		IMethod method = context.resolveMethod(this.name, Type.EMPTY_TYPES);
+		IMethod method = context.resolveMethod(this.qualifiedName, Type.EMPTY_TYPES);
 		if (method != null)
 		{
-			MethodCall call = new MethodCall(this.position, this.instance, this.name);
+			MethodCall call = new MethodCall(this.position, this.instance, this.qualifiedName);
 			call.method = method;
 			call.isSugarCall = true;
 			return call;
@@ -126,7 +128,7 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	@Override
 	public Marker getResolveError()
 	{
-		return new SemanticError(this.position, "'" + this.name + "' could not be resolved to a field");
+		return new SemanticError(this.position, "'" + this.qualifiedName + "' could not be resolved to a field");
 	}
 	
 	@Override
@@ -140,7 +142,7 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 				buffer.append(Formatting.Field.sugarAccessStart);
 			}
 			
-			buffer.append(this.name);
+			buffer.append(this.qualifiedName);
 		}
 		else
 		{
@@ -149,7 +151,15 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 				this.instance.toString("", buffer);
 				buffer.append('.');
 			}
-			buffer.append(this.name);
+			
+			if (Formatting.Method.convertQualifiedNames)
+			{
+				buffer.append(this.qualifiedName);
+			}
+			else
+			{
+				buffer.append(this.name);
+			}
 		}
 	}
 	

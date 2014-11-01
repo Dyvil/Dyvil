@@ -66,7 +66,15 @@ public class Field extends Member implements IField
 		buffer.append(Modifiers.FIELD.toString(this.modifiers));
 		this.type.toString("", buffer);
 		buffer.append(' ');
-		buffer.append(this.name);
+		
+		if (Formatting.Field.convertQualifiedNames)
+		{
+			buffer.append(this.qualifiedName);
+		}
+		else
+		{
+			buffer.append(this.name);
+		}
 		
 		IValue value = this.value;
 		if (value != null)

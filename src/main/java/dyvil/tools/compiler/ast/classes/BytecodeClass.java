@@ -25,7 +25,7 @@ public class BytecodeClass extends AbstractClass
 	public void visitField(int access, String name, String desc, String signature, Object value)
 	{
 		Field field = new Field(this);
-		field.setName(name);
+		field.setQualifiedName(name);
 		field.setModifiers(access);
 		field.setType(ClassFormat.internalToType(desc));
 		this.body.addField(field);
@@ -34,7 +34,7 @@ public class BytecodeClass extends AbstractClass
 	public void visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
 		Method method = new Method(this);
-		method.setName(name);
+		method.setQualifiedName(name);
 		method.setModifiers(access);
 		ClassFormat.readMethodType(desc, method);
 		
