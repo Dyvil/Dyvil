@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.util.List;
+
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
@@ -15,13 +17,20 @@ public class Type extends ASTObject implements IContext
 {
 	public static Type[]	EMPTY_TYPES	= new Type[0];
 	
-	public static Type		NONE		= new Type(null);
+	public static Type		NONE		= new Type(null)
+										{
+											@Override
+											public boolean isAssignableFrom(Type t)
+											{
+												return true;
+											};
+										};
 	
 	public static Type		VOID		= new PrimitiveType("void");
 	public static Type		BOOL		= new PrimitiveType("boolean");
 	public static Type		BYTE		= new PrimitiveType("byte");
 	public static Type		SHORT		= new PrimitiveType("short");
-	public static Type		CHAR		= new PrimitiveType("char"); 
+	public static Type		CHAR		= new PrimitiveType("char");
 	public static Type		INT			= new PrimitiveType("int");
 	public static Type		LONG		= new PrimitiveType("long");
 	public static Type		FLOAT		= new PrimitiveType("float");
@@ -107,6 +116,20 @@ public class Type extends ASTObject implements IContext
 	public boolean isArrayType()
 	{
 		return this.arrayDimensions > 0;
+	}
+	
+	public boolean isAssignableFrom(Type that)
+	{
+		if (this.equals(that))
+		{
+			return true;
+		}
+		if (this.theClass != null)
+		{
+			List<Type> superClasses = this.theClass.getSuperClasses();
+			return superClasses.contains(that);
+		}
+		return false;
 	}
 	
 	@Override

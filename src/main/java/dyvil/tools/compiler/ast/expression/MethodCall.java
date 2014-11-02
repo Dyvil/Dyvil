@@ -95,6 +95,7 @@ public class MethodCall extends Call implements INamed, IValued
 		{
 			this.instance = this.instance.applyState(state, context);
 		}
+		
 		return this;
 	}
 	

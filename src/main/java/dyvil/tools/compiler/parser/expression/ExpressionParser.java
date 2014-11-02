@@ -169,14 +169,18 @@ public class ExpressionParser extends Parser implements ITyped
 		if (this.isInMode(DOT_ACCESS))
 		{
 			IToken next = token.next();
-			if (next.equals("("))
+			if (next.isType(Token.TYPE_OPEN_BRACKET))
 			{
 				MethodCall call = new MethodCall(token, this.value, value);
 				this.value = call;
 				this.mode = PARAMETERS;
 				return true;
 			}
-			else if (!next.isType(Token.TYPE_IDENTIFIER | Token.TYPE_BRACKET | Token.TYPE_SYMBOL))
+			else if (next.isType(Token.TYPE_CLOSE_BRACKET))
+			{
+				return false;
+			}
+			else if (!next.isAnyType(Token.TYPE_IDENTIFIER | Token.TYPE_SYMBOL))
 			{
 				MethodCall call = new MethodCall(token, this.value, value);
 				call.setSugar(true);

@@ -111,7 +111,7 @@ public class ParserManager
 				
 				if (Dyvilc.parseStack)
 				{
-					System.out.println(token + ":\t\t" + parser.name);
+					System.out.println(token + ":\t\t" + parser.name + " @ " + parser.mode);
 				}
 			}
 		}

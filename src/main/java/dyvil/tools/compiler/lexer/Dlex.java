@@ -309,9 +309,13 @@ public class Dlex implements Iterable<IToken>
 		{
 			return TYPE_IDENTIFIER;
 		}
-		else if (isBracket(c))
+		else if (isOpenBracket(c))
 		{
-			return TYPE_BRACKET;
+			return TYPE_OPEN_BRACKET;
+		}
+		else if (isCloseBracket(c))
+		{
+			return TYPE_CLOSE_BRACKET;
 		}
 		else if (isSymbol(c))
 		{
@@ -340,9 +344,13 @@ public class Dlex implements Iterable<IToken>
 		return c <= ' ';
 	}
 	
-	protected static boolean isBracket(char c)
+	protected static boolean isOpenBracket(char c)
 	{
-		return c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}';
+		return c == '(' || c == '[' || c == '{';
+	}
+	
+	protected static boolean isCloseBracket(char c) {
+		return c == ')' || c == ']' || c == '}';
 	}
 	
 	protected static boolean isSymbol(char c)
@@ -382,7 +390,7 @@ public class Dlex implements Iterable<IToken>
 	
 	protected static boolean isIdentifierPart(char c)
 	{
-		return c >= '!' && c <= '~' && !isSymbol(c) && !isBracket(c);
+		return c >= '!' && c <= '~' && !isSymbol(c) && !isOpenBracket(c) && !isCloseBracket(c);
 	}
 	
 	@Override

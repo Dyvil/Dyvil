@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
@@ -12,10 +11,14 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class Method extends Member implements IMethod
 {
 	private IValue				statement;
+	
+	private String					openBracket;
+	private String					closeBracket;
 	
 	private List<Parameter>		parameters			= new ArrayList(3);
 	private List<ThrowsDecl>	throwsDeclarations	= new ArrayList(1);
@@ -86,6 +89,18 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public void setParametersOpenBracket(String bracket)
+	{
+		this.openBracket = bracket;
+	}
+	
+	@Override
+	public void setParametersCloseBracket(String bracket)
+	{
+		this.closeBracket = bracket;
+	}
+	
+	@Override
 	public IClass resolveClass(String name)
 	{
 		return this.theClass.resolveClass(name);
@@ -150,30 +165,7 @@ public class Method extends Member implements IMethod
 			buffer.append(this.name);
 		}
 		
-		if (!this.parameters.isEmpty())
-		{
-			buffer.append(Formatting.Method.parametersStart);
-			Iterator<Parameter> iterator = this.parameters.iterator();
-			while (true)
-			{
-				Parameter parameter = iterator.next();
-				parameter.toString("", buffer);
-				
-				if (iterator.hasNext())
-				{
-					buffer.append(parameter.getSeperator());
-				}
-				else
-				{
-					break;
-				}
-			}
-			buffer.append(Formatting.Method.parametersEnd);
-		}
-		else
-		{
-			buffer.append(Formatting.Method.emptyParameters);
-		}
+		ParserUtil.parametersToString(this.parameters, buffer, true, this.openBracket + this.closeBracket, this.openBracket, Formatting.Method.parameterSeperator, this.closeBracket);
 		
 		IValue statement = this.getValue();
 		if (statement != null)

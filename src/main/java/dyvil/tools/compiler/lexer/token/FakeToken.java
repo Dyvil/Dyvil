@@ -46,6 +46,12 @@ public class FakeToken implements IToken
 	}
 	
 	@Override
+	public boolean isAnyType(int type) throws SyntaxError
+	{
+		throw new SyntaxError(this, "No token!");
+	}
+	
+	@Override
 	public int index() throws SyntaxError
 	{
 		throw new SyntaxError(this, "No token!");

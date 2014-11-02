@@ -16,7 +16,7 @@ public class Token implements IToken
 	private final String	value;
 	private final Object	object;
 	
-	private final CodeFile file;
+	private final CodeFile	file;
 	private final int		lineNumber;
 	private final int		start;
 	private final int		end;
@@ -60,6 +60,12 @@ public class Token implements IToken
 	
 	@Override
 	public boolean isType(int type) throws SyntaxError
+	{
+		return (this.type & type) == type;
+	}
+	
+	@Override
+	public boolean isAnyType(int type) throws SyntaxError
 	{
 		return (this.type & type) != 0;
 	}

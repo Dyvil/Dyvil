@@ -14,10 +14,16 @@ public interface IToken extends ICodePosition
 	public int	MOD_LINE			= 0x00010000;
 	public int	MOD_BLOCK			= 0x00020000;
 	
+	public int	MOD_OPEN			= 0x00010000;
+	public int	MOD_CLOSE			= 0x00020000;
+	
 	// TYPES
 	public int	TYPE_IDENTIFIER		= 0x00000001;
 	public int	TYPE_SYMBOL			= 0x00000002;
 	public int	TYPE_BRACKET		= 0x00000004;
+	
+	public int	TYPE_OPEN_BRACKET	= TYPE_BRACKET | MOD_OPEN;
+	public int	TYPE_CLOSE_BRACKET	= TYPE_BRACKET | MOD_CLOSE;
 	
 	public int	TYPE_INT			= 0x00000010;
 	public int	TYPE_LONG			= 0x00000020;
@@ -41,6 +47,8 @@ public interface IToken extends ICodePosition
 	public boolean equals(String value) throws SyntaxError;
 	
 	public boolean isType(int type) throws SyntaxError;
+	
+	public boolean isAnyType(int types) throws SyntaxError;
 	
 	public int index() throws SyntaxError;
 	

@@ -14,13 +14,13 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class ParameterListParser extends Parser
 {
-	public static final int	TYPE		= 0;
-	public static final int	NAME		= 1;
+	public static final int		TYPE		= 0;
+	public static final int		NAME		= 1;
 	
-	protected IContext context;
+	protected IContext			context;
 	protected IParameterized	parameterized;
 	
-	private Parameter		parameter	= new Parameter();
+	private Parameter			parameter	= new Parameter();
 	
 	public ParameterListParser(IContext context, IParameterized parameterized)
 	{
@@ -39,7 +39,7 @@ public class ParameterListParser extends Parser
 				this.parameter.addModifier(i);
 				return true;
 			}
-			else if (")".equals(value))
+			else if (token.isType(Token.TYPE_CLOSE_BRACKET))
 			{
 				pm.popParser(true);
 				return true;
@@ -63,11 +63,9 @@ public class ParameterListParser extends Parser
 				this.mode = TYPE;
 				return true;
 			}
-			else if (")".equals(value))
-			{
-				pm.popParser(true);
-				return true;
-			}
+			
+			pm.popParser(true);
+			return true;
 		}
 		return false;
 	}
