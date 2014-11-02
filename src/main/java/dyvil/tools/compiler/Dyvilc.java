@@ -21,34 +21,24 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class Dyvilc
 {
-	public static boolean		parseStack;
-	public static boolean		debug;
+	public static boolean				parseStack;
+	public static boolean				debug;
 	
-	public static Dyvilc		instance;
+	public static Logger				logger = Logger.getLogger("DYVILC");
+	public static DateFormat			format	= new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
 	
-	public static Logger		logger;
-	public static DateFormat	format	= new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+	public static CompilerConfig		config	= new CompilerConfig();
+	public static Set<CompilerState>	states	= new TreeSet();
 	
-	public CompilerConfig		config;
-	public Set<CompilerState>	states	= new TreeSet();
-	
-	public static ParserManager	parser	= new ParserManager();
-	
-	public Dyvilc(CompilerConfig config)
-	{
-		this.config = config;
-	}
+	public static ParserManager			parser	= new ParserManager();
 	
 	public static void main(String[] args)
 	{
 		// Sets up the logger
 		initLogger();
 		
-		CodeFile file = new CodeFile(args[0]);
-		
 		// Loads the config
-		CompilerConfig config = new CompilerConfig();
-		parser.parse(file, new ConfigParser(config));
+		parser.parse(new CodeFile(args[0]), new ConfigParser(config));
 		
 		// Loads libraries
 		for (Library library : config.libraries)
@@ -60,20 +50,18 @@ public class Dyvilc
 		Type.init();
 		
 		// Sets up States from config
-		instance = new Dyvilc(config);
 		for (int i = 1; i < args.length; i++)
 		{
-			instance.addStates(args[i]);
+			addStates(args[i]);
 		}
 		
-		instance.run();
+		run();
 	}
 	
 	public static void initLogger()
 	{
 		try
 		{
-			logger = Logger.getLogger("DYVILC");
 			logger.setUseParentHandlers(false);
 			
 			String path = new File("dyvilc.log").getAbsolutePath();
@@ -99,34 +87,34 @@ public class Dyvilc
 		{}
 	}
 	
-	public void addStates(String s)
+	public static void addStates(String s)
 	{
 		switch (s)
 		{
 		case "compile":
-			this.states.add(CompilerState.TOKENIZE);
-			this.states.add(CompilerState.PARSE);
-			this.states.add(CompilerState.RESOLVE_TYPES);
-			this.states.add(CompilerState.RESOLVE);
-			this.states.add(CompilerState.OPERATOR_PRECEDENCE);
-			this.states.add(CompilerState.FOLD_CONSTANTS);
-			this.states.add(CompilerState.CONVERT);
-			this.states.add(CompilerState.COMPILE);
+			Dyvilc.states.add(CompilerState.TOKENIZE);
+			Dyvilc.states.add(CompilerState.PARSE);
+			Dyvilc.states.add(CompilerState.RESOLVE_TYPES);
+			Dyvilc.states.add(CompilerState.RESOLVE);
+			Dyvilc.states.add(CompilerState.OPERATOR_PRECEDENCE);
+			Dyvilc.states.add(CompilerState.FOLD_CONSTANTS);
+			Dyvilc.states.add(CompilerState.CONVERT);
+			Dyvilc.states.add(CompilerState.COMPILE);
 			break;
 		case "optimize":
-			this.states.add(CompilerState.OPTIMIZE);
+			Dyvilc.states.add(CompilerState.OPTIMIZE);
 			break;
 		case "obfuscate":
-			this.states.add(CompilerState.OBFUSCATE);
+			Dyvilc.states.add(CompilerState.OBFUSCATE);
 			break;
 		case "doc":
-			this.states.add(CompilerState.DYVILDOC);
+			Dyvilc.states.add(CompilerState.DYVILDOC);
 			break;
 		case "decompile":
-			this.states.add(CompilerState.DECOMPILE);
+			Dyvilc.states.add(CompilerState.DECOMPILE);
 			break;
 		case "--debug":
-			this.states.add(CompilerState.DEBUG);
+			Dyvilc.states.add(CompilerState.DEBUG);
 			debug = true;
 			break;
 		case "--pstack":
@@ -135,25 +123,25 @@ public class Dyvilc
 		}
 	}
 	
-	public void run()
+	public static void run()
 	{
 		long now = System.nanoTime();
 		
-		File sourceDir = this.config.sourceDir;
-		File outputDir = this.config.outputDir;
+		File sourceDir = Dyvilc.config.sourceDir;
+		File outputDir = Dyvilc.config.outputDir;
 		Package root = Package.rootPackage;
-		int states = this.states.size();
+		int states = Dyvilc.states.size();
 		
 		logger.info("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
 		if (debug)
 		{
-			logger.info("Applying " + states + " States: " + this.states);
+			logger.info("Applying " + states + " States: " + Dyvilc.states);
 			logger.info("");
 		}
 		
 		for (String s : sourceDir.list())
 		{
-			this.compile(new CodeFile(sourceDir, s), new File(outputDir, s), Package.rootPackage);
+			compile(new CodeFile(sourceDir, s), new File(outputDir, s), Package.rootPackage);
 		}
 		
 		List<CompilationUnit> units = new ArrayList(root.subPackages.size());
@@ -165,7 +153,7 @@ public class Dyvilc
 			}
 		}
 		
-		for (CompilerState state : this.states)
+		for (CompilerState state : Dyvilc.states)
 		{
 			state.apply(units, null);
 		}
@@ -174,7 +162,7 @@ public class Dyvilc
 		ParserUtil.logProfile(now, units.size(), "Compilation finished (%.1f ms, %.1f ms/CU, %.2f CU/s)");
 	}
 	
-	public void compile(File source, File output, Package pack)
+	public static void compile(File source, File output, Package pack)
 	{
 		if (!source.exists())
 		{
@@ -185,7 +173,7 @@ public class Dyvilc
 			String name = source.getName();
 			for (String s : source.list())
 			{
-				this.compile(new CodeFile(source, s), new File(output, s), pack.createSubPackage(name));
+				compile(new CodeFile(source, s), new File(output, s), pack.createSubPackage(name));
 			}
 		}
 		else

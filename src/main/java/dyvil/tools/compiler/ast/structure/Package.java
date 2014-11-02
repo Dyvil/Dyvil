@@ -130,7 +130,7 @@ public class Package implements IContext
 		}
 		
 		String internalName = ClassFormat.packageToInternal(name);
-		for (Library library : Dyvilc.instance.config.libraries)
+		for (Library library : Dyvilc.config.libraries)
 		{
 			Package pack = library.resolvePackage(name);
 			if (pack != null)

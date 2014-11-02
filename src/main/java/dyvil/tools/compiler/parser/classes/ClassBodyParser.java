@@ -64,6 +64,12 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 			this.theClass.setBody(this.classBody);
 		}
 		
+		if (this.mode == (TYPE | ANNOTATION) && "}".equals(value))
+		{
+			pm.popParser();
+			return true;
+		}
+		
 		if (this.isInMode(TYPE))
 		{
 			if ((i = Modifiers.FIELD_OR_METHOD.parse(value)) != -1)
