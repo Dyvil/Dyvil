@@ -177,9 +177,20 @@ public class ParserManager
 		this.pushParser(parser, reparse);
 	}
 	
+	public void setParser(Parser parser)
+	{
+		this.currentParser = parser;
+		parser.begin(this);
+	}
+	
 	public void pushParser(Parser parser)
 	{
-		this.pushParser(parser, false);
+		if (this.currentParser != null)
+		{
+			parser.setParent(this.currentParser);
+		}
+		this.currentParser = parser;
+		parser.begin(this);
 	}
 	
 	public void pushParser(Parser parser, boolean reparse)
@@ -198,7 +209,14 @@ public class ParserManager
 	
 	public void popParser() throws SyntaxError
 	{
-		this.popParser(false);
+		// Drop the jumpback token since the tryparser has completed
+		// successfully.
+		this.jumpBackToken = null;
+		if (this.currentParser != null)
+		{
+			this.currentParser.end(this);
+			this.currentParser = this.currentParser.getParent();
+		}
 	}
 	
 	public void popParser(boolean reparse) throws SyntaxError

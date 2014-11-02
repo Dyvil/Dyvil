@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public enum CompilerState
 {
@@ -90,10 +91,7 @@ public enum CompilerState
 		
 		if (Dyvilc.debug)
 		{
-			now = System.nanoTime() - now;
-			float n = now / 1000000F;
-			float f = (float) n / units.size();
-			Dyvilc.logger.info(String.format("Finished State %s (%.1f ms, %.1f ms/CU, %.2f CU/s)", this.name(), n, f, 1000F / f));
+			ParserUtil.logProfile(now, units.size(), "Finished State " + this.name() + " (%.1f ms, %.1f ms/CU, %.2f CU/s)");
 		}
 	}
 	

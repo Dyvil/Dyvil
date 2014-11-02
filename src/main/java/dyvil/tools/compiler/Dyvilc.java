@@ -17,21 +17,22 @@ import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.config.ConfigParser;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class Dyvilc
 {
-	public static final boolean	parseStack	= false;
+	public static boolean		parseStack;
+	public static boolean		debug;
 	
 	public static Dyvilc		instance;
 	
 	public static Logger		logger;
-	public static DateFormat	format		= new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+	public static DateFormat	format	= new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
 	
 	public CompilerConfig		config;
-	public Set<CompilerState>	states		= new TreeSet();
+	public Set<CompilerState>	states	= new TreeSet();
 	
-	public static ParserManager	parser		= new ParserManager();
-	public static boolean		debug;
+	public static ParserManager	parser	= new ParserManager();
 	
 	public Dyvilc(CompilerConfig config)
 	{
@@ -124,21 +125,27 @@ public class Dyvilc
 		case "decompile":
 			this.states.add(CompilerState.DECOMPILE);
 			break;
-		case "debug":
+		case "--debug":
 			this.states.add(CompilerState.DEBUG);
 			debug = true;
+			break;
+		case "--pstack":
+			parseStack = true;
 			break;
 		}
 	}
 	
 	public void run()
 	{
+		long now = System.nanoTime();
+		
 		File sourceDir = this.config.sourceDir;
 		File outputDir = this.config.outputDir;
 		Package root = Package.rootPackage;
+		int states = this.states.size();
 		
 		logger.info("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
-		logger.info("Applying States " + this.states);
+		logger.info("Applying " + states + " States: " + this.states);
 		logger.info("");
 		
 		for (String s : sourceDir.list())
@@ -159,6 +166,9 @@ public class Dyvilc
 		{
 			state.apply(units, null);
 		}
+		
+		logger.info("");
+		ParserUtil.logProfile(now, units.size(), "Compilation finished (%.1f ms, %.1f s/CU, %.2f CU/s)");
 	}
 	
 	public void compile(File source, File output, Package pack)

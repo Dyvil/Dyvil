@@ -1,26 +1,26 @@
-[11-02-2014 19:43:17] [INFO]: Compiling /Users/adriankunz/Documents/Eclipse Workspace/Dyvil/src/test/dyvil to /Users/adriankunz/Documents/Eclipse Workspace/Dyvil/bin/test/dyvil
-[11-02-2014 19:43:17] [INFO]: Applying States [TOKENIZE, PARSE, RESOLVE_TYPES, RESOLVE, OPERATOR_PRECEDENCE, FOLD_CONSTANTS, CONVERT, OPTIMIZE, COMPILE, DEBUG]
-[11-02-2014 19:43:17] [INFO]: 
-[11-02-2014 19:43:17] [INFO]: Applying State TOKENIZE
-[11-02-2014 19:43:17] [INFO]: Finished State TOKENIZE (59,1 ms, 19,7 ms/CU, 50,76 CU/s)
-[11-02-2014 19:43:17] [INFO]: Applying State PARSE
-[11-02-2014 19:43:18] [INFO]: Finished State PARSE (893,8 ms, 297,9 ms/CU, 3,36 CU/s)
-[11-02-2014 19:43:18] [INFO]: Applying State RESOLVE_TYPES
-[11-02-2014 19:43:18] [INFO]: Finished State RESOLVE_TYPES (4,9 ms, 1,6 ms/CU, 610,13 CU/s)
-[11-02-2014 19:43:18] [INFO]: Applying State RESOLVE
-[11-02-2014 19:43:18] [INFO]: Finished State RESOLVE (35,6 ms, 11,9 ms/CU, 84,32 CU/s)
-[11-02-2014 19:43:18] [INFO]: Applying State OPERATOR_PRECEDENCE
-[11-02-2014 19:43:18] [INFO]: Finished State OPERATOR_PRECEDENCE (0,0 ms, 0,0 ms/CU, 100000,00 CU/s)
-[11-02-2014 19:43:18] [INFO]: Applying State FOLD_CONSTANTS
-[11-02-2014 19:43:18] [INFO]: Finished State FOLD_CONSTANTS (0,0 ms, 0,0 ms/CU, 103448,28 CU/s)
-[11-02-2014 19:43:18] [INFO]: Applying State CONVERT
-[11-02-2014 19:43:18] [INFO]: Finished State CONVERT (0,0 ms, 0,0 ms/CU, 130434,78 CU/s)
-[11-02-2014 19:43:18] [INFO]: Applying State OPTIMIZE
-[11-02-2014 19:43:18] [INFO]: Finished State OPTIMIZE (0,0 ms, 0,0 ms/CU, 130434,78 CU/s)
-[11-02-2014 19:43:18] [INFO]: Applying State COMPILE
-[11-02-2014 19:43:18] [INFO]: Finished State COMPILE (0,0 ms, 0,0 ms/CU, 249999,98 CU/s)
-[11-02-2014 19:43:18] [INFO]: Applying State DEBUG
-[11-02-2014 19:43:18] [INFO]: src/test/dyvil/com/clashsoft/test/A.dyvil:
+[11-02-2014 19:56:54] [INFO]: Compiling /Users/adriankunz/Documents/Eclipse Workspace/Dyvil/src/test/dyvil to /Users/adriankunz/Documents/Eclipse Workspace/Dyvil/bin/test/dyvil
+[11-02-2014 19:56:54] [INFO]: Applying 10 States: [TOKENIZE, PARSE, RESOLVE_TYPES, RESOLVE, OPERATOR_PRECEDENCE, FOLD_CONSTANTS, CONVERT, OPTIMIZE, COMPILE, DEBUG]
+[11-02-2014 19:56:54] [INFO]: 
+[11-02-2014 19:56:54] [INFO]: Applying State TOKENIZE
+[11-02-2014 19:56:54] [INFO]: Finished State TOKENIZE (47,0 ms, 15,7 ms/CU, 63,88 CU/s)
+[11-02-2014 19:56:54] [INFO]: Applying State PARSE
+[11-02-2014 19:56:54] [INFO]: Finished State PARSE (20,9 ms, 7,0 ms/CU, 143,73 CU/s)
+[11-02-2014 19:56:54] [INFO]: Applying State RESOLVE_TYPES
+[11-02-2014 19:56:54] [INFO]: Finished State RESOLVE_TYPES (3,7 ms, 1,2 ms/CU, 802,14 CU/s)
+[11-02-2014 19:56:54] [INFO]: Applying State RESOLVE
+[11-02-2014 19:56:54] [INFO]: Finished State RESOLVE (0,9 ms, 0,3 ms/CU, 3267,97 CU/s)
+[11-02-2014 19:56:54] [INFO]: Applying State OPERATOR_PRECEDENCE
+[11-02-2014 19:56:54] [INFO]: Finished State OPERATOR_PRECEDENCE (0,0 ms, 0,0 ms/CU, 130434,78 CU/s)
+[11-02-2014 19:56:54] [INFO]: Applying State FOLD_CONSTANTS
+[11-02-2014 19:56:54] [INFO]: Finished State FOLD_CONSTANTS (0,0 ms, 0,0 ms/CU, 107142,85 CU/s)
+[11-02-2014 19:56:54] [INFO]: Applying State CONVERT
+[11-02-2014 19:56:54] [INFO]: Finished State CONVERT (0,0 ms, 0,0 ms/CU, 136363,64 CU/s)
+[11-02-2014 19:56:54] [INFO]: Applying State OPTIMIZE
+[11-02-2014 19:56:54] [INFO]: Finished State OPTIMIZE (0,0 ms, 0,0 ms/CU, 136363,64 CU/s)
+[11-02-2014 19:56:54] [INFO]: Applying State COMPILE
+[11-02-2014 19:56:54] [INFO]: Finished State COMPILE (0,0 ms, 0,0 ms/CU, 249999,98 CU/s)
+[11-02-2014 19:56:54] [INFO]: Applying State DEBUG
+[11-02-2014 19:56:54] [INFO]: src/test/dyvil/com/clashsoft/test/A.dyvil:
 package com.clashsoft.test;
 
 public class A
@@ -30,7 +30,7 @@ public class A
 }
 
 
-[11-02-2014 19:43:18] [INFO]: src/test/dyvil/com/clashsoft/test/B.dyvil:
+[11-02-2014 19:56:54] [INFO]: src/test/dyvil/com/clashsoft/test/B.dyvil:
 package com.clashsoft.test;
 
 public class B
@@ -40,7 +40,7 @@ public class B
 }
 
 
-[11-02-2014 19:43:18] [INFO]: src/test/dyvil/com/clashsoft/test/Main.dyvil:
+[11-02-2014 19:56:54] [INFO]: src/test/dyvil/com/clashsoft/test/Main.dyvil:
 package com.clashsoft.test;
 
 public class Main
@@ -55,4 +55,6 @@ public class Main
 }
 
 
-[11-02-2014 19:43:18] [INFO]: Finished State DEBUG (15,9 ms, 5,3 ms/CU, 188,95 CU/s)
+[11-02-2014 19:56:54] [INFO]: Finished State DEBUG (2,9 ms, 1,0 ms/CU, 1047,12 CU/s)
+[11-02-2014 19:56:54] [INFO]: 
+[11-02-2014 19:56:54] [INFO]: Compilation finished (89,5 ms, 29,8 s/CU, 33,53 CU/s)

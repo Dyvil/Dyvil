@@ -155,7 +155,7 @@ public class CompilationUnit extends ASTObject implements IContext
 		}
 		else if (state == CompilerState.PARSE)
 		{
-			Dyvilc.parser.pushParser(new CompilationUnitParser(this));
+			Dyvilc.parser.setParser(new CompilationUnitParser(this));
 			Dyvilc.parser.parse(this.getFile(), this.tokens);
 			this.tokens = null;
 			return this;

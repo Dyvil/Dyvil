@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.tools.compiler.Dyvilc;
 import dyvil.tools.compiler.ast.api.IASTObject;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -144,5 +145,13 @@ public class ParserUtil
 			}
 			buffer.append(end);
 		}
+	}
+	
+	public static void logProfile(long now, int operations, String format)
+	{
+		now = System.nanoTime() - now;
+		float n = now / 1000000F;
+		float f = (float) n / operations;
+		Dyvilc.logger.info(String.format(format, n, f, 1000F / f));
 	}
 }
