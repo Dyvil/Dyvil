@@ -2,6 +2,8 @@ package dyvil.tools.compiler.lexer;
 
 import static dyvil.tools.compiler.lexer.token.IToken.*;
 
+import static dyvil.tools.compiler.util.ParserUtil.*;
+
 import java.util.Iterator;
 
 import dyvil.tools.compiler.Dyvilc;
@@ -337,60 +339,6 @@ public class Dlex implements Iterable<IToken>
 		String s = buf.toString();
 		buf.delete(0, buf.length());
 		return addToken(prev, s, type, line, start, end);
-	}
-	
-	protected static boolean isWhitespace(char c)
-	{
-		return c <= ' ';
-	}
-	
-	protected static boolean isOpenBracket(char c)
-	{
-		return c == '(' || c == '[' || c == '{';
-	}
-	
-	protected static boolean isCloseBracket(char c) {
-		return c == ')' || c == ']' || c == '}';
-	}
-	
-	protected static boolean isSymbol(char c)
-	{
-		return c == '.' || c == ',' || c == ';';
-	}
-	
-	protected static boolean isBinDigit(char c)
-	{
-		return c == '0' || c == '1';
-	}
-	
-	protected static boolean isOctDigit(char c)
-	{
-		return c >= '0' && c <= '7';
-	}
-	
-	protected static boolean isDigit(char c)
-	{
-		return c >= '0' && c <= '9';
-	}
-	
-	protected static boolean isHexDigit(char c)
-	{
-		return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
-	}
-	
-	protected static boolean isLetter(char c)
-	{
-		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-	}
-	
-	protected static boolean isIdentifierStart(char c)
-	{
-		return isIdentifierPart(c) && !isDigit(c);
-	}
-	
-	protected static boolean isIdentifierPart(char c)
-	{
-		return c >= '!' && c <= '~' && !isSymbol(c) && !isOpenBracket(c) && !isCloseBracket(c);
 	}
 	
 	@Override

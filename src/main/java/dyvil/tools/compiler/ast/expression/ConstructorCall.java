@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Util;
 
 public class ConstructorCall extends Call implements ITyped
 {
@@ -49,7 +49,7 @@ public class ConstructorCall extends Call implements ITyped
 		}
 		else
 		{
-			ParserUtil.parametersToString(this.arguments, buffer, true);
+			Util.parametersToString(this.arguments, buffer, true);
 		}
 	}
 	

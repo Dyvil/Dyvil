@@ -13,8 +13,8 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.AccessResolver;
-import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Symbols;
+import dyvil.tools.compiler.util.Util;
 
 public class MethodCall extends Call implements INamed, IValued
 {
@@ -168,7 +168,7 @@ public class MethodCall extends Call implements INamed, IValued
 				buffer.append(this.name);
 			}
 			
-			ParserUtil.parametersToString(this.arguments, buffer, !this.isSugarCall);
+			Util.parametersToString(this.arguments, buffer, !this.isSugarCall);
 		}
 	}
 }

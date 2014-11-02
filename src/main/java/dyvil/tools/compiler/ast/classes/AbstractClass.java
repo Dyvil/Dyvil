@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Util;
 
 public class AbstractClass extends ASTObject implements IClass
 {
@@ -229,7 +229,7 @@ public class AbstractClass extends ASTObject implements IClass
 		if (!this.superClasses.isEmpty())
 		{
 			buffer.append(" extends ");
-			ParserUtil.astToString(this.superClasses, Formatting.Class.superClassesSeperator, buffer);
+			Util.astToString(this.superClasses, Formatting.Class.superClassesSeperator, buffer);
 		}
 		
 		buffer.append(Formatting.Class.bodyStart);

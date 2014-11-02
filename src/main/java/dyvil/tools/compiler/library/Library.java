@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.InputStream;
 
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.bytecode.ClassReader;
+import dyvil.tools.compiler.util.IOUtil;
 
 public abstract class Library
 {
-	public static Library	dyvilLibrary	= load(ClassReader.dyvilRTJar);
-	public static Library	javaLibrary		= load(ClassReader.javaRTJar);
+	public static Library	dyvilLibrary	= load(IOUtil.dyvilRTJar);
+	public static Library	javaLibrary		= load(IOUtil.javaRTJar);
 	
 	public File				file;
 	

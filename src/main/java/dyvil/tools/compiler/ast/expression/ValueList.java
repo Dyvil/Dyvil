@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Util;
 
 public class ValueList extends ASTObject implements IValue, IValueList
 {
@@ -90,7 +90,7 @@ public class ValueList extends ASTObject implements IValue, IValueList
 			else
 			{
 				buffer.append(Formatting.Expression.arrayStart);
-				ParserUtil.astToString(this.values, Formatting.Expression.arraySeperator, buffer);
+				Util.astToString(this.values, Formatting.Expression.arraySeperator, buffer);
 				buffer.append(Formatting.Expression.arrayEnd);
 			}
 		}

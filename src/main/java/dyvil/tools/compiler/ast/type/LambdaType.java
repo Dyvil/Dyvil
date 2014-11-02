@@ -6,7 +6,7 @@ import java.util.List;
 import dyvil.tools.compiler.ast.api.ITypeList;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Util;
 
 public class LambdaType extends Type implements ITyped, ITypeList
 {
@@ -56,7 +56,7 @@ public class LambdaType extends Type implements ITyped, ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		ParserUtil.parametersToString(this.argumentTypes, buffer, true);
+		Util.parametersToString(this.argumentTypes, buffer, true);
 		buffer.append(Formatting.Expression.lambdaSeperator);
 		this.returnType.toString("", buffer);
 	}

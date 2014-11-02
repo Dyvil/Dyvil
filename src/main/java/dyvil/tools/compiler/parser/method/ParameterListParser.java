@@ -56,7 +56,7 @@ public class ParameterListParser extends Parser
 				this.parameter.setName(value);
 				return true;
 			}
-			else if (ParserUtil.isSeperatorChar(value))
+			else if (ParserUtil.isSeperator(value.charAt(0)))
 			{
 				this.parameter.setSeperator(value.charAt(0));
 				this.end(pm);

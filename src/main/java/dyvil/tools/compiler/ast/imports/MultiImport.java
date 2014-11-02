@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Util;
 
 public class MultiImport extends PackageImport
 {
@@ -63,7 +63,7 @@ public class MultiImport extends PackageImport
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(prefix).append("import ").append(this.packageName).append(Formatting.Import.multiImportStart);
-		ParserUtil.listToString(this.classNames, Formatting.Import.multiImportSeperator, buffer);
+		Util.listToString(this.classNames, Formatting.Import.multiImportSeperator, buffer);
 		buffer.append(Formatting.Import.multiImportEnd).append(';');
 	}
 	

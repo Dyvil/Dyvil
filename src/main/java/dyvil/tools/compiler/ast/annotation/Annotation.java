@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Util;
 
 public class Annotation extends ASTObject implements ITyped, IValueList
 {
@@ -70,6 +70,6 @@ public class Annotation extends ASTObject implements ITyped, IValueList
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.name);
-		ParserUtil.parametersToString(this.parameters, buffer, false);
+		Util.parametersToString(this.parameters, buffer, false);
 	}
 }

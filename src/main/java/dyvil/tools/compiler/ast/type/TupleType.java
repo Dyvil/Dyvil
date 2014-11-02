@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.api.ITypeList;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Util;
 
 public class TupleType extends Type implements ITypeList
 {
@@ -31,6 +31,6 @@ public class TupleType extends Type implements ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		ParserUtil.parametersToString(this.types, buffer, true);
+		Util.parametersToString(this.types, buffer, true);
 	}
 }

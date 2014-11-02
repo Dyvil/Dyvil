@@ -17,7 +17,7 @@ import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.config.ConfigParser;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Util;
 
 public class Dyvilc
 {
@@ -159,7 +159,7 @@ public class Dyvilc
 		}
 		
 		logger.info("");
-		ParserUtil.logProfile(now, units.size(), "Compilation finished (%.1f ms, %.1f ms/CU, %.2f CU/s)");
+		Util.logProfile(now, units.size(), "Compilation finished (%.1f ms, %.1f ms/CU, %.2f CU/s)");
 	}
 	
 	public static void compile(File source, File output, Package pack)

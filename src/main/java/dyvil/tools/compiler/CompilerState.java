@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Util;
 
 public enum CompilerState
 {
@@ -91,7 +91,7 @@ public enum CompilerState
 		
 		if (Dyvilc.debug)
 		{
-			ParserUtil.logProfile(now, units.size(), "Finished State " + this.name() + " (%.1f ms, %.1f ms/CU, %.2f CU/s)");
+			Util.logProfile(now, units.size(), "Finished State " + this.name() + " (%.1f ms, %.1f ms/CU, %.2f CU/s)");
 		}
 	}
 	

@@ -11,14 +11,14 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
 	private IValue				statement;
 	
-	private String					openBracket;
-	private String					closeBracket;
+	private String				openBracket;
+	private String				closeBracket;
 	
 	private List<Parameter>		parameters			= new ArrayList(3);
 	private List<ThrowsDecl>	throwsDeclarations	= new ArrayList(1);
@@ -141,6 +141,7 @@ public class Method extends Member implements IMethod
 		{
 			this.statement = this.statement.applyState(state, this);
 		}
+		
 		return this;
 	}
 	
@@ -165,7 +166,7 @@ public class Method extends Member implements IMethod
 			buffer.append(this.name);
 		}
 		
-		ParserUtil.parametersToString(this.parameters, buffer, true, this.openBracket + this.closeBracket, this.openBracket, Formatting.Method.parameterSeperator, this.closeBracket);
+		Util.parametersToString(this.parameters, buffer, true, this.openBracket + this.closeBracket, this.openBracket, Formatting.Method.parameterSeperator, this.closeBracket);
 		
 		IValue statement = this.getValue();
 		if (statement != null)
