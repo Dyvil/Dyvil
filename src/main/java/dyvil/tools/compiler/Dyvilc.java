@@ -178,7 +178,7 @@ public class Dyvilc
 		}
 		else
 		{
-			CompilationUnit unit = new CompilationUnit(pack, (CodeFile) source);
+			CompilationUnit unit = new CompilationUnit(pack, (CodeFile) source, output);
 			pack.addCompilationUnit(unit);
 		}
 	}

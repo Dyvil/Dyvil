@@ -6,10 +6,4 @@ public class Main
 	public int j = 0;
 	
 	public static void main[String[] args] = 3 + 4;
-	
-	public void new() =
-	{
-	}
-	
-	public static void instance[] = Main.main(null);
 }

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.structure;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.bytecode.ClassWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
@@ -23,6 +25,9 @@ import dyvil.tools.compiler.parser.CompilationUnitParser;
 
 public class CompilationUnit extends ASTObject implements IContext
 {
+	public final File					inputFile;
+	public final File					outputFile;
+	
 	public final String					name;
 	public final Package				pack;
 	protected transient TokenIterator	tokens;
@@ -31,11 +36,17 @@ public class CompilationUnit extends ASTObject implements IContext
 	protected List<IImport>				imports	= new ArrayList();
 	protected List<AbstractClass>		classes	= new ArrayList();
 	
-	public CompilationUnit(Package pack, CodeFile file)
+	public CompilationUnit(Package pack, CodeFile input, File output)
 	{
-		this.position = file;
+		this.position = input;
+		this.inputFile = input;
+		this.outputFile = output;
 		this.pack = pack;
-		this.name = pack.fullName + "." + file.getName();
+		
+		String name = input.getAbsolutePath();
+		int start = name.lastIndexOf('/');
+		int end = name.lastIndexOf('.');
+		this.name = name.substring(start + 1, end);
 	}
 	
 	public CodeFile getFile()
@@ -112,7 +123,8 @@ public class CompilationUnit extends ASTObject implements IContext
 		
 		// Package Classes
 		iclass = this.pack.resolveClass(name);
-		if (iclass != null) {
+		if (iclass != null)
+		{
 			return iclass;
 		}
 		
@@ -184,8 +196,6 @@ public class CompilationUnit extends ASTObject implements IContext
 		}
 		else if (state == CompilerState.COMPILE)
 		{
-			// TODO COMPILE
-			
 			synchronized (this)
 			{
 				List<Marker> markers = this.getFile().markers;
@@ -197,6 +207,23 @@ public class CompilationUnit extends ASTObject implements IContext
 					{
 						marker.log(Dyvilc.logger);
 					}
+					
+					return this;
+				}
+				
+				String s = this.outputFile.getAbsolutePath();
+				int index = s.lastIndexOf('/') + 1;
+				s = s.substring(0, index);
+				
+				for (IClass iclass : this.classes)
+				{
+					String name = iclass.getName();
+					if (!name.equals(this.name))
+					{
+						name = this.name + '$' + name;
+					}
+					File file = new File(s, name + ".class");
+					ClassWriter.saveClass(file, iclass);
 				}
 			}
 			return this;
