@@ -192,10 +192,10 @@ public class CompilationUnit extends ASTObject implements IContext
 				int size = markers.size();
 				if (size > 0)
 				{
-					System.out.println("Markers in Compilation Unit " + this.name + ": " + size);
+					Dyvilc.logger.info("Markers in Compilation Unit " + this.name + ": " + size);
 					for (Marker marker : this.getFile().markers)
 					{
-						marker.print(System.err);
+						marker.log(Dyvilc.logger);
 					}
 				}
 			}
@@ -203,8 +203,7 @@ public class CompilationUnit extends ASTObject implements IContext
 		}
 		else if (state == CompilerState.DEBUG)
 		{
-			System.out.println(this.getFile() + ":");
-			System.out.println(this);
+			Dyvilc.logger.info(this.getFile() + ":\n" + this.toString());
 		}
 		this.classes.replaceAll(c -> c.applyState(state, this));
 		return this;

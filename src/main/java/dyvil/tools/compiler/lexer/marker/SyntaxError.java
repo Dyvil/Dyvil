@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.lexer.marker;
 
-import java.io.PrintStream;
+import java.util.logging.Logger;
 
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -29,10 +29,10 @@ public class SyntaxError extends Marker
 	}
 	
 	@Override
-	public void print(PrintStream out)
+	public void log(Logger logger)
 	{
 		StringBuilder builder = new StringBuilder("Syntax error at Token");
-		this.appendMessage(out, builder);
-		out.println(builder);
+		this.appendMessage(builder);
+		logger.info(builder.toString());
 	}
 }

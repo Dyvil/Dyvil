@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.lexer.marker;
 
-import java.io.PrintStream;
+import java.util.logging.Logger;
 
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -40,9 +40,9 @@ public abstract class Marker extends Exception
 		return this.suggestion;
 	}
 	
-	public abstract void print(PrintStream out);
+	public abstract void log(Logger logger);
 	
-	protected void appendMessage(PrintStream out, StringBuilder builder)
+	protected void appendMessage(StringBuilder builder)
 	{
 		String message = this.getMessage();
 		String suggestion = this.getSuggestion();

@@ -3,10 +3,11 @@ package dyvil.tools.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.*;
+import java.util.logging.Formatter;
 
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -23,6 +24,9 @@ public class Dyvilc
 	
 	public static Dyvilc		instance;
 	
+	public static Logger		logger;
+	public static DateFormat	format		= new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+	
 	public CompilerConfig		config;
 	public Set<CompilerState>	states		= new TreeSet();
 	
@@ -36,26 +40,62 @@ public class Dyvilc
 	
 	public static void main(String[] args)
 	{
-		int i = 0;
-		CodeFile file = new CodeFile(args[i++]);
+		// Sets up the logger
+		initLogger();
 		
+		CodeFile file = new CodeFile(args[0]);
+		
+		// Loads the config
 		CompilerConfig config = new CompilerConfig();
 		parser.parse(file, new ConfigParser(config));
 		
+		// Loads libraries
 		for (Library library : config.libraries)
 		{
 			library.loadLibrary();
 		}
 		
+		// Inits primitive data types
 		Type.init();
 		
+		// Sets up States from config
 		instance = new Dyvilc(config);
-		for (int j = i; j < args.length; j++)
+		for (int i = 1; i < args.length; i++)
 		{
-			instance.addStates(args[j]);
+			instance.addStates(args[i]);
 		}
 		
 		instance.run();
+	}
+	
+	public static void initLogger()
+	{
+		try
+		{
+			logger = Logger.getLogger("DYVILC");
+			logger.setUseParentHandlers(false);
+			
+			String path = new File("dyvilc.log").getAbsolutePath();
+			Formatter formatter = new Formatter()
+			{
+				@Override
+				public String format(LogRecord record)
+				{
+					StringBuilder builder = new StringBuilder();
+					builder.append('[').append(format.format(new Date(record.getMillis()))).append("] [");
+					builder.append(record.getLevel()).append("]: ").append(record.getMessage()).append('\n');
+					return builder.toString();
+				}
+			};
+			FileHandler fh = new FileHandler(path);
+			fh.setFormatter(formatter);
+			StreamHandler ch = new StreamHandler(System.out, formatter);
+			
+			logger.addHandler(fh);
+			logger.addHandler(ch);
+		}
+		catch (Exception ex)
+		{}
 	}
 	
 	public void addStates(String s)
@@ -96,9 +136,10 @@ public class Dyvilc
 		File sourceDir = this.config.sourceDir;
 		File outputDir = this.config.outputDir;
 		Package root = Package.rootPackage;
-		System.out.println("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
-		System.out.println("Applying States " + this.states);
-		System.out.println();
+		
+		logger.info("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
+		logger.info("Applying States " + this.states);
+		logger.info("");
 		
 		for (String s : sourceDir.list())
 		{
@@ -124,7 +165,7 @@ public class Dyvilc
 	{
 		if (!source.exists())
 		{
-			System.out.println(source.getPath() + " does not exist.");
+			logger.warning(source.getPath() + " does not exist.");
 		}
 		else if (source.isDirectory())
 		{

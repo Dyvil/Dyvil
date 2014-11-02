@@ -73,7 +73,7 @@ public enum CompilerState
 		long now = 0L;
 		if (Dyvilc.debug)
 		{
-			System.out.println("Applying State " + this.name());
+			Dyvilc.logger.info("Applying State " + this.name());
 			now = System.nanoTime();
 		}
 		
@@ -93,7 +93,7 @@ public enum CompilerState
 			now = System.nanoTime() - now;
 			float n = now / 1000000F;
 			float f = (float) n / units.size();
-			System.out.println(String.format("Finished State %s (%.1f ms, %.1f ms/CU, %.2f CU/s)", this.name(), n, f, 1000F / f));
+			Dyvilc.logger.info(String.format("Finished State %s (%.1f ms, %.1f ms/CU, %.2f CU/s)", this.name(), n, f, 1000F / f));
 		}
 	}
 	
