@@ -145,8 +145,11 @@ public class Dyvilc
 		int states = this.states.size();
 		
 		logger.info("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
-		logger.info("Applying " + states + " States: " + this.states);
-		logger.info("");
+		if (debug)
+		{
+			logger.info("Applying " + states + " States: " + this.states);
+			logger.info("");
+		}
 		
 		for (String s : sourceDir.list())
 		{
@@ -168,7 +171,7 @@ public class Dyvilc
 		}
 		
 		logger.info("");
-		ParserUtil.logProfile(now, units.size(), "Compilation finished (%.1f ms, %.1f s/CU, %.2f CU/s)");
+		ParserUtil.logProfile(now, units.size(), "Compilation finished (%.1f ms, %.1f ms/CU, %.2f CU/s)");
 	}
 	
 	public void compile(File source, File output, Package pack)
