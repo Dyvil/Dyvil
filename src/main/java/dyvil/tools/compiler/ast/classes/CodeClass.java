@@ -18,24 +18,27 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
-public class AbstractClass extends ASTObject implements IClass
+public class CodeClass extends ASTObject implements IClass
 {
+	protected CompilationUnit	unit;
+	
 	protected int				type;
+	
+	protected int				modifiers;
 	
 	protected String			name;
 	protected String			internalName;
 	
-	protected int				modifiers;
-	protected CompilationUnit	unit;
-	protected ClassBody			body;
-	
-	protected List<Type>		superClasses	= new ArrayList(1);
 	protected List<Annotation>	annotations		= new ArrayList(1);
 	
-	public AbstractClass()
+	protected List<Type>		superClasses	= new ArrayList(1);
+	
+	protected ClassBody			body;
+	
+	public CodeClass()
 	{}
 	
-	public AbstractClass(ICodePosition position, CompilationUnit unit, int type, ClassBody body)
+	public CodeClass(ICodePosition position, CompilationUnit unit, int type, ClassBody body)
 	{
 		this.position = position;
 		this.unit = unit;
@@ -43,10 +46,21 @@ public class AbstractClass extends ASTObject implements IClass
 		this.body = body;
 	}
 	
+	public int getClassType()
+	{
+		return this.type;
+	}
+	
 	@Override
 	public void setModifiers(int modifiers)
 	{
 		this.modifiers = modifiers;
+	}
+	
+	@Override
+	public int getModifiers()
+	{
+		return this.modifiers;
 	}
 	
 	@Override
@@ -57,38 +71,21 @@ public class AbstractClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public void setAnnotations(List<Annotation> annotations)
-	{
-		this.annotations = annotations;
-	}
-	
-	public int getClassType()
-	{
-		return this.type;
-	}
-	
-	@Override
-	public int getModifiers()
-	{
-		return this.modifiers;
-	}
-	
-	@Override
 	public String getName()
 	{
 		return this.name;
 	}
 	
 	@Override
-	public String getGenericName()
+	public void setAnnotations(List<Annotation> annotations)
 	{
-		return this.name;
+		this.annotations = annotations;
 	}
 	
 	@Override
-	public List<Type> getTypes()
+	public List<Annotation> getAnnotations()
 	{
-		return this.superClasses;
+		return this.annotations;
 	}
 	
 	@Override
@@ -104,15 +101,15 @@ public class AbstractClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public void addType(Type type)
+	public List<Type> getTypes()
 	{
-		this.superClasses.add(type);
+		return this.superClasses;
 	}
 	
 	@Override
-	public List<Annotation> getAnnotations()
+	public void addType(Type type)
 	{
-		return this.annotations;
+		this.superClasses.add(type);
 	}
 	
 	@Override
@@ -125,6 +122,12 @@ public class AbstractClass extends ASTObject implements IClass
 	public ClassBody getBody()
 	{
 		return this.body;
+	}
+	
+	@Override
+	public String getInternalName()
+	{
+		return this.internalName;
 	}
 	
 	@Override
@@ -144,12 +147,6 @@ public class AbstractClass extends ASTObject implements IClass
 		{
 			m.write(writer);
 		}
-	}
-	
-	@Override
-	public String getInternalName()
-	{
-		return this.internalName;
 	}
 	
 	@Override
@@ -225,7 +222,7 @@ public class AbstractClass extends ASTObject implements IClass
 	{
 		// Own methods
 		List<IMethod> list = new ArrayList();
-		this.body.getMethod(list, name, args);
+		this.body.getMethods(list, name, args);
 		
 		if (!list.isEmpty())
 		{
@@ -247,7 +244,7 @@ public class AbstractClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public AbstractClass applyState(CompilerState state, IContext context)
+	public CodeClass applyState(CompilerState state, IContext context)
 	{
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
@@ -264,7 +261,7 @@ public class AbstractClass extends ASTObject implements IClass
 		buffer.append(prefix);
 		buffer.append(Modifiers.CLASS.toString(this.modifiers));
 		buffer.append(Modifiers.CLASS_TYPE.toString(this.type));
-		buffer.append(this.getGenericName());
+		buffer.append(this.name);
 		
 		if (!this.superClasses.isEmpty())
 		{

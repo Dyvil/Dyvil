@@ -8,10 +8,10 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class BooleanValue extends ASTObject implements IValue
 {
-	public static BooleanValue TRUE = new BooleanValue(true);
-	public static BooleanValue FALSE = new BooleanValue(false);
+	public static BooleanValue	TRUE	= new BooleanValue(true);
+	public static BooleanValue	FALSE	= new BooleanValue(false);
 	
-	public boolean value;
+	public boolean				value;
 	
 	public static BooleanValue of(boolean value)
 	{
@@ -22,7 +22,7 @@ public class BooleanValue extends ASTObject implements IValue
 	{
 		this.value = value;
 	}
-
+	
 	@Override
 	public boolean isConstant()
 	{
@@ -46,7 +46,7 @@ public class BooleanValue extends ASTObject implements IValue
 	{
 		buffer.append(this.value);
 	}
-
+	
 	@Override
 	public int hashCode()
 	{
@@ -55,22 +55,30 @@ public class BooleanValue extends ASTObject implements IValue
 		result = prime * result + (this.value ? 1231 : 1237);
 		return result;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj)
 	{
 		if (this == obj)
+		{
 			return true;
+		}
 		if (obj == null)
+		{
 			return false;
+		}
 		if (!(obj instanceof BooleanValue))
+		{
 			return false;
+		}
 		BooleanValue other = (BooleanValue) obj;
 		if (this.value != other.value)
+		{
 			return false;
+		}
 		return true;
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{

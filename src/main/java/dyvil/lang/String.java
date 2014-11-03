@@ -2,7 +2,7 @@ package dyvil.lang;
 
 public abstract class String
 {
-	protected char[] value;
+	protected char[]	value;
 	
 	protected String(char[] value)
 	{

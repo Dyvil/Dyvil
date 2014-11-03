@@ -10,7 +10,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class SuperValue extends ASTObject implements IValue
 {
-	public Type type;
+	public Type	type;
 	
 	public SuperValue(ICodePosition position, Type type)
 	{

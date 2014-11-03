@@ -14,7 +14,7 @@ public interface IValue extends IASTObject
 	
 	@Override
 	public IValue applyState(CompilerState state, IContext context);
-
+	
 	// Compilation
 	
 	public void write(MethodVisitor visitor);

@@ -11,7 +11,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ThisValue extends ASTObject implements IValue
 {
-	public Type type;
+	public Type	type;
 	
 	public ThisValue(ICodePosition position, Type type)
 	{

@@ -98,7 +98,7 @@ public class IfStatement extends ASTObject implements IStatement
 			this.elseThen.toString(prefix, buffer);
 		}
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{

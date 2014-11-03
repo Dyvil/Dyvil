@@ -12,7 +12,7 @@ public class StatementList extends ValueList implements IStatement
 	{
 		super(position);
 	}
-
+	
 	public void addStatement(IStatement statement)
 	{
 		this.values.add(statement);

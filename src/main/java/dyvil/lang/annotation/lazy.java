@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
  * @author Clashsoft
  */
 @Retention(RetentionPolicy.CLASS)
-@Target({ElementType.FIELD, ElementType.LOCAL_VARIABLE})
+@Target({ ElementType.FIELD, ElementType.LOCAL_VARIABLE })
 public @interface lazy
 {}

@@ -3,11 +3,10 @@ package dyvil.tools.compiler.ast.classes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.util.ClassFormat;
 
-import dyvil.tools.compiler.ast.structure.Package;
-
-public class BytecodeClass extends AbstractClass
+public class BytecodeClass extends CodeClass
 {
 	public BytecodeClass()
 	{

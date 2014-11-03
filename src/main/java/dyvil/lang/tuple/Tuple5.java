@@ -4,11 +4,11 @@ import java.util.Objects;
 
 public class Tuple5<A, B, C, D, E>
 {
-	public A _1;
-	public B _2;
-	public C _3;
-	public D _4;
-	public E _5;
+	public A	_1;
+	public B	_2;
+	public C	_3;
+	public D	_4;
+	public E	_5;
 	
 	public Tuple5(A a, B b, C c, D d, E e)
 	{
@@ -33,12 +33,12 @@ public class Tuple5<A, B, C, D, E>
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(_1, _2, _3, _4, _5);
+		return Objects.hash(this._1, this._2, this._3, this._4, this._5);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + ")";
+		return "(" + this._1 + "," + this._2 + "," + this._3 + "," + this._4 + "," + this._5 + ")";
 	}
 }

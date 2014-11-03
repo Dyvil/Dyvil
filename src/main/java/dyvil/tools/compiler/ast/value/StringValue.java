@@ -8,19 +8,19 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class StringValue extends ASTObject implements IValue
 {
-	public String value;
+	public String	value;
 	
 	public StringValue(String value)
 	{
 		this.value = value;
 	}
-
+	
 	@Override
 	public boolean isConstant()
 	{
 		return true;
 	}
-
+	
 	@Override
 	public Type getType()
 	{

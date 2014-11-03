@@ -99,7 +99,7 @@ public class Symbols
 		for (; start < end; start++)
 		{
 			char c = s.charAt(start);
-			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+			if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')
 			{
 				continue;
 			}

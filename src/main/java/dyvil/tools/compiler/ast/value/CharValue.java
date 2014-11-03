@@ -43,7 +43,7 @@ public class CharValue extends ASTObject implements IValue
 	{
 		buffer.append('\'').append(this.value).append('\'');
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{

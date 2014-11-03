@@ -11,7 +11,6 @@ public class ClassReader extends ClassVisitor
 {
 	protected BytecodeClass	bclass;
 	
-	
 	public ClassReader(BytecodeClass bclass)
 	{
 		super(Opcodes.ASM5);
@@ -81,6 +80,5 @@ public class ClassReader extends ClassVisitor
 	
 	@Override
 	public void visitEnd()
-	{
-	}
+	{}
 }

@@ -48,7 +48,7 @@ public class LongValue extends ASTObject implements IValue
 	{
 		buffer.append(this.value).append('L');
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{

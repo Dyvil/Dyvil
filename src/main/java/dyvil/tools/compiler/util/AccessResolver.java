@@ -7,10 +7,9 @@ import java.util.ListIterator;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.Marker;
-
-import dyvil.tools.compiler.ast.structure.Package;
 
 public class AccessResolver
 {

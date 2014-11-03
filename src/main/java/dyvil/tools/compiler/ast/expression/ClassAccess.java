@@ -52,41 +52,41 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 	{
 		this.type.toString("", buffer);
 	}
-
+	
 	@Override
 	public void setName(String name)
 	{}
-
+	
 	@Override
 	public String getName()
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setValue(IValue value)
 	{}
-
+	
 	@Override
 	public void setValues(List<IValue> list)
 	{}
-
+	
 	@Override
 	public void setIsArray(boolean isArray)
 	{}
-
+	
 	@Override
 	public boolean isArray()
 	{
 		return false;
 	}
-
+	
 	@Override
 	public boolean resolve(IContext context)
 	{
 		return this.type.isResolved();
 	}
-
+	
 	@Override
 	public IAccess resolve2(IContext context)
 	{
@@ -108,25 +108,25 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 		
 		return this;
 	}
-
+	
 	@Override
 	public Marker getResolveError()
 	{
 		return new SyntaxError(this.position, "'" + this.type.name + "' could not be resolved to a type.");
 	}
-
+	
 	@Override
 	public IValue getValue()
 	{
 		return null;
 	}
-
+	
 	@Override
 	public List<IValue> getValues()
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{

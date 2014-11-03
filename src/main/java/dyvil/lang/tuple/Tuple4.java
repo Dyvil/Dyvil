@@ -4,10 +4,10 @@ import java.util.Objects;
 
 public class Tuple4<A, B, C, D>
 {
-	public A _1;
-	public B _2;
-	public C _3;
-	public D _4;
+	public A	_1;
+	public B	_2;
+	public C	_3;
+	public D	_4;
 	
 	public Tuple4(A a, B b, C c, D d)
 	{
@@ -31,12 +31,12 @@ public class Tuple4<A, B, C, D>
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(_1, _2, _3, _4);
+		return Objects.hash(this._1, this._2, this._3, this._4);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "(" + _1 + "," + _2 + "," + _3 + "," + _4 + ")";
+		return "(" + this._1 + "," + this._2 + "," + this._3 + "," + this._4 + ")";
 	}
 }

@@ -42,11 +42,11 @@ public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParame
 	
 	// Compilation
 	
-	public void write(ClassWriter writer);
-
 	public String getDescriptor();
 	
 	public String getSignature();
 	
 	public String[] getExceptions();
+	
+	public void write(ClassWriter writer);
 }

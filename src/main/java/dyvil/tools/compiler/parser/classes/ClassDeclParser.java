@@ -1,10 +1,9 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.tools.compiler.ast.classes.AbstractClass;
+import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.type.TypeListParser;
@@ -12,15 +11,15 @@ import dyvil.tools.compiler.util.Modifiers;
 
 public class ClassDeclParser extends Parser
 {
-	public static final int		MODIFIERS		= 0;
-	public static final int		NAME			= 1;
-	public static final int		EXTENDS			= 2;
-	public static final int		BODY			= 8;
-	public static final int		BODY_END		= 16;
+	public static final int		MODIFIERS	= 0;
+	public static final int		NAME		= 1;
+	public static final int		EXTENDS		= 2;
+	public static final int		BODY		= 8;
+	public static final int		BODY_END	= 16;
 	
 	protected CompilationUnit	unit;
 	
-	private AbstractClass		theClassDecl;
+	private CodeClass			theClassDecl;
 	private int					modifiers;
 	
 	public ClassDeclParser(CompilationUnit unit)
@@ -41,7 +40,7 @@ public class ClassDeclParser extends Parser
 			}
 			else if ((i = Modifiers.CLASS_TYPE.parse(value)) != -1)
 			{
-				this.theClassDecl = new AbstractClass(token, this.unit, i, null);
+				this.theClassDecl = new CodeClass(token, this.unit, i, null);
 				this.theClassDecl.setModifiers(this.modifiers);
 				this.unit.addClass(this.theClassDecl);
 				
@@ -52,7 +51,7 @@ public class ClassDeclParser extends Parser
 		}
 		if (this.isInMode(NAME))
 		{
-			if (token.isType(Token.TYPE_IDENTIFIER))
+			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				this.theClassDecl.setName(value);
 				this.mode = EXTENDS | BODY;

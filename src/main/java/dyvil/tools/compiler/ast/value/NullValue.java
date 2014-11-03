@@ -32,7 +32,7 @@ public class NullValue extends ASTObject implements IValue
 	{
 		buffer.append("null");
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{

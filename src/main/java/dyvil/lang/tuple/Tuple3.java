@@ -7,9 +7,9 @@ import dyvil.lang.annotation.alias;
 @alias("Triple")
 public class Tuple3<A, B, C>
 {
-	public A _1;
-	public B _2;
-	public C _3;
+	public A	_1;
+	public B	_2;
+	public C	_3;
 	
 	public Tuple3(A a, B b, C c)
 	{
@@ -32,12 +32,12 @@ public class Tuple3<A, B, C>
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(_1, _2, _3);
+		return Objects.hash(this._1, this._2, this._3);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "(" + _1 + "," + _2 + "," + _3 + ")";
+		return "(" + this._1 + "," + this._2 + "," + this._3 + ")";
 	}
 }

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.util;
 
-
 public class ParserUtil
 {
 	public static boolean isWhitespace(char c)
@@ -13,7 +12,8 @@ public class ParserUtil
 		return c == '(' || c == '[' || c == '{';
 	}
 	
-	public static boolean isCloseBracket(char c) {
+	public static boolean isCloseBracket(char c)
+	{
 		return c == ')' || c == ']' || c == '}';
 	}
 	
@@ -39,12 +39,12 @@ public class ParserUtil
 	
 	public static boolean isHexDigit(char c)
 	{
-		return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+		return c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F';
 	}
 	
 	public static boolean isLetter(char c)
 	{
-		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+		return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
 	}
 	
 	public static boolean isIdentifierStart(char c)

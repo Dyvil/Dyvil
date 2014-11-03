@@ -37,19 +37,6 @@ public class Type extends ASTObject implements IContext
 	public char				seperator;
 	public int				arrayDimensions;
 	
-	public static void init()
-	{
-		BOOL.theClass = Package.dyvilLang.resolveClass("Boolean");
-		BYTE.theClass = Package.dyvilLang.resolveClass("Byte");
-		SHORT.theClass = Package.dyvilLang.resolveClass("Short");
-		CHAR.theClass = Package.dyvilLang.resolveClass("Char");
-		INT.theClass = Package.dyvilLang.resolveClass("Int");
-		LONG.theClass = Package.dyvilLang.resolveClass("Long");
-		FLOAT.theClass = Package.dyvilLang.resolveClass("Float");
-		DOUBLE.theClass = Package.dyvilLang.resolveClass("Double");
-		STRING.theClass = Package.javaLang.resolveClass("String");
-	}
-	
 	public Type()
 	{}
 	
@@ -77,66 +64,17 @@ public class Type extends ASTObject implements IContext
 		this.position = position;
 	}
 	
-	public void setClass(IClass theClass)
+	public static void init()
 	{
-		this.theClass = theClass;
-	}
-	
-	public void setSeperator(char seperator)
-	{
-		this.seperator = seperator;
-	}
-	
-	public void setArrayDimensions(int dimensions)
-	{
-		this.arrayDimensions = dimensions;
-	}
-	
-	public boolean isResolved()
-	{
-		return this.theClass != null;
-	}
-	
-	public char getSeperator()
-	{
-		return this.seperator;
-	}
-	
-	public int getArrayDimensions()
-	{
-		return this.arrayDimensions;
-	}
-	
-	public boolean isArrayType()
-	{
-		return this.arrayDimensions > 0;
-	}
-	
-	public final String getExtendedName()
-	{
-		StringBuilder buf = new StringBuilder();
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buf.append('[');
-		}
-		this.appendExtendedName(buf);
-		return buf.toString();
-	}
-	
-	protected void appendExtendedName(StringBuilder buf)
-	{
-		buf.append('L').append(this.getInternalName()).append(';');
-	}
-	
-	public String getInternalName()
-	{
-		return this.theClass == null ? ClassFormat.packageToInternal(this.name) : this.theClass.getInternalName();
-	}
-	
-	public String getSignature()
-	{
-		// TODO Generic signature
-		return null;
+		BOOL.theClass = Package.dyvilLang.resolveClass("Boolean");
+		BYTE.theClass = Package.dyvilLang.resolveClass("Byte");
+		SHORT.theClass = Package.dyvilLang.resolveClass("Short");
+		CHAR.theClass = Package.dyvilLang.resolveClass("Char");
+		INT.theClass = Package.dyvilLang.resolveClass("Int");
+		LONG.theClass = Package.dyvilLang.resolveClass("Long");
+		FLOAT.theClass = Package.dyvilLang.resolveClass("Float");
+		DOUBLE.theClass = Package.dyvilLang.resolveClass("Double");
+		STRING.theClass = Package.javaLang.resolveClass("String");
 	}
 	
 	/**
@@ -165,6 +103,41 @@ public class Type extends ASTObject implements IContext
 		return superType.isAssignableFrom(subType);
 	}
 	
+	public void setClass(IClass theClass)
+	{
+		this.theClass = theClass;
+	}
+	
+	public void setSeperator(char seperator)
+	{
+		this.seperator = seperator;
+	}
+	
+	public char getSeperator()
+	{
+		return this.seperator;
+	}
+	
+	public void setArrayDimensions(int dimensions)
+	{
+		this.arrayDimensions = dimensions;
+	}
+	
+	public int getArrayDimensions()
+	{
+		return this.arrayDimensions;
+	}
+	
+	public boolean isArrayType()
+	{
+		return this.arrayDimensions > 0;
+	}
+	
+	public boolean isResolved()
+	{
+		return this.theClass != null;
+	}
+	
 	protected boolean isAssignableFrom(Type that)
 	{
 		if (that.theClass != null)
@@ -175,19 +148,31 @@ public class Type extends ASTObject implements IContext
 		return false;
 	}
 	
-	@Override
-	public Type applyState(CompilerState state, IContext context)
+	public String getInternalName()
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		return this.theClass == null ? ClassFormat.packageToInternal(this.name) : this.theClass.getInternalName();
+	}
+	
+	public final String getExtendedName()
+	{
+		StringBuilder buf = new StringBuilder();
+		for (int i = 0; i < this.arrayDimensions; i++)
 		{
-			Type type = this.resolve(context);
-			if (!type.isResolved())
-			{
-				state.addMarker(new SemanticError(this.position, "'" + this.name + "' cannot be resolved to a type"));
-			}
-			return type;
+			buf.append('[');
 		}
-		return this;
+		this.appendExtendedName(buf);
+		return buf.toString();
+	}
+	
+	protected void appendExtendedName(StringBuilder buf)
+	{
+		buf.append('L').append(this.getInternalName()).append(';');
+	}
+	
+	public String getSignature()
+	{
+		// TODO Generic signature
+		return null;
 	}
 	
 	public Type resolve(IContext context)
@@ -215,6 +200,21 @@ public class Type extends ASTObject implements IContext
 			}
 			
 			this.theClass = context.resolveClass(this.name);
+		}
+		return this;
+	}
+	
+	@Override
+	public Type applyState(CompilerState state, IContext context)
+	{
+		if (state == CompilerState.RESOLVE_TYPES)
+		{
+			Type type = this.resolve(context);
+			if (!type.isResolved())
+			{
+				state.addMarker(new SemanticError(this.position, "'" + this.name + "' cannot be resolved to a type"));
+			}
+			return type;
 		}
 		return this;
 	}
@@ -253,6 +253,25 @@ public class Type extends ASTObject implements IContext
 	public IMethod resolveMethod(String name, Type... args)
 	{
 		return this.theClass.resolveMethod(name, args);
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(prefix).append(this.name);
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append(Formatting.Type.array);
+		}
+		// TODO Generics
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder buffer = new StringBuilder();
+		this.toString("", buffer);
+		return buffer.toString();
 	}
 	
 	@Override
@@ -297,24 +316,5 @@ public class Type extends ASTObject implements IContext
 			return false;
 		}
 		return true;
-	}
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder buffer = new StringBuilder();
-		this.toString("", buffer);
-		return buffer.toString();
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append(prefix).append(this.name);
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append(Formatting.Type.array);
-		}
-		// TODO Generics
 	}
 }

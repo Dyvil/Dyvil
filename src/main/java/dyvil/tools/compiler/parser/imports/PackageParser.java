@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
@@ -13,7 +12,7 @@ public class PackageParser extends Parser
 	protected CompilationUnit	unit;
 	
 	private PackageDecl			packageDeclaration;
-	private StringBuilder		buffer				= new StringBuilder();
+	private StringBuilder		buffer	= new StringBuilder();
 	
 	public PackageParser(CompilationUnit unit)
 	{
@@ -32,7 +31,7 @@ public class PackageParser extends Parser
 			jcp.popParser();
 			return true;
 		}
-		else if (token.isType(Token.TYPE_IDENTIFIER) || ".".equals(value))
+		else if (token.isType(IToken.TYPE_IDENTIFIER) || ".".equals(value))
 		{
 			if (this.packageDeclaration == null)
 			{

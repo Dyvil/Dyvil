@@ -10,12 +10,11 @@ import dyvil.tools.compiler.ast.value.IValue;
 
 public class ForEachStatement extends ASTObject implements IStatement
 {
-	private Field variable;
-	private IValue iterable;
+	private Field	variable;
+	private IValue	iterable;
 	
 	public ForEachStatement()
-	{
-	}
+	{}
 	
 	public void setVariable(Field variable)
 	{
@@ -42,7 +41,7 @@ public class ForEachStatement extends ASTObject implements IStatement
 	{
 		return false;
 	}
-
+	
 	@Override
 	public Type getType()
 	{
@@ -57,13 +56,13 @@ public class ForEachStatement extends ASTObject implements IStatement
 		this.iterable = this.iterable.applyState(state, context);
 		return this;
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		//TODO
+		// TODO
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{

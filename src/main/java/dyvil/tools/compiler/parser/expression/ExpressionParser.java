@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
@@ -60,7 +59,7 @@ public class ExpressionParser extends Parser implements ITyped
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (this.mode == 0 || ";".equals(value) || (")".equals(value) && !this.isInMode(PARAMETERS_2)))
+		if (this.mode == 0 || ";".equals(value) || ")".equals(value) && !this.isInMode(PARAMETERS_2))
 		{
 			pm.popParser(true);
 			return true;
@@ -115,7 +114,7 @@ public class ExpressionParser extends Parser implements ITyped
 				pm.pushParser(new TypeParser(this.context, call));
 				return true;
 			}
-			else if (token.isType(Token.TYPE_IDENTIFIER))
+			else if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				this.mode = ACCESS;
 				pm.pushParser(new TypeParser(this.context, this), true);
@@ -175,17 +174,17 @@ public class ExpressionParser extends Parser implements ITyped
 		}
 		if (this.isInMode(DOT_ACCESS))
 		{
-			if (token.isType(Token.TYPE_IDENTIFIER))
+			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				IToken next = token.next();
-				if (next.isType(Token.TYPE_OPEN_BRACKET))
+				if (next.isType(IToken.TYPE_OPEN_BRACKET))
 				{
 					MethodCall call = new MethodCall(token, this.value, value);
 					this.value = call;
 					this.mode = PARAMETERS;
 					return true;
 				}
-				else if (!next.isType(Token.TYPE_IDENTIFIER) && !next.isType(Token.TYPE_CLOSE_BRACKET))
+				else if (!next.isType(IToken.TYPE_IDENTIFIER) && !next.isType(IToken.TYPE_CLOSE_BRACKET))
 				{
 					MethodCall call = new MethodCall(token, this.value, value);
 					call.setSugar(true);
@@ -261,35 +260,35 @@ public class ExpressionParser extends Parser implements ITyped
 			return true;
 		}
 		// String
-		else if (token.isType(Token.TYPE_STRING))
+		else if (token.isType(IToken.TYPE_STRING))
 		{
 			this.value = new StringValue((String) token.object());
 			return true;
 		}
 		// Char
-		else if (token.isType(Token.TYPE_CHAR))
+		else if (token.isType(IToken.TYPE_CHAR))
 		{
 			this.value = new CharValue((Character) token.object());
 			return true;
 		}
 		// Int
-		else if (token.isType(Token.TYPE_INT))
+		else if (token.isType(IToken.TYPE_INT))
 		{
 			this.value = new IntValue((Integer) token.object());
 			return true;
 		}
-		else if (token.isType(Token.TYPE_LONG))
+		else if (token.isType(IToken.TYPE_LONG))
 		{
 			this.value = new LongValue((Long) token.object());
 			return true;
 		}
 		// Float
-		else if (token.isType(Token.TYPE_FLOAT))
+		else if (token.isType(IToken.TYPE_FLOAT))
 		{
 			this.value = new FloatValue((Float) token.object());
 			return true;
 		}
-		else if (token.isType(Token.TYPE_DOUBLE))
+		else if (token.isType(IToken.TYPE_DOUBLE))
 		{
 			this.value = new DoubleValue((Double) token.object());
 			return true;

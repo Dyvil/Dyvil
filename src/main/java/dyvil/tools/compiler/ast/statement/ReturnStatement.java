@@ -59,7 +59,7 @@ public class ReturnStatement extends ASTObject implements IStatement, IValued
 		buffer.append("return ");
 		this.value.toString("", buffer);
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{

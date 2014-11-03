@@ -48,7 +48,7 @@ public abstract class Double implements Number
 	@Override
 	public double doubleValue()
 	{
-		return (double) this.value;
+		return this.value;
 	}
 	
 	// Unary operators

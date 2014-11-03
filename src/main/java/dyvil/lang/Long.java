@@ -36,19 +36,19 @@ public abstract class Long implements Number
 	@Override
 	public long longValue()
 	{
-		return (long) this.value;
+		return this.value;
 	}
 	
 	@Override
 	public float floatValue()
 	{
-		return (float) this.value;
+		return this.value;
 	}
 	
 	@Override
 	public double doubleValue()
 	{
-		return (double) this.value;
+		return this.value;
 	}
 	
 	// Unary operators

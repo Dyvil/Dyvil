@@ -17,8 +17,6 @@ public interface IClass extends IASTObject, INamed, IModified, ITypeList, IAnnot
 		}
 	}
 	
-	public String getGenericName();
-	
 	public List<Type> getSuperClasses();
 	
 	public void setBody(ClassBody body);

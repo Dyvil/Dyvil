@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public final class Tuple1<A>
 {
-	public A _1;
+	public A	_1;
 	
 	public Tuple1(A a)
 	{
@@ -31,6 +31,6 @@ public final class Tuple1<A>
 	@Override
 	public String toString()
 	{
-		return "(" + _1 + ")";
+		return "(" + this._1 + ")";
 	}
 }

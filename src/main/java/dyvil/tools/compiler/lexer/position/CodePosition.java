@@ -4,13 +4,13 @@ import dyvil.tools.compiler.lexer.CodeFile;
 
 public class CodePosition implements ICodePosition
 {
-	public CodeFile file;
+	public CodeFile	file;
 	
-	public String text;
+	public String	text;
 	
-	public int line;
-	public int start;
-	public int end;
+	public int		line;
+	public int		start;
+	public int		end;
 	
 	public CodePosition(CodeFile file, int line, int start, int end)
 	{

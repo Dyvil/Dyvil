@@ -12,13 +12,15 @@ import dyvil.tools.compiler.util.Symbols;
 
 public abstract class Member extends ASTObject implements IMember
 {
+	public IClass				theClass;
+	
+	protected List<Annotation>	annotations	= new ArrayList(1);
+	
 	protected int				modifiers;
 	
-	public IClass				theClass;
 	protected Type				type;
 	protected String			name;
 	protected String			qualifiedName;
-	protected List<Annotation>	annotations	= new ArrayList(1);
 	
 	protected Member(IClass iclass)
 	{
@@ -47,28 +49,39 @@ public abstract class Member extends ASTObject implements IMember
 	}
 	
 	@Override
-	public void setName(String name)
+	public IClass getTheClass()
 	{
-		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
-	}
-	
-	public void setQualifiedName(String name)
-	{
-		this.qualifiedName = name;
-		this.name = Symbols.contract(name);
+		return this.theClass;
 	}
 	
 	@Override
-	public void setType(Type type)
+	public void setAnnotations(List<Annotation> annotations)
 	{
-		this.type = type;
+		this.annotations = annotations;
+	}
+	
+	@Override
+	public List<Annotation> getAnnotations()
+	{
+		return this.annotations;
+	}
+	
+	@Override
+	public void addAnnotation(Annotation annotation)
+	{
+		this.annotations.add(annotation);
 	}
 	
 	@Override
 	public void setModifiers(int modifiers)
 	{
 		this.modifiers = modifiers;
+	}
+	
+	@Override
+	public int getModifiers()
+	{
+		return this.modifiers;
 	}
 	
 	@Override
@@ -84,27 +97,9 @@ public abstract class Member extends ASTObject implements IMember
 	}
 	
 	@Override
-	public boolean hasModifier(int mod)
+	public void setType(Type type)
 	{
-		return (this.modifiers & mod) == mod;
-	}
-	
-	@Override
-	public void setAnnotations(List<Annotation> annotations)
-	{
-		this.annotations = annotations;
-	}
-	
-	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		this.annotations.add(annotation);
-	}
-	
-	@Override
-	public String getName()
-	{
-		return this.qualifiedName;
+		this.type = type;
 	}
 	
 	@Override
@@ -114,21 +109,28 @@ public abstract class Member extends ASTObject implements IMember
 	}
 	
 	@Override
-	public int getModifiers()
+	public void setName(String name)
 	{
-		return this.modifiers;
+		this.name = name;
+		this.qualifiedName = Symbols.expand(name);
 	}
 	
 	@Override
-	public List<Annotation> getAnnotations()
+	public String getName()
 	{
-		return this.annotations;
+		return this.qualifiedName;
+	}
+	
+	public void setQualifiedName(String name)
+	{
+		this.qualifiedName = name;
+		this.name = Symbols.contract(name);
 	}
 	
 	@Override
-	public IClass getTheClass()
+	public boolean hasModifier(int mod)
 	{
-		return this.theClass;
+		return (this.modifiers & mod) == mod;
 	}
 	
 	@Override

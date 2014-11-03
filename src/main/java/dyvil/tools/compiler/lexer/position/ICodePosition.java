@@ -18,7 +18,9 @@ public interface ICodePosition
 	{
 		int i = this.getFile().getCode().lastIndexOf('\n', this.getStart());
 		if (i < 0)
+		{
 			return 0;
+		}
 		return i + 1;
 	}
 	
@@ -26,7 +28,9 @@ public interface ICodePosition
 	{
 		int i = this.getFile().getCode().indexOf('\n', this.getEnd());
 		if (i < 0)
+		{
 			return this.getFile().getLength() - 1;
+		}
 		return i;
 	}
 	

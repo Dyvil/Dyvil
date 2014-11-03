@@ -21,12 +21,12 @@ public class StreamGobbler extends Thread
 	{
 		try
 		{
-			InputStreamReader isr = new InputStreamReader(is);
+			InputStreamReader isr = new InputStreamReader(this.is);
 			BufferedReader br = new BufferedReader(isr);
 			String line = null;
 			while ((line = br.readLine()) != null)
 			{
-				System.out.println(type + "> " + line);
+				System.out.println(this.type + "> " + line);
 			}
 		}
 		catch (IOException ioe)

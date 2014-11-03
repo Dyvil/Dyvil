@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.lexer;
 
 import static dyvil.tools.compiler.lexer.token.IToken.*;
-
 import static dyvil.tools.compiler.util.ParserUtil.*;
 
 import java.util.Iterator;
@@ -226,7 +225,7 @@ public class Dlex implements Iterable<IToken>
 			
 			if (addToken)
 			{
-				prev = addToken(prev, buf, type | subtype, lineNumber, start, i);
+				prev = this.addToken(prev, buf, type | subtype, lineNumber, start, i);
 				addToken = false;
 				type = 0;
 				
@@ -243,7 +242,7 @@ public class Dlex implements Iterable<IToken>
 		
 		if (buf.length() > 0)
 		{
-			addToken(prev, buf, type, lineNumber, start, i);
+			this.addToken(prev, buf, type, lineNumber, start, i);
 		}
 		
 		this.first = first.next();
@@ -263,11 +262,17 @@ public class Dlex implements Iterable<IToken>
 		{
 			char n = code.charAt(i + 1);
 			if (n == '*')
+			{
 				return TYPE_BLOCK_COMMENT;
+			}
 			else if (n == '/')
+			{
 				return TYPE_LINE_COMMENT;
+			}
 			else
+			{
 				return TYPE_SYMBOL;
+			}
 		}
 		else if (c == '@')
 		{
@@ -338,7 +343,7 @@ public class Dlex implements Iterable<IToken>
 	{
 		String s = buf.toString();
 		buf.delete(0, buf.length());
-		return addToken(prev, s, type, line, start, end);
+		return this.addToken(prev, s, type, line, start, end);
 	}
 	
 	@Override

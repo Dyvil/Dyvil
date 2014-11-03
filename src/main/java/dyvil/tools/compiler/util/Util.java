@@ -132,7 +132,7 @@ public class Util
 	{
 		now = System.nanoTime() - now;
 		float n = now / 1000000F;
-		float f = (float) n / operations;
+		float f = n / operations;
 		Dyvilc.logger.info(String.format(format, n, f, 1000F / f));
 	}
 }

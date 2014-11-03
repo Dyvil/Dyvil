@@ -8,7 +8,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.Dyvilc;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
-import dyvil.tools.compiler.ast.classes.AbstractClass;
+import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
@@ -34,7 +34,7 @@ public class CompilationUnit extends ASTObject implements IContext
 	
 	protected PackageDecl				packageDecl;
 	protected List<IImport>				imports	= new ArrayList();
-	protected List<AbstractClass>		classes	= new ArrayList();
+	protected List<CodeClass>			classes	= new ArrayList();
 	
 	public CompilationUnit(Package pack, CodeFile input, File output)
 	{
@@ -64,7 +64,7 @@ public class CompilationUnit extends ASTObject implements IContext
 		return this.imports;
 	}
 	
-	public List<AbstractClass> getClasses()
+	public List<CodeClass> getClasses()
 	{
 		return this.classes;
 	}
@@ -79,7 +79,7 @@ public class CompilationUnit extends ASTObject implements IContext
 		this.imports.add(iimport);
 	}
 	
-	public void addClass(AbstractClass iclass)
+	public void addClass(CodeClass iclass)
 	{
 		this.classes.add(iclass);
 		this.pack.classes.add(iclass);
@@ -110,7 +110,7 @@ public class CompilationUnit extends ASTObject implements IContext
 	public IClass resolveClass(String name)
 	{
 		// Own classes
-		for (AbstractClass aclass : this.classes)
+		for (CodeClass aclass : this.classes)
 		{
 			if (name.equals(aclass.getName()))
 			{

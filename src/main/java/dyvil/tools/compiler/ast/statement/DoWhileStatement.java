@@ -11,11 +11,10 @@ import dyvil.tools.compiler.ast.value.IValue;
 public class DoWhileStatement extends ASTObject implements IStatement, IValued
 {
 	private IValue	then;
-	private IValue		condition;
+	private IValue	condition;
 	
 	public DoWhileStatement()
-	{
-	}
+	{}
 	
 	public void setThen(IValue then)
 	{

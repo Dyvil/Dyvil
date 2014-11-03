@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
@@ -92,14 +91,14 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 		}
 		if (this.isInMode(NAME))
 		{
-			if (token.isType(Token.TYPE_IDENTIFIER))
+			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				IToken next = token.next();
 				if (next.equals("="))
 				{
 					this.mode = FIELD;
 					this.field.setName(value);
-					this.classBody.addField(field);
+					this.classBody.addField(this.field);
 					return true;
 				}
 				else if (next.equals(";"))
@@ -110,7 +109,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 					this.reset();
 					return true;
 				}
-				else if (next.isType(Token.TYPE_OPEN_BRACKET))
+				else if (next.isType(IToken.TYPE_OPEN_BRACKET))
 				{
 					this.mode = METHOD;
 					this.method.setName(value);
@@ -142,13 +141,13 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 		}
 		if (this.isInMode(METHOD))
 		{
-			if (token.isType(Token.TYPE_OPEN_BRACKET))
+			if (token.isType(IToken.TYPE_OPEN_BRACKET))
 			{
 				this.method.setParametersOpenBracket(value);
 				pm.pushParser(new ParameterListParser(this.theClass, this.method));
 				return true;
 			}
-			else if (token.isType(Token.TYPE_CLOSE_BRACKET))
+			else if (token.isType(IToken.TYPE_CLOSE_BRACKET))
 			{
 				this.method.setParametersCloseBracket(value);
 				this.mode = METHOD_END;

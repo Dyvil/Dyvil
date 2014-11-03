@@ -7,8 +7,8 @@ import dyvil.lang.annotation.alias;
 @alias("Pair")
 public class Tuple2<A, B>
 {
-	public A _1;
-	public B _2;
+	public A	_1;
+	public B	_2;
 	
 	public Tuple2(A a, B b)
 	{
@@ -30,12 +30,12 @@ public class Tuple2<A, B>
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(_1, _2);
+		return Objects.hash(this._1, this._2);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "(" + _1 + "," + _2 + ")";
+		return "(" + this._1 + "," + this._2 + ")";
 	}
 }

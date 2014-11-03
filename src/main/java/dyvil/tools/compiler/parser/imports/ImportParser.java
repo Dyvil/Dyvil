@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.imports.SimpleImport;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
@@ -69,7 +68,7 @@ public class ImportParser extends Parser
 				this.theImport = new SimpleImport(token);
 			}
 			
-			if (token.isType(Token.TYPE_IDENTIFIER))
+			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				this.buffer.append(value);
 				return true;
@@ -96,7 +95,7 @@ public class ImportParser extends Parser
 				}
 				return true;
 			}
-			else if (token.isType(Token.TYPE_IDENTIFIER) || ".".equals(value))
+			else if (token.isType(IToken.TYPE_IDENTIFIER) || ".".equals(value))
 			{
 				this.buffer.append(value);
 				return true;

@@ -71,7 +71,7 @@ public class WhileStatement extends ASTObject implements IStatement, IValued
 			this.then.toString(prefix, buffer);
 		}
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{

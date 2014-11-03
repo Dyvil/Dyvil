@@ -42,13 +42,13 @@ public abstract class Float implements Number
 	@Override
 	public float floatValue()
 	{
-		return (float) this.value;
+		return this.value;
 	}
 	
 	@Override
 	public double doubleValue()
 	{
-		return (double) this.value;
+		return this.value;
 	}
 	
 	// Unary operators

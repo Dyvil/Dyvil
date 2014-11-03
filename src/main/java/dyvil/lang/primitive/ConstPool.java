@@ -37,35 +37,45 @@ public class ConstPool
 	public static ByteConst getByte(byte value)
 	{
 		if (value >= 0 && value < constantTableSize)
+		{
 			return byteConstants[value];
+		}
 		return new ByteConst(value);
 	}
 	
 	public static ShortConst getShort(short value)
 	{
 		if (value >= 0 && value < constantTableSize)
+		{
 			return shortConstants[value];
+		}
 		return new ShortConst(value);
 	}
 	
 	public static CharConst getChar(char value)
 	{
 		if (value >= 0 && value < constantTableSize)
+		{
 			return charConstants[value];
+		}
 		return new CharConst(value);
 	}
 	
 	public static IntConst getInt(int value)
 	{
 		if (value >= 0 && value < constantTableSize)
+		{
 			return intConstants[value];
+		}
 		return new IntConst(value);
 	}
 	
 	public static LongConst getLong(long value)
 	{
 		if (value >= 0 && value < constantTableSize)
+		{
 			return longConstants[(int) value];
+		}
 		return new LongConst(value);
 	}
 	
@@ -73,7 +83,9 @@ public class ConstPool
 	{
 		int i = (int) value;
 		if (value >= 0 && value == i && value < constantTableSize)
+		{
 			return floatConstants[i];
+		}
 		return new FloatConst(value);
 	}
 	
@@ -81,7 +93,9 @@ public class ConstPool
 	{
 		int i = (int) value;
 		if (value >= 0 && value == i && value < constantTableSize)
+		{
 			return doubleConstants[i];
+		}
 		return new DoubleConst(value);
 	}
 }

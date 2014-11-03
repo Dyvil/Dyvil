@@ -7,7 +7,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public class Warning extends Marker
 {
 	private static final long	serialVersionUID	= 8238564164743045522L;
-
+	
 	public Warning(ICodePosition position)
 	{
 		super(position);

@@ -27,33 +27,6 @@ public class Parameter extends Member implements IField
 		this.seperator = seperator;
 	}
 	
-	public void setSeperator(char seperator)
-	{
-		this.seperator = seperator;
-	}
-	
-	public char getSeperator()
-	{
-		return this.seperator;
-	}
-	
-	@Override
-	public Parameter applyState(CompilerState state, IContext context)
-	{
-		if (state == CompilerState.RESOLVE_TYPES)
-		{
-			this.type = this.type.resolve(context);
-		}
-		return this;
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		this.type.toString("", buffer);
-		buffer.append(' ').append(this.name);
-	}
-	
 	@Override
 	public void setValue(IValue value)
 	{}
@@ -62,6 +35,16 @@ public class Parameter extends Member implements IField
 	public IValue getValue()
 	{
 		return null;
+	}
+	
+	public void setSeperator(char seperator)
+	{
+		this.seperator = seperator;
+	}
+	
+	public char getSeperator()
+	{
+		return this.seperator;
 	}
 	
 	@Override
@@ -79,4 +62,21 @@ public class Parameter extends Member implements IField
 	@Override
 	public void write(ClassWriter writer)
 	{}
+	
+	@Override
+	public Parameter applyState(CompilerState state, IContext context)
+	{
+		if (state == CompilerState.RESOLVE_TYPES)
+		{
+			this.type = this.type.resolve(context);
+		}
+		return this;
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		this.type.toString("", buffer);
+		buffer.append(' ').append(this.name);
+	}
 }

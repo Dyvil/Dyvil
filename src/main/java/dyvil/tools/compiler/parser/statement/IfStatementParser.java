@@ -16,7 +16,7 @@ public class IfStatementParser extends Parser implements IValued
 	public static final int	THEN	= 2;
 	public static final int	ELSE	= 3;
 	
-	protected IContext	context;
+	protected IContext		context;
 	protected IfStatement	statement;
 	
 	public IfStatementParser(IContext context, IfStatement statement)

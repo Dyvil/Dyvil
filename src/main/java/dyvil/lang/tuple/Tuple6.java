@@ -4,12 +4,12 @@ import java.util.Objects;
 
 public class Tuple6<A, B, C, D, E, F>
 {
-	public A _1;
-	public B _2;
-	public C _3;
-	public D _4;
-	public E _5;
-	public F _6;
+	public A	_1;
+	public B	_2;
+	public C	_3;
+	public D	_4;
+	public E	_5;
+	public F	_6;
 	
 	public Tuple6(A a, B b, C c, D d, E e, F f)
 	{
@@ -35,12 +35,12 @@ public class Tuple6<A, B, C, D, E, F>
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(_1, _2, _3, _4, _5, _6);
+		return Objects.hash(this._1, this._2, this._3, this._4, this._5, this._6);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + "," + _6 + ")";
+		return "(" + this._1 + "," + this._2 + "," + this._3 + "," + this._4 + "," + this._5 + "," + this._6 + ")";
 	}
 }

@@ -18,17 +18,23 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
-	private IValue			statement;
-	
 	private String			openBracket			= "(";
+	private List<Parameter>	parameters			= new ArrayList(3);
 	private String			closeBracket		= ")";
 	
-	private List<Parameter>	parameters			= new ArrayList(3);
 	private List<Type>		throwsDeclarations	= new ArrayList(1);
+	
+	private IValue			statement;
 	
 	public Method(IClass iclass)
 	{
 		super(iclass);
+	}
+	
+	@Override
+	public void setParametersOpenBracket(String bracket)
+	{
+		this.openBracket = bracket;
 	}
 	
 	@Override
@@ -50,9 +56,9 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void setValue(IValue statement)
+	public void setParametersCloseBracket(String bracket)
 	{
-		this.statement = statement;
+		this.closeBracket = bracket;
 	}
 	
 	@Override
@@ -71,6 +77,12 @@ public class Method extends Member implements IMethod
 	public void addThrows(Type throwsDecl)
 	{
 		this.throwsDeclarations.add(throwsDecl);
+	}
+	
+	@Override
+	public void setValue(IValue statement)
+	{
+		this.statement = statement;
 	}
 	
 	@Override
@@ -148,18 +160,6 @@ public class Method extends Member implements IMethod
 	public Type getThisType()
 	{
 		return this.theClass.getThisType();
-	}
-	
-	@Override
-	public void setParametersOpenBracket(String bracket)
-	{
-		this.openBracket = bracket;
-	}
-	
-	@Override
-	public void setParametersCloseBracket(String bracket)
-	{
-		this.closeBracket = bracket;
 	}
 	
 	@Override

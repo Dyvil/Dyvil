@@ -24,7 +24,7 @@ public class Dyvilc
 	public static boolean				parseStack;
 	public static boolean				debug;
 	
-	public static Logger				logger = Logger.getLogger("DYVILC");
+	public static Logger				logger	= Logger.getLogger("DYVILC");
 	public static DateFormat			format	= new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
 	
 	public static CompilerConfig		config	= new CompilerConfig();

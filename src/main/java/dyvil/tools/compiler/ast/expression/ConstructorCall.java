@@ -75,21 +75,21 @@ public class ConstructorCall extends Call implements ITyped
 	{
 		return false;
 	}
-
+	
 	@Override
 	public IValue getValue()
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setValue(IValue value)
 	{}
-
+	
 	@Override
 	public void setName(String name)
 	{}
-
+	
 	@Override
 	public String getName()
 	{

@@ -43,11 +43,6 @@ public class ClassBody extends ASTObject
 		this.fields.add(var);
 	}
 	
-	public void addMethod(IMethod method)
-	{
-		this.methods.add(method);
-	}
-	
 	public IField getField(String name)
 	{
 		for (IField field : this.fields)
@@ -58,6 +53,11 @@ public class ClassBody extends ASTObject
 			}
 		}
 		return null;
+	}
+	
+	public void addMethod(IMethod method)
+	{
+		this.methods.add(method);
 	}
 	
 	public IMethod getMethod(String name)
@@ -72,7 +72,7 @@ public class ClassBody extends ASTObject
 		return null;
 	}
 	
-	public void getMethod(List<IMethod> list, String name, Type... args)
+	public void getMethods(List<IMethod> list, String name, Type... args)
 	{
 		for (IMethod method : this.methods)
 		{

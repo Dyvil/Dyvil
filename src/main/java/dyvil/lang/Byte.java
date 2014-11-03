@@ -12,13 +12,13 @@ public abstract class Byte implements Number
 	@Override
 	public byte byteValue()
 	{
-		return (byte) this.value;
+		return this.value;
 	}
 	
 	@Override
 	public short shortValue()
 	{
-		return (short) this.value;
+		return this.value;
 	}
 	
 	@Override
@@ -30,25 +30,25 @@ public abstract class Byte implements Number
 	@Override
 	public int intValue()
 	{
-		return (int) this.value;
+		return this.value;
 	}
 	
 	@Override
 	public long longValue()
 	{
-		return (long) this.value;
+		return this.value;
 	}
 	
 	@Override
 	public float floatValue()
 	{
-		return (float) this.value;
+		return this.value;
 	}
 	
 	@Override
 	public double doubleValue()
 	{
-		return (double) this.value;
+		return this.value;
 	}
 	
 	// Unary operators

@@ -5,7 +5,6 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 
-
 public interface IField extends IASTObject, INamed, ITyped, IModified, IAnnotatable, IValued
 {
 	@Override

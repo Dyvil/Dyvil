@@ -38,7 +38,7 @@ public class OperatorComparator implements Comparator<MethodCall>
 			}
 			else if (c == String[].class)
 			{
-				for (String s : ((String[]) o))
+				for (String s : (String[]) o)
 				{
 					if (name.equals(s))
 					{

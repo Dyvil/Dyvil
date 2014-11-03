@@ -23,7 +23,7 @@ public class ArrayConst extends Array
 	{
 		return new ArrayConst(data);
 	}
-
+	
 	@Override
 	public Array $eq(Object[] data)
 	{

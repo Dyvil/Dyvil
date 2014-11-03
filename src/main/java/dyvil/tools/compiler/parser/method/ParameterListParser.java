@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.method.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.type.TypeParser;
@@ -39,7 +38,7 @@ public class ParameterListParser extends Parser
 				this.parameter.addModifier(i);
 				return true;
 			}
-			else if (token.isType(Token.TYPE_CLOSE_BRACKET))
+			else if (token.isType(IToken.TYPE_CLOSE_BRACKET))
 			{
 				pm.popParser(true);
 				return true;
@@ -51,7 +50,7 @@ public class ParameterListParser extends Parser
 		}
 		if (this.isInMode(NAME))
 		{
-			if (token.isType(Token.TYPE_IDENTIFIER))
+			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				this.parameter.setName(value);
 				return true;

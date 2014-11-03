@@ -48,7 +48,7 @@ public class IntValue extends ASTObject implements IValue
 	{
 		buffer.append(this.value);
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{

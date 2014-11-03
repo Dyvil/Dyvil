@@ -5,7 +5,6 @@ import java.io.File;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
@@ -34,7 +33,7 @@ public class ConfigParser extends Parser
 				this.mode = VALUE;
 				return true;
 			}
-			else if (token.isType(Token.TYPE_IDENTIFIER))
+			else if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				this.key = value;
 				return true;

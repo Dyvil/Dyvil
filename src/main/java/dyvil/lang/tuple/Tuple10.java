@@ -4,16 +4,16 @@ import java.util.Objects;
 
 public class Tuple10<A, B, C, D, E, F, G, H, I, J>
 {
-	public A _1;
-	public B _2;
-	public C _3;
-	public D _4;
-	public E _5;
-	public F _6;
-	public G _7;
-	public H _8;
-	public I _9;
-	public J _10;
+	public A	_1;
+	public B	_2;
+	public C	_3;
+	public D	_4;
+	public E	_5;
+	public F	_6;
+	public G	_7;
+	public H	_8;
+	public I	_9;
+	public J	_10;
 	
 	public Tuple10(A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
 	{
@@ -43,12 +43,12 @@ public class Tuple10<A, B, C, D, E, F, G, H, I, J>
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10);
+		return Objects.hash(this._1, this._2, this._3, this._4, this._5, this._6, this._7, this._8, this._9, this._10);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + "," + _6 + "," + _7 + "," + _8 + "," + _9 + "," + _10 + ")";
+		return "(" + this._1 + "," + this._2 + "," + this._3 + "," + this._4 + "," + this._5 + "," + this._6 + "," + this._7 + "," + this._8 + "," + this._9 + "," + this._10 + ")";
 	}
 }

@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
@@ -47,7 +46,7 @@ public class TypeParser extends Parser
 				this.mode = TUPLE_TYPE;
 				return true;
 			}
-			else if (token.isType(Token.TYPE_IDENTIFIER))
+			else if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				// TODO package.class
 				this.type = new Type(value, token);
