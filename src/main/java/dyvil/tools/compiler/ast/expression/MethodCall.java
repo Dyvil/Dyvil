@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
@@ -187,7 +188,6 @@ public class MethodCall extends Call implements INamed, IValued
 			arg.write(visitor);
 		}
 		
-		// TODO super -> INVOKESPECIAL
 		int opcode;
 		if (this.method.hasModifier(Modifiers.STATIC))
 		{
@@ -196,6 +196,10 @@ public class MethodCall extends Call implements INamed, IValued
 		else if (this.method.getTheClass().hasModifier(Modifiers.INTERFACE_CLASS))
 		{
 			opcode = Opcodes.INVOKEINTERFACE;
+		}
+		else if (this.instance instanceof SuperValue)
+		{
+			opcode = Opcodes.INVOKESPECIAL;
 		}
 		else
 		{

@@ -1,4 +1,6 @@
 .classpath
 .project
 bin/
-dyvilc.log*
+
+*.log*
+*.log

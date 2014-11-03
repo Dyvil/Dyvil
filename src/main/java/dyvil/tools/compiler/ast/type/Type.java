@@ -112,21 +112,25 @@ public class Type extends ASTObject implements IContext
 		return this.arrayDimensions > 0;
 	}
 	
-	public final String getInternalName()
+	public final String getExtendedName()
 	{
 		StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < this.arrayDimensions; i++)
 		{
 			buf.append('[');
 		}
-		this.appendInternalName(buf);
+		this.appendExtendedName(buf);
 		return buf.toString();
 	}
 	
-	protected void appendInternalName(StringBuilder buf)
+	protected void appendExtendedName(StringBuilder buf)
 	{
-		String s = this.theClass == null ? ClassFormat.packageToInternal(this.name) : this.theClass.getInternalName();
-		buf.append('L').append(s).append(';');
+		buf.append('L').append(this.getInternalName()).append(';');
+	}
+	
+	public String getInternalName()
+	{
+		return this.theClass == null ? ClassFormat.packageToInternal(this.name) : this.theClass.getInternalName();
 	}
 	
 	public String getSignature()

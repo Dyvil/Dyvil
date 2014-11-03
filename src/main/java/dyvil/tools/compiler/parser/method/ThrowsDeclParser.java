@@ -1,48 +1,61 @@
 package dyvil.tools.compiler.parser.method;
 
 import dyvil.tools.compiler.ast.api.IThrower;
-import dyvil.tools.compiler.ast.method.ThrowsDecl;
+import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.parser.type.TypeParser;
 
-public class ThrowsDeclParser extends Parser
-{	
-	private IThrower thrower;
+public class ThrowsDeclParser extends Parser implements ITyped
+{
+	protected IThrower	thrower;
+	protected IContext	context;
 	
-	public ThrowsDeclParser(IThrower thrower)
+	private Type		type;
+	
+	public ThrowsDeclParser(IThrower thrower, IContext context)
 	{
 		this.thrower = thrower;
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if ("{".equals(value) || ";".equals(value))
+		if (this.mode == 0)
 		{
-			if (this.mode == 1)
-			{
-				jcp.popParser(true);
-				return true;				
-			}
-			throw new SyntaxError(token, "Invalid throws delcaration!");
+			this.mode = 1;
+			pm.pushParser(new TypeParser(this.context, this), true);
+			return true;
 		}
-		else if (",".equals(token))
+		if (this.mode == 1)
 		{
-			if (this.mode == 1)
+			if (",".equals(value) || ";".equals(value))
 			{
+				this.type.setSeperator(value.charAt(0));
+				this.thrower.addThrows(this.type);
 				this.mode = 0;
 				return true;
 			}
-			throw new SyntaxError(token, "Invalid comma");
 		}
-		else if (token.type() == IToken.TYPE_IDENTIFIER)
-		{
-			this.thrower.addThrows(new ThrowsDecl(value));
-			this.mode = 1;
-			return true;
-		}
-		return false;
+		
+		pm.popParser(true);
+		this.thrower.addThrows(this.type);
+		return true;
+	}
+	
+	@Override
+	public void setType(Type type)
+	{
+		this.type = type;
+	}
+	
+	@Override
+	public Type getType()
+	{
+		return this.type;
 	}
 }

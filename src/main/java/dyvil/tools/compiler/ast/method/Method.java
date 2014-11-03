@@ -18,13 +18,13 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
-	private IValue				statement;
+	private IValue			statement;
 	
-	private String				openBracket			= "(";
-	private String				closeBracket		= ")";
+	private String			openBracket			= "(";
+	private String			closeBracket		= ")";
 	
-	private List<Parameter>		parameters			= new ArrayList(3);
-	private List<ThrowsDecl>	throwsDeclarations	= new ArrayList(1);
+	private List<Parameter>	parameters			= new ArrayList(3);
+	private List<Type>		throwsDeclarations	= new ArrayList(1);
 	
 	public Method(IClass iclass)
 	{
@@ -56,19 +56,19 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void setThrows(List<ThrowsDecl> throwsDecls)
+	public void setThrows(List<Type> throwsDecls)
 	{
 		this.throwsDeclarations = throwsDecls;
 	}
 	
 	@Override
-	public List<ThrowsDecl> getThrows()
+	public List<Type> getThrows()
 	{
 		return this.throwsDeclarations;
 	}
 	
 	@Override
-	public void addThrows(ThrowsDecl throwsDecl)
+	public void addThrows(Type throwsDecl)
 	{
 		this.throwsDeclarations.add(throwsDecl);
 	}
@@ -86,10 +86,10 @@ public class Method extends Member implements IMethod
 		buf.append('(');
 		for (Parameter par : this.parameters)
 		{
-			buf.append(par.type.getInternalName());
+			buf.append(par.type.getExtendedName());
 		}
 		buf.append(')');
-		buf.append(this.type.getInternalName());
+		buf.append(this.type.getExtendedName());
 		return buf.toString();
 	}
 	
@@ -103,8 +103,18 @@ public class Method extends Member implements IMethod
 	@Override
 	public String[] getExceptions()
 	{
-		// TODO Exceptions
-		return null;
+		int len = this.throwsDeclarations.size();
+		if (len == 0)
+		{
+			return null;
+		}
+		
+		String[] array = new String[len];
+		for (int i = 0; i < len; i++)
+		{
+			array[i] = this.throwsDeclarations.get(i).getInternalName();
+		}
+		return array;
 	}
 	
 	@Override
@@ -187,7 +197,11 @@ public class Method extends Member implements IMethod
 	@Override
 	public Method applyState(CompilerState state, IContext context)
 	{
-		this.type = this.type.applyState(state, context);
+		if (state == CompilerState.RESOLVE_TYPES)
+		{
+			this.type = this.type.applyState(state, context);
+			this.throwsDeclarations.replaceAll(t -> t.applyState(state, context));
+		}
 		
 		this.parameters.replaceAll(p -> p.applyState(state, context));
 		
@@ -221,6 +235,12 @@ public class Method extends Member implements IMethod
 		}
 		
 		Util.parametersToString(this.parameters, buffer, true, this.openBracket + this.closeBracket, this.openBracket, Formatting.Method.parameterSeperator, this.closeBracket);
+		
+		if (!this.throwsDeclarations.isEmpty())
+		{
+			buffer.append(Formatting.Method.signatureThrowsSeperator);
+			Util.astToString(this.throwsDeclarations, Formatting.Method.throwsSeperator, buffer);
+		}
 		
 		IValue statement = this.getValue();
 		if (statement != null)

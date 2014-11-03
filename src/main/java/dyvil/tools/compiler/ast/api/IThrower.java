@@ -2,15 +2,15 @@ package dyvil.tools.compiler.ast.api;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.method.ThrowsDecl;
+import dyvil.tools.compiler.ast.type.Type;
 
 public interface IThrower
 {
-	public void setThrows(List<ThrowsDecl> throwsDecls);
+	public void setThrows(List<Type> throwsDecls);
 	
-	public List<ThrowsDecl> getThrows();
+	public List<Type> getThrows();
 	
-	public default void addThrows(ThrowsDecl throwsDecl)
+	public default void addThrows(Type throwsDecl)
 	{
 		this.getThrows().add(throwsDecl);
 	}

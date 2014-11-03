@@ -45,18 +45,20 @@ public class Formatting
 	
 	public static class Method
 	{
-		public static String	emptyParameters			= "()";
-		public static String	parametersStart			= "(";
-		public static String	parametersEnd			= ")";
-		public static String	parameterSeperator		= ", ";
+		public static String	emptyParameters				= "()";
+		public static String	parametersStart				= "(";
+		public static String	parametersEnd				= ")";
+		public static String	parameterSeperator			= ", ";
 		
-		public static boolean	convertQualifiedNames	= false;
-		public static boolean	convertSugarCalls		= true;
-		public static String	sugarCallStart			= " ";
-		public static String	sugarCallEnd			= " ";
+		public static boolean	convertQualifiedNames		= false;
+		public static boolean	convertSugarCalls			= true;
+		public static String	sugarCallStart				= " ";
+		public static String	sugarCallEnd				= " ";
 		
-		public static String	signatureBodySeperator	= " = ";
-		public static String	indent					= "\t";
+		public static String	throwsSeperator				= ", ";
+		public static String	signatureThrowsSeperator	= " throws ";
+		public static String	signatureBodySeperator		= " = ";
+		public static String	indent						= "\t";
 	}
 	
 	public static class Statements

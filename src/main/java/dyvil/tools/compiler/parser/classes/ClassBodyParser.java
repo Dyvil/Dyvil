@@ -159,7 +159,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 		{
 			if ("throws".equals(value))
 			{
-				pm.pushParser(new ThrowsDeclParser(this.method));
+				pm.pushParser(new ThrowsDeclParser(this.method, this.method));
 				return true;
 			}
 			else if ("=".equals(value))

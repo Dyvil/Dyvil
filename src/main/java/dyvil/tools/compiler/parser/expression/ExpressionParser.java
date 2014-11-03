@@ -79,6 +79,12 @@ public class ExpressionParser extends Parser implements ITyped
 				this.value = new ThisValue(token, this.context.getThisType());
 				return true;
 			}
+			else if ("super".equals(value))
+			{
+				this.mode = ACCESS;
+				this.value = new SuperValue(token, this.context.getThisType());
+				return true;
+			}
 			else if ("(".equals(value))
 			{
 				this.mode = TUPLE_END;

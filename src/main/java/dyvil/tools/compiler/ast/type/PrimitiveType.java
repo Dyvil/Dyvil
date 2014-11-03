@@ -23,7 +23,7 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public void appendInternalName(StringBuilder buf)
+	public void appendExtendedName(StringBuilder buf)
 	{
 		if (this == Type.VOID)
 			buf.append("V");

@@ -67,7 +67,7 @@ public class Parameter extends Member implements IField
 	@Override
 	public String getDescription()
 	{
-		return this.type.getInternalName();
+		return this.type.getExtendedName();
 	}
 	
 	@Override
