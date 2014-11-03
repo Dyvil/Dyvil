@@ -13,9 +13,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassBody extends ASTObject
 {
-	private IClass			theClass;
-	private List<IField>	fields	= new ArrayList();
-	private List<IMethod>	methods	= new ArrayList();
+	protected IClass		theClass;
+	protected List<IField>	fields	= new ArrayList();
+	protected List<IMethod>	methods	= new ArrayList();
 	
 	public ClassBody(ICodePosition position)
 	{

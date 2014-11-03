@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IAccess;
@@ -131,5 +132,11 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 	public List<IValue> getValues()
 	{
 		return null;
+	}
+
+	@Override
+	public void write(MethodVisitor visitor)
+	{
+		// TODO
 	}
 }

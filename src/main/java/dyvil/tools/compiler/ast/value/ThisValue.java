@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.value;
 
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -46,5 +48,11 @@ public class ThisValue extends ASTObject implements IValue
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("this");
+	}
+	
+	@Override
+	public void write(MethodVisitor visitor)
+	{
+		visitor.visitIntInsn(Opcodes.ALOAD, 0);
 	}
 }

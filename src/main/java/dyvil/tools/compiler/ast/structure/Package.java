@@ -14,7 +14,30 @@ import dyvil.tools.compiler.util.ClassFormat;
 
 public class Package implements IContext
 {
-	public static Package			rootPackage	= new Package(null, null);
+	public static Package			rootPackage	= new Package(null, null)
+												{
+													@Override
+													public IClass resolveClass(String name)
+													{
+														int index = name.lastIndexOf('.');
+														if (index == -1)
+														{
+															return super.resolveClass(name);
+														}
+														else
+														{
+															String packageName = name.substring(0, index);
+															String className = name.substring(index + 1);
+															Package pack = this.resolvePackage(packageName);
+															if (pack != null)
+															{
+																return pack.resolveClass(className);
+															}
+														}
+														
+														return null;
+													}
+												};
 	
 	public static Package			dyvilLang	= Library.dyvilLibrary.resolvePackage("dyvil.lang");
 	public static Package			javaLang	= Library.javaLibrary.resolvePackage("java.lang");
@@ -23,6 +46,8 @@ public class Package implements IContext
 	public String					name;
 	public String					fullName;
 	public String					internalName;
+	
+	public boolean					isExternal;
 	
 	public List<CompilationUnit>	units		= new ArrayList();
 	public List<IClass>				classes		= new ArrayList();
@@ -129,7 +154,6 @@ public class Package implements IContext
 			}
 		}
 		
-		String internalName = ClassFormat.packageToInternal(name);
 		for (Library library : Dyvilc.config.libraries)
 		{
 			Package pack = library.resolvePackage(name);

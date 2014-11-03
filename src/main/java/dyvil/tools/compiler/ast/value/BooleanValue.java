@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.value;
 
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -68,5 +69,11 @@ public class BooleanValue extends ASTObject implements IValue
 		if (this.value != other.value)
 			return false;
 		return true;
+	}
+
+	@Override
+	public void write(MethodVisitor visitor)
+	{
+		visitor.visitLdcInsn(Integer.valueOf(this.value ? 1 : 0));
 	}
 }

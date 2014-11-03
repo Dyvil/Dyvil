@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.Collections;
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IAccess;
@@ -181,5 +183,29 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	public List<IValue> getValues()
 	{
 		return Collections.EMPTY_LIST;
+	}
+	
+	@Override
+	public void write(MethodVisitor visitor)
+	{
+		if (this.instance != null)
+		{
+			this.instance.write(visitor);
+		}
+		
+		int opcode;
+		if (this.field.hasModifier(Modifiers.STATIC))
+		{
+			opcode = Opcodes.GETSTATIC;
+		}
+		else
+		{
+			opcode = Opcodes.GETFIELD;
+		}
+		
+		String owner = this.field.getTheClass().getInternalName();
+		String name = this.field.getName();
+		String desc = this.field.getDescription();
+		visitor.visitFieldInsn(opcode, owner, name, desc);
 	}
 }

@@ -10,6 +10,8 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
+import dyvil.tools.compiler.ast.structure.Package;
+
 public class AccessResolver
 {
 	public static IAccess resolve(IContext context, IAccess access)
@@ -53,23 +55,24 @@ public class AccessResolver
 		ListIterator<IAccess> iterator = list.listIterator();
 		while (iterator.hasNext())
 		{
+			IContext context1 = context;
 			IAccess iaccess = iterator.next();
 			if (a != null)
 			{
-				context = a.getType();
+				context1 = a.getType().resolve(Package.rootPackage);
 			}
 			else
 			{
 				IValue value = iaccess.getValue();
 				if (value != null)
 				{
-					context = value.getType();
+					context1 = value.getType().resolve(Package.rootPackage);
 				}
 			}
 			
-			if (!iaccess.resolve(context))
+			if (!iaccess.resolve(context1))
 			{
-				IAccess iaccess2 = iaccess.resolve2(context);
+				IAccess iaccess2 = iaccess.resolve2(context1);
 				if (iaccess2 == iaccess)
 				{
 					markers.add(iaccess.getResolveError());

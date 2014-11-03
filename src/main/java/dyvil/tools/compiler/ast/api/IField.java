@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.api;
 
+import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 
 
@@ -8,4 +10,14 @@ public interface IField extends IASTObject, INamed, ITyped, IModified, IAnnotata
 {
 	@Override
 	public IField applyState(CompilerState state, IContext context);
+	
+	public IClass getTheClass();
+	
+	// Compilation
+	
+	public void write(ClassWriter writer);
+	
+	public String getDescription();
+	
+	public String getSignature();
 }

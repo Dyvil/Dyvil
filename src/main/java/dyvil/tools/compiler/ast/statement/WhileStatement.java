@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValued;
@@ -69,5 +70,11 @@ public class WhileStatement extends ASTObject implements IStatement, IValued
 			buffer.append(' ');
 			this.then.toString(prefix, buffer);
 		}
+	}
+
+	@Override
+	public void write(MethodVisitor visitor)
+	{
+		// TODO
 	}
 }

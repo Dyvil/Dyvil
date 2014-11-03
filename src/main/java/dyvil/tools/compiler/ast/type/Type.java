@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.ClassFormat;
 
 public class Type extends ASTObject implements IContext
 {
@@ -116,6 +117,29 @@ public class Type extends ASTObject implements IContext
 	public boolean isArrayType()
 	{
 		return this.arrayDimensions > 0;
+	}
+	
+	public final String getInternalName()
+	{
+		StringBuilder buf = new StringBuilder();
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buf.append('[');
+		}
+		this.appendInternalName(buf);
+		return buf.toString();
+	}
+	
+	protected void appendInternalName(StringBuilder buf)
+	{
+		String s = this.theClass == null ? ClassFormat.packageToInternal(this.name) : this.theClass.getInternalName();
+		buf.append('L').append(s).append(';');
+	}
+	
+	public String getSignature()
+	{
+		// TODO Generic signature
+		return null;
 	}
 	
 	public boolean isAssignableFrom(Type that)

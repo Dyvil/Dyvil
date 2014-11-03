@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.method;
 
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -38,4 +39,14 @@ public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParame
 		}
 		return false;
 	}
+	
+	// Compilation
+	
+	public void write(ClassWriter writer);
+
+	public String getDescriptor();
+	
+	public String getSignature();
+	
+	public String[] getExceptions();
 }

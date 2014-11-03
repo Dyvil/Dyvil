@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.IField;
@@ -13,6 +15,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.AccessResolver;
+import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 import dyvil.tools.compiler.util.Util;
 
@@ -170,5 +173,38 @@ public class MethodCall extends Call implements INamed, IValued
 			
 			Util.parametersToString(this.arguments, buffer, !this.isSugarCall);
 		}
+	}
+	
+	@Override
+	public void write(MethodVisitor visitor)
+	{
+		if (this.instance != null)
+		{
+			this.instance.write(visitor);
+		}
+		for (IValue arg : this.arguments)
+		{
+			arg.write(visitor);
+		}
+		
+		// TODO super -> INVOKESPECIAL
+		int opcode;
+		if (this.method.hasModifier(Modifiers.STATIC))
+		{
+			opcode = Opcodes.INVOKESTATIC;
+		}
+		else if (this.method.getTheClass().hasModifier(Modifiers.INTERFACE_CLASS))
+		{
+			opcode = Opcodes.INVOKEINTERFACE;
+		}
+		else
+		{
+			opcode = Opcodes.INVOKEVIRTUAL;
+		}
+		
+		String owner = this.method.getTheClass().getInternalName();
+		String name = this.method.getName();
+		String desc = this.method.getDescriptor();
+		visitor.visitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
 	}
 }

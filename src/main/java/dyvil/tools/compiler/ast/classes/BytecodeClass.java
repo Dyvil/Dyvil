@@ -14,8 +14,20 @@ public class BytecodeClass extends AbstractClass
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
 	{
 		this.modifiers = access;
-		this.name = ClassFormat.internalToPackage(name);
+		this.internalName = name;
+		
+		int index = name.lastIndexOf('/');
+		if (index == -1)
+		{
+			this.name = name;
+		}
+		else
+		{
+			this.name = name.substring(index + 1);
+		}
+		
 		this.superClasses.add(ClassFormat.internalToType(superName));
+		
 		for (String s : interfaces)
 		{
 			this.superClasses.add(ClassFormat.internalToType(s));

@@ -14,6 +14,7 @@ public class ExternalPackage extends Package
 	{
 		super(parent, name);
 		this.library = library;
+		this.isExternal = true;
 	}
 	
 	@Override

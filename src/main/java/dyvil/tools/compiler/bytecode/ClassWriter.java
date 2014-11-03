@@ -25,7 +25,8 @@ public class ClassWriter
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 		{
 			jdk.internal.org.objectweb.asm.ClassWriter writer = new jdk.internal.org.objectweb.asm.ClassWriter(Opcodes.ASM5);
-			writeClass(iclass, writer);
+			iclass.write(writer);
+			writer.visitEnd();
 			byte[] bytes = writer.toByteArray();
 			os.write(bytes, 0, bytes.length);
 		}
@@ -33,10 +34,5 @@ public class ClassWriter
 		{
 			ex.printStackTrace();
 		}
-	}
-	
-	public static void writeClass(IClass iclass, jdk.internal.org.objectweb.asm.ClassWriter writer)
-	{
-		writer.visit(Opcodes.V1_8, iclass.getModifiers(), iclass.getName(), null, "java/lang/Object", new String[0]);
 	}
 }

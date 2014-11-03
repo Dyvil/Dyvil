@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.classes;
 import java.util.ArrayList;
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -18,8 +20,11 @@ import dyvil.tools.compiler.util.Util;
 
 public class AbstractClass extends ASTObject implements IClass
 {
-	protected String			name;
 	protected int				type;
+	
+	protected String			name;
+	protected String			internalName;
+	
 	protected int				modifiers;
 	protected CompilationUnit	unit;
 	protected ClassBody			body;
@@ -48,6 +53,7 @@ public class AbstractClass extends ASTObject implements IClass
 	public void setName(String name)
 	{
 		this.name = name;
+		this.internalName = this.unit.getInternalName(this.name);
 	}
 	
 	@Override
@@ -119,6 +125,31 @@ public class AbstractClass extends ASTObject implements IClass
 	public ClassBody getBody()
 	{
 		return this.body;
+	}
+	
+	@Override
+	public void write(ClassWriter writer)
+	{
+		// TODO Actual super classes / interfaces
+		writer.visit(Opcodes.V1_8, this.modifiers, this.internalName, null, "java/lang/Object", null);
+		
+		List<IField> fields = this.body.fields;
+		for (IField f : fields)
+		{
+			f.write(writer);
+		}
+		
+		List<IMethod> methods = this.body.methods;
+		for (IMethod m : methods)
+		{
+			m.write(writer);
+		}
+	}
+	
+	@Override
+	public String getInternalName()
+	{
+		return this.internalName;
 	}
 	
 	@Override

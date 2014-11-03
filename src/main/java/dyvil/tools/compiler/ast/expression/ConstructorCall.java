@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -95,5 +96,9 @@ public class ConstructorCall extends Call implements ITyped
 		return null;
 	}
 	
-	
+	@Override
+	public void write(MethodVisitor visitor)
+	{
+		// TODO
+	}
 }

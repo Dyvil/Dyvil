@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.ArrayList;
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IValueList;
@@ -82,7 +83,7 @@ public class ValueList extends ASTObject implements IValue, IValueList
 	{
 		int size = this.values.size();
 		if (this.isArray)
-		{	
+		{
 			if (size == 0)
 			{
 				buffer.append(Formatting.Expression.emptyArray);
@@ -111,6 +112,15 @@ public class ValueList extends ASTObject implements IValue, IValueList
 				}
 				buffer.append(prefix).append('}');
 			}
+		}
+	}
+	
+	@Override
+	public void write(MethodVisitor visitor)
+	{
+		for (IValue ivalue : this.values)
+		{
+			ivalue.write(visitor);
 		}
 	}
 }

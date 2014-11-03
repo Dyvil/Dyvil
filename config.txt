@@ -3,7 +3,7 @@ jar_group = "dyvil.test"
 jar_version = "1.0.0"
 
 source_dir = "src/test/dyvil"
-output_dir = "bin/test/dyvil"
+output_dir = "bin"
 
 main_type = "dyvil.test.DyvilTest"
 

@@ -97,6 +97,15 @@ public class CompilationUnit extends ASTObject implements IContext
 		return null;
 	}
 	
+	public String getInternalName(String name)
+	{
+		if (!name.equals(this.name))
+		{
+			name = this.name + '$' + name;
+		}
+		return this.pack.internalName + name;
+	}
+	
 	@Override
 	public IClass resolveClass(String name)
 	{
@@ -220,7 +229,7 @@ public class CompilationUnit extends ASTObject implements IContext
 					String name = iclass.getName();
 					if (!name.equals(this.name))
 					{
-						name = this.name + '$' + name;
+						name = this.name + "$" + name;
 					}
 					File file = new File(s, name + ".class");
 					ClassWriter.saveClass(file, iclass);

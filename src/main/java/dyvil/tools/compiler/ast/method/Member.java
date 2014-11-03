@@ -14,7 +14,7 @@ public abstract class Member extends ASTObject implements IMember
 {
 	protected int				modifiers;
 	
-	protected IClass			theClass;
+	public IClass				theClass;
 	protected Type				type;
 	protected String			name;
 	protected String			qualifiedName;
@@ -123,6 +123,12 @@ public abstract class Member extends ASTObject implements IMember
 	public List<Annotation> getAnnotations()
 	{
 		return this.annotations;
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		return this.theClass;
 	}
 	
 	@Override

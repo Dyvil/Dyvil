@@ -81,12 +81,7 @@ public enum CompilerState
 		for (CompilationUnit unit : units)
 		{
 			this.file = unit.getFile();
-			try
-			{
-				unit.applyState(this, context);
-			}
-			catch (Exception ex)
-			{}
+			unit.applyState(this, context);
 		}
 		
 		if (Dyvilc.debug)
