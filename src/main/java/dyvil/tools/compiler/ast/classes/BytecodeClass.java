@@ -1,8 +1,11 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.util.ClassFormat;
+
+import dyvil.tools.compiler.ast.structure.Package;
 
 public class BytecodeClass extends AbstractClass
 {
@@ -26,12 +29,20 @@ public class BytecodeClass extends AbstractClass
 			this.name = name.substring(index + 1);
 		}
 		
-		this.superClasses.add(ClassFormat.internalToType(superName));
-		
-		for (String s : interfaces)
+		if (superName != null)
 		{
-			this.superClasses.add(ClassFormat.internalToType(s));
+			this.superClasses.add(ClassFormat.internalToType(superName));
 		}
+		
+		if (interfaces != null)
+		{
+			for (String s : interfaces)
+			{
+				this.superClasses.add(ClassFormat.internalToType(s));
+			}
+		}
+		
+		this.applyState(CompilerState.RESOLVE_TYPES, Package.rootPackage);
 	}
 	
 	public void visitField(int access, String name, String desc, String signature, Object value)

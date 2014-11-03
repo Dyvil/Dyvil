@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassAccess extends ASTObject implements IValue, IAccess
@@ -43,29 +43,6 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
 			this.type = this.type.resolve(context);
-		}
-		else if (state == CompilerState.RESOLVE)
-		{
-			if (!this.type.isResolved())
-			{
-				String name = this.type.name;
-				IField field = context.resolveField(name);
-				if (field != null)
-				{
-					FieldAccess access = new FieldAccess(this.position, null, name);
-					access.field = field;
-					return access;
-				}
-				IMethod method = context.resolveMethod(name, Type.EMPTY_TYPES);
-				if (method != null)
-				{
-					MethodCall call = new MethodCall(this.position, null, name);
-					call.method = method;
-					return call;
-				}
-				
-				state.addMarker(new SemanticError(this.position, "'" + name + "' cannot be resolved to a type"));
-			}
 		}
 		return this;
 	}
@@ -107,19 +84,35 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 	@Override
 	public boolean resolve(IContext context)
 	{
-		return true;
+		return this.type.isResolved();
 	}
 
 	@Override
 	public IAccess resolve2(IContext context)
 	{
+		String name = this.type.name;
+		IField field = context.resolveField(name);
+		if (field != null)
+		{
+			FieldAccess access = new FieldAccess(this.position, null, name);
+			access.field = field;
+			return access;
+		}
+		IMethod method = context.resolveMethod(name, Type.EMPTY_TYPES);
+		if (method != null)
+		{
+			MethodCall call = new MethodCall(this.position, null, name);
+			call.method = method;
+			return call;
+		}
+		
 		return this;
 	}
 
 	@Override
 	public Marker getResolveError()
 	{
-		return null;
+		return new SyntaxError(this.position, "'" + this.type.name + "' could not be resolved to a type.");
 	}
 
 	@Override

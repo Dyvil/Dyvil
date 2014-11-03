@@ -1,8 +1,9 @@
 package test;
 
 import java.lang.String;
+import javax.swing.JOptionPane;
 
 public class Main
 {
-	public static void main(String[] args) = System.out.println("HelloWorld");
+	public static void main(String[] args) = JOptionPane.showMessageDialog(null, "Hello World", "Dyvil", JOptionPane.PLAIN_MESSAGE);
 }

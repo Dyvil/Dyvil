@@ -30,7 +30,7 @@ public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParame
 			for (int i = 0; i < types.length; i++)
 			{
 				Type t = parameters.get(i).type;
-				if (!types[i].isAssignableFrom(t))
+				if (!Type.isSuperType(t, types[i]))
 				{
 					return false;
 				}

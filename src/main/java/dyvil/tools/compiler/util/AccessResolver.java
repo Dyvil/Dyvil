@@ -48,6 +48,10 @@ public class AccessResolver
 					continue;
 				}
 			}
+			else
+			{
+				params.replaceAll(v -> v.applyState(CompilerState.RESOLVE, context));
+			}
 			break;
 		}
 		
@@ -76,6 +80,7 @@ public class AccessResolver
 				if (iaccess2 == iaccess)
 				{
 					markers.add(iaccess.getResolveError());
+					return access;
 				}
 			}
 			a = iaccess;

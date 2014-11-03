@@ -78,16 +78,18 @@ public class Symbols
 				if (s1.isEmpty())
 				{
 					builder.append('$');
-					i++;
 					continue;
 				}
-				builder.append(replacementMap.get(s1).charValue());
-				i = index - 1;
+				Character replacement = replacementMap.get(s1);
+				if (replacement != null)
+				{
+					builder.append(replacement.charValue());
+					i = index - 1;
+					continue;
+				}
 			}
-			else
-			{
-				builder.append(c);
-			}
+			
+			builder.append(c);
 		}
 		return builder.toString();
 	}

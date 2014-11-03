@@ -65,11 +65,6 @@ public class ExpressionParser extends Parser implements ITyped
 			pm.popParser(true);
 			return true;
 		}
-		else if (this.lazy && this.value != null)
-		{
-			pm.popParser(true);
-			return true;
-		}
 		
 		if (this.isInMode(VALUE))
 		{
@@ -164,39 +159,44 @@ public class ExpressionParser extends Parser implements ITyped
 				this.mode = DOT_ACCESS;
 				return true;
 			}
+			
+			if (this.lazy && this.value != null)
+			{
+				pm.popParser(true);
+				return true;
+			}
 			this.mode = DOT_ACCESS;
 		}
 		if (this.isInMode(DOT_ACCESS))
 		{
-			IToken next = token.next();
-			if (next.isType(Token.TYPE_OPEN_BRACKET))
+			if (token.isType(Token.TYPE_IDENTIFIER))
 			{
-				MethodCall call = new MethodCall(token, this.value, value);
-				this.value = call;
-				this.mode = PARAMETERS;
-				return true;
-			}
-			else if (next.isType(Token.TYPE_CLOSE_BRACKET))
-			{
-				return false;
-			}
-			else if (!next.isAnyType(Token.TYPE_IDENTIFIER | Token.TYPE_SYMBOL))
-			{
-				MethodCall call = new MethodCall(token, this.value, value);
-				call.setSugar(true);
-				this.value = call;
-				
-				ExpressionParser parser = new ExpressionParser(this.context, call);
-				parser.lazy = true;
-				pm.pushParser(parser);
-				return true;
-			}
-			else
-			{
-				FieldAccess access = new FieldAccess(token, this.value, value);
-				this.value = access;
-				this.mode = ACCESS;
-				return true;
+				IToken next = token.next();
+				if (next.isType(Token.TYPE_OPEN_BRACKET))
+				{
+					MethodCall call = new MethodCall(token, this.value, value);
+					this.value = call;
+					this.mode = PARAMETERS;
+					return true;
+				}
+				else if (!next.isType(Token.TYPE_IDENTIFIER) && !next.isType(Token.TYPE_CLOSE_BRACKET))
+				{
+					MethodCall call = new MethodCall(token, this.value, value);
+					call.setSugar(true);
+					this.value = call;
+					
+					ExpressionParser parser = new ExpressionParser(this.context, call);
+					parser.lazy = true;
+					pm.pushParser(parser);
+					return true;
+				}
+				else
+				{
+					FieldAccess access = new FieldAccess(token, this.value, value);
+					this.value = access;
+					this.mode = ACCESS;
+					return true;
+				}
 			}
 		}
 		if (this.isInMode(PARAMETERS))

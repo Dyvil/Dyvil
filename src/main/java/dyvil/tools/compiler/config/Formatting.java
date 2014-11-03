@@ -38,7 +38,7 @@ public class Formatting
 		public static String	keyValueSeperator		= " = ";
 		
 		public static boolean	convertQualifiedNames	= false;
-		public static boolean	convertSugarAccess		= false;
+		public static boolean	convertSugarAccess		= true;
 		public static String	sugarAccessStart		= " ";
 		public static String	sugarAccessEnd			= " ";
 	}
@@ -51,7 +51,7 @@ public class Formatting
 		public static String	parameterSeperator		= ", ";
 		
 		public static boolean	convertQualifiedNames	= false;
-		public static boolean	convertSugarCalls		= false;
+		public static boolean	convertSugarCalls		= true;
 		public static String	sugarCallStart			= " ";
 		public static String	sugarCallEnd			= " ";
 		

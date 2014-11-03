@@ -18,14 +18,7 @@ public class Type extends ASTObject implements IContext
 {
 	public static Type[]	EMPTY_TYPES	= new Type[0];
 	
-	public static Type		NONE		= new Type(null)
-										{
-											@Override
-											public boolean isAssignableFrom(Type t)
-											{
-												return true;
-											};
-										};
+	public static Type		NONE		= new Type(null);
 	
 	public static Type		VOID		= new PrimitiveType("void");
 	public static Type		BOOL		= new PrimitiveType("boolean");
@@ -142,16 +135,38 @@ public class Type extends ASTObject implements IContext
 		return null;
 	}
 	
-	public boolean isAssignableFrom(Type that)
+	/**
+	 * Returns true if {@code t2} is equal to or a subclass of {@code t1}.
+	 * 
+	 * @param superType
+	 *            the super type
+	 * @param subType
+	 *            the sub type
+	 * @return true if t2 is equal to or a subclass of t1
+	 */
+	public static boolean isSuperType(Type superType, Type subType)
 	{
-		if (this.equals(that))
+		if (superType == VOID)
 		{
 			return true;
 		}
-		if (this.theClass != null)
+		else if (subType == NONE)
 		{
-			List<Type> superClasses = this.theClass.getSuperClasses();
-			return superClasses.contains(that);
+			return true;
+		}
+		else if (superType.equals(subType))
+		{
+			return true;
+		}
+		return superType.isAssignableFrom(subType);
+	}
+	
+	protected boolean isAssignableFrom(Type that)
+	{
+		if (that.theClass != null)
+		{
+			List<Type> superClasses = that.theClass.getSuperClasses();
+			return superClasses.contains(this);
 		}
 		return false;
 	}
@@ -159,11 +174,6 @@ public class Type extends ASTObject implements IContext
 	@Override
 	public Type applyState(CompilerState state, IContext context)
 	{
-		if (this.position == null)
-		{
-			return this;
-		}
-		
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
 			Type type = this.resolve(context);
@@ -214,50 +224,30 @@ public class Type extends ASTObject implements IContext
 	@Override
 	public boolean isStatic()
 	{
-		if (this.theClass == null)
-		{
-			return false;
-		}
 		return this.theClass.isStatic();
 	}
 	
 	@Override
 	public IClass resolveClass(String name)
 	{
-		if (this.theClass == null)
-		{
-			return null;
-		}
 		return this.theClass.resolveClass(name);
 	}
 	
 	@Override
 	public IField resolveField(String name)
 	{
-		if (this.theClass == null)
-		{
-			return null;
-		}
 		return this.theClass.resolveField(name);
 	}
 	
 	@Override
 	public IMethod resolveMethodName(String name)
 	{
-		if (this.theClass == null)
-		{
-			return null;
-		}
 		return this.theClass.resolveMethodName(name);
 	}
 	
 	@Override
 	public IMethod resolveMethod(String name, Type... args)
 	{
-		if (this.theClass == null)
-		{
-			return null;
-		}
 		return this.theClass.resolveMethod(name, args);
 	}
 	

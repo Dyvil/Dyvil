@@ -29,8 +29,8 @@ public class AbstractClass extends ASTObject implements IClass
 	protected CompilationUnit	unit;
 	protected ClassBody			body;
 	
-	protected List<Type>		superClasses	= new ArrayList();
-	protected List<Annotation>	annotations		= new ArrayList();
+	protected List<Type>		superClasses	= new ArrayList(1);
+	protected List<Annotation>	annotations		= new ArrayList(1);
 	
 	public AbstractClass()
 	{}
@@ -227,6 +227,11 @@ public class AbstractClass extends ASTObject implements IClass
 		List<IMethod> list = new ArrayList();
 		this.body.getMethod(list, name, args);
 		
+		if (!list.isEmpty())
+		{
+			return list.get(0);
+		}
+		
 		for (Type type : this.superClasses)
 		{
 			IMethod method = type.resolveMethod(name, args);
@@ -244,7 +249,11 @@ public class AbstractClass extends ASTObject implements IClass
 	@Override
 	public AbstractClass applyState(CompilerState state, IContext context)
 	{
-		this.superClasses.replaceAll(t -> t.applyState(state, context));
+		if (state == CompilerState.RESOLVE_TYPES)
+		{
+			this.superClasses.replaceAll(t -> t.applyState(state, context));
+		}
+		
 		this.body = this.body.applyState(state, this);
 		return this;
 	}

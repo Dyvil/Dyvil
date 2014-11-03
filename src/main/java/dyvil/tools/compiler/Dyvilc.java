@@ -9,6 +9,9 @@ import java.util.*;
 import java.util.logging.*;
 import java.util.logging.Formatter;
 
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
