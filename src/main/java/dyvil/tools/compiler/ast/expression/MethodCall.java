@@ -42,6 +42,10 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public Type getType()
 	{
+		if (this.method == null)
+		{
+			return null;
+		}
 		return this.method.getType();
 	}
 	
@@ -93,6 +97,7 @@ public class MethodCall extends Call implements INamed, IValued
 		
 		if (state == CompilerState.RESOLVE)
 		{
+			this.arguments.replaceAll(v -> v.applyState(state, context));
 			return AccessResolver.resolve(context, this);
 		}
 		else if (this.instance != null)

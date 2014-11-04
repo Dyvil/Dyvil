@@ -183,12 +183,6 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IMethod resolveMethodName(String name)
-	{
-		return this.theClass.resolveMethodName(name);
-	}
-	
-	@Override
 	public IMethod resolveMethod(String name, Type... args)
 	{
 		return this.theClass.resolveMethod(name, args);

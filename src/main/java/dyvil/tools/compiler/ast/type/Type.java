@@ -92,7 +92,7 @@ public class Type extends ASTObject implements IContext
 		{
 			return true;
 		}
-		else if (subType == NONE)
+		else if (subType == NONE && !(superType instanceof PrimitiveType))
 		{
 			return true;
 		}
@@ -241,12 +241,6 @@ public class Type extends ASTObject implements IContext
 	public IField resolveField(String name)
 	{
 		return this.theClass.resolveField(name);
-	}
-	
-	@Override
-	public IMethod resolveMethodName(String name)
-	{
-		return this.theClass.resolveMethodName(name);
 	}
 	
 	@Override

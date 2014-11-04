@@ -105,12 +105,6 @@ public class SimpleImport extends ASTObject implements IImport
 	}
 	
 	@Override
-	public IMethod resolveMethodName(String name)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
 	public IMethod resolveMethod(String name, Type... args)
 	{
 		throw new UnsupportedOperationException();

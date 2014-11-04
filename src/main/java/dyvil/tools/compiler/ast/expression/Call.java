@@ -64,10 +64,14 @@ public abstract class Call extends ASTObject implements IValue, IValueList, IAcc
 		for (int i = 0; i < len; i++)
 		{
 			IValue arg = this.arguments.get(i);
-			if (arg != null)
-			{
-				types[i] = arg.getType();
-			}
+			if (arg == null)
+				return null;
+			
+			Type t = arg.getType();
+			if (t == null)
+				return null;
+			
+			types[i] = t;
 		}
 		return types;
 	}

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -72,13 +73,14 @@ public class ClassBody extends ASTObject
 		return null;
 	}
 	
-	public void getMethods(List<IMethod> list, String name, Type... args)
+	public void getMethods(List<MethodMatch> list, String name, Type... args)
 	{
 		for (IMethod method : this.methods)
 		{
-			if (method.hasSignature(name, args))
+			int match = method.getSignatureMatch(name, args);
+			if (match > 0)
 			{
-				list.add(method);
+				list.add(new MethodMatch(method, match));
 			}
 		}
 	}

@@ -16,46 +16,10 @@ public class AccessResolver
 	public static IAccess resolve(IContext context, IAccess access)
 	{
 		List<Marker> markers = CompilerState.RESOLVE.file.markers;
+		LinkedList<IAccess> chain = getCallChain(access);
 		
-		LinkedList<IAccess> list = new LinkedList();
-		
-		IAccess a = access;
-		while (true)
-		{
-			list.addFirst(a);
-			
-			IValue v = a.getValue();
-			if (v instanceof IAccess)
-			{
-				a = (IAccess) v;
-				continue;
-			}
-			break;
-		}
-		
-		a = access;
-		while (true)
-		{
-			List<IValue> params = a.getValues();
-			int size = params.size();
-			if (size == 1)
-			{
-				IValue v = params.get(0);
-				if (v instanceof IAccess)
-				{
-					a = (IAccess) v;
-					continue;
-				}
-			}
-			else
-			{
-				params.replaceAll(v -> v.applyState(CompilerState.RESOLVE, context));
-			}
-			break;
-		}
-		
-		a = null;
-		ListIterator<IAccess> iterator = list.listIterator();
+		IAccess a = null;
+		ListIterator<IAccess> iterator = chain.listIterator();
 		while (iterator.hasNext())
 		{
 			IContext context1 = context;
@@ -86,5 +50,24 @@ public class AccessResolver
 		}
 		
 		return access;
+	}
+	
+	public static LinkedList<IAccess> getCallChain(IAccess iaccess)
+	{
+		LinkedList<IAccess> list = new LinkedList();
+		while (true)
+		{
+			list.addFirst(iaccess);
+			
+			IValue v = iaccess.getValue();
+			if (v instanceof IAccess)
+			{
+				iaccess = (IAccess) v;
+				continue;
+			}
+			break;
+		}
+		
+		return list;
 	}
 }

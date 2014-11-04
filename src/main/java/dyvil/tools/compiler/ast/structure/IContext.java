@@ -22,7 +22,5 @@ public interface IContext
 	
 	public IField resolveField(String name);
 	
-	public IMethod resolveMethodName(String name);
-	
 	public IMethod resolveMethod(String name, Type... args);
 }

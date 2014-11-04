@@ -4,6 +4,7 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
@@ -18,6 +19,8 @@ public interface IClass extends IASTObject, INamed, IModified, ITypeList, IAnnot
 	}
 	
 	public List<Type> getSuperClasses();
+	
+	public void getMethodMatches(List<MethodMatch> matches, String name, Type... types);
 	
 	public void setBody(ClassBody body);
 	

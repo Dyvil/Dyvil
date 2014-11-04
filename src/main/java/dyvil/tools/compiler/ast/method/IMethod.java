@@ -17,7 +17,7 @@ public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParame
 	
 	public void setParametersCloseBracket(String bracket);
 	
-	public default boolean hasSignature(String name, Type... types)
+	public default int getSignatureMatch(String name, Type... types)
 	{
 		if (name.equals(this.getName()))
 		{
@@ -25,19 +25,30 @@ public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParame
 			
 			if (parameters.size() != types.length)
 			{
-				return false;
+				return 0;
 			}
+			
+			int match = 0;
 			for (int i = 0; i < types.length; i++)
 			{
-				Type t = parameters.get(i).type;
-				if (!Type.isSuperType(t, types[i]))
+				Type t1 = parameters.get(i).type;
+				Type t2 = types[i];
+				if (t1.equals(t2))
+				{	
+					match += 2;
+				}
+				else if (Type.isSuperType(t1, types[i]))
 				{
-					return false;
+					match += 1;
+				}
+				else
+				{
+					return 0;
 				}
 			}
-			return true;
+			return match;
 		}
-		return false;
+		return 0;
 	}
 	
 	// Compilation

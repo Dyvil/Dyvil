@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
@@ -10,6 +11,7 @@ import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
@@ -196,51 +198,36 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public IMethod resolveMethodName(String name)
+	public IMethod resolveMethod(String name, Type... args)
 	{
-		// Own methods
-		IMethod method = this.body.getMethod(name);
-		if (method != null)
+		if (args == null)
 		{
-			return method;
+			return null;
 		}
 		
-		for (Type type : this.superClasses)
-		{
-			method = type.resolveMethodName(name);
-			if (method != null)
-			{
-				return method;
-			}
-		}
+		List<MethodMatch> list = new ArrayList();
+		this.getMethodMatches(list, name, args);
+		Collections.sort(list);
 		
-		return null;
+		// TODO Static, Accessibility, Ambiguity
+		
+		return list.isEmpty() ? null : list.get(0).theMethod;
 	}
 	
 	@Override
-	public IMethod resolveMethod(String name, Type... args)
+	public void getMethodMatches(List<MethodMatch> list, String name, Type... args)
 	{
-		// Own methods
-		List<IMethod> list = new ArrayList();
 		this.body.getMethods(list, name, args);
 		
 		if (!list.isEmpty())
 		{
-			return list.get(0);
+			return;
 		}
 		
 		for (Type type : this.superClasses)
 		{
-			IMethod method = type.resolveMethod(name, args);
-			if (method != null)
-			{
-				list.add(method);
-			}
+			type.theClass.getMethodMatches(list, name, args);
 		}
-		
-		// TODO Static, Accessibility, Ambiguity
-		
-		return list.isEmpty() ? null : list.get(0);
 	}
 	
 	@Override

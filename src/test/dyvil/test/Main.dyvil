@@ -6,5 +6,5 @@ import javax.swing.JOptionPane;
 
 public class Main
 {
-	public static void main(String[] args) throws IOException = { };
+	public static void main(String[] args) = System out println(Integer.toString(3 + 4));
 }
