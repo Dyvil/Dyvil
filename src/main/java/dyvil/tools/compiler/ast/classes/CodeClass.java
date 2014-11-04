@@ -31,9 +31,10 @@ public class CodeClass extends ASTObject implements IClass
 	protected String			name;
 	protected String			internalName;
 	
-	protected List<Annotation>	annotations		= new ArrayList(1);
+	protected List<Annotation>	annotations	= new ArrayList(1);
 	
-	protected List<Type>		superClasses	= new ArrayList(1);
+	protected Type				superClass	= Type.OBJECT;
+	protected List<Type>		interfaces	= new ArrayList(1);
 	
 	protected ClassBody			body;
 	
@@ -91,27 +92,33 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public List<Type> getSuperClasses()
+	public void setType(Type type)
 	{
-		return this.superClasses;
+		this.superClass = type;
+	}
+	
+	@Override
+	public Type getType()
+	{
+		return this.superClass;
 	}
 	
 	@Override
 	public void setTypes(List<Type> types)
 	{
-		this.superClasses = types;
+		this.interfaces = types;
 	}
 	
 	@Override
 	public List<Type> getTypes()
 	{
-		return this.superClasses;
+		return this.interfaces;
 	}
 	
 	@Override
 	public void addType(Type type)
 	{
-		this.superClasses.add(type);
+		this.interfaces.add(type);
 	}
 	
 	@Override
@@ -127,16 +134,43 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
+	public boolean isSuperType(Type t)
+	{
+		return t.equals(this.superClass) || this.interfaces.contains(t);
+	}
+	
+	@Override
 	public String getInternalName()
 	{
 		return this.internalName;
 	}
 	
 	@Override
+	public String getSignature()
+	{
+		return null;
+	}
+	
+	@Override
+	public String[] getInterfaces()
+	{
+		int len = this.interfaces.size();
+		String[] interfaces = new String[len];
+		for (int i = 0; i < len; i++)
+		{
+			interfaces[i] = this.interfaces.get(i).getInternalName();
+		}
+		return interfaces;
+	}
+	
+	@Override
 	public void write(ClassWriter writer)
 	{
-		// TODO Actual super classes / interfaces
-		writer.visit(Opcodes.V1_8, this.modifiers, this.internalName, null, "java/lang/Object", null);
+		String internalName = this.getInternalName();
+		String signature = this.getSignature();
+		String superClass = this.superClass.getInternalName();
+		String[] interfaces = this.getInterfaces();
+		writer.visit(Opcodes.V1_8, this.modifiers, internalName, signature, superClass, interfaces);
 		
 		List<IField> fields = this.body.fields;
 		for (IField f : fields)
@@ -185,7 +219,16 @@ public class CodeClass extends ASTObject implements IClass
 		}
 		
 		// Inherited Fields
-		for (Type type : this.superClasses)
+		if (this.superClass != null)
+		{
+			field = this.superClass.resolveField(name);
+			if (field != null)
+			{
+				return field;
+			}
+		}
+		
+		for (Type type : this.interfaces)
 		{
 			field = type.resolveField(name);
 			if (field != null)
@@ -224,7 +267,11 @@ public class CodeClass extends ASTObject implements IClass
 			return;
 		}
 		
-		for (Type type : this.superClasses)
+		if (this.superClass != null)
+		{
+			this.superClass.theClass.getMethodMatches(list, name, args);
+		}
+		for (Type type : this.interfaces)
 		{
 			type.theClass.getMethodMatches(list, name, args);
 		}
@@ -235,7 +282,15 @@ public class CodeClass extends ASTObject implements IClass
 	{
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
-			this.superClasses.replaceAll(t -> t.applyState(state, context));
+			if (this.superClass == Type.VOID)
+			{
+				return null;
+			}
+			else if (this.superClass != null)
+			{
+				this.superClass = this.superClass.resolve(context);
+			}
+			this.interfaces.replaceAll(t -> t.applyState(state, context));
 		}
 		
 		this.body = this.body.applyState(state, this);
@@ -250,10 +305,15 @@ public class CodeClass extends ASTObject implements IClass
 		buffer.append(Modifiers.CLASS_TYPE.toString(this.type));
 		buffer.append(this.name);
 		
-		if (!this.superClasses.isEmpty())
+		if (this.superClass != null)
 		{
 			buffer.append(" extends ");
-			Util.astToString(this.superClasses, Formatting.Class.superClassesSeperator, buffer);
+			this.superClass.toString("", buffer);
+		}
+		if (!this.interfaces.isEmpty())
+		{
+			buffer.append(" implements ");
+			Util.astToString(this.interfaces, Formatting.Class.superClassesSeperator, buffer);
 		}
 		
 		buffer.append(Formatting.Class.bodyStart);

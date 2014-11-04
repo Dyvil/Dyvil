@@ -3,8 +3,10 @@ package test;
 import java.lang.String;
 import java.io.IOException;
 import javax.swing.JOptionPane;
+import java.lang.Comparable;
 
-public class Main
+// Extending void causes the class to not be a subclass of java.lang.Object.
+public class Main extends void implements Comparable
 {
-	public static void main(String[] args) = System out println(Integer.toString(3 + 4));
+	public static void main(String[] args) = System out println("Test");
 }

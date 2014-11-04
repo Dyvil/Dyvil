@@ -30,14 +30,18 @@ public class BytecodeClass extends CodeClass
 		
 		if (superName != null)
 		{
-			this.superClasses.add(ClassFormat.internalToType(superName));
+			this.superClass = ClassFormat.internalToType(superName);
+		}
+		else
+		{
+			this.superClass = null;
 		}
 		
 		if (interfaces != null)
 		{
 			for (String s : interfaces)
 			{
-				this.superClasses.add(ClassFormat.internalToType(s));
+				this.interfaces.add(ClassFormat.internalToType(s));
 			}
 		}
 		

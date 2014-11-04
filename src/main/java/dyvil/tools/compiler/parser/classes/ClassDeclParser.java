@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.type.TypeListParser;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 
 public class ClassDeclParser extends Parser
@@ -14,6 +15,7 @@ public class ClassDeclParser extends Parser
 	public static final int		MODIFIERS	= 0;
 	public static final int		NAME		= 1;
 	public static final int		EXTENDS		= 2;
+	public static final int		IMPLEMENTS	= 4;
 	public static final int		BODY		= 8;
 	public static final int		BODY_END	= 16;
 	
@@ -54,13 +56,22 @@ public class ClassDeclParser extends Parser
 			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				this.theClassDecl.setName(value);
-				this.mode = EXTENDS | BODY;
+				this.mode = EXTENDS | IMPLEMENTS | BODY;
 				return true;
 			}
 		}
 		if (this.isInMode(EXTENDS))
 		{
 			if ("extends".equals(value))
+			{
+				jcp.pushParser(new TypeParser(this.unit, this.theClassDecl));
+				this.mode = IMPLEMENTS | BODY;
+				return true;
+			}
+		}
+		if (this.isInMode(IMPLEMENTS))
+		{
+			if ("implements".equals(value))
 			{
 				jcp.pushParser(new TypeListParser(this.unit, this.theClassDecl));
 				this.mode = BODY;

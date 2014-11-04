@@ -110,7 +110,7 @@ public class CompilationUnit extends ASTObject implements IContext
 	public IClass resolveClass(String name)
 	{
 		// Own classes
-		for (CodeClass aclass : this.classes)
+		for (IClass aclass : this.classes)
 		{
 			if (name.equals(aclass.getName()))
 			{

@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.List;
-
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IField;
@@ -30,6 +28,7 @@ public class Type extends ASTObject implements IContext
 	public static Type		FLOAT		= new PrimitiveType("float");
 	public static Type		DOUBLE		= new PrimitiveType("double");
 	
+	public static Type OBJECT = new Type("java.lang.Object");
 	public static Type		STRING		= new StringType("java.lang.String");
 	
 	public String			name;
@@ -74,6 +73,8 @@ public class Type extends ASTObject implements IContext
 		LONG.theClass = Package.dyvilLang.resolveClass("Long");
 		FLOAT.theClass = Package.dyvilLang.resolveClass("Float");
 		DOUBLE.theClass = Package.dyvilLang.resolveClass("Double");
+		
+		OBJECT.theClass = Package.javaLang.resolveClass("Object");
 		STRING.theClass = Package.javaLang.resolveClass("String");
 	}
 	
@@ -142,8 +143,7 @@ public class Type extends ASTObject implements IContext
 	{
 		if (that.theClass != null)
 		{
-			List<Type> superClasses = that.theClass.getSuperClasses();
-			return superClasses.contains(this);
+			return that.theClass.isSuperType(this);
 		}
 		return false;
 	}

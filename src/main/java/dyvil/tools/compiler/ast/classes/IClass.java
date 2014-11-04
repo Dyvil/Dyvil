@@ -8,27 +8,23 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
-public interface IClass extends IASTObject, INamed, IModified, ITypeList, IAnnotatable, IContext
-{
-	public default void addSuperClass(Type superClass)
-	{
-		if (superClass != null)
-		{
-			this.getSuperClasses().add(superClass);
-		}
-	}
-	
-	public List<Type> getSuperClasses();
-	
-	public void getMethodMatches(List<MethodMatch> matches, String name, Type... types);
-	
+public interface IClass extends IASTObject, INamed, IModified, ITyped, ITypeList, IAnnotatable, IContext
+{	
 	public void setBody(ClassBody body);
 	
 	public ClassBody getBody();
 	
+	public boolean isSuperType(Type t);
+	
+	public void getMethodMatches(List<MethodMatch> matches, String name, Type... types);
+	
 	// Compilation
 	
-	public void write(ClassWriter writer);
-	
 	public String getInternalName();
+	
+	public String getSignature();
+	
+	public String[] getInterfaces();
+	
+	public void write(ClassWriter writer);
 }
