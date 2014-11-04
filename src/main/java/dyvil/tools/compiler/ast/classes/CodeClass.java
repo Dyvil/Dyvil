@@ -218,8 +218,10 @@ public class CodeClass extends ASTObject implements IClass
 			return field;
 		}
 		
+		IClass predef = Type.PREDEF.theClass;
+		
 		// Inherited Fields
-		if (this.superClass != null)
+		if (this.superClass != null && this.superClass.theClass != null && this != predef)
 		{
 			field = this.superClass.resolveField(name);
 			if (field != null)
@@ -231,6 +233,16 @@ public class CodeClass extends ASTObject implements IClass
 		for (Type type : this.interfaces)
 		{
 			field = type.resolveField(name);
+			if (field != null)
+			{
+				return field;
+			}
+		}
+		
+		// Predef
+		if (this != predef)
+		{
+			field = predef.resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -258,22 +270,29 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, String name, Type... args)
+	public void getMethodMatches(List<MethodMatch> list, String name, Type... types)
 	{
-		this.body.getMethods(list, name, args);
+		this.body.getMethodMatches(list, name, types);
 		
 		if (!list.isEmpty())
 		{
 			return;
 		}
 		
-		if (this.superClass != null)
+		IClass predef = Type.PREDEF.theClass;
+		
+		if (this.superClass != null && this.superClass.theClass != null && this != predef)
 		{
-			this.superClass.theClass.getMethodMatches(list, name, args);
+			this.superClass.theClass.getMethodMatches(list, name, types);
 		}
 		for (Type type : this.interfaces)
 		{
-			type.theClass.getMethodMatches(list, name, args);
+			type.theClass.getMethodMatches(list, name, types);
+		}
+		
+		if (list.isEmpty() && this != predef)
+		{
+			predef.getMethodMatches(list, name, types);
 		}
 	}
 	

@@ -73,7 +73,7 @@ public class ClassBody extends ASTObject
 		return null;
 	}
 	
-	public void getMethods(List<MethodMatch> list, String name, Type... args)
+	public void getMethodMatches(List<MethodMatch> list, String name, Type... args)
 	{
 		for (IMethod method : this.methods)
 		{

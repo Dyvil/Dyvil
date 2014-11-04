@@ -28,7 +28,8 @@ public class Type extends ASTObject implements IContext
 	public static Type		FLOAT		= new PrimitiveType("float");
 	public static Type		DOUBLE		= new PrimitiveType("double");
 	
-	public static Type OBJECT = new Type("java.lang.Object");
+	public static Type		OBJECT		= new Type("java.lang.Object");
+	public static Type		PREDEF		= new Type("dyvil.lang.Predef");
 	public static Type		STRING		= new StringType("java.lang.String");
 	
 	public String			name;
@@ -75,6 +76,7 @@ public class Type extends ASTObject implements IContext
 		DOUBLE.theClass = Package.dyvilLang.resolveClass("Double");
 		
 		OBJECT.theClass = Package.javaLang.resolveClass("Object");
+		PREDEF.theClass = Package.dyvilLang.resolveClass("Predef");
 		STRING.theClass = Package.javaLang.resolveClass("String");
 	}
 	

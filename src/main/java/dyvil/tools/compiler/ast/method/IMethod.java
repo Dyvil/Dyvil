@@ -28,7 +28,7 @@ public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParame
 				return 0;
 			}
 			
-			int match = 0;
+			int match = 1;
 			for (int i = 0; i < types.length; i++)
 			{
 				Type t1 = parameters.get(i).type;

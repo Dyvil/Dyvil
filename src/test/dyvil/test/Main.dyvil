@@ -8,5 +8,5 @@ import java.lang.Comparable;
 // Extending void causes the class to not be a subclass of java.lang.Object.
 public class Main extends void implements Comparable
 {
-	public static void main(String[] args) = System out println("Test");
+	public static void main(String[] args) = hash({1, 2, 3});
 }

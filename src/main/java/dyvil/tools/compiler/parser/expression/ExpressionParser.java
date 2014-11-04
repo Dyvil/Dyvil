@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
@@ -114,7 +115,7 @@ public class ExpressionParser extends Parser implements ITyped
 				pm.pushParser(new TypeParser(this.context, call));
 				return true;
 			}
-			else if (token.isType(IToken.TYPE_IDENTIFIER))
+			else if (token.isType(IToken.TYPE_IDENTIFIER) && !token.next().isType(Token.TYPE_OPEN_BRACKET))
 			{
 				this.mode = ACCESS;
 				pm.pushParser(new TypeParser(this.context, this), true);
