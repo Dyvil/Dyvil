@@ -1,6 +1,7 @@
 package dyvil.lang.primitive;
 
-import dyvil.lang.Number;
+import dyvil.lang.Double;
+import dyvil.lang.Float;
 
 public class FloatRef extends dyvil.lang.Float
 {
@@ -15,49 +16,49 @@ public class FloatRef extends dyvil.lang.Float
 	}
 	
 	@Override
-	public Number $eq(byte v)
+	public Float $eq(byte v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(short v)
+	public Float $eq(short v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(char v)
+	public Float $eq(char v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(int v)
+	public Float $eq(int v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(long v)
+	public Float $eq(long v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(float v)
+	public Float $eq(float v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(double v)
+	public Double $eq(double v)
 	{
 		return DoubleRef.get(v);
 	}

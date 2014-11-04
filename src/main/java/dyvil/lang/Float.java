@@ -10,6 +10,27 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	public abstract Float $eq(byte v);
+	
+	@Override
+	public abstract Float $eq(short v);
+	
+	@Override
+	public abstract Float $eq(char v);
+	
+	@Override
+	public abstract Float $eq(int v);
+	
+	@Override
+	public abstract Float $eq(long v);
+	
+	@Override
+	public abstract Float $eq(float v);
+	
+	@Override
+	public abstract Double $eq(double v);
+	
+	@Override
 	public byte byteValue()
 	{
 		return (byte) this.value;
@@ -54,38 +75,38 @@ public abstract class Float implements Number
 	// Unary operators
 	
 	@Override
-	public Number $minus()
+	public Float $minus()
 	{
 		return this.$eq(-this.value);
 	}
 	
 	@Override
-	public Number $tilde()
+	public Float $tilde()
 	{
 		// Unsupported
 		return this;
 	}
 	
 	@Override
-	public Number $plus$plus()
+	public Float $plus$plus()
 	{
 		return this.$eq(this.value + 1);
 	}
 	
 	@Override
-	public Number $minus$minus()
+	public Float $minus$minus()
 	{
 		return this.$eq(this.value - 1);
 	}
 	
 	@Override
-	public Number sqr()
+	public Float sqr()
 	{
 		return this.$eq(this.value * this.value);
 	}
 	
 	@Override
-	public Number sqrt()
+	public Float sqrt()
 	{
 		return this.$eq(1 / this.value);
 	}
@@ -129,67 +150,67 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	public Number $plus(byte v)
+	public Float $plus(byte v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(byte v)
+	public Float $minus(byte v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(byte v)
+	public Float $times(byte v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(byte v)
+	public Float $div(byte v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(byte v)
+	public Float $percent(byte v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(byte v)
+	public Float $bar(byte v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $amp(byte v)
+	public Float $amp(byte v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $up(byte v)
+	public Float $up(byte v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $less$less(byte v)
+	public Float $less$less(byte v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater(byte v)
+	public Float $greater$greater(byte v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater$greater(byte v)
+	public Float $greater$greater$greater(byte v)
 	{
 		return this;
 	}
@@ -233,67 +254,67 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	public Number $plus(short v)
+	public Float $plus(short v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(short v)
+	public Float $minus(short v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(short v)
+	public Float $times(short v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(short v)
+	public Float $div(short v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(short v)
+	public Float $percent(short v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(short v)
+	public Float $bar(short v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $amp(short v)
+	public Float $amp(short v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $up(short v)
+	public Float $up(short v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $less$less(short v)
+	public Float $less$less(short v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater(short v)
+	public Float $greater$greater(short v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater$greater(short v)
+	public Float $greater$greater$greater(short v)
 	{
 		return this;
 	}
@@ -337,67 +358,67 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	public Number $plus(char v)
+	public Float $plus(char v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(char v)
+	public Float $minus(char v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(char v)
+	public Float $times(char v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(char v)
+	public Float $div(char v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(char v)
+	public Float $percent(char v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(char v)
+	public Float $bar(char v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $amp(char v)
+	public Float $amp(char v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $up(char v)
+	public Float $up(char v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $less$less(char v)
+	public Float $less$less(char v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater(char v)
+	public Float $greater$greater(char v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater$greater(char v)
+	public Float $greater$greater$greater(char v)
 	{
 		return this;
 	}
@@ -441,67 +462,67 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	public Number $plus(int v)
+	public Float $plus(int v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(int v)
+	public Float $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(int v)
+	public Float $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(int v)
+	public Float $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(int v)
+	public Float $percent(int v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(int v)
+	public Float $bar(int v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $amp(int v)
+	public Float $amp(int v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $up(int v)
+	public Float $up(int v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $less$less(int v)
+	public Float $less$less(int v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater(int v)
+	public Float $greater$greater(int v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater$greater(int v)
+	public Float $greater$greater$greater(int v)
 	{
 		return this;
 	}
@@ -545,67 +566,67 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	public Number $plus(long v)
+	public Float $plus(long v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(long v)
+	public Float $minus(long v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(long v)
+	public Float $times(long v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(long v)
+	public Float $div(long v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(long v)
+	public Float $percent(long v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(long v)
+	public Float $bar(long v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $amp(long v)
+	public Float $amp(long v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $up(long v)
+	public Float $up(long v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $less$less(long v)
+	public Float $less$less(long v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater(long v)
+	public Float $greater$greater(long v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater$greater(long v)
+	public Float $greater$greater$greater(long v)
 	{
 		return this;
 	}
@@ -649,31 +670,31 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	public Number $plus(float v)
+	public Float $plus(float v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(float v)
+	public Float $minus(float v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(float v)
+	public Float $times(float v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(float v)
+	public Float $div(float v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(float v)
+	public Float $percent(float v)
 	{
 		return this.$eq(this.value % v);
 	}
@@ -717,31 +738,31 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	public Number $plus(double v)
+	public Double $plus(double v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(double v)
+	public Double $minus(double v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(double v)
+	public Double $times(double v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(double v)
+	public Double $div(double v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(double v)
+	public Double $percent(double v)
 	{
 		return this.$eq(this.value % v);
 	}

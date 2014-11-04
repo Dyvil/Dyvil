@@ -1,6 +1,7 @@
 package dyvil.lang.primitive;
 
-import dyvil.lang.Number;
+import dyvil.lang.Double;
+import dyvil.lang.Float;
 
 public class FloatConst extends dyvil.lang.Float
 {
@@ -15,43 +16,43 @@ public class FloatConst extends dyvil.lang.Float
 	}
 	
 	@Override
-	public Number $eq(byte v)
+	public Float $eq(byte v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(short v)
+	public Float $eq(short v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(char v)
+	public Float $eq(char v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(int v)
+	public Float $eq(int v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(long v)
+	public Float $eq(long v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(float v)
+	public Float $eq(float v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(double v)
+	public Double $eq(double v)
 	{
 		return DoubleConst.get(v);
 	}

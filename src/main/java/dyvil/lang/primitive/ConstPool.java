@@ -82,7 +82,7 @@ public class ConstPool
 	public static FloatConst getFloat(float value)
 	{
 		int i = (int) value;
-		if (value >= 0 && value == i && value < constantTableSize)
+		if (i >= 0 && value == i && i < constantTableSize)
 		{
 			return floatConstants[i];
 		}
@@ -92,7 +92,7 @@ public class ConstPool
 	public static DoubleConst getDouble(double value)
 	{
 		int i = (int) value;
-		if (value >= 0 && value == i && value < constantTableSize)
+		if (i >= 0 && value == i && i < constantTableSize)
 		{
 			return doubleConstants[i];
 		}

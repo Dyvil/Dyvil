@@ -1,6 +1,10 @@
 package dyvil.lang.primitive;
 
-import dyvil.lang.Number;
+import dyvil.lang.*;
+import dyvil.lang.Double;
+import dyvil.lang.Float;
+import dyvil.lang.Long;
+import dyvil.lang.Short;
 
 public class ShortConst extends dyvil.lang.Short
 {
@@ -15,43 +19,43 @@ public class ShortConst extends dyvil.lang.Short
 	}
 	
 	@Override
-	public Number $eq(byte v)
+	public Short $eq(byte v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(short v)
+	public Short $eq(short v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(char v)
+	public Char $eq(char v)
 	{
 		return CharConst.get(v);
 	}
 	
 	@Override
-	public Number $eq(int v)
+	public Int $eq(int v)
 	{
 		return IntConst.get(v);
 	}
 	
 	@Override
-	public Number $eq(long v)
+	public Long $eq(long v)
 	{
 		return LongConst.get(v);
 	}
 	
 	@Override
-	public Number $eq(float v)
+	public Float $eq(float v)
 	{
 		return FloatConst.get(v);
 	}
 	
 	@Override
-	public Number $eq(double v)
+	public Double $eq(double v)
 	{
 		return DoubleConst.get(v);
 	}

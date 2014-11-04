@@ -1,6 +1,9 @@
 package dyvil.lang.primitive;
 
-import dyvil.lang.Number;
+import dyvil.lang.Double;
+import dyvil.lang.Float;
+import dyvil.lang.Int;
+import dyvil.lang.Long;
 
 public class IntConst extends dyvil.lang.Int
 {
@@ -15,43 +18,43 @@ public class IntConst extends dyvil.lang.Int
 	}
 	
 	@Override
-	public Number $eq(byte v)
+	public Int $eq(byte v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(short v)
+	public Int $eq(short v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(char v)
+	public Int $eq(char v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(int v)
+	public Int $eq(int v)
 	{
 		return get(v);
 	}
 	
 	@Override
-	public Number $eq(long v)
+	public Long $eq(long v)
 	{
 		return LongConst.get(v);
 	}
 	
 	@Override
-	public Number $eq(float v)
+	public Float $eq(float v)
 	{
 		return FloatConst.get(v);
 	}
 	
 	@Override
-	public Number $eq(double v)
+	public Double $eq(double v)
 	{
 		return DoubleConst.get(v);
 	}

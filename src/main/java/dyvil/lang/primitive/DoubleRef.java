@@ -1,6 +1,6 @@
 package dyvil.lang.primitive;
 
-import dyvil.lang.Number;
+import dyvil.lang.Double;
 
 public class DoubleRef extends dyvil.lang.Double
 {
@@ -15,49 +15,49 @@ public class DoubleRef extends dyvil.lang.Double
 	}
 	
 	@Override
-	public Number $eq(byte v)
+	public Double $eq(byte v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(short v)
+	public Double $eq(short v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(char v)
+	public Double $eq(char v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(int v)
+	public Double $eq(int v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(long v)
+	public Double $eq(long v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(float v)
+	public Double $eq(float v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(double v)
+	public Double $eq(double v)
 	{
 		this.value = v;
 		return this;

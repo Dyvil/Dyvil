@@ -4,6 +4,27 @@ public abstract class Double implements Number
 {
 	protected double	value;
 	
+	@Override
+	public abstract Double $eq(byte v);
+	
+	@Override
+	public abstract Double $eq(short v);
+	
+	@Override
+	public abstract Double $eq(char v);
+	
+	@Override
+	public abstract Double $eq(int v);
+	
+	@Override
+	public abstract Double $eq(long v);
+	
+	@Override
+	public abstract Double $eq(float v);
+	
+	@Override
+	public abstract Double $eq(double v);
+	
 	protected Double(double value)
 	{
 		this.value = value;
@@ -54,38 +75,38 @@ public abstract class Double implements Number
 	// Unary operators
 	
 	@Override
-	public Number $minus()
+	public Double $minus()
 	{
 		return this.$eq(-this.value);
 	}
 	
 	@Override
-	public Number $tilde()
+	public Double $tilde()
 	{
 		// Unsupported
 		return this;
 	}
 	
 	@Override
-	public Number $plus$plus()
+	public Double $plus$plus()
 	{
 		return this.$eq(this.value + 1);
 	}
 	
 	@Override
-	public Number $minus$minus()
+	public Double $minus$minus()
 	{
 		return this.$eq(this.value - 1);
 	}
 	
 	@Override
-	public Number sqr()
+	public Double sqr()
 	{
 		return this.$eq(this.value * this.value);
 	}
 	
 	@Override
-	public Number sqrt()
+	public Double sqrt()
 	{
 		return this.$eq(1 / this.value);
 	}
@@ -129,67 +150,67 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	public Number $plus(byte v)
+	public Double $plus(byte v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(byte v)
+	public Double $minus(byte v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(byte v)
+	public Double $times(byte v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(byte v)
+	public Double $div(byte v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(byte v)
+	public Double $percent(byte v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(byte v)
+	public Double $bar(byte v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $amp(byte v)
+	public Double $amp(byte v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $up(byte v)
+	public Double $up(byte v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $less$less(byte v)
+	public Double $less$less(byte v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater(byte v)
+	public Double $greater$greater(byte v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater$greater(byte v)
+	public Double $greater$greater$greater(byte v)
 	{
 		return this;
 	}
@@ -233,67 +254,67 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	public Number $plus(short v)
+	public Double $plus(short v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(short v)
+	public Double $minus(short v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(short v)
+	public Double $times(short v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(short v)
+	public Double $div(short v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(short v)
+	public Double $percent(short v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(short v)
+	public Double $bar(short v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $amp(short v)
+	public Double $amp(short v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $up(short v)
+	public Double $up(short v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $less$less(short v)
+	public Double $less$less(short v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater(short v)
+	public Double $greater$greater(short v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater$greater(short v)
+	public Double $greater$greater$greater(short v)
 	{
 		return this;
 	}
@@ -337,67 +358,67 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	public Number $plus(char v)
+	public Double $plus(char v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(char v)
+	public Double $minus(char v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(char v)
+	public Double $times(char v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(char v)
+	public Double $div(char v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(char v)
+	public Double $percent(char v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(char v)
+	public Double $bar(char v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $amp(char v)
+	public Double $amp(char v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $up(char v)
+	public Double $up(char v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $less$less(char v)
+	public Double $less$less(char v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater(char v)
+	public Double $greater$greater(char v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater$greater(char v)
+	public Double $greater$greater$greater(char v)
 	{
 		return this;
 	}
@@ -441,67 +462,67 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	public Number $plus(int v)
+	public Double $plus(int v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(int v)
+	public Double $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(int v)
+	public Double $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(int v)
+	public Double $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(int v)
+	public Double $percent(int v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(int v)
+	public Double $bar(int v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $amp(int v)
+	public Double $amp(int v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $up(int v)
+	public Double $up(int v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $less$less(int v)
+	public Double $less$less(int v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater(int v)
+	public Double $greater$greater(int v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater$greater(int v)
+	public Double $greater$greater$greater(int v)
 	{
 		return this;
 	}
@@ -545,67 +566,67 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	public Number $plus(long v)
+	public Double $plus(long v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(long v)
+	public Double $minus(long v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(long v)
+	public Double $times(long v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(long v)
+	public Double $div(long v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(long v)
+	public Double $percent(long v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(long v)
+	public Double $bar(long v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $amp(long v)
+	public Double $amp(long v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $up(long v)
+	public Double $up(long v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $less$less(long v)
+	public Double $less$less(long v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater(long v)
+	public Double $greater$greater(long v)
 	{
 		return this;
 	}
 	
 	@Override
-	public Number $greater$greater$greater(long v)
+	public Double $greater$greater$greater(long v)
 	{
 		return this;
 	}
@@ -649,31 +670,31 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	public Number $plus(float v)
+	public Double $plus(float v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(float v)
+	public Double $minus(float v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(float v)
+	public Double $times(float v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(float v)
+	public Double $div(float v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(float v)
+	public Double $percent(float v)
 	{
 		return this.$eq(this.value % v);
 	}
@@ -717,31 +738,31 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	public Number $plus(double v)
+	public Double $plus(double v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(double v)
+	public Double $minus(double v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(double v)
+	public Double $times(double v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(double v)
+	public Double $div(double v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(double v)
+	public Double $percent(double v)
 	{
 		return this.$eq(this.value % v);
 	}

@@ -1,8 +1,13 @@
 package dyvil.lang.primitive;
 
-import dyvil.lang.Number;
+import dyvil.lang.*;
+import dyvil.lang.Byte;
+import dyvil.lang.Double;
+import dyvil.lang.Float;
+import dyvil.lang.Long;
+import dyvil.lang.Short;
 
-public class ByteRef extends dyvil.lang.Byte
+public class ByteRef extends Byte
 {
 	protected ByteRef(byte value)
 	{
@@ -15,44 +20,44 @@ public class ByteRef extends dyvil.lang.Byte
 	}
 	
 	@Override
-	public Number $eq(byte v)
+	public Byte $eq(byte v)
 	{
 		this.value = v;
 		return this;
 	}
 	
 	@Override
-	public Number $eq(short v)
+	public Short $eq(short v)
 	{
 		return ShortRef.get(v);
 	}
 	
 	@Override
-	public Number $eq(char v)
+	public Char $eq(char v)
 	{
 		return CharRef.get(v);
 	}
 	
 	@Override
-	public Number $eq(int v)
+	public Int $eq(int v)
 	{
 		return IntRef.get(v);
 	}
 	
 	@Override
-	public Number $eq(long v)
+	public Long $eq(long v)
 	{
 		return LongRef.get(v);
 	}
 	
 	@Override
-	public Number $eq(float v)
+	public Float $eq(float v)
 	{
 		return FloatRef.get(v);
 	}
 	
 	@Override
-	public Number $eq(double v)
+	public Double $eq(double v)
 	{
 		return DoubleRef.get(v);
 	}

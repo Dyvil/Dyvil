@@ -10,6 +10,27 @@ public abstract class Long implements Number
 	}
 	
 	@Override
+	public abstract Long $eq(byte v);
+	
+	@Override
+	public abstract Long $eq(short v);
+	
+	@Override
+	public abstract Long $eq(char v);
+	
+	@Override
+	public abstract Long $eq(int v);
+	
+	@Override
+	public abstract Long $eq(long v);
+	
+	@Override
+	public abstract Float $eq(float v);
+	
+	@Override
+	public abstract Double $eq(double v);
+	
+	@Override
 	public byte byteValue()
 	{
 		return (byte) this.value;
@@ -54,37 +75,37 @@ public abstract class Long implements Number
 	// Unary operators
 	
 	@Override
-	public Number $minus()
+	public Long $minus()
 	{
 		return this.$eq(-this.value);
 	}
 	
 	@Override
-	public Number $tilde()
+	public Long $tilde()
 	{
 		return this.$eq(~this.value);
 	}
 	
 	@Override
-	public Number $plus$plus()
+	public Long $plus$plus()
 	{
 		return this.$eq(this.value + 1);
 	}
 	
 	@Override
-	public Number $minus$minus()
+	public Long $minus$minus()
 	{
 		return this.$eq(this.value - 1);
 	}
 	
 	@Override
-	public Number sqr()
+	public Long sqr()
 	{
 		return this.$eq(this.value * this.value);
 	}
 	
 	@Override
-	public Number sqrt()
+	public Long sqrt()
 	{
 		return this.$eq(1 / this.value);
 	}
@@ -128,67 +149,67 @@ public abstract class Long implements Number
 	}
 	
 	@Override
-	public Number $plus(byte v)
+	public Long $plus(byte v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(byte v)
+	public Long $minus(byte v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(byte v)
+	public Long $times(byte v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(byte v)
+	public Long $div(byte v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(byte v)
+	public Long $percent(byte v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(byte v)
+	public Long $bar(byte v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	public Number $amp(byte v)
+	public Long $amp(byte v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	public Number $up(byte v)
+	public Long $up(byte v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	public Number $less$less(byte v)
+	public Long $less$less(byte v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	public Number $greater$greater(byte v)
+	public Long $greater$greater(byte v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	public Number $greater$greater$greater(byte v)
+	public Long $greater$greater$greater(byte v)
 	{
 		return this.$eq(this.value >>> v);
 	}
@@ -232,67 +253,67 @@ public abstract class Long implements Number
 	}
 	
 	@Override
-	public Number $plus(short v)
+	public Long $plus(short v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(short v)
+	public Long $minus(short v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(short v)
+	public Long $times(short v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(short v)
+	public Long $div(short v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(short v)
+	public Long $percent(short v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(short v)
+	public Long $bar(short v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	public Number $amp(short v)
+	public Long $amp(short v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	public Number $up(short v)
+	public Long $up(short v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	public Number $less$less(short v)
+	public Long $less$less(short v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	public Number $greater$greater(short v)
+	public Long $greater$greater(short v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	public Number $greater$greater$greater(short v)
+	public Long $greater$greater$greater(short v)
 	{
 		return this.$eq(this.value >>> v);
 	}
@@ -336,67 +357,67 @@ public abstract class Long implements Number
 	}
 	
 	@Override
-	public Number $plus(char v)
+	public Long $plus(char v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(char v)
+	public Long $minus(char v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(char v)
+	public Long $times(char v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(char v)
+	public Long $div(char v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(char v)
+	public Long $percent(char v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(char v)
+	public Long $bar(char v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	public Number $amp(char v)
+	public Long $amp(char v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	public Number $up(char v)
+	public Long $up(char v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	public Number $less$less(char v)
+	public Long $less$less(char v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	public Number $greater$greater(char v)
+	public Long $greater$greater(char v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	public Number $greater$greater$greater(char v)
+	public Long $greater$greater$greater(char v)
 	{
 		return this.$eq(this.value >>> v);
 	}
@@ -440,67 +461,67 @@ public abstract class Long implements Number
 	}
 	
 	@Override
-	public Number $plus(int v)
+	public Long $plus(int v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(int v)
+	public Long $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(int v)
+	public Long $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(int v)
+	public Long $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(int v)
+	public Long $percent(int v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(int v)
+	public Long $bar(int v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	public Number $amp(int v)
+	public Long $amp(int v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	public Number $up(int v)
+	public Long $up(int v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	public Number $less$less(int v)
+	public Long $less$less(int v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	public Number $greater$greater(int v)
+	public Long $greater$greater(int v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	public Number $greater$greater$greater(int v)
+	public Long $greater$greater$greater(int v)
 	{
 		return this.$eq(this.value >>> v);
 	}
@@ -544,67 +565,67 @@ public abstract class Long implements Number
 	}
 	
 	@Override
-	public Number $plus(long v)
+	public Long $plus(long v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(long v)
+	public Long $minus(long v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(long v)
+	public Long $times(long v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(long v)
+	public Long $div(long v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(long v)
+	public Long $percent(long v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	public Number $bar(long v)
+	public Long $bar(long v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	public Number $amp(long v)
+	public Long $amp(long v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	public Number $up(long v)
+	public Long $up(long v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	public Number $less$less(long v)
+	public Long $less$less(long v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	public Number $greater$greater(long v)
+	public Long $greater$greater(long v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	public Number $greater$greater$greater(long v)
+	public Long $greater$greater$greater(long v)
 	{
 		return this.$eq(this.value >>> v);
 	}
@@ -648,31 +669,31 @@ public abstract class Long implements Number
 	}
 	
 	@Override
-	public Number $plus(float v)
+	public Float $plus(float v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(float v)
+	public Float $minus(float v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(float v)
+	public Float $times(float v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(float v)
+	public Float $div(float v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(float v)
+	public Float $percent(float v)
 	{
 		return this.$eq(this.value % v);
 	}
@@ -716,31 +737,31 @@ public abstract class Long implements Number
 	}
 	
 	@Override
-	public Number $plus(double v)
+	public Double $plus(double v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	public Number $minus(double v)
+	public Double $minus(double v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	public Number $times(double v)
+	public Double $times(double v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	public Number $div(double v)
+	public Double $div(double v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	public Number $percent(double v)
+	public Double $percent(double v)
 	{
 		return this.$eq(this.value % v);
 	}
