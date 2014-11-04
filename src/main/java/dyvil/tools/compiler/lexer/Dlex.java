@@ -83,20 +83,23 @@ public class Dlex implements Iterable<IToken>
 				addToken = true;
 				reparse = false;
 			}
-			else if (type == TYPE_LINE_COMMENT)
+			else if (type == TYPE_COMMENT)
 			{
-				if (c == '\n')
+				if (subtype == MOD_LINE)
 				{
-					type = 0;
-					continue;
+					if (c == '\n')
+					{
+						type = 0;
+						continue;
+					}
 				}
-			}
-			else if (type == TYPE_BLOCK_COMMENT)
-			{
-				if (l == '*' && c == '/')
+				else if (subtype == MOD_BLOCK)
 				{
-					type = 0;
-					continue;
+					if (l == '*' && c == '/')
+					{
+						type = 0;
+						continue;
+					}
 				}
 			}
 			else if (type == TYPE_INT || type == TYPE_LONG)
