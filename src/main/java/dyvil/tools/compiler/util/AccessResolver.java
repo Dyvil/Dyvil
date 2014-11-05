@@ -44,6 +44,9 @@ public class AccessResolver
 					markers.add(iaccess.getResolveError());
 					return access;
 				}
+				
+				a = iaccess2;
+				continue;
 			}
 			a = iaccess;
 		}
