@@ -98,6 +98,7 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 			access.field = f.theField;
 			return access;
 		}
+		
 		MethodMatch m = context.resolveMethod(context1, name, Type.EMPTY_TYPES);
 		if (m != null)
 		{

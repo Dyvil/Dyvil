@@ -7,7 +7,6 @@ import java.util.ListIterator;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
@@ -26,14 +25,14 @@ public class AccessResolver
 			IAccess iaccess = iterator.next();
 			if (a != null)
 			{
-				context1 = a.getType().resolve(Package.rootPackage);
+				context1 = a.getType();
 			}
 			else
 			{
 				IValue value = iaccess.getValue();
 				if (value != null)
 				{
-					context1 = value.getType().resolve(Package.rootPackage);
+					context1 = value.getType();
 				}
 			}
 			
