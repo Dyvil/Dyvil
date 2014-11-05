@@ -53,7 +53,9 @@ public class JarLibrary extends Library
 		String internalName = ClassFormat.packageToInternal(name);
 		if (this.packages.contains(internalName))
 		{
-			return new ExternalPackage(Package.rootPackage, name, this);
+			ExternalPackage pack = new ExternalPackage(Package.rootPackage, name, this);
+			Package.rootPackage.addSubPackage(pack);
+			return pack;
 		}
 		return null;
 	}

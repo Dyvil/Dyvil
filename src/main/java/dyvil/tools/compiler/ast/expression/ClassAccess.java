@@ -82,23 +82,23 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 	}
 	
 	@Override
-	public boolean resolve(IContext context)
+	public boolean resolve(IContext context, IContext context1)
 	{
 		return this.type.isResolved();
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context)
+	public IAccess resolve2(IContext context, IContext context1)
 	{
 		String name = this.type.name;
-		FieldMatch f = context.resolveField(name, null);
+		FieldMatch f = context.resolveField(context1, name);
 		if (f != null)
 		{
 			FieldAccess access = new FieldAccess(this.position, null, name);
 			access.field = f.theField;
 			return access;
 		}
-		MethodMatch m = context.resolveMethod(name, null, Type.EMPTY_TYPES);
+		MethodMatch m = context.resolveMethod(context1, name, Type.EMPTY_TYPES);
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position, null, name);

@@ -20,7 +20,7 @@ public interface IContext
 	
 	public IClass resolveClass(String name);
 	
-	public FieldMatch resolveField(String name, Type type);
+	public FieldMatch resolveField(IContext context, String name);
 	
-	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes);
+	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes);
 }

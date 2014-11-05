@@ -73,11 +73,11 @@ public class ClassBody extends ASTObject
 		return null;
 	}
 	
-	public void getMethodMatches(List<MethodMatch> list, String name, Type... args)
+	public void getMethodMatches(List<MethodMatch> list, Type type, String name, Type... argumentTypes)
 	{
 		for (IMethod method : this.methods)
 		{
-			int match = method.getSignatureMatch(name, args);
+			int match = method.getSignatureMatch(name, type, argumentTypes);
 			if (match > 0)
 			{
 				list.add(new MethodMatch(method, match));

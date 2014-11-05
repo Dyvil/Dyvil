@@ -110,9 +110,9 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public boolean resolve(IContext context)
+	public boolean resolve(IContext context, IContext context1)
 	{
-		MethodMatch match = context.resolveMethod(this.qualifiedName, null, this.getTypes());
+		MethodMatch match = context.resolveMethod(context1, this.qualifiedName, this.getTypes());
 		if (match != null)
 		{
 			this.method = match.theMethod;
@@ -122,11 +122,11 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context)
+	public IAccess resolve2(IContext context, IContext context1)
 	{
 		if (this.arguments.isEmpty())
 		{
-			FieldMatch f = context.resolveField(this.qualifiedName, null);
+			FieldMatch f = context.resolveField(context1, this.qualifiedName);
 			if (f != null)
 			{
 				FieldAccess access = new FieldAccess(this.position, this.instance, this.qualifiedName);

@@ -1,20 +1,20 @@
 package dyvil.tools.compiler.ast.classes;
 
+import java.util.List;
+
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.ClassFormat;
 
 public class BytecodeClass extends CodeClass
 {
-	public boolean	fieldsResolved;
-	public boolean	methodsResolved;
+	public boolean	typesResolved;
 	
 	public BytecodeClass()
 	{
@@ -32,31 +32,36 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name, Type type)
+	public FieldMatch resolveField(IContext context, String name)
 	{
-		if (!this.fieldsResolved)
+		if (!this.typesResolved)
 		{
-			for (IField field : this.body.fields)
-			{
-				field.applyState(CompilerState.RESOLVE_TYPES, this);
-			}
-			this.fieldsResolved = true;
+			this.applyState(CompilerState.RESOLVE_TYPES, Package.rootPackage);
+			this.typesResolved = true;
 		}
-		return super.resolveField(name, type);
+		return super.resolveField(context, name);
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
 	{
-		if (!this.methodsResolved)
+		if (!this.typesResolved)
 		{
-			for (IMethod method : this.body.methods)
-			{
-				method.applyState(CompilerState.RESOLVE_TYPES, this);
-			}
-			this.methodsResolved = true;
+			this.applyState(CompilerState.RESOLVE_TYPES, Package.rootPackage);
+			this.typesResolved = true;
 		}
-		return super.resolveMethod(name, returnType, argumentTypes);
+		return super.resolveMethod(returnType, name, argumentTypes);
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, Type type, String name, Type... argumentTypes)
+	{
+		if (!this.typesResolved)
+		{
+			this.applyState(CompilerState.RESOLVE_TYPES, Package.rootPackage);
+			this.typesResolved = true;
+		}
+		super.getMethodMatches(list, type, name, argumentTypes);
 	}
 	
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)

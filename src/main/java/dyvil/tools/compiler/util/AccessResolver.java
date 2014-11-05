@@ -37,9 +37,9 @@ public class AccessResolver
 				}
 			}
 			
-			if (!iaccess.resolve(context1))
+			if (!iaccess.resolve(context1, context))
 			{
-				IAccess iaccess2 = iaccess.resolve2(context1);
+				IAccess iaccess2 = iaccess.resolve2(context1, context);
 				if (iaccess2 == iaccess)
 				{
 					markers.add(iaccess.getResolveError());

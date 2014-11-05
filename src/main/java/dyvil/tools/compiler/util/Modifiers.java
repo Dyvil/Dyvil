@@ -71,6 +71,7 @@ public enum Modifiers
 					m = readMethodModifier(mod);
 				}
 			}
+			break;
 		case FIELD:
 			if ((m = readAccessModifier(mod)) == -1)
 			{

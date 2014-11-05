@@ -181,13 +181,13 @@ public class Package implements IContext
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name, Type type)
+	public FieldMatch resolveField(IContext context, String name)
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
 	{
 		throw new UnsupportedOperationException();
 	}

@@ -21,14 +21,14 @@ public class ConstructorCall extends Call implements ITyped
 	}
 	
 	@Override
-	public boolean resolve(IContext context)
+	public boolean resolve(IContext context, IContext context1)
 	{
 		// TODO
 		return false;
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context)
+	public IAccess resolve2(IContext context, IContext context1)
 	{
 		return this;
 	}

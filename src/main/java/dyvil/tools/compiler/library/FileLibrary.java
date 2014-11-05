@@ -26,7 +26,9 @@ public class FileLibrary extends Library
 		File file = new File(this.file, ClassFormat.packageToInternal(name));
 		if (file.exists())
 		{
-			return new ExternalPackage(Package.rootPackage, name, this);
+			ExternalPackage pack = new ExternalPackage(Package.rootPackage, name, this);
+			Package.rootPackage.addSubPackage(pack);
+			return pack;
 		}
 		return null;
 	}

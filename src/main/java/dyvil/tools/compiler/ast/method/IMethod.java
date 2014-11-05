@@ -7,6 +7,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.util.Modifiers;
 
 public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParameterized, IContext
 {
@@ -17,27 +18,52 @@ public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParame
 	
 	public void setParametersCloseBracket(String bracket);
 	
-	public default int getSignatureMatch(String name, Type... types)
+	public default int getSignatureMatch(String name, Type type, Type... argumentTypes)
 	{
 		if (name.equals(this.getName()))
 		{
+			int pOff = 0;
+			int match = 1;
+			int len = argumentTypes.length;
 			List<Parameter> parameters = this.getParameters();
 			
-			if (parameters.size() != types.length)
+			if (type != null && this.hasModifier(Modifiers.IMPLICIT))
+			{
+				if (len != parameters.size() - 1)
+				{
+					return 0;
+				}
+				
+				Type t2 = parameters.get(0).type;
+				if (type.equals(t2))
+				{
+					match += 2;
+				}
+				else if (Type.isSuperType(type, t2))
+				{
+					match += 1;
+				}
+				else
+				{
+					return 0;
+				}
+				
+				pOff = 1;
+			}
+			else if (len != argumentTypes.length)
 			{
 				return 0;
 			}
 			
-			int match = 1;
-			for (int i = 0; i < types.length; i++)
+			for (int i = 0; i < len; i++)
 			{
-				Type t1 = parameters.get(i).type;
-				Type t2 = types[i];
+				Type t1 = parameters.get(i + pOff).type;
+				Type t2 = argumentTypes[i];
 				if (t1.equals(t2))
-				{	
+				{
 					match += 2;
 				}
-				else if (Type.isSuperType(t1, types[i]))
+				else if (Type.isSuperType(t1, t2))
 				{
 					match += 1;
 				}

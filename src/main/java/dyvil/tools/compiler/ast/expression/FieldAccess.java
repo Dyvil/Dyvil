@@ -108,9 +108,9 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	}
 	
 	@Override
-	public boolean resolve(IContext context)
+	public boolean resolve(IContext context, IContext context1)
 	{
-		FieldMatch f = context.resolveField(this.qualifiedName, null);
+		FieldMatch f = context.resolveField(context1, this.qualifiedName);
 		if (f != null)
 		{
 			this.field = f.theField;
@@ -120,9 +120,9 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context)
+	public IAccess resolve2(IContext context, IContext context1)
 	{
-		MethodMatch match = context.resolveMethod(this.qualifiedName, null, Type.EMPTY_TYPES);
+		MethodMatch match = context.resolveMethod(context1, this.qualifiedName, Type.EMPTY_TYPES);
 		if (match != null)
 		{
 			MethodCall call = new MethodCall(this.position, this.instance, this.qualifiedName);

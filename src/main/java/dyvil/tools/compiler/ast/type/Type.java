@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -33,6 +37,7 @@ public class Type extends ASTObject implements IContext
 	public static Type		STRING		= new StringType("java.lang.String");
 	
 	public String			name;
+	public String			qualifiedName;
 	public IClass			theClass;
 	public char				seperator;
 	public int				arrayDimensions;
@@ -43,23 +48,27 @@ public class Type extends ASTObject implements IContext
 	public Type(String name)
 	{
 		this.name = name;
+		this.qualifiedName = name;
 	}
 	
 	public Type(String name, IClass iclass)
 	{
 		this.name = name;
+		this.qualifiedName = name;
 		this.theClass = iclass;
 	}
 	
 	public Type(String name, ICodePosition position)
 	{
 		this.name = name;
+		this.qualifiedName = name;
 		this.position = position;
 	}
 	
 	public Type(String name, IClass iclass, ICodePosition position)
 	{
 		this.name = name;
+		this.qualifiedName = name;
 		this.theClass = iclass;
 		this.position = position;
 	}
@@ -152,7 +161,7 @@ public class Type extends ASTObject implements IContext
 	
 	public String getInternalName()
 	{
-		return this.theClass == null ? ClassFormat.packageToInternal(this.name) : this.theClass.getInternalName();
+		return this.theClass == null ? ClassFormat.packageToInternal(this.qualifiedName) : this.theClass.getInternalName();
 	}
 	
 	public final String getExtendedName()
@@ -201,7 +210,13 @@ public class Type extends ASTObject implements IContext
 				return STRING;
 			}
 			
-			this.theClass = context.resolveClass(this.name);
+			IClass iclass = context.resolveClass(this.name);
+			
+			if (iclass != null)
+			{
+				this.theClass = iclass;
+				this.qualifiedName = iclass.getName();
+			}
 		}
 		return this;
 	}
@@ -236,19 +251,47 @@ public class Type extends ASTObject implements IContext
 	@Override
 	public IClass resolveClass(String name)
 	{
+		if (this.theClass == null)
+		{
+			return null;
+		}
 		return this.theClass.resolveClass(name);
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name, Type type)
+	public FieldMatch resolveField(IContext context, String name)
 	{
-		return this.theClass.resolveField(name, type);
+		if (this.theClass == null)
+		{
+			return null;
+		}
+		return this.theClass.resolveField(context, name);
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
 	{
-		return this.theClass.resolveMethod(name, returnType, argumentTypes);
+		if (this.theClass == null || argumentTypes == null)
+		{
+			return null;
+		}
+		
+		List<MethodMatch> list = new ArrayList();
+		this.theClass.getMethodMatches(list, null, name, argumentTypes);
+		
+		if (list.isEmpty())
+		{
+			Type t = context.getThisType();
+			t.theClass.getMethodMatches(list, this, name, argumentTypes);
+		}
+		
+		if (list.isEmpty())
+		{
+			return null;
+		}
+		
+		Collections.sort(list);
+		return list.get(0);
 	}
 	
 	@Override
@@ -300,14 +343,18 @@ public class Type extends ASTObject implements IContext
 		{
 			return false;
 		}
-		if (this.name == null)
+		if (this.theClass != null && this.theClass == other.theClass)
 		{
-			if (other.name != null)
+			return true;
+		}
+		if (this.qualifiedName == null)
+		{
+			if (other.qualifiedName != null)
 			{
 				return false;
 			}
 		}
-		else if (!this.name.equals(other.name))
+		else if (!this.qualifiedName.equals(other.qualifiedName))
 		{
 			return false;
 		}

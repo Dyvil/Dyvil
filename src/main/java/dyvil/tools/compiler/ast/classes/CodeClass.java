@@ -210,7 +210,7 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name, Type type)
+	public FieldMatch resolveField(IContext context, String name)
 	{
 		// Own fields
 		IField field = this.body.getField(name);
@@ -225,7 +225,7 @@ public class CodeClass extends ASTObject implements IClass
 		// Inherited Fields
 		if (this.superClass != null && this.superClass.theClass != null && this != predef)
 		{
-			match = this.superClass.resolveField(name, type);
+			match = this.superClass.resolveField(context, name);
 			if (match != null)
 			{
 				return match;
@@ -234,7 +234,7 @@ public class CodeClass extends ASTObject implements IClass
 		
 		for (Type type1 : this.interfaces)
 		{
-			match = type1.resolveField(name, type);
+			match = type1.resolveField(context, name);
 			if (match != null)
 			{
 				return match;
@@ -244,7 +244,7 @@ public class CodeClass extends ASTObject implements IClass
 		// Predef
 		if (this != predef)
 		{
-			match = predef.resolveField(name, type);
+			match = predef.resolveField(context, name);
 			if (match != null)
 			{
 				return match;
@@ -255,7 +255,7 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
 	{
 		if (argumentTypes == null)
 		{
@@ -263,18 +263,21 @@ public class CodeClass extends ASTObject implements IClass
 		}
 		
 		List<MethodMatch> list = new ArrayList();
-		this.getMethodMatches(list, name, returnType, argumentTypes);
+		this.getMethodMatches(list, null, name, argumentTypes);
 		Collections.sort(list);
 		
-		// TODO Static, Accessibility, Ambiguity
+		if (!list.isEmpty())
+		{
+			return list.get(0);
+		}
 		
-		return list.isEmpty() ? null : list.get(0);
+		return null;
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, String name, Type returnType, Type... types)
+	public void getMethodMatches(List<MethodMatch> list, Type type, String name, Type... argumentTypes)
 	{
-		this.body.getMethodMatches(list, name, types);
+		this.body.getMethodMatches(list, type, name, argumentTypes);
 		
 		if (!list.isEmpty())
 		{
@@ -285,16 +288,16 @@ public class CodeClass extends ASTObject implements IClass
 		
 		if (this.superClass != null && this.superClass.theClass != null && this != predef)
 		{
-			this.superClass.theClass.getMethodMatches(list, name, returnType, types);
+			this.superClass.theClass.getMethodMatches(list, type, name, argumentTypes);
 		}
-		for (Type type : this.interfaces)
+		for (Type type1 : this.interfaces)
 		{
-			type.theClass.getMethodMatches(list, name, returnType, types);
+			type1.theClass.getMethodMatches(list, type, name, argumentTypes);
 		}
 		
 		if (list.isEmpty() && this != predef)
 		{
-			predef.getMethodMatches(list, name, returnType, types);
+			predef.getMethodMatches(list, type, name, argumentTypes);
 		}
 	}
 	

@@ -99,13 +99,13 @@ public class SimpleImport extends ASTObject implements IImport
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name, Type type)
+	public FieldMatch resolveField(IContext context, String name)
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
 	{
 		throw new UnsupportedOperationException();
 	}

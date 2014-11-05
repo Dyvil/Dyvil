@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.type;
 
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.IContext;
 
 public class StringType extends Type
 {
@@ -10,13 +11,13 @@ public class StringType extends Type
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
 	{
 		if (name.equals("+") && argumentTypes.length == 1)
 		{
-			return this.theClass.resolveMethod("concat", returnType, argumentTypes);
+			return this.theClass.resolveMethod(returnType, "concat", argumentTypes);
 		}
 		
-		return super.resolveMethod(name, returnType, argumentTypes);
+		return super.resolveMethod(returnType, name, argumentTypes);
 	}
 }

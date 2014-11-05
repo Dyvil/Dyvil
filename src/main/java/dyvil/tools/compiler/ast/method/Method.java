@@ -169,7 +169,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name, Type type)
+	public FieldMatch resolveField(IContext context, String name)
 	{
 		for (Parameter param : this.parameters)
 		{
@@ -179,13 +179,13 @@ public class Method extends Member implements IMethod
 			}
 		}
 		
-		return this.theClass.resolveField(name, type);
+		return this.theClass.resolveField(context, name);
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
 	{
-		return this.theClass.resolveMethod(name, returnType, argumentTypes);
+		return this.theClass.resolveMethod(returnType, name, argumentTypes);
 	}
 	
 	@Override
