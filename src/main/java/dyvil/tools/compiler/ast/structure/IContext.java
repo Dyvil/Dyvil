@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.structure;
 
-import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.Type;
 
 public interface IContext
@@ -20,7 +20,7 @@ public interface IContext
 	
 	public IClass resolveClass(String name);
 	
-	public IField resolveField(String name);
+	public FieldMatch resolveField(String name, Type type);
 	
-	public IMethod resolveMethod(String name, Type... args);
+	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes);
 }

@@ -3,11 +3,13 @@ package dyvil.tools.compiler.ast.classes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.ClassFormat;
-import dyvil.tools.compiler.ast.structure.Package;
 
 public class BytecodeClass extends CodeClass
 {
@@ -30,7 +32,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public IField resolveField(String name)
+	public FieldMatch resolveField(String name, Type type)
 	{
 		if (!this.fieldsResolved)
 		{
@@ -40,11 +42,11 @@ public class BytecodeClass extends CodeClass
 			}
 			this.fieldsResolved = true;
 		}
-		return super.resolveField(name);
+		return super.resolveField(name, type);
 	}
 	
 	@Override
-	public IMethod resolveMethod(String name, Type... args)
+	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
 	{
 		if (!this.methodsResolved)
 		{
@@ -54,7 +56,7 @@ public class BytecodeClass extends CodeClass
 			}
 			this.methodsResolved = true;
 		}
-		return super.resolveMethod(name, args);
+		return super.resolveMethod(name, returnType, argumentTypes);
 	}
 	
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)

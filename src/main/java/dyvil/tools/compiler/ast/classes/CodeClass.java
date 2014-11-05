@@ -10,6 +10,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
@@ -209,43 +210,44 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public IField resolveField(String name)
+	public FieldMatch resolveField(String name, Type type)
 	{
 		// Own fields
 		IField field = this.body.getField(name);
 		if (field != null)
 		{
-			return field;
+			return new FieldMatch(field, 1);
 		}
 		
+		FieldMatch match;
 		IClass predef = Type.PREDEF.theClass;
 		
 		// Inherited Fields
 		if (this.superClass != null && this.superClass.theClass != null && this != predef)
 		{
-			field = this.superClass.resolveField(name);
-			if (field != null)
+			match = this.superClass.resolveField(name, type);
+			if (match != null)
 			{
-				return field;
+				return match;
 			}
 		}
 		
-		for (Type type : this.interfaces)
+		for (Type type1 : this.interfaces)
 		{
-			field = type.resolveField(name);
-			if (field != null)
+			match = type1.resolveField(name, type);
+			if (match != null)
 			{
-				return field;
+				return match;
 			}
 		}
 		
 		// Predef
 		if (this != predef)
 		{
-			field = predef.resolveField(name);
-			if (field != null)
+			match = predef.resolveField(name, type);
+			if (match != null)
 			{
-				return field;
+				return match;
 			}
 		}
 		
@@ -253,24 +255,24 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public IMethod resolveMethod(String name, Type... args)
+	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
 	{
-		if (args == null)
+		if (argumentTypes == null)
 		{
 			return null;
 		}
 		
 		List<MethodMatch> list = new ArrayList();
-		this.getMethodMatches(list, name, args);
+		this.getMethodMatches(list, name, returnType, argumentTypes);
 		Collections.sort(list);
 		
 		// TODO Static, Accessibility, Ambiguity
 		
-		return list.isEmpty() ? null : list.get(0).theMethod;
+		return list.isEmpty() ? null : list.get(0);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, String name, Type... types)
+	public void getMethodMatches(List<MethodMatch> list, String name, Type returnType, Type... types)
 	{
 		this.body.getMethodMatches(list, name, types);
 		
@@ -283,16 +285,16 @@ public class CodeClass extends ASTObject implements IClass
 		
 		if (this.superClass != null && this.superClass.theClass != null && this != predef)
 		{
-			this.superClass.theClass.getMethodMatches(list, name, types);
+			this.superClass.theClass.getMethodMatches(list, name, returnType, types);
 		}
 		for (Type type : this.interfaces)
 		{
-			type.theClass.getMethodMatches(list, name, types);
+			type.theClass.getMethodMatches(list, name, returnType, types);
 		}
 		
 		if (list.isEmpty() && this != predef)
 		{
-			predef.getMethodMatches(list, name, types);
+			predef.getMethodMatches(list, name, returnType, types);
 		}
 	}
 	

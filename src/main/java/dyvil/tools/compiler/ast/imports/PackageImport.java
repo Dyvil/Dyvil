@@ -2,9 +2,9 @@ package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
-import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
@@ -79,13 +79,13 @@ public class PackageImport extends ASTObject implements IImport
 	}
 	
 	@Override
-	public IField resolveField(String name)
+	public FieldMatch resolveField(String name, Type type)
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	@Override
-	public IMethod resolveMethod(String name, Type... args)
+	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
 	{
 		throw new UnsupportedOperationException();
 	}

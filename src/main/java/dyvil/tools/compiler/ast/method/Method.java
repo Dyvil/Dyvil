@@ -7,8 +7,8 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -169,23 +169,23 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IField resolveField(String name)
+	public FieldMatch resolveField(String name, Type type)
 	{
 		for (Parameter param : this.parameters)
 		{
 			if (param.name.equals(name))
 			{
-				return param;
+				return new FieldMatch(param, 1);
 			}
 		}
 		
-		return this.theClass.resolveField(name);
+		return this.theClass.resolveField(name, type);
 	}
 	
 	@Override
-	public IMethod resolveMethod(String name, Type... args)
+	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
 	{
-		return this.theClass.resolveMethod(name, args);
+		return this.theClass.resolveMethod(name, returnType, argumentTypes);
 	}
 	
 	@Override

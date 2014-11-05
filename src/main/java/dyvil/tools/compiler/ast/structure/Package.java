@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.Dyvilc;
-import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.util.ClassFormat;
@@ -181,13 +181,13 @@ public class Package implements IContext
 	}
 	
 	@Override
-	public IField resolveField(String name)
+	public FieldMatch resolveField(String name, Type type)
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	@Override
-	public IMethod resolveMethod(String name, Type... args)
+	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
 	{
 		throw new UnsupportedOperationException();
 	}

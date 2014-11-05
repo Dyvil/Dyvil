@@ -4,9 +4,10 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IAccess;
-import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -111,8 +112,13 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public boolean resolve(IContext context)
 	{
-		this.method = context.resolveMethod(this.qualifiedName, this.getTypes());
-		return this.method != null;
+		MethodMatch match = context.resolveMethod(this.qualifiedName, null, this.getTypes());
+		if (match != null)
+		{
+			this.method = match.theMethod;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -120,11 +126,11 @@ public class MethodCall extends Call implements INamed, IValued
 	{
 		if (this.arguments.isEmpty())
 		{
-			IField field = context.resolveField(this.qualifiedName);
-			if (field != null)
+			FieldMatch f = context.resolveField(this.qualifiedName, null);
+			if (f != null)
 			{
 				FieldAccess access = new FieldAccess(this.position, this.instance, this.qualifiedName);
-				access.field = field;
+				access.field = f.theField;
 				return access;
 			}
 		}

@@ -16,7 +16,7 @@ public interface IClass extends IASTObject, INamed, IModified, ITyped, ITypeList
 	
 	public boolean isSuperType(Type t);
 	
-	public void getMethodMatches(List<MethodMatch> matches, String name, Type... types);
+	public void getMethodMatches(List<MethodMatch> matches, String name, Type returnType, Type... argumentTypes);
 	
 	// Compilation
 	

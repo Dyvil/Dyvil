@@ -2,9 +2,9 @@ package dyvil.tools.compiler.ast.type;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
-import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
@@ -240,15 +240,15 @@ public class Type extends ASTObject implements IContext
 	}
 	
 	@Override
-	public IField resolveField(String name)
+	public FieldMatch resolveField(String name, Type type)
 	{
-		return this.theClass.resolveField(name);
+		return this.theClass.resolveField(name, type);
 	}
 	
 	@Override
-	public IMethod resolveMethod(String name, Type... args)
+	public MethodMatch resolveMethod(String name, Type returnType, Type... argumentTypes)
 	{
-		return this.theClass.resolveMethod(name, args);
+		return this.theClass.resolveMethod(name, returnType, argumentTypes);
 	}
 	
 	@Override

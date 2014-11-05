@@ -11,7 +11,8 @@ import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -109,18 +110,23 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	@Override
 	public boolean resolve(IContext context)
 	{
-		this.field = context.resolveField(this.qualifiedName);
-		return this.field != null;
+		FieldMatch f = context.resolveField(this.qualifiedName, null);
+		if (f != null)
+		{
+			this.field = f.theField;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
 	public IAccess resolve2(IContext context)
 	{
-		IMethod method = context.resolveMethod(this.qualifiedName, Type.EMPTY_TYPES);
-		if (method != null)
+		MethodMatch match = context.resolveMethod(this.qualifiedName, null, Type.EMPTY_TYPES);
+		if (match != null)
 		{
 			MethodCall call = new MethodCall(this.position, this.instance, this.qualifiedName);
-			call.method = method;
+			call.method = match.theMethod;
 			call.isSugarCall = true;
 			return call;
 		}

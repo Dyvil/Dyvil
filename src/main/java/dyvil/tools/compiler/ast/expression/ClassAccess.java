@@ -6,8 +6,8 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IAccess;
-import dyvil.tools.compiler.ast.api.IField;
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -91,18 +91,18 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 	public IAccess resolve2(IContext context)
 	{
 		String name = this.type.name;
-		IField field = context.resolveField(name);
-		if (field != null)
+		FieldMatch f = context.resolveField(name, null);
+		if (f != null)
 		{
 			FieldAccess access = new FieldAccess(this.position, null, name);
-			access.field = field;
+			access.field = f.theField;
 			return access;
 		}
-		IMethod method = context.resolveMethod(name, Type.EMPTY_TYPES);
-		if (method != null)
+		MethodMatch m = context.resolveMethod(name, null, Type.EMPTY_TYPES);
+		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position, null, name);
-			call.method = method;
+			call.method = m.theMethod;
 			return call;
 		}
 		
