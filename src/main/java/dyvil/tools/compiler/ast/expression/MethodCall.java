@@ -94,10 +94,10 @@ public class MethodCall extends Call implements INamed, IValued
 	public IAccess applyState(CompilerState state, IContext context)
 	{
 		super.applyState(state, context);
+		this.arguments.replaceAll(v -> v.applyState(state, context));
 		
 		if (state == CompilerState.RESOLVE)
 		{
-			this.arguments.replaceAll(v -> v.applyState(state, context));
 			return AccessResolver.resolve(context, this);
 		}
 		else if (this.instance != null)
