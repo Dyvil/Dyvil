@@ -7,7 +7,5 @@ import java.lang.Comparable;
 
 public class Main
 {
-	public static void main(String[] args) = System out println("test" foo);
-	
-	public implicit int foo(String s) = { s.length(); };
+	public static void main(String[] args) = 4 * 5 + 3;
 }

@@ -21,7 +21,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 
-public class ExpressionParser extends Parser implements ITyped
+public class ExpressionParser extends Parser implements ITyped, IValued
 {
 	public static final int	VALUE			= 1;
 	public static final int	VALUE_2			= 2;
@@ -191,7 +191,7 @@ public class ExpressionParser extends Parser implements ITyped
 					call.setSugar(true);
 					this.value = call;
 					
-					ExpressionParser parser = new ExpressionParser(this.context, call);
+					ExpressionParser parser = new ExpressionParser(this.context, this);
 					parser.lazy = true;
 					pm.pushParser(parser);
 					return true;
@@ -305,6 +305,18 @@ public class ExpressionParser extends Parser implements ITyped
 	
 	@Override
 	public Type getType()
+	{
+		return null;
+	}
+
+	@Override
+	public void setValue(IValue value)
+	{
+		((MethodCall) this.value).addValue(value);
+	}
+
+	@Override
+	public IValue getValue()
 	{
 		return null;
 	}

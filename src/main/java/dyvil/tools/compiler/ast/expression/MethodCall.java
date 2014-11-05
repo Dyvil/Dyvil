@@ -65,14 +65,7 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.isSugarCall)
-		{
-			this.arguments.add(value);
-		}
-		else
-		{
-			this.instance = value;
-		}
+		this.instance = value;
 	}
 	
 	@Override
@@ -94,19 +87,23 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public IAccess applyState(CompilerState state, IContext context)
 	{
-		super.applyState(state, context);
-		this.arguments.replaceAll(v -> v.applyState(state, context));
-		
 		if (state == CompilerState.RESOLVE)
 		{
 			return AccessResolver.resolve(context, this);
 		}
-		else if (this.instance != null)
+		else
 		{
-			this.instance = this.instance.applyState(state, context);
+			super.applyState(state, context);
+			
+			if (this.instance != null)
+			{
+				this.instance = this.instance.applyState(state, context);
+			}
+			
+			this.arguments.replaceAll(v -> v.applyState(state, context));
+			
+			return this;
 		}
-		
-		return this;
 	}
 	
 	@Override

@@ -64,7 +64,7 @@ public class Method extends Member implements IMethod
 	@Override
 	public int getSignatureMatch(String name, Type type, Type... argumentTypes)
 	{
-		if (name.equals(this.name))
+		if (name.equals(this.qualifiedName))
 		{
 			int pOff = 0;
 			int match = 1;
