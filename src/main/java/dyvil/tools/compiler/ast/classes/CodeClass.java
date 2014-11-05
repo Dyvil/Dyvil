@@ -68,6 +68,26 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
+	public boolean addModifier(int mod)
+	{
+		boolean flag = (this.modifiers & mod) != 0;
+		this.modifiers |= mod;
+		return flag;
+	}
+	
+	@Override
+	public void removeModifier(int mod)
+	{
+		this.modifiers &= ~mod;
+	}
+	
+	@Override
+	public boolean hasModifier(int mod)
+	{
+		return (this.modifiers & mod) != 0;
+	}
+	
+	@Override
 	public void setName(String name)
 	{
 		this.name = name;

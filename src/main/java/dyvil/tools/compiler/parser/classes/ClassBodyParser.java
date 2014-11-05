@@ -73,8 +73,10 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 		{
 			if ((i = Modifiers.FIELD_OR_METHOD.parse(value)) != -1)
 			{
-				this.field.addModifier(i);
-				this.method.addModifier(i);
+				if (this.field.addModifier(i) | this.method.addModifier(i))
+				{
+					throw new SyntaxError(token, "Duplicate Modifier '" + value + "'", "Remove this Modifier");
+				}
 				return true;
 			}
 			else if (value.indexOf('@') == 0)

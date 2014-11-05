@@ -37,6 +37,10 @@ public class ClassDeclParser extends Parser
 			int i = 0;
 			if ((i = Modifiers.CLASS.parse(value)) != -1)
 			{
+				if ((this.modifiers & i) != 0)
+				{
+					throw new SyntaxError(token, "Duplicate Modifier '" + value + "'", "Remove this Modifier");
+				}
 				this.modifiers |= i;
 				return true;
 			}

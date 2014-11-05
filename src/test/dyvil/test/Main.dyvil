@@ -10,5 +10,5 @@ public class Main
 {
 	public static void main(String[] args) = "test".foo();
 	
-	public static implicit int foo(String s) = { s.length(); };
+	public implicit int foo(String s) = { s.length(); };
 }

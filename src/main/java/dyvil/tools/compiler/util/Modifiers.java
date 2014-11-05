@@ -168,7 +168,7 @@ public enum Modifiers
 	 * a method that can be called on any Object and virtually has the instance
 	 * as the first parameter.
 	 */
-	public static final int	IMPLICIT				= 0x00020000;
+	public static final int	IMPLICIT				= 0x00020000 | STATIC;
 	
 	/**
 	 * Dyvil module modifier. If a class is marked with this modifier, it is a

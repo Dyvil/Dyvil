@@ -85,9 +85,11 @@ public abstract class Member extends ASTObject implements IMember
 	}
 	
 	@Override
-	public void addModifier(int mod)
+	public boolean addModifier(int mod)
 	{
+		boolean flag = (this.modifiers & mod) != 0;
 		this.modifiers |= mod;
+		return flag;
 	}
 	
 	@Override
