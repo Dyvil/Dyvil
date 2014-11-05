@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -197,6 +198,12 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 		if (this.instance != null)
 		{
 			this.instance.write(visitor);
+		}
+		
+		if (this.field instanceof Parameter)
+		{
+			visitor.visitIntInsn(Opcodes.ALOAD, ((Parameter) this.field).index);
+			return;
 		}
 		
 		int opcode;

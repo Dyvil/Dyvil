@@ -26,6 +26,7 @@ public class AccessResolver
 			if (a != null)
 			{
 				context1 = a.getType();
+				iaccess.setValue(a);
 			}
 			else
 			{
@@ -51,7 +52,7 @@ public class AccessResolver
 			a = iaccess;
 		}
 		
-		return access;
+		return a;
 	}
 	
 	public static LinkedList<IAccess> getCallChain(IAccess iaccess)

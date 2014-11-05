@@ -185,7 +185,7 @@ public class ExpressionParser extends Parser implements ITyped
 					this.mode = PARAMETERS;
 					return true;
 				}
-				else if (!next.isType(IToken.TYPE_IDENTIFIER) && !next.isType(IToken.TYPE_CLOSE_BRACKET))
+				else if (!next.isType(IToken.TYPE_IDENTIFIER) && !next.isType(IToken.TYPE_CLOSE_BRACKET) && !next.isType(IToken.TYPE_SYMBOL))
 				{
 					MethodCall call = new MethodCall(token, this.value, value);
 					call.setSugar(true);

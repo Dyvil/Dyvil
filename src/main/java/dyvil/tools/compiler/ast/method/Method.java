@@ -94,7 +94,7 @@ public class Method extends Member implements IMethod
 				
 				pOff = 1;
 			}
-			else if (len != argumentTypes.length)
+			else if (len != this.parameters.size())
 			{
 				return 0;
 			}

@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 
 public class Parameter extends Member implements IField
 {
+	public int index;
 	private char	seperator;
 	
 	public Parameter()
@@ -16,14 +17,15 @@ public class Parameter extends Member implements IField
 		super(null);
 	}
 	
-	public Parameter(String name, Type type, int modifiers)
+	public Parameter(int index, String name, Type type, int modifiers)
 	{
-		this(name, type, modifiers, ',');
+		this(index, name, type, modifiers, ',');
 	}
 	
-	public Parameter(String name, Type type, int modifiers, char seperator)
+	public Parameter(int index, String name, Type type, int modifiers, char seperator)
 	{
 		super(null, name, type, modifiers);
+		this.index = index;
 		this.seperator = seperator;
 	}
 	
