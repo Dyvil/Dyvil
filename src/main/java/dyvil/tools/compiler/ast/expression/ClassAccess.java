@@ -113,7 +113,7 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 	@Override
 	public Marker getResolveError()
 	{
-		return new SyntaxError(this.position, "'" + this.type.name + "' could not be resolved to a type.");
+		return new SyntaxError(this.position, "'" + this.type.name + "' could not be resolved to a type or field");
 	}
 	
 	@Override

@@ -7,6 +7,8 @@ import dyvil.tools.compiler.ast.expression.ClassAccess;
 import dyvil.tools.compiler.ast.expression.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.FieldAccess;
 import dyvil.tools.compiler.ast.expression.MethodCall;
+import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.statement.FieldAssign;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
@@ -14,6 +16,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
@@ -34,6 +37,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int	TYPE			= 128;
 	public static final int	PARAMETERS		= 256;
 	public static final int	PARAMETERS_2	= 512;
+	public static final int	VARIABLE		= 1024;
 	
 	protected IContext		context;
 	protected IValued		field;
@@ -117,7 +121,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			else if (token.isType(IToken.TYPE_IDENTIFIER) && !token.next().isType(Token.TYPE_OPEN_BRACKET))
 			{
-				this.mode = ACCESS;
+				this.mode = ACCESS | VARIABLE;
 				pm.pushParser(new TypeParser(this.context, this), true);
 				return true;
 			}
@@ -156,6 +160,32 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.value = statement;
 				pm.pushParser(new IfStatementParser(this.context, statement));
 				return true;
+			}
+		}
+		if (this.isInMode(VARIABLE))
+		{
+			if (token.isType(Token.TYPE_IDENTIFIER))
+			{
+				IToken next = token.next();
+				boolean flag = next.equals("=");
+				if (flag || next.equals(";"))
+				{
+					ICodePosition pos = token.raw();
+					Type type = ((ClassAccess) this.value).getType();
+					
+					FieldAssign access = new FieldAssign(pos, value, null);
+					access.field = new Variable(pos, value, type);
+					access.initializer = true;
+					this.value = access;
+					
+					if (flag)
+					{
+						pm.skip();
+						pm.pushParser(new ExpressionParser(this.context, access));
+					}
+					
+					return true;
+				}
 			}
 		}
 		if (this.isInMode(ACCESS))
@@ -308,13 +338,13 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setValue(IValue value)
 	{
 		((MethodCall) this.value).addValue(value);
 	}
-
+	
 	@Override
 	public IValue getValue()
 	{

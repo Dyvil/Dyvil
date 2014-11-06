@@ -231,6 +231,8 @@ public class Method extends Member implements IMethod
 	@Override
 	public FieldMatch resolveField(IContext context, String name)
 	{
+		// TODO Variables
+		
 		for (Parameter param : this.parameters)
 		{
 			if (param.name.equals(name))

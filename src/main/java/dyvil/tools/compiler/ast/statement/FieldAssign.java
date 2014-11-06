@@ -1,10 +1,9 @@
-package dyvil.tools.compiler.ast.expression;
+package dyvil.tools.compiler.ast.statement;
 
 import java.util.Collections;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IAccess;
@@ -12,8 +11,6 @@ import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.method.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -27,25 +24,25 @@ import dyvil.tools.compiler.util.AccessResolver;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 
-public class FieldAccess extends ASTObject implements IValue, INamed, IValued, IAccess
+public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
 {
-	protected IValue	instance;
 	protected String	name;
 	protected String	qualifiedName;
 	
-	protected boolean	dotless;
+	public boolean		initializer;
 	
 	public IField		field;
+	protected IValue	value;
 	
-	public FieldAccess(ICodePosition position)
+	public FieldAssign(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public FieldAccess(ICodePosition position, IValue instance, String name)
+	public FieldAssign(ICodePosition position, String name, IValue instance)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.value = instance;
 		this.name = name;
 		this.qualifiedName = Symbols.expand(name);
 	}
@@ -77,49 +74,49 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	@Override
 	public void setValue(IValue value)
 	{
-		this.instance = value;
+		this.value = value;
 	}
 	
 	@Override
 	public IValue getValue()
 	{
-		return this.instance;
+		return this.value;
 	}
 	
 	@Override
 	public void setValues(List<IValue> list)
 	{}
-
+	
 	@Override
 	public List<IValue> getValues()
 	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	@Override
 	public IValue getValue(int index)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void addValue(IValue value)
 	{}
-
+	
 	@Override
 	public void setValue(int index, IValue value)
 	{}
-
+	
 	@Override
 	public void setIsArray(boolean isArray)
 	{}
-
+	
 	@Override
 	public boolean isArray()
 	{
 		return false;
 	}
-
+	
 	@Override
 	public IValue applyState(CompilerState state, IContext context)
 	{
@@ -129,15 +126,15 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 		}
 		else if (state == CompilerState.CHECK)
 		{
-			if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
+			if (this.field.hasModifier(Modifiers.STATIC) && this.value instanceof ThisValue)
 			{
 				state.addMarker(new Warning(this.position, "'" + this.qualifiedName + "' is a static field and should be accessed in a static way"));
-				this.instance = null;
+				this.value = null;
 			}
 		}
-		else if (this.instance != null)
+		else if (this.value != null)
 		{
-			this.instance = this.instance.applyState(state, context);
+			this.value = this.value.applyState(state, context);
 		}
 		return this;
 	}
@@ -145,7 +142,12 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	@Override
 	public boolean resolve(IContext context, IContext context1)
 	{
-		FieldMatch f = context.resolveField(context1, this.qualifiedName);
+		if (this.field != null)
+		{
+			return true;
+		}
+		
+		FieldMatch f = context1.resolveField(null, this.qualifiedName);
 		if (f != null)
 		{
 			this.field = f.theField;
@@ -157,14 +159,6 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	@Override
 	public IAccess resolve2(IContext context, IContext context1)
 	{
-		MethodMatch match = context.resolveMethod(context1, this.qualifiedName, Type.EMPTY_TYPES);
-		if (match != null)
-		{
-			MethodCall call = new MethodCall(this.position, this.instance, this.qualifiedName);
-			call.method = match.theMethod;
-			call.isSugarCall = true;
-			return call;
-		}
 		return this;
 	}
 	
@@ -177,62 +171,24 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	@Override
 	public void write(MethodVisitor visitor)
 	{
-		if (this.instance != null)
-		{
-			this.instance.write(visitor);
-		}
-		
-		if (this.field instanceof Parameter)
-		{
-			visitor.visitIntInsn(Opcodes.ALOAD, ((Parameter) this.field).index);
-			return;
-		}
-		
-		int opcode;
-		if (this.field.hasModifier(Modifiers.STATIC))
-		{
-			opcode = Opcodes.GETSTATIC;
-		}
-		else
-		{
-			opcode = Opcodes.GETFIELD;
-		}
-		
-		String owner = this.field.getTheClass().getInternalName();
-		String name = this.field.getName();
-		String desc = this.field.getDescription();
-		visitor.visitFieldInsn(opcode, owner, name, desc);
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.dotless && !Formatting.Field.convertSugarAccess)
+		if (this.initializer)
 		{
-			if (this.instance != null)
-			{
-				this.instance.toString("", buffer);
-				buffer.append(Formatting.Field.sugarAccessStart);
-			}
+			this.field.toString("", buffer);
 			
-			buffer.append(this.qualifiedName);
+			if (this.value != null)
+			{
+				buffer.append(Formatting.Field.keyValueSeperator);
+				this.value.toString("", buffer);
+			}
 		}
 		else
 		{
-			if (this.instance != null)
-			{
-				this.instance.toString("", buffer);
-				buffer.append('.');
-			}
-			
-			if (Formatting.Method.convertQualifiedNames)
-			{
-				buffer.append(this.qualifiedName);
-			}
-			else
-			{
-				buffer.append(this.name);
-			}
+			buffer.append(this.name);
 		}
 	}
 }

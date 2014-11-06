@@ -7,5 +7,8 @@ import java.lang.Comparable;
 
 public class Main
 {
-	public static void main(String[] args) = 3 + 4 * 5 + 2;
+	public static void main(String[] args) = {
+		int i = 5;
+		i = 4;
+	};
 }

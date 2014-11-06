@@ -134,7 +134,7 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public Marker getResolveError()
 	{
-		return new SemanticError(this.position, "'" + this.qualifiedName + "' could not be resolved to a method");
+		return new SemanticError(this.position, "'" + this.qualifiedName + "' could not be resolved to a method or field");
 	}
 	
 	@Override
