@@ -1,25 +1,30 @@
 package dyvil.tools.compiler.util;
 
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 
 import dyvil.tools.compiler.ast.expression.MethodCall;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public class OperatorComparator implements Comparator<MethodCall>
 {
 	public static OperatorComparator	instance	= new OperatorComparator();
 	
-	private static Object[]				MAP			= { new String[] { "++", "--", "+", "-", "~", "!" }, // unary
-			new String[] { "*", "/", "%" }, // multiplicative
-			new String[] { "+", "-" }, // additive
-			new String[] { "<<", ">>", ">>>" }, // shift
-			new String[] { "<", ">", "<=", ">=" }, // relational
-			new String[] { "<:", ":>" }, // type check
-			new String[] { "==", "!=" }, // equality
-			"&", // bitwise AND
-			"^", // bitwise XOR
-			"|", // bitwise OR
-			"&&", // logical AND
-			"||", // logical OR
+	// private static String[] UNARY = new String[] { "++", "--", "+", "-", "~",
+	// "!" };
+	
+	private static Object[]				MAP			= { new String[] { "$times", "$div", "$percent" }, // multiplicative
+			new String[] { "$plus", "$minus" }, // additive
+			new String[] { "$less$less", "$greater$greater", "$greater$greater$greater" }, // shift
+			new String[] { "$less", "$greater", "$less$eq", "$greater$eq" }, // relational
+			new String[] { "$less$colon", "$colon$greater" }, // type check
+			new String[] { "$eq$eq", "$bang$eq" }, // equality
+			"$amp", // bitwise AND
+			"$up", // bitwise XOR
+			"$bar", // bitwise OR
+			"$amp$amp", // logical AND
+			"$bar$bar", // logical OR
 													};
 	
 	private static int index(String name)
@@ -53,9 +58,30 @@ public class OperatorComparator implements Comparator<MethodCall>
 	@Override
 	public int compare(MethodCall o1, MethodCall o2)
 	{
-		int index1 = index(o1.getName());
-		int index2 = index(o2.getName());
-		return -Integer.compare(index1, index2);
+		int index1 = index(o1.method.getName());
+		int index2 = index(o2.method.getName());
+		return Integer.compare(index1, index2);
 	}
 	
+	public static MethodCall run(MethodCall call)
+	{
+		LinkedList<MethodCall> list = new LinkedList();
+		MethodCall c = call;
+		while (true)
+		{
+			list.addFirst(c);
+			
+			IValue v = c.getValue();
+			if (v instanceof MethodCall)
+			{
+				c = (MethodCall) v;
+				continue;
+			}
+			break;
+		}
+		
+		Collections.sort(list, instance);
+		
+		return list.getLast();
+	}
 }

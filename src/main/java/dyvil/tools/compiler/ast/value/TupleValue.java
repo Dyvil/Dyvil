@@ -35,6 +35,18 @@ public class TupleValue extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
+	public IValue getValue(int index)
+	{
+		return this.values.get(index);
+	}
+	
+	@Override
+	public void setValue(int index, IValue value)
+	{
+		this.values.set(index, value);
+	}
+	
+	@Override
 	public void setIsArray(boolean isArray)
 	{}
 	

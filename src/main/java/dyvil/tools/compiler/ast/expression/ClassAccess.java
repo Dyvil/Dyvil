@@ -129,6 +129,20 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 	}
 	
 	@Override
+	public void addValue(IValue value)
+	{}
+	
+	@Override
+	public IValue getValue(int index)
+	{
+		return null;
+	}
+	
+	@Override
+	public void setValue(int index, IValue value)
+	{}
+	
+	@Override
 	public void write(MethodVisitor visitor)
 	{
 		// TODO

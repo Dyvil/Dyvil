@@ -10,10 +10,11 @@ public interface IValueList
 	
 	public List<IValue> getValues();
 	
-	public default void addValue(IValue value)
-	{
-		this.getValues().add(value);
-	}
+	public IValue getValue(int index);
+	
+	public void addValue(IValue value);
+	
+	public void setValue(int index, IValue value);
 	
 	public void setIsArray(boolean isArray);
 	

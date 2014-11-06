@@ -193,6 +193,20 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	}
 	
 	@Override
+	public IValue getValue(int index)
+	{
+		return null;
+	}
+	
+	@Override
+	public void addValue(IValue value)
+	{}
+	
+	@Override
+	public void setValue(int index, IValue value)
+	{}
+	
+	@Override
 	public void write(MethodVisitor visitor)
 	{
 		if (this.instance != null)

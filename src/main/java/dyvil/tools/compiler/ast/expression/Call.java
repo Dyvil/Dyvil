@@ -57,6 +57,18 @@ public abstract class Call extends ASTObject implements IValue, IValueList, IAcc
 		this.arguments.add(value);
 	}
 	
+	@Override
+	public void setValue(int index, IValue value)
+	{
+		this.arguments.set(index, value);
+	}
+	
+	@Override
+	public IValue getValue(int index)
+	{
+		return this.arguments.get(index);
+	}
+	
 	public Type[] getTypes()
 	{
 		int len = this.arguments.size();

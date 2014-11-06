@@ -51,6 +51,24 @@ public class Annotation extends ASTObject implements ITyped, IValueList
 	}
 	
 	@Override
+	public void addValue(IValue value)
+	{
+		this.parameters.add(value);
+	}
+	
+	@Override
+	public void setValue(int index, IValue value)
+	{
+		this.parameters.set(index, value);
+	}
+	
+	@Override
+	public IValue getValue(int index)
+	{
+		return this.parameters.get(index);
+	}
+	
+	@Override
 	public void setIsArray(boolean isArray)
 	{}
 	
