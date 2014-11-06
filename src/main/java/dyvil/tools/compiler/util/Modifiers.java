@@ -14,6 +14,7 @@ public enum Modifiers
 			break;
 		case CLASS_TYPE:
 			writeClassTypeModifiers(mod, sb);
+			break;
 		case CLASS:
 			writeAccessModifiers(mod, sb);
 			writeClassModifiers(mod, sb);
@@ -25,6 +26,7 @@ public enum Modifiers
 		case FIELD_OR_METHOD:
 			writeAccessModifiers(mod, sb);
 			writeFieldOrMethodModifiers(mod, sb);
+			break;
 		case FIELD:
 			writeAccessModifiers(mod, sb);
 			writeFieldModifiers(mod, sb);
@@ -195,22 +197,22 @@ public enum Modifiers
 	
 	private static void writeAccessModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & PUBLIC) != 0)
+		if ((mod & PUBLIC) == PUBLIC)
 		{
 			sb.append("public ");
 		}
 		
-		if ((mod & DERIVED) != 0)
+		if ((mod & DERIVED) == DERIVED)
 		{
 			sb.append("derived ");
 		}
 		else
 		{
-			if ((mod & PROTECTED) != 0)
+			if ((mod & PROTECTED) == PROTECTED)
 			{
 				sb.append("protected ");
 			}
-			if ((mod & PRIVATE) != 0)
+			if ((mod & PRIVATE) == PRIVATE)
 			{
 				sb.append("private ");
 			}
@@ -223,23 +225,23 @@ public enum Modifiers
 		{
 			sb.append("class ");
 		}
-		else if ((mod & INTERFACE_CLASS) != 0)
+		else if ((mod & INTERFACE_CLASS) == INTERFACE_CLASS)
 		{
 			sb.append("interface ");
 		}
-		else if ((mod & ANNOTATION) != 0)
+		else if ((mod & ANNOTATION) == ANNOTATION)
 		{
 			sb.append("annotation ");
 		}
-		else if ((mod & ENUM_CLASS) != 0)
+		else if ((mod & ENUM_CLASS) == ENUM_CLASS)
 		{
 			sb.append("enum ");
 		}
-		else if ((mod & OBJECT_CLASS) != 0)
+		else if ((mod & OBJECT_CLASS) == OBJECT_CLASS)
 		{
 			sb.append("object ");
 		}
-		else if ((mod & MODULE) != 0)
+		else if ((mod & MODULE) == MODULE)
 		{
 			sb.append("module ");
 		}
@@ -251,19 +253,19 @@ public enum Modifiers
 	
 	private static void writeClassModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & STATIC) != 0)
+		if ((mod & STATIC) == STATIC)
 		{
 			sb.append("static ");
 		}
-		if ((mod & ABSTRACT) != 0)
+		if ((mod & ABSTRACT) == ABSTRACT)
 		{
 			sb.append("abstract ");
 		}
-		if ((mod & FINAL) != 0)
+		if ((mod & FINAL) == FINAL)
 		{
 			sb.append("final ");
 		}
-		if ((mod & STRICT) != 0)
+		if ((mod & STRICT) == STRICT)
 		{
 			sb.append("strictfp ");
 		}
@@ -271,15 +273,15 @@ public enum Modifiers
 	
 	private static void writeInterfaceModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & STATIC) != 0)
+		if ((mod & STATIC) == STATIC)
 		{
 			sb.append("static ");
 		}
-		if ((mod & ABSTRACT) != 0)
+		if ((mod & ABSTRACT) == ABSTRACT)
 		{
 			sb.append("abstract ");
 		}
-		if ((mod & STRICT) != 0)
+		if ((mod & STRICT) == STRICT)
 		{
 			sb.append("strictfp ");
 		}
@@ -287,45 +289,45 @@ public enum Modifiers
 	
 	private static void writeFieldOrMethodModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & STATIC) != 0)
+		if ((mod & STATIC) == STATIC)
 		{
 			sb.append("static ");
 		}
-		if ((mod & FINAL) != 0)
+		if ((mod & FINAL) == FINAL)
 		{
 			sb.append("final ");
 		}
 		
-		if ((mod & TRANSIENT) != 0)
+		if ((mod & TRANSIENT) == TRANSIENT)
 		{
 			sb.append("transient ");
 		}
-		if ((mod & VOLATILE) != 0)
+		if ((mod & VOLATILE) == VOLATILE)
 		{
 			sb.append("volatile ");
 		}
-		if ((mod & LAZY) != 0)
+		if ((mod & LAZY) == LAZY)
 		{
 			sb.append("lazy ");
 		}
 		
-		if ((mod & SYNCHRONIZED) != 0)
+		if ((mod & SYNCHRONIZED) == SYNCHRONIZED)
 		{
 			sb.append("synchronized ");
 		}
-		if ((mod & NATIVE) != 0)
+		if ((mod & NATIVE) == NATIVE)
 		{
 			sb.append("native ");
 		}
-		if ((mod & STRICT) != 0)
+		if ((mod & STRICT) == STRICT)
 		{
 			sb.append("strictfp ");
 		}
-		if ((mod & INLINE) != 0)
+		if ((mod & INLINE) == INLINE)
 		{
 			sb.append("inline ");
 		}
-		if ((mod & IMPLICIT) != 0)
+		if ((mod & IMPLICIT) == IMPLICIT)
 		{
 			sb.append("implicit ");
 		}
@@ -333,31 +335,31 @@ public enum Modifiers
 	
 	private static void writeFieldModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & CONST) != 0)
+		if ((mod & CONST) == CONST)
 		{
 			sb.append("const ");
 		}
 		else
 		{
-			if ((mod & STATIC) != 0)
+			if ((mod & STATIC) == STATIC)
 			{
 				sb.append("static ");
 			}
-			if ((mod & FINAL) != 0)
+			if ((mod & FINAL) == FINAL)
 			{
 				sb.append("final ");
 			}
 		}
 		
-		if ((mod & TRANSIENT) != 0)
+		if ((mod & TRANSIENT) == TRANSIENT)
 		{
 			sb.append("transient ");
 		}
-		if ((mod & VOLATILE) != 0)
+		if ((mod & VOLATILE) == VOLATILE)
 		{
 			sb.append("volatile ");
 		}
-		if ((mod & LAZY) != 0)
+		if ((mod & LAZY) == LAZY)
 		{
 			sb.append("lazy ");
 		}
@@ -365,32 +367,32 @@ public enum Modifiers
 	
 	private static void writeMethodModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & STATIC) != 0)
+		if ((mod & STATIC) == STATIC)
 		{
 			sb.append("static ");
 		}
-		if ((mod & FINAL) != 0)
+		if ((mod & FINAL) == FINAL)
 		{
 			sb.append("final ");
 		}
 		
-		if ((mod & SYNCHRONIZED) != 0)
+		if ((mod & SYNCHRONIZED) == SYNCHRONIZED)
 		{
 			sb.append("synchronized ");
 		}
-		if ((mod & NATIVE) != 0)
+		if ((mod & NATIVE) == NATIVE)
 		{
 			sb.append("native ");
 		}
-		if ((mod & STRICT) != 0)
+		if ((mod & STRICT) == STRICT)
 		{
 			sb.append("strictfp ");
 		}
-		if ((mod & INLINE) != 0)
+		if ((mod & INLINE) == INLINE)
 		{
 			sb.append("inline ");
 		}
-		if ((mod & IMPLICIT) != 0)
+		if ((mod & IMPLICIT) == IMPLICIT)
 		{
 			sb.append("implicit ");
 		}
@@ -398,11 +400,11 @@ public enum Modifiers
 	
 	private static void writeParameterModifier(int mod, StringBuilder sb)
 	{
-		if ((mod & FINAL) != 0)
+		if ((mod & FINAL) == FINAL)
 		{
 			sb.append("final ");
 		}
-		if ((mod & BYREF) != 0)
+		if ((mod & BYREF) == BYREF)
 		{
 			sb.append("ref ");
 		}
