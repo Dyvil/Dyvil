@@ -14,7 +14,17 @@ import dyvil.tools.compiler.util.Util;
 
 public class TupleValue extends ASTObject implements IValue, IValueList
 {
-	private List<IValue>	values	= new ArrayList(3);
+	private List<IValue>	values;
+	
+	public TupleValue()
+	{
+		this.values = new ArrayList(3);
+	}
+	
+	public TupleValue(List<IValue> values)
+	{
+		this.values = values;
+	}
 	
 	@Override
 	public void setValues(List<IValue> list)

@@ -18,10 +18,9 @@ import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
-import dyvil.tools.compiler.lexer.marker.Warning;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.AccessResolver;
-import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 
 public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
@@ -126,9 +125,9 @@ public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
 		}
 		else if (state == CompilerState.CHECK)
 		{
-			if (this.field.hasModifier(Modifiers.STATIC) && this.value instanceof ThisValue)
+			if (this.value instanceof ThisValue)
 			{
-				state.addMarker(new Warning(this.position, "'" + this.qualifiedName + "' is a static field and should be accessed in a static way"));
+				state.addMarker(new SyntaxError(this.position, "Cannot assign a value to 'this'"));
 				this.value = null;
 			}
 		}
@@ -179,16 +178,16 @@ public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
 		if (this.initializer)
 		{
 			this.field.toString("", buffer);
-			
-			if (this.value != null)
-			{
-				buffer.append(Formatting.Field.keyValueSeperator);
-				this.value.toString("", buffer);
-			}
 		}
 		else
 		{
 			buffer.append(this.name);
+		}
+		
+		if (this.value != null)
+		{
+			buffer.append(Formatting.Field.keyValueSeperator);
+			this.value.toString("", buffer);
 		}
 	}
 }
