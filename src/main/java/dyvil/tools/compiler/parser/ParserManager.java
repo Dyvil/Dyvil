@@ -16,6 +16,7 @@ public class ParserManager
 	protected TokenIterator	tokens;
 	protected IToken		currentToken;
 	protected IToken		jumpBackToken;
+	protected int			skip;
 	
 	public ParserManager()
 	{
@@ -89,8 +90,15 @@ public class ParserManager
 			tokens.reset();
 			while (tokens.hasNext())
 			{
-				Parser parser = this.currentParser;
 				token = this.currentToken = tokens.next();
+				
+				if (this.skip > 0)
+				{
+					this.skip--;
+					continue;
+				}
+				
+				Parser parser = this.currentParser;
 				try
 				{
 					this.parseToken(parser, token);
@@ -163,6 +171,16 @@ public class ParserManager
 		{
 			throw new SyntaxError(token, "Invalid token '" + value + "'", "Delete this token");
 		}
+	}
+	
+	public void skip()
+	{
+		this.skip++;
+	}
+	
+	public void skip(int tokens)
+	{
+		this.skip += tokens;
 	}
 	
 	public void pushTryParser(Parser parser, IToken token)
