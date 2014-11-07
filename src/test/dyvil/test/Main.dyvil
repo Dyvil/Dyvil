@@ -10,14 +10,7 @@ public class Main
 	public static String str = null;
 	
 	public static void main(String[] args) = {
-		str = "Hello";
+		str = new String("test");
 		System.out.println(str);
-		str = "World";
-		System.out.println(str);
-		System.out.println();
-		String s = "Dyvil now has";
-		System.out.println(s);
-		s = "Variables";
-		System.out.println(s);
 	};
 }

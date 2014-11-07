@@ -235,7 +235,7 @@ public class Method extends Member implements IMethod
 				visitor.visitLocalVariable(name, desc, signature, var.start, var.end, var.index);
 			}
 			
-			visitor.visitMaxs(10, index + 1);
+			visitor.visitMaxs(10, index);
 			visitor.visitEnd();
 		}
 	}
