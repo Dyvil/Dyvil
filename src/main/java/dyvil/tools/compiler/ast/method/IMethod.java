@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
-public interface IMethod extends IASTObject, IMember, IValued, IThrower, IParameterized, IContext
+public interface IMethod extends IASTObject, IMember, IValued, IThrower, IVariableList, IParameterized, IContext
 {
 	@Override
 	public IMethod applyState(CompilerState state, IContext context);

@@ -2,6 +2,8 @@ package dyvil.tools.compiler.ast.field;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.FieldVisitor;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -65,6 +67,44 @@ public class Field extends Member implements IField
 	{
 		// TODO static fields initial value
 		FieldVisitor visitor = writer.visitField(this.modifiers, this.name, this.getDescription(), this.type.getSignature(), null);
+	}
+	
+	@Override
+	public void writeGet(MethodVisitor visitor)
+	{
+		int opcode;
+		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
+		{
+			opcode = Opcodes.GETSTATIC;
+		}
+		else
+		{
+			opcode = Opcodes.GETFIELD;
+		}
+		
+		String owner = this.getTheClass().getInternalName();
+		String name = this.name;
+		String desc = this.type.getExtendedName();
+		visitor.visitFieldInsn(opcode, owner, name, desc);
+	}
+	
+	@Override
+	public void writeSet(MethodVisitor visitor)
+	{
+		int opcode;
+		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
+		{
+			opcode = Opcodes.PUTSTATIC;
+		}
+		else
+		{
+			opcode = Opcodes.PUTFIELD;
+		}
+		
+		String owner = this.getTheClass().getInternalName();
+		String name = this.name;
+		String desc = this.type.getExtendedName();
+		visitor.visitFieldInsn(opcode, owner, name, desc);
 	}
 	
 	@Override

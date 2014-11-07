@@ -9,6 +9,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -25,6 +26,8 @@ public class Method extends Member implements IMethod
 	private List<Type>		throwsDeclarations	= new ArrayList(1);
 	
 	private IValue			statement;
+	
+	private List<Variable>	variables			= new ArrayList(5);
 	
 	public Method(IClass iclass)
 	{
@@ -53,6 +56,12 @@ public class Method extends Member implements IMethod
 	public void addParameter(Parameter parameter)
 	{
 		this.parameters.add(parameter);
+	}
+	
+	@Override
+	public void addVariable(Variable variable)
+	{
+		this.variables.add(variable);
 	}
 	
 	@Override
@@ -197,17 +206,38 @@ public class Method extends Member implements IMethod
 		int index = 0;
 		for (Parameter param : this.parameters)
 		{
-			visitor.visitParameter(param.name, index++);
+			param.index = index++;
+			visitor.visitParameter(param.name, index);
 		}
 		
 		if (this.statement != null)
 		{
-			this.statement.write(visitor);
+			visitor.visitCode();
+			
+			for (Variable var : this.variables)
+			{
+				var.index = index++;
+			}
+			
+			if (this.statement != null)
+			{
+				this.statement.write(visitor);
+			}
+			
+			// TODO Actual values -.-
+			visitor.visitInsn(Opcodes.RETURN);
+			
+			for (Variable var : this.variables)
+			{
+				String name = var.qualifiedName;
+				String desc = var.getDescription();
+				String signature = var.getSignature();
+				visitor.visitLocalVariable(name, desc, signature, var.start, var.end, var.index);
+			}
+			
+			visitor.visitMaxs(10, index + 1);
+			visitor.visitEnd();
 		}
-		
-		// TODO Actual values -.-
-		visitor.visitInsn(Opcodes.RETURN);
-		visitor.visitMaxs(10, index + 1);
 	}
 	
 	@Override

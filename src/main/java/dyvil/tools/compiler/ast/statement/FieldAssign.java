@@ -30,6 +30,7 @@ public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
 	
 	public boolean		initializer;
 	
+	public IValue		instance;
 	public IField		field;
 	protected IValue	value;
 	
@@ -41,7 +42,7 @@ public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
 	public FieldAssign(ICodePosition position, String name, IValue instance)
 	{
 		this.position = position;
-		this.value = instance;
+		this.instance = instance;
 		this.name = name;
 		this.qualifiedName = Symbols.expand(name);
 	}
@@ -119,7 +120,11 @@ public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
 	@Override
 	public IValue applyState(CompilerState state, IContext context)
 	{
-		if (state == CompilerState.RESOLVE)
+		if (state == CompilerState.RESOLVE_TYPES && this.initializer)
+		{
+			this.field.applyState(state, context);
+		}
+		else if (state == CompilerState.RESOLVE)
 		{
 			return AccessResolver.resolve(context, this);
 		}
@@ -170,6 +175,17 @@ public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
 	@Override
 	public void write(MethodVisitor visitor)
 	{
+		if (this.value != null)
+		{
+			if (this.instance != null)
+			{
+				this.instance.write(visitor);
+			}
+			
+			this.value.write(visitor);
+			
+			this.field.writeSet(visitor);
+		}
 	}
 	
 	@Override
@@ -181,6 +197,12 @@ public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
 		}
 		else
 		{
+			if (this.instance != null)
+			{
+				this.instance.toString("", buffer);
+				buffer.append('.');
+			}
+			
 			buffer.append(this.name);
 		}
 		

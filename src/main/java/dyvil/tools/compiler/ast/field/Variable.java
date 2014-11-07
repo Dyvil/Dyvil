@@ -1,6 +1,11 @@
 package dyvil.tools.compiler.ast.field;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.Label;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+
+import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
+
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.Member;
@@ -11,6 +16,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Variable extends Member implements IField
 {
+	public int index;
+	
+	public Label start;
+	public Label end;
+	
 	public Variable()
 	{
 		super(null);
@@ -47,15 +57,27 @@ public class Variable extends Member implements IField
 	{}
 	
 	@Override
+	public void writeGet(MethodVisitor visitor)
+	{
+		visitor.visitIntInsn(Opcodes.ALOAD, this.index);
+	}
+	
+	@Override
+	public void writeSet(MethodVisitor visitor)
+	{
+		visitor.visitIntInsn(Opcodes.ASTORE, this.index);
+	}
+	
+	@Override
 	public String getDescription()
 	{
-		return null;
+		return this.type.getExtendedName();
 	}
 	
 	@Override
 	public String getSignature()
 	{
-		return null;
+		return this.type.getSignature();
 	}
 	
 	@Override

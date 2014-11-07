@@ -119,7 +119,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.pushParser(new TypeParser(this.context, call));
 				return true;
 			}
-			else if (token.isType(IToken.TYPE_IDENTIFIER) && !token.next().isType(Token.TYPE_OPEN_BRACKET))
+			else if ((token.isType(IToken.TYPE_IDENTIFIER) || token.equals("(")) && !token.next().isType(Token.TYPE_OPEN_BRACKET))
 			{
 				this.mode = ACCESS | VARIABLE;
 				pm.pushParser(new TypeParser(this.context, this), true);
@@ -193,6 +193,31 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (".".equals(value))
 			{
 				this.mode = DOT_ACCESS;
+				return true;
+			}
+			
+			if ("=".equals(value))
+			{
+				String name = null;
+				IValue instance = null;
+				if (this.value instanceof ClassAccess)
+				{
+					name = ((ClassAccess) this.value).getName();
+				}
+				else if (this.value instanceof FieldAccess)
+				{
+					FieldAccess fa = (FieldAccess) this.value;
+					name = fa.getName();
+					instance = fa.getValue();
+				}
+				else
+				{
+					return false;
+				}
+				
+				FieldAssign assign = new FieldAssign(this.value.getPosition(), name, instance);
+				this.value = assign;
+				pm.pushParser(new ExpressionParser(this.context, assign));
 				return true;
 			}
 			

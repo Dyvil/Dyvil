@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IAccess;
@@ -13,7 +12,6 @@ import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.method.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -65,13 +63,13 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	@Override
 	public void setName(String name)
 	{
-		this.qualifiedName = name;
+		this.name = name;
 	}
 	
 	@Override
 	public String getName()
 	{
-		return this.qualifiedName;
+		return this.name;
 	}
 	
 	@Override
@@ -182,26 +180,7 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 			this.instance.write(visitor);
 		}
 		
-		if (this.field instanceof Parameter)
-		{
-			visitor.visitIntInsn(Opcodes.ALOAD, ((Parameter) this.field).index);
-			return;
-		}
-		
-		int opcode;
-		if (this.field.hasModifier(Modifiers.STATIC))
-		{
-			opcode = Opcodes.GETSTATIC;
-		}
-		else
-		{
-			opcode = Opcodes.GETFIELD;
-		}
-		
-		String owner = this.field.getTheClass().getInternalName();
-		String name = this.field.getName();
-		String desc = this.field.getDescription();
-		visitor.visitFieldInsn(opcode, owner, name, desc);
+		this.field.writeGet(visitor);
 	}
 
 	@Override

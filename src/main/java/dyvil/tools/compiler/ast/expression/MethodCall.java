@@ -8,12 +8,10 @@ import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.statement.FieldAssign;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.SuperValue;
-import dyvil.tools.compiler.ast.value.TupleValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
@@ -91,12 +89,11 @@ public class MethodCall extends Call implements INamed, IValued
 	{
 		if (state == CompilerState.RESOLVE)
 		{
+			this.arguments.replaceAll(v -> v.applyState(state, context));
 			return AccessResolver.resolve(context, this);
 		}
 		else
 		{
-			super.applyState(state, context);
-			
 			if (this.instance != null)
 			{
 				this.instance = this.instance.applyState(state, context);
@@ -133,14 +130,6 @@ public class MethodCall extends Call implements INamed, IValued
 				return access;
 			}
 		}
-		else if (this.qualifiedName.equals("$eq"))
-		{
-			if (this.instance instanceof FieldAccess)
-			{
-				FieldAccess access = (FieldAccess) this.instance;
-				return new FieldAssign(access.getPosition().to(this.position), access.name, this.argumentsToValue());
-			}
-		}
 		return this;
 	}
 	
@@ -148,19 +137,6 @@ public class MethodCall extends Call implements INamed, IValued
 	public Marker getResolveError()
 	{
 		return new SemanticError(this.position, "'" + this.qualifiedName + "' could not be resolved to a method or field");
-	}
-	
-	public IValue argumentsToValue()
-	{
-		int len = this.arguments.size();
-		if (len == 1)
-		{
-			return this.arguments.get(0);
-		}
-		else
-		{
-			return new TupleValue(this.arguments);
-		}
 	}
 	
 	@Override

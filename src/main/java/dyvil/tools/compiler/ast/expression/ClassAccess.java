@@ -44,6 +44,13 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 		{
 			this.type = this.type.resolve(context);
 		}
+		else if (state == CompilerState.RESOLVE)
+		{
+			if (!this.type.isResolved())
+			{
+				return this.resolve2(context, null);
+			}
+		}
 		return this;
 	}
 	
@@ -60,7 +67,7 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 	@Override
 	public String getName()
 	{
-		return null;
+		return this.type.name;
 	}
 	
 	@Override

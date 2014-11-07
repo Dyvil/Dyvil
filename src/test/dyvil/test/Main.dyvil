@@ -7,8 +7,17 @@ import java.lang.Comparable;
 
 public class Main
 {
+	public static String str = null;
+	
 	public static void main(String[] args) = {
-		int i = 5;
-		i = 4;
+		str = "Hello";
+		System.out.println(str);
+		str = "World";
+		System.out.println(str);
+		System.out.println();
+		String s = "Dyvil now has";
+		System.out.println(s);
+		s = "Variables";
+		System.out.println(s);
 	};
 }

@@ -3,11 +3,15 @@ package dyvil.tools.compiler.ast.statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import jdk.internal.org.objectweb.asm.Label;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.api.IVariableList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
@@ -20,6 +24,8 @@ public class StatementList extends ValueList implements IStatement, IContext
 	private int					resolveIndex;
 	
 	public Map<String, IField>	variables	= new HashMap();
+	public Label				start		= new Label();
+	public Label				end		= new Label();
 	
 	public StatementList(ICodePosition position)
 	{
@@ -44,6 +50,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		else if (state == CompilerState.RESOLVE)
 		{
+			IVariableList variableList = context instanceof IVariableList ? (IVariableList) context : null;
 			for (IValue v : this.values)
 			{
 				if (!(v instanceof FieldAssign))
@@ -57,7 +64,15 @@ public class StatementList extends ValueList implements IStatement, IContext
 					continue;
 				}
 				
+				Variable var = (Variable) assign.field;
+				var.start = this.start;
+				var.end = this.end;
 				this.variables.put(assign.qualifiedName, assign.field);
+				
+				if (variableList != null)
+				{
+					variableList.addVariable((Variable) assign.field);
+				}
 			}
 		}
 		
@@ -105,5 +120,13 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
 	{
 		return this.context.resolveMethod(context, name, argumentTypes);
+	}
+	
+	@Override
+	public void write(MethodVisitor visitor)
+	{
+		visitor.visitLabel(this.start);
+		super.write(visitor);
+		visitor.visitLabel(this.end);
 	}
 }

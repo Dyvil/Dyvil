@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.method;
 
+import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
+
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -64,6 +67,18 @@ public class Parameter extends Member implements IField
 	@Override
 	public void write(ClassWriter writer)
 	{}
+	
+	@Override
+	public void writeGet(MethodVisitor visitor)
+	{
+		visitor.visitIntInsn(Opcodes.ALOAD, this.index);
+	}
+	
+	@Override
+	public void writeSet(MethodVisitor visitor)
+	{
+		visitor.visitIntInsn(Opcodes.ASTORE, this.index);
+	}
 	
 	@Override
 	public Parameter applyState(CompilerState state, IContext context)
