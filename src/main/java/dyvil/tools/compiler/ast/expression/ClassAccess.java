@@ -38,6 +38,60 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 	}
 	
 	@Override
+	public void setName(String name)
+	{}
+	
+	@Override
+	public String getName()
+	{
+		return this.type.name;
+	}
+	
+	@Override
+	public void setValue(IValue value)
+	{}
+	
+	@Override
+	public IValue getValue()
+	{
+		return null;
+	}
+
+	@Override
+	public void setValues(List<IValue> list)
+	{}
+	
+	@Override
+	public void setValue(int index, IValue value)
+	{}
+
+	@Override
+	public void addValue(IValue value)
+	{}
+
+	@Override
+	public List<IValue> getValues()
+	{
+		return null;
+	}
+
+	@Override
+	public IValue getValue(int index)
+	{
+		return null;
+	}
+
+	@Override
+	public void setArray(boolean array)
+	{}
+	
+	@Override
+	public boolean isArray()
+	{
+		return false;
+	}
+	
+	@Override
 	public IValue applyState(CompilerState state, IContext context)
 	{
 		if (state == CompilerState.RESOLVE_TYPES)
@@ -53,41 +107,7 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 		}
 		return this;
 	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		this.type.toString("", buffer);
-	}
-	
-	@Override
-	public void setName(String name)
-	{}
-	
-	@Override
-	public String getName()
-	{
-		return this.type.name;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{}
-	
-	@Override
-	public void setValues(List<IValue> list)
-	{}
-	
-	@Override
-	public void setIsArray(boolean isArray)
-	{}
-	
-	@Override
-	public boolean isArray()
-	{
-		return false;
-	}
-	
+
 	@Override
 	public boolean resolve(IContext context, IContext context1)
 	{
@@ -124,34 +144,14 @@ public class ClassAccess extends ASTObject implements IValue, IAccess
 	}
 	
 	@Override
-	public IValue getValue()
-	{
-		return null;
-	}
-	
-	@Override
-	public List<IValue> getValues()
-	{
-		return null;
-	}
-	
-	@Override
-	public void addValue(IValue value)
-	{}
-	
-	@Override
-	public IValue getValue(int index)
-	{
-		return null;
-	}
-	
-	@Override
-	public void setValue(int index, IValue value)
-	{}
-	
-	@Override
 	public void write(MethodVisitor visitor)
 	{
 		// TODO
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		this.type.toString("", buffer);
 	}
 }

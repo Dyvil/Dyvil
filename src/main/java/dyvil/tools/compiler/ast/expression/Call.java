@@ -6,8 +6,8 @@ import java.util.List;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.api.IAccess;
+import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.IValueList;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -33,34 +33,27 @@ public abstract class Call extends ASTObject implements IValue, IValueList, IAcc
 	}
 	
 	@Override
-	public IAccess applyState(CompilerState state, IContext context)
-	{
-		this.arguments.replaceAll(a -> a.applyState(state, context));
-		return this;
-	}
-	
-	@Override
 	public void setValues(List<IValue> list)
 	{
 		this.arguments = list;
 	}
 	
 	@Override
-	public List<IValue> getValues()
+	public void setValue(int index, IValue value)
 	{
-		return this.arguments;
+		this.arguments.set(index, value);
 	}
-	
+
 	@Override
 	public void addValue(IValue value)
 	{
 		this.arguments.add(value);
 	}
-	
+
 	@Override
-	public void setValue(int index, IValue value)
+	public List<IValue> getValues()
 	{
-		this.arguments.set(index, value);
+		return this.arguments;
 	}
 	
 	@Override
@@ -69,6 +62,11 @@ public abstract class Call extends ASTObject implements IValue, IValueList, IAcc
 		return this.arguments.get(index);
 	}
 	
+	public void setSugar(boolean sugar)
+	{
+		this.isSugarCall = sugar;
+	}
+
 	public Type[] getTypes()
 	{
 		int len = this.arguments.size();
@@ -87,9 +85,11 @@ public abstract class Call extends ASTObject implements IValue, IValueList, IAcc
 		}
 		return types;
 	}
-	
-	public void setSugar(boolean sugar)
+
+	@Override
+	public IAccess applyState(CompilerState state, IContext context)
 	{
-		this.isSugarCall = sugar;
+		this.arguments.replaceAll(a -> a.applyState(state, context));
+		return this;
 	}
 }

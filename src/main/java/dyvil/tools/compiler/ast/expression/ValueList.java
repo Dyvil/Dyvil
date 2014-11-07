@@ -56,9 +56,9 @@ public class ValueList extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public void setIsArray(boolean isArray)
+	public void setArray(boolean array)
 	{
-		this.isArray = isArray;
+		this.isArray = array;
 	}
 	
 	@Override

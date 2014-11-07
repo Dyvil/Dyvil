@@ -7,8 +7,10 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
@@ -199,47 +201,24 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public Method applyState(CompilerState state, IContext context)
 	{
-		MethodVisitor visitor = writer.visitMethod(this.modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
-		
-		int index = 0;
-		for (Parameter param : this.parameters)
+		if (state == CompilerState.RESOLVE_TYPES)
 		{
-			param.index = index++;
-			visitor.visitParameter(param.name, index);
+			this.type = this.type.applyState(state, context);
+			this.throwsDeclarations.replaceAll(t -> t.applyState(state, context));
 		}
+		
+		this.parameters.replaceAll(p -> p.applyState(state, context));
 		
 		if (this.statement != null)
 		{
-			visitor.visitCode();
-			
-			for (Variable var : this.variables)
-			{
-				var.index = index++;
-			}
-			
-			if (this.statement != null)
-			{
-				this.statement.write(visitor);
-			}
-			
-			// TODO Actual values -.-
-			visitor.visitInsn(Opcodes.RETURN);
-			
-			for (Variable var : this.variables)
-			{
-				String name = var.qualifiedName;
-				String desc = var.getDescription();
-				String signature = var.getSignature();
-				visitor.visitLocalVariable(name, desc, signature, var.start, var.end, var.index);
-			}
-			
-			visitor.visitMaxs(10, index);
-			visitor.visitEnd();
+			this.statement = this.statement.applyState(state, this);
 		}
+		
+		return this;
 	}
-	
+
 	@Override
 	public boolean isStatic()
 	{
@@ -281,24 +260,47 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public Method applyState(CompilerState state, IContext context)
+	public void write(ClassWriter writer)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
-		{
-			this.type = this.type.applyState(state, context);
-			this.throwsDeclarations.replaceAll(t -> t.applyState(state, context));
-		}
+		MethodVisitor visitor = writer.visitMethod(this.modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
 		
-		this.parameters.replaceAll(p -> p.applyState(state, context));
+		int index = 0;
+		for (Parameter param : this.parameters)
+		{
+			param.index = index++;
+			visitor.visitParameter(param.name, index);
+		}
 		
 		if (this.statement != null)
 		{
-			this.statement = this.statement.applyState(state, this);
+			visitor.visitCode();
+			
+			for (Variable var : this.variables)
+			{
+				var.index = index++;
+			}
+			
+			if (this.statement != null)
+			{
+				this.statement.write(visitor);
+			}
+			
+			// TODO Actual values -.-
+			visitor.visitInsn(Opcodes.RETURN);
+			
+			for (Variable var : this.variables)
+			{
+				String name = var.qualifiedName;
+				String desc = var.getDescription();
+				String signature = var.getSignature();
+				visitor.visitLocalVariable(name, desc, signature, var.start, var.end, var.index);
+			}
+			
+			visitor.visitMaxs(10, index);
+			visitor.visitEnd();
 		}
-		
-		return this;
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

@@ -57,7 +57,7 @@ public class TupleValue extends ASTObject implements IValue, IValueList
 	}
 	
 	@Override
-	public void setIsArray(boolean isArray)
+	public void setArray(boolean array)
 	{}
 	
 	@Override

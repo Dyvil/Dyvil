@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import dyvil.tools.compiler.Dyvilc;
-import dyvil.tools.compiler.ast.api.IASTObject;
+import dyvil.tools.compiler.ast.api.IASTNode;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
@@ -78,7 +78,7 @@ public class Util
 			Iterator iterator = list.iterator();
 			while (true)
 			{
-				IASTObject o = (IASTObject) iterator.next();
+				IASTNode o = (IASTNode) iterator.next();
 				o.toString("", buffer);
 				
 				if (iterator.hasNext())
@@ -93,12 +93,12 @@ public class Util
 		}
 	}
 	
-	public static void parametersToString(Collection<? extends IASTObject> parameters, StringBuilder buffer, boolean writeEmpty)
+	public static void parametersToString(Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty)
 	{
 		parametersToString(parameters, buffer, writeEmpty, Formatting.Method.emptyParameters, Formatting.Method.parametersStart, Formatting.Method.parameterSeperator, Formatting.Method.parametersEnd);
 	}
 	
-	public static void parametersToString(Collection<? extends IASTObject> parameters, StringBuilder buffer, boolean writeEmpty, String empty, String start, String seperator, String end)
+	public static void parametersToString(Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty, String empty, String start, String seperator, String end)
 	{
 		if (parameters.isEmpty())
 		{
@@ -110,10 +110,10 @@ public class Util
 		else
 		{
 			buffer.append(start);
-			Iterator<? extends IASTObject> iterator = parameters.iterator();
+			Iterator<? extends IASTNode> iterator = parameters.iterator();
 			while (true)
 			{
-				IASTObject value = iterator.next();
+				IASTNode value = iterator.next();
 				value.toString("", buffer);
 				if (iterator.hasNext())
 				{

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.util;
 
+import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.ITypeList;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class ClassFormat

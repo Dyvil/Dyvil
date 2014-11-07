@@ -46,7 +46,7 @@ public class ExpressionListParser extends Parser implements IValued
 			}
 			else if (",".equals(value))
 			{
-				this.valueList.setIsArray(true);
+				this.valueList.setArray(true);
 				this.mode = 0;
 				return true;
 			}

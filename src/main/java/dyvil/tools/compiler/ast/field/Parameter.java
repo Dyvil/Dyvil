@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.method;
+package dyvil.tools.compiler.ast.field;
 
 import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
 
@@ -6,6 +6,7 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -65,6 +66,16 @@ public class Parameter extends Member implements IField
 	}
 	
 	@Override
+	public Parameter applyState(CompilerState state, IContext context)
+	{
+		if (state == CompilerState.RESOLVE_TYPES)
+		{
+			this.type = this.type.resolve(context);
+		}
+		return this;
+	}
+
+	@Override
 	public void write(ClassWriter writer)
 	{}
 	
@@ -78,16 +89,6 @@ public class Parameter extends Member implements IField
 	public void writeSet(MethodVisitor visitor)
 	{
 		visitor.visitIntInsn(Opcodes.ASTORE, this.index);
-	}
-	
-	@Override
-	public Parameter applyState(CompilerState state, IContext context)
-	{
-		if (state == CompilerState.RESOLVE_TYPES)
-		{
-			this.type = this.type.resolve(context);
-		}
-		return this;
 	}
 	
 	@Override

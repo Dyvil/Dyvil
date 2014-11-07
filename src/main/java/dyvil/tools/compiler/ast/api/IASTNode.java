@@ -4,7 +4,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public interface IASTObject
+public interface IASTNode
 {
 	public void setPosition(ICodePosition position);
 	
@@ -12,7 +12,7 @@ public interface IASTObject
 	
 	public void expandPosition(ICodePosition position);
 	
-	public IASTObject applyState(CompilerState state, IContext context);
+	public IASTNode applyState(CompilerState state, IContext context);
 	
 	public void toString(String prefix, StringBuilder buffer);
 }

@@ -2,11 +2,11 @@ package dyvil.tools.compiler.ast.value;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IASTObject;
+import dyvil.tools.compiler.ast.api.IASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
-public interface IValue extends IASTObject
+public interface IValue extends IASTNode
 {
 	public boolean isConstant();
 	

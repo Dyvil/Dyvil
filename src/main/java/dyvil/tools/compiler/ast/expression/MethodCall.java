@@ -75,7 +75,7 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public void setIsArray(boolean isArray)
+	public void setArray(boolean array)
 	{}
 	
 	@Override
@@ -140,6 +140,42 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
+	public void write(MethodVisitor visitor)
+	{
+		if (this.instance != null)
+		{
+			this.instance.write(visitor);
+		}
+		for (IValue arg : this.arguments)
+		{
+			arg.write(visitor);
+		}
+		
+		int opcode;
+		if (this.method.hasModifier(Modifiers.STATIC))
+		{
+			opcode = Opcodes.INVOKESTATIC;
+		}
+		else if (this.method.getTheClass().hasModifier(Modifiers.INTERFACE_CLASS))
+		{
+			opcode = Opcodes.INVOKEINTERFACE;
+		}
+		else if (this.instance instanceof SuperValue)
+		{
+			opcode = Opcodes.INVOKESPECIAL;
+		}
+		else
+		{
+			opcode = Opcodes.INVOKEVIRTUAL;
+		}
+		
+		String owner = this.method.getTheClass().getInternalName();
+		String name = this.method.getName();
+		String desc = this.method.getDescriptor();
+		visitor.visitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
+	}
+
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.isSugarCall && !Formatting.Method.convertSugarCalls)
@@ -181,41 +217,5 @@ public class MethodCall extends Call implements INamed, IValued
 			
 			Util.parametersToString(this.arguments, buffer, !this.isSugarCall);
 		}
-	}
-	
-	@Override
-	public void write(MethodVisitor visitor)
-	{
-		if (this.instance != null)
-		{
-			this.instance.write(visitor);
-		}
-		for (IValue arg : this.arguments)
-		{
-			arg.write(visitor);
-		}
-		
-		int opcode;
-		if (this.method.hasModifier(Modifiers.STATIC))
-		{
-			opcode = Opcodes.INVOKESTATIC;
-		}
-		else if (this.method.getTheClass().hasModifier(Modifiers.INTERFACE_CLASS))
-		{
-			opcode = Opcodes.INVOKEINTERFACE;
-		}
-		else if (this.instance instanceof SuperValue)
-		{
-			opcode = Opcodes.INVOKESPECIAL;
-		}
-		else
-		{
-			opcode = Opcodes.INVOKEVIRTUAL;
-		}
-		
-		String owner = this.method.getTheClass().getInternalName();
-		String name = this.method.getName();
-		String desc = this.method.getDescriptor();
-		visitor.visitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
 	}
 }

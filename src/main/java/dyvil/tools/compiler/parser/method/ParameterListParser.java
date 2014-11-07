@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.method;
 
 import dyvil.tools.compiler.ast.api.IParameterized;
-import dyvil.tools.compiler.ast.method.Parameter;
+import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;

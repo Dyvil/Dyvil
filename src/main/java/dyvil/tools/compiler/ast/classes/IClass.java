@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
-public interface IClass extends IASTObject, INamed, IModified, ITyped, ITypeList, IAnnotatable, IContext
+public interface IClass extends IASTNode, INamed, IModified, ITyped, ITypeList, IAnnotatable, IContext
 {	
 	public void setBody(ClassBody body);
 	

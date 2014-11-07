@@ -63,12 +63,24 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
+	public Field applyState(CompilerState state, IContext context)
+	{
+		this.type = this.type.applyState(state, context);
+		
+		if (this.value != null)
+		{
+			this.value = this.value.applyState(state, context);
+		}
+		return this;
+	}
+	
+	@Override
 	public void write(ClassWriter writer)
 	{
 		// TODO static fields initial value
 		FieldVisitor visitor = writer.visitField(this.modifiers, this.name, this.getDescription(), this.type.getSignature(), null);
 	}
-	
+
 	@Override
 	public void writeGet(MethodVisitor visitor)
 	{
@@ -87,7 +99,7 @@ public class Field extends Member implements IField
 		String desc = this.type.getExtendedName();
 		visitor.visitFieldInsn(opcode, owner, name, desc);
 	}
-	
+
 	@Override
 	public void writeSet(MethodVisitor visitor)
 	{
@@ -106,19 +118,7 @@ public class Field extends Member implements IField
 		String desc = this.type.getExtendedName();
 		visitor.visitFieldInsn(opcode, owner, name, desc);
 	}
-	
-	@Override
-	public Field applyState(CompilerState state, IContext context)
-	{
-		this.type = this.type.applyState(state, context);
-		
-		if (this.value != null)
-		{
-			this.value = this.value.applyState(state, context);
-		}
-		return this;
-	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

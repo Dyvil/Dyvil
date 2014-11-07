@@ -69,7 +69,7 @@ public class Annotation extends ASTObject implements ITyped, IValueList
 	}
 	
 	@Override
-	public void setIsArray(boolean isArray)
+	public void setArray(boolean array)
 	{}
 	
 	@Override

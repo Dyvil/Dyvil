@@ -21,7 +21,6 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public class StatementList extends ValueList implements IStatement, IContext
 {
 	private IContext			context;
-	private int					resolveIndex;
 	
 	public Map<String, IField>	variables	= new HashMap();
 	public Label				start		= new Label();
@@ -79,7 +78,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 		this.context = context;
 		for (int i = 0; i < len; i++)
 		{
-			this.resolveIndex = i;
 			IValue v = this.values.get(i);
 			this.values.set(i, v.applyState(state, this));
 		}

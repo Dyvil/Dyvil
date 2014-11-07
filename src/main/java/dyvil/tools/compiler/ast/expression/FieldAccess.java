@@ -89,6 +89,14 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	{}
 
 	@Override
+	public void setValue(int index, IValue value)
+	{}
+
+	@Override
+	public void addValue(IValue value)
+	{}
+
+	@Override
 	public List<IValue> getValues()
 	{
 		return Collections.EMPTY_LIST;
@@ -101,15 +109,7 @@ public class FieldAccess extends ASTObject implements IValue, INamed, IValued, I
 	}
 
 	@Override
-	public void addValue(IValue value)
-	{}
-
-	@Override
-	public void setValue(int index, IValue value)
-	{}
-
-	@Override
-	public void setIsArray(boolean isArray)
+	public void setArray(boolean array)
 	{}
 
 	@Override

@@ -1,12 +1,11 @@
-package dyvil.tools.compiler.ast.method;
+package dyvil.tools.compiler.ast.api;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
-public interface IMethod extends IASTObject, IMember, IValued, IThrower, IVariableList, IParameterized, IContext
+public interface IMethod extends IASTNode, IMember, IValued, IThrower, IVariableList, IParameterized, IContext
 {
 	@Override
 	public IMethod applyState(CompilerState state, IContext context);

@@ -43,6 +43,18 @@ public class Variable extends Member implements IField
 	}
 	
 	@Override
+	public String getDescription()
+	{
+		return this.type.getExtendedName();
+	}
+
+	@Override
+	public String getSignature()
+	{
+		return this.type.getSignature();
+	}
+
+	@Override
 	public Variable applyState(CompilerState state, IContext context)
 	{
 		if (state == CompilerState.RESOLVE_TYPES)
@@ -66,18 +78,6 @@ public class Variable extends Member implements IField
 	public void writeSet(MethodVisitor visitor)
 	{
 		visitor.visitIntInsn(Opcodes.ASTORE, this.index);
-	}
-	
-	@Override
-	public String getDescription()
-	{
-		return this.type.getExtendedName();
-	}
-	
-	@Override
-	public String getSignature()
-	{
-		return this.type.getSignature();
 	}
 	
 	@Override

@@ -108,7 +108,7 @@ public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
 	{}
 	
 	@Override
-	public void setIsArray(boolean isArray)
+	public void setArray(boolean array)
 	{}
 	
 	@Override

@@ -10,8 +10,8 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTObject;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -185,27 +185,25 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public CodeClass applyState(CompilerState state, IContext context)
 	{
-		String internalName = this.getInternalName();
-		String signature = this.getSignature();
-		String superClass = this.superClass.getInternalName();
-		String[] interfaces = this.getInterfaces();
-		writer.visit(Opcodes.V1_8, this.modifiers, internalName, signature, superClass, interfaces);
-		
-		List<IField> fields = this.body.fields;
-		for (IField f : fields)
+		if (state == CompilerState.RESOLVE_TYPES)
 		{
-			f.write(writer);
+			if (this.superClass == Type.VOID)
+			{
+				return null;
+			}
+			else if (this.superClass != null)
+			{
+				this.superClass = this.superClass.resolve(context);
+			}
+			this.interfaces.replaceAll(t -> t.applyState(state, context));
 		}
 		
-		List<IMethod> methods = this.body.methods;
-		for (IMethod m : methods)
-		{
-			m.write(writer);
-		}
+		this.body = this.body.applyState(state, this);
+		return this;
 	}
-	
+
 	@Override
 	public boolean isStatic()
 	{
@@ -322,25 +320,27 @@ public class CodeClass extends ASTObject implements IClass
 	}
 	
 	@Override
-	public CodeClass applyState(CompilerState state, IContext context)
+	public void write(ClassWriter writer)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		String internalName = this.getInternalName();
+		String signature = this.getSignature();
+		String superClass = this.superClass.getInternalName();
+		String[] interfaces = this.getInterfaces();
+		writer.visit(Opcodes.V1_8, this.modifiers, internalName, signature, superClass, interfaces);
+		
+		List<IField> fields = this.body.fields;
+		for (IField f : fields)
 		{
-			if (this.superClass == Type.VOID)
-			{
-				return null;
-			}
-			else if (this.superClass != null)
-			{
-				this.superClass = this.superClass.resolve(context);
-			}
-			this.interfaces.replaceAll(t -> t.applyState(state, context));
+			f.write(writer);
 		}
 		
-		this.body = this.body.applyState(state, this);
-		return this;
+		List<IMethod> methods = this.body.methods;
+		for (IMethod m : methods)
+		{
+			m.write(writer);
+		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

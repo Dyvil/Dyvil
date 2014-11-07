@@ -4,8 +4,8 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IAccess;
+import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.ITyped;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
@@ -27,6 +27,60 @@ public class ConstructorCall extends Call implements ITyped
 		super(position);
 	}
 	
+	@Override
+	public void setType(Type type)
+	{
+		this.type = type;
+	}
+
+	@Override
+	public Type getType()
+	{
+		return this.type;
+	}
+	
+	@Override
+	public void setName(String name)
+	{}
+	
+	@Override
+	public String getName()
+	{
+		return "<init>";
+	}
+	
+	@Override
+	public void setValue(IValue value)
+	{}
+
+	@Override
+	public IValue getValue()
+	{
+		return null;
+	}
+
+	@Override
+	public void setArray(boolean array)
+	{}
+
+	@Override
+	public boolean isArray()
+	{
+		return false;
+	}
+
+	@Override
+	public IAccess applyState(CompilerState state, IContext context)
+	{
+		if (state == CompilerState.RESOLVE_TYPES)
+		{
+			this.type = this.type.resolve(context);
+		}
+		
+		this.arguments.replaceAll(a -> a.applyState(state, context));
+		return this;
+	}
+
 	@Override
 	public boolean resolve(IContext context, IContext context1)
 	{
@@ -51,13 +105,13 @@ public class ConstructorCall extends Call implements ITyped
 		}
 		return false;
 	}
-	
+
 	@Override
 	public IAccess resolve2(IContext context, IContext context1)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public Marker getResolveError()
 	{
@@ -67,76 +121,7 @@ public class ConstructorCall extends Call implements ITyped
 		}
 		return new SemanticError(this.position, "'' could not be resolved to a constructor");
 	}
-	
-	@Override
-	public IAccess applyState(CompilerState state, IContext context)
-	{
-		if (state == CompilerState.RESOLVE_TYPES)
-		{
-			this.type = this.type.resolve(context);
-		}
-		
-		this.arguments.replaceAll(a -> a.applyState(state, context));
-		return this;
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append("new ");
-		this.type.toString("", buffer);
-		if (this.isSugarCall && !Formatting.Method.convertSugarCalls)
-		{
-			this.arguments.get(0).toString("", buffer);
-		}
-		else
-		{
-			Util.parametersToString(this.arguments, buffer, true);
-		}
-	}
-	
-	@Override
-	public Type getType()
-	{
-		return this.type;
-	}
-	
-	@Override
-	public void setType(Type type)
-	{
-		this.type = type;
-	}
-	
-	@Override
-	public void setIsArray(boolean isArray)
-	{}
-	
-	@Override
-	public boolean isArray()
-	{
-		return false;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{}
-	
-	@Override
-	public void setName(String name)
-	{}
-	
-	@Override
-	public String getName()
-	{
-		return "<init>";
-	}
-	
+
 	@Override
 	public void write(MethodVisitor visitor)
 	{
@@ -163,5 +148,20 @@ public class ConstructorCall extends Call implements ITyped
 		String name = this.method.getName();
 		String desc = this.method.getDescriptor();
 		visitor.visitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("new ");
+		this.type.toString("", buffer);
+		if (this.isSugarCall && !Formatting.Method.convertSugarCalls)
+		{
+			this.arguments.get(0).toString("", buffer);
+		}
+		else
+		{
+			Util.parametersToString(this.arguments, buffer, true);
+		}
 	}
 }
