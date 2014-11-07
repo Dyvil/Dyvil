@@ -3,14 +3,14 @@ package dyvil.tools.compiler.ast.method;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.Symbols;
 
-public abstract class Member extends ASTObject implements IMember
+public abstract class Member extends ASTNode implements IMember
 {
 	public IClass				theClass;
 	

@@ -4,7 +4,7 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -15,7 +15,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ClassAccess extends ASTObject implements IValue, IAccess
+public class ClassAccess extends ASTNode implements IValue, IAccess
 {
 	public Type	type;
 	

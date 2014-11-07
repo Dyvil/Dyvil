@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -16,7 +16,7 @@ import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ClassFormat;
 
-public class Type extends ASTObject implements IContext
+public class Type extends ASTNode implements IContext
 {
 	public static Type[]	EMPTY_TYPES	= new Type[0];
 	
@@ -343,18 +343,16 @@ public class Type extends ASTObject implements IContext
 		{
 			return false;
 		}
+		
 		if (this.theClass != null && this.theClass == other.theClass)
 		{
 			return true;
 		}
-		if (this.qualifiedName == null)
-		{
-			if (other.qualifiedName != null)
-			{
-				return false;
-			}
-		}
-		else if (!this.qualifiedName.equals(other.qualifiedName))
+		
+		String thisName = this.theClass != null ? this.theClass.getQualifiedName() : this.qualifiedName;
+		String otherName = other.theClass != null ? other.theClass.getQualifiedName() : other.qualifiedName;
+		
+		if (thisName == null || !thisName.equals(otherName))
 		{
 			return false;
 		}

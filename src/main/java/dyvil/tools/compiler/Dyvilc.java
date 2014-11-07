@@ -31,6 +31,7 @@ public class Dyvilc
 	public static Set<CompilerState>	states	= new TreeSet();
 	
 	public static ParserManager			parser	= new ParserManager();
+	public static List<File>			files	= new ArrayList();
 	
 	public static void main(String[] args)
 	{
@@ -92,29 +93,32 @@ public class Dyvilc
 		switch (s)
 		{
 		case "compile":
-			Dyvilc.states.add(CompilerState.TOKENIZE);
-			Dyvilc.states.add(CompilerState.PARSE);
-			Dyvilc.states.add(CompilerState.RESOLVE_TYPES);
-			Dyvilc.states.add(CompilerState.RESOLVE);
-			Dyvilc.states.add(CompilerState.OPERATOR_PRECEDENCE);
-			Dyvilc.states.add(CompilerState.FOLD_CONSTANTS);
-			Dyvilc.states.add(CompilerState.CONVERT);
-			Dyvilc.states.add(CompilerState.COMPILE);
+			states.add(CompilerState.TOKENIZE);
+			states.add(CompilerState.PARSE);
+			states.add(CompilerState.RESOLVE_TYPES);
+			states.add(CompilerState.RESOLVE);
+			states.add(CompilerState.OPERATOR_PRECEDENCE);
+			states.add(CompilerState.FOLD_CONSTANTS);
+			states.add(CompilerState.CONVERT);
+			states.add(CompilerState.COMPILE);
 			break;
 		case "optimize":
-			Dyvilc.states.add(CompilerState.OPTIMIZE);
+			states.add(CompilerState.OPTIMIZE);
 			break;
 		case "obfuscate":
-			Dyvilc.states.add(CompilerState.OBFUSCATE);
+			states.add(CompilerState.OBFUSCATE);
 			break;
 		case "doc":
-			Dyvilc.states.add(CompilerState.DYVILDOC);
+			states.add(CompilerState.DYVILDOC);
 			break;
 		case "decompile":
-			Dyvilc.states.add(CompilerState.DECOMPILE);
+			states.add(CompilerState.DECOMPILE);
+			break;
+		case "jar":
+			states.add(CompilerState.JAR);
 			break;
 		case "--debug":
-			Dyvilc.states.add(CompilerState.DEBUG);
+			states.add(CompilerState.DEBUG);
 			debug = true;
 			break;
 		case "--pstack":
@@ -167,6 +171,7 @@ public class Dyvilc
 		if (!source.exists())
 		{
 			logger.warning(source.getPath() + " does not exist.");
+			return;
 		}
 		else if (source.isDirectory())
 		{
@@ -175,11 +180,27 @@ public class Dyvilc
 			{
 				compile(new CodeFile(source, s), new File(output, s), pack.createSubPackage(name));
 			}
+			return;
 		}
 		else
 		{
-			CompilationUnit unit = new CompilationUnit(pack, (CodeFile) source, output);
-			pack.addCompilationUnit(unit);
+			String fileName = source.getPath();
+			if (!config.compileFile(fileName))
+			{
+				return;
+			}
+			
+			if (fileName.endsWith("Thumbs.db") || fileName.endsWith(".DS_Store"))
+			{
+				return;
+			}
+			else if (fileName.endsWith(".dyvil"))
+			{
+				CompilationUnit unit = new CompilationUnit(pack, (CodeFile) source, output);
+				output = unit.outputFile;
+				pack.addCompilationUnit(unit);
+			}
+			files.add(output);
 		}
 	}
 	

@@ -2,13 +2,13 @@ package dyvil.tools.compiler.ast.value;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class SuperValue extends ASTObject implements IValue
+public class SuperValue extends ASTNode implements IValue
 {
 	public Type	type;
 	

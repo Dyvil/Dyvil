@@ -14,6 +14,8 @@ public interface IClass extends IASTNode, INamed, IModified, ITyped, ITypeList, 
 	
 	public ClassBody getBody();
 	
+	public String getQualifiedName();
+	
 	public boolean isSuperType(Type t);
 	
 	public void getMethodMatches(List<MethodMatch> matches, Type type, String name, Type... argumentTypes);

@@ -2,13 +2,13 @@ package dyvil.tools.compiler.ast.statement;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public class ForEachStatement extends ASTObject implements IStatement
+public class ForEachStatement extends ASTNode implements IStatement
 {
 	private Field	variable;
 	private IValue	iterable;

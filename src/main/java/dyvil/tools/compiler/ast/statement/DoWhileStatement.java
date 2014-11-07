@@ -2,13 +2,13 @@ package dyvil.tools.compiler.ast.statement;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
-public class DoWhileStatement extends ASTObject implements IStatement, IValued
+public class DoWhileStatement extends ASTNode implements IStatement, IValued
 {
 	private IValue	then;
 	private IValue	condition;

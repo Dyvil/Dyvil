@@ -78,12 +78,14 @@ public class ConfigParser extends Parser
 		case "jar_name":
 			this.config.jarName = (String) property;
 			break;
-		case "jar_group":
-			this.config.jarGroup = (String) property;
+		case "jar_vendor":
+			this.config.jarVendor = (String) property;
 			break;
 		case "jar_version":
 			this.config.jarVersion = (String) property;
 			break;
+		case "jar_format":
+			this.config.jarNameFormat = (String) property;
 		case "source_dir":
 			this.config.sourceDir = new File((String) property);
 			break;

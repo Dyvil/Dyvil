@@ -9,8 +9,9 @@ import dyvil.tools.compiler.library.Library;
 public class CompilerConfig
 {
 	public String			jarName;
-	public String			jarGroup;
+	public String			jarVendor;
 	public String			jarVersion;
+	public String			jarNameFormat	= "%1$s-%2$s.jar";
 	
 	public File				sourceDir;
 	public File				outputDir;
@@ -51,7 +52,7 @@ public class CompilerConfig
 	{
 		for (String s : this.excludedFiles)
 		{
-			if (name.startsWith(s))
+			if (name.endsWith(s))
 			{
 				return false;
 			}
@@ -59,22 +60,25 @@ public class CompilerConfig
 		
 		for (String s : this.includedFiles)
 		{
-			if (name.startsWith(s))
+			if (name.endsWith(s))
 			{
 				return true;
 			}
 		}
 		
-		return false;
+		return true;
+	}
+	
+	public String getJarName()
+	{
+		return String.format(this.jarNameFormat, this.jarName, this.jarVersion);
 	}
 	
 	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append("CompilerConfig [jarName=").append(this.jarName);
-		builder.append(", jarGroup=").append(this.jarGroup);
-		builder.append(", jarVersion=").append(this.jarVersion);
+		builder.append("CompilerConfig [jarName=").append(this.getJarName());
 		builder.append(", sourceDir=").append(this.sourceDir);
 		builder.append(", outputDir=").append(this.outputDir);
 		builder.append(", libraryFiles=").append(this.libraries);

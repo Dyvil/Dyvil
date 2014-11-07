@@ -5,7 +5,7 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.INamed;
@@ -23,7 +23,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.AccessResolver;
 import dyvil.tools.compiler.util.Symbols;
 
-public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
+public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 {
 	protected String	name;
 	protected String	qualifiedName;
@@ -136,7 +136,8 @@ public class FieldAssign extends ASTObject implements INamed, IValued, IAccess
 				this.value = null;
 			}
 		}
-		else if (this.value != null)
+		
+		if (this.value != null)
 		{
 			this.value = this.value.applyState(state, context);
 		}

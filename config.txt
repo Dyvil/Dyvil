@@ -1,10 +1,10 @@
-jar_name = "DyvilTest.jar"
-jar_group = "dyvil.test"
+jar_name = "DyvilTest"
+jar_vendor = "Clashsoft"
 jar_version = "1.0.0"
 
 source_dir = "src/test/dyvil"
 output_dir = "bin"
 
-main_type = "dyvil.test.DyvilTest"
+main_type = "test.Main"
 
 libraries = []

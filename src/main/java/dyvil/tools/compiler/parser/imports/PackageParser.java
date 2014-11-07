@@ -26,7 +26,7 @@ public class PackageParser extends Parser
 		{
 			this.packageDeclaration.expandPosition(token);
 			this.packageDeclaration.setPackage(this.buffer.toString());
-			this.unit.setPackageDecl(this.packageDeclaration);
+			this.unit.setPackageDeclaration(this.packageDeclaration);
 			
 			jcp.popParser();
 			return true;

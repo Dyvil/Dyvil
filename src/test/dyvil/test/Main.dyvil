@@ -1,16 +1,28 @@
 package test;
 
 import java.lang.String;
+import java.awt.Font;
 import java.io.IOException;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+
 import java.lang.Comparable;
 
 public class Main
 {
-	public static String str = null;
-	
 	public static void main(String[] args) = {
-		str = new String("test");
-		System.out.println(str);
+		Font font = new Font("Helvetica", 0, 20);
+		
+		JFrame frame = new JFrame("Dyvil");
+		frame.setBounds(200, 200, 140, 50);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		JLabel label = new JLabel("Dyvil is ALIVE");
+		label.setFont(font);
+		
+		frame.getContentPane().add(label);
+		frame.setVisible(true);
 	};
 }

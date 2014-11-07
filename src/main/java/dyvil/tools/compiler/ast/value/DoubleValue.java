@@ -2,11 +2,11 @@ package dyvil.tools.compiler.ast.value;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
-public class DoubleValue extends ASTObject implements IValue
+public class DoubleValue extends ASTNode implements IValue
 {
 	public double	value;
 	

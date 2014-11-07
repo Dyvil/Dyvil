@@ -5,7 +5,7 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
@@ -14,7 +14,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class ValueList extends ASTObject implements IValue, IValueList
+public class ValueList extends ASTNode implements IValue, IValueList
 {
 	protected List<IValue>	values	= new ArrayList(3);
 	

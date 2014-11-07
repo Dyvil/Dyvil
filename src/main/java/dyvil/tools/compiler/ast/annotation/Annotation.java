@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class Annotation extends ASTObject implements ITyped, IValueList
+public class Annotation extends ASTNode implements ITyped, IValueList
 {
 	public Type			type;
 	public List<IValue>	parameters	= new ArrayList();

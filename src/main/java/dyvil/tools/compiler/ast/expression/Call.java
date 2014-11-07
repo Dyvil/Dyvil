@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.IValueList;
@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public abstract class Call extends ASTObject implements IValue, IValueList, IAccess
+public abstract class Call extends ASTNode implements IValue, IValueList, IAccess
 {
 	protected List<IValue>	arguments	= new ArrayList(3);
 	

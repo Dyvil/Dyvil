@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -12,7 +12,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class PackageImport extends ASTObject implements IImport
+public class PackageImport extends ASTNode implements IImport
 {
 	public Package		pack;
 	

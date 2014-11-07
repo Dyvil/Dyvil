@@ -3,11 +3,11 @@ package dyvil.tools.compiler.ast.value;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
-public class NullValue extends ASTObject implements IValue
+public class NullValue extends ASTNode implements IValue
 {
 	@Override
 	public boolean isConstant()

@@ -7,7 +7,7 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IMethod;
@@ -21,7 +21,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
-public class CodeClass extends ASTObject implements IClass
+public class CodeClass extends ASTNode implements IClass
 {
 	protected CompilationUnit	unit;
 	
@@ -30,6 +30,7 @@ public class CodeClass extends ASTObject implements IClass
 	protected int				modifiers;
 	
 	protected String			name;
+	protected String			qualifiedName;
 	protected String			internalName;
 	
 	protected List<Annotation>	annotations	= new ArrayList(1);
@@ -92,12 +93,19 @@ public class CodeClass extends ASTObject implements IClass
 	{
 		this.name = name;
 		this.internalName = this.unit.getInternalName(this.name);
+		this.qualifiedName = this.unit.getQualifiedName(this.name);
 	}
 	
 	@Override
 	public String getName()
 	{
 		return this.name;
+	}
+	
+	@Override
+	public String getQualifiedName()
+	{
+		return this.qualifiedName;
 	}
 	
 	@Override
@@ -157,7 +165,15 @@ public class CodeClass extends ASTObject implements IClass
 	@Override
 	public boolean isSuperType(Type t)
 	{
-		return t.equals(this.superClass) || this.interfaces.contains(t);
+		if (t.equals(this.superClass) || this.interfaces.contains(t))
+		{
+			return true;
+		}
+		else if (this.superClass.theClass != null)
+		{
+			return this.superClass.theClass.isSuperType(t);
+		}
+		return false;
 	}
 	
 	@Override
@@ -203,7 +219,7 @@ public class CodeClass extends ASTObject implements IClass
 		this.body = this.body.applyState(state, this);
 		return this;
 	}
-
+	
 	@Override
 	public boolean isStatic()
 	{
@@ -340,7 +356,7 @@ public class CodeClass extends ASTObject implements IClass
 			m.write(writer);
 		}
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ClassBody extends ASTObject
+public class ClassBody extends ASTNode
 {
 	protected IClass		theClass;
 	protected List<IField>	fields	= new ArrayList();

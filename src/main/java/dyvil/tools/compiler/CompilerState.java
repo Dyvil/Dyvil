@@ -4,6 +4,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.bytecode.ClassWriter;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.util.Util;
@@ -51,9 +52,15 @@ public enum CompilerState
 	 */
 	OPTIMIZE,
 	/**
-	 * Compiles the AST to byte code.
+	 * Compiles the AST to byte code and stores the generated .class files in
+	 * the bin directory.
 	 */
 	COMPILE,
+	/**
+	 * Converts the .class files in the bin directory to a JAR file, sets up the
+	 * classpath and signs the JAR.
+	 */
+	JAR,
 	/**
 	 * Decompiles the byte code to an AST.
 	 */
@@ -78,10 +85,17 @@ public enum CompilerState
 			now = System.nanoTime();
 		}
 		
-		for (CompilationUnit unit : units)
+		if (this == JAR)
 		{
-			this.file = unit.getFile();
-			unit.applyState(this, context);
+			ClassWriter.generateJAR(Dyvilc.files);
+		}
+		else
+		{
+			for (CompilationUnit unit : units)
+			{
+				this.file = unit.getFile();
+				unit.applyState(this, context);
+			}
 		}
 		
 		if (Dyvilc.debug)

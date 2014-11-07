@@ -79,6 +79,8 @@ public class BytecodeClass extends CodeClass
 			this.name = name.substring(index + 1);
 		}
 		
+		this.qualifiedName = name.replace('/', '.');
+		
 		if (superName != null)
 		{
 			this.superClass = ClassFormat.internalToType(superName);

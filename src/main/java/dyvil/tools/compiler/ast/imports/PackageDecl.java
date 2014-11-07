@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class PackageDecl extends ASTObject
+public class PackageDecl extends ASTNode
 {
 	public String	thePackage;
 	

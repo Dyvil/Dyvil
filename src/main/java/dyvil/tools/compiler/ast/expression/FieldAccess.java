@@ -5,7 +5,7 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.INamed;
@@ -25,7 +25,7 @@ import dyvil.tools.compiler.util.AccessResolver;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 
-public class FieldAccess extends ASTObject implements IValue, INamed, IValued, IAccess
+public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAccess
 {
 	protected IValue	instance;
 	protected String	name;

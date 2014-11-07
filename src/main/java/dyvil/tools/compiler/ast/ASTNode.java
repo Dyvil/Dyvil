@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.api.IASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public abstract class ASTObject implements IASTNode
+public abstract class ASTNode implements IASTNode
 {
 	protected ICodePosition	position;
 	

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.ASTObject;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.BooleanValue;
@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class IfStatement extends ASTObject implements IStatement
+public class IfStatement extends ASTNode implements IStatement
 {
 	private IValue	condition;
 	private IValue	then;
