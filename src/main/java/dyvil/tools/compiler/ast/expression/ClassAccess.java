@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -148,6 +149,10 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	{
 		// TODO
 	}
+	
+	@Override
+	public void writeJump(MethodVisitor visitor, Label label)
+	{}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

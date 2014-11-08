@@ -14,13 +14,15 @@ public class IfStatementParser extends Parser implements IValued
 {
 	public static final int	IF		= 1;
 	public static final int	THEN	= 2;
-	public static final int	ELSE	= 3;
+	public static final int	ELSE	= 4;
+	public static final int END = 8;
 	
 	protected IContext		context;
 	protected IfStatement	statement;
 	
 	public IfStatementParser(IContext context, IfStatement statement)
 	{
+		this.mode = IF;
 		this.context = context;
 		this.statement = statement;
 	}
@@ -28,65 +30,57 @@ public class IfStatementParser extends Parser implements IValued
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (this.mode == 0)
+		if (this.mode == END)
 		{
-			if ("(".equals(value))
-			{
-				this.mode = IF;
-				return true;
-			}
+			pm.popParser(true);
+			return true;
 		}
 		if (this.mode == IF)
 		{
-			if (")".equals(value))
-			{
-				this.mode = THEN;
-				return true;
-			}
-			else
-			{
-				pm.pushParser(new ExpressionParser(this.context, this), true);
-				return true;
-			}
+			pm.pushParser(new ExpressionParser(this.context, this), true);
+			this.mode = THEN;
+			return true;
 		}
 		if (this.mode == THEN)
 		{
-			pm.pushParser(new ExpressionParser(this.context, this, true), true);
+			if (!";".equals(value))
+			{
+				pm.pushParser(new ExpressionParser(this.context, this), true);
+			}
+			this.mode = ELSE;
 			return true;
 		}
 		if (this.mode == ELSE)
 		{
 			if ("else".equals(value))
 			{
-				pm.pushParser(new ExpressionParser(this.context, this, true));
+				pm.pushParser(new ExpressionParser(this.context, this));
+				this.mode = END;
+				return true;
+			}
+			else if (";".equals(value))
+			{
 				return true;
 			}
 		}
 		
-		if (this.statement.getThen() != null)
-		{
-			pm.popParser(true);
-			return true;
-		}
 		return false;
 	}
 	
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == IF)
+		if (this.mode == THEN)
 		{
 			this.statement.setCondition(value);
 		}
-		else if (this.mode == THEN)
-		{
-			this.statement.setThen(value);
-			this.mode = ELSE;
-		}
 		else if (this.mode == ELSE)
 		{
+			this.statement.setThen(value);
+		}
+		else if (this.mode == END)
+		{
 			this.statement.setElse(value);
-			this.mode = -1;
 		}
 	}
 	

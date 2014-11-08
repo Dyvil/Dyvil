@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import java.util.Collections;
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -126,6 +127,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 		}
 		else if (state == CompilerState.RESOLVE)
 		{
+			this.value.applyState(state, context);
 			return AccessResolver.resolve(context, this);
 		}
 		else if (state == CompilerState.CHECK)
@@ -187,6 +189,12 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 			
 			this.field.writeSet(visitor);
 		}
+	}
+	
+	@Override
+	public void writeJump(MethodVisitor visitor, Label label)
+	{
+		// TODO
 	}
 	
 	@Override

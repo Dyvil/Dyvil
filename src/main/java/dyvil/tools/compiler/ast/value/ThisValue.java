@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.value;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
@@ -55,4 +56,8 @@ public class ThisValue extends ASTNode implements IValue
 	{
 		visitor.visitIntInsn(Opcodes.ALOAD, 0);
 	}
+	
+	@Override
+	public void writeJump(MethodVisitor visitor, Label label)
+	{}
 }

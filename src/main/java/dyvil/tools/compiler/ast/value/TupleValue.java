@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.value;
 import java.util.ArrayList;
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -104,4 +105,8 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	{
 		// TODO
 	}
+	
+	@Override
+	public void writeJump(MethodVisitor visitor, Label label)
+	{}
 }

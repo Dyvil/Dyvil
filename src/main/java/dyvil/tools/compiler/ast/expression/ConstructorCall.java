@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
@@ -32,7 +33,7 @@ public class ConstructorCall extends Call implements ITyped
 	{
 		this.type = type;
 	}
-
+	
 	@Override
 	public Type getType()
 	{
@@ -52,23 +53,23 @@ public class ConstructorCall extends Call implements ITyped
 	@Override
 	public void setValue(IValue value)
 	{}
-
+	
 	@Override
 	public IValue getValue()
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setArray(boolean array)
 	{}
-
+	
 	@Override
 	public boolean isArray()
 	{
 		return false;
 	}
-
+	
 	@Override
 	public IAccess applyState(CompilerState state, IContext context)
 	{
@@ -76,11 +77,20 @@ public class ConstructorCall extends Call implements ITyped
 		{
 			this.type = this.type.resolve(context);
 		}
+		else if (state == CompilerState.RESOLVE)
+		{
+			this.arguments.replaceAll(a -> a.applyState(state, context));
+			if (!this.resolve(context, null))
+			{
+				state.addMarker(new SemanticError(this.position, "The constructor '' could not be resolved"));
+			}
+			return this;
+		}
 		
 		this.arguments.replaceAll(a -> a.applyState(state, context));
 		return this;
 	}
-
+	
 	@Override
 	public boolean resolve(IContext context, IContext context1)
 	{
@@ -105,13 +115,13 @@ public class ConstructorCall extends Call implements ITyped
 		}
 		return false;
 	}
-
+	
 	@Override
 	public IAccess resolve2(IContext context, IContext context1)
 	{
 		return this;
 	}
-
+	
 	@Override
 	public Marker getResolveError()
 	{
@@ -121,7 +131,7 @@ public class ConstructorCall extends Call implements ITyped
 		}
 		return new SemanticError(this.position, "'' could not be resolved to a constructor");
 	}
-
+	
 	@Override
 	public void write(MethodVisitor visitor)
 	{
@@ -147,9 +157,15 @@ public class ConstructorCall extends Call implements ITyped
 		String owner = this.method.getTheClass().getInternalName();
 		String name = this.method.getName();
 		String desc = this.method.getDescriptor();
-		visitor.visitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
+		visitor.visitMethodInsn(opcode, owner, name, desc, false);
 	}
-
+	
+	@Override
+	public void writeJump(MethodVisitor visitor, Label label)
+	{
+		// TODO
+	}
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

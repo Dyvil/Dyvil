@@ -165,7 +165,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 			}
 			else if ("=".equals(value))
 			{
-				pm.pushParser(new ExpressionParser(this.method, this.method, true));
+				pm.pushParser(new ExpressionParser(this.method, this.method));
 				return true;
 			}
 			else if (";".equals(value))

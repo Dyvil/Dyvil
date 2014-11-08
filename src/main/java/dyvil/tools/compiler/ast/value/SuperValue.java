@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.value;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -51,5 +52,9 @@ public class SuperValue extends ASTNode implements IValue
 	
 	@Override
 	public void write(MethodVisitor visitor)
+	{}
+	
+	@Override
+	public void writeJump(MethodVisitor visitor, Label label)
 	{}
 }

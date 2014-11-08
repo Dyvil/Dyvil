@@ -12,7 +12,7 @@ public class StatementListParser extends ExpressionListParser
 {
 	public StatementListParser(IContext context, IValueList valueList)
 	{
-		super(context, valueList, true);
+		super(context, valueList);
 	}
 	
 	@Override
@@ -21,7 +21,7 @@ public class StatementListParser extends ExpressionListParser
 		if (this.mode == 0)
 		{
 			this.mode = 1;
-			pm.pushParser(new ExpressionParser(this.context, this, true), true);
+			pm.pushParser(new ExpressionParser(this.context, this), true);
 			return true;
 		}
 		else if (";".equals(value))

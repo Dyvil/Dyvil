@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.value;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -44,14 +46,22 @@ public class LongValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append(this.value).append('L');
-	}
-	
-	@Override
 	public void write(MethodVisitor visitor)
 	{
 		visitor.visitLdcInsn(Long.valueOf(this.value));
+	}
+	
+	@Override
+	public void writeJump(MethodVisitor visitor, Label label)
+	{
+		visitor.visitLdcInsn(Long.valueOf(this.value));
+		visitor.visitLdcInsn(Long.valueOf(0));
+		visitor.visitJumpInsn(Opcodes.IFNE, label);
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(this.value).append('L');
 	}
 }

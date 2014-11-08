@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.statement;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -68,9 +70,12 @@ public class IfStatement extends ASTNode implements IStatement
 	{
 		this.condition = this.condition.applyState(state, context);
 		this.then = this.then.applyState(state, context);
-		this.elseThen = this.elseThen.applyState(state, context);
+		if (this.elseThen != null)
+		{
+			this.elseThen = this.elseThen.applyState(state, context);
+		}
 		
-		if (state == CompilerState.FOLD_CONSTANTS)
+		if (state == CompilerState.FOLD_CONSTANTS && false)
 		{
 			if (BooleanValue.TRUE.equals(this.condition))
 			{
@@ -85,23 +90,42 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public void write(MethodVisitor visitor)
+	{
+		if (this.elseThen != null)
+		{
+			Label ifEnd = new Label();
+			Label elseEnd = new Label();
+			
+			this.condition.writeJump(visitor, ifEnd);
+			this.then.write(visitor);
+			visitor.visitJumpInsn(Opcodes.GOTO, elseEnd);
+			visitor.visitLabel(ifEnd);
+			this.elseThen.write(visitor);
+			visitor.visitLabel(elseEnd);
+		}
+		else
+		{
+			Label ifEnd = new Label();
+			this.condition.writeJump(visitor, ifEnd);
+			this.then.write(visitor);
+			visitor.visitLabel(ifEnd);
+		}
+	}
+
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Statements.ifStart);
 		this.condition.toString(prefix, buffer);
 		buffer.append(Formatting.Statements.ifEnd);
 		this.then.toString(prefix, buffer);
+		buffer.append(';');
 		
 		if (this.elseThen != null)
 		{
 			buffer.append(Formatting.Statements.ifElse);
 			this.elseThen.toString(prefix, buffer);
 		}
-	}
-	
-	@Override
-	public void write(MethodVisitor visitor)
-	{
-		// TODO
 	}
 }

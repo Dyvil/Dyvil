@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.value;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IASTNode;
@@ -18,4 +19,6 @@ public interface IValue extends IASTNode
 	// Compilation
 	
 	public void write(MethodVisitor visitor);
+	
+	public void writeJump(MethodVisitor visitor, Label label);
 }

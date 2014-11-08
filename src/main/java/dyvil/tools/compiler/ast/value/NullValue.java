@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.value;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
@@ -28,14 +29,20 @@ public class NullValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append("null");
-	}
-	
-	@Override
 	public void write(MethodVisitor visitor)
 	{
 		visitor.visitInsn(Opcodes.ACONST_NULL);
+	}
+	
+	@Override
+	public void writeJump(MethodVisitor visitor, Label label)
+	{
+		visitor.visitJumpInsn(Opcodes.GOTO, label);
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("null");
 	}
 }

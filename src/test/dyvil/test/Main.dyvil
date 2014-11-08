@@ -13,16 +13,7 @@ import java.lang.Comparable;
 public class Main
 {
 	public static void main(String[] args) = {
-		Font font = new Font("Helvetica", 0, 20);
-		
-		JFrame frame = new JFrame("Dyvil");
-		frame.setBounds(200, 200, 140, 50);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		JLabel label = new JLabel("Dyvil is ALIVE");
-		label.setFont(font);
-		
-		frame.getContentPane().add(label);
-		frame.setVisible(true);
+		String text = if true "True"; else "False";
+		System out println(text);
 	};
 }

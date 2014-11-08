@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
@@ -173,6 +174,12 @@ public class MethodCall extends Call implements INamed, IValued
 		String name = this.method.getName();
 		String desc = this.method.getDescriptor();
 		visitor.visitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
+	}
+	
+	@Override
+	public void writeJump(MethodVisitor visitor, Label label)
+	{
+		// TODO
 	}
 
 	@Override

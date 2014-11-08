@@ -13,19 +13,11 @@ public class ExpressionListParser extends Parser implements IValued
 {
 	protected IContext		context;
 	protected IValueList	valueList;
-	protected boolean		statements;
 	
 	public ExpressionListParser(IContext context, IValueList valueList)
 	{
 		this.context = context;
 		this.valueList = valueList;
-	}
-	
-	public ExpressionListParser(IContext context, IValueList valueList, boolean statements)
-	{
-		this.context = context;
-		this.valueList = valueList;
-		this.statements = statements;
 	}
 	
 	@Override
@@ -34,7 +26,7 @@ public class ExpressionListParser extends Parser implements IValued
 		if (this.mode == 0)
 		{
 			this.mode = 1;
-			pm.pushTryParser(new ExpressionParser(this.context, this, this.statements), token, true);
+			pm.pushTryParser(new ExpressionParser(this.context, this), token, true);
 			return true;
 		}
 		if (this.mode == 1)

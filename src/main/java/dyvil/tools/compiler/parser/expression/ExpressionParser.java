@@ -41,7 +41,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	
 	protected IContext		context;
 	protected IValued		field;
-	protected boolean		statements;
 	protected boolean		lazy;
 	
 	private IValue			value;
@@ -53,18 +52,10 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		this.field = field;
 	}
 	
-	public ExpressionParser(IContext context, IValued field, boolean statements)
-	{
-		this.mode = VALUE | (statements ? STATEMENT : 0);
-		this.context = context;
-		this.field = field;
-		this.statements = statements;
-	}
-	
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (this.mode == 0 || ";".equals(value) || ")".equals(value) && !this.isInMode(PARAMETERS_2))
+		if (this.mode == 0 || ";".equals(value) || ")".equals(value) && !this.isInMode(PARAMETERS_2) && !this.isInMode(TUPLE_END))
 		{
 			pm.popParser(true);
 			return true;
@@ -89,6 +80,20 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.value = new SuperValue(token, this.context.getThisType());
 				return true;
 			}
+			else if ("return".equals(value))
+			{
+				ReturnStatement statement = new ReturnStatement(token);
+				this.value = statement;
+				pm.pushParser(new ExpressionParser(this.context, statement));
+				return true;
+			}
+			else if ("if".equals(value))
+			{
+				IfStatement statement = new IfStatement(token);
+				this.value = statement;
+				pm.pushParser(new IfStatementParser(this.context, statement));
+				return true;
+			}
 			else if ("(".equals(value))
 			{
 				this.mode = TUPLE_END;
@@ -107,7 +112,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				
 				if (!token.next().equals("}"))
 				{
-					pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value, true));
+					pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value));
 				}
 				return true;
 			}
@@ -142,23 +147,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				this.value.expandPosition(token);
 				this.mode = ACCESS;
-				return true;
-			}
-		}
-		if (this.isInMode(STATEMENT))
-		{
-			if ("return".equals(value))
-			{
-				ReturnStatement statement = new ReturnStatement(token);
-				this.value = statement;
-				pm.pushParser(new ExpressionParser(this.context, statement));
-				return true;
-			}
-			else if ("if".equals(value))
-			{
-				IfStatement statement = new IfStatement(token);
-				this.value = statement;
-				pm.pushParser(new IfStatementParser(this.context, statement));
 				return true;
 			}
 		}

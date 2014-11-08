@@ -279,7 +279,7 @@ public class Type extends ASTNode implements IContext
 		List<MethodMatch> list = new ArrayList();
 		this.theClass.getMethodMatches(list, null, name, argumentTypes);
 		
-		if (list.isEmpty())
+		if (list.isEmpty() && context != null)
 		{
 			Type t = context.getThisType();
 			t.theClass.getMethodMatches(list, this, name, argumentTypes);

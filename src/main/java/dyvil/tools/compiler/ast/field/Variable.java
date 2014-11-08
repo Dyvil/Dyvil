@@ -71,13 +71,13 @@ public class Variable extends Member implements IField
 	@Override
 	public void writeGet(MethodVisitor visitor)
 	{
-		visitor.visitIntInsn(Opcodes.ALOAD, this.index);
+		visitor.visitVarInsn(Opcodes.ALOAD, this.index);
 	}
 	
 	@Override
 	public void writeSet(MethodVisitor visitor)
 	{
-		visitor.visitIntInsn(Opcodes.ASTORE, this.index);
+		visitor.visitVarInsn(Opcodes.ASTORE, this.index);
 	}
 	
 	@Override
