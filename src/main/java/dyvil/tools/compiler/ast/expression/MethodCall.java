@@ -93,17 +93,13 @@ public class MethodCall extends Call implements INamed, IValued
 			this.arguments.replaceAll(v -> v.applyState(state, context));
 			return AccessResolver.resolve(context, this);
 		}
-		else
+		
+		if (this.instance != null)
 		{
-			if (this.instance != null)
-			{
-				this.instance = this.instance.applyState(state, context);
-			}
-			
-			this.arguments.replaceAll(v -> v.applyState(state, context));
-			
-			return this;
+			this.instance = this.instance.applyState(state, context);
 		}
+		this.arguments.replaceAll(v -> v.applyState(state, context));
+		return this;
 	}
 	
 	@Override

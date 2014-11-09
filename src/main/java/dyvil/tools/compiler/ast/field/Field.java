@@ -65,7 +65,10 @@ public class Field extends Member implements IField
 	@Override
 	public Field applyState(CompilerState state, IContext context)
 	{
-		this.type = this.type.applyState(state, context);
+		if (state == CompilerState.RESOLVE_TYPES)
+		{
+			this.type = this.type.applyState(state, context);
+		}
 		
 		if (this.value != null)
 		{
@@ -99,7 +102,7 @@ public class Field extends Member implements IField
 		String desc = this.type.getExtendedName();
 		visitor.visitFieldInsn(opcode, owner, name, desc);
 	}
-
+	
 	@Override
 	public void writeSet(MethodVisitor visitor)
 	{
@@ -118,7 +121,7 @@ public class Field extends Member implements IField
 		String desc = this.type.getExtendedName();
 		visitor.visitFieldInsn(opcode, owner, name, desc);
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

@@ -69,13 +69,8 @@ public class IfStatement extends ASTNode implements IStatement
 	public IValue applyState(CompilerState state, IContext context)
 	{
 		this.condition = this.condition.applyState(state, context);
-		this.then = this.then.applyState(state, context);
-		if (this.elseThen != null)
-		{
-			this.elseThen = this.elseThen.applyState(state, context);
-		}
 		
-		if (state == CompilerState.FOLD_CONSTANTS && false)
+		if (state == CompilerState.FOLD_CONSTANTS)
 		{
 			if (BooleanValue.TRUE.equals(this.condition))
 			{
@@ -86,6 +81,13 @@ public class IfStatement extends ASTNode implements IStatement
 				return this.elseThen;
 			}
 		}
+		
+		this.then = this.then.applyState(state, context);
+		if (this.elseThen != null)
+		{
+			this.elseThen = this.elseThen.applyState(state, context);
+		}
+		
 		return this;
 	}
 	

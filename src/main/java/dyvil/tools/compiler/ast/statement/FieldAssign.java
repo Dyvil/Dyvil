@@ -121,9 +121,12 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	@Override
 	public IValue applyState(CompilerState state, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES && this.initializer)
+		if (state == CompilerState.RESOLVE_TYPES)
 		{
-			this.field.applyState(state, context);
+			if (this.initializer)
+			{
+				this.field.applyState(state, context);
+			}
 		}
 		else if (state == CompilerState.RESOLVE)
 		{

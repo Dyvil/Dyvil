@@ -181,7 +181,12 @@ public class CompilationUnit extends ASTNode implements IContext
 		{
 			Dyvilc.logger.info(this.getFile() + ":\n" + this.toString());
 		}
-		this.classes.replaceAll(c -> c.applyState(state, this));
+		
+		for (IClass iclass : this.classes)
+		{
+			iclass.applyState(state, context);
+		}
+		
 		return this;
 	}
 	

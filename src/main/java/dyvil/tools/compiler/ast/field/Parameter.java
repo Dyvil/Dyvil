@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 
 public class Parameter extends Member implements IField
 {
-	public int index;
+	public int		index;
 	private char	seperator;
 	
 	public Parameter()
@@ -74,7 +74,7 @@ public class Parameter extends Member implements IField
 		}
 		return this;
 	}
-
+	
 	@Override
 	public void write(ClassWriter writer)
 	{}

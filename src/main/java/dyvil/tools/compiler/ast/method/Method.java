@@ -77,6 +77,11 @@ public class Method extends Member implements IMethod
 	{
 		if (name.equals(this.qualifiedName))
 		{
+			if (argumentTypes == null)
+			{
+				return 1;
+			}
+			
 			int pOff = 0;
 			int match = 1;
 			int len = argumentTypes.length;
@@ -209,7 +214,10 @@ public class Method extends Member implements IMethod
 			this.throwsDeclarations.replaceAll(t -> t.applyState(state, context));
 		}
 		
-		this.parameters.replaceAll(p -> p.applyState(state, context));
+		for (Parameter p : this.parameters)
+		{
+			p.applyState(state, context);
+		}
 		
 		if (this.statement != null)
 		{
@@ -218,7 +226,7 @@ public class Method extends Member implements IMethod
 		
 		return this;
 	}
-
+	
 	@Override
 	public boolean isStatic()
 	{
@@ -300,7 +308,7 @@ public class Method extends Member implements IMethod
 			visitor.visitEnd();
 		}
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

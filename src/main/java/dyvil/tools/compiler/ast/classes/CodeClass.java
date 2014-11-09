@@ -163,6 +163,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public Type toType()
+	{
+		return new Type(this.name, this);
+	}
+	
+	@Override
 	public boolean isSuperType(Type t)
 	{
 		if (t.equals(this.superClass) || this.interfaces.contains(t))
@@ -216,7 +222,7 @@ public class CodeClass extends ASTNode implements IClass
 			this.interfaces.replaceAll(t -> t.applyState(state, context));
 		}
 		
-		this.body = this.body.applyState(state, this);
+		this.body.applyState(state, this);
 		return this;
 	}
 	

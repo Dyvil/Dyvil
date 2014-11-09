@@ -88,8 +88,14 @@ public class ClassBody extends ASTNode
 	@Override
 	public ClassBody applyState(CompilerState state, IContext context)
 	{
-		this.fields.replaceAll(f -> f.applyState(state, context));
-		this.methods.replaceAll(m -> m.applyState(state, context));
+		for (IField field : this.fields)
+		{
+			field.applyState(state, context);
+		}
+		for (IMethod method : this.methods)
+		{
+			method.applyState(state, context);
+		}
 		
 		return this;
 	}

@@ -52,6 +52,8 @@ public class StatementList extends ValueList implements IStatement, IContext
 			IVariableList variableList = context instanceof IVariableList ? (IVariableList) context : null;
 			for (IValue v : this.values)
 			{
+				v.applyState(state, context);
+				
 				if (!(v instanceof FieldAssign))
 				{
 					continue;

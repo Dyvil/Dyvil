@@ -3,12 +3,10 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.IValueList;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -84,12 +82,5 @@ public abstract class Call extends ASTNode implements IValue, IValueList, IAcces
 			types[i] = t;
 		}
 		return types;
-	}
-
-	@Override
-	public IAccess applyState(CompilerState state, IContext context)
-	{
-		this.arguments.replaceAll(a -> a.applyState(state, context));
-		return this;
 	}
 }
