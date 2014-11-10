@@ -8,6 +8,9 @@ import java.util.function.Predicate;
 
 import dyvil.tools.compiler.Dyvilc;
 import dyvil.tools.compiler.ast.api.IASTNode;
+import dyvil.tools.compiler.ast.api.IMethod;
+import dyvil.tools.compiler.ast.api.IValueList;
+import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
@@ -125,6 +128,23 @@ public class Util
 				}
 			}
 			buffer.append(end);
+		}
+	}
+	
+	public static void prependValue(IMethod method, IValue value)
+	{
+		IValue value1 = method.getValue();
+		if (value1 instanceof IValueList)
+		{
+			List<IValue> list = ((IValueList) value1).getValues();
+			list.add(0, value);
+		}
+		else
+		{
+			StatementList list = new StatementList(null);
+			list.addValue(value1);
+			list.addValue(value);
+			method.setValue(list);
 		}
 	}
 	

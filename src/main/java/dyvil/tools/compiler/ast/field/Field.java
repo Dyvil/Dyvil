@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.FieldVisitor;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
@@ -81,9 +80,9 @@ public class Field extends Member implements IField
 	public void write(ClassWriter writer)
 	{
 		// TODO static fields initial value
-		FieldVisitor visitor = writer.visitField(this.modifiers, this.name, this.getDescription(), this.type.getSignature(), null);
+		writer.visitField(this.modifiers, this.name, this.getDescription(), this.type.getSignature(), null);
 	}
-
+	
 	@Override
 	public void writeGet(MethodVisitor visitor)
 	{

@@ -33,7 +33,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	
 	public IValue		instance;
 	public IField		field;
-	protected IValue	value;
+	public IValue		value;
 	
 	public FieldAssign(ICodePosition position)
 	{

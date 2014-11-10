@@ -12,10 +12,15 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.statement.FieldAssign;
+import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
@@ -351,14 +356,64 @@ public class CodeClass extends ASTNode implements IClass
 		writer.visit(Opcodes.V1_8, this.modifiers, internalName, signature, superClass, interfaces);
 		
 		List<IField> fields = this.body.fields;
+		ThisValue thisValue = new ThisValue(null, this.toType());
+		StatementList instanceFields = new StatementList(null);
+		StatementList staticFields = new StatementList(null);
+		boolean instanceFieldsAdded = false;
+		boolean staticFieldsAdded = false;
+		
 		for (IField f : fields)
 		{
 			f.write(writer);
+			
+			IValue v = f.getValue();
+			if (v != null)
+			{
+				if (f.hasModifier(Modifiers.STATIC))
+				{
+					FieldAssign assign = new FieldAssign(null, f.getName(), null);
+					assign.value = v;
+					assign.field = f;
+					staticFields.addValue(assign);
+				}
+				else
+				{
+					FieldAssign assign = new FieldAssign(null, f.getName(), thisValue);
+					assign.value = v;
+					assign.field = f;
+					instanceFields.addValue(assign);
+				}
+			}
 		}
 		
 		List<IMethod> methods = this.body.methods;
 		for (IMethod m : methods)
 		{
+			String name = m.getName();
+			if (name.equals("<init>"))
+			{
+				Util.prependValue(m, instanceFields);
+				instanceFieldsAdded = true;
+			}
+			else if (name.equals("<clinit>"))
+			{
+				Util.prependValue(m, staticFields);
+				staticFieldsAdded = true;
+			}
+			m.write(writer);
+		}
+		
+		if (!instanceFieldsAdded)
+		{
+			// TODO
+		}
+		if (!staticFieldsAdded)
+		{
+			Method m = new Method(this);
+			m.setQualifiedName("<clinit>");
+			m.setType(Type.VOID);
+			m.setModifiers(Modifiers.STATIC | Modifiers.MANDATED);
+			m.setValue(staticFields);
 			m.write(writer);
 		}
 	}

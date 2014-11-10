@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Symbols;
 import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
@@ -31,9 +32,20 @@ public class Method extends Member implements IMethod
 	
 	private List<Variable>	variables			= new ArrayList(5);
 	
+	private boolean			isConstructor;
+	
 	public Method(IClass iclass)
 	{
 		super(iclass);
+	}
+	
+	@Override
+	public void setQualifiedName(String name)
+	{
+		this.qualifiedName = name;
+		this.name = Symbols.contract(name);
+		
+		this.isConstructor = name.equals("<init>");
 	}
 	
 	@Override
@@ -302,6 +314,11 @@ public class Method extends Member implements IMethod
 				String desc = var.getDescription();
 				String signature = var.getSignature();
 				visitor.visitLocalVariable(name, desc, signature, var.start, var.end, var.index);
+			}
+			
+			if (this.isConstructor)
+			{
+				index++;
 			}
 			
 			visitor.visitMaxs(10, index);
