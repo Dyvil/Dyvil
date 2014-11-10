@@ -35,6 +35,12 @@ public class Dyvilc
 	
 	public static void main(String[] args)
 	{
+		// Sets up States from config
+		for (int i = 1; i < args.length; i++)
+		{
+			addStates(args[i]);
+		}
+		
 		// Sets up the logger
 		initLogger();
 		
@@ -49,12 +55,6 @@ public class Dyvilc
 		
 		// Inits primitive data types
 		Type.init();
-		
-		// Sets up States from config
-		for (int i = 1; i < args.length; i++)
-		{
-			addStates(args[i]);
-		}
 		
 		run();
 	}

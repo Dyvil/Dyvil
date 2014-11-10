@@ -175,7 +175,7 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			return true;
 		}
-		else if (this.superClass.theClass != null)
+		else if (this.superClass != null && this.superClass.theClass != null)
 		{
 			return this.superClass.theClass.isSuperType(t);
 		}

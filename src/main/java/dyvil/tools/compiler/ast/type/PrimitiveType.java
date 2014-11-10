@@ -17,6 +17,12 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
+	protected boolean isAssignableFrom(Type that)
+	{
+		return false;
+	}
+	
+	@Override
 	public Type resolve(IContext context)
 	{
 		return this;

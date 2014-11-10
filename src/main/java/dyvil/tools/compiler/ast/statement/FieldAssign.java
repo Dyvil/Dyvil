@@ -130,7 +130,10 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 		}
 		else if (state == CompilerState.RESOLVE)
 		{
-			this.value.applyState(state, context);
+			if (this.value != null)
+			{
+				this.value.applyState(state, context);
+			}
 			return AccessResolver.resolve(context, this);
 		}
 		else if (state == CompilerState.CHECK)
