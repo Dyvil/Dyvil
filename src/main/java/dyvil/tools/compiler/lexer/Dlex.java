@@ -521,12 +521,12 @@ public class Dlex implements Iterable<IToken>
 		case TYPE_FLOAT:
 			return Float.parseFloat(value);
 		case TYPE_FLOAT | MOD_HEX:
-			return Float.parseFloat(value.substring(2)); // FIXME
+			return Float.parseFloat(value.substring(2));
 			
 		case TYPE_DOUBLE:
 			return Double.parseDouble(value);
 		case TYPE_DOUBLE | MOD_HEX:
-			return Double.parseDouble(value.substring(2)); // FIXME
+			return Double.parseDouble(value.substring(2));
 			
 		case TYPE_STRING:
 			return value.substring(1, value.length() - 1);

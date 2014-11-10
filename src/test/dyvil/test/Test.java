@@ -8,9 +8,13 @@ public class Test
 		
 		String text;
 		if (flag)
+		{
 			text = "True";
+		}
 		else
+		{
 			text = "False";
+		}
 		System.out.println(text);
 	};
 }

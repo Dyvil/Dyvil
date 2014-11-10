@@ -124,7 +124,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.pushParser(new TypeParser(this.context, call));
 				return true;
 			}
-			else if ((token.isType(IToken.TYPE_IDENTIFIER) || token.equals("(")) && !token.next().isType(Token.TYPE_OPEN_BRACKET))
+			else if ((token.isType(IToken.TYPE_IDENTIFIER) || token.equals("(")) && !token.next().isType(IToken.TYPE_OPEN_BRACKET))
 			{
 				this.mode = ACCESS | VARIABLE;
 				pm.pushParser(new TypeParser(this.context, this), true);
@@ -152,7 +152,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(VARIABLE))
 		{
-			if (token.isType(Token.TYPE_IDENTIFIER))
+			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				IToken next = token.next();
 				boolean flag = next.equals("=");

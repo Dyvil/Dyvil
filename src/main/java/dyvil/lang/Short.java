@@ -77,13 +77,13 @@ public abstract class Short implements Number
 	@Override
 	public Short $minus()
 	{
-		return this.$eq((short) (-this.value));
+		return this.$eq((short) -this.value);
 	}
 	
 	@Override
 	public Short $tilde()
 	{
-		return this.$eq((short) (~this.value));
+		return this.$eq((short) ~this.value);
 	}
 	
 	@Override

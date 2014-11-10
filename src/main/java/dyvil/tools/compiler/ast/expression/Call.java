@@ -73,11 +73,15 @@ public abstract class Call extends ASTNode implements IValue, IValueList, IAcces
 		{
 			IValue arg = this.arguments.get(i);
 			if (arg == null)
+			{
 				return null;
+			}
 			
 			Type t = arg.getType();
 			if (t == null)
+			{
 				return null;
+			}
 			
 			types[i] = t;
 		}

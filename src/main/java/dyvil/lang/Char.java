@@ -77,13 +77,13 @@ public abstract class Char implements Number
 	@Override
 	public Char $minus()
 	{
-		return this.$eq((char) (-this.value));
+		return this.$eq((char) -this.value);
 	}
 	
 	@Override
 	public Char $tilde()
 	{
-		return this.$eq((char) (~this.value));
+		return this.$eq((char) ~this.value);
 	}
 	
 	@Override
