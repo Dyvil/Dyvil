@@ -9,5 +9,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface bytecode
 {
-	public String value();
+	/**
+	 * The opcode of this bytecode instruction.
+	 * @return the opcode
+	 */
+	public int value();
 }
