@@ -62,13 +62,51 @@ public class Dlex implements Iterable<IToken>
 			
 			if (type == TYPE_IDENTIFIER)
 			{
-				if (isIdentifierPart(c))
+				if (subtype == MOD_DOTS)
 				{
-					buf.append(c);
+					if (c == '.')
+					{
+						buf.append(c);
+					}
 				}
 				else
 				{
-					addToken = true;
+					boolean letter = (subtype & MOD_LETTER) != 0;
+					boolean symbol = (subtype & MOD_SYMBOL) != 0;
+					if (letter)
+					{
+						if (c == '_')
+						{
+							subtype |= MOD_SYMBOL;
+							buf.append(c);
+						}
+						else if (isIdentifierPart(c))
+						{
+							subtype = MOD_LETTER;
+							buf.append(c);
+						}
+						else if (!symbol)
+						{
+							addToken = true;
+						}
+					}
+					if (symbol)
+					{
+						if (c == '_')
+						{
+							subtype |= MOD_LETTER;
+							buf.append(c);
+						}
+						else if (isIdentifierSymbol(c))
+						{
+							subtype = MOD_SYMBOL;
+							buf.append(c);
+						}
+						else if (!letter)
+						{
+							addToken = true;
+						}
+					}
 				}
 			}
 			else if (type == TYPE_SYMBOL)
@@ -315,9 +353,13 @@ public class Dlex implements Iterable<IToken>
 		{
 			return TYPE_INT;
 		}
-		else if (isIdentifierStart(c))
+		else if (isIdentifierSymbol(c))
 		{
-			return TYPE_IDENTIFIER;
+			return TYPE_IDENTIFIER | MOD_SYMBOL;
+		}
+		else if (isIdentifierPart(c))
+		{
+			return TYPE_IDENTIFIER | MOD_LETTER;
 		}
 		else if (isOpenBracket(c))
 		{
@@ -326,6 +368,15 @@ public class Dlex implements Iterable<IToken>
 		else if (isCloseBracket(c))
 		{
 			return TYPE_CLOSE_BRACKET;
+		}
+		else if (c == '.')
+		{
+			char n = code.charAt(i + 1);
+			if (n == '.')
+			{
+				return TYPE_IDENTIFIER | MOD_DOTS;
+			}
+			return TYPE_SYMBOL;
 		}
 		else if (isSymbol(c))
 		{

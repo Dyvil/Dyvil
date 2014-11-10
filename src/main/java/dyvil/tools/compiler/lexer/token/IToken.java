@@ -17,6 +17,10 @@ public interface IToken extends ICodePosition
 	public int	MOD_OPEN			= 0x00010000;
 	public int	MOD_CLOSE			= 0x00020000;
 	
+	public int	MOD_LETTER			= 0x00010000;
+	public int	MOD_SYMBOL			= 0x00020000;
+	public int	MOD_DOTS			= 0x00040000;
+	
 	// TYPES
 	public int	TYPE_IDENTIFIER		= 0x00000001;
 	public int	TYPE_SYMBOL			= 0x00000002;

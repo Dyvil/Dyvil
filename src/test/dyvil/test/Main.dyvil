@@ -12,8 +12,9 @@ import java.lang.Comparable;
 
 public class Main
 {
+	public static int i = 1+2;
+	
 	public static void main(String[] args) = {
-		String text = if true "True"; else "False";
-		System out println(text);
+		System out println(i);
 	};
 }

@@ -148,7 +148,7 @@ public class Token implements IToken
 		IToken token = this;
 		for (Object object : objects)
 		{
-			if (!token.match(objects))
+			if (!token.match(object))
 			{
 				return false;
 			}
