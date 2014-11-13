@@ -75,7 +75,7 @@ public class Dlex implements Iterable<IToken>
 					boolean symbol = (subtype & MOD_SYMBOL) != 0;
 					if (letter)
 					{
-						if (c == '_')
+						if (c == '_' || c == '$' || c == '@')
 						{
 							subtype |= MOD_SYMBOL;
 							buf.append(c);
@@ -92,7 +92,7 @@ public class Dlex implements Iterable<IToken>
 					}
 					if (symbol)
 					{
-						if (c == '_')
+						if (c == '_' || c == '$' || c == '@')
 						{
 							subtype |= MOD_LETTER;
 							buf.append(c);

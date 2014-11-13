@@ -5,7 +5,6 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IAccess;
-import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -20,7 +19,6 @@ import dyvil.tools.compiler.util.Util;
 public class ConstructorCall extends Call implements ITyped
 {
 	protected Type		type;
-	protected IMethod	method;
 	protected boolean	isCustom;
 	
 	public ConstructorCall(ICodePosition position)

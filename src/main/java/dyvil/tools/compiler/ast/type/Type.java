@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -186,6 +187,24 @@ public class Type extends ASTNode implements IContext
 		return null;
 	}
 	
+	public int getLoadOpcode()
+	{
+		if (this.arrayDimensions > 0)
+		{
+			return Opcodes.AALOAD;
+		}
+		return Opcodes.ALOAD;
+	}
+	
+	public int getStoreOpcode()
+	{
+		if (this.arrayDimensions > 0)
+		{
+			return Opcodes.AASTORE;
+		}
+		return Opcodes.ASTORE;
+	}
+	
 	public Type resolve(IContext context)
 	{
 		if (this.theClass == null)
@@ -271,7 +290,7 @@ public class Type extends ASTNode implements IContext
 	@Override
 	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
 	{
-		if (this.theClass == null || argumentTypes == null)
+		if (this.theClass == null)
 		{
 			return null;
 		}

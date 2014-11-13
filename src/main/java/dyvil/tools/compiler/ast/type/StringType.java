@@ -13,7 +13,7 @@ public class StringType extends Type
 	@Override
 	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
 	{
-		if (name.equals("+") && argumentTypes.length == 1)
+		if (name.equals("$plus") && argumentTypes.length == 1)
 		{
 			return this.theClass.resolveMethod(returnType, "concat", argumentTypes);
 		}

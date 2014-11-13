@@ -81,13 +81,13 @@ public class Parameter extends Member implements IField
 	@Override
 	public void writeGet(MethodVisitor visitor)
 	{
-		visitor.visitVarInsn(Opcodes.ALOAD, this.index);
+		visitor.visitVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
 	@Override
 	public void writeSet(MethodVisitor visitor)
 	{
-		visitor.visitVarInsn(Opcodes.ASTORE, this.index);
+		visitor.visitVarInsn(this.type.getStoreOpcode(), this.index);
 	}
 	
 	@Override

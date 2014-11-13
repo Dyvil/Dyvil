@@ -153,9 +153,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
-				IToken next = token.next();
-				boolean flag = next.equals("=");
-				if (flag || next.equals(";"))
+				if (token.next().equals("="))
 				{
 					ICodePosition pos = token.raw();
 					Type type = ((ClassAccess) this.value).getType();
@@ -165,11 +163,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					access.initializer = true;
 					this.value = access;
 					
-					if (flag)
-					{
-						pm.skip();
-						pm.pushParser(new ExpressionParser(this.context, access));
-					}
+					pm.skip();
+					pm.pushParser(new ExpressionParser(this.context, access));
 					
 					return true;
 				}

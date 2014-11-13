@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.structure.IContext;
 
@@ -67,6 +68,42 @@ public class PrimitiveType extends Type
 		{
 			buf.append("D");
 		}
+	}
+	
+	@Override
+	public int getLoadOpcode()
+	{
+		if (this == LONG)
+		{
+			return Opcodes.LLOAD;
+		}
+		else if (this == FLOAT)
+		{
+			return Opcodes.FLOAD;
+		}
+		else if (this == DOUBLE)
+		{
+			return Opcodes.DLOAD;
+		}
+		return Opcodes.ILOAD;
+	}
+	
+	@Override
+	public int getStoreOpcode()
+	{
+		if (this == LONG)
+		{
+			return Opcodes.LSTORE;
+		}
+		else if (this == FLOAT)
+		{
+			return Opcodes.FSTORE;
+		}
+		else if (this == DOUBLE)
+		{
+			return Opcodes.DSTORE;
+		}
+		return Opcodes.ISTORE;
 	}
 	
 	@Override
