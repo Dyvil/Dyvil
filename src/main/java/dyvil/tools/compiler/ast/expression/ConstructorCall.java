@@ -175,7 +175,7 @@ public class ConstructorCall extends Call implements ITyped
 	{
 		buffer.append("new ");
 		this.type.toString("", buffer);
-		if (this.isSugarCall && !Formatting.Method.convertSugarCalls)
+		if (this.isSugarCall && !Formatting.Method.useJavaFormat)
 		{
 			this.arguments.get(0).toString("", buffer);
 		}

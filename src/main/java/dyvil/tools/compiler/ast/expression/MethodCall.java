@@ -28,6 +28,8 @@ public class MethodCall extends Call implements INamed, IValued
 	protected String	name;
 	protected String	qualifiedName;
 	
+	public boolean		dotless;
+	
 	public MethodCall(ICodePosition position)
 	{
 		super(position);
@@ -105,6 +107,11 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public boolean resolve(IContext context, IContext context1)
 	{
+		if (this.method != null)
+		{
+			return true;
+		}
+		
 		MethodMatch match = context.resolveMethod(context1, this.qualifiedName, this.getTypes());
 		if (match != null)
 		{
@@ -130,7 +137,7 @@ public class MethodCall extends Call implements INamed, IValued
 		
 		return null;
 	}
-
+	
 	@Override
 	public IAccess resolve3(IContext context, IAccess next)
 	{
@@ -184,47 +191,39 @@ public class MethodCall extends Call implements INamed, IValued
 	{
 		// TODO
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.isSugarCall && !Formatting.Method.convertSugarCalls)
+		if (this.instance != null)
 		{
-			if (this.instance != null)
+			this.instance.toString("", buffer);
+			if (this.dotless && !Formatting.Method.useJavaFormat)
 			{
-				this.instance.toString("", buffer);
-				buffer.append(Formatting.Method.sugarCallStart);
-			}
-			
-			if (Formatting.Method.convertQualifiedNames)
-			{
-				buffer.append(this.qualifiedName);
+				buffer.append(Formatting.Method.dotlessSeperator);
 			}
 			else
 			{
-				buffer.append(this.name);
+				buffer.append('.');
 			}
-			
-			buffer.append(Formatting.Method.sugarCallEnd);
+		}
+		
+		if (Formatting.Method.convertQualifiedNames)
+		{
+			buffer.append(this.qualifiedName);
+		}
+		else
+		{
+			buffer.append(this.name);
+		}
+		
+		if (this.isSugarCall && !Formatting.Method.useJavaFormat)
+		{
+			buffer.append(Formatting.Method.sugarCallSeperator);
 			this.arguments.get(0).toString("", buffer);
 		}
 		else
 		{
-			if (this.instance != null)
-			{
-				this.instance.toString("", buffer);
-				buffer.append('.');
-			}
-			
-			if (Formatting.Method.convertQualifiedNames)
-			{
-				buffer.append(this.qualifiedName);
-			}
-			else
-			{
-				buffer.append(this.name);
-			}
-			
 			Util.parametersToString(this.arguments, buffer, !this.isSugarCall);
 		}
 	}

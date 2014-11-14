@@ -32,7 +32,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	protected String	name;
 	protected String	qualifiedName;
 	
-	protected boolean	dotless;
+	public boolean		dotless;
 	
 	public IField		field;
 	
@@ -149,6 +149,11 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public boolean resolve(IContext context, IContext context1)
 	{
+		if (this.field != null)
+		{
+			return true;
+		}
+		
 		FieldMatch f = context.resolveField(context1, this.qualifiedName);
 		if (f != null)
 		{
@@ -166,6 +171,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		{
 			MethodCall call = new MethodCall(this.position, this.instance, this.name);
 			call.method = match.theMethod;
+			call.dotless = this.dotless;
 			call.isSugarCall = true;
 			return call;
 		}
@@ -182,6 +188,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 			MethodCall call = new MethodCall(this.position, this.instance, this.name);
 			call.addValue(next);
 			call.method = m.theMethod;
+			call.dotless = this.dotless;
 			call.isSugarCall = true;
 			return call;
 		}
@@ -215,32 +222,26 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.dotless && !Formatting.Field.convertSugarAccess)
+		if (this.instance != null)
 		{
-			if (this.instance != null)
+			this.instance.toString("", buffer);
+			if (this.dotless && !Formatting.Field.useJavaFormat)
 			{
-				this.instance.toString("", buffer);
-				buffer.append(Formatting.Field.sugarAccessStart);
+				buffer.append(Formatting.Field.dotlessSeperator);
 			}
-			
+			else
+			{
+				buffer.append('.');
+			}
+		}
+		
+		if (Formatting.Method.convertQualifiedNames)
+		{
 			buffer.append(this.qualifiedName);
 		}
 		else
 		{
-			if (this.instance != null)
-			{
-				this.instance.toString("", buffer);
-				buffer.append('.');
-			}
-			
-			if (Formatting.Method.convertQualifiedNames)
-			{
-				buffer.append(this.qualifiedName);
-			}
-			else
-			{
-				buffer.append(this.name);
-			}
+			buffer.append(this.name);
 		}
 	}
 }

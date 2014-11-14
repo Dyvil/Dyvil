@@ -132,6 +132,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 		{
 			MethodCall call = new MethodCall(this.position, null, name);
 			call.method = m.theMethod;
+			call.dotless = true;
 			call.isSugarCall = true;
 			return call;
 		}
@@ -149,6 +150,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 			MethodCall call = new MethodCall(this.position, null, name);
 			call.addValue(next);
 			call.method = m.theMethod;
+			call.dotless = true;
 			call.isSugarCall = true;
 			return call;
 		}

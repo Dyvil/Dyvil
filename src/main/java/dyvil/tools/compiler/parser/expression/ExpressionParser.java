@@ -30,7 +30,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int	TUPLE_END		= 4;
 	
 	public static final int	ACCESS			= 8;
-	public static final int	DOT_ACCESS		= 16;
+	public static final int	ACCESS_2		= 16;
 	
 	public static final int	STATEMENT		= 64;
 	public static final int	TYPE			= 128;
@@ -44,6 +44,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	
 	private IValue			value;
 	
+	private boolean			dotless;
+	
 	public ExpressionParser(IContext context, IValued field)
 	{
 		this.mode = VALUE;
@@ -54,7 +56,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (this.mode == 0 || ";".equals(value) || ")".equals(value) && !this.isInMode(PARAMETERS_2) && !this.isInMode(TUPLE_END))
+		if (this.mode == 0 || ";".equals(value))
 		{
 			pm.popParser(true);
 			return true;
@@ -174,9 +176,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (".".equals(value))
 			{
-				this.mode = DOT_ACCESS;
+				this.mode = ACCESS_2;
+				this.dotless = false;
 				return true;
 			}
+			
+			this.dotless = true;
 			
 			if ("=".equals(value))
 			{
@@ -208,9 +213,9 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.popParser(true);
 				return true;
 			}
-			this.mode = DOT_ACCESS;
+			this.mode = ACCESS_2;
 		}
-		if (this.isInMode(DOT_ACCESS))
+		if (this.isInMode(ACCESS_2))
 		{
 			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
@@ -226,6 +231,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				{
 					MethodCall call = new MethodCall(token, this.value, value);
 					call.setSugar(true);
+					call.dotless = this.dotless;
 					this.value = call;
 					
 					ExpressionParser parser = new ExpressionParser(this.context, this);
@@ -236,6 +242,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				else
 				{
 					FieldAccess access = new FieldAccess(token, this.value, value);
+					access.dotless = this.dotless;
 					this.value = access;
 					this.mode = ACCESS;
 					return true;

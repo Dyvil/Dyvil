@@ -18,7 +18,8 @@ public class Main
 	{
 		System out println "Please enter your number to convert to binary.";
 		int i = scanner nextInt;
-		System out println ("= 0b" + (Integer toBinaryString i));
+		String s = "= 0b" + (Integer toBinaryString i);
+		System out println(s);
 		System out println;
 		
 		// Recursion

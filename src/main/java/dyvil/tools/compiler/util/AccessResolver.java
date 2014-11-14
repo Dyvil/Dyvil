@@ -55,18 +55,17 @@ public class AccessResolver
 						if (alternate != null)
 						{
 							next.setValue(null);
+							curr = alternate;
 							iterator.set(alternate);
 							continue;
 						}
 					}
-					else
-					{
-						markers.add(curr.getResolveError());
-						return access;
-					}
+					
+					markers.add(curr.getResolveError());
+					return access;
 				}
 				
-				prev = alternate;
+				curr = alternate;
 				continue;
 			}
 		}

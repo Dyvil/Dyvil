@@ -38,9 +38,8 @@ public class Formatting
 		public static String	keyValueSeperator		= " = ";
 		
 		public static boolean	convertQualifiedNames	= false;
-		public static boolean	convertSugarAccess		= true;
-		public static String	sugarAccessStart		= " ";
-		public static String	sugarAccessEnd			= " ";
+		public static boolean	useJavaFormat			= true;
+		public static String	dotlessSeperator		= " ";
 	}
 	
 	public static class Method
@@ -51,9 +50,9 @@ public class Formatting
 		public static String	parameterSeperator			= ", ";
 		
 		public static boolean	convertQualifiedNames		= false;
-		public static boolean	convertSugarCalls			= true;
-		public static String	sugarCallStart				= " ";
-		public static String	sugarCallEnd				= " ";
+		public static boolean	useJavaFormat				= true;
+		public static String	dotlessSeperator			= " ";
+		public static String	sugarCallSeperator			= " ";
 		
 		public static String	throwsSeperator				= ", ";
 		public static String	signatureThrowsSeperator	= " throws ";
