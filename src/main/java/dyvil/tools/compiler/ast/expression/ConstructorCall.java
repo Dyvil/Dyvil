@@ -117,7 +117,13 @@ public class ConstructorCall extends Call implements ITyped
 	@Override
 	public IAccess resolve2(IContext context, IContext context1)
 	{
-		return this;
+		return null;
+	}
+	
+	@Override
+	public IAccess resolve3(IContext context, IAccess next)
+	{
+		return null;
 	}
 	
 	@Override

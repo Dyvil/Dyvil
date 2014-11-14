@@ -24,7 +24,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	
 	public Map<String, IField>	variables	= new HashMap();
 	public Label				start		= new Label();
-	public Label				end		= new Label();
+	public Label				end			= new Label();
 	
 	public StatementList(ICodePosition position)
 	{
@@ -50,9 +50,15 @@ public class StatementList extends ValueList implements IStatement, IContext
 		else if (state == CompilerState.RESOLVE)
 		{
 			IVariableList variableList = context instanceof IVariableList ? (IVariableList) context : null;
-			for (IValue v : this.values)
+			for (int i = 0; i < this.values.size(); i++)
 			{
-				v.applyState(state, this);
+				IValue v = this.values.get(i);
+				IValue v1 = v.applyState(state, this);
+				if (v1 != v)
+				{
+					this.values.set(i, v1);
+					v = v1;
+				}
 				
 				if (!(v instanceof FieldAssign))
 				{

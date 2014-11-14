@@ -11,17 +11,17 @@ public class Main
 		System out println "-------------------------";
 		
 		Scanner scanner = new Scanner(System in);
-		scan(scanner);
+		scan scanner;
 	};
 	
 	public static void scan(Scanner scanner) =
 	{
 		System out println "Please enter your number to convert to binary.";
 		int i = scanner nextInt;
-		System out println("= 0b" + (Integer toBinaryString(i)));
+		System out println ("= 0b" + (Integer toBinaryString i));
 		System out println;
 		
 		// Recursion
-		scan(scanner);
+		scan scanner;
 	};
 }

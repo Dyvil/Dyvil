@@ -58,6 +58,10 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public Type getType()
 	{
+		if (this.field == null)
+		{
+			return null;
+		}
 		return this.field.getType();
 	}
 	
@@ -88,37 +92,37 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public void setValues(List<IValue> list)
 	{}
-
+	
 	@Override
 	public void setValue(int index, IValue value)
 	{}
-
+	
 	@Override
 	public void addValue(IValue value)
 	{}
-
+	
 	@Override
 	public List<IValue> getValues()
 	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	@Override
 	public IValue getValue(int index)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setArray(boolean array)
 	{}
-
+	
 	@Override
 	public boolean isArray()
 	{
 		return false;
 	}
-
+	
 	@Override
 	public IValue applyState(CompilerState state, IContext context)
 	{
@@ -160,12 +164,29 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		MethodMatch match = context.resolveMethod(context1, this.qualifiedName, Type.EMPTY_TYPES);
 		if (match != null)
 		{
-			MethodCall call = new MethodCall(this.position, this.instance, this.qualifiedName);
+			MethodCall call = new MethodCall(this.position, this.instance, this.name);
 			call.method = match.theMethod;
 			call.isSugarCall = true;
 			return call;
 		}
-		return this;
+		
+		return null;
+	}
+	
+	@Override
+	public IAccess resolve3(IContext context, IAccess next)
+	{
+		MethodMatch m = context.resolveMethod(null, this.qualifiedName, next.getType());
+		if (m != null)
+		{
+			MethodCall call = new MethodCall(this.position, this.instance, this.name);
+			call.addValue(next);
+			call.method = m.theMethod;
+			call.isSugarCall = true;
+			return call;
+		}
+		
+		return null;
 	}
 	
 	@Override
@@ -190,7 +211,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	{
 		// TODO
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

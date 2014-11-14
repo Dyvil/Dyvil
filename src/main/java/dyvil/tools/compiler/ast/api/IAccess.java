@@ -12,6 +12,8 @@ public interface IAccess extends INamed, IValue, IValued, IValueList
 	
 	public IAccess resolve2(IContext context, IContext context1);
 	
+	public IAccess resolve3(IContext context, IAccess next);
+	
 	public Marker getResolveError();
 	
 	@Override

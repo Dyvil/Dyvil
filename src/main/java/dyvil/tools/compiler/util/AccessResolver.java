@@ -17,42 +17,61 @@ public class AccessResolver
 		List<Marker> markers = CompilerState.RESOLVE.file.markers;
 		LinkedList<IAccess> chain = getCallChain(access);
 		
-		IAccess a = null;
 		ListIterator<IAccess> iterator = chain.listIterator();
+		IAccess prev = null;
+		IAccess curr = null;
+		IAccess next = iterator.next();
+		
 		while (iterator.hasNext())
 		{
 			IContext context1 = context;
-			IAccess iaccess = iterator.next();
-			if (a != null)
+			
+			prev = curr;
+			curr = next;
+			next = iterator.next();
+			
+			if (prev != null)
 			{
-				context1 = a.getType();
-				iaccess.setValue(a);
+				context1 = prev.getType();
+				curr.setValue(prev);
 			}
 			else
 			{
-				IValue value = iaccess.getValue();
+				IValue value = curr.getValue();
 				if (value != null)
 				{
 					context1 = value.getType();
 				}
 			}
 			
-			if (!iaccess.resolve(context1, context))
+			if (!curr.resolve(context1, context))
 			{
-				IAccess iaccess2 = iaccess.resolve2(context1, context);
-				if (iaccess2 == iaccess)
+				IAccess alternate = curr.resolve2(context1, context);
+				if (alternate == null)
 				{
-					markers.add(iaccess.getResolveError());
-					return access;
+					if (next.resolve(context, context1))
+					{
+						alternate = curr.resolve3(context1, next);
+						if (alternate != null)
+						{
+							next.setValue(null);
+							iterator.set(alternate);
+							continue;
+						}
+					}
+					else
+					{
+						markers.add(curr.getResolveError());
+						return access;
+					}
 				}
 				
-				a = iaccess2;
+				prev = alternate;
 				continue;
 			}
-			a = iaccess;
 		}
 		
-		return a;
+		return chain.getLast();
 	}
 	
 	public static LinkedList<IAccess> getCallChain(IAccess iaccess)

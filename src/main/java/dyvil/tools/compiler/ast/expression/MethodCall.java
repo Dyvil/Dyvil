@@ -127,7 +127,14 @@ public class MethodCall extends Call implements INamed, IValued
 				return access;
 			}
 		}
-		return this;
+		
+		return null;
+	}
+
+	@Override
+	public IAccess resolve3(IContext context, IAccess next)
+	{
+		return null;
 	}
 	
 	@Override

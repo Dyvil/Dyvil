@@ -21,7 +21,6 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.AccessResolver;
 import dyvil.tools.compiler.util.Symbols;
 
 public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
@@ -134,7 +133,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 			{
 				this.value.applyState(state, context);
 			}
-			return AccessResolver.resolve(context, this);
+			return this;
 		}
 		else if (state == CompilerState.CHECK)
 		{
@@ -172,7 +171,13 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	@Override
 	public IAccess resolve2(IContext context, IContext context1)
 	{
-		return this;
+		return null;
+	}
+
+	@Override
+	public IAccess resolve3(IContext context, IAccess next)
+	{
+		return null;
 	}
 	
 	@Override

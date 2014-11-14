@@ -57,7 +57,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setValues(List<IValue> list)
 	{}
@@ -65,23 +65,23 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public void setValue(int index, IValue value)
 	{}
-
+	
 	@Override
 	public void addValue(IValue value)
 	{}
-
+	
 	@Override
 	public List<IValue> getValues()
 	{
 		return null;
 	}
-
+	
 	@Override
 	public IValue getValue(int index)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setArray(boolean array)
 	{}
@@ -108,7 +108,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 		}
 		return this;
 	}
-
+	
 	@Override
 	public boolean resolve(IContext context, IContext context1)
 	{
@@ -136,7 +136,24 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 			return call;
 		}
 		
-		return this;
+		return null;
+	}
+	
+	@Override
+	public IAccess resolve3(IContext context, IAccess next)
+	{
+		String name = this.type.name;
+		MethodMatch m = context.resolveMethod(null, name, next.getType());
+		if (m != null)
+		{
+			MethodCall call = new MethodCall(this.position, null, name);
+			call.addValue(next);
+			call.method = m.theMethod;
+			call.isSugarCall = true;
+			return call;
+		}
+		
+		return null;
 	}
 	
 	@Override
@@ -154,7 +171,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public void writeJump(MethodVisitor visitor, Label label)
 	{}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

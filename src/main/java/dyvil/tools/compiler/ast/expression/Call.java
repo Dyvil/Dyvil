@@ -41,13 +41,13 @@ public abstract class Call extends ASTNode implements IValue, IValueList, IAcces
 	{
 		this.arguments.set(index, value);
 	}
-
+	
 	@Override
 	public void addValue(IValue value)
 	{
 		this.arguments.add(value);
 	}
-
+	
 	@Override
 	public List<IValue> getValues()
 	{
@@ -64,7 +64,7 @@ public abstract class Call extends ASTNode implements IValue, IValueList, IAcces
 	{
 		this.isSugarCall = sugar;
 	}
-
+	
 	public Type[] getTypes()
 	{
 		int len = this.arguments.size();
