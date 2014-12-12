@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IAccess;
@@ -17,6 +16,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
@@ -203,20 +203,30 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeExpression(MethodWriter writer)
 	{
 		if (this.instance != null)
 		{
-			this.instance.write(visitor);
+			this.instance.writeExpression(writer);
 		}
 		
-		this.field.writeGet(visitor);
+		this.field.writeGet(writer);
 	}
 	
 	@Override
-	public void writeJump(MethodVisitor visitor, Label label)
+	public void writeStatement(MethodWriter writer)
 	{
-		// TODO
+		if (this.instance != null)
+		{
+			this.instance.writeExpression(writer);
+		}
+		
+		this.field.writeGet(writer);
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label label)
+	{
 	}
 	
 	@Override

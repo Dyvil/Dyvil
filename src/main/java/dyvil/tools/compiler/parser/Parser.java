@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.Dyvilc;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 
@@ -23,7 +23,7 @@ public abstract class Parser<T>
 	public Parser()
 	{
 		this.parent = rootParser;
-		if (Dyvilc.parseStack)
+		if (DyvilCompiler.parseStack)
 		{
 			this.name = this.computeName();
 		}
@@ -32,7 +32,7 @@ public abstract class Parser<T>
 	public Parser(Parser parent)
 	{
 		this.parent = parent;
-		if (Dyvilc.parseStack)
+		if (DyvilCompiler.parseStack)
 		{
 			this.name = parent.name + "." + this.computeName();
 		}
@@ -59,7 +59,7 @@ public abstract class Parser<T>
 		if (parent != null)
 		{
 			this.parent = parent;
-			if (Dyvilc.parseStack)
+			if (DyvilCompiler.parseStack)
 			{
 				this.name = parent.name + "." + this.computeName();
 			}

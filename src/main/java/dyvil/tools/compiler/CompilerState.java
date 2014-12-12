@@ -79,15 +79,15 @@ public enum CompilerState
 	public void apply(List<CompilationUnit> units, IContext context)
 	{
 		long now = 0L;
-		if (Dyvilc.debug)
+		if (DyvilCompiler.debug)
 		{
-			Dyvilc.logger.info("Applying State " + this.name());
+			DyvilCompiler.logger.info("Applying State " + this.name());
 			now = System.nanoTime();
 		}
 		
 		if (this == JAR)
 		{
-			ClassWriter.generateJAR(Dyvilc.files);
+			ClassWriter.generateJAR(DyvilCompiler.files);
 		}
 		else
 		{
@@ -98,7 +98,7 @@ public enum CompilerState
 			}
 		}
 		
-		if (Dyvilc.debug)
+		if (DyvilCompiler.debug)
 		{
 			Util.logProfile(now, units.size(), "Finished State " + this.name() + " (%.1f ms, %.1f ms/CU, %.2f CU/s)");
 		}

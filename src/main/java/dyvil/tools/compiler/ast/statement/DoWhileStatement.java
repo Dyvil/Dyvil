@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 
 public class DoWhileStatement extends ASTNode implements IStatement, IValued
 {
@@ -59,14 +59,17 @@ public class DoWhileStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void writeExpression(MethodWriter writer)
 	{
-		// TODO
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeStatement(MethodWriter writer)
 	{
-		// TODO
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
 	}
 }

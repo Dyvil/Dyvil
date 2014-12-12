@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 
@@ -101,12 +101,18 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeExpression(MethodWriter visitor)
 	{
 		// TODO
 	}
 	
 	@Override
-	public void writeJump(MethodVisitor visitor, Label label)
+	public void writeStatement(MethodWriter writer)
+	{
+		// TODO
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label label)
 	{}
 }

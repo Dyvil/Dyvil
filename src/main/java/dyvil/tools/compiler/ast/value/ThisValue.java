@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.value;
 
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -35,7 +35,7 @@ public class ThisValue extends ASTNode implements IValue
 	@Override
 	public ThisValue applyState(CompilerState state, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		if (state == CompilerState.CHECK)
 		{
 			if (context.isStatic())
 			{
@@ -52,12 +52,18 @@ public class ThisValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeExpression(MethodWriter writer)
 	{
-		visitor.visitIntInsn(Opcodes.ALOAD, 0);
+		writer.visitIntInsn(Opcodes.ALOAD, 0);
 	}
 	
 	@Override
-	public void writeJump(MethodVisitor visitor, Label label)
+	public void writeStatement(MethodWriter writer)
+	{
+		// TODO
+	}
+	
+	@Override
+	public void writeJump(MethodWriter visitor, Label label)
 	{}
 }

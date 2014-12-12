@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.structure;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.Dyvilc;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
@@ -154,7 +154,7 @@ public class Package implements IContext
 			}
 		}
 		
-		for (Library library : Dyvilc.config.libraries)
+		for (Library library : DyvilCompiler.config.libraries)
 		{
 			Package pack = library.resolvePackage(name);
 			if (pack != null)

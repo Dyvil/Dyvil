@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IAccess;
@@ -10,6 +9,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
@@ -137,7 +137,7 @@ public class ConstructorCall extends Call implements ITyped
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeExpression(MethodWriter writer)
 	{
 		int opcode;
 		if (this.isCustom)
@@ -149,25 +149,30 @@ public class ConstructorCall extends Call implements ITyped
 			opcode = Opcodes.INVOKESPECIAL;
 			
 			String name = this.type.getInternalName();
-			visitor.visitTypeInsn(Opcodes.NEW, name);
-			visitor.visitInsn(Opcodes.DUP);
+			writer.visitTypeInsn(Opcodes.NEW, name);
+			writer.visitInsn(Opcodes.DUP);
 		}
 		
 		for (IValue arg : this.arguments)
 		{
-			arg.write(visitor);
+			arg.writeExpression(writer);
 		}
 		
 		String owner = this.method.getTheClass().getInternalName();
 		String name = this.method.getName();
 		String desc = this.method.getDescriptor();
-		visitor.visitMethodInsn(opcode, owner, name, desc, false);
+		writer.visitMethodInsn(opcode, owner, name, desc, false);
 	}
 	
 	@Override
-	public void writeJump(MethodVisitor visitor, Label label)
+	public void writeStatement(MethodWriter writer)
 	{
-		// TODO
+		this.writeExpression(writer);
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label label)
+	{
 	}
 	
 	@Override

@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -9,6 +8,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.BooleanValue;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -92,26 +92,50 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeExpression(MethodWriter writer)
 	{
 		if (this.elseThen != null)
 		{
 			Label ifEnd = new Label();
 			Label elseEnd = new Label();
 			
-			this.condition.writeJump(visitor, ifEnd);
-			this.then.write(visitor);
-			visitor.visitJumpInsn(Opcodes.GOTO, elseEnd);
-			visitor.visitLabel(ifEnd);
-			this.elseThen.write(visitor);
-			visitor.visitLabel(elseEnd);
+			this.condition.writeJump(writer, ifEnd);
+			this.then.writeExpression(writer);
+			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+			writer.visitLabel(ifEnd);
+			this.elseThen.writeExpression(writer);
+			writer.visitLabel(elseEnd);
 		}
 		else
 		{
 			Label ifEnd = new Label();
-			this.condition.writeJump(visitor, ifEnd);
-			this.then.write(visitor);
-			visitor.visitLabel(ifEnd);
+			this.condition.writeJump(writer, ifEnd);
+			this.then.writeExpression(writer);
+			writer.visitLabel(ifEnd);
+		}
+	}
+	
+	@Override
+	public void writeStatement(MethodWriter writer)
+	{
+		if (this.elseThen != null)
+		{
+			Label ifEnd = new Label();
+			Label elseEnd = new Label();
+			
+			this.condition.writeJump(writer, ifEnd);
+			this.then.writeStatement(writer);
+			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+			writer.visitLabel(ifEnd);
+			this.elseThen.writeStatement(writer);
+			writer.visitLabel(elseEnd);
+		}
+		else
+		{
+			Label ifEnd = new Label();
+			this.condition.writeJump(writer, ifEnd);
+			this.then.writeStatement(writer);
+			writer.visitLabel(ifEnd);
 		}
 	}
 

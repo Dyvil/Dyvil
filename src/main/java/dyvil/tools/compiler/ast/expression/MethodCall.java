@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IAccess;
@@ -13,6 +12,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.SuperValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
@@ -112,7 +112,12 @@ public class MethodCall extends Call implements INamed, IValued
 			return true;
 		}
 		
-		MethodMatch match = context.resolveMethod(context1, this.qualifiedName, this.getTypes());
+		Type[] types = this.getTypes();
+		if (types == null) {
+			return false;
+		}
+		
+		MethodMatch match = context.resolveMethod(context1, this.qualifiedName, types);
 		if (match != null)
 		{
 			this.method = match.theMethod;
@@ -151,15 +156,15 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeExpression(MethodWriter visitor)
 	{
 		if (this.instance != null)
 		{
-			this.instance.write(visitor);
+			this.instance.writeExpression(visitor);
 		}
 		for (IValue arg : this.arguments)
 		{
-			arg.write(visitor);
+			arg.writeExpression(visitor);
 		}
 		
 		int opcode;
@@ -187,9 +192,14 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public void writeJump(MethodVisitor visitor, Label label)
+	public void writeStatement(MethodWriter writer)
 	{
-		// TODO
+		this.writeExpression(writer);
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label label)
+	{
 	}
 	
 	@Override

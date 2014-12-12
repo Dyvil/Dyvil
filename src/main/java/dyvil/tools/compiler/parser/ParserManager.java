@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.Dyvilc;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
@@ -117,7 +117,7 @@ public class ParserManager
 					}
 				}
 				
-				if (Dyvilc.parseStack)
+				if (DyvilCompiler.parseStack)
 				{
 					System.out.println(token + ":\t\t" + parser.name + " @ " + parser.mode);
 				}

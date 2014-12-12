@@ -8,7 +8,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.Dyvilc;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.config.CompilerConfig;
 
@@ -30,7 +30,7 @@ public class ClassWriter
 		}
 		catch (Exception ex)
 		{
-			Dyvilc.logger.throwing("ClassWriter", "createFile", ex);
+			DyvilCompiler.logger.throwing("ClassWriter", "createFile", ex);
 		}
 	}
 	
@@ -48,13 +48,13 @@ public class ClassWriter
 		}
 		catch (Exception ex)
 		{
-			Dyvilc.logger.throwing("ClassWriter", "saveClass", ex);
+			DyvilCompiler.logger.throwing("ClassWriter", "saveClass", ex);
 		}
 	}
 	
 	public static void generateJAR(List<File> files)
 	{
-		CompilerConfig config = Dyvilc.config;
+		CompilerConfig config = DyvilCompiler.config;
 		String fileName = config.getJarName();
 		
 		File output = new File(fileName);
@@ -73,7 +73,7 @@ public class ClassWriter
 	
 	public static void jar(List<File> files, File output, Manifest manifest)
 	{
-		String outputDir = Dyvilc.config.outputDir.getAbsolutePath();
+		String outputDir = DyvilCompiler.config.outputDir.getAbsolutePath();
 		int len = outputDir.length();
 		if (!outputDir.endsWith("/"))
 		{
@@ -92,7 +92,7 @@ public class ClassWriter
 		}
 		catch (Exception ex)
 		{
-			Dyvilc.logger.throwing("ClassWriter", "jar", ex);
+			DyvilCompiler.logger.throwing("ClassWriter", "jar", ex);
 		}
 	}
 	
@@ -112,7 +112,7 @@ public class ClassWriter
 		}
 		catch (Exception ex)
 		{
-			Dyvilc.logger.throwing("ClassWriter", "createEntry", ex);
+			DyvilCompiler.logger.throwing("ClassWriter", "createEntry", ex);
 		}
 	}
 }

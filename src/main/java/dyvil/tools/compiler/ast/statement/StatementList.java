@@ -1,10 +1,11 @@
 package dyvil.tools.compiler.ast.statement;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IVariableList;
@@ -16,6 +17,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class StatementList extends ValueList implements IStatement, IContext
@@ -49,16 +51,19 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		else if (state == CompilerState.RESOLVE)
 		{
+			this.context = context;
 			IVariableList variableList = context instanceof IVariableList ? (IVariableList) context : null;
-			for (int i = 0; i < this.values.size(); i++)
+			this.context = context;
+			ListIterator<IValue> iterator = this.values.listIterator();
+			while (iterator.hasNext())
 			{
-				IValue v = this.values.get(i);
-				IValue v1 = v.applyState(state, this);
-				if (v1 != v)
+				IValue v = iterator.next();
+				if (v == null)
 				{
-					this.values.set(i, v1);
-					v = v1;
+					iterator.remove();
+					continue;
 				}
+				iterator.set(v.applyState(state, this));
 				
 				if (!(v instanceof FieldAssign))
 				{
@@ -82,12 +87,20 @@ public class StatementList extends ValueList implements IStatement, IContext
 				}
 			}
 		}
-		
-		this.context = context;
-		for (int i = 0; i < len; i++)
+		else
 		{
-			IValue v = this.values.get(i);
-			this.values.set(i, v.applyState(state, this));
+			this.context = context;
+			ListIterator<IValue> iterator = this.values.listIterator();
+			while (iterator.hasNext())
+			{
+				IValue v = iterator.next();
+				if (v == null)
+				{
+					iterator.remove();
+					continue;
+				}
+				iterator.set(v.applyState(state, this));
+			}
 		}
 		return this;
 	}
@@ -129,10 +142,34 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeExpression(MethodWriter writer)
 	{
-		visitor.visitLabel(this.start);
-		super.write(visitor);
-		visitor.visitLabel(this.end);
+		writer.visitLabel(this.start);
+		Iterator<IValue> iterator = this.values.iterator();
+		while (true)
+		{
+			IValue v = iterator.next();
+			if (iterator.hasNext())
+			{
+				v.writeStatement(writer);
+			}
+			else
+			{
+				v.writeExpression(writer);
+				break;
+			}
+		}
+		writer.visitLabel(this.end);
+	}
+	
+	@Override
+	public void writeStatement(MethodWriter writer)
+	{
+		writer.visitLabel(this.start);
+		for (IValue v : this.values)
+		{
+			v.writeStatement(writer);
+		}
+		writer.visitLabel(this.end);
 	}
 }

@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.value;
 
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 
 public class BooleanValue extends ASTNode implements IValue
 {
@@ -44,7 +44,7 @@ public class BooleanValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeExpression(MethodWriter visitor)
 	{
 		if (this.value)
 		{
@@ -57,17 +57,22 @@ public class BooleanValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void writeJump(MethodVisitor visitor, Label label)
+	public void writeStatement(MethodWriter writer)
+	{
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label label)
 	{
 		if (this.value)
 		{
-			visitor.visitInsn(Opcodes.ICONST_1);
+			writer.visitInsn(Opcodes.ICONST_1);
 		}
 		else
 		{
-			visitor.visitInsn(Opcodes.ICONST_0);
+			writer.visitInsn(Opcodes.ICONST_0);
 		}
-		visitor.visitJumpInsn(Opcodes.IFEQ, label);
+		writer.visitJumpInsn(Opcodes.IFEQ, label);
 	}
 	
 	@Override

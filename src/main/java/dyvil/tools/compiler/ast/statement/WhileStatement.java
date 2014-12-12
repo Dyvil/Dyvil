@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 
 public class WhileStatement extends ASTNode implements IStatement, IValued
@@ -15,7 +15,8 @@ public class WhileStatement extends ASTNode implements IStatement, IValued
 	private IValue	then;
 	
 	public WhileStatement()
-	{}
+	{
+	}
 	
 	@Override
 	public void setValue(IValue value)
@@ -73,8 +74,12 @@ public class WhileStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeExpression(MethodWriter writer)
 	{
-		// TODO
+	}
+	
+	@Override
+	public void writeStatement(MethodWriter writer)
+	{
 	}
 }

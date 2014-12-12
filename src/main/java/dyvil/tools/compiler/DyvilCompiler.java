@@ -19,7 +19,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.config.ConfigParser;
 import dyvil.tools.compiler.util.Util;
 
-public class Dyvilc
+public class DyvilCompiler
 {
 	public static boolean				parseStack;
 	public static boolean				debug;
@@ -131,15 +131,15 @@ public class Dyvilc
 	{
 		long now = System.nanoTime();
 		
-		File sourceDir = Dyvilc.config.sourceDir;
-		File outputDir = Dyvilc.config.outputDir;
+		File sourceDir = DyvilCompiler.config.sourceDir;
+		File outputDir = DyvilCompiler.config.outputDir;
 		Package root = Package.rootPackage;
-		int states = Dyvilc.states.size();
+		int states = DyvilCompiler.states.size();
 		
 		logger.info("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
 		if (debug)
 		{
-			logger.info("Applying " + states + " States: " + Dyvilc.states);
+			logger.info("Applying " + states + " States: " + DyvilCompiler.states);
 			logger.info("");
 		}
 		
@@ -157,7 +157,7 @@ public class Dyvilc
 			}
 		}
 		
-		for (CompilerState state : Dyvilc.states)
+		for (CompilerState state : DyvilCompiler.states)
 		{
 			state.apply(units, null);
 		}

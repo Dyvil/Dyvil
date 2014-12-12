@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
@@ -283,17 +284,18 @@ public class Method extends Member implements IMethod
 	public void write(ClassWriter writer)
 	{
 		MethodVisitor visitor = writer.visitMethod(this.modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
+		MethodWriter mw = new MethodWriter(Opcodes.ASM5, visitor);
 		
 		int index = 0;
 		for (Parameter param : this.parameters)
 		{
 			param.index = index++;
-			visitor.visitParameter(param.name, index);
+			mw.visitParameter(param.name, index);
 		}
 		
 		if (this.statement != null)
 		{
-			visitor.visitCode();
+			mw.visitCode();
 			
 			for (Variable var : this.variables)
 			{
@@ -302,18 +304,15 @@ public class Method extends Member implements IMethod
 			
 			if (this.statement != null)
 			{
-				this.statement.write(visitor);
+				this.statement.writeExpression(mw);
 			}
-			
-			// TODO Actual values -.-
-			visitor.visitInsn(Opcodes.RETURN);
 			
 			for (Variable var : this.variables)
 			{
 				String name = var.qualifiedName;
 				String desc = var.getDescription();
 				String signature = var.getSignature();
-				visitor.visitLocalVariable(name, desc, signature, var.start, var.end, var.index);
+				mw.visitLocalVariable(name, desc, signature, var.start, var.end, var.index);
 			}
 			
 			if (this.isConstructor)
@@ -321,8 +320,7 @@ public class Method extends Member implements IMethod
 				index++;
 			}
 			
-			visitor.visitMaxs(10, index);
-			visitor.visitEnd();
+			mw.visitEnd();
 		}
 	}
 	

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IAccess;
@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
@@ -85,7 +86,8 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	
 	@Override
 	public void setValues(List<IValue> list)
-	{}
+	{
+	}
 	
 	@Override
 	public List<IValue> getValues()
@@ -101,15 +103,18 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	
 	@Override
 	public void addValue(IValue value)
-	{}
+	{
+	}
 	
 	@Override
 	public void setValue(int index, IValue value)
-	{}
+	{
+	}
 	
 	@Override
 	public void setArray(boolean array)
-	{}
+	{
+	}
 	
 	@Override
 	public boolean isArray()
@@ -173,7 +178,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	{
 		return null;
 	}
-
+	
 	@Override
 	public IAccess resolve3(IContext context, IAccess next)
 	{
@@ -187,23 +192,41 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	}
 	
 	@Override
-	public void write(MethodVisitor visitor)
+	public void writeExpression(MethodWriter writer)
 	{
-		if (this.value != null)
+		if (this.value == null)
 		{
-			if (this.instance != null)
-			{
-				this.instance.write(visitor);
-			}
-			
-			this.value.write(visitor);
-			
-			this.field.writeSet(visitor);
+			return;
 		}
+		
+		if (this.instance != null)
+		{
+			this.instance.writeExpression(writer);
+		}
+		this.value.writeExpression(writer);
+		writer.visitInsn(Opcodes.DUP);
+		this.field.writeSet(writer);
 	}
 	
 	@Override
-	public void writeJump(MethodVisitor visitor, Label label)
+	public void writeStatement(MethodWriter writer)
+	{
+		if (this.value == null)
+		{
+			return;
+		}
+		
+		if (this.instance != null)
+		{
+			this.instance.writeExpression(writer);
+		}
+		this.value.writeExpression(writer);
+		writer.visitInsn(Opcodes.DUP);
+		this.field.writeSet(writer);
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label label)
 	{
 		// TODO
 	}

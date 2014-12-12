@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.Dyvilc;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -97,7 +97,7 @@ public class CodeFile extends File implements ICodePosition
 	{
 		for (Marker m : this.markers)
 		{
-			m.log(Dyvilc.logger);
+			m.log(DyvilCompiler.logger);
 		}
 	}
 }

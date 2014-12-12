@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.Dyvilc;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -114,13 +114,13 @@ public class CompilationUnit extends ASTNode implements IContext
 	{
 		if (state == CompilerState.TOKENIZE)
 		{
-			this.tokens = Dyvilc.parser.tokenize(this.getFile());
+			this.tokens = DyvilCompiler.parser.tokenize(this.getFile());
 			return this;
 		}
 		else if (state == CompilerState.PARSE)
 		{
-			Dyvilc.parser.setParser(new CompilationUnitParser(this));
-			Dyvilc.parser.parse(this.getFile(), this.tokens);
+			DyvilCompiler.parser.setParser(new CompilationUnitParser(this));
+			DyvilCompiler.parser.parse(this.getFile(), this.tokens);
 			this.tokens = null;
 			return this;
 		}
@@ -154,12 +154,12 @@ public class CompilationUnit extends ASTNode implements IContext
 				int size = markers.size();
 				if (size > 0)
 				{
-					Dyvilc.logger.info("Markers in Compilation Unit " + this.name + ": " + size);
+					DyvilCompiler.logger.info("Markers in Compilation Unit " + this.name + ": " + size);
 					for (Marker marker : this.getFile().markers)
 					{
-						marker.log(Dyvilc.logger);
+						marker.log(DyvilCompiler.logger);
 					}
-					Dyvilc.logger.warning(this.name + " was not compiled as there were Syntax Errors in the Compilation Unit.");
+					DyvilCompiler.logger.warning(this.name + " was not compiled as there were Syntax Errors in the Compilation Unit.");
 					
 					return this;
 				}
@@ -179,7 +179,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		}
 		else if (state == CompilerState.DEBUG)
 		{
-			Dyvilc.logger.info(this.getFile() + ":\n" + this.toString());
+			DyvilCompiler.logger.info(this.getFile() + ":\n" + this.toString());
 		}
 		
 		for (IClass iclass : this.classes)
