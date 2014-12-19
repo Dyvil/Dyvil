@@ -2,7 +2,7 @@ package dyvil.lang;
 
 import dyvil.lang.annotation.prefix;
 
-public interface Number
+public interface Number extends Ordered<Number>
 {
 	// Primitive value getters
 	
@@ -20,6 +20,24 @@ public interface Number
 	
 	public double doubleValue();
 	
+	// Setters
+	
+	public Number $eq(byte v);
+	
+	public Number $eq(short v);
+	
+	public Number $eq(char v);
+	
+	public Number $eq(int v);
+	
+	public Number $eq(long v);
+	
+	public Number $eq(float v);
+	
+	public Number $eq(double v);
+	
+	public Number $eq(Number v);
+	
 	// Unary operators
 	
 	public @prefix Number $minus();
@@ -35,8 +53,6 @@ public interface Number
 	public Number sqrt();
 	
 	// byte operators
-	
-	public Number $eq(byte v);
 	
 	public boolean $eq$eq(byte v);
 	
@@ -60,21 +76,7 @@ public interface Number
 	
 	public Number $percent(byte v);
 	
-	public Number $amp(byte v);
-	
-	public Number $bar(byte v);
-	
-	public Number $up(byte v);
-	
-	public Number $less$less(byte v);
-	
-	public Number $greater$greater(byte v);
-	
-	public Number $greater$greater$greater(byte v);
-	
 	// short operators
-	
-	public Number $eq(short v);
 	
 	public boolean $eq$eq(short v);
 	
@@ -98,21 +100,7 @@ public interface Number
 	
 	public Number $percent(short v);
 	
-	public Number $amp(short v);
-	
-	public Number $bar(short v);
-	
-	public Number $up(short v);
-	
-	public Number $less$less(short v);
-	
-	public Number $greater$greater(short v);
-	
-	public Number $greater$greater$greater(short v);
-	
 	// char operators
-	
-	public Number $eq(char v);
 	
 	public boolean $eq$eq(char v);
 	
@@ -136,21 +124,7 @@ public interface Number
 	
 	public Number $percent(char v);
 	
-	public Number $amp(char v);
-	
-	public Number $bar(char v);
-	
-	public Number $up(char v);
-	
-	public Number $less$less(char v);
-	
-	public Number $greater$greater(char v);
-	
-	public Number $greater$greater$greater(char v);
-	
 	// int operators
-	
-	public Number $eq(int v);
 	
 	public boolean $eq$eq(int v);
 	
@@ -174,21 +148,7 @@ public interface Number
 	
 	public Number $percent(int v);
 	
-	public Number $amp(int v);
-	
-	public Number $bar(int v);
-	
-	public Number $up(int v);
-	
-	public Number $less$less(int v);
-	
-	public Number $greater$greater(int v);
-	
-	public Number $greater$greater$greater(int v);
-	
 	// long operators
-	
-	public Number $eq(long v);
 	
 	public boolean $eq$eq(long v);
 	
@@ -212,21 +172,7 @@ public interface Number
 	
 	public Number $percent(long v);
 	
-	public Number $amp(long v);
-	
-	public Number $bar(long v);
-	
-	public Number $up(long v);
-	
-	public Number $less$less(long v);
-	
-	public Number $greater$greater(long v);
-	
-	public Number $greater$greater$greater(long v);
-	
 	// float operators
-	
-	public Number $eq(float v);
 	
 	public boolean $eq$eq(float v);
 	
@@ -252,8 +198,6 @@ public interface Number
 	
 	// double operators
 	
-	public Number $eq(double v);
-	
 	public boolean $eq$eq(double v);
 	
 	public boolean $bang$eq(double v);
@@ -275,4 +219,34 @@ public interface Number
 	public Number $div(double v);
 	
 	public Number $percent(double v);
+	
+	// generic operators
+	
+	@Override
+	public boolean $eq$eq(Number v);
+	
+	@Override
+	public boolean $bang$eq(Number v);
+	
+	@Override
+	public boolean $less(Number v);
+	
+	@Override
+	public boolean $less$eq(Number v);
+	
+	@Override
+	public boolean $greater(Number v);
+	
+	@Override
+	public boolean $greater$eq(Number v);
+	
+	public Number $plus(Number v);
+	
+	public Number $minus(Number v);
+	
+	public Number $times(Number v);
+	
+	public Number $div(Number v);
+	
+	public Number $percent(Number v);
 }

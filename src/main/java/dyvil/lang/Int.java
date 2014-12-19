@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Int implements Number
+public abstract class Int implements Integer
 {
 	protected int	value;
 	
@@ -29,6 +29,18 @@ public abstract class Int implements Number
 	
 	@Override
 	public abstract Double $eq(double v);
+	
+	@Override
+	public Number $eq(Number v)
+	{
+		return v;
+	}
+	
+	@Override
+	public Integer $eq(Integer v)
+	{
+		return v;
+	}
 	
 	@Override
 	public byte byteValue()
@@ -764,5 +776,109 @@ public abstract class Int implements Number
 	public Double $percent(double v)
 	{
 		return this.$eq(this.value % v);
+	}
+	
+	// generic operators
+	
+	@Override
+	public boolean $eq$eq(Number b)
+	{
+		return this.value == b.intValue();
+	}
+	
+	@Override
+	public boolean $bang$eq(Number b)
+	{
+		return this.value != b.intValue();
+	}
+	
+	@Override
+	public boolean $less(Number b)
+	{
+		return this.value < b.intValue();
+	}
+	
+	@Override
+	public boolean $less$eq(Number b)
+	{
+		return this.value == b.intValue();
+	}
+	
+	@Override
+	public boolean $greater(Number b)
+	{
+		return this.value > b.intValue();
+	}
+	
+	@Override
+	public boolean $greater$eq(Number b)
+	{
+		return this.value >= b.intValue();
+	}
+	
+	@Override
+	public Int $plus(Number v)
+	{
+		return this.$eq((int) (this.value + v.intValue()));
+	}
+	
+	@Override
+	public Int $minus(Number v)
+	{
+		return this.$eq((int) (this.value - v.intValue()));
+	}
+	
+	@Override
+	public Int $times(Number v)
+	{
+		return this.$eq((int) (this.value * v.intValue()));
+	}
+	
+	@Override
+	public Int $div(Number v)
+	{
+		return this.$eq((int) (this.value / v.intValue()));
+	}
+	
+	@Override
+	public Int $percent(Number v)
+	{
+		return this.$eq((int) (this.value % v.intValue()));
+	}
+	
+	@Override
+	public Int $bar(Integer v)
+	{
+		return this.$eq((int) (this.value | v.intValue()));
+	}
+	
+	@Override
+	public Int $amp(Integer v)
+	{
+		return this.$eq((int) (this.value & v.intValue()));
+	}
+	
+	@Override
+	public Int $up(Integer v)
+	{
+		return this.$eq((int) (this.value ^ v.intValue()));
+	}
+	
+	@Override
+	public Int $less$less(Integer v)
+	{
+		return this.$eq((int) (this.value << v.intValue()));
+	}
+	
+	@Override
+	public Int $greater$greater(Integer v)
+	{
+		return this.$eq((int) (this.value >> v.intValue()));
+	}
+	
+	@Override
+	public Int $greater$greater$greater(Integer v)
+	{
+		return this.$eq((int) (this.value >>> v.intValue()));
 	}
 }

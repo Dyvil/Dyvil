@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Long implements Number
+public abstract class Long implements Integer
 {
 	protected long	value;
 	
@@ -29,6 +29,18 @@ public abstract class Long implements Number
 	
 	@Override
 	public abstract Double $eq(double v);
+	
+	@Override
+	public Number $eq(Number v)
+	{
+		return v;
+	}
+	
+	@Override
+	public Integer $eq(Integer v)
+	{
+		return v;
+	}
 	
 	@Override
 	public byte byteValue()
@@ -764,5 +776,109 @@ public abstract class Long implements Number
 	public Double $percent(double v)
 	{
 		return this.$eq(this.value % v);
+	}
+	
+	// generic operators
+	
+	@Override
+	public boolean $eq$eq(Number b)
+	{
+		return this.value == b.longValue();
+	}
+	
+	@Override
+	public boolean $bang$eq(Number b)
+	{
+		return this.value != b.longValue();
+	}
+	
+	@Override
+	public boolean $less(Number b)
+	{
+		return this.value < b.longValue();
+	}
+	
+	@Override
+	public boolean $less$eq(Number b)
+	{
+		return this.value == b.longValue();
+	}
+	
+	@Override
+	public boolean $greater(Number b)
+	{
+		return this.value > b.longValue();
+	}
+	
+	@Override
+	public boolean $greater$eq(Number b)
+	{
+		return this.value >= b.longValue();
+	}
+	
+	@Override
+	public Long $plus(Number v)
+	{
+		return this.$eq((long) (this.value + v.longValue()));
+	}
+	
+	@Override
+	public Long $minus(Number v)
+	{
+		return this.$eq((long) (this.value - v.longValue()));
+	}
+	
+	@Override
+	public Long $times(Number v)
+	{
+		return this.$eq((long) (this.value * v.longValue()));
+	}
+	
+	@Override
+	public Long $div(Number v)
+	{
+		return this.$eq((long) (this.value / v.longValue()));
+	}
+	
+	@Override
+	public Long $percent(Number v)
+	{
+		return this.$eq((long) (this.value % v.longValue()));
+	}
+	
+	@Override
+	public Long $bar(Integer v)
+	{
+		return this.$eq((long) (this.value | v.longValue()));
+	}
+	
+	@Override
+	public Long $amp(Integer v)
+	{
+		return this.$eq((long) (this.value & v.longValue()));
+	}
+	
+	@Override
+	public Long $up(Integer v)
+	{
+		return this.$eq((long) (this.value ^ v.longValue()));
+	}
+	
+	@Override
+	public Long $less$less(Integer v)
+	{
+		return this.$eq((long) (this.value << v.longValue()));
+	}
+	
+	@Override
+	public Long $greater$greater(Integer v)
+	{
+		return this.$eq((long) (this.value >> v.longValue()));
+	}
+	
+	@Override
+	public Long $greater$greater$greater(Integer v)
+	{
+		return this.$eq((long) (this.value >>> v.longValue()));
 	}
 }

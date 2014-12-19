@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Byte implements Number
+public abstract class Byte implements Integer
 {
 	protected byte	value;
 	
@@ -29,6 +29,18 @@ public abstract class Byte implements Number
 	
 	@Override
 	public abstract Double $eq(double v);
+	
+	@Override
+	public Number $eq(Number v)
+	{
+		return v;
+	}
+	
+	@Override
+	public Integer $eq(Integer v)
+	{
+		return v;
+	}
 	
 	@Override
 	public byte byteValue()
@@ -764,5 +776,109 @@ public abstract class Byte implements Number
 	public Double $percent(double v)
 	{
 		return this.$eq(this.value % v);
+	}
+	
+	// generic operators
+	
+	@Override
+	public boolean $eq$eq(Number b)
+	{
+		return this.value == b.byteValue();
+	}
+	
+	@Override
+	public boolean $bang$eq(Number b)
+	{
+		return this.value != b.byteValue();
+	}
+	
+	@Override
+	public boolean $less(Number b)
+	{
+		return this.value < b.byteValue();
+	}
+	
+	@Override
+	public boolean $less$eq(Number b)
+	{
+		return this.value == b.byteValue();
+	}
+	
+	@Override
+	public boolean $greater(Number b)
+	{
+		return this.value > b.byteValue();
+	}
+	
+	@Override
+	public boolean $greater$eq(Number b)
+	{
+		return this.value >= b.byteValue();
+	}
+	
+	@Override
+	public Byte $plus(Number v)
+	{
+		return this.$eq((byte) (this.value + v.byteValue()));
+	}
+	
+	@Override
+	public Byte $minus(Number v)
+	{
+		return this.$eq((byte) (this.value - v.byteValue()));
+	}
+	
+	@Override
+	public Byte $times(Number v)
+	{
+		return this.$eq((byte) (this.value * v.byteValue()));
+	}
+	
+	@Override
+	public Byte $div(Number v)
+	{
+		return this.$eq((byte) (this.value / v.byteValue()));
+	}
+	
+	@Override
+	public Byte $percent(Number v)
+	{
+		return this.$eq((byte) (this.value % v.byteValue()));
+	}
+	
+	@Override
+	public Byte $bar(Integer v)
+	{
+		return this.$eq((byte) (this.value | v.byteValue()));
+	}
+	
+	@Override
+	public Byte $amp(Integer v)
+	{
+		return this.$eq((byte) (this.value & v.byteValue()));
+	}
+	
+	@Override
+	public Byte $up(Integer v)
+	{
+		return this.$eq((byte) (this.value ^ v.byteValue()));
+	}
+	
+	@Override
+	public Byte $less$less(Integer v)
+	{
+		return this.$eq((byte) (this.value << v.byteValue()));
+	}
+	
+	@Override
+	public Byte $greater$greater(Integer v)
+	{
+		return this.$eq((byte) (this.value >> v.byteValue()));
+	}
+	
+	@Override
+	public Byte $greater$greater$greater(Integer v)
+	{
+		return this.$eq((byte) (this.value >>> v.byteValue()));
 	}
 }
