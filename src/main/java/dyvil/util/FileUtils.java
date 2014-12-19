@@ -7,7 +7,8 @@ import java.nio.file.Files;
 import java.util.List;
 
 /**
- * A class for accessing files on the disk.
+ * {@code FileUtils} and its members can be used for several operations related
+ * to files on the hard drive.
  * 
  * @author Clashsoft
  */
@@ -15,7 +16,9 @@ public class FileUtils
 {
 	/**
 	 * Writes the given {@link String} {@code text} to the given {@link File}
-	 * {@code file}.
+	 * {@code file}. This operation attempts to override an existing file, and
+	 * creates a new file if no existing file was found. If an exception occurs,
+	 * its stack trace is printed.
 	 * 
 	 * @param file
 	 *            the file
@@ -45,7 +48,9 @@ public class FileUtils
 	
 	/**
 	 * Writes the given {@link List} {@code lines} to the given {@link File}
-	 * {@code file}.
+	 * {@code file}. This operation attempts to override an existing file, and
+	 * creates a new file if no existing file was found. If an exception occurs,
+	 * its stack trace is printed.
 	 * 
 	 * @param file
 	 *            the file
@@ -75,7 +80,8 @@ public class FileUtils
 	/**
 	 * Reads the content of the the given {@link File} {@code file} and returns
 	 * it as a {@link String}. If the {@code file} does not exist, it returns
-	 * {@code null}.
+	 * {@code null}. If any other {@link IOException} occurs, its stack trace is
+	 * printed.
 	 * 
 	 * @param file
 	 *            the file
@@ -103,7 +109,8 @@ public class FileUtils
 	/**
 	 * Reads the content of the the given {@link File} {@code file} and returns
 	 * it as a {@link List} of lines. If the {@code file} does not exist, it
-	 * returns {@code null}.
+	 * returns {@code null}. If any other {@link IOException} occurs, its stack
+	 * trace is printed.
 	 * 
 	 * @param file
 	 *            the file
@@ -128,7 +135,7 @@ public class FileUtils
 	}
 	
 	/**
-	 * Returns the Appdata directory of the host OS. Common paths are:
+	 * Returns the AppData directory of the host OS. Common paths are:
 	 * <ul>
 	 * <li>Windows: {@code %appdata%/}
 	 * <li>Mac OS: {@code $username$/Library/Application Support/}
@@ -136,7 +143,7 @@ public class FileUtils
 	 * <li>Every other OS: System Property {@code user.dir}
 	 * </ul>
 	 * 
-	 * @return the Appdata directory
+	 * @return the AppData directory
 	 */
 	public static String getAppdataDirectory()
 	{

@@ -8,22 +8,26 @@ public class MathUtils
 	 * Used to calculate the index of a sin value in the {@link #sinTable}.
 	 * <p>
 	 * Value:<br>
-	 * <b>3.141592653589793D * 2.0D / 65536.0D</b>
+	 * <b>3.141592653589793D * 2D / 65536D</b>
 	 */
-	private static double	sinFactor	= 0.00009587379924285257;
+	private static double	sinFactor					= 0.00009587379924285257;
 	
 	/**
 	 * Used to calculate the index of a sin value in the {@link #sinTable}.
 	 * <p>
 	 * Value:<br>
 	 * <b>1 / sinFactor<br>
-	 * 65536.0D / 3.141592653589793D * 2.0D</b>
+	 * 65536D / 3.141592653589793D * 2D</b>
 	 */
-	private static double	sinFactor2	= 10430.378350470453;
+	private static double	sinFactor2					= 10430.378350470453;
 	
-	private static float[]	sinTable	= new float[65536];
+	/**
+	 * A table of sin values storing 65536 values between {@code 0} and
+	 * {@code PI}.
+	 */
+	private static float[]	sinTable					= new float[65536];
 	
-	private static int[]	multiplyDeBruijnBitPosition;
+	private static int[]	multiplyDeBruijnBitPosition	= new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 };
 	
 	static
 	{
@@ -31,37 +35,66 @@ public class MathUtils
 		{
 			sinTable[i] = (float) Math.sin(i * sinFactor);
 		}
-		
-		multiplyDeBruijnBitPosition = new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 };
 	}
 	
+	/**
+	 * Returns the absolute value of this {@code int}.
+	 * 
+	 * @param i
+	 * @return the abs value
+	 */
 	public static @implicit int abs(int i)
 	{
-		return i >= 0 ? i : -i;
+		return i < 0 ? -i : i;
 	}
 	
+	/**
+	 * Returns the absolute value of this {@code long}.
+	 * 
+	 * @param l
+	 * @return the abs value
+	 */
 	public static @implicit long abs(long l)
 	{
-		return l >= 0 ? l : -l;
+		return l < 0 ? -l : l;
 	}
 	
+	/**
+	 * Returns the absolute value of this {@code float}.
+	 * 
+	 * @param f
+	 * @return the abs value
+	 */
 	public static @implicit float abs(float f)
 	{
-		return f >= 0.0F ? f : -f;
+		return f < 0F ? -f : f;
 	}
 	
+	/**
+	 * Returns the absolute value of this {@code double}.
+	 * 
+	 * @param d
+	 * @return the abs value
+	 */
 	public static @implicit double abs(double d)
 	{
-		return d >= 0.0D ? d : -d;
+		return d < 0D ? -d : d;
 	}
 	
+	/**
+	 * Returns the absolute value of this {@code double}.
+	 * 
+	 * @param i
+	 * @param max
+	 * @return the abs value
+	 */
 	public static @implicit double abs(double d, double max)
 	{
-		if (d < 0.0D)
+		if (d < 0D)
 		{
 			d = -d;
 		}
-		if (max < 0.0D)
+		if (max < 0D)
 		{
 			max = -max;
 		}
@@ -99,7 +132,7 @@ public class MathUtils
 	
 	public static @implicit float cos(float f)
 	{
-		return sinTable[(int) (f * 10430.378F + 16384.0F) & 0xFFFF];
+		return sinTable[(int) (f * 10430.378F + 16384F) & 0xFFFF];
 	}
 	
 	public static @implicit float sqrt(float f)
@@ -114,7 +147,7 @@ public class MathUtils
 	
 	public static @implicit int truncate(double d)
 	{
-		return (int) (d + 1024.0D) - 1024;
+		return (int) (d + 1024D) - 1024;
 	}
 	
 	public static @implicit int bucket(int i, int factor)
@@ -181,11 +214,11 @@ public class MathUtils
 	
 	public static int interpolate(int min, int max, float f)
 	{
-		if (f < 0.0F)
+		if (f < 0F)
 		{
 			return min;
 		}
-		if (f > 1.0F)
+		if (f > 1F)
 		{
 			return max;
 		}
@@ -194,11 +227,11 @@ public class MathUtils
 	
 	public static float interpolate(float min, float max, float f)
 	{
-		if (f < 0.0F)
+		if (f < 0F)
 		{
 			return min;
 		}
-		if (f > 1.0F)
+		if (f > 1F)
 		{
 			return max;
 		}
@@ -207,11 +240,11 @@ public class MathUtils
 	
 	public static long interpolate(long min, long max, double d)
 	{
-		if (d < 0.0D)
+		if (d < 0D)
 		{
 			return min;
 		}
-		if (d > 1.0D)
+		if (d > 1D)
 		{
 			return max;
 		}
@@ -220,11 +253,11 @@ public class MathUtils
 	
 	public static double interpolate(double d1, double d2, double factor)
 	{
-		if (factor < 0.0D)
+		if (factor < 0D)
 		{
 			return d1;
 		}
-		if (factor > 1.0D)
+		if (factor > 1D)
 		{
 			return d2;
 		}
@@ -364,28 +397,28 @@ public class MathUtils
 	
 	public static @implicit float angle(float f)
 	{
-		f %= 360.0F;
-		if (f >= 180.0F)
+		f %= 360F;
+		if (f >= 180F)
 		{
-			f -= 360.0F;
+			f -= 360F;
 		}
-		if (f < -180.0F)
+		if (f < -180F)
 		{
-			f += 360.0F;
+			f += 360F;
 		}
 		return f;
 	}
 	
 	public static @implicit double angle(double d)
 	{
-		d %= 360.0D;
-		if (d >= 180.0D)
+		d %= 360D;
+		if (d >= 180D)
 		{
-			d -= 360.0D;
+			d -= 360D;
 		}
-		if (d < -180.0D)
+		if (d < -180D)
 		{
-			d += 360.0D;
+			d += 360D;
 		}
 		return d;
 	}
