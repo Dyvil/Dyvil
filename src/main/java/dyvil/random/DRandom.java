@@ -6,13 +6,19 @@ public interface DRandom
 	
 	public boolean nextBoolean(float f);
 	
-	public int nextInt(int n);
+	public int next(int bits);
+	
+	public int nextInt();
+	
+	public int nextInt(int max);
 	
 	public int nextInt(float f);
 	
 	public int nextInt(int min, int max);
 	
 	public long nextLong();
+	
+	public long nextLong(long max);
 	
 	public long nextLong(long min, long max);
 	

@@ -3,8 +3,7 @@ package dyvil.random;
 import java.util.Random;
 
 /**
- * A {@link Random} implementation that always returns the minimum value, mostly
- * being 0.
+ * A {@link Random} implementation that always returns the minimum value.
  * 
  * @author Clashsoft
  */
@@ -19,7 +18,7 @@ public class MinRandom extends Random implements DRandom
 	}
 	
 	@Override
-	protected int next(int bits)
+	public int next(int bits)
 	{
 		return 0;
 	}
@@ -46,7 +45,7 @@ public class MinRandom extends Random implements DRandom
 	}
 	
 	@Override
-	public int nextInt(int n)
+	public int nextInt(int max)
 	{
 		return 0;
 	}
@@ -67,6 +66,12 @@ public class MinRandom extends Random implements DRandom
 	public long nextLong()
 	{
 		return 0L;
+	}
+	
+	@Override
+	public long nextLong(long max)
+	{
+		return 0;
 	}
 	
 	@Override

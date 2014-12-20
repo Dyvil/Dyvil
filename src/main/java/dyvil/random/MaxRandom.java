@@ -20,9 +20,9 @@ public class MaxRandom extends Random implements DRandom
 	}
 	
 	@Override
-	protected int next(int bits)
+	public int next(int bits)
 	{
-		return bits;
+		return 1 << (bits + 1) - 1;
 	}
 	
 	@Override
@@ -47,9 +47,9 @@ public class MaxRandom extends Random implements DRandom
 	}
 	
 	@Override
-	public int nextInt(int n)
+	public int nextInt(int max)
 	{
-		return n - 1;
+		return max - 1;
 	}
 	
 	@Override
@@ -71,9 +71,15 @@ public class MaxRandom extends Random implements DRandom
 	}
 	
 	@Override
+	public long nextLong(long max)
+	{
+		return max - 1;
+	}
+	
+	@Override
 	public long nextLong(long min, long max)
 	{
-		return max;
+		return max - 1;
 	}
 	
 	@Override

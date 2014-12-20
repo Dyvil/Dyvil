@@ -3,23 +3,19 @@ package dyvil.random;
 import dyvil.lang.annotation.implicit;
 import dyvil.util.StringUtils;
 
-/**
- * The Class CSRandom.
- * <p>
- * A class that adds several randomization utils.
- * 
- * @author Clashsoft
- */
 public class Random
 {
 	/**
-	 * Returns true with the given chance.
+	 * Returns true with the given chance of {@code chance}. It does that by
+	 * generating a new random float using the given {@link java.util.Random
+	 * Random} {@code random} and comparing it to the given {@code float chance}.
+	 * .
 	 * 
 	 * @param random
 	 *            the random
 	 * @param chance
 	 *            the chance
-	 * @return true, if successful
+	 * @return true, if a randomly generated float is less than the given chance
 	 */
 	public static @implicit boolean nextBoolean(java.util.Random random, float chance)
 	{
@@ -89,7 +85,7 @@ public class Random
 		int len = nextInt(random, minLength, maxLength);
 		StringBuilder buf = new StringBuilder(len);
 		
-		buf.append(Character.toUpperCase(StringUtils.nextLetter(random)));		
+		buf.append(Character.toUpperCase(StringUtils.nextLetter(random)));
 		
 		for (int i = 1; i < len; i++)
 		{
