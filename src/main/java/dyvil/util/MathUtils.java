@@ -10,7 +10,7 @@ public class MathUtils
 	 * Value:<br>
 	 * <b>3.141592653589793D * 2D / 65536D</b>
 	 */
-	private static double	sinFactor					= 0.00009587379924285257;
+	private static double	sinFactor		= 0.00009587379924285257D;
 	
 	/**
 	 * Used to calculate the index of a sin value in the {@link #sinTable}.
@@ -19,15 +19,15 @@ public class MathUtils
 	 * <b>1 / sinFactor<br>
 	 * 65536D / 3.141592653589793D * 2D</b>
 	 */
-	private static double	sinFactor2					= 10430.378350470453;
+	private static double	sinFactor2		= 10430.378350470453D;
 	
 	/**
 	 * A table of sin values storing 65536 values between {@code 0} and
 	 * {@code PI}.
 	 */
-	private static float[]	sinTable					= new float[65536];
+	private static float[]	sinTable		= new float[65536];
 	
-	private static int[]	multiplyDeBruijnBitPosition	= new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 };
+	private static int[]	deBruijnBits	= new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 };
 	
 	static
 	{
@@ -135,6 +135,26 @@ public class MathUtils
 		return sinTable[(int) (f * 10430.378F + 16384F) & 0xFFFF];
 	}
 	
+	public static @implicit float tan(float f)
+	{
+		return sin(f) / cos(f);
+	}
+	
+	public static @implicit double sin(double d)
+	{
+		return Math.sin(d);
+	}
+	
+	public static @implicit double cos(double d)
+	{
+		return Math.cos(d);
+	}
+	
+	public static @implicit double tan(double d)
+	{
+		return Math.tan(d);
+	}
+	
 	public static @implicit float sqrt(float f)
 	{
 		return (float) Math.sqrt(f);
@@ -162,11 +182,11 @@ public class MathUtils
 	
 	public static @implicit int clamp(int i, int min, int max)
 	{
-		if (i < min)
+		if (i <= min)
 		{
 			return min;
 		}
-		if (i > max)
+		if (i >= max)
 		{
 			return max;
 		}
@@ -175,11 +195,11 @@ public class MathUtils
 	
 	public static @implicit long clamp(long l, long min, long max)
 	{
-		if (l < min)
+		if (l <= min)
 		{
 			return min;
 		}
-		if (l > max)
+		if (l >= max)
 		{
 			return max;
 		}
@@ -188,11 +208,11 @@ public class MathUtils
 	
 	public static @implicit float clamp(float f, float min, float max)
 	{
-		if (f < min)
+		if (f <= min)
 		{
 			return min;
 		}
-		if (f > max)
+		if (f >= max)
 		{
 			return max;
 		}
@@ -201,11 +221,11 @@ public class MathUtils
 	
 	public static @implicit double clamp(double d, double min, double max)
 	{
-		if (d < min)
+		if (d <= min)
 		{
 			return min;
 		}
-		if (d > max)
+		if (d >= max)
 		{
 			return max;
 		}
@@ -214,11 +234,11 @@ public class MathUtils
 	
 	public static int interpolate(int min, int max, float f)
 	{
-		if (f < 0F)
+		if (f <= 0F)
 		{
 			return min;
 		}
-		if (f > 1F)
+		if (f >= 1F)
 		{
 			return max;
 		}
@@ -227,11 +247,11 @@ public class MathUtils
 	
 	public static float interpolate(float min, float max, float f)
 	{
-		if (f < 0F)
+		if (f <= 0F)
 		{
 			return min;
 		}
-		if (f > 1F)
+		if (f >= 1F)
 		{
 			return max;
 		}
@@ -240,11 +260,11 @@ public class MathUtils
 	
 	public static long interpolate(long min, long max, double d)
 	{
-		if (d < 0D)
+		if (d <= 0D)
 		{
 			return min;
 		}
-		if (d > 1D)
+		if (d >= 1D)
 		{
 			return max;
 		}
@@ -253,11 +273,11 @@ public class MathUtils
 	
 	public static double interpolate(double d1, double d2, double factor)
 	{
-		if (factor < 0D)
+		if (factor <= 0D)
 		{
 			return d1;
 		}
-		if (factor > 1D)
+		if (factor >= 1D)
 		{
 			return d2;
 		}
@@ -266,11 +286,6 @@ public class MathUtils
 	
 	public static @implicit int factorial(int i)
 	{
-		if (i <= 1)
-		{
-			return 1;
-		}
-		
 		int j = i;
 		while (i > 1)
 		{
@@ -281,11 +296,6 @@ public class MathUtils
 	
 	public static @implicit long factorial(long l)
 	{
-		if (l <= 1)
-		{
-			return 1;
-		}
-		
 		long j = l;
 		while (l > 1)
 		{
@@ -350,48 +360,40 @@ public class MathUtils
 	public static float average(int[] ints)
 	{
 		int i = 0;
-		
 		for (int j : ints)
 		{
 			i += j;
 		}
-		
 		return i / ints.length;
 	}
 	
 	public static double average(long[] longs)
 	{
 		long l1 = 0L;
-		
 		for (long l2 : longs)
 		{
 			l1 += l2;
 		}
-		
 		return l1 / longs.length;
 	}
 	
 	public static float average(float[] floats)
 	{
 		float f1 = 0L;
-		
 		for (float f2 : floats)
 		{
 			f1 += f2;
 		}
-		
 		return f1 / floats.length;
 	}
 	
 	public static double average(double[] doubles)
 	{
 		double d1 = 0L;
-		
 		for (double d2 : doubles)
 		{
 			d1 += d2;
 		}
-		
 		return d1 / doubles.length;
 	}
 	
@@ -521,11 +523,11 @@ public class MathUtils
 	{
 		if (isPowerOfTwo(i))
 		{
-			return multiplyDeBruijnBitPosition[(int) (i * 125613361L >> 27) & 0x1F];
+			return deBruijnBits[(int) (i * 125613361L >> 27) & 0x1F];
 		}
 		else
 		{
-			return multiplyDeBruijnBitPosition[(int) (powerOfTwo(i) * 125613361L >> 27) & 0x1F] - 1;
+			return deBruijnBits[(int) (powerOfTwo(i) * 125613361L >> 27) & 0x1F] - 1;
 		}
 	}
 	
