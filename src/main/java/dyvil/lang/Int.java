@@ -881,4 +881,12 @@ public abstract class Int implements Integer
 	{
 		return this.$eq((int) (this.value >>> v.intValue()));
 	}
+	
+	// string representations
+	
+	@Override
+	public java.lang.String toString()
+	{
+		return java.lang.Integer.toString(this.value);
+	}
 }

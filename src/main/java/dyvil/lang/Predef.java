@@ -7,6 +7,10 @@ import dyvil.lang.tuple.Tuple2;
 
 public class Predef
 {
+	private Predef()
+	{
+	}
+	
 	public static int hash(Object o)
 	{
 		return o == null ? 0 : o.hashCode();

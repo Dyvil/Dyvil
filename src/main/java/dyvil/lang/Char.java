@@ -881,4 +881,12 @@ public abstract class Char implements Integer
 	{
 		return this.$eq((char) (this.value >>> v.charValue()));
 	}
+	
+	// string representations
+	
+	@Override
+	public java.lang.String toString()
+	{
+		return Character.toString(this.value);
+	}
 }

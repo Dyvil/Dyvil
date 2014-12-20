@@ -6,85 +6,85 @@ public interface Integer extends Number
 	
 	// byte operators
 	
-	public Number $amp(byte v);
+	public Integer $amp(byte v);
 	
-	public Number $bar(byte v);
+	public Integer $bar(byte v);
 	
-	public Number $up(byte v);
+	public Integer $up(byte v);
 	
-	public Number $less$less(byte v);
+	public Integer $less$less(byte v);
 	
-	public Number $greater$greater(byte v);
+	public Integer $greater$greater(byte v);
 	
-	public Number $greater$greater$greater(byte v);
+	public Integer $greater$greater$greater(byte v);
 	
 	// short operators
 	
-	public Number $amp(short v);
+	public Integer $amp(short v);
 	
-	public Number $bar(short v);
+	public Integer $bar(short v);
 	
-	public Number $up(short v);
+	public Integer $up(short v);
 	
-	public Number $less$less(short v);
+	public Integer $less$less(short v);
 	
-	public Number $greater$greater(short v);
+	public Integer $greater$greater(short v);
 	
-	public Number $greater$greater$greater(short v);
+	public Integer $greater$greater$greater(short v);
 	
 	// char operators
 	
-	public Number $amp(char v);
+	public Integer $amp(char v);
 	
-	public Number $bar(char v);
+	public Integer $bar(char v);
 	
-	public Number $up(char v);
+	public Integer $up(char v);
 	
-	public Number $less$less(char v);
+	public Integer $less$less(char v);
 	
-	public Number $greater$greater(char v);
+	public Integer $greater$greater(char v);
 	
-	public Number $greater$greater$greater(char v);
+	public Integer $greater$greater$greater(char v);
 	
 	// int operators
 	
-	public Number $amp(int v);
+	public Integer $amp(int v);
 	
-	public Number $bar(int v);
+	public Integer $bar(int v);
 	
-	public Number $up(int v);
+	public Integer $up(int v);
 	
-	public Number $less$less(int v);
+	public Integer $less$less(int v);
 	
-	public Number $greater$greater(int v);
+	public Integer $greater$greater(int v);
 	
-	public Number $greater$greater$greater(int v);
+	public Integer $greater$greater$greater(int v);
 	
 	// long operators
 	
-	public Number $amp(long v);
+	public Integer $amp(long v);
 	
-	public Number $bar(long v);
+	public Integer $bar(long v);
 	
-	public Number $up(long v);
+	public Integer $up(long v);
 	
-	public Number $less$less(long v);
+	public Integer $less$less(long v);
 	
-	public Number $greater$greater(long v);
+	public Integer $greater$greater(long v);
 	
-	public Number $greater$greater$greater(long v);
+	public Integer $greater$greater$greater(long v);
 	
-	// generic operators
+	// Integer operators
 	
-	public Number $amp(Integer v);
+	public Integer $amp(Integer v);
 	
-	public Number $bar(Integer v);
+	public Integer $bar(Integer v);
 	
-	public Number $up(Integer v);
+	public Integer $up(Integer v);
 	
-	public Number $less$less(Integer v);
+	public Integer $less$less(Integer v);
 	
-	public Number $greater$greater(Integer v);
+	public Integer $greater$greater(Integer v);
 	
-	public Number $greater$greater$greater(Integer v);
+	public Integer $greater$greater$greater(Integer v);
 }

@@ -220,7 +220,7 @@ public interface Number extends Ordered<Number>
 	
 	public Number $percent(double v);
 	
-	// generic operators
+	// Number operators
 	
 	@Override
 	public boolean $eq$eq(Number v);
@@ -249,4 +249,9 @@ public interface Number extends Ordered<Number>
 	public Number $div(Number v);
 	
 	public Number $percent(Number v);
+	
+	// String representations
+	
+	@Override
+	public java.lang.String toString();
 }

@@ -881,4 +881,12 @@ public abstract class Byte implements Integer
 	{
 		return this.$eq((byte) (this.value >>> v.byteValue()));
 	}
+	
+	// string representations
+	
+	@Override
+	public java.lang.String toString()
+	{
+		return java.lang.Byte.toString(this.value);
+	}
 }

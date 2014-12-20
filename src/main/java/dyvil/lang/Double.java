@@ -660,4 +660,12 @@ public abstract class Double implements Number
 	{
 		return this.$eq((double) (this.value % v.doubleValue()));
 	}
+	
+	// string representations
+	
+	@Override
+	public java.lang.String toString()
+	{
+		return java.lang.Double.toString(this.value);
+	}
 }

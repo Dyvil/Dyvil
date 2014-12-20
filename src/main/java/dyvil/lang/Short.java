@@ -780,105 +780,113 @@ public abstract class Short implements Integer
 	
 	// generic operators
 	
-		@Override
-		public boolean $eq$eq(Number b)
-		{
-			return this.value == b.shortValue();
-		}
-		
-		@Override
-		public boolean $bang$eq(Number b)
-		{
-			return this.value != b.shortValue();
-		}
-		
-		@Override
-		public boolean $less(Number b)
-		{
-			return this.value < b.shortValue();
-		}
-		
-		@Override
-		public boolean $less$eq(Number b)
-		{
-			return this.value == b.shortValue();
-		}
-		
-		@Override
-		public boolean $greater(Number b)
-		{
-			return this.value > b.shortValue();
-		}
-		
-		@Override
-		public boolean $greater$eq(Number b)
-		{
-			return this.value >= b.shortValue();
-		}
-		
-		@Override
-		public Short $plus(Number v)
-		{
-			return this.$eq((short) (this.value + v.shortValue()));
-		}
-		
-		@Override
-		public Short $minus(Number v)
-		{
-			return this.$eq((short) (this.value - v.shortValue()));
-		}
-		
-		@Override
-		public Short $times(Number v)
-		{
-			return this.$eq((short) (this.value * v.shortValue()));
-		}
-		
-		@Override
-		public Short $div(Number v)
-		{
-			return this.$eq((short) (this.value / v.shortValue()));
-		}
-		
-		@Override
-		public Short $percent(Number v)
-		{
-			return this.$eq((short) (this.value % v.shortValue()));
-		}
-		
-		@Override
-		public Short $bar(Integer v)
-		{
-			return this.$eq((short) (this.value | v.shortValue()));
-		}
-		
-		@Override
-		public Short $amp(Integer v)
-		{
-			return this.$eq((short) (this.value & v.shortValue()));
-		}
-		
-		@Override
-		public Short $up(Integer v)
-		{
-			return this.$eq((short) (this.value ^ v.shortValue()));
-		}
-		
-		@Override
-		public Short $less$less(Integer v)
-		{
-			return this.$eq((short) (this.value << v.shortValue()));
-		}
-		
-		@Override
-		public Short $greater$greater(Integer v)
-		{
-			return this.$eq((short) (this.value >> v.shortValue()));
-		}
-		
-		@Override
-		public Short $greater$greater$greater(Integer v)
-		{
-			return this.$eq((short) (this.value >>> v.shortValue()));
-		}
+	@Override
+	public boolean $eq$eq(Number b)
+	{
+		return this.value == b.shortValue();
+	}
+	
+	@Override
+	public boolean $bang$eq(Number b)
+	{
+		return this.value != b.shortValue();
+	}
+	
+	@Override
+	public boolean $less(Number b)
+	{
+		return this.value < b.shortValue();
+	}
+	
+	@Override
+	public boolean $less$eq(Number b)
+	{
+		return this.value == b.shortValue();
+	}
+	
+	@Override
+	public boolean $greater(Number b)
+	{
+		return this.value > b.shortValue();
+	}
+	
+	@Override
+	public boolean $greater$eq(Number b)
+	{
+		return this.value >= b.shortValue();
+	}
+	
+	@Override
+	public Short $plus(Number v)
+	{
+		return this.$eq((short) (this.value + v.shortValue()));
+	}
+	
+	@Override
+	public Short $minus(Number v)
+	{
+		return this.$eq((short) (this.value - v.shortValue()));
+	}
+	
+	@Override
+	public Short $times(Number v)
+	{
+		return this.$eq((short) (this.value * v.shortValue()));
+	}
+	
+	@Override
+	public Short $div(Number v)
+	{
+		return this.$eq((short) (this.value / v.shortValue()));
+	}
+	
+	@Override
+	public Short $percent(Number v)
+	{
+		return this.$eq((short) (this.value % v.shortValue()));
+	}
+	
+	@Override
+	public Short $bar(Integer v)
+	{
+		return this.$eq((short) (this.value | v.shortValue()));
+	}
+	
+	@Override
+	public Short $amp(Integer v)
+	{
+		return this.$eq((short) (this.value & v.shortValue()));
+	}
+	
+	@Override
+	public Short $up(Integer v)
+	{
+		return this.$eq((short) (this.value ^ v.shortValue()));
+	}
+	
+	@Override
+	public Short $less$less(Integer v)
+	{
+		return this.$eq((short) (this.value << v.shortValue()));
+	}
+	
+	@Override
+	public Short $greater$greater(Integer v)
+	{
+		return this.$eq((short) (this.value >> v.shortValue()));
+	}
+	
+	@Override
+	public Short $greater$greater$greater(Integer v)
+	{
+		return this.$eq((short) (this.value >>> v.shortValue()));
+	}
+	
+	// string representations
+	
+	@Override
+	public java.lang.String toString()
+	{
+		return java.lang.Long.toString(this.value);
+	}
 }

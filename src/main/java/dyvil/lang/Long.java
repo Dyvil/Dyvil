@@ -881,4 +881,12 @@ public abstract class Long implements Integer
 	{
 		return this.$eq((long) (this.value >>> v.longValue()));
 	}
+	
+	// string representations
+	
+	@Override
+	public java.lang.String toString()
+	{
+		return java.lang.Long.toString(this.value);
+	}
 }

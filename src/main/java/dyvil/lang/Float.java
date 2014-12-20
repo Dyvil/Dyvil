@@ -660,4 +660,12 @@ public abstract class Float implements Number
 	{
 		return this.$eq((float) (this.value % v.floatValue()));
 	}
+	
+	// string representations
+	
+	@Override
+	public java.lang.String toString()
+	{
+		return java.lang.Float.toString(this.value);
+	}
 }
