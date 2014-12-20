@@ -67,6 +67,19 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
+	public Annotation getAnnotation(Type type)
+	{
+		for (Annotation a : this.annotations)
+		{
+			if (a.type.equals(type))
+			{
+				return a;
+			}
+		}
+		return null;
+	}
+	
+	@Override
 	public void addAnnotation(Annotation annotation)
 	{
 		this.annotations.add(annotation);

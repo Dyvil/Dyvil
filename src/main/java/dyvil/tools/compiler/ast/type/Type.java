@@ -23,19 +23,21 @@ public class Type extends ASTNode implements IContext
 	
 	public static Type		NONE		= new Type(null);
 	
-	public static Type		VOID		= new PrimitiveType("void");
-	public static Type		BOOL		= new PrimitiveType("boolean");
-	public static Type		BYTE		= new PrimitiveType("byte");
-	public static Type		SHORT		= new PrimitiveType("short");
-	public static Type		CHAR		= new PrimitiveType("char");
-	public static Type		INT			= new PrimitiveType("int");
-	public static Type		LONG		= new PrimitiveType("long");
-	public static Type		FLOAT		= new PrimitiveType("float");
-	public static Type		DOUBLE		= new PrimitiveType("double");
+	public static Type		VOID		= new PrimitiveType("void", "dyvil.lang.Void");
+	public static Type		BOOL		= new PrimitiveType("boolean", "dyvil.lang.Boolean");
+	public static Type		BYTE		= new PrimitiveType("byte", "dyvil.lang.Byte");
+	public static Type		SHORT		= new PrimitiveType("short", "dyvil.lang.Short");
+	public static Type		CHAR		= new PrimitiveType("char", "dyvil.lang.Char");
+	public static Type		INT			= new PrimitiveType("int", "dyvil.lang,Int");
+	public static Type		LONG		= new PrimitiveType("long", "dyvil.lang.Long");
+	public static Type		FLOAT		= new PrimitiveType("float", "dyvil.lang.Float");
+	public static Type		DOUBLE		= new PrimitiveType("double", "dyvil.lang.Double");
 	
 	public static Type		OBJECT		= new Type("java.lang.Object");
 	public static Type		PREDEF		= new Type("dyvil.lang.Predef");
 	public static Type		STRING		= new StringType("java.lang.String");
+	
+	public static Type		ABytecode	= new Type("dyvil.lang.annotation.bytecode");
 	
 	public String			name;
 	public String			qualifiedName;
@@ -44,7 +46,8 @@ public class Type extends ASTNode implements IContext
 	public int				arrayDimensions;
 	
 	public Type()
-	{}
+	{
+	}
 	
 	public Type(String name)
 	{
@@ -343,7 +346,7 @@ public class Type extends ASTNode implements IContext
 	}
 	
 	@Override
-	public boolean equals(Object obj)
+	public final boolean equals(Object obj)
 	{
 		if (this == obj)
 		{
@@ -353,23 +356,31 @@ public class Type extends ASTNode implements IContext
 		{
 			return false;
 		}
+		if (obj instanceof PrimitiveType)
+		{
+			return ((PrimitiveType) obj).equals(this);
+		}
 		if (!(obj instanceof Type))
 		{
 			return false;
 		}
-		Type other = (Type) obj;
-		if (this.arrayDimensions != other.arrayDimensions)
+		return this.equals((Type) obj);
+	}
+	
+	protected boolean equals(Type type)
+	{
+		if (this.arrayDimensions != type.arrayDimensions)
 		{
 			return false;
 		}
 		
-		if (this.theClass != null && this.theClass == other.theClass)
+		if (this.theClass != null && this.theClass == type.theClass)
 		{
 			return true;
 		}
 		
 		String thisName = this.theClass != null ? this.theClass.getQualifiedName() : this.qualifiedName;
-		String otherName = other.theClass != null ? other.theClass.getQualifiedName() : other.qualifiedName;
+		String otherName = type.theClass != null ? type.theClass.getQualifiedName() : type.qualifiedName;
 		
 		if (thisName == null || !thisName.equals(otherName))
 		{

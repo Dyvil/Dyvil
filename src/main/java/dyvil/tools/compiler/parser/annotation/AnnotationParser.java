@@ -7,7 +7,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.parser.expression.ExpressionListParser;
 
 public class AnnotationParser extends Parser
 {
@@ -46,7 +45,7 @@ public class AnnotationParser extends Parser
 		{
 			if ("(".equals(value))
 			{
-				pm.pushParser(new ExpressionListParser(this.context, this.annotation));
+				// TODO pm.pushParser(new ExpressionListParser(this.context, this.annotation));
 				this.mode = PARAMETERS_END;
 				return true;
 			}

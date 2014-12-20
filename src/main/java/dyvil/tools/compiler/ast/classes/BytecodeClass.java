@@ -2,7 +2,12 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.AnnotationVisitor;
+import jdk.internal.org.objectweb.asm.FieldVisitor;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.Method;
@@ -10,10 +15,34 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.util.ClassFormat;
 
 public class BytecodeClass extends CodeClass
 {
+	private final class AnnotationVisitorImpl extends AnnotationVisitor
+	{
+		private Annotation annotation;
+		
+		private AnnotationVisitorImpl(int flags, Annotation annotation)
+		{
+			super(flags);
+			this.annotation = annotation;
+		}
+		
+		@Override
+		public void visit(String key, Object value)
+		{
+			annotation.addValue(key, IValue.fromObject(value));
+		}
+		
+		@Override
+		public void visitEnum(String key, String enumClass, String name)
+		{
+			// TODO
+		}
+	}
+
 	public boolean	typesResolved;
 	
 	public BytecodeClass()
@@ -99,7 +128,7 @@ public class BytecodeClass extends CodeClass
 		}
 	}
 	
-	public void visitField(int access, String name, String desc, String signature, Object value)
+	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
 		Field field = new Field(this);
 		field.setQualifiedName(name);
@@ -107,9 +136,22 @@ public class BytecodeClass extends CodeClass
 		field.setType(ClassFormat.internalToType(desc));
 		
 		this.body.addField(field);
+		
+		return new FieldVisitor(Opcodes.ASM5)
+		{
+			@Override
+			public AnnotationVisitor visitAnnotation(String name, boolean visible)
+			{
+				Type type = ClassFormat.internalToType(name);
+				Annotation annotation = new Annotation(null, type);
+				field.addAnnotation(annotation);
+				
+				return new AnnotationVisitorImpl(Opcodes.ASM5, annotation);
+			}
+		};
 	}
 	
-	public void visitMethod(int access, String name, String desc, String signature, String[] exceptions)
+	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
 		Method method = new Method(this);
 		method.setQualifiedName(name);
@@ -117,5 +159,18 @@ public class BytecodeClass extends CodeClass
 		ClassFormat.readMethodType(desc, method);
 		
 		this.body.addMethod(method);
+		
+		return new MethodVisitor(Opcodes.ASM5)
+		{
+			@Override
+			public AnnotationVisitor visitAnnotation(String name, boolean visible)
+			{
+				Type type = ClassFormat.internalToType(name);
+				Annotation annotation = new Annotation(null, type);
+				method.addAnnotation(annotation);
+				
+				return new AnnotationVisitorImpl(Opcodes.ASM5, annotation);
+			}
+		};
 	}
 }

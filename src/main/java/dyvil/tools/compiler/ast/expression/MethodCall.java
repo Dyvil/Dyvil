@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
@@ -11,6 +12,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IntValue;
 import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -79,7 +81,8 @@ public class MethodCall extends Call implements INamed, IValued
 	
 	@Override
 	public void setArray(boolean array)
-	{}
+	{
+	}
 	
 	@Override
 	public boolean isArray()
@@ -113,7 +116,8 @@ public class MethodCall extends Call implements INamed, IValued
 		}
 		
 		Type[] types = this.getTypes();
-		if (types == null) {
+		if (types == null)
+		{
 			return false;
 		}
 		
@@ -165,6 +169,14 @@ public class MethodCall extends Call implements INamed, IValued
 		for (IValue arg : this.arguments)
 		{
 			arg.writeExpression(visitor);
+		}
+		
+		Annotation bytecode = this.method.getAnnotation(Type.ABytecode);
+		if (bytecode != null)
+		{
+			IntValue v = (IntValue) bytecode.getValue("value");
+			visitor.visitInsn(v.value);
+			return;
 		}
 		
 		int opcode;

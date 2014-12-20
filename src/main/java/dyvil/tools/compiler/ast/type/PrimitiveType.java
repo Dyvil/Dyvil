@@ -6,9 +6,10 @@ import dyvil.tools.compiler.ast.structure.IContext;
 
 public class PrimitiveType extends Type
 {
-	public PrimitiveType(String name)
+	public PrimitiveType(String name, String wrapper)
 	{
 		super(name);
+		this.qualifiedName = wrapper;
 	}
 	
 	@Override
@@ -110,5 +111,11 @@ public class PrimitiveType extends Type
 	public Type applyState(CompilerState state, IContext context)
 	{
 		return this;
+	}
+	
+	@Override
+	public boolean equals(Type type)
+	{
+		return super.equals(type) || this.qualifiedName.equals(type.qualifiedName);
 	}
 }

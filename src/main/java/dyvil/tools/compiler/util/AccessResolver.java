@@ -18,17 +18,16 @@ public class AccessResolver
 		LinkedList<IAccess> chain = getCallChain(access);
 		
 		ListIterator<IAccess> iterator = chain.listIterator();
+		IContext context1 = context;
 		IAccess prev = null;
 		IAccess curr = null;
-		IAccess next = iterator.next();
+		
+		boolean backwards = false;
 		
 		while (iterator.hasNext())
 		{
-			IContext context1 = context;
-			
 			prev = curr;
-			curr = next;
-			next = iterator.next();
+			curr = iterator.next();
 			
 			if (prev != null)
 			{
@@ -44,30 +43,69 @@ public class AccessResolver
 				}
 			}
 			
+			if (context1 == null)
+			{
+				backwards = true;
+				break;
+			}
+			
 			if (!curr.resolve(context1, context))
 			{
 				IAccess alternate = curr.resolve2(context1, context);
 				if (alternate == null)
 				{
-					if (next.resolve(context, context1))
-					{
-						alternate = curr.resolve3(context1, next);
-						if (alternate != null)
-						{
-							next.setValue(null);
-							curr = alternate;
-							iterator.set(alternate);
-							continue;
-						}
-					}
-					
-					markers.add(curr.getResolveError());
-					return access;
+					backwards = true;
 				}
-				
-				curr = alternate;
-				continue;
+				else
+				{
+					curr = alternate;
+					iterator.set(alternate);
+				}
 			}
+		}
+		
+		if (!backwards)
+		{
+			return chain.getLast();
+		}
+		
+		IAccess next = curr;
+		prev = iterator.previous();
+		
+		while (iterator.hasPrevious())
+		{
+			next = curr;
+			curr = prev;
+			prev = iterator.previous();
+			
+			if (prev != null)
+			{
+				context1 = prev.getType();
+				curr.setValue(prev);
+			}
+			else
+			{
+				IValue value = curr.getValue();
+				if (value != null)
+				{
+					context1 = value.getType();
+				}
+			}
+			
+			if (context1 == null)
+			{
+				context1 = context;
+			}
+			
+			IAccess alternate = curr.resolve3(context1, next);
+			if (alternate != null)
+			{
+				curr = alternate;
+				iterator.set(alternate);
+			}
+			
+			markers.add(curr.getResolveError());
+			
 		}
 		
 		return chain.getLast();

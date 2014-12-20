@@ -201,6 +201,12 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	}
 	
 	@Override
+	public Annotation getAnnotation(Type type)
+	{
+		return null;
+	}
+	
+	@Override
 	public void addAnnotation(Annotation annotation)
 	{
 		this.field.addAnnotation(annotation);

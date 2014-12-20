@@ -1,11 +1,32 @@
 package dyvil.tools.compiler.util;
 
+import java.io.File;
+
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class ClassFormat
 {
+	public static File	javaRTJar;
+	public static File	dyvilRTJar;
+	
+	static
+	{
+		String s = System.getProperty("sun.boot.class.path");
+		int index = s.indexOf("rt.jar");
+		if (index != -1)
+		{
+			int index1 = s.lastIndexOf(':', index);
+			int index2 = s.indexOf(':', index + 1);
+			String s1 = s.substring(index1 + 1, index2);
+			javaRTJar = new File(s1);
+		}
+		
+		// TODO Actually use the installed Dyvil Runtime Library
+		dyvilRTJar = new File("bin");
+	}
+	
 	public static String packageToInternal(String name)
 	{
 		return name.replace('.', '/');

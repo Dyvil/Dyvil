@@ -37,4 +37,38 @@ public interface IValue extends IASTNode
 	public void writeStatement(MethodWriter writer);
 	
 	public void writeJump(MethodWriter writer, Label label);
+	
+	public static IValue fromObject(Object o)
+	{
+		if (o == null)
+		{
+			return new NullValue();
+		}
+		Class c = o.getClass();
+		if (c == Character.class)
+		{
+			return new CharValue((Character) o);
+		}
+		else if (c == Integer.class)
+		{
+			return new IntValue((Integer) o);
+		}
+		else if (c == Long.class)
+		{
+			return new LongValue((Long) o);
+		}
+		else if (c == Float.class)
+		{
+			return new FloatValue((Float) o);
+		}
+		else if (c == Double.class)
+		{
+			return new DoubleValue((Double) o);
+		}
+		else if (c == String.class)
+		{
+			return new StringValue((String) o);
+		}
+		return null;
+	}
 }

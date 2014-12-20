@@ -67,15 +67,13 @@ public class ClassReader extends ClassVisitor
 	@Override
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
-		this.bclass.visitField(access, name, desc, signature, value);
-		return null;
+		return this.bclass.visitField(access, name, desc, signature, value);
 	}
 	
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
-		this.bclass.visitMethod(access, name, desc, signature, exceptions);
-		return null;
+		return this.bclass.visitMethod(access, name, desc, signature, exceptions);
 	}
 	
 	@Override
