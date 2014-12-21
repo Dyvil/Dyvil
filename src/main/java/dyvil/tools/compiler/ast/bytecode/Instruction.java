@@ -68,6 +68,14 @@ public class Instruction extends ASTNode
 		{
 			return new FieldInstruction(opcode, name);
 		}
+		else if (opcode == ALOAD || opcode == ILOAD || opcode == LLOAD || opcode == FLOAD || opcode == DLOAD)
+		{
+			return new VarInstruction(opcode, name);
+		}
+		else if (opcode == ASTORE || opcode == ISTORE || opcode == LSTORE || opcode == FSTORE || opcode == DSTORE)
+		{
+			return new VarInstruction(opcode, name);
+		}
 		else if (opcode == GOTO)
 		{
 			return new JumpInstruction(opcode, name);

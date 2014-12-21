@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.bytecode;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.type.Type;
@@ -19,6 +20,13 @@ public class MethodWriter extends MethodVisitor
 	{
 		this.locals++;
 		this.mv.visitParameter(desc, index);
+	}
+	
+	@Override
+	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index)
+	{
+		this.locals++;
+		this.mv.visitLocalVariable(name, desc, signature, start, end, index);
 	}
 	
 	@Override
