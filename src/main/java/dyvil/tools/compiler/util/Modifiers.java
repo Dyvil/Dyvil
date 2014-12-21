@@ -146,10 +146,9 @@ public enum Modifiers
 	public static final int	MANDATED				= 0x00008000;
 	
 	/**
-	 * Dyvil lazy modifier. If a field is marked with this modifier, it is going
-	 * to be evaluated / calculated every time it is demanded and is thus not
-	 * saved in the memory. This behavior can be compared with a method without
-	 * parameters.
+	 * Dyvil lazy modifier. If a field is marked with this modifier, it will be
+	 * evaluated every time it is demanded and is thus not saved in the memory.
+	 * This behavior can be compared with a method without parameters.
 	 */
 	public static final int	LAZY					= 0x00010000;
 	
@@ -168,7 +167,7 @@ public enum Modifiers
 	/**
 	 * Dyvil implicit modifier. If a method is marked with this modifier, it is
 	 * a method that can be called on any Object and virtually has the instance
-	 * as the first parameter.
+	 * as the first parameter. An implicit method is always static.
 	 */
 	public static final int	IMPLICIT				= 0x00020000 | STATIC;
 	
@@ -185,6 +184,11 @@ public enum Modifiers
 	 */
 	public static final int	BYREF					= 0x00040000;
 	
+	/**
+	 * Dyvil prefix modifier.
+	 */
+	public static final int	PREFIX					= 0x00040000;
+	
 	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM_CLASS | OBJECT_CLASS | MODULE;
 	public static final int	ACCESS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE;
 	public static final int	MEMBER_MODIFIERS		= ACCESS_MODIFIERS | STATIC | FINAL;
@@ -192,7 +196,7 @@ public enum Modifiers
 	public static final int	INTERFACE_MODIFIERS		= ACCESS_MODIFIERS | ABSTRACT | STATIC | STRICT;
 	
 	public static final int	FIELD_MODIFIERS			= MEMBER_MODIFIERS | TRANSIENT | VOLATILE | LAZY | SYNTHETIC;
-	public static final int	METHOD_MODIFIERS		= MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT | BRIDGE | VARARGS | MANDATED;
+	public static final int	METHOD_MODIFIERS		= MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT | PREFIX | BRIDGE | VARARGS | MANDATED;
 	public static final int	PARAMETER_MODIFIERS		= FINAL | BYREF;
 	
 	private static void writeAccessModifiers(int mod, StringBuilder sb)
@@ -396,6 +400,10 @@ public enum Modifiers
 		{
 			sb.append("implicit ");
 		}
+		if ((mod & PREFIX) == PREFIX)
+		{
+			sb.append("prefix ");
+		}
 	}
 	
 	private static void writeParameterModifier(int mod, StringBuilder sb)
@@ -516,6 +524,8 @@ public enum Modifiers
 			return INLINE;
 		case "implicit":
 			return IMPLICIT;
+		case "prefix":
+			return PREFIX;
 		}
 		return -1;
 	}

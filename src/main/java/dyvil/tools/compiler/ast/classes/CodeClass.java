@@ -377,14 +377,25 @@ public class CodeClass extends ASTNode implements IClass
 		String signature = this.getSignature();
 		String superClass = this.superClass == null ? null : this.superClass.getInternalName();
 		String[] interfaces = this.getInterfaces();
-		writer.visit(Opcodes.V1_8, this.modifiers, internalName, signature, superClass, interfaces);
+		writer.visit(Opcodes.V1_8, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
 		
 		List<IField> fields = this.body.fields;
+		List<IMethod> methods = this.body.methods;
+		
 		ThisValue thisValue = new ThisValue(null, this.toType());
 		StatementList instanceFields = new StatementList(null);
 		StatementList staticFields = new StatementList(null);
 		boolean instanceFieldsAdded = false;
 		boolean staticFieldsAdded = false;
+		
+		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
+		{
+			writer.visitAnnotation("Ldyvil/lang/annotation/object;", true);
+		}
+		if ((this.modifiers & Modifiers.MODULE) != 0)
+		{
+			writer.visitAnnotation("Ldyvil/lang/annotation/module;", true);
+		}
 		
 		for (IField f : fields)
 		{
@@ -410,7 +421,6 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		List<IMethod> methods = this.body.methods;
 		for (IMethod m : methods)
 		{
 			String name = m.getName();

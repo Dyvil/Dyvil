@@ -79,8 +79,12 @@ public class Field extends Member implements IField
 	@Override
 	public void write(ClassWriter writer)
 	{
-		// TODO static fields initial value
-		writer.visitField(this.modifiers, this.name, this.getDescription(), this.type.getSignature(), null);
+		writer.visitField(this.modifiers & 0xFFFF, this.name, this.getDescription(), this.type.getSignature(), null);
+		
+		if ((this.modifiers & Modifiers.LAZY) != 0)
+		{
+			writer.visitAnnotation("Ldyvil/lang/annotation/lazy", true);
+		}
 	}
 	
 	@Override

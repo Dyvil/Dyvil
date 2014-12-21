@@ -28,10 +28,10 @@ public class MethodWriter extends MethodVisitor
 	{
 	}
 	
-	public void visitParameter(Type type, int index)
+	public void visitParameter(String name, Type type, int index)
 	{
 		this.locals.add(type.getFrameType());
-		this.mv.visitParameter(type.getExtendedName(), index);
+		this.mv.visitParameter(name, index);
 	}
 	
 	@Override

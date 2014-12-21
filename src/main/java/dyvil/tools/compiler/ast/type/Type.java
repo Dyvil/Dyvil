@@ -37,7 +37,7 @@ public class Type extends ASTNode implements IContext
 	public static Type		PREDEF		= new Type("dyvil.lang.Predef");
 	public static Type		STRING		= new StringType("java.lang.String");
 	
-	public static Type		ABytecode	= new Type("dyvil.lang.annotation.bytecode");
+	public static Type		ABytecode	= new Type("dyvil.lang.annotation.Bytecode");
 	
 	public String			name;
 	public String			qualifiedName;

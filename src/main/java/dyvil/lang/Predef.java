@@ -1,7 +1,7 @@
 package dyvil.lang;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.lang.annotation.bytecode;
+import dyvil.lang.annotation.Bytecode;
 import dyvil.lang.annotation.implicit;
 import dyvil.lang.tuple.Tuple2;
 
@@ -81,7 +81,7 @@ public class Predef
 	 *            the class
 	 * @return true, if t is an instance of c
 	 */
-	@bytecode(Opcodes.INSTANCEOF)
+	@Bytecode(Opcodes.INSTANCEOF)
 	public static @implicit <T> boolean $less$colon(T t, Class<?> c)
 	{
 		return t == null ? false : c.isInstance(t);
@@ -97,7 +97,7 @@ public class Predef
 	 *            the class
 	 * @return t as an instance of c
 	 */
-	@bytecode(Opcodes.CHECKCAST)
+	@Bytecode(Opcodes.CHECKCAST)
 	public static @implicit <T, U> U $colon$greater(T t)
 	{
 		return (U) t;
@@ -114,7 +114,7 @@ public class Predef
 	 *            the class
 	 * @return t as an instance of c
 	 */
-	@bytecode(Opcodes.CHECKCAST)
+	@Bytecode(Opcodes.CHECKCAST)
 	public static @implicit <T, U> U $colon$greater(T t, Class<U> c)
 	{
 		return t == null ? (U) null : c.cast(t);

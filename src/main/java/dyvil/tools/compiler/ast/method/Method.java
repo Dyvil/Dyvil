@@ -3,9 +3,7 @@ package dyvil.tools.compiler.ast.method;
 import java.util.ArrayList;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
-import jdk.internal.org.objectweb.asm.Opcodes;
+import jdk.internal.org.objectweb.asm.*;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -307,15 +305,32 @@ public class Method extends Member implements IMethod
 	@Override
 	public void write(ClassWriter writer)
 	{
-		MethodVisitor visitor = writer.visitMethod(this.modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
+		MethodVisitor visitor = writer.visitMethod(this.modifiers & 0xFFFF, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
 		MethodWriter mw = new MethodWriter(Opcodes.ASM5, visitor);
 		
-		int index = this.hasModifier(Modifiers.STATIC) ? 0 : 1;
+		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
+		{
+			mw.visitAnnotation("Ldyvil/lang/annotation/inline;", false);
+		}
+		if ((this.modifiers & Modifiers.IMPLICIT) == Modifiers.IMPLICIT)
+		{
+			mw.visitAnnotation("Ldyvil/lang/annotation/implicit;", false);
+		}
+		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		{
+			mw.visitAnnotation("Ldyvil/lang/annotation/prefix;", false);
+		}
 		
+		int index = this.hasModifier(Modifiers.STATIC) ? 0 : 1;
 		for (Parameter param : this.parameters)
 		{
 			param.index = index++;
-			mw.visitParameter(param.type, index);
+			mw.visitParameter(param.name, param.type, index);
+			
+			if (param.hasModifier(Modifiers.BYREF))
+			{
+				mw.visitParameterAnnotation(index, "Ldyvil/lang/annotation/ByRef;", true);
+			}
 		}
 		
 		if (this.statement != null)

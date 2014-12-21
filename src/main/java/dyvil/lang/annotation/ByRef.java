@@ -5,13 +5,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.CLASS)
-@Target(ElementType.METHOD)
-public @interface Bytecode
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ByRef
 {
-	/**
-	 * The opcode of this bytecode instruction.
-	 * @return the opcode
-	 */
-	public int value();
+	
 }

@@ -6,14 +6,7 @@ import java.util.Arrays;
 
 public class Main
 {
-	public static int i = 3;
+	public static void main(String[] args) = "Hello World" print;
 	
-	public static void main(String[] args) =
-	@{
-		getstatic "java.lang.System", "out", "java.io.PrintStream";
-		aload 0;
-		invokestatic "java.util.Arrays", "toString", "([Ljava/lang/Object;)Ljava/lang/String;";
-		invokevirtual "java.io.PrintStream", "println", "(Ljava/lang/Object;)V";
-		return;
-	};
+	public implicit void print(String s) = System out println(s);
 }

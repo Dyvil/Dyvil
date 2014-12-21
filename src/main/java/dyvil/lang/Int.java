@@ -1,7 +1,7 @@
 package dyvil.lang;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.lang.annotation.bytecode;
+import dyvil.lang.annotation.Bytecode;
 
 public abstract class Int implements Integer
 {
@@ -90,7 +90,7 @@ public abstract class Int implements Integer
 	// Unary operators
 	
 	@Override
-	@bytecode(Opcodes.INEG)
+	@Bytecode(Opcodes.INEG)
 	public Int $minus()
 	{
 		return this.$eq(-this.value);
@@ -477,77 +477,77 @@ public abstract class Int implements Integer
 	}
 	
 	@Override
-	@bytecode(Opcodes.IADD)
+	@Bytecode(Opcodes.IADD)
 	public Int $plus(int v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	@bytecode(Opcodes.ISUB)
+	@Bytecode(Opcodes.ISUB)
 	public Int $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	@bytecode(Opcodes.IMUL)
+	@Bytecode(Opcodes.IMUL)
 	public Int $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	@bytecode(Opcodes.IDIV)
+	@Bytecode(Opcodes.IDIV)
 	public Int $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	@bytecode(Opcodes.IREM)
+	@Bytecode(Opcodes.IREM)
 	public Int $percent(int v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	@bytecode(Opcodes.IOR)
+	@Bytecode(Opcodes.IOR)
 	public Int $bar(int v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	@bytecode(Opcodes.IAND)
+	@Bytecode(Opcodes.IAND)
 	public Int $amp(int v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	@bytecode(Opcodes.IXOR)
+	@Bytecode(Opcodes.IXOR)
 	public Int $up(int v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	@bytecode(Opcodes.ISHL)
+	@Bytecode(Opcodes.ISHL)
 	public Int $less$less(int v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	@bytecode(Opcodes.ISHR)
+	@Bytecode(Opcodes.ISHR)
 	public Int $greater$greater(int v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	@bytecode(Opcodes.IUSHR)
+	@Bytecode(Opcodes.IUSHR)
 	public Int $greater$greater$greater(int v)
 	{
 		return this.$eq(this.value >>> v);
