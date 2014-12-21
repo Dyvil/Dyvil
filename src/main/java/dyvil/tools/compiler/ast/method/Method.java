@@ -51,8 +51,8 @@ public class Method extends Member implements IMethod
 		}
 		else
 		{
-			this.qualifiedName = name;
-			this.name = Symbols.contract(name);
+			this.qualifiedName = Symbols.expand(name);
+			this.name = name;
 		}
 	}
 	
@@ -310,7 +310,8 @@ public class Method extends Member implements IMethod
 		MethodVisitor visitor = writer.visitMethod(this.modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
 		MethodWriter mw = new MethodWriter(Opcodes.ASM5, visitor);
 		
-		int index = 0;
+		int index = this.hasModifier(Modifiers.STATIC) ? 0 : 1;
+		
 		for (Parameter param : this.parameters)
 		{
 			param.index = index++;
