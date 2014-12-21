@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.expression.ClassAccess;
 import dyvil.tools.compiler.ast.expression.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.FieldAccess;
@@ -18,6 +19,7 @@ import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.BytecodeParser;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
@@ -37,6 +39,9 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int	PARAMETERS		= 256;
 	public static final int	PARAMETERS_2	= 512;
 	public static final int	VARIABLE		= 1024;
+	
+	public static final int	BYTECODE		= 2048;
+	public static final int	BYTECODE_2		= 4096;
 	
 	protected IContext		context;
 	protected IValued		field;
@@ -95,6 +100,11 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.pushParser(new IfStatementParser(this.context, statement));
 				return true;
 			}
+			else if ("@".equals(value))
+			{
+				this.mode = BYTECODE;
+				return true;
+			}
 			else if ("(".equals(value))
 			{
 				this.mode = TUPLE_END;
@@ -148,6 +158,26 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				this.value.expandPosition(token);
 				this.mode = ACCESS;
+				return true;
+			}
+		}
+		if (this.isInMode(BYTECODE))
+		{
+			if ("{".equals(value))
+			{
+				Bytecode bc = new Bytecode(token);
+				pm.pushParser(new BytecodeParser(this.context, bc));
+				this.value = bc;
+				this.mode = BYTECODE_2;
+				return true;
+			}
+		}
+		if (this.isInMode(BYTECODE_2))
+		{
+			if ("}".equals(value))
+			{
+				this.value.expandPosition(token);
+				pm.popParser();
 				return true;
 			}
 		}
