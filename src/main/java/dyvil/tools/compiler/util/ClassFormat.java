@@ -39,6 +39,36 @@ public class ClassFormat
 		return name.replace('/', '.');
 	}
 	
+	public static String typeToInternal(String name)
+	{
+		switch (name)
+		{
+		case "boolean":
+			return "Z";
+		case "byte":
+			return "B";
+		case "short":
+			return "S";
+		case "char":
+			return "C";
+		case "int":
+			return "I";
+		case "long":
+			return "L";
+		case "float":
+			return "F";
+		case "double":
+			return "D";
+		case "void":
+			return "V";
+		}
+		if (name.length() > 1)
+		{
+			return "L" + name.replace('.', '/') + ";";
+		}
+		return name;
+	}
+	
 	public static String opcodeToString(int opcode)
 	{
 		return OPCODES[opcode];
@@ -46,12 +76,10 @@ public class ClassFormat
 	
 	public static int parseOpcode(String opcode)
 	{
-		int hash = opcode.hashCode();
 		int len = OPCODES.length;
 		for (int i = 0; i < len; i++)
 		{
-			String s = OPCODES[i];
-			if (s.hashCode() == hash && s.equals(opcode))
+			if (opcode.equalsIgnoreCase(OPCODES[i]))
 			{
 				return i;
 			}

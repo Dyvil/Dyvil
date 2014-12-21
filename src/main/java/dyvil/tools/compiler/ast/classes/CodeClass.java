@@ -229,13 +229,16 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
-			if (this.superClass.name.equals("void"))
+			if (this.superClass != null)
 			{
-				this.superClass = null;
-			}
-			else
-			{
-				this.superClass = this.superClass.resolve(context);
+				if (this.superClass.name.equals("void"))
+				{
+					this.superClass = null;
+				}
+				else
+				{
+					this.superClass = this.superClass.resolve(context);
+				}
 			}
 			this.interfaces.replaceAll(t -> t.applyState(state, context));
 		}

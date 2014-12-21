@@ -481,6 +481,9 @@ public class Dlex implements Iterable<IToken>
 		switch (type)
 		{
 		case TYPE_IDENTIFIER:
+		case TYPE_IDENTIFIER | MOD_DOTS:
+		case TYPE_IDENTIFIER | MOD_LETTER:
+		case TYPE_IDENTIFIER | MOD_SYMBOL:
 			return value;
 		case TYPE_SYMBOL:
 			return value;
