@@ -33,7 +33,8 @@ public class Parameter extends Member implements IField
 	
 	@Override
 	public void setValue(IValue value)
-	{}
+	{
+	}
 	
 	@Override
 	public IValue getValue()
@@ -75,7 +76,8 @@ public class Parameter extends Member implements IField
 	
 	@Override
 	public void write(ClassWriter writer)
-	{}
+	{
+	}
 	
 	@Override
 	public void writeGet(MethodVisitor visitor)

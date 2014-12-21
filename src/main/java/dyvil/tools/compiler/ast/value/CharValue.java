@@ -58,7 +58,7 @@ public class CharValue extends ASTNode implements IValue
 		visitor.visitLdcInsn(Integer.valueOf(0));
 		visitor.visitJumpInsn(Opcodes.IF_ICMPNE, label);
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

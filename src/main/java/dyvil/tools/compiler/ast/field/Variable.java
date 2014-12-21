@@ -13,10 +13,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Variable extends Member implements IField
 {
-	public int index;
+	public int		index;
 	
-	public Label start;
-	public Label end;
+	public Label	start;
+	public Label	end;
 	
 	public Variable()
 	{
@@ -31,7 +31,8 @@ public class Variable extends Member implements IField
 	
 	@Override
 	public void setValue(IValue value)
-	{}
+	{
+	}
 	
 	@Override
 	public IValue getValue()
@@ -44,13 +45,13 @@ public class Variable extends Member implements IField
 	{
 		return this.type.getExtendedName();
 	}
-
+	
 	@Override
 	public String getSignature()
 	{
 		return this.type.getSignature();
 	}
-
+	
 	@Override
 	public Variable applyState(CompilerState state, IContext context)
 	{
@@ -63,7 +64,8 @@ public class Variable extends Member implements IField
 	
 	@Override
 	public void write(ClassWriter writer)
-	{}
+	{
+	}
 	
 	@Override
 	public void writeGet(MethodVisitor visitor)

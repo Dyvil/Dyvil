@@ -85,7 +85,8 @@ public class DyvilCompiler
 			logger.addHandler(ch);
 		}
 		catch (Exception ex)
-		{}
+		{
+		}
 	}
 	
 	public static void addStates(String s)

@@ -65,5 +65,6 @@ public class ThisValue extends ASTNode implements IValue
 	
 	@Override
 	public void writeJump(MethodWriter visitor, Label label)
-	{}
+	{
+	}
 }

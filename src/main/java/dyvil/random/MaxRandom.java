@@ -22,7 +22,7 @@ public class MaxRandom extends Random implements DRandom
 	@Override
 	public int next(int bits)
 	{
-		return 1 << (bits + 1) - 1;
+		return (1 << bits + 1) - 1;
 	}
 	
 	@Override

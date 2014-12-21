@@ -52,13 +52,16 @@ public class SuperValue extends ASTNode implements IValue
 	
 	@Override
 	public void writeExpression(MethodWriter writer)
-	{}
+	{
+	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
-	{}
+	{
+	}
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label label)
-	{}
+	{
+	}
 }

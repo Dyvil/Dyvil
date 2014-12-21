@@ -4,7 +4,7 @@ import dyvil.tools.compiler.bytecode.MethodWriter;
 
 public class VarInstruction extends Instruction
 {
-	private int index = -1;
+	private int	index	= -1;
 	
 	public VarInstruction(int opcode, String name)
 	{

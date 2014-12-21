@@ -14,7 +14,8 @@ public class ForEachStatement extends ASTNode implements IStatement
 	private IValue	iterable;
 	
 	public ForEachStatement()
-	{}
+	{
+	}
 	
 	public void setVariable(Field variable)
 	{

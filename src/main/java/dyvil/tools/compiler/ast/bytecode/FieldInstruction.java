@@ -5,9 +5,9 @@ import dyvil.tools.compiler.util.ClassFormat;
 
 public class FieldInstruction extends Instruction
 {
-	private String			owner;
-	private String			fieldName;
-	private String desc;
+	private String	owner;
+	private String	fieldName;
+	private String	desc;
 	
 	public FieldInstruction(int opcode, String name)
 	{

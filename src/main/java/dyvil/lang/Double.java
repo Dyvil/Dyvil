@@ -634,31 +634,31 @@ public abstract class Double implements Number
 	@Override
 	public Double $plus(Number v)
 	{
-		return this.$eq((double) (this.value + v.doubleValue()));
+		return this.$eq(this.value + v.doubleValue());
 	}
 	
 	@Override
 	public Double $minus(Number v)
 	{
-		return this.$eq((double) (this.value - v.doubleValue()));
+		return this.$eq(this.value - v.doubleValue());
 	}
 	
 	@Override
 	public Double $times(Number v)
 	{
-		return this.$eq((double) (this.value * v.doubleValue()));
+		return this.$eq(this.value * v.doubleValue());
 	}
 	
 	@Override
 	public Double $div(Number v)
 	{
-		return this.$eq((double) (this.value / v.doubleValue()));
+		return this.$eq(this.value / v.doubleValue());
 	}
 	
 	@Override
 	public Double $percent(Number v)
 	{
-		return this.$eq((double) (this.value % v.doubleValue()));
+		return this.$eq(this.value % v.doubleValue());
 	}
 	
 	// string representations

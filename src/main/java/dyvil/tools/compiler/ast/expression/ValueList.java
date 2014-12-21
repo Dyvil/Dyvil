@@ -31,7 +31,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		return false;
 	}
-
+	
 	@Override
 	public Type getType()
 	{
@@ -41,7 +41,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		}
 		return this.values.get(this.values.size() - 1).getType();
 	}
-
+	
 	@Override
 	public void setValues(List<IValue> list)
 	{
@@ -53,13 +53,13 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		this.values.set(index, value);
 	}
-
+	
 	@Override
 	public void addValue(IValue value)
 	{
 		this.values.add(value);
 	}
-
+	
 	@Override
 	public List<IValue> getValues()
 	{
@@ -111,8 +111,9 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label label)
-	{}
-
+	{
+	}
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

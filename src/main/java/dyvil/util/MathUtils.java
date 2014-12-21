@@ -172,12 +172,12 @@ public class MathUtils
 	
 	public static @implicit int bucket(int i, int factor)
 	{
-		return (i < 0) ? ~(~i / factor) : i / factor;
+		return i < 0 ? ~(~i / factor) : i / factor;
 	}
 	
 	public static @implicit long bucket(long l, long factor)
 	{
-		return (l < 0) ? ~(~l / factor) : l / factor;
+		return l < 0 ? ~(~l / factor) : l / factor;
 	}
 	
 	public static @implicit int clamp(int i, int min, int max)
@@ -533,12 +533,12 @@ public class MathUtils
 	
 	public static @implicit boolean checkBit(int i, byte bit)
 	{
-		return (i & (1 << bit)) != 0;
+		return (i & 1 << bit) != 0;
 	}
 	
 	public static @implicit int setBit(int i, byte bit)
 	{
-		return i | (1 << bit);
+		return i | 1 << bit;
 	}
 	
 	public static @implicit int clearBit(int i, byte bit)
@@ -549,12 +549,12 @@ public class MathUtils
 	
 	public static @implicit boolean checkBit(long l, byte bit)
 	{
-		return (l & (1L << bit)) != 0;
+		return (l & 1L << bit) != 0;
 	}
 	
 	public static @implicit long setBit(long l, byte bit)
 	{
-		return l | (1L << bit);
+		return l | 1L << bit;
 	}
 	
 	public static @implicit long clearBit(long l, byte bit)

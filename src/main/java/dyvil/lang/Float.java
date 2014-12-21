@@ -634,31 +634,31 @@ public abstract class Float implements Number
 	@Override
 	public Float $plus(Number v)
 	{
-		return this.$eq((float) (this.value + v.floatValue()));
+		return this.$eq(this.value + v.floatValue());
 	}
 	
 	@Override
 	public Float $minus(Number v)
 	{
-		return this.$eq((float) (this.value - v.floatValue()));
+		return this.$eq(this.value - v.floatValue());
 	}
 	
 	@Override
 	public Float $times(Number v)
 	{
-		return this.$eq((float) (this.value * v.floatValue()));
+		return this.$eq(this.value * v.floatValue());
 	}
 	
 	@Override
 	public Float $div(Number v)
 	{
-		return this.$eq((float) (this.value / v.floatValue()));
+		return this.$eq(this.value / v.floatValue());
 	}
 	
 	@Override
 	public Float $percent(Number v)
 	{
-		return this.$eq((float) (this.value % v.floatValue()));
+		return this.$eq(this.value % v.floatValue());
 	}
 	
 	// string representations

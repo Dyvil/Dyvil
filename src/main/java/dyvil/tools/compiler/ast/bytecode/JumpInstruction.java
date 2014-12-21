@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.bytecode;
 
+import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
-import jdk.internal.org.objectweb.asm.Label;
 
 public class JumpInstruction extends Instruction
 {

@@ -3,7 +3,9 @@ package dyvil.tools.compiler.ast.method;
 import java.util.ArrayList;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.*;
+import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -109,67 +111,70 @@ public class Method extends Member implements IMethod
 	@Override
 	public int getSignatureMatch(String name, Type type, Type... argumentTypes)
 	{
-		if (name.equals(this.qualifiedName))
+		if (!name.equals(this.qualifiedName))
 		{
-			if (argumentTypes == null)
-			{
-				return 1;
-			}
-			
-			int pOff = 0;
-			int match = 1;
-			int len = argumentTypes.length;
-			List<Parameter> parameters = this.parameters;
-			
-			if (type != null && (this.modifiers & Modifiers.IMPLICIT) != 0)
-			{
-				if (len != parameters.size() - 1)
-				{
-					return 0;
-				}
-				
-				Type t2 = parameters.get(0).type;
-				if (type.equals(t2))
-				{
-					match += 2;
-				}
-				else if (Type.isSuperType(type, t2))
-				{
-					match += 1;
-				}
-				else
-				{
-					return 0;
-				}
-				
-				pOff = 1;
-			}
-			else if (len != this.parameters.size())
+			return 0;
+		}
+		// Only matching the name
+		if (argumentTypes == null)
+		{
+			return 1;
+		}
+		
+		int pOff = 0;
+		int match = 1;
+		int len = argumentTypes.length;
+		List<Parameter> parameters = this.parameters;
+		
+		// implicit modifier implementation
+		if (type != null && (this.modifiers & Modifiers.IMPLICIT) != 0)
+		{
+			if (len != parameters.size() - 1)
 			{
 				return 0;
 			}
 			
-			for (int i = 0; i < len; i++)
+			Type t2 = parameters.get(0).type;
+			if (type.equals(t2))
 			{
-				Type t1 = parameters.get(i + pOff).type;
-				Type t2 = argumentTypes[i];
-				
-				if (t1.equals(t2))
-				{
-					match += 2;
-				}
-				else if (Type.isSuperType(t1, t2))
-				{
-					match += 1;
-				}
-				else
-				{
-					return 0;
-				}
+				match += 2;
 			}
-			return match;
+			else if (Type.isSuperType(type, t2))
+			{
+				match += 1;
+			}
+			else
+			{
+				return 0;
+			}
+			
+			pOff = 1;
 		}
-		return 0;
+		else if (len != this.parameters.size())
+		{
+			return 0;
+		}
+		
+		for (int i = 0; i < len; i++)
+		{
+			Type t1 = parameters.get(i + pOff).type;
+			Type t2 = argumentTypes[i];
+			
+			if (t1.equals(t2))
+			{
+				match += 2;
+			}
+			else if (Type.isSuperType(t1, t2))
+			{
+				match += 1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		
+		return match;
 	}
 	
 	@Override

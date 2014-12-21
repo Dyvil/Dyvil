@@ -59,7 +59,8 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	
 	@Override
 	public void setArray(boolean array)
-	{}
+	{
+	}
 	
 	@Override
 	public boolean isArray()
@@ -114,5 +115,6 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label label)
-	{}
+	{
+	}
 }

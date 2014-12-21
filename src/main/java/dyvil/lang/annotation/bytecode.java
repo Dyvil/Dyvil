@@ -11,6 +11,7 @@ public @interface Bytecode
 {
 	/**
 	 * The opcode of this bytecode instruction.
+	 * 
 	 * @return the opcode
 	 */
 	public int value();

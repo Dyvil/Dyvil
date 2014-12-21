@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.imports.SimpleImport;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
@@ -69,7 +68,7 @@ public class ImportParser extends Parser
 				this.theImport = new SimpleImport(token);
 			}
 			
-			if (":".equals(value) && token.prev().isType(Token.TYPE_IDENTIFIER))
+			if (":".equals(value) && token.prev().isType(IToken.TYPE_IDENTIFIER))
 			{
 				this.mode = ALIAS;
 				return true;
@@ -110,7 +109,7 @@ public class ImportParser extends Parser
 		}
 		else if (this.isInMode(ALIAS))
 		{
-			if (token.isType(Token.TYPE_IDENTIFIER))
+			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				((SimpleImport) this.theImport).setAlias(value);
 				this.mode = -1;

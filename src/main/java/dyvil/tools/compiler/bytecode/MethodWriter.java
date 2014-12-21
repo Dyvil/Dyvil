@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.bytecode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
@@ -12,10 +14,10 @@ import dyvil.tools.compiler.util.OpcodeUtil;
 
 public class MethodWriter extends MethodVisitor
 {
-	private boolean					hasReturn;
+	private boolean	hasReturn;
 	
-	private List					locals		= new ArrayList();
-	private Stack					typeStack	= new Stack();
+	private List	locals		= new ArrayList();
+	private Stack	typeStack	= new Stack();
 	
 	public MethodWriter(int mode, MethodVisitor mv)
 	{
@@ -52,23 +54,23 @@ public class MethodWriter extends MethodVisitor
 		Class c = obj.getClass();
 		if (c == String.class)
 		{
-			typeStack.push("Ljava/lang/String;");
+			this.typeStack.push("Ljava/lang/String;");
 		}
 		else if (c == Integer.class)
 		{
-			typeStack.push(Opcodes.INTEGER);
+			this.typeStack.push(Opcodes.INTEGER);
 		}
 		else if (c == Long.class)
 		{
-			typeStack.push(Opcodes.LONG);
+			this.typeStack.push(Opcodes.LONG);
 		}
 		else if (c == Float.class)
 		{
-			typeStack.push(Opcodes.FLOAT);
+			this.typeStack.push(Opcodes.FLOAT);
 		}
 		else if (c == Double.class)
 		{
-			typeStack.push(Opcodes.DOUBLE);
+			this.typeStack.push(Opcodes.DOUBLE);
 		}
 	}
 	
@@ -92,11 +94,11 @@ public class MethodWriter extends MethodVisitor
 		this.hasReturn = OpcodeUtil.isReturnOpcode(op);
 		if (this.hasReturn)
 		{
-			typeStack.clear();
+			this.typeStack.clear();
 		}
 		else if (op == Opcodes.ACONST_NULL)
 		{
-			typeStack.push(Opcodes.NULL);
+			this.typeStack.push(Opcodes.NULL);
 		}
 		this.mv.visitInsn(op);
 	}

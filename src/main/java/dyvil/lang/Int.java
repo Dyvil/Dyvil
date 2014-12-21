@@ -834,67 +834,67 @@ public abstract class Int implements Integer
 	@Override
 	public Int $plus(Number v)
 	{
-		return this.$eq((int) (this.value + v.intValue()));
+		return this.$eq(this.value + v.intValue());
 	}
 	
 	@Override
 	public Int $minus(Number v)
 	{
-		return this.$eq((int) (this.value - v.intValue()));
+		return this.$eq(this.value - v.intValue());
 	}
 	
 	@Override
 	public Int $times(Number v)
 	{
-		return this.$eq((int) (this.value * v.intValue()));
+		return this.$eq(this.value * v.intValue());
 	}
 	
 	@Override
 	public Int $div(Number v)
 	{
-		return this.$eq((int) (this.value / v.intValue()));
+		return this.$eq(this.value / v.intValue());
 	}
 	
 	@Override
 	public Int $percent(Number v)
 	{
-		return this.$eq((int) (this.value % v.intValue()));
+		return this.$eq(this.value % v.intValue());
 	}
 	
 	@Override
 	public Int $bar(Integer v)
 	{
-		return this.$eq((int) (this.value | v.intValue()));
+		return this.$eq(this.value | v.intValue());
 	}
 	
 	@Override
 	public Int $amp(Integer v)
 	{
-		return this.$eq((int) (this.value & v.intValue()));
+		return this.$eq(this.value & v.intValue());
 	}
 	
 	@Override
 	public Int $up(Integer v)
 	{
-		return this.$eq((int) (this.value ^ v.intValue()));
+		return this.$eq(this.value ^ v.intValue());
 	}
 	
 	@Override
 	public Int $less$less(Integer v)
 	{
-		return this.$eq((int) (this.value << v.intValue()));
+		return this.$eq(this.value << v.intValue());
 	}
 	
 	@Override
 	public Int $greater$greater(Integer v)
 	{
-		return this.$eq((int) (this.value >> v.intValue()));
+		return this.$eq(this.value >> v.intValue());
 	}
 	
 	@Override
 	public Int $greater$greater$greater(Integer v)
 	{
-		return this.$eq((int) (this.value >>> v.intValue()));
+		return this.$eq(this.value >>> v.intValue());
 	}
 	
 	// string representations

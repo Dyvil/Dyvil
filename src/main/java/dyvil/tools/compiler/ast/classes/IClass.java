@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 
 public interface IClass extends IASTNode, INamed, IModified, ITyped, ITypeList, IAnnotatable, IContext
-{	
+{
 	public Type toType();
 	
 	public void setBody(ClassBody body);

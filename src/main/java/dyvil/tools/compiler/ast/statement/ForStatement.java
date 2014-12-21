@@ -11,7 +11,8 @@ public class ForStatement extends WhileStatement
 	private IValue		action;
 	
 	public ForStatement()
-	{}
+	{
+	}
 	
 	public void setVariables(List<Field> variables)
 	{

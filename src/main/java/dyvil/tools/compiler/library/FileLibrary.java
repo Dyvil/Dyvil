@@ -18,7 +18,8 @@ public class FileLibrary extends Library
 	
 	@Override
 	public void loadLibrary()
-	{}
+	{
+	}
 	
 	@Override
 	public Package resolvePackage(String name)
@@ -45,7 +46,8 @@ public class FileLibrary extends Library
 			}
 		}
 		catch (IOException ex)
-		{}
+		{
+		}
 		return null;
 	}
 }

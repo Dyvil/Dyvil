@@ -36,7 +36,8 @@ public class NullValue extends ASTNode implements IValue
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
-	{}
+	{
+	}
 	
 	@Override
 	public void writeJump(MethodWriter visitor, Label label)

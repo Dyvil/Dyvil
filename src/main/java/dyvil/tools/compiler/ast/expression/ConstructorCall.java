@@ -40,7 +40,8 @@ public class ConstructorCall extends Call implements ITyped
 	
 	@Override
 	public void setName(String name)
-	{}
+	{
+	}
 	
 	@Override
 	public String getName()
@@ -50,7 +51,8 @@ public class ConstructorCall extends Call implements ITyped
 	
 	@Override
 	public void setValue(IValue value)
-	{}
+	{
+	}
 	
 	@Override
 	public IValue getValue()
@@ -60,7 +62,8 @@ public class ConstructorCall extends Call implements ITyped
 	
 	@Override
 	public void setArray(boolean array)
-	{}
+	{
+	}
 	
 	@Override
 	public boolean isArray()

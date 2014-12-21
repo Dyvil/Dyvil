@@ -22,7 +22,7 @@ public class BytecodeClass extends CodeClass
 {
 	private final class AnnotationVisitorImpl extends AnnotationVisitor
 	{
-		private Annotation annotation;
+		private Annotation	annotation;
 		
 		private AnnotationVisitorImpl(int flags, Annotation annotation)
 		{
@@ -33,7 +33,7 @@ public class BytecodeClass extends CodeClass
 		@Override
 		public void visit(String key, Object value)
 		{
-			annotation.addValue(key, IValue.fromObject(value));
+			this.annotation.addValue(key, IValue.fromObject(value));
 		}
 		
 		@Override
@@ -42,7 +42,7 @@ public class BytecodeClass extends CodeClass
 			// TODO
 		}
 	}
-
+	
 	public boolean	typesResolved;
 	
 	public BytecodeClass()

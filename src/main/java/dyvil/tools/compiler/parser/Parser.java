@@ -76,10 +76,12 @@ public abstract class Parser<T>
 	}
 	
 	public void begin(ParserManager pm)
-	{}
+	{
+	}
 	
 	public abstract boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError;
 	
 	public void end(ParserManager pm)
-	{}
+	{
+	}
 }

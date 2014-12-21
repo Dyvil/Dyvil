@@ -5,9 +5,9 @@ import dyvil.tools.compiler.util.ClassFormat;
 
 public class InvokeInstruction extends Instruction
 {
-	private String			owner;
-	private String			methodName;
-	private String			desc;
+	private String	owner;
+	private String	methodName;
+	private String	desc;
 	
 	public InvokeInstruction(int opcode, String name)
 	{

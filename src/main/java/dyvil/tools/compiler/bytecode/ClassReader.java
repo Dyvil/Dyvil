@@ -44,11 +44,13 @@ public class ClassReader extends ClassVisitor
 	
 	@Override
 	public void visitSource(String source, String debug)
-	{}
+	{
+	}
 	
 	@Override
 	public void visitOuterClass(String owner, String name, String desc)
-	{}
+	{
+	}
 	
 	@Override
 	public AnnotationVisitor visitAnnotation(String desc, boolean visible)
@@ -58,11 +60,13 @@ public class ClassReader extends ClassVisitor
 	
 	@Override
 	public void visitAttribute(Attribute attr)
-	{}
+	{
+	}
 	
 	@Override
 	public void visitInnerClass(String name, String outerName, String innerName, int access)
-	{}
+	{
+	}
 	
 	@Override
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
@@ -78,5 +82,6 @@ public class ClassReader extends ClassVisitor
 	
 	@Override
 	public void visitEnd()
-	{}
+	{
+	}
 }

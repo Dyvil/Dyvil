@@ -40,7 +40,8 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	
 	@Override
 	public void setName(String name)
-	{}
+	{
+	}
 	
 	@Override
 	public String getName()
@@ -50,7 +51,8 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	
 	@Override
 	public void setValue(IValue value)
-	{}
+	{
+	}
 	
 	@Override
 	public IValue getValue()
@@ -60,15 +62,18 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	
 	@Override
 	public void setValues(List<IValue> list)
-	{}
+	{
+	}
 	
 	@Override
 	public void setValue(int index, IValue value)
-	{}
+	{
+	}
 	
 	@Override
 	public void addValue(IValue value)
-	{}
+	{
+	}
 	
 	@Override
 	public List<IValue> getValues()
@@ -84,7 +89,8 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	
 	@Override
 	public void setArray(boolean array)
-	{}
+	{
+	}
 	
 	@Override
 	public boolean isArray()
@@ -181,7 +187,8 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label label)
-	{}
+	{
+	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

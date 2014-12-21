@@ -44,7 +44,8 @@ public class JarLibrary extends Library
 			}
 		}
 		catch (IOException ex)
-		{}
+		{
+		}
 	}
 	
 	@Override
@@ -71,7 +72,8 @@ public class JarLibrary extends Library
 				return this.jarFile.getInputStream(entry);
 			}
 			catch (IOException ex)
-			{}
+			{
+			}
 		}
 		return null;
 	}

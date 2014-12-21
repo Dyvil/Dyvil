@@ -11,7 +11,7 @@ import java.util.ListIterator;
  */
 public class TaskThread extends Thread
 {
-	public static boolean		DEBUG		= true;
+	public static boolean			DEBUG		= true;
 	
 	private List<Runnable>			tasks		= new ArrayList();
 	private ListIterator<Runnable>	iterator	= this.tasks.listIterator();

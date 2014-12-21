@@ -91,15 +91,18 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	
 	@Override
 	public void setValues(List<IValue> list)
-	{}
+	{
+	}
 	
 	@Override
 	public void setValue(int index, IValue value)
-	{}
+	{
+	}
 	
 	@Override
 	public void addValue(IValue value)
-	{}
+	{
+	}
 	
 	@Override
 	public List<IValue> getValues()
@@ -115,7 +118,8 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	
 	@Override
 	public void setArray(boolean array)
-	{}
+	{
+	}
 	
 	@Override
 	public boolean isArray()

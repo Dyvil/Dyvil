@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.bytecode.Instruction;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.util.ClassFormat;
 
 public class BytecodeParser extends Parser
@@ -41,7 +40,7 @@ public class BytecodeParser extends Parser
 		}
 		if (this.isInMode(INSTRUCTION))
 		{
-			if (token.isType(Token.TYPE_IDENTIFIER))
+			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				int opcode = ClassFormat.parseOpcode(value);
 				Instruction insn = Instruction.fromOpcode(opcode, value);
@@ -78,7 +77,7 @@ public class BytecodeParser extends Parser
 			{
 				return true;
 			}
-			else if (!token.isType(Token.TYPE_SYMBOL) && !token.isType(Token.TYPE_BRACKET))
+			else if (!token.isType(IToken.TYPE_SYMBOL) && !token.isType(IToken.TYPE_BRACKET))
 			{
 				if (this.instruction == null)
 				{

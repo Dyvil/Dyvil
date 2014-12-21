@@ -14,7 +14,8 @@ public class DoWhileStatement extends ASTNode implements IStatement, IValued
 	private IValue	condition;
 	
 	public DoWhileStatement()
-	{}
+	{
+	}
 	
 	public void setThen(IValue then)
 	{

@@ -7,8 +7,8 @@ public class TaskThreadManager
 	private TaskThread[]	threads;
 	
 	/**
-	 * Creates a new {@link TaskThreadManager} with the current amount of available
-	 * processors.
+	 * Creates a new {@link TaskThreadManager} with the current amount of
+	 * available processors.
 	 * 
 	 * @param name
 	 *            the name
@@ -19,9 +19,9 @@ public class TaskThreadManager
 	}
 	
 	/**
-	 * Creates a new {@link TaskThreadManager} with the given amount of available
-	 * processors. For each available processor, it creates an instance of
-	 * {@link TaskThread}.
+	 * Creates a new {@link TaskThreadManager} with the given amount of
+	 * available processors. For each available processor, it creates an
+	 * instance of {@link TaskThread}.
 	 * 
 	 * @param name
 	 *            the name

@@ -138,7 +138,7 @@ public class IfStatement extends ASTNode implements IStatement
 			writer.visitLabel(ifEnd);
 		}
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
