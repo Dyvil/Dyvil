@@ -156,6 +156,10 @@ public class Type extends ASTNode implements IContext
 	
 	protected boolean isAssignableFrom(Type that)
 	{
+		if (this.arrayDimensions != that.arrayDimensions)
+		{
+			return false;
+		}
 		if (that.theClass != null)
 		{
 			return that.theClass.isSuperType(this);
@@ -192,19 +196,11 @@ public class Type extends ASTNode implements IContext
 	
 	public int getLoadOpcode()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return Opcodes.AALOAD;
-		}
 		return Opcodes.ALOAD;
 	}
 	
 	public int getStoreOpcode()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return Opcodes.AASTORE;
-		}
 		return Opcodes.ASTORE;
 	}
 	
@@ -361,24 +357,20 @@ public class Type extends ASTNode implements IContext
 		{
 			return false;
 		}
-		if (obj instanceof PrimitiveType)
-		{
-			return ((PrimitiveType) obj).equals(this);
-		}
 		if (!(obj instanceof Type))
 		{
 			return false;
 		}
-		return this.equals((Type) obj);
-	}
-	
-	protected boolean equals(Type type)
-	{
-		if (this.arrayDimensions != type.arrayDimensions)
+		Type other = (Type) obj;
+		if (this.arrayDimensions != other.arrayDimensions)
 		{
 			return false;
 		}
-		
+		return this.classEquals(other);
+	}
+	
+	public boolean classEquals(Type type)
+	{
 		if (this.theClass != null && this.theClass == type.theClass)
 		{
 			return true;

@@ -139,12 +139,16 @@ public class Util
 			List<IValue> list = ((IValueList) value1).getValues();
 			list.add(0, value);
 		}
-		else
+		else if (value1 != null)
 		{
 			StatementList list = new StatementList(null);
 			list.addValue(value1);
 			list.addValue(value);
 			method.setValue(list);
+		}
+		else
+		{
+			method.setValue(value);
 		}
 	}
 	

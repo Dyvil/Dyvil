@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.statement.FieldAssign;
 import dyvil.tools.compiler.ast.statement.StatementList;
@@ -189,13 +190,20 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean isSuperType(Type t)
 	{
-		if (t.equals(this.superClass) || this.interfaces.contains(t))
+		if (this.interfaces.contains(t))
 		{
 			return true;
 		}
-		else if (this.superClass != null && this.superClass.theClass != null)
+		else if (this.superClass != null)
 		{
-			return this.superClass.theClass.isSuperType(t);
+			if (t.classEquals(this.superClass))
+			{
+				return true;
+			}
+			if (this.superClass.theClass != null)
+			{
+				return this.superClass.theClass.isSuperType(t);
+			}
 		}
 		return false;
 	}
@@ -419,19 +427,19 @@ public class CodeClass extends ASTNode implements IClass
 			m.write(writer);
 		}
 		
-		// if (!instanceFieldsAdded)
-		// {
-		// // TODO
-		// }
-		// if (!staticFieldsAdded)
-		// {
-		// Method m = new Method(this);
-		// m.setQualifiedName("<clinit>");
-		// m.setType(Type.VOID);
-		// m.setModifiers(Modifiers.STATIC | Modifiers.MANDATED);
-		// m.setValue(staticFields);
-		// m.write(writer);
-		// }
+		if (!instanceFieldsAdded)
+		{
+			// TODO
+		}
+		if (!staticFieldsAdded)
+		{
+			Method m = new Method(this);
+			m.setQualifiedName("<clinit>");
+			m.setType(Type.VOID);
+			m.setModifiers(Modifiers.STATIC | Modifiers.MANDATED);
+			m.setValue(staticFields);
+			m.write(writer);
+		}
 	}
 	
 	@Override

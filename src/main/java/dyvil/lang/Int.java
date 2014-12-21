@@ -3,7 +3,7 @@ package dyvil.lang;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.lang.annotation.bytecode;
 
-public abstract class Int extends Value implements Integer
+public abstract class Int implements Integer
 {
 	protected int	value;
 	

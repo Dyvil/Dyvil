@@ -2,19 +2,18 @@ package test;
 
 import java.lang.String;
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class Main
 {
-	public static void main(String[] args) = test;
+	public static int i = 3;
 	
-	public static void test() =
-	{
-		System out println "Hello World";
-		@{
-			getstatic "java.lang.System", "out", "java.io.PrintStream";
-			ldc "Hello Bytecode";
-			invokevirtual "java.io.PrintStream", "println", "(Ljava/lang/String;)V";
-			return;
-		};
+	public static void main(String[] args) =
+	@{
+		getstatic "java.lang.System", "out", "java.io.PrintStream";
+		aload 0;
+		invokestatic "java.util.Arrays", "toString", "([Ljava/lang/Object;)Ljava/lang/String;";
+		invokevirtual "java.io.PrintStream", "println", "(Ljava/lang/Object;)V";
+		return;
 	};
 }

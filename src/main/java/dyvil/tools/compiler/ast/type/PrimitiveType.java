@@ -136,8 +136,8 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public boolean equals(Type type)
+	public boolean classEquals(Type type)
 	{
-		return super.equals(type) || this.qualifiedName.equals(type.qualifiedName);
+		return super.classEquals(type) || this.qualifiedName.equals(type.qualifiedName);
 	}
 }
