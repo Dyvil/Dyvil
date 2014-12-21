@@ -174,6 +174,12 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				return true;
 			}
 		}
+		
+		if ("}".equals(value))
+		{
+			pm.popParser(true);
+			return true;
+		}
 		return false;
 	}
 	
@@ -192,7 +198,8 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	
 	@Override
 	public void setAnnotations(List<Annotation> annotations)
-	{}
+	{
+	}
 	
 	@Override
 	public List<Annotation> getAnnotations()

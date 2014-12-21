@@ -12,10 +12,10 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 
 public class IfStatementParser extends Parser implements IValued
 {
-	public static final int	IF		= 1;
-	public static final int	THEN	= 2;
-	public static final int	ELSE	= 4;
-	public static final int END = 8;
+	public static final int	IF			= 1;
+	public static final int	CONDITION	= 2;
+	public static final int	THEN		= 4;
+	public static final int	ELSE		= 8;
 	
 	protected IContext		context;
 	protected IfStatement	statement;
@@ -30,16 +30,27 @@ public class IfStatementParser extends Parser implements IValued
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (this.mode == END)
+		if (this.mode == -1)
 		{
 			pm.popParser(true);
 			return true;
 		}
 		if (this.mode == IF)
 		{
-			pm.pushParser(new ExpressionParser(this.context, this), true);
-			this.mode = THEN;
-			return true;
+			if ("(".equals(value))
+			{
+				pm.pushParser(new ExpressionParser(this.context, this));
+				this.mode = CONDITION;
+				return true;
+			}
+		}
+		if (this.mode == CONDITION)
+		{
+			if (")".equals(value))
+			{
+				this.mode = THEN;
+				return true;
+			}
 		}
 		if (this.mode == THEN)
 		{
@@ -55,7 +66,7 @@ public class IfStatementParser extends Parser implements IValued
 			if ("else".equals(value))
 			{
 				pm.pushParser(new ExpressionParser(this.context, this));
-				this.mode = END;
+				this.mode = -1;
 				return true;
 			}
 			else if (";".equals(value))
@@ -64,13 +75,18 @@ public class IfStatementParser extends Parser implements IValued
 			}
 		}
 		
+		if ("}".equals(value))
+		{
+			pm.popParser(true);
+			return true;
+		}
 		return false;
 	}
 	
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == THEN)
+		if (this.mode == CONDITION)
 		{
 			this.statement.setCondition(value);
 		}
@@ -78,7 +94,7 @@ public class IfStatementParser extends Parser implements IValued
 		{
 			this.statement.setThen(value);
 		}
-		else if (this.mode == END)
+		else if (this.mode == -1)
 		{
 			this.statement.setElse(value);
 		}

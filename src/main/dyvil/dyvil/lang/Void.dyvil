@@ -1,8 +1,8 @@
 package dyvil.lang;
 
-public class Value extends void
+public class Void extends void
 {
-	public Value new();
+	private Void new();
 	
 	public Class getClass() = null;
 }

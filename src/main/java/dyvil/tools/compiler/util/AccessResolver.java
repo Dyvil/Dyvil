@@ -54,7 +54,8 @@ public class AccessResolver
 				IAccess alternate = curr.resolve2(context1, context);
 				if (alternate == null)
 				{
-					backwards = true;
+					// TODO
+					markers.add(curr.getResolveError());
 				}
 				else
 				{

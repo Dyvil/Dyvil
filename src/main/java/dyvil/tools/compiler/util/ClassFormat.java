@@ -54,7 +54,7 @@ public class ClassFormat
 		case "int":
 			return "I";
 		case "long":
-			return "L";
+			return "J";
 		case "float":
 			return "F";
 		case "double":

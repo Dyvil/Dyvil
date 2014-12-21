@@ -98,11 +98,11 @@ public class DyvilCompiler
 			states.add(CompilerState.RESOLVE_TYPES);
 			states.add(CompilerState.RESOLVE);
 			states.add(CompilerState.OPERATOR_PRECEDENCE);
-			states.add(CompilerState.FOLD_CONSTANTS);
 			states.add(CompilerState.CONVERT);
 			states.add(CompilerState.COMPILE);
 			break;
 		case "optimize":
+			states.add(CompilerState.FOLD_CONSTANTS);
 			states.add(CompilerState.OPTIMIZE);
 			break;
 		case "obfuscate":

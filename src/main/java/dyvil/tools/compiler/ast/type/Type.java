@@ -194,6 +194,11 @@ public class Type extends ASTNode implements IContext
 		return null;
 	}
 	
+	public Object getFrameType()
+	{
+		return this.getExtendedName();
+	}
+	
 	public int getLoadOpcode()
 	{
 		return Opcodes.ALOAD;

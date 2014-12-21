@@ -72,6 +72,28 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
+	public Object getFrameType()
+	{
+		if (this == Type.INT)
+		{
+			return Opcodes.INTEGER;
+		}
+		else if (this == Type.LONG)
+		{
+			return Opcodes.LONG;
+		}
+		else if (this == Type.FLOAT)
+		{
+			return Opcodes.FLOAT;
+		}
+		else if (this == Type.DOUBLE)
+		{
+			return Opcodes.DOUBLE;
+		}
+		return Opcodes.NULL;
+	}
+	
+	@Override
 	public int getLoadOpcode()
 	{
 		if (this == LONG)

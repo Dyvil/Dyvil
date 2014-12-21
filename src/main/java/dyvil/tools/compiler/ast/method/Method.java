@@ -315,7 +315,7 @@ public class Method extends Member implements IMethod
 		for (Parameter param : this.parameters)
 		{
 			param.index = index++;
-			mw.visitParameter(param.name, index);
+			mw.visitParameter(param.type, index);
 		}
 		
 		if (this.statement != null)
@@ -330,9 +330,7 @@ public class Method extends Member implements IMethod
 			for (Variable var : this.variables)
 			{
 				String name = var.qualifiedName;
-				String desc = var.getDescription();
-				String signature = var.getSignature();
-				mw.visitLocalVariable(name, desc, signature, var.start, var.end, var.index);
+				mw.visitLocalVariable(name, var.type, var.start, var.end, var.index);
 			}
 			
 			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);
