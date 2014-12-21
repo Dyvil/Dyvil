@@ -5,19 +5,16 @@ import java.util.Scanner;
 
 public class Main
 {
-	public static void main(String[] args) =
+	public static void main(String[] args) = test;
+	
+	public static void test() =
 	{
-		test;
-		bytecode;
-	};
-	
-	public static void test() = System out println "Hello World";
-	
-	public static void bytecode() =
-	@{
-		getstatic "java.lang.System", "out", "java.io.PrintStream";
-		ldc "Hello Bytecode";
-		invokevirtual "java.io.PrintStream", "println", "(Ljava/lang/String;)V";
-		return;
+		System out println "Hello World";
+		@{
+			getstatic "java.lang.System", "out", "java.io.PrintStream";
+			ldc "Hello Bytecode";
+			invokevirtual "java.io.PrintStream", "println", "(Ljava/lang/String;)V";
+			return;
+		};
 	};
 }

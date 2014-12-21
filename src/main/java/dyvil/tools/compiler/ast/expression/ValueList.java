@@ -141,7 +141,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 				for (IValue value : this.values)
 				{
 					buffer.append(prefix).append(Formatting.Method.indent);
-					value.toString("", buffer);
+					value.toString(prefix + Formatting.Method.indent, buffer);
 					buffer.append(";\n");
 				}
 				buffer.append(prefix).append('}');
