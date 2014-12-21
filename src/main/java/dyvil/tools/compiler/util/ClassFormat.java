@@ -8,8 +8,10 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class ClassFormat
 {
-	public static File	javaRTJar;
-	public static File	dyvilRTJar;
+	public static File		javaRTJar;
+	public static File		dyvilRTJar;
+	
+	private static String[]	OPCODES	= jdk.internal.org.objectweb.asm.util.Printer.OPCODES;
 	
 	static
 	{
@@ -35,6 +37,26 @@ public class ClassFormat
 	public static String internalToPackage(String name)
 	{
 		return name.replace('/', '.');
+	}
+	
+	public static String opcodeToString(int opcode)
+	{
+		return OPCODES[opcode];
+	}
+	
+	public static int parseOpcode(String opcode)
+	{
+		int hash = opcode.hashCode();
+		int len = OPCODES.length;
+		for (int i = 0; i < len; i++)
+		{
+			String s = OPCODES[i];
+			if (s.hashCode() == hash && s.equals(opcode))
+			{
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 	private static Type parseBaseType(char c)

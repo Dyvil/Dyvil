@@ -69,5 +69,7 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		this.value.writeExpression(writer);
+		writer.visitInsn(this.value.getType().getReturnOpcode());
 	}
 }

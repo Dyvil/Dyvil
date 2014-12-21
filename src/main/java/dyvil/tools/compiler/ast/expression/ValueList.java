@@ -116,10 +116,9 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		int size = this.values.size();
 		if (this.isArray)
 		{
-			if (size == 0)
+			if (this.values.isEmpty())
 			{
 				buffer.append(Formatting.Expression.emptyArray);
 			}
@@ -132,7 +131,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		}
 		else
 		{
-			if (size == 0)
+			if (this.values.isEmpty())
 			{
 				buffer.append(Formatting.Expression.emptyExpression);
 			}

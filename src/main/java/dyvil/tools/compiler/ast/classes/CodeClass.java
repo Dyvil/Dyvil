@@ -229,11 +229,11 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
-			if (this.superClass == Type.VOID)
+			if (this.superClass.name.equals("void"))
 			{
-				return null;
+				this.superClass = null;
 			}
-			else if (this.superClass != null)
+			else
 			{
 				this.superClass = this.superClass.resolve(context);
 			}
@@ -364,7 +364,7 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		String internalName = this.getInternalName();
 		String signature = this.getSignature();
-		String superClass = this.superClass.getInternalName();
+		String superClass = this.superClass == null ? null : this.superClass.getInternalName();
 		String[] interfaces = this.getInterfaces();
 		writer.visit(Opcodes.V1_8, this.modifiers, internalName, signature, superClass, interfaces);
 		
@@ -416,19 +416,19 @@ public class CodeClass extends ASTNode implements IClass
 			m.write(writer);
 		}
 		
-//		if (!instanceFieldsAdded)
-//		{
-//			// TODO
-//		}
-//		if (!staticFieldsAdded)
-//		{
-//			Method m = new Method(this);
-//			m.setQualifiedName("<clinit>");
-//			m.setType(Type.VOID);
-//			m.setModifiers(Modifiers.STATIC | Modifiers.MANDATED);
-//			m.setValue(staticFields);
-//			m.write(writer);
-//		}
+		// if (!instanceFieldsAdded)
+		// {
+		// // TODO
+		// }
+		// if (!staticFieldsAdded)
+		// {
+		// Method m = new Method(this);
+		// m.setQualifiedName("<clinit>");
+		// m.setType(Type.VOID);
+		// m.setModifiers(Modifiers.STATIC | Modifiers.MANDATED);
+		// m.setValue(staticFields);
+		// m.write(writer);
+		// }
 	}
 	
 	@Override
@@ -443,6 +443,10 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			buffer.append(" extends ");
 			this.superClass.toString("", buffer);
+		}
+		else
+		{
+			buffer.append(" extends void");
 		}
 		if (!this.interfaces.isEmpty())
 		{

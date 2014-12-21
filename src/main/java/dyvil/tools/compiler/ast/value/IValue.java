@@ -25,7 +25,7 @@ public interface IValue extends IASTNode
 	 * 
 	 * @param visitor
 	 */
-	public void writeExpression(MethodWriter visitor);
+	public void writeExpression(MethodWriter writer);
 	
 	/**
 	 * Writes this {@link IValue} to the given {@link MethodWriter}

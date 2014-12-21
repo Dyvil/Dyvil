@@ -184,7 +184,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		
 		for (IClass iclass : this.classes)
 		{
-			iclass.applyState(state, context);
+			iclass.applyState(state, this);
 		}
 		
 		return this;

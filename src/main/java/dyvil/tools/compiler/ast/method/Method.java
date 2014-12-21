@@ -33,7 +33,7 @@ public class Method extends Member implements IMethod
 	
 	private List<Variable>	variables			= new ArrayList(5);
 	
-	private boolean			isConstructor;
+	protected boolean		isConstructor;
 	
 	public Method(IClass iclass)
 	{
@@ -41,12 +41,35 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public void setName(String name)
+	{
+		if (name.equals("new"))
+		{
+			this.qualifiedName = "<init>";
+			this.name = "new";
+			this.isConstructor = true;
+		}
+		else
+		{
+			this.qualifiedName = name;
+			this.name = Symbols.contract(name);
+		}
+	}
+	
+	@Override
 	public void setQualifiedName(String name)
 	{
-		this.qualifiedName = name;
-		this.name = Symbols.contract(name);
-		
-		this.isConstructor = name.equals("<init>");
+		if (name.equals("<init>"))
+		{
+			this.qualifiedName = "<init>";
+			this.name = "new";
+			this.isConstructor = true;
+		}
+		else
+		{
+			this.qualifiedName = name;
+			this.name = Symbols.contract(name);
+		}
 	}
 	
 	@Override
@@ -297,11 +320,6 @@ public class Method extends Member implements IMethod
 		{
 			mw.visitCode();
 			
-			for (Variable var : this.variables)
-			{
-				var.index = index++;
-			}
-			
 			if (this.statement != null)
 			{
 				this.statement.writeExpression(mw);
@@ -315,12 +333,7 @@ public class Method extends Member implements IMethod
 				mw.visitLocalVariable(name, desc, signature, var.start, var.end, var.index);
 			}
 			
-			if (this.isConstructor)
-			{
-				index++;
-			}
-			
-			mw.visitEnd();
+			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);
 		}
 	}
 	

@@ -108,6 +108,28 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
+	public int getReturnOpcode()
+	{
+		if (this == INT)
+		{
+			return Opcodes.IRETURN;
+		}
+		else if (this == LONG)
+		{
+			return Opcodes.LRETURN;
+		}
+		else if (this == FLOAT)
+		{
+			return Opcodes.FRETURN;
+		}
+		else if (this == DOUBLE)
+		{
+			return Opcodes.DRETURN;
+		}
+		return Opcodes.RETURN;
+	}
+	
+	@Override
 	public Type applyState(CompilerState state, IContext context)
 	{
 		return this;

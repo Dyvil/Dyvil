@@ -145,18 +145,21 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public void writeExpression(MethodWriter writer)
 	{
 		writer.visitLabel(this.start);
-		Iterator<IValue> iterator = this.values.iterator();
-		while (true)
+		if (!this.values.isEmpty())
 		{
-			IValue v = iterator.next();
-			if (iterator.hasNext())
+			Iterator<IValue> iterator = this.values.iterator();
+			while (true)
 			{
-				v.writeStatement(writer);
-			}
-			else
-			{
-				v.writeExpression(writer);
-				break;
+				IValue v = iterator.next();
+				if (iterator.hasNext())
+				{
+					v.writeStatement(writer);
+				}
+				else
+				{
+					v.writeExpression(writer);
+					break;
+				}
 			}
 		}
 		writer.visitLabel(this.end);

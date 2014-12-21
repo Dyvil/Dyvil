@@ -208,6 +208,11 @@ public class Type extends ASTNode implements IContext
 		return Opcodes.ASTORE;
 	}
 	
+	public int getReturnOpcode()
+	{
+		return Opcodes.ARETURN;
+	}
+	
 	public Type resolve(IContext context)
 	{
 		if (this.theClass == null)
