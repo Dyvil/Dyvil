@@ -1,0 +1,8 @@
+package dyvil.lang;
+
+public class Value extends void
+{
+	public Value new() = {};
+	
+	public Class getClass() = return null;
+}
