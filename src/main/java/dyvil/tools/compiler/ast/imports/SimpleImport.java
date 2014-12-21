@@ -18,33 +18,39 @@ public class SimpleImport extends ASTNode implements IImport
 	private String	qualifiedImport;
 	private String	packageName;
 	private String	className;
+	private String	alias;
 	
 	public SimpleImport(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public SimpleImport(ICodePosition position, String qualifiedImport, String className)
+	public SimpleImport(ICodePosition position, String qualifiedImport)
 	{
 		this.position = position;
-		this.setImport(qualifiedImport, className);
+		this.setImport(qualifiedImport);
 	}
 	
-	public void setImport(String qualifiedImport, String className)
+	public void setImport(String qualifiedImport)
 	{
 		this.qualifiedImport = qualifiedImport;
-		this.className = className;
 		
 		int index = qualifiedImport.lastIndexOf('.');
 		if (index != -1)
 		{
 			this.packageName = qualifiedImport.substring(0, index);
+			this.className = qualifiedImport.substring(index + 1);
 		}
 	}
 	
 	public String getImport()
 	{
 		return this.qualifiedImport;
+	}
+	
+	public void setAlias(String alias)
+	{
+		this.alias = alias;
 	}
 	
 	@Override
@@ -91,7 +97,7 @@ public class SimpleImport extends ASTNode implements IImport
 	@Override
 	public IClass resolveClass(String name)
 	{
-		if (this.className.equals(name))
+		if (this.className.equals(name) || name.equals(this.alias))
 		{
 			return this.theClass;
 		}

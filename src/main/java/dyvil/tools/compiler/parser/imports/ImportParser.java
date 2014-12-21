@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.imports.SimpleImport;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
@@ -14,7 +15,7 @@ public class ImportParser extends Parser
 {
 	public static final int		PACKAGEIMPORT		= 1;
 	public static final int		MULTIIMPORT_START	= 2;
-	public static final int		MULTIIMPORT_END		= 4;
+	public static final int		ALIAS				= 4;
 	
 	protected CompilationUnit	unit;
 	
@@ -33,7 +34,7 @@ public class ImportParser extends Parser
 		{
 			if (this.theImport instanceof SimpleImport)
 			{
-				((SimpleImport) this.theImport).setImport(this.buffer.toString(), token.prev().value());
+				((SimpleImport) this.theImport).setImport(this.buffer.toString());
 			}
 			this.theImport.expandPosition(token.prev());
 			pm.popParser();
@@ -68,6 +69,12 @@ public class ImportParser extends Parser
 				this.theImport = new SimpleImport(token);
 			}
 			
+			if (":".equals(value) && token.prev().isType(Token.TYPE_IDENTIFIER))
+			{
+				this.mode = ALIAS;
+				return true;
+			}
+			
 			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				this.buffer.append(value);
@@ -87,7 +94,7 @@ public class ImportParser extends Parser
 			}
 			else if ("}".equals(value))
 			{
-				this.mode = MULTIIMPORT_END;
+				this.mode = -1;
 				
 				if (this.buffer.length() > 0)
 				{
@@ -98,6 +105,15 @@ public class ImportParser extends Parser
 			else if (token.isType(IToken.TYPE_IDENTIFIER) || ".".equals(value))
 			{
 				this.buffer.append(value);
+				return true;
+			}
+		}
+		else if (this.isInMode(ALIAS))
+		{
+			if (token.isType(Token.TYPE_IDENTIFIER))
+			{
+				((SimpleImport) this.theImport).setAlias(value);
+				this.mode = -1;
 				return true;
 			}
 		}
