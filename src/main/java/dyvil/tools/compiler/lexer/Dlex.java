@@ -69,44 +69,34 @@ public class Dlex implements Iterable<IToken>
 						buf.append(c);
 					}
 				}
+				else if (c == '_' || c == '$' || c == '@')
+				{
+					subtype = MOD_SYMBOL | MOD_LETTER;
+					buf.append(c);
+				}
 				else
 				{
 					boolean letter = (subtype & MOD_LETTER) != 0;
 					boolean symbol = (subtype & MOD_SYMBOL) != 0;
 					if (letter)
 					{
-						if (c == '_' || c == '$' || c == '@')
-						{
-							subtype |= MOD_SYMBOL;
-							buf.append(c);
-						}
-						else if (isIdentifierPart(c))
+						if (isIdentifierPart(c))
 						{
 							subtype = MOD_LETTER;
 							buf.append(c);
-						}
-						else if (!symbol)
-						{
-							addToken = true;
+							continue;
 						}
 					}
 					if (symbol)
 					{
-						if (c == '_' || c == '$' || c == '@')
-						{
-							subtype |= MOD_LETTER;
-							buf.append(c);
-						}
-						else if (isIdentifierSymbol(c))
+						if (isIdentifierSymbol(c))
 						{
 							subtype = MOD_SYMBOL;
 							buf.append(c);
-						}
-						else if (!letter)
-						{
-							addToken = true;
+							continue;
 						}
 					}
+					addToken = true;
 				}
 			}
 			else if (type == TYPE_SYMBOL)
@@ -323,13 +313,9 @@ public class Dlex implements Iterable<IToken>
 			{
 				return TYPE_STRING_2;
 			}
-			else if (isWhitespace(c))
-			{
-				return TYPE_SYMBOL;
-			}
 			else
 			{
-				return TYPE_IDENTIFIER;
+				return TYPE_IDENTIFIER | MOD_SYMBOL;
 			}
 		}
 		else if (c == '0')
@@ -482,7 +468,8 @@ public class Dlex implements Iterable<IToken>
 			}
 		}
 		catch (SyntaxError ex)
-		{}
+		{
+		}
 		
 		buf.setCharAt(buf.length() - 1, ']');
 		
