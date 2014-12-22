@@ -37,7 +37,7 @@ public class PrimitiveType extends Type
 		{
 			buf.append("V");
 		}
-		else if (this == Type.BOOL)
+		else if (this == Type.BOOLEAN)
 		{
 			buf.append("Z");
 		}

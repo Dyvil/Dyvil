@@ -94,7 +94,7 @@ public class ClassFormat
 		case 'V':
 			return Type.VOID;
 		case 'Z':
-			return Type.BOOL;
+			return Type.BOOLEAN;
 		case 'B':
 			return Type.BYTE;
 		case 'S':

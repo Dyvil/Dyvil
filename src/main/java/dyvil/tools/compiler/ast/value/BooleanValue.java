@@ -34,7 +34,7 @@ public class BooleanValue extends ASTNode implements IValue
 	@Override
 	public Type getType()
 	{
-		return Type.BOOL;
+		return Type.BOOLEAN;
 	}
 	
 	@Override

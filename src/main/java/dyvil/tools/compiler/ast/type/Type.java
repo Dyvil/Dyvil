@@ -24,7 +24,7 @@ public class Type extends ASTNode implements IContext
 	public static Type		NONE		= new Type(null);
 	
 	public static Type		VOID		= new PrimitiveType("void", "dyvil.lang.Void");
-	public static Type		BOOL		= new PrimitiveType("boolean", "dyvil.lang.Boolean");
+	public static Type		BOOLEAN		= new PrimitiveType("boolean", "dyvil.lang.Boolean");
 	public static Type		BYTE		= new PrimitiveType("byte", "dyvil.lang.Byte");
 	public static Type		SHORT		= new PrimitiveType("short", "dyvil.lang.Short");
 	public static Type		CHAR		= new PrimitiveType("char", "dyvil.lang.Char");
@@ -79,7 +79,7 @@ public class Type extends ASTNode implements IContext
 	
 	public static void init()
 	{
-		BOOL.theClass = Package.dyvilLang.resolveClass("Boolean");
+		BOOLEAN.theClass = Package.dyvilLang.resolveClass("Boolean");
 		BYTE.theClass = Package.dyvilLang.resolveClass("Byte");
 		SHORT.theClass = Package.dyvilLang.resolveClass("Short");
 		CHAR.theClass = Package.dyvilLang.resolveClass("Char");
@@ -222,6 +222,14 @@ public class Type extends ASTNode implements IContext
 			{
 			case "void":
 				return VOID;
+			case "boolean":
+				return BOOLEAN;
+			case "char":
+				return CHAR;
+			case "byte":
+				return BYTE;
+			case "short":
+				return SHORT;
 			case "int":
 				return INT;
 			case "long":
@@ -230,11 +238,7 @@ public class Type extends ASTNode implements IContext
 				return FLOAT;
 			case "double":
 				return DOUBLE;
-			case "char":
-				return CHAR;
-			case "bool":
-				return BOOL;
-			case "java.lang.String":
+			case "String":
 				return STRING;
 			}
 			
