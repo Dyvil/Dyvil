@@ -78,6 +78,11 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		return this.values.get(index);
 	}
 	
+	public boolean isEmpty()
+	{
+		return this.values.isEmpty();
+	}
+	
 	@Override
 	public void setArray(boolean array)
 	{

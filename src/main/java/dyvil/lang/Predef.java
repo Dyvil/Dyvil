@@ -120,8 +120,13 @@ public class Predef
 		return t == null ? (U) null : c.cast(t);
 	}
 	
+	public static @implicit java.lang.String $plus(java.lang.String s1, java.lang.String s2)
+	{
+		return s1 + s2;
+	}
+	
 	public static @implicit java.lang.String $plus(Object o, java.lang.String s)
 	{
-		return java.lang.String.valueOf(o).concat(s);
+		return o + s;
 	}
 }

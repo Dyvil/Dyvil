@@ -451,13 +451,12 @@ public class CodeClass extends ASTNode implements IClass
 			m.write(writer);
 		}
 		
-		if (!instanceFieldsAdded)
+		if (!instanceFieldsAdded && !instanceFields.isEmpty())
 		{
 			// Create the default constructor
-			Type t = this.toType();
 			Method m = new Method(this);
 			m.setQualifiedName("<init>");
-			m.setType(this.toType());
+			m.setType(Type.VOID);
 			m.setModifiers(Modifiers.PUBLIC | Modifiers.MANDATED);
 			
 			// If this class has a superclass...
@@ -476,7 +475,7 @@ public class CodeClass extends ASTNode implements IClass
 			m.setValue(instanceFields);
 			m.write(writer);
 		}
-		if (!staticFieldsAdded)
+		if (!staticFieldsAdded && !staticFields.isEmpty())
 		{
 			// Create the classinit method
 			Method m = new Method(this);

@@ -313,6 +313,11 @@ public class Method extends Member implements IMethod
 		MethodVisitor visitor = writer.visitMethod(this.modifiers & 0xFFFF, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
 		MethodWriter mw = new MethodWriter(Opcodes.ASM5, visitor);
 		
+		if (this.isConstructor)
+		{
+			mw.setConstructor(this.type);
+		}
+		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
 		{
 			mw.visitAnnotation("Ldyvil/lang/annotation/inline;", false);

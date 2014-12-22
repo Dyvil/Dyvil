@@ -24,6 +24,12 @@ public class MethodWriter extends MethodVisitor
 		super(mode, mv);
 	}
 	
+	public void setConstructor(Type type)
+	{
+		this.locals.add(Opcodes.UNINITIALIZED_THIS);
+		this.typeStack.add(type.getFrameType());
+	}
+	
 	@Override
 	@Deprecated
 	public void visitParameter(String desc, int index)

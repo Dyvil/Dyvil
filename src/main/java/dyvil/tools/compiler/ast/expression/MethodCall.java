@@ -239,10 +239,6 @@ public class MethodCall extends Call implements INamed, IValued
 	public void writeStatement(MethodWriter writer)
 	{
 		this.writeExpression(writer);
-		if (this.method.getType() != Type.VOID)
-		{
-			writer.visitInsn(Opcodes.POP);
-		}
 	}
 	
 	@Override

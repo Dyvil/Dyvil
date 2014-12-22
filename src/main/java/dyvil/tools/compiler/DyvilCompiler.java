@@ -140,34 +140,33 @@ public class DyvilCompiler
 		logger.info("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
 		if (debug)
 		{
-			logger.info("Applying " + states + " States: " + DyvilCompiler.states);
-			logger.info("");
+			logger.info("Applying " + states + (states == 1 ? " State: " : " States: ") + DyvilCompiler.states);
 		}
 		
+		// Scan for Packages and Compilation Units
 		for (String s : sourceDir.list())
 		{
-			compile(new CodeFile(sourceDir, s), new File(outputDir, s), Package.rootPackage);
+			findUnits(new CodeFile(sourceDir, s), new File(outputDir, s), Package.rootPackage);
 		}
 		
-		List<CompilationUnit> units = new ArrayList(root.subPackages.size());
-		for (Package pack : root.subPackages)
+		int units = root.units.size();
+		if (debug)
 		{
-			for (CompilationUnit unit : pack.units)
-			{
-				units.add(unit);
-			}
+			int packages = root.subPackages.size();
+			logger.info("Compiling " + packages + (packages == 1 ? " Package, " : " Packages, ") + units + (units == 1 ? " Compilation Unit" : " Compilation Units"));
+			logger.info("");
 		}
 		
 		for (CompilerState state : DyvilCompiler.states)
 		{
-			state.apply(units, null);
+			state.apply(root.units, null);
 		}
 		
 		logger.info("");
-		Util.logProfile(now, units.size(), "Compilation finished (%.1f ms, %.1f ms/CU, %.2f CU/s)");
+		Util.logProfile(now, units, "Compilation finished (%.1f ms, %.1f ms/CU, %.2f CU/s)");
 	}
 	
-	public static void compile(File source, File output, Package pack)
+	public static void findUnits(File source, File output, Package pack)
 	{
 		if (!source.exists())
 		{
@@ -179,7 +178,7 @@ public class DyvilCompiler
 			String name = source.getName();
 			for (String s : source.list())
 			{
-				compile(new CodeFile(source, s), new File(output, s), pack.createSubPackage(name));
+				findUnits(new CodeFile(source, s), new File(output, s), pack.createSubPackage(name));
 			}
 			return;
 		}

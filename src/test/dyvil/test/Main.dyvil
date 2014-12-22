@@ -1,14 +1,12 @@
 package test;
 
-import java.util.Scanner;
-import java.util.Arrays;
-
 public class Main
 {
-	public long l = 3L;
-	public static int i = 4;
+	public static void main(String[] args) = "Hello" _ "World" ! print;
 	
-	public static void main(String[] args) = "Hello World" print;
+	public implicit String _(String s, String s2) = s + " " +(s2);
+	
+	public implicit String !(String s) = s + "!";
 	
 	public implicit void print(String s) = System out println(s);
 }
