@@ -484,60 +484,70 @@ public abstract class Long implements Integer
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LSUB })
 	public Long $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LMUL })
 	public Long $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LDIV })
 	public Long $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LREM })
 	public Long $percent(int v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LOR })
 	public Long $bar(int v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LAND })
 	public Long $amp(int v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LXOR })
 	public Long $up(int v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LSHL })
 	public Long $less$less(int v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LSHR })
 	public Long $greater$greater(int v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LUSHR })
 	public Long $greater$greater$greater(int v)
 	{
 		return this.$eq(this.value >>> v);

@@ -2,6 +2,7 @@ package dyvil.lang;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.lang.annotation.Bytecode;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 public abstract class Int implements Integer
 {
@@ -477,77 +478,77 @@ public abstract class Int implements Integer
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.IADD)
+	@Bytecode(opcode = IADD)
 	public Int $plus(int v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.ISUB)
+	@Bytecode(opcode = ISUB)
 	public Int $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.IMUL)
+	@Bytecode(opcode = IMUL)
 	public Int $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.IDIV)
+	@Bytecode(opcode = IDIV)
 	public Int $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.IREM)
+	@Bytecode(opcode = IREM)
 	public Int $percent(int v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.IOR)
+	@Bytecode(opcode = IOR)
 	public Int $bar(int v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.IAND)
+	@Bytecode(opcode = IAND)
 	public Int $amp(int v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.IXOR)
+	@Bytecode(opcode = IXOR)
 	public Int $up(int v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.ISHL)
+	@Bytecode(opcode = ISHL)
 	public Int $less$less(int v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.ISHR)
+	@Bytecode(opcode = ISHR)
 	public Int $greater$greater(int v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	@Bytecode(opcode = Opcodes.IUSHR)
+	@Bytecode(opcode = IUSHR)
 	public Int $greater$greater$greater(int v)
 	{
 		return this.$eq(this.value >>> v);
@@ -592,66 +593,77 @@ public abstract class Int implements Integer
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LADD)
 	public Long $plus(long v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LSUB)
 	public Long $minus(long v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LMUL)
 	public Long $times(long v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LDIV)
 	public Long $div(long v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LREM)
 	public Long $percent(long v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LOR)
 	public Long $bar(long v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LAND)
 	public Long $amp(long v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LXOR)
 	public Long $up(long v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LSHL)
 	public Int $less$less(long v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LSHR)
 	public Int $greater$greater(long v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, opcode = LUSHR)
 	public Int $greater$greater$greater(long v)
 	{
 		return this.$eq(this.value >>> v);
