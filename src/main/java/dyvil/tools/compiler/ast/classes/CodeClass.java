@@ -188,6 +188,18 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public Type getSuperClass()
+	{
+		return this.superClass;
+	}
+	
+	@Override
+	public List<Type> getInterfaces()
+	{
+		return this.interfaces;
+	}
+	
+	@Override
 	public boolean isSuperType(Type t)
 	{
 		if (this.interfaces.contains(t))
@@ -221,7 +233,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public String[] getInterfaces()
+	public String[] getInterfaceArray()
 	{
 		int len = this.interfaces.size();
 		String[] interfaces = new String[len];
@@ -376,7 +388,7 @@ public class CodeClass extends ASTNode implements IClass
 		String internalName = this.getInternalName();
 		String signature = this.getSignature();
 		String superClass = this.superClass == null ? null : this.superClass.getInternalName();
-		String[] interfaces = this.getInterfaces();
+		String[] interfaces = this.getInterfaceArray();
 		writer.visit(Opcodes.V1_8, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
 		
 		List<IField> fields = this.body.fields;

@@ -10,6 +10,10 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public interface IClass extends IASTNode, INamed, IModified, ITyped, ITypeList, IAnnotatable, IContext
 {
+	public Type getSuperClass();
+	
+	public List<Type> getInterfaces();
+	
 	public Type toType();
 	
 	public void setBody(ClassBody body);
@@ -28,7 +32,7 @@ public interface IClass extends IASTNode, INamed, IModified, ITyped, ITypeList, 
 	
 	public String getSignature();
 	
-	public String[] getInterfaces();
+	public String[] getInterfaceArray();
 	
 	public void write(ClassWriter writer);
 }

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -162,43 +163,50 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public void writeExpression(MethodWriter visitor)
 	{
+		Annotation bytecode = this.method.getAnnotation(Type.ABytecode);
+		
+		// Writes the instance (the first operand).
 		if (this.instance != null)
 		{
 			this.instance.writeExpression(visitor);
 		}
+		
+		// Writes the infix opcodes if a @Bytecode annotation is present.
+		if (bytecode != null)
+		{
+			visitBytecodeAnnotation(visitor, bytecode, "infixOpcode", "infixOpcodes");
+		}
+		
+		// Writes the arguments (the second operand).
 		for (IValue arg : this.arguments)
 		{
 			arg.writeExpression(visitor);
 		}
 		
-		Annotation bytecode = this.method.getAnnotation(Type.ABytecode);
+		// Writes the postfix opcodes if a @Bytecode annotation is present.
 		if (bytecode != null)
 		{
-			ValueList array = (ValueList) bytecode.getValue("opcodes");
-			if (array != null)
-			{
-				for (IValue v : array.values)
-				{
-					visitor.visitInsn(((IntValue) v).value);
-				}
-				return;
-			}
-			IntValue i = (IntValue) bytecode.getValue("value");
-			visitor.visitInsn(i.value);
+			visitBytecodeAnnotation(visitor, bytecode, "opcode", "opcodes");
 			return;
 		}
 		
+		// If no @Bytecode annotation is present, write a normal invocation.
+		IClass ownerClass = this.method.getTheClass();
+		String owner = ownerClass.getInternalName();
+		String name = this.method.getName();
+		String desc = this.method.getDescriptor();
 		int opcode;
 		if (this.method.hasModifier(Modifiers.STATIC))
 		{
 			opcode = Opcodes.INVOKESTATIC;
 		}
-		else if (this.method.getTheClass().hasModifier(Modifiers.INTERFACE_CLASS))
+		else if (ownerClass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
 			opcode = Opcodes.INVOKEINTERFACE;
 		}
 		else if (this.instance instanceof SuperValue)
 		{
+			owner = ownerClass.getSuperClass().getInternalName();
 			opcode = Opcodes.INVOKESPECIAL;
 		}
 		else
@@ -206,10 +214,26 @@ public class MethodCall extends Call implements INamed, IValued
 			opcode = Opcodes.INVOKEVIRTUAL;
 		}
 		
-		String owner = this.method.getTheClass().getInternalName();
-		String name = this.method.getName();
-		String desc = this.method.getDescriptor();
-		visitor.visitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
+		visitor.visitMethodInsn(opcode, owner, name, desc, ownerClass.hasModifier(Modifiers.INTERFACE_CLASS));
+	}
+	
+	private static void visitBytecodeAnnotation(MethodWriter writer, Annotation annotation, String key1, String key2)
+	{
+		ValueList array = (ValueList) annotation.getValue(key2);
+		if (array != null)
+		{
+			for (IValue v : array.values)
+			{
+				writer.visitInsn(((IntValue) v).value);
+			}
+			return;
+		}
+		
+		IntValue i = (IntValue) annotation.getValue(key1);
+		if (i != null)
+		{
+			writer.visitInsn(i.value);
+		}
 	}
 	
 	@Override

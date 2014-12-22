@@ -90,7 +90,7 @@ public abstract class Int implements Integer
 	// Unary operators
 	
 	@Override
-	@Bytecode(Opcodes.INEG)
+	@Bytecode(opcode = Opcodes.INEG)
 	public Int $minus()
 	{
 		return this.$eq(-this.value);
@@ -477,77 +477,77 @@ public abstract class Int implements Integer
 	}
 	
 	@Override
-	@Bytecode(Opcodes.IADD)
+	@Bytecode(opcode = Opcodes.IADD)
 	public Int $plus(int v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(Opcodes.ISUB)
+	@Bytecode(opcode = Opcodes.ISUB)
 	public Int $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(Opcodes.IMUL)
+	@Bytecode(opcode = Opcodes.IMUL)
 	public Int $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(Opcodes.IDIV)
+	@Bytecode(opcode = Opcodes.IDIV)
 	public Int $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(Opcodes.IREM)
+	@Bytecode(opcode = Opcodes.IREM)
 	public Int $percent(int v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	@Bytecode(Opcodes.IOR)
+	@Bytecode(opcode = Opcodes.IOR)
 	public Int $bar(int v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	@Bytecode(Opcodes.IAND)
+	@Bytecode(opcode = Opcodes.IAND)
 	public Int $amp(int v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	@Bytecode(Opcodes.IXOR)
+	@Bytecode(opcode = Opcodes.IXOR)
 	public Int $up(int v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	@Bytecode(Opcodes.ISHL)
+	@Bytecode(opcode = Opcodes.ISHL)
 	public Int $less$less(int v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	@Bytecode(Opcodes.ISHR)
+	@Bytecode(opcode = Opcodes.ISHR)
 	public Int $greater$greater(int v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	@Bytecode(Opcodes.IUSHR)
+	@Bytecode(opcode = Opcodes.IUSHR)
 	public Int $greater$greater$greater(int v)
 	{
 		return this.$eq(this.value >>> v);
