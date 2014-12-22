@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import jdk.internal.org.objectweb.asm.*;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.classes.AnnotationVisitorImpl;
 import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 
@@ -55,7 +57,9 @@ public class ClassReader extends ClassVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String desc, boolean visible)
 	{
-		return null;
+		Annotation annotation = new Annotation(null, desc);
+		this.bclass.addAnnotation(annotation);
+		return new AnnotationVisitorImpl(this.api, annotation);
 	}
 	
 	@Override

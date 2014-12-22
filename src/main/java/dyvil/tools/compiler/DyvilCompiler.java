@@ -25,7 +25,7 @@ public class DyvilCompiler
 	public static boolean				debug;
 	
 	public static Logger				logger	= Logger.getLogger("DYVILC");
-	public static DateFormat			format	= new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+	public static DateFormat			format	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public static CompilerConfig		config	= new CompilerConfig();
 	public static Set<CompilerState>	states	= new TreeSet();
@@ -35,7 +35,7 @@ public class DyvilCompiler
 	
 	public static void main(String[] args)
 	{
-		// Sets up States from config
+		// Sets up States from arguments
 		for (int i = 1; i < args.length; i++)
 		{
 			addStates(args[i]);
@@ -65,7 +65,13 @@ public class DyvilCompiler
 		{
 			logger.setUseParentHandlers(false);
 			
-			String path = new File("dyvilc.log").getAbsolutePath();
+			File file = new File("dyvilc.log");
+			if (file.exists())
+			{
+				file.delete();
+			}
+			
+			String path = file.getAbsolutePath();
 			Formatter formatter = new Formatter()
 			{
 				@Override

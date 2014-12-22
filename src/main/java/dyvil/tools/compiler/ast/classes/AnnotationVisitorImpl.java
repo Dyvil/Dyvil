@@ -10,7 +10,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 {
 	private Annotation	annotation;
 	
-	AnnotationVisitorImpl(int api, Annotation annotation)
+	public AnnotationVisitorImpl(int api, Annotation annotation)
 	{
 		super(api);
 		this.annotation = annotation;
