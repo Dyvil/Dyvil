@@ -218,31 +218,28 @@ public class Type extends ASTNode implements IContext
 	{
 		if (this.theClass == null)
 		{
-			switch (this.name)
+			IClass iclass;
+			// Try to resolve the name of this Type as a primitive type
+			Type t = resolvePrimitive(this.name);
+			if (t != null)
 			{
-			case "void":
-				return VOID;
-			case "boolean":
-				return BOOLEAN;
-			case "char":
-				return CHAR;
-			case "byte":
-				return BYTE;
-			case "short":
-				return SHORT;
-			case "int":
-				return INT;
-			case "long":
-				return LONG;
-			case "float":
-				return FLOAT;
-			case "double":
-				return DOUBLE;
-			case "String":
-				return STRING;
+				// If the array dimensions of this type are 0, we can assume
+				// that it is exactly the primitive type, so the primitive type
+				// instance is returned.
+				if (this.arrayDimensions == 0)
+				{
+					return t;
+				}
+				// Otherwise just take their IClass object instead of
+				// re-resolving it
+				iclass = t.theClass;
 			}
-			
-			IClass iclass = context.resolveClass(this.name);
+			else
+			{
+				// This type is probably not a primitive one, so resolve using
+				// the context.
+				iclass = context.resolveClass(this.name);
+			}
 			
 			if (iclass != null)
 			{
@@ -251,6 +248,36 @@ public class Type extends ASTNode implements IContext
 			}
 		}
 		return this;
+	}
+	
+	private static Type resolvePrimitive(String name)
+	{
+		switch (name)
+		{
+		case "void":
+			return VOID;
+		case "boolean":
+			return BOOLEAN;
+		case "char":
+			return CHAR;
+		case "byte":
+			return BYTE;
+		case "short":
+			return SHORT;
+		case "int":
+			return INT;
+		case "long":
+			return LONG;
+		case "float":
+			return FLOAT;
+		case "double":
+			return DOUBLE;
+		case "string":
+		case "String":
+			// Both lower- and uppercase "string" resolve to java.lang.String.
+			return STRING;
+		}
+		return null;
 	}
 	
 	@Override
@@ -277,7 +304,7 @@ public class Type extends ASTNode implements IContext
 	@Override
 	public boolean isStatic()
 	{
-		return this.theClass.isStatic();
+		return true;
 	}
 	
 	@Override

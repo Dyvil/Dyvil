@@ -1,12 +1,12 @@
 package test;
 
-import java.lang.String;
 import java.util.Scanner;
 import java.util.Arrays;
 
 public class Main
 {
-	public static long l = 3L + 4;
+	public long l = 3L;
+	public static int i = 4;
 	
 	public static void main(String[] args) = "Hello World" print;
 	

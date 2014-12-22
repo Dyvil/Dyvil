@@ -206,7 +206,6 @@ public class MethodCall extends Call implements INamed, IValued
 		}
 		else if (this.instance instanceof SuperValue)
 		{
-			owner = ownerClass.getSuperClass().getInternalName();
 			opcode = Opcodes.INVOKESPECIAL;
 		}
 		else
@@ -240,7 +239,10 @@ public class MethodCall extends Call implements INamed, IValued
 	public void writeStatement(MethodWriter writer)
 	{
 		this.writeExpression(writer);
-		writer.visitInsn(Opcodes.POP);
+		if (this.method.getType() != Type.VOID)
+		{
+			writer.visitInsn(Opcodes.POP);
+		}
 	}
 	
 	@Override

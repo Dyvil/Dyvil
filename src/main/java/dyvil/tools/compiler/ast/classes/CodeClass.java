@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IMethod;
+import dyvil.tools.compiler.ast.expression.MethodCall;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -20,6 +21,7 @@ import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -451,10 +453,32 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (!instanceFieldsAdded)
 		{
-			// TODO
+			// Create the default constructor
+			Type t = this.toType();
+			Method m = new Method(this);
+			m.setQualifiedName("<init>");
+			m.setType(this.toType());
+			m.setModifiers(Modifiers.PUBLIC | Modifiers.MANDATED);
+			
+			// If this class has a superclass...
+			if (this.superClass != null && this.superClass.theClass != null)
+			{
+				IMethod m1 = this.superClass.theClass.getBody().getMethod("<init>");
+				// ... and the superclass has a default constructor
+				if (m1 != null)
+				{
+					// Create the call to the super constructor
+					MethodCall superConstructor = new MethodCall(null, new SuperValue(null, this.superClass), "<init>");
+					superConstructor.method = m1;
+					instanceFields.getValues().add(0, superConstructor);
+				}
+			}
+			m.setValue(instanceFields);
+			m.write(writer);
 		}
 		if (!staticFieldsAdded)
 		{
+			// Create the classinit method
 			Method m = new Method(this);
 			m.setQualifiedName("<clinit>");
 			m.setType(Type.VOID);

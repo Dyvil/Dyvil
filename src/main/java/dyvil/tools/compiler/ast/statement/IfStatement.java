@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.value.BooleanValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class IfStatement extends ASTNode implements IStatement
@@ -79,6 +80,13 @@ public class IfStatement extends ASTNode implements IStatement
 			if (BooleanValue.FALSE.equals(this.condition))
 			{
 				return this.elseThen;
+			}
+		}
+		else if (state == CompilerState.CHECK)
+		{
+			if (!Type.isSuperType(Type.BOOLEAN, this.condition.getType()))
+			{
+				state.addMarker(new SemanticError(this.position, "The condition of an if statement has to evaluate to a boolean value."));
 			}
 		}
 		

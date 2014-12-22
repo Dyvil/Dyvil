@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.value;
 
 import jdk.internal.org.objectweb.asm.Label;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -53,6 +54,7 @@ public class SuperValue extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		writer.visitIntInsn(Opcodes.ALOAD, 0);
 	}
 	
 	@Override

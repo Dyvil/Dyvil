@@ -9,7 +9,6 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-// TODO Bytecode...
 public class ReturnStatement extends ASTNode implements IStatement, IValued
 {
 	protected IValue	value;
