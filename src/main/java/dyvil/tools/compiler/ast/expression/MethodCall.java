@@ -174,8 +174,17 @@ public class MethodCall extends Call implements INamed, IValued
 		Annotation bytecode = this.method.getAnnotation(Type.ABytecode);
 		if (bytecode != null)
 		{
-			IntValue v = (IntValue) bytecode.getValue("value");
-			visitor.visitInsn(v.value);
+			ValueList array = (ValueList) bytecode.getValue("opcodes");
+			if (array != null)
+			{
+				for (IValue v : array.values)
+				{
+					visitor.visitInsn(((IntValue) v).value);
+				}
+				return;
+			}
+			IntValue i = (IntValue) bytecode.getValue("value");
+			visitor.visitInsn(i.value);
 			return;
 		}
 		

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.value;
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IASTNode;
+import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -68,6 +69,42 @@ public interface IValue extends IASTNode
 		else if (c == String.class)
 		{
 			return new StringValue((String) o);
+		}
+		else if (c == int[].class)
+		{
+			ValueList valueList = new ValueList(null, true);
+			for (int i : (int[]) o)
+			{
+				valueList.addValue(new IntValue(i));
+			}
+			return valueList;
+		}
+		else if (c == long[].class)
+		{
+			ValueList valueList = new ValueList(null, true);
+			for (long l : (long[]) o)
+			{
+				valueList.addValue(new LongValue(l));
+			}
+			return valueList;
+		}
+		else if (c == float[].class)
+		{
+			ValueList valueList = new ValueList(null, true);
+			for (float f : (float[]) o)
+			{
+				valueList.addValue(new FloatValue(f));
+			}
+			return valueList;
+		}
+		else if (c == double[].class)
+		{
+			ValueList valueList = new ValueList(null, true);
+			for (double d : (double[]) o)
+			{
+				valueList.addValue(new DoubleValue(d));
+			}
+			return valueList;
 		}
 		return null;
 	}

@@ -15,34 +15,10 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.util.ClassFormat;
 
 public class BytecodeClass extends CodeClass
 {
-	private final class AnnotationVisitorImpl extends AnnotationVisitor
-	{
-		private Annotation	annotation;
-		
-		private AnnotationVisitorImpl(int flags, Annotation annotation)
-		{
-			super(flags);
-			this.annotation = annotation;
-		}
-		
-		@Override
-		public void visit(String key, Object value)
-		{
-			this.annotation.addValue(key, IValue.fromObject(value));
-		}
-		
-		@Override
-		public void visitEnum(String key, String enumClass, String name)
-		{
-			// TODO
-		}
-	}
-	
 	public boolean	typesResolved;
 	
 	public BytecodeClass()

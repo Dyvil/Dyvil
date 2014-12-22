@@ -1,5 +1,9 @@
 package dyvil.lang;
 
+import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
+
+import dyvil.lang.annotation.Bytecode;
+
 public abstract class Long implements Integer
 {
 	protected long	value;
@@ -473,6 +477,7 @@ public abstract class Long implements Integer
 	}
 	
 	@Override
+	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LADD })
 	public Long $plus(int v)
 	{
 		return this.$eq(this.value + v);

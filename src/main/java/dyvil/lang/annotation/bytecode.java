@@ -5,14 +5,27 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.CLASS)
+/**
+ * An annotation for value class methods using JVM instructions instead of an
+ * actual method invocation.
+ * 
+ * @author Clashsoft
+ */
 @Target(ElementType.METHOD)
+@Retention(RetentionPolicy.CLASS)
 public @interface Bytecode
 {
 	/**
-	 * The opcode of this bytecode instruction.
+	 * Returns the opcode of this bytecode instruction.
 	 * 
 	 * @return the opcode
 	 */
-	public int value();
+	public int value() default -1;
+	
+	/**
+	 * Returns all opcodes of this bytecode instruction.
+	 * 
+	 * @return the opcodes
+	 */
+	public int[] opcodes() default {};
 }

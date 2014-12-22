@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 public class Main
 {
+	public static long l = 3L + 4;
+	
 	public static void main(String[] args) = "Hello World" print;
 	
 	public implicit void print(String s) = System out println(s);
