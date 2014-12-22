@@ -207,6 +207,7 @@ public class MethodCall extends Call implements INamed, IValued
 	public void writeStatement(MethodWriter writer)
 	{
 		this.writeExpression(writer);
+		writer.visitInsn(Opcodes.POP);
 	}
 	
 	@Override

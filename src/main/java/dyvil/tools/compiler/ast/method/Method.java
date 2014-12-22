@@ -344,7 +344,7 @@ public class Method extends Member implements IMethod
 			
 			if (this.statement != null)
 			{
-				this.statement.writeExpression(mw);
+				this.statement.writeStatement(mw);
 			}
 			
 			for (Variable var : this.variables)

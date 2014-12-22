@@ -83,7 +83,7 @@ public class Annotation extends ASTNode implements ITyped
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.name);
+		buffer.append('@').append(this.name);
 		if (!this.parameters.isEmpty())
 		{
 			buffer.append(Formatting.Method.parametersStart);

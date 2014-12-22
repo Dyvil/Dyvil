@@ -26,6 +26,12 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		this.position = position;
 	}
 	
+	public ValueList(ICodePosition position, boolean array)
+	{
+		this.position = position;
+		this.isArray = array;
+	}
+	
 	@Override
 	public boolean isConstant()
 	{

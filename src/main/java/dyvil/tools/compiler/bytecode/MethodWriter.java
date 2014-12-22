@@ -72,6 +72,7 @@ public class MethodWriter extends MethodVisitor
 		{
 			this.typeStack.push(Opcodes.DOUBLE);
 		}
+		this.mv.visitLdcInsn(obj);
 	}
 	
 	@Override
