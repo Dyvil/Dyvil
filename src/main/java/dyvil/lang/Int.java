@@ -717,30 +717,35 @@ public abstract class Int implements Integer
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2F, postfixOpcode = FADD)
 	public Float $plus(float v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2F, postfixOpcode = FSUB)
 	public Float $minus(float v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2F, postfixOpcode = FMUL)
 	public Float $times(float v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2F, postfixOpcode = FDIV)
 	public Float $div(float v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2F, postfixOpcode = FREM)
 	public Float $percent(float v)
 	{
 		return this.$eq(this.value % v);
@@ -785,30 +790,35 @@ public abstract class Int implements Integer
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2D, postfixOpcode = DADD)
 	public Double $plus(double v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2D, postfixOpcode = DSUB)
 	public Double $minus(double v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2D, postfixOpcode = DMUL)
 	public Double $times(double v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2D, postfixOpcode = DDIV)
 	public Double $div(double v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2D, postfixOpcode = DREM)
 	public Double $percent(double v)
 	{
 		return this.$eq(this.value % v);

@@ -1,5 +1,8 @@
 package dyvil.lang;
 
+import static dyvil.reflect.Opcodes.*;
+import dyvil.lang.annotation.Bytecode;
+
 public abstract class Float implements Number
 {
 	protected float	value;
@@ -37,42 +40,49 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { F2I, I2B })
 	public byte byteValue()
 	{
 		return (byte) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { F2I, I2S })
 	public short shortValue()
 	{
 		return (short) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { F2I, I2C })
 	public char charValue()
 	{
 		return (char) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = F2I)
 	public int intValue()
 	{
 		return (int) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = F2L)
 	public long longValue()
 	{
 		return (long) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {})
 	public float floatValue()
 	{
 		return this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = F2D)
 	public double doubleValue()
 	{
 		return this.value;
@@ -81,6 +91,7 @@ public abstract class Float implements Number
 	// Unary operators
 	
 	@Override
+	@Bytecode(postfixOpcode = FNEG)
 	public Float $minus()
 	{
 		return this.$eq(-this.value);
@@ -99,12 +110,14 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { DUP, FMUL })
 	public Float sqr()
 	{
 		return this.$eq(this.value * this.value);
 	}
 	
 	@Override
+	@Bytecode(prefixOpcode = FCONST_1, postfixOpcode = FDIV)
 	public Float rec()
 	{
 		return this.$eq(1 / this.value);
@@ -353,30 +366,35 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FADD })
 	public Float $plus(int v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FSUB })
 	public Float $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FMUL })
 	public Float $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FDIV })
 	public Float $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FREM })
 	public Float $percent(int v)
 	{
 		return this.$eq(this.value % v);
@@ -421,30 +439,35 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FADD })
 	public Float $plus(long v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FSUB })
 	public Float $minus(long v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FMUL })
 	public Float $times(long v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FDIV })
 	public Float $div(long v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FREM })
 	public Float $percent(long v)
 	{
 		return this.$eq(this.value % v);
@@ -489,30 +512,35 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = FADD)
 	public Float $plus(float v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = FSUB)
 	public Float $minus(float v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = FMUL)
 	public Float $times(float v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = FDIV)
 	public Float $div(float v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = FREM)
 	public Float $percent(float v)
 	{
 		return this.$eq(this.value % v);
@@ -557,30 +585,35 @@ public abstract class Float implements Number
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcode = DADD)
 	public Double $plus(double v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcode = DSUB)
 	public Double $minus(double v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcode = DMUL)
 	public Double $times(double v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcode = DDIV)
 	public Double $div(double v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcode = DREM)
 	public Double $percent(double v)
 	{
 		return this.$eq(this.value % v);

@@ -1,5 +1,8 @@
 package dyvil.lang;
 
+import static dyvil.reflect.Opcodes.*;
+import dyvil.lang.annotation.Bytecode;
+
 public abstract class Double implements Number
 {
 	protected double	value;
@@ -37,42 +40,49 @@ public abstract class Double implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { D2I, I2B })
 	public byte byteValue()
 	{
 		return (byte) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { D2I, I2S })
 	public short shortValue()
 	{
 		return (short) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { D2I, I2C })
 	public char charValue()
 	{
 		return (char) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = D2I)
 	public int intValue()
 	{
 		return (int) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = D2L)
 	public long longValue()
 	{
 		return (long) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = D2F)
 	public float floatValue()
 	{
 		return (float) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {})
 	public double doubleValue()
 	{
 		return this.value;
@@ -81,6 +91,7 @@ public abstract class Double implements Number
 	// Unary operators
 	
 	@Override
+	@Bytecode(postfixOpcode = DNEG)
 	public Double $minus()
 	{
 		return this.$eq(-this.value);
@@ -99,12 +110,14 @@ public abstract class Double implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { DUP2, DMUL })
 	public Double sqr()
 	{
 		return this.$eq(this.value * this.value);
 	}
 	
 	@Override
+	@Bytecode(prefixOpcode = DCONST_1, postfixOpcode = DDIV)
 	public Double rec()
 	{
 		return this.$eq(1 / this.value);
@@ -353,30 +366,35 @@ public abstract class Double implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {I2D, DADD})
 	public Double $plus(int v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {I2D, DSUB})
 	public Double $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {I2D, DMUL})
 	public Double $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {I2D, DDIV})
 	public Double $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {I2D, DREM})
 	public Double $percent(int v)
 	{
 		return this.$eq(this.value % v);
@@ -421,30 +439,35 @@ public abstract class Double implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {L2D, DADD})
 	public Double $plus(long v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {L2D, DSUB})
 	public Double $minus(long v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {L2D, DMUL})
 	public Double $times(long v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {L2D, DDIV})
 	public Double $div(long v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {L2D, DREM})
 	public Double $percent(long v)
 	{
 		return this.$eq(this.value % v);
@@ -489,30 +512,35 @@ public abstract class Double implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {F2D, DADD})
 	public Double $plus(float v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {F2D, DSUB})
 	public Double $minus(float v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {F2D, DMUL})
 	public Double $times(float v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {F2D, DDIV})
 	public Double $div(float v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = {F2D, DREM})
 	public Double $percent(float v)
 	{
 		return this.$eq(this.value % v);
@@ -557,30 +585,35 @@ public abstract class Double implements Number
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = DADD)
 	public Double $plus(double v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = DSUB)
 	public Double $minus(double v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = DMUL)
 	public Double $times(double v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = DDIV)
 	public Double $div(double v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = DREM)
 	public Double $percent(double v)
 	{
 		return this.$eq(this.value % v);
