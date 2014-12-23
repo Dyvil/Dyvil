@@ -138,7 +138,7 @@ public class ClassFormat
 		}
 		else if (len - i == 1)
 		{
-			type = parseBaseType(c);
+			type = parseBaseType(c).clone();
 		}
 		else
 		{

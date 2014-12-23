@@ -7,18 +7,20 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class FloatValue extends ASTNode implements IValue
 {
 	public float	value;
 	
-	public FloatValue(String value)
-	{
-		this.value = Float.parseFloat(value);
-	}
-	
 	public FloatValue(float value)
 	{
+		this.value = value;
+	}
+	
+	public FloatValue(ICodePosition position, float value)
+	{
+		this.position = position;
 		this.value = value;
 	}
 	
@@ -32,6 +34,12 @@ public class FloatValue extends ASTNode implements IValue
 	public Type getType()
 	{
 		return Type.FLOAT;
+	}
+	
+	@Override
+	public Float toObject()
+	{
+		return Float.valueOf(this.value);
 	}
 	
 	@Override

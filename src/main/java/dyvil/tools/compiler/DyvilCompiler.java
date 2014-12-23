@@ -104,6 +104,7 @@ public class DyvilCompiler
 			states.add(CompilerState.PARSE);
 			states.add(CompilerState.RESOLVE_TYPES);
 			states.add(CompilerState.RESOLVE);
+			states.add(CompilerState.CHECK);
 			states.add(CompilerState.OPERATOR_PRECEDENCE);
 			states.add(CompilerState.CONVERT);
 			states.add(CompilerState.COMPILE);

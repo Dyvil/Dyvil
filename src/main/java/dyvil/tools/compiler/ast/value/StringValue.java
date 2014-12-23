@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class StringValue extends ASTNode implements IValue
 {
@@ -14,6 +15,12 @@ public class StringValue extends ASTNode implements IValue
 	
 	public StringValue(String value)
 	{
+		this.value = value;
+	}
+	
+	public StringValue(ICodePosition position, String value)
+	{
+		this.position = position;
 		this.value = value;
 	}
 	
@@ -27,6 +34,12 @@ public class StringValue extends ASTNode implements IValue
 	public Type getType()
 	{
 		return Type.STRING;
+	}
+	
+	@Override
+	public String toObject()
+	{
+		return this.value;
 	}
 	
 	@Override

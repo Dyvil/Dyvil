@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.LambdaType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -142,6 +143,10 @@ public class TypeParser extends Parser
 	{
 		if (this.type != null)
 		{
+			if (this.type instanceof PrimitiveType || this.type == Type.OBJECT || this.type == Type.STRING)
+			{
+				this.type = this.type.clone();
+			}
 			this.type.setArrayDimensions(this.arrayDimensions);
 		}
 		this.typed.setType(this.type);

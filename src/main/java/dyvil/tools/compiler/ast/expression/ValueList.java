@@ -45,7 +45,10 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		{
 			return Type.VOID;
 		}
-		return this.values.get(this.values.size() - 1).getType();
+		IValue v = this.values.get(this.values.size() - 1);
+		Type t = v.getType().clone();
+		t.arrayDimensions++;
+		return t;
 	}
 	
 	@Override

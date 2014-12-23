@@ -7,6 +7,7 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -254,6 +255,11 @@ public class Method extends Member implements IMethod
 			this.throwsDeclarations.replaceAll(t -> t.applyState(state, context));
 		}
 		
+		for (Annotation a : this.annotations)
+		{
+			a.applyState(state, context);
+		}
+		
 		for (Parameter p : this.parameters)
 		{
 			p.applyState(state, context);
@@ -312,6 +318,11 @@ public class Method extends Member implements IMethod
 	{
 		MethodVisitor visitor = writer.visitMethod(this.modifiers & 0xFFFF, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
 		MethodWriter mw = new MethodWriter(Opcodes.ASM5, visitor);
+		
+		for (Annotation annotation : this.annotations)
+		{
+			annotation.write(mw);
+		}
 		
 		if (this.isConstructor)
 		{

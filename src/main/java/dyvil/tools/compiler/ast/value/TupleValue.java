@@ -82,6 +82,13 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public Object toObject()
+	{
+		// TODO Tuple object
+		return null;
+	}
+	
+	@Override
 	public IValue applyState(CompilerState state, IContext context)
 	{
 		if (state == CompilerState.FOLD_CONSTANTS)

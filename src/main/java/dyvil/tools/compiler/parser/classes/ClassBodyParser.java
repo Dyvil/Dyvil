@@ -25,19 +25,19 @@ import dyvil.tools.compiler.util.Modifiers;
 
 public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 {
-	public static int	TYPE			= 1;
-	public static int	NAME			= 2;
-	public static int	FIELD			= 4;
-	public static int	METHOD			= 8;
-	public static int	METHOD_END		= 16;
-	public static int	ANNOTATION		= 32;
-	public static int	ANNOTATION_END	= 128;
+	public static final int	TYPE			= 1;
+	public static final int	NAME			= 2;
+	public static final int	FIELD			= 4;
+	public static final int	METHOD			= 8;
+	public static final int	METHOD_END		= 16;
+	public static final int	ANNOTATION		= 32;
+	public static final int	ANNOTATION_END	= 128;
 	
-	protected IClass	theClass;
-	protected ClassBody	classBody;
+	protected IClass		theClass;
+	protected ClassBody		classBody;
 	
-	private IField		field;
-	private IMethod		method;
+	private IField			field;
+	private IMethod			method;
 	
 	public ClassBodyParser(IClass theClass)
 	{
@@ -79,7 +79,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				}
 				return true;
 			}
-			else if (value.indexOf('@') == 0)
+			else if (value.startsWith("@"))
 			{
 				pm.pushParser(new AnnotationParser(this.theClass, this), true);
 				return true;

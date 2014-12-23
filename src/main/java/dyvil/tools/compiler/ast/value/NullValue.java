@@ -7,9 +7,19 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class NullValue extends ASTNode implements IValue
 {
+	public NullValue()
+	{
+	}
+	
+	public NullValue(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
 	@Override
 	public boolean isConstant()
 	{
@@ -20,6 +30,12 @@ public class NullValue extends ASTNode implements IValue
 	public Type getType()
 	{
 		return Type.NONE;
+	}
+	
+	@Override
+	public Object toObject()
+	{
+		return null;
 	}
 	
 	@Override

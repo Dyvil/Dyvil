@@ -421,4 +421,12 @@ public class Type extends ASTNode implements IContext
 		}
 		return true;
 	}
+	
+	@Override
+	public Type clone()
+	{
+		Type t = new Type(this.name, this.theClass, this.position);
+		t.arrayDimensions = arrayDimensions;
+		return t;
+	}
 }

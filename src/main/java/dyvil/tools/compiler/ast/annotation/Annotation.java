@@ -5,18 +5,24 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.api.IValueList;
+import dyvil.tools.compiler.ast.api.IValueMap;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class Annotation extends ASTNode implements ITyped
+public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 {
 	public Type					type;
 	public Map<String, IValue>	parameters	= new HashMap();
@@ -49,11 +55,25 @@ public class Annotation extends ASTNode implements ITyped
 		return this.type;
 	}
 	
+	@Override
+	public void setValues(Map<String, IValue> map)
+	{
+		this.parameters = map;
+	}
+	
+	@Override
+	public Map<String, IValue> getValues()
+	{
+		return this.parameters;
+	}
+	
+	@Override
 	public void addValue(String key, IValue value)
 	{
 		this.parameters.put(key, value);
 	}
 	
+	@Override
 	public IValue getValue(String key)
 	{
 		return this.parameters.get(key);
@@ -72,12 +92,57 @@ public class Annotation extends ASTNode implements ITyped
 		}
 		else if (state == CompilerState.CHECK)
 		{
-			if (!this.type.theClass.hasModifier(Modifiers.ANNOTATION))
+			IClass theClass = this.type.theClass;
+			if (!theClass.hasModifier(Modifiers.ANNOTATION))
 			{
 				state.addMarker(new SemanticError(this.position, "The type '" + this.name + "' is not an annotation type"));
 			}
+			
+			for (Entry<String, IValue> entry : this.parameters.entrySet())
+			{
+				String key = entry.getKey();
+				IMethod m = theClass.getBody().getMethod(key);
+				if (m == null)
+				{
+					state.addMarker(new SemanticError(this.position, "Invalid annotation method '" + key + "' for annotation type " + this.name));
+					continue;
+				}
+				
+				IValue value = entry.getValue();
+				Type type = m.getType();
+				if (!Type.isSuperType(type, value.getType()))
+				{
+					state.addMarker(new SemanticError(value.getPosition(), "The annotation value '" + key + "' does not match the required type " + type));
+				}
+			}
 		}
 		return this;
+	}
+	
+	public void write(MethodWriter writer)
+	{
+		// TODO Visible
+		AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), true);
+		for (Entry<String, IValue> entry : this.parameters.entrySet())
+		{
+			visitValue(visitor, entry.getKey(), entry.getValue());
+		}
+	}
+	
+	private static void visitValue(AnnotationVisitor visitor, String key, IValue value)
+	{
+		if (value instanceof IValueList)
+		{
+			AnnotationVisitor arrayVisitor = visitor.visitArray(key);
+			for (IValue v : ((IValueList) value).getValues())
+			{
+				visitValue(arrayVisitor, null, v);
+			}
+		}
+		else
+		{
+			visitor.visit(key, value.toObject());
+		}
 	}
 	
 	@Override
@@ -97,7 +162,6 @@ public class Annotation extends ASTNode implements ITyped
 				if (iterator.hasNext())
 				{
 					buffer.append(Formatting.Method.parameterSeperator);
-					
 				}
 				else
 				{

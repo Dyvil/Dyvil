@@ -7,23 +7,20 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class LongValue extends ASTNode implements IValue
 {
 	public long	value;
 	
-	public LongValue(String value)
-	{
-		this.value = Long.parseLong(value);
-	}
-	
-	public LongValue(String value, int radix)
-	{
-		this.value = Long.parseLong(value);
-	}
-	
 	public LongValue(long value)
 	{
+		this.value = value;
+	}
+	
+	public LongValue(ICodePosition position, long value)
+	{
+		this.position = position;
 		this.value = value;
 	}
 	
@@ -37,6 +34,12 @@ public class LongValue extends ASTNode implements IValue
 	public Type getType()
 	{
 		return Type.LONG;
+	}
+	
+	@Override
+	public Long toObject()
+	{
+		return Long.valueOf(this.value);
 	}
 	
 	@Override

@@ -320,52 +320,52 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	{
 		if ("null".equals(value))
 		{
-			this.value = new NullValue();
+			this.value = new NullValue(token.raw());
 			return true;
 		}
 		// Boolean
 		else if ("true".equals(value))
 		{
-			this.value = BooleanValue.of(true);
+			this.value = new BooleanValue(token.raw(), true);
 			return true;
 		}
 		else if ("false".equals(value))
 		{
-			this.value = BooleanValue.of(false);
+			this.value = new BooleanValue(token.raw(), false);
 			return true;
 		}
 		// String
 		else if (token.isType(IToken.TYPE_STRING))
 		{
-			this.value = new StringValue((String) token.object());
+			this.value = new StringValue(token.raw(), (String) token.object());
 			return true;
 		}
 		// Char
 		else if (token.isType(IToken.TYPE_CHAR))
 		{
-			this.value = new CharValue((Character) token.object());
+			this.value = new CharValue(token.raw(), (Character) token.object());
 			return true;
 		}
 		// Int
 		else if (token.isType(IToken.TYPE_INT))
 		{
-			this.value = new IntValue((Integer) token.object());
+			this.value = new IntValue(token.raw(), (Integer) token.object());
 			return true;
 		}
 		else if (token.isType(IToken.TYPE_LONG))
 		{
-			this.value = new LongValue((Long) token.object());
+			this.value = new LongValue(token.raw(), (Long) token.object());
 			return true;
 		}
 		// Float
 		else if (token.isType(IToken.TYPE_FLOAT))
 		{
-			this.value = new FloatValue((Float) token.object());
+			this.value = new FloatValue(token.raw(), (Float) token.object());
 			return true;
 		}
 		else if (token.isType(IToken.TYPE_DOUBLE))
 		{
-			this.value = new DoubleValue((Double) token.object());
+			this.value = new DoubleValue(token.raw(), (Double) token.object());
 			return true;
 		}
 		return false;

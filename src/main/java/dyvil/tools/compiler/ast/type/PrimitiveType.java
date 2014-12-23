@@ -162,4 +162,13 @@ public class PrimitiveType extends Type
 	{
 		return super.classEquals(type) || this.qualifiedName.equals(type.qualifiedName);
 	}
+	
+	@Override
+	public PrimitiveType clone()
+	{
+		PrimitiveType t = new PrimitiveType(this.name, this.qualifiedName);
+		t.theClass = this.theClass;
+		t.arrayDimensions = this.arrayDimensions;
+		return t;
+	}
 }

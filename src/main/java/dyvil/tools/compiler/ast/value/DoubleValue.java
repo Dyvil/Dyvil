@@ -7,18 +7,20 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class DoubleValue extends ASTNode implements IValue
 {
 	public double	value;
 	
-	public DoubleValue(String value)
-	{
-		this.value = Double.parseDouble(value);
-	}
-	
 	public DoubleValue(double value)
 	{
+		this.value = value;
+	}
+	
+	public DoubleValue(ICodePosition position, double value)
+	{
+		this.position = position;
 		this.value = value;
 	}
 	
@@ -32,6 +34,12 @@ public class DoubleValue extends ASTNode implements IValue
 	public Type getType()
 	{
 		return Type.DOUBLE;
+	}
+	
+	@Override
+	public Double toObject()
+	{
+		return Double.valueOf(this.value);
 	}
 	
 	@Override

@@ -1,12 +1,10 @@
 package test;
 
+import dyvil.lang.annotation.Bytecode;
+import dyvil.reflect.Opcodes;
+
 public class Main
 {
-	public static void main(String[] args) = "Hello" _ "World" ! print;
-	
-	public implicit String _(String s, String s2) = s + " " +(s2);
-	
-	public implicit String !(String s) = s + "!";
-	
-	public implicit void print(String s) = System out println(s);
+	@Bytecode(postfixOpcode = 1)
+	public static void main(String[] args);	
 }

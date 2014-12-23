@@ -7,18 +7,20 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class CharValue extends ASTNode implements IValue
 {
 	public char	value;
 	
-	public CharValue(String value)
-	{
-		this.value = value.charAt(0);
-	}
-	
 	public CharValue(char value)
 	{
+		this.value = value;
+	}
+	
+	public CharValue(ICodePosition position, char value)
+	{
+		this.position = position;
 		this.value = value;
 	}
 	
@@ -32,6 +34,12 @@ public class CharValue extends ASTNode implements IValue
 	public Type getType()
 	{
 		return Type.CHAR;
+	}
+	
+	@Override
+	public Character toObject()
+	{
+		return Character.valueOf(this.value);
 	}
 	
 	@Override

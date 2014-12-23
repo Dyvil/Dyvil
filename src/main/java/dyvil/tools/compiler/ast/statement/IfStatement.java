@@ -6,7 +6,6 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.BooleanValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -71,18 +70,7 @@ public class IfStatement extends ASTNode implements IStatement
 	{
 		this.condition = this.condition.applyState(state, context);
 		
-		if (state == CompilerState.FOLD_CONSTANTS)
-		{
-			if (BooleanValue.TRUE.equals(this.condition))
-			{
-				return this.then;
-			}
-			if (BooleanValue.FALSE.equals(this.condition))
-			{
-				return this.elseThen;
-			}
-		}
-		else if (state == CompilerState.CHECK)
+		if (state == CompilerState.CHECK)
 		{
 			if (!Type.isSuperType(Type.BOOLEAN, this.condition.getType()))
 			{

@@ -14,6 +14,11 @@ public interface IValue extends IASTNode
 	
 	public Type getType();
 	
+	public default Object toObject()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
 	@Override
 	public IValue applyState(CompilerState state, IContext context);
 	

@@ -7,21 +7,20 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class BooleanValue extends ASTNode implements IValue
 {
-	public static BooleanValue	TRUE	= new BooleanValue(true);
-	public static BooleanValue	FALSE	= new BooleanValue(false);
-	
 	public boolean				value;
 	
-	public static BooleanValue of(boolean value)
+	public BooleanValue(boolean value)
 	{
-		return value ? TRUE : FALSE;
+		this.value = value;
 	}
 	
-	private BooleanValue(boolean value)
+	public BooleanValue(ICodePosition position, boolean value)
 	{
+		this.position = position;
 		this.value = value;
 	}
 	
@@ -35,6 +34,12 @@ public class BooleanValue extends ASTNode implements IValue
 	public Type getType()
 	{
 		return Type.BOOLEAN;
+	}
+	
+	@Override
+	public Boolean toObject()
+	{
+		return Boolean.valueOf(this.value);
 	}
 	
 	@Override
