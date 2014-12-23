@@ -146,9 +146,16 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		}
 		else
 		{
-			if (this.values.isEmpty())
+			int len = this.values.size();
+			if (len == 0)
 			{
 				buffer.append(Formatting.Expression.emptyExpression);
+			}
+			else if (len == 1)
+			{
+				buffer.append("{ ");
+				this.values.get(0).toString("", buffer);
+				buffer.append(" }");
 			}
 			else
 			{

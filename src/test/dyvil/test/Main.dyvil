@@ -5,6 +5,6 @@ import dyvil.reflect.Opcodes;
 
 public class Main
 {
-	@Bytecode(postfixOpcode = 1)
+	@Bytecode(postfixOpcodes = { 1, 2, 3 })
 	public static void main(String[] args);	
 }
