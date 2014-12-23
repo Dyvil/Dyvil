@@ -95,7 +95,6 @@ public abstract class Complex implements Number
 		return this.$eq(-this.real, -this.imag);
 	}
 	
-	@Override
 	public Number $tilde()
 	{
 		return this.$eq(this.real, -this.imag);
@@ -120,7 +119,7 @@ public abstract class Complex implements Number
 	}
 	
 	@Override
-	public Number sqrt()
+	public Number rec()
 	{
 		double m = Math.sqrt(this.real * this.real + this.imag * this.imag);
 		return this.$eq(Math.sqrt((this.real + m) / 2), Math.copySign((-this.real + m) / 2, this.imag));

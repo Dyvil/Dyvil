@@ -117,7 +117,7 @@ public abstract class Short implements Integer
 	}
 	
 	@Override
-	public Short sqrt()
+	public Short rec()
 	{
 		return this.$eq((short) (1 / this.value));
 	}

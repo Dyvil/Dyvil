@@ -42,15 +42,13 @@ public interface Number extends Ordered<Number>
 	
 	public @prefix Number $minus();
 	
-	public @prefix Number $tilde();
-	
 	public Number $plus$plus();
 	
 	public Number $minus$minus();
 	
 	public Number sqr();
 	
-	public Number sqrt();
+	public Number rec();
 	
 	// byte operators
 	

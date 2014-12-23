@@ -117,7 +117,7 @@ public abstract class Char implements Integer
 	}
 	
 	@Override
-	public Char sqrt()
+	public Char rec()
 	{
 		return this.$eq((char) (1 / this.value));
 	}

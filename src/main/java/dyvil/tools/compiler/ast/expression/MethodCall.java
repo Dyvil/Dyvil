@@ -165,6 +165,12 @@ public class MethodCall extends Call implements INamed, IValued
 	{
 		Annotation bytecode = this.method.getAnnotation(Type.ABytecode);
 		
+		// Writes the prefix opcodes if a @Bytecode annotation is present.
+		if (bytecode != null)
+		{
+			visitBytecodeAnnotation(visitor, bytecode, "prefixOpcode", "prefixOpcodes");
+		}
+		
 		// Writes the instance (the first operand).
 		if (this.instance != null)
 		{
@@ -186,7 +192,7 @@ public class MethodCall extends Call implements INamed, IValued
 		// Writes the postfix opcodes if a @Bytecode annotation is present.
 		if (bytecode != null)
 		{
-			visitBytecodeAnnotation(visitor, bytecode, "opcode", "opcodes");
+			visitBytecodeAnnotation(visitor, bytecode, "postfixOpcode", "postfixOpcodes");
 			return;
 		}
 		

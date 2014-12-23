@@ -117,7 +117,7 @@ public abstract class Byte implements Integer
 	}
 	
 	@Override
-	public Byte sqrt()
+	public Byte rec()
 	{
 		return this.$eq((byte) Math.sqrt(this.value));
 	}

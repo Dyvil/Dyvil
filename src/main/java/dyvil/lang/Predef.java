@@ -81,7 +81,7 @@ public class Predef
 	 *            the class
 	 * @return true, if t is an instance of c
 	 */
-	@Bytecode(opcode = Opcodes.INSTANCEOF)
+	@Bytecode(postfixOpcode = Opcodes.INSTANCEOF)
 	public static @implicit <T> boolean $less$colon(T t, Class<?> c)
 	{
 		return t == null ? false : c.isInstance(t);
@@ -97,7 +97,7 @@ public class Predef
 	 *            the class
 	 * @return t as an instance of c
 	 */
-	@Bytecode(opcode = Opcodes.CHECKCAST)
+	@Bytecode(postfixOpcode = Opcodes.CHECKCAST)
 	public static @implicit <T, U> U $colon$greater(T t)
 	{
 		return (U) t;
@@ -114,7 +114,7 @@ public class Predef
 	 *            the class
 	 * @return t as an instance of c
 	 */
-	@Bytecode(opcode = Opcodes.CHECKCAST)
+	@Bytecode(postfixOpcode = Opcodes.CHECKCAST)
 	public static @implicit <T, U> U $colon$greater(T t, Class<U> c)
 	{
 		return t == null ? (U) null : c.cast(t);

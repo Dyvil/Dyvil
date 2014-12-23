@@ -87,13 +87,6 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	public Double $tilde()
-	{
-		// Unsupported
-		return this;
-	}
-	
-	@Override
 	public Double $plus$plus()
 	{
 		return this.$eq(this.value + 1);
@@ -112,7 +105,7 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	public Double sqrt()
+	public Double rec()
 	{
 		return this.$eq(1 / this.value);
 	}

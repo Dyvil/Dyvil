@@ -121,7 +121,7 @@ public abstract class Long implements Integer
 	}
 	
 	@Override
-	public Long sqrt()
+	public Long rec()
 	{
 		return this.$eq(1 / this.value);
 	}
@@ -477,77 +477,77 @@ public abstract class Long implements Integer
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LADD })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LADD })
 	public Long $plus(int v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LSUB })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LSUB })
 	public Long $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LMUL })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LMUL })
 	public Long $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LDIV })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LDIV })
 	public Long $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LREM })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LREM })
 	public Long $percent(int v)
 	{
 		return this.$eq(this.value % v);
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LOR })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LOR })
 	public Long $bar(int v)
 	{
 		return this.$eq(this.value | v);
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LAND })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LAND })
 	public Long $amp(int v)
 	{
 		return this.$eq(this.value & v);
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LXOR })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LXOR })
 	public Long $up(int v)
 	{
 		return this.$eq(this.value ^ v);
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LSHL })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LSHL })
 	public Long $less$less(int v)
 	{
 		return this.$eq(this.value << v);
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LSHR })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LSHR })
 	public Long $greater$greater(int v)
 	{
 		return this.$eq(this.value >> v);
 	}
 	
 	@Override
-	@Bytecode(opcodes = { Opcodes.I2L, Opcodes.LUSHR })
+	@Bytecode(postfixOpcodes = { Opcodes.I2L, Opcodes.LUSHR })
 	public Long $greater$greater$greater(int v)
 	{
 		return this.$eq(this.value >>> v);

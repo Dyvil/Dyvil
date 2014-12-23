@@ -87,13 +87,6 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	public Float $tilde()
-	{
-		// Unsupported
-		return this;
-	}
-	
-	@Override
 	public Float $plus$plus()
 	{
 		return this.$eq(this.value + 1);
@@ -112,7 +105,7 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	public Float sqrt()
+	public Float rec()
 	{
 		return this.$eq(1 / this.value);
 	}
