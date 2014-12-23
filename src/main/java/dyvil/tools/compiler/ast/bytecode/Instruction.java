@@ -68,15 +68,27 @@ public class Instruction extends ASTNode
 		{
 			return new FieldInstruction(opcode, name);
 		}
-		else if (opcode == ALOAD || opcode == ILOAD || opcode == LLOAD || opcode == FLOAD || opcode == DLOAD)
+		else if (opcode == ALOAD || opcode == ILOAD || opcode == LLOAD || opcode == FLOAD || opcode == DLOAD || opcode == ASTORE || opcode == ISTORE || opcode == LSTORE || opcode == FSTORE || opcode == DSTORE || opcode == RET)
 		{
 			return new VarInstruction(opcode, name);
 		}
-		else if (opcode == ASTORE || opcode == ISTORE || opcode == LSTORE || opcode == FSTORE || opcode == DSTORE)
+		else if (opcode == BIPUSH || opcode == SIPUSH)
 		{
-			return new VarInstruction(opcode, name);
+			return new IntInstruction(opcode, name);
 		}
-		else if (opcode == GOTO)
+		else if (opcode == NEW || opcode == NEWARRAY || opcode == ANEWARRAY || opcode == CHECKCAST || opcode == INSTANCEOF)
+		{
+			return new TypeInstruction(opcode, name);
+		}
+		else if (opcode == MULTIANEWARRAY)
+		{
+			return new MultiArrayInstruction(name);
+		}
+		else if (opcode == IINC)
+		{
+			return new IIncInstruction(opcode, name);
+		}
+		else if ((opcode >= IFEQ && opcode <= JSR) || opcode == IFNULL || opcode == IFNONNULL)
 		{
 			return new JumpInstruction(opcode, name);
 		}
