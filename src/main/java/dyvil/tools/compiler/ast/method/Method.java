@@ -339,7 +339,7 @@ public class Method extends Member implements IMethod
 			
 			if (param.hasModifier(Modifiers.BYREF))
 			{
-				mw.visitParameterAnnotation(index, "Ldyvil/lang/annotation/ByRef;", true);
+				mw.visitParameterAnnotation(index, "Ldyvil/lang/annotation/ref;", true);
 			}
 		}
 		
