@@ -286,12 +286,15 @@ public class MethodCall extends Call implements INamed, IValued
 		
 		if (this.isSugarCall && !Formatting.Method.useJavaFormat)
 		{
-			buffer.append(Formatting.Method.sugarCallSeperator);
-			this.arguments.get(0).toString("", buffer);
+			if (!this.arguments.isEmpty())
+			{
+				buffer.append(Formatting.Method.sugarCallSeperator);
+				this.arguments.get(0).toString("", buffer);
+			}
 		}
 		else
 		{
-			Util.parametersToString(this.arguments, buffer, !this.isSugarCall);
+			Util.parametersToString(this.arguments, buffer, this.isSugarCall);
 		}
 	}
 }
