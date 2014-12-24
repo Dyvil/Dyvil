@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class StatementList extends ValueList implements IStatement, IContext
@@ -28,6 +29,8 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public Label				start		= new Label();
 	public Label				end			= new Label();
 	
+	protected Type				returnType;
+	
 	public StatementList(ICodePosition position)
 	{
 		super(position);
@@ -36,6 +39,17 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public void addStatement(IStatement statement)
 	{
 		this.values.add(statement);
+	}
+	
+	@Override
+	public boolean requireType(Type type)
+	{
+		this.returnType = type;
+		if (type == Type.VOID)
+		{
+			return true;
+		}
+		return super.requireType(type);
 	}
 	
 	@Override
@@ -85,6 +99,21 @@ public class StatementList extends ValueList implements IStatement, IContext
 				{
 					variableList.addVariable((Variable) assign.field);
 				}
+			}
+		}
+		else if (state == CompilerState.CHECK)
+		{
+			for (IValue v : this.values)
+			{
+				if (v instanceof IStatement)
+				{
+					if (!v.requireType(this.returnType))
+					{
+						state.addMarker(new SemanticError(v.getPosition(), "The returning type of the block is incompatible with the required type " + this.returnType));
+					}
+				}
+				
+				v.applyState(state, context);
 			}
 		}
 		else
@@ -147,6 +176,12 @@ public class StatementList extends ValueList implements IStatement, IContext
 		if (this.isArray)
 		{
 			super.writeExpression(writer);
+			return;
+		}
+		
+		if (this.returnType == Type.VOID)
+		{
+			this.writeStatement(writer);
 			return;
 		}
 		

@@ -152,11 +152,7 @@ public class Type extends ASTNode implements IContext
 	
 	public static boolean isSuperType(Type superType, Type subType)
 	{
-		if (superType == VOID)
-		{
-			return true;
-		}
-		else if (subType == NONE && !(superType instanceof PrimitiveType))
+		if (subType == NONE && !(superType instanceof PrimitiveType))
 		{
 			return true;
 		}

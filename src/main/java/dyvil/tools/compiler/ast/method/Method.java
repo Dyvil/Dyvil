@@ -121,7 +121,7 @@ public class Method extends Member implements IMethod
 		
 		if (instance != null && (this.modifiers & Modifiers.IMPLICIT) == Modifiers.IMPLICIT)
 		{
-			par = params.get(0); 
+			par = params.get(0);
 			parType = par.type;
 			if (!instance.requireType(parType))
 			{
@@ -285,7 +285,24 @@ public class Method extends Member implements IMethod
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
 			this.type = this.type.applyState(state, context);
-			this.throwsDeclarations.replaceAll(t -> t.applyState(state, context));
+			
+			int len = this.throwsDeclarations.size();
+			for (int i = 0; i < len; i++)
+			{
+				Type t1 = this.throwsDeclarations.get(i);
+				Type t2 = t1.applyState(state, context);
+				if (t1 != t2)
+				{
+					this.throwsDeclarations.set(i, t2);
+				}
+			}
+		}
+		else if (state == CompilerState.CHECK)
+		{
+			if (this.statement != null && !this.statement.requireType(this.type))
+			{
+				state.addMarker(new SemanticError(this.statement.getPosition(), "The method '" + this.name + "' must return a result of type " + this.type));
+			}
 		}
 		
 		for (Annotation a : this.annotations)

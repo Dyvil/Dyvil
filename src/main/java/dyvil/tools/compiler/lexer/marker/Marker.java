@@ -25,6 +25,11 @@ public abstract class Marker extends Exception
 	public Marker(ICodePosition position, String message, String suggestion)
 	{
 		super(message);
+		if (position == null)
+		{
+			throw new IllegalArgumentException("Marker Position cannot be null");
+		}
+		
 		this.position = position;
 		this.suggestion = suggestion;
 	}

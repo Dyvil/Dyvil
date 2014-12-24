@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IValued;
@@ -39,16 +40,19 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	@Override
 	public Type getType()
 	{
-		return this.value.getType();
+		return this.value == null ? Type.VOID : this.value.getType();
 	}
 	
 	@Override
 	public IValue applyState(CompilerState state, IContext context)
 	{
-		this.value = this.value.applyState(state, context);
-		if (state == CompilerState.FOLD_CONSTANTS)
+		if (this.value != null)
 		{
-			return this.value;
+			this.value = this.value.applyState(state, context);
+			if (state == CompilerState.FOLD_CONSTANTS)
+			{
+				return this.value;
+			}
 		}
 		return this;
 	}
@@ -56,8 +60,15 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("return ");
-		this.value.toString("", buffer);
+		if (this.value != null)
+		{
+			buffer.append("return ");
+			this.value.toString("", buffer);
+		}
+		else
+		{
+			buffer.append("return");
+		}
 	}
 	
 	@Override
@@ -68,7 +79,14 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.value.writeExpression(writer);
-		writer.visitInsn(this.value.getType().getReturnOpcode());
+		if (this.value != null)
+		{
+			this.value.writeExpression(writer);
+			writer.visitInsn(this.value.getType().getReturnOpcode());
+		}
+		else
+		{
+			writer.visitInsn(Opcodes.RETURN);
+		}
 	}
 }
