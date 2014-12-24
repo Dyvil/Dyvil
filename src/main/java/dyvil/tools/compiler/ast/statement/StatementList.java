@@ -144,6 +144,12 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		if (this.isArray)
+		{
+			super.writeExpression(writer);
+			return;
+		}
+		
 		writer.visitLabel(this.start);
 		if (!this.values.isEmpty())
 		{

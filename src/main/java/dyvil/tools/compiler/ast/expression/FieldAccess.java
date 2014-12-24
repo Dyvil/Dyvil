@@ -136,7 +136,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		}
 		else if (state == CompilerState.CHECK)
 		{
-			if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
+			if (this.field != null && this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
 			{
 				state.addMarker(new Warning(this.position, "'" + this.qualifiedName + "' is a static field and should be accessed in a static way"));
 				this.instance = null;

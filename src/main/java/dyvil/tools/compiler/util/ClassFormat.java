@@ -184,7 +184,7 @@ public class ClassFormat
 			}
 			else
 			{
-				Type type = parseBaseType(c);
+				Type type = parseBaseType(c).clone();
 				type.arrayDimensions = arrayDimensions;
 				arrayDimensions = 0;
 				list.addType(type);

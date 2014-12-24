@@ -99,6 +99,13 @@ public class MethodCall extends Call implements INamed, IValued
 			this.arguments.replaceAll(v -> v.applyState(state, context));
 			return AccessResolver.resolve(context, this);
 		}
+		else if (state == CompilerState.CHECK)
+		{
+			if (this.method != null)
+			{
+				this.method.checkArguments(state, this.instance, this.arguments);
+			}
+		}
 		
 		if (this.instance != null)
 		{

@@ -23,18 +23,20 @@ public class Type extends ASTNode implements IContext
 	
 	public static Type		NONE		= new Type(null);
 	
-	public static Type		VOID		= new PrimitiveType("void", "dyvil.lang.Void");
-	public static Type		BOOLEAN		= new PrimitiveType("boolean", "dyvil.lang.Boolean");
-	public static Type		BYTE		= new PrimitiveType("byte", "dyvil.lang.Byte");
-	public static Type		SHORT		= new PrimitiveType("short", "dyvil.lang.Short");
-	public static Type		CHAR		= new PrimitiveType("char", "dyvil.lang.Char");
-	public static Type		INT			= new PrimitiveType("int", "dyvil.lang,Int");
-	public static Type		LONG		= new PrimitiveType("long", "dyvil.lang.Long");
-	public static Type		FLOAT		= new PrimitiveType("float", "dyvil.lang.Float");
-	public static Type		DOUBLE		= new PrimitiveType("double", "dyvil.lang.Double");
+	public static Type		VOID		= new PrimitiveType("void", "dyvil.lang.Void", 0);
+	public static Type		BOOLEAN		= new PrimitiveType("boolean", "dyvil.lang.Boolean", Opcodes.T_BOOLEAN);
+	public static Type		BYTE		= new PrimitiveType("byte", "dyvil.lang.Byte", Opcodes.T_BOOLEAN);
+	public static Type		SHORT		= new PrimitiveType("short", "dyvil.lang.Short", Opcodes.T_SHORT);
+	public static Type		CHAR		= new PrimitiveType("char", "dyvil.lang.Char", Opcodes.T_CHAR);
+	public static Type		INT			= new PrimitiveType("int", "dyvil.lang,Int", Opcodes.T_INT);
+	public static Type		LONG		= new PrimitiveType("long", "dyvil.lang.Long", Opcodes.T_LONG);
+	public static Type		FLOAT		= new PrimitiveType("float", "dyvil.lang.Float", Opcodes.T_FLOAT);
+	public static Type		DOUBLE		= new PrimitiveType("double", "dyvil.lang.Double", Opcodes.T_DOUBLE);
 	
 	public static Type		OBJECT		= new Type("java.lang.Object");
 	public static Type		PREDEF		= new Type("dyvil.lang.Predef");
+	public static Type		NUMBER		= new Type("dyvil.lang.Number");
+	public static Type		INTEGER		= new Type("dyvil.lang.Integer");
 	public static Type		STRING		= new Type("java.lang.String");
 	
 	public static Type		ABytecode	= new Type("dyvil.lang.annotation.Bytecode");
@@ -90,18 +92,64 @@ public class Type extends ASTNode implements IContext
 		
 		OBJECT.theClass = Package.javaLang.resolveClass("Object");
 		PREDEF.theClass = Package.dyvilLang.resolveClass("Predef");
+		NUMBER.theClass = Package.dyvilLang.resolveClass("Number");
+		INTEGER.theClass = Package.dyvilLang.resolveClass("Integer");
 		STRING.theClass = Package.javaLang.resolveClass("String");
 	}
 	
-	/**
-	 * Returns true if {@code t2} is equal to or a subclass of {@code t1}.
-	 * 
-	 * @param superType
-	 *            the super type
-	 * @param subType
-	 *            the sub type
-	 * @return true if t2 is equal to or a subclass of t1
-	 */
+	public static Type findCommonSuperType(Type type1, Type type2)
+	{
+		Type t = superType(type1, type2);
+		if (t != null)
+		{
+			return t;
+		}
+		
+		Type superType1 = type1;
+		while (true)
+		{
+			superType1 = superType1.getSuperType();
+			if (superType1 == null)
+			{
+				break;
+			}
+			
+			Type superType2 = type2;
+			while (true)
+			{
+				superType2 = superType2.getSuperType();
+				if (superType2 == null)
+				{
+					break;
+				}
+				
+				t = superType(superType1, superType2);
+				if (t != null)
+				{
+					return t;
+				}
+			}
+		}
+		return OBJECT;
+	}
+	
+	private static Type superType(Type type1, Type type2)
+	{
+		if (type1.arrayDimensions != type2.arrayDimensions)
+		{
+			return OBJECT;
+		}
+		if (isSuperType(type1, type2))
+		{
+			return type1;
+		}
+		if (isSuperType(type2, type1))
+		{
+			return type2;
+		}
+		return null;
+	}
+	
 	public static boolean isSuperType(Type superType, Type subType)
 	{
 		if (superType == VOID)
@@ -154,6 +202,15 @@ public class Type extends ASTNode implements IContext
 		return this.theClass != null;
 	}
 	
+	public Type getSuperType()
+	{
+		if (this.theClass != null)
+		{
+			return this.theClass.getSuperType();
+		}
+		return null;
+	}
+	
 	protected boolean isAssignableFrom(Type that)
 	{
 		if (this.arrayDimensions != that.arrayDimensions)
@@ -204,9 +261,19 @@ public class Type extends ASTNode implements IContext
 		return Opcodes.ALOAD;
 	}
 	
+	public int getArrayLoadOpcode()
+	{
+		return Opcodes.AALOAD;
+	}
+	
 	public int getStoreOpcode()
 	{
 		return Opcodes.ASTORE;
+	}
+	
+	public int getArrayStoreOpcode()
+	{
+		return Opcodes.AASTORE;
 	}
 	
 	public int getReturnOpcode()
@@ -230,9 +297,10 @@ public class Type extends ASTNode implements IContext
 				{
 					return t;
 				}
-				// Otherwise just take their IClass object instead of
-				// re-resolving it
-				iclass = t.theClass;
+				
+				t = t.clone();
+				t.arrayDimensions = this.arrayDimensions;
+				return t;
 			}
 			else
 			{

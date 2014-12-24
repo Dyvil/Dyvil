@@ -9,6 +9,7 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 
 import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
 
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.OpcodeUtil;
 
@@ -108,6 +109,23 @@ public class MethodWriter extends MethodVisitor
 			this.typeStack.push(Opcodes.NULL);
 		}
 		this.mv.visitInsn(op);
+	}
+	
+	@Override
+	@Deprecated
+	public void visitTypeInsn(int opcode, String type)
+	{
+		this.mv.visitTypeInsn(opcode, type);
+	}
+	
+	public void visitTypeInsn(int opcode, Type type)
+	{
+		if ((opcode == Opcodes.ANEWARRAY || opcode == Opcodes.NEWARRAY) && type instanceof PrimitiveType)
+		{
+			this.mv.visitIntInsn(Opcodes.NEWARRAY, ((PrimitiveType) type).typecode);
+			return;
+		}
+		this.mv.visitTypeInsn(opcode, type.getInternalName());
 	}
 	
 	public void visitEnd(Type type)

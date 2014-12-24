@@ -6,10 +6,13 @@ import dyvil.tools.compiler.ast.structure.IContext;
 
 public class PrimitiveType extends Type
 {
-	public PrimitiveType(String name, String wrapper)
+	public int	typecode;
+	
+	public PrimitiveType(String name, String wrapper, int typecode)
 	{
 		super(name);
 		this.qualifiedName = wrapper;
+		this.typecode = typecode;
 	}
 	
 	@Override
@@ -31,44 +34,35 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
+	public String getInternalName()
+	{
+		switch (this.typecode)
+		{
+		case Opcodes.T_BOOLEAN:
+			return "Z";
+		case Opcodes.T_BYTE:
+			return "B";
+		case Opcodes.T_SHORT:
+			return "S";
+		case Opcodes.T_CHAR:
+			return "C";
+		case Opcodes.T_INT:
+			return "I";
+		case Opcodes.T_LONG:
+			return "J";
+		case Opcodes.T_FLOAT:
+			return "F";
+		case Opcodes.T_DOUBLE:
+			return "D";
+		default:
+			return "V";
+		}
+	}
+	
+	@Override
 	public void appendExtendedName(StringBuilder buf)
 	{
-		if (this == Type.VOID)
-		{
-			buf.append("V");
-		}
-		else if (this == Type.BOOLEAN)
-		{
-			buf.append("Z");
-		}
-		else if (this == Type.BYTE)
-		{
-			buf.append("B");
-		}
-		else if (this == Type.SHORT)
-		{
-			buf.append("S");
-		}
-		else if (this == Type.CHAR)
-		{
-			buf.append("C");
-		}
-		else if (this == Type.INT)
-		{
-			buf.append("I");
-		}
-		else if (this == Type.LONG)
-		{
-			buf.append("J");
-		}
-		else if (this == Type.FLOAT)
-		{
-			buf.append("F");
-		}
-		else if (this == Type.DOUBLE)
-		{
-			buf.append("D");
-		}
+		buf.append(this.getInternalName());
 	}
 	
 	@Override
@@ -96,7 +90,11 @@ public class PrimitiveType extends Type
 	@Override
 	public int getLoadOpcode()
 	{
-		if (this == LONG)
+		if (this.arrayDimensions > 0)
+		{
+			return Opcodes.ALOAD;
+		}
+		else if (this == LONG)
 		{
 			return Opcodes.LLOAD;
 		}
@@ -112,9 +110,43 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public int getStoreOpcode()
+	public int getArrayLoadOpcode()
 	{
 		if (this == LONG)
+		{
+			return Opcodes.LALOAD;
+		}
+		else if (this == FLOAT)
+		{
+			return Opcodes.FALOAD;
+		}
+		else if (this == DOUBLE)
+		{
+			return Opcodes.DALOAD;
+		}
+		else if (this == BYTE)
+		{
+			return Opcodes.BALOAD;
+		}
+		else if (this == SHORT)
+		{
+			return Opcodes.SALOAD;
+		}
+		else if (this == CHAR)
+		{
+			return Opcodes.CALOAD;
+		}
+		return Opcodes.IALOAD;
+	}
+	
+	@Override
+	public int getStoreOpcode()
+	{
+		if (this.arrayDimensions > 0)
+		{
+			return Opcodes.ASTORE;
+		}
+		else if (this == LONG)
 		{
 			return Opcodes.LSTORE;
 		}
@@ -130,9 +162,43 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
+	public int getArrayStoreOpcode()
+	{
+		if (this == LONG)
+		{
+			return Opcodes.LASTORE;
+		}
+		else if (this == FLOAT)
+		{
+			return Opcodes.FASTORE;
+		}
+		else if (this == DOUBLE)
+		{
+			return Opcodes.DASTORE;
+		}
+		else if (this == BYTE)
+		{
+			return Opcodes.BASTORE;
+		}
+		else if (this == SHORT)
+		{
+			return Opcodes.SASTORE;
+		}
+		else if (this == CHAR)
+		{
+			return Opcodes.CASTORE;
+		}
+		return Opcodes.IASTORE;
+	}
+	
+	@Override
 	public int getReturnOpcode()
 	{
-		if (this == INT)
+		if (this.arrayDimensions > 0)
+		{
+			return Opcodes.ARETURN;
+		}
+		else if (this == INT)
 		{
 			return Opcodes.IRETURN;
 		}
@@ -166,7 +232,7 @@ public class PrimitiveType extends Type
 	@Override
 	public PrimitiveType clone()
 	{
-		PrimitiveType t = new PrimitiveType(this.name, this.qualifiedName);
+		PrimitiveType t = new PrimitiveType(this.name, this.qualifiedName, this.typecode);
 		t.theClass = this.theClass;
 		t.arrayDimensions = this.arrayDimensions;
 		return t;

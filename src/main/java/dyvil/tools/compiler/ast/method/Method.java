@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 import dyvil.tools.compiler.util.Util;
@@ -110,6 +111,38 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public void checkArguments(CompilerState state, IValue instance, List<IValue> arguments)
+	{
+		int pOff = 0;
+		int len = arguments.size();
+		List<Parameter> params = this.parameters;
+		Parameter par;
+		Type parType;
+		
+		if (instance != null && (this.modifiers & Modifiers.IMPLICIT) == Modifiers.IMPLICIT)
+		{
+			par = params.get(0); 
+			parType = par.type;
+			if (!instance.requireType(parType))
+			{
+				state.addMarker(new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name + "' is incompatible with the required type " + parType));
+			}
+			pOff = 1;
+		}
+		
+		for (int i = 0; i < len; i++)
+		{
+			par = params.get(i + pOff);
+			parType = par.type;
+			IValue value = arguments.get(i);
+			if (!value.requireType(parType))
+			{
+				state.addMarker(new SemanticError(value.getPosition(), "The method argument for '" + par.name + "' is incompatible with the required type " + parType));
+			}
+		}
+	}
+	
+	@Override
 	public int getSignatureMatch(String name, Type type, Type... argumentTypes)
 	{
 		if (!name.equals(this.qualifiedName))
@@ -125,17 +158,17 @@ public class Method extends Member implements IMethod
 		int pOff = 0;
 		int match = 1;
 		int len = argumentTypes.length;
-		List<Parameter> parameters = this.parameters;
+		List<Parameter> params = this.parameters;
 		
 		// implicit modifier implementation
-		if (type != null && (this.modifiers & Modifiers.IMPLICIT) != 0)
+		if (type != null && (this.modifiers & Modifiers.IMPLICIT) == Modifiers.IMPLICIT)
 		{
-			if (len != parameters.size() - 1)
+			if (len != params.size() - 1)
 			{
 				return 0;
 			}
 			
-			Type t2 = parameters.get(0).type;
+			Type t2 = params.get(0).type;
 			if (type.equals(t2))
 			{
 				match += 2;
@@ -158,7 +191,7 @@ public class Method extends Member implements IMethod
 		
 		for (int i = 0; i < len; i++)
 		{
-			Type t1 = parameters.get(i + pOff).type;
+			Type t1 = params.get(i + pOff).type;
 			Type t2 = argumentTypes[i];
 			
 			if (t1.equals(t2))

@@ -10,12 +10,14 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.ClassFormat;
+import dyvil.tools.compiler.util.Modifiers;
 
 public class BytecodeClass extends CodeClass
 {
@@ -134,10 +136,24 @@ public class BytecodeClass extends CodeClass
 		method.setModifiers(access);
 		ClassFormat.readMethodType(desc, method);
 		
+		List<Parameter> parameters = method.getParameters();
+		
+		if ((access & Modifiers.VARARGS) != 0)
+		{
+			Parameter param = parameters.get(parameters.size() - 1);
+			param.getType().arrayDimensions++;
+		}
+		
 		this.body.addMethod(method);
 		
 		return new MethodVisitor(Opcodes.ASM5)
 		{
+			@Override
+			public void visitParameter(String name, int index)
+			{
+				parameters.get(index).setName(name);
+			}
+			
 			@Override
 			public AnnotationVisitor visitAnnotation(String name, boolean visible)
 			{

@@ -151,8 +151,7 @@ public class ConstructorCall extends Call implements ITyped
 		{
 			opcode = Opcodes.INVOKESPECIAL;
 			
-			String name = this.type.getInternalName();
-			writer.visitTypeInsn(Opcodes.NEW, name);
+			writer.visitTypeInsn(Opcodes.NEW, this.type);
 			writer.visitInsn(Opcodes.DUP);
 		}
 		

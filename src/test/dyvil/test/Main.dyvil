@@ -2,9 +2,17 @@ package test;
 
 import dyvil.lang.annotation.Bytecode;
 import dyvil.reflect.Opcodes;
+import java.util.Arrays;
 
 public class Main
 {
-	@Bytecode(postfixOpcodes = { 1, 2, 3 })
-	public static void main(String[] args);	
+	public static void main(String[] args) =
+	{
+		{ 1, 2, 3, 4, 5 } print;
+		args print;
+	};
+	
+	public implicit void print(int[] a) = System out println(Arrays toString(a));
+	
+	public implicit void print(String[] a) = System out println(Arrays toString(a));
 }

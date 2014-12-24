@@ -19,6 +19,11 @@ public interface IValue extends IASTNode
 		throw new UnsupportedOperationException();
 	}
 	
+	public default boolean requireType(Type type)
+	{
+		return Type.isSuperType(type, this.getType());
+	}
+	
 	@Override
 	public IValue applyState(CompilerState state, IContext context);
 	

@@ -190,7 +190,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public Type getSuperClass()
+	public Type getSuperType()
 	{
 		return this.superClass;
 	}

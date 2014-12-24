@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IValueList;
@@ -20,6 +21,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	protected List<IValue>	values	= new ArrayList(3);
 	
 	protected boolean		isArray;
+	protected Type			commonType;
 	
 	public ValueList(ICodePosition position)
 	{
@@ -45,10 +47,32 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		{
 			return Type.VOID;
 		}
-		IValue v = this.values.get(this.values.size() - 1);
-		Type t = v.getType().clone();
+		if (this.commonType != null)
+		{
+			return this.commonType;
+		}
+		
+		int len = this.values.size();
+		Type t = this.values.get(0).getType();
+		for (int i = 1; i < len; i++)
+		{
+			IValue v = this.values.get(i);
+			t = Type.findCommonSuperType(t, v.getType());
+		}
+		t = t.clone();
 		t.arrayDimensions++;
-		return t;
+		return this.commonType = t;
+	}
+	
+	@Override
+	public boolean requireType(Type type)
+	{
+		if (type.arrayDimensions > 0)
+		{
+			this.isArray = true;
+			return Type.isSuperType(type, this.getType());
+		}
+		return false;
 	}
 	
 	@Override
@@ -108,9 +132,30 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		for (IValue ivalue : this.values)
+		if (this.isArray)
 		{
-			ivalue.writeExpression(writer);
+			Type t = this.getType();
+			int len = this.values.size();
+			int opcode = t.getArrayStoreOpcode();
+			
+			writer.visitLdcInsn(len);
+			writer.visitTypeInsn(Opcodes.ANEWARRAY, t);
+			
+			for (int i = 0; i < len; i++)
+			{
+				writer.visitInsn(Opcodes.DUP);
+				IValue value = this.values.get(i);
+				writer.visitLdcInsn(i);
+				value.writeExpression(writer);
+				writer.visitInsn(opcode);
+			}
+		}
+		else
+		{
+			for (IValue ivalue : this.values)
+			{
+				ivalue.writeExpression(writer);
+			}
 		}
 	}
 	
