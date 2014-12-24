@@ -8,11 +8,15 @@ public class Main
 {
 	public static void main(String[] args) =
 	{
-		{ 1, 2, 3, 4, 5 } print;
+		int[] ints = { 1, 2, 3, 4 };
+		ints print;
 		args print;
+		{ 1F, 2F, 3F } print;
 	};
 	
 	public implicit void print(int[] a) = System out println(Arrays toString(a));
+	
+	public implicit void print(float[] a) = System out println(Arrays toString(a));
 	
 	public implicit void print(String[] a) = System out println(Arrays toString(a));
 }

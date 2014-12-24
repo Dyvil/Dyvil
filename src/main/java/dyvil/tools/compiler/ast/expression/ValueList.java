@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
@@ -21,7 +22,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	protected List<IValue>	values	= new ArrayList(3);
 	
 	protected boolean		isArray;
-	protected Type			commonType;
+	protected Type			requiredType;
 	
 	public ValueList(ICodePosition position)
 	{
@@ -47,9 +48,10 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		{
 			return Type.VOID;
 		}
-		if (this.commonType != null)
+		
+		if (this.requiredType != null)
 		{
-			return this.commonType;
+			return this.requiredType;
 		}
 		
 		int len = this.values.size();
@@ -61,7 +63,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		}
 		t = t.clone();
 		t.arrayDimensions++;
-		return this.commonType = t;
+		return this.requiredType = t;
 	}
 	
 	@Override
@@ -69,8 +71,12 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		if (type.arrayDimensions > 0)
 		{
-			this.isArray = true;
-			return Type.isSuperType(type, this.getType());
+			if (this.requiredType != null)
+			{
+				return Type.isSuperType(type, this.requiredType);
+			}
+			this.requiredType = type;
+			return true;
 		}
 		return false;
 	}
@@ -125,7 +131,31 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public IValue applyState(CompilerState state, IContext context)
 	{
-		this.values.replaceAll(v -> v.applyState(state, context));
+		if (state == CompilerState.CHECK)
+		{
+			Type type = this.requiredType;
+			type.arrayDimensions--;
+			for (IValue value : this.values)
+			{
+				if (!value.requireType(type))
+				{
+					state.addMarker(new SemanticError(value.getPosition(), "The array value is incompatible with the required type " + type));
+				}
+				
+				value.applyState(state, context);
+			}
+			type.arrayDimensions++;
+		}
+		int len = this.values.size();
+		for (int i = 0; i < len; i++)
+		{
+			IValue v1 = this.values.get(i);
+			IValue v2 = v1.applyState(state, context);
+			if (v1 != v2)
+			{
+				this.values.set(i, v2);
+			}
+		}
 		return this;
 	}
 	

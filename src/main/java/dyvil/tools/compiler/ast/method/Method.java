@@ -408,6 +408,11 @@ public class Method extends Member implements IMethod
 		{
 			mw.visitCode();
 			
+			for (Variable var : this.variables)
+			{
+				var.index = index++;
+			}
+			
 			if (this.statement != null)
 			{
 				this.statement.writeStatement(mw);
@@ -415,8 +420,7 @@ public class Method extends Member implements IMethod
 			
 			for (Variable var : this.variables)
 			{
-				String name = var.qualifiedName;
-				mw.visitLocalVariable(name, var.type, var.start, var.end, var.index);
+				mw.visitLocalVariable(var.qualifiedName, var.type, var.start, var.end, var.index);
 			}
 			
 			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);

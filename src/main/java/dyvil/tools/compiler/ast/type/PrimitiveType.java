@@ -68,23 +68,23 @@ public class PrimitiveType extends Type
 	@Override
 	public Object getFrameType()
 	{
-		if (this == Type.INT)
+		switch (this.typecode)
 		{
+		case Opcodes.T_BOOLEAN:
+		case Opcodes.T_BYTE:
+		case Opcodes.T_SHORT:
+		case Opcodes.T_CHAR:
+		case Opcodes.T_INT:
 			return Opcodes.INTEGER;
-		}
-		else if (this == Type.LONG)
-		{
+		case Opcodes.T_LONG:
 			return Opcodes.LONG;
-		}
-		else if (this == Type.FLOAT)
-		{
+		case Opcodes.T_FLOAT:
 			return Opcodes.FLOAT;
-		}
-		else if (this == Type.DOUBLE)
-		{
+		case Opcodes.T_DOUBLE:
 			return Opcodes.DOUBLE;
+		default:
+			return Opcodes.NULL;
 		}
-		return Opcodes.NULL;
 	}
 	
 	@Override
@@ -94,49 +94,48 @@ public class PrimitiveType extends Type
 		{
 			return Opcodes.ALOAD;
 		}
-		else if (this == LONG)
+		switch (this.typecode)
 		{
+		case Opcodes.T_BOOLEAN:
+		case Opcodes.T_BYTE:
+		case Opcodes.T_SHORT:
+		case Opcodes.T_CHAR:
+		case Opcodes.T_INT:
+			return Opcodes.ILOAD;
+		case Opcodes.T_LONG:
 			return Opcodes.LLOAD;
-		}
-		else if (this == FLOAT)
-		{
+		case Opcodes.T_FLOAT:
 			return Opcodes.FLOAD;
-		}
-		else if (this == DOUBLE)
-		{
+		case Opcodes.T_DOUBLE:
 			return Opcodes.DLOAD;
+		default:
+			return 0;
 		}
-		return Opcodes.ILOAD;
 	}
 	
 	@Override
 	public int getArrayLoadOpcode()
 	{
-		if (this == LONG)
+		switch (this.typecode)
 		{
-			return Opcodes.LALOAD;
-		}
-		else if (this == FLOAT)
-		{
-			return Opcodes.FALOAD;
-		}
-		else if (this == DOUBLE)
-		{
-			return Opcodes.DALOAD;
-		}
-		else if (this == BYTE)
-		{
+		case Opcodes.T_BOOLEAN:
+		case Opcodes.T_BYTE:
 			return Opcodes.BALOAD;
-		}
-		else if (this == SHORT)
-		{
+		case Opcodes.T_SHORT:
 			return Opcodes.SALOAD;
-		}
-		else if (this == CHAR)
-		{
+		case Opcodes.T_CHAR:
 			return Opcodes.CALOAD;
+		case Opcodes.T_INT:
+			return Opcodes.IALOAD;
+		case Opcodes.T_LONG:
+			return Opcodes.LALOAD;
+		case Opcodes.T_FLOAT:
+			return Opcodes.FALOAD;
+		case Opcodes.T_DOUBLE:
+			return Opcodes.DALOAD;
+		default:
+			return 0;
 		}
-		return Opcodes.IALOAD;
 	}
 	
 	@Override
@@ -146,49 +145,48 @@ public class PrimitiveType extends Type
 		{
 			return Opcodes.ASTORE;
 		}
-		else if (this == LONG)
+		switch (this.typecode)
 		{
+		case Opcodes.T_BOOLEAN:
+		case Opcodes.T_BYTE:
+		case Opcodes.T_SHORT:
+		case Opcodes.T_CHAR:
+		case Opcodes.T_INT:
+			return Opcodes.ISTORE;
+		case Opcodes.T_LONG:
 			return Opcodes.LSTORE;
-		}
-		else if (this == FLOAT)
-		{
+		case Opcodes.T_FLOAT:
 			return Opcodes.FSTORE;
-		}
-		else if (this == DOUBLE)
-		{
+		case Opcodes.T_DOUBLE:
 			return Opcodes.DSTORE;
+		default:
+			return 0;
 		}
-		return Opcodes.ISTORE;
 	}
 	
 	@Override
 	public int getArrayStoreOpcode()
 	{
-		if (this == LONG)
+		switch (this.typecode)
 		{
-			return Opcodes.LASTORE;
-		}
-		else if (this == FLOAT)
-		{
-			return Opcodes.FASTORE;
-		}
-		else if (this == DOUBLE)
-		{
-			return Opcodes.DASTORE;
-		}
-		else if (this == BYTE)
-		{
+		case Opcodes.T_BOOLEAN:
+		case Opcodes.T_BYTE:
 			return Opcodes.BASTORE;
-		}
-		else if (this == SHORT)
-		{
+		case Opcodes.T_SHORT:
 			return Opcodes.SASTORE;
-		}
-		else if (this == CHAR)
-		{
+		case Opcodes.T_CHAR:
 			return Opcodes.CASTORE;
+		case Opcodes.T_INT:
+			return Opcodes.IASTORE;
+		case Opcodes.T_LONG:
+			return Opcodes.LASTORE;
+		case Opcodes.T_FLOAT:
+			return Opcodes.FASTORE;
+		case Opcodes.T_DOUBLE:
+			return Opcodes.DASTORE;
+		default:
+			return 0;
 		}
-		return Opcodes.IASTORE;
 	}
 	
 	@Override
@@ -198,23 +196,23 @@ public class PrimitiveType extends Type
 		{
 			return Opcodes.ARETURN;
 		}
-		else if (this == INT)
+		switch (this.typecode)
 		{
+		case Opcodes.T_BOOLEAN:
+		case Opcodes.T_BYTE:
+		case Opcodes.T_SHORT:
+		case Opcodes.T_CHAR:
+		case Opcodes.T_INT:
 			return Opcodes.IRETURN;
-		}
-		else if (this == LONG)
-		{
+		case Opcodes.T_LONG:
 			return Opcodes.LRETURN;
-		}
-		else if (this == FLOAT)
-		{
+		case Opcodes.T_FLOAT:
 			return Opcodes.FRETURN;
-		}
-		else if (this == DOUBLE)
-		{
+		case Opcodes.T_DOUBLE:
 			return Opcodes.DRETURN;
+		default:
+			return Opcodes.RETURN;
 		}
-		return Opcodes.RETURN;
 	}
 	
 	@Override

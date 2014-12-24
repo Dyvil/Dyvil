@@ -145,7 +145,14 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 			if (this.value instanceof ThisValue)
 			{
 				state.addMarker(new SyntaxError(this.position, "Cannot assign a value to 'this'"));
-				this.value = null;
+			}
+			else if (this.field != null)
+			{
+				Type type = this.field.getType();
+				if (!this.value.requireType(type))
+				{
+					state.addMarker(new SemanticError(this.value.getPosition(), "The type of the assigned value is incompatible with the required type " + type));
+				}
 			}
 		}
 		

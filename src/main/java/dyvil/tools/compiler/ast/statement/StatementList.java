@@ -29,8 +29,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public Label				start		= new Label();
 	public Label				end			= new Label();
 	
-	protected Type				returnType;
-	
 	public StatementList(ICodePosition position)
 	{
 		super(position);
@@ -44,7 +42,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public boolean requireType(Type type)
 	{
-		this.returnType = type;
+		this.requiredType = type;
 		if (type == Type.VOID)
 		{
 			return true;
@@ -103,17 +101,35 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		else if (state == CompilerState.CHECK)
 		{
-			for (IValue v : this.values)
+			Type type = this.requiredType;
+			if (this.isArray)
 			{
-				if (v instanceof IStatement)
+				type.arrayDimensions--;
+				for (IValue value : this.values)
 				{
-					if (!v.requireType(this.returnType))
+					if (!value.requireType(type))
 					{
-						state.addMarker(new SemanticError(v.getPosition(), "The returning type of the block is incompatible with the required type " + this.returnType));
+						state.addMarker(new SemanticError(value.getPosition(), "The array value is incompatible with the required type " + type));
 					}
+					
+					value.applyState(state, context);
 				}
-				
-				v.applyState(state, context);
+				type.arrayDimensions++;
+			}
+			else
+			{
+				for (IValue v : this.values)
+				{
+					if (v instanceof IStatement)
+					{
+						if (!v.requireType(type))
+						{
+							state.addMarker(new SemanticError(v.getPosition(), "The returning type of the block is incompatible with the required type " + type));
+						}
+					}
+					
+					v.applyState(state, context);
+				}
 			}
 		}
 		else
@@ -179,7 +195,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 			return;
 		}
 		
-		if (this.returnType == Type.VOID)
+		if (this.requiredType == Type.VOID)
 		{
 			this.writeStatement(writer);
 			return;
