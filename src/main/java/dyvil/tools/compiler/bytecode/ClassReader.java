@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.AnnotationVisitorImpl;
 import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.util.ClassFormat;
 
 public class ClassReader extends ClassVisitor
@@ -59,7 +59,8 @@ public class ClassReader extends ClassVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String name, boolean visible)
 	{
-		Type type = ClassFormat.internalToType(name);
+		AnnotationType type = new AnnotationType();
+		ClassFormat.internalToType(name, type);
 		Annotation annotation = new Annotation(null, type);
 		this.bclass.addAnnotation(annotation);
 		return new AnnotationVisitorImpl(this.api, annotation);

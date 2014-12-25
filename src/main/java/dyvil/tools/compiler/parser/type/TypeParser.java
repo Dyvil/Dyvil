@@ -50,7 +50,7 @@ public class TypeParser extends Parser
 			else if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				// TODO package.class
-				this.type = new Type(value, token);
+				this.type = new Type(token, value);
 				
 				IToken next = token.next();
 				if (next.equals("<"))

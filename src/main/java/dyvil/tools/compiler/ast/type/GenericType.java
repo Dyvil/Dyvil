@@ -10,9 +10,9 @@ public class GenericType extends Type implements ITypeList
 {
 	public List<Type>	generics	= new ArrayList();
 	
-	public GenericType(String name, ICodePosition position)
+	public GenericType(ICodePosition position, String name)
 	{
-		super(name, position);
+		super(position, name);
 	}
 	
 	@Override

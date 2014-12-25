@@ -51,7 +51,7 @@ public class EnumValue extends ASTNode implements IValue
 		String owner = this.type.getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
-		writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
+		writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc, this.type.getFrameType());
 	}
 	
 	@Override

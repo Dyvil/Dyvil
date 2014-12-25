@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
+import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -131,6 +132,13 @@ public class CodeClass extends ASTNode implements IClass
 	public List<Annotation> getAnnotations()
 	{
 		return this.annotations;
+	}
+	
+	@Override
+	public void addAnnotation(Annotation annotation)
+	{
+		annotation.target = ElementType.TYPE;
+		this.annotations.add(annotation);
 	}
 	
 	@Override

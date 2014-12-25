@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
+import java.lang.annotation.ElementType;
+
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -76,6 +78,7 @@ public class Parameter extends Member implements IField
 		}
 		else
 		{
+			annotation.target = ElementType.PARAMETER;
 			this.annotations.add(annotation);
 		}
 	}

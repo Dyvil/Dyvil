@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,8 +17,8 @@ import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.api.IValueMap;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.EnumValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -29,10 +30,11 @@ import dyvil.tools.compiler.util.Util;
 public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 {
 	public String				name;
-	public Type					type;
+	public AnnotationType		type;
 	public Map<String, IValue>	parameters	= new HashMap();
+	public ElementType			target;
 	
-	public Annotation(ICodePosition position, Type type)
+	public Annotation(ICodePosition position, AnnotationType type)
 	{
 		this.position = position;
 		this.name = type.name;
@@ -43,13 +45,13 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	{
 		this.position = position;
 		this.name = name;
-		this.type = new Type(name, position);
+		this.type = new AnnotationType(position, name);
 	}
 	
 	@Override
 	public void setType(Type type)
 	{
-		this.type = type;
+		this.type = (AnnotationType) type;
 	}
 	
 	@Override
@@ -88,10 +90,14 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
 			this.type = this.type.resolve(context);
-			if (!this.type.isResolved())
+			if (this.position != null && !this.type.isResolved())
 			{
 				state.addMarker(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a type"));
 			}
+		}
+		else if (state == CompilerState.RESOLVE)
+		{
+			this.type.readMetaAnnotations();
 		}
 		else if (state == CompilerState.CHECK)
 		{
@@ -99,6 +105,11 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 			if (!theClass.hasModifier(Modifiers.ANNOTATION))
 			{
 				state.addMarker(new SemanticError(this.position, "The type '" + this.name + "' is not an annotation type"));
+			}
+			
+			if (!this.type.isTarget(this.target))
+			{
+				state.addMarker(new SemanticError(this.position, "The annotation type '" + this.name + "' is not applicable for the annotated element type " + this.target));
 			}
 			
 			for (Entry<String, IValue> entry : this.parameters.entrySet())
@@ -126,7 +137,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	
 	public void write(ClassWriter writer)
 	{
-		RetentionPolicy retention = this.getRetention();
+		RetentionPolicy retention = this.type.retention;
 		if (retention != RetentionPolicy.SOURCE)
 		{
 			boolean visible = retention == RetentionPolicy.RUNTIME;
@@ -141,7 +152,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	
 	public void write(MethodWriter writer)
 	{
-		RetentionPolicy retention = this.getRetention();
+		RetentionPolicy retention = this.type.retention;
 		if (retention != RetentionPolicy.SOURCE)
 		{
 			boolean visible = retention == RetentionPolicy.RUNTIME;
@@ -156,7 +167,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	
 	public void write(MethodWriter writer, int index)
 	{
-		RetentionPolicy retention = this.getRetention();
+		RetentionPolicy retention = this.type.retention;
 		if (retention != RetentionPolicy.SOURCE)
 		{
 			boolean visible = retention == RetentionPolicy.RUNTIME;
@@ -167,28 +178,6 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 				visitValue(visitor, entry.getKey(), entry.getValue());
 			}
 		}
-	}
-	
-	private RetentionPolicy getRetention()
-	{
-		if (this.type.theClass != null)
-		{
-			Annotation retention = this.type.theClass.getAnnotation(Type.ARetention);
-			if (retention != null)
-			{
-				EnumValue value = (EnumValue) retention.getValue("value");
-				switch (value.name)
-				{
-				case "SOURCE":
-					return RetentionPolicy.SOURCE;
-				case "CLASS":
-					return RetentionPolicy.CLASS;
-				case "RUNTIME":
-					return RetentionPolicy.RUNTIME;
-				}
-			}
-		}
-		return RetentionPolicy.CLASS;
 	}
 	
 	private static void visitValue(AnnotationVisitor visitor, String key, IValue value)

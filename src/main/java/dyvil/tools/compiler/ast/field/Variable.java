@@ -1,8 +1,11 @@
 package dyvil.tools.compiler.ast.field;
 
+import java.lang.annotation.ElementType;
+
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -10,6 +13,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Modifiers;
 
 public class Variable extends Member implements IField
 {
@@ -38,6 +42,20 @@ public class Variable extends Member implements IField
 	public IValue getValue()
 	{
 		return null;
+	}
+	
+	@Override
+	public void addAnnotation(Annotation annotation)
+	{
+		if ("dyvil.lang.annotation.lazy".equals(annotation.name))
+		{
+			this.modifiers |= Modifiers.LAZY;
+		}
+		else
+		{
+			annotation.target = ElementType.LOCAL_VARIABLE;
+			this.annotations.add(annotation);
+		}
 	}
 	
 	@Override

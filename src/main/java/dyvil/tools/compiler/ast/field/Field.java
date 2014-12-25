@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
+import java.lang.annotation.ElementType;
+
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
@@ -13,6 +15,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Util;
 
 public class Field extends Member implements IField
 {
@@ -71,6 +74,7 @@ public class Field extends Member implements IField
 		}
 		else
 		{
+			annotation.target = ElementType.FIELD;
 			this.annotations.add(annotation);
 		}
 	}
@@ -87,6 +91,7 @@ public class Field extends Member implements IField
 		{
 			this.value = this.value.applyState(state, context);
 		}
+		Util.applyState(this.annotations, state, context);
 		return this;
 	}
 	

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
+import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +128,7 @@ public class Method extends Member implements IMethod
 		}
 		else
 		{
+			annotation.target = ElementType.METHOD;
 			this.annotations.add(annotation);
 		}
 	}

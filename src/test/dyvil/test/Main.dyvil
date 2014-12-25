@@ -5,7 +5,6 @@ import dyvil.lang.annotation.byref;
 import dyvil.reflect.Opcodes;
 import java.util.Arrays;
 
-@Deprecated
 public class Main
 {
 	public static void main(String[] args) =
@@ -16,7 +15,7 @@ public class Main
 		{ 1F, 2F, 3F } print;
 	};
 	
-	public implicit void print(@byref int[] a) = System out println(Arrays toString(a));
+	public implicit void print(int[] a) = System out println(Arrays toString(a));
 	
 	public implicit void print(float[] a) = System out println(Arrays toString(a));
 	

@@ -15,12 +15,15 @@ import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.ClassFormat;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Util;
 
 public class BytecodeClass extends CodeClass
 {
+	public Package	thePackage;
 	public boolean	typesResolved;
 	
 	public BytecodeClass()
@@ -29,11 +32,45 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
+	public void setName(String name)
+	{
+		super.setName(name);
+	}
+	
+	@Override
+	public CodeClass applyState(CompilerState state, IContext context)
+	{
+		if (state == CompilerState.RESOLVE_TYPES)
+		{
+			if (this.superClass != null)
+			{
+				if (this.superClass.name.equals("void"))
+				{
+					this.superClass = null;
+				}
+				else
+				{
+					this.superClass = this.superClass.resolve(context);
+				}
+			}
+			Util.applyState(this.interfaces, state, context);
+			Util.applyState(this.annotations, state, Package.rootPackage);
+			this.body.applyState(state, Package.rootPackage);
+		}
+		return this;
+	}
+	
+	@Override
 	public IClass resolveClass(String name)
 	{
 		if (this.name.equals(name))
 		{
 			return this;
+		}
+		IClass iclass = this.thePackage.resolveClass(name);
+		if (iclass != null)
+		{
+			return iclass;
 		}
 		return Package.rootPackage.resolveClass(name);
 	}
@@ -80,10 +117,12 @@ public class BytecodeClass extends CodeClass
 		if (index == -1)
 		{
 			this.name = name;
+			this.thePackage = Package.rootPackage;
 		}
 		else
 		{
 			this.name = name.substring(index + 1);
+			this.thePackage = Package.rootPackage.resolvePackage(name.substring(0, index));
 		}
 		
 		this.qualifiedName = name.replace('/', '.');
@@ -120,7 +159,8 @@ public class BytecodeClass extends CodeClass
 			@Override
 			public AnnotationVisitor visitAnnotation(String name, boolean visible)
 			{
-				Type type = ClassFormat.internalToType(name);
+				AnnotationType type = new AnnotationType();
+				ClassFormat.internalToType(name, type);
 				Annotation annotation = new Annotation(null, type);
 				field.addAnnotation(annotation);
 				
@@ -157,7 +197,8 @@ public class BytecodeClass extends CodeClass
 			@Override
 			public AnnotationVisitor visitAnnotation(String name, boolean visible)
 			{
-				Type type = ClassFormat.internalToType(name);
+				AnnotationType type = new AnnotationType();
+				ClassFormat.internalToType(name, type);
 				Annotation annotation = new Annotation(null, type);
 				method.addAnnotation(annotation);
 				

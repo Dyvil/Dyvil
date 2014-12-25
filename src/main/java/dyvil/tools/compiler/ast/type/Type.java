@@ -39,9 +39,9 @@ public class Type extends ASTNode implements IContext
 	public static Type		INTEGER		= new Type("dyvil.lang.Integer");
 	public static Type		STRING		= new Type("java.lang.String");
 	
-	public static Type		ABytecode	= new Type("dyvil.lang.annotation.Bytecode");
-	public static Type		ARetention	= new Type("java.lang.annotation.Retention");
-	public static Type		ATarget		= new Type("java.lang.annotation.Target");
+	public static Type		ABytecode	= new AnnotationType("dyvil.lang.annotation.Bytecode");
+	public static Type		ARetention	= new AnnotationType("java.lang.annotation.Retention");
+	public static Type		ATarget		= new AnnotationType("java.lang.annotation.Target");
 	
 	public String			name;
 	public String			qualifiedName;
@@ -65,19 +65,19 @@ public class Type extends ASTNode implements IContext
 		this.theClass = iclass;
 	}
 	
-	public Type(String name, ICodePosition position)
+	public Type(ICodePosition position, String name)
 	{
+		this.position = position;
 		this.name = name;
 		this.qualifiedName = name;
-		this.position = position;
 	}
 	
-	public Type(String name, IClass iclass, ICodePosition position)
+	public Type(ICodePosition position, String name, IClass iclass)
 	{
+		this.position = position;
 		this.name = name;
 		this.qualifiedName = name;
 		this.theClass = iclass;
-		this.position = position;
 	}
 	
 	public static void init()
@@ -166,6 +166,18 @@ public class Type extends ASTNode implements IContext
 			return true;
 		}
 		return superType.isAssignableFrom(subType);
+	}
+	
+	public void setQualifiedName(String name)
+	{
+		this.qualifiedName = name;
+		int index = name.lastIndexOf('.');
+		if (index == -1)
+		{
+			this.name = name;
+			return;
+		}
+		this.name = name.substring(index + 1);
 	}
 	
 	public void setClass(IClass theClass)
@@ -292,6 +304,10 @@ public class Type extends ASTNode implements IContext
 				t = t.clone();
 				t.arrayDimensions = this.arrayDimensions;
 				return t;
+			}
+			else if (context == Package.rootPackage)
+			{
+				iclass = context.resolveClass(this.qualifiedName);
 			}
 			else
 			{
@@ -484,7 +500,7 @@ public class Type extends ASTNode implements IContext
 	@Override
 	public Type clone()
 	{
-		Type t = new Type(this.name, this.theClass, this.position);
+		Type t = new Type(this.position, this.name, this.theClass);
 		t.arrayDimensions = arrayDimensions;
 		return t;
 	}

@@ -113,7 +113,11 @@ public class ClassFormat
 		return null;
 	}
 	
-	public static Type internalToType(String internal)
+	public static Type internalToType(String internal) {
+		return internalToType(internal, new Type());
+	}
+	
+	public static Type internalToType(String internal, Type type)
 	{
 		int len = internal.length();
 		int arrayDimensions = 0;
@@ -125,7 +129,6 @@ public class ClassFormat
 		}
 		
 		char c = internal.charAt(i);
-		Type type = null;
 		
 		if (c == 'L')
 		{
@@ -134,7 +137,7 @@ public class ClassFormat
 			{
 				internal = internal.substring(i + 1, l);
 			}
-			type = internalToType2(internal);
+			type.setQualifiedName(internalToPackage(internal));
 		}
 		else if (len - i == 1)
 		{
@@ -142,7 +145,7 @@ public class ClassFormat
 		}
 		else
 		{
-			type = internalToType2(internal);
+			type.setQualifiedName(internalToPackage(internal));
 		}
 		
 		type.arrayDimensions = arrayDimensions;
