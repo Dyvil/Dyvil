@@ -99,6 +99,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				if (next.equals("="))
 				{
 					this.mode = FIELD;
+					this.field.setPosition(token.raw());
 					this.field.setName(value);
 					this.classBody.addField(this.field);
 					return true;
@@ -106,6 +107,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				else if (next.equals(";"))
 				{
 					this.mode = FIELD;
+					this.field.setPosition(token.raw());
 					this.field.setName(value);
 					this.classBody.addField(this.field);
 					this.reset();
@@ -114,6 +116,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				else if (next.isType(IToken.TYPE_OPEN_BRACKET))
 				{
 					this.mode = METHOD;
+					this.method.setPosition(token.raw());
 					this.method.setName(value);
 					this.classBody.addMethod(this.method);
 					return true;

@@ -40,6 +40,7 @@ public class Type extends ASTNode implements IContext
 	public static Type		STRING		= new Type("java.lang.String");
 	
 	public static Type		ABytecode	= new AnnotationType("dyvil.lang.annotation.Bytecode");
+	public static Type		AOverride	= new AnnotationType("java.lang.Override");
 	public static Type		ARetention	= new AnnotationType("java.lang.annotation.Retention");
 	public static Type		ATarget		= new AnnotationType("java.lang.annotation.Target");
 	
@@ -98,6 +99,7 @@ public class Type extends ASTNode implements IContext
 		STRING.theClass = Package.javaLang.resolveClass("String");
 		
 		ABytecode.theClass = Package.dyvilLangAnnotation.resolveClass("Bytecode");
+		AOverride.theClass = Package.javaLang.resolveClass("Override");
 		ARetention.theClass = Package.javaLangAnnotation.resolveClass("Retention");
 		ATarget.theClass = Package.javaLangAnnotation.resolveClass("Target");
 	}

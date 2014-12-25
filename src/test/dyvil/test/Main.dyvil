@@ -20,4 +20,6 @@ public class Main
 	public implicit void print(float[] a) = System out println(Arrays toString(a));
 	
 	public implicit void print(String[] a) = System out println(Arrays toString(a));
+	
+	public Object toString();
 }

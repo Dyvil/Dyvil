@@ -7,6 +7,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IMethod;
+import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
@@ -69,6 +70,37 @@ public class ClassBody extends ASTNode
 			{
 				return method;
 			}
+		}
+		return null;
+	}
+	
+	public IMethod getMethod(String name, List<Parameter> parameters)
+	{
+		outer:
+		for (IMethod method : this.methods)
+		{
+			if (!name.equals(method.getName()))
+			{
+				continue;
+			}
+			
+			List<Parameter> parameters2 = method.getParameters();
+			int len = parameters.size();
+			if (len != parameters2.size())
+			{
+				continue;
+			}
+			
+			for (int i = 0; i < len; i++)
+			{
+				Parameter par1 = parameters.get(i);
+				Parameter par2 = parameters2.get(i);
+				if (!par1.getType().equals(par2.getType()))
+				{
+					continue outer;
+				}
+			}
+			return method;
 		}
 		return null;
 	}

@@ -10,6 +10,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IMethod;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
@@ -29,7 +30,6 @@ public class Method extends Member implements IMethod
 	private String			openBracket			= "(";
 	private List<Parameter>	parameters			= new ArrayList(3);
 	private String			closeBracket		= ")";
-	
 	private List<Type>		throwsDeclarations	= new ArrayList(1);
 	
 	private IValue			statement;
@@ -37,6 +37,9 @@ public class Method extends Member implements IMethod
 	private List<Variable>	variables			= new ArrayList(5);
 	
 	protected boolean		isConstructor;
+	
+	protected boolean		hasOverride;
+	protected IMethod		overrideMethod;
 	
 	public Method(IClass iclass)
 	{
@@ -320,8 +323,43 @@ public class Method extends Member implements IMethod
 				}
 			}
 		}
+		else if (state == CompilerState.RESOLVE)
+		{
+			if (this.getAnnotation(Type.AOverride) != null)
+			{
+				this.hasOverride = true;
+			}
+			
+			Type t = this.theClass.getSuperType();
+			if (t != null && t.theClass != null)
+			{
+				ClassBody body = t.theClass.getBody();
+				this.overrideMethod = body.getMethod(this.name, this.parameters);
+			}
+		}
 		else if (state == CompilerState.CHECK)
 		{
+			if (this.overrideMethod == null)
+			{
+				if (this.hasOverride)
+				{
+					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' must override or implement a supertype method"));
+				}
+			}
+			else
+			{
+				if (!this.hasOverride)
+				{
+					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' overrides a method, but does not have an @Override annotation"));
+				}
+				
+				Type type = this.overrideMethod.getType();
+				if (!Type.isSuperType(type, this.type))
+				{
+					state.addMarker(new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type " + type));
+				}
+			}
+			
 			if (this.statement != null && !this.statement.requireType(this.type))
 			{
 				state.addMarker(new SemanticError(this.statement.getPosition(), "The method '" + this.name + "' must return a result of type " + this.type));
