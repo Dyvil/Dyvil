@@ -21,5 +21,6 @@ public class Main
 	
 	public implicit void print(String[] a) = System out println(Arrays toString(a));
 	
-	public Object toString();
+	@Override
+	public String toString();
 }

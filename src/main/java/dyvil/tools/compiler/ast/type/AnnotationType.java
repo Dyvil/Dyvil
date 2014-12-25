@@ -62,7 +62,7 @@ public class AnnotationType extends Type
 			if (iclass != null)
 			{
 				this.theClass = iclass;
-				this.qualifiedName = iclass.getName();
+				this.qualifiedName = iclass.getQualifiedName();
 			}
 		}
 		return this;

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
+import java.util.Iterator;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
@@ -14,6 +15,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Util;
 
 public class Variable extends Member implements IField
 {
@@ -47,15 +49,22 @@ public class Variable extends Member implements IField
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		if ("dyvil.lang.annotation.lazy".equals(annotation.name))
-		{
-			this.modifiers |= Modifiers.LAZY;
-		}
-		else
+		if (!this.processAnnotation(annotation))
 		{
 			annotation.target = ElementType.LOCAL_VARIABLE;
 			this.annotations.add(annotation);
 		}
+	}
+	
+	private boolean processAnnotation(Annotation annotation)
+	{
+		String name = annotation.type.qualifiedName;
+		if ("dyvil.lang.annotation.lazy".equals(name))
+		{
+			this.modifiers |= Modifiers.LAZY;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -77,6 +86,23 @@ public class Variable extends Member implements IField
 		{
 			this.type = this.type.resolve(context);
 		}
+		else if (state == CompilerState.RESOLVE)
+		{
+			for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
+			{
+				Annotation a = iterator.next();
+				if (this.processAnnotation(a))
+				{
+					iterator.remove();
+					continue;
+				}
+				
+				a.applyState(state, context);
+			}
+			return this;
+		}
+		
+		Util.applyState(this.annotations, state, context);
 		return this;
 	}
 	

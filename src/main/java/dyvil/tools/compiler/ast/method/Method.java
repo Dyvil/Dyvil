@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.method;
 
 import java.lang.annotation.ElementType;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
@@ -38,7 +39,6 @@ public class Method extends Member implements IMethod
 	
 	protected boolean		isConstructor;
 	
-	protected boolean		hasOverride;
 	protected IMethod		overrideMethod;
 	
 	public Method(IClass iclass)
@@ -117,23 +117,37 @@ public class Method extends Member implements IMethod
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		if ("dyvil.lang.annotation.inline".equals(annotation.name))
-		{
-			this.modifiers |= Modifiers.INLINE;
-		}
-		if ("dyvil.lang.annotation.implicit".equals(annotation.name))
-		{
-			this.modifiers |= Modifiers.IMPLICIT;
-		}
-		if ("dyvil.lang.annotation.prefix".equals(annotation.name))
-		{
-			this.modifiers |= Modifiers.PREFIX;
-		}
-		else
+		if (!this.processAnnotation(annotation))
 		{
 			annotation.target = ElementType.METHOD;
 			this.annotations.add(annotation);
 		}
+	}
+	
+	private boolean processAnnotation(Annotation annotation)
+	{
+		String name = annotation.type.qualifiedName;
+		if ("dyvil.lang.annotation.inline".equals(name))
+		{
+			this.modifiers |= Modifiers.INLINE;
+			return true;
+		}
+		if ("dyvil.lang.annotation.implicit".equals(name))
+		{
+			this.modifiers |= Modifiers.IMPLICIT;
+			return true;
+		}
+		if ("dyvil.lang.annotation.prefix".equals(name))
+		{
+			this.modifiers |= Modifiers.PREFIX;
+			return true;
+		}
+		if ("java.lang.Override".equals(name))
+		{
+			this.modifiers |= Modifiers.OVERRIDE;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -322,12 +336,27 @@ public class Method extends Member implements IMethod
 					this.throwsDeclarations.set(i, t2);
 				}
 			}
+			
+			for (Variable v : this.variables)
+			{
+				v.applyState(state, context);
+			}
 		}
 		else if (state == CompilerState.RESOLVE)
 		{
-			if (this.getAnnotation(Type.AOverride) != null)
+			Iterator<Annotation> iterator = this.annotations.iterator();
+			while (iterator.hasNext())
 			{
-				this.hasOverride = true;
+				Annotation a = iterator.next();
+				if (this.processAnnotation(a))
+				{
+					iterator.remove();
+				}
+			}
+			
+			for (Variable v : this.variables)
+			{
+				v.applyState(state, context);
 			}
 			
 			Type t = this.theClass.getSuperType();
@@ -341,16 +370,16 @@ public class Method extends Member implements IMethod
 		{
 			if (this.overrideMethod == null)
 			{
-				if (this.hasOverride)
+				if ((this.modifiers & Modifiers.OVERRIDE) != 0)
 				{
 					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' must override or implement a supertype method"));
 				}
 			}
 			else
 			{
-				if (!this.hasOverride)
+				if ((this.modifiers & Modifiers.OVERRIDE) == 0)
 				{
-					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' overrides a method, but does not have an @Override annotation"));
+					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' overrides a method, but does not have an 'override' modifier"));
 				}
 				
 				Type type = this.overrideMethod.getType();

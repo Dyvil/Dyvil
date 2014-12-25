@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
+import java.util.Iterator;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -68,15 +69,22 @@ public class Field extends Member implements IField
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		if ("dyvil.lang.annotation.lazy".equals(annotation.name))
-		{
-			this.modifiers |= Modifiers.LAZY;
-		}
-		else
+		if (!processAnnotation(annotation))
 		{
 			annotation.target = ElementType.FIELD;
 			this.annotations.add(annotation);
 		}
+	}
+	
+	private boolean processAnnotation(Annotation annotation)
+	{
+		String name = annotation.type.qualifiedName;
+		if ("dyvil.lang.annotation.lazy".equals(name))
+		{
+			this.modifiers |= Modifiers.LAZY;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -85,6 +93,26 @@ public class Field extends Member implements IField
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
 			this.type = this.type.applyState(state, context);
+		}
+		else if (state == CompilerState.RESOLVE)
+		{
+			if (this.value != null)
+			{
+				this.value = this.value.applyState(state, context);
+			}
+			
+			for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
+			{
+				Annotation a = iterator.next();
+				if (this.processAnnotation(a))
+				{
+					iterator.remove();
+					continue;
+				}
+				
+				a.applyState(state, context);
+			}
+			return this;
 		}
 		
 		if (this.value != null)

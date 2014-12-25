@@ -189,6 +189,12 @@ public enum Modifiers
 	 */
 	public static final int	PREFIX					= 0x00040000;
 	
+	/**
+	 * Dyvil override modifier. This modifier is a shortcut for the @Override
+	 * annotation.
+	 */
+	public static final int	OVERRIDE				= 0x00080000;
+	
 	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM_CLASS | OBJECT_CLASS | MODULE;
 	public static final int	ACCESS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE;
 	public static final int	MEMBER_MODIFIERS		= ACCESS_MODIFIERS | STATIC | FINAL;
@@ -335,6 +341,10 @@ public enum Modifiers
 		{
 			sb.append("implicit ");
 		}
+		if ((mod & OVERRIDE) == OVERRIDE)
+		{
+			sb.append("override ");
+		}
 	}
 	
 	private static void writeFieldModifiers(int mod, StringBuilder sb)
@@ -404,6 +414,9 @@ public enum Modifiers
 		{
 			sb.append("prefix ");
 		}
+		if ((mod & OVERRIDE) == OVERRIDE) {
+			sb.append("override ");
+		}
 	}
 	
 	private static void writeParameterModifier(int mod, StringBuilder sb)
@@ -414,7 +427,7 @@ public enum Modifiers
 		}
 		if ((mod & BYREF) == BYREF)
 		{
-			sb.append("ref ");
+			sb.append("byref ");
 		}
 	}
 	
@@ -526,6 +539,8 @@ public enum Modifiers
 			return IMPLICIT;
 		case "prefix":
 			return PREFIX;
+		case "override":
+			return OVERRIDE;
 		}
 		return -1;
 	}
@@ -538,7 +553,7 @@ public enum Modifiers
 			return FINAL;
 		case "const":
 			return FINAL;
-		case "ref":
+		case "byref":
 			return BYREF;
 		}
 		return -1;

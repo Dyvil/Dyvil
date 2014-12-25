@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
+import java.util.Iterator;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.CompilerState;
@@ -72,15 +73,22 @@ public class Parameter extends Member implements IField
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		if ("dyvil.lang.annotation.byref".equals(annotation.name))
-		{
-			this.modifiers |= Modifiers.BYREF;
-		}
-		else
+		if (!this.processAnnotation(annotation))
 		{
 			annotation.target = ElementType.PARAMETER;
 			this.annotations.add(annotation);
 		}
+	}
+	
+	private boolean processAnnotation(Annotation annotation)
+	{
+		String name = annotation.type.qualifiedName;
+		if ("dyvil.lang.annotation.byref".equals(name))
+		{
+			this.modifiers |= Modifiers.BYREF;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -90,6 +98,22 @@ public class Parameter extends Member implements IField
 		{
 			this.type = this.type.resolve(context);
 		}
+		else if (state == CompilerState.RESOLVE)
+		{
+			for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
+			{
+				Annotation a = iterator.next();
+				if (this.processAnnotation(a))
+				{
+					iterator.remove();
+					continue;
+				}
+				
+				a.applyState(state, context);
+			}
+			return this;
+		}
+		
 		Util.applyState(this.annotations, state, context);
 		return this;
 	}
@@ -129,7 +153,8 @@ public class Parameter extends Member implements IField
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (Annotation a : this.annotations) {
+		for (Annotation a : this.annotations)
+		{
 			a.toString(prefix, buffer);
 			buffer.append(' ');
 		}
