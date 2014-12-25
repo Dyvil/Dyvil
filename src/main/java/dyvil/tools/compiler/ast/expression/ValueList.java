@@ -38,7 +38,14 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public boolean isConstant()
 	{
-		return false;
+		for (IValue v : this.values)
+		{
+			if (!v.isConstant())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	@Override

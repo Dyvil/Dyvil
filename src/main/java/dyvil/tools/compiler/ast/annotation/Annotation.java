@@ -123,6 +123,13 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 				}
 				
 				IValue value = entry.getValue();
+				
+				if (!value.isConstant())
+				{
+					state.addMarker(new SemanticError(value.getPosition(), "The annotation value '" + key + "' has to be a constant expression"));
+					continue;
+				}
+				
 				Type type = m.getType();
 				if (!Type.isSuperType(type, value.getType()))
 				{

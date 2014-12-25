@@ -142,6 +142,17 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 				this.instance = null;
 			}
 		}
+		else if (state == CompilerState.FOLD_CONSTANTS)
+		{
+			if (this.field.hasModifier(Modifiers.CONST))
+			{
+				IValue v = this.field.getValue();
+				if (v != null)
+				{
+					return v;
+				}
+			}
+		}
 		
 		if (this.instance != null)
 		{

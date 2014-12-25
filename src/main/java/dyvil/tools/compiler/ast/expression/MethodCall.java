@@ -236,6 +236,10 @@ public class MethodCall extends Call implements INamed, IValued
 		{
 			for (IValue v : array.values)
 			{
+				if (v instanceof FieldAccess)
+				{
+					v = v.applyState(CompilerState.FOLD_CONSTANTS, null);
+				}
 				writer.visitInsn(((IntValue) v).value);
 			}
 			return;

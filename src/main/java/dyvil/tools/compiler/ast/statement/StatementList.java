@@ -101,7 +101,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		else if (state == CompilerState.CHECK)
 		{
-			Type type = this.requiredType;
+			Type type = this.getType();
 			if (this.isArray)
 			{
 				type.arrayDimensions--;
