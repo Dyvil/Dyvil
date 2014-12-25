@@ -167,17 +167,18 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			Type t = this.getType();
 			int len = this.values.size();
 			int opcode = t.getArrayStoreOpcode();
+			Object frame = t.getFrameType();
 			
 			writer.visitLdcInsn(len);
 			writer.visitTypeInsn(Opcodes.ANEWARRAY, t);
 			
 			for (int i = 0; i < len; i++)
 			{
-				writer.visitInsn(Opcodes.DUP);
+				writer.visitInsn(Opcodes.DUP, frame);
 				IValue value = this.values.get(i);
 				writer.visitLdcInsn(i);
 				value.writeExpression(writer);
-				writer.visitInsn(opcode);
+				writer.visitInsn(opcode, null, 3);
 			}
 		}
 		else

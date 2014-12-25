@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
@@ -9,6 +8,7 @@ import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
@@ -112,15 +112,15 @@ public class Parameter extends Member implements IField
 	}
 	
 	@Override
-	public void writeGet(MethodVisitor visitor)
+	public void writeGet(MethodWriter writer)
 	{
-		visitor.visitVarInsn(this.type.getLoadOpcode(), this.index);
+		writer.visitVarInsn(this.type.getLoadOpcode(), this.index, this.type.getFrameType());
 	}
 	
 	@Override
-	public void writeSet(MethodVisitor visitor)
+	public void writeSet(MethodWriter writer)
 	{
-		visitor.visitVarInsn(this.type.getStoreOpcode(), this.index);
+		writer.visitVarInsn(this.type.getStoreOpcode(), this.index, this.type.getFrameType());
 	}
 	
 	@Override

@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.api;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 
 public interface IField extends IASTNode, INamed, ITyped, IModified, IAnnotatable, IValued
 {
@@ -17,9 +17,9 @@ public interface IField extends IASTNode, INamed, ITyped, IModified, IAnnotatabl
 	
 	public void write(ClassWriter writer);
 	
-	public void writeGet(MethodVisitor visitor);
+	public void writeGet(MethodWriter writer);
 	
-	public void writeSet(MethodVisitor visitor);
+	public void writeSet(MethodWriter writer);
 	
 	public String getDescription();
 	

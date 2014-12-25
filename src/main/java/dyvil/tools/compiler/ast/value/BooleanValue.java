@@ -53,11 +53,11 @@ public class BooleanValue extends ASTNode implements IValue
 	{
 		if (this.value)
 		{
-			visitor.visitInsn(Opcodes.ICONST_1);
+			visitor.visitInsn(Opcodes.ICONST_1, Type.INT);
 		}
 		else
 		{
-			visitor.visitInsn(Opcodes.ICONST_0);
+			visitor.visitInsn(Opcodes.ICONST_0, Type.INT);
 		}
 	}
 	
@@ -71,11 +71,11 @@ public class BooleanValue extends ASTNode implements IValue
 	{
 		if (this.value)
 		{
-			writer.visitInsn(Opcodes.ICONST_1);
+			writer.visitInsn(Opcodes.ICONST_1, Type.INT);
 		}
 		else
 		{
-			writer.visitInsn(Opcodes.ICONST_0);
+			writer.visitInsn(Opcodes.ICONST_0, Type.INT);
 		}
 		writer.visitJumpInsn(Opcodes.IFEQ, label);
 	}

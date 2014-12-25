@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -11,6 +10,7 @@ import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Modifiers;
 
@@ -102,7 +102,7 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void writeGet(MethodVisitor visitor)
+	public void writeGet(MethodWriter writer)
 	{
 		int opcode;
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
@@ -117,11 +117,11 @@ public class Field extends Member implements IField
 		String owner = this.getTheClass().getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
-		visitor.visitFieldInsn(opcode, owner, name, desc);
+		writer.visitFieldInsn(opcode, owner, name, desc, this.type.getFrameType());
 	}
 	
 	@Override
-	public void writeSet(MethodVisitor visitor)
+	public void writeSet(MethodWriter writer)
 	{
 		int opcode;
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
@@ -136,7 +136,7 @@ public class Field extends Member implements IField
 		String owner = this.getTheClass().getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
-		visitor.visitFieldInsn(opcode, owner, name, desc);
+		writer.visitFieldInsn(opcode, owner, name, desc, this.type.getFrameType());
 	}
 	
 	@Override

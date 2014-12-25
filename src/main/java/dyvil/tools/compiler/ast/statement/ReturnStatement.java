@@ -82,11 +82,12 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 		if (this.value != null)
 		{
 			this.value.writeExpression(writer);
-			writer.visitInsn(this.value.getType().getReturnOpcode());
+			Type type = this.value.getType();
+			writer.visitInsn(type.getReturnOpcode(), type.getFrameType());
 		}
 		else
 		{
-			writer.visitInsn(Opcodes.RETURN);
+			writer.visitInsn(Opcodes.RETURN, null);
 		}
 	}
 }

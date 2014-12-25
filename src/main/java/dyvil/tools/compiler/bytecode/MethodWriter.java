@@ -7,7 +7,6 @@ import java.util.Stack;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
-
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.OpcodeUtil;
@@ -15,6 +14,7 @@ import dyvil.tools.compiler.util.OpcodeUtil;
 public class MethodWriter extends MethodVisitor
 {
 	private boolean	hasReturn;
+	private int		maxStack;
 	
 	private List	locals		= new ArrayList();
 	private Stack	typeStack	= new Stack();
@@ -27,7 +27,17 @@ public class MethodWriter extends MethodVisitor
 	public void setConstructor(Type type)
 	{
 		this.locals.add(UNINITIALIZED_THIS);
-		this.typeStack.add(type.getFrameType());
+		this.push(type.getFrameType());
+	}
+	
+	public void push(Object type)
+	{
+		this.typeStack.add(type);
+		int size = this.typeStack.size();
+		if (size > this.maxStack)
+		{
+			this.maxStack = size;
+		}
 	}
 	
 	@Override
@@ -56,7 +66,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitLdcInsn(int value)
 	{
-		this.typeStack.push(INTEGER);
+		this.push(INTEGER);
 		switch (value)
 		{
 		case -1:
@@ -86,7 +96,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitLdcInsn(long value)
 	{
-		this.typeStack.push(LONG);
+		this.push(LONG);
 		if (value == 0L)
 		{
 			this.mv.visitInsn(LCONST_0);
@@ -102,7 +112,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitLdcInsn(float value)
 	{
-		this.typeStack.push(FLOAT);
+		this.push(FLOAT);
 		if (value == 0F)
 		{
 			this.mv.visitInsn(FCONST_0);
@@ -123,7 +133,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitLdcInsn(double value)
 	{
-		this.typeStack.push(DOUBLE);
+		this.push(DOUBLE);
 		if (value == 0D)
 		{
 			this.mv.visitInsn(DCONST_0);
@@ -139,7 +149,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitLdcInsn(String value)
 	{
-		this.typeStack.push("Ljava/lang/String;");
+		this.push("Ljava/lang/String;");
 		this.mv.visitLdcInsn(value);
 	}
 	
@@ -150,23 +160,23 @@ public class MethodWriter extends MethodVisitor
 		Class c = obj.getClass();
 		if (c == String.class)
 		{
-			this.typeStack.push("Ljava/lang/String;");
+			this.push("Ljava/lang/String;");
 		}
 		else if (c == Integer.class)
 		{
-			this.typeStack.push(INTEGER);
+			this.push(INTEGER);
 		}
 		else if (c == Long.class)
 		{
-			this.typeStack.push(LONG);
+			this.push(LONG);
 		}
 		else if (c == Float.class)
 		{
-			this.typeStack.push(FLOAT);
+			this.push(FLOAT);
 		}
 		else if (c == Double.class)
 		{
-			this.typeStack.push(DOUBLE);
+			this.push(DOUBLE);
 		}
 		this.mv.visitLdcInsn(obj);
 	}
@@ -186,18 +196,43 @@ public class MethodWriter extends MethodVisitor
 	}
 	
 	@Override
-	public void visitInsn(int op)
+	public void visitInsn(int opcode)
 	{
-		this.hasReturn = OpcodeUtil.isReturnOpcode(op);
+		this.mv.visitInsn(opcode);
+	}
+	
+	public void visitInsn(int opcode, Object type)
+	{
+		this.hasReturn = OpcodeUtil.isReturnOpcode(opcode);
 		if (this.hasReturn)
 		{
 			this.typeStack.clear();
 		}
-		else if (op == ACONST_NULL)
+		if (type != null)
 		{
-			this.typeStack.push(NULL);
+			this.typeStack.push(type);
 		}
-		this.mv.visitInsn(op);
+		this.mv.visitInsn(opcode);
+	}
+	
+	public void visitInsn(int opcode, Object type, int pop)
+	{
+		this.hasReturn = OpcodeUtil.isReturnOpcode(opcode);
+		if (this.hasReturn)
+		{
+			this.typeStack.clear();
+		}
+		
+		if (type != null)
+		{
+			this.typeStack.push(type);
+		}
+		while (pop > 0)
+		{
+			this.typeStack.pop();
+			pop--;
+		}
+		this.mv.visitInsn(opcode);
 	}
 	
 	@Override
@@ -217,13 +252,45 @@ public class MethodWriter extends MethodVisitor
 		this.mv.visitTypeInsn(opcode, type.getInternalName());
 	}
 	
+	@Override
+	@Deprecated
+	public void visitVarInsn(int opcode, int index)
+	{
+		this.mv.visitVarInsn(opcode, index);
+	}
+	
+	public void visitVarInsn(int opcode, int index, Object type)
+	{
+		if (type != null)
+		{
+			this.push(type);
+		}
+		this.mv.visitVarInsn(opcode, index);
+	}
+	
+	@Override
+	@Deprecated
+	public void visitFieldInsn(int opcode, String owner, String name, String desc)
+	{
+		this.mv.visitFieldInsn(opcode, owner, name, desc);
+	}
+	
+	public void visitFieldInsn(int opcode, String owner, String name, String desc, Object type)
+	{
+		if (type != null)
+		{
+			this.push(type);
+		}
+		this.mv.visitFieldInsn(opcode, owner, name, desc);
+	}
+	
 	public void visitEnd(Type type)
 	{
 		if (!this.hasReturn)
 		{
 			this.mv.visitInsn(type.getReturnOpcode());
 		}
-		this.mv.visitMaxs(this.typeStack.capacity(), this.locals.size());
+		this.mv.visitMaxs(this.maxStack, this.locals.size());
 		this.mv.visitEnd();
 	}
 }
