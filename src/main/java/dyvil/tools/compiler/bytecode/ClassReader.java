@@ -5,7 +5,6 @@ import java.io.InputStream;
 
 import jdk.internal.org.objectweb.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.classes.AnnotationVisitorImpl;
 import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.AnnotationType;

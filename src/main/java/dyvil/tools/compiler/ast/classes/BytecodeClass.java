@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.bytecode.AnnotationVisitorImpl;
 import dyvil.tools.compiler.util.ClassFormat;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;

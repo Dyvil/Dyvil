@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.classes;
+package dyvil.tools.compiler.bytecode;
 
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -46,7 +46,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		ValueList valueList = new ValueList(null);
+		ValueList valueList = new ValueList(null, true);
 		this.annotation.addValue(key, valueList);
 		return new AnnotationVisitorArray(this.api, valueList);
 	}
