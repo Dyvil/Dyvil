@@ -4,6 +4,7 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.Member;
@@ -62,6 +63,19 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
+	public void addAnnotation(Annotation annotation)
+	{
+		if ("dyvil.lang.annotation.lazy".equals(annotation.name))
+		{
+			this.modifiers |= Modifiers.LAZY;
+		}
+		else
+		{
+			this.annotations.add(annotation);
+		}
+	}
+	
+	@Override
 	public Field applyState(CompilerState state, IContext context)
 	{
 		if (state == CompilerState.RESOLVE_TYPES)
@@ -83,7 +97,7 @@ public class Field extends Member implements IField
 		
 		if ((this.modifiers & Modifiers.LAZY) != 0)
 		{
-			writer.visitAnnotation("Ldyvil/lang/annotation/lazy", true);
+			writer.visitAnnotation("Ldyvil/lang/annotation/lazy;", true);
 		}
 	}
 	

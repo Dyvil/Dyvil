@@ -1,11 +1,13 @@
 package dyvil.tools.compiler.ast.annotation;
 
+import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
+import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IMethod;
@@ -22,13 +24,13 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Util;
 
 public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 {
+	public String				name;
 	public Type					type;
 	public Map<String, IValue>	parameters	= new HashMap();
-	
-	private String				name;
 	
 	public Annotation(ICodePosition position, Type type)
 	{
@@ -117,33 +119,76 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 				}
 			}
 		}
+		
+		Util.applyState(this.parameters, state, context);
 		return this;
+	}
+	
+	public void write(ClassWriter writer)
+	{
+		RetentionPolicy retention = this.getRetention();
+		if (retention != RetentionPolicy.SOURCE)
+		{
+			boolean visible = retention == RetentionPolicy.RUNTIME;
+			
+			AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
+			for (Entry<String, IValue> entry : this.parameters.entrySet())
+			{
+				visitValue(visitor, entry.getKey(), entry.getValue());
+			}
+		}
 	}
 	
 	public void write(MethodWriter writer)
 	{
-		boolean visible = false;
-		Annotation retention = this.type.theClass.getAnnotation(Type.ARetention);
-		if (retention != null)
+		RetentionPolicy retention = this.getRetention();
+		if (retention != RetentionPolicy.SOURCE)
 		{
-			EnumValue value = (EnumValue) retention.getValue("value");
-			switch (value.name)
+			boolean visible = retention == RetentionPolicy.RUNTIME;
+			
+			AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
+			for (Entry<String, IValue> entry : this.parameters.entrySet())
 			{
-			case "SOURCE":
-				return;
-			case "CLASS":
-				break;
-			case "RUNTIME":
-				visible = true;
-				break;
+				visitValue(visitor, entry.getKey(), entry.getValue());
 			}
 		}
-		
-		AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
-		for (Entry<String, IValue> entry : this.parameters.entrySet())
+	}
+	
+	public void write(MethodWriter writer, int index)
+	{
+		RetentionPolicy retention = this.getRetention();
+		if (retention != RetentionPolicy.SOURCE)
 		{
-			visitValue(visitor, entry.getKey(), entry.getValue());
+			boolean visible = retention == RetentionPolicy.RUNTIME;
+			
+			AnnotationVisitor visitor = writer.visitParameterAnnotation(index, this.type.getExtendedName(), visible);
+			for (Entry<String, IValue> entry : this.parameters.entrySet())
+			{
+				visitValue(visitor, entry.getKey(), entry.getValue());
+			}
 		}
+	}
+	
+	private RetentionPolicy getRetention()
+	{
+		if (this.type.theClass != null)
+		{
+			Annotation retention = this.type.theClass.getAnnotation(Type.ARetention);
+			if (retention != null)
+			{
+				EnumValue value = (EnumValue) retention.getValue("value");
+				switch (value.name)
+				{
+				case "SOURCE":
+					return RetentionPolicy.SOURCE;
+				case "CLASS":
+					return RetentionPolicy.CLASS;
+				case "RUNTIME":
+					return RetentionPolicy.RUNTIME;
+				}
+			}
+		}
+		return RetentionPolicy.CLASS;
 	}
 	
 	private static void visitValue(AnnotationVisitor visitor, String key, IValue value)

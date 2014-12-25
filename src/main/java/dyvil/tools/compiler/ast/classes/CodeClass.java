@@ -59,6 +59,11 @@ public class CodeClass extends ASTNode implements IClass
 		this.body = body;
 	}
 	
+	public void setClassType(int type)
+	{
+		this.type = type;
+	}
+	
 	public int getClassType()
 	{
 		return this.type;
@@ -79,7 +84,7 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean addModifier(int mod)
 	{
-		boolean flag = (this.modifiers & mod) != 0;
+		boolean flag = (this.modifiers & mod) == mod;
 		this.modifiers |= mod;
 		return flag;
 	}
@@ -265,6 +270,7 @@ public class CodeClass extends ASTNode implements IClass
 			Util.applyState(this.interfaces, state, context);
 		}
 		
+		Util.applyState(this.annotations, state, this);
 		this.body.applyState(state, this);
 		return this;
 	}
@@ -409,6 +415,11 @@ public class CodeClass extends ASTNode implements IClass
 		if ((this.modifiers & Modifiers.MODULE) != 0)
 		{
 			writer.visitAnnotation("Ldyvil/lang/annotation/module;", true);
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.write(writer);
 		}
 		
 		for (IField f : fields)

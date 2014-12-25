@@ -79,7 +79,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				}
 				return true;
 			}
-			else if (value.startsWith("@"))
+			else if (value.charAt(0) == '@')
 			{
 				pm.pushParser(new AnnotationParser(this.theClass, this), true);
 				return true;

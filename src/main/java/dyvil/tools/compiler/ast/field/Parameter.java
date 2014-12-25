@@ -3,11 +3,14 @@ package dyvil.tools.compiler.ast.field;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Util;
 
 public class Parameter extends Member implements IField
 {
@@ -65,18 +68,47 @@ public class Parameter extends Member implements IField
 	}
 	
 	@Override
+	public void addAnnotation(Annotation annotation)
+	{
+		if ("dyvil.lang.annotation.byref".equals(annotation.name))
+		{
+			this.modifiers |= Modifiers.BYREF;
+		}
+		else
+		{
+			this.annotations.add(annotation);
+		}
+	}
+	
+	@Override
 	public Parameter applyState(CompilerState state, IContext context)
 	{
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
 			this.type = this.type.resolve(context);
 		}
+		Util.applyState(this.annotations, state, context);
 		return this;
 	}
 	
 	@Override
 	public void write(ClassWriter writer)
 	{
+	}
+	
+	public void write(MethodWriter writer)
+	{
+		writer.visitParameter(this.name, this.type, this.index);
+		
+		if ((this.modifiers & Modifiers.BYREF) != 0)
+		{
+			writer.visitParameterAnnotation(this.index, "Ldyvil/lang/annotation/byref;", true);
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.write(writer, this.index);
+		}
 	}
 	
 	@Override
@@ -94,6 +126,11 @@ public class Parameter extends Member implements IField
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		for (Annotation a : this.annotations) {
+			a.toString(prefix, buffer);
+			buffer.append(' ');
+		}
+		
 		this.type.toString("", buffer);
 		buffer.append(' ').append(this.name);
 	}

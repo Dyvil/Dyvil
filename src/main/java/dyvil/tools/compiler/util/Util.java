@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.util;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -164,6 +163,19 @@ public class Util
 			if (v1 != v2)
 			{
 				list.set(i, v2);
+			}
+		}
+	}
+	
+	public static <T extends IASTNode> void applyState(Map<?, T> map, CompilerState state, IContext context)
+	{
+		for (Entry<?, T> entry : map.entrySet())
+		{
+			IASTNode v1 = entry.getValue();
+			T v2 = (T) v1.applyState(state, context);
+			if (v1 != v2)
+			{
+				entry.setValue(v2);
 			}
 		}
 	}

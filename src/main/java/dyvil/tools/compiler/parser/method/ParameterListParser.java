@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -36,6 +37,11 @@ public class ParameterListParser extends Parser
 			if ((i = Modifiers.PARAMETER.parse(value)) != -1)
 			{
 				this.parameter.addModifier(i);
+				return true;
+			}
+			else if (value.charAt(0) == '@')
+			{
+				pm.pushParser(new AnnotationParser(this.context, this.parameter), true);
 				return true;
 			}
 			else if (token.isType(IToken.TYPE_CLOSE_BRACKET))

@@ -111,6 +111,27 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public void addAnnotation(Annotation annotation)
+	{
+		if ("dyvil.lang.annotation.inline".equals(annotation.name))
+		{
+			this.modifiers |= Modifiers.INLINE;
+		}
+		if ("dyvil.lang.annotation.implicit".equals(annotation.name))
+		{
+			this.modifiers |= Modifiers.IMPLICIT;
+		}
+		if ("dyvil.lang.annotation.prefix".equals(annotation.name))
+		{
+			this.modifiers |= Modifiers.PREFIX;
+		}
+		else
+		{
+			this.annotations.add(annotation);
+		}
+	}
+	
+	@Override
 	public void checkArguments(CompilerState state, IValue instance, List<IValue> arguments)
 	{
 		int pOff = 0;
@@ -394,12 +415,7 @@ public class Method extends Member implements IMethod
 		for (Parameter param : this.parameters)
 		{
 			param.index = index++;
-			mw.visitParameter(param.name, param.type, index);
-			
-			if (param.hasModifier(Modifiers.BYREF))
-			{
-				mw.visitParameterAnnotation(index, "Ldyvil/lang/annotation/ref;", true);
-			}
+			param.write(mw);
 		}
 		
 		if (this.statement != null)
