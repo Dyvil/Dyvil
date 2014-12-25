@@ -490,10 +490,15 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix);
-		buffer.append(Modifiers.CLASS.toString(this.modifiers));
-		buffer.append(Modifiers.CLASS_TYPE.toString(this.type));
-		buffer.append(this.name);
+		for (Annotation annotation : this.annotations)
+		{
+			buffer.append(prefix);
+			annotation.toString(prefix, buffer);
+			buffer.append('\n');
+		}
+		
+		buffer.append(prefix).append(Modifiers.CLASS.toString(this.modifiers));
+		buffer.append(Modifiers.CLASS_TYPE.toString(this.type)).append(this.name);
 		
 		if (this.superClass != null)
 		{

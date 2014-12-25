@@ -40,11 +40,12 @@ public class Type extends ASTNode implements IContext
 	public static Type		STRING		= new Type("java.lang.String");
 	
 	public static Type		ABytecode	= new Type("dyvil.lang.annotation.Bytecode");
+	public static Type		ARetention	= new Type("java.lang.annotation.Retention");
+	public static Type		ATarget		= new Type("java.lang.annotation.Target");
 	
 	public String			name;
 	public String			qualifiedName;
 	public IClass			theClass;
-	public char				seperator;
 	public int				arrayDimensions;
 	
 	public Type()
@@ -95,6 +96,10 @@ public class Type extends ASTNode implements IContext
 		NUMBER.theClass = Package.dyvilLang.resolveClass("Number");
 		INTEGER.theClass = Package.dyvilLang.resolveClass("Integer");
 		STRING.theClass = Package.javaLang.resolveClass("String");
+		
+		ABytecode.theClass = Package.dyvilLangAnnotation.resolveClass("Bytecode");
+		ARetention.theClass = Package.javaLangAnnotation.resolveClass("Retention");
+		ATarget.theClass = Package.javaLangAnnotation.resolveClass("Target");
 	}
 	
 	public static Type findCommonSuperType(Type type1, Type type2)
@@ -166,16 +171,6 @@ public class Type extends ASTNode implements IContext
 	public void setClass(IClass theClass)
 	{
 		this.theClass = theClass;
-	}
-	
-	public void setSeperator(char seperator)
-	{
-		this.seperator = seperator;
-	}
-	
-	public char getSeperator()
-	{
-		return this.seperator;
 	}
 	
 	public void setArrayDimensions(int dimensions)

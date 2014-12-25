@@ -14,10 +14,12 @@ import dyvil.tools.compiler.util.ClassFormat;
 
 public class Package implements IContext
 {
-	public static Package			rootPackage	= new RootPackage(null, null);
+	public static Package			rootPackage			= new RootPackage(null, null);
 	
-	public static Package			dyvilLang	= Library.dyvilLibrary.resolvePackage("dyvil.lang");
-	public static Package			javaLang	= Library.javaLibrary.resolvePackage("java.lang");
+	public static Package			dyvilLang			= Library.dyvilLibrary.resolvePackage("dyvil.lang");
+	public static Package			javaLang			= Library.javaLibrary.resolvePackage("java.lang");
+	public static Package			dyvilLangAnnotation	= Library.dyvilLibrary.resolvePackage("dyvil.lang.annotation");
+	public static Package			javaLangAnnotation	= Library.javaLibrary.resolvePackage("java.lang.annotation");
 	
 	public Package					parent;
 	public String					name;
@@ -26,9 +28,9 @@ public class Package implements IContext
 	
 	public boolean					isExternal;
 	
-	public List<CompilationUnit>	units		= new ArrayList();
-	public List<IClass>				classes		= new ArrayList();
-	public List<Package>			subPackages	= new ArrayList();
+	public List<CompilationUnit>	units				= new ArrayList();
+	public List<IClass>				classes				= new ArrayList();
+	public List<Package>			subPackages			= new ArrayList();
 	
 	public Package(Package parent, String name)
 	{

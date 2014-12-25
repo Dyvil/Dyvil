@@ -35,7 +35,6 @@ public class ThrowsDeclParser extends Parser implements ITyped
 		{
 			if (",".equals(value) || ";".equals(value))
 			{
-				this.type.setSeperator(value.charAt(0));
 				this.thrower.addThrows(this.type);
 				this.mode = 0;
 				return true;

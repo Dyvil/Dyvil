@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.api.IValueMap;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.EnumValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -121,8 +122,24 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	
 	public void write(MethodWriter writer)
 	{
-		// TODO Visible
-		AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), true);
+		boolean visible = false;
+		Annotation retention = this.type.theClass.getAnnotation(Type.ARetention);
+		if (retention != null)
+		{
+			EnumValue value = (EnumValue) retention.getValue("value");
+			switch (value.name)
+			{
+			case "SOURCE":
+				return;
+			case "CLASS":
+				break;
+			case "RUNTIME":
+				visible = true;
+				break;
+			}
+		}
+		
+		AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
 		for (Entry<String, IValue> entry : this.parameters.entrySet())
 		{
 			visitValue(visitor, entry.getKey(), entry.getValue());
