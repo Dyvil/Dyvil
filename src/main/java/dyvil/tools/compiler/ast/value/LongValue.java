@@ -51,7 +51,7 @@ public class LongValue extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitLdcInsn(Long.valueOf(this.value));
+		writer.visitLdcInsn(this.value);
 	}
 	
 	@Override
@@ -62,8 +62,7 @@ public class LongValue extends ASTNode implements IValue
 	@Override
 	public void writeJump(MethodWriter visitor, Label label)
 	{
-		visitor.visitLdcInsn(Long.valueOf(this.value));
-		visitor.visitLdcInsn(Long.valueOf(0));
+		visitor.visitLdcInsn(this.value);
 		visitor.visitJumpInsn(Opcodes.IFNE, label);
 	}
 	

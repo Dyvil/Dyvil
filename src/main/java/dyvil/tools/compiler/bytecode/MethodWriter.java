@@ -6,8 +6,7 @@ import java.util.Stack;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-
-import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -27,7 +26,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void setConstructor(Type type)
 	{
-		this.locals.add(Opcodes.UNINITIALIZED_THIS);
+		this.locals.add(UNINITIALIZED_THIS);
 		this.typeStack.add(type.getFrameType());
 	}
 	
@@ -55,7 +54,97 @@ public class MethodWriter extends MethodVisitor
 		this.mv.visitLocalVariable(name, type.getExtendedName(), type.getSignature(), start, end, index);
 	}
 	
+	public void visitLdcInsn(int value)
+	{
+		this.typeStack.push(INTEGER);
+		switch (value)
+		{
+		case -1:
+			this.mv.visitInsn(ICONST_M1);
+			return;
+		case 0:
+			this.mv.visitInsn(ICONST_0);
+			return;
+		case 1:
+			this.mv.visitInsn(ICONST_1);
+			return;
+		case 2:
+			this.mv.visitInsn(ICONST_2);
+			return;
+		case 3:
+			this.mv.visitInsn(ICONST_3);
+			return;
+		case 4:
+			this.mv.visitInsn(ICONST_4);
+			return;
+		case 5:
+			this.mv.visitInsn(ICONST_5);
+			return;
+		}
+		this.mv.visitLdcInsn(Integer.valueOf(value));
+	}
+	
+	public void visitLdcInsn(long value)
+	{
+		this.typeStack.push(LONG);
+		if (value == 0L)
+		{
+			this.mv.visitInsn(LCONST_0);
+			return;
+		}
+		if (value == 1L)
+		{
+			this.mv.visitInsn(LCONST_1);
+			return;
+		}
+		this.mv.visitLdcInsn(Long.valueOf(value));
+	}
+	
+	public void visitLdcInsn(float value)
+	{
+		this.typeStack.push(FLOAT);
+		if (value == 0F)
+		{
+			this.mv.visitInsn(FCONST_0);
+			return;
+		}
+		if (value == 1F)
+		{
+			this.mv.visitInsn(FCONST_1);
+			return;
+		}
+		if (value == 2F)
+		{
+			this.mv.visitInsn(FCONST_2);
+			return;
+		}
+		this.mv.visitLdcInsn(Float.valueOf(value));
+	}
+	
+	public void visitLdcInsn(double value)
+	{
+		this.typeStack.push(DOUBLE);
+		if (value == 0D)
+		{
+			this.mv.visitInsn(DCONST_0);
+			return;
+		}
+		if (value == 1D)
+		{
+			this.mv.visitInsn(DCONST_1);
+			return;
+		}
+		this.mv.visitLdcInsn(Double.valueOf(value));
+	}
+	
+	public void visitLdcInsn(String value)
+	{
+		this.typeStack.push("Ljava/lang/String;");
+		this.mv.visitLdcInsn(value);
+	}
+	
 	@Override
+	@Deprecated
 	public void visitLdcInsn(Object obj)
 	{
 		Class c = obj.getClass();
@@ -65,19 +154,19 @@ public class MethodWriter extends MethodVisitor
 		}
 		else if (c == Integer.class)
 		{
-			this.typeStack.push(Opcodes.INTEGER);
+			this.typeStack.push(INTEGER);
 		}
 		else if (c == Long.class)
 		{
-			this.typeStack.push(Opcodes.LONG);
+			this.typeStack.push(LONG);
 		}
 		else if (c == Float.class)
 		{
-			this.typeStack.push(Opcodes.FLOAT);
+			this.typeStack.push(FLOAT);
 		}
 		else if (c == Double.class)
 		{
-			this.typeStack.push(Opcodes.DOUBLE);
+			this.typeStack.push(DOUBLE);
 		}
 		this.mv.visitLdcInsn(obj);
 	}
@@ -86,14 +175,14 @@ public class MethodWriter extends MethodVisitor
 	public void visitJumpInsn(int opcode, Label label)
 	{
 		this.mv.visitJumpInsn(opcode, label);
-		this.mv.visitFrame(Opcodes.F_NEW, this.locals.size(), this.locals.toArray(), this.typeStack.size(), this.typeStack.toArray());
+		this.mv.visitFrame(F_NEW, this.locals.size(), this.locals.toArray(), this.typeStack.size(), this.typeStack.toArray());
 	}
 	
 	@Override
 	public void visitLabel(Label label)
 	{
 		this.mv.visitLabel(label);
-		this.mv.visitFrame(Opcodes.F_SAME, this.locals.size(), this.locals.toArray(), this.typeStack.size(), this.typeStack.toArray());
+		this.mv.visitFrame(F_SAME, this.locals.size(), this.locals.toArray(), this.typeStack.size(), this.typeStack.toArray());
 	}
 	
 	@Override
@@ -104,9 +193,9 @@ public class MethodWriter extends MethodVisitor
 		{
 			this.typeStack.clear();
 		}
-		else if (op == Opcodes.ACONST_NULL)
+		else if (op == ACONST_NULL)
 		{
-			this.typeStack.push(Opcodes.NULL);
+			this.typeStack.push(NULL);
 		}
 		this.mv.visitInsn(op);
 	}
@@ -120,9 +209,9 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitTypeInsn(int opcode, Type type)
 	{
-		if ((opcode == Opcodes.ANEWARRAY || opcode == Opcodes.NEWARRAY) && type instanceof PrimitiveType)
+		if ((opcode == ANEWARRAY || opcode == NEWARRAY) && type instanceof PrimitiveType)
 		{
-			this.mv.visitIntInsn(Opcodes.NEWARRAY, ((PrimitiveType) type).typecode);
+			this.mv.visitIntInsn(NEWARRAY, ((PrimitiveType) type).typecode);
 			return;
 		}
 		this.mv.visitTypeInsn(opcode, type.getInternalName());

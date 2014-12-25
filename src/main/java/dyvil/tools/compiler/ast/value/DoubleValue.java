@@ -51,7 +51,7 @@ public class DoubleValue extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitLdcInsn(Double.valueOf(this.value));
+		writer.visitLdcInsn(this.value);
 	}
 	
 	@Override
@@ -62,8 +62,7 @@ public class DoubleValue extends ASTNode implements IValue
 	@Override
 	public void writeJump(MethodWriter visitor, Label label)
 	{
-		visitor.visitLdcInsn(Double.valueOf(this.value));
-		visitor.visitLdcInsn(Double.valueOf(0D));
+		visitor.visitLdcInsn(this.value);
 		visitor.visitJumpInsn(Opcodes.IFNE, label);
 	}
 	

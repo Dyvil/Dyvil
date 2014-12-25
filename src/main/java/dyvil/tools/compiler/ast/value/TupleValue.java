@@ -98,7 +98,7 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 				return this.values.get(0).applyState(state, context);
 			}
 		}
-		this.values.replaceAll(v -> v.applyState(state, context));
+		Util.applyState(this.values, state, context);
 		return this;
 	}
 	

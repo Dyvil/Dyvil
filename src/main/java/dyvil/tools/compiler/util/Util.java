@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.api.IASTNode;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
@@ -149,6 +151,20 @@ public class Util
 		else
 		{
 			method.setValue(value);
+		}
+	}
+	
+	public static <T extends IASTNode> void applyState(List<T> list, CompilerState state, IContext context)
+	{
+		int len = list.size();
+		for (int i = 0; i < len; i++)
+		{
+			IASTNode v1 = list.get(i);
+			T v2 = (T) v1.applyState(state, context);
+			if (v1 != v2)
+			{
+				list.set(i, v2);
+			}
 		}
 	}
 	

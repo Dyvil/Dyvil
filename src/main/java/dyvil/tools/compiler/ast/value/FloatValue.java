@@ -51,7 +51,7 @@ public class FloatValue extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitLdcInsn(Float.valueOf(this.value));
+		writer.visitLdcInsn(this.value);
 	}
 	
 	@Override
@@ -62,8 +62,7 @@ public class FloatValue extends ASTNode implements IValue
 	@Override
 	public void writeJump(MethodWriter visitor, Label label)
 	{
-		visitor.visitLdcInsn(Float.valueOf(this.value));
-		visitor.visitLdcInsn(Float.valueOf(0F));
+		visitor.visitLdcInsn(this.value);
 		visitor.visitJumpInsn(Opcodes.IFNE, label);
 	}
 	

@@ -96,7 +96,7 @@ public class MethodCall extends Call implements INamed, IValued
 	{
 		if (state == CompilerState.RESOLVE)
 		{
-			this.arguments.replaceAll(v -> v.applyState(state, context));
+			Util.applyState(this.arguments, state, context);
 			return AccessResolver.resolve(context, this);
 		}
 		else if (state == CompilerState.CHECK)
@@ -111,7 +111,7 @@ public class MethodCall extends Call implements INamed, IValued
 		{
 			this.instance = this.instance.applyState(state, context);
 		}
-		this.arguments.replaceAll(v -> v.applyState(state, context));
+		Util.applyState(this.arguments, state, context);
 		return this;
 	}
 	

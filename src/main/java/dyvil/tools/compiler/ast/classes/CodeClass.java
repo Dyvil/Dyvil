@@ -262,7 +262,7 @@ public class CodeClass extends ASTNode implements IClass
 					this.superClass = this.superClass.resolve(context);
 				}
 			}
-			this.interfaces.replaceAll(t -> t.applyState(state, context));
+			Util.applyState(this.interfaces, state, context);
 		}
 		
 		this.body.applyState(state, this);

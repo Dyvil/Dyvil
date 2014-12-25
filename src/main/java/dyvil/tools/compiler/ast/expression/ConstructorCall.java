@@ -80,7 +80,7 @@ public class ConstructorCall extends Call implements ITyped
 		}
 		else if (state == CompilerState.RESOLVE)
 		{
-			this.arguments.replaceAll(a -> a.applyState(state, context));
+			Util.applyState(this.arguments, state, context);
 			if (!this.resolve(context, null))
 			{
 				state.addMarker(new SemanticError(this.position, "The constructor '' could not be resolved"));
@@ -88,7 +88,7 @@ public class ConstructorCall extends Call implements ITyped
 			return this;
 		}
 		
-		this.arguments.replaceAll(a -> a.applyState(state, context));
+		Util.applyState(this.arguments, state, context);
 		return this;
 	}
 	

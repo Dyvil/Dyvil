@@ -51,7 +51,7 @@ public class CharValue extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter visitor)
 	{
-		visitor.visitLdcInsn(Integer.valueOf(this.value));
+		visitor.visitLdcInsn(this.value);
 	}
 	
 	@Override
@@ -62,9 +62,8 @@ public class CharValue extends ASTNode implements IValue
 	@Override
 	public void writeJump(MethodWriter visitor, Label label)
 	{
-		visitor.visitLdcInsn(Integer.valueOf(this.value));
-		visitor.visitLdcInsn(Integer.valueOf(0));
-		visitor.visitJumpInsn(Opcodes.IF_ICMPNE, label);
+		visitor.visitLdcInsn(this.value);
+		visitor.visitJumpInsn(Opcodes.IFNE, label);
 	}
 	
 	@Override
