@@ -1,67 +1,37 @@
 package dyvil.lang;
 
+import dyvil.lang.annotation.Bytecode;
+import dyvil.reflect.Opcodes;
+
 public abstract class Array<T>
 {
-	protected Class<T>	type;
-	protected Object[]	data;
+	@Bytecode(postfixOpcode = Opcodes.AALOAD)
+	public abstract T apply(int i);
 	
-	protected Array(int size)
-	{
-		this.data = new Object[size];
-	}
+	@Bytecode(postfixOpcode = Opcodes.AASTORE)
+	public abstract void update(int i, T v);
 	
-	protected Array(Object[] data)
-	{
-		this.data = data;
-	}
+	@Bytecode(postfixOpcode = Opcodes.IALOAD)
+	public abstract int apply_int(int i);
 	
-	protected Array(Class<T> type, int size)
-	{
-		this.type = type;
-		this.data = new Object[size];
-	}
+	@Bytecode(postfixOpcode = Opcodes.IASTORE)
+	public abstract void update_int(int i, int v);
 	
-	public abstract Array<T> $eq(Object[] data);
+	@Bytecode(postfixOpcode = Opcodes.LALOAD)
+	public abstract long apply_long(int i);
 	
-	public T get(int i)
-	{
-		return (T) this.data[i];
-	}
+	@Bytecode(postfixOpcode = Opcodes.LASTORE)
+	public abstract void update_long(int i, long v);
 	
-	public void set(int i, T v)
-	{
-		this.data[i] = v;
-	}
+	@Bytecode(postfixOpcode = Opcodes.FALOAD)
+	public abstract float apply_float(int i);
 	
-	public T getAndSet(int i, T v)
-	{
-		T o = (T) this.data[i];
-		this.data[i] = v;
-		return o;
-	}
+	@Bytecode(postfixOpcode = Opcodes.FASTORE)
+	public abstract void update_float(int i, float v);
 	
-	public Array<T> $plus(Object[] v)
-	{
-		int len1 = this.data.length;
-		int len2 = v.length;
-		Object[] newArray = new Object[len1 + len2];
-		
-		System.arraycopy(this.data, 0, newArray, 0, len1);
-		System.arraycopy(v, 0, newArray, len1, len2);
-		
-		return this.$eq(newArray);
-	}
+	@Bytecode(postfixOpcode = Opcodes.DALOAD)
+	public abstract double apply_double(int i);
 	
-	public Array<T> $times(int v)
-	{
-		int len1 = this.data.length;
-		Object[] newArray = new Object[len1 * v];
-		
-		for (int i = 0; i < v; i++)
-		{
-			System.arraycopy(this.data, 0, newArray, len1 * i, len1);
-		}
-		
-		return this.$eq(newArray);
-	}
+	@Bytecode(postfixOpcode = Opcodes.DASTORE)
+	public abstract void update_double(int i, double v);
 }

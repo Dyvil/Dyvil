@@ -361,10 +361,10 @@ public class CodeClass extends ASTNode implements IClass
 		
 		List<MethodMatch> list = new ArrayList();
 		this.getMethodMatches(list, null, name, argumentTypes);
-		Collections.sort(list);
 		
 		if (!list.isEmpty())
 		{
+			Collections.sort(list);
 			return list.get(0);
 		}
 		

@@ -141,13 +141,13 @@ public class Parameter extends Member implements IField
 	@Override
 	public void writeGet(MethodWriter writer)
 	{
-		writer.visitVarInsn(this.type.getLoadOpcode(), this.index, this.type.getFrameType());
+		writer.visitVarInsn(this.type.getLoadOpcode(), this.index, this.type);
 	}
 	
 	@Override
 	public void writeSet(MethodWriter writer)
 	{
-		writer.visitVarInsn(this.type.getStoreOpcode(), this.index, this.type.getFrameType());
+		writer.visitVarInsn(this.type.getStoreOpcode(), this.index, this.type);
 	}
 	
 	@Override

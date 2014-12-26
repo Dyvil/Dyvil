@@ -151,10 +151,9 @@ public class ConstructorCall extends Call implements ITyped
 		{
 			opcode = Opcodes.INVOKESPECIAL;
 			
-			Object frame = this.type.getFrameType();
 			writer.visitTypeInsn(Opcodes.NEW, this.type);
-			writer.push(frame);
-			writer.visitInsn(Opcodes.DUP, frame);
+			writer.push(this.type);
+			writer.visitInsn(Opcodes.DUP, this.type);
 		}
 		
 		for (IValue arg : this.arguments)

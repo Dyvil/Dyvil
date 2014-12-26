@@ -150,7 +150,7 @@ public class Field extends Member implements IField
 		String owner = this.getTheClass().getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
-		writer.visitFieldInsn(opcode, owner, name, desc, this.type.getFrameType());
+		writer.visitFieldInsn(opcode, owner, name, desc, this.type);
 	}
 	
 	@Override
@@ -169,7 +169,7 @@ public class Field extends Member implements IField
 		String owner = this.getTheClass().getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
-		writer.visitFieldInsn(opcode, owner, name, desc, this.type.getFrameType());
+		writer.visitFieldInsn(opcode, owner, name, desc, this.type);
 	}
 	
 	@Override

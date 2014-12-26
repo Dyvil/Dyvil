@@ -141,14 +141,35 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public IAccess resolve2(IContext context, IContext context1)
 	{
-		if (this.arguments.isEmpty())
+		if (this.isSugarCall)
 		{
-			FieldMatch f = context.resolveField(context1, this.qualifiedName);
-			if (f != null)
+			if (this.arguments.isEmpty())
 			{
-				FieldAccess access = new FieldAccess(this.position, this.instance, this.qualifiedName);
-				access.field = f.theField;
-				return access;
+				FieldMatch f = context.resolveField(context1, this.qualifiedName);
+				if (f != null)
+				{
+					FieldAccess access = new FieldAccess(this.position, this.instance, this.qualifiedName);
+					access.field = f.theField;
+					return access;
+				}
+			}
+		}
+		else
+		{
+			if (this.instance == null)
+			{
+				FieldMatch f = context.resolveField(context1, this.qualifiedName);
+				if (f != null)
+				{
+					FieldAccess access = new FieldAccess(this.position, null, this.qualifiedName);
+					access.field = f.theField;
+					MethodCall call = new MethodCall(this.position, access, "apply");
+					call.arguments = this.arguments;
+					if (call.resolve(access.getType(), context1))
+					{
+						return call;
+					}
+				}
 			}
 		}
 		

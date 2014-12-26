@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.BytecodeParser;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -212,6 +213,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			
 			this.dotless = true;
+			this.mode = ACCESS_2;
 			
 			if ("=".equals(value))
 			{
@@ -237,13 +239,25 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.pushParser(new ExpressionParser(this.context, assign));
 				return true;
 			}
-			
-			if (this.lazy && this.value != null)
+			else if (token.isType(Token.TYPE_OPEN_BRACKET))
+			{
+				IToken prev = token.prev();
+				if (prev.isType(Token.TYPE_IDENTIFIER))
+				{
+					this.value = new MethodCall(prev, null, prev.value());
+					this.mode = PARAMETERS;
+				}
+				else
+				{
+					this.value = new MethodCall(this.value.getPosition(), this.value, "apply");
+					this.mode = PARAMETERS;
+				}
+			}
+			else if (this.lazy && this.value != null)
 			{
 				pm.popParser(true);
 				return true;
 			}
-			this.mode = ACCESS_2;
 		}
 		if (this.isInMode(ACCESS_2))
 		{

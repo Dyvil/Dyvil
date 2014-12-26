@@ -16,7 +16,7 @@ public class MethodMatch implements Comparable<MethodMatch>
 	@Override
 	public int compareTo(MethodMatch o)
 	{
-		return -Integer.compare(this.match, o.match);
+		return this.match < o.match ? 1 : this.match == o.match ? 0 : -1;
 	}
 	
 	@Override

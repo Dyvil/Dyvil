@@ -47,7 +47,7 @@ public class NullValue extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitInsn(Opcodes.ACONST_NULL, Opcodes.NULL);
+		writer.visitInsn(Opcodes.ACONST_NULL, Type.NONE);
 	}
 	
 	@Override

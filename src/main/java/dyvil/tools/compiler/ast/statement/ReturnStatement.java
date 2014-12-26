@@ -83,7 +83,7 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 		{
 			this.value.writeExpression(writer);
 			Type type = this.value.getType();
-			writer.visitInsn(type.getReturnOpcode(), type.getFrameType());
+			writer.visitInsn(type.getReturnOpcode(), type);
 		}
 		else
 		{

@@ -35,8 +35,7 @@ public class Type extends ASTNode implements IContext
 	
 	public static Type		OBJECT		= new Type("java.lang.Object");
 	public static Type		PREDEF		= new Type("dyvil.lang.Predef");
-	public static Type		NUMBER		= new Type("dyvil.lang.Number");
-	public static Type		INTEGER		= new Type("dyvil.lang.Integer");
+	public static Type		ARRAY		= new Type("dyvil.lang.Array");
 	public static Type		STRING		= new Type("java.lang.String");
 	
 	public static Type		ABytecode	= new AnnotationType("dyvil.lang.annotation.Bytecode");
@@ -94,8 +93,7 @@ public class Type extends ASTNode implements IContext
 		
 		OBJECT.theClass = Package.javaLang.resolveClass("Object");
 		PREDEF.theClass = Package.dyvilLang.resolveClass("Predef");
-		NUMBER.theClass = Package.dyvilLang.resolveClass("Number");
-		INTEGER.theClass = Package.dyvilLang.resolveClass("Integer");
+		ARRAY.theClass = Package.dyvilLang.resolveClass("Array");
 		STRING.theClass = Package.javaLang.resolveClass("String");
 		
 		ABytecode.theClass = Package.dyvilLangAnnotation.resolveClass("Bytecode");
@@ -401,6 +399,12 @@ public class Type extends ASTNode implements IContext
 		{
 			return null;
 		}
+		
+		if (this.arrayDimensions > 0)
+		{
+			return ARRAY.resolveField(context, name);
+		}
+		
 		return this.theClass.resolveField(context, name);
 	}
 	
@@ -410,6 +414,15 @@ public class Type extends ASTNode implements IContext
 		if (this.theClass == null)
 		{
 			return null;
+		}
+		
+		if (this.arrayDimensions > 0)
+		{
+			MethodMatch match = ARRAY.resolveMethod(context, name, argumentTypes);
+			if (match != null)
+			{
+				return match;
+			}
 		}
 		
 		List<MethodMatch> list = new ArrayList();

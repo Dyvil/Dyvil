@@ -7,17 +7,18 @@ import java.util.Stack;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.OpcodeUtil;
 
 public class MethodWriter extends MethodVisitor
 {
-	private boolean	hasReturn;
-	private int		maxStack;
+	private boolean		hasReturn;
+	private int			maxStack;
 	
-	private List	locals		= new ArrayList();
-	private Stack	typeStack	= new Stack();
+	private List		locals		= new ArrayList();
+	private Stack<Type>	typeStack	= new Stack();
 	
 	public MethodWriter(int mode, MethodVisitor mv)
 	{
@@ -27,10 +28,10 @@ public class MethodWriter extends MethodVisitor
 	public void setConstructor(Type type)
 	{
 		this.locals.add(UNINITIALIZED_THIS);
-		this.push(type.getFrameType());
+		this.push(type);
 	}
 	
-	public void push(Object type)
+	public void push(Type type)
 	{
 		this.typeStack.add(type);
 		int size = this.typeStack.size();
@@ -66,7 +67,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitLdcInsn(int value)
 	{
-		this.push(INTEGER);
+		this.push(Type.INT);
 		switch (value)
 		{
 		case -1:
@@ -96,7 +97,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitLdcInsn(long value)
 	{
-		this.push(LONG);
+		this.push(Type.LONG);
 		if (value == 0L)
 		{
 			this.mv.visitInsn(LCONST_0);
@@ -112,7 +113,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitLdcInsn(float value)
 	{
-		this.push(FLOAT);
+		this.push(Type.FLOAT);
 		if (value == 0F)
 		{
 			this.mv.visitInsn(FCONST_0);
@@ -133,7 +134,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitLdcInsn(double value)
 	{
-		this.push(DOUBLE);
+		this.push(Type.DOUBLE);
 		if (value == 0D)
 		{
 			this.mv.visitInsn(DCONST_0);
@@ -149,7 +150,7 @@ public class MethodWriter extends MethodVisitor
 	
 	public void visitLdcInsn(String value)
 	{
-		this.push("Ljava/lang/String;");
+		this.push(Type.STRING);
 		this.mv.visitLdcInsn(value);
 	}
 	
@@ -160,23 +161,23 @@ public class MethodWriter extends MethodVisitor
 		Class c = obj.getClass();
 		if (c == String.class)
 		{
-			this.push("Ljava/lang/String;");
+			this.push(Type.STRING);
 		}
 		else if (c == Integer.class)
 		{
-			this.push(INTEGER);
+			this.push(Type.INT);
 		}
 		else if (c == Long.class)
 		{
-			this.push(LONG);
+			this.push(Type.LONG);
 		}
 		else if (c == Float.class)
 		{
-			this.push(FLOAT);
+			this.push(Type.FLOAT);
 		}
 		else if (c == Double.class)
 		{
-			this.push(DOUBLE);
+			this.push(Type.DOUBLE);
 		}
 		this.mv.visitLdcInsn(obj);
 	}
@@ -185,14 +186,25 @@ public class MethodWriter extends MethodVisitor
 	public void visitJumpInsn(int opcode, Label label)
 	{
 		this.mv.visitJumpInsn(opcode, label);
-		this.mv.visitFrame(F_NEW, this.locals.size(), this.locals.toArray(), this.typeStack.size(), this.typeStack.toArray());
+		this.visitFrame();
 	}
 	
 	@Override
 	public void visitLabel(Label label)
 	{
 		this.mv.visitLabel(label);
-		this.mv.visitFrame(F_SAME, this.locals.size(), this.locals.toArray(), this.typeStack.size(), this.typeStack.toArray());
+		this.visitFrame();
+	}
+	
+	private void visitFrame()
+	{
+		int len = this.typeStack.size();
+		Object[] o = new Object[len];
+		for (int i = 0; i < len; i++)
+		{
+			o[i] = this.typeStack.get(i).getFrameType();
+		}
+		this.mv.visitFrame(F_SAME, this.locals.size(), this.locals.toArray(), len, o);
 	}
 	
 	@Override
@@ -201,7 +213,7 @@ public class MethodWriter extends MethodVisitor
 		this.mv.visitInsn(opcode);
 	}
 	
-	public void visitInsn(int opcode, Object type)
+	public void visitInsn(int opcode, Type type)
 	{
 		this.hasReturn = OpcodeUtil.isReturnOpcode(opcode);
 		if (this.hasReturn)
@@ -215,7 +227,7 @@ public class MethodWriter extends MethodVisitor
 		this.mv.visitInsn(opcode);
 	}
 	
-	public void visitInsn(int opcode, Object type, int pop)
+	public void visitInsn(int opcode, Type type, int pop)
 	{
 		this.hasReturn = OpcodeUtil.isReturnOpcode(opcode);
 		if (this.hasReturn)
@@ -259,7 +271,7 @@ public class MethodWriter extends MethodVisitor
 		this.mv.visitVarInsn(opcode, index);
 	}
 	
-	public void visitVarInsn(int opcode, int index, Object type)
+	public void visitVarInsn(int opcode, int index, Type type)
 	{
 		if (type != null)
 		{
@@ -275,7 +287,7 @@ public class MethodWriter extends MethodVisitor
 		this.mv.visitFieldInsn(opcode, owner, name, desc);
 	}
 	
-	public void visitFieldInsn(int opcode, String owner, String name, String desc, Object type)
+	public void visitFieldInsn(int opcode, String owner, String name, String desc, Type type)
 	{
 		if (type != null)
 		{

@@ -2,6 +2,8 @@ package dyvil.tools.compiler.ast.type;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 
 public class PrimitiveType extends Type
@@ -68,6 +70,10 @@ public class PrimitiveType extends Type
 	@Override
 	public Object getFrameType()
 	{
+		if (this.arrayDimensions > 0)
+		{
+			return this.getExtendedName();
+		}
 		switch (this.typecode)
 		{
 		case Opcodes.T_BOOLEAN:
@@ -225,6 +231,36 @@ public class PrimitiveType extends Type
 	public boolean classEquals(Type type)
 	{
 		return super.classEquals(type) || this.qualifiedName.equals(type.qualifiedName);
+	}
+	
+	@Override
+	public FieldMatch resolveField(IContext context, String name)
+	{
+		if (this.arrayDimensions > 0)
+		{
+			return ARRAY.resolveField(context, name);
+		}
+		return null;
+	}
+	
+	@Override
+	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
+	{
+		if (this.theClass == null)
+		{
+			return null;
+		}
+		
+		if (this.arrayDimensions > 0)
+		{
+			MethodMatch match = ARRAY.resolveMethod(context, name + "_" + this.name, argumentTypes);
+			if (match != null)
+			{
+				return match;
+			}
+		}
+		
+		return super.resolveMethod(context, name, argumentTypes);
 	}
 	
 	@Override
