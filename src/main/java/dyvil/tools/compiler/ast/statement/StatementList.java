@@ -225,6 +225,12 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		if (this.isArray)
+		{
+			super.writeExpression(writer);
+			return;
+		}
+		
 		writer.visitLabel(this.start);
 		for (IValue v : this.values)
 		{

@@ -23,5 +23,5 @@ public class Main
 	
 	public implicit void print(int i) = System out println(i);
 	
-	public static String[] test() = return { "a", "b" };
+	public static String[] test() = { "a", "b" };
 }

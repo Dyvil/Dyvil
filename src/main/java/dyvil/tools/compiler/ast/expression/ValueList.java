@@ -199,6 +199,11 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		if (this.isArray)
+		{
+			this.writeExpression(writer);
+			return;
+		}
 		for (IValue ivalue : this.values)
 		{
 			ivalue.writeExpression(writer);
