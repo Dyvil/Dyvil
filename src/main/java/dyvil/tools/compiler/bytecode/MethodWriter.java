@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.bytecode;
 
+import static jdk.internal.org.objectweb.asm.Opcodes.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import static jdk.internal.org.objectweb.asm.Opcodes.*;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.OpcodeUtil;

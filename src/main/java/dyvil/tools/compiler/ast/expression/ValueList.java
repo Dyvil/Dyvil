@@ -78,6 +78,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		if (type.arrayDimensions > 0)
 		{
+			this.isArray = true;
 			if (this.requiredType != null)
 			{
 				return Type.isSuperType(type, this.requiredType);

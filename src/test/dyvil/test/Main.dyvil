@@ -9,7 +9,6 @@ public class Main
 {
 	public static void main(String[] args) =
 	{
-		{ "a", "b", "c" }(0) = "Test";
 		args(0) = "Test";
 		args print;
 		System out println(test()(1));
@@ -23,5 +22,5 @@ public class Main
 	
 	public implicit void print(int i) = System out println(i);
 	
-	public static String[] test() = { "a", "b" };
+	public static String[] test() = { "Hello", "World" };
 }

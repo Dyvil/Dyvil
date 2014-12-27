@@ -14,8 +14,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public abstract class Call extends ASTNode implements IValue, IValueList, IAccess
 {
 	protected List<IValue>	arguments	= new ArrayList(3);
-	
-	protected boolean		isSugarCall;
+	public boolean			isSugarCall;
 	
 	public IMethod			method;
 	
