@@ -9,7 +9,10 @@ public class Main
 {
 	public static void main(String[] args) =
 	{
-		args(0);
+		{ "a", "b", "c" }(0) = "Test";
+		args(0) = "Test";
+		args print;
+		System out println(test()(1));
 	};
 	
 	public implicit void print(int[] a) = System out println(Arrays toString(a));
@@ -19,4 +22,6 @@ public class Main
 	public implicit void print(String[] a) = System out println(Arrays toString(a));
 	
 	public implicit void print(int i) = System out println(i);
+	
+	public static String[] test() = return { "a", "b" };
 }
