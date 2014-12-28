@@ -16,6 +16,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ClassFormat;
+import dyvil.tools.compiler.util.Symbols;
 
 public class Type extends ASTNode implements IContext
 {
@@ -69,14 +70,14 @@ public class Type extends ASTNode implements IContext
 	{
 		this.position = position;
 		this.name = name;
-		this.qualifiedName = name;
+		this.qualifiedName = Symbols.expand(name);
 	}
 	
 	public Type(ICodePosition position, String name, IClass iclass)
 	{
 		this.position = position;
 		this.name = name;
-		this.qualifiedName = name;
+		this.qualifiedName = Symbols.expand(name);
 		this.theClass = iclass;
 	}
 	

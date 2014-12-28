@@ -129,7 +129,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public IAccess resolve2(IContext context, IContext context1)
 	{
-		String name = this.type.name;
+		String name = this.type.qualifiedName;
 		FieldMatch f = context.resolveField(context1, name);
 		if (f != null)
 		{

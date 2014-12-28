@@ -359,33 +359,39 @@ public class Method extends Member implements IMethod
 				v.applyState(state, context);
 			}
 			
-			Type t = this.theClass.getSuperType();
-			if (t != null && t.theClass != null)
+			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
-				ClassBody body = t.theClass.getBody();
-				this.overrideMethod = body.getMethod(this.name, this.parameters);
+				Type t = this.theClass.getSuperType();
+				if (t != null && t.theClass != null)
+				{
+					ClassBody body = t.theClass.getBody();
+					this.overrideMethod = body.getMethod(this.name, this.parameters);
+				}
 			}
 		}
 		else if (state == CompilerState.CHECK)
 		{
-			if (this.overrideMethod == null)
+			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
-				if ((this.modifiers & Modifiers.OVERRIDE) != 0)
+				if (this.overrideMethod == null)
 				{
-					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' must override or implement a supertype method"));
+					if ((this.modifiers & Modifiers.OVERRIDE) != 0)
+					{
+						state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' must override or implement a supertype method"));
+					}
 				}
-			}
-			else
-			{
-				if ((this.modifiers & Modifiers.OVERRIDE) == 0)
+				else
 				{
-					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' overrides a method, but does not have an 'override' modifier"));
-				}
-				
-				Type type = this.overrideMethod.getType();
-				if (!Type.isSuperType(type, this.type))
-				{
-					state.addMarker(new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type " + type));
+					if ((this.modifiers & Modifiers.OVERRIDE) == 0)
+					{
+						state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' overrides a method, but does not have an 'override' modifier"));
+					}
+					
+					Type type = this.overrideMethod.getType();
+					if (!Type.isSuperType(type, this.type))
+					{
+						state.addMarker(new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type " + type));
+					}
 				}
 			}
 			

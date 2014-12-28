@@ -11,6 +11,15 @@ public class Predef
 	{
 	}
 	
+	public static void $qmark$qmark$qmark()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	public static void $dot$dot$dot()
+	{
+	}
+	
 	public static int hash(Object o)
 	{
 		return o == null ? 0 : o.hashCode();

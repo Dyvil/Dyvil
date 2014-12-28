@@ -28,6 +28,7 @@ public class Symbols
 		addReplacement('|', "bar");
 		addReplacement('\\', "bslash");
 		addReplacement(':', "colon");
+		addReplacement('.', "dot");
 	}
 	
 	private static void addReplacement(char symbol, String replacement)
@@ -39,7 +40,7 @@ public class Symbols
 	
 	private static boolean isSymbol(char c)
 	{
-		return c == '=' || c == '>' || c == '<' || c == '+' || c == '-' || c == '*' || c == '/' || c == '!' || c == '@' || c == '#' || c == '%' || c == '^' || c == '&' || c == '~' || c == '?' || c == '|' || c == '\\' || c == ':';
+		return c == '=' || c == '>' || c == '<' || c == '+' || c == '-' || c == '*' || c == '/' || c == '!' || c == '@' || c == '#' || c == '%' || c == '^' || c == '&' || c == '~' || c == '?' || c == '|' || c == '\\' || c == ':' || c == '.';
 	}
 	
 	public static String expand(String s)
