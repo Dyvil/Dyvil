@@ -13,10 +13,6 @@ public interface IMethod extends IASTNode, IMember, IValued, IThrower, IVariable
 	@Override
 	public IMethod applyState(CompilerState state, IContext context);
 	
-	public void setParametersOpenBracket(String bracket);
-	
-	public void setParametersCloseBracket(String bracket);
-	
 	public void checkArguments(CompilerState state, IValue instance, List<IValue> arguments);
 	
 	public int getSignatureMatch(String name, Type type, Type... argumentTypes);

@@ -28,9 +28,10 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	public static final int	TYPE			= 1;
 	public static final int	NAME			= 2;
 	public static final int	FIELD			= 4;
-	public static final int	METHOD			= 8;
-	public static final int	METHOD_END		= 16;
-	public static final int	ANNOTATION		= 32;
+	public static final int	PARAMETERS		= 8;
+	public static final int	PARAMETERS_END	= 16;
+	public static final int	METHOD_END		= 32;
+	public static final int	ANNOTATION		= 64;
 	public static final int	ANNOTATION_END	= 128;
 	
 	protected IClass		theClass;
@@ -115,7 +116,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				}
 				else if (next.isType(IToken.TYPE_OPEN_BRACKET))
 				{
-					this.mode = METHOD;
+					this.mode = PARAMETERS;
 					this.method.setPosition(token.raw());
 					this.method.setName(value);
 					this.classBody.addMethod(this.method);
@@ -144,17 +145,19 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				return true;
 			}
 		}
-		if (this.isInMode(METHOD))
+		if (this.isInMode(PARAMETERS))
 		{
-			if (token.isType(IToken.TYPE_OPEN_BRACKET))
+			if ("(".equals(value))
 			{
-				this.method.setParametersOpenBracket(value);
 				pm.pushParser(new ParameterListParser(this.theClass, this.method));
+				this.mode = PARAMETERS_END;
 				return true;
 			}
-			else if (token.isType(IToken.TYPE_CLOSE_BRACKET))
+		}
+		if (this.isInMode(PARAMETERS_END))
+		{
+			if (")".equals(value))
 			{
-				this.method.setParametersCloseBracket(value);
 				this.mode = METHOD_END;
 				return true;
 			}

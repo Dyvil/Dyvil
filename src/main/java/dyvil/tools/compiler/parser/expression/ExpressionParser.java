@@ -254,7 +254,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.pushParser(new ExpressionParser(this.context, assign));
 				return true;
 			}
-			else if (token.isType(Token.TYPE_OPEN_BRACKET))
+			else if ("(".equals(value))
 			{
 				IToken prev = token.prev();
 				if (prev.isType(Token.TYPE_IDENTIFIER))
@@ -279,14 +279,14 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				IToken next = token.next();
-				if (next.isType(IToken.TYPE_OPEN_BRACKET))
+				if (next.equals("("))
 				{
 					MethodCall call = new MethodCall(token, this.value, value);
 					this.value = call;
 					this.mode = PARAMETERS;
 					return true;
 				}
-				else if (!next.isType(IToken.TYPE_IDENTIFIER) && !next.isType(IToken.TYPE_CLOSE_BRACKET) && !next.isType(IToken.TYPE_SYMBOL))
+				else if (!next.isType(IToken.TYPE_IDENTIFIER) && !next.isType(IToken.TYPE_SYMBOL))
 				{
 					MethodCall call = new MethodCall(token, this.value, value);
 					call.setSugar(true);
