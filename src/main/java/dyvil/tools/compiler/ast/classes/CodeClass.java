@@ -50,14 +50,15 @@ public class CodeClass extends ASTNode implements IClass
 	
 	public CodeClass()
 	{
+		this.body = new ClassBody(null, this);
 	}
 	
-	public CodeClass(ICodePosition position, CompilationUnit unit, int type, ClassBody body)
+	public CodeClass(ICodePosition position, CompilationUnit unit, int type)
 	{
 		this.position = position;
 		this.unit = unit;
 		this.type = type;
-		this.body = body;
+		this.body = new ClassBody(null, this);
 	}
 	
 	public void setClassType(int type)

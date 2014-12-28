@@ -22,13 +22,13 @@ public class ClassDeclParser extends Parser
 	
 	protected CompilationUnit	unit;
 	
-	private CodeClass			theClassDecl;
+	private CodeClass			theClass;
 	
 	public ClassDeclParser(CompilationUnit unit)
 	{
 		this.unit = unit;
-		this.theClassDecl = new CodeClass(null, unit, 0, null);
-		this.unit.addClass(this.theClassDecl);
+		this.theClass = new CodeClass(null, unit, 0);
+		this.unit.addClass(this.theClass);
 	}
 	
 	@Override
@@ -39,7 +39,7 @@ public class ClassDeclParser extends Parser
 			int i = 0;
 			if ((i = Modifiers.CLASS.parse(value)) != -1)
 			{
-				if (this.theClassDecl.addModifier(i))
+				if (this.theClass.addModifier(i))
 				{
 					throw new SyntaxError(token, "Duplicate Modifier '" + value + "'", "Remove this Modifier");
 				}
@@ -47,13 +47,13 @@ public class ClassDeclParser extends Parser
 			}
 			else if ((i = Modifiers.CLASS_TYPE.parse(value)) != -1)
 			{
-				this.theClassDecl.setClassType(i);
+				this.theClass.setClassType(i);
 				this.mode = NAME;
 				return true;
 			}
 			else if (value.charAt(0) == '@')
 			{
-				pm.pushParser(new AnnotationParser(this.unit, this.theClassDecl), true);
+				pm.pushParser(new AnnotationParser(this.unit, this.theClass), true);
 				return true;
 			}
 		}
@@ -61,8 +61,8 @@ public class ClassDeclParser extends Parser
 		{
 			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
-				this.theClassDecl.setPosition(token.raw());
-				this.theClassDecl.setName(value);
+				this.theClass.setPosition(token.raw());
+				this.theClass.setName(value);
 				this.mode = EXTENDS | IMPLEMENTS | BODY;
 				return true;
 			}
@@ -71,7 +71,7 @@ public class ClassDeclParser extends Parser
 		{
 			if ("extends".equals(value))
 			{
-				pm.pushParser(new TypeParser(this.unit, this.theClassDecl));
+				pm.pushParser(new TypeParser(this.theClass));
 				this.mode = IMPLEMENTS | BODY;
 				return true;
 			}
@@ -80,7 +80,7 @@ public class ClassDeclParser extends Parser
 		{
 			if ("implements".equals(value))
 			{
-				pm.pushParser(new TypeListParser(this.unit, this.theClassDecl));
+				pm.pushParser(new TypeListParser(this.theClass));
 				this.mode = BODY;
 				return true;
 			}
@@ -89,7 +89,7 @@ public class ClassDeclParser extends Parser
 		{
 			if ("{".equals(value))
 			{
-				pm.pushParser(new ClassBodyParser(this.theClassDecl));
+				pm.pushParser(new ClassBodyParser(this.theClass, this.theClass.getBody()));
 				this.mode = BODY_END;
 				return true;
 			}
@@ -98,7 +98,7 @@ public class ClassDeclParser extends Parser
 		{
 			if ("}".equals(value))
 			{
-				this.theClassDecl.expandPosition(token);
+				this.theClass.expandPosition(token);
 				pm.popParser();
 				return true;
 			}

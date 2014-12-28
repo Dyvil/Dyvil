@@ -48,7 +48,7 @@ public interface IParameterized extends ITyped, ITypeList
 		int index = 0;
 		for (Type type : types)
 		{
-			this.addParameter(new Parameter(index, "par" + index, type, 0));
+			this.addParameter(new Parameter(index, "par" + index, type));
 			index++;
 		}
 	}
@@ -57,6 +57,6 @@ public interface IParameterized extends ITyped, ITypeList
 	public default void addType(Type type)
 	{
 		int index = this.getParameters().size();
-		this.addParameter(new Parameter(index, "par" + index, type, 0));
+		this.addParameter(new Parameter(index, "par" + index, type));
 	}
 }

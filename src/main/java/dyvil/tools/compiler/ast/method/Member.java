@@ -14,7 +14,7 @@ public abstract class Member extends ASTNode implements IMember
 {
 	public IClass				theClass;
 	
-	protected List<Annotation>	annotations	= new ArrayList(1);
+	protected List<Annotation>	annotations;
 	
 	protected int				modifiers;
 	
@@ -25,6 +25,7 @@ public abstract class Member extends ASTNode implements IMember
 	protected Member(IClass iclass)
 	{
 		this.theClass = iclass;
+		this.annotations = new ArrayList(1);
 	}
 	
 	public Member(IClass iclass, String name)
@@ -32,6 +33,7 @@ public abstract class Member extends ASTNode implements IMember
 		this.theClass = iclass;
 		this.name = name;
 		this.qualifiedName = Symbols.expand(name);
+		this.annotations = new ArrayList(1);
 	}
 	
 	public Member(IClass iclass, String name, Type type)
@@ -40,12 +42,17 @@ public abstract class Member extends ASTNode implements IMember
 		this.name = name;
 		this.qualifiedName = Symbols.expand(name);
 		this.type = type;
+		this.annotations = new ArrayList(1);
 	}
 	
-	public Member(IClass iclass, String name, Type type, int modifiers)
+	public Member(IClass iclass, String name, Type type, int modifiers, List<Annotation> annotations)
 	{
-		this(iclass, name, type);
+		this.theClass = iclass;
+		this.name = name;
+		this.qualifiedName = Symbols.expand(name);
+		this.type = type;
 		this.modifiers = modifiers;
+		this.annotations = annotations;
 	}
 	
 	@Override

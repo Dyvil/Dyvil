@@ -27,10 +27,10 @@ public class TypeParser extends Parser
 	private int				arrayDimensions;
 	private int				arrayDimensions2;
 	
-	public TypeParser(IContext context, ITyped typed)
+	
+	public TypeParser(ITyped typed)
 	{
 		this.mode = NAME;
-		this.context = context;
 		this.typed = typed;
 	}
 	
@@ -42,7 +42,7 @@ public class TypeParser extends Parser
 			if ("(".equals(value))
 			{
 				TupleType type = new TupleType();
-				pm.pushParser(new TypeListParser(this.context, type));
+				pm.pushParser(new TypeListParser(type));
 				this.type = type;
 				this.mode = TUPLE_TYPE;
 				return true;
@@ -51,21 +51,7 @@ public class TypeParser extends Parser
 			{
 				// TODO package.class
 				this.type = new Type(token, value);
-				
-				IToken next = token.next();
-				if (next.equals("<"))
-				{
-					this.mode = GENERICS;
-				}
-				else if (next.equals("["))
-				{
-					this.mode = ARRAY;
-				}
-				else
-				{
-					pm.popParser();
-				}
-				
+				this.mode = ARRAY | GENERICS;
 				return true;
 			}
 		}
@@ -87,7 +73,7 @@ public class TypeParser extends Parser
 		}
 		if (this.isInMode(LAMBDA_TYPE))
 		{
-			pm.pushParser(new TypeParser(this.context, (LambdaType) this.type));
+			pm.pushParser(new TypeParser((LambdaType) this.type));
 			this.mode = LAMBDA_END;
 			return true;
 		}
@@ -132,7 +118,8 @@ public class TypeParser extends Parser
 			}
 			else
 			{
-				// TODO Generics
+				pm.popParser(true);
+				return true;
 			}
 		}
 		return false;

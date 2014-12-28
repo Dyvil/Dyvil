@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
 import java.util.Iterator;
+import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.CompilerState;
@@ -25,14 +26,22 @@ public class Parameter extends Member implements IField
 		super(null);
 	}
 	
-	public Parameter(int index, String name, Type type, int modifiers)
+	public Parameter(int index, String name, Type type)
 	{
-		this(index, name, type, modifiers, ',');
+		super(null, name, type);
+		this.index = index;
 	}
 	
-	public Parameter(int index, String name, Type type, int modifiers, char seperator)
+	public Parameter(int index, String name, Type type, int modifiers, List<Annotation> annotations)
 	{
-		super(null, name, type, modifiers);
+		super(null, name, type, modifiers, annotations);
+		this.index = index;
+		this.seperator = ',';
+	}
+	
+	public Parameter(int index, String name, Type type, int modifiers, List<Annotation> annotations, char seperator)
+	{
+		super(null, name, type, modifiers, annotations);
 		this.index = index;
 		this.seperator = seperator;
 	}

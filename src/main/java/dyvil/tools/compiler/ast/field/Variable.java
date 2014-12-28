@@ -31,7 +31,7 @@ public class Variable extends Member implements IField
 	
 	public Variable(ICodePosition position, String name, Type type)
 	{
-		super(null, name, type, 0);
+		super(null, name, type);
 		this.position = position;
 	}
 	

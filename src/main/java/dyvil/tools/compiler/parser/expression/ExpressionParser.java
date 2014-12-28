@@ -133,13 +133,13 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				ConstructorCall call = new ConstructorCall(token);
 				this.mode = PARAMETERS;
 				this.value = call;
-				pm.pushParser(new TypeParser(this.context, call));
+				pm.pushParser(new TypeParser(call));
 				return true;
 			}
 			else if (token.isType(IToken.TYPE_IDENTIFIER) || token.equals("("))
 			{
 				this.mode = ACCESS | VARIABLE;
-				pm.pushParser(new TypeParser(this.context, this), true);
+				pm.pushParser(new TypeParser(this), true);
 				return true;
 			}
 			this.mode = ACCESS;

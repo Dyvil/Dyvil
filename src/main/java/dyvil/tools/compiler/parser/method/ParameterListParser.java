@@ -51,7 +51,7 @@ public class ParameterListParser extends Parser
 			}
 			
 			this.mode = NAME;
-			pm.pushParser(new TypeParser(this.context, this.parameter), true);
+			pm.pushParser(new TypeParser(this.parameter), true);
 			return true;
 		}
 		if (this.isInMode(NAME))

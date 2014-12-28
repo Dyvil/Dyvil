@@ -44,6 +44,21 @@ public class Method extends Member implements IMethod
 		super(iclass);
 	}
 	
+	public Method(IClass iclass, String name)
+	{
+		super(iclass, name);
+	}
+	
+	public Method(IClass iclass, String name, Type type)
+	{
+		super(iclass, name, type);
+	}
+	
+	public Method(IClass iclass, String name, Type type, int modifiers, List<Annotation> annotations)
+	{
+		super(iclass, name, type, modifiers, annotations);
+	}
+	
 	@Override
 	public void setName(String name)
 	{

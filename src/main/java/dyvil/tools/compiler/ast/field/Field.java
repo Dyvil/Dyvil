@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
 import java.util.Iterator;
+import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -37,9 +38,9 @@ public class Field extends Member implements IField
 		super(iclass, name, type);
 	}
 	
-	public Field(IClass iclass, String name, Type type, int modifiers)
+	public Field(IClass iclass, String name, Type type, int modifiers, List<Annotation> annotations)
 	{
-		super(iclass, name, type, modifiers);
+		super(iclass, name, type, modifiers, annotations);
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.classes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -25,59 +26,61 @@ import dyvil.tools.compiler.util.Modifiers;
 
 public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 {
-	public static final int	TYPE			= 1;
-	public static final int	NAME			= 2;
-	public static final int	FIELD			= 4;
-	public static final int	PARAMETERS		= 8;
-	public static final int	PARAMETERS_END	= 16;
-	public static final int	METHOD_END		= 32;
-	public static final int	ANNOTATION		= 64;
-	public static final int	ANNOTATION_END	= 128;
+	public static final int		TYPE			= 1;
+	public static final int		NAME			= 2;
+	public static final int		FIELD			= 4;
+	public static final int		PARAMETERS		= 8;
+	public static final int		PARAMETERS_END	= 16;
+	public static final int		METHOD_END		= 32;
+	public static final int		BODY_END		= 64;
 	
-	protected IClass		theClass;
-	protected ClassBody		classBody;
+	public static final int		DEFAULT_MODE	= TYPE | BODY_END;
 	
-	private IField			field;
-	private IMethod			method;
+	protected IClass			theClass;
+	protected ClassBody			body;
 	
-	public ClassBodyParser(IClass theClass)
+	private Type				type;
+	private int					modifiers;
+	private List<Annotation>	annotations;
+	
+	private IMethod				method;
+	private IField				field;
+	
+	public ClassBodyParser(IClass theClass, ClassBody body)
 	{
 		this.theClass = theClass;
+		this.body = body;
 		this.reset();
 	}
 	
 	private void reset()
 	{
-		this.mode = TYPE | ANNOTATION;
-		this.field = new Field(this.theClass);
-		this.method = new Method(this.theClass);
+		this.mode = DEFAULT_MODE;
+		this.modifiers = 0;
+		this.annotations = new ArrayList();
 	}
 	
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		int i = 0;
-		if (this.classBody == null)
+		if (this.isInMode(BODY_END))
 		{
-			this.classBody = new ClassBody(token);
-			this.classBody.setTheClass(this.theClass);
-			this.theClass.setBody(this.classBody);
+			if ("}".equals(value))
+			{
+				pm.popParser(true);
+				return true;
+			}
 		}
-		
-		if (this.mode == (TYPE | ANNOTATION) && "}".equals(value))
-		{
-			pm.popParser();
-			return true;
-		}
-		
 		if (this.isInMode(TYPE))
 		{
+			int i = 0;
 			if ((i = Modifiers.FIELD_OR_METHOD.parse(value)) != -1)
 			{
-				if (this.field.addModifier(i) | this.method.addModifier(i))
+				if ((this.modifiers & i) != 0)
 				{
 					throw new SyntaxError(token, "Duplicate Modifier '" + value + "'", "Remove this Modifier");
 				}
+				this.modifiers |= i;
 				return true;
 			}
 			else if (value.charAt(0) == '@')
@@ -87,7 +90,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 			}
 			else
 			{
-				pm.pushParser(new TypeParser(this.theClass, this), true);
+				pm.pushParser(new TypeParser(this), true);
 				this.mode = NAME;
 				return true;
 			}
@@ -100,26 +103,26 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				if (next.equals("="))
 				{
 					this.mode = FIELD;
+					this.field = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
 					this.field.setPosition(token.raw());
-					this.field.setName(value);
-					this.classBody.addField(this.field);
+					this.body.addField(this.field);
 					return true;
 				}
 				else if (next.equals(";"))
 				{
 					this.mode = FIELD;
-					this.field.setPosition(token.raw());
-					this.field.setName(value);
-					this.classBody.addField(this.field);
+					Field f = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
+					f.setPosition(token.raw());
+					this.body.addField(f);
 					this.reset();
 					return true;
 				}
-				else if (next.isType(IToken.TYPE_OPEN_BRACKET))
+				else if (next.equals("("))
 				{
 					this.mode = PARAMETERS;
+					this.method = new Method(this.theClass, value, this.type, this.modifiers, this.annotations);
 					this.method.setPosition(token.raw());
-					this.method.setName(value);
-					this.classBody.addMethod(this.method);
+					this.body.addMethod(this.method);
 					return true;
 				}
 			}
@@ -129,7 +132,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				return true;
 			}
 			
-			pm.pushParser(new TypeParser(this.theClass, this), true);
+			pm.pushParser(new TypeParser(this), true);
 			return true;
 		}
 		if (this.isInMode(FIELD))
@@ -166,7 +169,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 		{
 			if ("throws".equals(value))
 			{
-				pm.pushParser(new ThrowsDeclParser(this.method, this.method));
+				pm.pushParser(new ThrowsDeclParser(this.method));
 				return true;
 			}
 			else if ("=".equals(value))
@@ -181,19 +184,13 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 			}
 		}
 		
-		if ("}".equals(value))
-		{
-			pm.popParser(true);
-			return true;
-		}
 		return false;
 	}
 	
 	@Override
 	public void setType(Type type)
 	{
-		this.field.setType(type);
-		this.method.setType(type);
+		this.type = type;
 	}
 	
 	@Override
@@ -222,7 +219,6 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		this.field.addAnnotation(annotation);
-		this.method.addAnnotation(annotation);
+		this.annotations.add(annotation);
 	}
 }
