@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -112,6 +113,12 @@ public class SimpleImport extends ASTNode implements IImport
 	
 	@Override
 	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
 	{
 		throw new UnsupportedOperationException();
 	}

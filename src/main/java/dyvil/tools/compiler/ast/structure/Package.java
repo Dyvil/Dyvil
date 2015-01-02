@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
@@ -165,6 +166,12 @@ public class Package implements IContext
 	
 	@Override
 	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
 	{
 		throw new UnsupportedOperationException();
 	}

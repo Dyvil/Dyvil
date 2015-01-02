@@ -6,11 +6,12 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 
-public interface IField extends IASTNode, INamed, ITyped, IModified, IAnnotatable, IValued
+public interface IField extends IASTNode, IMember, IValued
 {
 	@Override
 	public IField applyState(CompilerState state, IContext context);
 	
+	@Override
 	public IClass getTheClass();
 	
 	// Compilation

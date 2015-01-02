@@ -10,6 +10,7 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -423,7 +424,7 @@ public class Method extends Member implements IMethod
 	@Override
 	public boolean isStatic()
 	{
-		return this.hasModifier(Modifiers.STATIC);
+		return (this.modifiers & Modifiers.STATIC) != 0;
 	}
 	
 	@Override
@@ -456,6 +457,21 @@ public class Method extends Member implements IMethod
 	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
 	{
 		return this.theClass.resolveMethod(returnType, name, argumentTypes);
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		IClass iclass = member.getTheClass();
+		if (iclass == null)
+		{
+			return READ_WRITE_ACCESS;
+		}
+		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC))
+		{
+			return STATIC;
+		}
+		return this.theClass.getAccessibility(member);
 	}
 	
 	@Override

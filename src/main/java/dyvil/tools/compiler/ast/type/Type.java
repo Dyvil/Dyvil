@@ -7,6 +7,7 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -442,6 +443,17 @@ public class Type extends ASTNode implements IContext
 		
 		Collections.sort(list);
 		return list.get(0);
+	}
+	
+	public boolean isMember(IMember member)
+	{
+		return member.getTheClass() == this.theClass;
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		return this.theClass == null ? 0 : this.theClass.getAccessibility(member);
 	}
 	
 	@Override

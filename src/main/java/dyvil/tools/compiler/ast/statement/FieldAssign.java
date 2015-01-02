@@ -22,6 +22,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 
 public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
@@ -153,6 +154,24 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 				{
 					state.addMarker(new SemanticError(this.value.getPosition(), "The type of the assigned value is incompatible with the required type " + type));
 				}
+				
+				if (!this.initializer)
+				{
+					if (this.field.hasModifier(Modifiers.FINAL))
+					{
+						state.addMarker(new SemanticError(this.position, "The final field '" + this.name + "' cannot be assigned"));
+					}
+					
+					byte access = context.getAccessibility(this.field);
+					if (access == IContext.STATIC)
+					{
+						state.addMarker(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be assigned from a static context"));
+					}
+					else if ((access & IContext.WRITE_ACCESS) == 0)
+					{
+						state.addMarker(new SemanticError(this.position, "The field '" + this.name + "' cannot be assigned since it is not visible"));
+					}
+				}
 			}
 		}
 		
@@ -195,7 +214,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	@Override
 	public Marker getResolveError()
 	{
-		return new SemanticError(this.position, "'" + this.qualifiedName + "' could not be resolved to a field");
+		return new SemanticError(this.position, "'" + this.name + "' could not be resolved to a field");
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.structure;
 
+import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -7,6 +8,12 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public interface IContext
 {
+	public static final int	INVISIBLE			= 0;
+	public static final int	READ_ACCESS			= 1;
+	public static final int	WRITE_ACCESS		= 2;
+	public static final int	READ_WRITE_ACCESS	= 3;
+	public static final int	STATIC				= 4;
+	
 	public boolean isStatic();
 	
 	/**
@@ -23,4 +30,6 @@ public interface IContext
 	public FieldMatch resolveField(IContext context, String name);
 	
 	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes);
+	
+	public byte getAccessibility(IMember member);
 }

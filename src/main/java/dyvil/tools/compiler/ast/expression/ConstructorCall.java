@@ -83,9 +83,20 @@ public class ConstructorCall extends Call implements ITyped
 			Util.applyState(this.arguments, state, context);
 			if (!this.resolve(context, null))
 			{
-				state.addMarker(new SemanticError(this.position, "The constructor '' could not be resolved"));
+				state.addMarker(new SemanticError(this.position, "The constructor could not be resolved"));
 			}
 			return this;
+		}
+		else if (state == CompilerState.CHECK) {
+			if (this.method != null) {
+				this.method.checkArguments(state, null, this.arguments);
+				
+				byte access = context.getAccessibility(this.method);
+				if ((access & IContext.READ_ACCESS) == 0)
+				{
+					state.addMarker(new SemanticError(this.position, "The constructor cannot be invoked since it is not visible"));
+				}
+			}
 		}
 		
 		Util.applyState(this.arguments, state, context);

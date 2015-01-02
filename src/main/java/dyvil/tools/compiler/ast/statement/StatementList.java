@@ -8,6 +8,7 @@ import java.util.Map;
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.api.IVariableList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.ValueList;
@@ -184,6 +185,12 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
 	{
 		return this.context.resolveMethod(context, name, argumentTypes);
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		return this.context.getAccessibility(member);
 	}
 	
 	@Override

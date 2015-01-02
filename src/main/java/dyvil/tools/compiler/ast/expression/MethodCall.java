@@ -104,6 +104,16 @@ public class MethodCall extends Call implements INamed, IValued
 			if (this.method != null)
 			{
 				this.method.checkArguments(state, this.instance, this.arguments);
+				
+				byte access = context.getAccessibility(this.method);
+				if (access == IContext.STATIC)
+				{
+					state.addMarker(new SemanticError(this.position, "The instance method '" + this.name + "' cannot be invoked from a static context"));
+				}
+				else if ((access & IContext.READ_ACCESS) == 0)
+				{
+					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' cannot be invoked since it is not visible"));
+				}
 			}
 		}
 		

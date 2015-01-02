@@ -136,10 +136,23 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		}
 		else if (state == CompilerState.CHECK)
 		{
-			if (this.field != null && this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
+			if (this.field != null)
 			{
-				state.addMarker(new Warning(this.position, "'" + this.qualifiedName + "' is a static field and should be accessed in a static way"));
-				this.instance = null;
+				if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
+				{
+					state.addMarker(new Warning(this.position, "'" + this.qualifiedName + "' is a static field and should be accessed in a static way"));
+					this.instance = null;
+				}
+				
+				byte access = context.getAccessibility(this.field);
+				if (access == IContext.STATIC)
+				{
+					state.addMarker(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be accessed from a static context"));
+				}
+				else if ((access & IContext.READ_ACCESS) == 0)
+				{
+					state.addMarker(new SemanticError(this.position, "The field '" + this.name + "' cannot be accessed since it is not visible"));
+				}
 			}
 		}
 		else if (state == CompilerState.FOLD_CONSTANTS)

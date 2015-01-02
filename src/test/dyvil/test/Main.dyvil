@@ -9,9 +9,7 @@ public class Main
 {
 	public static void main(String[] args) =
 	{
-		args(0) = "Test";
-		args print;
-		System out println(test()(1));
+		"test" hashCode;
 	};
 	
 	public implicit void print(int[] a) = System out println(Arrays toString(a));
@@ -21,8 +19,4 @@ public class Main
 	public implicit void print(String[] a) = System out println(Arrays toString(a));
 	
 	public implicit void print(int i) = System out println(i);
-	
-	public static void foo() = ???;
-	
-	public static String[] test() = { "Hello", "World" };
 }

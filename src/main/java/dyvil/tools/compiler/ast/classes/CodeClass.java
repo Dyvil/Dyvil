@@ -11,6 +11,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.expression.MethodCall;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -20,6 +21,7 @@ import dyvil.tools.compiler.ast.statement.FieldAssign;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.SuperValue;
@@ -69,6 +71,18 @@ public class CodeClass extends ASTNode implements IClass
 	public int getClassType()
 	{
 		return this.type;
+	}
+	
+	@Override
+	public CompilationUnit getUnit()
+	{
+		return this.unit;
+	}
+	
+	@Override
+	public Package getPackage()
+	{
+		return this.unit.pack;
 	}
 	
 	@Override
@@ -397,6 +411,52 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			predef.getMethodMatches(list, type, name, argumentTypes);
 		}
+	}
+	
+	@Override
+	public boolean isMember(IMember member)
+	{
+		return this == member.getTheClass();
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		IClass iclass = member.getTheClass();
+		if (iclass == this)
+		{
+			return READ_WRITE_ACCESS;
+		}
+		
+		int level = member.getAccessLevel();
+		if (level == Modifiers.PUBLIC)
+		{
+			return READ_WRITE_ACCESS;
+		}
+		if (level == Modifiers.PROTECTED || level == Modifiers.DERIVED)
+		{
+			if (this.superClass != null && this.superClass.theClass == iclass)
+			{
+				return READ_WRITE_ACCESS;
+			}
+			
+			for (Type t : this.interfaces)
+			{
+				if (t.theClass == iclass)
+				{
+					return READ_WRITE_ACCESS;
+				}
+			}
+		}
+		if (level == Modifiers.PROTECTED || level == Modifiers.PACKAGE)
+		{
+			if (iclass.getPackage() == this.unit.pack)
+			{
+				return READ_WRITE_ACCESS;
+			}
+		}
+		
+		return INVISIBLE;
 	}
 	
 	@Override

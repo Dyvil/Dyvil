@@ -7,6 +7,7 @@ import java.util.List;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -252,6 +253,12 @@ public class CompilationUnit extends ASTNode implements IContext
 	
 	@Override
 	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
 	{
 		throw new UnsupportedOperationException();
 	}
