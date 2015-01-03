@@ -7,16 +7,16 @@ import java.util.Arrays;
 
 public class Main
 {
-	public static void main(String[] args) =
+	private static int test1;
+	
+	public static int test
 	{
-		"test" hashCode;
+		get: test1 + 1;
+		set: test1 = test + 1;
+	}
+	
+	public static void main(String[] args) = {
+		test = 3;
+		System out println(test);
 	};
-	
-	public implicit void print(int[] a) = System out println(Arrays toString(a));
-	
-	public implicit void print(float[] a) = System out println(Arrays toString(a));
-	
-	public implicit void print(String[] a) = System out println(Arrays toString(a));
-	
-	public implicit void print(int i) = System out println(i);
 }

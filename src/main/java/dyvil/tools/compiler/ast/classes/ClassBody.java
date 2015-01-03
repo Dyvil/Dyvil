@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.field.Parameter;
+import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
@@ -15,9 +16,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassBody extends ASTNode
 {
-	protected IClass		theClass;
-	protected List<IField>	fields	= new ArrayList();
-	protected List<IMethod>	methods	= new ArrayList();
+	protected IClass			theClass;
+	protected List<IField>		fields		= new ArrayList();
+	protected List<IMethod>		methods		= new ArrayList();
+	protected List<Property>	properties	= new ArrayList();
 	
 	public ClassBody(ICodePosition position)
 	{
@@ -40,9 +42,9 @@ public class ClassBody extends ASTNode
 		return this.theClass;
 	}
 	
-	public void addField(IField var)
+	public void addField(IField field)
 	{
-		this.fields.add(var);
+		this.fields.add(field);
 	}
 	
 	public IField getField(String name)
@@ -52,6 +54,23 @@ public class ClassBody extends ASTNode
 			if (name.equals(field.getName()))
 			{
 				return field;
+			}
+		}
+		return null;
+	}
+	
+	public void addProperty(Property prop)
+	{
+		this.properties.add(prop);
+	}
+	
+	public Property getProperty(String name)
+	{
+		for (Property prop : this.properties)
+		{
+			if (name.equals(prop.getName()))
+			{
+				return prop;
 			}
 		}
 		return null;
@@ -124,6 +143,10 @@ public class ClassBody extends ASTNode
 		{
 			field.applyState(state, context);
 		}
+		for (Property prop : this.properties)
+		{
+			prop.applyState(state, context);
+		}
 		for (IMethod method : this.methods)
 		{
 			method.applyState(state, context);
@@ -140,6 +163,16 @@ public class ClassBody extends ASTNode
 			for (IField field : this.fields)
 			{
 				field.toString(prefix, buffer);
+				buffer.append('\n');
+			}
+			buffer.append('\n');
+		}
+		
+		if (!this.properties.isEmpty())
+		{
+			for (Property prop : this.properties)
+			{
+				prop.toString(prefix, buffer);
 				buffer.append('\n');
 			}
 			buffer.append('\n');

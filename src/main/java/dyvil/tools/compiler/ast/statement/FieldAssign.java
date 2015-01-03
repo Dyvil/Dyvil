@@ -132,14 +132,34 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 			{
 				this.field.applyState(state, context);
 			}
+			else if (this.instance != null)
+			{
+				this.instance.applyState(state, context);
+			}
 		}
 		else if (state == CompilerState.RESOLVE)
 		{
-			if (this.value != null)
+			if (!this.initializer)
 			{
-				this.value.applyState(state, context);
+				FieldMatch match;
+				if (this.instance == null)
+				{
+					match = context.resolveField(null, this.qualifiedName);
+				}
+				else
+				{
+					match = this.instance.getType().resolveField(context, this.qualifiedName);
+				}
+				
+				if (match != null)
+				{
+					this.field = match.theField;
+				}
+				else
+				{
+					state.addMarker(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a field"));
+				}
 			}
-			return this;
 		}
 		else if (state == CompilerState.CHECK)
 		{

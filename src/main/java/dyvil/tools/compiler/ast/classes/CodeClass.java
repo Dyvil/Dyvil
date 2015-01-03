@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.expression.MethodCall;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.statement.FieldAssign;
@@ -324,8 +325,15 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public FieldMatch resolveField(IContext context, String name)
 	{
+		// Own properties
+		IField field = this.body.getProperty(name);
+		if (field != null)
+		{
+			return new FieldMatch(field, 1);
+		}
+		
 		// Own fields
-		IField field = this.body.getField(name);
+		field = this.body.getField(name);
 		if (field != null)
 		{
 			return new FieldMatch(field, 1);
@@ -513,6 +521,11 @@ public class CodeClass extends ASTNode implements IClass
 					instanceFields.addValue(assign);
 				}
 			}
+		}
+		
+		for (Property p : this.body.properties)
+		{
+			p.write(writer);
 		}
 		
 		for (IMethod m : methods)

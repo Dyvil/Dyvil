@@ -9,17 +9,20 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
+import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.Member;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
-public class Field extends Member implements IField
+public class Field extends Member implements IField, IContext
 {
 	private IValue	value;
 	
@@ -99,7 +102,7 @@ public class Field extends Member implements IField
 		{
 			if (this.value != null)
 			{
-				this.value = this.value.applyState(state, context);
+				this.value = this.value.applyState(state, this);
 			}
 			
 			for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
@@ -115,13 +118,69 @@ public class Field extends Member implements IField
 			}
 			return this;
 		}
+		else if (state == CompilerState.CHECK)
+		{
+			if (this.value != null && !this.value.requireType(this.type))
+			{
+				state.addMarker(new SemanticError(this.value.getPosition(), "The value of the field '" + this.name + "' is incompatible with the field type " + this.type));
+			}
+		}
 		
 		if (this.value != null)
 		{
-			this.value = this.value.applyState(state, context);
+			this.value = this.value.applyState(state, this);
 		}
 		Util.applyState(this.annotations, state, context);
 		return this;
+	}
+	
+	@Override
+	public boolean isStatic()
+	{
+		return (this.modifiers & Modifiers.STATIC) != 0;
+	}
+	
+	@Override
+	public Type getThisType()
+	{
+		return this.theClass.getThisType();
+	}
+	
+	@Override
+	public IClass resolveClass(String name)
+	{
+		return this.theClass.resolveClass(name);
+	}
+	
+	@Override
+	public FieldMatch resolveField(IContext context, String name)
+	{
+		if (name.equals(this.name))
+		{
+			return new FieldMatch(this, 1);
+		}
+		return this.theClass.resolveField(context, name);
+	}
+	
+	@Override
+	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
+	{
+		return this.theClass.resolveMethod(returnType, name, argumentTypes);
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		IClass iclass = member.getTheClass();
+		if (iclass == null)
+		{
+			return READ_WRITE_ACCESS;
+		}
+		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC))
+		{
+			return STATIC;
+		}
+		return this.theClass.getAccessibility(member);
 	}
 	
 	@Override
@@ -148,7 +207,7 @@ public class Field extends Member implements IField
 			opcode = Opcodes.GETFIELD;
 		}
 		
-		String owner = this.getTheClass().getInternalName();
+		String owner = this.theClass.getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
 		writer.visitFieldInsn(opcode, owner, name, desc, this.type);
@@ -167,7 +226,7 @@ public class Field extends Member implements IField
 			opcode = Opcodes.PUTFIELD;
 		}
 		
-		String owner = this.getTheClass().getInternalName();
+		String owner = this.theClass.getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
 		writer.visitFieldInsn(opcode, owner, name, desc, this.type);

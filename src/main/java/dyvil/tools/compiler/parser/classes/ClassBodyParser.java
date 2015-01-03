@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -29,10 +30,11 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	public static final int		TYPE			= 1;
 	public static final int		NAME			= 2;
 	public static final int		FIELD			= 4;
-	public static final int		PARAMETERS		= 8;
-	public static final int		PARAMETERS_END	= 16;
-	public static final int		METHOD_END		= 32;
-	public static final int		BODY_END		= 64;
+	public static final int		PROPERTY		= 8;
+	public static final int		PARAMETERS		= 16;
+	public static final int		PARAMETERS_END	= 32;
+	public static final int		METHOD_END		= 64;
+	public static final int		BODY_END		= 128;
 	
 	public static final int		DEFAULT_MODE	= TYPE | BODY_END;
 	
@@ -110,10 +112,10 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				}
 				else if (next.equals(";"))
 				{
-					this.mode = FIELD;
 					Field f = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
 					f.setPosition(token.raw());
 					this.body.addField(f);
+					pm.skip();
 					this.reset();
 					return true;
 				}
@@ -125,15 +127,23 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 					this.body.addMethod(this.method);
 					return true;
 				}
+				else if (next.equals("{"))
+				{
+					this.mode = PROPERTY;
+					Property property = new Property(this.theClass, value, this.type, this.modifiers, this.annotations);
+					property.setPosition(token.raw());
+					this.body.addProperty(property);
+					this.field = property;
+					pm.skip();
+					pm.pushParser(new PropertyParser(this.theClass, property));
+					return true;
+				}
 			}
 			else if (";".equals(value))
 			{
 				this.reset();
 				return true;
 			}
-			
-			pm.pushParser(new TypeParser(this), true);
-			return true;
 		}
 		if (this.isInMode(FIELD))
 		{
@@ -143,6 +153,14 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				return true;
 			}
 			else if (";".equals(value))
+			{
+				this.reset();
+				return true;
+			}
+		}
+		if (this.isInMode(PROPERTY))
+		{
+			if ("}".equals(value))
 			{
 				this.reset();
 				return true;

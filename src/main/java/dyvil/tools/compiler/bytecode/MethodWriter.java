@@ -296,6 +296,18 @@ public class MethodWriter extends MethodVisitor
 		this.mv.visitFieldInsn(opcode, owner, name, desc);
 	}
 	
+	@Override
+	public void visitMethodInsn(int opcode, String owner, String name, String desc)
+	{
+		this.mv.visitMethodInsn(opcode, owner, name, desc);
+	}
+	
+	@Override
+	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface)
+	{
+		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
+	}
+	
 	public void visitEnd(Type type)
 	{
 		if (!this.hasReturn)
