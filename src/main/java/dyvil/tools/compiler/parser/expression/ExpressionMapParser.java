@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.api.IContext;
+import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.api.IValueMap;
 import dyvil.tools.compiler.ast.api.IValued;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -16,7 +16,7 @@ public class ExpressionMapParser extends Parser implements IValued
 	public static final int	SEPERATOR	= 4;
 	
 	protected IContext		context;
-	protected IValueMap	valueMap;
+	protected IValueMap		valueMap;
 	
 	private Object			key;
 	

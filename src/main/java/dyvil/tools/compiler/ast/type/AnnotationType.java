@@ -6,12 +6,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.api.IClass;
+import dyvil.tools.compiler.ast.api.IContext;
+import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.api.IValueList;
-import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.EnumValue;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class AnnotationType extends Type
@@ -108,6 +108,6 @@ public class AnnotationType extends Type
 		{
 			return true;
 		}
-		return targets.contains(target);
+		return this.targets.contains(target);
 	}
 }

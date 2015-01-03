@@ -8,17 +8,17 @@ import java.util.Stack;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.util.OpcodeUtil;
 
 public class MethodWriter extends MethodVisitor
 {
-	private boolean		hasReturn;
-	private int			maxStack;
+	private boolean			hasReturn;
+	private int				maxStack;
 	
-	private List		locals		= new ArrayList();
+	private List			locals		= new ArrayList();
 	private Stack<IType>	typeStack	= new Stack();
 	
 	public MethodWriter(int mode, MethodVisitor mv)

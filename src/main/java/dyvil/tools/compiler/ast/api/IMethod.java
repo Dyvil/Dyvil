@@ -4,9 +4,6 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.value.IValue;
 
 public interface IMethod extends IASTNode, IMember, IValued, IThrower, IVariableList, IParameterized, IContext
 {

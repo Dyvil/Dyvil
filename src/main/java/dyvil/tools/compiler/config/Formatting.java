@@ -41,8 +41,8 @@ public class Formatting
 		public static boolean	useJavaFormat			= true;
 		public static String	dotlessSeperator		= " ";
 		
-		public static String propertyGet = "get: ";
-		public static String propertySet = "set: ";
+		public static String	propertyGet				= "get: ";
+		public static String	propertySet				= "set: ";
 	}
 	
 	public static class Method

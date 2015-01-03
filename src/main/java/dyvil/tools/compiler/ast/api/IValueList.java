@@ -2,8 +2,6 @@ package dyvil.tools.compiler.ast.api;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.value.IValue;
-
 public interface IValueList
 {
 	public void setValues(List<IValue> list);

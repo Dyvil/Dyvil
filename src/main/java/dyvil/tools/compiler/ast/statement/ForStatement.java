@@ -2,8 +2,8 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.List;
 
+import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.value.IValue;
 
 public class ForStatement extends WhileStatement
 {

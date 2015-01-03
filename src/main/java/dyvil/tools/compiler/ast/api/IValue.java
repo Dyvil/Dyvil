@@ -1,12 +1,10 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.api;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IASTNode;
 import dyvil.tools.compiler.ast.expression.ValueList;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 
 public interface IValue extends IASTNode

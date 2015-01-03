@@ -2,8 +2,6 @@ package dyvil.tools.compiler.ast.api;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IAccess extends INamed, IValue, IValued, IValueList

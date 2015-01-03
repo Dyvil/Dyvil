@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 
 public class ConstantInstruction extends Instruction

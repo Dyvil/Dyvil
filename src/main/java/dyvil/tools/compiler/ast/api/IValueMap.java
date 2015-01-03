@@ -2,8 +2,6 @@ package dyvil.tools.compiler.ast.api;
 
 import java.util.Map;
 
-import dyvil.tools.compiler.ast.value.IValue;
-
 public interface IValueMap<T>
 {
 	public void setValues(Map<T, IValue> map);

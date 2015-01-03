@@ -1,14 +1,12 @@
-package dyvil.tools.compiler.ast.classes;
+package dyvil.tools.compiler.ast.api;
 
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 
 public interface IClass extends IASTNode, INamed, IModified, ITyped, ITypeList, IAnnotatable, IContext
 {

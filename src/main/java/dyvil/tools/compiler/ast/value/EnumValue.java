@@ -4,17 +4,18 @@ import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.api.IContext;
+import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class EnumValue extends ASTNode implements IValue
 {
-	public IType type;
-	public String name;
-
+	public IType	type;
+	public String	name;
+	
 	public EnumValue(IType type, String name)
 	{
 		this.type = type;

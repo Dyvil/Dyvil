@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.parser.expression;
 
-import dyvil.tools.compiler.ast.api.ITyped;
-import dyvil.tools.compiler.ast.api.IValueList;
-import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.expression.ClassAccess;
 import dyvil.tools.compiler.ast.expression.ConstructorCall;
@@ -13,14 +11,11 @@ import dyvil.tools.compiler.ast.statement.FieldAssign;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.BytecodeParser;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -258,7 +253,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			else if ("(".equals(value))
 			{
 				IToken prev = token.prev();
-				if (prev.isType(Token.TYPE_IDENTIFIER))
+				if (prev.isType(IToken.TYPE_IDENTIFIER))
 				{
 					this.value = new MethodCall(prev, null, prev.value());
 					this.mode = PARAMETERS;

@@ -7,13 +7,8 @@ import java.util.function.Predicate;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.api.IASTNode;
-import dyvil.tools.compiler.ast.api.IMethod;
-import dyvil.tools.compiler.ast.api.IValueList;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 
 public class Util

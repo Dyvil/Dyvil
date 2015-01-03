@@ -414,7 +414,8 @@ public enum Modifiers
 		{
 			sb.append("prefix ");
 		}
-		if ((mod & OVERRIDE) == OVERRIDE) {
+		if ((mod & OVERRIDE) == OVERRIDE)
+		{
 			sb.append("override ");
 		}
 	}

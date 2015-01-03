@@ -7,11 +7,11 @@ import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.api.IContext;
+import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.api.IValueList;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
@@ -24,7 +24,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	
 	protected boolean		isArray;
 	protected IType			requiredType;
-	protected IType elementType;
+	protected IType			elementType;
 	
 	public ValueList(ICodePosition position)
 	{
@@ -50,7 +50,8 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		return true;
 	}
 	
-	private void generateTypes() {
+	private void generateTypes()
+	{
 		int len = this.values.size();
 		IType t = this.values.get(0).getType();
 		for (int i = 1; i < len; i++)
@@ -80,8 +81,10 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		return this.requiredType;
 	}
 	
-	public IType getElementType() {
-		if (this.elementType == null) {
+	public IType getElementType()
+	{
+		if (this.elementType == null)
+		{
 			this.generateTypes();
 		}
 		

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IValueList;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.ParserManager;

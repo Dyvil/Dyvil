@@ -9,7 +9,7 @@ import java.util.jar.Manifest;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.api.IClass;
 import dyvil.tools.compiler.config.CompilerConfig;
 
 public class ClassWriter

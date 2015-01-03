@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.type;
 
+import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.ITyped;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.LambdaType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.TupleType;
@@ -26,7 +26,6 @@ public class TypeParser extends Parser
 	private Type			type;
 	private int				arrayDimensions;
 	private int				arrayDimensions2;
-	
 	
 	public TypeParser(ITyped typed)
 	{

@@ -1,10 +1,7 @@
-package dyvil.tools.compiler.ast.structure;
+package dyvil.tools.compiler.ast.api;
 
-import dyvil.tools.compiler.ast.api.IMember;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.type.IType;
 
 public interface IContext
 {

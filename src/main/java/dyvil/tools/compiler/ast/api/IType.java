@@ -1,13 +1,9 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.api;
 
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IASTNode;
-import dyvil.tools.compiler.ast.api.INamed;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.structure.IContext;
 
 public interface IType extends IASTNode, INamed, IContext
 {

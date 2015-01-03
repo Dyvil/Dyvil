@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.ast.api.IClass;
+import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IMember;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.util.ClassFormat;

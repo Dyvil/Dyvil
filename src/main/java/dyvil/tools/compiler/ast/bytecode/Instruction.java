@@ -4,7 +4,7 @@ import static jdk.internal.org.objectweb.asm.Opcodes.*;
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 
 public class Instruction extends ASTNode
@@ -88,7 +88,7 @@ public class Instruction extends ASTNode
 		{
 			return new IIncInstruction(opcode, name);
 		}
-		else if ((opcode >= IFEQ && opcode <= JSR) || opcode == IFNULL || opcode == IFNONNULL)
+		else if (opcode >= IFEQ && opcode <= JSR || opcode == IFNULL || opcode == IFNONNULL)
 		{
 			return new JumpInstruction(opcode, name);
 		}

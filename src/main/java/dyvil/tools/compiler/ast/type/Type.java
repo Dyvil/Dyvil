@@ -7,11 +7,12 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.api.IClass;
+import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IMember;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
@@ -598,7 +599,7 @@ public class Type extends ASTNode implements IContext, IType
 	public Type clone()
 	{
 		Type t = new Type(this.position, this.name, this.theClass);
-		t.arrayDimensions = arrayDimensions;
+		t.arrayDimensions = this.arrayDimensions;
 		return t;
 	}
 }

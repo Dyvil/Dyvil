@@ -2,8 +2,8 @@ package dyvil.tools.compiler;
 
 import java.util.List;
 
+import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.bytecode.ClassWriter;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.Marker;

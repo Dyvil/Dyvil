@@ -366,35 +366,35 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {I2D, DADD})
+	@Bytecode(postfixOpcodes = { I2D, DADD })
 	public Double $plus(int v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {I2D, DSUB})
+	@Bytecode(postfixOpcodes = { I2D, DSUB })
 	public Double $minus(int v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {I2D, DMUL})
+	@Bytecode(postfixOpcodes = { I2D, DMUL })
 	public Double $times(int v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {I2D, DDIV})
+	@Bytecode(postfixOpcodes = { I2D, DDIV })
 	public Double $div(int v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {I2D, DREM})
+	@Bytecode(postfixOpcodes = { I2D, DREM })
 	public Double $percent(int v)
 	{
 		return this.$eq(this.value % v);
@@ -439,35 +439,35 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {L2D, DADD})
+	@Bytecode(postfixOpcodes = { L2D, DADD })
 	public Double $plus(long v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {L2D, DSUB})
+	@Bytecode(postfixOpcodes = { L2D, DSUB })
 	public Double $minus(long v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {L2D, DMUL})
+	@Bytecode(postfixOpcodes = { L2D, DMUL })
 	public Double $times(long v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {L2D, DDIV})
+	@Bytecode(postfixOpcodes = { L2D, DDIV })
 	public Double $div(long v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {L2D, DREM})
+	@Bytecode(postfixOpcodes = { L2D, DREM })
 	public Double $percent(long v)
 	{
 		return this.$eq(this.value % v);
@@ -512,35 +512,35 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {F2D, DADD})
+	@Bytecode(postfixOpcodes = { F2D, DADD })
 	public Double $plus(float v)
 	{
 		return this.$eq(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {F2D, DSUB})
+	@Bytecode(postfixOpcodes = { F2D, DSUB })
 	public Double $minus(float v)
 	{
 		return this.$eq(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {F2D, DMUL})
+	@Bytecode(postfixOpcodes = { F2D, DMUL })
 	public Double $times(float v)
 	{
 		return this.$eq(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {F2D, DDIV})
+	@Bytecode(postfixOpcodes = { F2D, DDIV })
 	public Double $div(float v)
 	{
 		return this.$eq(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {F2D, DREM})
+	@Bytecode(postfixOpcodes = { F2D, DREM })
 	public Double $percent(float v)
 	{
 		return this.$eq(this.value % v);

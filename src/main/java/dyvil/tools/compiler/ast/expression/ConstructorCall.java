@@ -3,12 +3,8 @@ package dyvil.tools.compiler.ast.expression;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.api.IAccess;
-import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -104,8 +100,10 @@ public class ConstructorCall extends Call implements ITyped
 			}
 			return this;
 		}
-		else if (state == CompilerState.CHECK) {
-			if (this.method != null) {
+		else if (state == CompilerState.CHECK)
+		{
+			if (this.method != null)
+			{
 				this.method.checkArguments(state, null, this.arguments);
 				
 				byte access = context.getAccessibility(this.method);

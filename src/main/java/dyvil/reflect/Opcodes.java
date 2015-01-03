@@ -623,27 +623,32 @@ public interface Opcodes
 	public static final int	I2S				= 147;
 	
 	/**
-	 * Removes two {@code long} values from the stack, compares them and pushes the result onto the stack.
+	 * Removes two {@code long} values from the stack, compares them and pushes
+	 * the result onto the stack.
 	 */
 	public static final int	LCMP			= 148;
 	
 	/**
-	 * Removes two {@code float} values from the stack, compares them and pushes the result onto the stack.
+	 * Removes two {@code float} values from the stack, compares them and pushes
+	 * the result onto the stack.
 	 */
 	public static final int	FCMPL			= 149;
 	
 	/**
-	 * Removes two {@code float} values from the stack, compares them and pushes the result onto the stack.
+	 * Removes two {@code float} values from the stack, compares them and pushes
+	 * the result onto the stack.
 	 */
 	public static final int	FCMPG			= 150;
 	
 	/**
-	 * Removes two {@code double} values from the stack, compares them and pushes the result onto the stack.
+	 * Removes two {@code double} values from the stack, compares them and
+	 * pushes the result onto the stack.
 	 */
 	public static final int	DCMPL			= 151;
 	
 	/**
-	 * Removes two {@code double} values from the stack, compares them and pushes the result onto the stack.
+	 * Removes two {@code double} values from the stack, compares them and
+	 * pushes the result onto the stack.
 	 */
 	public static final int	DCMPG			= 152;
 	

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class PackageDecl extends ASTNode

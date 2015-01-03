@@ -46,21 +46,21 @@ public abstract class Long implements Integer
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {L2I, I2B})
+	@Bytecode(postfixOpcodes = { L2I, I2B })
 	public byte byteValue()
 	{
 		return (byte) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {L2I, I2S})
+	@Bytecode(postfixOpcodes = { L2I, I2S })
 	public short shortValue()
 	{
 		return (short) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {L2I, I2C})
+	@Bytecode(postfixOpcodes = { L2I, I2C })
 	public char charValue()
 	{
 		return (char) this.value;
@@ -104,7 +104,8 @@ public abstract class Long implements Integer
 	}
 	
 	@Override
-	@Bytecode // TODO
+	@Bytecode
+	// TODO
 	public Long $tilde()
 	{
 		return this.$eq(~this.value);

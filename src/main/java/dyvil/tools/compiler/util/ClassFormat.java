@@ -3,8 +3,8 @@ package dyvil.tools.compiler.util;
 import java.io.File;
 
 import dyvil.tools.compiler.ast.api.IMethod;
+import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.api.ITypeList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class ClassFormat
@@ -114,7 +114,8 @@ public class ClassFormat
 		return null;
 	}
 	
-	public static IType internalToType(String internal) {
+	public static IType internalToType(String internal)
+	{
 		return internalToType(internal, new Type());
 	}
 	

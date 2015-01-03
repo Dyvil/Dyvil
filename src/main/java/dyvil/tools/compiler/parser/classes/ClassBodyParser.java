@@ -4,16 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.IAnnotatable;
-import dyvil.tools.compiler.ast.api.IField;
-import dyvil.tools.compiler.ast.api.IMethod;
-import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.classes.ClassBody;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.Method;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;

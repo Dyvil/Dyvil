@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import dyvil.tools.compiler.CompilerState;
-import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.api.IClass;
+import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -71,7 +71,7 @@ public class MultiImport extends PackageImport
 		}
 		return null;
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

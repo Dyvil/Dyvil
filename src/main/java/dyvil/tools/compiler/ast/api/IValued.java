@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.api;
 
-import dyvil.tools.compiler.ast.value.IValue;
-
 public interface IValued
 {
 	public void setValue(IValue value);

@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.api;
 
-import dyvil.tools.compiler.ast.value.IValue;
-
 public interface IProperty extends IField
 {
 	public void setGetter(IValue get);

@@ -2,13 +2,10 @@ package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IMember;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -117,7 +114,7 @@ public class SimpleImport extends ASTNode implements IImport
 	{
 		throw new UnsupportedOperationException();
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.field.Parameter;
-import dyvil.tools.compiler.ast.type.IType;
 
 public interface IParameterized extends ITyped, ITypeList
 {

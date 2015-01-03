@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IAccess;
-import dyvil.tools.compiler.ast.api.IMethod;
-import dyvil.tools.compiler.ast.api.IValueList;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class Call extends ASTNode implements IValue, IValueList, IAccess
