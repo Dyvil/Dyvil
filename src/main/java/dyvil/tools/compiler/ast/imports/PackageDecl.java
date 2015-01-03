@@ -39,6 +39,6 @@ public class PackageDecl extends ASTNode
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append("package ").append(this.thePackage).append(";");
+		buffer.append("package ").append(this.thePackage);
 	}
 }

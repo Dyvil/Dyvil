@@ -608,8 +608,6 @@ public class CodeClass extends ASTNode implements IClass
 			Util.astToString(this.interfaces, Formatting.Class.superClassesSeperator, buffer);
 		}
 		
-		buffer.append(Formatting.Class.bodyStart);
-		this.body.toString(Formatting.Class.bodyIndent, buffer);
-		buffer.append(Formatting.Class.bodyEnd);
+		this.body.toString(prefix, buffer);
 	}
 }

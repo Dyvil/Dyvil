@@ -276,8 +276,9 @@ public class CompilationUnit extends ASTNode implements IContext
 	{
 		if (this.packageDeclaration != null)
 		{
-			this.packageDeclaration.toString("", buffer);
-			buffer.append('\n');
+			buffer.append(prefix);
+			this.packageDeclaration.toString(prefix, buffer);
+			buffer.append(";\n");
 			if (Formatting.Package.newLine)
 			{
 				buffer.append('\n');
@@ -288,8 +289,9 @@ public class CompilationUnit extends ASTNode implements IContext
 		{
 			for (IImport iimport : this.imports)
 			{
-				iimport.toString("", buffer);
-				buffer.append('\n');
+				buffer.append(prefix);
+				iimport.toString(prefix, buffer);
+				buffer.append(";\n");
 			}
 			if (Formatting.Import.newLine)
 			{
@@ -299,7 +301,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		
 		for (IClass iclass : this.classes)
 		{
-			iclass.toString("", buffer);
+			iclass.toString(prefix, buffer);
 			
 			if (Formatting.Class.newLine)
 			{

@@ -15,7 +15,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class PackageImport extends ASTNode implements IImport
 {
-	public Package		pack;
+	public Package		thePackage;
 	
 	protected String	packageName;
 	
@@ -46,15 +46,9 @@ public class PackageImport extends ASTNode implements IImport
 				state.addMarker(new SemanticError(this.position, "'" + this.packageName + "' could not be resolved to a package"));
 			}
 			
-			this.pack = pack;
+			this.thePackage = pack;
 		}
 		return this;
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append(prefix).append("import ").append(this.packageName).append(Formatting.Import.packageImportEnd).append(';');
 	}
 	
 	@Override
@@ -72,11 +66,11 @@ public class PackageImport extends ASTNode implements IImport
 	@Override
 	public IClass resolveClass(String name)
 	{
-		if (this.pack == null)
+		if (this.thePackage == null)
 		{
 			return null;
 		}
-		return this.pack.resolveClass(name);
+		return this.thePackage.resolveClass(name);
 	}
 	
 	@Override
@@ -95,5 +89,11 @@ public class PackageImport extends ASTNode implements IImport
 	public byte getAccessibility(IMember member)
 	{
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("import ").append(this.packageName).append(Formatting.Import.packageImportEnd);
 	}
 }

@@ -78,12 +78,6 @@ public class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append(prefix).append("import ").append(this.qualifiedImport).append(";");
-	}
-	
-	@Override
 	public boolean isStatic()
 	{
 		return false;
@@ -121,5 +115,11 @@ public class SimpleImport extends ASTNode implements IImport
 	public byte getAccessibility(IMember member)
 	{
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("import ").append(this.qualifiedImport);
 	}
 }

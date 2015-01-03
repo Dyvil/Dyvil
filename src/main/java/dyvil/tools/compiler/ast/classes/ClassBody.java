@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import dyvil.tools.compiler.CompilerState;
@@ -12,6 +13,7 @@ import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassBody extends ASTNode
@@ -158,11 +160,14 @@ public class ClassBody extends ASTNode
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		buffer.append(prefix).append(Formatting.Class.bodyStart);
+		String prefix1 = prefix + Formatting.Class.bodyIndent;
+		
 		if (!this.fields.isEmpty())
 		{
 			for (IField field : this.fields)
 			{
-				field.toString(prefix, buffer);
+				field.toString(prefix1, buffer);
 				buffer.append('\n');
 			}
 			buffer.append('\n');
@@ -172,7 +177,7 @@ public class ClassBody extends ASTNode
 		{
 			for (Property prop : this.properties)
 			{
-				prop.toString(prefix, buffer);
+				prop.toString(prefix1, buffer);
 				buffer.append('\n');
 			}
 			buffer.append('\n');
@@ -180,12 +185,24 @@ public class ClassBody extends ASTNode
 		
 		if (!this.methods.isEmpty())
 		{
-			for (IMethod method : this.methods)
+			Iterator<IMethod> iterator = this.methods.iterator();
+			while (true)
 			{
-				method.toString(prefix, buffer);
+				IMethod method = iterator.next();
+				method.toString(prefix1, buffer);
 				buffer.append('\n');
-				buffer.append('\n');
+				
+				if (iterator.hasNext())
+				{
+					buffer.append('\n');
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
+		
+		buffer.append(prefix).append(Formatting.Class.bodyEnd);
 	}
 }

@@ -37,7 +37,7 @@ public class MultiImport extends PackageImport
 		super.applyState(state, context);
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
-			if (this.pack == null)
+			if (this.thePackage == null)
 			{
 				return this;
 			}
@@ -45,7 +45,7 @@ public class MultiImport extends PackageImport
 			this.classes = new HashSet(this.classNames.size());
 			for (String s : this.classNames)
 			{
-				IClass c = this.pack.resolveClass(s);
+				IClass c = this.thePackage.resolveClass(s);
 				if (c == null)
 				{
 					state.addMarker(new SemanticError(this.position, "'" + s + "' could not be resolved to a class"));
@@ -60,14 +60,6 @@ public class MultiImport extends PackageImport
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append(prefix).append("import ").append(this.packageName).append(Formatting.Import.multiImportStart);
-		Util.listToString(this.classNames, Formatting.Import.multiImportSeperator, buffer);
-		buffer.append(Formatting.Import.multiImportEnd).append(';');
-	}
-	
-	@Override
 	public IClass resolveClass(String name)
 	{
 		for (IClass c : this.classes)
@@ -78,5 +70,13 @@ public class MultiImport extends PackageImport
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("import ").append(this.packageName).append(Formatting.Import.multiImportStart);
+		Util.listToString(this.classNames, Formatting.Import.multiImportSeperator, buffer);
+		buffer.append(Formatting.Import.multiImportEnd);
 	}
 }
