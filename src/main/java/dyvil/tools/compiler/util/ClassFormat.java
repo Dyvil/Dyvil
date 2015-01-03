@@ -3,8 +3,8 @@ package dyvil.tools.compiler.util;
 import java.io.File;
 
 import dyvil.tools.compiler.ast.api.IMethod;
+import dyvil.tools.compiler.ast.api.IParameterized;
 import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class ClassFormat
@@ -165,7 +165,7 @@ public class ClassFormat
 		method.setType(t);
 	}
 	
-	protected static void readTypeList(String internal, int start, int end, ITypeList list)
+	protected static void readTypeList(String internal, int start, int end, IParameterized list)
 	{
 		int arrayDimensions = 0;
 		
@@ -184,7 +184,7 @@ public class ClassFormat
 				Type type = internalToType2(s);
 				type.arrayDimensions = arrayDimensions;
 				arrayDimensions = 0;
-				list.addType(type);
+				list.addParameterType(type);
 				i = end1;
 			}
 			else
@@ -192,7 +192,7 @@ public class ClassFormat
 				IType type = parseBaseType(c).clone();
 				type.setArrayDimensions(arrayDimensions);
 				arrayDimensions = 0;
-				list.addType(type);
+				list.addParameterType(type);
 			}
 		}
 	}

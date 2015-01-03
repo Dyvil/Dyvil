@@ -1,5 +1,10 @@
 package dyvil.tools.compiler.parser.classes;
 
+import java.util.List;
+
+import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.api.ITypeList;
+import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -11,14 +16,16 @@ import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class ClassDeclParser extends Parser
+public class ClassDeclParser extends Parser implements ITyped, ITypeList
 {
-	public static final int		MODIFIERS	= 0;
-	public static final int		NAME		= 1;
-	public static final int		EXTENDS		= 2;
-	public static final int		IMPLEMENTS	= 4;
-	public static final int		BODY		= 8;
-	public static final int		BODY_END	= 16;
+	public static final int		MODIFIERS		= 0;
+	public static final int		NAME			= 1;
+	public static final int		GENERICS		= 2;
+	public static final int		GENERICS_END	= 4;
+	public static final int		EXTENDS			= 8;
+	public static final int		IMPLEMENTS		= 16;
+	public static final int		BODY			= 32;
+	public static final int		BODY_END		= 64;
 	
 	protected CompilationUnit	unit;
 	
@@ -63,15 +70,35 @@ public class ClassDeclParser extends Parser
 			{
 				this.theClass.setPosition(token.raw());
 				this.theClass.setName(value);
+				this.mode = GENERICS | EXTENDS | IMPLEMENTS | BODY;
+				return true;
+			}
+			return false;
+		}
+		if (this.isInMode(GENERICS))
+		{
+			if ("<".equals(value))
+			{
+				pm.pushParser(new TypeListParser(this.theClass, true));
+				this.theClass.setGeneric();
+				this.mode = GENERICS_END;
+				return true;
+			}
+		}
+		if (this.isInMode(GENERICS_END))
+		{
+			if (">".equals(value))
+			{
 				this.mode = EXTENDS | IMPLEMENTS | BODY;
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(EXTENDS))
 		{
 			if ("extends".equals(value))
 			{
-				pm.pushParser(new TypeParser(this.theClass));
+				pm.pushParser(new TypeParser(this));
 				this.mode = IMPLEMENTS | BODY;
 				return true;
 			}
@@ -80,7 +107,7 @@ public class ClassDeclParser extends Parser
 		{
 			if ("implements".equals(value))
 			{
-				pm.pushParser(new TypeListParser(this.theClass));
+				pm.pushParser(new TypeListParser(this));
 				this.mode = BODY;
 				return true;
 			}
@@ -93,6 +120,7 @@ public class ClassDeclParser extends Parser
 				this.mode = BODY_END;
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(BODY_END))
 		{
@@ -102,7 +130,37 @@ public class ClassDeclParser extends Parser
 				pm.popParser();
 				return true;
 			}
+			return false;
 		}
 		return false;
+	}
+	
+	@Override
+	public void setType(IType type)
+	{
+		this.theClass.setSuperType(type);
+	}
+	
+	@Override
+	public IType getType()
+	{
+		return null;
+	}
+
+	@Override
+	public void setTypes(List<IType> types)
+	{
+	}
+
+	@Override
+	public List<IType> getTypes()
+	{
+		return null;
+	}
+	
+	@Override
+	public void addType(IType type)
+	{
+		this.theClass.addInterface(type);
 	}
 }

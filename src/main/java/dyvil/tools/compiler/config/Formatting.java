@@ -32,6 +32,8 @@ public class Formatting
 	{
 		public static String	array				= "[]";
 		public static String	genericSeperator	= ", ";
+		public static String	genericUpperBound	= " >= ";
+		public static String	genericLowerBound	= " <= ";
 	}
 	
 	public static class Field

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.type;
 
+import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.LambdaType;
@@ -10,18 +11,24 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
-public class TypeParser extends Parser
+public class TypeParser extends Parser implements ITyped
 {
 	public static final int	NAME			= 1;
 	public static final int	GENERICS		= 2;
 	public static final int	GENERICS_END	= 4;
-	public static final int	ARRAY			= 8;
-	public static final int	TUPLE_TYPE		= 16;
-	public static final int	LAMBDA_TYPE		= 32;
-	public static final int	LAMBDA_END		= 64;
+	public static final int	TYPE_VARIABLE	= 8;
+	public static final int	ARRAY			= 16;
+	public static final int	TUPLE_END		= 32;
+	public static final int	LAMBDA_TYPE		= 64;
+	public static final int	LAMBDA_END		= 128;
 	
-	protected ITyped		typed;
-	public boolean generic;
+	public static final int	UPPER			= 0;
+	public static final int	LOWER			= 1;
+	
+	public ITyped			typed;
+	public boolean			generic;
+	
+	private byte			boundMode;
 	
 	private Type			type;
 	private int				arrayDimensions;
@@ -37,6 +44,7 @@ public class TypeParser extends Parser
 	{
 		this.mode = NAME;
 		this.typed = typed;
+		this.generic = generic;
 	}
 	
 	@Override
@@ -49,7 +57,7 @@ public class TypeParser extends Parser
 				TupleType type = new TupleType();
 				pm.pushParser(new TypeListParser(type));
 				this.type = type;
-				this.mode = TUPLE_TYPE;
+				this.mode = TUPLE_END;
 				return true;
 			}
 			else if (token.isType(IToken.TYPE_IDENTIFIER))
@@ -61,13 +69,35 @@ public class TypeParser extends Parser
 					this.mode = GENERICS;
 					return true;
 				}
-				
-				this.type = new Type(token, value);
-				this.mode = ARRAY;
-				return true;
+				else if (this.generic)
+				{
+					this.type = new TypeVariable(token, value);
+					this.mode = TYPE_VARIABLE;
+					return true;
+				}
+				else
+				{
+					this.type = new Type(token, value);
+					this.mode = ARRAY;
+					return true;
+				}
 			}
+			else if ("_".equals(value))
+			{
+				if (this.generic)
+				{
+					this.type = new TypeVariable(token, value);
+					this.mode = TYPE_VARIABLE;
+					return true;
+				}
+				else
+				{
+					throw new SyntaxError(token, "Invalid generic Wildcard Type");
+				}
+			}
+			return false;
 		}
-		if (this.isInMode(TUPLE_TYPE))
+		if (this.isInMode(TUPLE_END))
 		{
 			if (")".equals(value))
 			{
@@ -79,9 +109,11 @@ public class TypeParser extends Parser
 					return true;
 				}
 				
+				this.type.expandPosition(token);
 				pm.popParser();
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(LAMBDA_TYPE))
 		{
@@ -91,6 +123,7 @@ public class TypeParser extends Parser
 		}
 		if (this.isInMode(LAMBDA_END))
 		{
+			this.type.expandPosition(token.prev());
 			pm.popParser(true);
 			return true;
 		}
@@ -113,6 +146,7 @@ public class TypeParser extends Parser
 			}
 			else
 			{
+				this.type.expandPosition(token.prev());
 				pm.popParser(true);
 				return true;
 			}
@@ -121,15 +155,35 @@ public class TypeParser extends Parser
 		{
 			if ("<".equals(value))
 			{
-				pm.pushParser(new TypeListParser((GenericType) this.type, true));
+				GenericType generic = (GenericType) this.type;
+				generic.setGeneric();
+				pm.pushParser(new TypeListParser(generic));
 				this.mode = GENERICS_END;
 				return true;
 			}
 			else
 			{
+				this.type.expandPosition(token.prev());
 				pm.popParser(true);
 				return true;
 			}
+		}
+		if (this.isInMode(TYPE_VARIABLE))
+		{
+			if ("<=".equals(value))
+			{
+				pm.pushParser(new TypeParser(this));
+				this.boundMode = LOWER;
+				return true;
+			}
+			else if (">=".equals(value))
+			{
+				pm.pushParser(new TypeParser(this));
+				this.boundMode = UPPER;
+				return true;
+			}
+			pm.popParser(true);
+			return true;
 		}
 		if (this.isInMode(GENERICS_END))
 		{
@@ -150,5 +204,24 @@ public class TypeParser extends Parser
 			this.type.setArrayDimensions(this.arrayDimensions);
 		}
 		this.typed.setType(this.type);
+	}
+	
+	@Override
+	public void setType(IType type)
+	{
+		if (this.boundMode == UPPER)
+		{
+			((TypeVariable) this.type).addUpperBound(type);
+		}
+		else if (this.boundMode == LOWER)
+		{
+			((TypeVariable) this.type).addLowerBound(type);
+		}
+	}
+	
+	@Override
+	public IType getType()
+	{
+		return null;
 	}
 }

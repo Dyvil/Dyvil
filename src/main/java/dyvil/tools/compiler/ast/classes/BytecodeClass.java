@@ -44,15 +44,15 @@ public class BytecodeClass extends CodeClass
 	{
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
-			if (this.superClass != null)
+			if (this.superType != null)
 			{
-				if (this.superClass.isName("void"))
+				if (this.superType.isName("void"))
 				{
-					this.superClass = null;
+					this.superType = null;
 				}
 				else
 				{
-					this.superClass = this.superClass.resolve(context);
+					this.superType = this.superType.resolve(context);
 				}
 			}
 			Util.applyState(this.interfaces, state, context);
@@ -131,11 +131,11 @@ public class BytecodeClass extends CodeClass
 		
 		if (superName != null)
 		{
-			this.superClass = ClassFormat.internalToType(superName);
+			this.superType = ClassFormat.internalToType(superName);
 		}
 		else
 		{
-			this.superClass = null;
+			this.superType = null;
 		}
 		
 		if (interfaces != null)

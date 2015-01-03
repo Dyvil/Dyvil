@@ -5,21 +5,11 @@ import dyvil.lang.annotation.byref;
 import dyvil.reflect.Opcodes;
 import java.util.{Arrays, HashMap};
 
-public class Main
+public class Main<T>
 {
 	private static int test1;
 	
 	public static HashMap<String, String> map;
 	
-	public static int test
-	{
-		get: test1 + 1;
-		set: test1 = test + 1;
-	}
-	
-	public static void main(String[] args) = {
-		3 / 4;
-		test = 3;
-		System out println(test);
-	};
+	public void add<T>() = { }; 
 }

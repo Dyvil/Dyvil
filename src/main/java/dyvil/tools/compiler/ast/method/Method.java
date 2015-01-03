@@ -24,6 +24,8 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
+	private List<IType>		generics;
+	
 	private List<Parameter>	parameters			= new ArrayList(3);
 	private List<IType>		throwsDeclarations	= new ArrayList(1);
 	
@@ -85,6 +87,36 @@ public class Method extends Member implements IMethod
 			this.qualifiedName = name;
 			this.name = Symbols.contract(name);
 		}
+	}
+	
+	@Override
+	public void setGeneric()
+	{
+		this.generics = new ArrayList(2);
+	}
+	
+	@Override
+	public boolean isGeneric()
+	{
+		return this.generics != null;
+	}
+	
+	@Override
+	public void setTypes(List<IType> types)
+	{
+		this.generics = types;
+	}
+	
+	@Override
+	public List<IType> getTypes()
+	{
+		return this.generics;
+	}
+	
+	@Override
+	public void addType(IType type)
+	{
+		this.generics.add(type);
 	}
 	
 	@Override
@@ -550,6 +582,13 @@ public class Method extends Member implements IMethod
 		else
 		{
 			buffer.append(this.name);
+		}
+		
+		if (this.generics != null)
+		{
+			buffer.append('<');
+			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
+			buffer.append('>');
 		}
 		
 		Util.parametersToString(this.parameters, buffer, true);

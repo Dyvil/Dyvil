@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.api.IClass;
+import dyvil.tools.compiler.ast.api.IGeneric;
 import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.ITypeList;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class GenericType extends Type implements ITypeList
+public class GenericType extends Type implements IGeneric
 {
-	public List<IType>	generics	= new ArrayList();
+	public List<IType>	generics;
 	
 	public GenericType()
 	{
@@ -37,6 +37,18 @@ public class GenericType extends Type implements ITypeList
 	public GenericType(ICodePosition position, String name, IClass iclass)
 	{
 		super(position, name, iclass);
+	}
+	
+	@Override
+	public void setGeneric()
+	{
+		this.generics = new ArrayList(2);
+	}
+	
+	@Override
+	public boolean isGeneric()
+	{
+		return this.generics != null;
 	}
 	
 	@Override
@@ -78,24 +90,30 @@ public class GenericType extends Type implements ITypeList
 			buf.append('[');
 		}
 		buf.append('L').append(this.getInternalName());
-		buf.append('<');
-		for (IType t : this.generics)
+		if (this.generics != null)
 		{
-			t.appendSignature(buf);
+			buf.append('<');
+			for (IType t : this.generics)
+			{
+				t.appendSignature(buf);
+			}
+			buf.append('>').append(';');
 		}
-		buf.append('>').append(';');
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.name);
-		buffer.append('<');
-		Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
-		buffer.append('>');
-		for (int i = 0; i < this.arrayDimensions; i++)
+		if (this.generics != null)
 		{
-			buffer.append(Formatting.Type.array);
+			buffer.append('<');
+			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
+			buffer.append('>');
+			for (int i = 0; i < this.arrayDimensions; i++)
+			{
+				buffer.append(Formatting.Type.array);
+			}
 		}
 	}
 }

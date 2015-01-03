@@ -5,7 +5,7 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.CompilerState;
 
-public interface IMethod extends IASTNode, IMember, IValued, IThrower, IVariableList, IParameterized, IContext
+public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower, IVariableList, IParameterized, IContext
 {
 	@Override
 	public IMethod applyState(CompilerState state, IContext context);

@@ -18,19 +18,21 @@ import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
+import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
+public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnotatable
 {
 	public static final int		TYPE			= 1;
 	public static final int		NAME			= 2;
 	public static final int		FIELD			= 4;
 	public static final int		PROPERTY		= 8;
-	public static final int		PARAMETERS		= 16;
-	public static final int		PARAMETERS_END	= 32;
-	public static final int		METHOD_END		= 64;
-	public static final int		BODY_END		= 128;
+	public static final int		GENERICS		= 16;
+	public static final int		PARAMETERS		= 32;
+	public static final int		PARAMETERS_END	= 64;
+	public static final int		METHOD_END		= 128;
+	public static final int		BODY_END		= 256;
 	
 	public static final int		DEFAULT_MODE	= TYPE | BODY_END;
 	
@@ -115,6 +117,17 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 					this.reset();
 					return true;
 				}
+				else if (next.equals("<"))
+				{
+					this.mode = GENERICS;
+					this.method = new Method(this.theClass, value, this.type, this.modifiers, this.annotations);
+					this.method.setPosition(token.raw());
+					this.method.setGeneric();
+					this.body.addMethod(this.method);
+					pm.skip();
+					pm.pushParser(new TypeListParser(this, true));
+					return true;
+				}
 				else if (next.equals("("))
 				{
 					this.mode = PARAMETERS;
@@ -135,11 +148,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 					return true;
 				}
 			}
-			else if (";".equals(value))
-			{
-				this.reset();
-				return true;
-			}
+			return false;
 		}
 		if (this.isInMode(FIELD))
 		{
@@ -153,6 +162,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				this.reset();
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(PROPERTY))
 		{
@@ -161,6 +171,16 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				this.reset();
 				return true;
 			}
+			return false;
+		}
+		if (this.isInMode(GENERICS))
+		{
+			if (">".equals(value))
+			{
+				this.mode = PARAMETERS;
+				return true;
+			}
+			return false;
 		}
 		if (this.isInMode(PARAMETERS))
 		{
@@ -170,6 +190,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				this.mode = PARAMETERS_END;
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(PARAMETERS_END))
 		{
@@ -178,6 +199,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				this.mode = METHOD_END;
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(METHOD_END))
 		{
@@ -196,6 +218,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 				this.reset();
 				return true;
 			}
+			return false;
 		}
 		
 		return false;
@@ -211,6 +234,23 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	public Type getType()
 	{
 		return null;
+	}
+	
+	@Override
+	public void setTypes(List<IType> types)
+	{
+	}
+	
+	@Override
+	public List<IType> getTypes()
+	{
+		return null;
+	}
+	
+	@Override
+	public void addType(IType type)
+	{
+		this.method.addType(type);
 	}
 	
 	@Override

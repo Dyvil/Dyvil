@@ -9,9 +9,6 @@ public interface IField extends IASTNode, IMember, IValued
 	@Override
 	public IField applyState(CompilerState state, IContext context);
 	
-	@Override
-	public IClass getTheClass();
-	
 	// Compilation
 	
 	public void write(ClassWriter writer);

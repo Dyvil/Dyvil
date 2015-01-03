@@ -8,23 +8,35 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 
-public interface IClass extends IASTNode, INamed, IModified, ITyped, ITypeList, IAnnotatable, IContext
+public interface IClass extends IASTNode, IAnnotatable, IModified, INamed, IGeneric, IContext
 {
 	public CompilationUnit getUnit();
 	
 	public Package getPackage();
 	
+	public IType toType();
+	
+	// Super Types
+	
+	public void setSuperType(IType type);
+	
 	public IType getSuperType();
+	
+	public boolean isSuperType(IType t);
+	
+	// Interfaces
+	
+	public void setInterfaces(List<IType> interfaces);
 	
 	public List<IType> getInterfaces();
 	
-	public IType toType();
+	public void addInterface(IType type);
+	
+	// Body
 	
 	public void setBody(ClassBody body);
 	
 	public ClassBody getBody();
-	
-	public boolean isSuperType(IType t);
 	
 	public void getMethodMatches(List<MethodMatch> matches, IType type, String name, IType... argumentTypes);
 	

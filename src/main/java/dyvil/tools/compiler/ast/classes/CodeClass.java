@@ -41,8 +41,10 @@ public class CodeClass extends ASTNode implements IClass
 	
 	protected List<Annotation>	annotations	= new ArrayList(1);
 	
-	protected IType				superClass	= Type.OBJECT;
+	protected IType				superType	= Type.OBJECT;
 	protected List<IType>		interfaces	= new ArrayList(1);
+	
+	protected List<IType>		generics;
 	
 	protected ClassBody			body;
 	
@@ -79,6 +81,44 @@ public class CodeClass extends ASTNode implements IClass
 	public Package getPackage()
 	{
 		return this.unit.pack;
+	}
+	
+	@Override
+	public Type toType()
+	{
+		return new Type(this.name, this);
+	}
+	
+	@Override
+	public void setAnnotations(List<Annotation> annotations)
+	{
+		this.annotations = annotations;
+	}
+	
+	@Override
+	public List<Annotation> getAnnotations()
+	{
+		return this.annotations;
+	}
+	
+	@Override
+	public void addAnnotation(Annotation annotation)
+	{
+		annotation.target = ElementType.TYPE;
+		this.annotations.add(annotation);
+	}
+	
+	@Override
+	public Annotation getAnnotation(IType type)
+	{
+		for (Annotation a : this.annotations)
+		{
+			if (a.type.equals(type))
+			{
+				return a;
+			}
+		}
+		return null;
 	}
 	
 	@Override
@@ -146,63 +186,75 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void setAnnotations(List<Annotation> annotations)
+	public void setGeneric()
 	{
-		this.annotations = annotations;
+		this.generics = new ArrayList(2);
 	}
 	
 	@Override
-	public List<Annotation> getAnnotations()
+	public boolean isGeneric()
 	{
-		return this.annotations;
-	}
-	
-	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		annotation.target = ElementType.TYPE;
-		this.annotations.add(annotation);
-	}
-	
-	@Override
-	public Annotation getAnnotation(IType type)
-	{
-		for (Annotation a : this.annotations)
-		{
-			if (a.type.equals(type))
-			{
-				return a;
-			}
-		}
-		return null;
-	}
-	
-	@Override
-	public void setType(IType type)
-	{
-		this.superClass = type;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return this.toType();
+		return this.generics != null;
 	}
 	
 	@Override
 	public void setTypes(List<IType> types)
 	{
-		this.interfaces = types;
+		this.generics = types;
 	}
 	
 	@Override
 	public List<IType> getTypes()
 	{
-		return this.interfaces;
+		return this.generics;
 	}
 	
 	@Override
 	public void addType(IType type)
+	{
+		this.generics.add(type);
+	}
+	
+	@Override
+	public void setSuperType(IType type)
+	{
+		this.superType = type;
+	}
+	
+	@Override
+	public IType getSuperType()
+	{
+		return this.superType;
+	}
+	
+	@Override
+	public boolean isSuperType(IType t)
+	{
+		if (this.interfaces.contains(t))
+		{
+			return true;
+		}
+		else if (this.superType != null)
+		{
+			return this.superType.isAssignableFrom(t);
+		}
+		return false;
+	}
+	
+	@Override
+	public void setInterfaces(List<IType> interfaces)
+	{
+		this.interfaces = interfaces;
+	}
+	
+	@Override
+	public List<IType> getInterfaces()
+	{
+		return this.interfaces;
+	}
+	
+	@Override
+	public void addInterface(IType type)
 	{
 		this.interfaces.add(type);
 	}
@@ -217,38 +269,6 @@ public class CodeClass extends ASTNode implements IClass
 	public ClassBody getBody()
 	{
 		return this.body;
-	}
-	
-	@Override
-	public Type toType()
-	{
-		return new Type(this.name, this);
-	}
-	
-	@Override
-	public IType getSuperType()
-	{
-		return this.superClass;
-	}
-	
-	@Override
-	public List<IType> getInterfaces()
-	{
-		return this.interfaces;
-	}
-	
-	@Override
-	public boolean isSuperType(IType t)
-	{
-		if (this.interfaces.contains(t))
-		{
-			return true;
-		}
-		else if (this.superClass != null)
-		{
-			return this.superClass.isAssignableFrom(t);
-		}
-		return false;
 	}
 	
 	@Override
@@ -280,15 +300,15 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		if (state == CompilerState.RESOLVE_TYPES)
 		{
-			if (this.superClass != null)
+			if (this.superType != null)
 			{
-				if (this.superClass.isName("void"))
+				if (this.superType.isName("void"))
 				{
-					this.superClass = null;
+					this.superType = null;
 				}
 				else
 				{
-					this.superClass = this.superClass.resolve(context);
+					this.superType = this.superType.resolve(context);
 				}
 			}
 			Util.applyState(this.interfaces, state, context);
@@ -343,9 +363,9 @@ public class CodeClass extends ASTNode implements IClass
 		IClass predef = Type.PREDEF.theClass;
 		
 		// Inherited Fields
-		if (this.superClass != null && this != predef)
+		if (this.superType != null && this != predef)
 		{
-			match = this.superClass.resolveField(context, name);
+			match = this.superType.resolveField(context, name);
 			if (match != null)
 			{
 				return match;
@@ -406,9 +426,9 @@ public class CodeClass extends ASTNode implements IClass
 		
 		IClass predef = Type.PREDEF.theClass;
 		
-		if (this.superClass != null && this != predef)
+		if (this.superType != null && this != predef)
 		{
-			this.superClass.getMethodMatches(list, type, name, argumentTypes);
+			this.superType.getMethodMatches(list, type, name, argumentTypes);
 		}
 		for (IType i : this.interfaces)
 		{
@@ -443,7 +463,7 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.DERIVED)
 		{
-			if (this.superClass != null && this.superClass.getTheClass() == iclass)
+			if (this.superType != null && this.superType.getTheClass() == iclass)
 			{
 				return member.getAccessibility();
 			}
@@ -472,7 +492,7 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		String internalName = this.getInternalName();
 		String signature = this.getSignature();
-		String superClass = this.superClass == null ? null : this.superClass.getInternalName();
+		String superClass = this.superType == null ? null : this.superType.getInternalName();
 		String[] interfaces = this.getInterfaceArray();
 		writer.visit(Opcodes.V1_8, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
 		
@@ -553,9 +573,9 @@ public class CodeClass extends ASTNode implements IClass
 			m.setModifiers(Modifiers.PUBLIC | Modifiers.MANDATED);
 			
 			// If this class has a superclass...
-			if (this.superClass != null)
+			if (this.superType != null)
 			{
-				IClass iclass = this.superClass.getTheClass();
+				IClass iclass = this.superType.getTheClass();
 				if (iclass != null)
 				{
 					IMethod m1 = iclass.getBody().getMethod("<init>");
@@ -563,7 +583,7 @@ public class CodeClass extends ASTNode implements IClass
 					if (m1 != null)
 					{
 						// Create the call to the super constructor
-						MethodCall superConstructor = new MethodCall(null, new SuperValue(null, this.superClass), "<init>");
+						MethodCall superConstructor = new MethodCall(null, new SuperValue(null, this.superType), "<init>");
 						superConstructor.method = m1;
 						instanceFields.getValues().add(0, superConstructor);
 					}
@@ -597,10 +617,17 @@ public class CodeClass extends ASTNode implements IClass
 		buffer.append(prefix).append(Modifiers.CLASS.toString(this.modifiers));
 		buffer.append(Modifiers.CLASS_TYPE.toString(this.type)).append(this.name);
 		
-		if (this.superClass != null)
+		if (this.generics != null)
+		{
+			buffer.append('<');
+			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
+			buffer.append('>');
+		}
+		
+		if (this.superType != null)
 		{
 			buffer.append(" extends ");
-			this.superClass.toString("", buffer);
+			this.superType.toString("", buffer);
 		}
 		else
 		{
