@@ -94,9 +94,13 @@ public class Type extends ASTNode implements IContext
 		DOUBLE.theClass = Package.dyvilLang.resolveClass("Double");
 		
 		OBJECT.theClass = Package.javaLang.resolveClass("Object");
+		OBJECT.name = "Object";
 		PREDEF.theClass = Package.dyvilLang.resolveClass("Predef");
+		PREDEF.name = "Predef";
 		ARRAY.theClass = Package.dyvilLang.resolveClass("Array");
+		ARRAY.name = "Array";
 		STRING.theClass = Package.javaLang.resolveClass("String");
+		STRING.name = "String";
 		
 		ABytecode.theClass = Package.dyvilLangAnnotation.resolveClass("Bytecode");
 		AOverride.theClass = Package.javaLang.resolveClass("Override");
