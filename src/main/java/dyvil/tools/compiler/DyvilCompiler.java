@@ -101,13 +101,7 @@ public class DyvilCompiler
 		{
 			logger.setUseParentHandlers(false);
 			
-			File file = new File("dyvilc.log");
-			if (file.exists())
-			{
-				file.delete();
-			}
-			
-			String path = file.getAbsolutePath();
+			String path = new File("dyvilc.log").getAbsolutePath();
 			Formatter formatter = new Formatter()
 			{
 				@Override
@@ -119,7 +113,7 @@ public class DyvilCompiler
 					return builder.toString();
 				}
 			};
-			FileHandler fh = new FileHandler(path);
+			FileHandler fh = new FileHandler(path, true);
 			fh.setFormatter(formatter);
 			StreamHandler ch = new StreamHandler(System.out, formatter);
 			
