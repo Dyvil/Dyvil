@@ -433,26 +433,26 @@ public class CodeClass extends ASTNode implements IClass
 		IClass iclass = member.getTheClass();
 		if (iclass == this)
 		{
-			return READ_WRITE_ACCESS;
+			return member.getAccessibility();
 		}
 		
 		int level = member.getAccessLevel();
 		if (level == Modifiers.PUBLIC)
 		{
-			return READ_WRITE_ACCESS;
+			return member.getAccessibility();
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.DERIVED)
 		{
 			if (this.superClass != null && this.superClass.theClass == iclass)
 			{
-				return READ_WRITE_ACCESS;
+				return member.getAccessibility();
 			}
 			
 			for (Type t : this.interfaces)
 			{
 				if (t.theClass == iclass)
 				{
-					return READ_WRITE_ACCESS;
+					return member.getAccessibility();
 				}
 			}
 		}
@@ -460,7 +460,7 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			if (iclass.getPackage() == this.unit.pack)
 			{
-				return READ_WRITE_ACCESS;
+				return member.getAccessibility();
 			}
 		}
 		

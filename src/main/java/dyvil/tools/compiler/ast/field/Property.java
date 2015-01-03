@@ -75,6 +75,12 @@ public class Property extends Field
 		}
 		else if (state == CompilerState.CHECK)
 		{
+			if (this.get == null && this.set == null)
+			{
+				state.addMarker(new SemanticError(this.position, "The property '" + this.name + "' does not have a getter nor a setter"));
+				Util.applyState(this.annotations, state, context);
+				return this;
+			}
 			if (this.get != null && !this.get.requireType(this.type))
 			{
 				state.addMarker(new SemanticError(this.get.getPosition(), "The getter value of the property '" + this.name + "' is incompatible with the property type " + this.type));
@@ -137,6 +143,21 @@ public class Property extends Field
 		String name = "get$" + this.qualifiedName;
 		String desc = "()" + this.type.getExtendedName();
 		writer.visitMethodInsn(opcode, owner, name, desc, false);
+	}
+	
+	@Override
+	public byte getAccessibility()
+	{
+		byte b = 0;
+		if (this.get != null)
+		{
+			b |= READ_ACCESS;
+		}
+		if (this.set != null)
+		{
+			b |= WRITE_ACCESS;
+		}
+		return b;
 	}
 	
 	@Override
