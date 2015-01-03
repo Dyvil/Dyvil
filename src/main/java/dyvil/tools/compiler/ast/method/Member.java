@@ -157,10 +157,23 @@ public abstract class Member extends ASTNode implements IMember
 		return this.qualifiedName;
 	}
 	
+	@Override
 	public void setQualifiedName(String name)
 	{
 		this.qualifiedName = name;
 		this.name = Symbols.contract(name);
+	}
+	
+	@Override
+	public String getQualifiedName()
+	{
+		return this.qualifiedName;
+	}
+	
+	@Override
+	public boolean isName(String name)
+	{
+		return this.qualifiedName.equals(name);
 	}
 	
 	@Override

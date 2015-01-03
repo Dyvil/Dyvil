@@ -8,6 +8,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IMethod;
+import dyvil.tools.compiler.ast.api.IProperty;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -21,7 +22,7 @@ public class ClassBody extends ASTNode
 	protected IClass			theClass;
 	protected List<IField>		fields		= new ArrayList();
 	protected List<IMethod>		methods		= new ArrayList();
-	protected List<Property>	properties	= new ArrayList();
+	protected List<IProperty>	properties	= new ArrayList();
 	
 	public ClassBody(ICodePosition position)
 	{
@@ -66,11 +67,11 @@ public class ClassBody extends ASTNode
 		this.properties.add(prop);
 	}
 	
-	public Property getProperty(String name)
+	public IProperty getProperty(String name)
 	{
-		for (Property prop : this.properties)
+		for (IProperty prop : this.properties)
 		{
-			if (name.equals(prop.getName()))
+			if (prop.isName(name))
 			{
 				return prop;
 			}
@@ -145,7 +146,7 @@ public class ClassBody extends ASTNode
 		{
 			field.applyState(state, context);
 		}
-		for (Property prop : this.properties)
+		for (IProperty prop : this.properties)
 		{
 			prop.applyState(state, context);
 		}
@@ -175,7 +176,7 @@ public class ClassBody extends ASTNode
 		
 		if (!this.properties.isEmpty())
 		{
-			for (Property prop : this.properties)
+			for (IProperty prop : this.properties)
 			{
 				prop.toString(prefix1, buffer);
 				buffer.append('\n');

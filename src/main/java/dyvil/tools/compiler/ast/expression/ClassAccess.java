@@ -50,6 +50,23 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	}
 	
 	@Override
+	public void setQualifiedName(String name)
+	{
+	}
+	
+	@Override
+	public String getQualifiedName()
+	{
+		return this.type.qualifiedName;
+	}
+	
+	@Override
+	public boolean isName(String name)
+	{
+		return this.type.qualifiedName.equals(name);
+	}
+	
+	@Override
 	public void setValue(IValue value)
 	{
 	}

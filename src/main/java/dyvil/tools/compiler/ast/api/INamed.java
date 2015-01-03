@@ -6,8 +6,14 @@ public interface INamed
 	
 	public String getName();
 	
+	public void setQualifiedName(String name);
+	
+	public String getQualifiedName();
+	
 	public default boolean hasName()
 	{
 		return this.getName() != null;
 	}
+	
+	public boolean isName(String name);
 }

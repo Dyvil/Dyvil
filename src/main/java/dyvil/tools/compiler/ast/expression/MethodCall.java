@@ -59,13 +59,31 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public void setName(String name)
 	{
-		this.qualifiedName = name;
+		this.name = name;
 	}
 	
 	@Override
 	public String getName()
 	{
+		return this.name;
+	}
+	
+	@Override
+	public void setQualifiedName(String name)
+	{
+		this.qualifiedName = name;
+	}
+	
+	@Override
+	public String getQualifiedName()
+	{
 		return this.qualifiedName;
+	}
+	
+	@Override
+	public boolean isName(String name)
+	{
+		return this.qualifiedName.equals(name);
 	}
 	
 	@Override

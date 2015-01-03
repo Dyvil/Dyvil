@@ -13,9 +13,9 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.api.IMethod;
+import dyvil.tools.compiler.ast.api.IProperty;
 import dyvil.tools.compiler.ast.expression.MethodCall;
 import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.statement.FieldAssign;
@@ -133,9 +133,21 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public void setQualifiedName(String name)
+	{
+		this.qualifiedName = name;
+	}
+	
+	@Override
 	public String getQualifiedName()
 	{
 		return this.qualifiedName;
+	}
+	
+	@Override
+	public boolean isName(String name)
+	{
+		return this.qualifiedName.equals(name);
 	}
 	
 	@Override
@@ -523,7 +535,7 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		for (Property p : this.body.properties)
+		for (IProperty p : this.body.properties)
 		{
 			p.write(writer);
 		}

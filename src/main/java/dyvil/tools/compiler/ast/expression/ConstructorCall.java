@@ -46,7 +46,24 @@ public class ConstructorCall extends Call implements ITyped
 	@Override
 	public String getName()
 	{
+		return "new";
+	}
+	
+	@Override
+	public void setQualifiedName(String name)
+	{
+	}
+	
+	@Override
+	public String getQualifiedName()
+	{
 		return "<init>";
+	}
+	
+	@Override
+	public boolean isName(String name)
+	{
+		return "<init>".equals(name);
 	}
 	
 	@Override

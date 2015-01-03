@@ -7,6 +7,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IMethod;
+import dyvil.tools.compiler.ast.api.IProperty;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -18,7 +19,7 @@ import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
-public class Property extends Field
+public class Property extends Field implements IProperty
 {
 	public IValue		get;
 	public IValue		set;
@@ -45,6 +46,30 @@ public class Property extends Field
 	public Property(IClass iclass, String name, Type type, int modifiers, List<Annotation> annotations)
 	{
 		super(iclass, name, type, modifiers, annotations);
+	}
+	
+	@Override
+	public void setGetter(IValue get)
+	{
+		this.get = get;
+	}
+	
+	@Override
+	public IValue getGetter()
+	{
+		return this.get;
+	}
+	
+	@Override
+	public void setSetter(IValue set)
+	{
+		this.set = set;
+	}
+	
+	@Override
+	public IValue getSetter()
+	{
+		return this.set;
 	}
 	
 	@Override

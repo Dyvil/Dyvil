@@ -72,9 +72,27 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
+	public void setQualifiedName(String name)
+	{
+		this.qualifiedName = name;
+	}
+	
+	@Override
 	public String getName()
 	{
 		return this.name;
+	}
+	
+	@Override
+	public String getQualifiedName()
+	{
+		return this.qualifiedName;
+	}
+	
+	@Override
+	public boolean isName(String name)
+	{
+		return this.qualifiedName.equals(name);
 	}
 	
 	@Override
