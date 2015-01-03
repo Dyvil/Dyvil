@@ -5,16 +5,16 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ThisValue extends ASTNode implements IValue
 {
-	public Type	type;
+	public IType	type;
 	
-	public ThisValue(ICodePosition position, Type type)
+	public ThisValue(ICodePosition position, IType type)
 	{
 		this.position = position;
 		this.type = type;
@@ -27,7 +27,7 @@ public class ThisValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.type;
 	}

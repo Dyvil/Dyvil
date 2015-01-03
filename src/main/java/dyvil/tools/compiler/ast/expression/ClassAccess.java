@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -18,9 +19,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassAccess extends ASTNode implements IValue, IAccess
 {
-	public Type	type;
+	public IType	type;
 	
-	public ClassAccess(ICodePosition position, Type type)
+	public ClassAccess(ICodePosition position, IType type)
 	{
 		this.position = position;
 		this.type = type;
@@ -33,7 +34,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.type;
 	}
@@ -46,7 +47,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public String getName()
 	{
-		return this.type.name;
+		return this.type.getName();
 	}
 	
 	@Override
@@ -57,13 +58,13 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public String getQualifiedName()
 	{
-		return this.type.qualifiedName;
+		return this.type.getQualifiedName();
 	}
 	
 	@Override
 	public boolean isName(String name)
 	{
-		return this.type.qualifiedName.equals(name);
+		return this.type.isName(name);
 	}
 	
 	@Override
@@ -146,7 +147,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public IAccess resolve2(IContext context, IContext context1)
 	{
-		String name = this.type.qualifiedName;
+		String name = this.type.getQualifiedName();
 		FieldMatch f = context.resolveField(context1, name);
 		if (f != null)
 		{
@@ -171,7 +172,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public IAccess resolve3(IContext context, IAccess next)
 	{
-		String name = this.type.name;
+		String name = this.type.getQualifiedName();
 		MethodMatch m = context.resolveMethod(null, name, next.getType());
 		if (m != null)
 		{
@@ -189,7 +190,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public Marker getResolveError()
 	{
-		return new SyntaxError(this.position, "'" + this.type.name + "' could not be resolved to a type or field");
+		return new SyntaxError(this.position, "'" + this.type + "' could not be resolved to a type or field");
 	}
 	
 	@Override

@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -187,7 +188,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (token.isType(IToken.TYPE_IDENTIFIER) && token.next().equals("="))
 			{
 				ICodePosition pos = token.raw();
-				Type type = ((ClassAccess) this.value).getType();
+				IType type = ((ClassAccess) this.value).getType();
 				
 				FieldAssign access = new FieldAssign(pos, value, null);
 				access.field = new Variable(pos, value, type);
@@ -401,7 +402,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	}
 	
 	@Override
-	public void setType(Type type)
+	public void setType(IType type)
 	{
 		this.value = new ClassAccess(type.getPosition(), type);
 	}

@@ -5,6 +5,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -60,7 +61,7 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.getThen().getType();
 	}

@@ -5,7 +5,7 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 
 public interface IMethod extends IASTNode, IMember, IValued, IThrower, IVariableList, IParameterized, IContext
@@ -15,7 +15,7 @@ public interface IMethod extends IASTNode, IMember, IValued, IThrower, IVariable
 	
 	public void checkArguments(CompilerState state, IValue instance, List<IValue> arguments);
 	
-	public int getSignatureMatch(String name, Type type, Type... argumentTypes);
+	public int getSignatureMatch(String name, IType type, IType... argumentTypes);
 	
 	// Compilation
 	

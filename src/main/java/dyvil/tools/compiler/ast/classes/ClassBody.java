@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -127,7 +127,7 @@ public class ClassBody extends ASTNode
 		return null;
 	}
 	
-	public void getMethodMatches(List<MethodMatch> list, Type type, String name, Type... argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes)
 	{
 		for (IMethod method : this.methods)
 		{

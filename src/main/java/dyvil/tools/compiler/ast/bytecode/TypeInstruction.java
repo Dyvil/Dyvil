@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.util.ClassFormat;
 
 public class TypeInstruction extends Instruction
 {
-	private Type	type;
+	private IType	type;
 	
 	public TypeInstruction(int opcode, String name)
 	{

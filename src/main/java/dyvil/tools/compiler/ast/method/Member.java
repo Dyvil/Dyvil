@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 
@@ -20,7 +20,7 @@ public abstract class Member extends ASTNode implements IMember
 	
 	protected int				modifiers;
 	
-	protected Type				type;
+	protected IType				type;
 	protected String			name;
 	protected String			qualifiedName;
 	
@@ -38,7 +38,7 @@ public abstract class Member extends ASTNode implements IMember
 		this.annotations = new ArrayList(1);
 	}
 	
-	public Member(IClass iclass, String name, Type type)
+	public Member(IClass iclass, String name, IType type)
 	{
 		this.theClass = iclass;
 		this.name = name;
@@ -47,7 +47,7 @@ public abstract class Member extends ASTNode implements IMember
 		this.annotations = new ArrayList(1);
 	}
 	
-	public Member(IClass iclass, String name, Type type, int modifiers, List<Annotation> annotations)
+	public Member(IClass iclass, String name, IType type, int modifiers, List<Annotation> annotations)
 	{
 		this.theClass = iclass;
 		this.name = name;
@@ -76,7 +76,7 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
-	public Annotation getAnnotation(Type type)
+	public Annotation getAnnotation(IType type)
 	{
 		for (Annotation a : this.annotations)
 		{
@@ -133,13 +133,13 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
-	public void setType(Type type)
+	public void setType(IType type)
 	{
 		this.type = type;
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.type;
 	}

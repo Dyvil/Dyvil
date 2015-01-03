@@ -9,6 +9,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -22,7 +23,8 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	protected List<IValue>	values	= new ArrayList(3);
 	
 	protected boolean		isArray;
-	protected Type			requiredType;
+	protected IType			requiredType;
+	protected IType elementType;
 	
 	public ValueList(ICodePosition position)
 	{
@@ -48,8 +50,21 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		return true;
 	}
 	
+	private void generateTypes() {
+		int len = this.values.size();
+		IType t = this.values.get(0).getType();
+		for (int i = 1; i < len; i++)
+		{
+			IValue v = this.values.get(i);
+			t = Type.findCommonSuperType(t, v.getType());
+		}
+		this.elementType = t;
+		this.requiredType = t.clone();
+		this.requiredType.addArrayDimension();
+	}
+	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		if (this.values == null || this.values.isEmpty())
 		{
@@ -61,22 +76,22 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			return this.requiredType;
 		}
 		
-		int len = this.values.size();
-		Type t = this.values.get(0).getType();
-		for (int i = 1; i < len; i++)
-		{
-			IValue v = this.values.get(i);
-			t = Type.findCommonSuperType(t, v.getType());
+		this.generateTypes();
+		return this.requiredType;
+	}
+	
+	public IType getElementType() {
+		if (this.elementType == null) {
+			this.generateTypes();
 		}
-		t = t.clone();
-		t.arrayDimensions++;
-		return this.requiredType = t;
+		
+		return this.elementType;
 	}
 	
 	@Override
-	public boolean requireType(Type type)
+	public boolean requireType(IType type)
 	{
-		if (type.arrayDimensions > 0)
+		if (type.isArrayType())
 		{
 			this.isArray = true;
 			if (this.requiredType != null)
@@ -141,8 +156,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		if (state == CompilerState.CHECK)
 		{
-			Type type = this.requiredType;
-			type.arrayDimensions--;
+			IType type = this.elementType;
 			for (IValue value : this.values)
 			{
 				if (!value.requireType(type))
@@ -152,7 +166,6 @@ public class ValueList extends ASTNode implements IValue, IValueList
 				
 				value.applyState(state, context);
 			}
-			type.arrayDimensions++;
 		}
 		int len = this.values.size();
 		for (int i = 0; i < len; i++)
@@ -172,7 +185,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		if (this.isArray)
 		{
-			Type type = this.getType();
+			IType type = this.getElementType();
 			int len = this.values.size();
 			int opcode = type.getArrayStoreOpcode();
 			

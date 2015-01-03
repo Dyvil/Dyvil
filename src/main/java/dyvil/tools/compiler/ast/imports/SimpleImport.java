@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -106,7 +107,7 @@ public class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext returnType, String name, IType... argumentTypes)
 	{
 		throw new UnsupportedOperationException();
 	}

@@ -10,8 +10,8 @@ import dyvil.tools.compiler.util.Util;
 
 public class LambdaType extends Type implements ITyped, ITypeList
 {
-	public Type			returnType;
-	public List<Type>	argumentTypes;
+	public IType			returnType;
+	public List<IType>	argumentTypes;
 	
 	public LambdaType()
 	{
@@ -24,31 +24,31 @@ public class LambdaType extends Type implements ITyped, ITypeList
 	}
 	
 	@Override
-	public void setType(Type type)
+	public void setType(IType type)
 	{
 		this.returnType = type;
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.returnType;
 	}
 	
 	@Override
-	public void setTypes(List<Type> types)
+	public void setTypes(List<IType> types)
 	{
 		this.argumentTypes = types;
 	}
 	
 	@Override
-	public List<Type> getTypes()
+	public List<IType> getTypes()
 	{
 		return this.argumentTypes;
 	}
 	
 	@Override
-	public void addType(Type type)
+	public void addType(IType type)
 	{
 		this.argumentTypes.add(type);
 	}

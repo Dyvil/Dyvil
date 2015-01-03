@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.api.INamed;
 import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -56,7 +56,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.field.getType();
 	}
@@ -187,7 +187,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 			}
 			else if (this.field != null)
 			{
-				Type type = this.field.getType();
+				IType type = this.field.getType();
 				if (!this.value.requireType(type))
 				{
 					state.addMarker(new SemanticError(this.value.getPosition(), "The type of the assigned value is incompatible with the required type " + type));

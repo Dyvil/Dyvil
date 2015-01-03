@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.api.IValued;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
@@ -56,7 +57,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		if (this.field == null)
 		{

@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -36,12 +36,12 @@ public class Field extends Member implements IField, IContext
 		super(iclass, name);
 	}
 	
-	public Field(IClass iclass, String name, Type type)
+	public Field(IClass iclass, String name, IType type)
 	{
 		super(iclass, name, type);
 	}
 	
-	public Field(IClass iclass, String name, Type type, int modifiers, List<Annotation> annotations)
+	public Field(IClass iclass, String name, IType type, int modifiers, List<Annotation> annotations)
 	{
 		super(iclass, name, type, modifiers, annotations);
 	}
@@ -141,7 +141,7 @@ public class Field extends Member implements IField, IContext
 	}
 	
 	@Override
-	public Type getThisType()
+	public IType getThisType()
 	{
 		return this.theClass.getThisType();
 	}
@@ -163,7 +163,7 @@ public class Field extends Member implements IField, IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext returnType, String name, IType... argumentTypes)
 	{
 		return this.theClass.resolveMethod(returnType, name, argumentTypes);
 	}

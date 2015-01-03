@@ -8,22 +8,22 @@ import dyvil.tools.compiler.util.Util;
 
 public class TupleType extends Type implements ITypeList
 {
-	public List<Type>	types	= new ArrayList(2);
+	public List<IType>	types	= new ArrayList(2);
 	
 	@Override
-	public void setTypes(List<Type> types)
+	public void setTypes(List<IType> types)
 	{
 		this.types = types;
 	}
 	
 	@Override
-	public List<Type> getTypes()
+	public List<IType> getTypes()
 	{
 		return this.types;
 	}
 	
 	@Override
-	public void addType(Type type)
+	public void addType(IType type)
 	{
 		this.types.add(type);
 	}

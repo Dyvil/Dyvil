@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -41,7 +42,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	protected IClass			theClass;
 	protected ClassBody			body;
 	
-	private Type				type;
+	private IType				type;
 	private int					modifiers;
 	private List<Annotation>	annotations;
 	
@@ -206,7 +207,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	}
 	
 	@Override
-	public void setType(Type type)
+	public void setType(IType type)
 	{
 		this.type = type;
 	}
@@ -229,7 +230,7 @@ public class ClassBodyParser extends Parser implements ITyped, IAnnotatable
 	}
 	
 	@Override
-	public Annotation getAnnotation(Type type)
+	public Annotation getAnnotation(IType type)
 	{
 		return null;
 	}

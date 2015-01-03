@@ -24,7 +24,7 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	protected boolean isAssignableFrom(Type that)
+	public boolean isAssignableFrom(IType that)
 	{
 		return false;
 	}
@@ -228,9 +228,9 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public boolean classEquals(Type type)
+	public boolean classEquals(IType type)
 	{
-		return super.classEquals(type) || this.qualifiedName.equals(type.qualifiedName);
+		return super.classEquals(type) || type.isName(this.qualifiedName);
 	}
 	
 	@Override
@@ -244,7 +244,7 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
 	{
 		if (this.theClass == null)
 		{

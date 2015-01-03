@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.api.ITypeList;
 import dyvil.tools.compiler.ast.api.ITyped;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -12,7 +12,7 @@ public class TypeListParser extends Parser implements ITyped
 {
 	protected ITypeList	typeList;
 	
-	private Type		type;
+	private IType		type;
 	
 	public TypeListParser(ITypeList typeList)
 	{
@@ -44,13 +44,13 @@ public class TypeListParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public void setType(Type type)
+	public void setType(IType type)
 	{
 		this.type = type;
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.type;
 	}

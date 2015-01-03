@@ -12,12 +12,12 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IMember;
 import dyvil.tools.compiler.ast.api.IMethod;
-import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -30,7 +30,7 @@ import dyvil.tools.compiler.util.Util;
 public class Method extends Member implements IMethod
 {
 	private List<Parameter>	parameters			= new ArrayList(3);
-	private List<Type>		throwsDeclarations	= new ArrayList(1);
+	private List<IType>		throwsDeclarations	= new ArrayList(1);
 	
 	private IValue			statement;
 	
@@ -50,12 +50,12 @@ public class Method extends Member implements IMethod
 		super(iclass, name);
 	}
 	
-	public Method(IClass iclass, String name, Type type)
+	public Method(IClass iclass, String name, IType type)
 	{
 		super(iclass, name, type);
 	}
 	
-	public Method(IClass iclass, String name, Type type, int modifiers, List<Annotation> annotations)
+	public Method(IClass iclass, String name, IType type, int modifiers, List<Annotation> annotations)
 	{
 		super(iclass, name, type, modifiers, annotations);
 	}
@@ -159,7 +159,7 @@ public class Method extends Member implements IMethod
 		int len = arguments.size();
 		List<Parameter> params = this.parameters;
 		Parameter par;
-		Type parType;
+		IType parType;
 		
 		if (instance != null && (this.modifiers & Modifiers.IMPLICIT) == Modifiers.IMPLICIT)
 		{
@@ -185,7 +185,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public int getSignatureMatch(String name, Type type, Type... argumentTypes)
+	public int getSignatureMatch(String name, IType type, IType... argumentTypes)
 	{
 		if (!name.equals(this.qualifiedName))
 		{
@@ -210,7 +210,7 @@ public class Method extends Member implements IMethod
 				return 0;
 			}
 			
-			Type t2 = params.get(0).type;
+			IType t2 = params.get(0).type;
 			if (type.equals(t2))
 			{
 				match += 2;
@@ -233,8 +233,8 @@ public class Method extends Member implements IMethod
 		
 		for (int i = 0; i < len; i++)
 		{
-			Type t1 = params.get(i + pOff).type;
-			Type t2 = argumentTypes[i];
+			IType t1 = params.get(i + pOff).type;
+			IType t2 = argumentTypes[i];
 			
 			if (t1.equals(t2))
 			{
@@ -254,19 +254,19 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void setThrows(List<Type> throwsDecls)
+	public void setThrows(List<IType> throwsDecls)
 	{
 		this.throwsDeclarations = throwsDecls;
 	}
 	
 	@Override
-	public List<Type> getThrows()
+	public List<IType> getThrows()
 	{
 		return this.throwsDeclarations;
 	}
 	
 	@Override
-	public void addThrows(Type throwsDecl)
+	public void addThrows(IType throwsDecl)
 	{
 		this.throwsDeclarations.add(throwsDecl);
 	}
@@ -331,8 +331,8 @@ public class Method extends Member implements IMethod
 			int len = this.throwsDeclarations.size();
 			for (int i = 0; i < len; i++)
 			{
-				Type t1 = this.throwsDeclarations.get(i);
-				Type t2 = t1.applyState(state, context);
+				IType t1 = this.throwsDeclarations.get(i);
+				IType t2 = t1.applyState(state, context);
 				if (t1 != t2)
 				{
 					this.throwsDeclarations.set(i, t2);
@@ -363,11 +363,14 @@ public class Method extends Member implements IMethod
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
-				Type t = this.theClass.getSuperType();
-				if (t != null && t.theClass != null)
+				IType t = this.theClass.getSuperType();
+				if (t != null)
 				{
-					ClassBody body = t.theClass.getBody();
-					this.overrideMethod = body.getMethod(this.name, this.parameters);
+					IClass iclass = t.getTheClass();
+					if (iclass != null)
+					{
+						this.overrideMethod = iclass.getBody().getMethod(this.name, this.parameters);
+					}
 				}
 			}
 		}
@@ -389,7 +392,7 @@ public class Method extends Member implements IMethod
 						state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' overrides a method, but does not have an 'override' modifier"));
 					}
 					
-					Type type = this.overrideMethod.getType();
+					IType type = this.overrideMethod.getType();
 					if (!Type.isSuperType(type, this.type))
 					{
 						state.addMarker(new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type " + type));
@@ -428,7 +431,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public Type getThisType()
+	public IType getThisType()
 	{
 		return this.theClass.getThisType();
 	}
@@ -454,7 +457,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext returnType, String name, IType... argumentTypes)
 	{
 		return this.theClass.resolveMethod(returnType, name, argumentTypes);
 	}

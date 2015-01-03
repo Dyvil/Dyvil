@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -18,7 +18,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class ConstructorCall extends Call implements ITyped
 {
-	protected Type		type;
+	protected IType		type;
 	protected boolean	isCustom;
 	
 	public ConstructorCall(ICodePosition position)
@@ -27,13 +27,13 @@ public class ConstructorCall extends Call implements ITyped
 	}
 	
 	@Override
-	public void setType(Type type)
+	public void setType(IType type)
 	{
 		this.type = type;
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.type;
 	}
@@ -162,7 +162,7 @@ public class ConstructorCall extends Call implements ITyped
 	{
 		if (!this.type.isResolved())
 		{
-			return new SemanticError(this.type.getPosition(), "'" + this.type.name + "' could not be resolved to a type");
+			return new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type");
 		}
 		return new SemanticError(this.position, "'' could not be resolved to a constructor");
 	}

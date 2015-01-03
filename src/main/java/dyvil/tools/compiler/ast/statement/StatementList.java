@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -41,7 +42,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public boolean requireType(Type type)
+	public boolean requireType(IType type)
 	{
 		this.requiredType = type;
 		if (type == Type.VOID)
@@ -102,10 +103,9 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		else if (state == CompilerState.CHECK)
 		{
-			Type type = this.getType();
 			if (this.isArray)
 			{
-				type.arrayDimensions--;
+				IType type = this.getElementType();
 				for (IValue value : this.values)
 				{
 					if (!value.requireType(type))
@@ -115,10 +115,10 @@ public class StatementList extends ValueList implements IStatement, IContext
 					
 					value.applyState(state, context);
 				}
-				type.arrayDimensions++;
 			}
 			else
 			{
+				IType type = this.getType();
 				for (IValue v : this.values)
 				{
 					if (v instanceof IStatement)
@@ -158,7 +158,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public Type getThisType()
+	public IType getThisType()
 	{
 		return this.context.getThisType();
 	}
@@ -182,7 +182,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
 	{
 		return this.context.resolveMethod(context, name, argumentTypes);
 	}

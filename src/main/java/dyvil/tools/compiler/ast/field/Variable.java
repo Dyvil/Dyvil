@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -29,7 +29,7 @@ public class Variable extends Member implements IField
 		super(null);
 	}
 	
-	public Variable(ICodePosition position, String name, Type type)
+	public Variable(ICodePosition position, String name, IType type)
 	{
 		super(null, name, type);
 		this.position = position;

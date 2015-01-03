@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.api;
 
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 
 public interface ITyped
 {
-	public void setType(Type type);
+	public void setType(IType type);
 	
-	public Type getType();
+	public IType getType();
 	
 	public default boolean hasType()
 	{

@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IField;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.util.Modifiers;
@@ -26,20 +26,20 @@ public class Parameter extends Member implements IField
 		super(null);
 	}
 	
-	public Parameter(int index, String name, Type type)
+	public Parameter(int index, String name, IType type)
 	{
 		super(null, name, type);
 		this.index = index;
 	}
 	
-	public Parameter(int index, String name, Type type, int modifiers, List<Annotation> annotations)
+	public Parameter(int index, String name, IType type, int modifiers, List<Annotation> annotations)
 	{
 		super(null, name, type, modifiers, annotations);
 		this.index = index;
 		this.seperator = ',';
 	}
 	
-	public Parameter(int index, String name, Type type, int modifiers, List<Annotation> annotations, char seperator)
+	public Parameter(int index, String name, IType type, int modifiers, List<Annotation> annotations, char seperator)
 	{
 		super(null, name, type, modifiers, annotations);
 		this.index = index;

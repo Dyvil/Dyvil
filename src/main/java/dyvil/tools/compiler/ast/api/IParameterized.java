@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.field.Parameter;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 
 public interface IParameterized extends ITyped, ITypeList
 {
@@ -19,10 +19,10 @@ public interface IParameterized extends ITyped, ITypeList
 		parameters.add(parameter);
 	}
 	
-	public default Type[] getParameterTypes()
+	public default IType[] getParameterTypes()
 	{
 		List<Parameter> parameters = this.getParameters();
-		Type[] types = new Type[parameters.size()];
+		IType[] types = new IType[parameters.size()];
 		for (int i = 0; i < types.length; i++)
 		{
 			types[i] = parameters.get(i).getType();
@@ -31,10 +31,10 @@ public interface IParameterized extends ITyped, ITypeList
 	}
 	
 	@Override
-	public default List<Type> getTypes()
+	public default List<IType> getTypes()
 	{
 		List<Parameter> parameters = this.getParameters();
-		List<Type> types = new ArrayList(parameters.size());
+		List<IType> types = new ArrayList(parameters.size());
 		for (Parameter param : parameters)
 		{
 			types.add(param.getType());
@@ -43,10 +43,10 @@ public interface IParameterized extends ITyped, ITypeList
 	}
 	
 	@Override
-	public default void setTypes(List<Type> types)
+	public default void setTypes(List<IType> types)
 	{
 		int index = 0;
-		for (Type type : types)
+		for (IType type : types)
 		{
 			this.addParameter(new Parameter(index, "par" + index, type));
 			index++;
@@ -54,7 +54,7 @@ public interface IParameterized extends ITyped, ITypeList
 	}
 	
 	@Override
-	public default void addType(Type type)
+	public default void addType(IType type)
 	{
 		int index = this.getParameters().size();
 		this.addParameter(new Parameter(index, "par" + index, type));

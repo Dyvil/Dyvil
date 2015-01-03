@@ -4,6 +4,7 @@ import java.io.File;
 
 import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.ITypeList;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class ClassFormat
@@ -87,7 +88,7 @@ public class ClassFormat
 		return -1;
 	}
 	
-	private static Type parseBaseType(char c)
+	private static IType parseBaseType(char c)
 	{
 		switch (c)
 		{
@@ -113,11 +114,11 @@ public class ClassFormat
 		return null;
 	}
 	
-	public static Type internalToType(String internal) {
+	public static IType internalToType(String internal) {
 		return internalToType(internal, new Type());
 	}
 	
-	public static Type internalToType(String internal, Type type)
+	public static IType internalToType(String internal, IType type)
 	{
 		int len = internal.length();
 		int arrayDimensions = 0;
@@ -148,7 +149,7 @@ public class ClassFormat
 			type.setQualifiedName(internalToPackage(internal));
 		}
 		
-		type.arrayDimensions = arrayDimensions;
+		type.setArrayDimensions(arrayDimensions);
 		return type;
 	}
 	
@@ -159,7 +160,7 @@ public class ClassFormat
 		
 		readTypeList(internal, 1, index, method);
 		
-		Type t = internalToType(internal.substring(index + 1));
+		IType t = internalToType(internal.substring(index + 1));
 		method.setType(t);
 	}
 	
@@ -187,8 +188,8 @@ public class ClassFormat
 			}
 			else
 			{
-				Type type = parseBaseType(c).clone();
-				type.arrayDimensions = arrayDimensions;
+				IType type = parseBaseType(c).clone();
+				type.setArrayDimensions(arrayDimensions);
 				arrayDimensions = 0;
 				list.addType(type);
 			}

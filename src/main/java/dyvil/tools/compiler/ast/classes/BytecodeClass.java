@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.bytecode.AnnotationVisitorImpl;
 import dyvil.tools.compiler.util.ClassFormat;
 import dyvil.tools.compiler.util.Modifiers;
@@ -45,7 +45,7 @@ public class BytecodeClass extends CodeClass
 		{
 			if (this.superClass != null)
 			{
-				if (this.superClass.name.equals("void"))
+				if (this.superClass.isName("void"))
 				{
 					this.superClass = null;
 				}
@@ -88,7 +88,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext returnType, String name, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext returnType, String name, IType... argumentTypes)
 	{
 		if (!this.typesResolved)
 		{
@@ -99,7 +99,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, Type type, String name, Type... argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes)
 	{
 		if (!this.typesResolved)
 		{
@@ -182,7 +182,7 @@ public class BytecodeClass extends CodeClass
 		if ((access & Modifiers.VARARGS) != 0)
 		{
 			Parameter param = parameters.get(parameters.size() - 1);
-			param.getType().arrayDimensions++;
+			param.getType().setVarargs();
 		}
 		
 		this.body.addMethod(method);

@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IntValue;
@@ -47,7 +48,7 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		if (this.method == null)
 		{
@@ -151,7 +152,7 @@ public class MethodCall extends Call implements INamed, IValued
 			return true;
 		}
 		
-		Type[] types = this.getTypes();
+		IType[] types = this.getTypes();
 		if (types == null)
 		{
 			return false;

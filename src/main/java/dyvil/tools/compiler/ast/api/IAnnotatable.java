@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.api;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 
 public interface IAnnotatable
 {
@@ -11,7 +11,7 @@ public interface IAnnotatable
 	
 	public List<Annotation> getAnnotations();
 	
-	public Annotation getAnnotation(Type type);
+	public Annotation getAnnotation(IType type);
 	
 	public default void addAnnotation(Annotation annotation)
 	{

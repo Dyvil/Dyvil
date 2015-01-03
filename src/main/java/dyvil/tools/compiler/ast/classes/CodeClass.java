@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.SuperValue;
@@ -46,8 +47,8 @@ public class CodeClass extends ASTNode implements IClass
 	
 	protected List<Annotation>	annotations	= new ArrayList(1);
 	
-	protected Type				superClass	= Type.OBJECT;
-	protected List<Type>		interfaces	= new ArrayList(1);
+	protected IType				superClass	= Type.OBJECT;
+	protected List<IType>		interfaces	= new ArrayList(1);
 	
 	protected ClassBody			body;
 	
@@ -170,7 +171,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public Annotation getAnnotation(Type type)
+	public Annotation getAnnotation(IType type)
 	{
 		for (Annotation a : this.annotations)
 		{
@@ -183,31 +184,31 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void setType(Type type)
+	public void setType(IType type)
 	{
 		this.superClass = type;
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
-		return this.superClass;
+		return this.toType();
 	}
 	
 	@Override
-	public void setTypes(List<Type> types)
+	public void setTypes(List<IType> types)
 	{
 		this.interfaces = types;
 	}
 	
 	@Override
-	public List<Type> getTypes()
+	public List<IType> getTypes()
 	{
 		return this.interfaces;
 	}
 	
 	@Override
-	public void addType(Type type)
+	public void addType(IType type)
 	{
 		this.interfaces.add(type);
 	}
@@ -231,19 +232,19 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public Type getSuperType()
+	public IType getSuperType()
 	{
 		return this.superClass;
 	}
 	
 	@Override
-	public List<Type> getInterfaces()
+	public List<IType> getInterfaces()
 	{
 		return this.interfaces;
 	}
 	
 	@Override
-	public boolean isSuperType(Type t)
+	public boolean isSuperType(IType t)
 	{
 		if (this.interfaces.contains(t))
 		{
@@ -251,14 +252,7 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		else if (this.superClass != null)
 		{
-			if (t.classEquals(this.superClass))
-			{
-				return true;
-			}
-			if (this.superClass.theClass != null)
-			{
-				return this.superClass.theClass.isSuperType(t);
-			}
+			return this.superClass.isAssignableFrom(t);
 		}
 		return false;
 	}
@@ -294,7 +288,7 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			if (this.superClass != null)
 			{
-				if (this.superClass.name.equals("void"))
+				if (this.superClass.isName("void"))
 				{
 					this.superClass = null;
 				}
@@ -355,7 +349,7 @@ public class CodeClass extends ASTNode implements IClass
 		IClass predef = Type.PREDEF.theClass;
 		
 		// Inherited Fields
-		if (this.superClass != null && this.superClass.theClass != null && this != predef)
+		if (this.superClass != null && this != predef)
 		{
 			match = this.superClass.resolveField(context, name);
 			if (match != null)
@@ -364,9 +358,9 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		for (Type type1 : this.interfaces)
+		for (IType i : this.interfaces)
 		{
-			match = type1.resolveField(context, name);
+			match = i.resolveField(context, name);
 			if (match != null)
 			{
 				return match;
@@ -387,7 +381,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
 	{
 		if (argumentTypes == null)
 		{
@@ -407,7 +401,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, Type type, String name, Type... argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes)
 	{
 		this.body.getMethodMatches(list, type, name, argumentTypes);
 		
@@ -418,13 +412,13 @@ public class CodeClass extends ASTNode implements IClass
 		
 		IClass predef = Type.PREDEF.theClass;
 		
-		if (this.superClass != null && this.superClass.theClass != null && this != predef)
+		if (this.superClass != null && this != predef)
 		{
-			this.superClass.theClass.getMethodMatches(list, type, name, argumentTypes);
+			this.superClass.getMethodMatches(list, type, name, argumentTypes);
 		}
-		for (Type type1 : this.interfaces)
+		for (IType i : this.interfaces)
 		{
-			type1.theClass.getMethodMatches(list, type, name, argumentTypes);
+			i.getMethodMatches(list, type, name, argumentTypes);
 		}
 		
 		if (list.isEmpty() && this != predef)
@@ -455,14 +449,14 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.DERIVED)
 		{
-			if (this.superClass != null && this.superClass.theClass == iclass)
+			if (this.superClass != null && this.superClass.getTheClass() == iclass)
 			{
 				return member.getAccessibility();
 			}
 			
-			for (Type t : this.interfaces)
+			for (IType i : this.interfaces)
 			{
-				if (t.theClass == iclass)
+				if (i.getTheClass() == iclass)
 				{
 					return member.getAccessibility();
 				}
@@ -565,16 +559,20 @@ public class CodeClass extends ASTNode implements IClass
 			m.setModifiers(Modifiers.PUBLIC | Modifiers.MANDATED);
 			
 			// If this class has a superclass...
-			if (this.superClass != null && this.superClass.theClass != null)
+			if (this.superClass != null)
 			{
-				IMethod m1 = this.superClass.theClass.getBody().getMethod("<init>");
-				// ... and the superclass has a default constructor
-				if (m1 != null)
+				IClass iclass = this.superClass.getTheClass();
+				if (iclass != null)
 				{
-					// Create the call to the super constructor
-					MethodCall superConstructor = new MethodCall(null, new SuperValue(null, this.superClass), "<init>");
-					superConstructor.method = m1;
-					instanceFields.getValues().add(0, superConstructor);
+					IMethod m1 = iclass.getBody().getMethod("<init>");
+					// ... and the superclass has a default constructor
+					if (m1 != null)
+					{
+						// Create the call to the super constructor
+						MethodCall superConstructor = new MethodCall(null, new SuperValue(null, this.superClass), "<init>");
+						superConstructor.method = m1;
+						instanceFields.getValues().add(0, superConstructor);
+					}
 				}
 			}
 			m.setValue(instanceFields);

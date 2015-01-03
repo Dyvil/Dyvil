@@ -5,6 +5,7 @@ import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IASTNode;
 import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 
@@ -12,14 +13,14 @@ public interface IValue extends IASTNode
 {
 	public boolean isConstant();
 	
-	public Type getType();
+	public IType getType();
 	
 	public default Object toObject()
 	{
 		throw new UnsupportedOperationException();
 	}
 	
-	public default boolean requireType(Type type)
+	public default boolean requireType(IType type)
 	{
 		return Type.isSuperType(type, this.getType());
 	}

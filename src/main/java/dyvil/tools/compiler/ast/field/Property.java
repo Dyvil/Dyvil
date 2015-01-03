@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.api.IProperty;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -38,12 +39,12 @@ public class Property extends Field implements IProperty
 		super(iclass, name);
 	}
 	
-	public Property(IClass iclass, String name, Type type)
+	public Property(IClass iclass, String name, IType type)
 	{
 		super(iclass, name, type);
 	}
 	
-	public Property(IClass iclass, String name, Type type, int modifiers, List<Annotation> annotations)
+	public Property(IClass iclass, String name, IType type, int modifiers, List<Annotation> annotations)
 	{
 		super(iclass, name, type, modifiers, annotations);
 	}

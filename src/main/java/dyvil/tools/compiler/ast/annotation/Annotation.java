@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.api.IValueMap;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.AnnotationType;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -49,7 +50,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	}
 	
 	@Override
-	public void setType(Type type)
+	public void setType(IType type)
 	{
 		this.type = (AnnotationType) type;
 	}
@@ -130,7 +131,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 					continue;
 				}
 				
-				Type type = m.getType();
+				IType type = m.getType();
 				if (!Type.isSuperType(type, value.getType()))
 				{
 					state.addMarker(new SemanticError(value.getPosition(), "The annotation value '" + key + "' does not match the required type " + type));

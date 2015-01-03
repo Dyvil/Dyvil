@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.ClassWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -252,7 +253,7 @@ public class CompilationUnit extends ASTNode implements IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
 	{
 		throw new UnsupportedOperationException();
 	}

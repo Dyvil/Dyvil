@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.api.IMethod;
 import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 
@@ -20,10 +20,10 @@ public class Util
 {
 	public static Predicate<?>	ISNULL	= a -> a == null;
 	
-	public static Type[] getTypes(List<IValue> values)
+	public static IType[] getTypes(List<IValue> values)
 	{
 		int len = values.size();
-		Type[] types = new Type[len];
+		IType[] types = new IType[len];
 		for (int i = 0; i < len; i++)
 		{
 			types[i] = values.get(i).getType();

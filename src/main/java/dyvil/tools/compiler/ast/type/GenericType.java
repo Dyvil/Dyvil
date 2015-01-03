@@ -8,7 +8,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class GenericType extends Type implements ITypeList
 {
-	public List<Type>	generics	= new ArrayList();
+	public List<IType>	generics	= new ArrayList();
 	
 	public GenericType(ICodePosition position, String name)
 	{
@@ -16,19 +16,19 @@ public class GenericType extends Type implements ITypeList
 	}
 	
 	@Override
-	public void setTypes(List<Type> types)
+	public void setTypes(List<IType> types)
 	{
 		this.generics = types;
 	}
 	
 	@Override
-	public List<Type> getTypes()
+	public List<IType> getTypes()
 	{
 		return this.generics;
 	}
 	
 	@Override
-	public void addType(Type type)
+	public void addType(IType type)
 	{
 		this.generics.add(type);
 	}

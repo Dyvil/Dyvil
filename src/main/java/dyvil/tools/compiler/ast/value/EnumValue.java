@@ -5,16 +5,17 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class EnumValue extends ASTNode implements IValue
 {
-	public Type type;
+	public IType type;
 	public String name;
 
-	public EnumValue(Type type, String name)
+	public EnumValue(IType type, String name)
 	{
 		this.type = type;
 		this.name = name;
@@ -34,7 +35,7 @@ public class EnumValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.type;
 	}

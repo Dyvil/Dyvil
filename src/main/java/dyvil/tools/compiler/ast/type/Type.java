@@ -19,7 +19,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ClassFormat;
 import dyvil.tools.compiler.util.Symbols;
 
-public class Type extends ASTNode implements IContext
+public class Type extends ASTNode implements IContext, IType
 {
 	public static Type[]	EMPTY_TYPES	= new Type[0];
 	
@@ -30,7 +30,7 @@ public class Type extends ASTNode implements IContext
 	public static Type		BYTE		= new PrimitiveType("byte", "dyvil.lang.Byte", Opcodes.T_BOOLEAN);
 	public static Type		SHORT		= new PrimitiveType("short", "dyvil.lang.Short", Opcodes.T_SHORT);
 	public static Type		CHAR		= new PrimitiveType("char", "dyvil.lang.Char", Opcodes.T_CHAR);
-	public static Type		INT			= new PrimitiveType("int", "dyvil.lang,Int", Opcodes.T_INT);
+	public static Type		INT			= new PrimitiveType("int", "dyvil.lang.Int", Opcodes.T_INT);
 	public static Type		LONG		= new PrimitiveType("long", "dyvil.lang.Long", Opcodes.T_LONG);
 	public static Type		FLOAT		= new PrimitiveType("float", "dyvil.lang.Float", Opcodes.T_FLOAT);
 	public static Type		DOUBLE		= new PrimitiveType("double", "dyvil.lang.Double", Opcodes.T_DOUBLE);
@@ -108,15 +108,15 @@ public class Type extends ASTNode implements IContext
 		ATarget.theClass = Package.javaLangAnnotation.resolveClass("Target");
 	}
 	
-	public static Type findCommonSuperType(Type type1, Type type2)
+	public static IType findCommonSuperType(IType type1, IType type2)
 	{
-		Type t = superType(type1, type2);
+		IType t = superType(type1, type2);
 		if (t != null)
 		{
 			return t;
 		}
 		
-		Type superType1 = type1;
+		IType superType1 = type1;
 		while (true)
 		{
 			superType1 = superType1.getSuperType();
@@ -125,7 +125,7 @@ public class Type extends ASTNode implements IContext
 				break;
 			}
 			
-			Type superType2 = type2;
+			IType superType2 = type2;
 			while (true)
 			{
 				superType2 = superType2.getSuperType();
@@ -144,9 +144,9 @@ public class Type extends ASTNode implements IContext
 		return OBJECT;
 	}
 	
-	private static Type superType(Type type1, Type type2)
+	private static IType superType(IType type1, IType type2)
 	{
-		if (type1.arrayDimensions != type2.arrayDimensions)
+		if (type1.getArrayDimensions() != type2.getArrayDimensions())
 		{
 			return OBJECT;
 		}
@@ -161,7 +161,7 @@ public class Type extends ASTNode implements IContext
 		return null;
 	}
 	
-	public static boolean isSuperType(Type superType, Type subType)
+	public static boolean isSuperType(IType superType, IType subType)
 	{
 		if (subType == NONE && !(superType instanceof PrimitiveType))
 		{
@@ -174,6 +174,19 @@ public class Type extends ASTNode implements IContext
 		return superType.isAssignableFrom(subType);
 	}
 	
+	@Override
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public String getName()
+	{
+		return this.name;
+	}
+	
+	@Override
 	public void setQualifiedName(String name)
 	{
 		this.qualifiedName = name;
@@ -186,32 +199,69 @@ public class Type extends ASTNode implements IContext
 		this.name = name.substring(index + 1);
 	}
 	
+	@Override
+	public String getQualifiedName()
+	{
+		return this.qualifiedName;
+	}
+	
+	@Override
+	public boolean isName(String name)
+	{
+		return this.qualifiedName.equals(name);
+	}
+	
+	@Override
 	public void setClass(IClass theClass)
 	{
 		this.theClass = theClass;
 	}
 	
+	@Override
+	public IClass getTheClass()
+	{
+		return this.theClass;
+	}
+	
+	@Override
 	public void setArrayDimensions(int dimensions)
 	{
 		this.arrayDimensions = dimensions;
 	}
 	
+	@Override
 	public int getArrayDimensions()
 	{
 		return this.arrayDimensions;
 	}
 	
+	@Override
+	public void setVarargs()
+	{
+		this.arrayDimensions = 1;
+		// TODO
+	}
+	
+	@Override
+	public void addArrayDimension()
+	{
+		this.arrayDimensions++;
+	}
+	
+	@Override
 	public boolean isArrayType()
 	{
 		return this.arrayDimensions > 0;
 	}
 	
+	@Override
 	public boolean isResolved()
 	{
 		return this.theClass != null;
 	}
 	
-	public Type getSuperType()
+	@Override
+	public IType getSuperType()
 	{
 		if (this.theClass != null)
 		{
@@ -220,24 +270,28 @@ public class Type extends ASTNode implements IContext
 		return null;
 	}
 	
-	protected boolean isAssignableFrom(Type that)
+	@Override
+	public boolean isAssignableFrom(IType type)
 	{
-		if (this.arrayDimensions != that.arrayDimensions)
+		if (this.arrayDimensions != type.getArrayDimensions())
 		{
 			return false;
 		}
-		if (that.theClass != null)
+		IClass iclass = type.getTheClass();
+		if (iclass != null)
 		{
-			return that.theClass.isSuperType(this);
+			return iclass.isSuperType(this);
 		}
 		return false;
 	}
 	
+	@Override
 	public String getInternalName()
 	{
 		return this.theClass == null ? ClassFormat.packageToInternal(this.qualifiedName) : this.theClass.getInternalName();
 	}
 	
+	@Override
 	public final String getExtendedName()
 	{
 		StringBuilder buf = new StringBuilder();
@@ -254,42 +308,50 @@ public class Type extends ASTNode implements IContext
 		buf.append('L').append(this.getInternalName()).append(';');
 	}
 	
+	@Override
 	public String getSignature()
 	{
 		// TODO Generic signature
 		return null;
 	}
 	
+	@Override
 	public Object getFrameType()
 	{
 		return this.getExtendedName();
 	}
 	
+	@Override
 	public int getLoadOpcode()
 	{
 		return Opcodes.ALOAD;
 	}
 	
+	@Override
 	public int getArrayLoadOpcode()
 	{
 		return Opcodes.AALOAD;
 	}
 	
+	@Override
 	public int getStoreOpcode()
 	{
 		return Opcodes.ASTORE;
 	}
 	
+	@Override
 	public int getArrayStoreOpcode()
 	{
 		return Opcodes.AASTORE;
 	}
 	
+	@Override
 	public int getReturnOpcode()
 	{
 		return Opcodes.ARETURN;
 	}
 	
+	@Override
 	public Type resolve(IContext context)
 	{
 		if (this.theClass == null)
@@ -415,7 +477,7 @@ public class Type extends ASTNode implements IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, Type... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
 	{
 		if (this.theClass == null)
 		{
@@ -436,8 +498,8 @@ public class Type extends ASTNode implements IContext
 		
 		if (list.isEmpty() && context != null)
 		{
-			Type t = context.getThisType();
-			t.theClass.getMethodMatches(list, this, name, argumentTypes);
+			IType t = context.getThisType();
+			t.getMethodMatches(list, this, name, argumentTypes);
 		}
 		
 		if (list.isEmpty())
@@ -449,9 +511,10 @@ public class Type extends ASTNode implements IContext
 		return list.get(0);
 	}
 	
-	public boolean isMember(IMember member)
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes)
 	{
-		return member.getTheClass() == this.theClass;
+		this.theClass.getMethodMatches(list, type, name, argumentTypes);
 	}
 	
 	@Override
@@ -512,15 +575,17 @@ public class Type extends ASTNode implements IContext
 		return this.classEquals(other);
 	}
 	
-	public boolean classEquals(Type type)
+	@Override
+	public boolean classEquals(IType type)
 	{
-		if (this.theClass != null && this.theClass == type.theClass)
+		IClass iclass = type.getTheClass();
+		if (this.theClass != null && this.theClass == iclass)
 		{
 			return true;
 		}
 		
 		String thisName = this.theClass != null ? this.theClass.getQualifiedName() : this.qualifiedName;
-		String otherName = type.theClass != null ? type.theClass.getQualifiedName() : type.qualifiedName;
+		String otherName = iclass != null ? iclass.getQualifiedName() : type.getQualifiedName();
 		
 		if (thisName == null || !thisName.equals(otherName))
 		{
