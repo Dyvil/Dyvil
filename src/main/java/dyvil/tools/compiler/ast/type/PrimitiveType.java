@@ -65,6 +65,10 @@ public class PrimitiveType extends Type
 	@Override
 	public void appendExtendedName(StringBuilder buf)
 	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buf.append('[');
+		}
 		buf.append(this.getInternalName());
 	}
 	

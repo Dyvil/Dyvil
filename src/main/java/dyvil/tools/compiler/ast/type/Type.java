@@ -22,37 +22,38 @@ import dyvil.tools.compiler.util.Symbols;
 
 public class Type extends ASTNode implements IContext, IType
 {
-	public static Type[]	EMPTY_TYPES	= new Type[0];
+	public static final IType[]	EMPTY_TYPES	= new IType[0];
 	
-	public static Type		NONE		= new Type(null);
+	public static final Type	NONE		= new Type(null);
 	
-	public static Type		VOID		= new PrimitiveType("void", "dyvil.lang.Void", 0);
-	public static Type		BOOLEAN		= new PrimitiveType("boolean", "dyvil.lang.Boolean", Opcodes.T_BOOLEAN);
-	public static Type		BYTE		= new PrimitiveType("byte", "dyvil.lang.Byte", Opcodes.T_BOOLEAN);
-	public static Type		SHORT		= new PrimitiveType("short", "dyvil.lang.Short", Opcodes.T_SHORT);
-	public static Type		CHAR		= new PrimitiveType("char", "dyvil.lang.Char", Opcodes.T_CHAR);
-	public static Type		INT			= new PrimitiveType("int", "dyvil.lang.Int", Opcodes.T_INT);
-	public static Type		LONG		= new PrimitiveType("long", "dyvil.lang.Long", Opcodes.T_LONG);
-	public static Type		FLOAT		= new PrimitiveType("float", "dyvil.lang.Float", Opcodes.T_FLOAT);
-	public static Type		DOUBLE		= new PrimitiveType("double", "dyvil.lang.Double", Opcodes.T_DOUBLE);
+	public static final Type	VOID		= new PrimitiveType("void", "dyvil.lang.Void", 0);
+	public static final Type	BOOLEAN		= new PrimitiveType("boolean", "dyvil.lang.Boolean", Opcodes.T_BOOLEAN);
+	public static final Type	BYTE		= new PrimitiveType("byte", "dyvil.lang.Byte", Opcodes.T_BOOLEAN);
+	public static final Type	SHORT		= new PrimitiveType("short", "dyvil.lang.Short", Opcodes.T_SHORT);
+	public static final Type	CHAR		= new PrimitiveType("char", "dyvil.lang.Char", Opcodes.T_CHAR);
+	public static final Type	INT			= new PrimitiveType("int", "dyvil.lang.Int", Opcodes.T_INT);
+	public static final Type	LONG		= new PrimitiveType("long", "dyvil.lang.Long", Opcodes.T_LONG);
+	public static final Type	FLOAT		= new PrimitiveType("float", "dyvil.lang.Float", Opcodes.T_FLOAT);
+	public static final Type	DOUBLE		= new PrimitiveType("double", "dyvil.lang.Double", Opcodes.T_DOUBLE);
 	
-	public static Type		OBJECT		= new Type("java.lang.Object");
-	public static Type		PREDEF		= new Type("dyvil.lang.Predef");
-	public static Type		ARRAY		= new Type("dyvil.lang.Array");
-	public static Type		STRING		= new Type("java.lang.String");
+	public static final Type	OBJECT		= new Type("java.lang.Object");
+	public static final Type	PREDEF		= new Type("dyvil.lang.Predef");
+	public static final Type	ARRAY		= new Type("dyvil.lang.Array");
+	public static final Type	STRING		= new Type("java.lang.String");
 	
-	public static Type		ABytecode	= new AnnotationType("dyvil.lang.annotation.Bytecode");
-	public static Type		AOverride	= new AnnotationType("java.lang.Override");
-	public static Type		ARetention	= new AnnotationType("java.lang.annotation.Retention");
-	public static Type		ATarget		= new AnnotationType("java.lang.annotation.Target");
+	public static final Type	ABytecode	= new AnnotationType("dyvil.lang.annotation.Bytecode");
+	public static final Type	AOverride	= new AnnotationType("java.lang.Override");
+	public static final Type	ARetention	= new AnnotationType("java.lang.annotation.Retention");
+	public static final Type	ATarget		= new AnnotationType("java.lang.annotation.Target");
 	
-	public String			name;
-	public String			qualifiedName;
-	public IClass			theClass;
-	public int				arrayDimensions;
+	public String				name;
+	public String				qualifiedName;
+	public IClass				theClass;
+	public int					arrayDimensions;
 	
 	public Type()
 	{
+		super();
 	}
 	
 	public Type(String name)
@@ -296,24 +297,29 @@ public class Type extends ASTNode implements IContext, IType
 	public final String getExtendedName()
 	{
 		StringBuilder buf = new StringBuilder();
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buf.append('[');
-		}
 		this.appendExtendedName(buf);
 		return buf.toString();
 	}
 	
-	protected void appendExtendedName(StringBuilder buf)
+	@Override
+	public void appendExtendedName(StringBuilder buf)
 	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buf.append('[');
+		}
 		buf.append('L').append(this.getInternalName()).append(';');
 	}
 	
 	@Override
 	public String getSignature()
 	{
-		// TODO Generic signature
 		return null;
+	}
+	
+	@Override
+	public void appendSignature(StringBuilder buffer)
+	{
 	}
 	
 	@Override
@@ -527,12 +533,11 @@ public class Type extends ASTNode implements IContext, IType
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append(this.name);
+		buffer.append(this.name);
 		for (int i = 0; i < this.arrayDimensions; i++)
 		{
 			buffer.append(Formatting.Type.array);
 		}
-		// TODO Generics
 	}
 	
 	@Override

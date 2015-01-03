@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.imports;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IClass;
@@ -13,7 +14,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class MultiImport extends PackageImport
 {
-	public Set<String>	classNames	= new HashSet();
+	public Set<String>	classNames	= new TreeSet();
 	public Set<IClass>	classes;
 	
 	public MultiImport(ICodePosition position, String basePackage)

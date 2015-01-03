@@ -7,9 +7,13 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 
 public interface IType extends IASTNode, INamed, IContext
 {
+	// Container Class
+	
 	public void setClass(IClass theClass);
 	
 	public IClass getTheClass();
+	
+	// Arrays
 	
 	public void setArrayDimensions(int dimensions);
 	
@@ -20,6 +24,8 @@ public interface IType extends IASTNode, INamed, IContext
 	public void addArrayDimension();
 	
 	public boolean isArrayType();
+	
+	// Super Type
 	
 	public IType getSuperType();
 	
@@ -41,9 +47,15 @@ public interface IType extends IASTNode, INamed, IContext
 	
 	public String getExtendedName();
 	
+	public void appendExtendedName(StringBuilder buffer);
+	
 	public String getSignature();
 	
+	public void appendSignature(StringBuilder buffer);
+	
 	public Object getFrameType();
+	
+	// Opcodes
 	
 	public int getLoadOpcode();
 	
@@ -54,6 +66,8 @@ public interface IType extends IASTNode, INamed, IContext
 	public int getArrayStoreOpcode();
 	
 	public int getReturnOpcode();
+	
+	// Misc
 	
 	@Override
 	public IType applyState(CompilerState state, IContext context);

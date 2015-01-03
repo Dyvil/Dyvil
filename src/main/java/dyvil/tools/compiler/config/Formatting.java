@@ -30,7 +30,8 @@ public class Formatting
 	
 	public static class Type
 	{
-		public static String	array	= "[]";
+		public static String	array				= "[]";
+		public static String	genericSeperator	= ", ";
 	}
 	
 	public static class Field

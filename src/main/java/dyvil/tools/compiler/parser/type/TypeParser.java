@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.parser.type;
 
-import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.LambdaType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -13,21 +12,28 @@ import dyvil.tools.compiler.parser.ParserManager;
 
 public class TypeParser extends Parser
 {
-	public static final int	NAME		= 1;
-	public static final int	GENERICS	= 2;
-	public static final int	ARRAY		= 4;
-	public static final int	TUPLE_TYPE	= 8;
-	public static final int	LAMBDA_TYPE	= 16;
-	public static final int	LAMBDA_END	= 32;
+	public static final int	NAME			= 1;
+	public static final int	GENERICS		= 2;
+	public static final int	GENERICS_END	= 4;
+	public static final int	ARRAY			= 8;
+	public static final int	TUPLE_TYPE		= 16;
+	public static final int	LAMBDA_TYPE		= 32;
+	public static final int	LAMBDA_END		= 64;
 	
-	protected IContext		context;
 	protected ITyped		typed;
+	public boolean generic;
 	
 	private Type			type;
 	private int				arrayDimensions;
 	private int				arrayDimensions2;
 	
 	public TypeParser(ITyped typed)
+	{
+		this.mode = NAME;
+		this.typed = typed;
+	}
+	
+	public TypeParser(ITyped typed, boolean generic)
 	{
 		this.mode = NAME;
 		this.typed = typed;
@@ -49,8 +55,15 @@ public class TypeParser extends Parser
 			else if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				// TODO package.class
+				if (token.next().equals("<"))
+				{
+					this.type = new GenericType(token, value);
+					this.mode = GENERICS;
+					return true;
+				}
+				
 				this.type = new Type(token, value);
-				this.mode = ARRAY | GENERICS;
+				this.mode = ARRAY;
 				return true;
 			}
 		}
@@ -108,16 +121,21 @@ public class TypeParser extends Parser
 		{
 			if ("<".equals(value))
 			{
-				return true;
-			}
-			if (">".equals(value))
-			{
-				this.mode = ARRAY;
+				pm.pushParser(new TypeListParser((GenericType) this.type, true));
+				this.mode = GENERICS_END;
 				return true;
 			}
 			else
 			{
 				pm.popParser(true);
+				return true;
+			}
+		}
+		if (this.isInMode(GENERICS_END))
+		{
+			if (">".equals(value))
+			{
+				this.mode = ARRAY;
 				return true;
 			}
 		}
@@ -129,10 +147,6 @@ public class TypeParser extends Parser
 	{
 		if (this.type != null)
 		{
-			if (this.type instanceof PrimitiveType || this.type == Type.OBJECT || this.type == Type.STRING)
-			{
-				this.type = this.type.clone();
-			}
 			this.type.setArrayDimensions(this.arrayDimensions);
 		}
 		this.typed.setType(this.type);

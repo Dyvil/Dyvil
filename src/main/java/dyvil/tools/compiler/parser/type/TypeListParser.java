@@ -11,6 +11,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 public class TypeListParser extends Parser implements ITyped
 {
 	protected ITypeList	typeList;
+	public boolean		generic;
 	
 	private IType		type;
 	
@@ -19,13 +20,19 @@ public class TypeListParser extends Parser implements ITyped
 		this.typeList = typeList;
 	}
 	
+	public TypeListParser(ITypeList typeList, boolean generic)
+	{
+		this.typeList = typeList;
+		this.generic = generic;
+	}
+	
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		if (this.mode == 0)
 		{
 			this.mode = 1;
-			pm.pushParser(new TypeParser(this), true);
+			pm.pushParser(new TypeParser(this, this.generic), true);
 			return true;
 		}
 		if (this.mode == 1)
@@ -39,7 +46,10 @@ public class TypeListParser extends Parser implements ITyped
 		}
 		
 		pm.popParser(true);
-		this.typeList.addType(this.type);
+		if (this.type != null)
+		{
+			this.typeList.addType(this.type);
+		}
 		return true;
 	}
 	

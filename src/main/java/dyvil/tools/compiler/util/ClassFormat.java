@@ -9,10 +9,10 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class ClassFormat
 {
-	public static File		javaRTJar;
-	public static File		dyvilRTJar;
+	public static File				javaRTJar;
+	public static File				dyvilRTJar;
 	
-	private static String[]	OPCODES	= jdk.internal.org.objectweb.asm.util.Printer.OPCODES;
+	private static final String[]	OPCODES	= jdk.internal.org.objectweb.asm.util.Printer.OPCODES;
 	
 	static
 	{
