@@ -302,7 +302,7 @@ public class Dlex implements Iterable<IToken>
 			}
 			else
 			{
-				return TYPE_SYMBOL;
+				return TYPE_IDENTIFIER | MOD_SYMBOL;
 			}
 		}
 		else if (c == '@')
