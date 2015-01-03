@@ -7,10 +7,7 @@ import dyvil.tools.compiler.ast.expression.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.FieldAccess;
 import dyvil.tools.compiler.ast.expression.MethodCall;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.statement.FieldAssign;
-import dyvil.tools.compiler.ast.statement.IfStatement;
-import dyvil.tools.compiler.ast.statement.ReturnStatement;
-import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -20,6 +17,7 @@ import dyvil.tools.compiler.parser.BytecodeParser;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
+import dyvil.tools.compiler.parser.statement.WhileStatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 
 public class ExpressionParser extends Parser implements ITyped, IValued
@@ -74,27 +72,34 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			else if ("this".equals(value))
 			{
 				this.mode = ACCESS;
-				this.value = new ThisValue(token, this.context.getThisType());
+				this.value = new ThisValue(token.raw(), this.context.getThisType());
 				return true;
 			}
 			else if ("super".equals(value))
 			{
 				this.mode = ACCESS;
-				this.value = new SuperValue(token, this.context.getThisType());
+				this.value = new SuperValue(token.raw(), this.context.getThisType());
 				return true;
 			}
 			else if ("return".equals(value))
 			{
-				ReturnStatement statement = new ReturnStatement(token);
+				ReturnStatement statement = new ReturnStatement(token.raw());
 				this.value = statement;
 				pm.pushParser(new ExpressionParser(this.context, statement));
 				return true;
 			}
 			else if ("if".equals(value))
 			{
-				IfStatement statement = new IfStatement(token);
+				IfStatement statement = new IfStatement(token.raw());
 				this.value = statement;
 				pm.pushParser(new IfStatementParser(this.context, statement));
+				return true;
+			}
+			else if ("while".equals(value))
+			{
+				WhileStatement statement = new WhileStatement(token);
+				this.value = statement;
+				pm.pushParser(new WhileStatementParser(this.context, statement));
 				return true;
 			}
 			else if ("@".equals(value))
@@ -148,6 +153,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = ACCESS;
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(TUPLE_END))
 		{
@@ -157,6 +163,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = ACCESS;
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(BYTECODE))
 		{
@@ -168,6 +175,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = BYTECODE_2;
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(BYTECODE_2))
 		{
@@ -177,6 +185,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.popParser();
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(VARIABLE))
 		{
@@ -312,6 +321,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = PARAMETERS_2;
 				return true;
 			}
+			return false;
 		}
 		if (this.isInMode(PARAMETERS_2))
 		{
@@ -321,6 +331,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = ACCESS;
 				return true;
 			}
+			return false;
 		}
 		
 		if (this.value != null)

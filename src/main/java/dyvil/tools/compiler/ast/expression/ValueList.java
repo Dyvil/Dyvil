@@ -59,9 +59,12 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			IValue v = this.values.get(i);
 			t = Type.findCommonSuperType(t, v.getType());
 		}
-		this.elementType = t;
-		this.requiredType = t.clone();
-		this.requiredType.addArrayDimension();
+		if (t != null)
+		{
+			this.elementType = t;
+			this.requiredType = t.clone();
+			this.requiredType.addArrayDimension();
+		}
 	}
 	
 	@Override
@@ -78,7 +81,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		}
 		
 		this.generateTypes();
-		return this.requiredType;
+		return this.isArray ? this.requiredType : this.elementType;
 	}
 	
 	public IType getElementType()

@@ -3,26 +3,25 @@ package dyvil.tools.compiler.parser.statement;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.api.IValued;
-import dyvil.tools.compiler.ast.statement.IfStatement;
+import dyvil.tools.compiler.ast.statement.WhileStatement;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 
-public class IfStatementParser extends Parser implements IValued
+public class WhileStatementParser extends Parser implements IValued
 {
-	public static final int	IF				= 1;
-	public static final int	CONDITION_END	= 2;
-	public static final int	THEN			= 4;
-	public static final int	ELSE			= 8;
+	public static final int		CONDITION		= 1;
+	public static final int		CONDITION_END	= 2;
+	public static final int		THEN			= 4;
 	
-	protected IContext		context;
-	protected IfStatement	statement;
+	protected IContext			context;
+	protected WhileStatement	statement;
 	
-	public IfStatementParser(IContext context, IfStatement statement)
+	public WhileStatementParser(IContext context, WhileStatement statement)
 	{
-		this.mode = IF;
+		this.mode = CONDITION;
 		this.context = context;
 		this.statement = statement;
 	}
@@ -35,7 +34,7 @@ public class IfStatementParser extends Parser implements IValued
 			pm.popParser(true);
 			return true;
 		}
-		if (this.mode == IF)
+		if (this.mode == CONDITION)
 		{
 			if ("(".equals(value))
 			{
@@ -56,28 +55,12 @@ public class IfStatementParser extends Parser implements IValued
 		}
 		if (this.mode == THEN)
 		{
-			if (";".equals(value))
+			if (!";".equals(value))
 			{
-				pm.popParser(true);
-				return true;
+				pm.pushParser(new ExpressionParser(this.context, this), true);
 			}
-			pm.pushParser(new ExpressionParser(this.context, this), true);
-			this.mode = ELSE;
+			this.mode = -1;
 			return true;
-		}
-		if (this.mode == ELSE)
-		{
-			if ("else".equals(value))
-			{
-				pm.pushParser(new ExpressionParser(this.context, this));
-				this.mode = -1;
-				return true;
-			}
-			else if (";".equals(value))
-			{
-				pm.popParser(true);
-				return true;
-			}
 		}
 		
 		if ("}".equals(value))
@@ -95,13 +78,9 @@ public class IfStatementParser extends Parser implements IValued
 		{
 			this.statement.setCondition(value);
 		}
-		else if (this.mode == ELSE)
-		{
-			this.statement.setThen(value);
-		}
 		else if (this.mode == -1)
 		{
-			this.statement.setElse(value);
+			this.statement.setThen(value);
 		}
 	}
 	

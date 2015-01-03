@@ -64,7 +64,7 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public IType getType()
 	{
-		return this.getThen().getType();
+		return this.then == null ? this.condition.getType() : this.then.getType();
 	}
 	
 	@Override
@@ -80,7 +80,10 @@ public class IfStatement extends ASTNode implements IStatement
 			}
 		}
 		
-		this.then = this.then.applyState(state, context);
+		if (this.then != null)
+		{
+			this.then = this.then.applyState(state, context);
+		}
 		if (this.elseThen != null)
 		{
 			this.elseThen = this.elseThen.applyState(state, context);
@@ -92,6 +95,10 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		if (this.then == null)
+		{
+			this.condition.writeExpression(writer);
+		}
 		if (this.elseThen != null)
 		{
 			Label ifEnd = new Label();
@@ -116,6 +123,10 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		if (this.then == null)
+		{
+			this.condition.writeStatement(writer);
+		}
 		if (this.elseThen != null)
 		{
 			Label ifEnd = new Label();
@@ -143,8 +154,10 @@ public class IfStatement extends ASTNode implements IStatement
 		buffer.append(Formatting.Statements.ifStart);
 		this.condition.toString(prefix, buffer);
 		buffer.append(Formatting.Statements.ifEnd);
-		this.then.toString(prefix, buffer);
-		buffer.append(';');
+		if (this.then != null)
+		{
+			this.then.toString(prefix, buffer);
+		}
 		
 		if (this.elseThen != null)
 		{

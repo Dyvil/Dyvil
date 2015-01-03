@@ -5,11 +5,11 @@ import dyvil.lang.annotation.byref;
 import dyvil.reflect.Opcodes;
 import java.util.{Arrays, HashMap};
 
-public class Main<T>
+public class Main
 {
 	private static int test1;
 	
 	public static HashMap<String, String> map;
 	
-	public void add<T>() = { }; 
+	public static void main(String[] args) = { while (true) { System out println("test"); } };
 }
