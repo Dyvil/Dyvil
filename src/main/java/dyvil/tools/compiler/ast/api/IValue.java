@@ -20,7 +20,7 @@ public interface IValue extends IASTNode
 	
 	public default boolean requireType(IType type)
 	{
-		return Type.isSuperType(type, this.getType());
+		return type.equals(Type.OBJECT) || Type.isSuperType(type, this.getType());
 	}
 	
 	@Override

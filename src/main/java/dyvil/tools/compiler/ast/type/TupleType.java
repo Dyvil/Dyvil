@@ -3,13 +3,22 @@ package dyvil.tools.compiler.ast.type;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.api.ITypeList;
 import dyvil.tools.compiler.util.Util;
 
 public class TupleType extends Type implements ITypeList
 {
-	public List<IType>	types	= new ArrayList(2);
+	public static String[]	descriptors	= new String[22];
+	
+	public List<IType>		types		= new ArrayList(2);
+	
+	@Override
+	public boolean isName(String name)
+	{
+		return false;
+	}
 	
 	@Override
 	public void setTypes(List<IType> types)
@@ -27,6 +36,134 @@ public class TupleType extends Type implements ITypeList
 	public void addType(IType type)
 	{
 		this.types.add(type);
+	}
+	
+	@Override
+	public boolean isAssignableFrom(IType type)
+	{
+		if (type instanceof TupleType)
+		{
+			TupleType tuple = (TupleType) type;
+			
+			int len = this.types.size();
+			if (len != tuple.types.size())
+			{
+				return false;
+			}
+			
+			for (int i = 0; i < len; i++)
+			{
+				IType t1 = this.types.get(i);
+				IType t2 = tuple.types.get(i);
+				if (!t1.isAssignableFrom(t2))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		return OBJECT.classEquals(type);
+	}
+	
+	@Override
+	public boolean classEquals(IType type)
+	{
+		if (type instanceof TupleType)
+		{
+			TupleType tuple = (TupleType) type;
+			
+			int len = this.types.size();
+			if (len != tuple.types.size())
+			{
+				return false;
+			}
+			
+			for (int i = 0; i < len; i++)
+			{
+				IType t1 = this.types.get(i);
+				IType t2 = tuple.types.get(i);
+				if (!t1.classEquals(t2))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public Type resolve(IContext context)
+	{
+		int len = this.types.size();
+		for (int i = 0; i < len; i++)
+		{
+			IType t1 = this.types.get(i);
+			IType t2 = t1.resolve(context);
+			if (t1 != t2)
+			{
+				this.types.set(i, t2);
+			}
+		}
+		return this;
+	}
+	
+	@Override
+	public String getInternalName()
+	{
+		return "dyvil/lang/tuple/Tuple" + this.types.size();
+	}
+	
+	public String getConstructorDescriptor()
+	{
+		int len = this.types.size();
+		if (len < 22)
+		{
+			String s = descriptors[len];
+			if (s != null)
+			{
+				return s;
+			}
+		}
+		
+		StringBuilder buffer = new StringBuilder();
+		buffer.append('(');
+		for (int i = 0; i < len; i++)
+		{
+			buffer.append("Ljava/lang/Object;");
+		}
+		buffer.append(")V");
+		
+		String s = buffer.toString();
+		if (len < 22)
+		{
+			descriptors[len] = s;
+		}
+		return s;
+	}
+	
+	@Override
+	public String getSignature()
+	{
+		StringBuilder buf = new StringBuilder();
+		this.appendSignature(buf);
+		return buf.toString();
+	}
+	
+	@Override
+	public void appendSignature(StringBuilder buf)
+	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buf.append('[');
+		}
+		buf.append('L').append(this.getInternalName());
+		buf.append('<');
+		for (IType t : this.types)
+		{
+			t.appendSignature(buf);
+		}
+		buf.append('>').append(';');
 	}
 	
 	@Override

@@ -296,19 +296,19 @@ public class Type extends ASTNode implements IContext, IType
 	@Override
 	public final String getExtendedName()
 	{
-		StringBuilder buf = new StringBuilder();
-		this.appendExtendedName(buf);
-		return buf.toString();
+		StringBuilder buffer = new StringBuilder();
+		this.appendExtendedName(buffer);
+		return buffer.toString();
 	}
 	
 	@Override
-	public void appendExtendedName(StringBuilder buf)
+	public void appendExtendedName(StringBuilder buffer)
 	{
 		for (int i = 0; i < this.arrayDimensions; i++)
 		{
-			buf.append('[');
+			buffer.append('[');
 		}
-		buf.append('L').append(this.getInternalName()).append(';');
+		buffer.append('L').append(this.getInternalName()).append(';');
 	}
 	
 	@Override
@@ -320,6 +320,11 @@ public class Type extends ASTNode implements IContext, IType
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append('[');
+		}
+		buffer.append('L').append(this.getInternalName()).append(';');
 	}
 	
 	@Override
@@ -573,12 +578,21 @@ public class Type extends ASTNode implements IContext, IType
 		{
 			return false;
 		}
-		Type other = (Type) obj;
-		if (this.arrayDimensions != other.arrayDimensions)
+		IType other = (IType) obj;
+		if (this.arrayDimensions != other.getArrayDimensions())
 		{
 			return false;
 		}
 		return this.classEquals(other);
+	}
+	
+	public boolean equals(IType type)
+	{
+		if (this.arrayDimensions != type.getArrayDimensions())
+		{
+			return false;
+		}
+		return this.classEquals(type);
 	}
 	
 	@Override

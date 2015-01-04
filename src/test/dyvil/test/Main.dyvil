@@ -7,9 +7,8 @@ import java.util.{Arrays, HashMap};
 
 public class Main
 {
-	private static int test1;
-	
-	public static HashMap<String, String> map;
-	
-	public static void main(String[] args) = { while (true) { System out println("test"); } };
+	public static void main(String[] args) = {
+		(String, String) tuple = ("Hello", "World");
+		System out println(tuple);
+	};
 }

@@ -240,9 +240,13 @@ public class Method extends Member implements IMethod
 			IType t2 = params.get(0).type;
 			if (type.equals(t2))
 			{
-				match += 2;
+				match += 3;
 			}
 			else if (Type.isSuperType(type, t2))
+			{
+				match += 2;
+			}
+			else if (t2.classEquals(Type.OBJECT))
 			{
 				match += 1;
 			}
@@ -265,9 +269,13 @@ public class Method extends Member implements IMethod
 			
 			if (t1.equals(t2))
 			{
-				match += 2;
+				match += 3;
 			}
 			else if (Type.isSuperType(t1, t2))
+			{
+				match += 2;
+			}
+			else if (t1.classEquals(Type.OBJECT))
 			{
 				match += 1;
 			}

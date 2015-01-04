@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.expression.FieldAccess;
 import dyvil.tools.compiler.ast.expression.MethodCall;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.*;
+import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -160,7 +161,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (")".equals(value))
 			{
 				this.value.expandPosition(token);
-				this.mode = ACCESS;
+				this.mode = ACCESS | VARIABLE;
 				return true;
 			}
 			return false;
@@ -192,7 +193,19 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (token.isType(IToken.TYPE_IDENTIFIER) && token.next().equals("="))
 			{
 				ICodePosition pos = token.raw();
-				IType type = ((ClassAccess) this.value).getType();
+				IType type;
+				if (this.value instanceof ClassAccess)
+				{
+					type = ((ClassAccess) this.value).type;
+				}
+				else if (this.value instanceof TupleValue)
+				{
+					type = getTupleType((TupleValue) this.value);
+				}
+				else
+				{
+					return false;
+				}
 				
 				FieldAssign access = new FieldAssign(pos, value, null);
 				access.field = new Variable(pos, value, type);
@@ -341,6 +354,17 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			return true;
 		}
 		return false;
+	}
+	
+	private static TupleType getTupleType(TupleValue value)
+	{
+		TupleType t = new TupleType();
+		for (IValue v : value.getValues())
+		{
+			ClassAccess ca = (ClassAccess) v;
+			t.addType(ca.type);
+		}
+		return t;
 	}
 	
 	@Override

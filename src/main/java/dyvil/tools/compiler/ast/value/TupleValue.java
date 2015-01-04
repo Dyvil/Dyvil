@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.api.IValueList;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
@@ -17,6 +18,7 @@ import dyvil.tools.compiler.util.Util;
 public class TupleValue extends ASTNode implements IValue, IValueList
 {
 	private List<IValue>	values;
+	private TupleType		tupleType;
 	
 	public TupleValue()
 	{
@@ -76,10 +78,19 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public Type getType()
+	public TupleType getType()
 	{
-		// TODO Type
-		return null;
+		if (this.tupleType != null)
+		{
+			return this.tupleType;
+		}
+		
+		TupleType t = new TupleType();
+		for (IValue v : this.values)
+		{
+			t.addType(v.getType());
+		}
+		return this.tupleType = t;
 	}
 	
 	@Override
@@ -110,9 +121,20 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter visitor)
+	public void writeExpression(MethodWriter writer)
 	{
-		// TODO
+		TupleType t = this.getType();
+		writer.visitTypeInsn(Opcodes.NEW, t);
+		writer.visitInsn(Opcodes.DUP, t);
+		
+		for (IValue v : this.values)
+		{
+			v.writeExpression(writer);
+		}
+		
+		String owner = t.getInternalName();
+		String desc = t.getConstructorDescriptor();
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false);
 	}
 	
 	@Override
