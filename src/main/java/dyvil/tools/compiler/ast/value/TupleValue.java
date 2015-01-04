@@ -96,7 +96,6 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public Object toObject()
 	{
-		// TODO Tuple object
 		return null;
 	}
 	
@@ -140,7 +139,6 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		// TODO
 	}
 	
 	@Override

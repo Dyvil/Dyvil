@@ -44,7 +44,7 @@ public class ParameterListParser extends Parser
 				pm.pushParser(new AnnotationParser(this.context, this.parameter), true);
 				return true;
 			}
-			else if (token.isType(IToken.TYPE_CLOSE_BRACKET))
+			else if (")".equals(value))
 			{
 				pm.popParser(true);
 				return true;
@@ -56,7 +56,13 @@ public class ParameterListParser extends Parser
 		}
 		if (this.isInMode(NAME))
 		{
-			if (token.isType(IToken.TYPE_IDENTIFIER))
+			if ("...".equals(value))
+			{
+				this.parameterized.setVarargs();
+				this.parameter.setVarargs();
+				return true;
+			}
+			else if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
 				this.parameter.setName(value);
 				return true;

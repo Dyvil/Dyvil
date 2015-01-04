@@ -238,13 +238,6 @@ public class Type extends ASTNode implements IContext, IType
 	}
 	
 	@Override
-	public void setVarargs()
-	{
-		this.arrayDimensions = 1;
-		// TODO
-	}
-	
-	@Override
 	public void addArrayDimension()
 	{
 		this.arrayDimensions++;

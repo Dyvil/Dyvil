@@ -6,6 +6,10 @@ import dyvil.tools.compiler.ast.field.Parameter;
 
 public interface IParameterized extends ITyped
 {
+	public void setVarargs();
+	
+	public boolean isVarargs();
+	
 	public void setParameters(List<Parameter> parameters);
 	
 	public List<Parameter> getParameters();

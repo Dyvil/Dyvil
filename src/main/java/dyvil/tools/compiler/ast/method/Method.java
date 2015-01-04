@@ -120,6 +120,18 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public void setVarargs()
+	{
+		this.modifiers |= Modifiers.VARARGS;
+	}
+	
+	@Override
+	public boolean isVarargs()
+	{
+		return (this.modifiers & Modifiers.VARARGS) != 0;
+	}
+	
+	@Override
 	public void setParameters(List<Parameter> parameters)
 	{
 		this.parameters = parameters;

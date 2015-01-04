@@ -20,6 +20,7 @@ public class Parameter extends Member implements IField
 {
 	public int		index;
 	private char	seperator;
+	private boolean	varargs;
 	
 	public Parameter()
 	{
@@ -65,6 +66,18 @@ public class Parameter extends Member implements IField
 	public char getSeperator()
 	{
 		return this.seperator;
+	}
+	
+	public void setVarargs()
+	{
+		this.type = this.type.clone();
+		this.type.addArrayDimension();
+		this.varargs = true;
+	}
+	
+	public boolean isVarargs()
+	{
+		return this.varargs;
 	}
 	
 	@Override
@@ -169,6 +182,11 @@ public class Parameter extends Member implements IField
 		}
 		
 		this.type.toString("", buffer);
+		if (this.isVarargs())
+		{
+			int len = buffer.length();
+			buffer.replace(len - 2, len, "...");
+		}
 		buffer.append(' ').append(this.name);
 	}
 }

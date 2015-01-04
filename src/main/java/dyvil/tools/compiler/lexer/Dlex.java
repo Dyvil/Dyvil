@@ -68,6 +68,11 @@ public class Dlex implements Iterable<IToken>
 					{
 						buf.append(c);
 					}
+					else
+					{
+						addToken = true;
+						reparse = true;
+					}
 				}
 				else if (c == '_' || c == '$' || c == '@')
 				{

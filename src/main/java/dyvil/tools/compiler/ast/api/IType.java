@@ -19,8 +19,6 @@ public interface IType extends IASTNode, INamed, IContext
 	
 	public int getArrayDimensions();
 	
-	public void setVarargs();
-	
 	public void addArrayDimension();
 	
 	public boolean isArrayType();
