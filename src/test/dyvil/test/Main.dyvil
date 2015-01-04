@@ -5,7 +5,7 @@ import dyvil.lang.annotation.byref;
 import dyvil.reflect.Opcodes;
 import java.util.{Arrays, HashMap};
 
-public class Main
+public abstract class Main
 {
-	public static void main(String... args);
+	public Main test() = new Main();
 }

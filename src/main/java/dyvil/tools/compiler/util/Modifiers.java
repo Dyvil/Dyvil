@@ -398,6 +398,10 @@ public enum Modifiers
 		{
 			sb.append("native ");
 		}
+		if ((mod & ABSTRACT) == ABSTRACT)
+		{
+			sb.append("abstract ");
+		}
 		if ((mod & STRICT) == STRICT)
 		{
 			sb.append("strictfp ");
@@ -532,6 +536,8 @@ public enum Modifiers
 			return SYNCHRONIZED;
 		case "native":
 			return NATIVE;
+		case "abstract":
+			return ABSTRACT;
 		case "strictfp":
 			return STRICT;
 		case "inline":

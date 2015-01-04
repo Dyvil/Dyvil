@@ -90,6 +90,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public boolean isAbstract()
+	{
+		return this.type == Modifiers.INTERFACE_CLASS || (this.modifiers & Modifiers.ABSTRACT) != 0;
+	}
+	
+	@Override
 	public void setAnnotations(List<Annotation> annotations)
 	{
 		this.annotations = annotations;

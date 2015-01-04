@@ -447,9 +447,29 @@ public class Method extends Member implements IMethod
 				}
 			}
 			
-			if (this.statement != null && !this.statement.requireType(this.type))
+			if (this.statement != null)
 			{
-				state.addMarker(new SemanticError(this.statement.getPosition(), "The method '" + this.name + "' must return a result of type " + this.type));
+				if (!this.statement.requireType(this.type))
+				{
+					state.addMarker(new SemanticError(this.statement.getPosition(), "The method '" + this.name + "' must return a result of type " + this.type));
+				}
+			}
+			// If the method does not have an implementation and is static
+			else if (this.isStatic())
+			{
+				state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' is declared static, but does not have an implementation"));
+			}
+			// Or not declared abstract and a member of a non-abstract class
+			else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
+			{
+				if (this.theClass.isAbstract())
+				{
+					this.modifiers |= Modifiers.ABSTRACT;
+				}
+				else
+				{
+					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' is not implemented, but does not have an abstract modifier"));
+				}
 			}
 		}
 		

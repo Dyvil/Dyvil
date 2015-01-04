@@ -10,6 +10,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
 public class ConstructorCall extends Call implements ITyped
@@ -102,7 +103,16 @@ public class ConstructorCall extends Call implements ITyped
 		}
 		else if (state == CompilerState.CHECK)
 		{
-			if (this.method != null)
+			IClass iclass = this.type.getTheClass();
+			if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
+			{
+				state.addMarker(new SemanticError(this.position, "The interface '" + iclass.getName() + "' cannot be instantiated"));
+			}
+			else if (iclass.hasModifier(Modifiers.ABSTRACT))
+			{
+				state.addMarker(new SemanticError(this.position, "The abstract class '" + iclass.getName() + "' cannot be instantiated"));
+			}
+			else if (this.method != null)
 			{
 				this.method.checkArguments(state, null, this.arguments);
 				

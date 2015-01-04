@@ -16,6 +16,8 @@ public interface IClass extends IASTNode, IAnnotatable, IModified, INamed, IGene
 	
 	public IType toType();
 	
+	public boolean isAbstract();
+	
 	// Super Types
 	
 	public void setSuperType(IType type);
