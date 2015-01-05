@@ -565,7 +565,7 @@ public class CodeClass extends ASTNode implements IClass
 	public byte getAccessibility(IMember member)
 	{
 		IClass iclass = member.getTheClass();
-		if (iclass == this)
+		if (iclass == this || iclass == null)
 		{
 			return member.getAccessibility();
 		}

@@ -8,6 +8,7 @@ import java.util.Stack;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -211,6 +212,13 @@ public class MethodWriter extends MethodVisitor
 	@Override
 	public void visitInsn(int opcode)
 	{
+		if (opcode > 255)
+		{
+			if (opcode == Opcodes.LCONST_M1)
+			{
+				this.mv.visitLdcInsn(-1L);
+			}
+		}
 		this.mv.visitInsn(opcode);
 	}
 	

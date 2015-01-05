@@ -104,8 +104,7 @@ public abstract class Long implements Integer
 	}
 	
 	@Override
-	@Bytecode
-	// TODO
+	@Bytecode(postfixOpcodes = { LCONST_M1, LXOR })
 	public Long $tilde()
 	{
 		return this.$eq(~this.value);

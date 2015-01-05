@@ -6,6 +6,12 @@ import dyvil.reflect.Opcodes;
 
 public abstract @sealed class Array<T>
 {
+	@Bytecode(postfixOpcode = Opcodes.ARRAYLENGTH)
+	public abstract int length();
+	
+	@Bytecode(postfixOpcode = Opcodes.ARRAYLENGTH)
+	public abstract int size();
+	
 	@Bytecode(postfixOpcode = Opcodes.AALOAD)
 	public abstract T apply(int i);
 	

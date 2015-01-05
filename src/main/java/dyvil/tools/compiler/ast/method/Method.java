@@ -409,7 +409,7 @@ public class Method extends Member implements IMethod
 		
 		if (this.statement != null)
 		{
-			this.statement.resolveTypes(markers, context);
+			this.statement.resolveTypes(markers, this);
 		}
 	}
 	
@@ -448,12 +448,12 @@ public class Method extends Member implements IMethod
 		
 		for (Variable v : this.variables)
 		{
-			v.resolve(markers, context);
+			v.resolve(markers, this);
 		}
 		
 		if (this.statement != null)
 		{
-			this.statement = this.statement.resolve(markers, context);
+			this.statement = this.statement.resolve(markers, this);
 		}
 	}
 	
@@ -579,7 +579,7 @@ public class Method extends Member implements IMethod
 	{
 		for (Parameter param : this.parameters)
 		{
-			if (param.name.equals(name))
+			if (param.isName(name))
 			{
 				return new FieldMatch(param, 1);
 			}

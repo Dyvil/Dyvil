@@ -53,7 +53,6 @@ public class ThisValue extends ASTNode implements IConstantValue
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		// TODO
 	}
 	
 	@Override

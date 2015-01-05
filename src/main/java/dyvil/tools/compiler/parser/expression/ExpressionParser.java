@@ -325,6 +325,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					return true;
 				}
 			}
+			else if (")".equals(value))
+			{
+				pm.popParser(true);
+				return true;
+			}
+			return false;
 		}
 		if (this.isInMode(PARAMETERS))
 		{

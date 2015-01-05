@@ -743,4 +743,18 @@ public interface Opcodes
 	public static final int	IFNULL			= 198;
 	
 	public static final int	IFNONNULL		= 199;
+	
+	/*
+	 * --------------------------- SPECIAL OPCODES ---------------------------
+	 * Special Opcodes are only used for the @Bytecode annotation. They are
+	 * treated specially by the Dyvil Compiler in order to work with the JVM.
+	 * Because of that, these Opcodes should only ever be used in annotations
+	 * that are directly processed by the Dyvil Compiler, and they are likely to
+	 * cause problems elsewhere.
+	 */
+	
+	/**
+	 * Pushes the long {@code -1} onto the stack.
+	 */
+	public static final int	LCONST_M1		= 264;
 }
