@@ -4,15 +4,13 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IAccess;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.IValue;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -133,12 +131,18 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 			}
 			markers.add(this.getResolveError());
 		}
+		
 		return this;
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
-	{
+	public void check(List<Marker> markers, IContext context)
+	{		
+		IClass iclass = this.type.getTheClass();
+		if (iclass != null && context.getAccessibility(iclass) == IContext.SEALED)
+		{
+			markers.add(new SemanticError(this.position, "The sealed class '" + iclass.getName() + "' cannot be accessed because it is private to it's library"));
+		}
 	}
 	
 	@Override

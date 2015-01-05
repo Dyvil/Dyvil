@@ -10,6 +10,7 @@ public interface IContext
 	public static final byte	WRITE_ACCESS		= 2;
 	public static final byte	READ_WRITE_ACCESS	= 3;
 	public static final byte	STATIC				= 4;
+	public static final byte	SEALED				= 5;
 	
 	public boolean isStatic();
 	

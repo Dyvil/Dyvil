@@ -118,22 +118,16 @@ public class ConstructorCall extends Call implements ITyped
 		if (!this.resolve(context, null))
 		{
 			markers.add(new SemanticError(this.position, "The constructor could not be resolved"));
-			
-			byte access = context.getAccessibility(this.method);
-			if ((access & IContext.READ_ACCESS) == 0)
-			{
-				markers.add(new SemanticError(this.position, "The constructor cannot be invoked since it is not visible"));
-			}
 		}
 		return this;
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		for (IValue v : this.arguments)
 		{
-			v.check(markers);
+			v.check(markers, context);
 		}
 		
 		IClass iclass = this.type.getTheClass();
@@ -148,6 +142,16 @@ public class ConstructorCall extends Call implements ITyped
 		else if (this.method != null)
 		{
 			this.method.checkArguments(markers, null, this.arguments);
+			
+			byte access = context.getAccessibility(this.method);
+			if (access == IContext.SEALED)
+			{
+				markers.add(new SemanticError(this.position, "The sealed constructor cannot be invoked because it is private to it's library"));
+			}
+			else if ((access & IContext.READ_ACCESS) == 0)
+			{
+				markers.add(new SemanticError(this.position, "The constructor cannot be invoked because it is not visible"));
+			}
 		}
 	}
 	

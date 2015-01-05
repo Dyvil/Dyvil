@@ -99,7 +99,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 		}
 	}
 	
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		IClass theClass = this.type.theClass;
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
@@ -123,7 +123,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 			}
 			
 			IValue value = entry.getValue();
-			value.check(markers);
+			value.check(markers, context);
 			
 			if (!value.isConstant())
 			{

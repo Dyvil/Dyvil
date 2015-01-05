@@ -161,7 +161,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		
 		for (IClass i : this.classes)
 		{
-			i.check(this.markers);
+			i.check(this.markers, this);
 		}
 	}
 	

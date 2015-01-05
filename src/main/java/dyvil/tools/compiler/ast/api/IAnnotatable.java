@@ -12,8 +12,5 @@ public interface IAnnotatable
 	
 	public Annotation getAnnotation(IType type);
 	
-	public default void addAnnotation(Annotation annotation)
-	{
-		this.getAnnotations().add(annotation);
-	}
+	public void addAnnotation(Annotation annotation);
 }

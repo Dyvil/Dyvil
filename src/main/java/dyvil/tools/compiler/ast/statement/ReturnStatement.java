@@ -63,11 +63,11 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		if (this.value != null)
 		{
-			this.value.check(markers);
+			this.value.check(markers, context);
 		}
 	}
 	

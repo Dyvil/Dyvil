@@ -195,8 +195,14 @@ public enum Modifiers
 	 */
 	public static final int	OVERRIDE				= 0x00080000;
 	
+	/**
+	 * Dyvil sealed modifier. This is used to mark that a class, method or field
+	 * is only visible from inside the current library / project.
+	 */
+	public static final int	SEALED					= 0x00100000;
+	
 	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM_CLASS | OBJECT_CLASS | MODULE;
-	public static final int	ACCESS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE;
+	public static final int	ACCESS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | SEALED;
 	public static final int	MEMBER_MODIFIERS		= ACCESS_MODIFIERS | STATIC | FINAL;
 	public static final int	CLASS_MODIFIERS			= MEMBER_MODIFIERS | ABSTRACT | STRICT;
 	public static final int	INTERFACE_MODIFIERS		= ACCESS_MODIFIERS | ABSTRACT | STATIC | STRICT;
@@ -226,6 +232,11 @@ public enum Modifiers
 			{
 				sb.append("private ");
 			}
+		}
+		
+		if ((mod & SEALED) == SEALED)
+		{
+			sb.append("sealed ");
 		}
 	}
 	

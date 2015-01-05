@@ -26,7 +26,7 @@ public interface IConstantValue extends IValue
 	}
 	
 	@Override
-	public default void check(List<Marker> markers)
+	public default void check(List<Marker> markers, IContext context)
 	{
 	}
 	

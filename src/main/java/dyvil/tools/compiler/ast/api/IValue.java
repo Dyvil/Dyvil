@@ -29,7 +29,7 @@ public interface IValue extends IASTNode
 	
 	public IValue resolve(List<Marker> markers, IContext context);
 	
-	public void check(List<Marker> markers);
+	public void check(List<Marker> markers, IContext context);
 	
 	public IValue foldConstants();
 	

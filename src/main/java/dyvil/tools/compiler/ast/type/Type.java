@@ -63,7 +63,7 @@ public class Type extends ASTNode implements IContext, IType
 	public Type(String name, IClass iclass)
 	{
 		this.name = name;
-		this.qualifiedName = name;
+		this.qualifiedName = iclass.getQualifiedName();
 		this.theClass = iclass;
 	}
 	

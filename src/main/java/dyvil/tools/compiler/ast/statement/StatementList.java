@@ -94,14 +94,14 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		if (this.isArray)
 		{
 			IType type = this.getElementType();
 			for (IValue value : this.values)
 			{
-				value.check(markers);
+				value.check(markers, context);
 				
 				if (!value.requireType(type))
 				{
@@ -114,7 +114,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 			IType type = this.getType();
 			for (IValue v : this.values)
 			{
-				v.check(markers);
+				v.check(markers, context);
 				
 				if (v instanceof IStatement && !v.requireType(type))
 				{

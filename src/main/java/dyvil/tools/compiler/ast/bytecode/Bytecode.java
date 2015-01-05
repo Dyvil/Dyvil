@@ -73,7 +73,7 @@ public class Bytecode extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 	}
 	

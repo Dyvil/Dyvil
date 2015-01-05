@@ -76,15 +76,15 @@ public class WhileStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
-		this.condition.check(markers);
+		this.condition.check(markers, context);
 		if (!Type.isSuperType(Type.BOOLEAN, this.condition.getType()))
 		{
 			markers.add(new SemanticError(this.position, "The condition of a while statement has to evaluate to a boolean value."));
 		}
 		
-		this.then.check(markers);
+		this.then.check(markers, context);
 	}
 	
 	@Override

@@ -18,7 +18,7 @@ public interface IMember extends INamed, ITyped, IModified, IAnnotatable
 	
 	public void resolve(List<Marker> markers, IContext context);
 	
-	public void check(List<Marker> markers);
+	public void check(List<Marker> markers, IContext context);
 	
 	public void foldConstants();
 }

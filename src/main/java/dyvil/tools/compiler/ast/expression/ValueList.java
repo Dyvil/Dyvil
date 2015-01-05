@@ -183,12 +183,12 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		IType type = this.elementType;
 		for (IValue v : this.values)
 		{
-			v.check(markers);
+			v.check(markers, context);
 			
 			if (!v.requireType(type))
 			{

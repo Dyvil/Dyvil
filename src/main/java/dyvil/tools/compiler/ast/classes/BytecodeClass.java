@@ -78,7 +78,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 	}
 	

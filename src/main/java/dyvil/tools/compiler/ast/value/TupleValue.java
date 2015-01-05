@@ -127,11 +127,11 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		for (IValue v : this.values)
 		{
-			v.check(markers);
+			v.check(markers, context);
 		}
 	}
 	

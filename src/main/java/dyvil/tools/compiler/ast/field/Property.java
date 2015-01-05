@@ -116,7 +116,7 @@ public class Property extends Field implements IProperty
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		if (this.get == null && this.set == null)
 		{
@@ -136,7 +136,7 @@ public class Property extends Field implements IProperty
 		
 		for (Annotation a : this.annotations)
 		{
-			a.check(markers);
+			a.check(markers, context);
 		}
 	}
 	

@@ -133,41 +133,39 @@ public class MethodCall extends Call implements INamed, IValued
 			}
 		}
 		
-		IValue v = AccessResolver.resolve(markers, context, this);
-		if (this != v)
-		{
-			return v;
-		}
-		
-		byte access = context.getAccessibility(this.method);
-		if (access == IContext.STATIC)
-		{
-			markers.add(new SemanticError(this.position, "The instance method '" + this.name + "' cannot be invoked from a static context"));
-		}
-		else if ((access & IContext.READ_ACCESS) == 0)
-		{
-			markers.add(new SemanticError(this.position, "The method '" + this.name + "' cannot be invoked since it is not visible"));
-		}
-		
-		return this;
+		return AccessResolver.resolve(markers, context, this);
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		if (this.instance != null)
 		{
-			this.instance.check(markers);
+			this.instance.check(markers, context);
 		}
 		
 		for (IValue v : this.arguments)
 		{
-			v.check(markers);
+			v.check(markers, context);
 		}
 		
 		if (this.method != null)
 		{
 			this.method.checkArguments(markers, this.instance, this.arguments);
+			
+			byte access = context.getAccessibility(this.method);
+			if (access == IContext.STATIC)
+			{
+				markers.add(new SemanticError(this.position, "The instance method '" + this.name + "' cannot be invoked from a static context"));
+			}
+			else if (access == IContext.SEALED)
+			{
+				markers.add(new SemanticError(this.position, "The sealed method '" + this.name + "' cannot be invoked because it is private to it's library"));
+			}
+			else if ((access & IContext.READ_ACCESS) == 0)
+			{
+				markers.add(new SemanticError(this.position, "The method '" + this.name + "' cannot be invoked since it is not visible"));
+			}
 		}
 	}
 	

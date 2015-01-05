@@ -183,6 +183,11 @@ public class Method extends Member implements IMethod
 			this.modifiers |= Modifiers.PREFIX;
 			return true;
 		}
+		if ("dyvil.lang.annotation.sealed".equals(name))
+		{
+			this.modifiers |= Modifiers.SEALED;
+			return true;
+		}
 		if ("java.lang.Override".equals(name))
 		{
 			this.modifiers |= Modifiers.OVERRIDE;
@@ -453,7 +458,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
@@ -487,17 +492,17 @@ public class Method extends Member implements IMethod
 		
 		for (Annotation a : this.annotations)
 		{
-			a.check(markers);
+			a.check(markers, context);
 		}
 		
 		for (Parameter p : this.parameters)
 		{
-			p.check(markers);
+			p.check(markers, context);
 		}
 		
 		for (Variable v : this.variables)
 		{
-			v.check(markers);
+			v.check(markers, context);
 		}
 		
 		if (this.statement != null)
@@ -506,7 +511,7 @@ public class Method extends Member implements IMethod
 			{
 				markers.add(new SemanticError(this.statement.getPosition(), "The method '" + this.name + "' must return a result of type " + this.type));
 			}
-			this.statement.check(markers);
+			this.statement.check(markers, context);
 		}
 		// If the method does not have an implementation and is static
 		else if (this.isStatic())
@@ -631,6 +636,10 @@ public class Method extends Member implements IMethod
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			mw.visitAnnotation("Ldyvil/lang/annotation/prefix;", false);
+		}
+		if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
+		{
+			mw.visitAnnotation("Ldyvil/lang/annotation/sealed;", false);
 		}
 		
 		int index = this.hasModifier(Modifiers.STATIC) ? 0 : 1;

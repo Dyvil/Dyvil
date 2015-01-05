@@ -99,9 +99,9 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
-		this.condition.check(markers);
+		this.condition.check(markers, context);
 		if (!Type.isSuperType(Type.BOOLEAN, this.condition.getType()))
 		{
 			markers.add(new SemanticError(this.position, "The condition of an if statement has to evaluate to a boolean value."));
@@ -109,11 +109,11 @@ public class IfStatement extends ASTNode implements IStatement
 		
 		if (this.then != null)
 		{
-			this.then.check(markers);
+			this.then.check(markers, context);
 		}
 		if (this.elseThen != null)
 		{
-			this.elseThen.check(markers);
+			this.elseThen.check(markers, context);
 		}
 	}
 	

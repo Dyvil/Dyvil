@@ -145,11 +145,11 @@ public class Parameter extends Member implements IField
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		for (Annotation a : this.annotations)
 		{
-			a.check(markers);
+			a.check(markers, context);
 		}
 	}
 	

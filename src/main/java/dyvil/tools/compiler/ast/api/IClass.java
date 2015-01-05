@@ -7,15 +7,14 @@ import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.lexer.marker.Marker;
 
-public interface IClass extends IASTNode, IAnnotatable, IModified, INamed, IGeneric, IContext
+public interface IClass extends IASTNode, IMember, IAnnotatable, IModified, INamed, IGeneric, IContext
 {
 	public CompilationUnit getUnit();
 	
 	public Package getPackage();
 	
-	public IType toType();
+	// Modifiers
 	
 	public boolean isAbstract();
 	
@@ -44,16 +43,6 @@ public interface IClass extends IASTNode, IAnnotatable, IModified, INamed, IGene
 	public void getMethodMatches(List<MethodMatch> matches, IType type, String name, IType... argumentTypes);
 	
 	public boolean isMember(IMember member);
-	
-	// States
-	
-	public void resolveTypes(List<Marker> markers, IContext context);
-	
-	public void resolve(List<Marker> markers, IContext context);
-	
-	public void check(List<Marker> markers);
-	
-	public void foldConstants();
 	
 	// Compilation
 	

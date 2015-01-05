@@ -167,19 +167,19 @@ public class ClassBody extends ASTNode
 		}
 	}
 	
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		for (IField field : this.fields)
 		{
-			field.check(markers);
+			field.check(markers, context);
 		}
 		for (IProperty prop : this.properties)
 		{
-			prop.check(markers);
+			prop.check(markers, context);
 		}
 		for (IMethod method : this.methods)
 		{
-			method.check(markers);
+			method.check(markers, context);
 		}
 	}
 	

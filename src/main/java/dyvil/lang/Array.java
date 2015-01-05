@@ -1,9 +1,10 @@
 package dyvil.lang;
 
 import dyvil.lang.annotation.Bytecode;
+import dyvil.lang.annotation.sealed;
 import dyvil.reflect.Opcodes;
 
-public abstract class Array<T>
+public abstract @sealed class Array<T>
 {
 	@Bytecode(postfixOpcode = Opcodes.AALOAD)
 	public abstract T apply(int i);

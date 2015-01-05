@@ -82,12 +82,22 @@ public class Field extends Member implements IField, IContext
 			this.modifiers |= Modifiers.LAZY;
 			return true;
 		}
+		if ("dyvil.lang.annotation.sealed".equals(name))
+		{
+			this.modifiers |= Modifiers.SEALED;
+			return true;
+		}
 		return false;
 	}
 	
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		for (Annotation a : this.annotations)
+		{
+			a.resolveTypes(markers, context);
+		}
+		
 		this.type = this.type.resolve(context);
 		if (!this.type.isResolved())
 		{
@@ -98,20 +108,11 @@ public class Field extends Member implements IField, IContext
 		{
 			this.value.resolveTypes(markers, this);
 		}
-		for (Annotation a : this.annotations)
-		{
-			a.resolveTypes(markers, context);
-		}
 	}
 	
 	@Override
 	public void resolve(List<Marker> markers, IContext context)
 	{
-		if (this.value != null)
-		{
-			this.value = this.value.resolve(markers, context);
-		}
-		
 		for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
 		{
 			Annotation a = iterator.next();
@@ -123,37 +124,42 @@ public class Field extends Member implements IField, IContext
 			
 			a.resolve(markers, context);
 		}
+		
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, context);
+		}
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
+		for (Annotation a : this.annotations)
+		{
+			a.check(markers, context);
+		}
+		
 		if (this.value != null)
 		{
-			this.value.check(markers);
+			this.value.check(markers, context);
 			if (!this.value.requireType(this.type))
 			{
 				markers.add(new SemanticError(this.value.getPosition(), "The value of the field '" + this.name + "' is incompatible with the field type " + this.type));
 			}
-		}
-		
-		for (Annotation a : this.annotations)
-		{
-			a.check(markers);
 		}
 	}
 	
 	@Override
 	public void foldConstants()
 	{
-		if (this.value != null)
-		{
-			this.value = this.value.foldConstants();
-		}
-		
 		for (Annotation a : this.annotations)
 		{
 			a.foldConstants();
+		}
+
+		if (this.value != null)
+		{
+			this.value = this.value.foldConstants();
 		}
 	}
 	
@@ -214,6 +220,10 @@ public class Field extends Member implements IField, IContext
 		if ((this.modifiers & Modifiers.LAZY) != 0)
 		{
 			writer.visitAnnotation("Ldyvil/lang/annotation/lazy;", true);
+		}
+		if ((this.modifiers & Modifiers.SEALED) != 0)
+		{
+			writer.visitAnnotation("Ldyvil/lang/annotation/sealed", false);
 		}
 	}
 	

@@ -1,10 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
 import java.lang.annotation.ElementType;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -44,6 +41,7 @@ public class CodeClass extends ASTNode implements IClass
 	protected IType				superType	= Type.OBJECT;
 	protected List<IType>		interfaces	= new ArrayList(1);
 	
+	protected Type				type;
 	protected List<IType>		generics;
 	
 	protected ClassBody			body;
@@ -73,15 +71,25 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public Type toType()
+	public void setType(IType type)
 	{
-		return new Type(this.name, this);
 	}
 	
 	@Override
-	public boolean isAbstract()
+	public Type getType()
 	{
-		return (this.modifiers & Modifiers.INTERFACE_CLASS) != 0 || (this.modifiers & Modifiers.ABSTRACT) != 0;
+		if (this.type == null)
+		{
+			this.type = new Type(this.name, this);
+		}
+		return this.type;
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		// TODO Outer class
+		return this;
 	}
 	
 	@Override
@@ -99,8 +107,22 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		annotation.target = ElementType.TYPE;
-		this.annotations.add(annotation);
+		if (!this.processAnnotation(annotation))
+		{
+			annotation.target = ElementType.TYPE;
+			this.annotations.add(annotation);
+		}
+	}
+	
+	private boolean processAnnotation(Annotation annotation)
+	{
+		String name = annotation.type.qualifiedName;
+		if ("dyvil.lang.annotation.sealed".equals(name))
+		{
+			this.modifiers |= Modifiers.SEALED;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -146,6 +168,24 @@ public class CodeClass extends ASTNode implements IClass
 	public boolean hasModifier(int mod)
 	{
 		return (this.modifiers & mod) != 0;
+	}
+	
+	@Override
+	public boolean isAbstract()
+	{
+		return (this.modifiers & Modifiers.INTERFACE_CLASS) != 0 || (this.modifiers & Modifiers.ABSTRACT) != 0;
+	}
+	
+	@Override
+	public int getAccessLevel()
+	{
+		return this.modifiers & Modifiers.ACCESS_MODIFIERS;
+	}
+	
+	@Override
+	public byte getAccessibility()
+	{
+		return IContext.READ_ACCESS;
 	}
 	
 	@Override
@@ -326,16 +366,23 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void resolve(List<Marker> markers, IContext context)
 	{
-		for (Annotation a : this.annotations)
+		for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
 		{
-			a.resolve(markers, this);
+			Annotation a = iterator.next();
+			if (this.processAnnotation(a))
+			{
+				iterator.remove();
+				continue;
+			}
+			
+			a.resolve(markers, context);
 		}
 		
 		this.body.resolve(markers, this);
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		if (this.superType != null)
 		{
@@ -369,10 +416,10 @@ public class CodeClass extends ASTNode implements IClass
 		
 		for (Annotation a : this.annotations)
 		{
-			a.check(markers);
+			a.check(markers, context);
 		}
 		
-		this.body.check(markers);
+		this.body.check(markers, this);
 	}
 	
 	@Override
@@ -524,6 +571,15 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		
 		int level = member.getAccessLevel();
+		if ((level & Modifiers.SEALED) != 0)
+		{
+			if (iclass instanceof BytecodeClass)
+			{
+				return SEALED;
+			}
+			// Clear the SEALED bit by ORing with 0b1111
+			level &= 0b1111;
+		}
 		if (level == Modifiers.PUBLIC)
 		{
 			return member.getAccessibility();
@@ -566,7 +622,7 @@ public class CodeClass extends ASTNode implements IClass
 		List<IField> fields = this.body.fields;
 		List<IMethod> methods = this.body.methods;
 		
-		ThisValue thisValue = new ThisValue(null, this.toType());
+		ThisValue thisValue = new ThisValue(null, this.type);
 		StatementList instanceFields = new StatementList(null);
 		StatementList staticFields = new StatementList(null);
 		boolean instanceFieldsAdded = false;
@@ -579,6 +635,10 @@ public class CodeClass extends ASTNode implements IClass
 		if ((this.modifiers & Modifiers.MODULE) != 0)
 		{
 			writer.visitAnnotation("Ldyvil/lang/annotation/module;", true);
+		}
+		if ((this.modifiers & Modifiers.SEALED) != 0)
+		{
+			writer.visitAnnotation("Ldyvil/lang/annotation/sealed;", false);
 		}
 		
 		for (Annotation a : this.annotations)

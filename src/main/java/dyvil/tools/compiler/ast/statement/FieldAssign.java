@@ -170,16 +170,6 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 			if (match != null)
 			{
 				this.field = match.theField;
-				
-				byte access = context.getAccessibility(this.field);
-				if (access == IContext.STATIC)
-				{
-					markers.add(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be assigned from a static context"));
-				}
-				else if ((access & IContext.WRITE_ACCESS) == 0)
-				{
-					markers.add(new SemanticError(this.position, "The field '" + this.name + "' cannot be assigned since it is not visible"));
-				}
 			}
 			else
 			{
@@ -196,7 +186,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	}
 	
 	@Override
-	public void check(List<Marker> markers)
+	public void check(List<Marker> markers, IContext context)
 	{
 		if (this.value instanceof ThisValue)
 		{
@@ -210,9 +200,26 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 				markers.add(new SemanticError(this.value.getPosition(), "The type of the assigned value is incompatible with the required type " + type));
 			}
 			
-			if (!this.initializer && this.field.hasModifier(Modifiers.FINAL))
+			if (!this.initializer)
 			{
-				markers.add(new SemanticError(this.position, "The final field '" + this.name + "' cannot be assigned"));
+				if (this.field.hasModifier(Modifiers.FINAL))
+				{
+					markers.add(new SemanticError(this.position, "The final field '" + this.name + "' cannot be assigned"));
+				}
+				
+				byte access = context.getAccessibility(this.field);
+				if (access == IContext.STATIC)
+				{
+					markers.add(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be assigned from a static context"));
+				}
+				else if (access == IContext.SEALED)
+				{
+					markers.add(new SemanticError(this.position, "The sealed field '" + this.name + "' cannot be assigned because it is private to it's library"));
+				}
+				else if ((access & IContext.WRITE_ACCESS) == 0)
+				{
+					markers.add(new SemanticError(this.position, "The field '" + this.name + "' cannot be assigned since it is not visible"));
+				}
 			}
 		}
 	}
