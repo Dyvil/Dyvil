@@ -5,11 +5,11 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 
 public interface IContext
 {
-	public static final int	INVISIBLE			= 0;
-	public static final int	READ_ACCESS			= 1;
-	public static final int	WRITE_ACCESS		= 2;
-	public static final int	READ_WRITE_ACCESS	= 3;
-	public static final int	STATIC				= 4;
+	public static final byte	INVISIBLE			= 0;
+	public static final byte	READ_ACCESS			= 1;
+	public static final byte	WRITE_ACCESS		= 2;
+	public static final byte	READ_WRITE_ACCESS	= 3;
+	public static final byte	STATIC				= 4;
 	
 	public boolean isStatic();
 	

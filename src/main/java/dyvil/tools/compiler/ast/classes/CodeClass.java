@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
@@ -30,8 +31,6 @@ import dyvil.tools.compiler.util.Util;
 public class CodeClass extends ASTNode implements IClass
 {
 	protected CompilationUnit	unit;
-	
-	protected int				type;
 	
 	protected int				modifiers;
 	
@@ -53,22 +52,11 @@ public class CodeClass extends ASTNode implements IClass
 		this.body = new ClassBody(null, this);
 	}
 	
-	public CodeClass(ICodePosition position, CompilationUnit unit, int type)
+	public CodeClass(ICodePosition position, CompilationUnit unit)
 	{
 		this.position = position;
 		this.unit = unit;
-		this.type = type;
 		this.body = new ClassBody(null, this);
-	}
-	
-	public void setClassType(int type)
-	{
-		this.type = type;
-	}
-	
-	public int getClassType()
-	{
-		return this.type;
 	}
 	
 	@Override
@@ -92,7 +80,7 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean isAbstract()
 	{
-		return this.type == Modifiers.INTERFACE_CLASS || (this.modifiers & Modifiers.ABSTRACT) != 0;
+		return (this.modifiers & Modifiers.INTERFACE_CLASS) != 0 || (this.modifiers & Modifiers.ABSTRACT) != 0;
 	}
 	
 	@Override
@@ -318,6 +306,38 @@ public class CodeClass extends ASTNode implements IClass
 				}
 			}
 			Util.applyState(this.interfaces, state, context);
+		}
+		else if (state == CompilerState.CHECK)
+		{
+			if (this.superType != null)
+			{
+				IClass superClass = this.superType.getTheClass();
+				if (superClass != null)
+				{
+					int modifiers = superClass.getModifiers();
+					if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
+					{
+						state.addMarker(new SemanticError(this.superType.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + "'" + superClass.getName() + "' cannot be extended, only classes are allowed"));
+					}
+					else if ((modifiers & Modifiers.FINAL) != 0)
+					{
+						state.addMarker(new SemanticError(this.superType.getPosition(), "The final class '" + superClass.getName() + "' cannot be extended"));
+					}
+				}
+				
+				for (IType t : this.interfaces)
+				{
+					IClass iclass = t.getTheClass();
+					if (iclass != null)
+					{
+						int modifiers = iclass.getModifiers();
+						if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
+						{
+							state.addMarker(new SemanticError(t.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + "'" + iclass.getName() + "' cannot be implemented, only interfaces are allowed"));
+						}
+					}
+				}
+			}
 		}
 		
 		Util.applyState(this.annotations, state, this);
@@ -621,7 +641,7 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		
 		buffer.append(prefix).append(Modifiers.CLASS.toString(this.modifiers));
-		buffer.append(Modifiers.CLASS_TYPE.toString(this.type)).append(this.name);
+		buffer.append(Modifiers.CLASS_TYPE.toString(this.modifiers)).append(this.name);
 		
 		if (this.generics != null)
 		{

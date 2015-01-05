@@ -34,7 +34,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 	public ClassDeclParser(CompilationUnit unit)
 	{
 		this.unit = unit;
-		this.theClass = new CodeClass(null, unit, 0);
+		this.theClass = new CodeClass(null, unit);
 		this.unit.addClass(this.theClass);
 	}
 	
@@ -54,7 +54,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 			}
 			else if ((i = Modifiers.CLASS_TYPE.parse(value)) != -1)
 			{
-				this.theClass.setClassType(i);
+				this.theClass.addModifier(i);
 				this.mode = NAME;
 				return true;
 			}

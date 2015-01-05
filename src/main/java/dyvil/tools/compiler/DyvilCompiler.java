@@ -107,9 +107,15 @@ public class DyvilCompiler
 				@Override
 				public String format(LogRecord record)
 				{
+					String message = record.getMessage();
+					if (message == null || message.isEmpty())
+					{
+						return "\n";
+					}
+					
 					StringBuilder builder = new StringBuilder();
 					builder.append('[').append(format.format(new Date(record.getMillis()))).append("] [");
-					builder.append(record.getLevel()).append("]: ").append(record.getMessage()).append('\n');
+					builder.append(record.getLevel()).append("]: ").append(message).append('\n');
 					return builder.toString();
 				}
 			};

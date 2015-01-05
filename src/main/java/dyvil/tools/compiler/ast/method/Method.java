@@ -438,11 +438,17 @@ public class Method extends Member implements IMethod
 					{
 						state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' overrides a method, but does not have an 'override' modifier"));
 					}
-					
-					IType type = this.overrideMethod.getType();
-					if (!Type.isSuperType(type, this.type))
+					else if (this.overrideMethod.hasModifier(Modifiers.FINAL))
 					{
-						state.addMarker(new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type " + type));
+						state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' cannot override a final method"));
+					}
+					else
+					{
+						IType type = this.overrideMethod.getType();
+						if (!Type.isSuperType(type, this.type))
+						{
+							state.addMarker(new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type " + type));
+						}
 					}
 				}
 			}
