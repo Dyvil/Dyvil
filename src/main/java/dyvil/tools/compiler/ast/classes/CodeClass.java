@@ -4,10 +4,10 @@ import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
@@ -290,59 +291,99 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public CodeClass applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		if (this.superType != null)
 		{
-			if (this.superType != null)
+			if (this.superType.isName("void"))
 			{
-				if (this.superType.isName("void"))
-				{
-					this.superType = null;
-				}
-				else
-				{
-					this.superType = this.superType.resolve(context);
-				}
+				this.superType = null;
 			}
-			Util.applyState(this.interfaces, state, context);
-		}
-		else if (state == CompilerState.CHECK)
-		{
-			if (this.superType != null)
+			else
 			{
-				IClass superClass = this.superType.getTheClass();
-				if (superClass != null)
+				this.superType = this.superType.resolve(context);
+			}
+		}
+		
+		for (ListIterator<IType> iterator = this.interfaces.listIterator(); iterator.hasNext();)
+		{
+			IType i1 = iterator.next();
+			IType i2 = i1.resolve(context);
+			if (i1 != i2)
+			{
+				iterator.set(i2);
+			}
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.resolveTypes(markers, this);
+		}
+		
+		this.body.resolveTypes(markers, this);
+	}
+	
+	@Override
+	public void resolve(List<Marker> markers, IContext context)
+	{
+		for (Annotation a : this.annotations)
+		{
+			a.resolve(markers, this);
+		}
+		
+		this.body.resolve(markers, this);
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		if (this.superType != null)
+		{
+			IClass superClass = this.superType.getTheClass();
+			if (superClass != null)
+			{
+				int modifiers = superClass.getModifiers();
+				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					int modifiers = superClass.getModifiers();
-					if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
-					{
-						state.addMarker(new SemanticError(this.superType.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + "'" + superClass.getName() + "' cannot be extended, only classes are allowed"));
-					}
-					else if ((modifiers & Modifiers.FINAL) != 0)
-					{
-						state.addMarker(new SemanticError(this.superType.getPosition(), "The final class '" + superClass.getName() + "' cannot be extended"));
-					}
+					markers.add(new SemanticError(this.superType.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + "'" + superClass.getName() + "' cannot be extended, only classes are allowed"));
 				}
-				
-				for (IType t : this.interfaces)
+				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
-					IClass iclass = t.getTheClass();
-					if (iclass != null)
-					{
-						int modifiers = iclass.getModifiers();
-						if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
-						{
-							state.addMarker(new SemanticError(t.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + "'" + iclass.getName() + "' cannot be implemented, only interfaces are allowed"));
-						}
-					}
+					markers.add(new SemanticError(this.superType.getPosition(), "The final class '" + superClass.getName() + "' cannot be extended"));
 				}
 			}
 		}
 		
-		Util.applyState(this.annotations, state, this);
-		this.body.applyState(state, this);
-		return this;
+		for (IType t : this.interfaces)
+		{
+			IClass iclass = t.getTheClass();
+			if (iclass != null)
+			{
+				int modifiers = iclass.getModifiers();
+				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
+				{
+					markers.add(new SemanticError(t.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + "'" + iclass.getName() + "' cannot be implemented, only interfaces are allowed"));
+				}
+			}
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.check(markers);
+		}
+		
+		this.body.check(markers);
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		for (Annotation a : this.annotations)
+		{
+			a.foldConstants();
+		}
+		
+		this.body.foldConstants();
 	}
 	
 	@Override

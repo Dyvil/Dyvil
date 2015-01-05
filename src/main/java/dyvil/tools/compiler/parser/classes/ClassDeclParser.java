@@ -146,12 +146,12 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setTypes(List<IType> types)
 	{
 	}
-
+	
 	@Override
 	public List<IType> getTypes()
 	{

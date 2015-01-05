@@ -6,16 +6,15 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.Util;
 
 public class Field extends Member implements IField, IContext
 {
@@ -87,46 +86,75 @@ public class Field extends Member implements IField, IContext
 	}
 	
 	@Override
-	public Field applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		this.type = this.type.resolve(context);
+		if (!this.type.isResolved())
 		{
-			this.type = this.type.applyState(state, context);
-		}
-		else if (state == CompilerState.RESOLVE)
-		{
-			if (this.value != null)
-			{
-				this.value = this.value.applyState(state, this);
-			}
-			
-			for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
-			{
-				Annotation a = iterator.next();
-				if (this.processAnnotation(a))
-				{
-					iterator.remove();
-					continue;
-				}
-				
-				a.applyState(state, context);
-			}
-			return this;
-		}
-		else if (state == CompilerState.CHECK)
-		{
-			if (this.value != null && !this.value.requireType(this.type))
-			{
-				state.addMarker(new SemanticError(this.value.getPosition(), "The value of the field '" + this.name + "' is incompatible with the field type " + this.type));
-			}
+			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
 		}
 		
 		if (this.value != null)
 		{
-			this.value = this.value.applyState(state, this);
+			this.value.resolveTypes(markers, this);
 		}
-		Util.applyState(this.annotations, state, context);
-		return this;
+		for (Annotation a : this.annotations)
+		{
+			a.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolve(List<Marker> markers, IContext context)
+	{
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, context);
+		}
+		
+		for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
+		{
+			Annotation a = iterator.next();
+			if (this.processAnnotation(a))
+			{
+				iterator.remove();
+				continue;
+			}
+			
+			a.resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		if (this.value != null)
+		{
+			this.value.check(markers);
+			if (!this.value.requireType(this.type))
+			{
+				markers.add(new SemanticError(this.value.getPosition(), "The value of the field '" + this.name + "' is incompatible with the field type " + this.type));
+			}
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.check(markers);
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		if (this.value != null)
+		{
+			this.value = this.value.foldConstants();
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.foldConstants();
+		}
 	}
 	
 	@Override

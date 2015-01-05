@@ -1,11 +1,13 @@
 package dyvil.tools.compiler.ast.api;
 
+import java.util.List;
+
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IValue extends IASTNode
 {
@@ -23,8 +25,13 @@ public interface IValue extends IASTNode
 		return type.equals(Type.OBJECT) || Type.isSuperType(type, this.getType());
 	}
 	
-	@Override
-	public IValue applyState(CompilerState state, IContext context);
+	public void resolveTypes(List<Marker> markers, IContext context);
+	
+	public IValue resolve(List<Marker> markers, IContext context);
+	
+	public void check(List<Marker> markers);
+	
+	public IValue foldConstants();
 	
 	// Compilation
 	

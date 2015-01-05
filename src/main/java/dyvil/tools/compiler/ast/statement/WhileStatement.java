@@ -1,13 +1,21 @@
 package dyvil.tools.compiler.ast.statement;
 
-import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
+import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.CompilerState;
+
+import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
+
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.api.IContext;
+import dyvil.tools.compiler.ast.api.IStatement;
+import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.api.IValue;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class WhileStatement extends ASTNode implements IStatement
@@ -53,10 +61,37 @@ public class WhileStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public WhileStatement applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.condition = this.condition.applyState(state, null);
-		this.then = this.then.applyState(state, context);
+		this.condition.resolveTypes(markers, context);
+		this.then.resolveTypes(markers, context);
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
+	{
+		this.condition = this.condition.resolve(markers, context);
+		this.then = this.then.resolve(markers, context);
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		this.condition.check(markers);
+		if (!Type.isSuperType(Type.BOOLEAN, this.condition.getType()))
+		{
+			markers.add(new SemanticError(this.position, "The condition of a while statement has to evaluate to a boolean value."));
+		}
+		
+		this.then.check(markers);
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		this.condition = this.condition.foldConstants();
+		this.then = this.then.foldConstants();
 		return this;
 	}
 	

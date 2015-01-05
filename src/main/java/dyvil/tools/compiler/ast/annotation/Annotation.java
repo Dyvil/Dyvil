@@ -2,24 +2,21 @@ package dyvil.tools.compiler.ast.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.Util;
 
 public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 {
@@ -78,62 +75,76 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 		return this.parameters.get(key);
 	}
 	
-	@Override
-	public Annotation applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		this.type = this.type.resolve(context);
+		if (!this.type.isResolved())
 		{
-			this.type = this.type.resolve(context);
-			if (this.position != null && !this.type.isResolved())
-			{
-				state.addMarker(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a type"));
-			}
-		}
-		else if (state == CompilerState.RESOLVE)
-		{
-			this.type.readMetaAnnotations();
-		}
-		else if (state == CompilerState.CHECK)
-		{
-			IClass theClass = this.type.theClass;
-			if (!theClass.hasModifier(Modifiers.ANNOTATION))
-			{
-				state.addMarker(new SemanticError(this.position, "The type '" + this.name + "' is not an annotation type"));
-			}
-			
-			if (!this.type.isTarget(this.target))
-			{
-				state.addMarker(new SemanticError(this.position, "The annotation type '" + this.name + "' is not applicable for the annotated element type " + this.target));
-			}
-			
-			for (Entry<String, IValue> entry : this.parameters.entrySet())
-			{
-				String key = entry.getKey();
-				IMethod m = theClass.getBody().getMethod(key);
-				if (m == null)
-				{
-					state.addMarker(new SemanticError(this.position, "Invalid annotation method '" + key + "' for annotation type " + this.name));
-					continue;
-				}
-				
-				IValue value = entry.getValue();
-				
-				if (!value.isConstant())
-				{
-					state.addMarker(new SemanticError(value.getPosition(), "The annotation value '" + key + "' has to be a constant expression"));
-					continue;
-				}
-				
-				IType type = m.getType();
-				if (!Type.isSuperType(type, value.getType()))
-				{
-					state.addMarker(new SemanticError(value.getPosition(), "The annotation value '" + key + "' does not match the required type " + type));
-				}
-			}
+			markers.add(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a type"));
 		}
 		
-		Util.applyState(this.parameters, state, context);
-		return this;
+		for (Entry<String, IValue> entry : this.parameters.entrySet())
+		{
+			entry.getValue().resolveTypes(markers, context);
+		}
+	}
+	
+	public void resolve(List<Marker> markers, IContext context)
+	{
+		this.type.readMetaAnnotations();
+		
+		for (Entry<String, IValue> entry : this.parameters.entrySet())
+		{
+			entry.getValue().resolve(markers, context);
+		}
+	}
+	
+	public void check(List<Marker> markers)
+	{
+		IClass theClass = this.type.theClass;
+		if (!theClass.hasModifier(Modifiers.ANNOTATION))
+		{
+			markers.add(new SemanticError(this.position, "The type '" + this.name + "' is not an annotation type"));
+		}
+		
+		if (!this.type.isTarget(this.target))
+		{
+			markers.add(new SemanticError(this.position, "The annotation type '" + this.name + "' is not applicable for the annotated element type " + this.target));
+		}
+		
+		for (Entry<String, IValue> entry : this.parameters.entrySet())
+		{
+			String key = entry.getKey();
+			IMethod m = theClass.getBody().getMethod(key);
+			if (m == null)
+			{
+				markers.add(new SemanticError(this.position, "Invalid annotation method '" + key + "' for annotation type " + this.name));
+				continue;
+			}
+			
+			IValue value = entry.getValue();
+			value.check(markers);
+			
+			if (!value.isConstant())
+			{
+				markers.add(new SemanticError(value.getPosition(), "The annotation value '" + key + "' has to be a constant expression"));
+				continue;
+			}
+			
+			IType type = m.getType();
+			if (!Type.isSuperType(type, value.getType()))
+			{
+				markers.add(new SemanticError(value.getPosition(), "The annotation value '" + key + "' does not match the required type " + type));
+			}
+		}
+	}
+	
+	public void foldConstants()
+	{
+		for (Entry<String, IValue> entry : this.parameters.entrySet())
+		{
+			entry.getValue().foldConstants();
+		}
 	}
 	
 	public void write(ClassWriter writer)

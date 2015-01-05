@@ -1,14 +1,10 @@
 package dyvil.tools.compiler.ast.api;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 
 public interface IField extends IASTNode, IMember, IValued
 {
-	@Override
-	public IField applyState(CompilerState state, IContext context);
-	
 	// Compilation
 	
 	public void write(ClassWriter writer);

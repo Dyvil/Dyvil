@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.bytecode;
 
+import java.util.List;
+
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 
 public class JumpInstruction extends Instruction
@@ -27,12 +29,12 @@ public class JumpInstruction extends Instruction
 	}
 	
 	@Override
-	public void resolve(CompilerState state, Bytecode bytecode)
+	public void resolve(List<Marker> markers, Bytecode bytecode)
 	{
 		this.destLabel = bytecode.getLabel(this.dest);
 		if (this.destLabel == null)
 		{
-			state.addMarker(new SemanticError(this.position, "'" + this.dest + "' could not be resolved to a Label"));
+			markers.add(new SemanticError(this.position, "'" + this.dest + "' could not be resolved to a Label"));
 		}
 	}
 	

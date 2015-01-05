@@ -2,15 +2,12 @@ package dyvil.tools.compiler.ast.value;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class NullValue extends ASTNode implements IValue
+public class NullValue extends ASTNode implements IConstantValue
 {
 	public NullValue()
 	{
@@ -19,12 +16,6 @@ public class NullValue extends ASTNode implements IValue
 	public NullValue(ICodePosition position)
 	{
 		this.position = position;
-	}
-	
-	@Override
-	public boolean isConstant()
-	{
-		return true;
 	}
 	
 	@Override
@@ -37,12 +28,6 @@ public class NullValue extends ASTNode implements IValue
 	public Object toObject()
 	{
 		return null;
-	}
-	
-	@Override
-	public NullValue applyState(CompilerState state, IContext context)
-	{
-		return this;
 	}
 	
 	@Override

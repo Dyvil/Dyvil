@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IClass;
 import dyvil.tools.compiler.ast.api.IContext;
@@ -15,7 +14,6 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ClassFormat;
 import dyvil.tools.compiler.util.Symbols;
@@ -426,21 +424,6 @@ public class Type extends ASTNode implements IContext, IType
 			return STRING;
 		}
 		return null;
-	}
-	
-	@Override
-	public Type applyState(CompilerState state, IContext context)
-	{
-		if (state == CompilerState.RESOLVE_TYPES)
-		{
-			Type type = this.resolve(context);
-			if (!type.isResolved())
-			{
-				state.addMarker(new SemanticError(this.position, "'" + this.name + "' cannot be resolved to a type"));
-			}
-			return type;
-		}
-		return this;
 	}
 	
 	@Override

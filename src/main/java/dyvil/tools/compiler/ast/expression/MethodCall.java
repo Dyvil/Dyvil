@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.ast.expression;
 
+import java.util.List;
+
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -105,36 +106,89 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public IAccess applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE)
+		if (this.instance != null)
 		{
-			Util.applyState(this.arguments, state, context);
-			return AccessResolver.resolve(context, this);
+			this.instance.resolveTypes(markers, context);
 		}
-		else if (state == CompilerState.CHECK)
+		
+		for (IValue v : this.arguments)
 		{
-			if (this.method != null)
+			v.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
+	{
+		int len = this.arguments.size();
+		for (int i = 0; i < len; i++)
+		{
+			IValue v1 = this.arguments.get(i);
+			IValue v2 = v1.resolve(markers, context);
+			if (v1 != v2)
 			{
-				this.method.checkArguments(state, this.instance, this.arguments);
-				
-				byte access = context.getAccessibility(this.method);
-				if (access == IContext.STATIC)
-				{
-					state.addMarker(new SemanticError(this.position, "The instance method '" + this.name + "' cannot be invoked from a static context"));
-				}
-				else if ((access & IContext.READ_ACCESS) == 0)
-				{
-					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' cannot be invoked since it is not visible"));
-				}
+				this.arguments.set(i, v2);
 			}
 		}
 		
+		IValue v = AccessResolver.resolve(markers, context, this);
+		if (this != v)
+		{
+			return v;
+		}
+		
+		byte access = context.getAccessibility(this.method);
+		if (access == IContext.STATIC)
+		{
+			markers.add(new SemanticError(this.position, "The instance method '" + this.name + "' cannot be invoked from a static context"));
+		}
+		else if ((access & IContext.READ_ACCESS) == 0)
+		{
+			markers.add(new SemanticError(this.position, "The method '" + this.name + "' cannot be invoked since it is not visible"));
+		}
+		
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
 		if (this.instance != null)
 		{
-			this.instance = this.instance.applyState(state, context);
+			this.instance.check(markers);
 		}
-		Util.applyState(this.arguments, state, context);
+		
+		for (IValue v : this.arguments)
+		{
+			v.check(markers);
+		}
+		
+		if (this.method != null)
+		{
+			this.method.checkArguments(markers, this.instance, this.arguments);
+		}
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		if (this.instance != null)
+		{
+			this.instance = this.instance.foldConstants();
+		}
+		
+		int len = this.arguments.size();
+		for (int i = 0; i < len; i++)
+		{
+			IValue v1 = this.arguments.get(i);
+			IValue v2 = v1.foldConstants();
+			if (v1 != v2)
+			{
+				this.arguments.set(i, v2);
+			}
+		}
 		return this;
 	}
 	
@@ -282,7 +336,7 @@ public class MethodCall extends Call implements INamed, IValued
 			{
 				if (v instanceof FieldAccess)
 				{
-					v = v.applyState(CompilerState.FOLD_CONSTANTS, null);
+					v = v.foldConstants();
 				}
 				writer.visitInsn(((IntValue) v).value);
 			}

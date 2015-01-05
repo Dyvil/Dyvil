@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.IContext;
@@ -117,24 +116,34 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		this.type = this.type.resolve(context);
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
+	{
+		if (!this.type.isResolved())
 		{
-			this.type = this.type.resolve(context);
-		}
-		else if (state == CompilerState.RESOLVE)
-		{
-			if (!this.type.isResolved())
+			IValue v = this.resolve2(context, null);
+			if (v != null)
 			{
-				IValue v = this.resolve2(context, null);
-				if (v != null)
-				{
-					return v;
-				}
-				state.addMarker(this.getResolveError());
+				return v;
 			}
+			markers.add(this.getResolveError());
 		}
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
 		return this;
 	}
 	

@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -141,49 +140,65 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE)
-		{
-			return AccessResolver.resolve(context, this);
-		}
-		else if (state == CompilerState.CHECK)
-		{
-			if (this.field != null)
-			{
-				if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
-				{
-					state.addMarker(new Warning(this.position, "'" + this.qualifiedName + "' is a static field and should be accessed in a static way"));
-					this.instance = null;
-				}
-				
-				byte access = context.getAccessibility(this.field);
-				if (access == IContext.STATIC)
-				{
-					state.addMarker(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be accessed from a static context"));
-				}
-				else if ((access & IContext.READ_ACCESS) == 0)
-				{
-					state.addMarker(new SemanticError(this.position, "The field '" + this.name + "' cannot be accessed since it is not visible"));
-				}
-			}
-		}
-		else if (state == CompilerState.FOLD_CONSTANTS)
-		{
-			if (this.field.hasModifier(Modifiers.CONST))
-			{
-				IValue v = this.field.getValue();
-				if (v != null)
-				{
-					return v;
-				}
-			}
-		}
-		
 		if (this.instance != null)
 		{
-			this.instance = this.instance.applyState(state, context);
+			this.instance.resolveTypes(markers, context);
 		}
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
+	{
+		IValue v = AccessResolver.resolve(markers, context, this);
+		if (this != v)
+		{
+			return v;
+		}
+		
+		byte access = context.getAccessibility(this.field);
+		if (access == IContext.STATIC)
+		{
+			markers.add(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be accessed from a static context"));
+		}
+		else if ((access & IContext.READ_ACCESS) == 0)
+		{
+			markers.add(new SemanticError(this.position, "The field '" + this.name + "' cannot be accessed since it is not visible"));
+		}
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		if (this.instance != null)
+		{
+			this.instance.check(markers);
+		}
+		
+		if (this.field != null)
+		{
+			if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
+			{
+				markers.add(new Warning(this.position, "'" + this.qualifiedName + "' is a static field and should be accessed in a static way"));
+				this.instance = null;
+			}
+		}
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		if (this.field.hasModifier(Modifiers.CONST))
+		{
+			IValue v = this.field.getValue();
+			if (v != null && v.isConstant())
+			{
+				return v;
+			}
+		}
+		this.instance = this.instance.foldConstants();
 		return this;
 	}
 	

@@ -5,7 +5,6 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -136,81 +135,92 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		if (this.initializer)
 		{
-			if (this.initializer)
-			{
-				this.field.applyState(state, context);
-			}
-			else if (this.instance != null)
-			{
-				this.instance.applyState(state, context);
-			}
+			this.field.resolveTypes(markers, context);
 		}
-		else if (state == CompilerState.RESOLVE)
+		else if (this.instance != null)
 		{
-			if (!this.initializer)
-			{
-				FieldMatch match;
-				if (this.instance == null)
-				{
-					match = context.resolveField(null, this.qualifiedName);
-				}
-				else
-				{
-					match = this.instance.getType().resolveField(context, this.qualifiedName);
-				}
-				
-				if (match != null)
-				{
-					this.field = match.theField;
-				}
-				else
-				{
-					state.addMarker(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a field"));
-				}
-			}
+			this.instance.resolveTypes(markers, context);
 		}
-		else if (state == CompilerState.CHECK)
+		
+		if (this.value != null)
 		{
-			if (this.value instanceof ThisValue)
+			this.value.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
+	{
+		if (!this.initializer)
+		{
+			FieldMatch match;
+			if (this.instance == null)
 			{
-				state.addMarker(new SyntaxError(this.position, "Cannot assign a value to 'this'"));
+				match = context.resolveField(null, this.qualifiedName);
 			}
-			else if (this.field != null)
+			else
 			{
-				IType type = this.field.getType();
-				if (!this.value.requireType(type))
-				{
-					state.addMarker(new SemanticError(this.value.getPosition(), "The type of the assigned value is incompatible with the required type " + type));
-				}
+				match = this.instance.getType().resolveField(context, this.qualifiedName);
+			}
+			
+			if (match != null)
+			{
+				this.field = match.theField;
 				
-				if (!this.initializer)
+				byte access = context.getAccessibility(this.field);
+				if (access == IContext.STATIC)
 				{
-					if (this.field.hasModifier(Modifiers.FINAL))
-					{
-						state.addMarker(new SemanticError(this.position, "The final field '" + this.name + "' cannot be assigned"));
-					}
-					
-					byte access = context.getAccessibility(this.field);
-					if (access == IContext.STATIC)
-					{
-						state.addMarker(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be assigned from a static context"));
-					}
-					else if ((access & IContext.WRITE_ACCESS) == 0)
-					{
-						state.addMarker(new SemanticError(this.position, "The field '" + this.name + "' cannot be assigned since it is not visible"));
-					}
+					markers.add(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be assigned from a static context"));
 				}
+				else if ((access & IContext.WRITE_ACCESS) == 0)
+				{
+					markers.add(new SemanticError(this.position, "The field '" + this.name + "' cannot be assigned since it is not visible"));
+				}
+			}
+			else
+			{
+				markers.add(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a field"));
 			}
 		}
 		
 		if (this.value != null)
 		{
-			this.value = this.value.applyState(state, context);
+			this.value = this.value.resolve(markers, context);
 		}
+		
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		if (this.value instanceof ThisValue)
+		{
+			markers.add(new SyntaxError(this.position, "Cannot assign a value to 'this'"));
+		}
+		else if (this.field != null)
+		{
+			IType type = this.field.getType();
+			if (!this.value.requireType(type))
+			{
+				markers.add(new SemanticError(this.value.getPosition(), "The type of the assigned value is incompatible with the required type " + type));
+			}
+			
+			if (!this.initializer && this.field.hasModifier(Modifiers.FINAL))
+			{
+				markers.add(new SemanticError(this.position, "The final field '" + this.name + "' cannot be assigned"));
+			}
+		}
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		this.value = this.value.foldConstants();
 		return this;
 	}
 	

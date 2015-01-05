@@ -1,12 +1,14 @@
 package dyvil.tools.compiler.ast.imports;
 
-import dyvil.tools.compiler.CompilerState;
+import java.util.List;
+
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -53,26 +55,22 @@ public class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public SimpleImport applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		Package pack = Package.rootPackage.resolvePackage(this.packageName);
+		if (pack == null)
 		{
-			Package pack = Package.rootPackage.resolvePackage(this.packageName);
-			if (pack == null)
-			{
-				state.addMarker(new SemanticError(this.position, "'" + this.packageName + "' could not be resolved to a package", "Remove this import"));
-				return this;
-			}
-			
-			IClass iclass = pack.resolveClass(this.className);
-			if (iclass == null)
-			{
-				state.addMarker(new SemanticError(this.position, "'" + this.className + "' could not be resolved to a class", "Remove this import"));
-			}
-			
-			this.theClass = iclass;
+			markers.add(new SemanticError(this.position, "'" + this.packageName + "' could not be resolved to a package", "Remove this import"));
+			return;
 		}
-		return this;
+		
+		IClass iclass = pack.resolveClass(this.className);
+		if (iclass == null)
+		{
+			markers.add(new SemanticError(this.position, "'" + this.className + "' could not be resolved to a class", "Remove this import"));
+		}
+		
+		this.theClass = iclass;
 	}
 	
 	@Override

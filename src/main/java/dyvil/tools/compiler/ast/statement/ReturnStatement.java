@@ -1,11 +1,13 @@
 package dyvil.tools.compiler.ast.statement;
 
+import java.util.List;
+
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ReturnStatement extends ASTNode implements IStatement, IValued
@@ -42,15 +44,39 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.value != null)
 		{
-			this.value = this.value.applyState(state, context);
-			if (state == CompilerState.FOLD_CONSTANTS)
-			{
-				return this.value;
-			}
+			this.value.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
+	{
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, context);
+		}
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		if (this.value != null)
+		{
+			this.value.check(markers);
+		}
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		if (this.value != null)
+		{
+			return this.value.foldConstants();
 		}
 		return this;
 	}

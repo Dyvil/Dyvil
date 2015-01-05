@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IField;
@@ -13,8 +12,9 @@ import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.Util;
 
 public class Parameter extends Member implements IField
 {
@@ -114,30 +114,52 @@ public class Parameter extends Member implements IField
 	}
 	
 	@Override
-	public Parameter applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		this.type = this.type.resolve(context);
+		if (!this.type.isResolved())
 		{
-			this.type = this.type.resolve(context);
-		}
-		else if (state == CompilerState.RESOLVE)
-		{
-			for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
-			{
-				Annotation a = iterator.next();
-				if (this.processAnnotation(a))
-				{
-					iterator.remove();
-					continue;
-				}
-				
-				a.applyState(state, context);
-			}
-			return this;
+			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
 		}
 		
-		Util.applyState(this.annotations, state, context);
-		return this;
+		for (Annotation a : this.annotations)
+		{
+			a.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolve(List<Marker> markers, IContext context)
+	{
+		for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
+		{
+			Annotation a = iterator.next();
+			if (this.processAnnotation(a))
+			{
+				iterator.remove();
+				continue;
+			}
+			
+			a.resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		for (Annotation a : this.annotations)
+		{
+			a.check(markers);
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		for (Annotation a : this.annotations)
+		{
+			a.foldConstants();
+		}
 	}
 	
 	@Override

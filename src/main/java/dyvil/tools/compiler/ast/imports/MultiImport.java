@@ -1,13 +1,14 @@
 package dyvil.tools.compiler.ast.imports;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IClass;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
@@ -33,31 +34,27 @@ public class MultiImport extends PackageImport
 	}
 	
 	@Override
-	public MultiImport applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		super.applyState(state, context);
-		if (state == CompilerState.RESOLVE_TYPES)
+		super.resolveTypes(markers, context);
+		if (this.thePackage == null)
 		{
-			if (this.thePackage == null)
+			return;
+		}
+		
+		this.classes = new HashSet(this.classNames.size());
+		for (String s : this.classNames)
+		{
+			IClass c = this.thePackage.resolveClass(s);
+			if (c == null)
 			{
-				return this;
+				markers.add(new SemanticError(this.position, "'" + s + "' could not be resolved to a class"));
 			}
-			
-			this.classes = new HashSet(this.classNames.size());
-			for (String s : this.classNames)
+			else
 			{
-				IClass c = this.thePackage.resolveClass(s);
-				if (c == null)
-				{
-					state.addMarker(new SemanticError(this.position, "'" + s + "' could not be resolved to a class"));
-				}
-				else
-				{
-					this.classes.add(c);
-				}
+				this.classes.add(c);
 			}
 		}
-		return this;
 	}
 	
 	@Override

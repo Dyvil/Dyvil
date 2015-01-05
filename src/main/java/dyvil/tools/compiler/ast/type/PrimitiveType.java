@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -224,12 +223,6 @@ public class PrimitiveType extends Type
 		default:
 			return Opcodes.RETURN;
 		}
-	}
-	
-	@Override
-	public Type applyState(CompilerState state, IContext context)
-	{
-		return this;
 	}
 	
 	@Override

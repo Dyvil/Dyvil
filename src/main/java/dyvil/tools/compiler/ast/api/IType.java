@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.api;
 
 import java.util.List;
 
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 
 public interface IType extends IASTNode, INamed, IContext
@@ -66,9 +65,6 @@ public interface IType extends IASTNode, INamed, IContext
 	public int getReturnOpcode();
 	
 	// Misc
-	
-	@Override
-	public IType applyState(CompilerState state, IContext context);
 	
 	public IType clone();
 }

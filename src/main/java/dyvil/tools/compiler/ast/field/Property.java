@@ -4,16 +4,15 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.Util;
 
 public class Property extends Field implements IProperty
 {
@@ -69,59 +68,94 @@ public class Property extends Field implements IProperty
 	}
 	
 	@Override
-	public Property applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		this.type = this.type.resolve(context);
+		if (!this.type.isResolved())
 		{
-			this.type = this.type.applyState(state, context);
-		}
-		else if (state == CompilerState.RESOLVE)
-		{
-			if (this.get != null)
-			{
-				this.getterMethod = new Method(this.theClass, "get$" + this.qualifiedName, this.type, this.modifiers, this.annotations);
-				this.getterMethod.setValue(this.get);
-				this.get = this.get.applyState(state, this);
-			}
-			if (this.set != null)
-			{
-				this.setterParameter = new Parameter(0, this.qualifiedName, this.type);
-				this.setterMethod = new Method(this.theClass, "set$" + this.qualifiedName, Type.VOID, this.modifiers, this.annotations);
-				this.setterMethod.addParameter(this.setterParameter);
-				this.setterMethod.setValue(this.set);
-				this.set = this.set.applyState(state, this);
-			}
-			Util.applyState(this.annotations, state, context);
-			return this;
-		}
-		else if (state == CompilerState.CHECK)
-		{
-			if (this.get == null && this.set == null)
-			{
-				state.addMarker(new SemanticError(this.position, "The property '" + this.name + "' does not have a getter nor a setter"));
-				Util.applyState(this.annotations, state, context);
-				return this;
-			}
-			if (this.get != null && !this.get.requireType(this.type))
-			{
-				state.addMarker(new SemanticError(this.get.getPosition(), "The getter value of the property '" + this.name + "' is incompatible with the property type " + this.type));
-			}
-			if (this.set != null && !this.set.requireType(this.type))
-			{
-				state.addMarker(new SemanticError(this.set.getPosition(), "The setter value of the property '" + this.name + "' has to be of type void"));
-			}
+			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
 		}
 		
 		if (this.get != null)
 		{
-			this.get = this.get.applyState(state, this);
+			this.get.resolveTypes(markers, this);
 		}
 		if (this.set != null)
 		{
-			this.set = this.set.applyState(state, this);
+			this.set.resolveTypes(markers, this);
 		}
-		Util.applyState(this.annotations, state, context);
-		return this;
+		
+		for (Annotation a : this.annotations)
+		{
+			a.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolve(List<Marker> markers, IContext context)
+	{
+		if (this.get != null)
+		{
+			this.getterMethod = new Method(this.theClass, "get$" + this.qualifiedName, this.type, this.modifiers, this.annotations);
+			this.getterMethod.setValue(this.get);
+			this.get = this.get.resolve(markers, this);
+		}
+		if (this.set != null)
+		{
+			this.setterParameter = new Parameter(0, this.qualifiedName, this.type);
+			this.setterMethod = new Method(this.theClass, "set$" + this.qualifiedName, Type.VOID, this.modifiers, this.annotations);
+			this.setterMethod.addParameter(this.setterParameter);
+			this.setterMethod.setValue(this.set);
+			this.set = this.set.resolve(markers, this);
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		if (this.get == null && this.set == null)
+		{
+			markers.add(new SemanticError(this.position, "The property '" + this.name + "' does not have a getter nor a setter"));
+		}
+		else
+		{
+			if (this.get != null && !this.get.requireType(this.type))
+			{
+				markers.add(new SemanticError(this.get.getPosition(), "The getter value of the property '" + this.name + "' is incompatible with the property type " + this.type));
+			}
+			if (this.set != null && !this.set.requireType(Type.VOID))
+			{
+				markers.add(new SemanticError(this.set.getPosition(), "The setter value of the property '" + this.name + "' has to be of type void"));
+			}
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.check(markers);
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		if (this.get != null)
+		{
+			this.get = this.get.foldConstants();
+		}
+		if (this.set != null)
+		{
+			this.set = this.set.foldConstants();
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.foldConstants();
+		}
 	}
 	
 	@Override

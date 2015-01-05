@@ -2,15 +2,12 @@ package dyvil.tools.compiler.ast.value;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class FloatValue extends ASTNode implements IValue
+public class FloatValue extends ASTNode implements IConstantValue
 {
 	public float	value;
 	
@@ -26,12 +23,6 @@ public class FloatValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return true;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return Type.FLOAT;
@@ -41,12 +32,6 @@ public class FloatValue extends ASTNode implements IValue
 	public Float toObject()
 	{
 		return Float.valueOf(this.value);
-	}
-	
-	@Override
-	public FloatValue applyState(CompilerState state, IContext context)
-	{
-		return this;
 	}
 	
 	@Override

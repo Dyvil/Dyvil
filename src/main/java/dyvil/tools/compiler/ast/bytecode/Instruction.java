@@ -1,11 +1,13 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
+
+import java.util.List;
+
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.Marker;
 
 public class Instruction extends ASTNode
 {
@@ -40,13 +42,7 @@ public class Instruction extends ASTNode
 		writer.visitInsn(this.opcode);
 	}
 	
-	@Override
-	public final Instruction applyState(CompilerState state, IContext context)
-	{
-		return this;
-	}
-	
-	public void resolve(CompilerState state, Bytecode bytecode)
+	public void resolve(List<Marker> markers, Bytecode bytecode)
 	{
 	}
 	

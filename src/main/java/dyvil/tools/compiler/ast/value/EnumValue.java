@@ -2,16 +2,13 @@ package dyvil.tools.compiler.ast.value;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class EnumValue extends ASTNode implements IValue
+public class EnumValue extends ASTNode implements IConstantValue
 {
 	public IType	type;
 	public String	name;
@@ -30,21 +27,9 @@ public class EnumValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return true;
-	}
-	
-	@Override
 	public IType getType()
 	{
 		return this.type;
-	}
-	
-	@Override
-	public EnumValue applyState(CompilerState state, IContext context)
-	{
-		return this;
 	}
 	
 	@Override

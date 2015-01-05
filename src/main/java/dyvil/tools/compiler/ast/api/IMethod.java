@@ -3,14 +3,11 @@ package dyvil.tools.compiler.ast.api;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower, IVariableList, IParameterized, IContext
 {
-	@Override
-	public IMethod applyState(CompilerState state, IContext context);
-	
-	public void checkArguments(CompilerState state, IValue instance, List<IValue> arguments);
+	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments);
 	
 	public int getSignatureMatch(String name, IType type, IType... argumentTypes);
 	

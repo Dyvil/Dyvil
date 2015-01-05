@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
@@ -31,6 +30,7 @@ public class CompilationUnit extends ASTNode implements IContext
 	public final String					name;
 	public final Package				pack;
 	protected transient TokenIterator	tokens;
+	protected List<Marker>				markers;
 	
 	protected PackageDecl				packageDeclaration;
 	protected List<IImport>				imports	= new ArrayList();
@@ -41,6 +41,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		this.position = input;
 		this.pack = pack;
 		this.inputFile = input;
+		this.markers = input.markers;
 		
 		String name = input.getAbsolutePath();
 		int start = name.lastIndexOf('/');
@@ -108,85 +109,101 @@ public class CompilationUnit extends ASTNode implements IContext
 		return this.pack.internalName + name;
 	}
 	
-	@Override
-	public CompilationUnit applyState(CompilerState state, IContext context)
+	public void tokenize()
 	{
-		if (state == CompilerState.TOKENIZE)
+		this.tokens = DyvilCompiler.parser.tokenize(this.getFile());
+	}
+	
+	public void parse()
+	{
+		DyvilCompiler.parser.setParser(new CompilationUnitParser(this));
+		DyvilCompiler.parser.parse(this.getFile(), this.tokens);
+		this.tokens = null;
+	}
+	
+	public void resolveTypes()
+	{
+		for (IImport i : this.imports)
 		{
-			this.tokens = DyvilCompiler.parser.tokenize(this.getFile());
-			return this;
+			i.resolveTypes(this.markers, this);
 		}
-		else if (state == CompilerState.PARSE)
+		
+		for (IClass i : this.classes)
 		{
-			DyvilCompiler.parser.setParser(new CompilationUnitParser(this));
-			DyvilCompiler.parser.parse(this.getFile(), this.tokens);
-			this.tokens = null;
-			return this;
+			i.resolveTypes(this.markers, this);
 		}
-		else if (state == CompilerState.RESOLVE_TYPES)
+	}
+	
+	public void resolve()
+	{
+		for (IClass i : this.classes)
 		{
-			switch (this.pack.check(this.packageDeclaration))
+			i.resolve(this.markers, this);
+		}
+	}
+	
+	public void check()
+	{
+		switch (this.pack.check(this.packageDeclaration))
+		{
+		case 0: // OK
+			break;
+		case 1: // Missing package decl.
+			this.markers.add(new SemanticError(new CodePosition((CodeFile) this.position, 1, 0, 1), "Missing Package Declaration", "Add 'package " + this.pack.name + ";' at the beginning of the file."));
+			break;
+		case 2: // Invalid package decl.
+			this.markers.add(new SemanticError(this.packageDeclaration.getPosition(), "Invalid Package Declaration", "Change the package declaration to '" + this.pack.name + "'."));
+			break;
+		case 3: // Package decl. in default package
+			this.markers.add(new SemanticError(this.packageDeclaration.getPosition(), "Invalid Package Declaration", "Remove the package declaration."));
+			break;
+		}
+		
+		for (IClass i : this.classes)
+		{
+			i.check(this.markers);
+		}
+	}
+	
+	public void foldConstants()
+	{
+		for (IClass i : this.classes)
+		{
+			i.foldConstants();
+		}
+	}
+	
+	public void compile()
+	{
+		synchronized (this)
+		{
+			int size = this.markers.size();
+			if (size > 0)
 			{
-			case 0: // OK
-				break;
-			case 1: // Missing package decl.
-				state.addMarker(new SemanticError(new CodePosition((CodeFile) this.position, 1, 0, 1), "Missing Package Declaration", "Add 'package " + this.pack.name + ";' at the beginning of the file."));
-				break;
-			case 2: // Invalid package decl.
-				state.addMarker(new SemanticError(this.packageDeclaration.getPosition(), "Invalid Package Declaration", "Change the package declaration to '" + this.pack.name + "'."));
-				break;
-			case 3: // Package decl. in default package
-				state.addMarker(new SemanticError(this.packageDeclaration.getPosition(), "Invalid Package Declaration", "Remove the package declaration."));
-				break;
+				DyvilCompiler.logger.info("Markers in Compilation Unit " + this.name + ": " + size);
+				for (Marker marker : this.markers)
+				{
+					marker.log(DyvilCompiler.logger);
+				}
+				DyvilCompiler.logger.warning(this.name + " was not compiled as there were Syntax Errors in the Compilation Unit.");
 			}
 			
-			for (IImport i : this.imports)
+			for (IClass iclass : this.classes)
 			{
-				i.applyState(state, this);
+				String name = iclass.getName();
+				if (!name.equals(this.name))
+				{
+					name = this.name + "$" + name;
+				}
+				File file = new File(this.outputDirectory, name + ".class");
+				ClassWriter.saveClass(file, iclass);
 			}
 		}
-		else if (state == CompilerState.COMPILE)
-		{
-			synchronized (this)
-			{
-				List<Marker> markers = this.getFile().markers;
-				int size = markers.size();
-				if (size > 0)
-				{
-					DyvilCompiler.logger.info("Markers in Compilation Unit " + this.name + ": " + size);
-					for (Marker marker : this.getFile().markers)
-					{
-						marker.log(DyvilCompiler.logger);
-					}
-					DyvilCompiler.logger.warning(this.name + " was not compiled as there were Syntax Errors in the Compilation Unit.");
-					
-					return this;
-				}
-				
-				for (IClass iclass : this.classes)
-				{
-					String name = iclass.getName();
-					if (!name.equals(this.name))
-					{
-						name = this.name + "$" + name;
-					}
-					File file = new File(this.outputDirectory, name + ".class");
-					ClassWriter.saveClass(file, iclass);
-				}
-			}
-			return this;
-		}
-		else if (state == CompilerState.DEBUG)
-		{
-			DyvilCompiler.logger.info(this.getFile() + ":\n" + this.toString());
-		}
-		
-		for (IClass iclass : this.classes)
-		{
-			iclass.applyState(state, this);
-		}
-		
-		return this;
+	}
+	
+	public void debug()
+	{
+		DyvilCompiler.logger.info(this.getFile() + ":\n" + this.toString());
 	}
 	
 	@Override

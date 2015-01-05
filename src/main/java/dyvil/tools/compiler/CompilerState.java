@@ -2,11 +2,8 @@ package dyvil.tools.compiler;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.bytecode.ClassWriter;
-import dyvil.tools.compiler.lexer.CodeFile;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.util.Util;
 
 public enum CompilerState
@@ -14,98 +11,148 @@ public enum CompilerState
 	/**
 	 * Tokenizes the input file.
 	 */
-	TOKENIZE,
+	TOKENIZE
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			for (CompilationUnit cu : units)
+			{
+				cu.tokenize();
+			}
+		}
+	},
 	/**
 	 * Parsers the token chain.
 	 */
-	PARSE,
+	PARSE
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			for (CompilationUnit cu : units)
+			{
+				cu.parse();
+			}
+		}
+	},
 	/**
 	 * Resolves packages, classes and types.
 	 */
-	RESOLVE_TYPES,
+	RESOLVE_TYPES
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			for (CompilationUnit cu : units)
+			{
+				cu.resolveTypes();
+			}
+		}
+	},
 	/**
 	 * Resolves methods and field names.
 	 */
-	RESOLVE,
+	RESOLVE
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			for (CompilationUnit cu : units)
+			{
+				cu.resolve();
+			}
+		}
+	},
 	/**
 	 * Checks for semantical errors.
 	 */
-	CHECK,
-	/**
-	 * Obfuscates the code.
-	 */
-	OBFUSCATE,
-	/**
-	 * Applies operator precendence rules to method calls.
-	 */
-	OPERATOR_PRECEDENCE,
+	CHECK
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			for (CompilationUnit cu : units)
+			{
+				cu.check();
+			}
+		}
+	},
 	/**
 	 * Folds constants.
 	 */
-	FOLD_CONSTANTS,
-	/**
-	 * Converts the Dyvil AST to a valid Java AST.
-	 */
-	CONVERT,
-	/**
-	 * Optimizes the code on the AST.
-	 */
-	OPTIMIZE,
+	FOLD_CONSTANTS
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			for (CompilationUnit cu : units)
+			{
+				cu.foldConstants();
+			}
+		}
+	},
 	/**
 	 * Compiles the AST to byte code and stores the generated .class files in
 	 * the bin directory.
 	 */
-	COMPILE,
+	COMPILE
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			for (CompilationUnit cu : units)
+			{
+				cu.compile();
+			}
+		}
+	},
 	/**
 	 * Converts the .class files in the bin directory to a JAR file, sets up the
 	 * classpath and signs the JAR.
 	 */
-	JAR,
-	/**
-	 * Decompiles the byte code to an AST.
-	 */
-	DECOMPILE,
-	/**
-	 * Generates the Dyvildoc files.
-	 */
-	DYVILDOC,
+	JAR
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			ClassWriter.generateJAR(DyvilCompiler.files);
+		}
+	},
 	/**
 	 * Prints the AST.
 	 */
-	DEBUG;
+	DEBUG
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			for (CompilationUnit cu : units)
+			{
+				cu.debug();
+			}
+		}
+	};
 	
-	public CodeFile	file;
-	
-	public void apply(List<CompilationUnit> units, IContext context)
+	public static void applyState(CompilerState state, List<CompilationUnit> units)
 	{
 		long now = 0L;
 		if (DyvilCompiler.debug)
 		{
-			DyvilCompiler.logger.info("Applying State " + this.name());
+			DyvilCompiler.logger.info("Applying State " + state.name());
 			now = System.nanoTime();
 		}
 		
-		if (this == JAR)
-		{
-			ClassWriter.generateJAR(DyvilCompiler.files);
-		}
-		else
-		{
-			for (CompilationUnit unit : units)
-			{
-				this.file = unit.getFile();
-				unit.applyState(this, context);
-			}
-		}
+		state.apply(units);
 		
 		if (DyvilCompiler.debug)
 		{
-			Util.logProfile(now, units.size(), "Finished State " + this.name() + " (%.1f ms, %.1f ms/CU, %.2f CU/s)");
+			Util.logProfile(now, units.size(), "Finished State " + state.name() + " (%.1f ms, %.1f ms/CU, %.2f CU/s)");
 		}
 	}
 	
-	public void addMarker(Marker marker)
+	public void apply(List<CompilationUnit> units)
 	{
-		this.file.markers.add(marker);
+		
 	}
 }

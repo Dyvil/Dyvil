@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IAccess;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IValue;
@@ -12,9 +11,8 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 
 public class AccessResolver
 {
-	public static IAccess resolve(IContext context, IAccess access)
+	public static IAccess resolve(List<Marker> markers, IContext context, IAccess access)
 	{
-		List<Marker> markers = CompilerState.RESOLVE.file.markers;
 		LinkedList<IAccess> chain = getCallChain(access);
 		
 		ListIterator<IAccess> iterator = chain.listIterator();

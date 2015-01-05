@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.ast;
 
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.IASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class ASTNode implements IASTNode
@@ -29,9 +27,6 @@ public abstract class ASTNode implements IASTNode
 			this.position = this.position.to(position);
 		}
 	}
-	
-	@Override
-	public abstract IASTNode applyState(CompilerState state, IContext context);
 	
 	@Override
 	public String toString()

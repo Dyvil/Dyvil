@@ -2,11 +2,10 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.ListIterator;
+import java.util.List;
 import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -14,6 +13,7 @@ import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -47,99 +47,94 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
+	{
+		this.context = context;
+		IVariableList variableList = context instanceof IVariableList ? (IVariableList) context : null;
+		
+		for (IValue v : this.values)
+		{
+			if (!(v instanceof FieldAssign))
+			{
+				continue;
+			}
+			
+			FieldAssign assign = (FieldAssign) v;
+			if (!assign.initializer)
+			{
+				continue;
+			}
+			
+			Variable var = (Variable) assign.field;
+			var.start = this.start;
+			var.end = this.end;
+			this.variables.put(assign.qualifiedName, assign.field);
+			
+			if (variableList != null)
+			{
+				variableList.addVariable(var);
+			}
+		}
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
 	{
 		int len = this.values.size();
-		if (state == CompilerState.FOLD_CONSTANTS)
+		for (int i = 0; i < len; i++)
 		{
-			if (len == 1)
+			IValue v1 = this.values.get(i);
+			IValue v2 = v1.resolve(markers, this);
+			if (v1 != v2)
 			{
-				return this.values.get(0);
+				this.values.set(i, v2);
 			}
 		}
-		else if (state == CompilerState.RESOLVE)
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		if (this.isArray)
 		{
-			this.context = context;
-			IVariableList variableList = context instanceof IVariableList ? (IVariableList) context : null;
-			this.context = context;
-			ListIterator<IValue> iterator = this.values.listIterator();
-			while (iterator.hasNext())
+			IType type = this.getElementType();
+			for (IValue value : this.values)
 			{
-				IValue v = iterator.next();
-				if (v == null)
-				{
-					iterator.remove();
-					continue;
-				}
-				iterator.set(v.applyState(state, this));
+				value.check(markers);
 				
-				if (!(v instanceof FieldAssign))
+				if (!value.requireType(type))
 				{
-					continue;
-				}
-				
-				FieldAssign assign = (FieldAssign) v;
-				if (!assign.initializer)
-				{
-					continue;
-				}
-				
-				Variable var = (Variable) assign.field;
-				var.start = this.start;
-				var.end = this.end;
-				this.variables.put(assign.qualifiedName, assign.field);
-				
-				if (variableList != null)
-				{
-					variableList.addVariable((Variable) assign.field);
-				}
-			}
-		}
-		else if (state == CompilerState.CHECK)
-		{
-			if (this.isArray)
-			{
-				IType type = this.getElementType();
-				for (IValue value : this.values)
-				{
-					if (!value.requireType(type))
-					{
-						state.addMarker(new SemanticError(value.getPosition(), "The array value is incompatible with the required type " + type));
-					}
-					
-					value.applyState(state, context);
-				}
-			}
-			else
-			{
-				IType type = this.getType();
-				for (IValue v : this.values)
-				{
-					if (v instanceof IStatement)
-					{
-						if (!v.requireType(type))
-						{
-							state.addMarker(new SemanticError(v.getPosition(), "The returning type of the block is incompatible with the required type " + type));
-						}
-					}
-					
-					v.applyState(state, context);
+					markers.add(new SemanticError(value.getPosition(), "The array value is incompatible with the required type " + type));
 				}
 			}
 		}
 		else
 		{
-			this.context = context;
-			ListIterator<IValue> iterator = this.values.listIterator();
-			while (iterator.hasNext())
+			IType type = this.getType();
+			for (IValue v : this.values)
 			{
-				IValue v = iterator.next();
-				if (v == null)
+				v.check(markers);
+				
+				if (v instanceof IStatement && !v.requireType(type))
 				{
-					iterator.remove();
-					continue;
+					markers.add(new SemanticError(v.getPosition(), "The returning type of the block is incompatible with the required type " + type));
 				}
-				iterator.set(v.applyState(state, this));
+			}
+		}
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		int len = this.values.size();
+		for (int i = 0; i < len; i++)
+		{
+			IValue v1 = this.values.get(i);
+			IValue v2 = v1.foldConstants();
+			if (v1 != v2)
+			{
+				this.values.set(i, v2);
 			}
 		}
 		return this;

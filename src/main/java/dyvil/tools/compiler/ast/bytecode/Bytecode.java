@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Bytecode extends ASTNode implements IValue
@@ -58,15 +58,28 @@ public class Bytecode extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE)
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
+	{
+		for (Instruction i : this.instructions)
 		{
-			for (Instruction i : this.instructions)
-			{
-				i.resolve(state, this);
-			}
+			i.resolve(markers, this);
 		}
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
 		return this;
 	}
 	

@@ -88,7 +88,7 @@ public class DyvilCompiler
 		// Apply states
 		for (CompilerState state : DyvilCompiler.states)
 		{
-			state.apply(root.units, null);
+			CompilerState.applyState(state, root.units);
 		}
 		
 		logger.info("");
@@ -141,22 +141,22 @@ public class DyvilCompiler
 			states.add(CompilerState.RESOLVE_TYPES);
 			states.add(CompilerState.RESOLVE);
 			states.add(CompilerState.CHECK);
-			states.add(CompilerState.OPERATOR_PRECEDENCE);
-			states.add(CompilerState.CONVERT);
+			// states.add(CompilerState.OPERATOR_PRECEDENCE);
+			// states.add(CompilerState.CONVERT);
 			states.add(CompilerState.COMPILE);
 			break;
 		case "optimize":
 			states.add(CompilerState.FOLD_CONSTANTS);
-			states.add(CompilerState.OPTIMIZE);
+			// states.add(CompilerState.OPTIMIZE);
 			break;
 		case "obfuscate":
-			states.add(CompilerState.OBFUSCATE);
+			// states.add(CompilerState.OBFUSCATE);
 			break;
 		case "doc":
-			states.add(CompilerState.DYVILDOC);
+			// states.add(CompilerState.DYVILDOC);
 			break;
 		case "decompile":
-			states.add(CompilerState.DECOMPILE);
+			// states.add(CompilerState.DECOMPILE);
 			break;
 		case "jar":
 			states.add(CompilerState.JAR);

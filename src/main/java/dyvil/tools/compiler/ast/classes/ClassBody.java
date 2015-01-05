@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassBody extends ASTNode
@@ -135,23 +135,68 @@ public class ClassBody extends ASTNode
 		}
 	}
 	
-	@Override
-	public ClassBody applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		for (IField field : this.fields)
 		{
-			field.applyState(state, context);
+			field.resolveTypes(markers, context);
 		}
 		for (IProperty prop : this.properties)
 		{
-			prop.applyState(state, context);
+			prop.resolveTypes(markers, context);
 		}
 		for (IMethod method : this.methods)
 		{
-			method.applyState(state, context);
+			method.resolveTypes(markers, context);
 		}
-		
-		return this;
+	}
+	
+	public void resolve(List<Marker> markers, IContext context)
+	{
+		for (IField field : this.fields)
+		{
+			field.resolve(markers, context);
+		}
+		for (IProperty prop : this.properties)
+		{
+			prop.resolve(markers, context);
+		}
+		for (IMethod method : this.methods)
+		{
+			method.resolve(markers, context);
+		}
+	}
+	
+	public void check(List<Marker> markers)
+	{
+		for (IField field : this.fields)
+		{
+			field.check(markers);
+		}
+		for (IProperty prop : this.properties)
+		{
+			prop.check(markers);
+		}
+		for (IMethod method : this.methods)
+		{
+			method.check(markers);
+		}
+	}
+	
+	public void foldConstants()
+	{
+		for (IField field : this.fields)
+		{
+			field.foldConstants();
+		}
+		for (IProperty prop : this.properties)
+		{
+			prop.foldConstants();
+		}
+		for (IMethod method : this.methods)
+		{
+			method.foldConstants();
+		}
 	}
 	
 	@Override

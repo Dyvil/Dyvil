@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.classes;
 
 import java.util.List;
+import java.util.ListIterator;
 
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import jdk.internal.org.objectweb.asm.FieldVisitor;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.IClass;
 import dyvil.tools.compiler.ast.api.IContext;
@@ -19,9 +19,9 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.bytecode.AnnotationVisitorImpl;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.util.ClassFormat;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.Util;
 
 public class BytecodeClass extends CodeClass
 {
@@ -40,26 +40,51 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public CodeClass applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		if (this.superType != null)
 		{
-			if (this.superType != null)
+			if (this.superType.isName("void"))
 			{
-				if (this.superType.isName("void"))
-				{
-					this.superType = null;
-				}
-				else
-				{
-					this.superType = this.superType.resolve(context);
-				}
+				this.superType = null;
 			}
-			Util.applyState(this.interfaces, state, context);
-			Util.applyState(this.annotations, state, Package.rootPackage);
-			this.body.applyState(state, Package.rootPackage);
+			else
+			{
+				this.superType = this.superType.resolve(context);
+			}
 		}
-		return this;
+		
+		for (ListIterator<IType> iterator = this.interfaces.listIterator(); iterator.hasNext();)
+		{
+			IType i1 = iterator.next();
+			IType i2 = i1.resolve(context);
+			if (i1 != i2)
+			{
+				iterator.set(i2);
+			}
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.resolveTypes(markers, Package.rootPackage);
+		}
+		
+		this.body.resolveTypes(markers, Package.rootPackage);
+	}
+	
+	@Override
+	public void resolve(List<Marker> markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+	}
+	
+	@Override
+	public void foldConstants()
+	{
 	}
 	
 	@Override
@@ -82,7 +107,7 @@ public class BytecodeClass extends CodeClass
 	{
 		if (!this.typesResolved)
 		{
-			this.applyState(CompilerState.RESOLVE_TYPES, Package.rootPackage);
+			this.resolveTypes(null, Package.rootPackage);
 			this.typesResolved = true;
 		}
 		return super.resolveField(context, name);
@@ -93,7 +118,7 @@ public class BytecodeClass extends CodeClass
 	{
 		if (!this.typesResolved)
 		{
-			this.applyState(CompilerState.RESOLVE_TYPES, Package.rootPackage);
+			this.resolveTypes(null, Package.rootPackage);
 			this.typesResolved = true;
 		}
 		return super.resolveMethod(returnType, name, argumentTypes);
@@ -104,7 +129,7 @@ public class BytecodeClass extends CodeClass
 	{
 		if (!this.typesResolved)
 		{
-			this.applyState(CompilerState.RESOLVE_TYPES, Package.rootPackage);
+			this.resolveTypes(null, Package.rootPackage);
 			this.typesResolved = true;
 		}
 		super.getMethodMatches(list, type, name, argumentTypes);

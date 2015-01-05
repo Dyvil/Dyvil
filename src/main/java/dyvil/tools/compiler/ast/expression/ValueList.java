@@ -5,7 +5,6 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IType;
@@ -14,6 +13,7 @@ import dyvil.tools.compiler.ast.api.IValueList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
@@ -158,26 +158,53 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.CHECK)
+		for (IValue v : this.values)
 		{
-			IType type = this.elementType;
-			for (IValue value : this.values)
-			{
-				if (!value.requireType(type))
-				{
-					state.addMarker(new SemanticError(value.getPosition(), "The array value is incompatible with the required type " + type));
-				}
-				
-				value.applyState(state, context);
-			}
+			v.resolveTypes(markers, context);
 		}
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
+	{
 		int len = this.values.size();
 		for (int i = 0; i < len; i++)
 		{
 			IValue v1 = this.values.get(i);
-			IValue v2 = v1.applyState(state, context);
+			IValue v2 = v1.resolve(markers, context);
+			if (v1 != v2)
+			{
+				this.values.set(i, v2);
+			}
+		}
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		IType type = this.elementType;
+		for (IValue v : this.values)
+		{
+			v.check(markers);
+			
+			if (!v.requireType(type))
+			{
+				markers.add(new SemanticError(v.getPosition(), "The array value is incompatible with the required type " + type));
+			}
+		}
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		int len = this.values.size();
+		for (int i = 0; i < len; i++)
+		{
+			IValue v1 = this.values.get(i);
+			IValue v2 = v1.foldConstants();
 			if (v1 != v2)
 			{
 				this.values.set(i, v2);

@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.ast.statement;
 
+import java.util.List;
+
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IStatement;
@@ -11,6 +12,7 @@ import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -68,27 +70,65 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public IValue applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.condition = this.condition.applyState(state, context);
-		
-		if (state == CompilerState.CHECK)
+		this.condition.resolveTypes(markers, context);
+		if (this.then != null)
 		{
-			if (!Type.isSuperType(Type.BOOLEAN, this.condition.getType()))
-			{
-				state.addMarker(new SemanticError(this.position, "The condition of an if statement has to evaluate to a boolean value."));
-			}
+			this.then.resolveTypes(markers, context);
+		}
+		if (this.elseThen != null)
+		{
+			this.elseThen.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
+	{
+		this.condition = this.condition.resolve(markers, context);
+		if (this.then != null)
+		{
+			this.then = this.then.resolve(markers, context);
+		}
+		if (this.elseThen != null)
+		{
+			this.elseThen = this.elseThen.resolve(markers, context);
+		}
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		this.condition.check(markers);
+		if (!Type.isSuperType(Type.BOOLEAN, this.condition.getType()))
+		{
+			markers.add(new SemanticError(this.position, "The condition of an if statement has to evaluate to a boolean value."));
 		}
 		
 		if (this.then != null)
 		{
-			this.then = this.then.applyState(state, context);
+			this.then.check(markers);
 		}
 		if (this.elseThen != null)
 		{
-			this.elseThen = this.elseThen.applyState(state, context);
+			this.elseThen.check(markers);
 		}
-		
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		this.condition = this.condition.foldConstants();
+		if (this.then != null)
+		{
+			this.then = this.then.foldConstants();
+		}
+		if (this.elseThen != null)
+		{
+			this.elseThen = this.elseThen.foldConstants();
+		}
 		return this;
 	}
 	

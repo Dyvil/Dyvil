@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.ast.expression;
 
+import java.util.List;
+
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -86,45 +87,83 @@ public class ConstructorCall extends Call implements ITyped
 	}
 	
 	@Override
-	public IAccess applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		this.type = this.type.resolve(context);
+		if (!this.type.isResolved())
 		{
-			this.type = this.type.resolve(context);
+			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
 		}
-		else if (state == CompilerState.RESOLVE)
+		
+		for (IValue v : this.arguments)
 		{
-			Util.applyState(this.arguments, state, context);
-			if (!this.resolve(context, null))
-			{
-				state.addMarker(new SemanticError(this.position, "The constructor could not be resolved"));
-			}
-			return this;
+			v.resolveTypes(markers, context);
 		}
-		else if (state == CompilerState.CHECK)
+	}
+	
+	@Override
+	public IValue resolve(List<Marker> markers, IContext context)
+	{
+		int len = this.arguments.size();
+		for (int i = 0; i < len; i++)
 		{
-			IClass iclass = this.type.getTheClass();
-			if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
+			IValue v1 = this.arguments.get(i);
+			IValue v2 = v1.resolve(markers, context);
+			if (v1 != v2)
 			{
-				state.addMarker(new SemanticError(this.position, "The interface '" + iclass.getName() + "' cannot be instantiated"));
-			}
-			else if (iclass.hasModifier(Modifiers.ABSTRACT))
-			{
-				state.addMarker(new SemanticError(this.position, "The abstract class '" + iclass.getName() + "' cannot be instantiated"));
-			}
-			else if (this.method != null)
-			{
-				this.method.checkArguments(state, null, this.arguments);
-				
-				byte access = context.getAccessibility(this.method);
-				if ((access & IContext.READ_ACCESS) == 0)
-				{
-					state.addMarker(new SemanticError(this.position, "The constructor cannot be invoked since it is not visible"));
-				}
+				this.arguments.set(i, v2);
 			}
 		}
 		
-		Util.applyState(this.arguments, state, context);
+		if (!this.resolve(context, null))
+		{
+			markers.add(new SemanticError(this.position, "The constructor could not be resolved"));
+			
+			byte access = context.getAccessibility(this.method);
+			if ((access & IContext.READ_ACCESS) == 0)
+			{
+				markers.add(new SemanticError(this.position, "The constructor cannot be invoked since it is not visible"));
+			}
+		}
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		for (IValue v : this.arguments)
+		{
+			v.check(markers);
+		}
+		
+		IClass iclass = this.type.getTheClass();
+		if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
+		{
+			markers.add(new SemanticError(this.position, "The interface '" + iclass.getName() + "' cannot be instantiated"));
+		}
+		else if (iclass.hasModifier(Modifiers.ABSTRACT))
+		{
+			markers.add(new SemanticError(this.position, "The abstract class '" + iclass.getName() + "' cannot be instantiated"));
+		}
+		else if (this.method != null)
+		{
+			this.method.checkArguments(markers, null, this.arguments);
+		}
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		int len = this.arguments.size();
+		for (int i = 0; i < len; i++)
+		{
+			IValue v1 = this.arguments.get(i);
+			IValue v2 = v1.foldConstants();
+			if (v1 != v2)
+			{
+				this.arguments.set(i, v2);
+			}
+		}
 		return this;
 	}
 	

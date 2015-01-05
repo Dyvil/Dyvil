@@ -8,7 +8,6 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -17,6 +16,7 @@ import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
@@ -192,7 +192,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void checkArguments(CompilerState state, IValue instance, List<IValue> arguments)
+	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments)
 	{
 		int pOff = 0;
 		int len = arguments.size();
@@ -206,7 +206,7 @@ public class Method extends Member implements IMethod
 			parType = par.type;
 			if (!instance.requireType(parType))
 			{
-				state.addMarker(new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name + "' is incompatible with the required type " + parType));
+				markers.add(new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name + "' is incompatible with the required type " + parType));
 			}
 			pOff = 1;
 		}
@@ -218,7 +218,7 @@ public class Method extends Member implements IMethod
 			IValue value = arguments.get(i);
 			if (!value.requireType(parType))
 			{
-				state.addMarker(new SemanticError(value.getPosition(), "The method argument for '" + par.name + "' is incompatible with the required type " + parType));
+				markers.add(new SemanticError(value.getPosition(), "The method argument for '" + par.name + "' is incompatible with the required type " + parType));
 			}
 		}
 	}
@@ -369,132 +369,186 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public Method applyState(CompilerState state, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (state == CompilerState.RESOLVE_TYPES)
+		this.type = this.type.resolve(context);
+		if (!this.type.isResolved())
 		{
-			this.type = this.type.applyState(state, context);
-			
-			int len = this.throwsDeclarations.size();
-			for (int i = 0; i < len; i++)
+			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
+		}
+		
+		int len = this.throwsDeclarations.size();
+		for (int i = 0; i < len; i++)
+		{
+			IType t1 = this.throwsDeclarations.get(i);
+			IType t2 = t1.resolve(context);
+			if (t1 != t2)
 			{
-				IType t1 = this.throwsDeclarations.get(i);
-				IType t2 = t1.applyState(state, context);
-				if (t1 != t2)
-				{
-					this.throwsDeclarations.set(i, t2);
-				}
+				this.throwsDeclarations.set(i, t2);
 			}
-			
-			for (Variable v : this.variables)
+			if (!t2.isResolved())
 			{
-				v.applyState(state, context);
+				markers.add(new SemanticError(t2.getPosition(), "'" + t2 + "' could not be resolved to a type"));
 			}
 		}
-		else if (state == CompilerState.RESOLVE)
+		
+		for (Annotation a : this.annotations)
 		{
-			Iterator<Annotation> iterator = this.annotations.iterator();
-			while (iterator.hasNext())
+			a.resolveTypes(markers, context);
+		}
+		
+		for (Parameter p : this.parameters)
+		{
+			p.resolveTypes(markers, context);
+		}
+		
+		if (this.statement != null)
+		{
+			this.statement.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolve(List<Marker> markers, IContext context)
+	{
+		if ((this.modifiers & Modifiers.STATIC) == 0)
+		{
+			IType t = this.theClass.getSuperType();
+			if (t != null)
 			{
-				Annotation a = iterator.next();
-				if (this.processAnnotation(a))
+				IClass iclass = t.getTheClass();
+				if (iclass != null)
 				{
-					iterator.remove();
-				}
-			}
-			
-			for (Variable v : this.variables)
-			{
-				v.applyState(state, context);
-			}
-			
-			if ((this.modifiers & Modifiers.STATIC) == 0)
-			{
-				IType t = this.theClass.getSuperType();
-				if (t != null)
-				{
-					IClass iclass = t.getTheClass();
-					if (iclass != null)
-					{
-						this.overrideMethod = iclass.getBody().getMethod(this.name, this.parameters);
-					}
+					this.overrideMethod = iclass.getBody().getMethod(this.name, this.parameters);
 				}
 			}
 		}
-		else if (state == CompilerState.CHECK)
+		
+		Iterator<Annotation> iterator = this.annotations.iterator();
+		while (iterator.hasNext())
 		{
-			if ((this.modifiers & Modifiers.STATIC) == 0)
+			Annotation a = iterator.next();
+			if (this.processAnnotation(a))
 			{
-				if (this.overrideMethod == null)
+				iterator.remove();
+				continue;
+			}
+			a.resolve(markers, context);
+		}
+		
+		for (Parameter p : this.parameters)
+		{
+			p.resolve(markers, context);
+		}
+		
+		for (Variable v : this.variables)
+		{
+			v.resolve(markers, context);
+		}
+		
+		if (this.statement != null)
+		{
+			this.statement = this.statement.resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void check(List<Marker> markers)
+	{
+		if ((this.modifiers & Modifiers.STATIC) == 0)
+		{
+			if (this.overrideMethod == null)
+			{
+				if ((this.modifiers & Modifiers.OVERRIDE) != 0)
 				{
-					if ((this.modifiers & Modifiers.OVERRIDE) != 0)
-					{
-						state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' must override or implement a supertype method"));
-					}
+					markers.add(new SemanticError(this.position, "The method '" + this.name + "' must override or implement a supertype method"));
+				}
+			}
+			else
+			{
+				if ((this.modifiers & Modifiers.OVERRIDE) == 0)
+				{
+					markers.add(new SemanticError(this.position, "The method '" + this.name + "' overrides a method, but does not have an 'override' modifier"));
+				}
+				else if (this.overrideMethod.hasModifier(Modifiers.FINAL))
+				{
+					markers.add(new SemanticError(this.position, "The method '" + this.name + "' cannot override a final method"));
 				}
 				else
 				{
-					if ((this.modifiers & Modifiers.OVERRIDE) == 0)
+					IType type = this.overrideMethod.getType();
+					if (!Type.isSuperType(type, this.type))
 					{
-						state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' overrides a method, but does not have an 'override' modifier"));
+						markers.add(new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type " + type));
 					}
-					else if (this.overrideMethod.hasModifier(Modifiers.FINAL))
-					{
-						state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' cannot override a final method"));
-					}
-					else
-					{
-						IType type = this.overrideMethod.getType();
-						if (!Type.isSuperType(type, this.type))
-						{
-							state.addMarker(new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type " + type));
-						}
-					}
-				}
-			}
-			
-			if (this.statement != null)
-			{
-				if (!this.statement.requireType(this.type))
-				{
-					state.addMarker(new SemanticError(this.statement.getPosition(), "The method '" + this.name + "' must return a result of type " + this.type));
-				}
-			}
-			// If the method does not have an implementation and is static
-			else if (this.isStatic())
-			{
-				state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' is declared static, but does not have an implementation"));
-			}
-			// Or not declared abstract and a member of a non-abstract class
-			else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
-			{
-				if (this.theClass.isAbstract())
-				{
-					this.modifiers |= Modifiers.ABSTRACT;
-				}
-				else
-				{
-					state.addMarker(new SemanticError(this.position, "The method '" + this.name + "' is not implemented, but does not have an abstract modifier"));
 				}
 			}
 		}
 		
 		for (Annotation a : this.annotations)
 		{
-			a.applyState(state, context);
+			a.check(markers);
 		}
 		
 		for (Parameter p : this.parameters)
 		{
-			p.applyState(state, context);
+			p.check(markers);
+		}
+		
+		for (Variable v : this.variables)
+		{
+			v.check(markers);
 		}
 		
 		if (this.statement != null)
 		{
-			this.statement = this.statement.applyState(state, this);
+			if (!this.statement.requireType(this.type))
+			{
+				markers.add(new SemanticError(this.statement.getPosition(), "The method '" + this.name + "' must return a result of type " + this.type));
+			}
+			this.statement.check(markers);
+		}
+		// If the method does not have an implementation and is static
+		else if (this.isStatic())
+		{
+			markers.add(new SemanticError(this.position, "The method '" + this.name + "' is declared static, but does not have an implementation"));
+		}
+		// Or not declared abstract and a member of a non-abstract class
+		else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
+		{
+			if (this.theClass.isAbstract())
+			{
+				this.modifiers |= Modifiers.ABSTRACT;
+			}
+			else
+			{
+				markers.add(new SemanticError(this.position, "The method '" + this.name + "' is not implemented, but does not have an abstract modifier"));
+			}
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		for (Annotation a : this.annotations)
+		{
+			a.foldConstants();
 		}
 		
-		return this;
+		for (Parameter p : this.parameters)
+		{
+			p.foldConstants();
+		}
+		
+		for (Variable v : this.variables)
+		{
+			v.foldConstants();
+		}
+		
+		if (this.statement != null)
+		{
+			this.statement = this.statement.foldConstants();
+		}
 	}
 	
 	@Override

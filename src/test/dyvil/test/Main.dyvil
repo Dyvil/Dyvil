@@ -7,5 +7,5 @@ import java.util.{Arrays, HashMap};
 
 public abstract class Main
 {
-	public Main test() = new Main();
+	public static void main(String[] args) = System out println "Hello World";
 }
