@@ -14,6 +14,8 @@ public interface IClass extends IASTNode, IMember, IAnnotatable, IModified, INam
 	
 	public Package getPackage();
 	
+	public boolean equals(IClass iclass);
+	
 	// Modifiers
 	
 	public boolean isAbstract();
@@ -24,7 +26,7 @@ public interface IClass extends IASTNode, IMember, IAnnotatable, IModified, INam
 	
 	public IType getSuperType();
 	
-	public boolean isSuperType(IType t);
+	public boolean isSuperType(IType type);
 	
 	// Interfaces
 	

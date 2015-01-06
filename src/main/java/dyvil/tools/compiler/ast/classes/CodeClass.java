@@ -23,39 +23,38 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.parser.type.ITypeVariable;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
 {
-	protected CompilationUnit	unit;
+	protected CompilationUnit		unit;
 	
-	protected int				modifiers;
+	protected int					modifiers;
 	
-	protected String			name;
-	protected String			qualifiedName;
-	protected String			internalName;
+	protected String				name;
+	protected String				qualifiedName;
+	protected String				internalName;
 	
-	protected List<Annotation>	annotations	= new ArrayList(1);
+	protected List<Annotation>		annotations	= new ArrayList(1);
 	
-	protected IType				superType	= Type.OBJECT;
-	protected List<IType>		interfaces	= new ArrayList(1);
+	protected IType					superType	= Type.OBJECT;
+	protected List<IType>			interfaces	= new ArrayList(1);
 	
-	protected Type				type;
-	protected List<IType>		generics;
+	protected Type					type;
+	protected List<ITypeVariable>	generics;
 	
-	protected ClassBody			body;
+	protected ClassBody				body;
 	
 	public CodeClass()
 	{
-		this.body = new ClassBody(null, this);
 	}
 	
 	public CodeClass(ICodePosition position, CompilationUnit unit)
 	{
 		this.position = position;
 		this.unit = unit;
-		this.body = new ClassBody(null, this);
 	}
 	
 	@Override
@@ -68,6 +67,12 @@ public class CodeClass extends ASTNode implements IClass
 	public Package getPackage()
 	{
 		return this.unit.pack;
+	}
+	
+	@Override
+	public boolean equals(IClass iclass)
+	{
+		return this == iclass;
 	}
 	
 	@Override
@@ -205,6 +210,7 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void setQualifiedName(String name)
 	{
+		this.name = name;
 		this.qualifiedName = name;
 	}
 	
@@ -233,21 +239,9 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void setTypes(List<IType> types)
-	{
-		this.generics = types;
-	}
-	
-	@Override
-	public List<IType> getTypes()
-	{
-		return this.generics;
-	}
-	
-	@Override
 	public void addType(IType type)
 	{
-		this.generics.add(type);
+		this.generics.add((ITypeVariable) type);
 	}
 	
 	@Override
@@ -263,15 +257,18 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public boolean isSuperType(IType t)
+	public boolean isSuperType(IType type)
 	{
-		if (this.interfaces.contains(t))
+		if (this.superType != null && this.superType.isAssignableFrom(type))
 		{
 			return true;
 		}
-		else if (this.superType != null)
+		for (IType i : this.interfaces)
 		{
-			return this.superType.isAssignableFrom(t);
+			if (i.isAssignableFrom(type))
+			{
+				return true;
+			}
 		}
 		return false;
 	}
@@ -352,6 +349,14 @@ public class CodeClass extends ASTNode implements IClass
 			if (i1 != i2)
 			{
 				iterator.set(i2);
+			}
+		}
+		
+		if (this.generics != null)
+		{
+			for (ITypeVariable v : this.generics)
+			{
+				v.resolveTypes(markers, context);
 			}
 		}
 		
@@ -448,9 +453,12 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public IClass resolveClass(String name)
 	{
-		if (this.name.equals(name))
+		for (ITypeVariable var : this.generics)
 		{
-			return this;
+			if (var.isName(name))
+			{
+				return var.getTheClass();
+			}
 		}
 		
 		return this.unit.resolveClass(name);
@@ -459,25 +467,27 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public FieldMatch resolveField(IContext context, String name)
 	{
-		// Own properties
-		IField field = this.body.getProperty(name);
-		if (field != null)
+		if (this.body != null)
 		{
-			return new FieldMatch(field, 1);
-		}
-		
-		// Own fields
-		field = this.body.getField(name);
-		if (field != null)
-		{
-			return new FieldMatch(field, 1);
+			// Own properties
+			IField field = this.body.getProperty(name);
+			if (field != null)
+			{
+				return new FieldMatch(field, 1);
+			}
+			
+			// Own fields
+			field = this.body.getField(name);
+			if (field != null)
+			{
+				return new FieldMatch(field, 1);
+			}
 		}
 		
 		FieldMatch match;
-		IClass predef = Type.PREDEF.theClass;
 		
 		// Inherited Fields
-		if (this.superType != null && this != predef)
+		if (this.superType != null && this != Type.PREDEF_CLASS)
 		{
 			match = this.superType.resolveField(context, name);
 			if (match != null)
@@ -496,9 +506,9 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		
 		// Predef
-		if (this != predef)
+		if (this != Type.PREDEF_CLASS)
 		{
-			match = predef.resolveField(context, name);
+			match = Type.PREDEF_CLASS.resolveField(context, name);
 			if (match != null)
 			{
 				return match;
@@ -531,16 +541,17 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes)
 	{
-		this.body.getMethodMatches(list, type, name, argumentTypes);
-		
-		if (!list.isEmpty())
+		if (this.body != null)
 		{
-			return;
+			this.body.getMethodMatches(list, type, name, argumentTypes);
+			
+			if (!list.isEmpty())
+			{
+				return;
+			}
 		}
 		
-		IClass predef = Type.PREDEF.theClass;
-		
-		if (this.superType != null && this != predef)
+		if (this.superType != null && this != Type.PREDEF_CLASS)
 		{
 			this.superType.getMethodMatches(list, type, name, argumentTypes);
 		}
@@ -549,9 +560,9 @@ public class CodeClass extends ASTNode implements IClass
 			i.getMethodMatches(list, type, name, argumentTypes);
 		}
 		
-		if (list.isEmpty() && this != predef)
+		if (list.isEmpty() && this != Type.PREDEF_CLASS)
 		{
-			predef.getMethodMatches(list, type, name, argumentTypes);
+			Type.PREDEF_CLASS.getMethodMatches(list, type, name, argumentTypes);
 		}
 	}
 	
@@ -771,6 +782,13 @@ public class CodeClass extends ASTNode implements IClass
 			Util.astToString(this.interfaces, Formatting.Class.superClassesSeperator, buffer);
 		}
 		
-		this.body.toString(prefix, buffer);
+		if (this.body != null)
+		{
+			this.body.toString(prefix, buffer);
+		}
+		else
+		{
+			buffer.append(';');
+		}
 	}
 }

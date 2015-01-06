@@ -26,9 +26,34 @@ public interface IType extends IASTNode, INamed, IContext
 	
 	public IType getSuperType();
 	
-	public boolean isAssignableFrom(IType type);
+	public default boolean isAssignableFrom(IType type)
+	{
+		if (this.getArrayDimensions() != type.getArrayDimensions())
+		{
+			return false;
+		}
+		IClass iclass = type.getTheClass();
+		if (iclass != null)
+		{
+			return iclass == this.getTheClass() || iclass.isSuperType(this);
+		}
+		return false;
+	}
 	
-	public boolean classEquals(IType type);
+	public default boolean classEquals(IType type)
+	{
+		IClass class1 = this.getTheClass();
+		IClass class2 = type.getTheClass();
+		if (class1 == class2)
+		{
+			return true;
+		}
+		if (class1 == null)
+		{
+			return false;
+		}
+		return class1.equals(class2);
+	}
 	
 	// Resolve
 	
@@ -38,19 +63,46 @@ public interface IType extends IASTNode, INamed, IContext
 	
 	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes);
 	
+	// IContext
+	
+	@Override
+	public default IType getThisType()
+	{
+		return this;
+	}
+	
+	@Override
+	public default boolean isStatic()
+	{
+		return true;
+	}
+	
 	// Compilation
 	
 	public String getInternalName();
 	
-	public String getExtendedName();
+	public default String getExtendedName()
+	{
+		StringBuilder buffer = new StringBuilder();
+		this.appendExtendedName(buffer);
+		return buffer.toString();
+	}
 	
 	public void appendExtendedName(StringBuilder buffer);
 	
-	public String getSignature();
+	public default String getSignature()
+	{
+		return null;
+	}
 	
 	public void appendSignature(StringBuilder buffer);
 	
-	public Object getFrameType();
+	public default Object getFrameType()
+	{
+		StringBuilder buffer = new StringBuilder();
+		this.appendExtendedName(buffer);
+		return buffer.toString();
+	}
 	
 	// Opcodes
 	

@@ -1,8 +1,10 @@
 package test;
 
-public class Main
+public class Main<T >= Object>
 {
 	public lazy String hi = "Hello World";
+	
+	public static T test = "Hi";
 	
 	public static void main(String[] args) = hi();
 	

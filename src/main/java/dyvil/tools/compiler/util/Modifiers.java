@@ -371,7 +371,11 @@ public enum Modifiers
 	
 	private static void writeFieldModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & CONST) == CONST)
+		if ((mod & LAZY) == LAZY)
+		{
+			sb.append("lazy ");
+		}
+		else if ((mod & CONST) == CONST)
 		{
 			sb.append("const ");
 		}
@@ -395,15 +399,15 @@ public enum Modifiers
 		{
 			sb.append("volatile ");
 		}
-		if ((mod & LAZY) == LAZY)
-		{
-			sb.append("lazy ");
-		}
 	}
 	
 	private static void writeMethodModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & STATIC) == STATIC)
+		if ((mod & IMPLICIT) == IMPLICIT)
+		{
+			sb.append("implicit ");
+		}
+		else if ((mod & STATIC) == STATIC)
 		{
 			sb.append("static ");
 		}
@@ -431,10 +435,6 @@ public enum Modifiers
 		if ((mod & INLINE) == INLINE)
 		{
 			sb.append("inline ");
-		}
-		if ((mod & IMPLICIT) == IMPLICIT)
-		{
-			sb.append("implicit ");
 		}
 		if ((mod & PREFIX) == PREFIX)
 		{

@@ -30,10 +30,11 @@ public class Formatting
 	
 	public static class Type
 	{
-		public static String	array				= "[]";
-		public static String	genericSeperator	= ", ";
-		public static String	genericUpperBound	= " >= ";
-		public static String	genericLowerBound	= " <= ";
+		public static String	array					= "[]";
+		public static String	genericSeperator		= ", ";
+		public static String	genericUpperBound		= " >= ";
+		public static String	genericBoundSeperator	= " & ";
+		public static String	genericLowerBound		= " <= ";
 	}
 	
 	public static class Field

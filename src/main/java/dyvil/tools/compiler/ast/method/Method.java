@@ -17,24 +17,25 @@ import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.parser.type.ITypeVariable;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
-	private List<IType>		generics;
+	private List<ITypeVariable>	generics;
 	
-	private List<Parameter>	parameters			= new ArrayList(3);
-	private List<IType>		throwsDeclarations	= new ArrayList(1);
+	private List<Parameter>		parameters			= new ArrayList(3);
+	private List<IType>			throwsDeclarations	= new ArrayList(1);
 	
-	private IValue			statement;
+	private IValue				statement;
 	
-	private List<Variable>	variables			= new ArrayList(5);
+	private List<Variable>		variables			= new ArrayList(5);
 	
-	protected boolean		isConstructor;
+	protected boolean			isConstructor;
 	
-	protected IMethod		overrideMethod;
+	protected IMethod			overrideMethod;
 	
 	public Method(IClass iclass)
 	{
@@ -113,21 +114,9 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void setTypes(List<IType> types)
-	{
-		this.generics = types;
-	}
-	
-	@Override
-	public List<IType> getTypes()
-	{
-		return this.generics;
-	}
-	
-	@Override
 	public void addType(IType type)
 	{
-		this.generics.add(type);
+		this.generics.add((ITypeVariable) type);
 	}
 	
 	@Override
@@ -413,6 +402,14 @@ public class Method extends Member implements IMethod
 			a.resolveTypes(markers, context);
 		}
 		
+		if (this.generics != null)
+		{
+			for (ITypeVariable v : this.generics)
+			{
+				v.resolveTypes(markers, context);
+			}
+		}
+		
 		for (Parameter p : this.parameters)
 		{
 			p.resolveTypes(markers, context);
@@ -587,6 +584,17 @@ public class Method extends Member implements IMethod
 	@Override
 	public IClass resolveClass(String name)
 	{
+		if (this.generics != null)
+		{
+			for (ITypeVariable var : this.generics)
+			{
+				if (var.isName(name))
+				{
+					return var.getTheClass();
+				}
+			}
+		}
+		
 		return this.theClass.resolveClass(name);
 	}
 	

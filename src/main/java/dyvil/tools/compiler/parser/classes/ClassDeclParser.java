@@ -116,7 +116,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 		{
 			if ("{".equals(value))
 			{
-				pm.pushParser(new ClassBodyParser(this.theClass, this.theClass.getBody()));
+				pm.pushParser(new ClassBodyParser(this.theClass));
 				this.mode = BODY_END;
 				return true;
 			}

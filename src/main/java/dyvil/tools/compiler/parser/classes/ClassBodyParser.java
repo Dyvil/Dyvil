@@ -46,10 +46,11 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 	private IMethod				method;
 	private IField				field;
 	
-	public ClassBodyParser(IClass theClass, ClassBody body)
+	public ClassBodyParser(IClass theClass)
 	{
 		this.theClass = theClass;
-		this.body = body;
+		this.body = new ClassBody(null, theClass);
+		theClass.setBody(this.body);
 		this.reset();
 	}
 	

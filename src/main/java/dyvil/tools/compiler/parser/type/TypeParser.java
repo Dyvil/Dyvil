@@ -22,15 +22,15 @@ public class TypeParser extends Parser implements ITyped
 	public static final int	LAMBDA_TYPE		= 64;
 	public static final int	LAMBDA_END		= 128;
 	
-	public static final int	UPPER			= 0;
-	public static final int	LOWER			= 1;
+	public static final int	UPPER			= 1;
+	public static final int	LOWER			= 2;
 	
 	public ITyped			typed;
 	public boolean			generic;
 	
 	private byte			boundMode;
 	
-	private Type			type;
+	private IType			type;
 	private int				arrayDimensions;
 	private int				arrayDimensions2;
 	
@@ -170,17 +170,28 @@ public class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(TYPE_VARIABLE))
 		{
-			if ("<=".equals(value))
+			if (this.boundMode == 0)
 			{
-				pm.pushParser(new TypeParser(this));
-				this.boundMode = LOWER;
-				return true;
+				if ("<=".equals(value))
+				{
+					pm.pushParser(new TypeParser(this));
+					this.boundMode = LOWER;
+					return true;
+				}
+				else if (">=".equals(value))
+				{
+					pm.pushParser(new TypeParser(this));
+					this.boundMode = UPPER;
+					return true;
+				}
 			}
-			else if (">=".equals(value))
+			else if (this.boundMode == UPPER)
 			{
-				pm.pushParser(new TypeParser(this));
-				this.boundMode = UPPER;
-				return true;
+				if ("&".equals(value))
+				{
+					pm.pushParser(new TypeParser(this));
+					return true;
+				}
 			}
 			pm.popParser(true);
 			return true;
@@ -211,11 +222,11 @@ public class TypeParser extends Parser implements ITyped
 	{
 		if (this.boundMode == UPPER)
 		{
-			((TypeVariable) this.type).addUpperBound(type);
+			((ITypeVariable) this.type).addUpperBound(type);
 		}
 		else if (this.boundMode == LOWER)
 		{
-			((TypeVariable) this.type).addLowerBound(type);
+			((ITypeVariable) this.type).setLowerBound(type);
 		}
 	}
 	

@@ -45,6 +45,8 @@ public class Type extends ASTNode implements IContext, IType
 	public static final Type	ARetention	= new AnnotationType("java.lang.annotation.Retention");
 	public static final Type	ATarget		= new AnnotationType("java.lang.annotation.Target");
 	
+	public static IClass		PREDEF_CLASS;
+	
 	public String				name;
 	public String				qualifiedName;
 	public IClass				theClass;
@@ -98,7 +100,7 @@ public class Type extends ASTNode implements IContext, IType
 		ANY.name = "Any";
 		OBJECT.theClass = Package.javaLang.resolveClass("Object");
 		OBJECT.name = "Object";
-		PREDEF.theClass = Package.dyvilLang.resolveClass("Predef");
+		PREDEF.theClass = PREDEF_CLASS = Package.dyvilLang.resolveClass("Predef");
 		PREDEF.name = "Predef";
 		ARRAY.theClass = Package.dyvilLang.resolveClass("Array");
 		ARRAY.name = "Array";
@@ -250,11 +252,7 @@ public class Type extends ASTNode implements IContext, IType
 		return this.arrayDimensions > 0;
 	}
 	
-	@Override
-	public boolean isResolved()
-	{
-		return this.theClass != null;
-	}
+	// Super Type
 	
 	@Override
 	public IType getSuperType()
@@ -266,96 +264,7 @@ public class Type extends ASTNode implements IContext, IType
 		return null;
 	}
 	
-	@Override
-	public boolean isAssignableFrom(IType type)
-	{
-		if (this.arrayDimensions != type.getArrayDimensions())
-		{
-			return false;
-		}
-		IClass iclass = type.getTheClass();
-		if (iclass != null)
-		{
-			return iclass.isSuperType(this);
-		}
-		return false;
-	}
-	
-	@Override
-	public String getInternalName()
-	{
-		return this.theClass == null ? ClassFormat.packageToInternal(this.qualifiedName) : this.theClass.getInternalName();
-	}
-	
-	@Override
-	public final String getExtendedName()
-	{
-		StringBuilder buffer = new StringBuilder();
-		this.appendExtendedName(buffer);
-		return buffer.toString();
-	}
-	
-	@Override
-	public void appendExtendedName(StringBuilder buffer)
-	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
-		buffer.append('L').append(this.getInternalName()).append(';');
-	}
-	
-	@Override
-	public String getSignature()
-	{
-		return null;
-	}
-	
-	@Override
-	public void appendSignature(StringBuilder buffer)
-	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
-		buffer.append('L').append(this.getInternalName()).append(';');
-	}
-	
-	@Override
-	public Object getFrameType()
-	{
-		return this.getExtendedName();
-	}
-	
-	@Override
-	public int getLoadOpcode()
-	{
-		return Opcodes.ALOAD;
-	}
-	
-	@Override
-	public int getArrayLoadOpcode()
-	{
-		return Opcodes.AALOAD;
-	}
-	
-	@Override
-	public int getStoreOpcode()
-	{
-		return Opcodes.ASTORE;
-	}
-	
-	@Override
-	public int getArrayStoreOpcode()
-	{
-		return Opcodes.AASTORE;
-	}
-	
-	@Override
-	public int getReturnOpcode()
-	{
-		return Opcodes.ARETURN;
-	}
+	// Resolve
 	
 	@Override
 	public Type resolve(IContext context)
@@ -430,16 +339,12 @@ public class Type extends ASTNode implements IContext, IType
 	}
 	
 	@Override
-	public Type getThisType()
+	public boolean isResolved()
 	{
-		return this;
+		return this.theClass != null;
 	}
 	
-	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
+	// IContext
 	
 	@Override
 	public IClass resolveClass(String name)
@@ -514,6 +419,72 @@ public class Type extends ASTNode implements IContext, IType
 		return this.theClass == null ? 0 : this.theClass.getAccessibility(member);
 	}
 	
+	// Compilation
+	
+	@Override
+	public String getInternalName()
+	{
+		return this.theClass == null ? ClassFormat.packageToInternal(this.qualifiedName) : this.theClass.getInternalName();
+	}
+	
+	@Override
+	public void appendExtendedName(StringBuilder buffer)
+	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append('[');
+		}
+		buffer.append('L').append(this.getInternalName()).append(';');
+	}
+	
+	@Override
+	public String getSignature()
+	{
+		return this.theClass.getSignature();
+	}
+	
+	@Override
+	public void appendSignature(StringBuilder buffer)
+	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append('[');
+		}
+		buffer.append('L').append(this.getInternalName()).append(';');
+	}
+	
+	@Override
+	public int getLoadOpcode()
+	{
+		return Opcodes.ALOAD;
+	}
+	
+	@Override
+	public int getArrayLoadOpcode()
+	{
+		return Opcodes.AALOAD;
+	}
+	
+	@Override
+	public int getStoreOpcode()
+	{
+		return Opcodes.ASTORE;
+	}
+	
+	@Override
+	public int getArrayStoreOpcode()
+	{
+		return Opcodes.AASTORE;
+	}
+	
+	@Override
+	public int getReturnOpcode()
+	{
+		return Opcodes.ARETURN;
+	}
+	
+	// Misc
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -572,25 +543,6 @@ public class Type extends ASTNode implements IContext, IType
 			return false;
 		}
 		return this.classEquals(type);
-	}
-	
-	@Override
-	public boolean classEquals(IType type)
-	{
-		IClass iclass = type.getTheClass();
-		if (this.theClass != null && this.theClass == iclass)
-		{
-			return true;
-		}
-		
-		String thisName = this.theClass != null ? this.theClass.getQualifiedName() : this.qualifiedName;
-		String otherName = iclass != null ? iclass.getQualifiedName() : type.getQualifiedName();
-		
-		if (thisName == null || !thisName.equals(otherName))
-		{
-			return false;
-		}
-		return true;
 	}
 	
 	@Override
