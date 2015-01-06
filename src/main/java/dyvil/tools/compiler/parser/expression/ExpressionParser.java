@@ -20,6 +20,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
 import dyvil.tools.compiler.parser.statement.WhileStatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.util.OperatorComparator;
 
 public class ExpressionParser extends Parser implements ITyped, IValued
 {
@@ -41,7 +42,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	
 	protected IContext		context;
 	protected IValued		field;
-	protected boolean		lazy;
+	protected int			precedence;
 	
 	private IValue			value;
 	
@@ -286,16 +287,21 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					this.mode = PARAMETERS;
 				}
 			}
-			else if (this.lazy && this.value != null)
-			{
-				pm.popParser(true);
-				return true;
-			}
 		}
 		if (this.isInMode(ACCESS_2))
 		{
 			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
+				if (this.precedence != 0)
+				{
+					int p = OperatorComparator.index(value);
+					if (p != 0 && this.precedence > p)
+					{
+						pm.popParser(true);
+						return true;
+					}
+				}
+				
 				IToken next = token.next();
 				if (next.equals("("))
 				{
@@ -312,7 +318,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					this.value = call;
 					
 					ExpressionParser parser = new ExpressionParser(this.context, this);
-					parser.lazy = true;
+					parser.precedence = OperatorComparator.index(value);
 					pm.pushParser(parser);
 					return true;
 				}

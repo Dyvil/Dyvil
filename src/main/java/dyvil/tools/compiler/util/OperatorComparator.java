@@ -14,43 +14,42 @@ public class OperatorComparator implements Comparator<MethodCall>
 	// private static String[] UNARY = new String[] { "++", "--", "+", "-", "~",
 	// "!" };
 	
-	private static Object[]				MAP			= { new String[] { "$times", "$div", "$percent" }, // multiplicative
-			new String[] { "$plus", "$minus" }, // additive
-			new String[] { "$less$less", "$greater$greater", "$greater$greater$greater" }, // shift
-			new String[] { "$less", "$greater", "$less$eq", "$greater$eq" }, // relational
-			new String[] { "$less$colon", "$colon$greater" }, // type check
-			new String[] { "$eq$eq", "$bang$eq" }, // equality
-			"$amp", // bitwise AND
-			"$up", // bitwise XOR
-			"$bar", // bitwise OR
-			"$amp$amp", // logical AND
-			"$bar$bar", // logical OR
-													};
-	
-	private static int index(String name)
+	public static int index(String name)
 	{
-		for (int i = 0; i < MAP.length; i++)
+		switch (name)
 		{
-			Object o = MAP[i];
-			Class c = o.getClass();
-			
-			if (c == String.class)
-			{
-				if (name.equals(c))
-				{
-					return i;
-				}
-			}
-			else if (c == String[].class)
-			{
-				for (String s : (String[]) o)
-				{
-					if (name.equals(s))
-					{
-						return i;
-					}
-				}
-			}
+		case "||":
+			return 1;
+		case "&&":
+			return 2;
+		case "|":
+			return 3;
+		case "^":
+			return 4;
+		case "&":
+			return 5;
+		case "==":
+		case "!=":
+			return 6;
+		case "<:":
+		case ":>":
+			return 7;
+		case "<":
+		case ">":
+		case "<=":
+		case ">=":
+			return 8;
+		case "<<":
+		case ">>":
+		case ">>>":
+			return 9;
+		case "+":
+		case "-":
+			return 10;
+		case "*":
+		case "/":
+		case "%":
+			return 11;
 		}
 		return 0;
 	}
