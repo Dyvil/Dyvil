@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.api;
 
-import java.util.List;
-
 import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IAccess extends INamed, IValue, IValued, IValueList
@@ -13,10 +11,4 @@ public interface IAccess extends INamed, IValue, IValued, IValueList
 	public IAccess resolve3(IContext context, IAccess next);
 	
 	public Marker getResolveError();
-	
-	@Override
-	public IValue getValue();
-	
-	@Override
-	public List<IValue> getValues();
 }

@@ -54,6 +54,8 @@ public class StatementList extends ValueList implements IStatement, IContext
 		
 		for (IValue v : this.values)
 		{
+			v.resolveTypes(markers, context);
+			
 			if (!(v instanceof FieldAssign))
 			{
 				continue;

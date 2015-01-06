@@ -204,11 +204,6 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public boolean resolve(IContext context, IContext context1)
 	{
-		if (this.field != null)
-		{
-			return true;
-		}
-		
 		FieldMatch f = context.resolveField(context1, this.qualifiedName);
 		if (f != null)
 		{

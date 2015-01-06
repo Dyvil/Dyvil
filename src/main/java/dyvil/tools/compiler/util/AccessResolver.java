@@ -52,8 +52,7 @@ public class AccessResolver
 				IAccess alternate = curr.resolve2(context1, context);
 				if (alternate == null)
 				{
-					// TODO
-					markers.add(curr.getResolveError());
+					backwards = true;
 				}
 				else
 				{
@@ -67,44 +66,52 @@ public class AccessResolver
 		{
 			return chain.getLast();
 		}
-		
-		IAccess next = curr;
-		prev = iterator.previous();
-		
-		while (iterator.hasPrevious())
+		else if (chain.size() == 1)
 		{
-			next = curr;
-			curr = prev;
-			prev = iterator.previous();
-			
-			if (prev != null)
+			markers.add(access.getResolveError());
+			return access;
+		}
+		
+		IAccess next = null;
+		curr = access;
+		prev = null;
+		
+		while (true)
+		{
+			IValue value = curr.getValue();
+			if (value instanceof IAccess)
 			{
-				context1 = prev.getType();
-				curr.setValue(prev);
+				prev = (IAccess) value;
 			}
 			else
 			{
-				IValue value = curr.getValue();
-				if (value != null)
-				{
-					context1 = value.getType();
-				}
+				break;
 			}
 			
+			context1 = value.getType();
 			if (context1 == null)
 			{
 				context1 = context;
 			}
 			
-			IAccess alternate = curr.resolve3(context1, next);
-			if (alternate != null)
+			if (!curr.resolve(context1, context))
 			{
-				curr = alternate;
-				iterator.set(alternate);
+				curr.setValue(null);
+				if (curr.resolve(context, null))
+				{
+					prev.addValue(curr);
+					curr = null;
+					iterator.remove();
+				}
+				else
+				{
+					curr.setValue(value);
+					markers.add(curr.getResolveError());
+				}
 			}
 			
-			markers.add(curr.getResolveError());
-			
+			next = curr;
+			curr = prev;
 		}
 		
 		return chain.getLast();

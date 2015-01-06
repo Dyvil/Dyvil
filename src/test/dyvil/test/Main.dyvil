@@ -1,14 +1,11 @@
 package test;
 
-public class Main<T >= Object>
+public class Main
 {
-	public lazy String hi = "Hello World";
+	public lazy String s = "Hello World";
 	
-	public static T test = "Hi";
-	
-	public static void main(String[] args) = hi();
-	
-	public implicit void apply(String s) = System out println(s);
-	
-	public static int i() = 3;
+	public static void main(String[] args) =
+	{
+		System out println s;
+	};
 }

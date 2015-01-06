@@ -453,11 +453,14 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public IClass resolveClass(String name)
 	{
-		for (ITypeVariable var : this.generics)
+		if (this.generics != null)
 		{
-			if (var.isName(name))
+			for (ITypeVariable var : this.generics)
 			{
-				return var.getTheClass();
+				if (var.isName(name))
+				{
+					return var.getTheClass();
+				}
 			}
 		}
 		

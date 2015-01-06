@@ -261,7 +261,7 @@ public class Dlex implements Iterable<IToken>
 			
 			if (addToken)
 			{
-				prev = this.addToken(prev, buf, type | subtype, lineNumber, start, i);
+				prev = this.addToken(prev, buf, type | subtype, lineNumber, start);
 				addToken = false;
 				type = 0;
 				
@@ -278,7 +278,7 @@ public class Dlex implements Iterable<IToken>
 		
 		if (buf.length() > 0)
 		{
-			this.addToken(prev, buf, type, lineNumber, start, i);
+			this.addToken(prev, buf, type, lineNumber, start);
 		}
 		
 		this.first = first.next();
@@ -376,19 +376,20 @@ public class Dlex implements Iterable<IToken>
 		return 0;
 	}
 	
-	private Token addToken(Token prev, String s, int type, int line, int start, int end)
+	private Token addToken(Token prev, String s, int type, int line, int start, int len)
 	{
-		Token t = new Token(prev.index() + 1, s, type, parse(type, s), this.file, line, start, end);
+		Token t = new Token(prev.index() + 1, s, type, parse(type, s), this.file, line, start, start + len);
 		prev.setNext(t);
 		t.setPrev(prev);
 		return t;
 	}
 	
-	private Token addToken(Token prev, StringBuilder buf, int type, int line, int start, int end)
+	private Token addToken(Token prev, StringBuilder buf, int type, int line, int start)
 	{
 		String s = buf.toString();
-		buf.delete(0, buf.length());
-		return this.addToken(prev, s, type, line, start, end);
+		int len = buf.length();
+		buf.delete(0, len);
+		return this.addToken(prev, s, type, line, start, len);
 	}
 	
 	@Override

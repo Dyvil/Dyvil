@@ -289,7 +289,8 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 				}
 			}
 			
-			if (this.upperBounds.isEmpty()) {
+			if (this.upperBounds.isEmpty())
+			{
 				this.upperBounds = null;
 			}
 			
@@ -303,8 +304,8 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 				markers.add(new SemanticError(this.lowerBound.getPosition(), "'" + this.lowerBound + "' could not be resolved to a type"));
 			}
 			
-			this.captureClass = Type.OBJECT.theClass;
 		}
+		this.captureClass = Type.OBJECT.theClass;
 	}
 	
 	@Override
@@ -324,13 +325,14 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 			buffer.append(Formatting.Type.genericLowerBound);
 			this.lowerBound.toString(prefix, buffer);
 		}
-		else
+		else if (this.upperBound != null || this.upperBounds != null)
 		{
 			buffer.append(Formatting.Type.genericUpperBound);
 			if (this.upperBound != null)
 			{
 				this.upperBound.toString(prefix, buffer);
-				if (this.upperBounds != null) {					
+				if (this.upperBounds != null)
+				{
 					buffer.append(Formatting.Type.genericBoundSeperator);
 				}
 			}

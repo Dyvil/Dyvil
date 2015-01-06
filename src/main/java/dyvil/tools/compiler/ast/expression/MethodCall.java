@@ -193,11 +193,6 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public boolean resolve(IContext context, IContext context1)
 	{
-		if (this.method != null)
-		{
-			return true;
-		}
-		
 		IType[] types = this.getTypes();
 		if (types == null)
 		{
