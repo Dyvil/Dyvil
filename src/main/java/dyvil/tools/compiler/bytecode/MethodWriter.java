@@ -22,9 +22,9 @@ public class MethodWriter extends MethodVisitor
 	private List			locals		= new ArrayList();
 	private Stack<IType>	typeStack	= new Stack();
 	
-	public MethodWriter(int mode, MethodVisitor mv)
+	public MethodWriter(MethodVisitor mv)
 	{
-		super(mode, mv);
+		super(ASM5, mv);
 	}
 	
 	public void setConstructor(IType type)
@@ -315,6 +315,13 @@ public class MethodWriter extends MethodVisitor
 	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface)
 	{
 		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
+	}
+	
+	@Override
+	@Deprecated
+	public void visitEnd()
+	{
+		this.mv.visitEnd();
 	}
 	
 	public void visitEnd(IType type)

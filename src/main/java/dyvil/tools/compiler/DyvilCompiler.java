@@ -22,6 +22,7 @@ import dyvil.tools.compiler.util.Util;
 public class DyvilCompiler
 {
 	public static boolean				parseStack;
+	public static boolean				logFile	= true;
 	public static boolean				debug;
 	
 	public static Logger				logger	= Logger.getLogger("DYVILC");
@@ -101,7 +102,6 @@ public class DyvilCompiler
 		{
 			logger.setUseParentHandlers(false);
 			
-			String path = new File("dyvilc.log").getAbsolutePath();
 			Formatter formatter = new Formatter()
 			{
 				@Override
@@ -119,12 +119,16 @@ public class DyvilCompiler
 					return builder.toString();
 				}
 			};
-			FileHandler fh = new FileHandler(path, true);
-			fh.setFormatter(formatter);
 			StreamHandler ch = new StreamHandler(System.out, formatter);
-			
-			logger.addHandler(fh);
 			logger.addHandler(ch);
+			
+			if (logFile)
+			{
+				String path = new File("dyvilc.log").getAbsolutePath();
+				FileHandler fh = new FileHandler(path, true);
+				fh.setFormatter(formatter);
+				logger.addHandler(fh);
+			}
 		}
 		catch (Exception ex)
 		{
@@ -167,6 +171,9 @@ public class DyvilCompiler
 			break;
 		case "--pstack":
 			parseStack = true;
+			break;
+		case "--nolog":
+			logFile = false;
 			break;
 		}
 	}

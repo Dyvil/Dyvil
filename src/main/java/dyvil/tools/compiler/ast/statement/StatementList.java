@@ -68,6 +68,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 			Variable var = (Variable) assign.field;
 			var.start = this.start;
 			var.end = this.end;
+			
 			this.variables.put(assign.qualifiedName, assign.field);
 			
 			if (variableList != null)

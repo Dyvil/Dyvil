@@ -186,6 +186,7 @@ public class CompilationUnit extends ASTNode implements IContext
 					marker.log(DyvilCompiler.logger);
 				}
 				DyvilCompiler.logger.warning(this.name + " was not compiled as there were Syntax Errors in the Compilation Unit.");
+				return;
 			}
 			
 			for (IClass iclass : this.classes)
@@ -224,7 +225,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		// Own classes
 		for (IClass aclass : this.classes)
 		{
-			if (name.equals(aclass.getName()))
+			if (aclass.isName(name))
 			{
 				return aclass;
 			}

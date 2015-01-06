@@ -650,6 +650,11 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			f.write(writer);
 			
+			if (f.hasModifier(Modifiers.LAZY))
+			{
+				continue;
+			}
+			
 			IValue v = f.getValue();
 			if (v != null)
 			{

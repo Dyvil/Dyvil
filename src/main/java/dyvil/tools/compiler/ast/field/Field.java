@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.FieldVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
@@ -156,7 +157,7 @@ public class Field extends Member implements IField, IContext
 		{
 			a.foldConstants();
 		}
-
+		
 		if (this.value != null)
 		{
 			this.value = this.value.foldConstants();
@@ -215,21 +216,51 @@ public class Field extends Member implements IField, IContext
 	@Override
 	public void write(ClassWriter writer)
 	{
-		writer.visitField(this.modifiers & 0xFFFF, this.name, this.getDescription(), this.type.getSignature(), null);
-		
-		if ((this.modifiers & Modifiers.LAZY) != 0)
+		if ((this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
 		{
-			writer.visitAnnotation("Ldyvil/lang/annotation/lazy;", true);
+			String desc = "()" + this.getDescription();
+			String signature = this.type.getSignature();
+			if (signature != null)
+			{
+				signature = "()" + signature;
+			}
+			MethodWriter mw = new MethodWriter(writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name, desc, signature, null));
+			
+			for (Annotation a : this.annotations)
+			{
+				a.write(mw);
+			}
+			
+			mw.visitAnnotation("Ldyvil/lang/annotation/lazy;", false);
+			
+			mw.visitCode();
+			this.value.writeExpression(mw);
+			mw.visitEnd(this.type);
+			
+			return;
 		}
-		if ((this.modifiers & Modifiers.SEALED) != 0)
+		
+		FieldVisitor visitor = writer.visitField(this.modifiers & 0xFFFF, this.name, this.getDescription(), this.type.getSignature(), null);
+		if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
 		{
-			writer.visitAnnotation("Ldyvil/lang/annotation/sealed", false);
+			visitor.visitAnnotation("Ldyvil/lang/annotation/sealed", false);
+		}
+		
+		for (Annotation a : this.annotations)
+		{
+			a.write(writer);
 		}
 	}
 	
 	@Override
 	public void writeGet(MethodWriter writer)
 	{
+		if ((this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
+		{
+			this.value.writeExpression(writer);
+			return;
+		}
+		
 		int opcode;
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
 		{

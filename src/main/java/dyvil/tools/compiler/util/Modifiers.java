@@ -150,7 +150,7 @@ public enum Modifiers
 	 * evaluated every time it is demanded and is thus not saved in the memory.
 	 * This behavior can be compared with a method without parameters.
 	 */
-	public static final int	LAZY					= 0x00010000;
+	public static final int	LAZY					= 0x00010000 | STATIC | FINAL;
 	
 	/**
 	 * Dyvil inline modifier. If a method is marked with this modifier, it will
@@ -310,13 +310,20 @@ public enum Modifiers
 	
 	private static void writeFieldOrMethodModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & STATIC) == STATIC)
+		if ((mod & LAZY) == LAZY)
 		{
-			sb.append("static ");
+			sb.append("lazy ");
 		}
-		if ((mod & FINAL) == FINAL)
+		else
 		{
-			sb.append("final ");
+			if ((mod & FINAL) == FINAL)
+			{
+				sb.append("final ");
+			}
+			if ((mod & STATIC) == STATIC)
+			{
+				sb.append("static ");
+			}
 		}
 		
 		if ((mod & TRANSIENT) == TRANSIENT)
@@ -326,10 +333,6 @@ public enum Modifiers
 		if ((mod & VOLATILE) == VOLATILE)
 		{
 			sb.append("volatile ");
-		}
-		if ((mod & LAZY) == LAZY)
-		{
-			sb.append("lazy ");
 		}
 		
 		if ((mod & SYNCHRONIZED) == SYNCHRONIZED)

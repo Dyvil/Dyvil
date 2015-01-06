@@ -25,6 +25,8 @@ public class Variable extends Member implements IField
 	public Label	start;
 	public Label	end;
 	
+	public IValue	value;
+	
 	public Variable()
 	{
 		super(null);
@@ -39,12 +41,13 @@ public class Variable extends Member implements IField
 	@Override
 	public void setValue(IValue value)
 	{
+		this.value = value;
 	}
 	
 	@Override
 	public IValue getValue()
 	{
-		return null;
+		return this.value;
 	}
 	
 	@Override
@@ -137,6 +140,10 @@ public class Variable extends Member implements IField
 	@Override
 	public void writeGet(MethodWriter writer)
 	{
+		if ((this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
+		{
+			this.value.writeExpression(writer);
+		}
 		writer.visitVarInsn(this.type.getLoadOpcode(), this.index, this.type);
 	}
 	

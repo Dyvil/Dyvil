@@ -7,7 +7,6 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
-import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -441,13 +440,17 @@ public class Method extends Member implements IMethod
 			a.resolve(markers, context);
 		}
 		
+		int index = this.hasModifier(Modifiers.STATIC) ? 0 : 1;
+		
 		for (Parameter p : this.parameters)
 		{
+			p.index = index++;
 			p.resolve(markers, context);
 		}
 		
 		for (Variable v : this.variables)
 		{
+			v.index = index++;
 			v.resolve(markers, this);
 		}
 		
@@ -613,16 +616,16 @@ public class Method extends Member implements IMethod
 	public void write(ClassWriter writer)
 	{
 		MethodVisitor visitor = writer.visitMethod(this.modifiers & 0xFFFF, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
-		MethodWriter mw = new MethodWriter(Opcodes.ASM5, visitor);
-		
-		for (Annotation annotation : this.annotations)
-		{
-			annotation.write(mw);
-		}
+		MethodWriter mw = new MethodWriter(visitor);
 		
 		if (this.isConstructor)
 		{
 			mw.setConstructor(this.type);
+		}
+		
+		for (Annotation annotation : this.annotations)
+		{
+			annotation.write(mw);
 		}
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
@@ -642,10 +645,8 @@ public class Method extends Member implements IMethod
 			mw.visitAnnotation("Ldyvil/lang/annotation/sealed;", false);
 		}
 		
-		int index = this.hasModifier(Modifiers.STATIC) ? 0 : 1;
 		for (Parameter param : this.parameters)
 		{
-			param.index = index++;
 			param.write(mw);
 		}
 		
@@ -653,15 +654,7 @@ public class Method extends Member implements IMethod
 		{
 			mw.visitCode();
 			
-			for (Variable var : this.variables)
-			{
-				var.index = index++;
-			}
-			
-			if (this.statement != null)
-			{
-				this.statement.writeStatement(mw);
-			}
+			this.statement.writeStatement(mw);
 			
 			for (Variable var : this.variables)
 			{

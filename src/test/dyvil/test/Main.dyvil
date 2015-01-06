@@ -1,11 +1,10 @@
 package test;
 
-import dyvil.lang.annotation.Bytecode;
-import dyvil.lang.annotation.byref;
-import dyvil.reflect.Opcodes;
-import java.util.{Arrays, HashMap};
-
-public abstract class Main
+public class Main
 {
-	public static void main(String[] args) = System out println(args.length);
+	public lazy String hi = "Hello World";
+	
+	public static void main(String[] args) = hi();
+	
+	public implicit void apply(String s) = System out println(s);
 }

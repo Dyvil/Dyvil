@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.FieldVisitor;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.type.AnnotationType;
@@ -163,6 +164,21 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	}
 	
 	public void write(MethodWriter writer)
+	{
+		RetentionPolicy retention = this.type.retention;
+		if (retention != RetentionPolicy.SOURCE)
+		{
+			boolean visible = retention == RetentionPolicy.RUNTIME;
+			
+			AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
+			for (Entry<String, IValue> entry : this.parameters.entrySet())
+			{
+				visitValue(visitor, entry.getKey(), entry.getValue());
+			}
+		}
+	}
+	
+	public void write(FieldVisitor writer)
 	{
 		RetentionPolicy retention = this.type.retention;
 		if (retention != RetentionPolicy.SOURCE)
