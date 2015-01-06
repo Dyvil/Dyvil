@@ -1,0 +1,8 @@
+package dyvil.lang;
+
+public abstract class Value extends Any
+{
+	private Value new() = { };
+	
+	public override Class getClass() = null;
+}
