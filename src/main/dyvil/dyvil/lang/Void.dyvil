@@ -2,7 +2,7 @@ package dyvil.lang;
 
 public class Void extends void
 {
-	private Void new();
+	private Void new() = { };
 	
 	public Class getClass() = null;
 }

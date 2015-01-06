@@ -122,6 +122,7 @@ public enum Modifiers
 	public static final int	VARARGS					= 0x00000080;
 	public static final int	NATIVE					= 0x00000100;
 	
+	// TODO Interfaces
 	public static final int	INTERFACE_CLASS			= 0x00000200;
 	public static final int	ABSTRACT				= 0x00000400;
 	
@@ -136,7 +137,9 @@ public enum Modifiers
 	 * the outer class.
 	 */
 	public static final int	SYNTHETIC				= 0x00001000;
+	// TODO Annotation Types
 	public static final int	ANNOTATION				= 0x00002000;
+	// TODO Enums
 	public static final int	ENUM_CLASS				= 0x00004000;
 	
 	/**
@@ -156,12 +159,14 @@ public enum Modifiers
 	 * Dyvil inline modifier. If a method is marked with this modifier, it will
 	 * be inlined by the compiler to reduce method call overhead.
 	 */
+	// TODO inline Implementation
 	public static final int	INLINE					= 0x00010000;
 	
 	/**
 	 * Dyvil object modifier. If a class is marked with this modifier, it is a
 	 * singleton object class.
 	 */
+	// TODO Object Types
 	public static final int	OBJECT_CLASS			= 0x00010000;
 	
 	/**
@@ -175,6 +180,7 @@ public enum Modifiers
 	 * Dyvil module modifier. If a class is marked with this modifier, it is a
 	 * module class.
 	 */
+	// TODO Modules
 	public static final int	MODULE					= 0x00020000;
 	
 	/**
@@ -182,11 +188,13 @@ public enum Modifiers
 	 * Call-By-Reference. If a parameter doesn't have this flag, it is
 	 * Call-By-Value.
 	 */
+	// TODO byref Implementation
 	public static final int	BYREF					= 0x00040000;
 	
 	/**
 	 * Dyvil prefix modifier.
 	 */
+	// TODO prefix Implementation
 	public static final int	PREFIX					= 0x00040000;
 	
 	/**

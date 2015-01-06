@@ -34,6 +34,7 @@ public class Type extends ASTNode implements IContext, IType
 	public static final Type	FLOAT		= new PrimitiveType("float", "dyvil.lang.Float", Opcodes.T_FLOAT);
 	public static final Type	DOUBLE		= new PrimitiveType("double", "dyvil.lang.Double", Opcodes.T_DOUBLE);
 	
+	public static final Type	ANY			= new Type("dyvil.lang.Any");
 	public static final Type	OBJECT		= new Type("java.lang.Object");
 	public static final Type	PREDEF		= new Type("dyvil.lang.Predef");
 	public static final Type	ARRAY		= new Type("dyvil.lang.Array");
@@ -93,6 +94,8 @@ public class Type extends ASTNode implements IContext, IType
 		FLOAT.theClass = Package.dyvilLang.resolveClass("Float");
 		DOUBLE.theClass = Package.dyvilLang.resolveClass("Double");
 		
+		ANY.theClass = Package.dyvilLang.resolveClass("Any");
+		ANY.name = "Any";
 		OBJECT.theClass = Package.javaLang.resolveClass("Object");
 		OBJECT.name = "Object";
 		PREDEF.theClass = Package.dyvilLang.resolveClass("Predef");
@@ -141,7 +144,7 @@ public class Type extends ASTNode implements IContext, IType
 				}
 			}
 		}
-		return OBJECT;
+		return ANY;
 	}
 	
 	private static IType superType(IType type1, IType type2)

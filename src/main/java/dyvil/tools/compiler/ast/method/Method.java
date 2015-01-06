@@ -44,16 +44,28 @@ public class Method extends Member implements IMethod
 	public Method(IClass iclass, String name)
 	{
 		super(iclass, name);
+		if (name.equals("new"))
+		{
+			this.isConstructor = true;
+		}
 	}
 	
 	public Method(IClass iclass, String name, IType type)
 	{
 		super(iclass, name, type);
+		if (name.equals("new"))
+		{
+			this.isConstructor = true;
+		}
 	}
 	
 	public Method(IClass iclass, String name, IType type, int modifiers, List<Annotation> annotations)
 	{
 		super(iclass, name, type, modifiers, annotations);
+		if (name.equals("new"))
+		{
+			this.isConstructor = true;
+		}
 	}
 	
 	@Override
@@ -262,7 +274,7 @@ public class Method extends Member implements IMethod
 			{
 				match += 2;
 			}
-			else if (t2.classEquals(Type.OBJECT))
+			else if (t2.classEquals(Type.ANY))
 			{
 				match += 1;
 			}
@@ -472,7 +484,7 @@ public class Method extends Member implements IMethod
 					markers.add(new SemanticError(this.position, "The method '" + this.name + "' must override or implement a supertype method"));
 				}
 			}
-			else
+			else if (!this.isConstructor)
 			{
 				if ((this.modifiers & Modifiers.OVERRIDE) == 0)
 				{
@@ -510,9 +522,10 @@ public class Method extends Member implements IMethod
 		
 		if (this.statement != null)
 		{
-			if (!this.statement.requireType(this.type))
+			IType type = this.isConstructor ? Type.VOID : this.type;
+			if (!this.statement.requireType(type))
 			{
-				markers.add(new SemanticError(this.statement.getPosition(), "The method '" + this.name + "' must return a result of type " + this.type));
+				markers.add(new SemanticError(this.statement.getPosition(), "The method '" + this.name + "' must return a result of type " + type));
 			}
 			this.statement.check(markers, context);
 		}
@@ -654,7 +667,7 @@ public class Method extends Member implements IMethod
 		{
 			mw.visitCode();
 			
-			this.statement.writeStatement(mw);
+			this.statement.writeExpression(mw);
 			
 			for (Variable var : this.variables)
 			{

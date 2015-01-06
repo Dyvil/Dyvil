@@ -22,7 +22,7 @@ public interface IValue extends IASTNode
 	
 	public default boolean requireType(IType type)
 	{
-		return type.equals(Type.OBJECT) || Type.isSuperType(type, this.getType());
+		return type.equals(Type.ANY) || Type.isSuperType(type, this.getType());
 	}
 	
 	public void resolveTypes(List<Marker> markers, IContext context);

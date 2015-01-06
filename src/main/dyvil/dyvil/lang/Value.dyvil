@@ -1,8 +1,0 @@
-package dyvil.lang;
-
-public abstract class Value extends void
-{
-	protected Value new();
-	
-	public Class getClass() = null;
-}
