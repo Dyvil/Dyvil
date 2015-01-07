@@ -84,6 +84,12 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		return this.isArray ? this.requiredType : this.elementType;
 	}
 	
+	@Override
+	public int getValueType()
+	{
+		return VALUE_LIST;
+	}
+	
 	public IType getElementType()
 	{
 		if (this.elementType == null)

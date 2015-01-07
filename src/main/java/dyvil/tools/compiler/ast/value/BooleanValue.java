@@ -35,6 +35,12 @@ public class BooleanValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return BOOLEAN;
+	}
+	
+	@Override
 	public Boolean toObject()
 	{
 		return Boolean.valueOf(this.value);

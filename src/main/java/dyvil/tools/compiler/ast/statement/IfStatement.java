@@ -70,6 +70,12 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return IF;
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.condition.resolveTypes(markers, context);

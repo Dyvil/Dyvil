@@ -37,6 +37,17 @@ public class ConstructorCall extends Call implements ITyped
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return CONSTRUCTOR_CALL;
+	}
+	
+	@Override
+	public void setName(String name, String qualifiedName)
+	{
+	}
+	
+	@Override
 	public void setName(String name)
 	{
 	}

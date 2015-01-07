@@ -33,6 +33,12 @@ public class EnumValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return ENUM;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 		String owner = this.type.getInternalName();

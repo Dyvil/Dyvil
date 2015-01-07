@@ -29,6 +29,12 @@ public class IntValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return INT;
+	}
+	
+	@Override
 	public Integer toObject()
 	{
 		return Integer.valueOf(this.value);

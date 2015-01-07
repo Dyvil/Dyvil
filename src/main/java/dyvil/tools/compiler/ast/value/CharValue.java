@@ -29,6 +29,12 @@ public class CharValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return CHAR;
+	}
+	
+	@Override
 	public Character toObject()
 	{
 		return Character.valueOf(this.value);

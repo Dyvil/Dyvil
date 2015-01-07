@@ -29,6 +29,12 @@ public class LongValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return LONG;
+	}
+	
+	@Override
 	public Long toObject()
 	{
 		return Long.valueOf(this.value);

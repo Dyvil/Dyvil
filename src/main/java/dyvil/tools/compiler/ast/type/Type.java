@@ -180,6 +180,13 @@ public class Type extends ASTNode implements IContext, IType
 	}
 	
 	@Override
+	public void setName(String name, String qualifiedName)
+	{
+		this.name = name;
+		this.qualifiedName = qualifiedName;
+	}
+	
+	@Override
 	public void setName(String name)
 	{
 		this.name = name;

@@ -29,6 +29,12 @@ public class FloatValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return FLOAT;
+	}
+	
+	@Override
 	public Float toObject()
 	{
 		return Float.valueOf(this.value);

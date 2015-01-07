@@ -20,11 +20,11 @@ import dyvil.tools.compiler.util.*;
 
 public class MethodCall extends Call implements INamed, IValued
 {
-	public IValue		instance;
-	protected String	name;
-	protected String	qualifiedName;
+	public IValue	instance;
+	public String	name;
+	public String	qualifiedName;
 	
-	public boolean		dotless;
+	public boolean	dotless;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -47,6 +47,19 @@ public class MethodCall extends Call implements INamed, IValued
 			return null;
 		}
 		return this.method.getType();
+	}
+	
+	@Override
+	public int getValueType()
+	{
+		return METHOD_CALL;
+	}
+	
+	@Override
+	public void setName(String name, String qualifiedName)
+	{
+		this.name = name;
+		this.qualifiedName = qualifiedName;
 	}
 	
 	@Override

@@ -29,6 +29,12 @@ public class StringValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return STRING;
+	}
+	
+	@Override
 	public String toObject()
 	{
 		return this.value;

@@ -25,6 +25,12 @@ public class NullValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return NULL;
+	}
+	
+	@Override
 	public Object toObject()
 	{
 		return null;

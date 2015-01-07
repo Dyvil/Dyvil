@@ -11,9 +11,43 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IValue extends IASTNode
 {
+	public static int	NULL				= 0;
+	public static int	BOOLEAN				= 1;
+	public static int	CHAR				= 2;
+	public static int	INT					= 3;
+	public static int	LONG				= 4;
+	public static int	FLOAT				= 5;
+	public static int	DOUBLE				= 6;
+	public static int	STRING				= 7;
+	public static int	ENUM				= 8;
+	
+	public static int	THIS				= 9;
+	public static int	SUPER				= 10;
+	
+	public static int	VALUE_LIST			= 11;
+	
+	public static int	CLASS_ACCESS		= 16;
+	public static int	FIELD_ACCESS		= 17;
+	public static int	FIELD_ASSIGN		= 18;
+	public static int	METHOD_CALL			= 19;
+	public static int	CONSTRUCTOR_CALL	= 20;
+	
+	public static int	TUPLE				= 48;
+	public static int	LAMBDA				= 49;
+	public static int	BYTECODE			= 50;
+	
+	public static int	RETURN				= 64;
+	public static int	IF					= 65;
+	public static int	SWITCH				= 66;
+	public static int	FOR					= 67;
+	public static int	WHILE				= 68;
+	public static int	DO_WHILE			= 69;
+	
 	public boolean isConstant();
 	
 	public IType getType();
+	
+	public int getValueType();
 	
 	public default Object toObject()
 	{

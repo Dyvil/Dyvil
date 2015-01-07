@@ -29,6 +29,12 @@ public class SuperValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return SUPER;
+	}
+	
+	@Override
 	public SuperValue resolve(List<Marker> markers, IContext context)
 	{
 		if (context.isStatic())

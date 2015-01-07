@@ -29,6 +29,12 @@ public class ThisValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return THIS;
+	}
+	
+	@Override
 	public ThisValue resolve(List<Marker> markers, IContext context)
 	{
 		if (context.isStatic())

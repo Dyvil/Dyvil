@@ -44,6 +44,12 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return RETURN;
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.value != null)

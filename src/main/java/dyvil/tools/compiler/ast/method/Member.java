@@ -145,6 +145,13 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
+	public void setName(String name, String qualifiedName)
+	{
+		this.name = name;
+		this.qualifiedName = qualifiedName;
+	}
+	
+	@Override
 	public void setName(String name)
 	{
 		this.name = name;
@@ -154,14 +161,13 @@ public abstract class Member extends ASTNode implements IMember
 	@Override
 	public String getName()
 	{
-		return this.qualifiedName;
+		return this.name;
 	}
 	
 	@Override
 	public void setQualifiedName(String name)
 	{
 		this.qualifiedName = name;
-		this.name = Symbols.contract(name);
 	}
 	
 	@Override

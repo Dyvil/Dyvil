@@ -47,6 +47,13 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	}
 	
 	@Override
+	public void setName(String name, String qualifiedName)
+	{
+		this.name = name;
+		this.qualifiedName = qualifiedName;
+	}
+	
+	@Override
 	public void setName(String name)
 	{
 		this.name = name;

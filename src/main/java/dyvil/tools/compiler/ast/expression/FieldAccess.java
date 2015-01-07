@@ -22,13 +22,13 @@ import dyvil.tools.compiler.util.Symbols;
 
 public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAccess
 {
-	protected IValue	instance;
-	protected String	name;
-	protected String	qualifiedName;
+	public IValue	instance;
+	public String	name;
+	public String	qualifiedName;
 	
-	public boolean		dotless;
+	public boolean	dotless;
 	
-	public IField		field;
+	public IField	field;
 	
 	public FieldAccess(ICodePosition position)
 	{
@@ -57,6 +57,19 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 			return null;
 		}
 		return this.field.getType();
+	}
+	
+	@Override
+	public int getValueType()
+	{
+		return FIELD_ACCESS;
+	}
+	
+	@Override
+	public void setName(String name, String qualifiedName)
+	{
+		this.name = name;
+		this.qualifiedName = qualifiedName;
 	}
 	
 	@Override

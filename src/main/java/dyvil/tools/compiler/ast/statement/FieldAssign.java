@@ -55,6 +55,19 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return FIELD_ASSIGN;
+	}
+	
+	@Override
+	public void setName(String name, String qualifiedName)
+	{
+		this.name = name;
+		this.qualifiedName = qualifiedName;
+	}
+	
+	@Override
 	public void setName(String name)
 	{
 		this.name = name;

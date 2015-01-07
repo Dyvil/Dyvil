@@ -38,6 +38,12 @@ public class Bytecode extends ASTNode implements IValue
 		return Type.VOID;
 	}
 	
+	@Override
+	public int getValueType()
+	{
+		return BYTECODE;
+	}
+	
 	public void addInstruction(Instruction insn)
 	{
 		this.instructions.add(insn);

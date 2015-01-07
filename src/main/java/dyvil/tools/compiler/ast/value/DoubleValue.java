@@ -29,6 +29,12 @@ public class DoubleValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return DOUBLE;
+	}
+	
+	@Override
 	public Double toObject()
 	{
 		return Double.valueOf(this.value);

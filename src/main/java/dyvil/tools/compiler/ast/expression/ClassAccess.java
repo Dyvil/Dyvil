@@ -37,6 +37,17 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return CLASS_ACCESS;
+	}
+	
+	@Override
+	public void setName(String name, String qualifiedName)
+	{
+	}
+	
+	@Override
 	public void setName(String name)
 	{
 	}

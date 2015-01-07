@@ -2,6 +2,8 @@ package dyvil.tools.compiler.ast.api;
 
 public interface INamed
 {
+	public void setName(String name, String qualifiedName);
+	
 	public void setName(String name);
 	
 	public String getName();

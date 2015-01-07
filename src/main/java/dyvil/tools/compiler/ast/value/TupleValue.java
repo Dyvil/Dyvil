@@ -94,6 +94,12 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return TUPLE;
+	}
+	
+	@Override
 	public Object toObject()
 	{
 		return null;

@@ -61,6 +61,12 @@ public class WhileStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return WHILE;
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.condition.resolveTypes(markers, context);
