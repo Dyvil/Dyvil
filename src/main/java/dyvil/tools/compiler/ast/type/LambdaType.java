@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.type;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.api.ITypeList;
 import dyvil.tools.compiler.ast.api.ITyped;
@@ -52,6 +53,12 @@ public class LambdaType extends Type implements ITyped, ITypeList
 	public void addType(IType type)
 	{
 		this.argumentTypes.add(type);
+	}
+	
+	@Override
+	public Type resolve(IContext context)
+	{
+		return this;
 	}
 	
 	@Override

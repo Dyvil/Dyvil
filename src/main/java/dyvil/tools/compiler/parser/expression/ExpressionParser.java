@@ -1,11 +1,15 @@
 package dyvil.tools.compiler.parser.expression;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.expression.ClassAccess;
 import dyvil.tools.compiler.ast.expression.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.FieldAccess;
 import dyvil.tools.compiler.ast.expression.MethodCall;
+import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.TupleType;
@@ -25,16 +29,17 @@ import dyvil.tools.compiler.util.OperatorComparator;
 public class ExpressionParser extends Parser implements ITyped, IValued
 {
 	public static final int	VALUE			= 1;
-	public static final int	VALUE_2			= 2;
+	public static final int	LIST_END		= 2;
 	public static final int	TUPLE_END		= 4;
 	
 	public static final int	ACCESS			= 8;
 	public static final int	ACCESS_2		= 16;
 	
+	public static final int	LAMBDA			= 32;
 	public static final int	STATEMENT		= 64;
 	public static final int	TYPE			= 128;
 	public static final int	PARAMETERS		= 256;
-	public static final int	PARAMETERS_2	= 512;
+	public static final int	PARAMETERS_END	= 512;
 	public static final int	VARIABLE		= 1024;
 	
 	public static final int	BYTECODE		= 2048;
@@ -122,7 +127,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			else if ("{".equals(value))
 			{
-				this.mode = VALUE_2;
+				this.mode = LIST_END;
 				this.value = new StatementList(token);
 				
 				if (!token.next().equals("}"))
@@ -139,15 +144,15 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.pushParser(new TypeParser(call));
 				return true;
 			}
-			else if (token.isType(IToken.TYPE_IDENTIFIER) || token.equals("("))
+			else if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
-				this.mode = ACCESS | VARIABLE;
+				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
 				return true;
 			}
 			this.mode = ACCESS;
 		}
-		if (this.isInMode(VALUE_2))
+		if (this.isInMode(LIST_END))
 		{
 			if ("}".equals(value))
 			{
@@ -162,7 +167,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (")".equals(value))
 			{
 				this.value.expandPosition(token);
-				this.mode = ACCESS | VARIABLE;
+				this.mode = ACCESS | VARIABLE | LAMBDA;
 				return true;
 			}
 			return false;
@@ -188,6 +193,21 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				return true;
 			}
 			return false;
+		}
+		if (this.isInMode(LAMBDA))
+		{
+			if ("=>".equals(value))
+			{
+				LambdaValue lv = getLambdaValue(this.value);
+				if (lv != null)
+				{
+					this.value = lv;
+					pm.popParser();
+					pm.pushParser(new ExpressionParser(this.context, lv));
+					return true;
+				}
+				return false;
+			}
 		}
 		if (this.isInMode(VARIABLE))
 		{
@@ -343,12 +363,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if ("(".equals(value))
 			{
 				pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value));
-				this.mode = PARAMETERS_2;
+				this.mode = PARAMETERS_END;
 				return true;
 			}
 			return false;
 		}
-		if (this.isInMode(PARAMETERS_2))
+		if (this.isInMode(PARAMETERS_END))
 		{
 			if (")".equals(value))
 			{
@@ -377,6 +397,44 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			t.addType(ca.type);
 		}
 		return t;
+	}
+	
+	private static LambdaValue getLambdaValue(IValue value)
+	{
+		List<Parameter> params = new ArrayList();
+		
+		int i = value.getValueType();
+		if (i == IValue.CLASS_ACCESS)
+		{
+			ClassAccess ca = (ClassAccess) value;
+			Parameter param = new Parameter();
+			param.setName(ca.type.getName(), ca.type.getQualifiedName());
+			params.add(param);
+		}
+		else if (i == IValue.TUPLE)
+		{
+			for (IValue v : ((TupleValue) value).getValues())
+			{
+				if (v.getValueType() != IValue.METHOD_CALL)
+				{
+					return null;
+				}
+				MethodCall mc = (MethodCall) v;
+				
+				v = mc.getValue();
+				if (!mc.dotless || v.getValueType() != IValue.CLASS_ACCESS)
+				{
+					return null;
+				}
+				
+				ClassAccess ca = (ClassAccess) v;
+				Parameter param = new Parameter();
+				param.setName(mc.name, mc.qualifiedName);
+				param.setType(ca.type);
+				params.add(param);
+			}
+		}
+		return new LambdaValue(params);
 	}
 	
 	@Override
