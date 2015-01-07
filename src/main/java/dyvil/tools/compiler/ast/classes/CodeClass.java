@@ -46,6 +46,7 @@ public class CodeClass extends ASTNode implements IClass
 	protected List<ITypeVariable>	generics;
 	
 	protected ClassBody				body;
+	protected IMethod				functionalMethod;
 	
 	public CodeClass()
 	{
@@ -127,6 +128,11 @@ public class CodeClass extends ASTNode implements IClass
 			this.modifiers |= Modifiers.SEALED;
 			return true;
 		}
+		else if ("java.lang.FunctionalInterface".equals(name))
+		{
+			this.modifiers |= Modifiers.FUNCTIONAL;
+			return true;
+		}
 		return false;
 	}
 	
@@ -135,7 +141,7 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		for (Annotation a : this.annotations)
 		{
-			if (a.type.equals(type))
+			if (a.type.classEquals(type))
 			{
 				return a;
 			}
@@ -308,6 +314,28 @@ public class CodeClass extends ASTNode implements IClass
 	public ClassBody getBody()
 	{
 		return this.body;
+	}
+	
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		if (this.functionalMethod == null)
+		{
+			if ((this.modifiers & Modifiers.FUNCTIONAL) != Modifiers.FUNCTIONAL)
+			{
+				return null;
+			}
+			
+			for (IMethod m : this.body.methods)
+			{
+				if (m.hasModifier(Modifiers.ABSTRACT))
+				{
+					this.functionalMethod = m;
+					return m;
+				}
+			}
+		}
+		return this.functionalMethod;
 	}
 	
 	@Override
@@ -660,6 +688,10 @@ public class CodeClass extends ASTNode implements IClass
 		if ((this.modifiers & Modifiers.SEALED) != 0)
 		{
 			writer.visitAnnotation("Ldyvil/lang/annotation/sealed;", false);
+		}
+		if ((this.modifiers & Modifiers.FUNCTIONAL) != 0)
+		{
+			writer.visitAnnotation("Ljava/lang/annotation/functional;", true);
 		}
 		
 		for (Annotation a : this.annotations)

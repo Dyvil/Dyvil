@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
 public class TupleValue extends ASTNode implements IValue, IValueList
@@ -20,13 +21,15 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	private List<IValue>	values;
 	private TupleType		tupleType;
 	
-	public TupleValue()
+	public TupleValue(ICodePosition position)
 	{
+		this.position = position;
 		this.values = new ArrayList(3);
 	}
 	
-	public TupleValue(List<IValue> values)
+	public TupleValue(ICodePosition position, List<IValue> values)
 	{
+		this.position = position;
 		this.values = values;
 	}
 	

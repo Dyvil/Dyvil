@@ -34,12 +34,6 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public void setName(String name)
-	{
-		super.setName(name);
-	}
-	
-	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.superType != null)

@@ -26,6 +26,9 @@ public abstract class ASTNode implements IASTNode
 		{
 			this.position = this.position.to(position);
 		}
+		else {
+			this.position = position.raw();
+		}
 	}
 	
 	@Override

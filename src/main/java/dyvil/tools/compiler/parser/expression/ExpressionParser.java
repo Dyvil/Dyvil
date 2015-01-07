@@ -117,7 +117,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			else if ("(".equals(value))
 			{
 				this.mode = TUPLE_END;
-				this.value = new TupleValue();
+				this.value = new TupleValue(token);
 				
 				if (!token.next().equals(")"))
 				{
@@ -201,6 +201,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				LambdaValue lv = getLambdaValue(this.value);
 				if (lv != null)
 				{
+					lv.expandPosition(token);
 					this.value = lv;
 					pm.popParser();
 					pm.pushParser(new ExpressionParser(this.context, lv));
@@ -434,7 +435,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				params.add(param);
 			}
 		}
-		return new LambdaValue(params);
+		return new LambdaValue(value.getPosition(), params);
 	}
 	
 	@Override

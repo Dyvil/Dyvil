@@ -2,7 +2,7 @@ package dyvil.tools.compiler.util;
 
 public enum Modifiers
 {
-	ACCESS, CLASS_TYPE, CLASS, INTERFACE, FIELD, METHOD, FIELD_OR_METHOD, PARAMETER;
+	ACCESS, CLASS_TYPE, CLASS, FIELD, METHOD, FIELD_OR_METHOD, PARAMETER;
 	
 	public String toString(int mod)
 	{
@@ -18,10 +18,6 @@ public enum Modifiers
 		case CLASS:
 			writeAccessModifiers(mod, sb);
 			writeClassModifiers(mod, sb);
-			break;
-		case INTERFACE:
-			writeAccessModifiers(mod, sb);
-			writeInterfaceModifiers(mod, sb);
 			break;
 		case FIELD_OR_METHOD:
 			writeAccessModifiers(mod, sb);
@@ -57,12 +53,6 @@ public enum Modifiers
 			if ((m = readAccessModifier(mod)) == -1)
 			{
 				m = readClassModifier(mod);
-			}
-			break;
-		case INTERFACE:
-			if ((m = readAccessModifier(mod)) == -1)
-			{
-				m = readInterfaceModifier(mod);
 			}
 			break;
 		case FIELD_OR_METHOD:
@@ -183,6 +173,8 @@ public enum Modifiers
 	// TODO Modules
 	public static final int	MODULE					= 0x00020000;
 	
+	public static final int	FUNCTIONAL				= 0x00040000;
+	
 	/**
 	 * Dyvil ref modifier. This is used to mark that a parameter is
 	 * Call-By-Reference. If a parameter doesn't have this flag, it is
@@ -212,8 +204,7 @@ public enum Modifiers
 	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM_CLASS | OBJECT_CLASS | MODULE;
 	public static final int	ACCESS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | SEALED;
 	public static final int	MEMBER_MODIFIERS		= ACCESS_MODIFIERS | STATIC | FINAL;
-	public static final int	CLASS_MODIFIERS			= MEMBER_MODIFIERS | ABSTRACT | STRICT;
-	public static final int	INTERFACE_MODIFIERS		= ACCESS_MODIFIERS | ABSTRACT | STATIC | STRICT;
+	public static final int	CLASS_MODIFIERS			= MEMBER_MODIFIERS | ABSTRACT | STRICT | FUNCTIONAL;
 	
 	public static final int	FIELD_MODIFIERS			= MEMBER_MODIFIERS | TRANSIENT | VOLATILE | LAZY | SYNTHETIC;
 	public static final int	METHOD_MODIFIERS		= MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT | PREFIX | BRIDGE | VARARGS | MANDATED;
@@ -298,21 +289,9 @@ public enum Modifiers
 		{
 			sb.append("strictfp ");
 		}
-	}
-	
-	private static void writeInterfaceModifiers(int mod, StringBuilder sb)
-	{
-		if ((mod & STATIC) == STATIC)
+		if ((mod & FUNCTIONAL) == FUNCTIONAL)
 		{
-			sb.append("static ");
-		}
-		if ((mod & ABSTRACT) == ABSTRACT)
-		{
-			sb.append("abstract ");
-		}
-		if ((mod & STRICT) == STRICT)
-		{
-			sb.append("strictfp ");
+			sb.append("functional ");
 		}
 	}
 	
@@ -508,18 +487,8 @@ public enum Modifiers
 			return FINAL;
 		case "strictfp":
 			return STRICT;
-		}
-		return -1;
-	}
-	
-	private static int readInterfaceModifier(String mod)
-	{
-		switch (mod)
-		{
-		case "static":
-			return STATIC;
-		case "strictfp":
-			return STRICT;
+		case "functional":
+			return FUNCTIONAL;
 		}
 		return -1;
 	}

@@ -3,7 +3,9 @@ package dyvil.tools.compiler.ast.value;
 import java.util.ArrayList;
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.Handle;
 import jdk.internal.org.objectweb.asm.Label;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.Parameter;
@@ -11,23 +13,28 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
 public class LambdaValue extends ASTNode implements IValue, IValued, IParameterized
 {
-	public List<Parameter>	parameters;
-	public IValue			value;
+	public static final Handle	lambdaMetafactory	= new Handle(Opcodes.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory", "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/Callsite;");
 	
-	protected IType			type;
-	protected IMethod		method;
+	public List<Parameter>		parameters;
+	public IValue				value;
 	
-	public LambdaValue()
+	protected IType				type;
+	protected IMethod			method;
+	
+	public LambdaValue(ICodePosition position)
 	{
+		this.position = position;
 		this.parameters = new ArrayList();
 	}
 	
-	public LambdaValue(List<Parameter> parameters)
+	public LambdaValue(ICodePosition position, List<Parameter> parameters)
 	{
+		this.position = position;
 		this.parameters = parameters;
 	}
 	
@@ -81,6 +88,7 @@ public class LambdaValue extends ASTNode implements IValue, IValued, IParameteri
 	@Override
 	public void setType(IType type)
 	{
+		this.type = type;
 	}
 	
 	@Override
@@ -98,12 +106,27 @@ public class LambdaValue extends ASTNode implements IValue, IValued, IParameteri
 	@Override
 	public boolean requireType(IType type)
 	{
-		return true;
+		IClass iclass = type.getTheClass();
+		if (iclass != null)
+		{
+			IMethod method = iclass.getFunctionalMethod();
+			if (method != null)
+			{
+				this.type = type;
+				this.method = method;
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		for (Parameter p : this.parameters)
+		{
+			p.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
