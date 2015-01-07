@@ -9,7 +9,6 @@ import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -177,7 +176,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		
 		if (this.field != null)
 		{
-			if (this.field.hasModifier(Modifiers.STATIC) && this.instance instanceof ThisValue)
+			if (this.instance != null && this.field.hasModifier(Modifiers.STATIC) && this.instance.getValueType() == IValue.THIS)
 			{
 				markers.add(new Warning(this.position, "'" + this.name + "' is a static field and should be accessed in a static way"));
 				this.instance = null;

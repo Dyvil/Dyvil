@@ -10,13 +10,15 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IntValue;
-import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.*;
+import dyvil.tools.compiler.util.AccessResolver;
+import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Symbols;
+import dyvil.tools.compiler.util.Util;
 
 public class MethodCall extends Call implements INamed, IValued
 {
@@ -314,11 +316,11 @@ public class MethodCall extends Call implements INamed, IValued
 		{
 			opcode = Opcodes.INVOKESTATIC;
 		}
-		else if (ownerClass.hasModifier(Modifiers.INTERFACE_CLASS))
+		else if (ownerClass.hasModifier(Modifiers.INTERFACE_CLASS) && this.method.hasModifier(Modifiers.ABSTRACT))
 		{
 			opcode = Opcodes.INVOKEINTERFACE;
 		}
-		else if (this.instance instanceof SuperValue)
+		else if (this.instance.getValueType() == IValue.SUPER)
 		{
 			opcode = Opcodes.INVOKESPECIAL;
 		}
@@ -337,11 +339,7 @@ public class MethodCall extends Call implements INamed, IValued
 		{
 			for (IValue v : array.values)
 			{
-				if (v instanceof FieldAccess)
-				{
-					v = v.foldConstants();
-				}
-				writer.visitInsn(((IntValue) v).value);
+				writer.visitInsn(((IntValue) v.foldConstants()).value);
 			}
 			return;
 		}

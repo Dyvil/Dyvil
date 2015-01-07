@@ -8,7 +8,6 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -201,7 +200,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		if (this.value instanceof ThisValue)
+		if (this.value.getValueType() == IValue.THIS)
 		{
 			markers.add(new SyntaxError(this.position, "Cannot assign a value to 'this'"));
 		}

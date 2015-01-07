@@ -216,11 +216,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				ICodePosition pos = token.raw();
 				IType type;
-				if (this.value instanceof ClassAccess)
+				int i = this.value.getValueType();
+				if (i == IValue.CLASS_ACCESS)
 				{
 					type = ((ClassAccess) this.value).type;
 				}
-				else if (this.value instanceof TupleValue)
+				else if (i == IValue.TUPLE)
 				{
 					type = getTupleType((TupleValue) this.value);
 				}
@@ -254,45 +255,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			
 			if ("=".equals(value))
 			{
-				String name = null;
-				IValue instance = null;
-				if (this.value instanceof ClassAccess)
-				{
-					name = ((ClassAccess) this.value).getName();
-				}
-				else if (this.value instanceof FieldAccess)
-				{
-					FieldAccess fa = (FieldAccess) this.value;
-					name = fa.getName();
-					instance = fa.getValue();
-				}
-				else if (this.value instanceof MethodCall)
-				{
-					MethodCall call = (MethodCall) this.value;
-					IValue v;
-					if (call.getName().equals("apply"))
-					{
-						v = call.getValue();
-					}
-					else
-					{
-						v = new FieldAccess(this.value.getPosition(), call.getValue(), call.getName());
-					}
-					MethodCall updateCall = new MethodCall(this.value.getPosition(), v, "update");
-					updateCall.setValues(call.getValues());
-					this.value = updateCall;
-					pm.pushParser(new ExpressionParser(this.context, this));
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-				
-				FieldAssign assign = new FieldAssign(this.value.getPosition(), name, instance);
-				this.value = assign;
-				pm.pushParser(new ExpressionParser(this.context, assign));
-				return true;
+				return this.getAssign(pm);
 			}
 			else if ("(".equals(value))
 			{
@@ -323,39 +286,20 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					}
 				}
 				
-				IToken next = token.next();
-				if (next.equals("("))
-				{
-					MethodCall call = new MethodCall(token, this.value, value);
-					this.value = call;
-					this.mode = PARAMETERS;
-					return true;
-				}
-				else if (!next.isType(IToken.TYPE_IDENTIFIER) && !next.isType(IToken.TYPE_SYMBOL))
-				{
-					MethodCall call = new MethodCall(token, this.value, value);
-					call.setSugar(true);
-					call.dotless = this.dotless;
-					this.value = call;
-					
-					ExpressionParser parser = new ExpressionParser(this.context, this);
-					parser.precedence = OperatorComparator.index(value);
-					pm.pushParser(parser);
-					return true;
-				}
-				else
-				{
-					FieldAccess access = new FieldAccess(token, this.value, value);
-					access.dotless = this.dotless;
-					this.value = access;
-					this.mode = ACCESS;
-					return true;
-				}
+				return this.getAccess(pm, value, token);
 			}
 			else if (")".equals(value))
 			{
 				pm.popParser(true);
 				return true;
+			}
+			
+			IToken prev = token.prev();
+			if (prev.isType(IToken.TYPE_IDENTIFIER))
+			{
+				this.value = null;
+				pm.reparse();
+				return this.getAccess(pm, prev.value(), prev);
 			}
 			return false;
 		}
@@ -387,6 +331,83 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			return true;
 		}
 		return false;
+	}
+	
+	private boolean getAccess(ParserManager pm, String value, IToken token) throws SyntaxError
+	{
+		IToken next = token.next();
+		if (next.equals("("))
+		{
+			MethodCall call = new MethodCall(token, this.value, value);
+			this.value = call;
+			this.mode = PARAMETERS;
+			return true;
+		}
+		else if (!next.isType(IToken.TYPE_IDENTIFIER) && !next.isType(IToken.TYPE_SYMBOL))
+		{
+			MethodCall call = new MethodCall(token, this.value, value);
+			call.setSugar(true);
+			call.dotless = this.dotless;
+			this.value = call;
+			this.mode = ACCESS;
+			
+			ExpressionParser parser = new ExpressionParser(this.context, this);
+			parser.precedence = OperatorComparator.index(value);
+			pm.pushParser(parser);
+			return true;
+		}
+		else
+		{
+			FieldAccess access = new FieldAccess(token, this.value, value);
+			access.dotless = this.dotless;
+			this.value = access;
+			this.mode = ACCESS;
+			return true;
+		}
+	}
+	
+	private boolean getAssign(ParserManager pm)
+	{
+		String name = null;
+		IValue instance = null;
+		int i = this.value.getValueType();
+		if (i == IValue.CLASS_ACCESS)
+		{
+			name = ((ClassAccess) this.value).getName();
+		}
+		else if (i == IValue.FIELD_ACCESS)
+		{
+			FieldAccess fa = (FieldAccess) this.value;
+			name = fa.getName();
+			instance = fa.getValue();
+		}
+		else if (i == IValue.METHOD_CALL)
+		{
+			MethodCall call = (MethodCall) this.value;
+			IValue v;
+			if (call.isName("apply"))
+			{
+				v = call.getValue();
+			}
+			else
+			{
+				v = new FieldAccess(this.value.getPosition(), call.getValue(), call.getName());
+			}
+			MethodCall updateCall = new MethodCall(this.value.getPosition(), v, "update");
+			updateCall.setValues(call.getValues());
+			this.value = updateCall;
+			pm.pushParser(new ExpressionParser(this.context, this));
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
+		FieldAssign assign = new FieldAssign(this.value.getPosition(), name, instance);
+		this.value = assign;
+		pm.pushParser(new ExpressionParser(this.context, assign));
+		return true;
 	}
 	
 	private static TupleType getTupleType(TupleValue value)

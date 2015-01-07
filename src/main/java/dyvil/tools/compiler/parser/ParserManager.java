@@ -253,4 +253,9 @@ public class ParserManager
 			this.tokens.jump(this.currentToken);
 		}
 	}
+	
+	public void reparse()
+	{
+		this.tokens.jump(this.currentToken);
+	}
 }

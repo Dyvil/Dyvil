@@ -22,6 +22,7 @@ import dyvil.tools.compiler.bytecode.AnnotationVisitorImpl;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.util.ClassFormat;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Symbols;
 
 public class BytecodeClass extends CodeClass
 {
@@ -169,7 +170,7 @@ public class BytecodeClass extends CodeClass
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
 		Field field = new Field(this);
-		field.setQualifiedName(name);
+		field.setName(Symbols.contract(name), name);
 		field.setModifiers(access);
 		field.setType(ClassFormat.internalToType(desc));
 		
@@ -193,7 +194,7 @@ public class BytecodeClass extends CodeClass
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
 		Method method = new Method(this);
-		method.setQualifiedName(name);
+		method.setName(Symbols.contract(name), name);
 		method.setModifiers(access);
 		ClassFormat.readMethodType(desc, method);
 		

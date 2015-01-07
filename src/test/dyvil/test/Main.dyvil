@@ -6,5 +6,8 @@ public class Main
 {
 	public lazy String s = "Hello World";
 	
-	public static void main(String[] args) = { Function f = (Object o) => o; };
+	public static void main(String[] args) =
+	{
+		
+	};
 }
