@@ -58,7 +58,7 @@ public class ClassBody extends ASTNode
 		return null;
 	}
 	
-	public void addProperty(Property prop)
+	public void addProperty(IProperty prop)
 	{
 		this.properties.add(prop);
 	}

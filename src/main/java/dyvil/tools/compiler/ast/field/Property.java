@@ -68,6 +68,20 @@ public class Property extends Field implements IProperty
 	}
 	
 	@Override
+	public void setGetterMethod(IMethod method)
+	{
+		this.get = method.getValue();
+		this.getterMethod = method;
+	}
+	
+	@Override
+	public void setSetterMethod(IMethod method)
+	{
+		this.set = method.getValue();
+		this.setterMethod = method;
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.type = this.type.resolve(context);
@@ -96,14 +110,14 @@ public class Property extends Field implements IProperty
 	{
 		if (this.get != null)
 		{
-			this.getterMethod = new Method(this.theClass, "get$" + this.qualifiedName, this.type, this.modifiers, this.annotations);
+			this.getterMethod = new Method(this.theClass, "get$" + this.qualifiedName, this.type, this.modifiers | Modifiers.SYNTHETIC, this.annotations);
 			this.getterMethod.setValue(this.get);
 			this.get = this.get.resolve(markers, this);
 		}
 		if (this.set != null)
 		{
 			this.setterParameter = new Parameter(0, this.qualifiedName, this.type);
-			this.setterMethod = new Method(this.theClass, "set$" + this.qualifiedName, Type.VOID, this.modifiers, this.annotations);
+			this.setterMethod = new Method(this.theClass, "set$" + this.qualifiedName, Type.VOID, this.modifiers | Modifiers.SYNTHETIC, this.annotations);
 			this.setterMethod.addParameter(this.setterParameter);
 			this.setterMethod.setValue(this.set);
 			this.set = this.set.resolve(markers, this);

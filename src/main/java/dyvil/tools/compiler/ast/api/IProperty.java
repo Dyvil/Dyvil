@@ -9,4 +9,8 @@ public interface IProperty extends IField
 	public void setSetter(IValue set);
 	
 	public IValue getSetter();
+	
+	public void setGetterMethod(IMethod method);
+	
+	public void setSetterMethod(IMethod method);
 }

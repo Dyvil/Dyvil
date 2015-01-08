@@ -8,12 +8,11 @@ import jdk.internal.org.objectweb.asm.FieldVisitor;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.IClass;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
+import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -130,6 +129,34 @@ public class BytecodeClass extends CodeClass
 		super.getMethodMatches(list, type, name, argumentTypes);
 	}
 	
+	public boolean addSpecialMethod(String specialType, String name, IMethod method)
+	{
+		if ("get".equals(specialType))
+		{
+			IProperty property = this.getProperty(name, method);
+			property.setGetterMethod(method);
+			return false;
+		}
+		if ("set".equals(specialType))
+		{
+			IProperty property = this.getProperty(name, method);
+			property.setSetterMethod(method);
+			return false;
+		}
+		return true;
+	}
+
+	private IProperty getProperty(String name, IMethod method)
+	{
+		IProperty property = this.body.getProperty(name);
+		if (property == null)
+		{
+			property = new Property(this, name, method.getType(), method.getModifiers() & ~Modifiers.SYNTHETIC, method.getAnnotations());
+			this.body.addProperty(property);
+		}
+		return property;
+	}
+	
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
 	{
 		this.modifiers = access;
@@ -206,7 +233,20 @@ public class BytecodeClass extends CodeClass
 			param.setVarargs();
 		}
 		
-		this.body.addMethod(method);
+		boolean flag = true;
+		if ((access & Modifiers.SYNTHETIC) != 0)
+		{
+			int index = name.indexOf('$');
+			if (index != -1)
+			{
+				flag = this.addSpecialMethod(name.substring(0, index), name.substring(index + 1), method);
+			}
+		}
+		
+		if (flag)
+		{
+			this.body.addMethod(method);
+		}
 		
 		return new MethodVisitor(Opcodes.ASM5)
 		{
