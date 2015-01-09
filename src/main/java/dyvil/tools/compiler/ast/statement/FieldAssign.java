@@ -8,6 +8,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -19,14 +20,14 @@ import dyvil.tools.compiler.util.Symbols;
 
 public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 {
-	protected String	name;
-	protected String	qualifiedName;
+	public String	name;
+	public String	qualifiedName;
 	
-	public boolean		initializer;
+	public boolean	initializer;
 	
-	public IValue		instance;
-	public IField		field;
-	public IValue		value;
+	public IValue	instance;
+	public IField	field;
+	public IValue	value;
 	
 	public FieldAssign(ICodePosition position)
 	{
@@ -51,6 +52,12 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	public IType getType()
 	{
 		return this.field.getType();
+	}
+	
+	@Override
+	public boolean requireType(IType type)
+	{
+		return type == Type.VOID || type.equals(Type.ANY) || Type.isSuperType(type, this.field.getType());
 	}
 	
 	@Override

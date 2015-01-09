@@ -2,12 +2,10 @@ package test;
 
 import java.util.function.Function;
 
-public class Main
+public object Main
 {
-	public lazy String s = "Hello World";
-	
 	public static void main(String[] args) =
 	{
-		
+		System out println(Main.instance);
 	};
 }

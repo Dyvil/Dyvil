@@ -8,7 +8,9 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.expression.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.MethodCall;
+import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -47,6 +49,7 @@ public class CodeClass extends ASTNode implements IClass
 	
 	protected ClassBody				body;
 	protected IMethod				functionalMethod;
+	protected IField				instanceField;
 	
 	public CodeClass()
 	{
@@ -317,6 +320,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public IField getInstanceField()
+	{
+		return this.instanceField;
+	}
+	
+	@Override
 	public IMethod getFunctionalMethod()
 	{
 		if (this.functionalMethod == null)
@@ -418,6 +427,11 @@ public class CodeClass extends ASTNode implements IClass
 			a.resolve(markers, context);
 		}
 		
+		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
+		{
+			this.instanceField = new Field(this, "instance", this.getType(), Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, Collections.EMPTY_LIST);
+		}
+		
 		this.body.resolve(markers, this);
 	}
 	
@@ -438,6 +452,15 @@ public class CodeClass extends ASTNode implements IClass
 				{
 					markers.add(new SemanticError(this.superType.getPosition(), "The final class '" + superClass.getName() + "' cannot be extended"));
 				}
+			}
+		}
+		
+		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
+		{
+			IMethod m = this.body.getMethod("<init>");
+			if (m != null)
+			{
+				markers.add(new SemanticError(m.getPosition(), "Object Classes cannot have a constructor"));
 			}
 		}
 		
@@ -520,6 +543,11 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				return new FieldMatch(field, 1);
 			}
+		}
+		
+		if (this.instanceField != null && "instance".equals(name))
+		{
+			return new FieldMatch(this.instanceField, 1);
 		}
 		
 		FieldMatch match;
@@ -672,10 +700,10 @@ public class CodeClass extends ASTNode implements IClass
 		List<IMethod> methods = this.body.methods;
 		
 		ThisValue thisValue = new ThisValue(null, this.type);
+		IField instanceField = this.instanceField;
 		StatementList instanceFields = new StatementList(null);
 		StatementList staticFields = new StatementList(null);
 		boolean instanceFieldsAdded = false;
-		boolean staticFieldsAdded = false;
 		
 		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
 		{
@@ -741,21 +769,17 @@ public class CodeClass extends ASTNode implements IClass
 				Util.prependValue(m, instanceFields);
 				instanceFieldsAdded = true;
 			}
-			else if (name.equals("<clinit>"))
-			{
-				Util.prependValue(m, staticFields);
-				staticFieldsAdded = true;
-			}
 			m.write(writer);
 		}
 		
-		if (!instanceFieldsAdded && !instanceFields.isEmpty())
+		Method constructor = null;
+		if (!instanceFieldsAdded && (!instanceFields.isEmpty() || instanceField != null))
 		{
 			// Create the default constructor
-			Method m = new Method(this);
-			m.setQualifiedName("<init>");
-			m.setType(Type.VOID);
-			m.setModifiers(Modifiers.PUBLIC | Modifiers.MANDATED);
+			constructor = new Method(this);
+			constructor.setQualifiedName("<init>");
+			constructor.setType(Type.VOID);
+			constructor.setModifiers(Modifiers.PUBLIC | Modifiers.MANDATED);
 			
 			// If this class has a superclass...
 			if (this.superType != null)
@@ -774,10 +798,22 @@ public class CodeClass extends ASTNode implements IClass
 					}
 				}
 			}
-			m.setValue(instanceFields);
-			m.write(writer);
+			constructor.setValue(instanceFields);
+			constructor.write(writer);
 		}
-		if (!staticFieldsAdded && !staticFields.isEmpty())
+		if (instanceField != null)
+		{
+			instanceField.write(writer);
+			FieldAssign assign = new FieldAssign(null);
+			assign.name = assign.qualifiedName = "instance";
+			assign.field = instanceField;
+			ConstructorCall call = new ConstructorCall(null);
+			call.type = this.type;
+			call.method = constructor;
+			assign.value = call;
+			staticFields.addValue(assign);
+		}
+		if (!staticFields.isEmpty())
 		{
 			// Create the classinit method
 			Method m = new Method(this);

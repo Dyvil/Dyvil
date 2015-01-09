@@ -42,6 +42,8 @@ public interface IClass extends IASTNode, IMember, IAnnotatable, IModified, INam
 	
 	public ClassBody getBody();
 	
+	public IField getInstanceField();
+	
 	public IMethod getFunctionalMethod();
 	
 	public void getMethodMatches(List<MethodMatch> matches, IType type, String name, IType... argumentTypes);

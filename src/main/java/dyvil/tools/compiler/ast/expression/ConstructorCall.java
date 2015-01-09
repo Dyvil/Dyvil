@@ -16,7 +16,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class ConstructorCall extends Call implements ITyped
 {
-	protected IType		type;
+	public IType		type;
 	protected boolean	isCustom;
 	
 	public ConstructorCall(ICodePosition position)

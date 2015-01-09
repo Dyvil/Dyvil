@@ -124,7 +124,7 @@ public enum Modifiers
 	
 	/**
 	 * Synthetic modifier. This is used for fields of inner classes that hold
-	 * the outer class.
+	 * the outer class as well as other fields inserted by the compiler.
 	 */
 	public static final int	SYNTHETIC				= 0x00001000;
 	// TODO Annotation Types
@@ -134,7 +134,8 @@ public enum Modifiers
 	
 	/**
 	 * Mandated modifier. This is used for constructors of inner classes that
-	 * have the outer class as a parameter.
+	 * have the outer class as a parameter as well as other methods inserted by
+	 * the compiler.
 	 */
 	public static final int	MANDATED				= 0x00008000;
 	
@@ -156,7 +157,6 @@ public enum Modifiers
 	 * Dyvil object modifier. If a class is marked with this modifier, it is a
 	 * singleton object class.
 	 */
-	// TODO Object Types
 	public static final int	OBJECT_CLASS			= 0x00010000;
 	
 	/**
