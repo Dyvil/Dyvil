@@ -636,7 +636,12 @@ public class Method extends Member implements IMethod
 	@Override
 	public void write(ClassWriter writer)
 	{
-		MethodVisitor visitor = writer.visitMethod(this.modifiers & 0xFFFF, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
+		int modifiers = this.modifiers & 0xFFFF;
+		if (this.statement == null)
+		{
+			modifiers |= Modifiers.ABSTRACT;
+		}
+		MethodVisitor visitor = writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
 		MethodWriter mw = new MethodWriter(visitor);
 		
 		if (this.isConstructor)

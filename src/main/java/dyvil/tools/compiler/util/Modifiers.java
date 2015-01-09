@@ -112,7 +112,6 @@ public enum Modifiers
 	public static final int	VARARGS					= 0x00000080;
 	public static final int	NATIVE					= 0x00000100;
 	
-	// TODO Interfaces
 	public static final int	INTERFACE_CLASS			= 0x00000200;
 	public static final int	ABSTRACT				= 0x00000400;
 	
