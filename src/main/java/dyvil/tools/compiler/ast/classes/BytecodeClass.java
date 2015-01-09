@@ -145,7 +145,7 @@ public class BytecodeClass extends CodeClass
 		}
 		return true;
 	}
-
+	
 	private IProperty getProperty(String name, IMethod method)
 	{
 		IProperty property = this.body.getProperty(name);
@@ -201,7 +201,17 @@ public class BytecodeClass extends CodeClass
 		field.setModifiers(access);
 		field.setType(ClassFormat.internalToType(desc));
 		
-		this.body.addField(field);
+		if ((this.modifiers & Modifiers.OBJECT_CLASS) == 0 || (access & Modifiers.SYNTHETIC) == 0)
+		{
+			this.body.addField(field);
+		}
+		else
+		{
+			// This is the instance field of a singleton object class, ignore
+			// annotations as it shouldn't have any
+			this.instanceField = field;
+			return null;
+		}
 		
 		return new FieldVisitor(Opcodes.ASM5)
 		{
