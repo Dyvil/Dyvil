@@ -8,6 +8,7 @@ import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.util.ClassFormat;
 
 public class Instruction extends ASTNode
 {
@@ -46,8 +47,14 @@ public class Instruction extends ASTNode
 	{
 	}
 	
-	public static Instruction fromOpcode(int opcode, String name)
+	public static Instruction parse(String name)
 	{
+		if ("local".equalsIgnoreCase(name))
+		{
+			return new LocalInstruction(name);
+		}
+		
+		int opcode = ClassFormat.parseOpcode(name);
 		if (opcode == -1)
 		{
 			return null;

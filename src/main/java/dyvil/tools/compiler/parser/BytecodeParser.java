@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.bytecode.Instruction;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.util.ClassFormat;
 
 public class BytecodeParser extends Parser
 {
@@ -42,11 +41,10 @@ public class BytecodeParser extends Parser
 		{
 			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
-				int opcode = ClassFormat.parseOpcode(value);
-				Instruction insn = Instruction.fromOpcode(opcode, value);
+				Instruction insn = Instruction.parse(value);
 				if (insn == null)
 				{
-					this.mode = INSTRUCTION | ARGUMENTS;
+					this.mode = INSTRUCTION | LABEL;
 					throw new SyntaxError(token, "Unknown Opcode '" + value + "'");
 				}
 				

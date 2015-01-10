@@ -20,6 +20,7 @@ public class Bytecode extends ASTNode implements IValue
 	private List<Instruction>	instructions	= new ArrayList();
 	
 	private Map<String, Label>	labels			= new HashMap();
+	public Label endLabel = new Label();
 	
 	public Bytecode(ICodePosition position)
 	{
@@ -100,6 +101,7 @@ public class Bytecode extends ASTNode implements IValue
 			}
 			i.write(writer);
 		}
+		writer.visitLabel(this.endLabel);
 	}
 	
 	@Override
@@ -113,6 +115,7 @@ public class Bytecode extends ASTNode implements IValue
 			}
 			i.write(writer);
 		}
+		writer.visitLabel(this.endLabel);
 	}
 	
 	@Override
