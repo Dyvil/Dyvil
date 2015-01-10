@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.bytecode;
 
+import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.util.ClassFormat;
 
@@ -8,6 +9,7 @@ public class FieldInstruction extends Instruction
 	private String	owner;
 	private String	fieldName;
 	private String	desc;
+	private IType	type;
 	
 	public FieldInstruction(int opcode, String name)
 	{
@@ -31,7 +33,8 @@ public class FieldInstruction extends Instruction
 			}
 			else if (this.desc == null)
 			{
-				this.desc = ClassFormat.typeToInternal((String) arg);
+				this.desc = ClassFormat.userToInternal((String) arg);
+				this.type = ClassFormat.internalToType(this.desc);
 				return true;
 			}
 		}
@@ -41,7 +44,7 @@ public class FieldInstruction extends Instruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.visitFieldInsn(this.opcode, this.owner, this.fieldName, this.desc);
+		writer.visitFieldInsn(this.opcode, this.owner, this.fieldName, this.desc, this.type);
 	}
 	
 	@Override

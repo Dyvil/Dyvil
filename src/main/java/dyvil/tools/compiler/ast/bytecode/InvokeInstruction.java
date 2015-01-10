@@ -39,7 +39,6 @@ public class InvokeInstruction extends Instruction
 	}
 	
 	@Override
-	@SuppressWarnings("deprecation")
 	public void write(MethodWriter writer)
 	{
 		writer.visitMethodInsn(this.opcode, this.owner, this.methodName, this.desc);

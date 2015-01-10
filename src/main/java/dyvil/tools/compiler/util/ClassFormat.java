@@ -40,7 +40,7 @@ public class ClassFormat
 		return name.replace('/', '.');
 	}
 	
-	public static String typeToInternal(String name)
+	public static String userToInternal(String name)
 	{
 		switch (name)
 		{
