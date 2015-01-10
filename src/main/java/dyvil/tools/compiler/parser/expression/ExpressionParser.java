@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.BytecodeParser;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -289,6 +290,11 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				return this.getAccess(pm, value, token);
 			}
 			else if (")".equals(value))
+			{
+				pm.popParser(true);
+				return true;
+			}
+			else if (token.isType(Token.TYPE_SYMBOL) || token.isType(Token.TYPE_CLOSE_BRACKET))
 			{
 				pm.popParser(true);
 				return true;

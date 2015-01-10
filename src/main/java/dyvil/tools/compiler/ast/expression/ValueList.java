@@ -53,6 +53,13 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	private void generateTypes()
 	{
 		int len = this.values.size();
+		if (len == 0)
+		{
+			this.elementType = Type.VOID;
+			this.requiredType = Type.VOID;
+			return;
+		}
+		
 		IType t = this.values.get(0).getType();
 		for (int i = 1; i < len; i++)
 		{
