@@ -150,17 +150,25 @@ public class IfStatement extends ASTNode implements IStatement
 			Label ifEnd = new Label();
 			Label elseEnd = new Label();
 			
-			this.condition.writeJump(writer, ifEnd);
+			// Condition
+			this.condition.writeExpression(writer);
+			writer.visitJumpInsn(Opcodes.IFEQ, ifEnd);
+			// If Block
 			this.then.writeExpression(writer);
 			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
 			writer.visitLabel(ifEnd);
+			// Else Block
 			this.elseThen.writeExpression(writer);
 			writer.visitLabel(elseEnd);
 		}
 		else
 		{
 			Label ifEnd = new Label();
-			this.condition.writeJump(writer, ifEnd);
+			
+			// Condition
+			this.condition.writeExpression(writer);
+			writer.visitJumpInsn(Opcodes.IFEQ, ifEnd);
+			// If Block
 			this.then.writeExpression(writer);
 			writer.visitLabel(ifEnd);
 		}
@@ -169,26 +177,30 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		if (this.then == null)
-		{
-			this.condition.writeStatement(writer);
-		}
 		if (this.elseThen != null)
 		{
 			Label ifEnd = new Label();
 			Label elseEnd = new Label();
 			
-			this.condition.writeJump(writer, ifEnd);
+			// Condition
+			this.condition.writeExpression(writer);
+			writer.visitJumpInsn(Opcodes.IFEQ, ifEnd);
+			// If Block
 			this.then.writeStatement(writer);
 			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
 			writer.visitLabel(ifEnd);
+			// Else Block
 			this.elseThen.writeStatement(writer);
 			writer.visitLabel(elseEnd);
 		}
 		else
 		{
 			Label ifEnd = new Label();
-			this.condition.writeJump(writer, ifEnd);
+			
+			// Condition
+			this.condition.writeExpression(writer);
+			writer.visitJumpInsn(Opcodes.IFEQ, ifEnd);
+			// If Block
 			this.then.writeStatement(writer);
 			writer.visitLabel(ifEnd);
 		}
@@ -199,7 +211,8 @@ public class IfStatement extends ASTNode implements IStatement
 	{
 		buffer.append(Formatting.Statements.ifStart);
 		this.condition.toString(prefix, buffer);
-		buffer.append(Formatting.Statements.ifEnd);
+		buffer.append(Formatting.Statements.ifEnd).append(' ');
+		
 		if (this.then != null)
 		{
 			this.then.toString(prefix, buffer);
@@ -207,6 +220,15 @@ public class IfStatement extends ASTNode implements IStatement
 		
 		if (this.elseThen != null)
 		{
+			if (this.then instanceof IStatement)
+			{
+				buffer.append('\n').append(prefix);
+			}
+			else
+			{
+				buffer.append(' ');
+			}
+			
 			buffer.append(Formatting.Statements.ifElse);
 			this.elseThen.toString(prefix, buffer);
 		}

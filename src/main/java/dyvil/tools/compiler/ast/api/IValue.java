@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.api;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
@@ -86,8 +85,6 @@ public interface IValue extends IASTNode
 	 * @param writer
 	 */
 	public void writeStatement(MethodWriter writer);
-	
-	public void writeJump(MethodWriter writer, Label label);
 	
 	public static IValue fromObject(Object o)
 	{

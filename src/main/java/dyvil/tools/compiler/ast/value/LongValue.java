@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.value;
 
-import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -49,13 +47,6 @@ public class LongValue extends ASTNode implements IConstantValue
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-	}
-	
-	@Override
-	public void writeJump(MethodWriter visitor, Label label)
-	{
-		visitor.visitLdcInsn(this.value);
-		visitor.visitJumpInsn(Opcodes.IFNE, label);
 	}
 	
 	@Override

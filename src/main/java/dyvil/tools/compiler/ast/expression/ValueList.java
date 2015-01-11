@@ -3,13 +3,9 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.ArrayList;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.IValue;
-import dyvil.tools.compiler.ast.api.IValueList;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -271,11 +267,6 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label label)
-	{
-	}
-	
-	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.isArray)
@@ -298,22 +289,26 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			{
 				buffer.append(Formatting.Expression.emptyExpression);
 			}
-			else if (len == 1)
-			{
-				buffer.append("{ ");
-				this.values.get(0).toString("", buffer);
-				buffer.append(" }");
-			}
 			else
 			{
-				buffer.append('\n').append(prefix).append('{').append('\n');
-				for (IValue value : this.values)
+				IValue v = this.values.get(0);
+				if (len == 1 && !(v instanceof IStatement))
 				{
-					buffer.append(prefix).append(Formatting.Method.indent);
-					value.toString(prefix + Formatting.Method.indent, buffer);
-					buffer.append(";\n");
+					buffer.append("{ ");
+					v.toString("", buffer);
+					buffer.append(" }");
 				}
-				buffer.append(prefix).append('}');
+				else
+				{
+					buffer.append('\n').append(prefix).append('{').append('\n');
+					for (IValue value : this.values)
+					{
+						buffer.append(prefix).append(Formatting.Method.indent);
+						value.toString(prefix + Formatting.Method.indent, buffer);
+						buffer.append(";\n");
+					}
+					buffer.append(prefix).append('}');
+				}
 			}
 		}
 	}

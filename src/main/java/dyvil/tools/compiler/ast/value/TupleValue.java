@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.value;
 import java.util.ArrayList;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IContext;
@@ -178,18 +177,14 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 			v.writeExpression(writer);
 		}
 		
+		int args = this.values.size() + 1;
 		String owner = t.getInternalName();
 		String desc = t.getConstructorDescriptor();
-		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false, args, t);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
-	{
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label label)
 	{
 	}
 }

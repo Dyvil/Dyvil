@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.bytecode;
 import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.util.ClassFormat;
+import static dyvil.reflect.Opcodes.*;
 
 public class FieldInstruction extends Instruction
 {
@@ -34,7 +35,10 @@ public class FieldInstruction extends Instruction
 			else if (this.desc == null)
 			{
 				this.desc = ClassFormat.userToInternal((String) arg);
-				this.type = ClassFormat.internalToType(this.desc);
+				if (this.opcode == GETSTATIC || this.opcode == GETFIELD)
+				{
+					this.type = ClassFormat.internalToType(this.desc);
+				}
 				return true;
 			}
 		}
@@ -44,7 +48,17 @@ public class FieldInstruction extends Instruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.visitFieldInsn(this.opcode, this.owner, this.fieldName, this.desc, this.type);
+		switch (this.opcode)
+		{
+		case GETSTATIC:
+			writer.visitGetStatic(owner, fieldName, desc, type);
+		case PUTSTATIC:
+			writer.visitPutStatic(owner, fieldName, desc);
+		case GETFIELD:
+			writer.visitGetField(owner, fieldName, desc, type);
+		case PUTFIELD:
+			writer.visitPutField(owner, fieldName, desc);
+		}
 	}
 	
 	@Override

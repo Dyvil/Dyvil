@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.statement;
 import java.util.Collections;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
@@ -316,12 +315,6 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 		}
 		this.value.writeExpression(writer);
 		this.field.writeSet(writer);
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label label)
-	{
-		// TODO
 	}
 	
 	@Override

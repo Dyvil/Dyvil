@@ -199,19 +199,22 @@ public class Property extends Field implements IProperty
 	public void writeGet(MethodWriter writer)
 	{
 		int opcode;
+		int args;
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
 		{
 			opcode = Opcodes.INVOKESTATIC;
+			args = 0;
 		}
 		else
 		{
 			opcode = Opcodes.INVOKEVIRTUAL;
+			args = 1;
 		}
 		
 		String owner = this.theClass.getInternalName();
 		String name = "get$" + this.qualifiedName;
 		String desc = "()" + this.type.getExtendedName();
-		writer.visitMethodInsn(opcode, owner, name, desc, false);
+		writer.visitMethodInsn(opcode, owner, name, desc, false, args, this.type);
 	}
 	
 	@Override
@@ -233,19 +236,22 @@ public class Property extends Field implements IProperty
 	public void writeSet(MethodWriter writer)
 	{
 		int opcode;
+		int args;
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
 		{
 			opcode = Opcodes.INVOKESTATIC;
+			args = 1;
 		}
 		else
 		{
 			opcode = Opcodes.INVOKEVIRTUAL;
+			args = 2;
 		}
 		
 		String owner = this.theClass.getInternalName();
 		String name = "set$" + this.qualifiedName;
 		String desc = "(" + this.type.getExtendedName() + ")V";
-		writer.visitMethodInsn(opcode, owner, name, desc, false);
+		writer.visitMethodInsn(opcode, owner, name, desc, false, args, null);
 	}
 	
 	@Override

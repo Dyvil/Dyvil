@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -233,6 +232,7 @@ public class ConstructorCall extends Call implements ITyped
 	public void writeExpression(MethodWriter writer)
 	{
 		int opcode;
+		int args = this.arguments.size();
 		if (this.isCustom)
 		{
 			opcode = Opcodes.INVOKESTATIC;
@@ -240,6 +240,7 @@ public class ConstructorCall extends Call implements ITyped
 		else
 		{
 			opcode = Opcodes.INVOKESPECIAL;
+			args++;
 			
 			writer.visitTypeInsn(Opcodes.NEW, this.type);
 			writer.visitInsn(Opcodes.DUP, this.type);
@@ -253,18 +254,13 @@ public class ConstructorCall extends Call implements ITyped
 		String owner = this.method.getTheClass().getInternalName();
 		String name = this.method.getName();
 		String desc = this.method.getDescriptor();
-		writer.visitMethodInsn(opcode, owner, name, desc, false);
+		writer.visitMethodInsn(opcode, owner, name, desc, false, args, null);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
 		this.writeExpression(writer);
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label label)
-	{
 	}
 	
 	@Override

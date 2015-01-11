@@ -101,6 +101,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				IfStatement statement = new IfStatement(token.raw());
 				this.value = statement;
 				pm.pushParser(new IfStatementParser(this.context, statement));
+				this.mode = 0;
 				return true;
 			}
 			else if ("while".equals(value))
@@ -108,6 +109,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				WhileStatement statement = new WhileStatement(token);
 				this.value = statement;
 				pm.pushParser(new WhileStatementParser(this.context, statement));
+				this.mode = 0;
 				return true;
 			}
 			else if ("@".equals(value))
@@ -158,7 +160,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if ("}".equals(value))
 			{
 				this.value.expandPosition(token);
-				this.mode = ACCESS;
+				pm.popParser();
 				return true;
 			}
 			return false;

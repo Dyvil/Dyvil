@@ -119,11 +119,6 @@ public class Bytecode extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label label)
-	{
-	}
-	
-	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.instructions.isEmpty())

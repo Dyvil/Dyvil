@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
@@ -308,10 +307,8 @@ public class MethodCall extends Call implements INamed, IValued
 		
 		// If no @Bytecode annotation is present, write a normal invocation.
 		IClass ownerClass = this.method.getTheClass();
-		String owner = ownerClass.getInternalName();
-		String name = this.method.getName();
-		String desc = this.method.getDescriptor();
 		int opcode;
+		int args = this.arguments.size();
 		if (this.method.hasModifier(Modifiers.STATIC))
 		{
 			opcode = Opcodes.INVOKESTATIC;
@@ -319,17 +316,24 @@ public class MethodCall extends Call implements INamed, IValued
 		else if (ownerClass.hasModifier(Modifiers.INTERFACE_CLASS) && this.method.hasModifier(Modifiers.ABSTRACT))
 		{
 			opcode = Opcodes.INVOKEINTERFACE;
+			args++;
 		}
-		else if (this.instance.getValueType() == IValue.SUPER)
+		else if (this.method.hasModifier(Modifiers.PRIVATE) || this.instance.getValueType() == IValue.SUPER)
 		{
 			opcode = Opcodes.INVOKESPECIAL;
+			args++;
 		}
 		else
 		{
 			opcode = Opcodes.INVOKEVIRTUAL;
+			args++;
 		}
 		
-		visitor.visitMethodInsn(opcode, owner, name, desc, ownerClass.hasModifier(Modifiers.INTERFACE_CLASS));
+		String owner = ownerClass.getInternalName();
+		String name = this.method.getName();
+		String desc = this.method.getDescriptor();
+		IType type = this.method.getType();
+		visitor.visitMethodInsn(opcode, owner, name, desc, ownerClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);
 	}
 	
 	private static void visitBytecodeAnnotation(MethodWriter writer, Annotation annotation, String key1, String key2)
@@ -355,11 +359,6 @@ public class MethodCall extends Call implements INamed, IValued
 	public void writeStatement(MethodWriter writer)
 	{
 		this.writeExpression(writer);
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label label)
-	{
 	}
 	
 	@Override

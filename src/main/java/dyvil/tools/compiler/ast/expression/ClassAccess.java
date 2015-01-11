@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -240,11 +239,6 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
-	{
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label label)
 	{
 	}
 	

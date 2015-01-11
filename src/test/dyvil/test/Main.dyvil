@@ -1,11 +1,11 @@
 package test;
 
-import java.util.function.Function;
-
-public object Main
+public class Main
 {
+	public static boolean flag = true;
+	
 	public static void main(String[] args) =
 	{
-		System out println(Main.instance);
+		if (flag) System out println "Hello Test";
 	};
 }

@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.value;
 
-import jdk.internal.org.objectweb.asm.Label;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -44,16 +42,11 @@ public class EnumValue extends ASTNode implements IConstantValue
 		String owner = this.type.getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
-		writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc, this.type);
+		writer.visitGetStatic(owner, name, desc, this.type);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
-	{
-	}
-	
-	@Override
-	public void writeJump(MethodWriter visitor, Label label)
 	{
 	}
 	

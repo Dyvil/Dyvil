@@ -117,19 +117,6 @@ public class WhileStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		if (this.then == null)
-		{
-			this.condition.writeExpression(writer);
-		}
-		
-		Label start = new Label();
-		Label end = new Label();
-		
-		writer.visitLabel(start);
-		this.condition.writeJump(writer, end);
-		this.then.writeExpression(writer);
-		writer.visitJumpInsn(Opcodes.GOTO, start);
-		writer.visitLabel(end);
 	}
 	
 	@Override
@@ -143,8 +130,11 @@ public class WhileStatement extends ASTNode implements IStatement
 		Label start = new Label();
 		Label end = new Label();
 		
+		// Condition
 		writer.visitLabel(start);
-		this.condition.writeJump(writer, end);
+		this.condition.writeExpression(writer);
+		writer.visitJumpInsn(Opcodes.IFEQ, end);
+		// While Block
 		this.then.writeStatement(writer);
 		writer.visitJumpInsn(Opcodes.GOTO, start);
 		writer.visitLabel(end);

@@ -22,7 +22,14 @@ public class Type extends ASTNode implements IContext, IType
 {
 	public static final IType[]	EMPTY_TYPES	= new IType[0];
 	
-	public static final Type	NONE		= new Type(null);
+	public static final Type	NONE		= new Type(null)
+											{
+												@Override
+												public Object getFrameType()
+												{
+													return Opcodes.NULL;
+												}
+											};
 	
 	public static final Type	VOID		= new PrimitiveType("void", "dyvil.lang.Void", 0);
 	public static final Type	BOOLEAN		= new PrimitiveType("boolean", "dyvil.lang.Boolean", Opcodes.T_BOOLEAN);

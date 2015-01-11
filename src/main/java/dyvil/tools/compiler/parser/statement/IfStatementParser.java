@@ -32,7 +32,7 @@ public class IfStatementParser extends Parser implements IValued
 	{
 		if (this.mode == -1)
 		{
-			pm.popParser(true);
+			pm.popParser();
 			return true;
 		}
 		if (this.mode == IF)
@@ -61,6 +61,7 @@ public class IfStatementParser extends Parser implements IValued
 				pm.popParser(true);
 				return true;
 			}
+			
 			pm.pushParser(new ExpressionParser(this.context, this), true);
 			this.mode = ELSE;
 			return true;
@@ -73,18 +74,11 @@ public class IfStatementParser extends Parser implements IValued
 				this.mode = -1;
 				return true;
 			}
-			else if (";".equals(value))
-			{
-				pm.popParser(true);
-				return true;
-			}
-		}
-		
-		if ("}".equals(value))
-		{
+			
 			pm.popParser(true);
 			return true;
 		}
+		
 		return false;
 	}
 	

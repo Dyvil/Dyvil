@@ -23,13 +23,7 @@ public class ExpressionListParser extends Parser implements IValued
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (this.mode == 0)
-		{
-			this.mode = 1;
-			pm.pushParser(new ExpressionParser(this.context, this), true);
-			return true;
-		}
-		else if (this.mode == 1)
+		if (this.mode == 1)
 		{
 			if (",".equals(value))
 			{
@@ -42,6 +36,22 @@ public class ExpressionListParser extends Parser implements IValued
 				this.mode = 0;
 				return true;
 			}
+			if (token.prev().equals("}"))
+			{
+				this.mode = 0;
+			}
+		}
+		if (this.mode == 0)
+		{
+			if ("}".equals(value))
+			{
+				pm.popParser(true);
+				return true;
+			}
+			
+			this.mode = 1;
+			pm.pushParser(new ExpressionParser(this.context, this), true);
+			return true;
 		}
 		
 		pm.popParser(true);

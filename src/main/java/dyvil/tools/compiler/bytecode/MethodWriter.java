@@ -44,11 +44,15 @@ public final class MethodWriter extends MethodVisitor
 	
 	public void push(IType type)
 	{
-		this.typeStack.add(type.getFrameType());
-		int size = this.typeStack.size();
-		if (size > this.maxStack)
+		Object frameType = type.getFrameType();
+		if (frameType != null)
 		{
-			this.maxStack = size;
+			this.typeStack.add(frameType);
+			int size = this.typeStack.size();
+			if (size > this.maxStack)
+			{
+				this.maxStack = size;
+			}
 		}
 	}
 	
@@ -305,25 +309,76 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitFieldInsn(opcode, owner, name, desc);
 	}
 	
-	public void visitFieldInsn(int opcode, String owner, String name, String desc, IType type)
+	public void visitGetStatic(String owner, String name, String desc, IType type)
 	{
 		if (type != null)
 		{
 			this.push(type);
 		}
-		this.mv.visitFieldInsn(opcode, owner, name, desc);
+		this.mv.visitFieldInsn(GETSTATIC, owner, name, desc);
+	}
+	
+	public void visitPutStatic(String owner, String name, String desc)
+	{
+		this.typeStack.pop(); // Value
+		this.mv.visitFieldInsn(PUTSTATIC, owner, name, desc);
+	}
+	
+	public void visitGetField(String owner, String name, String desc, IType type)
+	{
+		this.typeStack.pop(); // Instance
+		if (type != null)
+		{
+			this.push(type);
+		}
+		this.mv.visitFieldInsn(GETSTATIC, owner, name, desc);
+	}
+	
+	public void visitPutField(String owner, String name, String desc)
+	{
+		this.typeStack.pop(); // Instance
+		this.typeStack.pop(); // Value
+		this.mv.visitFieldInsn(PUTFIELD, owner, name, desc);
 	}
 	
 	@Override
+	@Deprecated
 	public void visitMethodInsn(int opcode, String owner, String name, String desc)
 	{
 		this.mv.visitMethodInsn(opcode, owner, name, desc, false);
 	}
 	
+	public void visitMethodInsn(int opcode, String owner, String name, String desc, int args, IType returnType)
+	{
+		this.mv.visitMethodInsn(opcode, owner, name, desc, false);
+		for (int i = 0; i < args; i++)
+		{
+			this.typeStack.pop();
+		}
+		if (returnType != null)
+		{
+			this.push(returnType);
+		}
+	}
+	
 	@Override
+	@Deprecated
 	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface)
 	{
 		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
+	}
+	
+	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, IType returnType)
+	{
+		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
+		for (int i = 0; i < args; i++)
+		{
+			this.typeStack.pop();
+		}
+		if (returnType != null)
+		{
+			this.push(returnType);
+		}
 	}
 	
 	@Override

@@ -93,7 +93,7 @@ public class PrimitiveType extends Type
 		case Opcodes.T_DOUBLE:
 			return Opcodes.DOUBLE;
 		default:
-			return Opcodes.NULL;
+			return null;
 		}
 	}
 	

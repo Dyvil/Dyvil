@@ -70,11 +70,11 @@ public class Formatting
 	public static class Statements
 	{
 		public static String	ifStart		= "if (";
-		public static String	ifEnd		= ") ";
-		public static String	ifElse		= " else ";
+		public static String	ifEnd		= ")";
+		public static String	ifElse		= "else";
 		
 		public static String	whileStart	= "while (";
-		public static String	whileEnd	= ") ";
+		public static String	whileEnd	= ")";
 	}
 	
 	public static class Expression

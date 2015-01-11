@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.value;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.IContext;
@@ -58,11 +57,6 @@ public class ThisValue extends ASTNode implements IConstantValue
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
-	{
-	}
-	
-	@Override
-	public void writeJump(MethodWriter visitor, Label label)
 	{
 	}
 }

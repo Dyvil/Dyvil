@@ -6,7 +6,6 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.FieldVisitor;
-import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.method.Member;
@@ -261,39 +260,33 @@ public class Field extends Member implements IField, IContext
 			return;
 		}
 		
-		int opcode;
-		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
-		{
-			opcode = Opcodes.GETSTATIC;
-		}
-		else
-		{
-			opcode = Opcodes.GETFIELD;
-		}
-		
 		String owner = this.theClass.getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
-		writer.visitFieldInsn(opcode, owner, name, desc, this.type);
+		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
+		{
+			writer.visitGetStatic(owner, name, desc, this.type);
+		}
+		else
+		{
+			writer.visitGetField(owner, name, desc, this.type);
+		}
 	}
 	
 	@Override
 	public void writeSet(MethodWriter writer)
 	{
-		int opcode;
-		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
-		{
-			opcode = Opcodes.PUTSTATIC;
-		}
-		else
-		{
-			opcode = Opcodes.PUTFIELD;
-		}
-		
 		String owner = this.theClass.getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
-		writer.visitFieldInsn(opcode, owner, name, desc, this.type);
+		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
+		{
+			writer.visitPutStatic(owner, name, desc);
+		}
+		else
+		{
+			writer.visitPutStatic(owner, name, desc);
+		}
 	}
 	
 	@Override

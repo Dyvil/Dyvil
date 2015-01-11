@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.Collections;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -284,11 +283,6 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		}
 		
 		this.field.writeGet(writer);
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label label)
-	{
 	}
 	
 	@Override

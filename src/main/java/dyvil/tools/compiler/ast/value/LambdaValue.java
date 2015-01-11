@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Handle;
-import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
@@ -153,11 +152,6 @@ public class LambdaValue extends ASTNode implements IValue, IValued, IParameteri
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
-	{
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label label)
 	{
 	}
 	

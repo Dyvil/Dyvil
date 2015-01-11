@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -194,31 +193,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 			return;
 		}
 		
-		if (this.requiredType == Type.VOID)
-		{
-			this.writeStatement(writer);
-			return;
-		}
-		
-		writer.visitLabel(this.start);
-		if (!this.values.isEmpty())
-		{
-			Iterator<IValue> iterator = this.values.iterator();
-			while (true)
-			{
-				IValue v = iterator.next();
-				if (iterator.hasNext())
-				{
-					v.writeStatement(writer);
-				}
-				else
-				{
-					v.writeExpression(writer);
-					break;
-				}
-			}
-		}
-		writer.visitLabel(this.end);
+		this.writeStatement(writer);
 	}
 	
 	@Override
