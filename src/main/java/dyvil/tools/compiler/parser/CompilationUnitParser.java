@@ -43,7 +43,7 @@ public class CompilationUnitParser extends Parser
 			if ("import".equals(value))
 			{
 				this.mode = IMPORT | CLASS;
-				jcp.pushParser(new ImportParser(this.unit));
+				jcp.pushParser(new ImportParser(null, this.unit));
 				return true;
 			}
 		}

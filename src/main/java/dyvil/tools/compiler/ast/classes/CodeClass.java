@@ -524,6 +524,13 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public Package resolvePackage(String name)
+	{
+		// TODO
+		return null;
+	}
+	
+	@Override
 	public IClass resolveClass(String name)
 	{
 		if (this.generics != null)

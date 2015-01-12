@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.method.Member;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -173,6 +174,12 @@ public class Field extends Member implements IField, IContext
 	public IType getThisType()
 	{
 		return this.theClass.getThisType();
+	}
+	
+	@Override
+	public Package resolvePackage(String name)
+	{
+		return this.theClass.resolvePackage(name);
 	}
 	
 	@Override

@@ -1,29 +1,31 @@
 package dyvil.tools.compiler.parser.imports;
 
 import dyvil.tools.compiler.ast.api.IImport;
+import dyvil.tools.compiler.ast.api.IImportContainer;
 import dyvil.tools.compiler.ast.imports.MultiImport;
 import dyvil.tools.compiler.ast.imports.PackageImport;
 import dyvil.tools.compiler.ast.imports.SimpleImport;
-import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
 public class ImportParser extends Parser
 {
-	public static final int		PACKAGEIMPORT		= 1;
-	public static final int		MULTIIMPORT_START	= 2;
-	public static final int		ALIAS				= 4;
+	public static final int	IMPORT		= 1;
+	public static final int	DOT			= 2;
+	public static final int	ALIAS		= 4;
+	public static final int	MULTIIMPORT	= 8;
 	
-	protected CompilationUnit	unit;
+	public IImport			parent;
+	public IImportContainer	container;
 	
-	private IImport				theImport;
-	private StringBuilder		buffer				= new StringBuilder();
-	
-	public ImportParser(CompilationUnit unit)
+	public ImportParser(IImport parent, IImportContainer container)
 	{
-		this.unit = unit;
+		this.parent = parent;
+		this.container = container;
+		this.mode = IMPORT;
 	}
 	
 	@Override
@@ -31,100 +33,82 @@ public class ImportParser extends Parser
 	{
 		if (";".equals(value))
 		{
-			if (this.theImport instanceof SimpleImport)
-			{
-				((SimpleImport) this.theImport).setImport(this.buffer.toString());
-			}
-			this.theImport.expandPosition(token.prev());
 			pm.popParser();
 			return true;
 		}
-		else if (this.mode == 0)
+		if (this.isInMode(IMPORT))
 		{
 			if ("{".equals(value))
 			{
-				this.mode = MULTIIMPORT_START;
-				this.theImport = new MultiImport(token, this.buffer.toString());
-				this.buffer.delete(0, this.buffer.length());
+				MultiImport mi = new MultiImport(token, this.parent);
+				this.container.addImport(mi);
+				this.parent = mi;
+				this.container = mi;
+				
+				if (!token.next().equals("}"))
+				{
+					pm.pushParser(new ImportListParser(mi, mi));
+					this.mode = MULTIIMPORT;
+					return true;
+				}
+				this.mode = 0;
+				pm.skip();
 				return true;
 			}
 			else if ("_".equals(value))
 			{
-				this.theImport = new PackageImport(token, this.buffer.toString());
+				PackageImport pi = new PackageImport(token.raw(), this.parent);
+				this.container.addImport(pi);
+				this.mode = 0;
 				return true;
 			}
-			else if (".".equals(value))
+			else if (token.isType(IToken.TYPE_IDENTIFIER))
+			{
+				SimpleImport si = new SimpleImport(token.raw(), this.parent, value);
+				this.container.addImport(si);
+				this.parent = si;
+				this.container = si;
+				this.mode = DOT | ALIAS;
+				return true;
+			}
+		}
+		if (this.isInMode(DOT))
+		{
+			if (".".equals(value))
+			{
+				this.mode = IMPORT;
+				return true;
+			}
+		}
+		if (this.isInMode(ALIAS))
+		{
+			if ("=>".equals(value))
 			{
 				IToken next = token.next();
-				if (!next.equals("_") && !next.equals("{"))
+				if (next.isType(Token.TYPE_IDENTIFIER))
 				{
-					this.buffer.append(value);
-				}
-				return true;
-			}
-			
-			if (this.theImport == null)
-			{
-				this.theImport = new SimpleImport(token);
-			}
-			
-			if (":".equals(value) && token.prev().isType(IToken.TYPE_IDENTIFIER))
-			{
-				this.mode = ALIAS;
-				return true;
-			}
-			
-			if (token.isType(IToken.TYPE_IDENTIFIER))
-			{
-				this.buffer.append(value);
-				return true;
-			}
-		}
-		else if (this.mode == MULTIIMPORT_START)
-		{
-			if (",".equals(value))
-			{
-				if (this.buffer.length() > 0)
-				{
-					((MultiImport) this.theImport).addClass(this.buffer.toString());
-					this.buffer.delete(0, this.buffer.length());
+					((SimpleImport) this.parent).setAlias(next.value());
+					pm.skip();
 					return true;
 				}
-			}
-			else if ("}".equals(value))
-			{
-				this.mode = -1;
-				
-				if (this.buffer.length() > 0)
+				else
 				{
-					((MultiImport) this.theImport).addClass(this.buffer.toString());
+					this.mode = DOT | IMPORT;
+					throw new SyntaxError(next, "Invalid Import Alias");
 				}
-				return true;
-			}
-			else if (token.isType(IToken.TYPE_IDENTIFIER) || ".".equals(value))
-			{
-				this.buffer.append(value);
-				return true;
 			}
 		}
-		else if (this.isInMode(ALIAS))
+		if (this.isInMode(MULTIIMPORT))
 		{
-			if (token.isType(IToken.TYPE_IDENTIFIER))
+			if ("}".equals(value))
 			{
-				((SimpleImport) this.theImport).setAlias(value);
-				this.mode = -1;
+				this.container.expandPosition(token);
+				this.mode = 0;
 				return true;
 			}
 		}
-		return false;
-	}
-	
-	@Override
-	public void end(ParserManager pm)
-	{
-		if (this.theImport != null)
-		{
-			this.unit.addImport(this.theImport);
-		}
+		
+		pm.popParser(true);
+		return true;
 	}
 }

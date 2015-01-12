@@ -1,5 +1,8 @@
 package test;
 
+import java.util.{Random => RNG, function.{Consumer, Function => F}};
+import java.util.Arrays => arr;
+
 public class Main
 {
 	public static boolean flag = true;

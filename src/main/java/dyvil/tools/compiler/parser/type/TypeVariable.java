@@ -20,6 +20,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.compiler.ast.structure.Package;
 
 public class TypeVariable extends ASTNode implements ITypeVariable
 {
@@ -185,6 +186,12 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	}
 	
 	// IContext
+	
+	@Override
+	public Package resolvePackage(String name)
+	{
+		return null;
+	}
 	
 	@Override
 	public IClass resolveClass(String name)

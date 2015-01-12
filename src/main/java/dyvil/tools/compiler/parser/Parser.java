@@ -66,7 +66,7 @@ public abstract class Parser<T>
 		}
 	}
 	
-	public boolean isInMode(int mode)
+	public final boolean isInMode(int mode)
 	{
 		if (mode == 0)
 		{

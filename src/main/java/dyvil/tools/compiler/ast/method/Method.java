@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -579,6 +580,12 @@ public class Method extends Member implements IMethod
 	public IType getThisType()
 	{
 		return this.theClass.getThisType();
+	}
+	
+	@Override
+	public Package resolvePackage(String name)
+	{
+		return this.theClass.resolvePackage(name);
 	}
 	
 	@Override

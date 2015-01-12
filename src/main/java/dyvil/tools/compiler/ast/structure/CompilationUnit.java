@@ -21,7 +21,7 @@ import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.parser.CompilationUnitParser;
 
-public class CompilationUnit extends ASTNode implements IContext
+public class CompilationUnit extends ASTNode implements IImportContainer, IContext
 {
 	public final File					inputFile;
 	public final File					outputDirectory;
@@ -75,6 +75,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		return this.imports;
 	}
 	
+	@Override
 	public void addImport(IImport iimport)
 	{
 		this.imports.add(iimport);
@@ -216,6 +217,13 @@ public class CompilationUnit extends ASTNode implements IContext
 	@Override
 	public Type getThisType()
 	{
+		return null;
+	}
+	
+	@Override
+	public Package resolvePackage(String name)
+	{
+		// TODO
 		return null;
 	}
 	

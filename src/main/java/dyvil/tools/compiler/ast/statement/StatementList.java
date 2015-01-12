@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -152,6 +153,12 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public IType getThisType()
 	{
 		return this.context.getThisType();
+	}
+	
+	@Override
+	public Package resolvePackage(String name)
+	{
+		return this.context.resolvePackage(name);
 	}
 	
 	@Override

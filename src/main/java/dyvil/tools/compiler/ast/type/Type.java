@@ -360,39 +360,31 @@ public class Type extends ASTNode implements IContext, IType
 	// IContext
 	
 	@Override
+	public Package resolvePackage(String name)
+	{
+		return this.theClass == null ? null : this.theClass.resolvePackage(name);
+	}
+	
+	@Override
 	public IClass resolveClass(String name)
 	{
-		if (this.theClass == null)
-		{
-			return null;
-		}
-		return this.theClass.resolveClass(name);
+		return this.theClass == null ? null : this.theClass.resolveClass(name);
 	}
 	
 	@Override
 	public FieldMatch resolveField(IContext context, String name)
 	{
-		if (this.theClass == null)
-		{
-			return null;
-		}
-		
 		if (this.arrayDimensions > 0)
 		{
 			return ARRAY.resolveField(context, name);
 		}
 		
-		return this.theClass.resolveField(context, name);
+		return this.theClass == null ? null : this.theClass.resolveField(context, name);
 	}
 	
 	@Override
 	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
 	{
-		if (this.theClass == null)
-		{
-			return null;
-		}
-		
 		if (this.arrayDimensions > 0)
 		{
 			MethodMatch match = ARRAY.resolveMethod(context, name, argumentTypes);
@@ -400,6 +392,11 @@ public class Type extends ASTNode implements IContext, IType
 			{
 				return match;
 			}
+		}
+		
+		if (this.theClass == null)
+		{
+			return null;
 		}
 		
 		List<MethodMatch> list = new ArrayList();

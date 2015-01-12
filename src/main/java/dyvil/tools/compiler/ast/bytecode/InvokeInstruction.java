@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -259,6 +260,12 @@ public class InvokeInstruction extends Instruction implements IMethod
 	
 	@Override
 	public IType getThisType()
+	{
+		return null;
+	}
+	
+	@Override
+	public Package resolvePackage(String name)
 	{
 		return null;
 	}

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.api;
 
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.Package;
 
 public interface IContext
 {
@@ -22,6 +23,8 @@ public interface IContext
 	 * @return the type of this context
 	 */
 	public IType getThisType();
+	
+	public Package resolvePackage(String name);
 	
 	public IClass resolveClass(String name);
 	

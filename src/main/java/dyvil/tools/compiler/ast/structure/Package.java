@@ -124,6 +124,7 @@ public class Package implements IContext
 		return null;
 	}
 	
+	@Override
 	public Package resolvePackage(String name)
 	{
 		for (Package pack : rootPackage.subPackages)

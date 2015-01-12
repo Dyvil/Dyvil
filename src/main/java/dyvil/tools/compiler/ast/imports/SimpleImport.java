@@ -8,45 +8,33 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class SimpleImport extends ASTNode implements IImport
+public class SimpleImport extends ASTNode implements IImport, IImportContainer
 {
-	public IClass	theClass;
-	
-	private String	qualifiedImport;
-	private String	packageName;
-	private String	className;
-	private String	alias;
+	public IImport	parent;
+	public String	name;
+	public String	alias;
+	public IImport	child;
 	
 	public SimpleImport(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public SimpleImport(ICodePosition position, String qualifiedImport)
+	public SimpleImport(ICodePosition position, IImport parent, String name)
 	{
 		this.position = position;
-		this.setImport(qualifiedImport);
+		this.parent = parent;
+		this.name = name;
 	}
 	
-	public void setImport(String qualifiedImport)
+	@Override
+	public void addImport(IImport iimport)
 	{
-		this.qualifiedImport = qualifiedImport;
-		
-		int index = qualifiedImport.lastIndexOf('.');
-		if (index != -1)
-		{
-			this.packageName = qualifiedImport.substring(0, index);
-			this.className = qualifiedImport.substring(index + 1);
-		}
-	}
-	
-	public String getImport()
-	{
-		return this.qualifiedImport;
+		this.child = iimport;
 	}
 	
 	public void setAlias(String alias)
@@ -54,23 +42,14 @@ public class SimpleImport extends ASTNode implements IImport
 		this.alias = alias;
 	}
 	
+	public String getAlias()
+	{
+		return this.alias;
+	}
+	
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		Package pack = Package.rootPackage.resolvePackage(this.packageName);
-		if (pack == null)
-		{
-			markers.add(new SemanticError(this.position, "'" + this.packageName + "' could not be resolved to a package", "Remove this import"));
-			return;
-		}
-		
-		IClass iclass = pack.resolveClass(this.className);
-		if (iclass == null)
-		{
-			markers.add(new SemanticError(this.position, "'" + this.className + "' could not be resolved to a class", "Remove this import"));
-		}
-		
-		this.theClass = iclass;
 	}
 	
 	@Override
@@ -86,12 +65,14 @@ public class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
+	public Package resolvePackage(String name)
+	{
+		return null;
+	}
+	
+	@Override
 	public IClass resolveClass(String name)
 	{
-		if (this.className.equals(name) || name.equals(this.alias))
-		{
-			return this.theClass;
-		}
 		return null;
 	}
 	
@@ -116,6 +97,20 @@ public class SimpleImport extends ASTNode implements IImport
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("import ").append(this.qualifiedImport);
+		if (this.parent == null)
+		{
+			buffer.append("import ");
+		}
+		buffer.append(this.name);
+		if (this.alias != null)
+		{
+			buffer.append(Formatting.Import.aliasSeperator);
+			buffer.append(this.alias);
+		}
+		if (this.child != null)
+		{
+			buffer.append('.');
+			this.child.toString(prefix, buffer);
+		}
 	}
 }

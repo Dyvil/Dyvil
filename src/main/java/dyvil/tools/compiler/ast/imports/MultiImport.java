@@ -1,80 +1,87 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
-import dyvil.tools.compiler.ast.api.IClass;
-import dyvil.tools.compiler.ast.api.IContext;
+import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class MultiImport extends PackageImport
+public class MultiImport extends ASTNode implements IImport, IImportContainer
 {
-	public Set<String>	classNames	= new TreeSet();
-	public Set<IClass>	classes;
+	public IImport			parent;
+	public List<IImport>	children	= new ArrayList();
 	
-	public MultiImport(ICodePosition position, String basePackage)
+	public MultiImport(ICodePosition position, IImport parent)
 	{
-		super(position, basePackage);
-	}
-	
-	public void addClass(String name)
-	{
-		this.classNames.add(name);
-	}
-	
-	public boolean containsClass(String name)
-	{
-		return this.classNames.contains(name);
+		this.position = position;
+		this.parent = parent;
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void addImport(IImport iimport)
 	{
-		super.resolveTypes(markers, context);
-		if (this.thePackage == null)
-		{
-			return;
-		}
-		
-		this.classes = new HashSet(this.classNames.size());
-		for (String s : this.classNames)
-		{
-			IClass c = this.thePackage.resolveClass(s);
-			if (c == null)
-			{
-				markers.add(new SemanticError(this.position, "'" + s + "' could not be resolved to a class"));
-			}
-			else
-			{
-				this.classes.add(c);
-			}
-		}
+		this.children.add(iimport);
+	}
+	
+	@Override
+	public boolean isStatic()
+	{
+		return false;
+	}
+	
+	@Override
+	public IType getThisType()
+	{
+		return null;
+	}
+	
+	@Override
+	public Package resolvePackage(String name)
+	{
+		return null;
 	}
 	
 	@Override
 	public IClass resolveClass(String name)
 	{
-		for (IClass c : this.classes)
-		{
-			if (name.equals(c.getName()))
-			{
-				return c;
-			}
-		}
 		return null;
+	}
+	
+	@Override
+	public FieldMatch resolveField(IContext context, String name)
+	{
+		return null;
+	}
+	
+	@Override
+	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
+	{
+		return null;
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		return 0;
+	}
+	
+	@Override
+	public void resolveTypes(List<Marker> markers, IContext context)
+	{
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("import ").append(this.packageName).append(Formatting.Import.multiImportStart);
-		Util.listToString(this.classNames, Formatting.Import.multiImportSeperator, buffer);
+		buffer.append(Formatting.Import.multiImportStart);
+		Util.astToString(this.children, Formatting.Import.multiImportSeperator, buffer);
 		buffer.append(Formatting.Import.multiImportEnd);
 	}
 }
