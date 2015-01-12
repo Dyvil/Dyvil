@@ -1,11 +1,10 @@
 package test;
 
-import java.util.{Random => RNG, function.{Consumer, Function => F}};
 import java.util.Arrays => arr;
 
 public class Main
 {
-	public static boolean flag = true;
+	public static int[] ints = 1 .. 3;
 	
-	public static void main(String[] args) = ...;
+	public static void main(String[] args) = System out println(arr toString(ints));
 }
