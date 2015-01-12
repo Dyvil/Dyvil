@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.structure;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import dyvil.tools.compiler.DyvilCompiler;
@@ -124,14 +125,19 @@ public class CompilationUnit extends ASTNode implements IImportContainer, IConte
 	
 	public void resolveTypes()
 	{
-		for (IImport i : this.imports)
+		for (Iterator<IImport> iterator = this.imports.iterator(); iterator.hasNext();)
 		{
-			i.resolveTypes(this.markers, this);
+			IImport i = iterator.next();
+			i.resolveTypes(this.markers, Package.rootPackage);
+			if (!i.isValid())
+			{
+				iterator.remove();
+			}
 		}
 		
 		for (IClass i : this.classes)
 		{
-			i.resolveTypes(this.markers, this);
+			i.resolveTypes(this.markers, Package.rootPackage);
 		}
 	}
 	
@@ -313,7 +319,7 @@ public class CompilationUnit extends ASTNode implements IImportContainer, IConte
 		{
 			for (IImport iimport : this.imports)
 			{
-				buffer.append(prefix);
+				buffer.append(prefix).append("import ");
 				iimport.toString(prefix, buffer);
 				buffer.append(";\n");
 			}

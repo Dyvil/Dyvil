@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.structure;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.api.IClass;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IMember;
@@ -127,20 +126,10 @@ public class Package implements IContext
 	@Override
 	public Package resolvePackage(String name)
 	{
-		for (Package pack : rootPackage.subPackages)
+		for (Package pack : this.subPackages)
 		{
-			if (name.equals(pack.fullName))
+			if (pack.name.equals(name))
 			{
-				return pack;
-			}
-		}
-		
-		for (Library library : DyvilCompiler.config.libraries)
-		{
-			Package pack = library.resolvePackage(name);
-			if (pack != null)
-			{
-				rootPackage.addSubPackage(pack);
 				return pack;
 			}
 		}

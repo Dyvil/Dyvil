@@ -244,11 +244,6 @@ public class PrimitiveType extends Type
 	@Override
 	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
 	{
-		if (this.theClass == null)
-		{
-			return null;
-		}
-		
 		if (this.arrayDimensions > 0)
 		{
 			MethodMatch match = ARRAY.resolveMethod(context, name + "_" + this.name, argumentTypes);

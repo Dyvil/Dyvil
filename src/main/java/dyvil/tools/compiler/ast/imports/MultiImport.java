@@ -31,6 +31,17 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
+	public boolean isValid()
+	{
+		return true;
+	}
+
+	@Override
+	public void resolveTypes(List<Marker> markers, IContext context)
+	{
+	}
+	
+	@Override
 	public boolean isStatic()
 	{
 		return false;
@@ -70,11 +81,6 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	public byte getAccessibility(IMember member)
 	{
 		return 0;
-	}
-	
-	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
-	{
 	}
 	
 	@Override

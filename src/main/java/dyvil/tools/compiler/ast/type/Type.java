@@ -400,12 +400,17 @@ public class Type extends ASTNode implements IContext, IType
 		}
 		
 		List<MethodMatch> list = new ArrayList();
-		this.theClass.getMethodMatches(list, null, name, argumentTypes);
+		this.theClass.getMethodMatches(list, this, name, argumentTypes);
 		
 		if (list.isEmpty() && context != null)
 		{
 			IType t = context.getThisType();
 			t.getMethodMatches(list, this, name, argumentTypes);
+		}
+		
+		if (list.isEmpty() && this.theClass != PREDEF_CLASS)
+		{
+			PREDEF_CLASS.getMethodMatches(list, this, name, argumentTypes);
 		}
 		
 		if (list.isEmpty())

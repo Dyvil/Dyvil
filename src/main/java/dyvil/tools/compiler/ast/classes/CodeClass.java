@@ -639,18 +639,13 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.superType != null && this != Type.PREDEF_CLASS)
+		if (this.superType != null)
 		{
 			this.superType.getMethodMatches(list, type, name, argumentTypes);
 		}
 		for (IType i : this.interfaces)
 		{
 			i.getMethodMatches(list, type, name, argumentTypes);
-		}
-		
-		if (list.isEmpty() && this != Type.PREDEF_CLASS)
-		{
-			Type.PREDEF_CLASS.getMethodMatches(list, type, name, argumentTypes);
 		}
 	}
 	

@@ -19,6 +19,17 @@ public class PackageImport extends ASTNode implements IImport
 		this.position = position;
 		this.parent = parent;
 	}
+
+	@Override
+	public void resolveTypes(List<Marker> markers, IContext context)
+	{
+	}
+	
+	@Override
+	public boolean isValid()
+	{
+		return true;
+	}
 	
 	@Override
 	public boolean isStatic()
@@ -63,17 +74,8 @@ public class PackageImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
-	{
-	}
-	
-	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.parent == null)
-		{
-			buffer.append("import ");
-		}
 		buffer.append('_');
 	}
 }

@@ -1,10 +1,12 @@
 package dyvil.tools.compiler.ast.structure;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.api.IClass;
+import dyvil.tools.compiler.library.Library;
 
-final class RootPackage extends Package
+public final class RootPackage extends Package
 {
-	RootPackage(Package parent, String name)
+	public RootPackage(Package parent, String name)
 	{
 		super(parent, name);
 	}
@@ -19,6 +21,28 @@ final class RootPackage extends Package
 	public void addSubPackage(Package pack)
 	{
 		this.subPackages.add(pack);
+	}
+	
+	@Override
+	public Package resolvePackage(String name)
+	{
+		Package pack = super.resolvePackage(name);
+		if (pack != null)
+		{
+			return pack;
+		}
+		
+		for (Library lib : DyvilCompiler.config.libraries)
+		{
+			pack = lib.resolvePackage(name);
+			if (pack != null)
+			{
+				this.subPackages.add(pack);
+				return pack;
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override
@@ -41,5 +65,11 @@ final class RootPackage extends Package
 		}
 		
 		return null;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "Default Package";
 	}
 }

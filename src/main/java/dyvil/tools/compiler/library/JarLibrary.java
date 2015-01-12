@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -17,7 +17,7 @@ import dyvil.tools.compiler.util.ClassFormat;
 public class JarLibrary extends Library
 {
 	private JarFile		jarFile;
-	private Set<String>	packages	= new HashSet();
+	private Set<String>	packages	= new TreeSet();
 	
 	public JarLibrary(File file)
 	{
@@ -36,10 +36,13 @@ public class JarLibrary extends Library
 			{
 				JarEntry entry = (JarEntry) e.nextElement();
 				String name = entry.getName();
-				int index = name.lastIndexOf('/');
-				if (index != -1)
+				int index = name.length();
+				while ((index = name.lastIndexOf('/', index - 1)) != -1)
 				{
-					this.packages.add(name.substring(0, index));
+					if (!this.packages.add(name.substring(0, index)))
+					{
+						break;
+					}
 				}
 			}
 		}

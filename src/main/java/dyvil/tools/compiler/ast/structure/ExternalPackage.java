@@ -18,6 +18,26 @@ public class ExternalPackage extends Package
 	}
 	
 	@Override
+	public Package resolvePackage(String name)
+	{
+		Package pack = super.resolvePackage(name);
+		if (pack != null)
+		{
+			return pack;
+		}
+		
+		String name1 = this.name + "." + name;
+		pack = this.library.resolvePackage(name1);
+		if (pack != null)
+		{
+			this.addSubPackage(pack);
+			return pack;
+		}
+		
+		return null;
+	}
+	
+	@Override
 	public IClass resolveClass(String name)
 	{
 		IClass iclass = super.resolveClass(name);

@@ -7,9 +7,9 @@ import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class SimpleImport extends ASTNode implements IImport, IImportContainer
@@ -18,6 +18,9 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	public String	name;
 	public String	alias;
 	public IImport	child;
+	
+	private IClass	theClass;
+	private Package	thePackage;
 	
 	public SimpleImport(ICodePosition position)
 	{
@@ -48,8 +51,37 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
+	public boolean isValid()
+	{
+		return this.thePackage != null || this.theClass != null;
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		Package pack = context.resolvePackage(this.name);
+		if (pack != null)
+		{
+			this.thePackage = pack;
+			if (this.child != null)
+			{
+				this.child.resolveTypes(markers, pack);
+			}
+			return;
+		}
+		
+		IClass iclass = context.resolveClass(this.name);
+		if (iclass != null)
+		{
+			this.theClass = iclass;
+			if (this.child != null)
+			{
+				this.child.resolveTypes(markers, iclass);
+			}
+			return;
+		}
+		
+		markers.add(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a package or class"));
 	}
 	
 	@Override
@@ -59,20 +91,32 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public Type getThisType()
+	public IType getThisType()
 	{
-		return null;
+		return this.theClass.getThisType();
 	}
 	
 	@Override
 	public Package resolvePackage(String name)
 	{
+		if (this.name.equals(name) || this.alias.equals(name))
+		{
+			return this.thePackage;
+		}
 		return null;
 	}
 	
 	@Override
 	public IClass resolveClass(String name)
 	{
+		if (this.child != null)
+		{
+			return this.child.resolveClass(name);
+		}
+		if (this.name.equals(name) || this.alias.equals(name))
+		{
+			return this.theClass;
+		}
 		return null;
 	}
 	
@@ -97,10 +141,6 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.parent == null)
-		{
-			buffer.append("import ");
-		}
 		buffer.append(this.name);
 		if (this.alias != null)
 		{
