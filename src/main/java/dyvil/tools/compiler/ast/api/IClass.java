@@ -20,6 +20,12 @@ public interface IClass extends IASTNode, IMember, IAnnotatable, IModified, INam
 	
 	public boolean isAbstract();
 	
+	// Full Name
+	
+	public void setFullName(String name);
+	
+	public String getFullName();
+	
 	// Super Types
 	
 	public void setSuperType(IType type);

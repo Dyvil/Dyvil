@@ -139,7 +139,7 @@ public class ClassFormat
 			{
 				internal = internal.substring(i + 1, l);
 			}
-			type.setQualifiedName(internalToPackage(internal));
+			setInternalName(type, internal);
 		}
 		else if (len - i == 1)
 		{
@@ -147,11 +147,27 @@ public class ClassFormat
 		}
 		else
 		{
-			type.setQualifiedName(internalToPackage(internal));
+			setInternalName(type, internal);
 		}
 		
 		type.setArrayDimensions(arrayDimensions);
 		return type;
+	}
+	
+	protected static void setInternalName(IType type, String internal)
+	{
+		int index = internal.lastIndexOf('/');
+		if (index == -1)
+		{
+			type.setName(Symbols.unqualify(internal), internal);
+			type.setFullName(internal);
+		}
+		else
+		{
+			String name = internal.substring(index + 1);
+			type.setName(Symbols.unqualify(name), name);
+			type.setFullName(internal.replace('/', '.'));
+		}
 	}
 	
 	public static void readMethodType(String internal, IMethod method)
@@ -167,39 +183,39 @@ public class ClassFormat
 	
 	protected static void readTypeList(String internal, int start, int end, IParameterized list)
 	{
-		int arrayDimensions = 0;
-		
+		int array = 0;
 		for (int i = start; i < end; i++)
 		{
 			char c = internal.charAt(i);
 			if (c == '[')
 			{
-				arrayDimensions++;
+				array++;
 			}
 			else if (c == 'L')
 			{
 				int end1 = internal.indexOf(';', i);
 				
 				String s = internal.substring(i + 1, end1);
-				Type type = internalToType2(s);
-				type.arrayDimensions = arrayDimensions;
-				arrayDimensions = 0;
+				IType type = internalToType2(s);
+				type.setArrayDimensions(array);
+				array = 0;
 				list.addParameterType(type);
 				i = end1;
 			}
 			else
 			{
 				IType type = parseBaseType(c).clone();
-				type.setArrayDimensions(arrayDimensions);
-				arrayDimensions = 0;
+				type.setArrayDimensions(array);
+				array = 0;
 				list.addParameterType(type);
 			}
 		}
 	}
 	
-	protected static Type internalToType2(String internal)
+	protected static IType internalToType2(String internal)
 	{
-		// TODO Generics
-		return new Type(internalToPackage(internal));
+		IType type = new Type();
+		setInternalName(type, internal);
+		return type;
 	}
 }

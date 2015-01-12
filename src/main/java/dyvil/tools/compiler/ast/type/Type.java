@@ -22,7 +22,7 @@ public class Type extends ASTNode implements IContext, IType
 {
 	public static final IType[]	EMPTY_TYPES	= new IType[0];
 	
-	public static final Type	NONE		= new Type(null)
+	public static final Type	NONE		= new Type()
 											{
 												@Override
 												public Object getFrameType()
@@ -56,6 +56,7 @@ public class Type extends ASTNode implements IContext, IType
 	
 	public String				name;
 	public String				qualifiedName;
+	public String				fullName;
 	public IClass				theClass;
 	public int					arrayDimensions;
 	
@@ -64,31 +65,24 @@ public class Type extends ASTNode implements IContext, IType
 		super();
 	}
 	
-	public Type(String name)
+	protected Type(String name)
 	{
 		this.name = name;
 		this.qualifiedName = name;
-	}
-	
-	public Type(String name, IClass iclass)
-	{
-		this.name = name;
-		this.qualifiedName = iclass.getQualifiedName();
-		this.theClass = iclass;
 	}
 	
 	public Type(ICodePosition position, String name)
 	{
 		this.position = position;
 		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
+		this.qualifiedName = Symbols.qualify(name);
 	}
 	
-	public Type(ICodePosition position, String name, IClass iclass)
+	public Type(IClass iclass)
 	{
-		this.position = position;
-		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
+		this.name = iclass.getName();
+		this.qualifiedName = iclass.getQualifiedName();
+		this.fullName = iclass.getFullName();
 		this.theClass = iclass;
 	}
 	
@@ -209,13 +203,6 @@ public class Type extends ASTNode implements IContext, IType
 	public void setQualifiedName(String name)
 	{
 		this.qualifiedName = name;
-		int index = name.lastIndexOf('.');
-		if (index == -1)
-		{
-			this.name = name;
-			return;
-		}
-		this.name = name.substring(index + 1);
 	}
 	
 	@Override
@@ -228,6 +215,18 @@ public class Type extends ASTNode implements IContext, IType
 	public boolean isName(String name)
 	{
 		return this.qualifiedName.equals(name);
+	}
+	
+	@Override
+	public void setFullName(String name)
+	{
+		this.fullName = name;
+	}
+	
+	@Override
+	public String getFullName()
+	{
+		return this.fullName;
 	}
 	
 	@Override
@@ -287,7 +286,7 @@ public class Type extends ASTNode implements IContext, IType
 		{
 			IClass iclass;
 			// Try to resolve the name of this Type as a primitive type
-			Type t = resolvePrimitive(this.name);
+			Type t = resolvePrimitive(this.qualifiedName);
 			if (t != null)
 			{
 				// If the array dimensions of this type are 0, we can assume
@@ -304,19 +303,19 @@ public class Type extends ASTNode implements IContext, IType
 			}
 			else if (context == Package.rootPackage)
 			{
-				iclass = context.resolveClass(this.qualifiedName);
+				iclass = context.resolveClass(this.fullName);
 			}
 			else
 			{
 				// This type is probably not a primitive one, so resolve using
 				// the context.
-				iclass = context.resolveClass(this.name);
+				iclass = context.resolveClass(this.qualifiedName);
 			}
 			
 			if (iclass != null)
 			{
 				this.theClass = iclass;
-				this.qualifiedName = iclass.getQualifiedName();
+				this.fullName = iclass.getFullName();
 			}
 		}
 		return this;
@@ -562,7 +561,11 @@ public class Type extends ASTNode implements IContext, IType
 	@Override
 	public Type clone()
 	{
-		Type t = new Type(this.position, this.name, this.theClass);
+		Type t = new Type();
+		t.theClass = this.theClass;
+		t.name = this.name;
+		t.qualifiedName = this.qualifiedName;
+		t.fullName = this.fullName;
 		t.arrayDimensions = this.arrayDimensions;
 		return t;
 	}

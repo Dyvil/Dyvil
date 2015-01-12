@@ -29,19 +29,14 @@ public class AnnotationType extends Type
 		super(name);
 	}
 	
-	public AnnotationType(String name, IClass iclass)
-	{
-		super(name, iclass);
-	}
-	
 	public AnnotationType(ICodePosition position, String name)
 	{
 		super(position, name);
 	}
 	
-	public AnnotationType(ICodePosition position, String name, IClass iclass)
+	public AnnotationType(IClass iclass)
 	{
-		super(position, name, iclass);
+		super(iclass);
 	}
 	
 	@Override
@@ -52,7 +47,7 @@ public class AnnotationType extends Type
 			IClass iclass;
 			if (context == Package.rootPackage)
 			{
-				iclass = context.resolveClass(this.qualifiedName);
+				iclass = context.resolveClass(this.fullName);
 			}
 			else
 			{
@@ -62,7 +57,7 @@ public class AnnotationType extends Type
 			if (iclass != null)
 			{
 				this.theClass = iclass;
-				this.qualifiedName = iclass.getQualifiedName();
+				this.fullName = iclass.getFullName();
 			}
 		}
 		return this;

@@ -43,7 +43,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	{
 		this.position = position;
 		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
+		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override
@@ -69,13 +69,6 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	public void setQualifiedName(String name)
 	{
 		this.qualifiedName = name;
-		int index = name.lastIndexOf('.');
-		if (index == -1)
-		{
-			this.name = name;
-			return;
-		}
-		this.name = name.substring(index + 1);
 	}
 	
 	@Override
@@ -88,6 +81,18 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	public boolean isName(String name)
 	{
 		return this.qualifiedName.equals(name);
+	}
+	
+	@Override
+	public void setFullName(String name)
+	{
+		this.qualifiedName = name;
+	}
+	
+	@Override
+	public String getFullName()
+	{
+		return this.qualifiedName;
 	}
 	
 	@Override

@@ -166,15 +166,17 @@ public class BytecodeClass extends CodeClass
 		if (index == -1)
 		{
 			this.name = name;
+			this.qualifiedName = Symbols.qualify(name);
 			this.thePackage = Package.rootPackage;
+			this.fullName = name;
 		}
 		else
 		{
 			this.name = name.substring(index + 1);
+			this.qualifiedName = Symbols.qualify(this.name);
+			this.fullName = name.replace('/', '.');
 			this.thePackage = Package.rootPackage.resolvePackage(name.substring(0, index));
 		}
-		
-		this.qualifiedName = name.replace('/', '.');
 		
 		if (superName != null)
 		{
@@ -197,7 +199,7 @@ public class BytecodeClass extends CodeClass
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
 		Field field = new Field(this);
-		field.setName(Symbols.contract(name), name);
+		field.setName(Symbols.unqualify(name), name);
 		field.setModifiers(access);
 		field.setType(ClassFormat.internalToType(desc));
 		
@@ -231,7 +233,7 @@ public class BytecodeClass extends CodeClass
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
 		Method method = new Method(this);
-		method.setName(Symbols.contract(name), name);
+		method.setName(Symbols.unqualify(name), name);
 		method.setModifiers(access);
 		ClassFormat.readMethodType(desc, method);
 		

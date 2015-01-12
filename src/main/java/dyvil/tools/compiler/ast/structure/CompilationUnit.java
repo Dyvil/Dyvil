@@ -91,7 +91,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		this.pack.classes.add(iclass);
 	}
 	
-	public String getQualifiedName(String name)
+	public String getFullName(String name)
 	{
 		if (!name.equals(this.name))
 		{

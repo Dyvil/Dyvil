@@ -28,6 +28,7 @@ public class Symbols
 		addReplacement('|', "bar");
 		addReplacement('\\', "bslash");
 		addReplacement(':', "colon");
+		addReplacement('.', "dot");
 	}
 	
 	private static void addReplacement(char symbol, String replacement)
@@ -39,10 +40,10 @@ public class Symbols
 	
 	private static boolean isSymbol(char c)
 	{
-		return c == '=' || c == '>' || c == '<' || c == '+' || c == '-' || c == '*' || c == '/' || c == '!' || c == '@' || c == '#' || c == '%' || c == '^' || c == '&' || c == '~' || c == '?' || c == '|' || c == '\\' || c == ':';
+		return c == '=' || c == '>' || c == '<' || c == '+' || c == '-' || c == '*' || c == '/' || c == '!' || c == '@' || c == '#' || c == '%' || c == '^' || c == '&' || c == '~' || c == '?' || c == '|' || c == '\\' || c == ':' || c == '.';
 	}
 	
-	public static String expand(String s)
+	public static String qualify(String s)
 	{
 		int len = s.length();
 		StringBuilder builder = new StringBuilder(len);
@@ -64,7 +65,7 @@ public class Symbols
 		return builder.toString();
 	}
 	
-	public static String contract(String s)
+	public static String unqualify(String s)
 	{
 		int len = s.length();
 		StringBuilder builder = new StringBuilder(len);

@@ -38,7 +38,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 		this.position = position;
 		this.instance = instance;
 		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
+		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override

@@ -80,7 +80,7 @@ public class Method extends Member implements IMethod
 		}
 		else
 		{
-			this.qualifiedName = Symbols.expand(name);
+			this.qualifiedName = Symbols.qualify(name);
 			this.name = name;
 		}
 	}
@@ -97,7 +97,7 @@ public class Method extends Member implements IMethod
 		else
 		{
 			this.qualifiedName = name;
-			this.name = Symbols.contract(name);
+			this.name = Symbols.unqualify(name);
 		}
 	}
 	

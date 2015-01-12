@@ -38,7 +38,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		this.position = position;
 		this.instance = instance;
 		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
+		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override

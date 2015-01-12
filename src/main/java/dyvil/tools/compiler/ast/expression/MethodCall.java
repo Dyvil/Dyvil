@@ -37,7 +37,7 @@ public class MethodCall extends Call implements INamed, IValued
 		super(position);
 		this.instance = instance;
 		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
+		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override

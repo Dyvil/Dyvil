@@ -27,6 +27,7 @@ import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.parser.type.ITypeVariable;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Symbols;
 import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
@@ -37,6 +38,7 @@ public class CodeClass extends ASTNode implements IClass
 	
 	protected String				name;
 	protected String				qualifiedName;
+	protected String fullName;
 	protected String				internalName;
 	
 	protected List<Annotation>		annotations	= new ArrayList(1);
@@ -89,7 +91,7 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		if (this.type == null)
 		{
-			this.type = new Type(this.name, this);
+			this.type = new Type(this);
 		}
 		return this.type;
 	}
@@ -213,8 +215,9 @@ public class CodeClass extends ASTNode implements IClass
 	public void setName(String name)
 	{
 		this.name = name;
-		this.internalName = this.unit.getInternalName(this.name);
-		this.qualifiedName = this.unit.getQualifiedName(this.name);
+		this.qualifiedName = Symbols.qualify(name);
+		this.internalName = this.unit.getInternalName(this.qualifiedName);
+		this.fullName = this.unit.getFullName(this.qualifiedName);
 	}
 	
 	@Override
@@ -239,7 +242,19 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean isName(String name)
 	{
-		return this.qualifiedName.equals(name);
+		return this.name.equals(name);
+	}
+	
+	@Override
+	public void setFullName(String name)
+	{
+		this.fullName = name;
+	}
+	
+	@Override
+	public String getFullName()
+	{
+		return this.fullName;
 	}
 	
 	@Override
@@ -505,7 +520,7 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public Type getThisType()
 	{
-		return new Type(this.name, this);
+		return new Type(this);
 	}
 	
 	@Override

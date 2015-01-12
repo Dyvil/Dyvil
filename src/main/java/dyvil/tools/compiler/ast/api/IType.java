@@ -6,6 +6,12 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 
 public interface IType extends IASTNode, INamed, IContext
 {
+	// Full Name
+	
+	public void setFullName(String name);
+	
+	public String getFullName();
+	
 	// Container Class
 	
 	public void setClass(IClass theClass);

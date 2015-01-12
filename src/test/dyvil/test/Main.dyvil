@@ -4,8 +4,5 @@ public class Main
 {
 	public static boolean flag = true;
 	
-	public static void main(String[] args) =
-	{
-		if (flag) System out println "Hello Test";
-	};
+	public static void main(String[] args) = ...;
 }

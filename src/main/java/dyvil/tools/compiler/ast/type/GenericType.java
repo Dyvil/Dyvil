@@ -24,19 +24,14 @@ public class GenericType extends Type implements IGeneric
 		super(name);
 	}
 	
-	public GenericType(String name, IClass iclass)
-	{
-		super(name, iclass);
-	}
-	
 	public GenericType(ICodePosition position, String name)
 	{
 		super(position, name);
 	}
 	
-	public GenericType(ICodePosition position, String name, IClass iclass)
+	public GenericType(IClass iclass)
 	{
-		super(position, name, iclass);
+		super(iclass);
 	}
 	
 	@Override

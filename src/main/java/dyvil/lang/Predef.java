@@ -16,6 +16,7 @@ public class Predef
 		throw new UnsupportedOperationException();
 	}
 	
+	@Bytecode
 	public static void $dot$dot$dot()
 	{
 	}

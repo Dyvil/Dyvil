@@ -34,7 +34,7 @@ public abstract class Member extends ASTNode implements IMember
 	{
 		this.theClass = iclass;
 		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
+		this.qualifiedName = Symbols.qualify(name);
 		this.annotations = new ArrayList(1);
 	}
 	
@@ -42,7 +42,7 @@ public abstract class Member extends ASTNode implements IMember
 	{
 		this.theClass = iclass;
 		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
+		this.qualifiedName = Symbols.qualify(name);
 		this.type = type;
 		this.annotations = new ArrayList(1);
 	}
@@ -51,7 +51,7 @@ public abstract class Member extends ASTNode implements IMember
 	{
 		this.theClass = iclass;
 		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
+		this.qualifiedName = Symbols.qualify(name);
 		this.type = type;
 		this.modifiers = modifiers;
 		this.annotations = annotations;
@@ -155,7 +155,7 @@ public abstract class Member extends ASTNode implements IMember
 	public void setName(String name)
 	{
 		this.name = name;
-		this.qualifiedName = Symbols.expand(name);
+		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override
