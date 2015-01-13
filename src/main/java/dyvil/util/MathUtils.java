@@ -288,6 +288,19 @@ public class MathUtils
 		}
 		return min + (int) ((max - min) * f);
 	}
+
+	public static long interpolate(long min, long max, double d)
+	{
+		if (d <= 0D)
+		{
+			return min;
+		}
+		if (d >= 1D)
+		{
+			return max;
+		}
+		return min + (long) ((max - min) * d);
+	}
 	
 	public static float interpolate(float min, float max, float f)
 	{
@@ -302,33 +315,20 @@ public class MathUtils
 		return min + (max - min) * f;
 	}
 	
-	public static long interpolate(long min, long max, double d)
-	{
-		if (d <= 0D)
-		{
-			return min;
-		}
-		if (d >= 1D)
-		{
-			return max;
-		}
-		return min + (long) ((max - min) * d);
-	}
-	
-	public static double interpolate(double d1, double d2, double factor)
+	public static double interpolate(double min, double max, double factor)
 	{
 		if (factor <= 0D)
 		{
-			return d1;
+			return min;
 		}
 		if (factor >= 1D)
 		{
-			return d2;
+			return max;
 		}
-		return d1 + (d2 - d1) * factor;
+		return min + (max - min) * factor;
 	}
 	
-	public static @implicit int factorial(int i)
+	public static @implicit int $bang(int i)
 	{
 		int j = i;
 		while (i > 1)
@@ -338,7 +338,7 @@ public class MathUtils
 		return j;
 	}
 	
-	public static @implicit long factorial(long l)
+	public static @implicit long $bang(long l)
 	{
 		long j = l;
 		while (l > 1)
@@ -348,9 +348,9 @@ public class MathUtils
 		return j;
 	}
 	
-	public static int permutations(int n)
+	public static @implicit int nPr(int n)
 	{
-		return factorial(n);
+		return $bang(n);
 	}
 	
 	/**
@@ -365,9 +365,9 @@ public class MathUtils
 	 *            the number of objects to pick
 	 * @return the number of combinations
 	 */
-	public static int permutations(int n, int k)
+	public static int nPr(int n, int k)
 	{
-		return factorial(n) / factorial(n - k);
+		return $bang(n) / $bang(n - k);
 	}
 	
 	/**
@@ -378,7 +378,7 @@ public class MathUtils
 	 *            the number of objects
 	 * @return the number of combinations
 	 */
-	public static int combinations(int n)
+	public static int nCr(int n)
 	{
 		return 1;
 	}
@@ -396,12 +396,12 @@ public class MathUtils
 	 *            the number of objects to pick
 	 * @return the number of combinations
 	 */
-	public static int combinations(int n, int k)
+	public static @implicit int nCr(int n, int k)
 	{
-		return factorial(n) / (factorial(k) * factorial(n - k));
+		return $bang(n) / ($bang(k) * $bang(n - k));
 	}
 	
-	public static float average(int[] ints)
+	public static @implicit float average(int[] ints)
 	{
 		int i = 0;
 		for (int j : ints)
@@ -411,7 +411,7 @@ public class MathUtils
 		return i / ints.length;
 	}
 	
-	public static double average(long[] longs)
+	public static @implicit double average(long[] longs)
 	{
 		long l1 = 0L;
 		for (long l2 : longs)
@@ -421,7 +421,7 @@ public class MathUtils
 		return l1 / longs.length;
 	}
 	
-	public static float average(float[] floats)
+	public static @implicit float average(float[] floats)
 	{
 		float f1 = 0L;
 		for (float f2 : floats)
@@ -431,7 +431,7 @@ public class MathUtils
 		return f1 / floats.length;
 	}
 	
-	public static double average(double[] doubles)
+	public static @implicit double average(double[] doubles)
 	{
 		double d1 = 0L;
 		for (double d2 : doubles)
