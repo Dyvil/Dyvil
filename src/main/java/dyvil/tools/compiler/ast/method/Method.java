@@ -168,7 +168,7 @@ public class Method extends Member implements IMethod
 	
 	private boolean processAnnotation(Annotation annotation)
 	{
-		String name = annotation.type.qualifiedName;
+		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.inline".equals(name))
 		{
 			this.modifiers |= Modifiers.INLINE;
@@ -232,10 +232,16 @@ public class Method extends Member implements IMethod
 	@Override
 	public int getSignatureMatch(String name, IType type, IType... argumentTypes)
 	{
+		if (name == null)
+		{
+			return 1;
+		}
+		
 		if (!name.equals(this.qualifiedName))
 		{
 			return 0;
 		}
+		
 		// Only matching the name
 		if (argumentTypes == null)
 		{
@@ -620,9 +626,15 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext returnType, String name, IType... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
 	{
-		return this.theClass.resolveMethod(returnType, name, argumentTypes);
+		return this.theClass.resolveMethod(context, name, argumentTypes);
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	{
+		this.theClass.getMethodMatches(list, type, name, argumentTypes);
 	}
 	
 	@Override

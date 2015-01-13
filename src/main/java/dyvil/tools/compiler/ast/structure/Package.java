@@ -157,9 +157,14 @@ public class Package implements IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
 	{
 		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	{
 	}
 	
 	@Override

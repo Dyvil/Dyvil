@@ -4,7 +4,6 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.ast.classes.ClassBody;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 
@@ -51,8 +50,6 @@ public interface IClass extends IASTNode, IMember, IAnnotatable, IModified, INam
 	public IField getInstanceField();
 	
 	public IMethod getFunctionalMethod();
-	
-	public void getMethodMatches(List<MethodMatch> matches, IType type, String name, IType... argumentTypes);
 	
 	public boolean isMember(IMember member);
 	

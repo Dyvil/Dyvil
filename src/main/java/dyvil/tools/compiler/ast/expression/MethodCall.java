@@ -330,7 +330,7 @@ public class MethodCall extends Call implements INamed, IValued
 		}
 		
 		String owner = ownerClass.getInternalName();
-		String name = this.method.getName();
+		String name = this.method.getQualifiedName();
 		String desc = this.method.getDescriptor();
 		IType type = this.method.getType();
 		visitor.visitMethodInsn(opcode, owner, name, desc, ownerClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);

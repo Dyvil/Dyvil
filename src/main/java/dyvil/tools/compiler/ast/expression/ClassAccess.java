@@ -207,7 +207,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	public IAccess resolve3(IContext context, IAccess next)
 	{
 		String name = this.type.getQualifiedName();
-		MethodMatch m = context.resolveMethod(null, name, next.getType());
+		MethodMatch m = context.resolveMethod(null, name, new IType[] { next.getType() });
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position, null, name);

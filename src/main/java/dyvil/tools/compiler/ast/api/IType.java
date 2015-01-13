@@ -1,8 +1,5 @@
 package dyvil.tools.compiler.ast.api;
 
-import java.util.List;
-
-import dyvil.tools.compiler.ast.method.MethodMatch;
 
 public interface IType extends IASTNode, INamed, IContext
 {
@@ -66,8 +63,6 @@ public interface IType extends IASTNode, INamed, IContext
 	public IType resolve(IContext context);
 	
 	public boolean isResolved();
-	
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes);
 	
 	// IContext
 	

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
@@ -8,41 +7,48 @@ import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
-public class MultiImport extends ASTNode implements IImport, IImportContainer
+public class Import extends ASTNode implements IContext, IImportContainer
 {
-	public IImport			parent;
-	public List<IImport>	children	= new ArrayList();
+	public IImport	theImport;
+	public IImport	last;
+	public boolean	isStatic;
 	
-	public MultiImport(ICodePosition position, IImport parent)
+	public Import(ICodePosition position)
 	{
 		this.position = position;
-		this.parent = parent;
 	}
 	
 	@Override
 	public void addImport(IImport iimport)
 	{
-		this.children.add(iimport);
+		this.theImport = iimport;
 	}
-	
-	@Override
-	public void resolveTypes(List<Marker> markers, IContext context, boolean isStatic)
+
+	public void resolveTypes(List<Marker> markers)
 	{
-		for (IImport i : this.children)
+		this.theImport.resolveTypes(markers, Package.rootPackage, this.isStatic);
+		
+		IImport iimport = this.theImport;
+		while (iimport instanceof SimpleImport)
 		{
-			i.resolveTypes(markers, context, isStatic);
+			IImport child = ((SimpleImport) iimport).child;
+			if (child == null)
+			{
+				break;
+			}
+			iimport = child;
 		}
+		
+		this.last = iimport;
 	}
 	
 	@Override
 	public boolean isStatic()
 	{
-		return false;
+		return this.isStatic;
 	}
 	
 	@Override
@@ -54,43 +60,51 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	@Override
 	public Package resolvePackage(String name)
 	{
-		return null;
+		return this.last.resolvePackage(name);
 	}
 	
 	@Override
 	public IClass resolveClass(String name)
 	{
-		return null;
+		return this.last.resolveClass(name);
 	}
 	
 	@Override
 	public FieldMatch resolveField(IContext context, String name)
 	{
-		return null;
+		return this.last.resolveField(context, name);
 	}
 	
 	@Override
 	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
 	{
-		return null;
+		return this.last.resolveMethod(context, name, argumentTypes);
 	}
 	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
 	{
+		this.last.getMethodMatches(list, type, name, argumentTypes);
 	}
 	
 	@Override
 	public byte getAccessibility(IMember member)
 	{
-		return 0;
+		return READ_WRITE_ACCESS;
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Import.multiImportStart);
-		Util.astToString(this.children, Formatting.Import.multiImportSeperator, buffer);
-		buffer.append(Formatting.Import.multiImportEnd);
+		if (this.isStatic)
+		{
+			buffer.append("using ");
+		}
+		else
+		{
+			buffer.append("import ");
+		}
+		
+		this.theImport.toString(prefix, buffer);
 	}
 }

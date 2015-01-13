@@ -383,7 +383,7 @@ public class Type extends ASTNode implements IContext, IType
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -423,7 +423,7 @@ public class Type extends ASTNode implements IContext, IType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
 	{
 		this.theClass.getMethodMatches(list, type, name, argumentTypes);
 	}

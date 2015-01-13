@@ -108,7 +108,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext returnType, String name, IType... argumentTypes)
+	public MethodMatch resolveMethod(IContext returnType, String name, IType[] argumentTypes)
 	{
 		if (!this.typesResolved)
 		{
@@ -119,7 +119,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
 	{
 		if (!this.typesResolved)
 		{

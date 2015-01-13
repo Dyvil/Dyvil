@@ -243,7 +243,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public IAccess resolve3(IContext context, IAccess next)
 	{
-		MethodMatch m = context.resolveMethod(null, this.qualifiedName, next.getType());
+		MethodMatch m = context.resolveMethod(null, this.qualifiedName, new IType[] { next.getType() });
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position, this.instance, this.name);

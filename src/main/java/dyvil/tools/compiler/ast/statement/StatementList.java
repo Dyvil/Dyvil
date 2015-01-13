@@ -180,9 +180,15 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
 	{
 		return this.context.resolveMethod(context, name, argumentTypes);
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	{
+		this.context.getMethodMatches(list, type, name, argumentTypes);
 	}
 	
 	@Override

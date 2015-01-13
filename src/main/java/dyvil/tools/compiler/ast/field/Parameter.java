@@ -104,7 +104,7 @@ public class Parameter extends Member implements IField
 	
 	private boolean processAnnotation(Annotation annotation)
 	{
-		String name = annotation.type.qualifiedName;
+		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.byref".equals(name))
 		{
 			this.modifiers |= Modifiers.BYREF;

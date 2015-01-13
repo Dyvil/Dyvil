@@ -38,7 +38,7 @@ public class CodeClass extends ASTNode implements IClass
 	
 	protected String				name;
 	protected String				qualifiedName;
-	protected String fullName;
+	protected String				fullName;
 	protected String				internalName;
 	
 	protected List<Annotation>		annotations	= new ArrayList(1);
@@ -127,7 +127,7 @@ public class CodeClass extends ASTNode implements IClass
 	
 	private boolean processAnnotation(Annotation annotation)
 	{
-		String name = annotation.type.qualifiedName;
+		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.sealed".equals(name))
 		{
 			this.modifiers |= Modifiers.SEALED;
@@ -593,6 +593,16 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
+		if (this.unit != null && this.unit.hasStaticImports())
+		{
+			// Static Imports
+			match = this.unit.resolveField(context, name);
+			if (match != null)
+			{
+				return match;
+			}
+		}
+		
 		// Predef
 		if (this != Type.PREDEF_CLASS)
 		{
@@ -607,7 +617,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
 	{
 		if (argumentTypes == null)
 		{
@@ -627,7 +637,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
 	{
 		if (this.body != null)
 		{
@@ -646,6 +656,11 @@ public class CodeClass extends ASTNode implements IClass
 		for (IType i : this.interfaces)
 		{
 			i.getMethodMatches(list, type, name, argumentTypes);
+		}
+		
+		if (this.unit != null && this.unit.hasStaticImports())
+		{
+			this.unit.getMethodMatches(list, type, name, argumentTypes);
 		}
 	}
 	

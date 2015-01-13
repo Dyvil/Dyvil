@@ -44,7 +44,7 @@ public class Formatting
 		public static String	keyValueSeperator		= " = ";
 		
 		public static boolean	convertQualifiedNames	= false;
-		public static boolean	useJavaFormat			= true;
+		public static boolean	useJavaFormat			= false;
 		public static String	dotlessSeperator		= " ";
 		
 		public static String	propertyGet				= "get: ";
@@ -59,7 +59,7 @@ public class Formatting
 		public static String	parameterSeperator			= ", ";
 		
 		public static boolean	convertQualifiedNames		= false;
-		public static boolean	useJavaFormat				= true;
+		public static boolean	useJavaFormat				= false;
 		public static String	dotlessSeperator			= " ";
 		public static String	sugarCallSeperator			= " ";
 		

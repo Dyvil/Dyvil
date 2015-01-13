@@ -77,7 +77,7 @@ public class Field extends Member implements IField, IContext
 	
 	private boolean processAnnotation(Annotation annotation)
 	{
-		String name = annotation.type.qualifiedName;
+		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.lazy".equals(name))
 		{
 			this.modifiers |= Modifiers.LAZY;
@@ -199,9 +199,15 @@ public class Field extends Member implements IField, IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext returnType, String name, IType... argumentTypes)
+	public MethodMatch resolveMethod(IContext returnType, String name, IType[] argumentTypes)
 	{
 		return this.theClass.resolveMethod(returnType, name, argumentTypes);
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	{
+		this.theClass.getMethodMatches(list, type, name, argumentTypes);
 	}
 	
 	@Override

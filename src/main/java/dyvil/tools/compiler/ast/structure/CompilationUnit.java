@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.structure;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import dyvil.tools.compiler.DyvilCompiler;
@@ -10,6 +9,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.Type;
@@ -22,7 +22,7 @@ import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.parser.CompilationUnitParser;
 
-public class CompilationUnit extends ASTNode implements IImportContainer, IContext
+public class CompilationUnit extends ASTNode implements IContext
 {
 	public final File					inputFile;
 	public final File					outputDirectory;
@@ -34,8 +34,9 @@ public class CompilationUnit extends ASTNode implements IImportContainer, IConte
 	protected List<Marker>				markers;
 	
 	protected PackageDecl				packageDeclaration;
-	protected List<IImport>				imports	= new ArrayList();
-	protected List<CodeClass>			classes	= new ArrayList();
+	protected List<Import>				imports			= new ArrayList();
+	protected List<Import>				staticImports	= new ArrayList();
+	protected List<CodeClass>			classes			= new ArrayList();
 	
 	public CompilationUnit(Package pack, CodeFile input, File output)
 	{
@@ -71,15 +72,24 @@ public class CompilationUnit extends ASTNode implements IImportContainer, IConte
 		return (CodeFile) this.position;
 	}
 	
-	public List<IImport> getImports()
+	public List<Import> getImports()
 	{
 		return this.imports;
 	}
 	
-	@Override
-	public void addImport(IImport iimport)
+	public void addImport(Import iimport)
 	{
 		this.imports.add(iimport);
+	}
+	
+	public void addStaticImport(Import iimport)
+	{
+		this.staticImports.add(iimport);
+	}
+	
+	public boolean hasStaticImports()
+	{
+		return !this.staticImports.isEmpty();
 	}
 	
 	public List<CodeClass> getClasses()
@@ -125,14 +135,14 @@ public class CompilationUnit extends ASTNode implements IImportContainer, IConte
 	
 	public void resolveTypes()
 	{
-		for (Iterator<IImport> iterator = this.imports.iterator(); iterator.hasNext();)
+		for (Import i : this.imports)
 		{
-			IImport i = iterator.next();
-			i.resolveTypes(this.markers, Package.rootPackage);
-			if (!i.isValid())
-			{
-				iterator.remove();
-			}
+			i.resolveTypes(this.markers);
+		}
+		
+		for (Import i : this.staticImports)
+		{
+			i.resolveTypes(this.markers);
 		}
 		
 		for (IClass i : this.classes)
@@ -248,7 +258,7 @@ public class CompilationUnit extends ASTNode implements IImportContainer, IConte
 		IClass iclass;
 		
 		// Imported Classes
-		for (IImport i : this.imports)
+		for (Import i : this.imports)
 		{
 			iclass = i.resolveClass(name);
 			if (iclass != null)
@@ -278,13 +288,38 @@ public class CompilationUnit extends ASTNode implements IImportContainer, IConte
 	@Override
 	public FieldMatch resolveField(IContext context, String name)
 	{
-		throw new UnsupportedOperationException();
+		for (Import i : this.staticImports)
+		{
+			FieldMatch field = i.resolveField(context, name);
+			if (field != null)
+			{
+				return field;
+			}
+		}
+		return null;
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
 	{
-		throw new UnsupportedOperationException();
+		for (Import i : this.staticImports)
+		{
+			MethodMatch method = i.resolveMethod(context, name, argumentTypes);
+			if (method != null)
+			{
+				return method;
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	{
+		for (Import i : this.staticImports)
+		{
+			i.getMethodMatches(list, type, name, argumentTypes);
+		}
 	}
 	
 	@Override
@@ -315,11 +350,25 @@ public class CompilationUnit extends ASTNode implements IImportContainer, IConte
 			}
 		}
 		
+		if (!this.staticImports.isEmpty())
+		{
+			for (Import iimport : this.staticImports)
+			{
+				buffer.append(prefix);
+				iimport.toString(prefix, buffer);
+				buffer.append(";\n");
+			}
+			if (Formatting.Import.newLine)
+			{
+				buffer.append('\n');
+			}
+		}
+		
 		if (!this.imports.isEmpty())
 		{
-			for (IImport iimport : this.imports)
+			for (Import iimport : this.imports)
 			{
-				buffer.append(prefix).append("import ");
+				buffer.append(prefix);
 				iimport.toString(prefix, buffer);
 				buffer.append(";\n");
 			}

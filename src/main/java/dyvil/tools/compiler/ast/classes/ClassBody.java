@@ -14,10 +14,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassBody extends ASTNode
 {
-	protected IClass			theClass;
-	protected List<IField>		fields		= new ArrayList();
-	protected List<IMethod>		methods		= new ArrayList();
-	protected List<IProperty>	properties	= new ArrayList();
+	public IClass			theClass;
+	public List<IField>		fields		= new ArrayList();
+	public List<IMethod>	methods		= new ArrayList();
+	public List<IProperty>	properties	= new ArrayList();
 	
 	public ClassBody(ICodePosition position)
 	{

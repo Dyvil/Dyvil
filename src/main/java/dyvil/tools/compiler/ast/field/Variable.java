@@ -62,7 +62,7 @@ public class Variable extends Member implements IField
 	
 	private boolean processAnnotation(Annotation annotation)
 	{
-		String name = annotation.type.qualifiedName;
+		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.lazy".equals(name))
 		{
 			this.modifiers |= Modifiers.LAZY;

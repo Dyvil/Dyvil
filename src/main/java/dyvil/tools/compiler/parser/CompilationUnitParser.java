@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser;
 
+import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -32,18 +33,24 @@ public class CompilationUnitParser extends Parser
 				jcp.pushParser(new PackageParser(this.unit));
 				return true;
 			}
-			else if ("import".equals(value))
-			{
-				this.mode = IMPORT | CLASS;
-				throw new SyntaxError(token, "Missing package declaration!", "Add a package declaration");
-			}
 		}
 		if (this.isInMode(IMPORT))
 		{
 			if ("import".equals(value))
 			{
 				this.mode = IMPORT | CLASS;
-				jcp.pushParser(new ImportParser(null, this.unit));
+				Import i = new Import(token.raw());
+				this.unit.addImport(i);
+				jcp.pushParser(new ImportParser(null, i));
+				return true;
+			}
+			else if ("using".equals(value))
+			{
+				this.mode = IMPORT | CLASS;
+				Import i = new Import(token.raw());
+				i.isStatic = true;
+				this.unit.addStaticImport(i);
+				jcp.pushParser(new ImportParser(null, i));
 				return true;
 			}
 		}
@@ -54,4 +61,5 @@ public class CompilationUnitParser extends Parser
 		}
 		return false;
 	}
+	
 }

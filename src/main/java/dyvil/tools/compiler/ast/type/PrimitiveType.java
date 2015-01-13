@@ -242,7 +242,7 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
 	{
 		if (this.arrayDimensions > 0)
 		{

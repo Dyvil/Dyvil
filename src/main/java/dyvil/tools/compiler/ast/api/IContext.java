@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.api;
 
+import java.util.List;
+
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -30,7 +32,9 @@ public interface IContext
 	
 	public FieldMatch resolveField(IContext context, String name);
 	
-	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes);
+	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes);
+	
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes);
 	
 	public byte getAccessibility(IMember member);
 }
