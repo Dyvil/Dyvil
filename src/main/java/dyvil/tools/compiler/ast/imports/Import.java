@@ -26,7 +26,7 @@ public class Import extends ASTNode implements IContext, IImportContainer
 	{
 		this.theImport = iimport;
 	}
-
+	
 	public void resolveTypes(List<Marker> markers)
 	{
 		this.theImport.resolveTypes(markers, Package.rootPackage, this.isStatic);

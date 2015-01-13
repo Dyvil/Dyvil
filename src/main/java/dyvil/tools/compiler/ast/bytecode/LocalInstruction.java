@@ -16,7 +16,7 @@ public class LocalInstruction extends Instruction
 	private int		index;
 	
 	private Label	startLabel	= new Label();
-	private Label endLabel;
+	private Label	endLabel;
 	
 	public LocalInstruction(String name)
 	{

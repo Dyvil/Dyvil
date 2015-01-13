@@ -9,7 +9,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 
 public class ImportListParser extends Parser
 {
-	public IImport parent;
+	public IImport			parent;
 	public IImportContainer	container;
 	
 	public ImportListParser(IImport parent, IImportContainer container)

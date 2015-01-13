@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.api;
 
-
 public interface IType extends IASTNode, INamed, IContext
 {
 	// Full Name

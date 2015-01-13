@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -20,7 +21,6 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.compiler.ast.structure.Package;
 
 public class TypeVariable extends ASTNode implements ITypeVariable
 {
@@ -206,13 +206,13 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType... argumentTypes)
+	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
 	{
 		return null;
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
 	{
 	}
 	

@@ -1,9 +1,12 @@
 package dyvil.tools.compiler.ast.bytecode;
 
+import static dyvil.reflect.Opcodes.GETFIELD;
+import static dyvil.reflect.Opcodes.GETSTATIC;
+import static dyvil.reflect.Opcodes.PUTFIELD;
+import static dyvil.reflect.Opcodes.PUTSTATIC;
 import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.util.ClassFormat;
-import static dyvil.reflect.Opcodes.*;
 
 public class FieldInstruction extends Instruction
 {
@@ -51,13 +54,13 @@ public class FieldInstruction extends Instruction
 		switch (this.opcode)
 		{
 		case GETSTATIC:
-			writer.visitGetStatic(owner, fieldName, desc, type);
+			writer.visitGetStatic(this.owner, this.fieldName, this.desc, this.type);
 		case PUTSTATIC:
-			writer.visitPutStatic(owner, fieldName, desc);
+			writer.visitPutStatic(this.owner, this.fieldName, this.desc);
 		case GETFIELD:
-			writer.visitGetField(owner, fieldName, desc, type);
+			writer.visitGetField(this.owner, this.fieldName, this.desc, this.type);
 		case PUTFIELD:
-			writer.visitPutField(owner, fieldName, desc);
+			writer.visitPutField(this.owner, this.fieldName, this.desc);
 		}
 	}
 	

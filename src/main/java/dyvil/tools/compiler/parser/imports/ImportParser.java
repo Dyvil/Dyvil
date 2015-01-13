@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.imports.PackageImport;
 import dyvil.tools.compiler.ast.imports.SimpleImport;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 
@@ -85,7 +84,7 @@ public class ImportParser extends Parser
 			if ("=>".equals(value))
 			{
 				IToken next = token.next();
-				if (next.isType(Token.TYPE_IDENTIFIER))
+				if (next.isType(IToken.TYPE_IDENTIFIER))
 				{
 					((SimpleImport) this.parent).setAlias(next.value());
 					pm.skip();

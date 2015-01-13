@@ -20,7 +20,7 @@ public class Bytecode extends ASTNode implements IValue
 	private List<Instruction>	instructions	= new ArrayList();
 	
 	private Map<String, Label>	labels			= new HashMap();
-	public Label endLabel = new Label();
+	public Label				endLabel		= new Label();
 	
 	public Bytecode(ICodePosition position)
 	{

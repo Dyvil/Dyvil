@@ -14,10 +14,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class PackageImport extends ASTNode implements IImport
 {
-	public IImport				parent;
+	public IImport	parent;
 	
-	private Package thePackage;
-	private IClass theClass;
+	private Package	thePackage;
+	private IClass	theClass;
 	
 	public PackageImport(ICodePosition position, IImport parent)
 	{

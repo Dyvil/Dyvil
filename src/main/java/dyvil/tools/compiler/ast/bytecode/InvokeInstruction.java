@@ -29,7 +29,7 @@ public class InvokeInstruction extends Instruction implements IMethod
 		super(opcode, name);
 		if (opcode != Opcodes.INVOKESTATIC)
 		{
-			args++;
+			this.args++;
 		}
 	}
 	

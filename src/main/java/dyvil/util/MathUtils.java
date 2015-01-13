@@ -288,7 +288,7 @@ public class MathUtils
 		}
 		return min + (int) ((max - min) * f);
 	}
-
+	
 	public static long interpolate(long min, long max, double d)
 	{
 		if (d <= 0D)
@@ -403,42 +403,42 @@ public class MathUtils
 	
 	public static @implicit float average(int[] ints)
 	{
-		int i = 0;
-		for (int j : ints)
+		int total = 0;
+		for (int i : ints)
 		{
-			i += j;
+			total += i;
 		}
-		return i / ints.length;
+		return total / ints.length;
 	}
 	
 	public static @implicit double average(long[] longs)
 	{
-		long l1 = 0L;
-		for (long l2 : longs)
+		long total = 0L;
+		for (long l : longs)
 		{
-			l1 += l2;
+			total += l;
 		}
-		return l1 / longs.length;
+		return total / longs.length;
 	}
 	
 	public static @implicit float average(float[] floats)
 	{
-		float f1 = 0L;
-		for (float f2 : floats)
+		float total = 0L;
+		for (float f : floats)
 		{
-			f1 += f2;
+			total += f;
 		}
-		return f1 / floats.length;
+		return total / floats.length;
 	}
 	
 	public static @implicit double average(double[] doubles)
 	{
-		double d1 = 0L;
-		for (double d2 : doubles)
+		double total = 0L;
+		for (double d : doubles)
 		{
-			d1 += d2;
+			total += d;
 		}
-		return d1 / doubles.length;
+		return total / doubles.length;
 	}
 	
 	public static @implicit float angle(float f)

@@ -6,7 +6,10 @@ import java.util.List;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.api.IClass;
+import dyvil.tools.compiler.ast.api.IContext;
+import dyvil.tools.compiler.ast.api.IMember;
+import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.Import;
