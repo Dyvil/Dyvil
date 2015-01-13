@@ -160,6 +160,15 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if ("}".equals(value))
 			{
 				this.value.expandPosition(token);
+				
+				if (token.next().equals("."))
+				{
+					this.mode = ACCESS_2;
+					this.dotless = false;
+					pm.skip();
+					return true;
+				}
+				
 				pm.popParser();
 				return true;
 			}
