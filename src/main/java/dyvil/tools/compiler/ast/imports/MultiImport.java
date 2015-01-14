@@ -54,30 +54,66 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	@Override
 	public Package resolvePackage(String name)
 	{
+		for (IImport i : this.children)
+		{
+			Package pack = i.resolvePackage(name);
+			if (pack != null)
+			{
+				return pack;
+			}
+		}
 		return null;
 	}
 	
 	@Override
 	public IClass resolveClass(String name)
 	{
+		for (IImport i : this.children)
+		{
+			IClass iclass = i.resolveClass(name);
+			if (iclass != null)
+			{
+				return iclass;
+			}
+		}
 		return null;
 	}
 	
 	@Override
 	public FieldMatch resolveField(IContext context, String name)
 	{
+		for (IImport i : this.children)
+		{
+			FieldMatch match = i.resolveField(context, name);
+			if (match != null)
+			{
+				return match;
+			}
+		}
 		return null;
 	}
 	
 	@Override
 	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
 	{
+		for (IImport i : this.children)
+		{
+			MethodMatch match = i.resolveMethod(context, name, argumentTypes);
+			if (match != null)
+			{
+				return match;
+			}
+		}
 		return null;
 	}
 	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
 	{
+		for (IImport i : this.children)
+		{
+			i.getMethodMatches(list, type, name, argumentTypes);
+		}
 	}
 	
 	@Override

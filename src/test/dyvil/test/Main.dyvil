@@ -1,12 +1,13 @@
 package test;
 
-import java.util.Arrays => arr;
+using java.util.Arrays._;
 using dyvil.util.MathUtils._;
 
 public class Main
 {
 	public static int[] ints = 1 .. 3;
+	
 	public static float average = { 1, 2, 3, 4 }.average;
 	
-	public static void main(String[] args) = System out println(arr toString(ints));
+	public static void main(String[] args) = System out println(toString(ints));
 }

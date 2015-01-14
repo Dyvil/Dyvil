@@ -119,7 +119,11 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	@Override
 	public Package resolvePackage(String name)
 	{
-		if (this.name.equals(name) || this.alias.equals(name))
+		if (this.name.equals(name))
+		{
+			return this.thePackage;
+		}
+		if (this.alias != null && this.alias.equals(name))
 		{
 			return this.thePackage;
 		}
@@ -133,7 +137,11 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 		{
 			return this.child.resolveClass(name);
 		}
-		if (this.name.equals(name) || this.alias.equals(name))
+		if (this.name.equals(name))
+		{
+			return this.theClass;
+		}
+		if (this.alias != null && this.alias.equals(name))
 		{
 			return this.theClass;
 		}
@@ -147,7 +155,11 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 		{
 			return this.child.resolveField(context, name);
 		}
-		if (this.name.equals(name) || this.alias.equals(name))
+		if (this.name.equals(name))
+		{
+			return this.field;
+		}
+		if (this.alias != null && this.alias.equals(name))
 		{
 			return this.field;
 		}
@@ -161,9 +173,16 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 		{
 			return this.child.resolveMethod(context, name, argumentTypes);
 		}
-		if (!this.methods.isEmpty() && (this.name.equals(name) || this.alias.equals(name)))
+		if (!this.methods.isEmpty())
 		{
-			return this.methods.get(0);
+			if (this.name.equals(name))
+			{
+				return this.methods.get(0);
+			}
+			if (this.alias != null && this.alias.equals(name))
+			{
+				return this.methods.get(0);
+			}
 		}
 		return null;
 	}
@@ -175,7 +194,11 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 		{
 			this.child.getMethodMatches(list, type, name, argumentTypes);
 		}
-		if (this.name.equals(name) || this.alias.equals(name))
+		if (this.name.equals(name))
+		{
+			list.addAll(this.methods);
+		}
+		if (this.alias != null && this.alias.equals(name))
 		{
 			list.addAll(this.methods);
 		}
