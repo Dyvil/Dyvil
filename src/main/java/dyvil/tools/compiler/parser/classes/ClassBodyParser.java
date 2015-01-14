@@ -22,7 +22,7 @@ import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnotatable
+public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnotated
 {
 	public static final int		TYPE			= 1;
 	public static final int		NAME			= 2;

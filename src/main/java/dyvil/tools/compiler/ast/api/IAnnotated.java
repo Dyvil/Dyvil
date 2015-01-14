@@ -4,7 +4,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 
-public interface IAnnotatable
+public interface IAnnotated
 {
 	public void setAnnotations(List<Annotation> annotations);
 	

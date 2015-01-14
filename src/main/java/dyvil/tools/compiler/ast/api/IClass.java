@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 
-public interface IClass extends IASTNode, IMember, IAnnotatable, IModified, INamed, IGeneric, IContext
+public interface IClass extends IASTNode, IMember, IAnnotated, IModified, INamed, IGeneric, IContext
 {
 	public CompilationUnit getUnit();
 	

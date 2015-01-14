@@ -61,8 +61,7 @@ public class ClassReader extends ClassVisitor
 		AnnotationType type = new AnnotationType();
 		ClassFormat.internalToType(name, type);
 		Annotation annotation = new Annotation(null, type);
-		this.bclass.addAnnotation(annotation);
-		return new AnnotationVisitorImpl(this.api, annotation);
+		return new AnnotationVisitorImpl(this.api, this.bclass, annotation);
 	}
 	
 	@Override

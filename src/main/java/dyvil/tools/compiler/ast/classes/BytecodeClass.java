@@ -223,9 +223,8 @@ public class BytecodeClass extends CodeClass
 				AnnotationType type = new AnnotationType();
 				ClassFormat.internalToType(name, type);
 				Annotation annotation = new Annotation(null, type);
-				field.addAnnotation(annotation);
 				
-				return new AnnotationVisitorImpl(Opcodes.ASM5, annotation);
+				return new AnnotationVisitorImpl(Opcodes.ASM5, field, annotation);
 			}
 		};
 	}
@@ -274,9 +273,8 @@ public class BytecodeClass extends CodeClass
 				AnnotationType type = new AnnotationType();
 				ClassFormat.internalToType(name, type);
 				Annotation annotation = new Annotation(null, type);
-				method.addAnnotation(annotation);
 				
-				return new AnnotationVisitorImpl(Opcodes.ASM5, annotation);
+				return new AnnotationVisitorImpl(Opcodes.ASM5, method, annotation);
 			}
 		};
 	}

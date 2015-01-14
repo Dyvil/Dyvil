@@ -2,6 +2,7 @@ package dyvil.tools.compiler.bytecode;
 
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.api.IAnnotated;
 import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.api.IValueList;
@@ -12,11 +13,13 @@ import dyvil.tools.compiler.util.ClassFormat;
 
 public class AnnotationVisitorImpl extends AnnotationVisitor
 {
+	private IAnnotated	annotated;
 	private Annotation	annotation;
 	
-	public AnnotationVisitorImpl(int api, Annotation annotation)
+	public AnnotationVisitorImpl(int api, IAnnotated annotated, Annotation annotation)
 	{
 		super(api);
+		this.annotated = annotated;
 		this.annotation = annotation;
 	}
 	
@@ -49,6 +52,12 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 		ValueList valueList = new ValueList(null, true);
 		this.annotation.addValue(key, valueList);
 		return new AnnotationVisitorArray(this.api, valueList);
+	}
+	
+	@Override
+	public void visitEnd()
+	{
+		this.annotated.addAnnotation(this.annotation);
 	}
 	
 	public static final class AnnotationVisitorArray extends AnnotationVisitor

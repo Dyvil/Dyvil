@@ -4,7 +4,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.lexer.marker.Marker;
 
-public interface IMember extends INamed, ITyped, IModified, IAnnotatable
+public interface IMember extends INamed, ITyped, IModified, IAnnotated
 {
 	public IClass getTheClass();
 	

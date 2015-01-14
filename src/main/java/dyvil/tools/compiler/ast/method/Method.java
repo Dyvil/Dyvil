@@ -164,15 +164,16 @@ public class Method extends Member implements IMethod
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		if (!this.processAnnotation(annotation.type.fullName))
+		if (!this.processAnnotation(annotation))
 		{
 			annotation.target = ElementType.METHOD;
 			this.annotations.add(annotation);
 		}
 	}
 	
-	private boolean processAnnotation(String name)
+	private boolean processAnnotation(Annotation annotation)
 	{
+		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.inline".equals(name))
 		{
 			this.modifiers |= Modifiers.INLINE;
@@ -192,6 +193,13 @@ public class Method extends Member implements IMethod
 		{
 			this.modifiers |= Modifiers.SEALED;
 			return true;
+		}
+		if ("dyvil.lang.annotation.Bytecode".equals(name))
+		{
+			this.prefixBytecode = readOpcodes(annotation, "prefixOpcode", "prefixOpcodes");
+			this.infixBytecode = readOpcodes(annotation, "infixOpcode", "infixOpcodes");
+			this.postfixBytecode = readOpcodes(annotation, "postfixOpcode", "postfixOpcodes");
+			return false;
 		}
 		if ("java.lang.Override".equals(name))
 		{
@@ -452,21 +460,12 @@ public class Method extends Member implements IMethod
 		while (iterator.hasNext())
 		{
 			Annotation a = iterator.next();
-			String name = a.type.fullName;
-			if (this.processAnnotation(name))
+			if (this.processAnnotation(a))
 			{
 				iterator.remove();
 				continue;
 			}
 			a.resolve(markers, context);
-			
-			// Reads the @Bytecode annotation
-			if (name.equals("dyvil.lang.annotation.Bytecode"))
-			{
-				this.prefixBytecode = readOpcodes(a, "prefixOpcode", "prefixOpcodes");
-				this.infixBytecode = readOpcodes(a, "infixOpcode", "infixOpcodes");
-				this.postfixBytecode = readOpcodes(a, "postfixOpcode", "postfixOpcodes");
-			}
 		}
 		
 		int index = this.hasModifier(Modifiers.STATIC) ? 0 : 1;
