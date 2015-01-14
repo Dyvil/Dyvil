@@ -11,10 +11,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.AccessResolver;
-import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.Symbols;
-import dyvil.tools.compiler.util.Util;
+import dyvil.tools.compiler.util.*;
 
 public class MethodCall extends Call implements INamed, IValued
 {
@@ -195,6 +192,32 @@ public class MethodCall extends Call implements INamed, IValued
 				this.arguments.set(i, v2);
 			}
 		}
+		
+		// Actual Constant Folding
+		if (this.instance != null && this.instance.isConstant())
+		{
+			if (len == 0)
+			{
+				IValue v1 = ConstantFolder.apply(this.instance, this.qualifiedName);
+				if (v1 != null)
+				{
+					return v1;
+				}
+			}
+			else if (len == 1)
+			{
+				IValue argument = this.arguments.get(0);
+				if (argument.isConstant())
+				{
+					IValue v1 = ConstantFolder.apply(instance, this.qualifiedName, argument);
+					if (v1 != null)
+					{
+						return v1;
+					}
+				}
+			}
+		}
+		
 		return this;
 	}
 	
