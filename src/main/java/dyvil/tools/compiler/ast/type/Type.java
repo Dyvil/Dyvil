@@ -321,7 +321,7 @@ public class Type extends ASTNode implements IContext, IType
 		return this;
 	}
 	
-	private static Type resolvePrimitive(String name)
+	protected static Type resolvePrimitive(String name)
 	{
 		switch (name)
 		{

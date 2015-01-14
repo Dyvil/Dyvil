@@ -32,6 +32,14 @@ public class PrimitiveType extends Type
 	@Override
 	public Type resolve(IContext context)
 	{
+		if (this.theClass == null)
+		{
+			Type t = resolvePrimitive(this.name);
+			if (t != null)
+			{
+				this.theClass = t.theClass;
+			}
+		}
 		return this;
 	}
 	
@@ -228,7 +236,15 @@ public class PrimitiveType extends Type
 	@Override
 	public boolean classEquals(IType type)
 	{
-		return super.classEquals(type) || type.isName(this.qualifiedName);
+		if (this == type)
+		{
+			return true;
+		}
+		if (type.isName(this.qualifiedName))
+		{
+			return true;
+		}
+		return super.classEquals(type);
 	}
 	
 	@Override

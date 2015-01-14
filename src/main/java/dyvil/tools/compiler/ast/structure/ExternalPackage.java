@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.structure;
 import java.io.InputStream;
 
 import dyvil.tools.compiler.ast.api.IClass;
+import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.bytecode.ClassReader;
 import dyvil.tools.compiler.library.Library;
 
@@ -46,8 +47,9 @@ public class ExternalPackage extends Package
 			InputStream is = this.library.getInputStream(this.internalName + name + ".class");
 			if (is != null)
 			{
-				iclass = ClassReader.loadClass(is, false);
-				this.classes.add(iclass);
+				BytecodeClass bclass = new BytecodeClass();
+				this.classes.add(bclass);
+				iclass = ClassReader.loadClass(bclass, is, false);
 			}
 		}
 		return iclass;

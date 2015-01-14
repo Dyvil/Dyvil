@@ -20,11 +20,10 @@ public class ClassReader extends ClassVisitor
 		this.bclass = bclass;
 	}
 	
-	public static IClass loadClass(InputStream is, boolean decompile)
+	public static IClass loadClass(BytecodeClass bclass, InputStream is, boolean decompile)
 	{
 		try
 		{
-			BytecodeClass bclass = new BytecodeClass();
 			jdk.internal.org.objectweb.asm.ClassReader reader = new jdk.internal.org.objectweb.asm.ClassReader(is);
 			ClassReader visitor = new ClassReader(bclass);
 			reader.accept(visitor, 0);
