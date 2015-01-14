@@ -9,11 +9,13 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IntValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -37,6 +39,9 @@ public class Method extends Member implements IMethod
 	protected boolean			isConstructor;
 	
 	protected IMethod			overrideMethod;
+	protected int[]				prefixBytecode;
+	protected int[]				infixBytecode;
+	protected int[]				postfixBytecode;
 	
 	public Method(IClass iclass)
 	{
@@ -159,16 +164,15 @@ public class Method extends Member implements IMethod
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		if (!this.processAnnotation(annotation))
+		if (!this.processAnnotation(annotation.type.fullName))
 		{
 			annotation.target = ElementType.METHOD;
 			this.annotations.add(annotation);
 		}
 	}
 	
-	private boolean processAnnotation(Annotation annotation)
+	private boolean processAnnotation(String name)
 	{
-		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.inline".equals(name))
 		{
 			this.modifiers |= Modifiers.INLINE;
@@ -448,12 +452,21 @@ public class Method extends Member implements IMethod
 		while (iterator.hasNext())
 		{
 			Annotation a = iterator.next();
-			if (this.processAnnotation(a))
+			String name = a.type.fullName;
+			if (this.processAnnotation(name))
 			{
 				iterator.remove();
 				continue;
 			}
 			a.resolve(markers, context);
+			
+			// Reads the @Bytecode annotation
+			if (name.equals("dyvil.lang.annotation.Bytecode"))
+			{
+				this.prefixBytecode = readOpcodes(a, "prefixOpcode", "prefixOpcodes");
+				this.infixBytecode = readOpcodes(a, "infixOpcode", "infixOpcodes");
+				this.postfixBytecode = readOpcodes(a, "postfixOpcode", "postfixOpcodes");
+			}
 		}
 		
 		int index = this.hasModifier(Modifiers.STATIC) ? 0 : 1;
@@ -576,6 +589,33 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
+	private static int[] readOpcodes(Annotation annotation, String key1, String key2)
+	{
+		int[] opcodes = null;
+		ValueList array = (ValueList) annotation.getValue(key2);
+		if (array != null)
+		{
+			List<IValue> values = array.values;
+			int len = values.size();
+			opcodes = new int[len];
+			for (int i = 0; i < len; i++)
+			{
+				IntValue v = (IntValue) values.get(i).foldConstants();
+				opcodes[i] = v.value;
+			}
+		}
+		else
+		{
+			IValue i = annotation.getValue(key1);
+			if (i != null)
+			{
+				IntValue v = (IntValue) i.foldConstants();
+				opcodes = new int[] { v.value };
+			}
+		}
+		return opcodes;
+	}
+	
 	@Override
 	public boolean isStatic()
 	{
@@ -650,6 +690,44 @@ public class Method extends Member implements IMethod
 			return STATIC;
 		}
 		return this.theClass.getAccessibility(member);
+	}
+	
+	@Override
+	public void writePrefixBytecode(MethodWriter writer)
+	{
+		if (this.prefixBytecode != null)
+		{
+			for (int i : this.prefixBytecode)
+			{
+				writer.visitInsn(i);
+			}
+		}
+	}
+	
+	@Override
+	public void writeInfixBytecode(MethodWriter writer)
+	{
+		if (this.infixBytecode != null)
+		{
+			for (int i : this.infixBytecode)
+			{
+				writer.visitInsn(i);
+			}
+		}
+	}
+	
+	@Override
+	public boolean writePostfixBytecode(MethodWriter writer)
+	{
+		if (this.postfixBytecode != null)
+		{
+			for (int i : this.postfixBytecode)
+			{
+				writer.visitInsn(i);
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	@Override

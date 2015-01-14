@@ -3,12 +3,9 @@ package dyvil.tools.compiler.ast.expression;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.IntValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -270,38 +267,29 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter visitor)
+	public void writeExpression(MethodWriter writer)
 	{
-		Annotation bytecode = this.method.getAnnotation(Type.ABytecode);
-		
 		// Writes the prefix opcodes if a @Bytecode annotation is present.
-		if (bytecode != null)
-		{
-			visitBytecodeAnnotation(visitor, bytecode, "prefixOpcode", "prefixOpcodes");
-		}
+		this.method.writePrefixBytecode(writer);
 		
 		// Writes the instance (the first operand).
 		if (this.instance != null)
 		{
-			this.instance.writeExpression(visitor);
+			this.instance.writeExpression(writer);
 		}
 		
 		// Writes the infix opcodes if a @Bytecode annotation is present.
-		if (bytecode != null)
-		{
-			visitBytecodeAnnotation(visitor, bytecode, "infixOpcode", "infixOpcodes");
-		}
+		this.method.writeInfixBytecode(writer);
 		
 		// Writes the arguments (the second operand).
 		for (IValue arg : this.arguments)
 		{
-			arg.writeExpression(visitor);
+			arg.writeExpression(writer);
 		}
 		
 		// Writes the postfix opcodes if a @Bytecode annotation is present.
-		if (bytecode != null)
+		if (this.method.writePostfixBytecode(writer))
 		{
-			visitBytecodeAnnotation(visitor, bytecode, "postfixOpcode", "postfixOpcodes");
 			return;
 		}
 		
@@ -333,26 +321,7 @@ public class MethodCall extends Call implements INamed, IValued
 		String name = this.method.getQualifiedName();
 		String desc = this.method.getDescriptor();
 		IType type = this.method.getType();
-		visitor.visitMethodInsn(opcode, owner, name, desc, ownerClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);
-	}
-	
-	private static void visitBytecodeAnnotation(MethodWriter writer, Annotation annotation, String key1, String key2)
-	{
-		ValueList array = (ValueList) annotation.getValue(key2);
-		if (array != null)
-		{
-			for (IValue v : array.values)
-			{
-				writer.visitInsn(((IntValue) v.foldConstants()).value);
-			}
-			return;
-		}
-		
-		IntValue i = (IntValue) annotation.getValue(key1);
-		if (i != null)
-		{
-			writer.visitInsn(i.value);
-		}
+		writer.visitMethodInsn(opcode, owner, name, desc, ownerClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);
 	}
 	
 	@Override

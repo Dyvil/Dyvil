@@ -16,7 +16,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class ValueList extends ASTNode implements IValue, IValueList
 {
-	protected List<IValue>	values	= new ArrayList(3);
+	public List<IValue>	values	= new ArrayList(3);
 	
 	protected boolean		isArray;
 	protected IType			requiredType;
