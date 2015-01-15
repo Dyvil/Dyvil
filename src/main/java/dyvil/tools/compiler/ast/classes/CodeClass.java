@@ -877,15 +877,16 @@ public class CodeClass extends ASTNode implements IClass
 			buffer.append('>');
 		}
 		
-		if (this.superType != null)
+		if (this.superType == null)
+		{
+			buffer.append(" extends void");
+		}
+		else if (this.superType != Type.OBJECT)
 		{
 			buffer.append(" extends ");
 			this.superType.toString("", buffer);
 		}
-		else
-		{
-			buffer.append(" extends void");
-		}
+		
 		if (!this.interfaces.isEmpty())
 		{
 			buffer.append(" implements ");

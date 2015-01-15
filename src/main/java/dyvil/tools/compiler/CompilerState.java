@@ -92,6 +92,17 @@ public enum CompilerState
 			}
 		}
 	},
+	FORMAT
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			for (CompilationUnit cu : units)
+			{
+				cu.format();
+			}
+		}
+	},
 	/**
 	 * Folds constants.
 	 */

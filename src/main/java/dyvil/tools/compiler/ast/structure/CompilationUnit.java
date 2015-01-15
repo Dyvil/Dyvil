@@ -24,10 +24,11 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.parser.CompilationUnitParser;
+import dyvil.util.FileUtils;
 
 public class CompilationUnit extends ASTNode implements IContext
 {
-	public final File					inputFile;
+	public final CodeFile				inputFile;
 	public final File					outputDirectory;
 	public final File					outputFile;
 	
@@ -68,11 +69,6 @@ public class CompilationUnit extends ASTNode implements IContext
 	public PackageDecl getPackageDeclaration()
 	{
 		return this.packageDeclaration;
-	}
-	
-	public CodeFile getFile()
-	{
-		return (CodeFile) this.position;
 	}
 	
 	public List<Import> getImports()
@@ -126,13 +122,13 @@ public class CompilationUnit extends ASTNode implements IContext
 	
 	public void tokenize()
 	{
-		this.tokens = DyvilCompiler.parser.tokenize(this.getFile());
+		this.tokens = DyvilCompiler.parser.tokenize(this.inputFile);
 	}
 	
 	public void parse()
 	{
 		DyvilCompiler.parser.setParser(new CompilationUnitParser(this));
-		DyvilCompiler.parser.parse(this.getFile(), this.tokens);
+		DyvilCompiler.parser.parse(this.inputFile, this.tokens);
 		this.tokens = null;
 	}
 	
@@ -224,7 +220,13 @@ public class CompilationUnit extends ASTNode implements IContext
 	
 	public void debug()
 	{
-		DyvilCompiler.logger.info(this.getFile() + ":\n" + this.toString());
+		DyvilCompiler.logger.info(this.inputFile + ":\n" + this.toString());
+	}
+	
+	public void format()
+	{
+		String s = this.toString();
+		FileUtils.write(this.inputFile, s);
 	}
 	
 	@Override

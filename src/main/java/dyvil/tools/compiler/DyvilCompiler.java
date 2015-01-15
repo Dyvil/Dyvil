@@ -51,15 +51,6 @@ public class DyvilCompiler
 		// Loads the config
 		parser.parse(new CodeFile(args[0]), new ConfigParser(config));
 		
-		// Loads libraries
-		for (Library library : config.libraries)
-		{
-			library.loadLibrary();
-		}
-		
-		// Inits primitive data types
-		Type.init();
-		
 		File sourceDir = config.sourceDir;
 		File outputDir = config.outputDir;
 		Package root = Package.rootPackage;
@@ -72,7 +63,19 @@ public class DyvilCompiler
 			logger.info("Applying " + states + (states == 1 ? " State: " : " States: ") + DyvilCompiler.states);
 		}
 		
-		Util.logProfile(now, libs, "Loaded " + libs + (libs == 1 ? " Library " : " Libraries ") + "(%.1f ms, %.1f ms/L, %.2f L/s)");
+		if (DyvilCompiler.states.contains(CompilerState.RESOLVE_TYPES))
+		{
+			// Loads libraries
+			for (Library library : config.libraries)
+			{
+				library.loadLibrary();
+			}
+			
+			// Inits primitive data types
+			Type.init();
+			
+			Util.logProfile(now, libs, "Loaded " + libs + (libs == 1 ? " Library " : " Libraries ") + "(%.1f ms, %.1f ms/L, %.2f L/s)");
+		}
 		
 		now = System.nanoTime();
 		
@@ -148,22 +151,20 @@ public class DyvilCompiler
 			states.add(CompilerState.CHECK);
 			states.add(CompilerState.COMPILE);
 			return;
+			// case "obfuscate":
+			// case "doc":
+			// case "decompile":
 		case "optimize":
 			states.add(CompilerState.FOLD_CONSTANTS);
 			constantFolding = 1;
 			return;
-		case "obfuscate":
-			// states.add(CompilerState.OBFUSCATE);
-			return;
-		case "doc":
-			// states.add(CompilerState.DYVILDOC);
-			return;
-		case "decompile":
-			// states.add(CompilerState.DECOMPILE);
-			return;
 		case "jar":
 			states.add(CompilerState.JAR);
 			return;
+		case "format":
+			states.add(CompilerState.TOKENIZE);
+			states.add(CompilerState.PARSE);
+			states.add(CompilerState.FORMAT);
 		case "--debug":
 			states.add(CompilerState.DEBUG);
 			debug = true;

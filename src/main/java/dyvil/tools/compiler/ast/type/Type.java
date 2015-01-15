@@ -31,26 +31,26 @@ public class Type extends ASTNode implements IContext, IType
 												}
 											};
 	
-	public static final Type	VOID		= new PrimitiveType("void", "dyvil.lang.Void", 0);
-	public static final Type	BOOLEAN		= new PrimitiveType("boolean", "dyvil.lang.Boolean", Opcodes.T_BOOLEAN);
-	public static final Type	BYTE		= new PrimitiveType("byte", "dyvil.lang.Byte", Opcodes.T_BOOLEAN);
-	public static final Type	SHORT		= new PrimitiveType("short", "dyvil.lang.Short", Opcodes.T_SHORT);
-	public static final Type	CHAR		= new PrimitiveType("char", "dyvil.lang.Char", Opcodes.T_CHAR);
-	public static final Type	INT			= new PrimitiveType("int", "dyvil.lang.Int", Opcodes.T_INT);
-	public static final Type	LONG		= new PrimitiveType("long", "dyvil.lang.Long", Opcodes.T_LONG);
-	public static final Type	FLOAT		= new PrimitiveType("float", "dyvil.lang.Float", Opcodes.T_FLOAT);
-	public static final Type	DOUBLE		= new PrimitiveType("double", "dyvil.lang.Double", Opcodes.T_DOUBLE);
+	public static final Type	VOID		= new PrimitiveType("void", "Void", 0);
+	public static final Type	BOOLEAN		= new PrimitiveType("boolean", "Boolean", Opcodes.T_BOOLEAN);
+	public static final Type	BYTE		= new PrimitiveType("byte", "Byte", Opcodes.T_BOOLEAN);
+	public static final Type	SHORT		= new PrimitiveType("short", "Short", Opcodes.T_SHORT);
+	public static final Type	CHAR		= new PrimitiveType("char", "Char", Opcodes.T_CHAR);
+	public static final Type	INT			= new PrimitiveType("int", "Int", Opcodes.T_INT);
+	public static final Type	LONG		= new PrimitiveType("long", "Long", Opcodes.T_LONG);
+	public static final Type	FLOAT		= new PrimitiveType("float", "Float", Opcodes.T_FLOAT);
+	public static final Type	DOUBLE		= new PrimitiveType("double", "Double", Opcodes.T_DOUBLE);
 	
-	public static final Type	ANY			= new Type("dyvil.lang.Any");
-	public static final Type	OBJECT		= new Type("java.lang.Object");
-	public static final Type	PREDEF		= new Type("dyvil.lang.Predef");
-	public static final Type	ARRAY		= new Type("dyvil.lang.Array");
-	public static final Type	STRING		= new Type("java.lang.String");
+	public static final Type	ANY			= new Type("Any");
+	public static final Type	OBJECT		= new Type("Object");
+	public static final Type	PREDEF		= new Type("Predef");
+	public static final Type	ARRAY		= new Type("Array");
+	public static final Type	STRING		= new Type("String");
 	
-	public static final Type	ABytecode	= new AnnotationType("dyvil.lang.annotation.Bytecode");
-	public static final Type	AOverride	= new AnnotationType("java.lang.Override");
-	public static final Type	ARetention	= new AnnotationType("java.lang.annotation.Retention");
-	public static final Type	ATarget		= new AnnotationType("java.lang.annotation.Target");
+	public static final Type	ABytecode	= new AnnotationType("Bytecode");
+	public static final Type	AOverride	= new AnnotationType("Override");
+	public static final Type	ARetention	= new AnnotationType("Retention");
+	public static final Type	ATarget		= new AnnotationType("Target");
 	
 	public static IClass		PREDEF_CLASS;
 	
@@ -98,15 +98,10 @@ public class Type extends ASTNode implements IContext, IType
 		DOUBLE.theClass = Package.dyvilLang.resolveClass("Double");
 		
 		ANY.theClass = Package.dyvilLang.resolveClass("Any");
-		ANY.name = "Any";
 		OBJECT.theClass = Package.javaLang.resolveClass("Object");
-		OBJECT.name = "Object";
 		PREDEF.theClass = PREDEF_CLASS = Package.dyvilLang.resolveClass("Predef");
-		PREDEF.name = "Predef";
 		ARRAY.theClass = Package.dyvilLang.resolveClass("Array");
-		ARRAY.name = "Array";
 		STRING.theClass = Package.javaLang.resolveClass("String");
-		STRING.name = "String";
 		
 		ABytecode.theClass = Package.dyvilLangAnnotation.resolveClass("Bytecode");
 		AOverride.theClass = Package.javaLang.resolveClass("Override");
