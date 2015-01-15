@@ -44,7 +44,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	@Override
 	public IType getType()
 	{
-		return this.field.getType();
+		return this.field == null ? Type.NONE : this.field.getType();
 	}
 	
 	@Override

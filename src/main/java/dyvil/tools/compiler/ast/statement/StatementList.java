@@ -83,6 +83,8 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
+		this.context = context;
+		
 		int len = this.values.size();
 		for (int i = 0; i < len; i++)
 		{
