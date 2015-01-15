@@ -24,6 +24,7 @@ public class DyvilCompiler
 	public static boolean				parseStack;
 	public static boolean				logFile	= true;
 	public static boolean				debug;
+	public static int					constantFolding;
 	
 	public static Logger				logger	= Logger.getLogger("DYVILC");
 	public static DateFormat			format	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -146,34 +147,49 @@ public class DyvilCompiler
 			states.add(CompilerState.RESOLVE);
 			states.add(CompilerState.CHECK);
 			states.add(CompilerState.COMPILE);
-			break;
+			return;
 		case "optimize":
 			states.add(CompilerState.FOLD_CONSTANTS);
-			// states.add(CompilerState.OPTIMIZE);
-			break;
+			constantFolding = 1;
+			return;
 		case "obfuscate":
 			// states.add(CompilerState.OBFUSCATE);
-			break;
+			return;
 		case "doc":
 			// states.add(CompilerState.DYVILDOC);
-			break;
+			return;
 		case "decompile":
 			// states.add(CompilerState.DECOMPILE);
-			break;
+			return;
 		case "jar":
 			states.add(CompilerState.JAR);
-			break;
+			return;
 		case "--debug":
 			states.add(CompilerState.DEBUG);
 			debug = true;
-			break;
+			return;
 		case "--pstack":
 			parseStack = true;
-			break;
+			return;
 		case "--nolog":
 			logFile = false;
-			break;
+			return;
 		}
+		
+		if (s.startsWith("-o"))
+		{
+			try
+			{
+				states.add(CompilerState.FOLD_CONSTANTS);
+				constantFolding = Integer.parseInt(s.substring(2));
+				return;
+			}
+			catch (Exception ex)
+			{
+			}
+		}
+		
+		System.out.println("Invalid Argument '" + s + "'");
 	}
 	
 	public static void findUnits(File source, File output, Package pack)

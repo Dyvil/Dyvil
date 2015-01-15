@@ -86,9 +86,12 @@ public enum CompilerState
 		@Override
 		public void apply(List<CompilationUnit> units)
 		{
-			for (CompilationUnit cu : units)
+			for (int i = 0; i < DyvilCompiler.constantFolding; i++)
 			{
-				cu.foldConstants();
+				for (CompilationUnit cu : units)
+				{
+					cu.foldConstants();
+				}
 			}
 		}
 	},
