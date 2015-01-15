@@ -79,12 +79,6 @@ public class LambdaValue extends ASTNode implements IValue, IValued, IParameteri
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return false;
-	}
-	
-	@Override
 	public void setType(IType type)
 	{
 		this.type = type;

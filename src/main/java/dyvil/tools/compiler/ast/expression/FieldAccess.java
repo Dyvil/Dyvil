@@ -42,12 +42,6 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return false;
-	}
-	
-	@Override
 	public IType getType()
 	{
 		if (this.field == null)

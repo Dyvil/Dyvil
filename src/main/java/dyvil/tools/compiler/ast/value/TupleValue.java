@@ -74,12 +74,6 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return true;
-	}
-	
-	@Override
 	public TupleType getType()
 	{
 		if (this.tupleType != null)

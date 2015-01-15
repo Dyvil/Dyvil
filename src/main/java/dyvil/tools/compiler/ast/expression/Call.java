@@ -21,12 +21,6 @@ public abstract class Call extends ASTNode implements IValue, IValueList, IAcces
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return false;
-	}
-	
-	@Override
 	public void setValues(List<IValue> list)
 	{
 		this.arguments = list;

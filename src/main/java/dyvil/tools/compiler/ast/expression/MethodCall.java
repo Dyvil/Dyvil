@@ -177,12 +177,29 @@ public class MethodCall extends Call implements INamed, IValued
 	@Override
 	public IValue foldConstants()
 	{
+		int len = this.arguments.size();
 		if (this.instance != null)
 		{
+			if (this.instance.isConstant())
+			{
+				if (len == 0)
+				{
+					IValue v1 = ConstantFolder.apply(this.instance, this.qualifiedName);
+					return v1 == null ? this : v1;
+				}
+				else if (len == 1)
+				{
+					IValue argument = this.arguments.get(0);
+					if (argument.isConstant())
+					{
+						IValue v1 = ConstantFolder.apply(this.instance, this.qualifiedName, argument);
+						return v1 == null ? this : v1;
+					}
+				}
+			}
 			this.instance = this.instance.foldConstants();
 		}
 		
-		int len = this.arguments.size();
 		for (int i = 0; i < len; i++)
 		{
 			IValue v1 = this.arguments.get(i);
@@ -190,31 +207,6 @@ public class MethodCall extends Call implements INamed, IValued
 			if (v1 != v2)
 			{
 				this.arguments.set(i, v2);
-			}
-		}
-		
-		// Actual Constant Folding
-		if (this.instance != null && this.instance.isConstant())
-		{
-			if (len == 0)
-			{
-				IValue v1 = ConstantFolder.apply(this.instance, this.qualifiedName);
-				if (v1 != null)
-				{
-					return v1;
-				}
-			}
-			else if (len == 1)
-			{
-				IValue argument = this.arguments.get(0);
-				if (argument.isConstant())
-				{
-					IValue v1 = ConstantFolder.apply(instance, this.qualifiedName, argument);
-					if (v1 != null)
-					{
-						return v1;
-					}
-				}
 			}
 		}
 		

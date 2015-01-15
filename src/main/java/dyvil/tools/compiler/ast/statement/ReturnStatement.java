@@ -32,12 +32,6 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return false;
-	}
-	
-	@Override
 	public IType getType()
 	{
 		return this.value == null ? Type.VOID : this.value.getType();

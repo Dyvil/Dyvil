@@ -42,12 +42,6 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return false;
-	}
-	
-	@Override
 	public IType getType()
 	{
 		return this.field.getType();

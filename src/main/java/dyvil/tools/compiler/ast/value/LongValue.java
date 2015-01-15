@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class LongValue extends ASTNode implements IConstantValue
+public class LongValue extends ASTNode implements INumericValue
 {
 	public long	value;
 	
@@ -36,6 +36,30 @@ public class LongValue extends ASTNode implements IConstantValue
 	public Long toObject()
 	{
 		return Long.valueOf(this.value);
+	}
+	
+	@Override
+	public int intValue()
+	{
+		return (int) this.value;
+	}
+	
+	@Override
+	public long longValue()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public float floatValue()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public double doubleValue()
+	{
+		return this.value;
 	}
 	
 	@Override

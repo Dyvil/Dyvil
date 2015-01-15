@@ -22,12 +22,6 @@ public class BooleanValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return true;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return Type.BOOLEAN;

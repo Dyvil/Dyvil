@@ -49,12 +49,6 @@ public class WhileStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return false;
-	}
-	
-	@Override
 	public IType getType()
 	{
 		return this.then.getType();

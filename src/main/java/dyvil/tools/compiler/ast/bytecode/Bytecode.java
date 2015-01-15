@@ -28,12 +28,6 @@ public class Bytecode extends ASTNode implements IValue
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return false;
-	}
-	
-	@Override
 	public Type getType()
 	{
 		return Type.VOID;

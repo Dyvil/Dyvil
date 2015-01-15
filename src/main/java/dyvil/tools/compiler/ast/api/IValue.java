@@ -12,18 +12,20 @@ public interface IValue extends IASTNode
 {
 	public static int	NULL				= 0;
 	public static int	BOOLEAN				= 1;
-	public static int	CHAR				= 2;
-	public static int	INT					= 3;
-	public static int	LONG				= 4;
-	public static int	FLOAT				= 5;
-	public static int	DOUBLE				= 6;
-	public static int	STRING				= 7;
-	public static int	ENUM				= 8;
+	public static int	BYTE				= 2;
+	public static int	SHORT				= 3;
+	public static int	CHAR				= 4;
+	public static int	INT					= 5;
+	public static int	LONG				= 6;
+	public static int	FLOAT				= 7;
+	public static int	DOUBLE				= 8;
+	public static int	STRING				= 9;
+	public static int	ENUM				= 10;
 	
-	public static int	THIS				= 9;
-	public static int	SUPER				= 10;
+	public static int	THIS				= 11;
+	public static int	SUPER				= 12;
 	
-	public static int	VALUE_LIST			= 11;
+	public static int	VALUE_LIST			= 13;
 	
 	public static int	CLASS_ACCESS		= 16;
 	public static int	FIELD_ACCESS		= 17;
@@ -42,7 +44,15 @@ public interface IValue extends IASTNode
 	public static int	WHILE				= 68;
 	public static int	DO_WHILE			= 69;
 	
-	public boolean isConstant();
+	public static boolean isNumeric(int t1)
+	{
+		return t1 >= BYTE && t1 <= DOUBLE;
+	}
+	
+	public default boolean isConstant()
+	{
+		return false;
+	}
 	
 	public IType getType();
 	
