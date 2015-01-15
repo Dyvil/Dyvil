@@ -79,6 +79,20 @@ public enum CompilerState
 		}
 	},
 	/**
+	 * Prints the AST.
+	 */
+	DEBUG
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			for (CompilationUnit cu : units)
+			{
+				cu.debug();
+			}
+		}
+	},
+	/**
 	 * Folds constants.
 	 */
 	FOLD_CONSTANTS
@@ -93,6 +107,12 @@ public enum CompilerState
 					cu.foldConstants();
 				}
 			}
+		}
+		
+		@Override
+		public String toString()
+		{
+			return "FOLD_CONSTANTS (" + DyvilCompiler.constantFolding + "x)";
 		}
 	},
 	/**
@@ -120,20 +140,6 @@ public enum CompilerState
 		public void apply(List<CompilationUnit> units)
 		{
 			ClassWriter.generateJAR(DyvilCompiler.files);
-		}
-	},
-	/**
-	 * Prints the AST.
-	 */
-	DEBUG
-	{
-		@Override
-		public void apply(List<CompilationUnit> units)
-		{
-			for (CompilationUnit cu : units)
-			{
-				cu.debug();
-			}
 		}
 	};
 	

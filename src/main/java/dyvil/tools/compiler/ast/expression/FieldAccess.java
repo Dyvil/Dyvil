@@ -5,9 +5,11 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -169,10 +171,18 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		
 		if (this.field != null)
 		{
-			if (this.instance != null && this.field.hasModifier(Modifiers.STATIC) && this.instance.getValueType() == IValue.THIS)
+			if (this.field.hasModifier(Modifiers.STATIC))
 			{
-				markers.add(new Warning(this.position, "'" + this.name + "' is a static field and should be accessed in a static way"));
-				this.instance = null;
+				if (this.instance != null && this.instance.getValueType() == IValue.THIS)
+				{
+					markers.add(new Warning(this.position, "'" + this.name + "' is a static field and should be accessed in a static way"));
+					this.instance = null;
+				}
+			}
+			else if (this.instance == null && this.field instanceof Field)
+			{
+				markers.add(new Warning(this.position, "Unqualified access to '" + this.name + "'"));
+				this.instance = new ThisValue(this.position, this.field.getTheClass().getType());
 			}
 			
 			byte access = context.getAccessibility(this.field);
@@ -197,10 +207,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		if (this.field.hasModifier(Modifiers.CONST))
 		{
 			IValue v = this.field.getValue();
-			if (v != null && v.isConstant())
-			{
-				return v;
-			}
+			return v != null && v.isConstant() ? v : this;
 		}
 		this.instance = this.instance.foldConstants();
 		return this;

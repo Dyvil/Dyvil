@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.api.IStatement;
 import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.api.IValue;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.BooleanValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -120,6 +121,23 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public IValue foldConstants()
 	{
+		if (this.condition.isConstant())
+		{
+			int type = this.condition.getValueType();
+			if (type == BOOLEAN)
+			{
+				if (((BooleanValue) this.condition).value)
+				{
+					return this.then;
+				}
+				else
+				{
+					return this.elseThen;
+				}
+			}
+			return this;
+		}
+		
 		this.condition = this.condition.foldConstants();
 		if (this.then != null)
 		{
