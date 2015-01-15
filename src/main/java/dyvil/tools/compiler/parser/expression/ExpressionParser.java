@@ -287,7 +287,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (token.isType(IToken.TYPE_IDENTIFIER))
 			{
-				if (this.precedence != 0)
+				if (this.precedence != 0 && this.dotless)
 				{
 					int p = OperatorComparator.index(value);
 					if (p != 0 && this.precedence > p)
@@ -355,6 +355,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		if (next.equals("("))
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
+			call.dotless = this.dotless;
 			this.value = call;
 			this.mode = PARAMETERS;
 			return true;
@@ -362,7 +363,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		else if (!next.isType(IToken.TYPE_IDENTIFIER) && !next.isType(IToken.TYPE_SYMBOL))
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
-			call.setSugar(true);
+			call.isSugarCall = true;
 			call.dotless = this.dotless;
 			this.value = call;
 			this.mode = ACCESS;
