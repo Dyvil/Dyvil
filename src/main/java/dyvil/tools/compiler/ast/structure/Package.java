@@ -16,12 +16,13 @@ import dyvil.tools.compiler.util.ClassFormat;
 
 public class Package implements IContext
 {
-	public static Package			rootPackage			= new RootPackage(null, null);
+	public static Package			rootPackage	= new RootPackage(null, null);
 	
-	public static Package			dyvilLang			= Library.dyvilLibrary.resolvePackage("dyvil.lang");
-	public static Package			javaLang			= Library.javaLibrary.resolvePackage("java.lang");
-	public static Package			dyvilLangAnnotation	= Library.dyvilLibrary.resolvePackage("dyvil.lang.annotation");
-	public static Package			javaLangAnnotation	= Library.javaLibrary.resolvePackage("java.lang.annotation");
+	public static Package			dyvilLang;
+	public static Package dyvilLangTuple;
+	public static Package			dyvilLangAnnotation;
+	public static Package			javaLang;
+	public static Package			javaLangAnnotation;
 	
 	public Package					parent;
 	public String					name;
@@ -30,9 +31,9 @@ public class Package implements IContext
 	
 	public boolean					isExternal;
 	
-	public List<CompilationUnit>	units				= new ArrayList();
-	public List<IClass>				classes				= new ArrayList();
-	public List<Package>			subPackages			= new ArrayList();
+	public List<CompilationUnit>	units		= new ArrayList();
+	public List<IClass>				classes		= new ArrayList();
+	public List<Package>			subPackages	= new ArrayList();
 	
 	public Package(Package parent, String name)
 	{
@@ -52,6 +53,15 @@ public class Package implements IContext
 			this.fullName = parent.fullName + "." + name;
 			this.internalName = parent.internalName + name + "/";
 		}
+	}
+	
+	public static void init()
+	{
+		dyvilLang = Library.dyvilLibrary.resolvePackage("dyvil.lang");
+		dyvilLangAnnotation = Library.dyvilLibrary.resolvePackage("dyvil.lang.annotation");
+		dyvilLangTuple = Library.dyvilLibrary.resolvePackage("dyvil.lang.tuple");
+		javaLang = Library.javaLibrary.resolvePackage("java.lang");
+		javaLangAnnotation = Library.javaLibrary.resolvePackage("java.lang.annotation");
 	}
 	
 	public void addCompilationUnit(CompilationUnit unit)

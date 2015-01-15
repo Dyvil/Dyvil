@@ -224,7 +224,7 @@ public class Method extends Member implements IMethod
 			parType = par.type;
 			if (!instance.requireType(parType))
 			{
-				markers.add(new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name + "' is incompatible with the required type " + parType));
+				markers.add(new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name + "' of type '" + instance.getType() + "' is incompatible with the required type " + parType));
 			}
 			pOff = 1;
 		}
@@ -236,7 +236,7 @@ public class Method extends Member implements IMethod
 			IValue value = arguments.get(i);
 			if (!value.requireType(parType))
 			{
-				markers.add(new SemanticError(value.getPosition(), "The method argument for '" + par.name + "' is incompatible with the required type " + parType));
+				markers.add(new SemanticError(value.getPosition(), "The method argument for '" + par.name + "' of type '" + value.getType() + "' is incompatible with the required type " + parType));
 			}
 		}
 	}

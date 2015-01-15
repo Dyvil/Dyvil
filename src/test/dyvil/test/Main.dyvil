@@ -2,6 +2,7 @@ package test;
 
 public class Main
 {
-	public static void main(String[] args) = System out.println(1 + 2 * 3 + 4);
+	public static void main(String[] args) = (1, 2) print;
+	
+	public implicit void print(Object o) = System out println o;
 }
-

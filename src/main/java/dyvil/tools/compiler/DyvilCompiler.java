@@ -72,6 +72,7 @@ public class DyvilCompiler
 			}
 			
 			// Inits primitive data types
+			Package.init();
 			Type.init();
 			
 			Util.logProfile(now, libs, "Loaded " + libs + (libs == 1 ? " Library " : " Libraries ") + "(%.1f ms, %.1f ms/L, %.2f L/s)");

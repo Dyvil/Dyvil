@@ -342,6 +342,9 @@ public class Type extends ASTNode implements IContext, IType
 		case "String":
 			// Both lower- and uppercase "string" resolve to java.lang.String.
 			return STRING;
+		case "any":
+		case "Any":
+			return ANY;
 		}
 		return null;
 	}

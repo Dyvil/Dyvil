@@ -13,7 +13,7 @@ public class AccessResolver
 {
 	public static IAccess resolve(List<Marker> markers, IContext context, IAccess access)
 	{
-		LinkedList<IAccess> chain = getCallChain(access);
+		LinkedList<IAccess> chain = getCallChain(markers, context, access);
 		
 		ListIterator<IAccess> iterator = chain.listIterator();
 		IContext context1 = context;
@@ -117,7 +117,7 @@ public class AccessResolver
 		return chain.getLast();
 	}
 	
-	public static LinkedList<IAccess> getCallChain(IAccess iaccess)
+	public static LinkedList<IAccess> getCallChain(List<Marker> markers, IContext context, IAccess iaccess)
 	{
 		LinkedList<IAccess> list = new LinkedList();
 		while (true)
@@ -129,6 +129,10 @@ public class AccessResolver
 			{
 				iaccess = (IAccess) v;
 				continue;
+			}
+			else if (v != null)
+			{
+				v.resolve(markers, context);
 			}
 			break;
 		}

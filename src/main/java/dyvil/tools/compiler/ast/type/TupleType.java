@@ -3,16 +3,19 @@ package dyvil.tools.compiler.ast.type;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.ast.api.IClass;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IType;
 import dyvil.tools.compiler.ast.api.ITypeList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.util.Util;
 
 public class TupleType extends Type implements ITypeList
 {
-	public static String[]	descriptors	= new String[22];
+	public static IClass[]	tupleClasses	= new IClass[22];
+	public static String[]	descriptors		= new String[22];
 	
-	public List<IType>		types		= new ArrayList(2);
+	public List<IType>		types			= new ArrayList(2);
 	
 	@Override
 	public boolean isName(String name)
@@ -36,6 +39,28 @@ public class TupleType extends Type implements ITypeList
 	public void addType(IType type)
 	{
 		this.types.add(type);
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		if (this.theClass != null)
+		{
+			return this.theClass;
+		}
+		
+		int len = this.types.size();
+		IClass iclass = tupleClasses[len];
+		if (iclass != null)
+		{
+			this.theClass = iclass;
+			return iclass;
+		}
+		
+		iclass = Package.dyvilLangTuple.resolveClass("Tuple" + len);
+		tupleClasses[len] = iclass;
+		this.theClass = iclass;
+		return iclass;
 	}
 	
 	@Override
@@ -66,6 +91,12 @@ public class TupleType extends Type implements ITypeList
 	}
 	
 	@Override
+	public IType getSuperType()
+	{
+		return Type.OBJECT;
+	}
+	
+	@Override
 	public boolean classEquals(IType type)
 	{
 		if (type instanceof TupleType)
@@ -93,8 +124,10 @@ public class TupleType extends Type implements ITypeList
 	}
 	
 	@Override
-	public Type resolve(IContext context)
+	public TupleType resolve(IContext context)
 	{
+		this.getTheClass();
+		
 		int len = this.types.size();
 		for (int i = 0; i < len; i++)
 		{

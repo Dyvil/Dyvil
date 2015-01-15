@@ -104,7 +104,14 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.getType();
+		TupleType type = new TupleType();
+		for (IValue v : this.values)
+		{
+			v.resolveTypes(markers, context);
+			type.addType(v.getType());
+		}
+		type.getTheClass();
+		this.tupleType = type;
 	}
 	
 	@Override
