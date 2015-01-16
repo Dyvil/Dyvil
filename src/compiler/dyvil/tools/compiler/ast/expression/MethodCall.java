@@ -359,7 +359,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 		// If no @Bytecode annotation is present, write a normal invocation.
 		IClass ownerClass = this.method.getTheClass();
 		int opcode;
-		int args = this.arguments.size();
+		int args = this.method.getParameters().size();
 		if (this.method.hasModifier(Modifiers.STATIC))
 		{
 			opcode = Opcodes.INVOKESTATIC;

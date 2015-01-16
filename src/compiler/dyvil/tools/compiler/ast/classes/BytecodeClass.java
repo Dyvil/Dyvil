@@ -34,6 +34,16 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
+	public boolean isSuperType(IType type)
+	{
+		if (!this.typesResolved)
+		{
+			this.resolveTypes(null, Package.rootPackage);
+		}
+		return super.isSuperType(type);
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.superType != null)
@@ -64,6 +74,7 @@ public class BytecodeClass extends CodeClass
 		}
 		
 		this.body.resolveTypes(markers, Package.rootPackage);
+		this.typesResolved = true;
 	}
 	
 	@Override
@@ -102,7 +113,6 @@ public class BytecodeClass extends CodeClass
 		if (!this.typesResolved)
 		{
 			this.resolveTypes(null, Package.rootPackage);
-			this.typesResolved = true;
 		}
 		return super.resolveField(name);
 	}
@@ -113,7 +123,6 @@ public class BytecodeClass extends CodeClass
 		if (!this.typesResolved)
 		{
 			this.resolveTypes(null, Package.rootPackage);
-			this.typesResolved = true;
 		}
 		return super.resolveMethod(instance, name, arguments);
 	}
@@ -124,7 +133,6 @@ public class BytecodeClass extends CodeClass
 		if (!this.typesResolved)
 		{
 			this.resolveTypes(null, Package.rootPackage);
-			this.typesResolved = true;
 		}
 		super.getMethodMatches(list, instance, name, arguments);
 	}

@@ -5,10 +5,9 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IValue;
-import dyvil.tools.compiler.ast.api.IValueList;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.type.TupleType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -74,19 +73,57 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public TupleType getType()
+	public IType getType()
 	{
+		int len = this.values.size();
 		if (this.tupleType != null)
 		{
 			return this.tupleType;
 		}
 		
-		TupleType t = new TupleType();
-		for (IValue v : this.values)
+		TupleType t = new TupleType(len);
+		for (int i = 0; i < len; i++)
 		{
+			IValue v = this.values.get(i);
 			t.addType(v.getType());
 		}
 		return this.tupleType = t;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		if (this.values.size() == 1)
+		{
+			return this.values.get(0).isType(type);
+		}
+		
+		IType type1 = this.getType();
+		return Type.isSuperType(type, type1);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.values.size() == 1)
+		{
+			return this.values.get(0).getTypeMatch(type);
+		}
+		
+		IType t = this.getType();
+		if (type.equals(t))
+		{
+			return 3;
+		}
+		else if (Type.isSuperType(type, t))
+		{
+			return 2;
+		}
+		else if (type.classEquals(Type.OBJECT))
+		{
+			return 1;
+		}
+		return 0;
 	}
 	
 	@Override
@@ -169,7 +206,7 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		TupleType t = this.getType();
+		TupleType t = this.tupleType;
 		writer.visitTypeInsn(Opcodes.NEW, t);
 		writer.visitInsn(Opcodes.DUP, t);
 		

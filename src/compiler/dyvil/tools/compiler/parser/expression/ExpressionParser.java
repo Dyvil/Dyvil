@@ -221,7 +221,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.dotless = true;
 			this.mode = ACCESS_2;
 			
-			if ("=".equals(value))
+			if (token.isType(IToken.KEYWORD_ELSE))
+			{
+				pm.popParser(true);
+				return true;
+			}
+			else if ("=".equals(value))
 			{
 				return this.getAssign(pm);
 			}
@@ -541,7 +546,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = 0;
 			return true;
 		case IToken.KEYWORD_ELSE:
-			throw new SyntaxError(token, "Invalid 'else' token");
+			pm.popParser(true);
+			return true;
 		case IToken.KEYWORD_WHILE:
 			WhileStatement statement = new WhileStatement(token);
 			this.value = statement;

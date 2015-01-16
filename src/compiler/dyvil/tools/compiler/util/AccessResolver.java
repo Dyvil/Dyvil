@@ -18,6 +18,7 @@ public class AccessResolver
 		ListIterator<IAccess> iterator = chain.listIterator();
 		IAccess prev = null;
 		IAccess curr = null;
+		IAccess alternate = null;
 		
 		boolean backwards = false;
 		
@@ -26,9 +27,15 @@ public class AccessResolver
 			prev = curr;
 			curr = iterator.next();
 			
+			if (alternate != null)
+			{
+				curr.setValue(alternate);
+				alternate = null;
+			}
+			
 			if (!curr.resolve(context))
 			{
-				IAccess alternate = curr.resolve2(context);
+				alternate = curr.resolve2(context);
 				if (alternate == null)
 				{
 					backwards = true;
@@ -105,7 +112,11 @@ public class AccessResolver
 			}
 			else if (v != null)
 			{
-				v.resolve(markers, context);
+				IValue v2 = v.resolve(markers, context);
+				if (v != v2)
+				{
+					iaccess.setValue(v2);
+				}
 			}
 			break;
 		}

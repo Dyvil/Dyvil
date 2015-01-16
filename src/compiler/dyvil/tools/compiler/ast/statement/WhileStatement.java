@@ -7,10 +7,7 @@ import jdk.internal.org.objectweb.asm.Label;
 import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
 
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IStatement;
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.IValue;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -49,15 +46,27 @@ public class WhileStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public IType getType()
-	{
-		return this.then.getType();
-	}
-	
-	@Override
 	public int getValueType()
 	{
 		return WHILE;
+	}
+	
+	@Override
+	public IType getType()
+	{
+		return Type.VOID;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type.classEquals(Type.VOID);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return 0;
 	}
 	
 	@Override

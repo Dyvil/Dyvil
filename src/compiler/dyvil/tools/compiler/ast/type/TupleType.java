@@ -17,6 +17,16 @@ public class TupleType extends Type implements ITypeList
 	
 	public List<IType>		types			= new ArrayList(2);
 	
+	public TupleType()
+	{
+		this.types = new ArrayList(2);
+	}
+	
+	public TupleType(int size)
+	{
+		this.types = new ArrayList(size);
+	}
+	
 	@Override
 	public boolean isName(String name)
 	{

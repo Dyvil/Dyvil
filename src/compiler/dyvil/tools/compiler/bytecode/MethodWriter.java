@@ -15,11 +15,13 @@ import dyvil.tools.compiler.util.OpcodeUtil;
 
 public final class MethodWriter extends MethodVisitor
 {
-	private boolean	hasReturn;
-	private int		maxStack;
+	public static final Object	JUMP_INSTRUCTION_TARGET	= new Object();
 	
-	private List	locals		= new ArrayList();
-	private Stack	typeStack	= new Stack();
+	private boolean				hasReturn;
+	private int					maxStack;
+	
+	private List				locals					= new ArrayList();
+	private Stack				typeStack				= new Stack();
 	
 	public MethodWriter(MethodVisitor mv)
 	{
@@ -200,15 +202,25 @@ public final class MethodWriter extends MethodVisitor
 	@Override
 	public void visitJumpInsn(int opcode, Label label)
 	{
+		if (opcode >= IFEQ && opcode <= IFLE)
+		{
+			this.typeStack.pop();
+		}
 		this.mv.visitJumpInsn(opcode, label);
-		this.visitFrame();
+		if (opcode == GOTO)
+		{
+			this.visitFrame();
+		}
 	}
 	
 	@Override
 	public void visitLabel(Label label)
 	{
+		if (label.info == JUMP_INSTRUCTION_TARGET)
+		{
+			this.visitFrame();
+		}
 		this.mv.visitLabel(label);
-		this.visitFrame();
 	}
 	
 	private void visitFrame()
@@ -231,6 +243,18 @@ public final class MethodWriter extends MethodVisitor
 			{
 				this.mv.visitLdcInsn(-1L);
 			}
+		}
+		else if (opcode >= IALOAD && opcode <= SALOAD)
+		{
+			this.typeStack.pop(); // Index
+			String s = (String) this.typeStack.pop(); // Array
+			this.push(s.substring(1));
+		}
+		else if (opcode >= IASTORE && opcode <= SASTORE)
+		{
+			this.typeStack.pop(); // Index
+			this.typeStack.pop(); // Array
+			this.typeStack.pop(); // Value
 		}
 		this.mv.visitInsn(opcode);
 	}

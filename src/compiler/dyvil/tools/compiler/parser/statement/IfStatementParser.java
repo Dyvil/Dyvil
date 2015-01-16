@@ -32,7 +32,7 @@ public class IfStatementParser extends Parser implements IValued
 	{
 		if (this.mode == -1)
 		{
-			pm.popParser();
+			pm.popParser(true);
 			return true;
 		}
 		if (this.mode == IF)

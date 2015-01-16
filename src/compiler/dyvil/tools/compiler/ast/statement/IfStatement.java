@@ -5,10 +5,7 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IStatement;
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.IValue;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.BooleanValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -22,6 +19,8 @@ public class IfStatement extends ASTNode implements IStatement
 	private IValue	condition;
 	private IValue	then;
 	private IValue	elseThen;
+	
+	private IType	commonType;
 	
 	public IfStatement(ICodePosition position)
 	{
@@ -61,7 +60,59 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public IType getType()
 	{
-		return this.then == null ? this.condition.getType() : this.then.getType();
+		if (this.commonType != null)
+		{
+			return this.commonType;
+		}
+		
+		if (this.then != null)
+		{
+			if (this.elseThen != null)
+			{
+				return this.commonType = Type.findCommonSuperType(this.then.getType(), this.elseThen.getType());
+			}
+			return this.commonType = this.then.getType();
+		}
+		return this.commonType = Type.VOID;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		if (this.commonType != null)
+		{
+			return Type.isSuperType(type, this.commonType);
+		}
+		
+		if (this.then != null)
+		{
+			if (this.elseThen != null)
+			{
+				if (this.then.isType(type) && this.elseThen.isType(type))
+				{
+					this.commonType = type;
+					return true;
+				}
+			}
+			
+			return this.then.isType(type);
+		}
+		
+		return type.classEquals(Type.VOID);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.isType(type))
+		{
+			return 2;
+		}
+		else if (type.classEquals(Type.OBJECT))
+		{
+			return 1;
+		}
+		return 0;
 	}
 	
 	@Override
@@ -160,11 +211,11 @@ public class IfStatement extends ASTNode implements IStatement
 		if (this.elseThen != null)
 		{
 			Label ifEnd = new Label();
+			ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 			Label elseEnd = new Label();
 			
 			// Condition
-			this.condition.writeExpression(writer);
-			writer.visitJumpInsn(Opcodes.IFEQ, ifEnd);
+			this.condition.writeJump(writer, ifEnd);
 			// If Block
 			this.then.writeExpression(writer);
 			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
@@ -176,6 +227,7 @@ public class IfStatement extends ASTNode implements IStatement
 		else
 		{
 			Label ifEnd = new Label();
+			ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 			
 			// Condition
 			this.condition.writeJump(writer, ifEnd);
@@ -191,6 +243,7 @@ public class IfStatement extends ASTNode implements IStatement
 		if (this.elseThen != null)
 		{
 			Label ifEnd = new Label();
+			ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 			Label elseEnd = new Label();
 			
 			// Condition
@@ -206,6 +259,7 @@ public class IfStatement extends ASTNode implements IStatement
 		else
 		{
 			Label ifEnd = new Label();
+			ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 			
 			// Condition
 			this.condition.writeJump(writer, ifEnd);
@@ -239,6 +293,16 @@ public class IfStatement extends ASTNode implements IStatement
 			}
 			
 			buffer.append(Formatting.Statements.ifElse);
+
+			if (this.elseThen instanceof IStatement)
+			{
+				buffer.append('\n').append(prefix);
+			}
+			else
+			{
+				buffer.append(' ');
+			}
+			
 			this.elseThen.toString(prefix, buffer);
 		}
 	}

@@ -48,6 +48,8 @@ public interface IValue extends IASTNode, ITyped
 	public static int	WHILE				= 68;
 	public static int	DO_WHILE			= 69;
 	
+	public int getValueType();
+	
 	public static boolean isNumeric(int t1)
 	{
 		return t1 >= BYTE && t1 <= DOUBLE;
@@ -65,8 +67,6 @@ public interface IValue extends IASTNode, ITyped
 	public default void setType(IType type)
 	{
 	}
-	
-	public int getValueType();
 	
 	public default Object toObject()
 	{
