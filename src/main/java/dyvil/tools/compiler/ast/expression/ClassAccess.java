@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
+import dyvil.lang.array.Arrays;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -135,7 +136,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	{
 		if (!this.type.isResolved())
 		{
-			IValue v = this.resolve2(context, null);
+			IValue v = this.resolve2(context);
 			if (v != null)
 			{
 				return v;
@@ -169,16 +170,16 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	}
 	
 	@Override
-	public boolean resolve(IContext context, IContext context1)
+	public boolean resolve(IContext context)
 	{
 		return this.type.isResolved();
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context, IContext context1)
+	public IAccess resolve2(IContext context)
 	{
 		String qualifiedName = this.type.getQualifiedName();
-		FieldMatch f = context.resolveField(context1, qualifiedName);
+		FieldMatch f = context.resolveField(qualifiedName);
 		if (f != null)
 		{
 			FieldAccess access = new FieldAccess(this.position);
@@ -188,7 +189,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 			return access;
 		}
 		
-		MethodMatch m = context.resolveMethod(context1, qualifiedName, Type.EMPTY_TYPES);
+		MethodMatch m = context.resolveMethod(null, qualifiedName, Type.EMPTY_TYPES);
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position);
@@ -207,7 +208,8 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	public IAccess resolve3(IContext context, IAccess next)
 	{
 		String name = this.type.getQualifiedName();
-		MethodMatch m = context.resolveMethod(null, name, new IType[] { next.getType() });
+		// TODO SingleElementList
+		MethodMatch m = context.resolveMethod(null, name, Arrays.asList(next));
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position, null, name);

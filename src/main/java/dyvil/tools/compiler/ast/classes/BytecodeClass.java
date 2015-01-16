@@ -97,36 +97,36 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		if (!this.typesResolved)
 		{
 			this.resolveTypes(null, Package.rootPackage);
 			this.typesResolved = true;
 		}
-		return super.resolveField(context, name);
+		return super.resolveField(name);
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext returnType, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		if (!this.typesResolved)
 		{
 			this.resolveTypes(null, Package.rootPackage);
 			this.typesResolved = true;
 		}
-		return super.resolveMethod(returnType, name, argumentTypes);
+		return super.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		if (!this.typesResolved)
 		{
 			this.resolveTypes(null, Package.rootPackage);
 			this.typesResolved = true;
 		}
-		super.getMethodMatches(list, type, name, argumentTypes);
+		super.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	public boolean addSpecialMethod(String specialType, String name, IMethod method)

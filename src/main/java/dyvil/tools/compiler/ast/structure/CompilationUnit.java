@@ -6,10 +6,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IClass;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IMember;
-import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.Import;
@@ -291,11 +288,11 @@ public class CompilationUnit extends ASTNode implements IContext
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		for (Import i : this.staticImports)
 		{
-			FieldMatch field = i.resolveField(context, name);
+			FieldMatch field = i.resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -305,11 +302,11 @@ public class CompilationUnit extends ASTNode implements IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		for (Import i : this.staticImports)
 		{
-			MethodMatch method = i.resolveMethod(context, name, argumentTypes);
+			MethodMatch method = i.resolveMethod(instance, name, arguments);
 			if (method != null)
 			{
 				return method;
@@ -319,11 +316,11 @@ public class CompilationUnit extends ASTNode implements IContext
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		for (Import i : this.staticImports)
 		{
-			i.getMethodMatches(list, type, name, argumentTypes);
+			i.getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	

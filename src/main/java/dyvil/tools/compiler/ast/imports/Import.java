@@ -70,21 +70,21 @@ public class Import extends ASTNode implements IContext, IImportContainer
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
-		return this.last.resolveField(context, name);
+		return this.last.resolveField(name);
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
-		return this.last.resolveMethod(context, name, argumentTypes);
+		return this.last.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
-		this.last.getMethodMatches(list, type, name, argumentTypes);
+		this.last.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override

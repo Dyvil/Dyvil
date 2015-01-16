@@ -1,15 +1,11 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IClass;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IMember;
-import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -20,45 +16,45 @@ import dyvil.tools.compiler.util.Symbols;
 
 public class Type extends ASTNode implements IContext, IType
 {
-	public static final IType[]	EMPTY_TYPES	= new IType[0];
+	public static final List<ITyped>	EMPTY_TYPES	= Collections.EMPTY_LIST;
 	
-	public static final Type	NONE		= new Type()
-											{
-												@Override
-												public Object getFrameType()
-												{
-													return Opcodes.NULL;
-												}
-											};
+	public static final Type			NONE		= new Type()
+													{
+														@Override
+														public Object getFrameType()
+														{
+															return Opcodes.NULL;
+														}
+													};
 	
-	public static final Type	VOID		= new PrimitiveType("void", "Void", 0);
-	public static final Type	BOOLEAN		= new PrimitiveType("boolean", "Boolean", Opcodes.T_BOOLEAN);
-	public static final Type	BYTE		= new PrimitiveType("byte", "Byte", Opcodes.T_BOOLEAN);
-	public static final Type	SHORT		= new PrimitiveType("short", "Short", Opcodes.T_SHORT);
-	public static final Type	CHAR		= new PrimitiveType("char", "Char", Opcodes.T_CHAR);
-	public static final Type	INT			= new PrimitiveType("int", "Int", Opcodes.T_INT);
-	public static final Type	LONG		= new PrimitiveType("long", "Long", Opcodes.T_LONG);
-	public static final Type	FLOAT		= new PrimitiveType("float", "Float", Opcodes.T_FLOAT);
-	public static final Type	DOUBLE		= new PrimitiveType("double", "Double", Opcodes.T_DOUBLE);
+	public static final Type			VOID		= new PrimitiveType("void", "Void", 0);
+	public static final Type			BOOLEAN		= new PrimitiveType("boolean", "Boolean", Opcodes.T_BOOLEAN);
+	public static final Type			BYTE		= new PrimitiveType("byte", "Byte", Opcodes.T_BOOLEAN);
+	public static final Type			SHORT		= new PrimitiveType("short", "Short", Opcodes.T_SHORT);
+	public static final Type			CHAR		= new PrimitiveType("char", "Char", Opcodes.T_CHAR);
+	public static final Type			INT			= new PrimitiveType("int", "Int", Opcodes.T_INT);
+	public static final Type			LONG		= new PrimitiveType("long", "Long", Opcodes.T_LONG);
+	public static final Type			FLOAT		= new PrimitiveType("float", "Float", Opcodes.T_FLOAT);
+	public static final Type			DOUBLE		= new PrimitiveType("double", "Double", Opcodes.T_DOUBLE);
 	
-	public static final Type	ANY			= new Type("Any");
-	public static final Type	OBJECT		= new Type("Object");
-	public static final Type	PREDEF		= new Type("Predef");
-	public static final Type	ARRAY		= new Type("Array");
-	public static final Type	STRING		= new Type("String");
+	public static final Type			ANY			= new Type("Any");
+	public static final Type			OBJECT		= new Type("Object");
+	public static final Type			PREDEF		= new Type("Predef");
+	public static final Type			ARRAY		= new Type("Array");
+	public static final Type			STRING		= new Type("String");
 	
-	public static final Type	ABytecode	= new AnnotationType("Bytecode");
-	public static final Type	AOverride	= new AnnotationType("Override");
-	public static final Type	ARetention	= new AnnotationType("Retention");
-	public static final Type	ATarget		= new AnnotationType("Target");
+	public static final Type			ABytecode	= new AnnotationType("Bytecode");
+	public static final Type			AOverride	= new AnnotationType("Override");
+	public static final Type			ARetention	= new AnnotationType("Retention");
+	public static final Type			ATarget		= new AnnotationType("Target");
 	
-	public static IClass		PREDEF_CLASS;
+	public static IClass				PREDEF_CLASS;
 	
-	public String				name;
-	public String				qualifiedName;
-	public String				fullName;
-	public IClass				theClass;
-	public int					arrayDimensions;
+	public String						name;
+	public String						qualifiedName;
+	public String						fullName;
+	public IClass						theClass;
+	public int							arrayDimensions;
 	
 	public Type()
 	{
@@ -370,60 +366,44 @@ public class Type extends ASTNode implements IContext, IType
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		if (this.arrayDimensions > 0)
 		{
-			return ARRAY.resolveField(context, name);
+			return ARRAY.resolveField(name);
 		}
 		
-		return this.theClass == null ? null : this.theClass.resolveField(context, name);
+		return this.theClass == null ? null : this.theClass.resolveField(name);
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
-			MethodMatch match = ARRAY.resolveMethod(context, name, argumentTypes);
+			MethodMatch match = ARRAY.resolveMethod(instance, name, arguments);
 			if (match != null)
 			{
 				return match;
 			}
 		}
 		
-		if (this.theClass == null)
-		{
-			return null;
-		}
-		
-		List<MethodMatch> list = new ArrayList();
-		this.theClass.getMethodMatches(list, this, name, argumentTypes);
-		
-		if (list.isEmpty() && context != null)
-		{
-			IType t = context.getThisType();
-			t.getMethodMatches(list, this, name, argumentTypes);
-		}
-		
-		if (list.isEmpty() && this.theClass != PREDEF_CLASS)
-		{
-			PREDEF_CLASS.getMethodMatches(list, this, name, argumentTypes);
-		}
-		
-		if (list.isEmpty())
-		{
-			return null;
-		}
-		
-		Collections.sort(list);
-		return list.get(0);
+		return this.theClass == null ? null : this.theClass.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
-		this.theClass.getMethodMatches(list, type, name, argumentTypes);
+		if (this.arrayDimensions > 0)
+		{
+			ARRAY.getMethodMatches(list, instance, name, arguments);
+			return;
+		}
+		
+		if (this.theClass != null)
+		{
+			this.theClass.getMethodMatches(list, instance, name, arguments);
+		}
 	}
 	
 	@Override

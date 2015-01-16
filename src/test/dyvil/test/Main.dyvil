@@ -4,16 +4,7 @@ import java.util.Scanner;
 
 public class Main
 {
-	public static void main(String[] args) =
-	{
-		Scanner scanner = new Scanner(System in);
-		int total = 0;
-		
-		while (true) {
-			total = total +(scanner nextInt);
-			System out println total;
-		}
-	};
+	public static void main(String[] args) = print "Hello World";
 	
-	public implicit void print(Object o) = System out println o;
+	public implicit void print(Object o) = System out println(o);
 }

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.api;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
@@ -10,7 +11,7 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 {
 	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments);
 	
-	public int getSignatureMatch(String name, IType type, IType... argumentTypes);
+	public int getSignatureMatch(String name, ITyped instance, List<? extends ITyped> arguments);
 	
 	// @Bytecode
 	
@@ -36,4 +37,27 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 	public String[] getExceptions();
 	
 	public void write(ClassWriter writer);
+	
+	public static IType[] getArgumentTypes(List<IValue> arguments)
+	{
+		int len = arguments.size();
+		IType[] types = new Type[len];
+		for (int i = 0; i < len; i++)
+		{
+			IValue arg = arguments.get(i);
+			if (arg == null)
+			{
+				return null;
+			}
+			
+			IType t = arg.getType();
+			if (t == null)
+			{
+				return null;
+			}
+			
+			types[i] = t;
+		}
+		return types;
+	}
 }

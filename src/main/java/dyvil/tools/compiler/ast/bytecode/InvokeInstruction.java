@@ -277,19 +277,19 @@ public class InvokeInstruction extends Instruction implements IMethod
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		return null;
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		return null;
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 	}
 	
@@ -339,7 +339,7 @@ public class InvokeInstruction extends Instruction implements IMethod
 	}
 	
 	@Override
-	public int getSignatureMatch(String name, IType type, IType... argumentTypes)
+	public int getSignatureMatch(String name, ITyped instance, List<? extends ITyped> arguments)
 	{
 		return 0;
 	}

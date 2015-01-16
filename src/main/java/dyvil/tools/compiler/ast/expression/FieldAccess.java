@@ -1,13 +1,12 @@
 package dyvil.tools.compiler.ast.expression;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -214,25 +213,25 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public boolean resolve(IContext context, IContext context1)
+	public boolean resolve(IContext context)
 	{
-		FieldMatch f = context.resolveField(context1, this.qualifiedName);
-		if (f != null)
+		IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
+		if (field != null)
 		{
-			this.field = f.theField;
+			this.field = field;
 			return true;
 		}
 		return false;
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context, IContext context1)
+	public IAccess resolve2(IContext context)
 	{
-		MethodMatch match = context.resolveMethod(context1, this.qualifiedName, Type.EMPTY_TYPES);
-		if (match != null)
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, Type.EMPTY_TYPES);
+		if (method != null)
 		{
 			MethodCall call = new MethodCall(this.position, this.instance, this.name);
-			call.method = match.theMethod;
+			call.method = method;
 			call.dotless = this.dotless;
 			call.isSugarCall = true;
 			return call;
@@ -244,12 +243,13 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public IAccess resolve3(IContext context, IAccess next)
 	{
-		MethodMatch m = context.resolveMethod(null, this.qualifiedName, new IType[] { next.getType() });
-		if (m != null)
+		// TODO SingleElementList
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, Arrays.asList(next));
+		if (method != null)
 		{
 			MethodCall call = new MethodCall(this.position, this.instance, this.name);
 			call.addValue(next);
-			call.method = m.theMethod;
+			call.method = method;
 			call.dotless = this.dotless;
 			call.isSugarCall = true;
 			return call;

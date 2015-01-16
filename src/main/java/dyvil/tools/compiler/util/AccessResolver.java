@@ -16,7 +16,6 @@ public class AccessResolver
 		LinkedList<IAccess> chain = getCallChain(markers, context, access);
 		
 		ListIterator<IAccess> iterator = chain.listIterator();
-		IContext context1 = context;
 		IAccess prev = null;
 		IAccess curr = null;
 		
@@ -27,29 +26,9 @@ public class AccessResolver
 			prev = curr;
 			curr = iterator.next();
 			
-			if (prev != null)
+			if (!curr.resolve(context))
 			{
-				context1 = prev.getType();
-				curr.setValue(prev);
-			}
-			else
-			{
-				IValue value = curr.getValue();
-				if (value != null)
-				{
-					context1 = value.getType();
-				}
-			}
-			
-			if (context1 == null)
-			{
-				backwards = true;
-				break;
-			}
-			
-			if (!curr.resolve(context1, context))
-			{
-				IAccess alternate = curr.resolve2(context1, context);
+				IAccess alternate = curr.resolve2(context);
 				if (alternate == null)
 				{
 					backwards = true;
@@ -88,16 +67,10 @@ public class AccessResolver
 				break;
 			}
 			
-			context1 = value.getType();
-			if (context1 == null)
-			{
-				context1 = context;
-			}
-			
-			if (!curr.resolve(context1, context))
+			if (!curr.resolve(context))
 			{
 				curr.setValue(null);
-				if (curr.resolve(context, null))
+				if (curr.resolve(context))
 				{
 					prev.addValue(curr);
 					curr = null;

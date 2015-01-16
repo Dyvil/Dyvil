@@ -1,8 +1,11 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.util.List;
+
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 
@@ -248,28 +251,43 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		if (this.arrayDimensions > 0)
 		{
-			return ARRAY.resolveField(context, name);
+			return ARRAY.resolveField(name);
 		}
 		return null;
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
-			MethodMatch match = ARRAY.resolveMethod(context, name + "_" + this.name, argumentTypes);
+			MethodMatch match = ARRAY.resolveMethod(instance, name + "_" + this.name, arguments);
 			if (match != null)
 			{
 				return match;
 			}
 		}
 		
-		return super.resolveMethod(context, name, argumentTypes);
+		return this.theClass == null ? null : this.theClass.resolveMethod(instance, name, arguments);
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
+	{
+		if (this.arrayDimensions > 0)
+		{
+			ARRAY.getMethodMatches(list, instance, name + "_" + this.name, arguments);
+			return;
+		}
+		
+		if (this.theClass != null)
+		{
+			this.theClass.getMethodMatches(list, instance, name, arguments);
+		}
 	}
 	
 	@Override

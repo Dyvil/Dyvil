@@ -14,7 +14,12 @@ public interface IValueList
 	
 	public IValue getValue(int index);
 	
-	public void setArray(boolean array);
+	public default void setArray(boolean array)
+	{
+	}
 	
-	public boolean isArray();
+	public default boolean isArray()
+	{
+		return false;
+	}
 }

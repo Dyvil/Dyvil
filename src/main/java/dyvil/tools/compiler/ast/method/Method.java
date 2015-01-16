@@ -242,7 +242,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public int getSignatureMatch(String name, IType type, IType... argumentTypes)
+	public int getSignatureMatch(String name, ITyped instance, List<? extends ITyped> arguments)
 	{
 		if (name == null)
 		{
@@ -255,18 +255,18 @@ public class Method extends Member implements IMethod
 		}
 		
 		// Only matching the name
-		if (argumentTypes == null)
+		if (arguments == null)
 		{
 			return 1;
 		}
 		
 		int pOff = 0;
 		int match = 1;
-		int len = argumentTypes.length;
+		int len = arguments.size();
 		List<Parameter> params = this.parameters;
 		
 		// implicit modifier implementation
-		if (type != null && (this.modifiers & Modifiers.IMPLICIT) == Modifiers.IMPLICIT)
+		if (instance != null && (this.modifiers & Modifiers.IMPLICIT) == Modifiers.IMPLICIT)
 		{
 			if (len != params.size() - 1)
 			{
@@ -274,22 +274,12 @@ public class Method extends Member implements IMethod
 			}
 			
 			IType t2 = params.get(0).type;
-			if (type.equals(t2))
-			{
-				match += 3;
-			}
-			else if (Type.isSuperType(type, t2))
-			{
-				match += 2;
-			}
-			else if (t2.classEquals(Type.ANY))
-			{
-				match += 1;
-			}
-			else
+			int m = instance.getTypeMatch(t2);
+			if (m == 0)
 			{
 				return 0;
 			}
+			match += m;
 			
 			pOff = 1;
 		}
@@ -301,24 +291,13 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < len; i++)
 		{
 			IType t1 = params.get(i + pOff).type;
-			IType t2 = argumentTypes[i];
-			
-			if (t1.equals(t2))
-			{
-				match += 3;
-			}
-			else if (Type.isSuperType(t1, t2))
-			{
-				match += 2;
-			}
-			else if (t1.classEquals(Type.OBJECT))
-			{
-				match += 1;
-			}
-			else
+			ITyped typed = arguments.get(i);
+			int m = typed.getTypeMatch(t1);
+			if (m == 0)
 			{
 				return 0;
 			}
+			match += m;
 		}
 		
 		return match;
@@ -651,7 +630,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		for (Parameter param : this.parameters)
 		{
@@ -661,19 +640,19 @@ public class Method extends Member implements IMethod
 			}
 		}
 		
-		return this.theClass.resolveField(context, name);
+		return this.theClass.resolveField(name);
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
-		return this.theClass.resolveMethod(context, name, argumentTypes);
+		return this.theClass.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
-		this.theClass.getMethodMatches(list, type, name, argumentTypes);
+		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override

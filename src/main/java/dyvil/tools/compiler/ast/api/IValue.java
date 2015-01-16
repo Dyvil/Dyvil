@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
-public interface IValue extends IASTNode
+public interface IValue extends IASTNode, ITyped
 {
 	public static int	NULL				= 0;
 	public static int	BOOLEAN				= 1;
@@ -54,7 +54,11 @@ public interface IValue extends IASTNode
 		return false;
 	}
 	
+	@Override
 	public IType getType();
+	
+	@Override
+	public default void setType(IType type) { }
 	
 	public int getValueType();
 	

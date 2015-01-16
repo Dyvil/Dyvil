@@ -172,11 +172,11 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 			FieldMatch match;
 			if (this.instance == null)
 			{
-				match = context.resolveField(null, this.qualifiedName);
+				match = context.resolveField(this.qualifiedName);
 			}
 			else
 			{
-				match = this.instance.getType().resolveField(context, this.qualifiedName);
+				match = this.instance.getType().resolveField(this.qualifiedName);
 			}
 			
 			if (match != null)
@@ -244,24 +244,19 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	}
 	
 	@Override
-	public boolean resolve(IContext context, IContext context1)
+	public boolean resolve(IContext context)
 	{
-		if (this.field != null)
+		IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
+		if (field != null)
 		{
-			return true;
-		}
-		
-		FieldMatch f = context1.resolveField(null, this.qualifiedName);
-		if (f != null)
-		{
-			this.field = f.theField;
+			this.field = field;
 			return true;
 		}
 		return false;
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context, IContext context1)
+	public IAccess resolve2(IContext context)
 	{
 		return null;
 	}

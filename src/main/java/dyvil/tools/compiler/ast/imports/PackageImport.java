@@ -68,21 +68,21 @@ public class PackageImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
-		return this.theClass.resolveField(context, name);
+		return this.theClass.resolveField(name);
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
-		return this.theClass.resolveMethod(context, name, argumentTypes);
+		return this.theClass.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
-		this.theClass.getMethodMatches(list, type, name, argumentTypes);
+		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override

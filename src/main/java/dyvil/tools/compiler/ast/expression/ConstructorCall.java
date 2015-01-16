@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.expression;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.bytecode.MethodWriter;
@@ -13,14 +15,20 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
-public class ConstructorCall extends Call implements ITyped
+public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueList, IValued
 {
 	public IType		type;
-	protected boolean	isCustom;
+	
+	public List<IValue> arguments = new ArrayList(3);
+	
+	public boolean isSugarCall;
+	public boolean	isCustom;
+	
+	public IMethod method;
 	
 	public ConstructorCall(ICodePosition position)
 	{
-		super(position);
+		this.position = position;
 	}
 	
 	@Override
@@ -86,14 +94,38 @@ public class ConstructorCall extends Call implements ITyped
 	}
 	
 	@Override
-	public void setArray(boolean array)
+	public void setValues(List<IValue> list)
 	{
+		this.arguments = list;
 	}
 	
 	@Override
-	public boolean isArray()
+	public void setValue(int index, IValue value)
 	{
-		return false;
+		this.arguments.set(index, value);
+	}
+	
+	@Override
+	public void addValue(IValue value)
+	{
+		this.arguments.add(value);
+	}
+	
+	@Override
+	public List<IValue> getValues()
+	{
+		return this.arguments;
+	}
+	
+	@Override
+	public IValue getValue(int index)
+	{
+		return this.arguments.get(index);
+	}
+	
+	public void setSugar(boolean sugar)
+	{
+		this.isSugarCall = sugar;
 	}
 	
 	@Override
@@ -125,7 +157,7 @@ public class ConstructorCall extends Call implements ITyped
 			}
 		}
 		
-		if (!this.resolve(context, null))
+		if (!this.resolve(context))
 		{
 			markers.add(new SemanticError(this.position, "The constructor could not be resolved"));
 		}
@@ -182,14 +214,14 @@ public class ConstructorCall extends Call implements ITyped
 	}
 	
 	@Override
-	public boolean resolve(IContext context, IContext context1)
+	public boolean resolve(IContext context)
 	{
 		if (!this.type.isResolved())
 		{
 			return false;
 		}
 		
-		MethodMatch match = this.type.resolveMethod(context1, "new", this.getTypes());
+		MethodMatch match = this.type.resolveMethod(null, "new", this.arguments);
 		if (match != null)
 		{
 			this.method = match.theMethod;
@@ -197,7 +229,7 @@ public class ConstructorCall extends Call implements ITyped
 			return true;
 		}
 		
-		match = this.type.resolveMethod(context1, "<init>", this.getTypes());
+		match = this.type.resolveMethod(null, "<init>", this.arguments);
 		if (match != null)
 		{
 			this.method = match.theMethod;
@@ -207,7 +239,7 @@ public class ConstructorCall extends Call implements ITyped
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context, IContext context1)
+	public IAccess resolve2(IContext context)
 	{
 		return null;
 	}

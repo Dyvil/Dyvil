@@ -30,11 +30,11 @@ public interface IContext
 	
 	public IClass resolveClass(String name);
 	
-	public FieldMatch resolveField(IContext context, String name);
+	public FieldMatch resolveField(String name);
 	
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes);
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments);
 	
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes);
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments);
 	
 	public byte getAccessibility(IMember member);
 }

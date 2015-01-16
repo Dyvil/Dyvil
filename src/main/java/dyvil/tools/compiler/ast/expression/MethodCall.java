@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.expression;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -13,22 +14,27 @@ import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.*;
 
-public class MethodCall extends Call implements INamed, IValued
+public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IValueList, IValued
 {
-	public IValue	instance;
-	public String	name;
-	public String	qualifiedName;
+	public String		name;
+	public String		qualifiedName;
 	
-	public boolean	dotless;
+	public IValue		instance;
+	public List<IValue>	arguments	= new ArrayList(3);
+	
+	public boolean		dotless;
+	public boolean		isSugarCall;
+	
+	public IMethod		method;
 	
 	public MethodCall(ICodePosition position)
 	{
-		super(position);
+		this.position = position;
 	}
 	
 	public MethodCall(ICodePosition position, IValue instance, String name)
 	{
-		super(position);
+		this.position = position;
 		this.instance = instance;
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
@@ -100,14 +106,38 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public void setArray(boolean array)
+	public void setValues(List<IValue> list)
 	{
+		this.arguments = list;
 	}
 	
 	@Override
-	public boolean isArray()
+	public void setValue(int index, IValue value)
 	{
-		return false;
+		this.arguments.set(index, value);
+	}
+	
+	@Override
+	public void addValue(IValue value)
+	{
+		this.arguments.add(value);
+	}
+	
+	@Override
+	public List<IValue> getValues()
+	{
+		return this.arguments;
+	}
+	
+	@Override
+	public IValue getValue(int index)
+	{
+		return this.arguments.get(index);
+	}
+	
+	public void setSugar(boolean sugar)
+	{
+		this.isSugarCall = sugar;
 	}
 	
 	@Override
@@ -214,54 +244,54 @@ public class MethodCall extends Call implements INamed, IValued
 	}
 	
 	@Override
-	public boolean resolve(IContext context, IContext context1)
+	public boolean resolve(IContext context)
 	{
-		IType[] types = this.getTypes();
-		if (types == null)
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, this.arguments);
+		if (method != null)
 		{
-			return false;
-		}
-		
-		MethodMatch match = context.resolveMethod(context1, this.qualifiedName, types);
-		if (match != null)
-		{
-			this.method = match.theMethod;
+			this.method = method;
 			return true;
 		}
 		return false;
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context, IContext context1)
+	public IAccess resolve2(IContext context)
 	{
 		if (this.isSugarCall)
 		{
 			if (this.arguments.isEmpty())
 			{
-				FieldMatch f = context.resolveField(context1, this.qualifiedName);
-				if (f != null)
+				IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
+				if (field != null)
 				{
-					FieldAccess access = new FieldAccess(this.position, this.instance, this.qualifiedName);
-					access.field = f.theField;
+					FieldAccess access = new FieldAccess(this.position);
+					access.field = field;
+					access.instance = this.instance;
+					access.name = this.name;
+					access.qualifiedName = this.qualifiedName;
+					access.dotless = this.dotless;
 					return access;
 				}
 			}
 		}
-		else
+		// Resolve Apply Method
+		else if (this.instance == null)
 		{
-			if (this.instance == null)
+			FieldMatch field = context.resolveField(this.qualifiedName);
+			if (field != null)
 			{
-				FieldMatch f = context.resolveField(context1, this.qualifiedName);
-				if (f != null)
+				FieldAccess access = new FieldAccess(this.position);
+				access.field = field.theField;
+				access.name = this.name;
+				access.qualifiedName = this.qualifiedName;
+				access.dotless = this.dotless;
+				
+				MethodCall call = new MethodCall(this.position, access, "apply");
+				call.arguments = this.arguments;
+				if (call.resolve(field.theField.getType()))
 				{
-					FieldAccess access = new FieldAccess(this.position, null, this.qualifiedName);
-					access.field = f.theField;
-					MethodCall call = new MethodCall(this.position, access, "apply");
-					call.arguments = this.arguments;
-					if (call.resolve(access.getType(), context1))
-					{
-						return call;
-					}
+					return call;
 				}
 			}
 		}

@@ -385,18 +385,30 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	
 	private boolean getAssign(ParserManager pm)
 	{
-		String name = null;
-		IValue instance = null;
+		ICodePosition position = this.value.getPosition();
 		int i = this.value.getValueType();
 		if (i == IValue.CLASS_ACCESS)
 		{
-			name = ((ClassAccess) this.value).getName();
+			ClassAccess ca = (ClassAccess) this.value;
+			FieldAssign assign = new FieldAssign(position);
+			assign.name = ca.type.getName();
+			assign.qualifiedName = ca.type.getQualifiedName();
+			
+			this.value = assign;
+			pm.pushParser(new ExpressionParser(this.context, assign));
+			return true;
 		}
 		else if (i == IValue.FIELD_ACCESS)
 		{
 			FieldAccess fa = (FieldAccess) this.value;
-			name = fa.getName();
-			instance = fa.getValue();
+			FieldAssign assign = new FieldAssign(position);
+			assign.instance = fa.instance;
+			assign.name = fa.name;
+			assign.qualifiedName = fa.qualifiedName;
+			
+			this.value = assign;
+			pm.pushParser(new ExpressionParser(this.context, assign));
+			return true;
 		}
 		else if (i == IValue.METHOD_CALL)
 		{
@@ -404,27 +416,29 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			IValue v;
 			if (call.isName("apply"))
 			{
-				v = call.getValue();
+				v = call.instance;
 			}
 			else
 			{
-				v = new FieldAccess(this.value.getPosition(), call.getValue(), call.getName());
+				FieldAccess fa = new FieldAccess(position);
+				fa.instance = call.instance;
+				fa.name = call.name;
+				fa.qualifiedName = call.qualifiedName;
+				v = fa;
 			}
-			MethodCall updateCall = new MethodCall(this.value.getPosition(), v, "update");
-			updateCall.setValues(call.getValues());
+			
+			MethodCall updateCall = new MethodCall(position);
+			updateCall.arguments = call.arguments;
+			updateCall.instance = v;
+			updateCall.name = "update";
+			updateCall.qualifiedName = "update";
+			
 			this.value = updateCall;
 			pm.pushParser(new ExpressionParser(this.context, this));
 			return true;
 		}
-		else
-		{
-			return false;
-		}
 		
-		FieldAssign assign = new FieldAssign(this.value.getPosition(), name, instance);
-		this.value = assign;
-		pm.pushParser(new ExpressionParser(this.context, assign));
-		return true;
+		return false;
 	}
 	
 	private static TupleType getTupleType(TupleValue value)

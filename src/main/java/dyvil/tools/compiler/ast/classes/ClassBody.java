@@ -122,11 +122,11 @@ public class ClassBody extends ASTNode
 		return null;
 	}
 	
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType... argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		for (IMethod method : this.methods)
 		{
-			int match = method.getSignatureMatch(name, type, argumentTypes);
+			int match = method.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
 				list.add(new MethodMatch(method, match));

@@ -548,7 +548,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		if (this.body != null)
 		{
@@ -577,7 +577,7 @@ public class CodeClass extends ASTNode implements IClass
 		// Inherited Fields
 		if (this.superType != null && this != Type.PREDEF_CLASS)
 		{
-			match = this.superType.resolveField(context, name);
+			match = this.superType.resolveField(name);
 			if (match != null)
 			{
 				return match;
@@ -586,7 +586,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		for (IType i : this.interfaces)
 		{
-			match = i.resolveField(context, name);
+			match = i.resolveField(name);
 			if (match != null)
 			{
 				return match;
@@ -596,7 +596,7 @@ public class CodeClass extends ASTNode implements IClass
 		if (this.unit != null && this.unit.hasStaticImports())
 		{
 			// Static Imports
-			match = this.unit.resolveField(context, name);
+			match = this.unit.resolveField(name);
 			if (match != null)
 			{
 				return match;
@@ -606,7 +606,7 @@ public class CodeClass extends ASTNode implements IClass
 		// Predef
 		if (this != Type.PREDEF_CLASS)
 		{
-			match = Type.PREDEF_CLASS.resolveField(context, name);
+			match = Type.PREDEF_CLASS.resolveField(name);
 			if (match != null)
 			{
 				return match;
@@ -617,15 +617,10 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
-		if (argumentTypes == null)
-		{
-			return null;
-		}
-		
 		List<MethodMatch> list = new ArrayList();
-		this.getMethodMatches(list, null, name, argumentTypes);
+		this.getMethodMatches(list, instance, name, arguments);
 		
 		if (!list.isEmpty())
 		{
@@ -637,30 +632,45 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		if (this.body != null)
 		{
-			this.body.getMethodMatches(list, type, name, argumentTypes);
-			
-			if (!list.isEmpty())
-			{
-				return;
-			}
+			this.body.getMethodMatches(list, instance, name, arguments);
+		}
+		
+		if (!list.isEmpty())
+		{
+			return;
 		}
 		
 		if (this.superType != null)
 		{
-			this.superType.getMethodMatches(list, type, name, argumentTypes);
+			this.superType.getMethodMatches(list, instance, name, arguments);
 		}
 		for (IType i : this.interfaces)
 		{
-			i.getMethodMatches(list, type, name, argumentTypes);
+			i.getMethodMatches(list, instance, name, arguments);
+		}
+		
+		if (!list.isEmpty())
+		{
+			return;
 		}
 		
 		if (this.unit != null && this.unit.hasStaticImports())
 		{
-			this.unit.getMethodMatches(list, type, name, argumentTypes);
+			this.unit.getMethodMatches(list, instance, name, arguments);
+		}
+		
+		if (!list.isEmpty())
+		{
+			return;
+		}
+		
+		if (this != Type.PREDEF_CLASS && !(this instanceof BytecodeClass))
+		{
+			Type.PREDEF_CLASS.getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	

@@ -170,7 +170,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		IField field = this.variables.get(name);
 		if (field != null)
@@ -178,19 +178,19 @@ public class StatementList extends ValueList implements IStatement, IContext
 			return new FieldMatch(field, 1);
 		}
 		
-		return this.context.resolveField(context, name);
+		return this.context.resolveField(name);
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
-		return this.context.resolveMethod(context, name, argumentTypes);
+		return this.context.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
-		this.context.getMethodMatches(list, type, name, argumentTypes);
+		this.context.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override

@@ -80,11 +80,11 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		for (IImport i : this.children)
 		{
-			FieldMatch match = i.resolveField(context, name);
+			FieldMatch match = i.resolveField(name);
 			if (match != null)
 			{
 				return match;
@@ -94,11 +94,11 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		for (IImport i : this.children)
 		{
-			MethodMatch match = i.resolveMethod(context, name, argumentTypes);
+			MethodMatch match = i.resolveMethod(instance, name, arguments);
 			if (match != null)
 			{
 				return match;
@@ -108,11 +108,11 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		for (IImport i : this.children)
 		{
-			i.getMethodMatches(list, type, name, argumentTypes);
+			i.getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	

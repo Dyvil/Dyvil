@@ -173,13 +173,13 @@ public class Property extends Field implements IProperty
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		if (name.equals(this.name))
 		{
 			return new FieldMatch(this.setterParameter, 1);
 		}
-		return super.resolveField(context, name);
+		return super.resolveField(name);
 	}
 	
 	@Override

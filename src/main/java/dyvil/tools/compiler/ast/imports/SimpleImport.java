@@ -60,7 +60,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	{
 		if (isStatic && this.child == null)
 		{
-			FieldMatch field = context.resolveField(null, this.name);
+			FieldMatch field = context.resolveField(this.name);
 			if (field != null)
 			{
 				this.field = field;
@@ -149,11 +149,11 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public FieldMatch resolveField(IContext context, String name)
+	public FieldMatch resolveField(String name)
 	{
 		if (this.child != null)
 		{
-			return this.child.resolveField(context, name);
+			return this.child.resolveField(name);
 		}
 		if (this.name.equals(name))
 		{
@@ -167,11 +167,11 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IContext context, String name, IType[] argumentTypes)
+	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		if (this.child != null)
 		{
-			return this.child.resolveMethod(context, name, argumentTypes);
+			return this.child.resolveMethod(instance, name, arguments);
 		}
 		if (!this.methods.isEmpty())
 		{
@@ -188,11 +188,11 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IType type, String name, IType[] argumentTypes)
+	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
 	{
 		if (this.child != null)
 		{
-			this.child.getMethodMatches(list, type, name, argumentTypes);
+			this.child.getMethodMatches(list, instance, name, arguments);
 		}
 		if (this.name.equals(name))
 		{
