@@ -2,6 +2,8 @@ package dyvil.tools.compiler.ast.api;
 
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.Label;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
@@ -32,6 +34,8 @@ public interface IValue extends IASTNode, ITyped
 	public static int	FIELD_ASSIGN		= 18;
 	public static int	METHOD_CALL			= 19;
 	public static int	CONSTRUCTOR_CALL	= 20;
+	public static int	BOOLEAN_AND			= 21;
+	public static int	BOOLEAN_OR			= 22;
 	
 	public static int	TUPLE				= 48;
 	public static int	LAMBDA				= 49;
@@ -58,7 +62,9 @@ public interface IValue extends IASTNode, ITyped
 	public IType getType();
 	
 	@Override
-	public default void setType(IType type) { }
+	public default void setType(IType type)
+	{
+	}
 	
 	public int getValueType();
 	
@@ -99,6 +105,24 @@ public interface IValue extends IASTNode, ITyped
 	 * @param writer
 	 */
 	public void writeStatement(MethodWriter writer);
+	
+	/**
+	 * Writes this {@link IValue} to the given {@link MethodWriter}
+	 * {@code writer} as a jump expression to the given {@link Label}
+	 * {@code dest}. By default, this calls
+	 * {@link #writeExpression(MethodWriter)} and then writes an
+	 * {@link Opcodes#IFEQ IFEQ} instruction pointing to {@code dest}. That
+	 * means the JVM would jump to {@code dest} if the current value on the
+	 * stack equals {@code 0}.
+	 * 
+	 * @param writer
+	 * @param dest
+	 */
+	public default void writeJump(MethodWriter writer, Label dest)
+	{
+		this.writeExpression(writer);
+		writer.visitJumpInsn(Opcodes.IFEQ, dest);
+	}
 	
 	public static IValue fromObject(Object o)
 	{

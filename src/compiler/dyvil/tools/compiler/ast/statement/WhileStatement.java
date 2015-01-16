@@ -96,19 +96,6 @@ public class WhileStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append(Formatting.Statements.whileStart);
-		this.condition.toString(prefix, buffer);
-		buffer.append(Formatting.Statements.whileEnd);
-		
-		if (this.then != null)
-		{
-			this.then.toString(prefix, buffer);
-		}
-	}
-	
-	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 	}
@@ -126,11 +113,23 @@ public class WhileStatement extends ASTNode implements IStatement
 		
 		// Condition
 		writer.visitLabel(start);
-		this.condition.writeExpression(writer);
-		writer.visitJumpInsn(Opcodes.IFEQ, end);
+		this.condition.writeJump(writer, end);
 		// While Block
 		this.then.writeStatement(writer);
 		writer.visitJumpInsn(Opcodes.GOTO, start);
 		writer.visitLabel(end);
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(Formatting.Statements.whileStart);
+		this.condition.toString(prefix, buffer);
+		buffer.append(Formatting.Statements.whileEnd);
+		
+		if (this.then != null)
+		{
+			this.then.toString(prefix, buffer);
+		}
 	}
 }

@@ -178,8 +178,7 @@ public class IfStatement extends ASTNode implements IStatement
 			Label ifEnd = new Label();
 			
 			// Condition
-			this.condition.writeExpression(writer);
-			writer.visitJumpInsn(Opcodes.IFEQ, ifEnd);
+			this.condition.writeJump(writer, ifEnd);
 			// If Block
 			this.then.writeExpression(writer);
 			writer.visitLabel(ifEnd);
@@ -195,8 +194,7 @@ public class IfStatement extends ASTNode implements IStatement
 			Label elseEnd = new Label();
 			
 			// Condition
-			this.condition.writeExpression(writer);
-			writer.visitJumpInsn(Opcodes.IFEQ, ifEnd);
+			this.condition.writeJump(writer, ifEnd);
 			// If Block
 			this.then.writeStatement(writer);
 			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
@@ -210,8 +208,7 @@ public class IfStatement extends ASTNode implements IStatement
 			Label ifEnd = new Label();
 			
 			// Condition
-			this.condition.writeExpression(writer);
-			writer.visitJumpInsn(Opcodes.IFEQ, ifEnd);
+			this.condition.writeJump(writer, ifEnd);
 			// If Block
 			this.then.writeStatement(writer);
 			writer.visitLabel(ifEnd);

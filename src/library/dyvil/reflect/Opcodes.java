@@ -652,16 +652,58 @@ public interface Opcodes
 	 */
 	public static final int	DCMPG			= 152;
 	
+	/**
+	 * Removes an {@code int} value from the stack and jumps to the given
+	 * {@link Label} if it equals {@code 0}.
+	 * 
+	 * @param label
+	 *            the label
+	 */
 	public static final int	IFEQ			= 153;
 	
+	/**
+	 * Removes an {@code int} value from the stack and jumps to the given
+	 * {@link Label} if it does not equal {@code 0}.
+	 * 
+	 * @param label
+	 *            the label
+	 */
 	public static final int	IFNE			= 154;
 	
+	/**
+	 * Removes an {@code int} value from the stack and jumps to the given
+	 * {@link Label} if it is less than {@code 0}.
+	 * 
+	 * @param label
+	 *            the label
+	 */
 	public static final int	IFLT			= 155;
 	
+	/**
+	 * Removes an {@code int} value from the stack and jumps to the given
+	 * {@link Label} if it is greater than or equal to {@code 0}.
+	 * 
+	 * @param label
+	 *            the label
+	 */
 	public static final int	IFGE			= 156;
 	
+	/**
+	 * Removes an {@code int} value from the stack and jumps to the given
+	 * {@link Label} if it is greater than {@code 0}.
+	 * 
+	 * @param label
+	 *            the label
+	 */
 	public static final int	IFGT			= 157;
 	
+	/**
+	 * Removes an {@code int} value from the stack and jumps to the given
+	 * {@link Label} if it is less than {@code 0}.
+	 * 
+	 * @param label
+	 *            the label
+	 */
 	public static final int	IFLE			= 158;
 	
 	public static final int	IF_ICMPEQ		= 159;
@@ -740,8 +782,22 @@ public interface Opcodes
 	
 	public static final int	MULTIANEWARRAY	= 197;
 	
+	/**
+	 * Removes a reference from the stack and jumps to the given
+	 * {@link Label} if it is a {@code null} reference
+	 * 
+	 * @param label
+	 *            the label
+	 */
 	public static final int	IFNULL			= 198;
 	
+	/**
+	 * Removes a reference from the stack and jumps to the given
+	 * {@link Label} if it is not a {@code null} reference
+	 * 
+	 * @param label
+	 *            the label
+	 */
 	public static final int	IFNONNULL		= 199;
 	
 	/*
