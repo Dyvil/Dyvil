@@ -1,4 +1,4 @@
-package test;
+package dyvil.test;
 
 import java.util.Scanner;
 

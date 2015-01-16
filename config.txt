@@ -2,9 +2,9 @@ jar_name = "DyvilTest"
 jar_vendor = "Clashsoft"
 jar_version = "1.0.0"
 
-source_dir = "src/test/dyvil"
+source_dir = "src/test"
 output_dir = "dbin"
 
-main_type = "test.Main"
+main_type = "dyvil.test.Main"
 
 libraries = []
