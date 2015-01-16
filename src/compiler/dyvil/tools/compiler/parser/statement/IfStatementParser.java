@@ -68,7 +68,7 @@ public class IfStatementParser extends Parser implements IValued
 		}
 		if (this.mode == ELSE)
 		{
-			if ("else".equals(value))
+			if (token.isType(IToken.KEYWORD_ELSE))
 			{
 				pm.pushParser(new ExpressionParser(this.context, this));
 				this.mode = -1;

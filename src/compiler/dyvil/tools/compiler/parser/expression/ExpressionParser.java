@@ -71,49 +71,14 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		
 		if (this.isInMode(VALUE))
 		{
-			if (this.parsePrimitive(value, token))
+			int type = token.type();
+			if (this.parseKeyword(pm, token, type))
+			{
+				return true;
+			}
+			else if (this.parsePrimitive(value, token))
 			{
 				this.mode = ACCESS;
-				return true;
-			}
-			else if ("this".equals(value))
-			{
-				this.mode = ACCESS;
-				this.value = new ThisValue(token.raw(), this.context.getThisType());
-				return true;
-			}
-			else if ("super".equals(value))
-			{
-				this.mode = ACCESS;
-				this.value = new SuperValue(token.raw(), this.context.getThisType());
-				return true;
-			}
-			else if ("return".equals(value))
-			{
-				ReturnStatement statement = new ReturnStatement(token.raw());
-				this.value = statement;
-				pm.pushParser(new ExpressionParser(this.context, statement));
-				return true;
-			}
-			else if ("if".equals(value))
-			{
-				IfStatement statement = new IfStatement(token.raw());
-				this.value = statement;
-				pm.pushParser(new IfStatementParser(this.context, statement));
-				this.mode = 0;
-				return true;
-			}
-			else if ("while".equals(value))
-			{
-				WhileStatement statement = new WhileStatement(token);
-				this.value = statement;
-				pm.pushParser(new WhileStatementParser(this.context, statement));
-				this.mode = 0;
-				return true;
-			}
-			else if ("@".equals(value))
-			{
-				this.mode = BYTECODE;
 				return true;
 			}
 			else if ("(".equals(value))
@@ -138,15 +103,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				return true;
 			}
-			else if ("new".equals(value))
-			{
-				ConstructorCall call = new ConstructorCall(token);
-				this.mode = PARAMETERS;
-				this.value = call;
-				pm.pushParser(new TypeParser(call));
-				return true;
-			}
-			else if (token.isType(IToken.TYPE_IDENTIFIER))
+			else if ((type & IToken.TYPE_IDENTIFIER) != 0)
 			{
 				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
@@ -501,24 +458,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	
 	public boolean parsePrimitive(String value, IToken token) throws SyntaxError
 	{
-		if ("null".equals(value))
-		{
-			this.value = new NullValue(token.raw());
-			return true;
-		}
-		// Boolean
-		else if ("true".equals(value))
-		{
-			this.value = new BooleanValue(token.raw(), true);
-			return true;
-		}
-		else if ("false".equals(value))
-		{
-			this.value = new BooleanValue(token.raw(), false);
-			return true;
-		}
-		// String
-		else if (token.isType(IToken.TYPE_STRING))
+		if (token.isType(IToken.TYPE_STRING))
 		{
 			this.value = new StringValue(token.raw(), (String) token.object());
 			return true;
@@ -552,6 +492,73 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean parseKeyword(ParserManager pm, IToken token, int type) throws SyntaxError
+	{
+		switch (type)
+		{
+		case IToken.KEYWORD_WC:
+			return true;
+		case IToken.KEYWORD_AT:
+			this.mode = BYTECODE;
+			return true;
+		case IToken.KEYWORD_NULL:
+			this.value = new NullValue(token.raw());
+			this.mode = ACCESS;
+			return true;
+		case IToken.KEYWORD_TRUE:
+			this.value = new BooleanValue(token.raw(), true);
+			this.mode = ACCESS;
+			return true;
+		case IToken.KEYWORD_FALSE:
+			this.value = new BooleanValue(token.raw(), false);
+			this.mode = ACCESS;
+			return true;
+		case IToken.KEYWORD_THIS:
+			this.value = new ThisValue(token.raw());
+			this.mode = ACCESS;
+			return true;
+		case IToken.KEYWORD_SUPER:
+			this.value = new SuperValue(token.raw());
+			this.mode = ACCESS;
+			return true;
+		case IToken.KEYWORD_NEW:
+			ConstructorCall call = new ConstructorCall(token);
+			this.mode = PARAMETERS;
+			this.value = call;
+			pm.pushParser(new TypeParser(call));
+			return true;
+		case IToken.KEYWORD_RETURN:
+			ReturnStatement rs = new ReturnStatement(token.raw());
+			this.value = rs;
+			pm.pushParser(new ExpressionParser(this.context, rs));
+			return true;
+		case IToken.KEYWORD_IF:
+			IfStatement is = new IfStatement(token.raw());
+			this.value = is;
+			pm.pushParser(new IfStatementParser(this.context, is));
+			this.mode = 0;
+			return true;
+		case IToken.KEYWORD_ELSE:
+			throw new SyntaxError(token, "Invalid 'else' token");
+		case IToken.KEYWORD_WHILE:
+			WhileStatement statement = new WhileStatement(token);
+			this.value = statement;
+			pm.pushParser(new WhileStatementParser(this.context, statement));
+			this.mode = 0;
+			return true;
+		case IToken.KEYWORD_DO:
+			return true;
+		case IToken.KEYWORD_FOR:
+			return true;
+		case IToken.KEYWORD_SWITCH:
+			return true;
+		case IToken.KEYWORD_CASE:
+			return true;
+		default:
+			return false;
+		}
 	}
 	
 	@Override

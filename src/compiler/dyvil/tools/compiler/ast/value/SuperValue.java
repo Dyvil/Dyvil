@@ -15,6 +15,11 @@ public class SuperValue extends ASTNode implements IConstantValue
 {
 	public IType	type;
 	
+	public SuperValue(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
 	public SuperValue(ICodePosition position, IType type)
 	{
 		this.position = position;
@@ -36,9 +41,20 @@ public class SuperValue extends ASTNode implements IConstantValue
 	@Override
 	public SuperValue resolve(List<Marker> markers, IContext context)
 	{
-		if (context.isStatic())
+		if (this.type == null)
 		{
-			markers.add(new SemanticError(this.position, "'super' cannot be accessed in a static context"));
+			if (context.isStatic())
+			{
+				markers.add(new SemanticError(this.position, "'super' cannot be accessed in a static context"));
+			}
+			else
+			{
+				this.type = context.getThisType().getSuperType();
+				if (this.type == null)
+				{
+					markers.add(new SemanticError(this.position, "Invalid access to 'super': The enclosing type does not have a super type"));
+				}
+			}
 		}
 		return this;
 	}

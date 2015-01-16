@@ -9,6 +9,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class Dlex implements Iterable<IToken>
 {
@@ -278,7 +279,7 @@ public class Dlex implements Iterable<IToken>
 		
 		if (buf.length() > 0)
 		{
-			this.addToken(prev, buf, type, lineNumber, start);
+			this.addToken(prev, buf, type | subtype, lineNumber, start);
 		}
 		
 		this.first = first.next();
@@ -378,7 +379,17 @@ public class Dlex implements Iterable<IToken>
 	
 	private Token addToken(Token prev, String s, int type, int line, int start, int len)
 	{
-		Token t = new Token(prev.index() + 1, s, type, parse(type, s), this.file, line, start, start + len);
+		Token t;
+		if ((type & TYPE_IDENTIFIER) != 0)
+		{
+			type = ParserUtil.getKeywordType(s);
+			t = new Token(prev.index() + 1, s, type, s, this.file, line, start, start + len);
+		}
+		else
+		{
+			t = new Token(prev.index() + 1, s, type, parse(type, s), this.file, line, start, start + len);
+		}
+		
 		prev.setNext(t);
 		t.setPrev(prev);
 		return t;

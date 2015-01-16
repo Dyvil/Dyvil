@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.util;
 
+import static dyvil.tools.compiler.lexer.token.IToken.*;
+
 public class ParserUtil
 {
 	public static boolean isWhitespace(char c)
@@ -60,5 +62,45 @@ public class ParserUtil
 	public static boolean isSeperator(char c)
 	{
 		return c == ',' || c == ';' || c == ':';
+	}
+	
+	public static int getKeywordType(String s)
+	{
+		switch (s)
+		{
+		case "_":
+			return KEYWORD_WC;
+		case "@":
+			return KEYWORD_AT;
+		case "null":
+			return KEYWORD_NULL;
+		case "true":
+			return KEYWORD_TRUE;
+		case "false":
+			return KEYWORD_FALSE;
+		case "this":
+			return KEYWORD_THIS;
+		case "super":
+			return KEYWORD_SUPER;
+		case "new":
+			return KEYWORD_NEW;
+		case "return":
+			return KEYWORD_RETURN;
+		case "if":
+			return KEYWORD_IF;
+		case "else":
+			return KEYWORD_ELSE;
+		case "while":
+			return KEYWORD_WHILE;
+		case "do":
+			return KEYWORD_DO;
+		case "for":
+			return KEYWORD_FOR;
+		case "switch":
+			return KEYWORD_SWITCH;
+		case "case":
+			return KEYWORD_CASE;
+		}
+		return TYPE_IDENTIFIER;
 	}
 }

@@ -15,6 +15,11 @@ public class ThisValue extends ASTNode implements IConstantValue
 {
 	public IType	type;
 	
+	public ThisValue(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
 	public ThisValue(ICodePosition position, IType type)
 	{
 		this.position = position;
@@ -36,9 +41,16 @@ public class ThisValue extends ASTNode implements IConstantValue
 	@Override
 	public ThisValue resolve(List<Marker> markers, IContext context)
 	{
-		if (context.isStatic())
+		if (this.type == null)
 		{
-			markers.add(new SemanticError(this.position, "'this' cannot be accessed in a static context"));
+			if (context.isStatic())
+			{
+				markers.add(new SemanticError(this.position, "'this' cannot be accessed in a static context"));
+			}
+			else
+			{
+				this.type = context.getThisType();
+			}
 		}
 		return this;
 	}

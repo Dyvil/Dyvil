@@ -8,6 +8,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class BooleanValue extends ASTNode implements IConstantValue
 {
+	public static final BooleanValue TRUE = new BooleanValue(true);
+	public static final BooleanValue FALSE = new BooleanValue(false);
+	
 	public boolean	value;
 	
 	public BooleanValue(boolean value)

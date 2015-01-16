@@ -54,7 +54,7 @@ public class ImportParser extends Parser
 				pm.skip();
 				return true;
 			}
-			else if ("_".equals(value))
+			else if (token.isType(IToken.KEYWORD_WC))
 			{
 				PackageImport pi = new PackageImport(token.raw(), this.parent);
 				this.container.addImport(pi);
