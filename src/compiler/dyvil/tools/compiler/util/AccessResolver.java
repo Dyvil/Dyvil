@@ -79,8 +79,33 @@ public class AccessResolver
 				break;
 			}
 			
-			if (!curr.resolve(context, null))
+			if (!curr.resolve(context, markers))
 			{
+				if (next != null)
+				{
+					next.setValue(null);
+					alternate = curr.resolve3(context, next);
+					if (alternate != null)
+					{
+						if (next.getValue() == curr)
+						{
+							next.setValue(alternate);
+						}
+						iterator.next();
+						iterator.remove();
+						iterator.previous();
+						iterator.set(alternate);
+						
+						next = alternate;
+						curr = prev;
+						continue;
+					}
+					else
+					{
+						next.setValue(curr);
+					}
+				}
+				
 				curr.setValue(null);
 				if (curr.resolve(context, markers))
 				{

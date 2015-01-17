@@ -11,8 +11,8 @@ public class Main
 		Scanner scanner = new Scanner(System in);
 		{
 			"Geben sie ihre Zahl zum Konvertieren in ein Bitmuster ein" print;
-			int n = scanner.nextInt();
-			String s = jInt toBinaryString(n);
+			int n = scanner nextInt;
+			String s = jInt toBinaryString n;
 			"=" concat(s) print;
 		}
 	};
