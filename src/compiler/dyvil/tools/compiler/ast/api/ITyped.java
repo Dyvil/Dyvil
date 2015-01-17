@@ -21,6 +21,10 @@ public interface ITyped
 	public default int getTypeMatch(IType type)
 	{
 		IType t = this.getType();
+		if (t == null)
+		{
+			return 0;
+		}
 		if (type.equals(t))
 		{
 			return 3;

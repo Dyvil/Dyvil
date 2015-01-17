@@ -157,7 +157,7 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 			}
 		}
 		
-		if (!this.resolve(context))
+		if (!this.resolve(context, null))
 		{
 			markers.add(new SemanticError(this.position, "The constructor could not be resolved"));
 		}
@@ -214,7 +214,7 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 	}
 	
 	@Override
-	public boolean resolve(IContext context)
+	public boolean resolve(IContext context, List<Marker> markers)
 	{
 		if (!this.type.isResolved())
 		{

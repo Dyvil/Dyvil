@@ -33,12 +33,13 @@ public class AccessResolver
 				alternate = null;
 			}
 			
-			if (!curr.resolve(context))
+			if (!curr.resolve(context, markers))
 			{
 				alternate = curr.resolve2(context);
 				if (alternate == null)
 				{
 					backwards = true;
+					break;
 				}
 				else
 				{
@@ -71,13 +72,17 @@ public class AccessResolver
 			}
 			else
 			{
+				if (!curr.resolve(context, markers))
+				{
+					markers.add(curr.getResolveError());
+				}
 				break;
 			}
 			
-			if (!curr.resolve(context))
+			if (!curr.resolve(context, null))
 			{
 				curr.setValue(null);
-				if (curr.resolve(context))
+				if (curr.resolve(context, markers))
 				{
 					prev.addValue(curr);
 					curr = null;

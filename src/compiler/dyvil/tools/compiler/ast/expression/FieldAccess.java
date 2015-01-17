@@ -135,17 +135,6 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public void setArray(boolean array)
-	{
-	}
-	
-	@Override
-	public boolean isArray()
-	{
-		return false;
-	}
-	
-	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.instance != null)
@@ -213,7 +202,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public boolean resolve(IContext context)
+	public boolean resolve(IContext context, List<Marker> markers)
 	{
 		IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
 		if (field != null)

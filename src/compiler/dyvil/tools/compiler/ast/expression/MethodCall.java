@@ -158,18 +158,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		int len = this.arguments.size();
-		for (int i = 0; i < len; i++)
-		{
-			IValue v1 = this.arguments.get(i);
-			IValue v2 = v1.resolve(markers, context);
-			if (v1 != v2)
-			{
-				this.arguments.set(i, v2);
-			}
-		}
-		
-		if (len == 1 && this.instance != null)
+		if (this.arguments.size() == 1 && this.instance != null)
 		{
 			boolean isOr = false;
 			if ("$amp$amp".equals(this.qualifiedName) || (isOr = "$bar$bar".equals(this.qualifiedName)))
@@ -262,8 +251,19 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	}
 	
 	@Override
-	public boolean resolve(IContext context)
+	public boolean resolve(IContext context, List<Marker> markers)
 	{
+		int len = this.arguments.size();
+		for (int i = 0; i < len; i++)
+		{
+			IValue v1 = this.arguments.get(i);
+			IValue v2 = v1.resolve(markers, context);
+			if (v1 != v2)
+			{
+				this.arguments.set(i, v2);
+			}
+		}
+		
 		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, this.arguments);
 		if (method != null)
 		{
@@ -307,7 +307,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 				
 				MethodCall call = new MethodCall(this.position, access, "apply");
 				call.arguments = this.arguments;
-				if (call.resolve(field.theField.getType()))
+				if (call.resolve(field.theField.getType(), null))
 				{
 					return call;
 				}

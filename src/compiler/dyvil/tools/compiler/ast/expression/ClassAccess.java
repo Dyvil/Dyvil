@@ -170,7 +170,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	}
 	
 	@Override
-	public boolean resolve(IContext context)
+	public boolean resolve(IContext context, List<Marker> markers)
 	{
 		return this.type.isResolved();
 	}

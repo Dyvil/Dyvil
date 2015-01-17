@@ -8,7 +8,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IAccess extends INamed, IValue, IValued, IValueList
 {
-	public boolean resolve(IContext context);
+	public boolean resolve(IContext context, List<Marker> markers);
 	
 	public IAccess resolve2(IContext context);
 	

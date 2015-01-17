@@ -244,7 +244,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	}
 	
 	@Override
-	public boolean resolve(IContext context)
+	public boolean resolve(IContext context, List<Marker> markers)
 	{
 		IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
 		if (field != null)

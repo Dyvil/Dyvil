@@ -1,8 +1,21 @@
 package dyvil.test;
 
+import java.util.Scanner;
+import java.lang.Integer => jInt;
+
 public class Main
 {
-	public static void main(String[] args) = if (args(0) equals "Hi") "test" print else "hi" print;
+	public static void main(String[] args) =
+	{
+		"BitMuster 2.0" print;
+		Scanner scanner = new Scanner(System in);
+		{
+			"Geben sie ihre Zahl zum Konvertieren in ein Bitmuster ein" print;
+			int n = scanner.nextInt();
+			String s = jInt toBinaryString(n);
+			"=" concat(s) print;
+		}
+	};
 	
 	public implicit void print(Object o) = System out println(o);
 }

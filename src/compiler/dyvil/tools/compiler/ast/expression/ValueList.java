@@ -18,9 +18,9 @@ public class ValueList extends ASTNode implements IValue, IValueList
 {
 	public List<IValue>	values	= new ArrayList(3);
 	
-	protected boolean		isArray;
-	protected IType			requiredType;
-	protected IType			elementType;
+	protected boolean	isArray;
+	protected IType		requiredType;
+	protected IType		elementType;
 	
 	public ValueList(ICodePosition position)
 	{
@@ -60,7 +60,13 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		for (int i = 1; i < len; i++)
 		{
 			IValue v = this.values.get(i);
-			t = Type.findCommonSuperType(t, v.getType());
+			IType t1 = v.getType();
+			if (t1 == null)
+			{
+				t = Type.VOID;
+				break;
+			}
+			t = Type.findCommonSuperType(t, t1);
 		}
 		if (t != null)
 		{
