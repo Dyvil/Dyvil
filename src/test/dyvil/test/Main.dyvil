@@ -1,10 +1,8 @@
 package dyvil.test;
 
-import java.util.Scanner;
-
 public class Main
 {
-	public static void main(String[] args) = (if (args(0) equals "Hi") "Hi" else "Hello") print;
+	public static void main(String[] args) = if (args(0) equals "Hi") "test" print else "hi" print;
 	
 	public implicit void print(Object o) = System out println(o);
 }

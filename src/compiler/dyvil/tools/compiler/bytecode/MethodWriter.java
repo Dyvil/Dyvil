@@ -207,10 +207,6 @@ public final class MethodWriter extends MethodVisitor
 			this.typeStack.pop();
 		}
 		this.mv.visitJumpInsn(opcode, label);
-		if (opcode == GOTO)
-		{
-			this.visitFrame();
-		}
 	}
 	
 	@Override
