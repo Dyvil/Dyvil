@@ -1,11 +1,8 @@
 package dyvil.tools.compiler.parser.type;
 
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.ITyped;
-import dyvil.tools.compiler.ast.type.GenericType;
-import dyvil.tools.compiler.ast.type.LambdaType;
-import dyvil.tools.compiler.ast.type.TupleType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.TypeVariable;
+import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;

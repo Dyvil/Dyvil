@@ -7,8 +7,8 @@ import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IValue;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;

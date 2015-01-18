@@ -3,9 +3,8 @@ package dyvil.tools.compiler.ast.type;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.ast.api.IClass;
-import dyvil.tools.compiler.ast.api.IGeneric;
-import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;

@@ -1,14 +1,18 @@
 package dyvil.tools.compiler.lexer.marker;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
+import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class Marker extends Exception
 {
 	private static final long	serialVersionUID	= 8313691845679541217L;
 	
-	public String				suggestion;
+	private String				suggestion;
+	private List<String>		info;
 	
 	public ICodePosition		position;
 	
@@ -40,47 +44,79 @@ public abstract class Marker extends Exception
 		this.position = position;
 	}
 	
+	public void setSuggestion(String suggestion)
+	{
+		this.suggestion = suggestion;
+	}
+	
 	public String getSuggestion()
 	{
 		return this.suggestion;
 	}
 	
-	public abstract void log(Logger logger);
-	
-	protected void appendMessage(StringBuilder builder)
+	public void addInfo(String info)
 	{
+		if (this.info == null)
+		{
+			this.info = new ArrayList(2);
+		}
+		this.info.add(info);
+	}
+	
+	public abstract String getMarkerType();
+	
+	public void log(Logger logger)
+	{
+		StringBuilder buf = new StringBuilder();
+		CodeFile file = this.position.getFile();
+		String type = this.getMarkerType();
 		String message = this.getMessage();
 		String suggestion = this.getSuggestion();
 		
-		builder.append(" \"").append(this.position.getText()).append('"');
+		buf.append(file).append(':').append(this.position.getLineNumber()).append(": ");
+		buf.append(type);
 		if (message != null)
 		{
-			builder.append(": ").append(message);
+			buf.append(": ").append(message);
 		}
 		if (suggestion != null)
 		{
-			builder.append(" - ").append(suggestion);
+			buf.append(" - ").append(suggestion);
 		}
 		
-		String code = this.position.getFile().getCode();
 		int prevNL = this.position.getPrevNewline();
 		int nextNL = this.position.getNextNewline();
+		String code = file.getCode();
 		String line = code.substring(prevNL, nextNL);
 		
-		builder.append('\n').append(line).append('\n');
+		// Append Line
+		buf.append('\n').append(line).append('\n');
 		
+		// Append ^
 		for (int i = prevNL; i < this.position.getStart(); i++)
 		{
 			char c = code.charAt(i);
 			if (c == '\t')
 			{
-				builder.append('\t');
+				buf.append('\t');
 			}
 			else
 			{
-				builder.append(' ');
+				buf.append(' ');
 			}
 		}
-		builder.append('^');
+		buf.append('^');
+		
+		// Append Info (if any)
+		if (this.info != null)
+		{
+			buf.append('\n');
+			for (String s : this.info)
+			{
+				buf.append('\n').append(s);
+			}
+		}
+		
+		logger.info(buf.toString());
 	}
 }

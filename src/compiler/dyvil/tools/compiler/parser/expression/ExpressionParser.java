@@ -3,15 +3,14 @@ package dyvil.tools.compiler.parser.expression;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
-import dyvil.tools.compiler.ast.expression.ClassAccess;
-import dyvil.tools.compiler.ast.expression.ConstructorCall;
-import dyvil.tools.compiler.ast.expression.FieldAccess;
-import dyvil.tools.compiler.ast.expression.MethodCall;
+import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.*;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
@@ -45,7 +44,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int	BYTECODE		= 2048;
 	public static final int	BYTECODE_2		= 4096;
 	
-	protected IContext		context;
 	protected IValued		field;
 	protected int			precedence;
 	
@@ -53,10 +51,9 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	
 	private boolean			dotless;
 	
-	public ExpressionParser(IContext context, IValued field)
+	public ExpressionParser(IValued field)
 	{
 		this.mode = VALUE;
-		this.context = context;
 		this.field = field;
 	}
 	
@@ -88,7 +85,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				
 				if (!token.next().equals(")"))
 				{
-					pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value));
+					pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				}
 				return true;
 			}
@@ -99,7 +96,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				
 				if (!token.next().equals("}"))
 				{
-					pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value));
+					pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				}
 				return true;
 			}
@@ -145,7 +142,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if ("{".equals(value))
 			{
 				Bytecode bc = new Bytecode(token);
-				pm.pushParser(new BytecodeParser(this.context, bc));
+				pm.pushParser(new BytecodeParser(bc));
 				this.value = bc;
 				this.mode = BYTECODE_2;
 				return true;
@@ -172,7 +169,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					lv.expandPosition(token);
 					this.value = lv;
 					pm.popParser();
-					pm.pushParser(new ExpressionParser(this.context, lv));
+					pm.pushParser(new ExpressionParser(lv));
 					return true;
 				}
 				return false;
@@ -204,7 +201,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.value = access;
 				
 				pm.skip();
-				pm.pushParser(new ExpressionParser(this.context, access));
+				pm.pushParser(new ExpressionParser(access));
 				
 				return true;
 			}
@@ -285,7 +282,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if ("(".equals(value))
 			{
-				pm.pushParser(new ExpressionListParser(this.context, (IValueList) this.value));
+				pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				this.mode = PARAMETERS_END;
 				return true;
 			}
@@ -330,7 +327,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = call;
 			this.mode = ACCESS;
 			
-			ExpressionParser parser = new ExpressionParser(this.context, this);
+			ExpressionParser parser = new ExpressionParser(this);
 			parser.precedence = OperatorComparator.index(value);
 			pm.pushParser(parser);
 			return true;
@@ -357,7 +354,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			assign.qualifiedName = ca.type.getQualifiedName();
 			
 			this.value = assign;
-			pm.pushParser(new ExpressionParser(this.context, assign));
+			pm.pushParser(new ExpressionParser(assign));
 			return true;
 		}
 		else if (i == IValue.FIELD_ACCESS)
@@ -369,7 +366,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			assign.qualifiedName = fa.qualifiedName;
 			
 			this.value = assign;
-			pm.pushParser(new ExpressionParser(this.context, assign));
+			pm.pushParser(new ExpressionParser(assign));
 			return true;
 		}
 		else if (i == IValue.METHOD_CALL)
@@ -396,7 +393,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			updateCall.qualifiedName = "update";
 			
 			this.value = updateCall;
-			pm.pushParser(new ExpressionParser(this.context, this));
+			pm.pushParser(new ExpressionParser(this));
 			return true;
 		}
 		
@@ -537,12 +534,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		case IToken.KEYWORD_RETURN:
 			ReturnStatement rs = new ReturnStatement(token.raw());
 			this.value = rs;
-			pm.pushParser(new ExpressionParser(this.context, rs));
+			pm.pushParser(new ExpressionParser(rs));
 			return true;
 		case IToken.KEYWORD_IF:
 			IfStatement is = new IfStatement(token.raw());
 			this.value = is;
-			pm.pushParser(new IfStatementParser(this.context, is));
+			pm.pushParser(new IfStatementParser(is));
 			this.mode = 0;
 			return true;
 		case IToken.KEYWORD_ELSE:
@@ -551,7 +548,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		case IToken.KEYWORD_WHILE:
 			WhileStatement statement = new WhileStatement(token);
 			this.value = statement;
-			pm.pushParser(new WhileStatementParser(this.context, statement));
+			pm.pushParser(new WhileStatementParser(statement));
 			this.mode = 0;
 			return true;
 		case IToken.KEYWORD_DO:

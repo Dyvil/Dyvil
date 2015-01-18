@@ -5,12 +5,19 @@ import java.util.List;
 import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.access.FieldAssign;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -19,11 +26,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class StatementList extends ValueList implements IStatement, IContext
 {
-	private IContext			context;
+	private IContext				context;
 	
 	public Map<String, Variable>	variables	= new HashMap();
-	public Label				start		= new Label();
-	public Label				end			= new Label();
+	public Label					start		= new Label();
+	public Label					end			= new Label();
 	
 	public StatementList(ICodePosition position)
 	{
@@ -103,16 +110,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	{
 		if (this.isArray)
 		{
-			IType type = this.getElementType();
-			for (IValue value : this.values)
-			{
-				value.check(markers, context);
-				
-				if (!value.requireType(type))
-				{
-					markers.add(new SemanticError(value.getPosition(), "The array value is incompatible with the required type " + type));
-				}
-			}
+			super.check(markers, context);
 		}
 		else
 		{
@@ -123,7 +121,10 @@ public class StatementList extends ValueList implements IStatement, IContext
 				
 				if (v instanceof IStatement && !v.requireType(type))
 				{
-					markers.add(new SemanticError(v.getPosition(), "The returning type of the block is incompatible with the required type " + type));
+					SemanticError error = new SemanticError(v.getPosition(), "The returning type of the block is incompatible with the required type");
+					error.addInfo("Block Type: " + type);
+					error.addInfo("Returning Type: " + v.getType());
+					markers.add(error);
 				}
 			}
 		}

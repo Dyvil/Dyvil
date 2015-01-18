@@ -2,8 +2,8 @@ package dyvil.tools.compiler.ast.structure;
 
 import java.io.InputStream;
 
-import dyvil.tools.compiler.ast.api.IClass;
 import dyvil.tools.compiler.ast.classes.BytecodeClass;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.bytecode.ClassReader;
 import dyvil.tools.compiler.library.Library;
 

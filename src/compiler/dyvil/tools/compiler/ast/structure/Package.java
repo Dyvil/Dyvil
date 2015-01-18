@@ -3,10 +3,12 @@ package dyvil.tools.compiler.ast.structure;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.util.ClassFormat;
@@ -16,7 +18,7 @@ public class Package implements IContext
 	public static Package			rootPackage	= new RootPackage(null, null);
 	
 	public static Package			dyvilLang;
-	public static Package dyvilLangTuple;
+	public static Package			dyvilLangTuple;
 	public static Package			dyvilLangAnnotation;
 	public static Package			javaLang;
 	public static Package			javaLangAnnotation;

@@ -13,10 +13,10 @@ import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.CompilerConfig;
+import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.parser.config.ConfigParser;
 import dyvil.tools.compiler.util.Util;
 
 public class DyvilCompiler

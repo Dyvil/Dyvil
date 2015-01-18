@@ -8,19 +8,25 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IntValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
-import dyvil.tools.compiler.parser.type.ITypeVariable;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 import dyvil.tools.compiler.util.Util;
@@ -224,7 +230,10 @@ public class Method extends Member implements IMethod
 			parType = par.type;
 			if (!instance.requireType(parType))
 			{
-				markers.add(new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name + "' of type '" + instance.getType() + "' is incompatible with the required type " + parType));
+				SemanticError error = new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name + "' is incompatible with the required type");
+				error.addInfo("Required Type: " + parType);
+				error.addInfo("Value Type: " + instance.getType());
+				markers.add(error);
 			}
 			pOff = 1;
 		}
@@ -236,7 +245,10 @@ public class Method extends Member implements IMethod
 			IValue value = arguments.get(i);
 			if (!value.requireType(parType))
 			{
-				markers.add(new SemanticError(value.getPosition(), "The method argument for '" + par.name + "' of type '" + value.getType() + "' is incompatible with the required type " + parType));
+				SemanticError error = new SemanticError(value.getPosition(), "The method argument for '" + par.name + "' is incompatible with the required type");
+				error.addInfo("Required Type: " + parType);
+				error.addInfo("Value Type: " + value.getType());
+				markers.add(error);
 			}
 		}
 	}
@@ -494,7 +506,10 @@ public class Method extends Member implements IMethod
 					IType type = this.overrideMethod.getType();
 					if (!Type.isSuperType(type, this.type))
 					{
-						markers.add(new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type " + type));
+						SemanticError error = new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type");
+						error.addInfo("Return Type: " + this.type);
+						error.addInfo("Overriden Type: " + type);
+						markers.add(error);
 					}
 				}
 			}
@@ -517,10 +532,21 @@ public class Method extends Member implements IMethod
 		
 		if (this.statement != null)
 		{
-			IType type = this.isConstructor ? Type.VOID : this.type;
-			if (!this.statement.requireType(type))
+			if (this.isConstructor)
 			{
-				markers.add(new SemanticError(this.statement.getPosition(), "The method '" + this.name + "' must return a result of type " + type));
+				if (!this.statement.requireType(Type.VOID))
+				{
+					SemanticError error = new SemanticError(this.position, "The constructor must not return a result");
+					error.addInfo("Expression Type: " + this.statement.getType());
+					markers.add(error);
+				}
+			}
+			else if (!this.statement.requireType(this.type))
+			{
+				SemanticError error = new SemanticError(this.position, "The expression type of '" + this.name + "' is incompatible with the return type");
+				error.addInfo("Return Type: " + this.type);
+				error.addInfo("Value Type: " + this.statement.getType());
+				markers.add(error);
 			}
 			this.statement.check(markers, context);
 		}

@@ -6,12 +6,14 @@ import java.util.List;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.classes.CodeClass;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.ClassWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -20,7 +22,7 @@ import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
-import dyvil.tools.compiler.parser.CompilationUnitParser;
+import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
 import dyvil.util.FileUtils;
 
 public class CompilationUnit extends ASTNode implements IContext

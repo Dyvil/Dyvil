@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IValue;
-import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Property;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -53,7 +53,7 @@ public class PropertyParser extends Parser implements IValued
 		{
 			if (":".equals(value))
 			{
-				pm.pushParser(new ExpressionParser(this.context, this));
+				pm.pushParser(new ExpressionParser(this));
 				return true;
 			}
 			else if (";".equals(value))

@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.parser.statement;
 
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IValue;
-import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.statement.WhileStatement;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -16,13 +15,11 @@ public class WhileStatementParser extends Parser implements IValued
 	public static final int		CONDITION_END	= 2;
 	public static final int		THEN			= 4;
 	
-	protected IContext			context;
 	protected WhileStatement	statement;
 	
-	public WhileStatementParser(IContext context, WhileStatement statement)
+	public WhileStatementParser(WhileStatement statement)
 	{
 		this.mode = CONDITION;
-		this.context = context;
 		this.statement = statement;
 	}
 	
@@ -38,7 +35,7 @@ public class WhileStatementParser extends Parser implements IValued
 		{
 			if ("(".equals(value))
 			{
-				pm.pushParser(new ExpressionParser(this.context, this));
+				pm.pushParser(new ExpressionParser(this));
 				this.mode = CONDITION_END;
 				return true;
 			}
@@ -57,7 +54,7 @@ public class WhileStatementParser extends Parser implements IValued
 		{
 			if (!";".equals(value))
 			{
-				pm.pushParser(new ExpressionParser(this.context, this), true);
+				pm.pushParser(new ExpressionParser(this), true);
 			}
 			this.mode = -1;
 			return true;

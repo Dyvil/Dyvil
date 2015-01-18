@@ -6,11 +6,10 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IField;
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.IValue;
-import dyvil.tools.compiler.ast.method.Member;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;

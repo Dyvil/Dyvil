@@ -2,11 +2,11 @@ package dyvil.tools.compiler.parser.classes;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.ITypeList;
-import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -60,7 +60,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 			}
 			else if (value.charAt(0) == '@')
 			{
-				pm.pushParser(new AnnotationParser(this.unit, this.theClass), true);
+				pm.pushParser(new AnnotationParser(this.theClass), true);
 				return true;
 			}
 		}

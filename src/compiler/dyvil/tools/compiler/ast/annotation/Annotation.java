@@ -9,8 +9,15 @@ import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.FieldVisitor;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.expression.IValueMap;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.AnnotationType;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -110,7 +117,10 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 		
 		if (!this.type.isTarget(this.target))
 		{
-			markers.add(new SemanticError(this.position, "The annotation type '" + this.name + "' is not applicable for the annotated element type " + this.target));
+			SemanticError error = new SemanticError(this.position, "The annotation type '" + this.name + "' is not applicable for the annotated element type");
+			error.addInfo("Element Target: " + this.target);
+			error.addInfo("Allowed Targets: " + this.type.getTargets());
+			markers.add(error);
 		}
 		
 		for (Entry<String, IValue> entry : this.parameters.entrySet())
@@ -133,9 +143,12 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 			}
 			
 			IType type = m.getType();
-			if (!Type.isSuperType(type, value.getType()))
+			if (!value.isType(type))
 			{
-				markers.add(new SemanticError(value.getPosition(), "The annotation value '" + key + "' does not match the required type " + type));
+				SemanticError error = new SemanticError(value.getPosition(), "The annotation value '" + key + "' is incompatible with the required type");
+				error.addInfo("Required Type: " + type);
+				error.addInfo("Value Type: " + value.getType());
+				markers.add(error);
 			}
 		}
 	}

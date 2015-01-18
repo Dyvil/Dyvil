@@ -5,7 +5,9 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.statement.IStatement;
+import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -207,7 +209,10 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			
 			if (!v.requireType(type))
 			{
-				markers.add(new SemanticError(v.getPosition(), "The array value is incompatible with the required type " + type));
+				SemanticError error = new SemanticError(v.getPosition(), "The array element is incompatible with the array type");
+				error.addInfo("Array Type: " + type);
+				error.addInfo("Array Element Type" + v.getType());
+				markers.add(error);
 			}
 		}
 	}

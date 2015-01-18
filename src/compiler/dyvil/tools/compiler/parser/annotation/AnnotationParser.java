@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.parser.annotation;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.IAnnotated;
-import dyvil.tools.compiler.ast.api.IContext;
+import dyvil.tools.compiler.ast.member.IAnnotated;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -15,14 +14,12 @@ public class AnnotationParser extends Parser
 	public static final int	PARAMETERS_START	= 1;
 	public static final int	PARAMETERS_END		= 2;
 	
-	protected IContext		context;
 	protected IAnnotated	annotatable;
 	
 	private Annotation		annotation;
 	
-	public AnnotationParser(IContext context, IAnnotated annotatable)
+	public AnnotationParser(IAnnotated annotatable)
 	{
-		this.context = context;
 		this.annotatable = annotatable;
 	}
 	
@@ -46,7 +43,7 @@ public class AnnotationParser extends Parser
 		{
 			if ("(".equals(value))
 			{
-				pm.pushParser(new ExpressionMapParser(this.context, this.annotation));
+				pm.pushParser(new ExpressionMapParser(this.annotation));
 				this.mode = PARAMETERS_END;
 				return true;
 			}

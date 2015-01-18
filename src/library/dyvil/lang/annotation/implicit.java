@@ -9,13 +9,11 @@ import java.lang.annotation.Target;
  * Annotation for implicit methods. If a method is annotated as <i>implicit</i>,
  * the first argument is implicit. That means that when calling the static
  * method {@code m(A a, B b)} on object {@code a} of type {@code A}, {@code a}
- * will be moved from the position before the dot to the position of the first
- * argument by the compiler.
+ * will be moved from in front of the dot to the position of the first argument
+ * by the compiler.
  * <p>
  * <code>
- * public static @implicit void m(A a, B b)
- * {
- * }<br>
+ * public implicit void m(A a, B b) = ...<br>
  * A a = new A();<br>
  * B b = new B();<br>
  * a.m(b);
@@ -24,9 +22,7 @@ import java.lang.annotation.Target;
  * will be translated to
  * <p>
  * <code>
- * public static void m(A a, B b)
- * {
- * }<br>
+ * public static @implicit void m(A a, B b) { ... }<br>
  * A a = new A();<br>
  * B b = new B();<br>
  * m(a, b);

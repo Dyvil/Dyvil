@@ -3,10 +3,7 @@ package dyvil.tools.compiler.ast.type;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.ITypeList;
-import dyvil.tools.compiler.ast.api.ITyped;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 

@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.parser.method;
 
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IParameterized;
 import dyvil.tools.compiler.ast.field.Parameter;
+import dyvil.tools.compiler.ast.method.IParameterized;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -17,14 +16,12 @@ public class ParameterListParser extends Parser
 	public static final int		TYPE		= 0;
 	public static final int		NAME		= 1;
 	
-	protected IContext			context;
 	protected IParameterized	parameterized;
 	
 	private Parameter			parameter	= new Parameter();
 	
-	public ParameterListParser(IContext context, IParameterized parameterized)
+	public ParameterListParser(IParameterized parameterized)
 	{
-		this.context = context;
 		this.parameterized = parameterized;
 	}
 	
@@ -41,7 +38,7 @@ public class ParameterListParser extends Parser
 			}
 			else if (value.charAt(0) == '@')
 			{
-				pm.pushParser(new AnnotationParser(this.context, this.parameter), true);
+				pm.pushParser(new AnnotationParser(this.parameter), true);
 				return true;
 			}
 			else if (")".equals(value))

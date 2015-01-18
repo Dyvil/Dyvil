@@ -5,8 +5,12 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -140,7 +144,10 @@ public class Property extends Field implements IProperty
 		{
 			if (this.get != null && !this.get.requireType(this.type))
 			{
-				markers.add(new SemanticError(this.get.getPosition(), "The getter value of the property '" + this.name + "' is incompatible with the property type " + this.type));
+				SemanticError error = new SemanticError(this.get.getPosition(), "The getter value of the property '" + this.name + "' is incompatible with the property type");
+				error.addInfo("Property Type: " + this.type);
+				error.addInfo("Getter Value Type: " + this.get.getType());
+				markers.add(error);
 			}
 			if (this.set != null && !this.set.requireType(Type.VOID))
 			{

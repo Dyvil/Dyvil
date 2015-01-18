@@ -4,8 +4,8 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
@@ -49,10 +49,13 @@ public class SuperValue extends ASTNode implements IConstantValue
 			}
 			else
 			{
-				this.type = context.getThisType().getSuperType();
+				IType thisType = context.getThisType();
+				this.type = thisType.getSuperType();
 				if (this.type == null)
 				{
-					markers.add(new SemanticError(this.position, "Invalid access to 'super': The enclosing type does not have a super type"));
+					SemanticError error = new SemanticError(this.position, "'super' cannot be accessed: The enclosing type does not have a super type");
+					error.addInfo("Enclosing Type: " + thisType);
+					markers.add(error);
 				}
 			}
 		}

@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.parser.statement;
 
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IValue;
-import dyvil.tools.compiler.ast.api.IValued;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -17,13 +16,11 @@ public class IfStatementParser extends Parser implements IValued
 	public static final int	THEN			= 4;
 	public static final int	ELSE			= 8;
 	
-	protected IContext		context;
 	protected IfStatement	statement;
 	
-	public IfStatementParser(IContext context, IfStatement statement)
+	public IfStatementParser(IfStatement statement)
 	{
 		this.mode = IF;
-		this.context = context;
 		this.statement = statement;
 	}
 	
@@ -39,7 +36,7 @@ public class IfStatementParser extends Parser implements IValued
 		{
 			if ("(".equals(value))
 			{
-				pm.pushParser(new ExpressionParser(this.context, this));
+				pm.pushParser(new ExpressionParser(this));
 				this.mode = CONDITION_END;
 				return true;
 			}
@@ -62,7 +59,7 @@ public class IfStatementParser extends Parser implements IValued
 				return true;
 			}
 			
-			pm.pushParser(new ExpressionParser(this.context, this), true);
+			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = ELSE;
 			return true;
 		}
@@ -70,7 +67,7 @@ public class IfStatementParser extends Parser implements IValued
 		{
 			if (token.isType(IToken.KEYWORD_ELSE))
 			{
-				pm.pushParser(new ExpressionParser(this.context, this));
+				pm.pushParser(new ExpressionParser(this));
 				this.mode = -1;
 				return true;
 			}

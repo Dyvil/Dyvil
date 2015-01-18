@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.util;
 
-import static dyvil.tools.compiler.ast.api.IValue.*;
-import dyvil.tools.compiler.ast.api.IValue;
+import static dyvil.tools.compiler.ast.expression.IValue.*;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.value.*;
 
 public class ConstantFolder

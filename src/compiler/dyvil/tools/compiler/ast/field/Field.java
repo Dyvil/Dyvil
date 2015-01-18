@@ -7,10 +7,15 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.FieldVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.*;
-import dyvil.tools.compiler.ast.method.Member;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -145,7 +150,10 @@ public class Field extends Member implements IField, IContext
 			this.value.check(markers, context);
 			if (!this.value.requireType(this.type))
 			{
-				markers.add(new SemanticError(this.value.getPosition(), "The value of the field '" + this.name + "' is incompatible with the field type " + this.type));
+				SemanticError error = new SemanticError(this.value.getPosition(), "The value of the field '" + this.name + "' is incompatible with the field type");
+				error.addInfo("Field Type: " + this.type);
+				error.addInfo("Value Type: " + this.value.getType());
+				markers.add(error);
 			}
 		}
 	}

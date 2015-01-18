@@ -5,13 +5,16 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.api.*;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.BooleanValue;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class IfStatement extends ASTNode implements IStatement
@@ -124,7 +127,10 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.condition.resolveTypes(markers, context);
+		if (this.condition != null)
+		{
+			this.condition.resolveTypes(markers, context);
+		}
 		if (this.then != null)
 		{
 			this.then.resolveTypes(markers, context);
@@ -138,7 +144,10 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		this.condition = this.condition.resolve(markers, context);
+		if (this.condition != null)
+		{
+			this.condition = this.condition.resolve(markers, context);
+		}
 		if (this.then != null)
 		{
 			this.then = this.then.resolve(markers, context);
@@ -153,12 +162,20 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		this.condition.check(markers, context);
-		if (!Type.isSuperType(Type.BOOLEAN, this.condition.getType()))
+		if (this.condition != null)
 		{
-			markers.add(new SemanticError(this.position, "The condition of an if statement has to evaluate to a boolean value."));
+			if (!this.condition.requireType(Type.BOOLEAN))
+			{
+				SemanticError error = new SemanticError(this.condition.getPosition(), "The condition of an if statement has to evaluate to a boolean value.");
+				error.addInfo("Condition Type: " + this.condition.getType());
+				markers.add(error);
+			}
+			this.condition.check(markers, context);
 		}
-		
+		else
+		{
+			markers.add(new SyntaxError(this.position, "Invalid if condition"));
+		}
 		if (this.then != null)
 		{
 			this.then.check(markers, context);
@@ -172,6 +189,11 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public IValue foldConstants()
 	{
+		if (this.condition == null)
+		{
+			return this;
+		}
+		
 		if (this.condition.isConstant())
 		{
 			int type = this.condition.getValueType();
@@ -275,7 +297,10 @@ public class IfStatement extends ASTNode implements IStatement
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Statements.ifStart);
-		this.condition.toString(prefix, buffer);
+		if (this.condition != null)
+		{
+			this.condition.toString(prefix, buffer);
+		}
 		buffer.append(Formatting.Statements.ifEnd);
 		
 		if (this.then instanceof IStatement)

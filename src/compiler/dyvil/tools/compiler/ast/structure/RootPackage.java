@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.structure;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.api.IClass;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.library.Library;
 
 public final class RootPackage extends Package

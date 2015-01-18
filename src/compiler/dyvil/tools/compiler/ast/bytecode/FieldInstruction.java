@@ -4,7 +4,7 @@ import static dyvil.reflect.Opcodes.GETFIELD;
 import static dyvil.reflect.Opcodes.GETSTATIC;
 import static dyvil.reflect.Opcodes.PUTFIELD;
 import static dyvil.reflect.Opcodes.PUTSTATIC;
-import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.util.ClassFormat;
 

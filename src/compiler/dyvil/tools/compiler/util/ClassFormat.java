@@ -2,9 +2,9 @@ package dyvil.tools.compiler.util;
 
 import java.io.File;
 
-import dyvil.tools.compiler.ast.api.IMethod;
-import dyvil.tools.compiler.ast.api.IParameterized;
-import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.IParameterized;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 
 public class ClassFormat

@@ -2,9 +2,8 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.api.IClass;
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.parser.type.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.type.IType;
 
 public class CaptureClass extends CodeClass
 {

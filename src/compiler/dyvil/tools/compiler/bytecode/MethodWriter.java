@@ -9,7 +9,7 @@ import java.util.Stack;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.api.IType;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.util.OpcodeUtil;
 

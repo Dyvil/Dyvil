@@ -3,11 +3,9 @@ package dyvil.tools.compiler.ast.type;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.ast.api.IContext;
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.ITyped;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.structure.IContext;
 
 public class PrimitiveType extends Type
 {

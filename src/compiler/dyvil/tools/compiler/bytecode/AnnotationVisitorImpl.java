@@ -2,12 +2,12 @@ package dyvil.tools.compiler.bytecode;
 
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.IAnnotated;
-import dyvil.tools.compiler.ast.api.IType;
-import dyvil.tools.compiler.ast.api.IValue;
-import dyvil.tools.compiler.ast.api.IValueList;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.expression.ValueList;
+import dyvil.tools.compiler.ast.member.IAnnotated;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.EnumValue;
 import dyvil.tools.compiler.util.ClassFormat;
 

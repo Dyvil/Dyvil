@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.field;
 
-import dyvil.tools.compiler.ast.api.IField;
-
 public class FieldMatch
 {
 	public IField	theField;

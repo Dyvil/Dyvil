@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.method;
 
-import dyvil.tools.compiler.ast.api.IMethod;
-
 public class MethodMatch implements Comparable<MethodMatch>
 {
 	public IMethod	theMethod;

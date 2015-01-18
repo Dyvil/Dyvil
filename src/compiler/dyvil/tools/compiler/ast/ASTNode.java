@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast;
 
-import dyvil.tools.compiler.ast.api.IASTNode;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class ASTNode implements IASTNode

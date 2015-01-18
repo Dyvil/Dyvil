@@ -9,7 +9,7 @@ public class Random
 	 * Returns true with the given chance of {@code chance}. It does that by
 	 * generating a new random float using the given {@link java.util.Random
 	 * Random} {@code random} and comparing it to the given {@code float chance}
-	 * . .
+	 * .
 	 * 
 	 * @param random
 	 *            the random
@@ -85,16 +85,14 @@ public class Random
 		int len = nextInt(random, minLength, maxLength);
 		StringBuilder buf = new StringBuilder(len);
 		
-		buf.append(Character.toUpperCase(StringUtils.nextLetter(random)));
-		
+		char prev = StringUtils.nextLetter(random);
+		buf.append(Character.toUpperCase(prev));
 		for (int i = 1; i < len; i++)
 		{
-			int lastIndex = buf.length() - 1;
-			char last = buf.charAt(lastIndex);
 			char c;
 			
 			// Always add a consonant after a vowel
-			if (StringUtils.isVowel(last))
+			if (StringUtils.isVowel(prev))
 			{
 				c = StringUtils.nextConsonant(random);
 			}
@@ -105,7 +103,7 @@ public class Random
 				{
 					c = StringUtils.nextConsonant(random);
 					int i1 = 0;
-					while (!StringUtils.canCharFollowChar(last, c) && i1++ <= StringUtils.CONSONANTS.length())
+					while (!StringUtils.canCharFollowChar(prev, c) && i1++ <= StringUtils.CONSONANTS.length())
 					{
 						c = StringUtils.nextConsonant(random);
 					}
@@ -121,6 +119,7 @@ public class Random
 				}
 			}
 			
+			prev = c;
 			buf.append(c);
 		}
 		

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.imports;
 
-import dyvil.tools.compiler.ast.api.IImport;
-import dyvil.tools.compiler.ast.api.IImportContainer;
+import dyvil.tools.compiler.ast.imports.IImport;
+import dyvil.tools.compiler.ast.imports.IImportContainer;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;

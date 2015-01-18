@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.*;
 import dyvil.tools.compiler.ast.classes.ClassBody;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Property;
+import dyvil.tools.compiler.ast.member.IAnnotated;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -86,7 +92,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 			}
 			else if (value.charAt(0) == '@')
 			{
-				pm.pushParser(new AnnotationParser(this.theClass, this), true);
+				pm.pushParser(new AnnotationParser(this), true);
 				return true;
 			}
 			else
@@ -155,7 +161,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		{
 			if ("=".equals(value))
 			{
-				pm.pushParser(new ExpressionParser(this.theClass, this.field));
+				pm.pushParser(new ExpressionParser(this.field));
 				return true;
 			}
 			else if (";".equals(value))
@@ -187,7 +193,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		{
 			if ("(".equals(value))
 			{
-				pm.pushParser(new ParameterListParser(this.theClass, this.method));
+				pm.pushParser(new ParameterListParser(this.method));
 				this.mode = PARAMETERS_END;
 				return true;
 			}
@@ -211,7 +217,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 			}
 			else if ("=".equals(value))
 			{
-				pm.pushParser(new ExpressionParser(this.method, this.method));
+				pm.pushParser(new ExpressionParser(this.method));
 				return true;
 			}
 			else if (";".equals(value))

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.ast.api.IContext;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.bytecode.Instruction;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -12,15 +11,13 @@ public class BytecodeParser extends Parser
 	public static final int	LABEL		= 2;
 	public static final int	ARGUMENTS	= 4;
 	
-	public IContext			context;
 	public Bytecode			bytecode;
 	
 	private String			label;
 	private Instruction		instruction;
 	
-	public BytecodeParser(IContext context, Bytecode bytecode)
+	public BytecodeParser(Bytecode bytecode)
 	{
-		this.context = context;
 		this.bytecode = bytecode;
 		this.mode = INSTRUCTION | LABEL;
 	}

@@ -6,18 +6,26 @@ import java.util.*;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.access.ConstructorCall;
+import dyvil.tools.compiler.ast.access.FieldAssign;
+import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.api.*;
-import dyvil.tools.compiler.ast.expression.ConstructorCall;
-import dyvil.tools.compiler.ast.expression.MethodCall;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.statement.FieldAssign;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
@@ -25,7 +33,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.parser.type.ITypeVariable;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Symbols;
 import dyvil.tools.compiler.util.Util;
@@ -461,7 +468,7 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = superClass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(new SemanticError(this.superType.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + "'" + superClass.getName() + "' cannot be extended, only classes are allowed"));
+					markers.add(new SemanticError(this.superType.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + " '" + superClass.getName() + "' cannot be extended, only classes are allowed"));
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
@@ -487,7 +494,7 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = iclass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
 				{
-					markers.add(new SemanticError(t.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + "'" + iclass.getName() + "' cannot be implemented, only interfaces are allowed"));
+					markers.add(new SemanticError(t.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + " '" + iclass.getName() + "' cannot be implemented, only interfaces are allowed"));
 				}
 			}
 		}
@@ -696,7 +703,7 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				return SEALED;
 			}
-			// Clear the SEALED bit by ORing with 0b1111
+			// Clear the SEALED bit by ANDing with 0b1111
 			level &= 0b1111;
 		}
 		if (level == Modifiers.PUBLIC)
