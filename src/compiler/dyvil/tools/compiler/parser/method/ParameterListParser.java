@@ -10,6 +10,7 @@ import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class ParameterListParser extends Parser
 {
@@ -28,6 +29,7 @@ public class ParameterListParser extends Parser
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
+		int type = token.type();
 		if (this.isInMode(TYPE))
 		{
 			int i = 0;
@@ -36,12 +38,12 @@ public class ParameterListParser extends Parser
 				this.parameter.addModifier(i);
 				return true;
 			}
-			else if (value.charAt(0) == '@')
+			if (value.charAt(0) == '@')
 			{
 				pm.pushParser(new AnnotationParser(this.parameter), true);
 				return true;
 			}
-			else if (")".equals(value))
+			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				pm.popParser(true);
 				return true;
@@ -53,22 +55,22 @@ public class ParameterListParser extends Parser
 		}
 		if (this.isInMode(NAME))
 		{
-			if ("...".equals(value))
-			{
-				this.parameterized.setVarargs();
-				this.parameter.setVarargs();
-				return true;
-			}
-			else if (token.isType(IToken.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(type))
 			{
 				this.parameter.setName(value);
 				return true;
 			}
-			else if (ParserUtil.isSeperator(value.charAt(0)))
+			if (type == Tokens.COMMA)
 			{
 				this.parameter.setSeperator(value.charAt(0));
 				this.end(pm);
 				this.mode = TYPE;
+				return true;
+			}
+			if ("...".equals(value))
+			{
+				this.parameterized.setVarargs();
+				this.parameter.setVarargs();
 				return true;
 			}
 			

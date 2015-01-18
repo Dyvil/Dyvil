@@ -4,6 +4,8 @@ import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.bytecode.Instruction;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class BytecodeParser extends Parser
 {
@@ -27,16 +29,17 @@ public class BytecodeParser extends Parser
 	{
 		if (this.isInMode(LABEL))
 		{
-			if (token.next().equals(":"))
+			if (token.next().isType(Tokens.SEMICOLON))
 			{
 				this.label = value;
 				pm.skip();
 				return true;
 			}
 		}
+		int type = token.type();
 		if (this.isInMode(INSTRUCTION))
 		{
-			if (token.isType(IToken.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(type))
 			{
 				Instruction insn = Instruction.parse(value);
 				if (insn == null)
@@ -63,16 +66,16 @@ public class BytecodeParser extends Parser
 		}
 		if (this.isInMode(ARGUMENTS))
 		{
-			if (";".equals(value))
+			if (type == Tokens.SEMICOLON)
 			{
 				this.mode = INSTRUCTION | LABEL;
 				return true;
 			}
-			else if (",".equals(value))
+			if (type == Tokens.COMMA)
 			{
 				return true;
 			}
-			else if (!token.isType(IToken.TYPE_SYMBOL) && !token.isType(IToken.TYPE_BRACKET))
+			if (!ParserUtil.isTerminator(type))
 			{
 				if (this.instruction == null)
 				{

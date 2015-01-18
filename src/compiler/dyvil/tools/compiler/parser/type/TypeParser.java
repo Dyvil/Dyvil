@@ -7,6 +7,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class TypeParser extends Parser implements ITyped
 {
@@ -47,17 +49,18 @@ public class TypeParser extends Parser implements ITyped
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
+		int type = token.type();
 		if (this.isInMode(NAME))
 		{
-			if ("(".equals(value))
+			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				TupleType type = new TupleType();
-				pm.pushParser(new TypeListParser(type));
-				this.type = type;
+				TupleType tupleType = new TupleType();
+				pm.pushParser(new TypeListParser(tupleType));
+				this.type = tupleType;
 				this.mode = TUPLE_END;
 				return true;
 			}
-			else if (token.isType(IToken.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(type))
 			{
 				// TODO package.class
 				if (token.next().equals("<"))
@@ -79,7 +82,7 @@ public class TypeParser extends Parser implements ITyped
 					return true;
 				}
 			}
-			else if ("_".equals(value))
+			if (type == Tokens.WILDCARD)
 			{
 				if (this.generic)
 				{
@@ -96,7 +99,7 @@ public class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(TUPLE_END))
 		{
-			if (")".equals(value))
+			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				if (token.next().equals("=>"))
 				{
@@ -126,7 +129,13 @@ public class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(ARRAY))
 		{
-			if ("]".equals(value))
+			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			{
+				this.arrayDimensions++;
+				this.arrayDimensions2++;
+				return true;
+			}
+			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
 				this.arrayDimensions2--;
 				if (this.arrayDimensions2 == 0)
@@ -135,18 +144,10 @@ public class TypeParser extends Parser implements ITyped
 				}
 				return true;
 			}
-			else if ("[".equals(value))
-			{
-				this.arrayDimensions++;
-				this.arrayDimensions2++;
-				return true;
-			}
-			else
-			{
-				this.type.expandPosition(token.prev());
-				pm.popParser(true);
-				return true;
-			}
+			
+			this.type.expandPosition(token.prev());
+			pm.popParser(true);
+			return true;
 		}
 		if (this.isInMode(GENERICS))
 		{
@@ -158,12 +159,10 @@ public class TypeParser extends Parser implements ITyped
 				this.mode = GENERICS_END;
 				return true;
 			}
-			else
-			{
-				this.type.expandPosition(token.prev());
-				pm.popParser(true);
-				return true;
-			}
+			
+			this.type.expandPosition(token.prev());
+			pm.popParser(true);
+			return true;
 		}
 		if (this.isInMode(TYPE_VARIABLE))
 		{

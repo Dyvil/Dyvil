@@ -76,7 +76,10 @@ public class WhileStatement extends ASTNode implements IStatement
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.condition.resolveTypes(markers, context);
-		this.then.resolveTypes(markers, context);
+		if (this.then != null)
+		{
+			this.then.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override

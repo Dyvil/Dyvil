@@ -5,6 +5,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class ImportParser extends Parser
 {
@@ -26,21 +28,23 @@ public class ImportParser extends Parser
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (";".equals(value))
+		int type = token.type();
+		if (type == Tokens.SEMICOLON)
 		{
 			pm.popParser();
 			return true;
 		}
+		
 		if (this.isInMode(IMPORT))
 		{
-			if ("{".equals(value))
+			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
 				MultiImport mi = new MultiImport(token, this.parent);
 				this.container.addImport(mi);
 				this.parent = mi;
 				this.container = mi;
 				
-				if (!token.next().equals("}"))
+				if (!token.next().isType(Tokens.CLOSE_CURLY_BRACKET))
 				{
 					pm.pushParser(new ImportListParser(mi, mi));
 					this.mode = MULTIIMPORT;
@@ -50,14 +54,14 @@ public class ImportParser extends Parser
 				pm.skip();
 				return true;
 			}
-			else if (token.isType(IToken.KEYWORD_WC))
+			if (type == Tokens.WILDCARD)
 			{
 				PackageImport pi = new PackageImport(token.raw(), this.parent);
 				this.container.addImport(pi);
 				this.mode = 0;
 				return true;
 			}
-			else if (token.isType(IToken.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(type))
 			{
 				SimpleImport si = new SimpleImport(token.raw(), this.parent, value);
 				this.container.addImport(si);
@@ -69,7 +73,7 @@ public class ImportParser extends Parser
 		}
 		if (this.isInMode(DOT))
 		{
-			if (".".equals(value))
+			if (type == Tokens.DOT)
 			{
 				this.mode = IMPORT;
 				return true;
@@ -80,7 +84,7 @@ public class ImportParser extends Parser
 			if ("=>".equals(value))
 			{
 				IToken next = token.next();
-				if (next.isType(IToken.TYPE_IDENTIFIER))
+				if (next.isType(Tokens.TYPE_IDENTIFIER))
 				{
 					((SimpleImport) this.parent).setAlias(next.value());
 					pm.skip();
@@ -95,7 +99,7 @@ public class ImportParser extends Parser
 		}
 		if (this.isInMode(MULTIIMPORT))
 		{
-			if ("}".equals(value))
+			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				this.container.expandPosition(token);
 				this.mode = 0;

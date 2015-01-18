@@ -7,6 +7,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class ExpressionMapParser extends Parser implements IValued
 {
@@ -21,19 +23,20 @@ public class ExpressionMapParser extends Parser implements IValued
 	public ExpressionMapParser(IValueMap valueMap)
 	{
 		this.valueMap = valueMap;
-		this.mode = NAME | VALUE;
+		this.mode = NAME;
 	}
 	
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if ("}".equals(value) || ")".equals(value))
+		int type = token.type();
+		if (ParserUtil.isCloseBracket(type))
 		{
 			pm.popParser(true);
 			return true;
 		}
 		
-		if (this.isInMode(NAME))
+		if (this.mode == NAME)
 		{
 			if (token.next().equals("="))
 			{
@@ -43,23 +46,21 @@ public class ExpressionMapParser extends Parser implements IValued
 			}
 			this.mode = VALUE;
 		}
-		if (this.isInMode(VALUE))
+		if (this.mode == VALUE)
 		{
 			this.mode = SEPERATOR;
 			pm.pushTryParser(new ExpressionParser(this), token, true);
 			return true;
 		}
-		if (this.isInMode(SEPERATOR))
+		if (this.mode == SEPERATOR)
 		{
-			if (",".equals(value))
+			if (type == Tokens.COMMA)
 			{
 				this.mode = NAME | VALUE;
 				return true;
 			}
 		}
-		
-		pm.popParser(true);
-		return true;
+		return false;
 	}
 	
 	@Override

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.expression.ExpressionMapParser;
+import dyvil.tools.compiler.util.Tokens;
 
 public class AnnotationParser extends Parser
 {
@@ -31,7 +32,7 @@ public class AnnotationParser extends Parser
 			this.annotation = new Annotation(token.raw(), value.substring(1));
 			this.mode = PARAMETERS_START;
 			
-			if (!token.next().equals("("))
+			if (!token.next().isType(Tokens.OPEN_PARENTHESIS))
 			{
 				this.annotatable.addAnnotation(this.annotation);
 				pm.popParser();
@@ -41,7 +42,7 @@ public class AnnotationParser extends Parser
 		}
 		if (this.isInMode(PARAMETERS_START))
 		{
-			if ("(".equals(value))
+			if (token.isType(Tokens.OPEN_PARENTHESIS))
 			{
 				pm.pushParser(new ExpressionMapParser(this.annotation));
 				this.mode = PARAMETERS_END;
@@ -50,7 +51,7 @@ public class AnnotationParser extends Parser
 		}
 		if (this.isInMode(PARAMETERS_END))
 		{
-			if (")".equals(value))
+			if (token.isType(Tokens.CLOSE_PARENTHESIS))
 			{
 				this.annotation.expandPosition(token);
 				this.annotatable.addAnnotation(this.annotation);

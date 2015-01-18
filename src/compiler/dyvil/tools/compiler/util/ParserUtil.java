@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.util;
 
-import static dyvil.tools.compiler.lexer.token.IToken.*;
-
 public class ParserUtil
 {
 	public static boolean isWhitespace(char c)
@@ -69,38 +67,58 @@ public class ParserUtil
 		switch (s)
 		{
 		case "_":
-			return KEYWORD_WC;
+			return Tokens.WILDCARD;
 		case "@":
-			return KEYWORD_AT;
+			return Tokens.AT;
 		case "null":
-			return KEYWORD_NULL;
+			return Tokens.NULL;
 		case "true":
-			return KEYWORD_TRUE;
+			return Tokens.TRUE;
 		case "false":
-			return KEYWORD_FALSE;
+			return Tokens.FALSE;
 		case "this":
-			return KEYWORD_THIS;
+			return Tokens.THIS;
 		case "super":
-			return KEYWORD_SUPER;
+			return Tokens.SUPER;
 		case "new":
-			return KEYWORD_NEW;
+			return Tokens.NEW;
 		case "return":
-			return KEYWORD_RETURN;
+			return Tokens.RETURN;
 		case "if":
-			return KEYWORD_IF;
+			return Tokens.IF;
 		case "else":
-			return KEYWORD_ELSE;
+			return Tokens.ELSE;
 		case "while":
-			return KEYWORD_WHILE;
+			return Tokens.WHILE;
 		case "do":
-			return KEYWORD_DO;
+			return Tokens.DO;
 		case "for":
-			return KEYWORD_FOR;
+			return Tokens.FOR;
 		case "switch":
-			return KEYWORD_SWITCH;
+			return Tokens.SWITCH;
 		case "case":
-			return KEYWORD_CASE;
+			return Tokens.CASE;
 		}
-		return TYPE_IDENTIFIER;
+		return Tokens.TYPE_IDENTIFIER;
+	}
+	
+	public static boolean isIdentifier(int type)
+	{
+		return (type & Tokens.TYPE_IDENTIFIER) != 0;
+	}
+	
+	public static boolean isCloseBracket(int type)
+	{
+		return (type & Tokens.CLOSE_BRACKET) != 0;
+	}
+	
+	public static boolean isTerminator(int type)
+	{
+		return type == Tokens.COMMA || type == Tokens.SEMICOLON || (type & Tokens.CLOSE_BRACKET) == Tokens.CLOSE_BRACKET;
+	}
+	
+	public static boolean isSeperator(int type)
+	{
+		return type == Tokens.COMMA || type == Tokens.SEMICOLON;
 	}
 }

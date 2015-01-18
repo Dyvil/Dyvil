@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class TypeListParser extends Parser implements ITyped
 {
@@ -37,7 +38,7 @@ public class TypeListParser extends Parser implements ITyped
 		}
 		if (this.mode == 1)
 		{
-			if (",".equals(value) || ";".equals(value))
+			if (ParserUtil.isTerminator(token.type()))
 			{
 				this.typeList.addType(this.type);
 				this.mode = 0;

@@ -6,6 +6,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class ImportListParser extends Parser
 {
@@ -21,20 +23,22 @@ public class ImportListParser extends Parser
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if ("}".equals(value) || ";".equals(value))
+		int type = token.type();
+		if (ParserUtil.isTerminator(type))
 		{
 			pm.popParser(true);
 			return true;
 		}
+		
 		if (this.mode == 0)
 		{
 			pm.pushParser(new ImportParser(this.parent, this.container), true);
 			this.mode = 1;
 			return true;
 		}
-		else if (this.mode == 1)
+		if (this.mode == 1)
 		{
-			if (",".equals(value))
+			if (type == Tokens.COMMA)
 			{
 				this.mode = 0;
 				return true;

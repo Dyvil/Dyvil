@@ -6,6 +6,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class PackageParser extends Parser
 {
@@ -20,18 +22,19 @@ public class PackageParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (";".equals(value))
+		int type = token.type();
+		if (type == Tokens.SEMICOLON)
 		{
 			this.packageDeclaration.expandPosition(token);
 			this.packageDeclaration.setPackage(this.buffer.toString());
 			this.unit.setPackageDeclaration(this.packageDeclaration);
 			
-			jcp.popParser();
+			pm.popParser();
 			return true;
 		}
-		else if (token.isType(IToken.TYPE_IDENTIFIER) || ".".equals(value))
+		if (ParserUtil.isIdentifier(type) || type == Tokens.DOT)
 		{
 			if (this.packageDeclaration == null)
 			{

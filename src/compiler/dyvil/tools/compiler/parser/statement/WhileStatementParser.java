@@ -8,6 +8,8 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class WhileStatementParser extends Parser implements IValued
 {
@@ -31,9 +33,11 @@ public class WhileStatementParser extends Parser implements IValued
 			pm.popParser(true);
 			return true;
 		}
+		
+		int type = token.type();
 		if (this.mode == CONDITION)
 		{
-			if ("(".equals(value))
+			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ExpressionParser(this));
 				this.mode = CONDITION_END;
@@ -43,7 +47,7 @@ public class WhileStatementParser extends Parser implements IValued
 		}
 		if (this.mode == CONDITION_END)
 		{
-			if (")".equals(value))
+			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				this.mode = THEN;
 				return true;
@@ -52,19 +56,17 @@ public class WhileStatementParser extends Parser implements IValued
 		}
 		if (this.mode == THEN)
 		{
-			if (!";".equals(value))
+			if (ParserUtil.isTerminator(type))
 			{
-				pm.pushParser(new ExpressionParser(this), true);
+				pm.popParser(true);
+				return true;
 			}
+			
+			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = -1;
 			return true;
 		}
 		
-		if ("}".equals(value))
-		{
-			pm.popParser(true);
-			return true;
-		}
 		return false;
 	}
 	

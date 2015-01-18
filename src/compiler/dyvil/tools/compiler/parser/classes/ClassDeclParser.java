@@ -15,6 +15,7 @@ import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Tokens;
 
 public class ClassDeclParser extends Parser implements ITyped, ITypeList
 {
@@ -66,7 +67,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 		}
 		if (this.isInMode(NAME))
 		{
-			if (token.isType(IToken.TYPE_IDENTIFIER))
+			if (token.isType(Tokens.TYPE_IDENTIFIER))
 			{
 				this.theClass.setPosition(token.raw());
 				this.theClass.setName(value);
@@ -114,7 +115,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 		}
 		if (this.isInMode(BODY))
 		{
-			if ("{".equals(value))
+			if (token.isType(Tokens.OPEN_CURLY_BRACKET))
 			{
 				pm.pushParser(new ClassBodyParser(this.theClass));
 				this.mode = BODY_END;
@@ -124,7 +125,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 		}
 		if (this.isInMode(BODY_END))
 		{
-			if ("}".equals(value))
+			if (token.isType(Tokens.CLOSE_CURLY_BRACKET))
 			{
 				this.theClass.expandPosition(token);
 				pm.popParser();

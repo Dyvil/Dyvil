@@ -24,6 +24,8 @@ import dyvil.tools.compiler.parser.statement.IfStatementParser;
 import dyvil.tools.compiler.parser.statement.WhileStatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.OperatorComparator;
+import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class ExpressionParser extends Parser implements ITyped, IValued
 {
@@ -42,7 +44,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int	VARIABLE		= 1024;
 	
 	public static final int	BYTECODE		= 2048;
-	public static final int	BYTECODE_2		= 4096;
+	public static final int	BYTECODE_END		= 4096;
 	
 	protected IValued		field;
 	protected int			precedence;
@@ -60,7 +62,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
-		if (this.mode == 0 || ";".equals(value))
+		int type = token.type();
+		if (this.mode == 0 || type == Tokens.SEMICOLON)
 		{
 			pm.popParser(true);
 			return true;
@@ -68,17 +71,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		
 		if (this.isInMode(VALUE))
 		{
-			int type = token.type();
-			if (this.parseKeyword(pm, token, type))
-			{
-				return true;
-			}
-			else if (this.parsePrimitive(value, token))
-			{
-				this.mode = ACCESS;
-				return true;
-			}
-			else if ("(".equals(value))
+			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				this.mode = TUPLE_END;
 				this.value = new TupleValue(token);
@@ -89,7 +82,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				return true;
 			}
-			else if ("{".equals(value))
+			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
 				this.mode = LIST_END;
 				this.value = new StatementList(token);
@@ -100,17 +93,26 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				return true;
 			}
-			else if ((type & IToken.TYPE_IDENTIFIER) != 0)
+			if ((type & Tokens.TYPE_IDENTIFIER) != 0)
 			{
 				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
+				return true;
+			}
+			if (this.parsePrimitive(value, token, type))
+			{
+				this.mode = ACCESS;
+				return true;
+			}
+			if (this.parseKeyword(pm, token, type))
+			{
 				return true;
 			}
 			this.mode = ACCESS;
 		}
 		if (this.isInMode(LIST_END))
 		{
-			if ("}".equals(value))
+			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
 				this.value.expandPosition(token);
 				
@@ -129,7 +131,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(TUPLE_END))
 		{
-			if (")".equals(value))
+			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				this.value.expandPosition(token);
 				this.mode = ACCESS | VARIABLE | LAMBDA;
@@ -139,19 +141,19 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(BYTECODE))
 		{
-			if ("{".equals(value))
+			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
 				Bytecode bc = new Bytecode(token);
 				pm.pushParser(new BytecodeParser(bc));
 				this.value = bc;
-				this.mode = BYTECODE_2;
+				this.mode = BYTECODE_END;
 				return true;
 			}
 			return false;
 		}
-		if (this.isInMode(BYTECODE_2))
+		if (this.isInMode(BYTECODE_END))
 		{
-			if ("}".equals(value))
+			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
 				this.value.expandPosition(token);
 				pm.popParser();
@@ -177,18 +179,18 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(VARIABLE))
 		{
-			if (token.isType(IToken.TYPE_IDENTIFIER) && token.next().equals("="))
+			if (ParserUtil.isIdentifier(type) && token.next().equals("="))
 			{
 				ICodePosition pos = token.raw();
-				IType type;
+				IType itype;
 				int i = this.value.getValueType();
 				if (i == IValue.CLASS_ACCESS)
 				{
-					type = ((ClassAccess) this.value).type;
+					itype = ((ClassAccess) this.value).type;
 				}
 				else if (i == IValue.TUPLE)
 				{
-					type = getTupleType((TupleValue) this.value);
+					itype = getTupleType((TupleValue) this.value);
 				}
 				else
 				{
@@ -196,7 +198,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				
 				FieldAssign access = new FieldAssign(pos, value, null);
-				access.field = new Variable(pos, value, type);
+				access.field = new Variable(pos, value, itype);
 				access.initializer = true;
 				this.value = access;
 				
@@ -208,7 +210,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(ACCESS))
 		{
-			if (".".equals(value))
+			if (type == Tokens.DOT)
 			{
 				this.mode = ACCESS_2;
 				this.dotless = false;
@@ -218,19 +220,19 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.dotless = true;
 			this.mode = ACCESS_2;
 			
-			if (token.isType(IToken.KEYWORD_ELSE))
+			if (type == Tokens.ELSE)
 			{
 				pm.popParser(true);
 				return true;
 			}
-			else if ("=".equals(value))
+			if ("=".equals(value))
 			{
 				return this.getAssign(pm);
 			}
-			else if ("(".equals(value))
+			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				IToken prev = token.prev();
-				if (prev.isType(IToken.TYPE_IDENTIFIER))
+				if (prev.isType(Tokens.TYPE_IDENTIFIER))
 				{
 					this.value = new MethodCall(prev, null, prev.value());
 					this.mode = PARAMETERS;
@@ -244,7 +246,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(ACCESS_2))
 		{
-			if (token.isType(IToken.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(type))
 			{
 				if (this.precedence != 0 && this.dotless)
 				{
@@ -258,19 +260,14 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				
 				return this.getAccess(pm, value, token);
 			}
-			else if (")".equals(value))
-			{
-				pm.popParser(true);
-				return true;
-			}
-			else if (token.isType(IToken.TYPE_SYMBOL) || token.isType(IToken.TYPE_CLOSE_BRACKET))
+			else if (ParserUtil.isTerminator(type))
 			{
 				pm.popParser(true);
 				return true;
 			}
 			
 			IToken prev = token.prev();
-			if (prev.isType(IToken.TYPE_IDENTIFIER))
+			if (prev.isType(Tokens.TYPE_IDENTIFIER))
 			{
 				this.value = null;
 				pm.reparse();
@@ -280,7 +277,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(PARAMETERS))
 		{
-			if ("(".equals(value))
+			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				this.mode = PARAMETERS_END;
@@ -290,7 +287,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(PARAMETERS_END))
 		{
-			if (")".equals(value))
+			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				this.value.expandPosition(token);
 				this.mode = ACCESS;
@@ -311,7 +308,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	private boolean getAccess(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
 		IToken next = token.next();
-		if (next.equals("("))
+		int type = next.type();
+		if (type == Tokens.OPEN_PARENTHESIS)
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
 			call.dotless = this.dotless;
@@ -319,7 +317,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = PARAMETERS;
 			return true;
 		}
-		else if (!next.isType(IToken.TYPE_IDENTIFIER) && !next.isType(IToken.TYPE_SYMBOL))
+		else if (!ParserUtil.isIdentifier(type) && !ParserUtil.isTerminator(type))
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
 			call.isSugarCall = true;
@@ -458,38 +456,26 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 	}
 	
-	public boolean parsePrimitive(String value, IToken token) throws SyntaxError
+	public boolean parsePrimitive(String value, IToken token, int type) throws SyntaxError
 	{
-		if (token.isType(IToken.TYPE_STRING))
+		switch (type)
 		{
+		case Tokens.TYPE_STRING:
 			this.value = new StringValue(token.raw(), (String) token.object());
 			return true;
-		}
-		// Char
-		else if (token.isType(IToken.TYPE_CHAR))
-		{
+		case Tokens.TYPE_CHAR:
 			this.value = new CharValue(token.raw(), (Character) token.object());
 			return true;
-		}
-		// Int
-		else if (token.isType(IToken.TYPE_INT))
-		{
+		case Tokens.TYPE_INT:
 			this.value = new IntValue(token.raw(), (Integer) token.object());
 			return true;
-		}
-		else if (token.isType(IToken.TYPE_LONG))
-		{
+		case Tokens.TYPE_LONG:
 			this.value = new LongValue(token.raw(), (Long) token.object());
 			return true;
-		}
-		// Float
-		else if (token.isType(IToken.TYPE_FLOAT))
-		{
+		case Tokens.TYPE_FLOAT:
 			this.value = new FloatValue(token.raw(), (Float) token.object());
 			return true;
-		}
-		else if (token.isType(IToken.TYPE_DOUBLE))
-		{
+		case Tokens.TYPE_DOUBLE:
 			this.value = new DoubleValue(token.raw(), (Double) token.object());
 			return true;
 		}
@@ -500,64 +486,64 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	{
 		switch (type)
 		{
-		case IToken.KEYWORD_WC:
+		case Tokens.WILDCARD:
 			return true;
-		case IToken.KEYWORD_AT:
+		case Tokens.AT:
 			this.mode = BYTECODE;
 			return true;
-		case IToken.KEYWORD_NULL:
+		case Tokens.NULL:
 			this.value = new NullValue(token.raw());
 			this.mode = ACCESS;
 			return true;
-		case IToken.KEYWORD_TRUE:
+		case Tokens.TRUE:
 			this.value = new BooleanValue(token.raw(), true);
 			this.mode = ACCESS;
 			return true;
-		case IToken.KEYWORD_FALSE:
+		case Tokens.FALSE:
 			this.value = new BooleanValue(token.raw(), false);
 			this.mode = ACCESS;
 			return true;
-		case IToken.KEYWORD_THIS:
+		case Tokens.THIS:
 			this.value = new ThisValue(token.raw());
 			this.mode = ACCESS;
 			return true;
-		case IToken.KEYWORD_SUPER:
+		case Tokens.SUPER:
 			this.value = new SuperValue(token.raw());
 			this.mode = ACCESS;
 			return true;
-		case IToken.KEYWORD_NEW:
+		case Tokens.NEW:
 			ConstructorCall call = new ConstructorCall(token);
 			this.mode = PARAMETERS;
 			this.value = call;
 			pm.pushParser(new TypeParser(call));
 			return true;
-		case IToken.KEYWORD_RETURN:
+		case Tokens.RETURN:
 			ReturnStatement rs = new ReturnStatement(token.raw());
 			this.value = rs;
 			pm.pushParser(new ExpressionParser(rs));
 			return true;
-		case IToken.KEYWORD_IF:
+		case Tokens.IF:
 			IfStatement is = new IfStatement(token.raw());
 			this.value = is;
 			pm.pushParser(new IfStatementParser(is));
 			this.mode = 0;
 			return true;
-		case IToken.KEYWORD_ELSE:
+		case Tokens.ELSE:
 			pm.popParser(true);
 			return true;
-		case IToken.KEYWORD_WHILE:
+		case Tokens.WHILE:
 			WhileStatement statement = new WhileStatement(token);
 			this.value = statement;
 			pm.pushParser(new WhileStatementParser(statement));
 			this.mode = 0;
 			return true;
-		case IToken.KEYWORD_DO:
+		case Tokens.DO:
 			return true;
-		case IToken.KEYWORD_FOR:
+		case Tokens.FOR:
 			return true;
-		case IToken.KEYWORD_SWITCH:
+		case Tokens.SWITCH:
 			return true;
-		case IToken.KEYWORD_CASE:
+		case Tokens.CASE:
 			return true;
 		default:
 			return false;

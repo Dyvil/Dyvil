@@ -9,6 +9,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class ThrowsDeclParser extends Parser implements ITyped
 {
@@ -22,6 +23,13 @@ public class ThrowsDeclParser extends Parser implements ITyped
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
+		int type = token.type();
+		if (ParserUtil.isCloseBracket(type))
+		{
+			pm.popParser(true);
+			return true;
+		}
+		
 		if (this.mode == 0)
 		{
 			pm.pushParser(new TypeParser(this), true);
@@ -30,15 +38,16 @@ public class ThrowsDeclParser extends Parser implements ITyped
 		}
 		if (this.mode == 1)
 		{
-			if (",".equals(value) || ";".equals(value))
+			if (ParserUtil.isSeperator(type))
 			{
 				this.mode = 0;
 				return true;
 			}
+			
+			pm.popParser(true);
+			return true;
 		}
-		
-		pm.popParser(true);
-		return true;
+		return false;
 	}
 	
 	@Override

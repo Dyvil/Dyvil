@@ -6,6 +6,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.util.Tokens;
 
 public class ConfigParser extends Parser
 {
@@ -32,7 +33,7 @@ public class ConfigParser extends Parser
 				this.mode = VALUE;
 				return true;
 			}
-			else if (token.isType(IToken.TYPE_IDENTIFIER))
+			else if (token.isType(Tokens.TYPE_IDENTIFIER))
 			{
 				this.key = value;
 				return true;
