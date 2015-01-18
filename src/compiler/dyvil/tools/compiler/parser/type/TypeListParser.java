@@ -30,6 +30,7 @@ public class TypeListParser extends Parser implements ITyped
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
+		int type = token.type();
 		if (this.mode == 0)
 		{
 			this.mode = 1;
@@ -38,20 +39,20 @@ public class TypeListParser extends Parser implements ITyped
 		}
 		if (this.mode == 1)
 		{
-			if (ParserUtil.isTerminator(token.type()))
+			if (ParserUtil.isCloseBracket(type))
+			{
+				this.typeList.addType(this.type);
+				pm.popParser();
+				return true;
+			}
+			if (ParserUtil.isSeperator(type))
 			{
 				this.typeList.addType(this.type);
 				this.mode = 0;
 				return true;
 			}
 		}
-		
-		pm.popParser(true);
-		if (this.type != null)
-		{
-			this.typeList.addType(this.type);
-		}
-		return true;
+		return false;
 	}
 	
 	@Override

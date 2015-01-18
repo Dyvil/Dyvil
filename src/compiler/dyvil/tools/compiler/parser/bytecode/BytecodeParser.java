@@ -1,9 +1,11 @@
-package dyvil.tools.compiler.parser;
+package dyvil.tools.compiler.parser.bytecode;
 
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.bytecode.Instruction;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -29,7 +31,7 @@ public class BytecodeParser extends Parser
 	{
 		if (this.isInMode(LABEL))
 		{
-			if (token.next().isType(Tokens.SEMICOLON))
+			if (token.next().isType(Tokens.COLON))
 			{
 				this.label = value;
 				pm.skip();

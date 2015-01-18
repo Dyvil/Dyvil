@@ -18,7 +18,7 @@ import dyvil.tools.compiler.util.Modifiers;
 public class Parameter extends Member implements IField
 {
 	public int		index;
-	private char	seperator;
+	public char		seperator;
 	private boolean	varargs;
 	
 	public Parameter()
