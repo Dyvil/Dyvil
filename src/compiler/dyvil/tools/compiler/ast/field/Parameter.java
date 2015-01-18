@@ -191,7 +191,7 @@ public class Parameter extends Member implements IField
 	@Override
 	public void writeSet(MethodWriter writer)
 	{
-		writer.visitVarInsn(this.type.getStoreOpcode(), this.index, this.type);
+		writer.visitVarInsn(this.type.getStoreOpcode(), this.index, null);
 	}
 	
 	@Override

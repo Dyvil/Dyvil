@@ -240,6 +240,10 @@ public final class MethodWriter extends MethodVisitor
 				this.mv.visitLdcInsn(-1L);
 			}
 		}
+		else if (opcode == POP)
+		{
+			this.typeStack.pop();
+		}
 		else if (opcode >= IALOAD && opcode <= SALOAD)
 		{
 			this.typeStack.pop(); // Index
@@ -303,6 +307,10 @@ public final class MethodWriter extends MethodVisitor
 			this.mv.visitIntInsn(NEWARRAY, ((PrimitiveType) type).typecode);
 			return;
 		}
+		if (opcode == NEW)
+		{
+			this.push(type);
+		}
 		this.mv.visitTypeInsn(opcode, type.getInternalName());
 	}
 	
@@ -318,6 +326,10 @@ public final class MethodWriter extends MethodVisitor
 		if (type != null)
 		{
 			this.push(type);
+		}
+		else
+		{
+			this.typeStack.pop();
 		}
 		this.mv.visitVarInsn(opcode, index);
 	}

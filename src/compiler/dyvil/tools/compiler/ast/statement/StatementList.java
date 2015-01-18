@@ -21,7 +21,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 {
 	private IContext			context;
 	
-	public Map<String, IField>	variables	= new HashMap();
+	public Map<String, Variable>	variables	= new HashMap();
 	public Label				start		= new Label();
 	public Label				end			= new Label();
 	
@@ -56,7 +56,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		{
 			v.resolveTypes(markers, context);
 			
-			if (!(v instanceof FieldAssign))
+			if (v.getValueType() != IValue.FIELD_ASSIGN)
 			{
 				continue;
 			}
@@ -71,7 +71,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 			var.start = this.start;
 			var.end = this.end;
 			
-			this.variables.put(assign.qualifiedName, assign.field);
+			this.variables.put(assign.qualifiedName, var);
 			
 			if (variableList != null)
 			{

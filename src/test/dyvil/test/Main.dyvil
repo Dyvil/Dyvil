@@ -7,15 +7,17 @@ public class Main
 {
 	public static void main(String[] args) =
 	{
-		"BitMuster 2.0" print;
+		"BinaryConverter v2.0" >>;
+		"--------------------" >>;
+		
 		Scanner scanner = new Scanner(System in);
+		while (true)
 		{
-			"Geben sie ihre Zahl zum Konvertieren in ein Bitmuster ein" print;
-			int n = scanner nextInt;
-			String s = jInt toBinaryString n;
-			"=" concat(s) print;
+			"Enter your number to convert it to binary" >>;
+			jInt toBinaryString(scanner nextInt) >>;
+			"" >>;
 		}
 	};
 	
-	public implicit void print(Object o) = System out println(o);
+	public implicit void >>(Object o) = System out println(o);
 }

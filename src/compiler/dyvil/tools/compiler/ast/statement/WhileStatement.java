@@ -118,7 +118,9 @@ public class WhileStatement extends ASTNode implements IStatement
 		}
 		
 		Label start = new Label();
+		start.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 		Label end = new Label();
+		end.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 		
 		// Condition
 		writer.visitLabel(start);

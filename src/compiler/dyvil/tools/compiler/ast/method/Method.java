@@ -755,12 +755,13 @@ public class Method extends Member implements IMethod
 		{
 			mw.visitCode();
 			
-			this.statement.writeExpression(mw);
-			
+			// TODO This breaks some things, do it inside the statement list
 			for (Variable var : this.variables)
 			{
 				mw.visitLocalVariable(var.qualifiedName, var.type, var.start, var.end, var.index);
 			}
+			
+			this.statement.writeExpression(mw);
 			
 			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);
 		}
