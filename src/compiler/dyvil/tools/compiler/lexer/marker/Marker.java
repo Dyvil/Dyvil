@@ -110,11 +110,11 @@ public abstract class Marker extends Exception
 		// Append Info (if any)
 		if (this.info != null)
 		{
-			buf.append('\n');
 			for (String s : this.info)
 			{
-				buf.append('\n').append(s);
+				buf.append("\n\t").append(s);
 			}
+			buf.append('\n');
 		}
 		
 		logger.info(buf.toString());

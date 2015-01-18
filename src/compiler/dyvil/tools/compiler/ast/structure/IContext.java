@@ -20,6 +20,11 @@ public interface IContext
 	
 	public boolean isStatic();
 	
+	public default int getVariableCount()
+	{
+		return 0;
+	}
+	
 	/**
 	 * Returns the type of this context. {@code null} in case of a package or
 	 * compilation unit, this in case of a Class and the class this is contained

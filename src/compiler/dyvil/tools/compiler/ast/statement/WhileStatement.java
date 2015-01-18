@@ -98,7 +98,7 @@ public class WhileStatement extends ASTNode implements IStatement
 	{
 		if (this.condition != null)
 		{
-			if (this.condition.requireType(Type.BOOLEAN))
+			if (!this.condition.requireType(Type.BOOLEAN))
 			{
 				SemanticError error = new SemanticError(this.condition.getPosition(), "The condition of a while statement has to evaluate to a boolean value.");
 				error.addInfo("Condition Type: " + this.condition.getType());

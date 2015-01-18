@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
@@ -20,10 +19,6 @@ import dyvil.tools.compiler.util.Modifiers;
 public class Variable extends Member implements IField
 {
 	public int		index;
-	
-	public Label	start;
-	public Label	end;
-	
 	public IValue	value;
 	
 	public Variable()

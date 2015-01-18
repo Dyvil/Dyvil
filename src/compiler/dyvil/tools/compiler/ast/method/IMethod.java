@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.statement.IVariableList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -16,7 +15,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.bytecode.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
-public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower, IVariableList, IParameterized, IContext
+public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower, IParameterized, IContext
 {
 	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments);
 	

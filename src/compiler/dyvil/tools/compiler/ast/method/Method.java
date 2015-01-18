@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
-import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
@@ -39,8 +38,6 @@ public class Method extends Member implements IMethod
 	private List<IType>			throwsDeclarations	= new ArrayList(1);
 	
 	private IValue				statement;
-	
-	private List<Variable>		variables			= new ArrayList(5);
 	
 	protected boolean			isConstructor;
 	
@@ -162,9 +159,9 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void addVariable(Variable variable)
+	public int getVariableCount()
 	{
-		this.variables.add(variable);
+		return this.parameters.size();
 	}
 	
 	@Override
@@ -467,12 +464,6 @@ public class Method extends Member implements IMethod
 			p.resolve(markers, context);
 		}
 		
-		for (Variable v : this.variables)
-		{
-			v.index = index++;
-			v.resolve(markers, this);
-		}
-		
 		if (this.statement != null)
 		{
 			this.statement = this.statement.resolve(markers, this);
@@ -525,11 +516,6 @@ public class Method extends Member implements IMethod
 			p.check(markers, context);
 		}
 		
-		for (Variable v : this.variables)
-		{
-			v.check(markers, context);
-		}
-		
 		if (this.statement != null)
 		{
 			if (this.isConstructor)
@@ -580,11 +566,6 @@ public class Method extends Member implements IMethod
 		for (Parameter p : this.parameters)
 		{
 			p.foldConstants();
-		}
-		
-		for (Variable v : this.variables)
-		{
-			v.foldConstants();
 		}
 		
 		if (this.statement != null)
@@ -780,15 +761,7 @@ public class Method extends Member implements IMethod
 		if (this.statement != null)
 		{
 			mw.visitCode();
-			
-			// TODO This breaks some things, do it inside the statement list
-			for (Variable var : this.variables)
-			{
-				mw.visitLocalVariable(var.qualifiedName, var.type, var.start, var.end, var.index);
-			}
-			
 			this.statement.writeExpression(mw);
-			
 			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);
 		}
 	}

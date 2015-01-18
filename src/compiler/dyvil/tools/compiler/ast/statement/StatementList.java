@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.access.FieldAssign;
@@ -28,6 +29,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 {
 	private IContext				context;
 	
+	private int						variableCount;
 	public Map<String, Variable>	variables	= new HashMap();
 	public Label					start		= new Label();
 	public Label					end			= new Label();
@@ -35,11 +37,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public StatementList(ICodePosition position)
 	{
 		super(position);
-	}
-	
-	public void addStatement(IStatement statement)
-	{
-		this.values.add(statement);
 	}
 	
 	@Override
@@ -57,33 +54,22 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.context = context;
-		IVariableList variableList = context instanceof IVariableList ? (IVariableList) context : null;
+		this.variableCount = context.getVariableCount();
 		
 		for (IValue v : this.values)
 		{
-			v.resolveTypes(markers, context);
-			
-			if (v.getValueType() != IValue.FIELD_ASSIGN)
+			if (v.getValueType() == IValue.FIELD_ASSIGN)
 			{
-				continue;
+				FieldAssign assign = (FieldAssign) v;
+				if (assign.initializer)
+				{
+					Variable var = (Variable) assign.field;
+					var.index = this.variableCount++;
+					this.variables.put(assign.qualifiedName, var);
+				}
 			}
 			
-			FieldAssign assign = (FieldAssign) v;
-			if (!assign.initializer)
-			{
-				continue;
-			}
-			
-			Variable var = (Variable) assign.field;
-			var.start = this.start;
-			var.end = this.end;
-			
-			this.variables.put(assign.qualifiedName, var);
-			
-			if (variableList != null)
-			{
-				variableList.addVariable(var);
-			}
+			v.resolveTypes(markers, this);
 		}
 	}
 	
@@ -159,6 +145,12 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
+	public int getVariableCount()
+	{
+		return this.variableCount;
+	}
+	
+	@Override
 	public Package resolvePackage(String name)
 	{
 		return this.context.resolvePackage(name);
@@ -227,5 +219,11 @@ public class StatementList extends ValueList implements IStatement, IContext
 			v.writeStatement(writer);
 		}
 		writer.visitLabel(this.end);
+		
+		for (Entry<String, Variable> entry : this.variables.entrySet())
+		{
+			Variable var = entry.getValue();
+			writer.visitLocalVariable(entry.getKey(), var.type, this.start, this.end, var.index);
+		}
 	}
 }

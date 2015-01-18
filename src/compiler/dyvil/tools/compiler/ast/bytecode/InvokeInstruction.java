@@ -9,7 +9,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
-import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -254,8 +253,9 @@ public class InvokeInstruction extends Instruction implements IMethod
 	}
 	
 	@Override
-	public void addVariable(Variable variable)
+	public int getVariableCount()
 	{
+		return 0;
 	}
 	
 	@Override
