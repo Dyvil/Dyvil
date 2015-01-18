@@ -6,9 +6,9 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.util.ClassFormat;
 
 public class Instruction extends ASTNode
 {

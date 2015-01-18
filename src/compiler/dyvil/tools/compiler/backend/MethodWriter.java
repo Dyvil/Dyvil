@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.bytecode;
+package dyvil.tools.compiler.backend;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
 

@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
 
 public class IIncInstruction extends Instruction
 {

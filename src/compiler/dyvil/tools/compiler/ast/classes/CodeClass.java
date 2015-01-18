@@ -33,8 +33,8 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.Symbols;
 import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass

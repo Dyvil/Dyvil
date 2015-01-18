@@ -17,11 +17,11 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.bytecode.AnnotationVisitorImpl;
+import dyvil.tools.compiler.backend.AnnotationVisitorImpl;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.util.ClassFormat;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.Symbols;
 
 public class BytecodeClass extends CodeClass
 {

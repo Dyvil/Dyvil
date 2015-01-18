@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.bytecode.MethodWriter;
-import dyvil.tools.compiler.util.ClassFormat;
+import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.backend.MethodWriter;
 
 public class TypeInstruction extends Instruction
 {

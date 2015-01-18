@@ -23,7 +23,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
 import dyvil.tools.compiler.parser.statement.WhileStatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
-import dyvil.tools.compiler.util.OperatorComparator;
+import dyvil.tools.compiler.transform.OperatorComparator;
 
 public class ExpressionParser extends Parser implements ITyped, IValued
 {

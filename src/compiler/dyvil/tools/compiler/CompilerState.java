@@ -3,7 +3,7 @@ package dyvil.tools.compiler;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
-import dyvil.tools.compiler.bytecode.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.util.Util;
 
 public enum CompilerState
@@ -81,14 +81,14 @@ public enum CompilerState
 	/**
 	 * Prints the AST.
 	 */
-	DEBUG
+	PRINT
 	{
 		@Override
 		public void apply(List<CompilationUnit> units)
 		{
 			for (CompilationUnit cu : units)
 			{
-				cu.debug();
+				cu.print();
 			}
 		}
 	},

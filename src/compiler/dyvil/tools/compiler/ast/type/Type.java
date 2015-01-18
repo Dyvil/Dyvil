@@ -11,10 +11,10 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.ClassFormat;
-import dyvil.tools.compiler.util.Symbols;
+import dyvil.tools.compiler.transform.Symbols;
 
 public class Type extends ASTNode implements IContext, IType
 {

@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.bytecode;
+package dyvil.tools.compiler.backend;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.AnnotationType;
-import dyvil.tools.compiler.util.ClassFormat;
 
 public class ClassReader extends ClassVisitor
 {

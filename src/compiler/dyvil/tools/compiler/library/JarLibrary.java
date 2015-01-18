@@ -12,7 +12,7 @@ import java.util.zip.ZipEntry;
 
 import dyvil.tools.compiler.ast.structure.ExternalPackage;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.util.ClassFormat;
+import dyvil.tools.compiler.backend.ClassFormat;
 
 public class JarLibrary extends Library
 {

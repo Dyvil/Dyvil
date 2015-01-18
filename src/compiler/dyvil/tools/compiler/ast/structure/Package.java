@@ -10,8 +10,8 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.library.Library;
-import dyvil.tools.compiler.util.ClassFormat;
 
 public class Package implements IContext
 {

@@ -166,8 +166,12 @@ public class DyvilCompiler
 			states.add(CompilerState.TOKENIZE);
 			states.add(CompilerState.PARSE);
 			states.add(CompilerState.FORMAT);
+			return;
+		case "print":
+			states.add(CompilerState.PRINT);
+			return;
 		case "--debug":
-			states.add(CompilerState.DEBUG);
+			states.add(CompilerState.PRINT);
 			debug = true;
 			return;
 		case "--pstack":

@@ -5,8 +5,8 @@ import static dyvil.reflect.Opcodes.GETSTATIC;
 import static dyvil.reflect.Opcodes.PUTFIELD;
 import static dyvil.reflect.Opcodes.PUTSTATIC;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.bytecode.MethodWriter;
-import dyvil.tools.compiler.util.ClassFormat;
+import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.backend.MethodWriter;
 
 public class FieldInstruction extends Instruction
 {

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.value;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.bytecode.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class StringValue extends ASTNode implements IConstantValue

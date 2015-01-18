@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.bytecode.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
@@ -217,7 +217,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		}
 	}
 	
-	public void debug()
+	public void print()
 	{
 		DyvilCompiler.logger.info(this.inputFile + ":\n" + this.toString());
 	}

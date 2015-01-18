@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.bytecode;
+package dyvil.tools.compiler.backend;
 
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -9,7 +9,6 @@ import dyvil.tools.compiler.ast.member.IAnnotated;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.EnumValue;
-import dyvil.tools.compiler.util.ClassFormat;
 
 public class AnnotationVisitorImpl extends AnnotationVisitor
 {

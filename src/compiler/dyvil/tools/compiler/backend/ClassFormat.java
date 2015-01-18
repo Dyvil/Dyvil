@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.util;
+package dyvil.tools.compiler.backend;
 
 import java.io.File;
 
@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.IParameterized;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.transform.Symbols;
 
 public class ClassFormat
 {
