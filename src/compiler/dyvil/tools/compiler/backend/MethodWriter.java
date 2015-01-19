@@ -34,6 +34,11 @@ public final class MethodWriter extends MethodVisitor
 		this.push(UNINITIALIZED_THIS);
 	}
 	
+	public void setInstance(IType type)
+	{
+		this.locals.add(type.getFrameType());
+	}
+	
 	protected void push(Object type)
 	{
 		this.typeStack.add(type);
@@ -317,7 +322,14 @@ public final class MethodWriter extends MethodVisitor
 	@Override
 	public void visitVarInsn(int opcode, int index)
 	{
-		this.push(this.locals.get(index));
+		if (opcode >= ILOAD && opcode <= ALOAD)
+		{
+			this.push(this.locals.get(index));
+		}
+		else if (opcode >= ISTORE && opcode <= ASTORE)
+		{
+			this.typeStack.pop();
+		}
 		this.mv.visitVarInsn(opcode, index);
 	}
 	
@@ -363,7 +375,7 @@ public final class MethodWriter extends MethodVisitor
 		{
 			this.push(type);
 		}
-		this.mv.visitFieldInsn(GETSTATIC, owner, name, desc);
+		this.mv.visitFieldInsn(GETFIELD, owner, name, desc);
 	}
 	
 	public void visitPutField(String owner, String name, String desc)

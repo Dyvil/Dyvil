@@ -174,14 +174,18 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	{
 		if (!this.initializer)
 		{
-			FieldMatch match;
+			FieldMatch match = null;
 			if (this.instance == null)
 			{
 				match = context.resolveField(this.qualifiedName);
 			}
 			else
 			{
-				match = this.instance.getType().resolveField(this.qualifiedName);
+				IType type = this.instance.getType();
+				if (type != null)
+				{
+					match = type.resolveField(this.qualifiedName);
+				}
 			}
 			
 			if (match != null)

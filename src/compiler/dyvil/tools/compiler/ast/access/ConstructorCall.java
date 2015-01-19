@@ -163,7 +163,7 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 			}
 		}
 		
-		if (!this.resolve(context, null))
+		if (!this.resolve(context, markers))
 		{
 			markers.add(new SemanticError(this.position, "The constructor could not be resolved"));
 		}
@@ -227,15 +227,7 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 			return false;
 		}
 		
-		MethodMatch match = this.type.resolveMethod(null, "new", this.arguments);
-		if (match != null)
-		{
-			this.method = match.theMethod;
-			this.isCustom = true;
-			return true;
-		}
-		
-		match = this.type.resolveMethod(null, "<init>", this.arguments);
+		MethodMatch match = this.type.resolveMethod(null, "<init>", this.arguments);
 		if (match != null)
 		{
 			this.method = match.theMethod;
@@ -290,7 +282,7 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 		}
 		
 		String owner = this.method.getTheClass().getInternalName();
-		String name = this.method.getName();
+		String name = "<init>";
 		String desc = this.method.getDescriptor();
 		writer.visitMethodInsn(opcode, owner, name, desc, false, args, null);
 	}
@@ -298,7 +290,29 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.writeExpression(writer);
+		int opcode;
+		int args = this.arguments.size();
+		if (this.isCustom)
+		{
+			opcode = Opcodes.INVOKESTATIC;
+		}
+		else
+		{
+			opcode = Opcodes.INVOKESPECIAL;
+			args++;
+			
+			writer.visitTypeInsn(Opcodes.NEW, this.type);
+		}
+		
+		for (IValue arg : this.arguments)
+		{
+			arg.writeExpression(writer);
+		}
+		
+		String owner = this.method.getTheClass().getInternalName();
+		String name = "<init>";
+		String desc = this.method.getDescriptor();
+		writer.visitMethodInsn(opcode, owner, name, desc, false, args, null);
 	}
 	
 	@Override

@@ -27,6 +27,7 @@ import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
 public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnotated
@@ -71,9 +72,10 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 	@Override
 	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
 	{
+		int type = token.type();
 		if (this.isInMode(BODY_END))
 		{
-			if (token.isType(Tokens.OPEN_CURLY_BRACKET))
+			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser(true);
 				return true;
@@ -91,33 +93,23 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 				this.modifiers |= i;
 				return true;
 			}
-			else if (value.charAt(0) == '@')
+			if (value.charAt(0) == '@')
 			{
 				pm.pushParser(new AnnotationParser(this), true);
 				return true;
 			}
-			else
-			{
-				pm.pushParser(new TypeParser(this), true);
-				this.mode = NAME;
-				return true;
-			}
+			
+			pm.pushParser(new TypeParser(this), true);
+			this.mode = NAME;
+			return true;
 		}
 		if (this.isInMode(NAME))
 		{
-			if (token.isType(Tokens.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(type) || type == Tokens.NEW)
 			{
 				IToken next = token.next();
-				int type = next.type();
-				if (next.equals("="))
-				{
-					this.mode = FIELD;
-					this.field = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
-					this.field.setPosition(token.raw());
-					this.body.addField(this.field);
-					return true;
-				}
-				else if (type == Tokens.SEMICOLON)
+				type = next.type();
+				if (type == Tokens.SEMICOLON)
 				{
 					Field f = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
 					f.setPosition(token.raw());
@@ -126,7 +118,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					this.reset();
 					return true;
 				}
-				else if (type == Tokens.OPEN_PARENTHESIS)
+				if (type == Tokens.OPEN_PARENTHESIS)
 				{
 					this.mode = PARAMETERS;
 					this.method = new Method(this.theClass, value, this.type, this.modifiers, this.annotations);
@@ -134,7 +126,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					this.body.addMethod(this.method);
 					return true;
 				}
-				else if (type == Tokens.OPEN_CURLY_BRACKET)
+				if (type == Tokens.OPEN_CURLY_BRACKET)
 				{
 					this.mode = PROPERTY;
 					Property property = new Property(this.theClass, value, this.type, this.modifiers, this.annotations);
@@ -145,7 +137,15 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					pm.pushParser(new PropertyParser(this.theClass, property));
 					return true;
 				}
-				else if (next.equals("<"))
+				if (next.equals("="))
+				{
+					this.mode = FIELD;
+					this.field = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
+					this.field.setPosition(token.raw());
+					this.body.addField(this.field);
+					return true;
+				}
+				if (next.equals("<"))
 				{
 					this.mode = GENERICS;
 					this.method = new Method(this.theClass, value, this.type, this.modifiers, this.annotations);
@@ -166,7 +166,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 				pm.pushParser(new ExpressionParser(this.field));
 				return true;
 			}
-			else if (token.isType(Tokens.SEMICOLON))
+			if (type == Tokens.SEMICOLON)
 			{
 				this.reset();
 				return true;
@@ -175,7 +175,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		}
 		if (this.isInMode(PROPERTY))
 		{
-			if (token.isType(Tokens.CLOSE_CURLY_BRACKET))
+			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
 				this.reset();
 				return true;
@@ -193,7 +193,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		}
 		if (this.isInMode(PARAMETERS))
 		{
-			if (token.isType(Tokens.OPEN_PARENTHESIS))
+			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ParameterListParser(this.method));
 				this.mode = PARAMETERS_END;
@@ -203,7 +203,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		}
 		if (this.isInMode(PARAMETERS_END))
 		{
-			if (token.isType(Tokens.CLOSE_PARENTHESIS))
+			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				this.mode = METHOD_END;
 				return true;
@@ -212,14 +212,19 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		}
 		if (this.isInMode(METHOD_END))
 		{
+			if (type == Tokens.SEMICOLON)
+			{
+				this.reset();
+				return true;
+			}
+			if (type == Tokens.OPEN_CURLY_BRACKET)
+			{
+				pm.pushParser(new ExpressionParser(this.method), true);
+				return true;
+			}
 			if ("=".equals(value))
 			{
 				pm.pushParser(new ExpressionParser(this.method));
-				return true;
-			}
-			if (token.isType(Tokens.SEMICOLON))
-			{
-				this.reset();
 				return true;
 			}
 			if ("throws".equals(value))
@@ -230,11 +235,10 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 			// "Insert" a semicolon after a closing curly bracket.
 			if (token.prev().isType(Tokens.CLOSE_CURLY_BRACKET))
 			{
-				this.mode = DEFAULT_MODE;
+				this.reset();
 				pm.reparse();
 				return true;
 			}
-			return false;
 		}
 		
 		return false;

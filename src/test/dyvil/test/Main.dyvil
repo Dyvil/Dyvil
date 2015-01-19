@@ -5,20 +5,10 @@ import java.lang.Integer => jInt;
 
 public class Main
 {
-	public static void main(String[] args) =
+	public static void main(String[] args)
 	{
-		"BinaryConverter v2.0" >>;
-		"--------------------" >>;
 		
-		Scanner scanner = new Scanner(System in);
-		while (true)
-		{
-			"Enter your number to convert it to binary" >>;
-			int n = scanner nextInt;
-			jInt toBinaryString(n) >>;
-			"" >>;
-		}
-	};
+	}
 	
 	public implicit void >>(Object o) = System out println(o);
 }

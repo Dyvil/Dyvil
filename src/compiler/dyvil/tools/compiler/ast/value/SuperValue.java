@@ -39,7 +39,7 @@ public class SuperValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public SuperValue resolve(List<Marker> markers, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.type == null)
 		{
@@ -59,7 +59,6 @@ public class SuperValue extends ASTNode implements IConstantValue
 				}
 			}
 		}
-		return this;
 	}
 	
 	@Override

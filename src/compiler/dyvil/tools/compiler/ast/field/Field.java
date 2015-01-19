@@ -306,7 +306,7 @@ public class Field extends Member implements IField, IContext
 		}
 		else
 		{
-			writer.visitPutStatic(owner, name, desc);
+			writer.visitPutField(owner, name, desc);
 		}
 	}
 	

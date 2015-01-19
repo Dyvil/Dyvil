@@ -413,7 +413,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	{
 		if (this.instance != null)
 		{
-			this.instance.toString("", buffer);
+			this.instance.toString(prefix, buffer);
 			if (this.dotless && !Formatting.Method.useJavaFormat)
 			{
 				buffer.append(Formatting.Method.dotlessSeperator);
@@ -438,7 +438,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 			if (!this.arguments.isEmpty())
 			{
 				buffer.append(Formatting.Method.sugarCallSeperator);
-				this.arguments.get(0).toString("", buffer);
+				this.arguments.get(0).toString(prefix, buffer);
 			}
 		}
 		else

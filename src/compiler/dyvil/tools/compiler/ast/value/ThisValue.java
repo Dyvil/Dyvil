@@ -39,7 +39,7 @@ public class ThisValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public ThisValue resolve(List<Marker> markers, IContext context)
+	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.type == null)
 		{
@@ -52,7 +52,6 @@ public class ThisValue extends ASTNode implements IConstantValue
 				this.type = context.getThisType();
 			}
 		}
-		return this;
 	}
 	
 	@Override
@@ -64,7 +63,7 @@ public class ThisValue extends ASTNode implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitIntInsn(Opcodes.ALOAD, 0);
+		writer.visitVarInsn(Opcodes.ALOAD, 0, this.type);
 	}
 	
 	@Override

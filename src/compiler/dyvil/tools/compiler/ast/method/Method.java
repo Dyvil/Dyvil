@@ -75,6 +75,7 @@ public class Method extends Member implements IMethod
 		if (name.equals("new"))
 		{
 			this.isConstructor = true;
+			this.qualifiedName = "<init>";
 		}
 	}
 	
@@ -352,7 +353,7 @@ public class Method extends Member implements IMethod
 			buf.append(par.type.getExtendedName());
 		}
 		buf.append(')');
-		buf.append(this.type.getExtendedName());
+		buf.append(this.isConstructor ? "V" : this.type.getExtendedName());
 		return buf.toString();
 	}
 	
@@ -729,6 +730,10 @@ public class Method extends Member implements IMethod
 		if (this.isConstructor)
 		{
 			mw.setConstructor(this.type);
+		}
+		if ((this.modifiers & Modifiers.STATIC) == 0)
+		{
+			mw.setInstance(this.type);
 		}
 		
 		for (Annotation annotation : this.annotations)

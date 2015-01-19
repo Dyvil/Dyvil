@@ -79,7 +79,7 @@ public interface IType extends IASTNode, INamed, IContext
 	@Override
 	public default boolean isStatic()
 	{
-		return true;
+		return false;
 	}
 	
 	// Compilation

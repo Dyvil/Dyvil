@@ -17,7 +17,6 @@ import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.ParserUtil;
-import dyvil.tools.compiler.util.Tokens;
 
 public class ParameterListParser extends Parser implements IAnnotated, ITyped
 {
@@ -62,7 +61,7 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 				pm.pushParser(new AnnotationParser(this), true);
 				return true;
 			}
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (ParserUtil.isCloseBracket(type))
 			{
 				pm.popParser(true);
 				return true;

@@ -39,12 +39,13 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int	LAMBDA			= 32;
 	public static final int	STATEMENT		= 64;
 	public static final int	TYPE			= 128;
-	public static final int	PARAMETERS		= 256;
-	public static final int	PARAMETERS_END	= 512;
-	public static final int	VARIABLE		= 1024;
+	public static final int	CONSTRUCTOR		= 256;
+	public static final int	PARAMETERS		= 512;
+	public static final int	PARAMETERS_END	= 1024;
+	public static final int	VARIABLE		= 2048;
 	
-	public static final int	BYTECODE		= 2048;
-	public static final int	BYTECODE_END		= 4096;
+	public static final int	BYTECODE		= 4096;
+	public static final int	BYTECODE_END	= 8192;
 	
 	protected IValued		field;
 	protected int			precedence;
@@ -272,6 +273,24 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.value = null;
 				pm.reparse();
 				return this.getAccess(pm, prev.value(), prev);
+			}
+			return false;
+		}
+		if (this.isInMode(CONSTRUCTOR))
+		{
+			if (type == Tokens.OPEN_PARENTHESIS)
+			{
+				pm.pushParser(new ExpressionListParser((IValueList) this.value));
+				this.mode = PARAMETERS_END;
+				return true;
+			}
+			if (type == Tokens.OPEN_CURLY_BRACKET)
+			{
+				SpecialConstructor pc = new SpecialConstructor(token, (ConstructorCall) this.value);
+				pm.pushParser(new ExpressionListParser(pc.list));
+				this.value = pc;
+				this.mode = LIST_END; // LIST_END because it matches a curly bracket.
+				return true;
 			}
 			return false;
 		}
@@ -513,7 +532,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			return true;
 		case Tokens.NEW:
 			ConstructorCall call = new ConstructorCall(token);
-			this.mode = PARAMETERS;
+			this.mode = CONSTRUCTOR;
 			this.value = call;
 			pm.pushParser(new TypeParser(call));
 			return true;
