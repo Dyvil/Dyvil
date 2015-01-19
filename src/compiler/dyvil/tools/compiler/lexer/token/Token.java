@@ -10,16 +10,16 @@ public class Token implements IToken
 	private IToken			prev;
 	private IToken			next;
 	
-	private int				index;
+	public int				index;
 	
-	private final int		type;
-	private final String	value;
-	private final Object	object;
+	public final int		type;
+	public final String		value;
+	public final Object		object;
 	
-	private final CodeFile	file;
-	private final int		lineNumber;
-	private final int		start;
-	private final int		end;
+	public final CodeFile	file;
+	public final int		lineNumber;
+	public final int		start;
+	public final int		end;
 	
 	public Token(int index, String value, int type, Object object, CodeFile file, int lineNumber, int start, int end)
 	{
@@ -41,13 +41,13 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public Object object() throws SyntaxError
+	public Object object()
 	{
 		return this.object;
 	}
 	
 	@Override
-	public int type() throws SyntaxError
+	public int type()
 	{
 		return this.type;
 	}
@@ -59,13 +59,13 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public boolean isType(int type) throws SyntaxError
+	public boolean isType(int type)
 	{
 		return (this.type & type) == type;
 	}
 	
 	@Override
-	public boolean isAnyType(int type) throws SyntaxError
+	public boolean isAnyType(int type)
 	{
 		return (this.type & type) != 0;
 	}
