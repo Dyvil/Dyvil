@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import dyvil.collections.SingleElementList;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
@@ -238,8 +238,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public IAccess resolve3(IContext context, IAccess next)
 	{
-		// TODO SingleElementList
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, Arrays.asList(next));
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, new SingleElementList(next));
 		if (method != null)
 		{
 			MethodCall call = new MethodCall(this.position, this.instance, this.name);

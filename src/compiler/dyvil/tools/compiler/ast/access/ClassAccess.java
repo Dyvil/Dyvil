@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.access;
 
 import java.util.List;
 
-import dyvil.lang.array.Arrays;
+import dyvil.collections.SingleElementList;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -212,8 +212,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	public IAccess resolve3(IContext context, IAccess next)
 	{
 		String name = this.type.getQualifiedName();
-		// TODO SingleElementList
-		MethodMatch m = context.resolveMethod(null, name, Arrays.asList(next));
+		MethodMatch m = context.resolveMethod(null, name, new SingleElementList(next));
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position, null, name);

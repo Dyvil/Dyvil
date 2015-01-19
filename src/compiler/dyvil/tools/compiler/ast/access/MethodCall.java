@@ -401,8 +401,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	{
 		this.writeExpression(writer);
 		
-		// TODO Optimize this
-		if (!this.method.isType(Type.VOID))
+		if (!this.method.getType().classEquals(Type.VOID))
 		{
 			writer.visitInsn(Opcodes.POP);
 		}
