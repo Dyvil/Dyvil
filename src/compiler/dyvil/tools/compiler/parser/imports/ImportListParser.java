@@ -21,7 +21,7 @@ public class ImportListParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (ParserUtil.isTerminator(type))

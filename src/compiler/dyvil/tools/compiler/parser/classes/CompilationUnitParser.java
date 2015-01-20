@@ -24,8 +24,9 @@ public class CompilationUnitParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager jcp, IToken token) throws SyntaxError
 	{
+		String value = token.value();
 		if (this.isInMode(PACKAGE))
 		{
 			if ("package".equals(value))
@@ -45,7 +46,7 @@ public class CompilationUnitParser extends Parser
 				jcp.pushParser(new ImportParser(null, i));
 				return true;
 			}
-			else if ("using".equals(value))
+			if ("using".equals(value))
 			{
 				this.mode = IMPORT | CLASS;
 				Import i = new Import(token.raw());

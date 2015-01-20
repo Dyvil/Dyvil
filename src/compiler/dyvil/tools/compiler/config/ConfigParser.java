@@ -6,13 +6,14 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
 public class ConfigParser extends Parser
 {
-	public static int			KEY		= 0;
-	public static int			VALUE	= 1;
-	public static int			ARRAY	= 2;
+	public static final int		KEY		= 0;
+	public static final int		VALUE	= 1;
+	public static final int		ARRAY	= 2;
 	
 	protected CompilerConfig	config;
 	
@@ -24,49 +25,46 @@ public class ConfigParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
+		int type = token.type();
 		if (this.mode == KEY)
 		{
-			if ("=".equals(value))
+			if (type == Tokens.EQUALS)
 			{
 				this.mode = VALUE;
 				return true;
 			}
-			else if (token.isType(Tokens.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(type))
 			{
-				this.key = value;
+				this.key = token.value();
 				return true;
 			}
 		}
 		else if (this.mode == VALUE)
 		{
-			if ("[".equals(value))
+			if (type == Tokens.OPEN_SQUARE_BRACKET)
 			{
 				this.mode = ARRAY;
 				return true;
 			}
-			else
-			{
-				this.setProperty(this.key, token.object());
-				this.mode = KEY;
-				this.key = null;
-				return true;
-			}
+			
+			this.setProperty(this.key, token.object());
+			this.mode = KEY;
+			this.key = null;
+			return true;
 		}
 		else if (this.mode == ARRAY)
 		{
-			if ("]".equals(value))
+			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
 				this.mode = KEY;
 				this.key = null;
 				return true;
 			}
-			else
-			{
-				this.setProperty(this.key, token.object());
-				return true;
-			}
+			
+			this.setProperty(this.key, token.object());
+			return true;
 		}
 		return false;
 	}

@@ -25,11 +25,11 @@ public class AnnotationParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		if (this.mode == NAME)
 		{
-			this.annotation = new Annotation(token.raw(), value.substring(1));
+			this.annotation = new Annotation(token.raw(), token.value().substring(1));
 			this.mode = PARAMETERS_START;
 			
 			if (!token.next().isType(Tokens.OPEN_PARENTHESIS))

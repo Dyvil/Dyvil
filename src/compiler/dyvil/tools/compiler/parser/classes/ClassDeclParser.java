@@ -40,8 +40,9 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
+		String value = token.value();
 		if (this.isInMode(MODIFIERS))
 		{
 			int i = 0;

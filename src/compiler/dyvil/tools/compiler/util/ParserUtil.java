@@ -72,6 +72,10 @@ public class ParserUtil
 			return Tokens.AT;
 		case ":":
 			return Tokens.COLON;
+		case "=":
+			return Tokens.EQUALS;
+		case "=>":
+			return Tokens.ARROW_OPERATOR;
 		case "null":
 			return Tokens.NULL;
 		case "true":

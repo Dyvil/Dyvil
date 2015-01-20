@@ -9,6 +9,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.util.Tokens;
 
 public class PropertyParser extends Parser implements IValued
 {
@@ -25,40 +26,38 @@ public class PropertyParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
+		int type = token.type();
+		if (type == Tokens.SEMICOLON)
+		{
+			return true;
+		}
+		if (type == Tokens.CLOSE_CURLY_BRACKET)
+		{
+			pm.popParser(true);
+			return true;
+		}
+		
 		if (this.mode == 0)
 		{
+			String value = token.value();
 			if ("get".equals(value))
 			{
 				this.mode = GET;
 				return true;
 			}
-			else if ("set".equals(value))
+			if ("set".equals(value))
 			{
 				this.mode = SET;
-				return true;
-			}
-			else if (";".equals(value))
-			{
-				return true;
-			}
-			else if ("}".equals(value))
-			{
-				pm.popParser(true);
 				return true;
 			}
 		}
 		if (this.isInMode(GET) || this.isInMode(SET))
 		{
-			if (":".equals(value))
+			if (type == Tokens.COLON)
 			{
 				pm.pushParser(new ExpressionParser(this));
-				return true;
-			}
-			else if (";".equals(value))
-			{
-				this.mode = 0;
 				return true;
 			}
 		}

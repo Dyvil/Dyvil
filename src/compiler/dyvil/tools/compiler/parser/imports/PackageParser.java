@@ -22,7 +22,7 @@ public class PackageParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)
@@ -41,7 +41,7 @@ public class PackageParser extends Parser
 				this.packageDeclaration = new PackageDecl(token, null);
 			}
 			
-			this.buffer.append(value);
+			this.buffer.append(token.value());
 			return true;
 		}
 		return false;

@@ -27,13 +27,13 @@ public class BytecodeParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		if (this.isInMode(LABEL))
 		{
 			if (token.next().isType(Tokens.COLON))
 			{
-				this.label = value;
+				this.label = token.value();
 				pm.skip();
 				return true;
 			}
@@ -43,11 +43,12 @@ public class BytecodeParser extends Parser
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
-				Instruction insn = Instruction.parse(value);
+				String name = token.value();
+				Instruction insn = Instruction.parse(name);
 				if (insn == null)
 				{
 					this.mode = INSTRUCTION | LABEL;
-					throw new SyntaxError(token, "Unknown Opcode '" + value + "'");
+					throw new SyntaxError(token, "Unknown Opcode '" + name + "'");
 				}
 				
 				if (this.label != null)
@@ -81,11 +82,11 @@ public class BytecodeParser extends Parser
 			{
 				if (this.instruction == null)
 				{
-					throw new SyntaxError(token, "Invalid Argument '" + value + "' for Unknown Opcode");
+					throw new SyntaxError(token, "Invalid Argument '" + token.value() + "' for Unknown Opcode");
 				}
 				else if (!this.instruction.addArgument(token.object()))
 				{
-					throw new SyntaxError(token, "Invalid Argument '" + value + "' for Opcode " + this.instruction.getName());
+					throw new SyntaxError(token, "Invalid Argument '" + token.value() + "' for Opcode " + this.instruction.getName());
 				}
 				return true;
 			}

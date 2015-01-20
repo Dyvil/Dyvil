@@ -146,11 +146,10 @@ public class ParserManager
 	
 	protected void parseToken(Parser parser, IToken token) throws SyntaxError
 	{
-		String value = token.value();
 		boolean parsed;
 		try
 		{
-			parsed = parser.parse(this, value, token);
+			parsed = parser.parse(this, token);
 		}
 		catch (SyntaxError error)
 		{
@@ -164,12 +163,12 @@ public class ParserManager
 				message = ex.getClass().getName();
 			}
 			ex.printStackTrace();
-			throw new SyntaxError(token, "Failed to parse token '" + value + "': " + message);
+			throw new SyntaxError(token, "Failed to parse " + token + ": " + message);
 		}
 		
 		if (!parsed)
 		{
-			throw new SyntaxError(token, "Invalid token '" + value + "'", "Delete this token");
+			throw new SyntaxError(token, "Invalid " + token, "Delete this token");
 		}
 	}
 	

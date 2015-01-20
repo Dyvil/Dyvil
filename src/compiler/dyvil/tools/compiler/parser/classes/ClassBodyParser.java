@@ -70,9 +70,10 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
+		String value = token.value();
 		if (this.isInMode(BODY_END))
 		{
 			if (type == Tokens.CLOSE_CURLY_BRACKET)
@@ -137,7 +138,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					pm.pushParser(new PropertyParser(this.theClass, property));
 					return true;
 				}
-				if (next.equals("="))
+				if (type == Tokens.EQUALS)
 				{
 					this.mode = FIELD;
 					this.field = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
@@ -161,7 +162,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		}
 		if (this.isInMode(FIELD))
 		{
-			if ("=".equals(value))
+			if (type == Tokens.EQUALS)
 			{
 				pm.pushParser(new ExpressionParser(this.field));
 				return true;
@@ -222,7 +223,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 				pm.pushParser(new ExpressionParser(this.method), true);
 				return true;
 			}
-			if ("=".equals(value))
+			if (type == Tokens.EQUALS)
 			{
 				pm.pushParser(new ExpressionParser(this.method));
 				return true;

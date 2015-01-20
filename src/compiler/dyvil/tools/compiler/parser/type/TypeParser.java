@@ -47,7 +47,7 @@ public class TypeParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.isInMode(NAME))
@@ -64,19 +64,19 @@ public class TypeParser extends Parser implements ITyped
 			{
 				if (token.next().equals("<"))
 				{
-					this.type = new GenericType(token, value);
+					this.type = new GenericType(token, token.value());
 					this.mode = GENERICS;
 					return true;
 				}
 				else if (this.generic)
 				{
-					this.type = new TypeVariable(token, value);
+					this.type = new TypeVariable(token, token.value());
 					this.mode = TYPE_VARIABLE;
 					return true;
 				}
 				else
 				{
-					this.type = new Type(token, value);
+					this.type = new Type(token, token.value());
 					this.mode = ARRAY;
 					return true;
 				}
@@ -85,7 +85,7 @@ public class TypeParser extends Parser implements ITyped
 			{
 				if (this.generic)
 				{
-					this.type = new TypeVariable(token, value);
+					this.type = new TypeVariable(token, token.value());
 					this.mode = TYPE_VARIABLE;
 					return true;
 				}
@@ -150,7 +150,7 @@ public class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(GENERICS))
 		{
-			if ("<".equals(value))
+			if ("<".equals(token.value()))
 			{
 				GenericType generic = (GenericType) this.type;
 				generic.setGeneric();
@@ -165,6 +165,7 @@ public class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(TYPE_VARIABLE))
 		{
+			String value = token.value();
 			if (this.boundMode == 0)
 			{
 				if ("<=".equals(value))
@@ -193,7 +194,7 @@ public class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(GENERICS_END))
 		{
-			if (">".equals(value))
+			if (">".equals(token.value()))
 			{
 				this.mode = ARRAY;
 				return true;

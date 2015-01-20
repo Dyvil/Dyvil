@@ -60,12 +60,16 @@ public class StatementList extends ValueList implements IStatement, IContext
 		{
 			if (v.getValueType() == IValue.FIELD_ASSIGN)
 			{
-				FieldAssign assign = (FieldAssign) v;
-				if (assign.initializer)
+				FieldAssign fa = (FieldAssign) v;
+				if (fa.type != null)
 				{
-					Variable var = (Variable) assign.field;
+					Variable var = new Variable(this.position);
+					var.name = fa.name;
+					var.qualifiedName = fa.qualifiedName;
+					var.type = fa.type;
 					var.index = this.variableCount++;
-					this.variables.put(assign.qualifiedName, var);
+					fa.field = var;
+					this.variables.put(fa.qualifiedName, var);
 				}
 			}
 			

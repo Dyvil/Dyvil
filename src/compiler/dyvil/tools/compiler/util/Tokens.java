@@ -2,25 +2,6 @@ package dyvil.tools.compiler.util;
 
 public interface Tokens
 {
-	// MODIFIERS
-	public int	MOD_DEC					= 0x00000000;
-	public int	MOD_BIN					= 0x00010000;
-	public int	MOD_OCT					= 0x00020000;
-	public int	MOD_HEX					= MOD_BIN | MOD_OCT;
-	
-	public int	MOD_LINE				= 0x00010000;
-	public int	MOD_BLOCK				= 0x00020000;
-	
-	public int	MOD_LETTER				= 0x00010000;
-	public int	MOD_SYMBOL				= 0x00020000;
-	public int	MOD_DOTS				= 0x00040000;
-	
-	public int	MOD_PARENTHESIS			= 0x00010000;
-	public int	MOD_SQUARE				= 0x00020000;
-	public int	MOD_CURLY				= 0x00040000;
-	public int	MOD_OPEN				= 0x00000000;
-	public int	MOD_CLOSE				= 0x00100000;
-	
 	// TYPES
 	public int	TYPE_IDENTIFIER			= 0x00000001;
 	public int	TYPE_KEYWORD			= 0x00000002;
@@ -33,13 +14,17 @@ public interface Tokens
 	public int	TYPE_DOUBLE				= 0x00000080;
 	
 	public int	TYPE_STRING				= 0x00000100;
-	public int	TYPE_STRING_2			= TYPE_STRING | MOD_HEX;
+	public int	TYPE_STRING_2			= 0x00000101;
 	
 	public int	TYPE_CHAR				= 0x00000200;
 	
 	public int	TYPE_COMMENT			= 0x00001000;
 	
 	// IDENTIFIERS
+	public int	MOD_LETTER				= 0x00010000;
+	public int	MOD_SYMBOL				= 0x00020000;
+	public int	MOD_DOTS				= 0x00040000;
+	
 	public int	TYPE_LETTER_ID			= TYPE_IDENTIFIER | MOD_LETTER;
 	public int	TYPE_SYMBOL_ID			= TYPE_IDENTIFIER | MOD_SYMBOL;
 	
@@ -60,8 +45,17 @@ public interface Tokens
 	public int	FOR						= TYPE_KEYWORD | 0x000E0000;
 	public int	SWITCH					= TYPE_KEYWORD | 0x000F0000;
 	public int	CASE					= TYPE_KEYWORD | 0x00100000;
+	public int	TRY						= TYPE_KEYWORD | 0x00200000;
+	public int	CATCH					= TYPE_KEYWORD | 0x00300000;
+	public int	FINALLY					= TYPE_KEYWORD | 0x00400000;
 	
 	// BRACKETS
+	public int	MOD_PARENTHESIS			= 0x00010000;
+	public int	MOD_SQUARE				= 0x00020000;
+	public int	MOD_CURLY				= 0x00040000;
+	public int	MOD_OPEN				= 0x00000000;
+	public int	MOD_CLOSE				= 0x00100000;
+	
 	public int	OPEN_BRACKET			= TYPE_BRACKET | MOD_OPEN;
 	public int	CLOSE_BRACKET			= TYPE_BRACKET | MOD_CLOSE;
 	public int	OPEN_PARENTHESIS		= TYPE_BRACKET | MOD_PARENTHESIS | MOD_OPEN;
@@ -76,8 +70,19 @@ public interface Tokens
 	public int	COLON					= TYPE_SYMBOL | 0x00020000;
 	public int	SEMICOLON				= TYPE_SYMBOL | 0x00030000;
 	public int	COMMA					= TYPE_SYMBOL | 0x00040000;
+	public int	EQUALS					= TYPE_SYMBOL | 0x00050000;
+	public int	ARROW_OPERATOR			= TYPE_SYMBOL | 0x00060000;
 	
 	// COMMENTS
+	public int	MOD_LINE				= 0x00010000;
+	public int	MOD_BLOCK				= 0x00020000;
+	
 	public int	LINE_COMMENT			= TYPE_COMMENT | MOD_LINE;
 	public int	BLOCK_COMMENT			= TYPE_COMMENT | MOD_BLOCK;
+	
+	// NUMBERS
+	public int	MOD_DEC					= 0x00000000;
+	public int	MOD_BIN					= 0x00010000;
+	public int	MOD_OCT					= 0x00020000;
+	public int	MOD_HEX					= MOD_BIN | MOD_OCT;
 }

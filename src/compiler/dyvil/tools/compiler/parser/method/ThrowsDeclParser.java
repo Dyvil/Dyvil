@@ -21,7 +21,7 @@ public class ThrowsDeclParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))

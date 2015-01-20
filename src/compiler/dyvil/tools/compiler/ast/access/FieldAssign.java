@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.Collections;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -22,12 +21,12 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
+public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 {
 	public String	name;
 	public String	qualifiedName;
 	
-	public boolean	initializer;
+	public IType	type;
 	
 	public IValue	instance;
 	public IField	field;
@@ -114,47 +113,9 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	}
 	
 	@Override
-	public void setValues(List<IValue> list)
-	{
-	}
-	
-	@Override
-	public List<IValue> getValues()
-	{
-		return Collections.EMPTY_LIST;
-	}
-	
-	@Override
-	public IValue getValue(int index)
-	{
-		return null;
-	}
-	
-	@Override
-	public void addValue(IValue value)
-	{
-	}
-	
-	@Override
-	public void setValue(int index, IValue value)
-	{
-	}
-	
-	@Override
-	public void setArray(boolean array)
-	{
-	}
-	
-	@Override
-	public boolean isArray()
-	{
-		return false;
-	}
-	
-	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (this.initializer)
+		if (this.type != null)
 		{
 			this.field.resolveTypes(markers, context);
 		}
@@ -172,7 +133,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		if (!this.initializer)
+		if (this.type == null)
 		{
 			FieldMatch match = null;
 			if (this.instance == null)
@@ -224,7 +185,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 				markers.add(error);
 			}
 			
-			if (!this.initializer)
+			if (this.type == null)
 			{
 				if (this.field.hasModifier(Modifiers.FINAL))
 				{
@@ -253,36 +214,6 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	{
 		this.value = this.value.foldConstants();
 		return this;
-	}
-	
-	@Override
-	public boolean resolve(IContext context, List<Marker> markers)
-	{
-		IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
-		if (field != null)
-		{
-			this.field = field;
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public IAccess resolve2(IContext context)
-	{
-		return null;
-	}
-	
-	@Override
-	public IAccess resolve3(IContext context, IAccess next)
-	{
-		return null;
-	}
-	
-	@Override
-	public Marker getResolveError()
-	{
-		return new SemanticError(this.position, "'" + this.name + "' could not be resolved to a field");
 	}
 	
 	@Override
@@ -321,7 +252,7 @@ public class FieldAssign extends ASTNode implements INamed, IValued, IAccess
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.initializer)
+		if (this.type == null)
 		{
 			this.field.toString("", buffer);
 		}

@@ -26,7 +26,7 @@ public class WhileStatementParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		if (this.mode == -1)
 		{

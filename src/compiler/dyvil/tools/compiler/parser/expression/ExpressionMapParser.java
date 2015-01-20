@@ -27,7 +27,7 @@ public class ExpressionMapParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))
@@ -38,9 +38,9 @@ public class ExpressionMapParser extends Parser implements IValued
 		
 		if (this.mode == NAME)
 		{
-			if (token.next().equals("="))
+			if (token.next().isType(Tokens.EQUALS))
 			{
-				this.key = value;
+				this.key = token.value();
 				pm.skip();
 				return true;
 			}

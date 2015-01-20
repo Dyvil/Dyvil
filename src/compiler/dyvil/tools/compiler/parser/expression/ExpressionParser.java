@@ -5,10 +5,14 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
-import dyvil.tools.compiler.ast.expression.*;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Parameter;
-import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.statement.*;
+import dyvil.tools.compiler.ast.statement.IfStatement;
+import dyvil.tools.compiler.ast.statement.ReturnStatement;
+import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.statement.WhileStatement;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.TupleType;
@@ -24,6 +28,7 @@ import dyvil.tools.compiler.parser.statement.IfStatementParser;
 import dyvil.tools.compiler.parser.statement.WhileStatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.OperatorComparator;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -61,7 +66,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == 0 || type == Tokens.SEMICOLON)
@@ -77,7 +82,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = TUPLE_END;
 				this.value = new TupleValue(token);
 				
-				if (!token.next().equals(")"))
+				if (!token.next().isType(Tokens.CLOSE_PARENTHESIS))
 				{
 					pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				}
@@ -88,7 +93,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = LIST_END;
 				this.value = new StatementList(token);
 				
-				if (!token.next().equals("}"))
+				if (!token.next().isType(Tokens.CLOSE_CURLY_BRACKET))
 				{
 					pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				}
@@ -100,7 +105,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.pushParser(new TypeParser(this), true);
 				return true;
 			}
-			if (this.parsePrimitive(value, token, type))
+			if (this.parsePrimitive(token, type))
 			{
 				this.mode = ACCESS;
 				return true;
@@ -164,7 +169,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(LAMBDA))
 		{
-			if ("=>".equals(value))
+			if (type == Tokens.ARROW_OPERATOR)
 			{
 				LambdaValue lv = getLambdaValue(this.value);
 				if (lv != null)
@@ -180,7 +185,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(VARIABLE))
 		{
-			if (ParserUtil.isIdentifier(type) && token.next().equals("="))
+			if (ParserUtil.isIdentifier(type) && token.next().isType(Tokens.EQUALS))
 			{
 				ICodePosition pos = token.raw();
 				IType itype;
@@ -198,9 +203,11 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					return false;
 				}
 				
-				FieldAssign access = new FieldAssign(pos, value, null);
-				access.field = new Variable(pos, value, itype);
-				access.initializer = true;
+				String name = token.value();
+				FieldAssign access = new FieldAssign(pos);
+				access.name = name;
+				access.qualifiedName = Symbols.qualify(name);
+				access.type = itype;
 				this.value = access;
 				
 				pm.skip();
@@ -226,7 +233,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.popParser(true);
 				return true;
 			}
-			if ("=".equals(value))
+			if (type == Tokens.EQUALS)
 			{
 				return this.getAssign(pm);
 			}
@@ -249,9 +256,10 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
+				String name = token.value();
 				if (this.precedence != 0 && this.dotless)
 				{
-					int p = OperatorComparator.index(value);
+					int p = OperatorComparator.index(name);
 					if (p != 0 && this.precedence >= p)
 					{
 						pm.popParser(true);
@@ -259,7 +267,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					}
 				}
 				
-				return this.getAccess(pm, value, token, type);
+				return this.getAccess(pm, name, token, type);
 			}
 			else if (ParserUtil.isTerminator(type))
 			{
@@ -475,7 +483,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 	}
 	
-	public boolean parsePrimitive(String value, IToken token, int type) throws SyntaxError
+	public boolean parsePrimitive(IToken token, int type) throws SyntaxError
 	{
 		switch (type)
 		{

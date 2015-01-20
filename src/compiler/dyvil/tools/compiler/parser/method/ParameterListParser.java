@@ -17,6 +17,7 @@ import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class ParameterListParser extends Parser implements IAnnotated, ITyped
 {
@@ -45,12 +46,13 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == TYPE)
 		{
 			int i = 0;
+			String value = token.value();
 			if ((i = Modifiers.PARAMETER.parse(value)) != -1)
 			{
 				this.modifiers |= i;
@@ -75,7 +77,7 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.parameter = new Parameter(0, value, this.type, this.modifiers, this.annotations);
+				this.parameter = new Parameter(0, token.value(), this.type, this.modifiers, this.annotations);
 				this.parameterized.addParameter(this.parameter);
 				this.mode = SEPERATOR;
 				return true;
@@ -89,9 +91,14 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 				pm.popParser(true);
 				return true;
 			}
-			if (ParserUtil.isSeperator(type))
+			if (type == Tokens.COMMA)
 			{
-				this.parameter.seperator = value.charAt(0);
+				this.reset();
+				return true;
+			}
+			if (type == Tokens.SEMICOLON)
+			{
+				this.parameter.seperator = ';';
 				this.reset();
 				return true;
 			}

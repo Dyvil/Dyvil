@@ -26,7 +26,7 @@ public class ImportParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)
@@ -63,7 +63,7 @@ public class ImportParser extends Parser
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				SimpleImport si = new SimpleImport(token.raw(), this.parent, value);
+				SimpleImport si = new SimpleImport(token.raw(), this.parent, token.value());
 				this.container.addImport(si);
 				this.parent = si;
 				this.container = si;
@@ -81,7 +81,7 @@ public class ImportParser extends Parser
 		}
 		if (this.isInMode(ALIAS))
 		{
-			if ("=>".equals(value))
+			if (type == Tokens.ARROW_OPERATOR)
 			{
 				IToken next = token.next();
 				if (next.isType(Tokens.TYPE_IDENTIFIER))

@@ -9,7 +9,7 @@ public abstract class Parser<T>
 	public static final Parser	rootParser	= new Parser()
 											{
 												@Override
-												public boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError
+												public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 												{
 													return false;
 												}
@@ -79,7 +79,7 @@ public abstract class Parser<T>
 	{
 	}
 	
-	public abstract boolean parse(ParserManager pm, String value, IToken token) throws SyntaxError;
+	public abstract boolean parse(ParserManager pm, IToken token) throws SyntaxError;
 	
 	public void end(ParserManager pm)
 	{

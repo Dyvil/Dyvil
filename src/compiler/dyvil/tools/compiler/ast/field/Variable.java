@@ -21,9 +21,10 @@ public class Variable extends Member implements IField
 	public int		index;
 	public IValue	value;
 	
-	public Variable()
+	public Variable(ICodePosition position)
 	{
 		super(null);
+		this.position = position;
 	}
 	
 	public Variable(ICodePosition position, String name, IType type)
