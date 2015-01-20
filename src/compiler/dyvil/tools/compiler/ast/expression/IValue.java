@@ -39,6 +39,7 @@ public interface IValue extends IASTNode, ITyped
 	public static int	CONSTRUCTOR_CALL	= 20;
 	public static int	BOOLEAN_AND			= 21;
 	public static int	BOOLEAN_OR			= 22;
+	public static int	SWAP_OPERATOR		= 23;
 	
 	public static int	TUPLE				= 48;
 	public static int	LAMBDA				= 49;

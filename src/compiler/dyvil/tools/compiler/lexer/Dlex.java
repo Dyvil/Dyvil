@@ -374,7 +374,7 @@ public class Dlex implements Iterable<IToken>
 		Token t;
 		if ((type & Tokens.TYPE_IDENTIFIER) != 0)
 		{
-			type = ParserUtil.getKeywordType(s);
+			type = ParserUtil.getKeywordType(s, type);
 			t = new Token(prev.index() + 1, s, type, s, this.file, line, start, start + len);
 		}
 		else

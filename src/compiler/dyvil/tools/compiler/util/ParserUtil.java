@@ -62,7 +62,7 @@ public class ParserUtil
 		return c == ',' || c == ';';
 	}
 	
-	public static int getKeywordType(String s)
+	public static int getKeywordType(String s, int type)
 	{
 		switch (s)
 		{
@@ -100,8 +100,9 @@ public class ParserUtil
 			return Tokens.SWITCH;
 		case "case":
 			return Tokens.CASE;
+		default:
+			return type;
 		}
-		return Tokens.TYPE_IDENTIFIER;
 	}
 	
 	public static boolean isIdentifier(int type)

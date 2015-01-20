@@ -30,6 +30,7 @@ public class OperatorComparator implements Comparator<MethodCall>
 			return 5;
 		case "==":
 		case "!=":
+		case ":=:":
 			return 6;
 		case "<:":
 		case ":>":

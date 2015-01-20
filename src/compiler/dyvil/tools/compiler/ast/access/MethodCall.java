@@ -22,7 +22,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.*;
+import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Util;
 
 public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IValueList, IValued
 {
@@ -167,23 +168,6 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		if (this.arguments.size() == 1 && this.instance != null)
-		{
-			boolean isOr = false;
-			if ("$amp$amp".equals(this.qualifiedName) || (isOr = "$bar$bar".equals(this.qualifiedName)))
-			{
-				this.instance.resolve(markers, context);
-				
-				IValue argument = this.arguments.get(0);
-				IType t1 = this.instance.getType();
-				IType t2 = argument.getType();
-				if (t1.classEquals(Type.BOOLEAN) && t2.classEquals(Type.BOOLEAN))
-				{
-					return isOr ? new BooleanOr(this.position, this.instance, argument) : new BooleanAnd(this.position, this.instance, argument);
-				}
-			}
-		}
-		
 		return AccessResolver.resolve(markers, context, this);
 	}
 	
@@ -259,17 +243,51 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 		return this;
 	}
 	
+	private IValue	replacement;
+	
 	@Override
 	public boolean resolve(IContext context, List<Marker> markers)
 	{
 		int len = this.arguments.size();
-		for (int i = 0; i < len; i++)
+		if (len == 1 && this.instance != null)
 		{
-			IValue v1 = this.arguments.get(i);
-			IValue v2 = v1.resolve(markers, context);
-			if (v1 != v2)
+			IValue argument = this.arguments.get(0);
+			argument = argument.resolve(markers, context);
+			
+			if ("$colon$eq$colon".equals(this.qualifiedName))
 			{
-				this.arguments.set(i, v2);
+				if (this.instance.getValueType() == FIELD_ACCESS && argument.getValueType() == FIELD_ACCESS)
+				{
+					this.replacement = new SwapOperator(this.position, (FieldAccess) this.instance, (FieldAccess) argument);
+					return false; // Return false to apply replacement in
+									// resolve2
+				}
+			}
+			boolean isOr = false;
+			if ("$amp$amp".equals(this.qualifiedName) || (isOr = "$bar$bar".equals(this.qualifiedName)))
+			{
+				IType t1 = this.instance.getType();
+				IType t2 = argument.getType();
+				if (t1.classEquals(Type.BOOLEAN) && t2.classEquals(Type.BOOLEAN))
+				{
+					this.replacement = isOr ? new BooleanOr(this.position, this.instance, argument) : new BooleanAnd(this.position, this.instance, argument);
+					return false; // Return false to apply replacement in
+									// resolve2
+				}
+			}
+			
+			this.arguments.set(0, argument);
+		}
+		else
+		{
+			for (int i = 0; i < len; i++)
+			{
+				IValue v1 = this.arguments.get(i);
+				IValue v2 = v1.resolve(markers, context);
+				if (v1 != v2)
+				{
+					this.arguments.set(i, v2);
+				}
 			}
 		}
 		
@@ -283,8 +301,13 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context)
+	public IValue resolve2(IContext context)
 	{
+		if (this.replacement != null)
+		{
+			return this.replacement;
+		}
+		
 		if (this.isSugarCall)
 		{
 			if (this.arguments.isEmpty())

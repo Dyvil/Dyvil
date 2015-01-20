@@ -11,14 +11,14 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 
 public class AccessResolver
 {
-	public static IAccess resolve(List<Marker> markers, IContext context, IAccess access)
+	public static IValue resolve(List<Marker> markers, IContext context, IAccess access)
 	{
 		LinkedList<IAccess> chain = getCallChain(markers, context, access);
 		
 		ListIterator<IAccess> iterator = chain.listIterator();
 		IAccess prev = null;
 		IAccess curr = null;
-		IAccess alternate = null;
+		IValue alternate = null;
 		
 		boolean backwards = false;
 		
@@ -36,15 +36,19 @@ public class AccessResolver
 			if (!curr.resolve(context, markers))
 			{
 				alternate = curr.resolve2(context);
-				if (alternate == null)
+				if (alternate instanceof IAccess)
 				{
-					backwards = true;
-					break;
+					curr = (IAccess) alternate;
+					iterator.set(curr);
+				}
+				else if (alternate != null)
+				{
+					return alternate;
 				}
 				else
 				{
-					curr = alternate;
-					iterator.set(alternate);
+					backwards = true;
+					break;
 				}
 			}
 		}
@@ -63,7 +67,7 @@ public class AccessResolver
 		curr = access;
 		prev = null;
 		
-		while (true)
+		while (curr != null)
 		{
 			IValue value = curr.getValue();
 			if (value instanceof IAccess)
@@ -72,40 +76,11 @@ public class AccessResolver
 			}
 			else
 			{
-				if (!curr.resolve(context, markers))
-				{
-					markers.add(curr.getResolveError());
-				}
-				break;
+				prev = null;
 			}
 			
 			if (!curr.resolve(context, markers))
 			{
-				if (next != null)
-				{
-					next.setValue(null);
-					alternate = curr.resolve3(context, next);
-					if (alternate != null)
-					{
-						if (next.getValue() == curr)
-						{
-							next.setValue(alternate);
-						}
-						iterator.next();
-						iterator.remove();
-						iterator.previous();
-						iterator.set(alternate);
-						
-						next = alternate;
-						curr = prev;
-						continue;
-					}
-					else
-					{
-						next.setValue(curr);
-					}
-				}
-				
 				curr.setValue(null);
 				if (curr.resolve(context, markers))
 				{
@@ -116,7 +91,30 @@ public class AccessResolver
 				else
 				{
 					curr.setValue(value);
-					markers.add(curr.getResolveError());
+					
+					if (next != null)
+					{
+						next.setValue(null);
+						alternate = curr.resolve3(context, next);
+						if (alternate instanceof IAccess)
+						{
+							if (next.getValue() == curr)
+							{
+								next.setValue(alternate);
+							}
+							next = (IAccess) alternate;
+							curr = prev;
+							iterator.next();
+							iterator.remove();
+							iterator.previous();
+							iterator.set(next);
+						}
+						else
+						{
+							next.setValue(curr);
+							markers.add(curr.getResolveError());
+						}
+					}
 				}
 			}
 			

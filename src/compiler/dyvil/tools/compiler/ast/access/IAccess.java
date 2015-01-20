@@ -19,7 +19,7 @@ public interface IAccess extends INamed, IValue, IValued, IValueList
 {
 	public boolean resolve(IContext context, List<Marker> markers);
 	
-	public IAccess resolve2(IContext context);
+	public IValue resolve2(IContext context);
 	
 	public IAccess resolve3(IContext context, IAccess next);
 	

@@ -39,6 +39,10 @@ public interface Tokens
 	
 	public int	TYPE_COMMENT			= 0x00001000;
 	
+	// IDENTIFIERS
+	public int	TYPE_LETTER_ID			= TYPE_IDENTIFIER | MOD_LETTER;
+	public int	TYPE_SYMBOL_ID			= TYPE_IDENTIFIER | MOD_SYMBOL;
+	
 	// KEYWORDS
 	public int	WILDCARD				= TYPE_KEYWORD | 0x00010000;
 	public int	AT						= TYPE_KEYWORD | 0x00020000;

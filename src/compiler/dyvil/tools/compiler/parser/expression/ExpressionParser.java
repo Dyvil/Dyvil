@@ -252,14 +252,14 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				if (this.precedence != 0 && this.dotless)
 				{
 					int p = OperatorComparator.index(value);
-					if (p != 0 && this.precedence > p)
+					if (p != 0 && this.precedence >= p)
 					{
 						pm.popParser(true);
 						return true;
 					}
 				}
 				
-				return this.getAccess(pm, value, token);
+				return this.getAccess(pm, value, token, type);
 			}
 			else if (ParserUtil.isTerminator(type))
 			{
@@ -272,7 +272,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				this.value = null;
 				pm.reparse();
-				return this.getAccess(pm, prev.value(), prev);
+				return this.getAccess(pm, prev.value(), prev, type);
 			}
 			return false;
 		}
@@ -324,11 +324,11 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		return false;
 	}
 	
-	private boolean getAccess(ParserManager pm, String value, IToken token) throws SyntaxError
+	private boolean getAccess(ParserManager pm, String value, IToken token, int type) throws SyntaxError
 	{
 		IToken next = token.next();
-		int type = next.type();
-		if (type == Tokens.OPEN_PARENTHESIS)
+		int type1 = next.type();
+		if (type1 == Tokens.OPEN_PARENTHESIS)
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
 			call.dotless = this.dotless;
@@ -336,7 +336,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = PARAMETERS;
 			return true;
 		}
-		else if (!ParserUtil.isIdentifier(type) && !ParserUtil.isTerminator(type))
+		else if (type == Tokens.TYPE_SYMBOL_ID || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator(type1))
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
 			call.isSugarCall = true;

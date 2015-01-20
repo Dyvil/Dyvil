@@ -2,6 +2,7 @@ package dyvil.lang;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.lang.annotation.Bytecode;
+import dyvil.lang.annotation.byref;
 import dyvil.lang.annotation.implicit;
 import dyvil.lang.tuple.Tuple2;
 
@@ -130,13 +131,28 @@ public class Predef
 		return t == null ? (U) null : c.cast(t);
 	}
 	
-	public static @implicit java.lang.String $plus(java.lang.String s1, java.lang.String s2)
+	// Not Implemented, only declared
+	public static @implicit void $colon$eq$colon(@byref Object var1, @byref Object var2)
 	{
-		return s1 + s2;
 	}
 	
-	public static @implicit java.lang.String $plus(Object o, java.lang.String s)
+	// Not Implemented, only declared
+	public static @implicit void $colon$eq$colon(@byref int var1, @byref int var2)
 	{
-		return o + s;
+	}
+	
+	// Not Implemented, only declared
+	public static @implicit void $colon$eq$colon(@byref long var1, @byref long var2)
+	{
+	}
+	
+	// Not Implemented, only declared
+	public static @implicit void $colon$eq$colon(@byref float var1, @byref float var2)
+	{
+	}
+	
+	// Not Implemented, only declared
+	public static @implicit void $colon$eq$colon(@byref double var1, @byref double var2)
+	{
 	}
 }
