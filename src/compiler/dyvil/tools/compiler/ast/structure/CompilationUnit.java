@@ -243,7 +243,6 @@ public class CompilationUnit extends ASTNode implements IContext
 	@Override
 	public Package resolvePackage(String name)
 	{
-		// TODO
 		return null;
 	}
 	

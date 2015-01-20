@@ -3,7 +3,7 @@ package dyvil.concurrent;
 public class TaskThreadManager
 {
 	public final String		name;
-	public final int		cores;
+	public final int		paralledThreads;
 	private TaskThread[]	threads;
 	
 	/**
@@ -25,16 +25,16 @@ public class TaskThreadManager
 	 * 
 	 * @param name
 	 *            the name
-	 * @param cores
+	 * @param parallelThreads
 	 *            the amount of available processors
 	 */
-	public TaskThreadManager(String name, int cores)
+	public TaskThreadManager(String name, int parallelThreads)
 	{
 		this.name = name;
-		this.cores = cores;
-		this.threads = new TaskThread[cores];
+		this.paralledThreads = parallelThreads;
+		this.threads = new TaskThread[parallelThreads];
 		
-		for (int i = 0; i < cores; i++)
+		for (int i = 0; i < parallelThreads; i++)
 		{
 			this.threads[i] = new TaskThread(name + "-" + i);
 		}
@@ -61,9 +61,9 @@ public class TaskThreadManager
 	public TaskThread getLeastOccupiedThread()
 	{
 		TaskThread[] threads = this.threads;
-		int cores = this.cores;
+		int cores = this.paralledThreads;
 		int min = Integer.MAX_VALUE;
-		int thread = 0;
+		TaskThread thread = null;
 		
 		for (int i = 0; i < cores; i++)
 		{
@@ -72,10 +72,10 @@ public class TaskThreadManager
 			if (taskCount < min)
 			{
 				min = taskCount;
-				thread = i;
+				thread = t;
 			}
 		}
 		
-		return threads[thread];
+		return thread;
 	}
 }

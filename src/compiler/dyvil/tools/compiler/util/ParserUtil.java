@@ -59,7 +59,7 @@ public class ParserUtil
 	
 	public static boolean isSeperator(char c)
 	{
-		return c == ',' || c == ';' || c == ':';
+		return c == ',' || c == ';';
 	}
 	
 	public static int getKeywordType(String s)
@@ -70,6 +70,8 @@ public class ParserUtil
 			return Tokens.WILDCARD;
 		case "@":
 			return Tokens.AT;
+		case ":":
+			return Tokens.COLON;
 		case "null":
 			return Tokens.NULL;
 		case "true":

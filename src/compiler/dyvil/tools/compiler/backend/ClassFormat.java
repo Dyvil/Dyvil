@@ -27,8 +27,23 @@ public class ClassFormat
 			javaRTJar = new File(s1);
 		}
 		
-		// TODO Actually use the installed Dyvil Runtime Library
-		dyvilRTJar = new File("bin");
+		File bin = new File("bin");
+		if (bin.exists())
+		{
+			dyvilRTJar = bin;
+		}
+		else
+		{
+			s = System.getenv("DYVIL_HOME");
+			if (s == null || s.isEmpty())
+			{
+				throw new UnsatisfiedLinkError("No installed Dyvil Runtime Library found!");
+			}
+			else
+			{
+				dyvilRTJar = new File(s);
+			}
+		}
 	}
 	
 	public static String packageToInternal(String name)

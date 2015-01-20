@@ -289,7 +289,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				SpecialConstructor pc = new SpecialConstructor(token, (ConstructorCall) this.value);
 				pm.pushParser(new ExpressionListParser(pc.list));
 				this.value = pc;
-				this.mode = LIST_END; // LIST_END because it matches a curly bracket.
+				this.mode = LIST_END; // matches a curly bracket
 				return true;
 			}
 			return false;

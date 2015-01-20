@@ -62,7 +62,6 @@ public class TypeParser extends Parser implements ITyped
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				// TODO package.class
 				if (token.next().equals("<"))
 				{
 					this.type = new GenericType(token, value);

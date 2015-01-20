@@ -349,8 +349,6 @@ public class Dlex implements Iterable<IToken>
 				return Tokens.TYPE_IDENTIFIER | Tokens.MOD_DOTS;
 			}
 			return Tokens.DOT;
-		case ':':
-			return Tokens.COLON;
 		case ';':
 			return Tokens.SEMICOLON;
 		case ',':

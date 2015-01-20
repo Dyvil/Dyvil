@@ -1,8 +1,7 @@
 package dyvil.concurrent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * A Thread implementation that processes a queue of tasks.
@@ -13,8 +12,7 @@ public class TaskThread extends Thread
 {
 	public static boolean			DEBUG		= true;
 	
-	private List<Runnable>			tasks		= new ArrayList();
-	private ListIterator<Runnable>	iterator	= this.tasks.listIterator();
+	private Queue<Runnable>			tasks		= new LinkedList();
 	
 	public TaskThread(String name)
 	{
@@ -24,10 +22,10 @@ public class TaskThread extends Thread
 	@Override
 	public void run()
 	{
-		while (this.iterator.hasNext())
+		while (!this.tasks.isEmpty())
 		{
-			this.iterator.next().run();
-			this.iterator.remove();
+			Runnable r = this.tasks.remove();
+			r.run();
 		}
 	}
 	
@@ -40,7 +38,7 @@ public class TaskThread extends Thread
 	 */
 	public void addTask(Runnable task)
 	{
-		this.iterator.add(task);
+		this.tasks.add(task);
 	}
 	
 	/**
