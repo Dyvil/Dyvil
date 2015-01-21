@@ -1,8 +1,9 @@
-package dyvil.tools.compiler.ast.access;
+package dyvil.tools.compiler.ast.operator;
 
 import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -15,6 +16,12 @@ public class SwapOperator extends ASTNode implements IValue
 {
 	public FieldAccess	left;
 	public FieldAccess	right;
+	
+	public SwapOperator(FieldAccess left, FieldAccess right)
+	{
+		this.left = left;
+		this.right = right;
+	}
 	
 	public SwapOperator(ICodePosition position, FieldAccess left, FieldAccess right)
 	{

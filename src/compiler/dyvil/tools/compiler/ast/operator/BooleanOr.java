@@ -1,10 +1,11 @@
-package dyvil.tools.compiler.ast.expression;
+package dyvil.tools.compiler.ast.operator;
 
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -17,6 +18,12 @@ public class BooleanOr extends ASTNode implements IValue
 {
 	public IValue	left;
 	public IValue	right;
+	
+	public BooleanOr(IValue left, IValue right)
+	{
+		this.left = left;
+		this.right = right;
+	}
 	
 	public BooleanOr(ICodePosition position, IValue left, IValue right)
 	{

@@ -270,7 +270,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		if (this.value != null)
 		{
 			buffer.append(Formatting.Field.keyValueSeperator);
-			this.value.toString("", buffer);
+			Formatting.appendValue(this.value, prefix, buffer);
 		}
 	}
 }

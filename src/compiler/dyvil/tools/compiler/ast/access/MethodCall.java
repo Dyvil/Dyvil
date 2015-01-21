@@ -6,7 +6,9 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.expression.*;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -23,6 +25,7 @@ import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Operators;
 import dyvil.tools.compiler.util.Util;
 
 public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IValueList, IValued
@@ -254,26 +257,12 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 			IValue argument = this.arguments.get(0);
 			argument = argument.resolve(markers, context);
 			
-			if ("$colon$eq$colon".equals(this.qualifiedName))
+			IValue operator = Operators.get(this.instance, this.name, argument);
+			if (operator != null)
 			{
-				if (this.instance.getValueType() == FIELD_ACCESS && argument.getValueType() == FIELD_ACCESS)
-				{
-					this.replacement = new SwapOperator(this.position, (FieldAccess) this.instance, (FieldAccess) argument);
-					return false; // Return false to apply replacement in
-									// resolve2
-				}
-			}
-			boolean isOr = false;
-			if ("$amp$amp".equals(this.qualifiedName) || (isOr = "$bar$bar".equals(this.qualifiedName)))
-			{
-				IType t1 = this.instance.getType();
-				IType t2 = argument.getType();
-				if (t1.classEquals(Type.BOOLEAN) && t2.classEquals(Type.BOOLEAN))
-				{
-					this.replacement = isOr ? new BooleanOr(this.position, this.instance, argument) : new BooleanAnd(this.position, this.instance, argument);
-					return false; // Return false to apply replacement in
-									// resolve2
-				}
+				this.replacement = operator;
+				// Return false to apply replacement in resolve2
+				return false;
 			}
 			
 			this.arguments.set(0, argument);
