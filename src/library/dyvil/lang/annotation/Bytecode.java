@@ -18,6 +18,15 @@ import java.lang.annotation.Target;
  * <li>push all <b>arguments</b> (i.e., the other operands) on the stack
  * <li>process {@code opcodes} (or, if empty, {@code opcode})
  * <b>instructions</b>
+ * </ul>
+ * The @Bytecode annotation is also designed to work with if or while statements
+ * and conditional jumps. If one uses an opcode such as GOTO or IFEQ, the
+ * compiler automatically assigns the Label of the else block to that statement.
+ * That means that these opcodes have to be inverted in order for the if
+ * statement to work properly. For example, the integer equality comparison ==
+ * uses the {@link Opcodes#IF_ICMPNE IF_ICMPNE} opcode for the jump, since the
+ * JVM is supposed to jump to the else block if the two integer are
+ * <i>unequal</i> (NE).
  * 
  * @author Clashsoft
  */

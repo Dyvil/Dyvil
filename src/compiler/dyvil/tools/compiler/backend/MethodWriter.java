@@ -34,7 +34,7 @@ public final class MethodWriter extends MethodVisitor
 		this.push(UNINITIALIZED_THIS);
 	}
 	
-	public void setInstance(IType type)
+	public void addLocal(IType type)
 	{
 		this.locals.add(type.getFrameType());
 	}
@@ -81,15 +81,9 @@ public final class MethodWriter extends MethodVisitor
 	}
 	
 	@Override
-	@Deprecated
 	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index)
 	{
-	}
-	
-	public void visitLocalVariable(String name, IType type, Label start, Label end, int index)
-	{
-		this.locals.add(type.getFrameType());
-		this.mv.visitLocalVariable(name, type.getExtendedName(), type.getSignature(), start, end, index);
+		this.mv.visitLocalVariable(name, desc, signature, start, end, index);
 	}
 	
 	public void visitLdcInsn(int value)
@@ -217,6 +211,12 @@ public final class MethodWriter extends MethodVisitor
 			this.visitFrame();
 			this.typeStack.pop();
 		}
+		if (opcode >= IF_ICMPEQ && opcode <= IF_ICMPLE)
+		{
+			this.visitFrame();
+			this.typeStack.pop();
+			this.typeStack.pop();
+		}
 		this.mv.visitJumpInsn(opcode, label);
 	}
 	
@@ -250,6 +250,11 @@ public final class MethodWriter extends MethodVisitor
 			{
 				this.mv.visitLdcInsn(-1L);
 			}
+		}
+		else if (opcode == DUP)
+		{
+			Object o = this.typeStack.peek();
+			this.typeStack.push(o);
 		}
 		else if (opcode == POP)
 		{
@@ -450,5 +455,13 @@ public final class MethodWriter extends MethodVisitor
 		}
 		this.mv.visitMaxs(this.maxStack, this.locals.size());
 		this.mv.visitEnd();
+	}
+
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append("MethodWriter [stack=").append(this.typeStack).append(", locals=").append(this.locals).append("]");
+		return builder.toString();
 	}
 }

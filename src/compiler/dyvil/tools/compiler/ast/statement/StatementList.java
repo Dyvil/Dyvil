@@ -218,6 +218,14 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		
 		writer.visitLabel(this.start);
+		
+		// Write variable types
+		for (Entry<String, Variable> entry : this.variables.entrySet())
+		{
+			Variable var = entry.getValue();
+			writer.addLocal(var.type);
+		}
+		
 		for (IValue v : this.values)
 		{
 			v.writeStatement(writer);
@@ -227,7 +235,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			writer.visitLocalVariable(entry.getKey(), var.type, this.start, this.end, var.index);
+			writer.visitLocalVariable(entry.getKey(), var.type.getExtendedName(), var.type.getSignature(), this.start, this.end, var.index);
 		}
 	}
 }

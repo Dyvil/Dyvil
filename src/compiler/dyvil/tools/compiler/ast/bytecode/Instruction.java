@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import static jdk.internal.org.objectweb.asm.Opcodes.*;
+import static dyvil.reflect.Opcodes.*;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.util.OpcodeUtil;
 
 public class Instruction extends ASTNode
 {
@@ -63,15 +64,15 @@ public class Instruction extends ASTNode
 		{
 			return new ConstantInstruction(name);
 		}
-		else if (opcode == INVOKEVIRTUAL || opcode == INVOKEINTERFACE || opcode == INVOKESPECIAL || opcode == INVOKESTATIC)
+		else if (OpcodeUtil.isInvokeOpcode(opcode))
 		{
 			return new InvokeInstruction(opcode, name);
 		}
-		else if (opcode == GETFIELD || opcode == PUTFIELD || opcode == GETSTATIC || opcode == PUTSTATIC)
+		else if (OpcodeUtil.isFieldOpcode(opcode))
 		{
 			return new FieldInstruction(opcode, name);
 		}
-		else if (opcode == ALOAD || opcode == ILOAD || opcode == LLOAD || opcode == FLOAD || opcode == DLOAD || opcode == ASTORE || opcode == ISTORE || opcode == LSTORE || opcode == FSTORE || opcode == DSTORE || opcode == RET)
+		else if (OpcodeUtil.isLoadOpcode(opcode) || OpcodeUtil.isStoreOpcode(opcode))
 		{
 			return new VarInstruction(opcode, name);
 		}
@@ -91,7 +92,7 @@ public class Instruction extends ASTNode
 		{
 			return new IIncInstruction(opcode, name);
 		}
-		else if (opcode >= IFEQ && opcode <= JSR || opcode == IFNULL || opcode == IFNONNULL)
+		else if (OpcodeUtil.isJumpOpcode(opcode))
 		{
 			return new JumpInstruction(opcode, name);
 		}

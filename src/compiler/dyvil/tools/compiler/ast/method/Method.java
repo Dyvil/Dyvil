@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -28,6 +29,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.OpcodeUtil;
 import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
@@ -717,6 +719,65 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public void writePrefixBytecode(MethodWriter writer, Label dest)
+	{
+		if (this.prefixBytecode != null)
+		{
+			for (int i : this.prefixBytecode)
+			{
+				if (OpcodeUtil.isJumpOpcode(i))
+				{
+					writer.visitJumpInsn(i, dest);
+				}
+				else
+				{
+					writer.visitInsn(i);
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void writeInfixBytecode(MethodWriter writer, Label dest)
+	{
+		if (this.infixBytecode != null)
+		{
+			for (int i : this.infixBytecode)
+			{
+				if (OpcodeUtil.isJumpOpcode(i))
+				{
+					writer.visitJumpInsn(i, dest);
+				}
+				else
+				{
+					writer.visitInsn(i);
+				}
+			}
+		}
+	}
+	
+	@Override
+	public boolean writePostfixBytecode(MethodWriter writer, Label dest)
+	{
+		if (this.postfixBytecode != null)
+		{
+			for (int i : this.postfixBytecode)
+			{
+				if (OpcodeUtil.isJumpOpcode(i))
+				{
+					writer.visitJumpInsn(i, dest);
+				}
+				else
+				{
+					writer.visitInsn(i);
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
 	public void write(ClassWriter writer)
 	{
 		int modifiers = this.modifiers & 0xFFFF;
@@ -733,7 +794,7 @@ public class Method extends Member implements IMethod
 		}
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.setInstance(this.type);
+			mw.addLocal(this.type);
 		}
 		
 		for (Annotation annotation : this.annotations)

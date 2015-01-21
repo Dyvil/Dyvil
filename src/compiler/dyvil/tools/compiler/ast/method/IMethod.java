@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.method;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
@@ -32,6 +33,19 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 	}
 	
 	public default boolean writePostfixBytecode(MethodWriter writer)
+	{
+		return false;
+	}
+	
+	public default void writePrefixBytecode(MethodWriter writer, Label dest)
+	{
+	}
+	
+	public default void writeInfixBytecode(MethodWriter writer, Label dest)
+	{
+	}
+	
+	public default boolean writePostfixBytecode(MethodWriter writer, Label dest)
 	{
 		return false;
 	}

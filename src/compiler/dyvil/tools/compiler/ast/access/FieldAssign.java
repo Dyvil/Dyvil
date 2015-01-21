@@ -229,7 +229,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 			this.instance.writeExpression(writer);
 		}
 		this.value.writeExpression(writer);
-		writer.visitInsn(Opcodes.DUP, this.value.getType());
+		writer.visitInsn(Opcodes.DUP);
 		this.field.writeSet(writer);
 	}
 	
@@ -252,7 +252,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.type == null)
+		if (this.type != null)
 		{
 			this.field.toString("", buffer);
 		}

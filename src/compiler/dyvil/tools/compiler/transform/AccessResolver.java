@@ -115,6 +115,10 @@ public class AccessResolver
 							markers.add(curr.getResolveError());
 						}
 					}
+					else
+					{
+						markers.add(curr.getResolveError());
+					}
 				}
 			}
 			

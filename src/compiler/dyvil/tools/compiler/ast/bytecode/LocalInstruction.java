@@ -62,7 +62,9 @@ public class LocalInstruction extends Instruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.visitLocalVariable(this.varName, this.type, this.startLabel, this.endLabel, this.index);
+		// FIXME
+		writer.addLocal(this.type);
+		writer.visitLocalVariable(this.varName, this.type.getExtendedName(), this.type.getSignature(), this.startLabel, this.endLabel, this.index);
 	}
 	
 	@Override
