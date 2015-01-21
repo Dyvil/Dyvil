@@ -1,9 +1,11 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.backend.MethodWriter;
 
 public interface IType extends IASTNode, INamed, IContext
 {
@@ -109,7 +111,7 @@ public interface IType extends IASTNode, INamed, IContext
 		return buffer.toString();
 	}
 	
-	// Opcodes
+	// Compilation
 	
 	public int getLoadOpcode();
 	
@@ -120,6 +122,11 @@ public interface IType extends IASTNode, INamed, IContext
 	public int getArrayStoreOpcode();
 	
 	public int getReturnOpcode();
+	
+	public default void writeDefaultValue(MethodWriter writer)
+	{
+		writer.visitInsn(Opcodes.ACONST_NULL, this);
+	}
 	
 	// Misc
 	

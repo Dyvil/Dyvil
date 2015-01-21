@@ -63,6 +63,11 @@ public final class MethodWriter extends MethodVisitor
 		}
 	}
 	
+	public void pop()
+	{
+		this.typeStack.pop();
+	}
+	
 	@Override
 	@Deprecated
 	public void visitParameter(String desc, int index)
@@ -209,6 +214,7 @@ public final class MethodWriter extends MethodVisitor
 	{
 		if (opcode >= IFEQ && opcode <= IFLE)
 		{
+			this.visitFrame();
 			this.typeStack.pop();
 		}
 		this.mv.visitJumpInsn(opcode, label);
@@ -248,6 +254,10 @@ public final class MethodWriter extends MethodVisitor
 		else if (opcode == POP)
 		{
 			this.typeStack.pop();
+		}
+		else if (opcode == ACONST_NULL)
+		{
+			this.typeStack.push(NULL);
 		}
 		else if (opcode >= IALOAD && opcode <= SALOAD)
 		{

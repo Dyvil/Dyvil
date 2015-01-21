@@ -1,18 +1,10 @@
 package dyvil.test;
 
-import java.util.Scanner;
-import java.lang.Integer => jInt;
-
 public class Main
 {
-	public static void main(String[] args)
-	{
-		int i = 1;
-		int j = 2;
-		int k = 1 + i * 2 + 3;
-		i :=: j;
-		System out println(i);
-		System out println(j);
-		System out println(k);
-	}
+	public static boolean flag = true;
+	
+	public static void main(String[] args) = (if (args(0) equals "start") "start = true") print;
+	
+	public implicit void print(Object o) = System out println(o);
 }

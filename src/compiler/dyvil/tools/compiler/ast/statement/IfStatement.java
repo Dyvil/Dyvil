@@ -226,38 +226,29 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		if (this.then == null)
+		Label ifEnd = new Label();
+		ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
+		Label elseEnd = new Label();
+		elseEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
+		
+		// Condition
+		this.condition.writeJump(writer, ifEnd);
+		// If Block
+		this.then.writeExpression(writer);
+		writer.pop();
+		writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+		writer.visitLabel(ifEnd);
+		// Else Block
+		if (this.elseThen == null)
 		{
-			this.condition.writeExpression(writer);
-		}
-		if (this.elseThen != null)
-		{
-			Label ifEnd = new Label();
-			ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
-			Label elseEnd = new Label();
-			elseEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
-			
-			// Condition
-			this.condition.writeJump(writer, ifEnd);
-			// If Block
-			this.then.writeExpression(writer);
-			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.visitLabel(ifEnd);
-			// Else Block
-			this.elseThen.writeExpression(writer);
-			writer.visitLabel(elseEnd);
+			// TODO Write default value
+			this.commonType.writeDefaultValue(writer);
 		}
 		else
 		{
-			Label ifEnd = new Label();
-			ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
-			
-			// Condition
-			this.condition.writeJump(writer, ifEnd);
-			// If Block
-			this.then.writeExpression(writer);
-			writer.visitLabel(ifEnd);
+			this.elseThen.writeExpression(writer);
 		}
+		writer.visitLabel(elseEnd);
 	}
 	
 	@Override

@@ -233,13 +233,14 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 				pm.pushParser(new ThrowsDeclParser(this.method));
 				return true;
 			}
-			// "Insert" a semicolon after a closing curly bracket.
-			if (token.prev().isType(Tokens.CLOSE_CURLY_BRACKET))
-			{
-				this.reset();
-				pm.reparse();
-				return true;
-			}
+		}
+		
+		// "Insert" a semicolon after a closing curly bracket.
+		if (token.prev().isType(Tokens.CLOSE_CURLY_BRACKET))
+		{
+			this.reset();
+			pm.reparse();
+			return true;
 		}
 		
 		return false;

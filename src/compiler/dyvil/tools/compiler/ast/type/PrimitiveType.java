@@ -6,6 +6,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.backend.MethodWriter;
 
 public class PrimitiveType extends Type
 {
@@ -231,6 +232,35 @@ public class PrimitiveType extends Type
 			return Opcodes.DRETURN;
 		default:
 			return Opcodes.RETURN;
+		}
+	}
+	
+	@Override
+	public void writeDefaultValue(MethodWriter writer)
+	{
+		if (this.arrayDimensions > 0)
+		{
+			writer.visitInsn(Opcodes.ACONST_NULL);
+			return;
+		}
+		switch (this.typecode)
+		{
+		case Opcodes.T_BOOLEAN:
+		case Opcodes.T_BYTE:
+		case Opcodes.T_SHORT:
+		case Opcodes.T_CHAR:
+		case Opcodes.T_INT:
+			writer.visitLdcInsn(0);
+			break;
+		case Opcodes.T_LONG:
+			writer.visitLdcInsn(0L);
+			break;
+		case Opcodes.T_FLOAT:
+			writer.visitLdcInsn(0F);
+			break;
+		case Opcodes.T_DOUBLE:
+			writer.visitLdcInsn(0D);
+			break;
 		}
 	}
 	
