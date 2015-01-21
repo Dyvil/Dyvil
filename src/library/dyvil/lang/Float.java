@@ -146,7 +146,7 @@ public abstract class Float implements Number
 	@Override
 	public boolean $less$eq(byte b)
 	{
-		return this.value == b;
+		return this.value <= b;
 	}
 	
 	@Override
@@ -214,7 +214,7 @@ public abstract class Float implements Number
 	@Override
 	public boolean $less$eq(short b)
 	{
-		return this.value == b;
+		return this.value <= b;
 	}
 	
 	@Override
@@ -282,7 +282,7 @@ public abstract class Float implements Number
 	@Override
 	public boolean $less$eq(char b)
 	{
-		return this.value == b;
+		return this.value <= b;
 	}
 	
 	@Override
@@ -330,36 +330,42 @@ public abstract class Float implements Number
 	// int operators
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FCMPL, IFNE })
 	public boolean $eq$eq(int b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FCMPL, IFEQ })
 	public boolean $bang$eq(int b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FCMPG, IFGE })
 	public boolean $less(int b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FCMPG, IFGT })
 	public boolean $less$eq(int b)
 	{
-		return this.value == b;
+		return this.value <= b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FCMPL, IFLE })
 	public boolean $greater(int b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F, FCMPL, IFLT })
 	public boolean $greater$eq(int b)
 	{
 		return this.value >= b;
@@ -403,36 +409,42 @@ public abstract class Float implements Number
 	// long operators
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FCMPL, IFNE })
 	public boolean $eq$eq(long b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FCMPL, IFEQ })
 	public boolean $bang$eq(long b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FCMPG, IFGE })
 	public boolean $less(long b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FCMPG, IFGT })
 	public boolean $less$eq(long b)
 	{
-		return this.value == b;
+		return this.value <= b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FCMPL, IFLE })
 	public boolean $greater(long b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { L2F, FCMPL, IFLT })
 	public boolean $greater$eq(long b)
 	{
 		return this.value >= b;
@@ -476,36 +488,42 @@ public abstract class Float implements Number
 	// float operators
 	
 	@Override
+	@Bytecode(postfixOpcodes = { FCMPL, IFNE })
 	public boolean $eq$eq(float b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { FCMPL, IFEQ })
 	public boolean $bang$eq(float b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { FCMPG, IFGE })
 	public boolean $less(float b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { FCMPG, IFGT })
 	public boolean $less$eq(float b)
 	{
-		return this.value == b;
+		return this.value <= b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { FCMPL, IFLE })
 	public boolean $greater(float b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { FCMPL, IFLT })
 	public boolean $greater$eq(float b)
 	{
 		return this.value >= b;
@@ -549,36 +567,42 @@ public abstract class Float implements Number
 	// double operators
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcodes = { DCMPL, IFNE })
 	public boolean $eq$eq(double b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcodes = { DCMPL, IFEQ })
 	public boolean $bang$eq(double b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcodes = { DCMPG, IFGE })
 	public boolean $less(double b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcodes = { DCMPG, IFGT })
 	public boolean $less$eq(double b)
 	{
-		return this.value == b;
+		return this.value <= b;
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcodes = { DCMPL, IFLE })
 	public boolean $greater(double b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = F2D, postfixOpcodes = { DCMPL, IFLT })
 	public boolean $greater$eq(double b)
 	{
 		return this.value >= b;
@@ -642,7 +666,7 @@ public abstract class Float implements Number
 	@Override
 	public boolean $less$eq(Number b)
 	{
-		return this.value == b.floatValue();
+		return this.value <= b.floatValue();
 	}
 	
 	@Override
