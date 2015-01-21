@@ -17,7 +17,6 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Modifiers;
 
 public class ClassAccess extends ASTNode implements IValue, IAccess
 {
@@ -148,12 +147,6 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 			markers.add(this.getResolveError());
 		}
 		
-		IClass iclass = this.type.getTheClass();
-		if (iclass == null || !iclass.hasModifier(Modifiers.OBJECT_CLASS))
-		{
-			markers.add(new SemanticError(this.position, "The type '" + this.type + "' is not a singleton object type"));
-		}
-		
 		return this;
 	}
 	
@@ -161,9 +154,12 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	public void check(List<Marker> markers, IContext context)
 	{
 		IClass iclass = this.type.getTheClass();
-		if (iclass != null && context.getAccessibility(iclass) == IContext.SEALED)
+		if (iclass != null)
 		{
-			markers.add(new SemanticError(this.position, "The sealed class '" + iclass.getName() + "' cannot be accessed because it is private to it's library"));
+			if (context.getAccessibility(iclass) == IContext.SEALED)
+			{
+				markers.add(new SemanticError(this.position, "The sealed class '" + iclass.getName() + "' cannot be accessed because it is private to it's library"));
+			}
 		}
 	}
 	

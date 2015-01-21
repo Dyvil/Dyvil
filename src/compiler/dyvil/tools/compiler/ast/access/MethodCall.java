@@ -261,6 +261,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 			IValue operator = Operators.get(this.instance, this.name, argument);
 			if (operator != null)
 			{
+				operator.setPosition(this.position);
 				this.replacement = operator;
 				// Return false to apply replacement in resolve2
 				return false;

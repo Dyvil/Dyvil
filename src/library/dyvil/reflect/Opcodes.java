@@ -772,8 +772,24 @@ public interface Opcodes
 	
 	public static final int	ATHROW			= 191;
 	
+	/**
+	 * Checks if the value on top of the stack can be cast to the given type,
+	 * and throws a {@link ClassCastException} otherwise.
+	 * 
+	 * @param type
+	 *            the type
+	 */
 	public static final int	CHECKCAST		= 192;
 	
+	/**
+	 * Checks if the value on top of the stack can be cast to the given type and
+	 * pushes the result as an {@code int} on the stack. If the cast is
+	 * applicable, the result is {@code 1}, and if it is not applicable or the
+	 * top value on the stack way {@code null}, the result is {@code 0}.
+	 * 
+	 * @param type
+	 *            the type
+	 */
 	public static final int	INSTANCEOF		= 193;
 	
 	public static final int	MONITORENTER	= 194;
@@ -783,8 +799,8 @@ public interface Opcodes
 	public static final int	MULTIANEWARRAY	= 197;
 	
 	/**
-	 * Removes a reference from the stack and jumps to the given
-	 * {@link Label} if it is a {@code null} reference
+	 * Removes a reference from the stack and jumps to the given {@link Label}
+	 * if it is a {@code null} reference
 	 * 
 	 * @param label
 	 *            the label
@@ -792,8 +808,8 @@ public interface Opcodes
 	public static final int	IFNULL			= 198;
 	
 	/**
-	 * Removes a reference from the stack and jumps to the given
-	 * {@link Label} if it is not a {@code null} reference
+	 * Removes a reference from the stack and jumps to the given {@link Label}
+	 * if it is not a {@code null} reference
 	 * 
 	 * @param label
 	 *            the label
