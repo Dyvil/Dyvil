@@ -807,11 +807,11 @@ public class Method extends Member implements IMethod
 			Util.astToString(this.throwsDeclarations, Formatting.Method.throwsSeperator, buffer);
 		}
 		
-		IValue statement = this.getValue();
-		if (statement != null)
+		IValue value = this.getValue();
+		if (value != null)
 		{
 			buffer.append(Formatting.Method.signatureBodySeperator);
-			statement.toString(prefix, buffer);
+			Formatting.appendValue(value, prefix, buffer);
 		}
 		buffer.append(';');
 	}

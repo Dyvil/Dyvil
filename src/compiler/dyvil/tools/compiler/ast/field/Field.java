@@ -332,7 +332,7 @@ public class Field extends Member implements IField, IContext
 		if (value != null)
 		{
 			buffer.append(Formatting.Field.keyValueSeperator);
-			value.toString("", buffer);
+			Formatting.appendValue(value, prefix, buffer);
 		}
 		buffer.append(';');
 	}

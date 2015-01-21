@@ -164,11 +164,20 @@ public class WhileStatement extends ASTNode implements IStatement
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Statements.whileStart);
-		this.condition.toString(prefix, buffer);
+		if (this.condition != null)
+		{
+			this.condition.toString(prefix, buffer);
+		}
 		buffer.append(Formatting.Statements.whileEnd);
 		
-		if (this.then != null)
+		if (this.then instanceof IStatement)
 		{
+			buffer.append('\n').append(prefix);
+			this.then.toString(prefix, buffer);
+		}
+		else
+		{
+			buffer.append(' ');
 			this.then.toString(prefix, buffer);
 		}
 	}

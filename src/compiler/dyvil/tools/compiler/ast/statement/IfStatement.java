@@ -294,17 +294,10 @@ public class IfStatement extends ASTNode implements IStatement
 		}
 		buffer.append(Formatting.Statements.ifEnd);
 		
-		if (this.then instanceof IStatement)
+		if (this.then != null)
 		{
-			buffer.append('\n').append(prefix);
-			this.then.toString(prefix, buffer);
+			Formatting.appendValue(this.then, prefix, buffer);
 		}
-		else
-		{
-			buffer.append(' ');
-			this.then.toString(prefix, buffer);
-		}
-		
 		if (this.elseThen != null)
 		{
 			if (this.then instanceof IStatement)
@@ -317,17 +310,7 @@ public class IfStatement extends ASTNode implements IStatement
 			}
 			
 			buffer.append(Formatting.Statements.ifElse);
-			
-			if (this.elseThen instanceof IStatement)
-			{
-				buffer.append('\n').append(prefix);
-			}
-			else
-			{
-				buffer.append(' ');
-			}
-			
-			this.elseThen.toString(prefix, buffer);
+			Formatting.appendValue(this.elseThen, prefix, buffer);
 		}
 	}
 }

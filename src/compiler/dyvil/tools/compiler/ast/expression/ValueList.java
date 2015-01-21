@@ -305,17 +305,18 @@ public class ValueList extends ASTNode implements IValue, IValueList
 				IValue v = this.values.get(0);
 				if (len == 1 && !(v instanceof IStatement))
 				{
-					buffer.append("{ ");
+					buffer.append(Formatting.Expression.arrayStart);
 					v.toString("", buffer);
-					buffer.append(" }");
+					buffer.append(Formatting.Expression.arrayEnd);
 				}
 				else
 				{
-					buffer.append('\n').append(prefix).append('{').append('\n');
+					buffer.append('{').append('\n');
+					String prefix1 = prefix + Formatting.Method.indent;
 					for (IValue value : this.values)
 					{
-						buffer.append(prefix).append(Formatting.Method.indent);
-						value.toString(prefix + Formatting.Method.indent, buffer);
+						buffer.append(prefix1);
+						value.toString(prefix1, buffer);
 						buffer.append(";\n");
 					}
 					buffer.append(prefix).append('}');

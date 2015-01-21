@@ -116,7 +116,7 @@ public class ParserUtil
 	
 	public static boolean isCloseBracket(int type)
 	{
-		return (type & Tokens.CLOSE_BRACKET) != 0;
+		return (type & Tokens.CLOSE_BRACKET) == Tokens.CLOSE_BRACKET;
 	}
 	
 	public static boolean isTerminator(int type)

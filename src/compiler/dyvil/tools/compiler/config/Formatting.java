@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.config;
 
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.statement.IStatement;
+
 public class Formatting
 {
 	public static class Package
@@ -41,7 +44,7 @@ public class Formatting
 	
 	public static class Field
 	{
-		public static String	keyValueSeperator		= " = ";
+		public static String	keyValueSeperator		= " =";
 		
 		public static boolean	convertQualifiedNames	= false;
 		public static boolean	useJavaFormat			= true;
@@ -65,7 +68,7 @@ public class Formatting
 		
 		public static String	throwsSeperator				= ", ";
 		public static String	signatureThrowsSeperator	= " throws ";
-		public static String	signatureBodySeperator		= " = ";
+		public static String	signatureBodySeperator		= " =";
 		public static String	indent						= "\t";
 	}
 	
@@ -95,5 +98,19 @@ public class Formatting
 		public static String	arraySeperator	= ", ";
 		
 		public static String	lambdaSeperator	= " => ";
+	}
+	
+	public static void appendValue(IValue value, String prefix, StringBuilder buffer)
+	{
+		if (value instanceof IStatement)
+		{
+			buffer.append('\n').append(prefix);
+			value.toString(prefix, buffer);
+		}
+		else
+		{
+			buffer.append(' ');
+			value.toString(prefix, buffer);
+		}
 	}
 }

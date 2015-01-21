@@ -2,9 +2,15 @@ package dyvil.test;
 
 public class Main
 {
-	public static boolean flag = true;
-	
-	public static void main(String[] args) = (if (args(0) equals "start") "start = true") print;
+	public static void main(String[] args) =
+	{
+		int i = 10;
+		while (i > 0)
+		{
+			System out println(i);
+			i = i - 1;
+		}
+	}
 	
 	public implicit void print(Object o) = System out println(o);
 }
