@@ -253,12 +253,23 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	public boolean resolve(IContext context, List<Marker> markers)
 	{
 		int len = this.arguments.size();
-		if (len == 1 && this.instance != null)
+		if (len == 0 && this.instance != null)
+		{
+			IValue operator = Operators.get(this.instance, this.name);
+			if (operator != null)
+			{
+				operator.setPosition(this.position);
+				this.replacement = operator;
+				// Return false to apply replacement in resolve2
+				return false;
+			}
+		}
+		else if (len == 1)
 		{
 			IValue argument = this.arguments.get(0);
 			argument = argument.resolve(markers, context);
 			
-			IValue operator = Operators.get(this.instance, this.name, argument);
+			IValue operator = this.instance == null ? Operators.get(this.name, argument) : Operators.get(this.instance, this.name, argument);
 			if (operator != null)
 			{
 				operator.setPosition(this.position);

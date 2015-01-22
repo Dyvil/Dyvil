@@ -9,8 +9,19 @@ import dyvil.tools.compiler.ast.type.Type;
 
 public class Operators
 {
+	public static IValue get(IValue arg1, String name)
+	{
+		return null;
+	}
+	
+	public static IValue get(String name, IValue arg1)
+	{
+		return null;
+	}
+	
 	public static IValue get(IValue arg1, String name, IValue arg2)
 	{
+		// Swap Operator
 		if (":=:".equals(name))
 		{
 			if (arg1.getValueType() == IValue.FIELD_ACCESS && arg2.getValueType() == IValue.FIELD_ACCESS)
@@ -19,6 +30,7 @@ public class Operators
 			}
 			return null;
 		}
+		// Cast Operator
 		if (":>".equals(name))
 		{
 			if (arg2.getValueType() == IValue.CLASS_ACCESS)
@@ -27,6 +39,7 @@ public class Operators
 			}
 			return null;
 		}
+		// Instanceof Operator
 		if ("<:".equals(name))
 		{
 			if (arg2.getValueType() == IValue.CLASS_ACCESS)
