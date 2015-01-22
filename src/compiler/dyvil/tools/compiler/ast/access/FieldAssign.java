@@ -187,7 +187,8 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		{
 			SemanticError error = new SemanticError(this.value.getPosition(), "The type of the assigned value is incompatible with the field type");
 			error.addInfo("Field Type: " + type);
-			error.addInfo("Value Type: " + this.value.getType());
+			IType vtype = this.value.getType();
+			error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
 			markers.add(error);
 		}
 		

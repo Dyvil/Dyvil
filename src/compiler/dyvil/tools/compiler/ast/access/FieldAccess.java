@@ -263,7 +263,10 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public Marker getResolveError()
 	{
-		return new SemanticError(this.position, "'" + this.qualifiedName + "' could not be resolved to a field");
+		SemanticError error = new SemanticError(this.position, "'" + this.name + "' could not be resolved to a field or method");
+		error.addInfo("Qualified Name: " + this.qualifiedName);
+		error.addInfo("Instance Type: " + this.instance.getType());
+		return error;
 	}
 	
 	@Override

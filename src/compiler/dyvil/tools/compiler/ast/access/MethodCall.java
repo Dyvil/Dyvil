@@ -349,7 +349,25 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	@Override
 	public Marker getResolveError()
 	{
-		return new SemanticError(this.position, "'" + this.name + "' could not be resolved to a method or field");
+		SemanticError error;
+		if (this.arguments.isEmpty())
+		{
+			error = new SemanticError(this.position, "'" + this.name + "' could not be resolved to a method or field");
+		}
+		else
+		{
+			error = new SemanticError(this.position, "'" + this.name + "' could not be resolved to a method");
+		}
+		
+		error.addInfo("Qualified Name: " + this.qualifiedName);
+		if (this.instance != null)
+		{
+			error.addInfo("Instance Type: " + this.instance.getType());
+		}
+		StringBuilder builder = new StringBuilder("Argument Types: [");
+		Util.typesToString(this.arguments, ", ", builder);
+		error.addInfo(builder.append(']').toString());
+		return error;
 	}
 	
 	@Override

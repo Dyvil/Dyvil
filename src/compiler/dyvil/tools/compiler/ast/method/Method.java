@@ -39,7 +39,7 @@ public class Method extends Member implements IMethod
 	private List<Parameter>		parameters			= new ArrayList(3);
 	private List<IType>			throwsDeclarations	= new ArrayList(1);
 	
-	private IValue				statement;
+	private IValue				value;
 	
 	protected boolean			isConstructor;
 	
@@ -232,7 +232,8 @@ public class Method extends Member implements IMethod
 			{
 				SemanticError error = new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name + "' is incompatible with the required type");
 				error.addInfo("Required Type: " + parType);
-				error.addInfo("Value Type: " + instance.getType());
+				IType vtype = instance.getType();
+				error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
 				markers.add(error);
 			}
 			pOff = 1;
@@ -247,7 +248,8 @@ public class Method extends Member implements IMethod
 			{
 				SemanticError error = new SemanticError(value.getPosition(), "The method argument for '" + par.name + "' is incompatible with the required type");
 				error.addInfo("Required Type: " + parType);
-				error.addInfo("Value Type: " + value.getType());
+				IType vtype = value.getType();
+				error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
 				markers.add(error);
 			}
 		}
@@ -336,13 +338,13 @@ public class Method extends Member implements IMethod
 	@Override
 	public void setValue(IValue statement)
 	{
-		this.statement = statement;
+		this.value = statement;
 	}
 	
 	@Override
 	public IValue getValue()
 	{
-		return this.statement;
+		return this.value;
 	}
 	
 	@Override
@@ -425,9 +427,9 @@ public class Method extends Member implements IMethod
 			p.resolveTypes(markers, context);
 		}
 		
-		if (this.statement != null)
+		if (this.value != null)
 		{
-			this.statement.resolveTypes(markers, this);
+			this.value.resolveTypes(markers, this);
 		}
 	}
 	
@@ -467,9 +469,9 @@ public class Method extends Member implements IMethod
 			p.resolve(markers, context);
 		}
 		
-		if (this.statement != null)
+		if (this.value != null)
 		{
-			this.statement = this.statement.resolve(markers, this);
+			this.value = this.value.resolve(markers, this);
 		}
 	}
 	
@@ -519,25 +521,26 @@ public class Method extends Member implements IMethod
 			p.check(markers, context);
 		}
 		
-		if (this.statement != null)
+		if (this.value != null)
 		{
 			if (this.isConstructor)
 			{
-				if (!this.statement.requireType(Type.VOID))
+				if (!this.value.requireType(Type.VOID))
 				{
 					SemanticError error = new SemanticError(this.position, "The constructor must not return a result");
-					error.addInfo("Expression Type: " + this.statement.getType());
+					error.addInfo("Expression Type: " + this.value.getType());
 					markers.add(error);
 				}
 			}
-			else if (!this.statement.requireType(this.type))
+			else if (!this.value.requireType(this.type))
 			{
 				SemanticError error = new SemanticError(this.position, "The expression type of '" + this.name + "' is incompatible with the return type");
 				error.addInfo("Return Type: " + this.type);
-				error.addInfo("Value Type: " + this.statement.getType());
+				IType vtype = this.value.getType();
+				error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
 				markers.add(error);
 			}
-			this.statement.check(markers, context);
+			this.value.check(markers, context);
 		}
 		// If the method does not have an implementation and is static
 		else if (this.isStatic())
@@ -571,9 +574,9 @@ public class Method extends Member implements IMethod
 			p.foldConstants();
 		}
 		
-		if (this.statement != null)
+		if (this.value != null)
 		{
-			this.statement = this.statement.foldConstants();
+			this.value = this.value.foldConstants();
 		}
 	}
 	
@@ -781,7 +784,7 @@ public class Method extends Member implements IMethod
 	public void write(ClassWriter writer)
 	{
 		int modifiers = this.modifiers & 0xFFFF;
-		if (this.statement == null)
+		if (this.value == null)
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
@@ -824,10 +827,10 @@ public class Method extends Member implements IMethod
 			param.write(mw);
 		}
 		
-		if (this.statement != null)
+		if (this.value != null)
 		{
 			mw.visitCode();
-			this.statement.writeExpression(mw);
+			this.value.writeExpression(mw);
 			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);
 		}
 	}

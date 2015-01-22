@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassAccess extends ASTNode implements IValue, IAccess
@@ -225,7 +224,16 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public Marker getResolveError()
 	{
-		return new SyntaxError(this.position, "'" + this.type + "' could not be resolved to a type or field");
+		SemanticError error;
+		if (!this.type.isArrayType())
+		{
+			error = new SemanticError(this.position, "'" + this.type + "' could not be resolved to a type, field or method");
+		}
+		else
+		{
+			error = new SemanticError(this.position, "'" + this.type + "' coult not be resolved to a type");
+		}
+		return error;
 	}
 	
 	@Override

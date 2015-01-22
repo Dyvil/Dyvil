@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.config.Formatting;
 
 public class Util
@@ -83,6 +84,35 @@ public class Util
 			{
 				IASTNode o = (IASTNode) iterator.next();
 				o.toString("", buffer);
+				
+				if (iterator.hasNext())
+				{
+					buffer.append(seperator);
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+	
+	public static void typesToString(Collection<? extends ITyped> list, String seperator, StringBuilder buffer)
+	{
+		if (!list.isEmpty())
+		{
+			Iterator<? extends ITyped> iterator = list.iterator();
+			while (true)
+			{
+				IType type = iterator.next().getType();
+				if (type == null)
+				{
+					buffer.append("unknown");
+				}
+				else
+				{
+					type.toString("", buffer);
+				}
 				
 				if (iterator.hasNext())
 				{
