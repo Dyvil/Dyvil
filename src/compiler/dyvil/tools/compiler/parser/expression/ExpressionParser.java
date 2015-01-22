@@ -99,7 +99,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				return true;
 			}
-			if ((type & Tokens.TYPE_IDENTIFIER) != 0)
+			if (ParserUtil.isIdentifier(type))
 			{
 				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);

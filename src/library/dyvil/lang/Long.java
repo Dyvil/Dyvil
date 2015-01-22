@@ -46,21 +46,21 @@ public abstract class Long implements Integer
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2I, I2B })
+	@Bytecode(postfixOpcode = L2B)
 	public byte byteValue()
 	{
 		return (byte) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2I, I2S })
+	@Bytecode(postfixOpcode = L2S)
 	public short shortValue()
 	{
 		return (short) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2I, I2C })
+	@Bytecode(postfixOpcode = L2C)
 	public char charValue()
 	{
 		return (char) this.value;

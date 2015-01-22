@@ -62,13 +62,7 @@ public class TypeParser extends Parser implements ITyped
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				if (token.next().equals("<"))
-				{
-					this.type = new GenericType(token, token.value());
-					this.mode = GENERICS;
-					return true;
-				}
-				else if (this.generic)
+				if (this.generic)
 				{
 					this.type = new TypeVariable(token, token.value());
 					this.mode = TYPE_VARIABLE;

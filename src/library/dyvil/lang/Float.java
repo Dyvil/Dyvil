@@ -40,21 +40,21 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2I, I2B })
+	@Bytecode(postfixOpcode = F2B)
 	public byte byteValue()
 	{
 		return (byte) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2I, I2S })
+	@Bytecode(postfixOpcode = F2S)
 	public short shortValue()
 	{
 		return (short) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2I, I2C })
+	@Bytecode(postfixOpcode = F2C)
 	public char charValue()
 	{
 		return (char) this.value;

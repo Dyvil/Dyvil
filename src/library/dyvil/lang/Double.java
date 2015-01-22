@@ -40,21 +40,21 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { D2I, I2B })
+	@Bytecode(postfixOpcode = D2B)
 	public byte byteValue()
 	{
 		return (byte) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { D2I, I2S })
+	@Bytecode(postfixOpcode = D2S)
 	public short shortValue()
 	{
 		return (short) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { D2I, I2C })
+	@Bytecode(postfixOpcode = D2C)
 	public char charValue()
 	{
 		return (char) this.value;

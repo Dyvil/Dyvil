@@ -30,7 +30,7 @@ public class Dlex implements Iterable<IToken>
 		Token first = new Token(-1, "", (byte) 0, null, null, 0, -1, -1);
 		Token prev = first;
 		int start = 0;
-		int lineNumber = 1;
+		int lineNumber = -1;
 		int i;
 		
 		char l = 0;
