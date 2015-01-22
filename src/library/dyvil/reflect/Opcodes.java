@@ -829,4 +829,14 @@ public interface Opcodes
 	 * Pushes the long {@code -1} onto the stack.
 	 */
 	public static final int	LCONST_M1		= 264;
+	
+	public static final int	L2B				= 280;
+	public static final int	L2S				= 281;
+	public static final int	L2C				= 282;
+	public static final int	F2B				= 283;
+	public static final int	F2S				= 284;
+	public static final int	F2C				= 285;
+	public static final int	D2B				= 286;
+	public static final int	D2S				= 287;
+	public static final int	D2C				= 289;
 }

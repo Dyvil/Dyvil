@@ -9,6 +9,11 @@ import dyvil.tools.compiler.backend.MethodWriter;
 
 public interface IType extends IASTNode, INamed, IContext
 {
+	public default boolean isPrimitive()
+	{
+		return false;
+	}
+	
 	// Full Name
 	
 	public void setFullName(String name);

@@ -20,6 +20,12 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return this.arrayDimensions == 0;
+	}
+	
+	@Override
 	public boolean isResolved()
 	{
 		return true;

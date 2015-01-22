@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.value;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -21,6 +22,12 @@ public class NullValue extends ASTNode implements IConstantValue
 	public Type getType()
 	{
 		return Type.NONE;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return !type.isPrimitive();
 	}
 	
 	@Override

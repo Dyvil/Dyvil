@@ -4,13 +4,7 @@ public class Main
 {
 	public static void main(String[] args) =
 	{
-		int i = 10;
-		while (i > 0)
-		{
-			System out println(i);
-			i = i - 1;
-		}
+		int i = 1L :> int;
+		long l = 0 :> long;
 	}
-	
-	public implicit void print(Object o) = System out println(o);
 }
