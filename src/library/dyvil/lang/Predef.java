@@ -1,8 +1,7 @@
 package dyvil.lang;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
+import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Bytecode;
-import dyvil.lang.annotation.byref;
 import dyvil.lang.annotation.implicit;
 import dyvil.lang.tuple.Tuple2;
 
@@ -12,15 +11,69 @@ public class Predef
 	{
 	}
 	
-	public static void $qmark$qmark$qmark()
+	// Prefix Operators
+	
+	@Bytecode
+	public static int $plus(int i)
 	{
-		throw new UnsupportedOperationException();
+		return i;
+	}
+	
+	@Bytecode(postfixOpcode = INEG)
+	public static int $minus(int i)
+	{
+		return -i;
+	}
+	
+	@Bytecode(postfixOpcodes = { ICONST_M1, IXOR })
+	public static int $tilde(int i)
+	{
+		return ~i;
 	}
 	
 	@Bytecode
-	public static void $dot$dot$dot()
+	public static long $plus(long l)
 	{
+		return l;
 	}
+	
+	@Bytecode(postfixOpcode = LNEG)
+	public static long $minus(long l)
+	{
+		return -l;
+	}
+	
+	@Bytecode(postfixOpcodes = { LCONST_M1, LXOR })
+	public static long $tilde(long l)
+	{
+		return ~l;
+	}
+	
+	@Bytecode
+	public static float $plus(float f)
+	{
+		return f;
+	}
+	
+	@Bytecode(postfixOpcode = LNEG)
+	public static float $minus(float f)
+	{
+		return -f;
+	}
+	
+	@Bytecode
+	public static double $plus(double d)
+	{
+		return d;
+	}
+	
+	@Bytecode(postfixOpcode = LNEG)
+	public static double $minus(double d)
+	{
+		return -d;
+	}
+	
+	// Hashing
 	
 	public static int hash(Object o)
 	{
@@ -49,6 +102,8 @@ public class Predef
 		return hash(o);
 	}
 	
+	// Print
+	
 	public static void println()
 	{
 		System.out.println();
@@ -58,6 +113,8 @@ public class Predef
 	{
 		System.out.println(s);
 	}
+	
+	// Tuples
 	
 	/**
 	 * @dyvil ->
@@ -81,6 +138,8 @@ public class Predef
 		return new Tuple2(b, a);
 	}
 	
+	// Casts
+	
 	/**
 	 * Returns true if the given {@code T t} is an instance of the given
 	 * {@link Class} {@code c}.
@@ -92,7 +151,7 @@ public class Predef
 	 *            the class
 	 * @return true, if t is an instance of c
 	 */
-	@Bytecode(postfixOpcode = Opcodes.INSTANCEOF)
+	@Bytecode(postfixOpcode = INSTANCEOF)
 	public static @implicit <T> boolean $less$colon(T t, Class<?> c)
 	{
 		return t == null ? false : c.isInstance(t);
@@ -108,7 +167,7 @@ public class Predef
 	 *            the class
 	 * @return t as an instance of c
 	 */
-	@Bytecode(postfixOpcode = Opcodes.CHECKCAST)
+	@Bytecode(postfixOpcode = CHECKCAST)
 	public static @implicit <T, U> U $colon$greater(T t)
 	{
 		return (U) t;
@@ -125,34 +184,21 @@ public class Predef
 	 *            the class
 	 * @return t as an instance of c
 	 */
-	@Bytecode(postfixOpcode = Opcodes.CHECKCAST)
+	@Bytecode(postfixOpcode = CHECKCAST)
 	public static @implicit <T, U> U $colon$greater(T t, Class<U> c)
 	{
 		return t == null ? (U) null : c.cast(t);
 	}
 	
-	// Not Implemented, only declared
-	public static @implicit void $colon$eq$colon(@byref Object var1, @byref Object var2)
+	// Miscellaneous
+	
+	public static void $qmark$qmark$qmark()
 	{
+		throw new UnsupportedOperationException();
 	}
 	
-	// Not Implemented, only declared
-	public static @implicit void $colon$eq$colon(@byref int var1, @byref int var2)
-	{
-	}
-	
-	// Not Implemented, only declared
-	public static @implicit void $colon$eq$colon(@byref long var1, @byref long var2)
-	{
-	}
-	
-	// Not Implemented, only declared
-	public static @implicit void $colon$eq$colon(@byref float var1, @byref float var2)
-	{
-	}
-	
-	// Not Implemented, only declared
-	public static @implicit void $colon$eq$colon(@byref double var1, @byref double var2)
+	@Bytecode
+	public static void $dot$dot$dot()
 	{
 	}
 }

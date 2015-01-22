@@ -58,6 +58,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	private IValue			value;
 	
 	private boolean			dotless;
+	private boolean prefix;
 	
 	public ExpressionParser(IValued field)
 	{
@@ -99,22 +100,30 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				return true;
 			}
-			if (ParserUtil.isIdentifier(type))
+			if ((type & Tokens.TYPE_SYMBOL_ID) == Tokens.TYPE_SYMBOL_ID)
+			{
+				this.prefix = true;
+				return this.getAccess(pm, token.value(), token, type);
+			}
+			else if (ParserUtil.isIdentifier(type))
 			{
 				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
 				return true;
 			}
-			if (this.parsePrimitive(token, type))
+			else if (this.parsePrimitive(token, type))
 			{
 				this.mode = ACCESS;
 				return true;
 			}
-			if (this.parseKeyword(pm, token, type))
+			else if (this.parseKeyword(pm, token, type))
 			{
 				return true;
 			}
-			this.mode = ACCESS;
+			else
+			{
+				this.mode = ACCESS;
+			}
 		}
 		if (this.isInMode(LIST_END))
 		{
@@ -256,6 +265,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
+				this.prefix = false;
 				String name = token.value();
 				if (this.precedence != 0 && this.dotless)
 				{
@@ -353,7 +363,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = ACCESS;
 			
 			ExpressionParser parser = new ExpressionParser(this);
-			parser.precedence = OperatorComparator.index(value);
+			parser.precedence = this.prefix ? 100 : OperatorComparator.index(value);
 			pm.pushParser(parser);
 			return true;
 		}

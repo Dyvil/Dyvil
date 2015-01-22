@@ -362,7 +362,8 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 		error.addInfo("Qualified Name: " + this.qualifiedName);
 		if (this.instance != null)
 		{
-			error.addInfo("Instance Type: " + this.instance.getType());
+			IType vtype = this.instance.getType();
+			error.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
 		}
 		StringBuilder builder = new StringBuilder("Argument Types: [");
 		Util.typesToString(this.arguments, ", ", builder);

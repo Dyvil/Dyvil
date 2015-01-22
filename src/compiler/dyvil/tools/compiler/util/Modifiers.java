@@ -185,7 +185,6 @@ public enum Modifiers
 	/**
 	 * Dyvil prefix modifier.
 	 */
-	// TODO prefix Implementation
 	public static final int	PREFIX					= 0x00040000;
 	
 	/**

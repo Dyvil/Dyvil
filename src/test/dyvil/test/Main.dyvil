@@ -4,7 +4,12 @@ public class Main
 {
 	public static void main(String[] args) =
 	{
-		int i = 0;
+		int i = 10 * -1;
+		int j = -i * -25;
+		System out println(i);
+		System out println(j);
+		System out println "----------";
+		i :=: j;
 		while (i < 10)
 		{
 			System out println(i);
