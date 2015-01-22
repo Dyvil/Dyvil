@@ -174,37 +174,42 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		{
 			markers.add(new SyntaxError(this.position, "Cannot assign a value to 'this'"));
 		}
-		else if (this.field != null)
+		
+		this.value.check(markers, context);
+		
+		if (this.field == null)
 		{
-			IType type = this.field.getType();
-			if (!this.value.requireType(type))
+			return;
+		}
+		
+		IType type = this.field.getType();
+		if (!this.value.requireType(type))
+		{
+			SemanticError error = new SemanticError(this.value.getPosition(), "The type of the assigned value is incompatible with the field type");
+			error.addInfo("Field Type: " + type);
+			error.addInfo("Value Type: " + this.value.getType());
+			markers.add(error);
+		}
+		
+		if (this.type == null)
+		{
+			if (this.field.hasModifier(Modifiers.FINAL))
 			{
-				SemanticError error = new SemanticError(this.value.getPosition(), "The type of the assigned value is incompatible with the field type");
-				error.addInfo("Field Type: " + type);
-				error.addInfo("Value Type: " + this.value.getType());
-				markers.add(error);
+				markers.add(new SemanticError(this.position, "The final field '" + this.name + "' cannot be assigned"));
 			}
 			
-			if (this.type == null)
+			byte access = context.getAccessibility(this.field);
+			if (access == IContext.STATIC)
 			{
-				if (this.field.hasModifier(Modifiers.FINAL))
-				{
-					markers.add(new SemanticError(this.position, "The final field '" + this.name + "' cannot be assigned"));
-				}
-				
-				byte access = context.getAccessibility(this.field);
-				if (access == IContext.STATIC)
-				{
-					markers.add(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be assigned from a static context"));
-				}
-				else if (access == IContext.SEALED)
-				{
-					markers.add(new SemanticError(this.position, "The sealed field '" + this.name + "' cannot be assigned because it is private to it's library"));
-				}
-				else if ((access & IContext.WRITE_ACCESS) == 0)
-				{
-					markers.add(new SemanticError(this.position, "The field '" + this.name + "' cannot be assigned since it is not visible"));
-				}
+				markers.add(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be assigned from a static context"));
+			}
+			else if (access == IContext.SEALED)
+			{
+				markers.add(new SemanticError(this.position, "The sealed field '" + this.name + "' cannot be assigned because it is private to it's library"));
+			}
+			else if ((access & IContext.WRITE_ACCESS) == 0)
+			{
+				markers.add(new SemanticError(this.position, "The field '" + this.name + "' cannot be assigned since it is not visible"));
 			}
 		}
 	}
