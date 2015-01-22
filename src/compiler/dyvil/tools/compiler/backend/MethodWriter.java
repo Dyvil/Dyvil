@@ -3,8 +3,8 @@ package dyvil.tools.compiler.backend;
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
@@ -21,7 +21,7 @@ public final class MethodWriter extends MethodVisitor
 	private int					maxStack;
 	
 	private List				locals					= new ArrayList();
-	private Stack				typeStack				= new Stack();
+	private LinkedList			typeStack				= new LinkedList();
 	
 	public MethodWriter(MethodVisitor mv)
 	{
@@ -39,9 +39,15 @@ public final class MethodWriter extends MethodVisitor
 		this.locals.add(type.getFrameType());
 	}
 	
+	protected void set(Object type)
+	{
+		this.typeStack.removeFirst();
+		this.typeStack.push(type);
+	}
+	
 	protected void push(Object type)
 	{
-		this.typeStack.add(type);
+		this.typeStack.push(type);
 		int size = this.typeStack.size();
 		if (size > this.maxStack)
 		{
@@ -54,7 +60,7 @@ public final class MethodWriter extends MethodVisitor
 		Object frameType = type.getFrameType();
 		if (frameType != null)
 		{
-			this.typeStack.add(frameType);
+			this.typeStack.push(frameType);
 			int size = this.typeStack.size();
 			if (size > this.maxStack)
 			{
@@ -246,25 +252,10 @@ public final class MethodWriter extends MethodVisitor
 	{
 		if (opcode > 255)
 		{
-			if (opcode == Opcodes.LCONST_M1)
-			{
-				this.mv.visitLdcInsn(-1L);
-			}
+			this.visitSpecialInsn(opcode);
+			return;
 		}
-		else if (opcode == DUP)
-		{
-			Object o = this.typeStack.peek();
-			this.typeStack.push(o);
-		}
-		else if (opcode == POP)
-		{
-			this.typeStack.pop();
-		}
-		else if (opcode == ACONST_NULL)
-		{
-			this.typeStack.push(NULL);
-		}
-		else if (opcode >= IALOAD && opcode <= SALOAD)
+		if (opcode >= IALOAD && opcode <= SALOAD)
 		{
 			this.typeStack.pop(); // Index
 			String s = (String) this.typeStack.pop(); // Array
@@ -276,7 +267,94 @@ public final class MethodWriter extends MethodVisitor
 			this.typeStack.pop(); // Array
 			this.typeStack.pop(); // Value
 		}
+		else
+		{
+			this.processInsn(opcode);
+		}
 		this.mv.visitInsn(opcode);
+	}
+	
+	private void processInsn(int opcode)
+	{
+		switch (opcode)
+		{
+		case DUP:
+			this.typeStack.push(this.typeStack.peek());
+			break;
+		case POP:
+			this.typeStack.pop();
+			break;
+		case ACONST_NULL:
+			this.push(NULL);
+			break;
+		case IADD:
+		case ISUB:
+		case IMUL:
+		case IDIV:
+		case IREM:
+		case ISHL:
+		case ISHR:
+		case IUSHR:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.push(INTEGER);
+			break;
+		case LADD:
+		case LSUB:
+		case LMUL:
+		case LDIV:
+		case LREM:
+		case LSHL:
+		case LSHR:
+		case LUSHR:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.push(LONG);
+			break;
+		case FADD:
+		case FSUB:
+		case FMUL:
+		case FDIV:
+		case FREM:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.push(FLOAT);
+			break;
+		case DADD:
+		case DSUB:
+		case DMUL:
+		case DDIV:
+		case DREM:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.push(DOUBLE);
+			break;
+		// Casts
+		case L2I:
+		case F2I:
+		case D2I:
+			this.set(INTEGER);
+		case I2L:
+		case F2L:
+		case D2L:
+			this.set(LONG);
+			break;
+		case I2F:
+		case L2F:
+		case D2F:
+			this.set(FLOAT);
+			break;
+		// Comparison Operators
+		case LCMP:
+		case FCMPL:
+		case FCMPG:
+		case DCMPL:
+		case DCMPG:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.push(INTEGER);
+			break;
+		}
 	}
 	
 	public void visitInsn(int opcode, IType type)
@@ -311,6 +389,61 @@ public final class MethodWriter extends MethodVisitor
 			pop--;
 		}
 		this.mv.visitInsn(opcode);
+	}
+	
+	public void visitSpecialInsn(int opcode)
+	{
+		switch (opcode)
+		{
+		case Opcodes.LCONST_M1:
+			this.mv.visitLdcInsn(-1L);
+			return;
+		case Opcodes.L2B:
+			this.mv.visitInsn(Opcodes.L2I);
+			this.mv.visitInsn(Opcodes.I2B);
+			this.set(INTEGER);
+			return;
+		case Opcodes.L2S:
+			this.mv.visitInsn(Opcodes.L2I);
+			this.mv.visitInsn(Opcodes.I2S);
+			this.set(INTEGER);
+			return;
+		case Opcodes.L2C:
+			this.mv.visitInsn(Opcodes.L2I);
+			this.mv.visitInsn(Opcodes.I2C);
+			this.set(INTEGER);
+			return;
+		case Opcodes.F2B:
+			this.mv.visitInsn(Opcodes.F2I);
+			this.mv.visitInsn(Opcodes.I2B);
+			this.set(INTEGER);
+			return;
+		case Opcodes.F2S:
+			this.mv.visitInsn(Opcodes.F2I);
+			this.mv.visitInsn(Opcodes.I2S);
+			this.set(INTEGER);
+			return;
+		case Opcodes.F2C:
+			this.mv.visitInsn(Opcodes.F2I);
+			this.mv.visitInsn(Opcodes.I2C);
+			this.set(INTEGER);
+			return;
+		case Opcodes.D2B:
+			this.mv.visitInsn(Opcodes.D2I);
+			this.mv.visitInsn(Opcodes.I2B);
+			this.set(INTEGER);
+			return;
+		case Opcodes.D2S:
+			this.mv.visitInsn(Opcodes.D2I);
+			this.mv.visitInsn(Opcodes.I2S);
+			this.set(INTEGER);
+			return;
+		case Opcodes.D2C:
+			this.mv.visitInsn(Opcodes.D2I);
+			this.mv.visitInsn(Opcodes.I2C);
+			this.set(INTEGER);
+			return;
+		}
 	}
 	
 	@Override
@@ -456,7 +589,7 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitMaxs(this.maxStack, this.locals.size());
 		this.mv.visitEnd();
 	}
-
+	
 	@Override
 	public String toString()
 	{
