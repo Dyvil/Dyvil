@@ -73,6 +73,12 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
+		if (type == Tokens.SEMICOLON)
+		{
+			this.reset();
+			return true;
+		}
+		
 		String value = token.value();
 		if (this.isInMode(BODY_END))
 		{
@@ -167,11 +173,6 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 				pm.pushParser(new ExpressionParser(this.field));
 				return true;
 			}
-			if (type == Tokens.SEMICOLON)
-			{
-				this.reset();
-				return true;
-			}
 			return false;
 		}
 		if (this.isInMode(PROPERTY))
@@ -213,11 +214,6 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		}
 		if (this.isInMode(METHOD_END))
 		{
-			if (type == Tokens.SEMICOLON)
-			{
-				this.reset();
-				return true;
-			}
 			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
 				pm.pushParser(new ExpressionParser(this.method), true);

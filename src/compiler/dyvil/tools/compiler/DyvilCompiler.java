@@ -32,8 +32,14 @@ public class DyvilCompiler
 	public static CompilerConfig		config	= new CompilerConfig();
 	public static Set<CompilerState>	states	= new TreeSet();
 	
+	public static ParserManager configParser = new ParserManager();
 	public static ParserManager			parser	= new ParserManager();
 	public static List<File>			files	= new ArrayList();
+	
+	static
+	{
+		parser.semicolonInference = true;
+	}
 	
 	public static void main(String[] args)
 	{
@@ -49,7 +55,7 @@ public class DyvilCompiler
 		initLogger();
 		
 		// Loads the config
-		parser.parse(new CodeFile(args[0]), new ConfigParser(config));
+		configParser.parse(new CodeFile(args[0]), new ConfigParser(config));
 		
 		File sourceDir = config.sourceDir;
 		File outputDir = config.outputDir;

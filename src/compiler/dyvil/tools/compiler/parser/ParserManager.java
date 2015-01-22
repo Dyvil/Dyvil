@@ -6,12 +6,16 @@ import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.lexer.token.Token;
+import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public class ParserManager
 {
 	protected Parser		currentParser;
 	
 	public CodeFile			file;
+	public boolean			semicolonInference;
 	
 	protected TokenIterator	tokens;
 	protected IToken		currentToken;
@@ -62,29 +66,26 @@ public class ParserManager
 		
 		try
 		{
-			boolean removed = false;
-			
+			IToken prev = null;
 			while (tokens.hasNext())
 			{
 				token = tokens.next();
-				if (!this.retainToken(token.getText(), token))
+				if (!this.retainToken((Token) token, prev))
 				{
 					tokens.remove();
-					removed = true;
 				}
+				prev = token;
 			}
 			
-			if (removed)
+			int index = 0;
+			tokens.reset();
+			while (tokens.hasNext())
 			{
-				int index = 0;
-				
-				tokens.reset();
-				while (tokens.hasNext())
-				{
-					token = tokens.next();
-					token.setIndex(index);
-					index++;
-				}
+				token = tokens.next();
+				token.setIndex(index);
+				token.setPrev(prev);
+				index++;
+				prev = token;
 			}
 			
 			tokens.reset();
@@ -139,8 +140,46 @@ public class ParserManager
 	 *            the token
 	 * @return true, if the token should be parser
 	 */
-	public boolean retainToken(String value, IToken token)
+	public boolean retainToken(Token token, IToken prev)
 	{
+		if (!this.semicolonInference)
+		{
+			return true;
+		}
+		
+		try
+		{
+			int type = token.type();
+			if (!ParserUtil.isIdentifier(type) && (type & Tokens.TYPE_KEYWORD) == 0)
+			{
+				return true;
+			}
+			
+			if (prev == null)
+			{
+				return true;
+			}
+			
+			int prevLN = prev.getLineNumber();
+			if (prevLN == token.getLineNumber())
+			{
+				return true;
+			}
+			
+			int type1 = prev.type();
+			if (ParserUtil.isSeperator(type1))
+			{
+				return true;
+			}
+			
+			int prevEnd = prev.getEnd();
+			Token semicolon = new Token(0, ";", Tokens.SEMICOLON, ";", this.file, prevLN, prevEnd, prevEnd + 1);
+			semicolon.setNext(token);
+			prev.setNext(semicolon);
+		}
+		catch (SyntaxError error)
+		{
+		}
 		return true;
 	}
 	

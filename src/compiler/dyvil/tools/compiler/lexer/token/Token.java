@@ -7,8 +7,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 
 public class Token implements IToken
 {
-	private IToken			prev;
-	private IToken			next;
+	public IToken			prev;
+	public IToken			next;
 	
 	public int				index;
 	

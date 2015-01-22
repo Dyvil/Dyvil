@@ -30,7 +30,7 @@ public class Dlex implements Iterable<IToken>
 		Token first = new Token(-1, "", (byte) 0, null, null, 0, -1, -1);
 		Token prev = first;
 		int start = 0;
-		int lineNumber = -1;
+		int lineNumber = 1;
 		int i;
 		
 		char l = 0;
@@ -42,16 +42,16 @@ public class Dlex implements Iterable<IToken>
 		for (i = 0; i < len; ++i, l = c)
 		{
 			c = code.charAt(i);
-			if (c == '\n')
-			{
-				lineNumber++;
-			}
 			
 			if (type == 0)
 			{
 				start = i;
 				
-				if (isWhitespace(c))
+				if (c == '\n') {
+					lineNumber++;
+					continue;
+				}
+				else if (c <= ' ')
 				{
 					continue;
 				}
@@ -272,6 +272,11 @@ public class Dlex implements Iterable<IToken>
 					reparse = true;
 				}
 			}
+			
+			if (c == '\n')
+			{
+				lineNumber++;
+			}
 		}
 		
 		if (buf.length() > 0)
@@ -375,15 +380,14 @@ public class Dlex implements Iterable<IToken>
 		if ((type & Tokens.TYPE_IDENTIFIER) != 0)
 		{
 			type = ParserUtil.getKeywordType(s, type);
-			t = new Token(prev.index() + 1, s, type, s, this.file, line, start, start + len);
+			t = new Token(0, s, type, s, this.file, line, start, start + len);
 		}
 		else
 		{
-			t = new Token(prev.index() + 1, s, type, parse(type, s), this.file, line, start, start + len);
+			t = new Token(0, s, type, parse(type, s), this.file, line, start, start + len);
 		}
 		
 		prev.setNext(t);
-		t.setPrev(prev);
 		return t;
 	}
 	

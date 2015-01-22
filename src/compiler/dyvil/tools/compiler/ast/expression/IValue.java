@@ -43,6 +43,8 @@ public interface IValue extends IASTNode, ITyped
 	public static int	SWAP_OPERATOR		= 23;
 	public static int	BOOLEAN_AND			= 24;
 	public static int	BOOLEAN_OR			= 25;
+	public static int	INCREMENT			= 26;
+	public static int	DECREMENT			= 27;
 	
 	public static int	TUPLE				= 48;
 	public static int	LAMBDA				= 49;
