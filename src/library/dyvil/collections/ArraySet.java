@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import dyvil.lang.array.Arrays;
 
+
 public class ArraySet<E> extends AbstractSet<E>
 {
 	private static final int	MAX_ARRAY_SIZE	= Integer.MAX_VALUE - 8;
@@ -97,7 +98,7 @@ public class ArraySet<E> extends AbstractSet<E>
 					i0++;
 				}
 			}
-			Arrays.sort(o);
+			java.util.Arrays.sort(o);
 			return this.toArray = o;
 		}
 	}
@@ -146,7 +147,7 @@ public class ArraySet<E> extends AbstractSet<E>
 			{
 				newCapacity = hugeCapacity(minCapacity);
 			}
-			this.entries = Arrays.copyOf(this.entries, newCapacity);
+			this.entries = Arrays.copy(this.entries, newCapacity);
 		}
 	}
 	

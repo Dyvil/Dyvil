@@ -1,5 +1,6 @@
 package dyvil.lang;
 
+
 public abstract class Byte implements Integer
 {
 	protected byte	value;
@@ -119,7 +120,7 @@ public abstract class Byte implements Integer
 	@Override
 	public Byte rec()
 	{
-		return this.$eq((byte) Math.sqrt(this.value));
+		return this.$eq((byte) (1 / this.value));
 	}
 	
 	// byte operators

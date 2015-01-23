@@ -181,7 +181,7 @@ public class Collections
 	/**
 	 * Creates a new {@link ArrayList} from the given array.
 	 * 
-	 * @see CSArrays#asList(Object...)
+	 * @see CSArrays#toList(Object...)
 	 * @param array
 	 *            the array
 	 * @return the array list

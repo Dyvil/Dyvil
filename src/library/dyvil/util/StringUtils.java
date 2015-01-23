@@ -207,7 +207,7 @@ public class StringUtils
 		{
 			return Collections.EMPTY_LIST;
 		}
-		return Arrays.asList(string.split("\n"));
+		return Arrays.toList(string.split("\n"));
 	}
 	
 	/**
