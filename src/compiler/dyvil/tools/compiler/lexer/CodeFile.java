@@ -69,6 +69,12 @@ public class CodeFile extends File implements ICodePosition
 	}
 	
 	@Override
+	public int getType()
+	{
+		return 0;
+	}
+	
+	@Override
 	public String getText()
 	{
 		return this.getCode();

@@ -83,6 +83,12 @@ public class Token implements IToken
 	}
 	
 	@Override
+	public int getType()
+	{
+		return this.type;
+	}
+	
+	@Override
 	public String getText()
 	{
 		return this.value;

@@ -6,6 +6,8 @@ public interface ICodePosition
 {
 	public CodeFile getFile();
 	
+	public int getType();
+	
 	public String getText();
 	
 	public int getLineNumber();
@@ -43,7 +45,7 @@ public interface ICodePosition
 	
 	public default ICodePosition raw()
 	{
-		return new CodePosition(this.getFile(), this.getLineNumber(), this.getStart(), this.getEnd());
+		return new CodePosition(this.getFile(), this.getType(), this.getLineNumber(), this.getStart(), this.getEnd());
 	}
 	
 	public default ICodePosition to(ICodePosition end)
@@ -53,6 +55,6 @@ public interface ICodePosition
 		{
 			throw new IllegalArgumentException("Cannot connect two CodePosition from different files.");
 		}
-		return new CodePosition(file, end.getLineNumber(), this.getStart(), end.getEnd());
+		return new CodePosition(file, this.getType(), end.getLineNumber(), this.getStart(), end.getEnd());
 	}
 }

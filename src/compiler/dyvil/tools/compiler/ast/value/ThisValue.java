@@ -27,15 +27,21 @@ public class ThisValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return THIS;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.type;
 	}
 	
 	@Override
-	public int getValueType()
+	public Object toObject()
 	{
-		return THIS;
+		return null;
 	}
 	
 	@Override

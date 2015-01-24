@@ -33,6 +33,12 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 		this.position = position;
 		this.values = values;
 	}
+
+	@Override
+	public int getValueType()
+	{
+		return TUPLE;
+	}
 	
 	@Override
 	public void setValues(List<IValue> list)
@@ -62,17 +68,6 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	public void setValue(int index, IValue value)
 	{
 		this.values.set(index, value);
-	}
-	
-	@Override
-	public void setArray(boolean array)
-	{
-	}
-	
-	@Override
-	public boolean isArray()
-	{
-		return false;
 	}
 	
 	@Override
@@ -127,18 +122,6 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 			return 1;
 		}
 		return 0;
-	}
-	
-	@Override
-	public int getValueType()
-	{
-		return TUPLE;
-	}
-	
-	@Override
-	public Object toObject()
-	{
-		return null;
 	}
 	
 	@Override

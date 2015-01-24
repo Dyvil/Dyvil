@@ -21,21 +21,15 @@ public class LongValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public Type getType()
-	{
-		return Type.LONG;
-	}
-	
-	@Override
 	public int getValueType()
 	{
 		return LONG;
 	}
 	
 	@Override
-	public Long toObject()
+	public Type getType()
 	{
-		return Long.valueOf(this.value);
+		return Type.LONG;
 	}
 	
 	@Override
@@ -63,6 +57,12 @@ public class LongValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
+	public Long toObject()
+	{
+		return Long.valueOf(this.value);
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 		writer.visitLdcInsn(this.value);
@@ -76,6 +76,12 @@ public class LongValue extends ASTNode implements INumericValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.value).append('L');
+		if (this.position == null)
+		{
+			buffer.append(this.value).append('L');
+			return;
+		}
+		
+		buffer.append(this.position.getText());
 	}
 }

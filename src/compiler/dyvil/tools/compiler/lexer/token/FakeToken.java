@@ -64,6 +64,12 @@ public class FakeToken implements IToken
 	}
 	
 	@Override
+	public int getType()
+	{
+		return 0;
+	}
+	
+	@Override
 	public String getText()
 	{
 		return "";

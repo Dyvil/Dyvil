@@ -8,6 +8,11 @@ import dyvil.tools.compiler.backend.MethodWriter;
 
 public interface IField extends IASTNode, IMember, IValued
 {
+	public default boolean isEnumConstant()
+	{
+		return false;
+	}
+	
 	// Compilation
 	
 	public void write(ClassWriter writer);

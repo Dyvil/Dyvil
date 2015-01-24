@@ -77,11 +77,6 @@ public interface IValue extends IASTNode, ITyped
 	{
 	}
 	
-	public default Object toObject()
-	{
-		throw new UnsupportedOperationException();
-	}
-	
 	public default boolean requireType(IType type)
 	{
 		return type.equals(Type.ANY) || Type.isSuperType(type, this.getType());

@@ -129,7 +129,7 @@ public enum Modifiers
 	// TODO Annotation Types
 	public static final int	ANNOTATION				= 0x00002000;
 	// TODO Enums
-	public static final int	ENUM_CLASS				= 0x00004000;
+	public static final int	ENUM					= 0x00004000;
 	
 	/**
 	 * Mandated modifier. This is used for constructors of inner classes that
@@ -199,13 +199,14 @@ public enum Modifiers
 	 */
 	public static final int	SEALED					= 0x00100000;
 	
-	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM_CLASS | OBJECT_CLASS | MODULE;
+	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS | MODULE;
 	public static final int	ACCESS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | SEALED;
 	public static final int	MEMBER_MODIFIERS		= ACCESS_MODIFIERS | STATIC | FINAL;
 	public static final int	CLASS_MODIFIERS			= MEMBER_MODIFIERS | ABSTRACT | STRICT | FUNCTIONAL;
 	
 	public static final int	FIELD_MODIFIERS			= MEMBER_MODIFIERS | TRANSIENT | VOLATILE | LAZY | SYNTHETIC;
-	public static final int	METHOD_MODIFIERS		= MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT | PREFIX | BRIDGE | VARARGS | MANDATED;
+	public static final int	METHOD_MODIFIERS		= MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT | PREFIX | BRIDGE | VARARGS
+															| MANDATED;
 	public static final int	PARAMETER_MODIFIERS		= FINAL | BYREF;
 	
 	private static void writeAccessModifiers(int mod, StringBuilder sb)
@@ -251,7 +252,7 @@ public enum Modifiers
 		{
 			sb.append("annotation ");
 		}
-		else if ((mod & ENUM_CLASS) == ENUM_CLASS)
+		else if ((mod & ENUM) == ENUM)
 		{
 			sb.append("enum ");
 		}
@@ -464,7 +465,7 @@ public enum Modifiers
 		case "annotation":
 			return ANNOTATION;
 		case "enum":
-			return ENUM_CLASS;
+			return ENUM;
 		case "object":
 			return OBJECT_CLASS;
 		case "module":

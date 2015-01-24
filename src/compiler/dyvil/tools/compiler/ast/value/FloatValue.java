@@ -21,15 +21,15 @@ public class FloatValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public Type getType()
-	{
-		return Type.FLOAT;
-	}
-	
-	@Override
 	public int getValueType()
 	{
 		return FLOAT;
+	}
+	
+	@Override
+	public Type getType()
+	{
+		return Type.FLOAT;
 	}
 	
 	@Override
@@ -76,6 +76,12 @@ public class FloatValue extends ASTNode implements INumericValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.value).append('F');
+		if (this.position == null)
+		{
+			buffer.append(this.value).append('F');
+			return;
+		}
+		
+		buffer.append(this.position.getText());
 	}
 }

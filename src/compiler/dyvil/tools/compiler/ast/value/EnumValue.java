@@ -1,15 +1,23 @@
 package dyvil.tools.compiler.ast.value;
 
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class EnumValue extends ASTNode implements IConstantValue
+public class EnumValue extends ASTNode implements IConstantValue, INamed
 {
 	public IType	type;
 	public String	name;
+	public String	qualifiedName;
+	
+	public EnumValue(ICodePosition position)
+	{
+		this.position = position;
+	}
 	
 	public EnumValue(IType type, String name)
 	{
@@ -25,22 +33,71 @@ public class EnumValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public IType getType()
-	{
-		return this.type;
-	}
-	
-	@Override
 	public int getValueType()
 	{
 		return ENUM;
 	}
 	
 	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+	
+	@Override
+	public IType getType()
+	{
+		return this.type;
+	}
+	
+	@Override
+	public void setName(String name, String qualifiedName)
+	{
+		this.name = name;
+		this.qualifiedName = name;
+	}
+	
+	@Override
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public String getName()
+	{
+		return this.name;
+	}
+	
+	@Override
+	public void setQualifiedName(String name)
+	{
+		this.qualifiedName = name;
+	}
+	
+	@Override
+	public String getQualifiedName()
+	{
+		return this.qualifiedName;
+	}
+	
+	@Override
+	public boolean isName(String name)
+	{
+		return this.qualifiedName.equals(name);
+	}
+	
+	@Override
+	public Object toObject()
+	{
+		return null;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 		String owner = this.type.getInternalName();
-		String name = this.name;
+		String name = this.qualifiedName;
 		String desc = this.type.getExtendedName();
 		writer.visitGetStatic(owner, name, desc, this.type);
 	}
@@ -53,6 +110,15 @@ public class EnumValue extends ASTNode implements IConstantValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.type).append('.').append(this.name);
+		this.type.toString(prefix, buffer);
+		buffer.append('.');
+		if (Formatting.Field.convertQualifiedNames)
+		{
+			buffer.append(this.qualifiedName);
+		}
+		else
+		{
+			buffer.append(this.name);
+		}
 	}
 }

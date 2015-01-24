@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.EnumValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -207,12 +208,24 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		return this;
 	}
 	
+	private transient IValue	replacement;
+	
 	@Override
 	public boolean resolve(IContext context, List<Marker> markers)
 	{
 		IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
 		if (field != null)
 		{
+			if (field.isEnumConstant())
+			{
+				EnumValue enumValue = new EnumValue(this.position);
+				enumValue.name = this.name;
+				enumValue.qualifiedName = this.qualifiedName;
+				enumValue.type = field.getType();
+				this.replacement = enumValue;
+				return false;
+			}
+			
 			this.field = field;
 			return true;
 		}
@@ -220,8 +233,13 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public IAccess resolve2(IContext context)
+	public IValue resolve2(IContext context)
 	{
+		if (this.replacement != null)
+		{
+			return this.replacement;
+		}
+		
 		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, Type.EMPTY_TYPES);
 		if (method != null)
 		{

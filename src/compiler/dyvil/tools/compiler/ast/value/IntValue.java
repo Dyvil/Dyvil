@@ -21,15 +21,15 @@ public class IntValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public Type getType()
-	{
-		return Type.INT;
-	}
-	
-	@Override
 	public int getValueType()
 	{
 		return INT;
+	}
+	
+	@Override
+	public Type getType()
+	{
+		return Type.INT;
 	}
 	
 	@Override
@@ -76,6 +76,12 @@ public class IntValue extends ASTNode implements INumericValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.value);
+		if (this.position == null)
+		{
+			buffer.append(this.value);
+			return;
+		}
+		
+		buffer.append(this.position.getText());
 	}
 }

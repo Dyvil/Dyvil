@@ -19,6 +19,8 @@ import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.EnumValue;
+import dyvil.tools.compiler.ast.value.IConstantValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -223,7 +225,8 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	
 	private static void visitValue(AnnotationVisitor visitor, String key, IValue value)
 	{
-		if (value instanceof IValueList)
+		int valueType = value.getValueType();
+		if (valueType == IValue.VALUE_LIST)
 		{
 			AnnotationVisitor arrayVisitor = visitor.visitArray(key);
 			for (IValue v : ((IValueList) value).getValues())
@@ -231,9 +234,14 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 				visitValue(arrayVisitor, null, v);
 			}
 		}
-		else
+		else if (valueType == IValue.ENUM)
 		{
-			visitor.visit(key, value.toObject());
+			EnumValue enumValue = (EnumValue) value;
+			visitor.visitEnum(key, enumValue.type.getExtendedName(), enumValue.name);
+		}
+		else if (value instanceof IConstantValue)
+		{
+			visitor.visit(key, ((IConstantValue) value).toObject());
 		}
 	}
 	

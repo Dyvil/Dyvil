@@ -164,7 +164,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		case 0: // OK
 			break;
 		case 1: // Missing package decl.
-			this.markers.add(new SemanticError(new CodePosition((CodeFile) this.position, 1, 0, 1), "Missing Package Declaration", "Add 'package " + this.pack.name + ";' at the beginning of the file."));
+			this.markers.add(new SemanticError(new CodePosition((CodeFile) this.position, 0, 1, 0, 1), "Missing Package Declaration", "Add 'package " + this.pack.name + ";' at the beginning of the file."));
 			break;
 		case 2: // Invalid package decl.
 			this.markers.add(new SemanticError(this.packageDeclaration.getPosition(), "Invalid Package Declaration", "Change the package declaration to '" + this.pack.name + "'."));

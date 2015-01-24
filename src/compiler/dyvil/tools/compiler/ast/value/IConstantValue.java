@@ -8,6 +8,8 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IConstantValue extends IValue
 {
+	public Object toObject();
+	
 	@Override
 	public default boolean isConstant()
 	{

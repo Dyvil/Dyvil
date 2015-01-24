@@ -27,15 +27,21 @@ public class SuperValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return SUPER;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.type;
 	}
 	
 	@Override
-	public int getValueType()
+	public Object toObject()
 	{
-		return SUPER;
+		return null;
 	}
 	
 	@Override
