@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
@@ -140,7 +140,7 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 		this.type = this.type.resolve(context);
 		if (!this.type.isResolved())
 		{
-			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
+			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
 		}
 		
 		for (IValue v : this.arguments)
@@ -165,7 +165,12 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 		
 		if (!this.resolve(context, markers))
 		{
-			markers.add(new SemanticError(this.position, "The constructor could not be resolved"));
+			Marker marker = Markers.create(this.position, "resolve.constructor");
+			StringBuilder builder = new StringBuilder("Argument Types: [");
+			Util.typesToString(this.arguments, ", ", builder);
+			builder.append(']');
+			marker.addInfo(builder.toString());
+			markers.add(marker);
 		}
 		return this;
 	}
@@ -181,11 +186,11 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 		IClass iclass = this.type.getTheClass();
 		if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
-			markers.add(new SemanticError(this.position, "The interface '" + iclass.getName() + "' cannot be instantiated"));
+			markers.add(Markers.create(this.position, "constructor.interface", iclass.getName()));
 		}
 		else if (iclass.hasModifier(Modifiers.ABSTRACT))
 		{
-			markers.add(new SemanticError(this.position, "The abstract class '" + iclass.getName() + "' cannot be instantiated"));
+			markers.add(Markers.create(this.position, "constructor.abstract", iclass.getName()));
 		}
 		else if (this.method != null)
 		{
@@ -194,11 +199,11 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 			byte access = context.getAccessibility(this.method);
 			if (access == IContext.SEALED)
 			{
-				markers.add(new SemanticError(this.position, "The sealed constructor cannot be invoked because it is private to it's library"));
+				markers.add(Markers.create(this.position, "access.constructor.sealed", iclass.getName()));
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(new SemanticError(this.position, "The constructor cannot be invoked because it is not visible"));
+				markers.add(Markers.create(this.position, "access.constructor.invisible", iclass.getName()));
 			}
 		}
 	}
@@ -253,9 +258,9 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 	{
 		if (!this.type.isResolved())
 		{
-			return new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type");
+			return Markers.create(this.type.getPosition(), "resolve.type", this.type.toString());
 		}
-		return new SemanticError(this.position, "'' could not be resolved to a constructor");
+		return Markers.create(this.position, "resolve.constructor", this.type.toString());
 	}
 	
 	@Override

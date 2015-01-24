@@ -12,8 +12,7 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
-import dyvil.tools.compiler.lexer.marker.Warning;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.util.OpcodeUtil;
 
 public class CastOperator extends ASTNode implements IValue
@@ -59,7 +58,7 @@ public class CastOperator extends ASTNode implements IValue
 		
 		if (this.type == Type.VOID)
 		{
-			markers.add(new SemanticError(this.position, "Cannot cast to void"));
+			markers.add(Markers.create(this.position, "cast.void"));
 		}
 		
 		boolean primitiveType = this.type.isPrimitive();
@@ -68,16 +67,16 @@ public class CastOperator extends ASTNode implements IValue
 		{
 			if (!type.isPrimitive())
 			{
-				markers.add(new SemanticError(this.position, "Cannot cast from a reference to a primitive type"));
+				markers.add(Markers.create(this.position, "cast.reference"));
 			}
 		}
 		else if (type.isPrimitive())
 		{
-			markers.add(new SemanticError(this.position, "Cannot cast from a primitive value to a reference type"));
+			markers.add(Markers.create(this.position, "cast.primitive"));
 		}
 		else if (this.value.isType(this.type))
 		{
-			markers.add(new Warning(this.position, "Unneccessary cast"));
+			markers.add(Markers.create(this.position, "cast.unnecessary"));
 		}
 	}
 	

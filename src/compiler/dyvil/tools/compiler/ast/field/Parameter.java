@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.util.Modifiers;
 
 public class Parameter extends Member implements IField
@@ -118,7 +118,7 @@ public class Parameter extends Member implements IField
 		this.type = this.type.resolve(context);
 		if (!this.type.isResolved())
 		{
-			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
+			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
 		}
 		
 		for (Annotation a : this.annotations)

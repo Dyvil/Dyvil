@@ -19,8 +19,7 @@ import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
-import dyvil.tools.compiler.lexer.marker.Warning;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.Symbols;
@@ -168,30 +167,30 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		{
 			if (this.field.hasModifier(Modifiers.STATIC))
 			{
-				if (this.instance != null && this.instance.getValueType() == IValue.THIS)
+				if (this.instance != null && (this.instance.getValueType() != CLASS_ACCESS))
 				{
-					markers.add(new Warning(this.position, "'" + this.name + "' is a static field and should be accessed in a static way"));
+					markers.add(Markers.create(this.position, "access.field.static", this.name));
 					this.instance = null;
 				}
 			}
 			else if (this.instance == null && this.field instanceof Field)
 			{
-				markers.add(new Warning(this.position, "Unqualified access to '" + this.name + "'"));
+				markers.add(Markers.create(this.position, "access.field.unqualified", this.name));
 				this.instance = new ThisValue(this.position, this.field.getTheClass().getType());
 			}
 			
 			byte access = context.getAccessibility(this.field);
 			if (access == IContext.STATIC)
 			{
-				markers.add(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be accessed from a static context"));
+				markers.add(Markers.create(this.position, "access.field.instance", this.name));
 			}
 			else if (access == IContext.SEALED)
 			{
-				markers.add(new SemanticError(this.position, "The sealed field '" + this.name + "' cannot be accessed because it is private to it's library"));
+				markers.add(Markers.create(this.position, "access.field.sealed", this.name));
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(new SemanticError(this.position, "The field '" + this.name + "' cannot be accessed because it is not visible"));
+				markers.add(Markers.create(this.position, "access.field.invisible", this.name));
 			}
 		}
 	}
@@ -199,12 +198,15 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.field.hasModifier(Modifiers.CONST))
+		if (this.field != null && this.field.hasModifier(Modifiers.CONST))
 		{
 			IValue v = this.field.getValue();
 			return v != null && v.isConstant() ? v : this;
 		}
-		this.instance = this.instance.foldConstants();
+		if (this.instance != null)
+		{
+			this.instance = this.instance.foldConstants();
+		}
 		return this;
 	}
 	
@@ -281,10 +283,10 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public Marker getResolveError()
 	{
-		SemanticError error = new SemanticError(this.position, "'" + this.name + "' could not be resolved to a field or method");
-		error.addInfo("Qualified Name: " + this.qualifiedName);
-		error.addInfo("Instance Type: " + this.instance.getType());
-		return error;
+		Marker marker = Markers.create(this.position, "resolve.method_field");
+		marker.addInfo("Qualified Name: " + this.qualifiedName);
+		marker.addInfo("Instance Type: " + this.instance.getType());
+		return marker;
 	}
 	
 	@Override

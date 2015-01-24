@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.util.Modifiers;
 
 public class Property extends Field implements IProperty
@@ -91,7 +91,7 @@ public class Property extends Field implements IProperty
 		this.type = this.type.resolve(context);
 		if (!this.type.isResolved())
 		{
-			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
+			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
 		}
 		
 		if (this.get != null)
@@ -138,21 +138,20 @@ public class Property extends Field implements IProperty
 	{
 		if (this.get == null && this.set == null)
 		{
-			markers.add(new SemanticError(this.position, "The property '" + this.name + "' does not have a getter nor a setter"));
+			markers.add(Markers.create(this.position, "property.empty", this.name));
 		}
 		else
 		{
 			if (this.get != null && !this.get.requireType(this.type))
 			{
-				SemanticError error = new SemanticError(this.get.getPosition(), "The getter value of the property '" + this.name
-						+ "' is incompatible with the property type");
-				error.addInfo("Property Type: " + this.type);
-				error.addInfo("Getter Value Type: " + this.get.getType());
-				markers.add(error);
+				Marker marker = Markers.create(this.get.getPosition(), "property.getter.type", this.name);
+				marker.addInfo("Property Type: " + this.type);
+				marker.addInfo("Getter Value Type: " + this.get.getType());
+				markers.add(marker);
 			}
 			if (this.set != null && !this.set.requireType(Type.VOID))
 			{
-				markers.add(new SemanticError(this.set.getPosition(), "The setter value of the property '" + this.name + "' has to be of type void"));
+				markers.add(Markers.create(this.set.getPosition(), "property.setter.type", this.name));
 			}
 		}
 		

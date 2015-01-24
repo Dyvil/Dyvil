@@ -22,7 +22,7 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class StatementList extends ValueList implements IStatement, IContext
@@ -104,17 +104,17 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		else
 		{
-			IType type = this.getType();
+			IType type = this.requiredType;
 			for (IValue v : this.values)
 			{
 				v.check(markers, context);
 				
-				if (v instanceof IStatement && !v.requireType(type))
+				if (v.getValueType() == RETURN && !v.requireType(type))
 				{
-					SemanticError error = new SemanticError(v.getPosition(), "The returning type of the block is incompatible with the required type");
-					error.addInfo("Block Type: " + type);
-					error.addInfo("Returning Type: " + v.getType());
-					markers.add(error);
+					Marker marker = Markers.create(v.getPosition(), "return.type");
+					marker.addInfo("Block Type: " + type);
+					marker.addInfo("Returning Type: " + v.getType());
+					markers.add(marker);
 				}
 			}
 		}

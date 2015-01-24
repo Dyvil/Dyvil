@@ -5,7 +5,7 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 
 public class JumpInstruction extends Instruction
 {
@@ -34,7 +34,7 @@ public class JumpInstruction extends Instruction
 		this.destLabel = bytecode.getLabel(this.dest);
 		if (this.destLabel == null)
 		{
-			markers.add(new SemanticError(this.position, "'" + this.dest + "' could not be resolved to a Label"));
+			markers.add(Markers.create(this.position, "resolve.label", this.dest));
 		}
 	}
 	

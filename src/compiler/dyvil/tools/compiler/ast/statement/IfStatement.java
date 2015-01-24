@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.value.BooleanValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -166,15 +166,15 @@ public class IfStatement extends ASTNode implements IStatement
 		{
 			if (!this.condition.requireType(Type.BOOLEAN))
 			{
-				SemanticError error = new SemanticError(this.condition.getPosition(), "The condition of an if statement has to evaluate to a boolean value.");
-				error.addInfo("Condition Type: " + this.condition.getType());
-				markers.add(error);
+				Marker marker = Markers.create(this.condition.getPosition(), "if.condition.type");
+				marker.addInfo("Condition Type: " + this.condition.getType());
+				markers.add(marker);
 			}
 			this.condition.check(markers, context);
 		}
 		else
 		{
-			markers.add(new SyntaxError(this.position, "Invalid if condition"));
+			markers.add(new SyntaxError(this.position, "if.condition.invalid"));
 		}
 		if (this.then != null)
 		{

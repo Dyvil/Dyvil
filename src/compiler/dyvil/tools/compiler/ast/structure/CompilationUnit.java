@@ -20,8 +20,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
-import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
 import dyvil.util.FileUtils;
 
@@ -159,22 +157,7 @@ public class CompilationUnit extends ASTNode implements IContext
 	
 	public void check()
 	{
-		switch (this.pack.check(this.packageDeclaration))
-		{
-		case 0: // OK
-			break;
-		case 1: // Missing package decl.
-			this.markers.add(new SemanticError(new CodePosition((CodeFile) this.position, 0, 1, 0, 1), "Missing Package Declaration", "Add 'package "
-					+ this.pack.name + ";' at the beginning of the file."));
-			break;
-		case 2: // Invalid package decl.
-			this.markers.add(new SemanticError(this.packageDeclaration.getPosition(), "Invalid Package Declaration", "Change the package declaration to '"
-					+ this.pack.name + "'."));
-			break;
-		case 3: // Package decl. in default package
-			this.markers.add(new SemanticError(this.packageDeclaration.getPosition(), "Invalid Package Declaration", "Remove the package declaration."));
-			break;
-		}
+		this.pack.check(this.packageDeclaration, this.inputFile, this.markers);
 		
 		for (IClass i : this.classes)
 		{
@@ -192,30 +175,39 @@ public class CompilationUnit extends ASTNode implements IContext
 	
 	public void compile()
 	{
-		synchronized (this)
+		
+		int size = this.markers.size();
+		if (size > 0)
 		{
-			int size = this.markers.size();
-			if (size > 0)
+			StringBuilder buffer = new StringBuilder("Markers in Compilation Unit '");
+			buffer.append(this.inputFile).append(": ").append(size).append("\n\n");
+			
+			boolean error = false;
+			for (Marker marker : this.markers)
 			{
-				DyvilCompiler.logger.info("Markers in Compilation Unit " + this.name + ": " + size);
-				for (Marker marker : this.markers)
+				if (!error && marker.isError())
 				{
-					marker.log(DyvilCompiler.logger);
+					error = true;
 				}
-				DyvilCompiler.logger.warning(this.name + " was not compiled as there were Syntax Errors in the Compilation Unit.");
+				marker.log(buffer);
+			}
+			DyvilCompiler.logger.info(buffer.toString());
+			if (error)
+			{
+				DyvilCompiler.logger.warning(this.name + " was not compiled due to errors in the Compilation Unit");
 				return;
 			}
-			
-			for (IClass iclass : this.classes)
+		}
+		
+		for (IClass iclass : this.classes)
+		{
+			String name = iclass.getName();
+			if (!name.equals(this.name))
 			{
-				String name = iclass.getName();
-				if (!name.equals(this.name))
-				{
-					name = this.name + "$" + name;
-				}
-				File file = new File(this.outputDirectory, name + ".class");
-				ClassWriter.saveClass(file, iclass);
+				name = this.name + "$" + name;
 			}
+			File file = new File(this.outputDirectory, name + ".class");
+			ClassWriter.saveClass(file, iclass);
 		}
 	}
 	

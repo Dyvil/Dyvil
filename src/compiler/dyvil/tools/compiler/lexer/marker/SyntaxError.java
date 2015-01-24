@@ -16,19 +16,15 @@ public class SyntaxError extends Marker
 		super(position, message);
 	}
 	
-	public SyntaxError(ICodePosition position, String message, String suggestion)
-	{
-		super(position, message, suggestion);
-	}
-	
-	public SyntaxError(ICodePosition position, Throwable cause)
-	{
-		super(position, cause);
-	}
-	
 	@Override
 	public String getMarkerType()
 	{
 		return "error";
+	}
+
+	@Override
+	public boolean isError()
+	{
+		return true;
 	}
 }

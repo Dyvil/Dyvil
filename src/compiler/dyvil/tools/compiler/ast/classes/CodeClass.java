@@ -31,7 +31,7 @@ import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
@@ -468,12 +468,11 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = superClass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(new SemanticError(this.superType.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + " '" + superClass.getName()
-							+ "' cannot be extended, only classes are allowed"));
+					markers.add(Markers.create(this.superType.getPosition(), "class.extend.class", Modifiers.CLASS_TYPE.toString(modifiers), superClass.getName()));
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
-					markers.add(new SemanticError(this.superType.getPosition(), "The final class '" + superClass.getName() + "' cannot be extended"));
+					markers.add(Markers.create(this.superType.getPosition(), "class.extend.final", superClass.getName()));
 				}
 			}
 		}
@@ -483,7 +482,7 @@ public class CodeClass extends ASTNode implements IClass
 			IMethod m = this.body.getMethod("<init>");
 			if (m != null)
 			{
-				markers.add(new SemanticError(m.getPosition(), "Object Classes cannot have a constructor"));
+				markers.add(Markers.create(m.getPosition(), "class.object.constructor", this.name));
 			}
 		}
 		
@@ -495,8 +494,7 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = iclass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
 				{
-					markers.add(new SemanticError(t.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + " '" + iclass.getName()
-							+ "' cannot be implemented, only interfaces are allowed"));
+					markers.add(Markers.create(t.getPosition(), "class.extend.interface", Modifiers.CLASS_TYPE.toString(modifiers),  iclass.getName()));
 				}
 			}
 		}

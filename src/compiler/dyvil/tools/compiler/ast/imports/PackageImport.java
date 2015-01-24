@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class PackageImport extends ASTNode implements IImport
@@ -36,7 +36,7 @@ public class PackageImport extends ASTNode implements IImport
 		{
 			if (!(context instanceof CodeClass))
 			{
-				markers.add(new SemanticError(this.position, "Invalid Wildcard Import"));
+				markers.add(Markers.create(this.position, "Invalid Wildcard Import"));
 				return;
 			}
 			

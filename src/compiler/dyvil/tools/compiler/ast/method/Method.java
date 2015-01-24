@@ -26,7 +26,7 @@ import dyvil.tools.compiler.ast.value.IntValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.OpcodeUtil;
@@ -230,12 +230,11 @@ public class Method extends Member implements IMethod
 			parType = par.type;
 			if (!instance.requireType(parType))
 			{
-				SemanticError error = new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name
-						+ "' is incompatible with the required type");
-				error.addInfo("Required Type: " + parType);
+				Marker marker = Markers.create(instance.getPosition(), "access.method.implicit_type", par.name);
+				marker.addInfo("Required Type: " + parType);
 				IType vtype = instance.getType();
-				error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
-				markers.add(error);
+				marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
+				markers.add(marker);
 			}
 			pOff = 1;
 		}
@@ -247,12 +246,11 @@ public class Method extends Member implements IMethod
 			IValue value = arguments.get(i);
 			if (!value.requireType(parType))
 			{
-				SemanticError error = new SemanticError(value.getPosition(), "The method argument for '" + par.name
-						+ "' is incompatible with the required type");
-				error.addInfo("Required Type: " + parType);
+				Marker marker = Markers.create(value.getPosition(), "access.method.argument_type", par.name);
+				marker.addInfo("Required Type: " + parType);
 				IType vtype = value.getType();
-				error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
-				markers.add(error);
+				marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
+				markers.add(marker);
 			}
 		}
 	}
@@ -393,7 +391,7 @@ public class Method extends Member implements IMethod
 		this.type = this.type.resolve(context);
 		if (!this.type.isResolved())
 		{
-			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
+			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
 		}
 		
 		int len = this.throwsDeclarations.size();
@@ -407,7 +405,7 @@ public class Method extends Member implements IMethod
 			}
 			if (!t2.isResolved())
 			{
-				markers.add(new SemanticError(t2.getPosition(), "'" + t2 + "' could not be resolved to a type"));
+				markers.add(Markers.create(t2.getPosition(), "resolve.type", t2.toString()));
 			}
 		}
 		
@@ -486,29 +484,28 @@ public class Method extends Member implements IMethod
 			{
 				if ((this.modifiers & Modifiers.OVERRIDE) != 0)
 				{
-					markers.add(new SemanticError(this.position, "The method '" + this.name + "' must override or implement a supertype method"));
+					markers.add(Markers.create(this.position, "method.override", this.name));
 				}
 			}
 			else if (!this.isConstructor)
 			{
 				if ((this.modifiers & Modifiers.OVERRIDE) == 0)
 				{
-					markers.add(new SemanticError(this.position, "The method '" + this.name + "' overrides a method, but does not have an 'override' modifier"));
+					markers.add(Markers.create(this.position, "method.overrides", this.name));
 				}
 				else if (this.overrideMethod.hasModifier(Modifiers.FINAL))
 				{
-					markers.add(new SemanticError(this.position, "The method '" + this.name + "' cannot override a final method"));
+					markers.add(Markers.create(this.position, "method.override.final", this.name));
 				}
 				else
 				{
 					IType type = this.overrideMethod.getType();
 					if (!Type.isSuperType(type, this.type))
 					{
-						SemanticError error = new SemanticError(this.position, "The return type of '" + this.name
-								+ "' is incompatible with the overriden method type");
-						error.addInfo("Return Type: " + this.type);
-						error.addInfo("Overriden Type: " + type);
-						markers.add(error);
+						Marker marker = Markers.create(this.position, "method.override.type", this.name);
+						marker.addInfo("Return Type: " + this.type);
+						marker.addInfo("Overriden Return Type: " + type);
+						markers.add(marker);
 					}
 				}
 			}
@@ -530,25 +527,25 @@ public class Method extends Member implements IMethod
 			{
 				if (!this.value.requireType(Type.VOID))
 				{
-					SemanticError error = new SemanticError(this.position, "The constructor must not return a result");
+					Marker error = Markers.create(this.position, "constructor.return");
 					error.addInfo("Expression Type: " + this.value.getType());
 					markers.add(error);
 				}
 			}
 			else if (!this.value.requireType(this.type))
 			{
-				SemanticError error = new SemanticError(this.position, "The expression type of '" + this.name + "' is incompatible with the return type");
-				error.addInfo("Return Type: " + this.type);
+				Marker marker = Markers.create(this.position, "method.type", this.name);
+				marker.addInfo("Return Type: " + this.type);
 				IType vtype = this.value.getType();
-				error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
-				markers.add(error);
+				marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
+				markers.add(marker);
 			}
 			this.value.check(markers, context);
 		}
 		// If the method does not have an implementation and is static
 		else if (this.isStatic())
 		{
-			markers.add(new SemanticError(this.position, "The method '" + this.name + "' is declared static, but does not have an implementation"));
+			markers.add(Markers.create(this.position, "method.static", this.name));
 		}
 		// Or not declared abstract and a member of a non-abstract class
 		else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
@@ -559,7 +556,7 @@ public class Method extends Member implements IMethod
 			}
 			else
 			{
-				markers.add(new SemanticError(this.position, "The method '" + this.name + "' is not implemented, but does not have an abstract modifier"));
+				markers.add(Markers.create(this.position, "method.unimplemented", this.name));
 			}
 		}
 	}

@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.value.*;
 
 public class ConstantFolder
 {
-	public static IValue apply(IValue v1, String op)
+	public static IValue apply(String op, IValue v1)
 	{
 		switch (v1.getValueType())
 		{

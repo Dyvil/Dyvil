@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class SimpleImport extends ASTNode implements IImport, IImportContainer
@@ -79,7 +79,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 				return;
 			}
 			
-			markers.add(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a method or field"));
+			markers.add(Markers.create(this.position, "resolve.method_field", this.name));
 			return;
 		}
 		
@@ -105,7 +105,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 			return;
 		}
 		
-		markers.add(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a package or class"));
+		markers.add(Markers.create(this.position, "resolve.package", this.name));
 	}
 	
 	@Override

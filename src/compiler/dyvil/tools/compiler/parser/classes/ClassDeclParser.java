@@ -43,6 +43,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		String value = token.value();
+		
 		if (this.isInMode(MODIFIERS))
 		{
 			int i = 0;
@@ -50,7 +51,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 			{
 				if (this.theClass.addModifier(i))
 				{
-					throw new SyntaxError(token, "Duplicate Modifier '" + value + "'", "Remove this Modifier");
+					throw new SyntaxError(token, "Duplicate Modifier '" + value + "' - Remove this Modifier");
 				}
 				return true;
 			}

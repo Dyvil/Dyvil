@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ThisValue extends ASTNode implements IConstantValue
@@ -51,7 +51,7 @@ public class ThisValue extends ASTNode implements IConstantValue
 		{
 			if (context.isStatic())
 			{
-				markers.add(new SemanticError(this.position, "'this' cannot be accessed in a static context"));
+				markers.add(Markers.create(this.position, "access.this.static"));
 			}
 			else
 			{

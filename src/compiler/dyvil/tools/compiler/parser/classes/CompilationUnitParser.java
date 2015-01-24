@@ -8,6 +8,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
+import dyvil.tools.compiler.util.Tokens;
 
 public class CompilationUnitParser extends Parser
 {
@@ -58,6 +59,11 @@ public class CompilationUnitParser extends Parser
 		}
 		if (this.isInMode(CLASS))
 		{
+			if (token.isType(Tokens.SEMICOLON))
+			{
+				return true;
+			}
+			
 			jcp.pushParser(new ClassDeclParser(this.unit), true);
 			return true;
 		}

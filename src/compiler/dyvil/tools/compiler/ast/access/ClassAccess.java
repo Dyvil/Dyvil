@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassAccess extends ASTNode implements IValue, IAccess
@@ -157,8 +157,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 		{
 			if (context.getAccessibility(iclass) == IContext.SEALED)
 			{
-				markers.add(new SemanticError(this.position, "The sealed class '" + iclass.getName()
-						+ "' cannot be accessed because it is private to it's library"));
+				markers.add(Markers.create(this.position, "access.class.sealed", iclass.getName()));
 			}
 		}
 	}
@@ -225,14 +224,14 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public Marker getResolveError()
 	{
-		SemanticError error;
+		Marker error;
 		if (!this.type.isArrayType())
 		{
-			error = new SemanticError(this.position, "'" + this.type + "' could not be resolved to a type, field or method");
+			error = Markers.create(this.position, "resolve.any", this.type.toString());
 		}
 		else
 		{
-			error = new SemanticError(this.position, "'" + this.type + "' coult not be resolved to a type");
+			error = Markers.create(this.position, "resolve.type", this.type.toString());
 		}
 		return error;
 	}

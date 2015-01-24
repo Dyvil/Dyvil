@@ -2,16 +2,16 @@ package dyvil.tools.compiler.lexer.marker;
 
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class SemanticError extends Marker
+public class Info extends Marker
 {
-	private static final long	serialVersionUID	= -2234451954260010124L;
+	private static final long	serialVersionUID	= 8238564164743045522L;
 	
-	protected SemanticError(ICodePosition position)
+	protected Info(ICodePosition position)
 	{
 		super(position);
 	}
 	
-	protected SemanticError(ICodePosition position, String message)
+	protected Info(ICodePosition position, String message)
 	{
 		super(position, message);
 	}
@@ -19,12 +19,12 @@ public class SemanticError extends Marker
 	@Override
 	public String getMarkerType()
 	{
-		return "error";
+		return "info";
 	}
-	
+
 	@Override
 	public boolean isError()
 	{
-		return true;
+		return false;
 	}
 }

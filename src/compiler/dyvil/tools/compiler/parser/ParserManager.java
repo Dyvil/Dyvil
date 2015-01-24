@@ -207,7 +207,7 @@ public class ParserManager
 		
 		if (!parsed)
 		{
-			throw new SyntaxError(token, "Invalid " + token, "Delete this token");
+			throw new SyntaxError(token, "Invalid " + token + " - Delete this token");
 		}
 	}
 	

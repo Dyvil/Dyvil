@@ -11,6 +11,10 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.library.Library;
 
 public class Package implements IContext
@@ -95,29 +99,27 @@ public class Package implements IContext
 		return pack;
 	}
 	
-	public int check(PackageDecl packageDecl)
+	public void check(PackageDecl packageDecl, CodeFile file, List<Marker> markers)
 	{
 		if (packageDecl == null)
 		{
-			if (this.fullName == null)
+			if (this.fullName != null)
 			{
-				return 0;
+				markers.add(Markers.create(new CodePosition(file, 0, 1, 0, 1), "package.missing"));
 			}
-			// Missing Package Decl.
-			return 1;
+			return;
 		}
 		
 		if (this.fullName == null)
 		{
-			// Existing Package Decl. in default package
-			return 3;
+			markers.add(Markers.create(packageDecl.getPosition(), "package.default"));
+			return;
 		}
-		else if (this.fullName.equals(packageDecl.thePackage))
+		
+		if (!this.fullName.equals(packageDecl.thePackage))
 		{
-			return 0;
+			markers.add(Markers.create(packageDecl.getPosition(), "package.invalid"));
 		}
-		// Invalid Package Decl.
-		return 2;
 	}
 	
 	@Override

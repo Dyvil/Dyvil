@@ -20,7 +20,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.ConstantFolder;
@@ -195,15 +195,15 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 			byte access = context.getAccessibility(this.method);
 			if (access == IContext.STATIC)
 			{
-				markers.add(new SemanticError(this.position, "The instance method '" + this.name + "' cannot be invoked from a static context"));
+				markers.add(Markers.create(this.position, "access.method.instance", this.name));
 			}
 			else if (access == IContext.SEALED)
 			{
-				markers.add(new SemanticError(this.position, "The sealed method '" + this.name + "' cannot be invoked because it is private to it's library"));
+				markers.add(Markers.create(this.position, "access.method.sealed", this.name));
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(new SemanticError(this.position, "The method '" + this.name + "' cannot be invoked since it is not visible"));
+				markers.add(Markers.create(this.position, "access.method.invisible", this.name));
 			}
 		}
 	}
@@ -212,28 +212,42 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	public IValue foldConstants()
 	{
 		int len = this.arguments.size();
-		if (this.instance != null)
+		if (len == 1)
 		{
-			if (this.instance.isConstant())
+			IValue argument = this.arguments.get(0);
+			if (argument.isConstant())
 			{
-				if (len == 0)
+				if (this.instance != null)
 				{
-					IValue v1 = ConstantFolder.apply(this.instance, this.qualifiedName);
-					return v1 == null ? this : v1;
-				}
-				else if (len == 1)
-				{
-					IValue argument = this.arguments.get(0);
-					if (argument.isConstant())
+					if (this.instance.isConstant())
 					{
 						IValue v1 = ConstantFolder.apply(this.instance, this.qualifiedName, argument);
 						return v1 == null ? this : v1;
 					}
+					
+					this.instance = this.instance.foldConstants();
+					return this;
+				}
+				
+				IValue v1 = ConstantFolder.apply(this.qualifiedName, argument);
+				if (v1 != null)
+				{
+					return v1;
 				}
 			}
-			this.instance = this.instance.foldConstants();
+			
+			if (this.instance != null)
+			{
+				this.instance = this.instance.foldConstants();
+			}
+			this.arguments.set(0, argument.foldConstants());
+			return this;
 		}
 		
+		if (this.instance != null)
+		{
+			this.instance = this.instance.foldConstants();
+		}
 		for (int i = 0; i < len; i++)
 		{
 			IValue v1 = this.arguments.get(i);
@@ -360,26 +374,26 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	@Override
 	public Marker getResolveError()
 	{
-		SemanticError error;
+		Marker marker;
 		if (this.arguments.isEmpty())
 		{
-			error = new SemanticError(this.position, "'" + this.name + "' could not be resolved to a method or field");
+			marker = Markers.create(this.position, "resolve.method_field", this.name);
 		}
 		else
 		{
-			error = new SemanticError(this.position, "'" + this.name + "' could not be resolved to a method");
+			marker = Markers.create(this.position, "resolve.method", this.name);
 		}
 		
-		error.addInfo("Qualified Name: " + this.qualifiedName);
+		marker.addInfo("Qualified Name: " + this.qualifiedName);
 		if (this.instance != null)
 		{
 			IType vtype = this.instance.getType();
-			error.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
+			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
 		}
 		StringBuilder builder = new StringBuilder("Argument Types: [");
 		Util.typesToString(this.arguments, ", ", builder);
-		error.addInfo(builder.append(']').toString());
-		return error;
+		marker.addInfo(builder.append(']').toString());
+		return marker;
 	}
 	
 	@Override

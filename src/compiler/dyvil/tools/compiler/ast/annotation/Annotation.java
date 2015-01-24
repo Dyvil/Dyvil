@@ -24,7 +24,7 @@ import dyvil.tools.compiler.ast.value.IConstantValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 
@@ -90,7 +90,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 		this.type = this.type.resolve(context);
 		if (!this.type.isResolved())
 		{
-			markers.add(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a type"));
+			markers.add(Markers.create(this.position, "resolve.type", this.name));
 		}
 		
 		for (Entry<String, IValue> entry : this.parameters.entrySet())
@@ -114,12 +114,13 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 		IClass theClass = this.type.theClass;
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{
-			markers.add(new SemanticError(this.position, "The type '" + this.name + "' is not an annotation type"));
+			markers.add(Markers.create(this.position, "annotation.type", this.name));
+			return;
 		}
 		
 		if (!this.type.isTarget(this.target))
 		{
-			SemanticError error = new SemanticError(this.position, "The annotation type '" + this.name + "' is not applicable for the annotated element type");
+			Marker error = Markers.create(this.position, "annotation.target", this.name);
 			error.addInfo("Element Target: " + this.target);
 			error.addInfo("Allowed Targets: " + this.type.getTargets());
 			markers.add(error);
@@ -131,7 +132,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 			IMethod m = theClass.getBody().getMethod(key);
 			if (m == null)
 			{
-				markers.add(new SemanticError(this.position, "Invalid annotation method '" + key + "' for annotation type " + this.name));
+				markers.add(Markers.create(this.position, "annotation.method", this.name, key));
 				continue;
 			}
 			
@@ -140,17 +141,17 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 			
 			if (!value.isConstant())
 			{
-				markers.add(new SemanticError(value.getPosition(), "The annotation value '" + key + "' has to be a constant expression"));
+				markers.add(Markers.create(value.getPosition(), "annotation.constant", key));
 				continue;
 			}
 			
 			IType type = m.getType();
 			if (!value.isType(type))
 			{
-				SemanticError error = new SemanticError(value.getPosition(), "The annotation value '" + key + "' is incompatible with the required type");
-				error.addInfo("Required Type: " + type);
-				error.addInfo("Value Type: " + value.getType());
-				markers.add(error);
+				Marker marker = Markers.create(value.getPosition(), "annotation.type", key);
+				marker.addInfo("Required Type: " + type);
+				marker.addInfo("Value Type: " + value.getType());
+				markers.add(marker);
 			}
 		}
 	}

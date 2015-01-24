@@ -2,31 +2,29 @@ package dyvil.tools.compiler.lexer.marker;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
-import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class Marker extends Exception
 {
 	private static final long	serialVersionUID	= 8313691845679541217L;
 	
-	private String				suggestion;
 	private List<String>		info;
 	
 	public ICodePosition		position;
 	
 	public Marker(ICodePosition position)
 	{
-		this(position, null, null);
+		super();
+		if (position == null)
+		{
+			throw new IllegalArgumentException("Marker Position cannot be null");
+		}
+		
+		this.position = position;
 	}
 	
 	public Marker(ICodePosition position, String message)
-	{
-		this(position, message, null);
-	}
-	
-	public Marker(ICodePosition position, String message, String suggestion)
 	{
 		super(message);
 		if (position == null)
@@ -35,23 +33,12 @@ public abstract class Marker extends Exception
 		}
 		
 		this.position = position;
-		this.suggestion = suggestion;
 	}
 	
 	public Marker(ICodePosition position, Throwable cause)
 	{
 		super(cause);
 		this.position = position;
-	}
-	
-	public void setSuggestion(String suggestion)
-	{
-		this.suggestion = suggestion;
-	}
-	
-	public String getSuggestion()
-	{
-		return this.suggestion;
 	}
 	
 	public void addInfo(String info)
@@ -65,28 +52,22 @@ public abstract class Marker extends Exception
 	
 	public abstract String getMarkerType();
 	
-	public void log(Logger logger)
+	public abstract boolean isError();
+	
+	public void log(StringBuilder buf)
 	{
-		StringBuilder buf = new StringBuilder();
-		CodeFile file = this.position.getFile();
 		String type = this.getMarkerType();
 		String message = this.getMessage();
-		String suggestion = this.getSuggestion();
 		
-		buf.append(file).append(':').append(this.position.getLineNumber()).append(": ");
-		buf.append(type);
+		buf.append("line ").append(this.position.getLineNumber()).append(": ").append(type);
 		if (message != null)
 		{
 			buf.append(": ").append(message);
 		}
-		if (suggestion != null)
-		{
-			buf.append(" - ").append(suggestion);
-		}
 		
 		int prevNL = this.position.getPrevNewline();
 		int nextNL = this.position.getNextNewline();
-		String code = file.getCode();
+		String code = this.position.getFile().getCode();
 		String line = code.substring(prevNL, nextNL);
 		
 		// Append Line
@@ -116,7 +97,6 @@ public abstract class Marker extends Exception
 			}
 			buf.append('\n');
 		}
-		
-		logger.info(buf.toString());
+		buf.append('\n');
 	}
 }

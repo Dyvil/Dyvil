@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
@@ -155,7 +155,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 			}
 			else
 			{
-				markers.add(new SemanticError(this.position, "'" + this.name + "' could not be resolved to a field"));
+				markers.add(Markers.create(this.position, "'" + this.name + "' could not be resolved to a field"));
 			}
 		}
 		
@@ -172,7 +172,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	{
 		if (this.value.getValueType() == IValue.THIS)
 		{
-			markers.add(new SyntaxError(this.position, "Cannot assign a value to 'this'"));
+			markers.add(new SyntaxError(this.position, "access.this.assign"));
 		}
 		
 		this.value.check(markers, context);
@@ -185,32 +185,32 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		IType type = this.field.getType();
 		if (!this.value.requireType(type))
 		{
-			SemanticError error = new SemanticError(this.value.getPosition(), "The type of the assigned value is incompatible with the field type");
-			error.addInfo("Field Type: " + type);
+			Marker marker = Markers.create(this.value.getPosition(), "access.assign.type", this.name);
+			marker.addInfo("Field Type: " + type);
 			IType vtype = this.value.getType();
-			error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
-			markers.add(error);
+			marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
+			markers.add(marker);
 		}
 		
 		if (this.type == null)
 		{
 			if (this.field.hasModifier(Modifiers.FINAL))
 			{
-				markers.add(new SemanticError(this.position, "The final field '" + this.name + "' cannot be assigned"));
+				markers.add(Markers.create(this.position, "access.final.field", this.name));
 			}
 			
 			byte access = context.getAccessibility(this.field);
 			if (access == IContext.STATIC)
 			{
-				markers.add(new SemanticError(this.position, "The instance field '" + this.name + "' cannot be assigned from a static context"));
+				markers.add(Markers.create(this.position, "access.static.field", this.name));
 			}
 			else if (access == IContext.SEALED)
 			{
-				markers.add(new SemanticError(this.position, "The sealed field '" + this.name + "' cannot be assigned because it is private to it's library"));
+				markers.add(Markers.create(this.position, "access.sealed.field", this.name));
 			}
 			else if ((access & IContext.WRITE_ACCESS) == 0)
 			{
-				markers.add(new SemanticError(this.position, "The field '" + this.name + "' cannot be assigned since it is not visible"));
+				markers.add(Markers.create(this.position, "access.invisible.field", this.name));
 			}
 		}
 	}

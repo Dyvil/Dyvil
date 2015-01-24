@@ -19,7 +19,7 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.util.Modifiers;
 
 public class Field extends Member implements IField, IContext
@@ -107,7 +107,7 @@ public class Field extends Member implements IField, IContext
 		this.type = this.type.resolve(context);
 		if (!this.type.isResolved())
 		{
-			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
+			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
 		}
 		
 		if (this.value != null)
@@ -150,12 +150,11 @@ public class Field extends Member implements IField, IContext
 			this.value.check(markers, context);
 			if (!this.value.requireType(this.type))
 			{
-				SemanticError error = new SemanticError(this.value.getPosition(), "The value of the field '" + this.name
-						+ "' is incompatible with the field type");
-				error.addInfo("Field Type: " + this.type);
+				Marker marker = Markers.create(this.value.getPosition(), "field.type", this.name);
+				marker.addInfo("Field Type: " + this.type);
 				IType vtype = this.value.getType();
-				error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
-				markers.add(error);
+				marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
+				markers.add(marker);
 			}
 		}
 	}

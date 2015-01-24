@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
@@ -209,10 +209,10 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			
 			if (!v.requireType(type))
 			{
-				SemanticError error = new SemanticError(v.getPosition(), "The array element is incompatible with the array type");
-				error.addInfo("Array Type: " + type);
-				error.addInfo("Array Element Type" + v.getType());
-				markers.add(error);
+				Marker marker = Markers.create(v.getPosition(), "array.element.type");
+				marker.addInfo("Array Type: " + type);
+				marker.addInfo("Array Element Type" + v.getType());
+				markers.add(marker);
 			}
 		}
 	}

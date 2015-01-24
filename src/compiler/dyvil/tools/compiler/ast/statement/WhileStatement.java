@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -103,15 +103,15 @@ public class WhileStatement extends ASTNode implements IStatement
 		{
 			if (!this.condition.requireType(Type.BOOLEAN))
 			{
-				SemanticError error = new SemanticError(this.condition.getPosition(), "The condition of a while statement has to evaluate to a boolean value.");
-				error.addInfo("Condition Type: " + this.condition.getType());
-				markers.add(error);
+				Marker marker = Markers.create(this.condition.getPosition(), "while.condition.type");
+				marker.addInfo("Condition Type: " + this.condition.getType());
+				markers.add(marker);
 			}
 			this.condition.check(markers, context);
 		}
 		else
 		{
-			markers.add(new SyntaxError(this.position, "Invalid while condition"));
+			markers.add(new SyntaxError(this.position, "while.condition.invalid"));
 		}
 		if (this.then != null)
 		{

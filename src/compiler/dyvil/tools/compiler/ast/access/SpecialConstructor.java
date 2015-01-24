@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 
@@ -84,7 +84,7 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 		this.type = this.type.resolve(context);
 		if (!this.type.isResolved())
 		{
-			markers.add(new SemanticError(this.type.getPosition(), "'" + this.type + "' could not be resolved to a type"));
+			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
 			return;
 		}
 		
@@ -102,7 +102,7 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 			return this;
 		}
 		
-		markers.add(new SemanticError(this.position, "The constructor could not be resolved"));
+		markers.add(Markers.create(this.position, "resolve.constructor", this.type.toString()));
 		return this;
 	}
 	
@@ -112,22 +112,22 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 		IClass iclass = this.type.getTheClass();
 		if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
-			markers.add(new SemanticError(this.position, "The interface '" + iclass.getName() + "' cannot be instantiated"));
+			markers.add(Markers.create(this.position, "constructor.interface", iclass.getName()));
 		}
 		else if (iclass.hasModifier(Modifiers.ABSTRACT))
 		{
-			markers.add(new SemanticError(this.position, "The abstract class '" + iclass.getName() + "' cannot be instantiated"));
+			markers.add(Markers.create(this.position, "constructor.abstract", iclass.getName()));
 		}
 		else if (this.method != null)
 		{
 			byte access = context.getAccessibility(this.method);
 			if (access == IContext.SEALED)
 			{
-				markers.add(new SemanticError(this.position, "The sealed constructor cannot be invoked because it is private to it's library"));
+				markers.add(Markers.create(this.position, "access.constructor.sealed", iclass.getName()));
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(new SemanticError(this.position, "The constructor cannot be invoked because it is not visible"));
+				markers.add(Markers.create(this.position, "access.constructor.invisible", iclass.getName()));
 			}
 			
 			this.list.check(markers, this.method);

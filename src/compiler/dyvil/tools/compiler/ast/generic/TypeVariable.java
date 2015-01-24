@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
@@ -286,7 +286,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 				
 				if (!t2.isResolved())
 				{
-					markers.add(new SemanticError(t2.getPosition(), "'" + t2 + "' could not be resolved to a type"));
+					markers.add(Markers.create(t2.getPosition(), "resolve.type", t2.toString()));
 					continue;
 				}
 				
@@ -295,7 +295,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 				{
 					if (this.upperBound != null)
 					{
-						markers.add(new SemanticError(t2.getPosition(), "Only one generic upper bound of '" + this.name + "' can be a class"));
+						markers.add(Markers.create(t2.getPosition(), "generic.upperbound", this.name));
 					}
 					
 					iterator.remove();
@@ -321,9 +321,8 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 			this.lowerBound = this.lowerBound.resolve(context);
 			if (!this.lowerBound.isResolved())
 			{
-				markers.add(new SemanticError(this.lowerBound.getPosition(), "'" + this.lowerBound + "' could not be resolved to a type"));
+				markers.add(Markers.create(this.lowerBound.getPosition(), "resolve.type", this.lowerBound.toString()));
 			}
-			
 		}
 		this.captureClass = Type.OBJECT.theClass;
 	}

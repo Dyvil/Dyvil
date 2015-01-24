@@ -95,7 +95,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 			{
 				if ((this.modifiers & i) != 0)
 				{
-					throw new SyntaxError(token, "Duplicate Modifier '" + value + "'", "Remove this Modifier");
+					throw new SyntaxError(token, "Duplicate Modifier '" + value + "' - Remove this Modifier");
 				}
 				this.modifiers |= i;
 				return true;

@@ -4,7 +4,6 @@ import static dyvil.tools.compiler.util.ParserUtil.*;
 
 import java.util.Iterator;
 
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
@@ -444,7 +443,6 @@ public class Dlex implements Iterable<IToken>
 			}
 			catch (SyntaxError ex)
 			{
-				ex.log(DyvilCompiler.logger);
 				return null;
 			}
 		}
@@ -463,7 +461,6 @@ public class Dlex implements Iterable<IToken>
 			}
 			catch (SyntaxError ex)
 			{
-				ex.log(DyvilCompiler.logger);
 			}
 		}
 	}

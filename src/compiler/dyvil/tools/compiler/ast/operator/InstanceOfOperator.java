@@ -11,8 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
-import dyvil.tools.compiler.lexer.marker.Warning;
+import dyvil.tools.compiler.lexer.marker.Markers;
 
 public class InstanceOfOperator extends ASTNode implements IValue
 {
@@ -55,11 +54,11 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	{
 		if (this.type instanceof PrimitiveType)
 		{
-			markers.add(new SemanticError(this.position, "An instance of check cannot be performed on a primitive type"));
+			markers.add(Markers.create(this.position, "instanceof.primitive"));
 		}
 		else if (this.value.isType(this.type))
 		{
-			markers.add(new Warning(this.position, "Unneccessary instance of operator"));
+			markers.add(Markers.create(this.position, "instanceof.unnecessary"));
 		}
 	}
 	
