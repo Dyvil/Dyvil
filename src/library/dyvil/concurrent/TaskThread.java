@@ -10,9 +10,9 @@ import java.util.Queue;
  */
 public class TaskThread extends Thread
 {
-	public static boolean			DEBUG		= true;
+	public static boolean	DEBUG	= true;
 	
-	private Queue<Runnable>			tasks		= new LinkedList();
+	private Queue<Runnable>	tasks	= new LinkedList();
 	
 	public TaskThread(String name)
 	{

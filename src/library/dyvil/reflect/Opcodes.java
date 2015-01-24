@@ -1,5 +1,7 @@
 package dyvil.reflect;
 
+import jdk.internal.org.objectweb.asm.Label;
+
 public interface Opcodes
 {
 	/**
@@ -843,24 +845,24 @@ public interface Opcodes
 	public static final int	D2S				= 287;
 	public static final int	D2C				= 289;
 	
-	public static final int IF_LCMPEQ = 300;
-	public static final int IF_LCMPNE = 301;
-	public static final int IF_LCMPLT = 302;
-	public static final int IF_LCMPGE = 303;
-	public static final int IF_LCMPGT = 304;
-	public static final int IF_LCMPLE = 305;
+	public static final int	IF_LCMPEQ		= 300;
+	public static final int	IF_LCMPNE		= 301;
+	public static final int	IF_LCMPLT		= 302;
+	public static final int	IF_LCMPGE		= 303;
+	public static final int	IF_LCMPGT		= 304;
+	public static final int	IF_LCMPLE		= 305;
 	
-	public static final int IF_FCMPEQ = 306;
-	public static final int IF_FCMPNE = 307;
-	public static final int IF_FCMPLT = 308;
-	public static final int IF_FCMPGE = 309;
-	public static final int IF_FCMPGT = 310;
-	public static final int IF_FCMPLE = 311;
+	public static final int	IF_FCMPEQ		= 306;
+	public static final int	IF_FCMPNE		= 307;
+	public static final int	IF_FCMPLT		= 308;
+	public static final int	IF_FCMPGE		= 309;
+	public static final int	IF_FCMPGT		= 310;
+	public static final int	IF_FCMPLE		= 311;
 	
-	public static final int IF_DCMPEQ = 312;
-	public static final int IF_DCMPNE = 313;
-	public static final int IF_DCMPLT = 314;
-	public static final int IF_DCMPGE = 315;
-	public static final int IF_DCMPGT = 316;
-	public static final int IF_DCMPLE = 317;
+	public static final int	IF_DCMPEQ		= 312;
+	public static final int	IF_DCMPNE		= 313;
+	public static final int	IF_DCMPLT		= 314;
+	public static final int	IF_DCMPGE		= 315;
+	public static final int	IF_DCMPGT		= 316;
+	public static final int	IF_DCMPLE		= 317;
 }

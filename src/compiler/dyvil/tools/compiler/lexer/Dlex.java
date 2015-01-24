@@ -47,7 +47,8 @@ public class Dlex implements Iterable<IToken>
 			{
 				start = i;
 				
-				if (c == '\n') {
+				if (c == '\n')
+				{
 					lineNumber++;
 					continue;
 				}

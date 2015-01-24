@@ -58,7 +58,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	private IValue			value;
 	
 	private boolean			dotless;
-	private boolean prefix;
+	private boolean			prefix;
 	
 	public ExpressionParser(IValued field)
 	{

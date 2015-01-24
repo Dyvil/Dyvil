@@ -65,7 +65,7 @@ public class ArrayUtils
 				list.add(element);
 			}
 		}
-		return (T[]) Arrays.toArray(list, (Class<T>) arrays.getClass().getComponentType());
+		return Arrays.toArray(list, (Class<T>) arrays.getClass().getComponentType());
 	}
 	
 	public static @implicit <T> T[] removeDuplicates(T... array)

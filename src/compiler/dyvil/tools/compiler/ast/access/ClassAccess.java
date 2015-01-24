@@ -157,7 +157,8 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 		{
 			if (context.getAccessibility(iclass) == IContext.SEALED)
 			{
-				markers.add(new SemanticError(this.position, "The sealed class '" + iclass.getName() + "' cannot be accessed because it is private to it's library"));
+				markers.add(new SemanticError(this.position, "The sealed class '" + iclass.getName()
+						+ "' cannot be accessed because it is private to it's library"));
 			}
 		}
 	}

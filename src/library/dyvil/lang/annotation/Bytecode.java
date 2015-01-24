@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import dyvil.reflect.Opcodes;
+
 /**
  * An annotation for value class methods using JVM instructions instead of an
  * actual method invocation. A method call with a Bytecode annotation will be

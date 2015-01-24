@@ -37,7 +37,7 @@ public class Arrays
 	
 	public static @implicit <T, N> N[] copy(T[] array, int newLength, Class<? extends N[]> newType)
 	{
-		return (N[]) java.util.Arrays.<N, T> copyOf(array, newLength, newType);
+		return java.util.Arrays.<N, T> copyOf(array, newLength, newType);
 	}
 	
 	// Collection Conversions

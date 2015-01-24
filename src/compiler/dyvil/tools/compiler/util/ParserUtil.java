@@ -54,7 +54,8 @@ public class ParserUtil
 	
 	public static boolean isIdentifierSymbol(char c)
 	{
-		return c >= '!' && c <= '~' && (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && !isSymbol(c) && !isOpenBracket(c) && !isCloseBracket(c);
+		return c >= '!' && c <= '~' && (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && !isSymbol(c) && !isOpenBracket(c)
+				&& !isCloseBracket(c);
 	}
 	
 	public static boolean isSeperator(char c)

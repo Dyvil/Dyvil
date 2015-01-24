@@ -144,7 +144,8 @@ public class Property extends Field implements IProperty
 		{
 			if (this.get != null && !this.get.requireType(this.type))
 			{
-				SemanticError error = new SemanticError(this.get.getPosition(), "The getter value of the property '" + this.name + "' is incompatible with the property type");
+				SemanticError error = new SemanticError(this.get.getPosition(), "The getter value of the property '" + this.name
+						+ "' is incompatible with the property type");
 				error.addInfo("Property Type: " + this.type);
 				error.addInfo("Getter Value Type: " + this.get.getType());
 				markers.add(error);

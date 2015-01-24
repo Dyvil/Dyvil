@@ -128,10 +128,12 @@ public class Util
 	
 	public static void parametersToString(Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty)
 	{
-		parametersToString(parameters, buffer, writeEmpty, Formatting.Method.emptyParameters, Formatting.Method.parametersStart, Formatting.Method.parameterSeperator, Formatting.Method.parametersEnd);
+		parametersToString(parameters, buffer, writeEmpty, Formatting.Method.emptyParameters, Formatting.Method.parametersStart,
+				Formatting.Method.parameterSeperator, Formatting.Method.parametersEnd);
 	}
 	
-	public static void parametersToString(Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty, String empty, String start, String seperator, String end)
+	public static void parametersToString(Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty, String empty, String start,
+			String seperator, String end)
 	{
 		if (parameters.isEmpty())
 		{

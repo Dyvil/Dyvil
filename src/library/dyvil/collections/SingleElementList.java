@@ -22,7 +22,7 @@ public class SingleElementList<E> implements List<E>
 			{
 				throw new NoSuchElementException();
 			}
-			return element;
+			return SingleElementList.this.element;
 		}
 		
 		@Override
@@ -59,7 +59,7 @@ public class SingleElementList<E> implements List<E>
 		{
 			if (this.returned)
 			{
-				element = e;
+				SingleElementList.this.element = e;
 			}
 		}
 		
@@ -68,7 +68,7 @@ public class SingleElementList<E> implements List<E>
 		{
 			if (!this.returned)
 			{
-				element = e;
+				SingleElementList.this.element = e;
 			}
 		}
 	}

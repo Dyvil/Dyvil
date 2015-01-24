@@ -1,8 +1,8 @@
 package dyvil.lang;
 
+import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Bytecode;
 import dyvil.lang.annotation.prefix;
-import static dyvil.reflect.Opcodes.*;
 
 public abstract class Boolean
 {

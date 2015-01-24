@@ -468,7 +468,8 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = superClass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(new SemanticError(this.superType.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + " '" + superClass.getName() + "' cannot be extended, only classes are allowed"));
+					markers.add(new SemanticError(this.superType.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + " '" + superClass.getName()
+							+ "' cannot be extended, only classes are allowed"));
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
@@ -494,7 +495,8 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = iclass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
 				{
-					markers.add(new SemanticError(t.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + " '" + iclass.getName() + "' cannot be implemented, only interfaces are allowed"));
+					markers.add(new SemanticError(t.getPosition(), "The " + Modifiers.CLASS_TYPE.toString(modifiers) + " '" + iclass.getName()
+							+ "' cannot be implemented, only interfaces are allowed"));
 				}
 			}
 		}

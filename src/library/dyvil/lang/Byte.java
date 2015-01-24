@@ -1,6 +1,5 @@
 package dyvil.lang;
 
-
 public abstract class Byte implements Integer
 {
 	protected byte	value;

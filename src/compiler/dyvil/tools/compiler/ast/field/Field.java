@@ -150,7 +150,8 @@ public class Field extends Member implements IField, IContext
 			this.value.check(markers, context);
 			if (!this.value.requireType(this.type))
 			{
-				SemanticError error = new SemanticError(this.value.getPosition(), "The value of the field '" + this.name + "' is incompatible with the field type");
+				SemanticError error = new SemanticError(this.value.getPosition(), "The value of the field '" + this.name
+						+ "' is incompatible with the field type");
 				error.addInfo("Field Type: " + this.type);
 				IType vtype = this.value.getType();
 				error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));

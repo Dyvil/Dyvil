@@ -230,7 +230,8 @@ public class Method extends Member implements IMethod
 			parType = par.type;
 			if (!instance.requireType(parType))
 			{
-				SemanticError error = new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name + "' is incompatible with the required type");
+				SemanticError error = new SemanticError(instance.getPosition(), "The implicit method argument for '" + par.name
+						+ "' is incompatible with the required type");
 				error.addInfo("Required Type: " + parType);
 				IType vtype = instance.getType();
 				error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
@@ -246,7 +247,8 @@ public class Method extends Member implements IMethod
 			IValue value = arguments.get(i);
 			if (!value.requireType(parType))
 			{
-				SemanticError error = new SemanticError(value.getPosition(), "The method argument for '" + par.name + "' is incompatible with the required type");
+				SemanticError error = new SemanticError(value.getPosition(), "The method argument for '" + par.name
+						+ "' is incompatible with the required type");
 				error.addInfo("Required Type: " + parType);
 				IType vtype = value.getType();
 				error.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
@@ -502,7 +504,8 @@ public class Method extends Member implements IMethod
 					IType type = this.overrideMethod.getType();
 					if (!Type.isSuperType(type, this.type))
 					{
-						SemanticError error = new SemanticError(this.position, "The return type of '" + this.name + "' is incompatible with the overriden method type");
+						SemanticError error = new SemanticError(this.position, "The return type of '" + this.name
+								+ "' is incompatible with the overriden method type");
 						error.addInfo("Return Type: " + this.type);
 						error.addInfo("Overriden Type: " + type);
 						markers.add(error);

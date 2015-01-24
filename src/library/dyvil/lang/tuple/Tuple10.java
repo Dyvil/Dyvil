@@ -35,7 +35,8 @@ public class Tuple10<A, B, C, D, E, F, G, H, I, J>
 		if (obj instanceof Tuple10)
 		{
 			Tuple10 that = (Tuple10) obj;
-			return this._1 == that._1 && this._2 == that._2 && this._3 == that._3 && this._4 == that._4 && this._5 == that._5 && this._6 == that._6 && this._7 == that._7 && this._8 == that._8 && this._9 == that._9 && this._10 == that._10;
+			return this._1 == that._1 && this._2 == that._2 && this._3 == that._3 && this._4 == that._4 && this._5 == that._5 && this._6 == that._6
+					&& this._7 == that._7 && this._8 == that._8 && this._9 == that._9 && this._10 == that._10;
 		}
 		return false;
 	}
@@ -49,6 +50,7 @@ public class Tuple10<A, B, C, D, E, F, G, H, I, J>
 	@Override
 	public String toString()
 	{
-		return "(" + this._1 + "," + this._2 + "," + this._3 + "," + this._4 + "," + this._5 + "," + this._6 + "," + this._7 + "," + this._8 + "," + this._9 + "," + this._10 + ")";
+		return "(" + this._1 + "," + this._2 + "," + this._3 + "," + this._4 + "," + this._5 + "," + this._6 + "," + this._7 + "," + this._8 + "," + this._9
+				+ "," + this._10 + ")";
 	}
 }

@@ -22,19 +22,19 @@ import dyvil.tools.compiler.util.Util;
 public class DyvilCompiler
 {
 	public static boolean				parseStack;
-	public static boolean				logFile	= true;
+	public static boolean				logFile			= true;
 	public static boolean				debug;
 	public static int					constantFolding;
 	
-	public static Logger				logger	= Logger.getLogger("DYVILC");
-	public static DateFormat			format	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static Logger				logger			= Logger.getLogger("DYVILC");
+	public static DateFormat			format			= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	public static CompilerConfig		config	= new CompilerConfig();
-	public static Set<CompilerState>	states	= new TreeSet();
+	public static CompilerConfig		config			= new CompilerConfig();
+	public static Set<CompilerState>	states			= new TreeSet();
 	
-	public static ParserManager configParser = new ParserManager();
-	public static ParserManager			parser	= new ParserManager();
-	public static List<File>			files	= new ArrayList();
+	public static ParserManager			configParser	= new ParserManager();
+	public static ParserManager			parser			= new ParserManager();
+	public static List<File>			files			= new ArrayList();
 	
 	static
 	{
@@ -94,7 +94,8 @@ public class DyvilCompiler
 		
 		int units = root.units.size();
 		int packages = root.subPackages.size();
-		logger.info("Compiling " + packages + (packages == 1 ? " Package, " : " Packages, ") + units + (units == 1 ? " Compilation Unit" : " Compilation Units"));
+		logger.info("Compiling " + packages + (packages == 1 ? " Package, " : " Packages, ") + units
+				+ (units == 1 ? " Compilation Unit" : " Compilation Units"));
 		logger.info("");
 		
 		// Apply states

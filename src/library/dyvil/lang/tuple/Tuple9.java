@@ -33,7 +33,8 @@ public class Tuple9<A, B, C, D, E, F, G, H, I>
 		if (obj instanceof Tuple9)
 		{
 			Tuple9 that = (Tuple9) obj;
-			return this._1 == that._1 && this._2 == that._2 && this._3 == that._3 && this._4 == that._4 && this._5 == that._5 && this._6 == that._6 && this._7 == that._7 && this._8 == that._8 && this._9 == that._9;
+			return this._1 == that._1 && this._2 == that._2 && this._3 == that._3 && this._4 == that._4 && this._5 == that._5 && this._6 == that._6
+					&& this._7 == that._7 && this._8 == that._8 && this._9 == that._9;
 		}
 		return false;
 	}
@@ -47,6 +48,7 @@ public class Tuple9<A, B, C, D, E, F, G, H, I>
 	@Override
 	public String toString()
 	{
-		return "(" + this._1 + "," + this._2 + "," + this._3 + "," + this._4 + "," + this._5 + "," + this._6 + "," + this._7 + "," + this._8 + "," + this._9 + ")";
+		return "(" + this._1 + "," + this._2 + "," + this._3 + "," + this._4 + "," + this._5 + "," + this._6 + "," + this._7 + "," + this._8 + "," + this._9
+				+ ")";
 	}
 }

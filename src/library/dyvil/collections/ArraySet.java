@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 import dyvil.lang.array.Arrays;
 
-
 public class ArraySet<E> extends AbstractSet<E>
 {
 	private static final int	MAX_ARRAY_SIZE	= Integer.MAX_VALUE - 8;

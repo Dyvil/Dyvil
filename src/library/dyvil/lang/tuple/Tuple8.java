@@ -31,7 +31,8 @@ public class Tuple8<A, B, C, D, E, F, G, H>
 		if (obj instanceof Tuple8)
 		{
 			Tuple8 that = (Tuple8) obj;
-			return this._1 == that._1 && this._2 == that._2 && this._3 == that._3 && this._4 == that._4 && this._5 == that._5 && this._6 == that._6 && this._7 == that._7 && this._8 == that._8;
+			return this._1 == that._1 && this._2 == that._2 && this._3 == that._3 && this._4 == that._4 && this._5 == that._5 && this._6 == that._6
+					&& this._7 == that._7 && this._8 == that._8;
 		}
 		return false;
 	}

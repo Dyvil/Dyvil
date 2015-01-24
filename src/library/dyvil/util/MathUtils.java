@@ -230,7 +230,7 @@ public class MathUtils
 			{
 				if (s >= 0x4000)
 				{
-					xn = (sqrtTable[s >> 8]) + 1;
+					xn = sqrtTable[s >> 8] + 1;
 				}
 				else
 				{
@@ -246,7 +246,7 @@ public class MathUtils
 				xn = (sqrtTable[s >> 2] >> 3) + 1;
 			}
 			
-			return (short) (((xn * xn) > s) ? --xn : xn);
+			return (short) (xn * xn > s ? --xn : xn);
 		}
 		else if (s >= 0)
 		{
@@ -284,9 +284,9 @@ public class MathUtils
 					xn = sqrtTable[i >> 18] << 5;
 				}
 				
-				xn = (xn + 1 + (i / xn)) >> 1;
-				xn = (xn + 1 + (i / xn)) >> 1;
-				return ((xn * xn) > i) ? --xn : xn;
+				xn = xn + 1 + i / xn >> 1;
+				xn = xn + 1 + i / xn >> 1;
+				return xn * xn > i ? --xn : xn;
 			}
 			else
 			{
@@ -310,9 +310,9 @@ public class MathUtils
 					xn = sqrtTable[i >> 10] << 1;
 				}
 				
-				xn = (xn + 1 + (i / xn)) >> 1;
+				xn = xn + 1 + i / xn >> 1;
 				
-				return ((xn * xn) > i) ? --xn : xn;
+				return xn * xn > i ? --xn : xn;
 			}
 		}
 		else
@@ -323,7 +323,7 @@ public class MathUtils
 				{
 					if (i >= 0x4000)
 					{
-						xn = (sqrtTable[i >> 8]) + 1;
+						xn = sqrtTable[i >> 8] + 1;
 					}
 					else
 					{
@@ -339,7 +339,7 @@ public class MathUtils
 					xn = (sqrtTable[i >> 2] >> 3) + 1;
 				}
 				
-				return ((xn * xn) > i) ? --xn : xn;
+				return xn * xn > i ? --xn : xn;
 			}
 			else if (i >= 0)
 			{

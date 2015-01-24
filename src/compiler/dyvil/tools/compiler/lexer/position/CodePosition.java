@@ -6,7 +6,7 @@ public class CodePosition implements ICodePosition
 {
 	public CodeFile	file;
 	
-	public int type;
+	public int		type;
 	public String	text;
 	
 	public int		line;
