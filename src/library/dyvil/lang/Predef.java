@@ -13,6 +13,12 @@ public class Predef
 	
 	// Prefix Operators
 	
+	@Bytecode(postfixOpcode = IBIN)
+	public static boolean $bang(boolean b)
+	{
+		return !b;
+	}
+	
 	@Bytecode
 	public static int $plus(int i)
 	{
@@ -25,7 +31,7 @@ public class Predef
 		return -i;
 	}
 	
-	@Bytecode(postfixOpcodes = { ICONST_M1, IXOR })
+	@Bytecode(postfixOpcode = IBIN)
 	public static int $tilde(int i)
 	{
 		return ~i;
@@ -43,7 +49,7 @@ public class Predef
 		return -l;
 	}
 	
-	@Bytecode(postfixOpcodes = { LCONST_M1, LXOR })
+	@Bytecode(postfixOpcode = LBIN)
 	public static long $tilde(long l)
 	{
 		return ~l;

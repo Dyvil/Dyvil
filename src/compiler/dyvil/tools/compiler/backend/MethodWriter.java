@@ -16,6 +16,7 @@ import dyvil.tools.compiler.util.OpcodeUtil;
 public final class MethodWriter extends MethodVisitor
 {
 	public static final Object	JUMP_INSTRUCTION_TARGET	= new Object();
+	public static final Long	LONG_MINUS_ONE			= Long.valueOf(-1);
 	
 	private boolean				hasReturn;
 	private int					maxStack;
@@ -396,7 +397,15 @@ public final class MethodWriter extends MethodVisitor
 		switch (opcode)
 		{
 		case Opcodes.LCONST_M1:
-			this.mv.visitLdcInsn(-1L);
+			this.mv.visitLdcInsn(LONG_MINUS_ONE);
+			return;
+		case Opcodes.IBIN:
+			this.mv.visitInsn(Opcodes.ICONST_M1);
+			this.mv.visitInsn(Opcodes.IXOR);
+			return;
+		case Opcodes.LBIN:
+			this.mv.visitLdcInsn(LONG_MINUS_ONE);
+			this.mv.visitInsn(Opcodes.IXOR);
 			return;
 		case Opcodes.L2B:
 			this.mv.visitInsn(Opcodes.L2I);
@@ -442,6 +451,114 @@ public final class MethodWriter extends MethodVisitor
 			this.mv.visitInsn(Opcodes.D2I);
 			this.mv.visitInsn(Opcodes.I2C);
 			this.set(INTEGER);
+			return;
+		case Opcodes.IF_LCMPEQ:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.LCMP);
+			this.mv.visitInsn(Opcodes.IFEQ);
+			return;
+		case Opcodes.IF_LCMPNE:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.LCMP);
+			this.mv.visitInsn(Opcodes.IFNE);
+			return;
+		case Opcodes.IF_LCMPLT:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.LCMP);
+			this.mv.visitInsn(Opcodes.IFLT);
+			return;
+		case Opcodes.IF_LCMPGE:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.LCMP);
+			this.mv.visitInsn(Opcodes.IFGE);
+			return;
+		case Opcodes.IF_LCMPGT:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.LCMP);
+			this.mv.visitInsn(Opcodes.IFGT);
+			return;
+		case Opcodes.IF_LCMPLE:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.LCMP);
+			this.mv.visitInsn(Opcodes.IFLE);
+			return;
+		case Opcodes.IF_FCMPEQ:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.FCMPL);
+			this.mv.visitInsn(Opcodes.IFEQ);
+			return;
+		case Opcodes.IF_FCMPNE:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.FCMPL);
+			this.mv.visitInsn(Opcodes.IFNE);
+			return;
+		case Opcodes.IF_FCMPLT:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.FCMPL);
+			this.mv.visitInsn(Opcodes.IFLT);
+			return;
+		case Opcodes.IF_FCMPGE:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.FCMPG);
+			this.mv.visitInsn(Opcodes.IFGE);
+			return;
+		case Opcodes.IF_FCMPGT:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.FCMPG);
+			this.mv.visitInsn(Opcodes.IFGT);
+			return;
+		case Opcodes.IF_FCMPLE:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.FCMPL);
+			this.mv.visitInsn(Opcodes.IFLE);
+			return;
+		case Opcodes.IF_DCMPEQ:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.DCMPL);
+			this.mv.visitInsn(Opcodes.IFEQ);
+			return;
+		case Opcodes.IF_DCMPNE:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.DCMPL);
+			this.mv.visitInsn(Opcodes.IFNE);
+			return;
+		case Opcodes.IF_DCMPLT:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.DCMPL);
+			this.mv.visitInsn(Opcodes.IFLT);
+			return;
+		case Opcodes.IF_DCMPGE:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.DCMPG);
+			this.mv.visitInsn(Opcodes.IFGE);
+			return;
+		case Opcodes.IF_DCMPGT:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.DCMPG);
+			this.mv.visitInsn(Opcodes.IFGT);
+			return;
+		case Opcodes.IF_DCMPLE:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.mv.visitInsn(Opcodes.DCMPL);
+			this.mv.visitInsn(Opcodes.IFLE);
 			return;
 		}
 	}

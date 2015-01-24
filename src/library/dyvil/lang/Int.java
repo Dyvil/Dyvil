@@ -104,7 +104,7 @@ public abstract class Int implements Integer
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { ICONST_M1, IXOR })
+	@Bytecode(postfixOpcode = IBIN)
 	public Int $tilde()
 	{
 		return this.$eq(~this.value);
@@ -572,42 +572,42 @@ public abstract class Int implements Integer
 	// long operators
 	
 	@Override
-	@Bytecode(infixOpcode = I2L, postfixOpcodes = { LCMP, IFNE })
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPNE)
 	public boolean $eq$eq(long b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2L, postfixOpcodes = { LCMP, IFEQ })
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPEQ)
 	public boolean $bang$eq(long b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2L, postfixOpcodes = { LCMP, IFGE })
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPGE)
 	public boolean $less(long b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2L, postfixOpcodes = { LCMP, IFGT })
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPGT)
 	public boolean $less$eq(long b)
 	{
 		return this.value <= b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2L, postfixOpcodes = { LCMP, IFNE })
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPNE)
 	public boolean $greater(long b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2L, postfixOpcodes = { LCMP, IFLT })
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPLT)
 	public boolean $greater$eq(long b)
 	{
 		return this.value >= b;
@@ -693,42 +693,42 @@ public abstract class Int implements Integer
 	// float operators
 	
 	@Override
-	@Bytecode(infixOpcode = I2F, postfixOpcodes = { FCMPL, IFNE })
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPNE)
 	public boolean $eq$eq(float b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2F, postfixOpcodes = { FCMPL, IFNE })
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPNE)
 	public boolean $bang$eq(float b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2F, postfixOpcodes = { FCMPG, IFGE })
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPGE)
 	public boolean $less(float b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2F, postfixOpcodes = { FCMPG, IFGT })
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPGT)
 	public boolean $less$eq(float b)
 	{
 		return this.value <= b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2F, postfixOpcodes = { FCMPL, IFLE })
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPLE)
 	public boolean $greater(float b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2F, postfixOpcodes = { FCMPL, IFLT })
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPLT)
 	public boolean $greater$eq(float b)
 	{
 		return this.value >= b;
@@ -772,42 +772,42 @@ public abstract class Int implements Integer
 	// double operators
 	
 	@Override
-	@Bytecode(infixOpcode = I2D, postfixOpcodes = { DCMPL, IFNE })
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPNE)
 	public boolean $eq$eq(double b)
 	{
 		return this.value == b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2D, postfixOpcodes = { DCMPL, IFNE })
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPNE)
 	public boolean $bang$eq(double b)
 	{
 		return this.value != b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2D, postfixOpcodes = { DCMPG, IFGE })
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPGE)
 	public boolean $less(double b)
 	{
 		return this.value < b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2D, postfixOpcodes = { DCMPG, IFGT })
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPGT)
 	public boolean $less$eq(double b)
 	{
 		return this.value <= b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2D, postfixOpcodes = { DCMPL, IFLE })
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPLE)
 	public boolean $greater(double b)
 	{
 		return this.value > b;
 	}
 	
 	@Override
-	@Bytecode(infixOpcode = I2D, postfixOpcodes = { DCMPL, IFLT })
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPLT)
 	public boolean $greater$eq(double b)
 	{
 		return this.value >= b;
