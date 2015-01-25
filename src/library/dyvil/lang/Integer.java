@@ -1,12 +1,11 @@
 package dyvil.lang;
 
-import dyvil.lang.annotation.prefix;
 
 public interface Integer extends Number
 {
 	public Integer $eq(Integer v);
 	
-	public @prefix Integer $tilde();
+	public Integer $tilde();
 	
 	// byte operators
 	

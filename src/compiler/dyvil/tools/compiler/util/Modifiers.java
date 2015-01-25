@@ -183,9 +183,10 @@ public enum Modifiers
 	public static final int	BYREF					= 0x00040000;
 	
 	/**
-	 * Dyvil prefix modifier.
+	 * Dyvil deprecated modifier. This modifier is a shortcut for the @Deprecated
+	 * annotation.
 	 */
-	public static final int	PREFIX					= 0x00040000;
+	public static final int	DEPRECATED				= 0x00040000;
 	
 	/**
 	 * Dyvil override modifier. This modifier is a shortcut for the @Override
@@ -205,7 +206,7 @@ public enum Modifiers
 	public static final int	CLASS_MODIFIERS			= MEMBER_MODIFIERS | ABSTRACT | STRICT | FUNCTIONAL;
 	
 	public static final int	FIELD_MODIFIERS			= MEMBER_MODIFIERS | TRANSIENT | VOLATILE | LAZY | SYNTHETIC;
-	public static final int	METHOD_MODIFIERS		= MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT | PREFIX | BRIDGE | VARARGS
+	public static final int	METHOD_MODIFIERS		= MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | IMPLICIT | DEPRECATED | BRIDGE | VARARGS
 															| MANDATED;
 	public static final int	PARAMETER_MODIFIERS		= FINAL | BYREF;
 	
@@ -288,6 +289,10 @@ public enum Modifiers
 		{
 			sb.append("strictfp ");
 		}
+		if ((mod & DEPRECATED) == DEPRECATED)
+		{
+			sb.append("deprecated ");
+		}
 		if ((mod & FUNCTIONAL) == FUNCTIONAL)
 		{
 			sb.append("functional ");
@@ -341,6 +346,10 @@ public enum Modifiers
 		{
 			sb.append("implicit ");
 		}
+		if ((mod & DEPRECATED) == DEPRECATED)
+		{
+			sb.append("deprecated ");
+		}
 		if ((mod & OVERRIDE) == OVERRIDE)
 		{
 			sb.append("override ");
@@ -369,6 +378,10 @@ public enum Modifiers
 			}
 		}
 		
+		if ((mod & DEPRECATED) == DEPRECATED)
+		{
+			sb.append("deprecated ");
+		}
 		if ((mod & TRANSIENT) == TRANSIENT)
 		{
 			sb.append("transient ");
@@ -414,9 +427,9 @@ public enum Modifiers
 		{
 			sb.append("inline ");
 		}
-		if ((mod & PREFIX) == PREFIX)
+		if ((mod & DEPRECATED) == DEPRECATED)
 		{
-			sb.append("prefix ");
+			sb.append("deprecated ");
 		}
 		if ((mod & OVERRIDE) == OVERRIDE)
 		{
@@ -534,8 +547,8 @@ public enum Modifiers
 			return INLINE;
 		case "implicit":
 			return IMPLICIT;
-		case "prefix":
-			return PREFIX;
+		case "deprecated":
+			return DEPRECATED;
 		case "override":
 			return OVERRIDE;
 		}

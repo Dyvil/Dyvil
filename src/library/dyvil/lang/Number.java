@@ -1,6 +1,5 @@
 package dyvil.lang;
 
-import dyvil.lang.annotation.prefix;
 
 public interface Number extends Ordered<Number>
 {
@@ -40,7 +39,7 @@ public interface Number extends Ordered<Number>
 	
 	// Unary operators
 	
-	public @prefix Number $minus();
+	public Number $minus();
 	
 	public Number $plus$plus();
 	

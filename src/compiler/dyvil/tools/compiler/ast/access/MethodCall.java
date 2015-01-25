@@ -192,6 +192,11 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 		{
 			this.method.checkArguments(markers, this.instance, this.arguments);
 			
+			if (this.method.hasModifier(Modifiers.DEPRECATED))
+			{
+				markers.add(Markers.create(this.position, "access.method.deprecated", this.name));
+			}
+			
 			byte access = context.getAccessibility(this.method);
 			if (access == IContext.STATIC)
 			{

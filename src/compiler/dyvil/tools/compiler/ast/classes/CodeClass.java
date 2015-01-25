@@ -140,7 +140,12 @@ public class CodeClass extends ASTNode implements IClass
 			this.modifiers |= Modifiers.SEALED;
 			return true;
 		}
-		else if ("java.lang.FunctionalInterface".equals(name))
+		if ("java.lang.Deprecated".equals(name))
+		{
+			this.modifiers |= Modifiers.DEPRECATED;
+			return true;
+		}
+		if ("java.lang.FunctionalInterface".equals(name))
 		{
 			this.modifiers |= Modifiers.FUNCTIONAL;
 			return true;
@@ -468,11 +473,16 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = superClass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(Markers.create(this.superType.getPosition(), "class.extend.class", Modifiers.CLASS_TYPE.toString(modifiers), superClass.getName()));
+					markers.add(Markers.create(this.superType.getPosition(), "class.extend.type", Modifiers.CLASS_TYPE.toString(modifiers),
+							superClass.getName()));
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
 					markers.add(Markers.create(this.superType.getPosition(), "class.extend.final", superClass.getName()));
+				}
+				else if ((modifiers & Modifiers.DEPRECATED) != 0)
+				{
+					markers.add(Markers.create(this.superType.getPosition(), "class.extend.deprecated", superClass.getName()));
 				}
 			}
 		}
@@ -494,7 +504,11 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = iclass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
 				{
-					markers.add(Markers.create(t.getPosition(), "class.extend.interface", Modifiers.CLASS_TYPE.toString(modifiers),  iclass.getName()));
+					markers.add(Markers.create(t.getPosition(), "class.implement.type", Modifiers.CLASS_TYPE.toString(modifiers), iclass.getName()));
+				}
+				else if ((modifiers & Modifiers.DEPRECATED) != 0)
+				{
+					markers.add(Markers.create(t.getPosition(), "class.implement.deprecated", iclass.getName()));
 				}
 			}
 		}
@@ -765,6 +779,10 @@ public class CodeClass extends ASTNode implements IClass
 		if ((this.modifiers & Modifiers.SEALED) != 0)
 		{
 			writer.visitAnnotation("Ldyvil/lang/annotation/sealed;", false);
+		}
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
+		{
+			writer.visitAnnotation("Ljava/lang/Deprecated;", true);
 		}
 		if ((this.modifiers & Modifiers.FUNCTIONAL) != 0)
 		{

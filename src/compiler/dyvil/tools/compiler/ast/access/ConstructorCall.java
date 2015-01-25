@@ -196,6 +196,11 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 		{
 			this.method.checkArguments(markers, null, this.arguments);
 			
+			if (this.method.hasModifier(Modifiers.DEPRECATED))
+			{
+				markers.add(Markers.create(this.position, "access.constructor.deprecated", iclass.getName()));
+			}
+			
 			byte access = context.getAccessibility(this.method);
 			if (access == IContext.SEALED)
 			{

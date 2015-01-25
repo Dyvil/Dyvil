@@ -93,6 +93,11 @@ public class Field extends Member implements IField, IContext
 			this.modifiers |= Modifiers.SEALED;
 			return true;
 		}
+		if ("java.lang.Deprecated".equals(name))
+		{
+			this.modifiers |= Modifiers.DEPRECATED;
+			return true;
+		}
 		return false;
 	}
 	
@@ -261,15 +266,19 @@ public class Field extends Member implements IField, IContext
 			return;
 		}
 		
-		FieldVisitor visitor = writer.visitField(this.modifiers & 0xFFFF, this.name, this.getDescription(), this.type.getSignature(), null);
-		if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
+		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name, this.getDescription(), this.type.getSignature(), null);
+		if ((this.modifiers & Modifiers.SEALED) != 0)
 		{
-			visitor.visitAnnotation("Ldyvil/lang/annotation/sealed", false);
+			fv.visitAnnotation("Ldyvil/lang/annotation/sealed", false);
+		}
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
+		{
+			fv.visitAnnotation("Ljava/lang/Deprecated;", true);
 		}
 		
 		for (Annotation a : this.annotations)
 		{
-			a.write(writer);
+			a.write(fv);
 		}
 	}
 	

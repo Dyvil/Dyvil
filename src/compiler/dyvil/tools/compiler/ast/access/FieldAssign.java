@@ -199,6 +199,11 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 				markers.add(Markers.create(this.position, "access.final.field", this.name));
 			}
 			
+			if (this.field.hasModifier(Modifiers.DEPRECATED))
+			{
+				markers.add(Markers.create(this.position, "access.field.deprecated", this.name));
+			}
+			
 			byte access = context.getAccessibility(this.field);
 			if (access == IContext.STATIC)
 			{

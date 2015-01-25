@@ -2,7 +2,6 @@ package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Bytecode;
-import dyvil.lang.annotation.prefix;
 
 public abstract class Boolean
 {
@@ -16,7 +15,7 @@ public abstract class Boolean
 	public abstract Boolean $eq(boolean v);
 	
 	@Bytecode(postfixOpcode = IBIN)
-	public @prefix Boolean $bang()
+	public Boolean $bang()
 	{
 		return this.$eq(!this.value);
 	}

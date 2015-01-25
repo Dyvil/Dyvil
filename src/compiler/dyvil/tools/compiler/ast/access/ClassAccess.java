@@ -16,6 +16,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Modifiers;
 
 public class ClassAccess extends ASTNode implements IValue, IAccess
 {
@@ -155,9 +156,14 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 		IClass iclass = this.type.getTheClass();
 		if (iclass != null)
 		{
+			if (iclass.hasModifier(Modifiers.DEPRECATED))
+			{
+				markers.add(Markers.create(this.position, "access.type.deprecated", iclass.getName()));
+			}
+			
 			if (context.getAccessibility(iclass) == IContext.SEALED)
 			{
-				markers.add(Markers.create(this.position, "access.class.sealed", iclass.getName()));
+				markers.add(Markers.create(this.position, "access.type.sealed", iclass.getName()));
 			}
 		}
 	}

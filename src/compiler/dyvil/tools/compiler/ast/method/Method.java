@@ -190,11 +190,6 @@ public class Method extends Member implements IMethod
 			this.modifiers |= Modifiers.IMPLICIT;
 			return true;
 		}
-		if ("dyvil.lang.annotation.prefix".equals(name))
-		{
-			this.modifiers |= Modifiers.PREFIX;
-			return true;
-		}
 		if ("dyvil.lang.annotation.sealed".equals(name))
 		{
 			this.modifiers |= Modifiers.SEALED;
@@ -206,6 +201,11 @@ public class Method extends Member implements IMethod
 			this.infixBytecode = readOpcodes(annotation, "infixOpcode", "infixOpcodes");
 			this.postfixBytecode = readOpcodes(annotation, "postfixOpcode", "postfixOpcodes");
 			return false;
+		}
+		if ("java.lang.Deprecated".equals(name))
+		{
+			this.modifiers |= Modifiers.DEPRECATED;
+			return true;
 		}
 		if ("java.lang.Override".equals(name))
 		{
@@ -813,9 +813,9 @@ public class Method extends Member implements IMethod
 		{
 			mw.visitAnnotation("Ldyvil/lang/annotation/implicit;", false);
 		}
-		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
 		{
-			mw.visitAnnotation("Ldyvil/lang/annotation/prefix;", false);
+			mw.visitAnnotation("Ljava/lang/Deprecated;", true);
 		}
 		if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
 		{
