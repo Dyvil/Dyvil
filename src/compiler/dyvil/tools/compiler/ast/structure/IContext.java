@@ -18,7 +18,10 @@ public interface IContext
 	public static final byte	STATIC				= 4;
 	public static final byte	SEALED				= 5;
 	
-	public boolean isStatic();
+	public default boolean isStatic()
+	{
+		return true;
+	}
 	
 	public default int getVariableCount()
 	{

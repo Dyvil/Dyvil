@@ -43,11 +43,14 @@ public interface Tokens
 	public int	WHILE					= TYPE_KEYWORD | 0x000C0000;
 	public int	DO						= TYPE_KEYWORD | 0x000D0000;
 	public int	FOR						= TYPE_KEYWORD | 0x000E0000;
-	public int	SWITCH					= TYPE_KEYWORD | 0x000F0000;
-	public int	CASE					= TYPE_KEYWORD | 0x00100000;
-	public int	TRY						= TYPE_KEYWORD | 0x00200000;
-	public int	CATCH					= TYPE_KEYWORD | 0x00300000;
-	public int	FINALLY					= TYPE_KEYWORD | 0x00400000;
+	public int	BREAK					= TYPE_KEYWORD | 0x000F0000;
+	public int	CONTINUE				= TYPE_KEYWORD | 0x00100000;
+	public int	GOTO					= TYPE_KEYWORD | 0x00200000;
+	public int	SWITCH					= TYPE_KEYWORD | 0x00300000;
+	public int	CASE					= TYPE_KEYWORD | 0x00400000;
+	public int	TRY						= TYPE_KEYWORD | 0x00500000;
+	public int	CATCH					= TYPE_KEYWORD | 0x00600000;
+	public int	FINALLY					= TYPE_KEYWORD | 0x00700000;
 	
 	// BRACKETS
 	public int	MOD_PARENTHESIS			= 0x00010000;
@@ -68,10 +71,10 @@ public interface Tokens
 	// SYMBOLS
 	public int	DOT						= TYPE_SYMBOL | 0x00010000;
 	public int	COLON					= TYPE_SYMBOL | 0x00020000;
-	public int	SEMICOLON				= TYPE_SYMBOL | 0x00030000;
-	public int	COMMA					= TYPE_SYMBOL | 0x00040000;
-	public int	EQUALS					= TYPE_SYMBOL | 0x00050000;
-	public int	ARROW_OPERATOR			= TYPE_SYMBOL | 0x00060000;
+	public int	SEMICOLON				= TYPE_SYMBOL | 0x00040000;
+	public int	COMMA					= TYPE_SYMBOL | 0x00080000;
+	public int	EQUALS					= TYPE_SYMBOL | 0x00100000;
+	public int	ARROW_OPERATOR			= TYPE_SYMBOL | 0x00200000;
 	
 	// COMMENTS
 	public int	MOD_LINE				= 0x00010000;

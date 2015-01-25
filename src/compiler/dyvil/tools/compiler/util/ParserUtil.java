@@ -101,6 +101,12 @@ public class ParserUtil
 			return Tokens.DO;
 		case "for":
 			return Tokens.FOR;
+		case "break":
+			return Tokens.BREAK;
+		case "continue":
+			return Tokens.CONTINUE;
+		case "goto":
+			return Tokens.GOTO;
 		case "switch":
 			return Tokens.SWITCH;
 		case "case":

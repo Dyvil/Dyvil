@@ -253,18 +253,6 @@ public class InvokeInstruction extends Instruction implements IMethod
 	}
 	
 	@Override
-	public int getVariableCount()
-	{
-		return 0;
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return false;
-	}
-	
-	@Override
 	public IType getThisType()
 	{
 		return null;

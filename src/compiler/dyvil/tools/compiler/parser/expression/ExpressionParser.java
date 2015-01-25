@@ -9,10 +9,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Parameter;
-import dyvil.tools.compiler.ast.statement.IfStatement;
-import dyvil.tools.compiler.ast.statement.ReturnStatement;
-import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.statement.WhileStatement;
+import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.TupleType;
@@ -549,35 +546,82 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = ACCESS;
 			return true;
 		case Tokens.NEW:
+		{
 			ConstructorCall call = new ConstructorCall(token);
 			this.mode = CONSTRUCTOR;
 			this.value = call;
 			pm.pushParser(new TypeParser(call));
 			return true;
+		}
 		case Tokens.RETURN:
+		{
 			ReturnStatement rs = new ReturnStatement(token.raw());
 			this.value = rs;
 			pm.pushParser(new ExpressionParser(rs));
 			return true;
+		}
 		case Tokens.IF:
+		{
 			IfStatement is = new IfStatement(token.raw());
 			this.value = is;
 			pm.pushParser(new IfStatementParser(is));
 			this.mode = 0;
 			return true;
+		}
 		case Tokens.ELSE:
 			pm.popParser(true);
 			return true;
 		case Tokens.WHILE:
+		{
 			WhileStatement statement = new WhileStatement(token);
 			this.value = statement;
 			pm.pushParser(new WhileStatementParser(statement));
 			this.mode = 0;
 			return true;
+		}
 		case Tokens.DO:
 			return true;
 		case Tokens.FOR:
 			return true;
+		case Tokens.BREAK:
+		{
+			BreakStatement statement = new BreakStatement(token);
+			this.value = statement;
+			IToken next = token.next();
+			if (next.isType(Tokens.TYPE_IDENTIFIER))
+			{
+				statement.setName(next.value());
+				pm.skip();
+			}
+			this.mode = 0;
+			return true;
+		}
+		case Tokens.CONTINUE:
+		{
+			ContinueStatement statement = new ContinueStatement(token);
+			this.value = statement;
+			IToken next = token.next();
+			if (next.isType(Tokens.TYPE_IDENTIFIER))
+			{
+				statement.setName(next.value());
+				pm.skip();
+			}
+			this.mode = 0;
+			return true;
+		}
+		case Tokens.GOTO:
+		{
+			GoToStatement statement = new GoToStatement(token);
+			this.value = statement;
+			IToken next = token.next();
+			if (next.isType(Tokens.TYPE_IDENTIFIER))
+			{
+				statement.setName(next.value());
+				pm.skip();
+			}
+			this.mode = 0;
+			return true;
+		}
 		case Tokens.SWITCH:
 			return true;
 		case Tokens.CASE:

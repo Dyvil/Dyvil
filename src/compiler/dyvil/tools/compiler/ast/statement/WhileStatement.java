@@ -18,14 +18,24 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class WhileStatement extends ASTNode implements IStatement
+public class WhileStatement extends ASTNode implements IStatement, ILoop
 {
-	private IValue	condition;
-	private IValue	then;
+	private IValue		condition;
+	private IValue		then;
+	
+	private IStatement	parent;
+	
+	public Label		start;
+	public Label		end;
 	
 	public WhileStatement(ICodePosition position)
 	{
 		this.position = position;
+		
+		this.start = new Label();
+		this.start.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
+		this.end = new Label();
+		this.end.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 	}
 	
 	public void setCondition(IValue condition)
@@ -73,10 +83,40 @@ public class WhileStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public void setParent(IStatement parent)
+	{
+		this.parent = parent;
+	}
+	
+	@Override
+	public IStatement getParent()
+	{
+		return this.parent;
+	}
+	
+	@Override
+	public Label getStartLabel()
+	{
+		return this.start;
+	}
+	
+	@Override
+	public Label getEndLabel()
+	{
+		return this.end;
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.condition.resolveTypes(markers, context);
-		if (this.then != null)
+		
+		if (this.then.isStatement())
+		{
+			((IStatement) this.then).setParent(this);
+			this.then.resolveTypes(markers, context);
+		}
+		else if (this.then != null)
 		{
 			this.then.resolveTypes(markers, context);
 		}
@@ -134,6 +174,21 @@ public class WhileStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public Label resolveLabel(String name)
+	{
+		if ("$whileStart".equals(name))
+		{
+			return this.start;
+		}
+		else if ("$whileEnd".equals(name))
+		{
+			return this.end;
+		}
+		
+		return this.parent == null ? null : this.parent.resolveLabel(name);
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 	}
@@ -145,11 +200,6 @@ public class WhileStatement extends ASTNode implements IStatement
 		{
 			this.condition.writeStatement(writer);
 		}
-		
-		Label start = new Label();
-		start.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
-		Label end = new Label();
-		end.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 		
 		// Condition
 		writer.visitLabel(start);
@@ -170,15 +220,18 @@ public class WhileStatement extends ASTNode implements IStatement
 		}
 		buffer.append(Formatting.Statements.whileEnd);
 		
-		if (this.then instanceof IStatement)
+		if (this.then != null)
 		{
-			buffer.append('\n').append(prefix);
-			this.then.toString(prefix, buffer);
-		}
-		else
-		{
-			buffer.append(' ');
-			this.then.toString(prefix, buffer);
+			if (this.then.isStatement())
+			{
+				buffer.append('\n').append(prefix);
+				this.then.toString(prefix, buffer);
+			}
+			else
+			{
+				buffer.append(' ');
+				this.then.toString(prefix, buffer);
+			}
 		}
 	}
 }

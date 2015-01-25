@@ -19,15 +19,25 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class IfStatement extends ASTNode implements IStatement
 {
-	private IValue	condition;
-	private IValue	then;
-	private IValue	elseThen;
+	public IValue		condition;
+	public IValue		then;
+	public IValue		elseThen;
 	
-	private IType	commonType;
+	private IType		commonType;
+	
+	private IStatement	parent;
+	
+	private Label		elseStart;
+	private Label		elseEnd;
 	
 	public IfStatement(ICodePosition position)
 	{
 		this.position = position;
+		
+		elseStart = new Label();
+		elseStart.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
+		elseEnd = new Label();
+		elseEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 	}
 	
 	public void setCondition(IValue condition)
@@ -58,6 +68,18 @@ public class IfStatement extends ASTNode implements IStatement
 	public IValue getElse()
 	{
 		return this.elseThen;
+	}
+	
+	@Override
+	public void setParent(IStatement parent)
+	{
+		this.parent = parent;
+	}
+	
+	@Override
+	public IStatement getParent()
+	{
+		return this.parent;
 	}
 	
 	@Override
@@ -125,18 +147,44 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public Label resolveLabel(String name)
+	{
+		switch (name)
+		{
+		case "$ifEnd":
+		case "$elseStart":
+			return this.elseStart;
+		case "$elseEnd":
+			return this.elseThen == null ? this.elseStart : this.elseEnd;
+		}
+		
+		return this.parent == null ? null : this.parent.resolveLabel(name);
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.condition != null)
 		{
 			this.condition.resolveTypes(markers, context);
 		}
+		
 		if (this.then != null)
 		{
+			if (this.then.isStatement())
+			{
+				((IStatement) this.then).setParent(this);
+			}
 			this.then.resolveTypes(markers, context);
 		}
+		
 		if (this.elseThen != null)
 		{
+			if (this.elseThen instanceof IStatement)
+			{
+				((IStatement) this.elseThen).setParent(this);
+			}
+			
 			this.elseThen.resolveTypes(markers, context);
 		}
 	}
@@ -226,22 +274,16 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		Label ifEnd = new Label();
-		ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
-		Label elseEnd = new Label();
-		elseEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
-		
 		// Condition
-		this.condition.writeJump(writer, ifEnd);
+		this.condition.writeJump(writer, elseStart);
 		// If Block
 		this.then.writeExpression(writer);
 		writer.pop();
 		writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
-		writer.visitLabel(ifEnd);
+		writer.visitLabel(elseStart);
 		// Else Block
 		if (this.elseThen == null)
 		{
-			// TODO Write default value
 			this.commonType.writeDefaultValue(writer);
 		}
 		else
@@ -256,31 +298,23 @@ public class IfStatement extends ASTNode implements IStatement
 	{
 		if (this.elseThen != null)
 		{
-			Label ifEnd = new Label();
-			ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
-			Label elseEnd = new Label();
-			elseEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
-			
 			// Condition
-			this.condition.writeJump(writer, ifEnd);
+			this.condition.writeJump(writer, elseStart);
 			// If Block
 			this.then.writeStatement(writer);
 			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.visitLabel(ifEnd);
+			writer.visitLabel(elseStart);
 			// Else Block
 			this.elseThen.writeStatement(writer);
 			writer.visitLabel(elseEnd);
 		}
 		else
 		{
-			Label ifEnd = new Label();
-			ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
-			
 			// Condition
-			this.condition.writeJump(writer, ifEnd);
+			this.condition.writeJump(writer, elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.visitLabel(ifEnd);
+			writer.visitLabel(elseStart);
 		}
 	}
 	
@@ -297,20 +331,21 @@ public class IfStatement extends ASTNode implements IStatement
 		if (this.then != null)
 		{
 			Formatting.appendValue(this.then, prefix, buffer);
-		}
-		if (this.elseThen != null)
-		{
-			if (this.then instanceof IStatement)
-			{
-				buffer.append('\n').append(prefix);
-			}
-			else
-			{
-				buffer.append(' ');
-			}
 			
-			buffer.append(Formatting.Statements.ifElse);
-			Formatting.appendValue(this.elseThen, prefix, buffer);
+			if (this.elseThen != null)
+			{
+				if (this.then.isStatement())
+				{
+					buffer.append('\n').append(prefix);
+				}
+				else
+				{
+					buffer.append(' ');
+				}
+				
+				buffer.append(Formatting.Statements.ifElse);
+				Formatting.appendValue(this.elseThen, prefix, buffer);
+			}
 		}
 	}
 }

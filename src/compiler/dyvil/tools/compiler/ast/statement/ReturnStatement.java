@@ -15,7 +15,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ReturnStatement extends ASTNode implements IStatement, IValued
 {
-	protected IValue	value;
+	public IValue	value;
+	private IStatement parent;
 	
 	public ReturnStatement(ICodePosition position)
 	{
@@ -44,6 +45,18 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	public int getValueType()
 	{
 		return RETURN;
+	}
+	
+	@Override
+	public void setParent(IStatement parent)
+	{
+		this.parent = parent;
+	}
+	
+	@Override
+	public IStatement getParent()
+	{
+		return this.parent;
 	}
 	
 	@Override

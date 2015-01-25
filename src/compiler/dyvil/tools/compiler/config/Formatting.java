@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.config;
 
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.statement.IStatement;
 
 public class Formatting
 {
@@ -85,6 +84,7 @@ public class Formatting
 	public static class Expression
 	{
 		public static String	emptyExpression	= "{ }";
+		public static String	labelSeperator	= ": ";
 		
 		public static boolean	convertTuples	= true;
 		public static String	emptyTuple		= "()";
@@ -102,7 +102,7 @@ public class Formatting
 	
 	public static void appendValue(IValue value, String prefix, StringBuilder buffer)
 	{
-		if (value instanceof IStatement)
+		if (value.isStatement())
 		{
 			buffer.append('\n').append(prefix);
 			value.toString(prefix, buffer);

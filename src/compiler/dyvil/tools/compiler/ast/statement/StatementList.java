@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -28,15 +29,52 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public class StatementList extends ValueList implements IStatement, IContext
 {
 	private IContext				context;
+	private IStatement				parent;
 	
 	private int						variableCount;
 	public Map<String, Variable>	variables	= new HashMap();
-	public Label					start		= new Label();
-	public Label					end			= new Label();
+	
+	public Label					start;
+	public Label					end;
+	
+	public Map<String, Label>		labels;
+	public Map<IValue, String>		valueLabels;
 	
 	public StatementList(ICodePosition position)
 	{
 		super(position);
+		
+		this.start = new Label();
+		this.start.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
+		this.end = new Label();
+		this.end.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
+	}
+	
+	@Override
+	public void addLabel(String name, IValue value)
+	{
+		if (this.labels == null)
+		{
+			this.labels = new HashMap();
+			this.valueLabels = new HashMap();
+		}
+		
+		Label label = new Label();
+		label.info = value;
+		this.labels.put(name, label);
+		this.valueLabels.put(value, name);
+	}
+	
+	@Override
+	public void setParent(IStatement parent)
+	{
+		this.parent = parent;
+	}
+	
+	@Override
+	public IStatement getParent()
+	{
+		return this.parent;
 	}
 	
 	@Override
@@ -53,12 +91,24 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		if (this.isArray)
+		{
+			for (IValue v : this.values)
+			{
+				v.resolveTypes(markers, context);
+			}
+		}
+		
 		this.context = context;
 		this.variableCount = context.getVariableCount();
 		
 		for (IValue v : this.values)
 		{
-			if (v.getValueType() == IValue.FIELD_ASSIGN)
+			if (v.isStatement())
+			{
+				((IStatement) v).setParent(this);
+			}
+			else if (v.getValueType() == IValue.FIELD_ASSIGN)
 			{
 				FieldAssign fa = (FieldAssign) v;
 				if (fa.type != null)
@@ -80,6 +130,12 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
+		if (this.isArray)
+		{
+			// Convert this to a simpler ValueList for performance
+			return new ValueList(this.position, this.values, this.requiredType, this.elementType).resolve(markers, context);
+		}
+		
 		this.context = context;
 		
 		int len = this.values.size();
@@ -197,26 +253,38 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public Label resolveLabel(String name)
 	{
-		if (this.isArray)
+		if ("$blockStart".equals(name))
 		{
-			super.writeExpression(writer);
-			return;
+			return this.start;
+		}
+		else if ("$blockEnd".equals(name))
+		{
+			return this.end;
 		}
 		
+		if (this.labels != null)
+		{
+			Label label = this.labels.get(name);
+			if (label != null)
+			{
+				return label;
+			}
+		}
+		
+		return this.parent == null ? null : this.parent.resolveLabel(name);
+	}
+	
+	@Override
+	public void writeExpression(MethodWriter writer)
+	{
 		this.writeStatement(writer);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		if (this.isArray)
-		{
-			super.writeExpression(writer);
-			return;
-		}
-		
 		writer.visitLabel(this.start);
 		
 		// Write variable types
@@ -226,16 +294,56 @@ public class StatementList extends ValueList implements IStatement, IContext
 			writer.addLocal(var.type);
 		}
 		
+		String label;
 		for (IValue v : this.values)
 		{
+			if (this.valueLabels != null && (label = this.valueLabels.get(v)) != null)
+			{
+				writer.visitLabel(this.labels.get(label));
+			}
+			
 			v.writeStatement(writer);
 		}
-		writer.visitLabel(this.end);
+		writer.visitLabelEnd(this.end);
 		
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
 			writer.visitLocalVariable(entry.getKey(), var.type.getExtendedName(), var.type.getSignature(), this.start, this.end, var.index);
+		}
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		int len = this.values.size();
+		if (len == 0)
+		{
+			buffer.append(Formatting.Expression.emptyExpression);
+		}
+		else if (len == 1)
+		{
+			buffer.append(Formatting.Expression.arrayStart);
+			this.values.get(0).toString("", buffer);
+			buffer.append(Formatting.Expression.arrayEnd);
+		}
+		else
+		{
+			buffer.append('{').append('\n');
+			String label;
+			String prefix1 = prefix + Formatting.Method.indent;
+			for (IValue value : this.values)
+			{
+				buffer.append(prefix1);
+				
+				if (this.valueLabels != null && (label = this.valueLabels.get(value)) != null)
+				{
+					buffer.append(label).append(Formatting.Expression.labelSeperator);
+				}
+				value.toString(prefix1, buffer);
+				buffer.append(";\n");
+			}
+			buffer.append(prefix).append('}');
 		}
 	}
 }

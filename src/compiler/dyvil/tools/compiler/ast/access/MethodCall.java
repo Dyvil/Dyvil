@@ -421,13 +421,11 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 		if (this.method.getType() == Type.BOOLEAN)
 		{
 			Label ifEnd = new Label();
-			ifEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 			
 			// Condition
 			if (this.method.writePostfixBytecode(writer, ifEnd))
 			{
 				Label elseEnd = new Label();
-				elseEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 				
 				// If Block
 				writer.visitLdcInsn(1);

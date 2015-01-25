@@ -13,6 +13,7 @@ import dyvil.tools.compiler.util.Tokens;
 public class ExpressionListParser extends Parser implements IValued
 {
 	protected IValueList	valueList;
+	private String			label;
 	
 	public ExpressionListParser(IValueList valueList)
 	{
@@ -31,6 +32,13 @@ public class ExpressionListParser extends Parser implements IValued
 		
 		if (this.mode == 0)
 		{
+			if (token.next().isType(Tokens.COLON))
+			{
+				this.label = token.value();
+				pm.skip();
+				return true;
+			}
+			
 			this.mode = 1;
 			pm.pushParser(new ExpressionParser(this), true);
 			return true;
@@ -61,6 +69,12 @@ public class ExpressionListParser extends Parser implements IValued
 	public void setValue(IValue value)
 	{
 		this.valueList.addValue(value);
+		
+		if (this.label != null)
+		{
+			this.valueList.addLabel(this.label, value);
+			this.label = null;
+		}
 	}
 	
 	@Override

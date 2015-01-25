@@ -22,4 +22,8 @@ public interface IValueList
 	{
 		return false;
 	}
+	
+	public default void addLabel(String name, IValue value)
+	{
+	}
 }

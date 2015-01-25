@@ -230,10 +230,12 @@ public final class MethodWriter extends MethodVisitor
 	@Override
 	public void visitLabel(Label label)
 	{
-		if (label.info == JUMP_INSTRUCTION_TARGET)
-		{
-			this.visitFrame();
-		}
+		this.visitFrame();
+		this.mv.visitLabel(label);
+	}
+	
+	public void visitLabelEnd(Label label)
+	{
 		this.mv.visitLabel(label);
 	}
 	

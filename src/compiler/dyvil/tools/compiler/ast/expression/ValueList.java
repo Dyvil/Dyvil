@@ -5,7 +5,6 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -18,7 +17,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class ValueList extends ASTNode implements IValue, IValueList
 {
-	public List<IValue>	values	= new ArrayList(3);
+	public List<IValue>	values;
 	
 	protected boolean	isArray;
 	protected IType		requiredType;
@@ -27,12 +26,23 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	public ValueList(ICodePosition position)
 	{
 		this.position = position;
+		this.values = new ArrayList(3);
 	}
 	
 	public ValueList(ICodePosition position, boolean array)
 	{
 		this.position = position;
 		this.isArray = array;
+		this.values = new ArrayList(3);
+	}
+	
+	public ValueList(ICodePosition position, List<IValue> values, IType type, IType elementType)
+	{
+		this.position = position;
+		this.isArray = true;
+		this.values = values;
+		this.requiredType = type;
+		this.elementType = elementType;
 	}
 	
 	@Override
@@ -300,27 +310,23 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			{
 				buffer.append(Formatting.Expression.emptyExpression);
 			}
+			else if (len == 1)
+			{
+				buffer.append(Formatting.Expression.arrayStart);
+				this.values.get(0).toString("", buffer);
+				buffer.append(Formatting.Expression.arrayEnd);
+			}
 			else
 			{
-				IValue v = this.values.get(0);
-				if (len == 1 && !(v instanceof IStatement))
+				buffer.append('{').append('\n');
+				String prefix1 = prefix + Formatting.Method.indent;
+				for (IValue value : this.values)
 				{
-					buffer.append(Formatting.Expression.arrayStart);
-					v.toString("", buffer);
-					buffer.append(Formatting.Expression.arrayEnd);
+					buffer.append(prefix1);
+					value.toString(prefix1, buffer);
+					buffer.append(";\n");
 				}
-				else
-				{
-					buffer.append('{').append('\n');
-					String prefix1 = prefix + Formatting.Method.indent;
-					for (IValue value : this.values)
-					{
-						buffer.append(prefix1);
-						value.toString(prefix1, buffer);
-						buffer.append(";\n");
-					}
-					buffer.append(prefix).append('}');
-				}
+				buffer.append(prefix).append('}');
 			}
 		}
 	}

@@ -57,6 +57,10 @@ public interface IValue extends IASTNode, ITyped
 	public static int	WHILE				= 68;
 	public static int	DO_WHILE			= 69;
 	
+	public static int	BREAK				= 72;
+	public static int	CONTINUE			= 73;
+	public static int	GOTO				= 74;
+	
 	public int getValueType();
 	
 	public static boolean isNumeric(int t1)
@@ -65,6 +69,11 @@ public interface IValue extends IASTNode, ITyped
 	}
 	
 	public default boolean isConstant()
+	{
+		return false;
+	}
+	
+	public default boolean isStatement()
 	{
 		return false;
 	}

@@ -4,21 +4,13 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		int i = 10 * -1
-		int j = i * -25
-		i print;
-		j print;
-		"----------" print;
+		int i = 0
 		
-		i :=: j
-		while (i < 10 && j == -10)
-		{
-			System out println(i)
-			i = i + 1
-		}
+		loop: System out println(i)
+		i = i + 1;
+			
+		if (i < 10) goto loop;
+		
+		System out println "end";
 	}
-	
-	public implicit void print(int i) = System out println(i);
-	
-	public implicit void print(String s) = System out println(s);
 }
