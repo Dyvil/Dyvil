@@ -81,6 +81,7 @@ public class GoToStatement extends ASTNode implements IStatement
 		{
 			markers.add(Markers.create(this.position, "goto.invalid"));
 		}
+		markers.add(Markers.create(this.position, "goto.warning"));
 		
 		return this;
 	}
