@@ -797,7 +797,7 @@ public class Method extends Member implements IMethod
 		}
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.addLocal(0, this.type);
+			mw.addLocal(0, this.getThisType());
 		}
 		
 		for (Annotation annotation : this.annotations)

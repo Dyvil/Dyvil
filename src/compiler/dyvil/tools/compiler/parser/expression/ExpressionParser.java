@@ -290,7 +290,17 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.reparse();
 				return this.getAccess(pm, prev.value(), prev, type);
 			}
-			return false;
+			else
+			{
+				MethodCall call = new MethodCall(token.raw());
+				call.instance = this.value;
+				call.name = "apply";
+				call.qualifiedName = "apply";
+				this.value = call;
+				this.mode = 0;
+				pm.pushParser(new ExpressionParser(this), true);
+				return true;
+			}
 		}
 		if (this.isInMode(CONSTRUCTOR))
 		{

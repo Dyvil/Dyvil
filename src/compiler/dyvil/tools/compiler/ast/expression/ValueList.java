@@ -69,17 +69,25 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		}
 		
 		IType t = this.values.get(0).getType();
-		for (int i = 1; i < len; i++)
+		if (t == null)
 		{
-			IValue v = this.values.get(i);
-			IType t1 = v.getType();
-			if (t1 == null)
-			{
-				t = Type.VOID;
-				break;
-			}
-			t = Type.findCommonSuperType(t, t1);
+			t = Type.VOID;
 		}
+		else
+		{
+			for (int i = 1; i < len; i++)
+			{
+				IValue v = this.values.get(i);
+				IType t1 = v.getType();
+				if (t1 == null)
+				{
+					t = Type.VOID;
+					break;
+				}
+				t = Type.findCommonSuperType(t, t1);
+			}
+		}
+		
 		if (t != null)
 		{
 			this.elementType = t;

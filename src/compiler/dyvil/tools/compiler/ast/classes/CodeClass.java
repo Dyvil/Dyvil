@@ -436,7 +436,10 @@ public class CodeClass extends ASTNode implements IClass
 			a.resolveTypes(markers, this);
 		}
 		
-		this.body.resolveTypes(markers, this);
+		if (this.body != null)
+		{
+			this.body.resolveTypes(markers, this);
+		}
 	}
 	
 	@Override
@@ -459,7 +462,10 @@ public class CodeClass extends ASTNode implements IClass
 			this.instanceField = new Field(this, "$instance", this.getType(), Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, Collections.EMPTY_LIST);
 		}
 		
-		this.body.resolve(markers, this);
+		if (this.body != null)
+		{
+			this.body.resolve(markers, this);
+		}
 	}
 	
 	@Override
@@ -518,7 +524,10 @@ public class CodeClass extends ASTNode implements IClass
 			a.check(markers, context);
 		}
 		
-		this.body.check(markers, this);
+		if (this.body != null)
+		{
+			this.body.check(markers, this);
+		}
 	}
 	
 	@Override
@@ -529,7 +538,10 @@ public class CodeClass extends ASTNode implements IClass
 			a.foldConstants();
 		}
 		
-		this.body.foldConstants();
+		if (this.body != null)
+		{
+			this.body.foldConstants();
+		}
 	}
 	
 	@Override
