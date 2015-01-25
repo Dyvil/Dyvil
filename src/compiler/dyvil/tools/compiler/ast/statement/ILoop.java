@@ -4,7 +4,7 @@ import jdk.internal.org.objectweb.asm.Label;
 
 public interface ILoop
 {
-	public Label getStartLabel();
+	public Label getContinueLabel();
 	
-	public Label getEndLabel();
+	public Label getBreakLabel();
 }

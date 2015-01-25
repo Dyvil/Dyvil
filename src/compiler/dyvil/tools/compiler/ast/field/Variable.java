@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -91,6 +92,11 @@ public class Variable extends Member implements IField
 		{
 			a.resolveTypes(markers, context);
 		}
+		
+		if (this.value != null)
+		{
+			this.value.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
@@ -107,6 +113,11 @@ public class Variable extends Member implements IField
 			
 			a.resolve(markers, context);
 		}
+		
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, context);
+		}
 	}
 	
 	@Override
@@ -116,6 +127,8 @@ public class Variable extends Member implements IField
 		{
 			a.check(markers, context);
 		}
+		
+		this.value.check(markers, context);
 	}
 	
 	@Override
@@ -125,6 +138,8 @@ public class Variable extends Member implements IField
 		{
 			a.foldConstants();
 		}
+		
+		this.value = this.value.foldConstants();
 	}
 	
 	@Override
@@ -135,7 +150,7 @@ public class Variable extends Member implements IField
 	@Override
 	public void writeGet(MethodWriter writer)
 	{
-		if ((this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
+		if (this.value != null && (this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
 		{
 			this.value.writeExpression(writer);
 		}
@@ -153,5 +168,11 @@ public class Variable extends Member implements IField
 	{
 		this.type.toString("", buffer);
 		buffer.append(' ').append(this.name);
+		
+		if (this.value != null)
+		{
+			buffer.append(Formatting.Field.keyValueSeperator);
+			Formatting.appendValue(this.value, prefix, buffer);
+		}
 	}
 }

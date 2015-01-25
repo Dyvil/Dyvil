@@ -119,21 +119,28 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		{
 			this.field.resolveTypes(markers, context);
 		}
-		else if (this.instance != null)
+		else
 		{
-			this.instance.resolveTypes(markers, context);
-		}
-		
-		if (this.value != null)
-		{
-			this.value.resolveTypes(markers, context);
+			if (this.instance != null)
+			{
+				this.instance.resolveTypes(markers, context);
+			}
+			
+			if (this.value != null)
+			{
+				this.value.resolveTypes(markers, context);
+			}
 		}
 	}
 	
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		if (this.type == null)
+		if (this.type != null)
+		{
+			this.field.resolve(markers, context);
+		}
+		else
 		{
 			FieldMatch match = null;
 			if (this.instance == null)
@@ -155,13 +162,13 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 			}
 			else
 			{
-				markers.add(Markers.create(this.position, "'" + this.name + "' could not be resolved to a field"));
+				markers.add(Markers.create(this.position, "resolve.field", this.field));
 			}
-		}
-		
-		if (this.value != null)
-		{
-			this.value = this.value.resolve(markers, context);
+			
+			if (this.value != null)
+			{
+				this.value = this.value.resolve(markers, context);
+			}
 		}
 		
 		return this;
@@ -170,12 +177,16 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
+		if (this.type != null)
+		{
+			this.field.check(markers, context);
+			return;
+		}
+		
 		if (this.value.getValueType() == IValue.THIS)
 		{
 			markers.add(new SyntaxError(this.position, "access.this.assign"));
 		}
-		
-		this.value.check(markers, context);
 		
 		if (this.field == null)
 		{
@@ -192,38 +203,41 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 			markers.add(marker);
 		}
 		
-		if (this.type == null)
+		if (this.field.hasModifier(Modifiers.FINAL))
 		{
-			if (this.field.hasModifier(Modifiers.FINAL))
-			{
-				markers.add(Markers.create(this.position, "access.final.field", this.name));
-			}
-			
-			if (this.field.hasModifier(Modifiers.DEPRECATED))
-			{
-				markers.add(Markers.create(this.position, "access.field.deprecated", this.name));
-			}
-			
-			byte access = context.getAccessibility(this.field);
-			if (access == IContext.STATIC)
-			{
-				markers.add(Markers.create(this.position, "access.static.field", this.name));
-			}
-			else if (access == IContext.SEALED)
-			{
-				markers.add(Markers.create(this.position, "access.sealed.field", this.name));
-			}
-			else if ((access & IContext.WRITE_ACCESS) == 0)
-			{
-				markers.add(Markers.create(this.position, "access.invisible.field", this.name));
-			}
+			markers.add(Markers.create(this.position, "access.final.field", this.name));
+		}
+		if (this.field.hasModifier(Modifiers.DEPRECATED))
+		{
+			markers.add(Markers.create(this.position, "access.field.deprecated", this.name));
+		}
+		
+		byte access = context.getAccessibility(this.field);
+		if (access == IContext.STATIC)
+		{
+			markers.add(Markers.create(this.position, "access.static.field", this.name));
+		}
+		else if (access == IContext.SEALED)
+		{
+			markers.add(Markers.create(this.position, "access.sealed.field", this.name));
+		}
+		else if ((access & IContext.WRITE_ACCESS) == 0)
+		{
+			markers.add(Markers.create(this.position, "access.invisible.field", this.name));
 		}
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
-		this.value = this.value.foldConstants();
+		if (this.type != null)
+		{
+			this.field.foldConstants();
+		}
+		else
+		{
+			this.value = this.value.foldConstants();
+		}
 		return this;
 	}
 	
@@ -276,12 +290,12 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 			}
 			
 			buffer.append(this.name);
-		}
-		
-		if (this.value != null)
-		{
-			buffer.append(Formatting.Field.keyValueSeperator);
-			Formatting.appendValue(this.value, prefix, buffer);
+			
+			if (this.value != null)
+			{
+				buffer.append(Formatting.Field.keyValueSeperator);
+				Formatting.appendValue(this.value, prefix, buffer);
+			}
 		}
 	}
 }

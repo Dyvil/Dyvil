@@ -63,7 +63,7 @@ public class ForStatementParser extends Parser implements IValued
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.forStatement.variableName = token.value();
+				this.forStatement.variable.setName(token.value());
 			}
 			else
 			{
@@ -152,9 +152,9 @@ public class ForStatementParser extends Parser implements IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == VARIABLE_END || this.forStatement.isForeach)
+		if (this.mode == VARIABLE_END)
 		{
-			this.forStatement.variableValue = value;
+			this.forStatement.variable.value = value;
 		}
 		else if (this.mode == CONDITION_END)
 		{
@@ -162,7 +162,14 @@ public class ForStatementParser extends Parser implements IValued
 		}
 		else if (this.mode == FOR_END)
 		{
-			this.forStatement.update = value;
+			if (this.forStatement.isForeach)
+			{
+				this.forStatement.variable.value = value;
+			}
+			else
+			{
+				this.forStatement.update = value;
+			}
 		}
 		else if (this.mode == STATEMENT_END)
 		{

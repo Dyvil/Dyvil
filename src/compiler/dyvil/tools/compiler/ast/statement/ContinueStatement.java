@@ -81,7 +81,7 @@ public class ContinueStatement extends ASTNode implements IStatement
 				IValue value = (IValue) this.label.info;
 				if (value instanceof ILoop)
 				{
-					this.label = ((ILoop) value).getStartLabel();
+					this.label = ((ILoop) value).getContinueLabel();
 				}
 				else
 				{
@@ -96,7 +96,7 @@ public class ContinueStatement extends ASTNode implements IStatement
 			{
 				if (parent instanceof ILoop)
 				{
-					this.label = ((ILoop) parent).getEndLabel();
+					this.label = ((ILoop) parent).getBreakLabel();
 					break;
 				}
 				parent = parent.getParent();

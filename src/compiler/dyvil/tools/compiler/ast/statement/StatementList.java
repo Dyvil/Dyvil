@@ -115,6 +115,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 					var.name = fa.name;
 					var.qualifiedName = fa.qualifiedName;
 					var.type = fa.type;
+					var.value = fa.value;
 					var.index = this.variableCount++;
 					fa.field = var;
 					this.variables.put(fa.qualifiedName, var);
@@ -307,7 +308,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			writer.visitLocalVariable(entry.getKey(), var.type.getExtendedName(), var.type.getSignature(), this.start, this.end, var.index);
+			writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), this.start, this.end, var.index);
 		}
 	}
 	

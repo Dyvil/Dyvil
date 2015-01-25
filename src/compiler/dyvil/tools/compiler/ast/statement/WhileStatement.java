@@ -93,13 +93,13 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public Label getStartLabel()
+	public Label getContinueLabel()
 	{
 		return this.start;
 	}
 	
 	@Override
-	public Label getEndLabel()
+	public Label getBreakLabel()
 	{
 		return this.end;
 	}

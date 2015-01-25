@@ -81,7 +81,7 @@ public class BreakStatement extends ASTNode implements IStatement
 				IValue value = (IValue) this.label.info;
 				if (value instanceof ILoop)
 				{
-					this.label = ((ILoop) value).getEndLabel();
+					this.label = ((ILoop) value).getBreakLabel();
 				}
 				else
 				{
@@ -96,7 +96,7 @@ public class BreakStatement extends ASTNode implements IStatement
 			{
 				if (parent instanceof ILoop)
 				{
-					this.label = ((ILoop) parent).getEndLabel();
+					this.label = ((ILoop) parent).getBreakLabel();
 					break;
 				}
 				parent = parent.getParent();

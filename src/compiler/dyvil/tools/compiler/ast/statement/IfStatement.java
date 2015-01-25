@@ -145,21 +145,6 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public Label resolveLabel(String name)
-	{
-		switch (name)
-		{
-		case "$ifEnd":
-		case "$elseStart":
-			return this.elseStart;
-		case "$elseEnd":
-			return this.elseThen == null ? this.elseStart : this.elseEnd;
-		}
-		
-		return this.parent == null ? null : this.parent.resolveLabel(name);
-	}
-	
-	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.condition != null)
@@ -267,6 +252,21 @@ public class IfStatement extends ASTNode implements IStatement
 			this.elseThen = this.elseThen.foldConstants();
 		}
 		return this;
+	}
+
+	@Override
+	public Label resolveLabel(String name)
+	{
+		switch (name)
+		{
+		case "$ifEnd":
+		case "$elseStart":
+			return this.elseStart;
+		case "$elseEnd":
+			return this.elseThen == null ? this.elseStart : this.elseEnd;
+		}
+		
+		return this.parent == null ? null : this.parent.resolveLabel(name);
 	}
 	
 	@Override
