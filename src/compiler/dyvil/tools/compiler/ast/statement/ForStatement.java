@@ -385,6 +385,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			if (var != null)
 			{
 				writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), this.startLabel, this.endLabel, var.index);
+				writer.removeLocals(1);
 			}
 			return;
 		}
@@ -437,6 +438,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			writer.visitLocalVariable("$index", "I", null, this.startLabel, this.endLabel, indexVar.index);
 			writer.visitLocalVariable("$length", "I", null, this.startLabel, this.endLabel, this.lengthVar.index);
 			writer.visitLocalVariable("$array", arrayVar.type.getExtendedName(), arrayVar.type.getSignature(), this.startLabel, this.endLabel, arrayVar.index);
+			writer.removeLocals(4);
 			return;
 		}
 	}

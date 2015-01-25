@@ -305,11 +305,14 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		writer.visitLabelEnd(this.end);
 		
+		int count = 0;
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
 			writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), this.start, this.end, var.index);
+			count++;
 		}
+		writer.removeLocals(count);
 	}
 	
 	@Override

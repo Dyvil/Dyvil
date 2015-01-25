@@ -20,6 +20,7 @@ public final class MethodWriter extends MethodVisitor
 	private int					maxLocals;
 	private int					maxStack;
 	
+	private int					localCount;
 	private Object[]			locals			= new Object[2];
 	private LinkedList			typeStack		= new LinkedList();
 	
@@ -34,31 +35,44 @@ public final class MethodWriter extends MethodVisitor
 		this.push(UNINITIALIZED_THIS);
 	}
 	
-	private void ensureLocals(int index)
+	private void ensureLocals(int count)
 	{
-		if (index >= this.locals.length)
+		if (count > this.locals.length)
 		{
-			int newLen = index + 1;
-			Object[] newLocals = new Object[newLen];
+			Object[] newLocals = new Object[count];
 			System.arraycopy(this.locals, 0, newLocals, 0, this.locals.length);
 			this.locals = newLocals;
+			this.localCount = count;
+			this.maxLocals = count;
+			return;
 		}
-		if (index >= this.maxLocals)
+		if (count > this.maxLocals)
 		{
-			this.maxLocals = index + 1;
+			this.maxLocals = count;
+			this.localCount = count;
+			return;
+		}
+		if (count > this.localCount)
+		{
+			this.localCount = count;
 		}
 	}
 	
 	public void addLocal(int index, IType type)
 	{
-		this.ensureLocals(index);
+		this.ensureLocals(index + 1);
 		this.locals[index] = type.getFrameType();
 	}
 	
 	public void addLocal(int index, Object type)
 	{
-		this.ensureLocals(index);
+		this.ensureLocals(index + 1);
 		this.locals[index] = type;
+	}
+	
+	public void removeLocals(int count)
+	{
+		this.localCount -= count;
 	}
 	
 	protected void set(Object type)
@@ -268,7 +282,7 @@ public final class MethodWriter extends MethodVisitor
 		{
 			o[i] = this.typeStack.get(i);
 		}
-		this.mv.visitFrame(F_NEW, this.maxLocals, this.locals, len, o);
+		this.mv.visitFrame(F_NEW, this.localCount, this.locals, len, o);
 	}
 	
 	@Override
