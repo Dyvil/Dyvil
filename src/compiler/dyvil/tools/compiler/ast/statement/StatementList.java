@@ -290,7 +290,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			writer.addLocal(var.type);
+			writer.addLocal(var.index, var.type);
 		}
 		
 		String label;

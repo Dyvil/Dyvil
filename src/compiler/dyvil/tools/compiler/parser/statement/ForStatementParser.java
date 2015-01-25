@@ -84,7 +84,7 @@ public class ForStatementParser extends Parser implements IValued
 			if (type == Tokens.COLON)
 			{
 				this.mode = FOR_END;
-				this.forStatement.isForeach = true;
+				this.forStatement.type = 3;
 				pm.pushParser(new ExpressionParser(this));
 				return true;
 			}
@@ -162,7 +162,7 @@ public class ForStatementParser extends Parser implements IValued
 		}
 		else if (this.mode == FOR_END)
 		{
-			if (this.forStatement.isForeach)
+			if (this.forStatement.type != 0)
 			{
 				this.forStatement.variable.value = value;
 			}

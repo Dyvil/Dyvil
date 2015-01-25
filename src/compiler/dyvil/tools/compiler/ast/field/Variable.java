@@ -128,6 +128,15 @@ public class Variable extends Member implements IField
 			a.check(markers, context);
 		}
 		
+		if (!this.value.requireType(this.type))
+		{
+			Marker marker = Markers.create(this.value.getPosition(), "access.variable.type", this.name);
+			marker.addInfo("Field Type: " + this.type);
+			IType vtype = this.value.getType();
+			marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
+			markers.add(marker);
+		}
+		
 		this.value.check(markers, context);
 	}
 	
@@ -154,7 +163,7 @@ public class Variable extends Member implements IField
 		{
 			this.value.writeExpression(writer);
 		}
-		writer.visitVarInsn(this.type.getLoadOpcode(), this.index, this.type);
+		writer.visitVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
 	@Override

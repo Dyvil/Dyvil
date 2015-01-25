@@ -32,7 +32,13 @@ public interface IType extends IASTNode, INamed, IContext
 	
 	public int getArrayDimensions();
 	
-	public void addArrayDimension();
+	public default void addArrayDimension()
+	{
+	}
+	
+	public default void removeArrayDimension()
+	{
+	}
 	
 	public boolean isArrayType();
 	

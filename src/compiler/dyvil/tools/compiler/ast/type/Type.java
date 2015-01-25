@@ -253,6 +253,12 @@ public class Type extends ASTNode implements IContext, IType
 	}
 	
 	@Override
+	public void removeArrayDimension()
+	{
+		this.arrayDimensions--;
+	}
+	
+	@Override
 	public boolean isArrayType()
 	{
 		return this.arrayDimensions > 0;

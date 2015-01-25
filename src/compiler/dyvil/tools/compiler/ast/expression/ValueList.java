@@ -132,6 +132,8 @@ public class ValueList extends ASTNode implements IValue, IValueList
 				return Type.isSuperType(type, this.requiredType);
 			}
 			this.requiredType = type;
+			this.elementType = type.clone();
+			this.elementType.removeArrayDimension();
 			return true;
 		}
 		return false;

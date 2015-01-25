@@ -15,13 +15,14 @@ import dyvil.tools.compiler.util.OpcodeUtil;
 
 public final class MethodWriter extends MethodVisitor
 {
-	public static final Long	LONG_MINUS_ONE			= Long.valueOf(-1);
+	public static final Long	LONG_MINUS_ONE	= Long.valueOf(-1);
+	public static final Integer	TOP				= jdk.internal.org.objectweb.asm.Opcodes.TOP;
 	
 	private boolean				hasReturn;
 	private int					maxStack;
 	
-	private List				locals					= new ArrayList();
-	private LinkedList			typeStack				= new LinkedList();
+	private List				locals			= new ArrayList();
+	private LinkedList			typeStack		= new LinkedList();
 	
 	public MethodWriter(MethodVisitor mv)
 	{
@@ -34,9 +35,14 @@ public final class MethodWriter extends MethodVisitor
 		this.push(UNINITIALIZED_THIS);
 	}
 	
-	public void addLocal(IType type)
+	public void addLocal(int index, IType type)
 	{
 		this.locals.add(type.getFrameType());
+	}
+	
+	public void addLocal(int index, Object type)
+	{
+		this.locals.add(type);
 	}
 	
 	protected void set(Object type)
@@ -282,13 +288,16 @@ public final class MethodWriter extends MethodVisitor
 		{
 		case DUP:
 			this.typeStack.push(this.typeStack.peek());
-			break;
+			return;
 		case POP:
 			this.typeStack.pop();
-			break;
+			return;
 		case ACONST_NULL:
 			this.push(NULL);
-			break;
+			return;
+		case ARRAYLENGTH:
+			this.set(INTEGER);
+			return;
 		case IADD:
 		case ISUB:
 		case IMUL:
@@ -300,7 +309,7 @@ public final class MethodWriter extends MethodVisitor
 			this.typeStack.pop();
 			this.typeStack.pop();
 			this.push(INTEGER);
-			break;
+			return;
 		case LADD:
 		case LSUB:
 		case LMUL:
@@ -312,7 +321,7 @@ public final class MethodWriter extends MethodVisitor
 			this.typeStack.pop();
 			this.typeStack.pop();
 			this.push(LONG);
-			break;
+			return;
 		case FADD:
 		case FSUB:
 		case FMUL:
@@ -321,7 +330,7 @@ public final class MethodWriter extends MethodVisitor
 			this.typeStack.pop();
 			this.typeStack.pop();
 			this.push(FLOAT);
-			break;
+			return;
 		case DADD:
 		case DSUB:
 		case DMUL:
@@ -330,8 +339,8 @@ public final class MethodWriter extends MethodVisitor
 			this.typeStack.pop();
 			this.typeStack.pop();
 			this.push(DOUBLE);
-			break;
-		// Casts
+			return;
+			// Casts
 		case L2I:
 		case F2I:
 		case D2I:
@@ -340,13 +349,13 @@ public final class MethodWriter extends MethodVisitor
 		case F2L:
 		case D2L:
 			this.set(LONG);
-			break;
+			return;
 		case I2F:
 		case L2F:
 		case D2F:
 			this.set(FLOAT);
-			break;
-		// Comparison Operators
+			return;
+			// Comparison Operators
 		case LCMP:
 		case FCMPL:
 		case FCMPG:
@@ -355,7 +364,7 @@ public final class MethodWriter extends MethodVisitor
 			this.typeStack.pop();
 			this.typeStack.pop();
 			this.push(INTEGER);
-			break;
+			return;
 		}
 	}
 	
@@ -712,7 +721,7 @@ public final class MethodWriter extends MethodVisitor
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append("MethodWriter [stack=").append(this.typeStack).append(", locals=").append(this.locals).append("]");
+		builder.append("MethodWriter {stack=").append(this.typeStack).append(", locals=").append(this.locals).append("}");
 		return builder.toString();
 	}
 }

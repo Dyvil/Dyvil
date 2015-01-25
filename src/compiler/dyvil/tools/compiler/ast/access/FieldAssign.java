@@ -261,6 +261,13 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		if (this.type != null)
+		{
+			this.field.getValue().writeExpression(writer);
+			this.field.writeSet(writer);
+			return;
+		}
+		
 		if (this.value == null)
 		{
 			return;
