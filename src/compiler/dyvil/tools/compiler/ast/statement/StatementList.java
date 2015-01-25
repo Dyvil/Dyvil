@@ -319,12 +319,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 		{
 			buffer.append(Formatting.Expression.emptyExpression);
 		}
-		else if (len == 1)
-		{
-			buffer.append(Formatting.Expression.arrayStart);
-			this.values.get(0).toString("", buffer);
-			buffer.append(Formatting.Expression.arrayEnd);
-		}
 		else
 		{
 			buffer.append('{').append('\n');

@@ -21,6 +21,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
+import dyvil.tools.compiler.parser.statement.ForStatementParser;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
 import dyvil.tools.compiler.parser.statement.WhileStatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
@@ -582,7 +583,13 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		case Tokens.DO:
 			return true;
 		case Tokens.FOR:
+		{
+			ForStatement statement = new ForStatement(token);
+			this.value = statement;
+			pm.pushParser(new ForStatementParser(statement));
+			this.mode = 0;
 			return true;
+		}
 		case Tokens.BREAK:
 		{
 			BreakStatement statement = new BreakStatement(token);
