@@ -2,9 +2,7 @@ package dyvil.tools.compiler.backend;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
@@ -19,9 +17,10 @@ public final class MethodWriter extends MethodVisitor
 	public static final Integer	TOP				= jdk.internal.org.objectweb.asm.Opcodes.TOP;
 	
 	private boolean				hasReturn;
+	private int					maxLocals;
 	private int					maxStack;
 	
-	private List				locals			= new ArrayList();
+	private Object[]			locals			= new Object[2];
 	private LinkedList			typeStack		= new LinkedList();
 	
 	public MethodWriter(MethodVisitor mv)
@@ -31,18 +30,35 @@ public final class MethodWriter extends MethodVisitor
 	
 	public void setConstructor(IType type)
 	{
-		this.locals.add(UNINITIALIZED_THIS);
+		this.locals[0] = UNINITIALIZED_THIS;
 		this.push(UNINITIALIZED_THIS);
+	}
+	
+	private void ensureLocals(int index)
+	{
+		if (index >= this.locals.length)
+		{
+			int newLen = index + 1;
+			Object[] newLocals = new Object[newLen];
+			System.arraycopy(this.locals, 0, newLocals, 0, this.locals.length);
+			this.locals = newLocals;
+		}
+		if (index >= this.maxLocals)
+		{
+			this.maxLocals = index + 1;
+		}
 	}
 	
 	public void addLocal(int index, IType type)
 	{
-		this.locals.add(type.getFrameType());
+		this.ensureLocals(index);
+		this.locals[index] = type.getFrameType();
 	}
 	
 	public void addLocal(int index, Object type)
 	{
-		this.locals.add(type);
+		this.ensureLocals(index);
+		this.locals[index] = type;
 	}
 	
 	protected void set(Object type)
@@ -88,7 +104,7 @@ public final class MethodWriter extends MethodVisitor
 	
 	public void visitParameter(String name, IType type, int index)
 	{
-		this.locals.add(type.getFrameType());
+		this.addLocal(index, type.getFrameType());
 		this.mv.visitParameter(name, index);
 	}
 	
@@ -252,7 +268,7 @@ public final class MethodWriter extends MethodVisitor
 		{
 			o[i] = this.typeStack.get(i);
 		}
-		this.mv.visitFrame(F_NEW, this.locals.size(), this.locals.toArray(), len, o);
+		this.mv.visitFrame(F_NEW, this.maxLocals, this.locals, len, o);
 	}
 	
 	@Override
@@ -265,9 +281,16 @@ public final class MethodWriter extends MethodVisitor
 		}
 		if (opcode >= IALOAD && opcode <= SALOAD)
 		{
+			Object o = this.typeStack.pop();
 			this.typeStack.pop(); // Index
-			String s = (String) this.typeStack.pop(); // Array
-			this.push(s.substring(1));
+			if (o instanceof String)
+			{
+				this.push(((String) o).substring(1));
+			}
+			else
+			{
+				this.push(TOP);
+			}
 		}
 		else if (opcode >= IASTORE && opcode <= SASTORE)
 		{
@@ -599,7 +622,7 @@ public final class MethodWriter extends MethodVisitor
 	{
 		if (opcode >= ILOAD && opcode <= ALOAD)
 		{
-			this.push(this.locals.get(index));
+			this.push(this.locals[index]);
 		}
 		else if (opcode >= ISTORE && opcode <= ASTORE)
 		{
@@ -713,7 +736,7 @@ public final class MethodWriter extends MethodVisitor
 		{
 			this.mv.visitInsn(type.getReturnOpcode());
 		}
-		this.mv.visitMaxs(this.maxStack, this.locals.size());
+		this.mv.visitMaxs(this.maxStack, this.maxLocals);
 		this.mv.visitEnd();
 	}
 	

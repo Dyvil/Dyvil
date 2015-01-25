@@ -175,6 +175,10 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 					marker.addInfo("Variable Type: " + type);
 					markers.add(marker);
 				}
+				else if (this.then == null)
+				{
+					markers.add(Markers.create(this.position, "for.array.statement"));
+				}
 				else
 				{
 					Variable var = new Variable(null);
@@ -351,7 +355,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Variable
 			if (var != null)
 			{
-				writer.addLocal(var.index, MethodWriter.TOP);
+				writer.addLocal(var.index, var.type);
 				var.value.writeExpression(writer);
 				var.writeSet(writer);
 			}
