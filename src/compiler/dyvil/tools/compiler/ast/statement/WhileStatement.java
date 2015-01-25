@@ -33,9 +33,7 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		this.position = position;
 		
 		this.start = new Label();
-		this.start.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 		this.end = new Label();
-		this.end.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 	}
 	
 	public void setCondition(IValue condition)
@@ -202,12 +200,12 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		}
 		
 		// Condition
-		writer.visitLabel(start);
-		this.condition.writeJump(writer, end);
+		writer.visitLabel(this.start);
+		this.condition.writeJump(writer, this.end);
 		// While Block
 		this.then.writeStatement(writer);
-		writer.visitJumpInsn(Opcodes.GOTO, start);
-		writer.visitLabel(end);
+		writer.visitJumpInsn(Opcodes.GOTO, this.start);
+		writer.visitLabel(this.end);
 	}
 	
 	@Override

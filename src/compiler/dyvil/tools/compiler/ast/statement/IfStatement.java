@@ -34,10 +34,8 @@ public class IfStatement extends ASTNode implements IStatement
 	{
 		this.position = position;
 		
-		elseStart = new Label();
-		elseStart.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
-		elseEnd = new Label();
-		elseEnd.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
+		this.elseStart = new Label();
+		this.elseEnd = new Label();
 	}
 	
 	public void setCondition(IValue condition)
@@ -275,12 +273,12 @@ public class IfStatement extends ASTNode implements IStatement
 	public void writeExpression(MethodWriter writer)
 	{
 		// Condition
-		this.condition.writeJump(writer, elseStart);
+		this.condition.writeJump(writer, this.elseStart);
 		// If Block
 		this.then.writeExpression(writer);
 		writer.pop();
-		writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
-		writer.visitLabel(elseStart);
+		writer.visitJumpInsn(Opcodes.GOTO, this.elseEnd);
+		writer.visitLabel(this.elseStart);
 		// Else Block
 		if (this.elseThen == null)
 		{
@@ -290,7 +288,7 @@ public class IfStatement extends ASTNode implements IStatement
 		{
 			this.elseThen.writeExpression(writer);
 		}
-		writer.visitLabel(elseEnd);
+		writer.visitLabel(this.elseEnd);
 	}
 	
 	@Override
@@ -299,22 +297,22 @@ public class IfStatement extends ASTNode implements IStatement
 		if (this.elseThen != null)
 		{
 			// Condition
-			this.condition.writeJump(writer, elseStart);
+			this.condition.writeJump(writer, this.elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.visitLabel(elseStart);
+			writer.visitJumpInsn(Opcodes.GOTO, this.elseEnd);
+			writer.visitLabel(this.elseStart);
 			// Else Block
 			this.elseThen.writeStatement(writer);
-			writer.visitLabel(elseEnd);
+			writer.visitLabel(this.elseEnd);
 		}
 		else
 		{
 			// Condition
-			this.condition.writeJump(writer, elseStart);
+			this.condition.writeJump(writer, this.elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.visitLabel(elseStart);
+			writer.visitLabel(this.elseStart);
 		}
 	}
 	

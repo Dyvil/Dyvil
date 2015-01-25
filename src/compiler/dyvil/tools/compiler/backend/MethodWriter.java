@@ -15,7 +15,6 @@ import dyvil.tools.compiler.util.OpcodeUtil;
 
 public final class MethodWriter extends MethodVisitor
 {
-	public static final Object	JUMP_INSTRUCTION_TARGET	= new Object();
 	public static final Long	LONG_MINUS_ONE			= Long.valueOf(-1);
 	
 	private boolean				hasReturn;

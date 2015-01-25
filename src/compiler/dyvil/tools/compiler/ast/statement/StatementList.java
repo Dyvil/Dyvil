@@ -45,9 +45,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		super(position);
 		
 		this.start = new Label();
-		this.start.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 		this.end = new Label();
-		this.end.info = MethodWriter.JUMP_INSTRUCTION_TARGET;
 	}
 	
 	@Override
