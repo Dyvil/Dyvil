@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -33,7 +34,25 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	@Override
 	public IType getType()
 	{
-		return this.type;
+		return Type.BOOLEAN;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.BOOLEAN ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type == Type.BOOLEAN;
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return type == Type.BOOLEAN ? 3 : 0;
 	}
 	
 	@Override

@@ -1,6 +1,5 @@
 package dyvil.lang;
 
-
 public interface Number extends Ordered<Number>
 {
 	// Primitive value getters

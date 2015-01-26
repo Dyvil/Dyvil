@@ -46,6 +46,12 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return VALUE_LIST;
+	}
+	
+	@Override
 	public boolean isConstant()
 	{
 		for (IValue v : this.values)
@@ -91,8 +97,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		if (t != null)
 		{
 			this.elementType = t;
-			this.requiredType = t.clone();
-			this.requiredType.addArrayDimension();
+			this.requiredType = t.getArrayType();
 		}
 	}
 	
@@ -114,37 +119,61 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public int getValueType()
+	public IValue withType(IType type)
 	{
-		return VALUE_LIST;
-	}
-	
-	public IType getElementType()
-	{
-		if (this.elementType == null)
-		{
-			this.generateTypes();
-		}
-		
-		return this.elementType;
+		return this.requiredType == null ? null : this;
 	}
 	
 	@Override
-	public boolean requireType(IType type)
+	public boolean isType(IType type)
 	{
 		if (type.isArrayType())
 		{
+			// If the type is an array type, get it's element type
+			IType type1 = type.getElementType();
 			this.isArray = true;
-			if (this.requiredType != null)
-			{
-				return Type.isSuperType(type, this.requiredType);
-			}
+			this.elementType = type1;
 			this.requiredType = type;
-			this.elementType = type.clone();
-			this.elementType.removeArrayDimension();
+			
+			// Check for every value if it is the element type
+			for (IValue v : this.values)
+			{
+				if (!v.isType(type1))
+				{
+					// If not, this is not the type
+					return false;
+				}
+			}
+			
 			return true;
 		}
 		return false;
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (type.isArrayType())
+		{
+			// If the type is an array type, get it's element type
+			IType type1 = type.getElementType();
+			this.isArray = true;
+			this.elementType = type1;
+			this.requiredType = type;
+			
+			// Check for every value if it is the element type
+			for (IValue v : this.values)
+			{
+				if (!v.isType(type1))
+				{
+					// If not, this is not the type
+					return 1;
+				}
+			}
+			
+			return 3;
+		}
+		return 0;
 	}
 	
 	@Override
@@ -223,17 +252,25 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	public void check(List<Marker> markers, IContext context)
 	{
 		IType type = this.elementType;
-		for (IValue v : this.values)
+		int len = this.values.size();
+		for (int i = 0; i < len; i++)
 		{
-			v.check(markers, context);
+			IValue value = this.values.get(i);
+			IValue value1 = value.withType(type);
 			
-			if (!v.requireType(type))
+			if (value1 == null)
 			{
-				Marker marker = Markers.create(v.getPosition(), "array.element.type");
-				marker.addInfo("Array Type: " + type);
-				marker.addInfo("Array Element Type" + v.getType());
+				Marker marker = Markers.create(value.getPosition(), "array.element.type");
+				marker.addInfo("Array Type: " + this.requiredType);
+				marker.addInfo("Array Element Type: " + value.getType());
 				markers.add(marker);
 			}
+			else
+			{
+				value = value1;
+				this.values.set(i, value1);
+			}
+			value.check(markers, context);
 		}
 	}
 	
@@ -258,7 +295,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		if (this.isArray)
 		{
-			IType type = this.getElementType();
+			IType type = this.elementType;
 			int len = this.values.size();
 			int opcode = type.getArrayStoreOpcode();
 			

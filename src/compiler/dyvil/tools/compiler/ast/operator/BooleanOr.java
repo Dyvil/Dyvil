@@ -33,15 +33,33 @@ public class BooleanOr extends ASTNode implements IValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return BOOLEAN_AND;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.BOOLEAN;
 	}
 	
 	@Override
-	public int getValueType()
+	public IValue withType(IType type)
 	{
-		return BOOLEAN_AND;
+		return type == Type.BOOLEAN ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type == Type.BOOLEAN;
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return type == Type.BOOLEAN ? 3 : 0;
 	}
 	
 	@Override

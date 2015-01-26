@@ -46,21 +46,44 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return FIELD_ASSIGN;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.field == null ? Type.NONE : this.field.getType();
 	}
 	
 	@Override
-	public boolean requireType(IType type)
+	public IValue withType(IType type)
 	{
-		return type == Type.VOID || type.equals(Type.ANY) || Type.isSuperType(type, this.field.getType());
+		if (type == Type.NONE || type == Type.VOID)
+		{
+			return this;
+		}
+		
+		IValue value1 = this.value.withType(type);
+		if (value1 == null)
+		{
+			return null;
+		}
+		this.value = value1;
+		return this;
 	}
 	
 	@Override
-	public int getValueType()
+	public boolean isType(IType type)
 	{
-		return FIELD_ASSIGN;
+		return this.value == null ? type == Type.NONE || type == Type.VOID : this.value.isType(type);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return this.value.getTypeMatch(type);
 	}
 	
 	@Override
@@ -194,13 +217,18 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		}
 		
 		IType type = this.field.getType();
-		if (!this.value.requireType(type))
+		IValue value1 = this.value.withType(type);
+		if (value1 == null)
 		{
 			Marker marker = Markers.create(this.value.getPosition(), "access.assign.type", this.name);
 			marker.addInfo("Field Type: " + type);
 			IType vtype = this.value.getType();
 			marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
 			markers.add(marker);
+		}
+		else
+		{
+			this.value = value1;
 		}
 		
 		if (this.field.hasModifier(Modifiers.FINAL))

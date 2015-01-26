@@ -16,7 +16,6 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ValueList;
@@ -76,14 +75,20 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public boolean requireType(IType type)
+	public IValue withType(IType type)
 	{
 		this.requiredType = type;
 		if (type == Type.VOID)
 		{
-			return true;
+			return this;
 		}
-		return super.requireType(type);
+		return super.withType(type);
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type == Type.VOID || type == Type.NONE || super.isType(type);
 	}
 	
 	@Override
@@ -164,7 +169,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 			{
 				v.check(markers, context);
 				
-				if (v.getValueType() == RETURN && !v.requireType(type))
+				if (v.getValueType() == RETURN && v.withType(type) == null)
 				{
 					Marker marker = Markers.create(v.getPosition(), "return.type");
 					marker.addInfo("Block Type: " + type);
@@ -234,13 +239,13 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
 		return this.context.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
 		this.context.getMethodMatches(list, instance, name, arguments);
 	}

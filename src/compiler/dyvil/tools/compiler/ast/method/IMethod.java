@@ -9,7 +9,6 @@ import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
@@ -20,7 +19,7 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 {
 	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments);
 	
-	public int getSignatureMatch(String name, ITyped instance, List<? extends ITyped> arguments);
+	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments);
 	
 	// @Bytecode
 	

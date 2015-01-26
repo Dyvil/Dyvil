@@ -9,7 +9,6 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
@@ -86,10 +85,9 @@ public interface IValue extends IASTNode, ITyped
 	{
 	}
 	
-	public default boolean requireType(IType type)
-	{
-		return type.equals(Type.ANY) || Type.isSuperType(type, this.getType());
-	}
+	public int getTypeMatch(IType type);
+	
+	public IValue withType(IType type);
 	
 	public void resolveTypes(List<Marker> markers, IContext context);
 	

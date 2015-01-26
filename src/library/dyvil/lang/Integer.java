@@ -1,6 +1,5 @@
 package dyvil.lang;
 
-
 public interface Integer extends Number
 {
 	public Integer $eq(Integer v);

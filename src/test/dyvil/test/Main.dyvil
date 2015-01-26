@@ -1,19 +1,12 @@
 package dyvil.test
 
+import java.util.Arrays
+
 public class Main
 {
-	public static void main(String[] args)
-	{
-		Curry(2)(3)(4)(5);
-		Curry(3) { 1, 2, 3 };
-	}
-}
-
-public class Curry
-{
-	public Curry apply(int[] array) = null;
+	public static void main(String[] args) = print { 1, 2, 3, f(3) }
 	
-	public Curry apply(int i) = null;
+	public static int f(int i) = if (i == 0) 1 else 2;
 	
-	public Curry apply(Curry curry) = null;
+	public static void print(int[] array) = System out println(Arrays toString(array));
 }

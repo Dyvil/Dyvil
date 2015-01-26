@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -152,15 +151,21 @@ public class Field extends Member implements IField, IContext
 		
 		if (this.value != null)
 		{
-			this.value.check(markers, context);
-			if (!this.value.requireType(this.type))
+			IValue value1 = this.value.withType(this.type);
+			if (value1 == null)
 			{
 				Marker marker = Markers.create(this.value.getPosition(), "field.type", this.name);
 				marker.addInfo("Field Type: " + this.type);
 				IType vtype = this.value.getType();
-				marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
+				marker.addInfo("Value Type: " + this.value.getType());
 				markers.add(marker);
 			}
+			else
+			{
+				this.value = value1;
+			}
+			
+			this.value.check(markers, context);
 		}
 	}
 	
@@ -213,13 +218,13 @@ public class Field extends Member implements IField, IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
 		return this.theClass.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}

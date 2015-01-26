@@ -2,7 +2,9 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -22,21 +24,33 @@ public class CharValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public Type getType()
-	{
-		return Type.CHAR;
-	}
-	
-	@Override
 	public int getValueType()
 	{
 		return CHAR;
 	}
 	
 	@Override
-	public Character toObject()
+	public Type getType()
 	{
-		return Character.valueOf(this.value);
+		return Type.CHAR;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.CHAR ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type == Type.CHAR;
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return type == Type.CHAR ? 3 : 0;
 	}
 	
 	@Override
@@ -61,6 +75,12 @@ public class CharValue extends ASTNode implements INumericValue
 	public double doubleValue()
 	{
 		return this.value;
+	}
+	
+	@Override
+	public Character toObject()
+	{
+		return Character.valueOf(this.value);
 	}
 	
 	@Override

@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.AnnotationVisitorImpl;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -118,7 +118,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
 		if (!this.typesResolved)
 		{
@@ -128,7 +128,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
 		if (!this.typesResolved)
 		{

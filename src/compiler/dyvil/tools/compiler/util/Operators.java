@@ -3,7 +3,6 @@ package dyvil.tools.compiler.util;
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.operator.*;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 
@@ -48,11 +47,9 @@ public class Operators
 			}
 			return null;
 		}
-		IType t1 = arg1.getType();
-		IType t2 = arg2.getType();
 		if ("&&".equals(name))
 		{
-			if (t1.classEquals(Type.BOOLEAN) && t2.classEquals(Type.BOOLEAN))
+			if (arg1.isType(Type.BOOLEAN) && arg2.isType(Type.BOOLEAN))
 			{
 				return new BooleanAnd(arg1, arg2);
 			}
@@ -60,7 +57,7 @@ public class Operators
 		}
 		if ("||".equals(name))
 		{
-			if (t1.classEquals(Type.BOOLEAN) && t2.classEquals(Type.BOOLEAN))
+			if (arg1.isType(Type.BOOLEAN) && arg2.isType(Type.BOOLEAN))
 			{
 				return new BooleanOr(arg1, arg2);
 			}

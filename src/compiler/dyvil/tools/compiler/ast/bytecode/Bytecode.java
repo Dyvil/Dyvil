@@ -8,6 +8,7 @@ import java.util.Map;
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -28,15 +29,33 @@ public class Bytecode extends ASTNode implements IValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return BYTECODE;
+	}
+	
+	@Override
 	public Type getType()
 	{
 		return Type.VOID;
 	}
 	
 	@Override
-	public int getValueType()
+	public IValue withType(IType type)
 	{
-		return BYTECODE;
+		return type == Type.VOID ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type == Type.VOID;
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return 0;
 	}
 	
 	public void addInstruction(Instruction insn)

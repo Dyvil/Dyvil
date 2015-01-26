@@ -7,12 +7,13 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ThisValue extends ASTNode implements IConstantValue
+public final class ThisValue extends ASTNode implements IConstantValue
 {
 	public IType	type;
 	
@@ -34,9 +35,41 @@ public class ThisValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.type;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return Type.isSuperType(type, this.type) ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return Type.isSuperType(type, this.type);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.type.equals(type))
+		{
+			return 3;
+		}
+		else if (this.type.getTheClass().isSuperType(type))
+		{
+			return 2;
+		}
+		return 0;
 	}
 	
 	@Override

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.util;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
@@ -18,7 +19,10 @@ import dyvil.tools.compiler.config.Formatting;
 
 public class Util
 {
-	public static Predicate<?>	ISNULL	= a -> a == null;
+	public static final List<ITyped>	EMPTY_TYPES		= Collections.EMPTY_LIST;
+	public static final List<IValue>	EMPTY_VALUES	= Collections.EMPTY_LIST;
+	
+	public static final Predicate<?>	ISNULL			= a -> a == null;
 	
 	public static IType[] getTypes(List<IValue> values)
 	{

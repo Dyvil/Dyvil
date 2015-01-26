@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -40,7 +41,25 @@ public class SwapOperator extends ASTNode implements IValue
 	@Override
 	public IType getType()
 	{
-		return null;
+		return Type.NONE;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type == Type.VOID || type == Type.NONE;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.VOID || type == Type.NONE ? this : null;
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return 0;
 	}
 	
 	@Override

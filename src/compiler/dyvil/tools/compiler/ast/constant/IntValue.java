@@ -2,7 +2,9 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -31,6 +33,24 @@ public class IntValue extends ASTNode implements INumericValue
 	public Type getType()
 	{
 		return Type.INT;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.INT ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type == Type.INT;
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return type == Type.INT ? 3 : 0;
 	}
 	
 	@Override

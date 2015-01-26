@@ -2,7 +2,9 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -31,6 +33,24 @@ public class FloatValue extends ASTNode implements INumericValue
 	public Type getType()
 	{
 		return Type.FLOAT;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.FLOAT ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type == Type.FLOAT;
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return type == Type.FLOAT ? 3 : 0;
 	}
 	
 	@Override

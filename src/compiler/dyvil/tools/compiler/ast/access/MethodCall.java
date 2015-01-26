@@ -57,19 +57,51 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	}
 	
 	@Override
-	public IType getType()
-	{
-		if (this.method == null)
-		{
-			return null;
-		}
-		return this.method.getType();
-	}
-	
-	@Override
 	public int getValueType()
 	{
 		return METHOD_CALL;
+	}
+	
+	@Override
+	public IType getType()
+	{
+		return this.method == null ? Type.NONE : this.method.getType();
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return this.isType(type) ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		if (type == Type.NONE || type == Type.VOID)
+		{
+			return true;
+		}
+		return this.method == null ? false : Type.isSuperType(type, this.method.getType());
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.method == null)
+		{
+			return 0;
+		}
+		
+		IType type1 = this.method.getType();
+		if (type.equals(type1))
+		{
+			return 3;
+		}
+		else if (type1.isSuperType(type))
+		{
+			return 2;
+		}
+		return 0;
 	}
 	
 	@Override
@@ -374,32 +406,26 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 						return null;
 					}
 					method = match.theMethod;
+					instance = new ClassAccess(this.position, type);
 				}
 			}
 			else
 			{
+				FieldAccess access = new FieldAccess(this.position);
+				access.field = field.theField;
+				
 				// Find the apply method of the field type
-				MethodMatch match = field.theField.getType().resolveMethod(field.theField, "apply", this.arguments);
+				MethodMatch match = field.theField.getType().resolveMethod(access, "apply", this.arguments);
 				if (match == null)
 				{
 					// No apply method found -> Not an apply method call
 					return null;
 				}
 				method = match.theMethod;
-			}
-			
-			if (field != null)
-			{
-				FieldAccess access = new FieldAccess(this.position);
-				access.field = field.theField;
 				access.name = this.name;
 				access.qualifiedName = this.qualifiedName;
 				access.dotless = this.dotless;
 				instance = access;
-			}
-			else
-			{
-				instance = new ClassAccess(this.position, type);
 			}
 			
 			MethodCall call = new MethodCall(this.position);

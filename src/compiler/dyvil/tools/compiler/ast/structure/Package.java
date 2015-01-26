@@ -8,8 +8,8 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -168,13 +168,13 @@ public class Package implements IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
 	}
 	

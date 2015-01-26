@@ -19,7 +19,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class LambdaValue extends ASTNode implements IValue, IValued, IParameterized
+public final class LambdaValue extends ASTNode implements IValue, IValued, IParameterized
 {
 	public static final Handle	lambdaMetafactory	= new Handle(
 															Opcodes.H_INVOKESTATIC,
@@ -46,6 +46,12 @@ public class LambdaValue extends ASTNode implements IValue, IValued, IParameteri
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return LAMBDA;
+	}
+	
+	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
@@ -55,17 +61,6 @@ public class LambdaValue extends ASTNode implements IValue, IValued, IParameteri
 	public IValue getValue()
 	{
 		return this.value;
-	}
-	
-	@Override
-	public void setVarargs()
-	{
-	}
-	
-	@Override
-	public boolean isVarargs()
-	{
-		return false;
 	}
 	
 	@Override
@@ -99,13 +94,7 @@ public class LambdaValue extends ASTNode implements IValue, IValued, IParameteri
 	}
 	
 	@Override
-	public int getValueType()
-	{
-		return LAMBDA;
-	}
-	
-	@Override
-	public boolean requireType(IType type)
+	public IValue withType(IType type)
 	{
 		IClass iclass = type.getTheClass();
 		if (iclass != null)
@@ -115,10 +104,32 @@ public class LambdaValue extends ASTNode implements IValue, IValued, IParameteri
 			{
 				this.type = type;
 				this.method = method;
+				return this;
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		IClass iclass = type.getTheClass();
+		if (iclass != null)
+		{
+			IMethod method = iclass.getFunctionalMethod();
+			if (method != null)
+			{
+				// TODO
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return this.isType(type) ? 3 : 0;
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -19,9 +20,21 @@ public class NullValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return NULL;
+	}
+	
+	@Override
 	public Type getType()
 	{
 		return Type.NONE;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return this;
 	}
 	
 	@Override
@@ -31,9 +44,9 @@ public class NullValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int getTypeMatch(IType type)
 	{
-		return NULL;
+		return !type.isPrimitive() ? 2 : 0;
 	}
 	
 	@Override

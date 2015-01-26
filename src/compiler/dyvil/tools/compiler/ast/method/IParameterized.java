@@ -8,9 +8,14 @@ import dyvil.tools.compiler.ast.type.ITyped;
 
 public interface IParameterized extends ITyped
 {
-	public void setVarargs();
+	public default void setVarargs()
+	{
+	}
 	
-	public boolean isVarargs();
+	public default boolean isVarargs()
+	{
+		return false;
+	}
 	
 	public void setParameters(List<Parameter> parameters);
 	

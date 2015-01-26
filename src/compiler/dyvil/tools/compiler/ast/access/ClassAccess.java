@@ -17,6 +17,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Util;
 
 public class ClassAccess extends ASTNode implements IValue, IAccess
 {
@@ -35,15 +36,41 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return CLASS_ACCESS;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.type;
 	}
 	
 	@Override
-	public int getValueType()
+	public IValue withType(IType type)
 	{
-		return CLASS_ACCESS;
+		return Type.isSuperType(type, this.type) ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return Type.isSuperType(type, this.type);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.type.equals(type))
+		{
+			return 3;
+		}
+		else if (this.type.isSuperType(type))
+		{
+			return 2;
+		}
+		return 0;
 	}
 	
 	@Override
@@ -118,17 +145,6 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	}
 	
 	@Override
-	public void setArray(boolean array)
-	{
-	}
-	
-	@Override
-	public boolean isArray()
-	{
-		return false;
-	}
-	
-	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.type = this.type.resolve(context);
@@ -137,13 +153,14 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
+		IValue v = this.resolve2(context);
+		if (v != null)
+		{
+			return v;
+		}
+		
 		if (!this.type.isResolved())
 		{
-			IValue v = this.resolve2(context);
-			if (v != null)
-			{
-				return v;
-			}
 			markers.add(this.getResolveError());
 		}
 		
@@ -194,7 +211,7 @@ public class ClassAccess extends ASTNode implements IValue, IAccess
 			return access;
 		}
 		
-		MethodMatch m = context.resolveMethod(null, qualifiedName, Type.EMPTY_TYPES);
+		MethodMatch m = context.resolveMethod(null, qualifiedName, Util.EMPTY_VALUES);
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position);

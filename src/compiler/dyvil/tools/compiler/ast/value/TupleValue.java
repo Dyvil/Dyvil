@@ -87,6 +87,12 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		return this.isType(type) ? this : null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		if (this.values.size() == 1)

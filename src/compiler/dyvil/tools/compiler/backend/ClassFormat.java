@@ -222,6 +222,10 @@ public class ClassFormat
 				list.addParameterType(type);
 				i = end1;
 			}
+			else if (array == 0)
+			{
+				list.addParameterType(parseBaseType(c));
+			}
 			else
 			{
 				IType type = parseBaseType(c).clone();

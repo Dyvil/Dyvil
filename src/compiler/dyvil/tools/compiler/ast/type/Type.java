@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.Collections;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -11,6 +10,7 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -18,26 +18,17 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public class Type extends ASTNode implements IContext, IType
 {
-	public static final List<ITyped>	EMPTY_TYPES	= Collections.EMPTY_LIST;
+	public static final Type			NONE		= new UnknownType();
 	
-	public static final Type			NONE		= new Type()
-													{
-														@Override
-														public Object getFrameType()
-														{
-															return Opcodes.NULL;
-														}
-													};
-	
-	public static final Type			VOID		= new PrimitiveType("void", "Void", 0);
-	public static final Type			BOOLEAN		= new PrimitiveType("boolean", "Boolean", Opcodes.T_BOOLEAN);
-	public static final Type			BYTE		= new PrimitiveType("byte", "Byte", Opcodes.T_BOOLEAN);
-	public static final Type			SHORT		= new PrimitiveType("short", "Short", Opcodes.T_SHORT);
-	public static final Type			CHAR		= new PrimitiveType("char", "Char", Opcodes.T_CHAR);
-	public static final Type			INT			= new PrimitiveType("int", "Int", Opcodes.T_INT);
-	public static final Type			LONG		= new PrimitiveType("long", "Long", Opcodes.T_LONG);
-	public static final Type			FLOAT		= new PrimitiveType("float", "Float", Opcodes.T_FLOAT);
-	public static final Type			DOUBLE		= new PrimitiveType("double", "Double", Opcodes.T_DOUBLE);
+	public static final PrimitiveType	VOID		= new PrimitiveType("void", "Void", 0);
+	public static final PrimitiveType	BOOLEAN		= new PrimitiveType("boolean", "Boolean", Opcodes.T_BOOLEAN);
+	public static final PrimitiveType	BYTE		= new PrimitiveType("byte", "Byte", Opcodes.T_BOOLEAN);
+	public static final PrimitiveType	SHORT		= new PrimitiveType("short", "Short", Opcodes.T_SHORT);
+	public static final PrimitiveType	CHAR		= new PrimitiveType("char", "Char", Opcodes.T_CHAR);
+	public static final PrimitiveType	INT			= new PrimitiveType("int", "Int", Opcodes.T_INT);
+	public static final PrimitiveType	LONG		= new PrimitiveType("long", "Long", Opcodes.T_LONG);
+	public static final PrimitiveType	FLOAT		= new PrimitiveType("float", "Float", Opcodes.T_FLOAT);
+	public static final PrimitiveType	DOUBLE		= new PrimitiveType("double", "Double", Opcodes.T_DOUBLE);
 	
 	public static final Type			ANY			= new Type("Any");
 	public static final Type			OBJECT		= new Type("Object");
@@ -45,12 +36,13 @@ public class Type extends ASTNode implements IContext, IType
 	public static final Type			ARRAY		= new Type("Array");
 	public static final Type			STRING		= new Type("String");
 	
-	public static final Type			ABytecode	= new AnnotationType("Bytecode");
-	public static final Type			AOverride	= new AnnotationType("Override");
-	public static final Type			ARetention	= new AnnotationType("Retention");
-	public static final Type			ATarget		= new AnnotationType("Target");
+	public static final AnnotationType	ABytecode	= new AnnotationType("Bytecode");
+	public static final AnnotationType	AOverride	= new AnnotationType("Override");
+	public static final AnnotationType	ARetention	= new AnnotationType("Retention");
+	public static final AnnotationType	ATarget		= new AnnotationType("Target");
 	
 	public static IClass				PREDEF_CLASS;
+	public static IClass				STRING_CLASS;
 	
 	public String						name;
 	public String						qualifiedName;
@@ -99,7 +91,7 @@ public class Type extends ASTNode implements IContext, IType
 		OBJECT.theClass = Package.javaLang.resolveClass("Object");
 		PREDEF.theClass = PREDEF_CLASS = Package.dyvilLang.resolveClass("Predef");
 		ARRAY.theClass = Package.dyvilLang.resolveClass("Array");
-		STRING.theClass = Package.javaLang.resolveClass("String");
+		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
 		
 		ABytecode.theClass = Package.dyvilLangAnnotation.resolveClass("Bytecode");
 		AOverride.theClass = Package.javaLang.resolveClass("Override");
@@ -385,7 +377,7 @@ public class Type extends ASTNode implements IContext, IType
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -400,7 +392,7 @@ public class Type extends ASTNode implements IContext, IType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{

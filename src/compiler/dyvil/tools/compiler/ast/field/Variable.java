@@ -128,13 +128,17 @@ public class Variable extends Member implements IField
 			a.check(markers, context);
 		}
 		
-		if (!this.value.requireType(this.type))
+		IValue value1 = this.value.withType(this.type);
+		if (value1 == null)
 		{
 			Marker marker = Markers.create(this.value.getPosition(), "access.variable.type", this.name);
 			marker.addInfo("Field Type: " + this.type);
-			IType vtype = this.value.getType();
-			marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
+			marker.addInfo("Value Type: " + this.value.getType());
 			markers.add(marker);
+		}
+		else
+		{
+			this.value = value1;
 		}
 		
 		this.value.check(markers, context);

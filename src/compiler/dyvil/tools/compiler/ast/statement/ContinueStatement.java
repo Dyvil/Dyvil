@@ -31,12 +31,6 @@ public class ContinueStatement extends ASTNode implements IStatement
 		return CONTINUE;
 	}
 	
-	@Override
-	public IType getType()
-	{
-		return null;
-	}
-	
 	public void setName(String name)
 	{
 		this.name = name;

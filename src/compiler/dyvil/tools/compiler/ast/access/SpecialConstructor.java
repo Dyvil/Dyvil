@@ -19,6 +19,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Util;
 
 public class SpecialConstructor extends ASTNode implements IValue, IValued
 {
@@ -44,6 +45,12 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return CONSTRUCTOR_CALL;
+	}
+	
+	@Override
 	public void expandPosition(ICodePosition position)
 	{
 		this.list.expandPosition(position);
@@ -62,9 +69,29 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
-	public int getValueType()
+	public IValue withType(IType type)
 	{
-		return CONSTRUCTOR_CALL;
+		return Type.isSuperType(type, this.type) ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return Type.isSuperType(type, this.type);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.type.equals(type))
+		{
+			return 3;
+		}
+		else if (this.type.isSuperType(type))
+		{
+			return 2;
+		}
+		return 0;
 	}
 	
 	@Override
@@ -94,7 +121,7 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		MethodMatch method = context.resolveMethod(null, "<init>", Type.EMPTY_TYPES);
+		MethodMatch method = context.resolveMethod(null, "<init>", Util.EMPTY_VALUES);
 		if (method != null)
 		{
 			this.method = method.theMethod;

@@ -21,7 +21,7 @@ public class SyntaxError extends Marker
 	{
 		return "error";
 	}
-
+	
 	@Override
 	public boolean isError()
 	{

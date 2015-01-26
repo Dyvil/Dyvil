@@ -15,12 +15,18 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ReturnStatement extends ASTNode implements IStatement, IValued
 {
-	public IValue	value;
-	private IStatement parent;
+	public IValue		value;
+	private IStatement	parent;
 	
 	public ReturnStatement(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	@Override
+	public int getValueType()
+	{
+		return RETURN;
 	}
 	
 	@Override
@@ -42,9 +48,36 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
-	public int getValueType()
+	public IValue withType(IType type)
 	{
-		return RETURN;
+		if (this.value == null)
+		{
+			return type == Type.NONE || type == Type.VOID ? this : null;
+		}
+		IValue value1 = this.value.withType(type);
+		if (value1 == null)
+		{
+			return null;
+		}
+		this.value = value1;
+		return this;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return this.value == null ? type == Type.NONE || type == Type.VOID : this.value.isType(type);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.value == null)
+		{
+			return 0;
+		}
+		
+		return this.value.getTypeMatch(type);
 	}
 	
 	@Override

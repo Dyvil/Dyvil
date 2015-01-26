@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -61,12 +60,6 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	public int getValueType()
 	{
 		return FOR;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return null;
 	}
 	
 	@Override
@@ -219,7 +212,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			{
 				this.condition.check(markers, this);
 				
-				if (!this.condition.requireType(Type.BOOLEAN))
+				if (!this.condition.isType(Type.BOOLEAN))
 				{
 					Marker marker = Markers.create(this.condition.getPosition(), "for.condition.type");
 					marker.addInfo("Condition Type: " + this.condition.getType());
@@ -305,13 +298,13 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
 		return this.context.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
 		this.context.getMethodMatches(list, instance, name, arguments);
 	}

@@ -139,7 +139,7 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	{
 		if (this.condition != null)
 		{
-			if (!this.condition.requireType(Type.BOOLEAN))
+			if (!this.condition.isType(Type.BOOLEAN))
 			{
 				Marker marker = Markers.create(this.condition.getPosition(), "while.condition.type");
 				marker.addInfo("Condition Type: " + this.condition.getType());

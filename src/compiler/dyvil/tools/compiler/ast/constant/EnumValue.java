@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -49,6 +50,32 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 	public IType getType()
 	{
 		return this.type;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return Type.isSuperType(type, this.type) ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return Type.isSuperType(type, this.type);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.type.equals(type))
+		{
+			return 3;
+		}
+		else if (this.type.getTheClass().isSuperType(type))
+		{
+			return 2;
+		}
+		return 0;
 	}
 	
 	@Override

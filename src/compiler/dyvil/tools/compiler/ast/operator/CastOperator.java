@@ -38,6 +38,32 @@ public class CastOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		return Type.isSuperType(type, this.type) ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return Type.isSuperType(type, this.type);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.type.equals(type))
+		{
+			return 3;
+		}
+		else if (this.type.isSuperType(type))
+		{
+			return 2;
+		}
+		return 0;
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.value.resolveTypes(markers, context);

@@ -142,14 +142,22 @@ public class Property extends Field implements IProperty
 		}
 		else
 		{
-			if (this.get != null && !this.get.requireType(this.type))
+			if (this.get != null)
 			{
-				Marker marker = Markers.create(this.get.getPosition(), "property.getter.type", this.name);
-				marker.addInfo("Property Type: " + this.type);
-				marker.addInfo("Getter Value Type: " + this.get.getType());
-				markers.add(marker);
+				IValue get1 = this.get.withType(this.type);
+				if (get1 == null)
+				{
+					Marker marker = Markers.create(this.get.getPosition(), "property.getter.type", this.name);
+					marker.addInfo("Property Type: " + this.type);
+					marker.addInfo("Getter Value Type: " + this.get.getType());
+					markers.add(marker);
+				}
+				else
+				{
+					this.get = get1;
+				}
 			}
-			if (this.set != null && !this.set.requireType(Type.VOID))
+			if (this.set != null && !this.set.isType(Type.VOID))
 			{
 				markers.add(Markers.create(this.set.getPosition(), "property.setter.type", this.name));
 			}

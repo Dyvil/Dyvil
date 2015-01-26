@@ -24,6 +24,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.Util;
 
 public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAccess
 {
@@ -49,19 +50,47 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public IType getType()
-	{
-		if (this.field == null)
-		{
-			return null;
-		}
-		return this.field.getType();
-	}
-	
-	@Override
 	public int getValueType()
 	{
 		return FIELD_ACCESS;
+	}
+	
+	@Override
+	public IType getType()
+	{
+		return this.field == null ? Type.NONE : this.field.getType();
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return this.field == null ? null : Type.isSuperType(type, this.field.getType()) ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return this.field == null ? false : Type.isSuperType(type, this.field.getType());
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.field == null)
+		{
+			return 0;
+		}
+		
+		IType type1 = this.field.getType();
+		if (type.equals(type1))
+		{
+			return 3;
+		}
+		else if (type1.isSuperType(type))
+		{
+			return 2;
+		}
+		return 0;
 	}
 	
 	@Override
@@ -167,7 +196,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		{
 			if (this.field.hasModifier(Modifiers.STATIC))
 			{
-				if (this.instance != null && (this.instance.getValueType() != CLASS_ACCESS))
+				if (this.instance != null && this.instance.getValueType() != CLASS_ACCESS)
 				{
 					markers.add(Markers.create(this.position, "access.field.static", this.name));
 					this.instance = null;
@@ -247,7 +276,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 			return this.replacement;
 		}
 		
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, Type.EMPTY_TYPES);
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, Util.EMPTY_VALUES);
 		if (method != null)
 		{
 			return this.toMethodCall(method);

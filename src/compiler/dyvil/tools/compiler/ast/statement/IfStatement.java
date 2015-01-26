@@ -38,6 +38,12 @@ public class IfStatement extends ASTNode implements IStatement
 		this.elseEnd = new Label();
 	}
 	
+	@Override
+	public int getValueType()
+	{
+		return IF;
+	}
+	
 	public void setCondition(IValue condition)
 	{
 		this.condition = condition;
@@ -100,8 +106,19 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		return this.isType(type) ? this : null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
+		if (type == Type.VOID || type == Type.NONE)
+		{
+			return true;
+		}
+		
 		if (this.commonType != null)
 		{
 			return Type.isSuperType(type, this.commonType);
@@ -117,31 +134,19 @@ public class IfStatement extends ASTNode implements IStatement
 					return true;
 				}
 			}
-			
-			return this.then.isType(type);
+			else
+			{
+				return this.then.isType(type);
+			}
 		}
 		
-		return type.classEquals(Type.VOID);
+		return false;
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (this.isType(type))
-		{
-			return 2;
-		}
-		else if (type.classEquals(Type.OBJECT))
-		{
-			return 1;
-		}
-		return 0;
-	}
-	
-	@Override
-	public int getValueType()
-	{
-		return IF;
+		return this.isType(type) ? 3 : 0;
 	}
 	
 	@Override
@@ -195,7 +200,7 @@ public class IfStatement extends ASTNode implements IStatement
 	{
 		if (this.condition != null)
 		{
-			if (!this.condition.requireType(Type.BOOLEAN))
+			if (!this.condition.isType(Type.BOOLEAN))
 			{
 				Marker marker = Markers.create(this.condition.getPosition(), "if.condition.type");
 				marker.addInfo("Condition Type: " + this.condition.getType());
@@ -253,7 +258,7 @@ public class IfStatement extends ASTNode implements IStatement
 		}
 		return this;
 	}
-
+	
 	@Override
 	public Label resolveLabel(String name)
 	{

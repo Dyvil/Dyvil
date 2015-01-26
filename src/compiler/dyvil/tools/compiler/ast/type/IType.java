@@ -32,6 +32,20 @@ public interface IType extends IASTNode, INamed, IContext
 	
 	public int getArrayDimensions();
 	
+	public default IType getElementType()
+	{
+		IType type1 = this.clone();
+		type1.removeArrayDimension();
+		return type1;
+	}
+	
+	public default IType getArrayType()
+	{
+		IType type1 = this.clone();
+		type1.addArrayDimension();
+		return type1;
+	}
+	
 	public default void addArrayDimension()
 	{
 	}
@@ -45,6 +59,20 @@ public interface IType extends IASTNode, INamed, IContext
 	// Super Type
 	
 	public IType getSuperType();
+	
+	public default boolean isSuperType(IType type)
+	{
+		if (this.getArrayDimensions() != type.getArrayDimensions())
+		{
+			return false;
+		}
+		IClass iclass = this.getTheClass();
+		if (iclass != null)
+		{
+			return iclass.isSuperType(type);
+		}
+		return false;
+	}
 	
 	public default boolean isAssignableFrom(IType type)
 	{

@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValued;
@@ -38,6 +39,12 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return CONSTRUCTOR_CALL;
+	}
+	
+	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
@@ -50,9 +57,29 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 	}
 	
 	@Override
-	public int getValueType()
+	public IValue withType(IType type)
 	{
-		return CONSTRUCTOR_CALL;
+		return Type.isSuperType(type, this.type) ? this : null;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return Type.isSuperType(type, this.type);
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.type.equals(type))
+		{
+			return 3;
+		}
+		else if (this.type.isSuperType(type))
+		{
+			return 2;
+		}
+		return 0;
 	}
 	
 	@Override

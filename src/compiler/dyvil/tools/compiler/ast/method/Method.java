@@ -19,7 +19,6 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ValueList;
@@ -228,12 +227,12 @@ public class Method extends Member implements IMethod
 		{
 			par = params.get(0);
 			parType = par.type;
-			if (!instance.requireType(parType))
+			IValue instance1 = instance.withType(parType);
+			if (instance1 == null)
 			{
 				Marker marker = Markers.create(instance.getPosition(), "access.method.implicit_type", par.name);
 				marker.addInfo("Required Type: " + parType);
-				IType vtype = instance.getType();
-				marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
+				marker.addInfo("Value Type: " + instance.getType());
 				markers.add(marker);
 			}
 			pOff = 1;
@@ -243,20 +242,25 @@ public class Method extends Member implements IMethod
 		{
 			par = params.get(i + pOff);
 			parType = par.type;
+			
 			IValue value = arguments.get(i);
-			if (!value.requireType(parType))
+			IValue value1 = value.withType(parType);
+			if (value1 == null)
 			{
 				Marker marker = Markers.create(value.getPosition(), "access.method.argument_type", par.name);
 				marker.addInfo("Required Type: " + parType);
-				IType vtype = value.getType();
-				marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
+				marker.addInfo("Value Type: " + value.getType());
 				markers.add(marker);
+			}
+			else
+			{
+				arguments.set(i, value1);
 			}
 		}
 	}
 	
 	@Override
-	public int getSignatureMatch(String name, ITyped instance, List<? extends ITyped> arguments)
+	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments)
 	{
 		if (name == null)
 		{
@@ -305,8 +309,8 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < len; i++)
 		{
 			IType t1 = params.get(i + pOff).type;
-			ITyped typed = arguments.get(i);
-			int m = typed.getTypeMatch(t1);
+			IValue argument = arguments.get(i);
+			int m = argument.getTypeMatch(t1);
 			if (m == 0)
 			{
 				return 0;
@@ -525,22 +529,29 @@ public class Method extends Member implements IMethod
 		{
 			if (this.isConstructor)
 			{
-				if (!this.value.requireType(Type.VOID))
+				if (!this.value.isType(Type.VOID))
 				{
 					Marker error = Markers.create(this.position, "constructor.return");
 					error.addInfo("Expression Type: " + this.value.getType());
 					markers.add(error);
 				}
 			}
-			else if (!this.value.requireType(this.type))
+			else
 			{
-				Marker marker = Markers.create(this.position, "method.type", this.name);
-				marker.addInfo("Return Type: " + this.type);
-				IType vtype = this.value.getType();
-				marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
-				markers.add(marker);
+				IValue value1 = this.value.withType(this.type);
+				if (value1 == null)
+				{
+					Marker marker = Markers.create(this.position, "method.type", this.name);
+					marker.addInfo("Return Type: " + this.type);
+					marker.addInfo("Value Type: " + this.value.getType());
+					markers.add(marker);
+				}
+				else
+				{
+					this.value = value1;
+				}
+				this.value.check(markers, context);
 			}
-			this.value.check(markers, context);
 		}
 		// If the method does not have an implementation and is static
 		else if (this.isStatic())
@@ -657,13 +668,13 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
 		return this.theClass.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}

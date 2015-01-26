@@ -31,12 +31,6 @@ public class BreakStatement extends ASTNode implements IStatement
 		return BREAK;
 	}
 	
-	@Override
-	public IType getType()
-	{
-		return null;
-	}
-	
 	public void setName(String name)
 	{
 		this.name = name;

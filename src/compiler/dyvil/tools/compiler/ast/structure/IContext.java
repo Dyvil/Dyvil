@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public interface IContext
 {
@@ -43,9 +43,9 @@ public interface IContext
 	
 	public FieldMatch resolveField(String name);
 	
-	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments);
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments);
 	
-	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments);
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments);
 	
 	public byte getAccessibility(IMember member);
 }

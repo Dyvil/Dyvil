@@ -21,7 +21,7 @@ public class Warning extends Marker
 	{
 		return "warning";
 	}
-
+	
 	@Override
 	public boolean isError()
 	{

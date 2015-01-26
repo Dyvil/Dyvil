@@ -49,7 +49,7 @@ public interface IAccess extends INamed, IValue, IValued, IValueList
 		return null;
 	}
 	
-	public static IMethod resolveMethod(IContext context, ITyped instance, String name, List<? extends ITyped> arguments)
+	public static IMethod resolveMethod(IContext context, IValue instance, String name, List<IValue> arguments)
 	{
 		MethodMatch match;
 		if (instance != null)

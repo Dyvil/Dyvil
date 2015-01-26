@@ -6,6 +6,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 
 public class PrimitiveType extends Type
@@ -19,10 +20,52 @@ public class PrimitiveType extends Type
 		this.typecode = typecode;
 	}
 	
+	public static PrimitiveType fromTypecode(int typecode)
+	{
+		switch (typecode)
+		{
+		case Opcodes.T_BOOLEAN:
+			return BOOLEAN;
+		case Opcodes.T_BYTE:
+			return BYTE;
+		case Opcodes.T_SHORT:
+			return SHORT;
+		case Opcodes.T_CHAR:
+			return CHAR;
+		case Opcodes.T_INT:
+			return INT;
+		case Opcodes.T_LONG:
+			return LONG;
+		case Opcodes.T_FLOAT:
+			return FLOAT;
+		case Opcodes.T_DOUBLE:
+			return DOUBLE;
+		default:
+			return VOID;
+		}
+	}
+	
 	@Override
 	public boolean isPrimitive()
 	{
 		return this.arrayDimensions == 0;
+	}
+	
+	@Override
+	public IType getElementType()
+	{
+		int newDims = this.arrayDimensions - 1;
+		if (newDims == 0)
+		{
+			return fromTypecode(this.typecode);
+		}
+		else
+		{
+			PrimitiveType t = new PrimitiveType(this.name, this.qualifiedName, this.typecode);
+			t.theClass = this.theClass;
+			t.arrayDimensions = newDims;
+			return t;
+		}
 	}
 	
 	@Override
@@ -295,7 +338,7 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(ITyped instance, String name, List<? extends ITyped> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -310,7 +353,7 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, ITyped instance, String name, List<? extends ITyped> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
