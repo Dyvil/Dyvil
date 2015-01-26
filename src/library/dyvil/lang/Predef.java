@@ -11,6 +11,20 @@ public class Predef
 	{
 	}
 	
+	// Object Operators
+	
+	@Bytecode(postfixOpcode = IF_ACMPNE)
+	public static boolean $eq$eq(Object o1, Object o2)
+	{
+		return o1 == o2;
+	}
+	
+	@Bytecode(postfixOpcode = IF_ACMPEQ)
+	public static boolean $bang$eq(Object o1, Object o2)
+	{
+		return o1 != o2;
+	}
+	
 	// Prefix Operators
 	
 	@Bytecode(postfixOpcode = IBIN)
@@ -81,11 +95,6 @@ public class Predef
 	
 	// Hashing
 	
-	public static int hash(Object o)
-	{
-		return o == null ? 0 : o.hashCode();
-	}
-	
 	public static int hash(Object... args)
 	{
 		if (args == null)
@@ -105,7 +114,27 @@ public class Predef
 	
 	public static @implicit int $hash$hash(Object o)
 	{
-		return hash(o);
+		return o == null ? 0 : o.hashCode();
+	}
+	
+	public static @implicit int $hash$hash(int i)
+	{
+		return i;
+	}
+	
+	public static @implicit int $hash$hash(long l)
+	{
+		return (int) (int) (l ^ (l >>> 32));
+	}
+	
+	public static @implicit int $hash$hash(float f)
+	{
+		return java.lang.Float.hashCode(f);
+	}
+	
+	public static @implicit int $hash$hash(double d)
+	{
+		return java.lang.Double.hashCode(d);
 	}
 	
 	// Print
@@ -197,6 +226,17 @@ public class Predef
 	}
 	
 	// Miscellaneous
+	
+	public static @implicit void match(Object o, Pattern[] patterns)
+	{
+		for (Pattern p : patterns)
+		{
+			if (p.match(o))
+			{
+				break;
+			}
+		}
+	}
 	
 	public static void $qmark$qmark$qmark()
 	{
