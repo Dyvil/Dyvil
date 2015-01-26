@@ -9,7 +9,6 @@ import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
-import dyvil.tools.compiler.util.OpcodeUtil;
 
 public final class MethodWriter extends MethodVisitor
 {
@@ -312,6 +311,10 @@ public final class MethodWriter extends MethodVisitor
 			this.typeStack.pop(); // Array
 			this.typeStack.pop(); // Value
 		}
+		else if (opcode >= IRETURN && opcode <= ARETURN)
+		{
+			this.typeStack.pop();
+		}
 		else
 		{
 			this.processInsn(opcode);
@@ -403,40 +406,6 @@ public final class MethodWriter extends MethodVisitor
 			this.push(INTEGER);
 			return;
 		}
-	}
-	
-	public void visitInsn(int opcode, IType type)
-	{
-		this.hasReturn = OpcodeUtil.isReturnOpcode(opcode);
-		if (this.hasReturn)
-		{
-			this.typeStack.clear();
-		}
-		if (type != null)
-		{
-			this.push(type);
-		}
-		this.mv.visitInsn(opcode);
-	}
-	
-	public void visitInsn(int opcode, IType type, int pop)
-	{
-		this.hasReturn = OpcodeUtil.isReturnOpcode(opcode);
-		if (this.hasReturn)
-		{
-			this.typeStack.clear();
-		}
-		
-		if (type != null)
-		{
-			this.push(type);
-		}
-		while (pop > 0)
-		{
-			this.typeStack.pop();
-			pop--;
-		}
-		this.mv.visitInsn(opcode);
 	}
 	
 	public void visitSpecialInsn(int opcode)
@@ -758,7 +727,17 @@ public final class MethodWriter extends MethodVisitor
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append("MethodWriter {stack=").append(this.typeStack).append(", locals=").append(this.locals).append("}");
+		builder.append("MethodWriter {stack=").append(this.typeStack);
+		builder.append(", locals=[");
+		
+		for (int i = 0; i < this.localCount; i++)
+		{
+			builder.append(this.locals[i]).append(", ");
+		}
+		
+		builder.append("], maxLocals=").append(this.maxLocals);
+		builder.append(", maxStack=").append(this.maxStack);
+		builder.append("}");
 		return builder.toString();
 	}
 }

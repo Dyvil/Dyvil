@@ -1,5 +1,6 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.constant;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -47,6 +48,8 @@ public class StringValue extends ASTNode implements IConstantValue
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		writer.visitLdcInsn(this.value);
+		writer.visitInsn(Opcodes.ARETURN);
 	}
 	
 	@Override

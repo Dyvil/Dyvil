@@ -2,9 +2,6 @@ package dyvil.tools.compiler.ast.access;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -13,6 +10,9 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValueList;
+import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IAccess extends INamed, IValue, IValued, IValueList

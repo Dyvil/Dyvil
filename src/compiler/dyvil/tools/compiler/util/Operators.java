@@ -2,10 +2,10 @@ package dyvil.tools.compiler.util;
 
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.operator.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public class Operators
 {

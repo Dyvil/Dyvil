@@ -1,9 +1,9 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.constant;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IConstantValue extends IValue

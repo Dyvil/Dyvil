@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.config;
 
-import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public class Formatting
 {

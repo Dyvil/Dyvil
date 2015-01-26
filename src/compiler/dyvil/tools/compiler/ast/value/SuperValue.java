@@ -4,6 +4,7 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -76,11 +77,13 @@ public class SuperValue extends ASTNode implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitIntInsn(Opcodes.ALOAD, 0);
+		writer.visitVarInsn(Opcodes.ALOAD, 0, this.type);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		writer.visitVarInsn(Opcodes.ALOAD, 0, this.type);
+		writer.visitInsn(Opcodes.ARETURN);
 	}
 }

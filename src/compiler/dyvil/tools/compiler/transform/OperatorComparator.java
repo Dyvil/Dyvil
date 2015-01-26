@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 import dyvil.tools.compiler.ast.access.MethodCall;
-import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public class OperatorComparator implements Comparator<MethodCall>
 {

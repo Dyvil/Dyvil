@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public interface IProperty extends IField
 {

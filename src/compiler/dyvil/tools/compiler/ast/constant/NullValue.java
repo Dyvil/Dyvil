@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.constant;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -45,12 +45,14 @@ public class NullValue extends ASTNode implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitInsn(Opcodes.ACONST_NULL, Type.NONE);
+		writer.visitInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		writer.visitInsn(Opcodes.ACONST_NULL);
+		writer.visitInsn(Opcodes.RETURN);
 	}
 	
 	@Override

@@ -7,16 +7,17 @@ import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValueList;
+import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -349,7 +350,44 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 		// Resolve Apply Method
 		else if (this.instance == null)
 		{
+			IValue instance;
+			IType type = null;
+			IMethod method = null;
+			
 			FieldMatch field = context.resolveField(this.qualifiedName);
+			if (field == null)
+			{
+				// Find a type
+				type = new Type(this.position, this.qualifiedName).resolve(context);
+				if (!type.isResolved())
+				{
+					// No type found -> Not an apply method call
+					return null;
+				}
+				else
+				{
+					// Find the apply method of the type
+					MethodMatch match = type.resolveMethod(null, "apply", this.arguments);
+					if (match == null)
+					{
+						// No apply method found -> Not an apply method call
+						return null;
+					}
+					method = match.theMethod;
+				}
+			}
+			else
+			{
+				// Find the apply method of the field type
+				MethodMatch match = field.theField.getType().resolveMethod(field.theField, "apply", this.arguments);
+				if (match == null)
+				{
+					// No apply method found -> Not an apply method call
+					return null;
+				}
+				method = match.theMethod;
+			}
+			
 			if (field != null)
 			{
 				FieldAccess access = new FieldAccess(this.position);
@@ -357,14 +395,21 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 				access.name = this.name;
 				access.qualifiedName = this.qualifiedName;
 				access.dotless = this.dotless;
-				
-				MethodCall call = new MethodCall(this.position, access, "apply");
-				call.arguments = this.arguments;
-				if (call.resolve(field.theField.getType(), null))
-				{
-					return call;
-				}
+				instance = access;
 			}
+			else
+			{
+				instance = new ClassAccess(this.position, type);
+			}
+			
+			MethodCall call = new MethodCall(this.position);
+			call.method = method;
+			call.instance = instance;
+			call.name = "apply";
+			call.qualifiedName = "apply";
+			call.arguments = this.arguments;
+			
+			return call;
 		}
 		
 		return null;

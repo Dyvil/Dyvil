@@ -7,10 +7,10 @@ import jdk.internal.org.objectweb.asm.Label;
 import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
 
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -189,6 +189,8 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		this.writeStatement(writer);
+		writer.visitInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override

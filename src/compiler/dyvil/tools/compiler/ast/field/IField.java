@@ -2,8 +2,8 @@ package dyvil.tools.compiler.ast.field;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.ast.IASTNode;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 
 public interface IField extends IASTNode, IMember, IValued

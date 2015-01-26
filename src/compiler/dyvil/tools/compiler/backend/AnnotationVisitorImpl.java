@@ -2,13 +2,13 @@ package dyvil.tools.compiler.backend;
 
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.expression.ValueList;
+import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.member.IAnnotated;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.value.EnumValue;
+import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValueList;
+import dyvil.tools.compiler.ast.value.ValueList;
 
 public class AnnotationVisitorImpl extends AnnotationVisitor
 {

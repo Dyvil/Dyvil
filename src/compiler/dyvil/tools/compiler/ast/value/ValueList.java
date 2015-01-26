@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.expression;
+package dyvil.tools.compiler.ast.value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -267,11 +267,11 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			
 			for (int i = 0; i < len; i++)
 			{
-				writer.visitInsn(Opcodes.DUP, type);
+				writer.visitInsn(Opcodes.DUP);
 				IValue value = this.values.get(i);
 				writer.visitLdcInsn(i);
 				value.writeExpression(writer);
-				writer.visitInsn(opcode, null, 3);
+				writer.visitInsn(opcode);
 			}
 		}
 		else

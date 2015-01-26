@@ -7,11 +7,11 @@ import java.util.TreeSet;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.value.EnumValue;
+import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class AnnotationType extends Type

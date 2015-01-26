@@ -1,20 +1,21 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.constant;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class DoubleValue extends ASTNode implements INumericValue
+public class FloatValue extends ASTNode implements INumericValue
 {
-	public double	value;
+	public float	value;
 	
-	public DoubleValue(double value)
+	public FloatValue(float value)
 	{
 		this.value = value;
 	}
 	
-	public DoubleValue(ICodePosition position, double value)
+	public FloatValue(ICodePosition position, float value)
 	{
 		this.position = position;
 		this.value = value;
@@ -23,13 +24,13 @@ public class DoubleValue extends ASTNode implements INumericValue
 	@Override
 	public int getValueType()
 	{
-		return DOUBLE;
+		return FLOAT;
 	}
 	
 	@Override
 	public Type getType()
 	{
-		return Type.DOUBLE;
+		return Type.FLOAT;
 	}
 	
 	@Override
@@ -47,7 +48,7 @@ public class DoubleValue extends ASTNode implements INumericValue
 	@Override
 	public float floatValue()
 	{
-		return (float) this.value;
+		return this.value;
 	}
 	
 	@Override
@@ -57,9 +58,9 @@ public class DoubleValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public Double toObject()
+	public Float toObject()
 	{
-		return Double.valueOf(this.value);
+		return Float.valueOf(this.value);
 	}
 	
 	@Override
@@ -71,6 +72,8 @@ public class DoubleValue extends ASTNode implements INumericValue
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		writer.visitLdcInsn(this.value);
+		writer.visitInsn(Opcodes.FRETURN);
 	}
 	
 	@Override
@@ -78,7 +81,7 @@ public class DoubleValue extends ASTNode implements INumericValue
 	{
 		if (this.position == null)
 		{
-			buffer.append(this.value).append('D');
+			buffer.append(this.value).append('F');
 			return;
 		}
 		

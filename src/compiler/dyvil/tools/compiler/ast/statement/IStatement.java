@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.statement;
 
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public interface IStatement extends IValue
 {

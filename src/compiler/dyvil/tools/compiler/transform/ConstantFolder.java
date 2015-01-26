@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.transform;
 
-import static dyvil.tools.compiler.ast.expression.IValue.*;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.value.*;
+import static dyvil.tools.compiler.ast.value.IValue.*;
+import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.value.IValue;
 
 public class ConstantFolder
 {

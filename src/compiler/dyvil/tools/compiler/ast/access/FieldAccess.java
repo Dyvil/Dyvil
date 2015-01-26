@@ -5,8 +5,7 @@ import java.util.List;
 
 import dyvil.collections.SingleElementList;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
+import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -14,7 +13,8 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.EnumValue;
+import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -314,6 +314,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		}
 		
 		this.field.writeGet(writer);
+		writer.visitInsn(this.field.getType().getReturnOpcode());
 	}
 	
 	@Override

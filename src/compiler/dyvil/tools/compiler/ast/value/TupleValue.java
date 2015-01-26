@@ -5,8 +5,6 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TupleType;
@@ -195,7 +193,7 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	{
 		TupleType t = this.tupleType;
 		writer.visitTypeInsn(Opcodes.NEW, t);
-		writer.visitInsn(Opcodes.DUP, t);
+		writer.visitInsn(Opcodes.DUP);
 		
 		for (IValue v : this.values)
 		{
@@ -211,5 +209,9 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		for (IValue v : this.values)
+		{
+			v.writeStatement(writer);
+		}
 	}
 }

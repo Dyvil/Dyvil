@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.constant;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -43,21 +43,23 @@ public class BooleanValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter visitor)
+	public void writeExpression(MethodWriter writer)
 	{
 		if (this.value)
 		{
-			visitor.visitInsn(Opcodes.ICONST_1, Type.INT);
+			writer.visitLdcInsn(1);
 		}
 		else
 		{
-			visitor.visitInsn(Opcodes.ICONST_0, Type.INT);
+			writer.visitLdcInsn(0);
 		}
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		this.writeExpression(writer);
+		writer.visitInsn(Opcodes.IRETURN);
 	}
 	
 	@Override

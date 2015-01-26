@@ -5,9 +5,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.expression.IValued;
+import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.IType;

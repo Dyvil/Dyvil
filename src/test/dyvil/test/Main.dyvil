@@ -4,11 +4,9 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		curry(2)(3)(4)(5);
-		curry(3) { 1, 2, 3 };
+		Curry(2)(3)(4)(5);
+		Curry(3) { 1, 2, 3 };
 	}
-	
-	public static Curry curry(int i) = null;
 }
 
 public class Curry

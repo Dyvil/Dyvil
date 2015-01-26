@@ -5,15 +5,15 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
-import dyvil.tools.compiler.ast.expression.ValueList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValued;
+import dyvil.tools.compiler.ast.value.ValueList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
@@ -156,7 +156,7 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 			args = 1;
 			
 			writer.visitTypeInsn(Opcodes.NEW, this.type);
-			writer.visitInsn(Opcodes.DUP, this.type);
+			writer.visitInsn(Opcodes.DUP);
 		}
 		
 		String owner = this.method.getTheClass().getInternalName();

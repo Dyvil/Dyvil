@@ -1,20 +1,21 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.constant;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class LongValue extends ASTNode implements INumericValue
+public class DoubleValue extends ASTNode implements INumericValue
 {
-	public long	value;
+	public double	value;
 	
-	public LongValue(long value)
+	public DoubleValue(double value)
 	{
 		this.value = value;
 	}
 	
-	public LongValue(ICodePosition position, long value)
+	public DoubleValue(ICodePosition position, double value)
 	{
 		this.position = position;
 		this.value = value;
@@ -23,13 +24,13 @@ public class LongValue extends ASTNode implements INumericValue
 	@Override
 	public int getValueType()
 	{
-		return LONG;
+		return DOUBLE;
 	}
 	
 	@Override
 	public Type getType()
 	{
-		return Type.LONG;
+		return Type.DOUBLE;
 	}
 	
 	@Override
@@ -41,13 +42,13 @@ public class LongValue extends ASTNode implements INumericValue
 	@Override
 	public long longValue()
 	{
-		return this.value;
+		return (long) this.value;
 	}
 	
 	@Override
 	public float floatValue()
 	{
-		return this.value;
+		return (float) this.value;
 	}
 	
 	@Override
@@ -57,9 +58,9 @@ public class LongValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public Long toObject()
+	public Double toObject()
 	{
-		return Long.valueOf(this.value);
+		return Double.valueOf(this.value);
 	}
 	
 	@Override
@@ -71,6 +72,8 @@ public class LongValue extends ASTNode implements INumericValue
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		writer.visitLdcInsn(this.value);
+		writer.visitInsn(Opcodes.DRETURN);
 	}
 	
 	@Override
@@ -78,7 +81,7 @@ public class LongValue extends ASTNode implements INumericValue
 	{
 		if (this.position == null)
 		{
-			buffer.append(this.value).append('L');
+			buffer.append(this.value).append('D');
 			return;
 		}
 		

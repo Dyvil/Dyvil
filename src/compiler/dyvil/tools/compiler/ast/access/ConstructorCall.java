@@ -6,13 +6,13 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValueList;
+import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -283,7 +283,7 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 			args++;
 			
 			writer.visitTypeInsn(Opcodes.NEW, this.type);
-			writer.visitInsn(Opcodes.DUP, this.type);
+			writer.visitInsn(Opcodes.DUP);
 		}
 		
 		for (IValue arg : this.arguments)

@@ -5,11 +5,11 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.BooleanValue;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -101,6 +101,8 @@ public class BooleanAnd extends ASTNode implements IValue
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		this.writeExpression(writer);
+		writer.visitInsn(Opcodes.IRETURN);
 	}
 	
 	@Override
