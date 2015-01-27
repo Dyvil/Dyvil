@@ -40,10 +40,6 @@ public interface Number extends Ordered<Number>
 	
 	public Number $minus();
 	
-	public Number $plus$plus();
-	
-	public Number $minus$minus();
-	
 	public Number sqr();
 	
 	public Number rec();

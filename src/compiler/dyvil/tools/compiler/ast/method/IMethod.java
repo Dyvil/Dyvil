@@ -59,6 +59,8 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 	
 	public void write(ClassWriter writer);
 	
+	public void writeCall(MethodWriter writer, boolean isSuperCall);
+	
 	public static IType[] getArgumentTypes(List<IValue> arguments)
 	{
 		int len = arguments.size();

@@ -99,21 +99,9 @@ public abstract class Byte implements Integer
 	}
 	
 	@Override
-	public Byte $plus$plus()
+	public Int sqr()
 	{
-		return this.$eq((byte) (this.value + 1));
-	}
-	
-	@Override
-	public Byte $minus$minus()
-	{
-		return this.$eq((byte) (this.value - 1));
-	}
-	
-	@Override
-	public Byte sqr()
-	{
-		return this.$eq((byte) (this.value * this.value));
+		return this.$eq(this.value * this.value);
 	}
 	
 	@Override

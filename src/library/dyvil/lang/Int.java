@@ -111,18 +111,6 @@ public abstract class Int implements Integer
 	}
 	
 	@Override
-	public Int $plus$plus()
-	{
-		return this.$eq(this.value + 1);
-	}
-	
-	@Override
-	public Int $minus$minus()
-	{
-		return this.$eq(this.value - 1);
-	}
-	
-	@Override
 	@Bytecode(postfixOpcodes = { DUP, IMUL })
 	public Int sqr()
 	{

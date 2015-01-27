@@ -1,5 +1,6 @@
 package dyvil.lang;
 
+
 public abstract class Complex implements Number
 {
 	protected double	real;
@@ -98,24 +99,6 @@ public abstract class Complex implements Number
 	public Number $tilde()
 	{
 		return this.$eq(this.real, -this.imag);
-	}
-	
-	@Override
-	public Number $plus$plus()
-	{
-		return this.$eq(this.real + 1, this.imag);
-	}
-	
-	@Override
-	public Number $minus$minus()
-	{
-		return this.$eq(this.real - 1, this.imag);
-	}
-	
-	@Override
-	public Number sqr()
-	{
-		return this.$eq(this.real * this.real - this.imag * this.imag, 2D * this.real * this.imag);
 	}
 	
 	@Override

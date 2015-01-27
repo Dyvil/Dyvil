@@ -99,21 +99,9 @@ public abstract class Short implements Integer
 	}
 	
 	@Override
-	public Short $plus$plus()
+	public Int sqr()
 	{
-		return this.$eq((short) (this.value + 1));
-	}
-	
-	@Override
-	public Short $minus$minus()
-	{
-		return this.$eq((short) (this.value - 1));
-	}
-	
-	@Override
-	public Short sqr()
-	{
-		return this.$eq((short) (this.value * this.value));
+		return this.$eq(this.value * this.value);
 	}
 	
 	@Override

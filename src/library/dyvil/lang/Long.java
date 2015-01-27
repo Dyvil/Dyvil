@@ -111,18 +111,6 @@ public abstract class Long implements Integer
 	}
 	
 	@Override
-	public Long $plus$plus()
-	{
-		return this.$eq(this.value + 1);
-	}
-	
-	@Override
-	public Long $minus$minus()
-	{
-		return this.$eq(this.value - 1);
-	}
-	
-	@Override
 	@Bytecode(postfixOpcodes = { DUP2, LMUL })
 	public Long sqr()
 	{

@@ -6,7 +6,6 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -494,66 +493,27 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 		}
 		
 		// Apply special compilation when dealing with boolean types
-		if (this.method.getType() == Type.BOOLEAN)
-		{
-			Label ifEnd = new Label();
-			
-			// Condition
-			if (this.method.writePostfixBytecode(writer, ifEnd))
-			{
-				Label elseEnd = new Label();
-				
-				// If Block
-				writer.visitLdcInsn(1);
-				writer.pop();
-				writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
-				writer.visitLabel(ifEnd);
-				// Else Block
-				writer.visitLdcInsn(0);
-				writer.visitLabel(elseEnd);
-				return;
-			}
-		}
 		// Writes the postfix opcodes if a @Bytecode annotation is present.
-		if (this.method.writePostfixBytecode(writer))
+		
+		Label ifEnd = new Label();
+		// Condition
+		if (this.method.writePostfixBytecode(writer, ifEnd))
 		{
+			Label elseEnd = new Label();
+			
+			// If Block
+			writer.visitLdcInsn(1);
+			writer.pop();
+			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+			writer.visitLabel(ifEnd);
+			// Else Block
+			writer.visitLdcInsn(0);
+			writer.visitLabel(elseEnd);
 			return;
 		}
 		
 		// If no @Bytecode annotation is present, write a normal invokation.
-		this.writeInvoke(writer);
-	}
-	
-	private void writeInvoke(MethodWriter writer)
-	{
-		IClass ownerClass = this.method.getTheClass();
-		int opcode;
-		int args = this.method.getParameters().size();
-		if (this.method.hasModifier(Modifiers.STATIC))
-		{
-			opcode = Opcodes.INVOKESTATIC;
-		}
-		else if (ownerClass.hasModifier(Modifiers.INTERFACE_CLASS) && this.method.hasModifier(Modifiers.ABSTRACT))
-		{
-			opcode = Opcodes.INVOKEINTERFACE;
-			args++;
-		}
-		else if (this.method.hasModifier(Modifiers.PRIVATE) || this.instance.getValueType() == IValue.SUPER)
-		{
-			opcode = Opcodes.INVOKESPECIAL;
-			args++;
-		}
-		else
-		{
-			opcode = Opcodes.INVOKEVIRTUAL;
-			args++;
-		}
-		
-		String owner = ownerClass.getInternalName();
-		String name = this.method.getQualifiedName();
-		String desc = this.method.getDescriptor();
-		IType type = this.method.getType();
-		writer.visitMethodInsn(opcode, owner, name, desc, ownerClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);
+		this.method.writeCall(writer, this.instance == null ? false : this.instance.getValueType() == SUPER);
 	}
 	
 	@Override
@@ -561,7 +521,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 	{
 		this.writeExpression(writer);
 		
-		if (!this.method.getType().classEquals(Type.VOID))
+		if (this.method.getType() != Type.VOID)
 		{
 			writer.visitInsn(Opcodes.POP);
 		}
@@ -594,8 +554,8 @@ public class MethodCall extends ASTNode implements IAccess, INamed, IValue, IVal
 			return;
 		}
 		
-		// If no @Bytecode annotation is present, write a normal invokation.
-		this.writeInvoke(writer);
+		// If no @Bytecode annotation is present, write a normal invocation.
+		this.method.writeCall(writer, this.instance.getValueType() == SUPER);
 		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
 	

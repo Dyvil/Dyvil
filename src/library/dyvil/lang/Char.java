@@ -99,21 +99,9 @@ public abstract class Char implements Integer
 	}
 	
 	@Override
-	public Char $plus$plus()
+	public Int sqr()
 	{
-		return this.$eq((char) (this.value + 1));
-	}
-	
-	@Override
-	public Char $minus$minus()
-	{
-		return this.$eq((char) (this.value - 1));
-	}
-	
-	@Override
-	public Char sqr()
-	{
-		return this.$eq((char) (this.value * this.value));
+		return this.$eq(this.value * this.value);
 	}
 	
 	@Override

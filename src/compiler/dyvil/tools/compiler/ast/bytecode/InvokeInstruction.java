@@ -2,25 +2,17 @@ package dyvil.tools.compiler.ast.bytecode;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
-import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.method.IParameterized;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
 
-public class InvokeInstruction extends Instruction implements IMethod
+public class InvokeInstruction extends Instruction implements INamed, ITyped, IParameterized
 {
 	private String	owner;
 	private String	methodName;
@@ -81,44 +73,6 @@ public class InvokeInstruction extends Instruction implements IMethod
 	// IMethod Interface
 	
 	@Override
-	public IClass getTheClass()
-	{
-		return null;
-	}
-	
-	@Override
-	public int getAccessLevel()
-	{
-		return 0;
-	}
-	
-	@Override
-	public byte getAccessibility()
-	{
-		return 0;
-	}
-	
-	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void resolve(List<Marker> markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void check(List<Marker> markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void foldConstants()
-	{
-	}
-	
-	@Override
 	public void setName(String name, String qualifiedName)
 	{
 	}
@@ -158,152 +112,6 @@ public class InvokeInstruction extends Instruction implements IMethod
 	}
 	
 	@Override
-	public void setModifiers(int modifiers)
-	{
-	}
-	
-	@Override
-	public boolean addModifier(int mod)
-	{
-		return false;
-	}
-	
-	@Override
-	public void removeModifier(int mod)
-	{
-	}
-	
-	@Override
-	public int getModifiers()
-	{
-		return 0;
-	}
-	
-	@Override
-	public boolean hasModifier(int mod)
-	{
-		return false;
-	}
-	
-	@Override
-	public void setAnnotations(List<Annotation> annotations)
-	{
-	}
-	
-	@Override
-	public List<Annotation> getAnnotations()
-	{
-		return null;
-	}
-	
-	@Override
-	public Annotation getAnnotation(IType type)
-	{
-		return null;
-	}
-	
-	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-	}
-	
-	@Override
-	public void setGeneric()
-	{
-	}
-	
-	@Override
-	public boolean isGeneric()
-	{
-		return false;
-	}
-	
-	@Override
-	public void setTypes(List<IType> types)
-	{
-	}
-	
-	@Override
-	public List<IType> getTypes()
-	{
-		return null;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
-	}
-	
-	@Override
-	public void setThrows(List<IType> throwsDecls)
-	{
-	}
-	
-	@Override
-	public List<IType> getThrows()
-	{
-		return null;
-	}
-	
-	@Override
-	public IType getThisType()
-	{
-		return null;
-	}
-	
-	@Override
-	public Package resolvePackage(String name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(String name)
-	{
-		return null;
-	}
-	
-	@Override
-	public FieldMatch resolveField(String name)
-	{
-		return null;
-	}
-	
-	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
-	{
-	}
-	
-	@Override
-	public byte getAccessibility(IMember member)
-	{
-		return 0;
-	}
-	
-	@Override
-	public void setVarargs()
-	{
-	}
-	
-	@Override
-	public boolean isVarargs()
-	{
-		return false;
-	}
-	
-	@Override
 	public void setParameters(List<Parameter> parameters)
 	{
 	}
@@ -324,39 +132,5 @@ public class InvokeInstruction extends Instruction implements IMethod
 	public void addParameterType(IType type)
 	{
 		this.args++;
-	}
-	
-	@Override
-	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments)
-	{
-	}
-	
-	@Override
-	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments)
-	{
-		return 0;
-	}
-	
-	@Override
-	public String getDescriptor()
-	{
-		return null;
-	}
-	
-	@Override
-	public String getSignature()
-	{
-		return null;
-	}
-	
-	@Override
-	public String[] getExceptions()
-	{
-		return null;
-	}
-	
-	@Override
-	public void write(ClassWriter writer)
-	{
 	}
 }

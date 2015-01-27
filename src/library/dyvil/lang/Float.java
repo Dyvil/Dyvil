@@ -98,18 +98,6 @@ public abstract class Float implements Number
 	}
 	
 	@Override
-	public Float $plus$plus()
-	{
-		return this.$eq(this.value + 1);
-	}
-	
-	@Override
-	public Float $minus$minus()
-	{
-		return this.$eq(this.value - 1);
-	}
-	
-	@Override
 	@Bytecode(postfixOpcodes = { DUP, FMUL })
 	public Float sqr()
 	{

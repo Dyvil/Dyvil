@@ -2,9 +2,10 @@ package dyvil.tools.compiler.backend;
 
 import java.io.File;
 
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IParameterized;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.transform.Symbols;
 
@@ -190,7 +191,7 @@ public class ClassFormat
 		}
 	}
 	
-	public static void readMethodType(String internal, IMethod method)
+	public static <T extends INamed & IParameterized & ITyped> void readMethodType(String internal, T method)
 	{
 		String methodName = method.getName();
 		int index = internal.indexOf(')');

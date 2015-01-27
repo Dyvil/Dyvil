@@ -8,6 +8,7 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IntValue;
@@ -844,6 +845,39 @@ public class Method extends Member implements IMethod
 			this.value.writeExpression(mw);
 			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);
 		}
+	}
+	
+	@Override
+	public void writeCall(MethodWriter writer, boolean isSuperCall)
+	{
+		int opcode;
+		int args = this.parameters.size();
+		int modifiers = this.modifiers;
+		if (( modifiers & Modifiers.STATIC) != 0)
+		{
+			opcode = Opcodes.INVOKESTATIC;
+		}
+		else if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS) && (modifiers & Modifiers.ABSTRACT) != 0)
+		{
+			opcode = Opcodes.INVOKEINTERFACE;
+			args++;
+		}
+		else if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE || isSuperCall)
+		{
+			opcode = Opcodes.INVOKESPECIAL;
+			args++;
+		}
+		else
+		{
+			opcode = Opcodes.INVOKEVIRTUAL;
+			args++;
+		}
+		
+		String owner = this.theClass.getInternalName();
+		String name = this.qualifiedName;
+		String desc = this.getDescriptor();
+		IType type = this.type;
+		writer.visitMethodInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);
 	}
 	
 	@Override

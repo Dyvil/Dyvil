@@ -98,18 +98,6 @@ public abstract class Double implements Number
 	}
 	
 	@Override
-	public Double $plus$plus()
-	{
-		return this.$eq(this.value + 1);
-	}
-	
-	@Override
-	public Double $minus$minus()
-	{
-		return this.$eq(this.value - 1);
-	}
-	
-	@Override
 	@Bytecode(postfixOpcodes = { DUP2, DMUL })
 	public Double sqr()
 	{
