@@ -1,8 +1,9 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.dynamic;
+
+import static dyvil.reflect.Opcodes.*;
 
 import java.util.List;
 
-import static dyvil.reflect.Opcodes.*;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -10,9 +11,10 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 
-final class UnknownType extends ASTNode implements IType
+public final class DynamicType extends ASTNode implements IType
 {
 	@Override
 	public void setName(String name, String qualifiedName)
@@ -27,7 +29,7 @@ final class UnknownType extends ASTNode implements IType
 	@Override
 	public String getName()
 	{
-		return "unknown";
+		return "dynamic";
 	}
 
 	@Override
@@ -38,7 +40,7 @@ final class UnknownType extends ASTNode implements IType
 	@Override
 	public String getQualifiedName()
 	{
-		return "unknown";
+		return "dynamic";
 	}
 
 	@Override
@@ -68,7 +70,7 @@ final class UnknownType extends ASTNode implements IType
 	@Override
 	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
-		return null;
+		return new MethodMatch(new DynamicMethod(name, arguments), 1);
 	}
 
 	@Override
@@ -90,7 +92,7 @@ final class UnknownType extends ASTNode implements IType
 	@Override
 	public String getFullName()
 	{
-		return "unknown";
+		return "dynamic";
 	}
 
 	@Override
@@ -195,12 +197,12 @@ final class UnknownType extends ASTNode implements IType
 	@Override
 	public String toString()
 	{
-		return "unknown";
+		return "dynamic";
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("unknown");
+		buffer.append("dynamic");
 	}
 }

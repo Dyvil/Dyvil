@@ -21,12 +21,11 @@ import dyvil.tools.compiler.util.Util;
 
 public final class LambdaValue extends ASTNode implements IValue, IValued, IParameterized
 {
-	public static final Handle	lambdaMetafactory	= new Handle(
-															Opcodes.H_INVOKESTATIC,
-															"java/lang/invoke/LambdaMetafactory",
-															"metafactory",
-															"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/Callsite;");
-	
+	public static final Handle	BOOTSTRAP	= new Handle(
+													Opcodes.H_INVOKESTATIC,
+													"java/lang/invoke/LambdaMetafactory",
+													"metafactory",
+													"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
 	public List<Parameter>		parameters;
 	public IValue				value;
 	

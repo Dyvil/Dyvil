@@ -5,6 +5,7 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -16,9 +17,10 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
 
-public class Type extends ASTNode implements IContext, IType
+public class Type extends ASTNode implements IType
 {
-	public static final Type			NONE		= new UnknownType();
+	public static final UnknownType		NONE		= new UnknownType();
+	public static final DynamicType		DYNAMIC		= new DynamicType();
 	
 	public static final PrimitiveType	VOID		= new PrimitiveType("void", "Void", 0);
 	public static final PrimitiveType	BOOLEAN		= new PrimitiveType("boolean", "Boolean", Opcodes.T_BOOLEAN);
@@ -271,13 +273,13 @@ public class Type extends ASTNode implements IContext, IType
 	// Resolve
 	
 	@Override
-	public Type resolve(IContext context)
+	public IType resolve(IContext context)
 	{
 		if (this.theClass == null)
 		{
 			IClass iclass;
 			// Try to resolve the name of this Type as a primitive type
-			Type t = resolvePrimitive(this.qualifiedName);
+			IType t = resolvePrimitive(this.qualifiedName);
 			if (t != null)
 			{
 				// If the array dimensions of this type are 0, we can assume
@@ -288,9 +290,7 @@ public class Type extends ASTNode implements IContext, IType
 					return t;
 				}
 				
-				t = t.clone();
-				t.arrayDimensions = this.arrayDimensions;
-				return t;
+				return t.getArrayType(this.arrayDimensions);
 			}
 			else if (context == Package.rootPackage)
 			{
@@ -312,7 +312,7 @@ public class Type extends ASTNode implements IContext, IType
 		return this;
 	}
 	
-	protected static Type resolvePrimitive(String name)
+	protected static IType resolvePrimitive(String name)
 	{
 		switch (name)
 		{
@@ -341,6 +341,8 @@ public class Type extends ASTNode implements IContext, IType
 		case "any":
 		case "Any":
 			return ANY;
+		case "dynamic":
+			return DYNAMIC;
 		}
 		return null;
 	}
@@ -486,14 +488,6 @@ public class Type extends ASTNode implements IContext, IType
 		{
 			buffer.append(Formatting.Type.array);
 		}
-	}
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder buffer = new StringBuilder();
-		this.toString("", buffer);
-		return buffer.toString();
 	}
 	
 	@Override

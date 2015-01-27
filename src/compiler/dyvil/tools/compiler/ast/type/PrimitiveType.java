@@ -81,14 +81,14 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public Type resolve(IContext context)
+	public IType resolve(IContext context)
 	{
 		if (this.theClass == null)
 		{
-			Type t = resolvePrimitive(this.name);
+			IType t = resolvePrimitive(this.name);
 			if (t != null)
 			{
-				this.theClass = t.theClass;
+				this.theClass = t.getTheClass();
 			}
 		}
 		return this;

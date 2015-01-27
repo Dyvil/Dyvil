@@ -46,6 +46,13 @@ public interface IType extends IASTNode, INamed, IContext
 		return type1;
 	}
 	
+	public default IType getArrayType(int dimensions)
+	{
+		IType type1 = this.clone();
+		type1.setArrayDimensions(dimensions);
+		return type1;
+	}
+	
 	public default void addArrayDimension()
 	{
 	}
