@@ -1,16 +1,14 @@
 package dyvil.tools.compiler.ast.access;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -21,43 +19,32 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
-import dyvil.tools.compiler.transform.ConstantFolder;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.Operators;
 import dyvil.tools.compiler.util.Util;
 
-public class MethodCall extends ASTNode implements IAccess, INamed
+public class UpdateMethodCall extends ASTNode implements IAccess
 {
-	public String		name;
-	public String		qualifiedName;
-	
 	public IValue		instance;
 	public List<IValue>	arguments;
 	
-	public boolean		dotless;
-	public boolean		isSugarCall;
-	
 	public IMethod		method;
 	
-	public MethodCall(ICodePosition position)
+	public UpdateMethodCall(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public MethodCall(ICodePosition position, IValue instance, String name)
+	public UpdateMethodCall(ICodePosition position, IValue instance)
 	{
 		this.position = position;
 		this.instance = instance;
-		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 		this.arguments = new ArrayList(3);
 	}
 	
 	@Override
 	public int getValueType()
 	{
-		return METHOD_CALL;
+		return UPDATE_METHOD_CALL;
 	}
 	
 	@Override
@@ -103,43 +90,6 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	}
 	
 	@Override
-	public void setName(String name, String qualifiedName)
-	{
-		this.name = name;
-		this.qualifiedName = qualifiedName;
-	}
-	
-	@Override
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-	
-	@Override
-	public String getName()
-	{
-		return this.name;
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
-	{
-		this.qualifiedName = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.qualifiedName;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.qualifiedName.equals(name);
-	}
-	
-	@Override
 	public void setValue(IValue value)
 	{
 		this.instance = value;
@@ -181,11 +131,6 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		return this.arguments.get(index);
 	}
 	
-	public void setSugar(boolean sugar)
-	{
-		this.isSugarCall = sugar;
-	}
-	
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
@@ -225,21 +170,21 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(Markers.create(this.position, "access.method.deprecated", this.name));
+				markers.add(Markers.create(this.position, "access.method.deprecated", "update"));
 			}
 			
 			byte access = context.getAccessibility(this.method);
 			if (access == IContext.STATIC)
 			{
-				markers.add(Markers.create(this.position, "access.method.instance", this.name));
+				markers.add(Markers.create(this.position, "access.method.instance", "update"));
 			}
 			else if (access == IContext.SEALED)
 			{
-				markers.add(Markers.create(this.position, "access.method.sealed", this.name));
+				markers.add(Markers.create(this.position, "access.method.sealed", "update"));
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(Markers.create(this.position, "access.method.invisible", this.name));
+				markers.add(Markers.create(this.position, "access.method.invisible", "update"));
 			}
 		}
 	}
@@ -247,43 +192,11 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	@Override
 	public IValue foldConstants()
 	{
-		int len = this.arguments.size();
-		if (len == 1)
-		{
-			IValue argument = this.arguments.get(0);
-			if (argument.isConstant())
-			{
-				if (this.instance != null)
-				{
-					if (this.instance.isConstant())
-					{
-						IValue v1 = ConstantFolder.apply(this.instance, this.qualifiedName, argument);
-						return v1 == null ? this : v1;
-					}
-					
-					this.instance = this.instance.foldConstants();
-					return this;
-				}
-				
-				IValue v1 = ConstantFolder.apply(this.qualifiedName, argument);
-				if (v1 != null)
-				{
-					return v1;
-				}
-			}
-			
-			if (this.instance != null)
-			{
-				this.instance = this.instance.foldConstants();
-			}
-			this.arguments.set(0, argument.foldConstants());
-			return this;
-		}
-		
 		if (this.instance != null)
 		{
 			this.instance = this.instance.foldConstants();
 		}
+		int len = this.arguments.size();
 		for (int i = 0; i < len; i++)
 		{
 			IValue v1 = this.arguments.get(i);
@@ -297,53 +210,10 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		return this;
 	}
 	
-	private IValue	replacement;
-	
 	@Override
 	public boolean resolve(IContext context, List<Marker> markers)
 	{
-		int len = this.arguments.size();
-		if (len == 0 && this.instance != null)
-		{
-			IValue operator = Operators.get(this.instance, this.name);
-			if (operator != null)
-			{
-				operator.setPosition(this.position);
-				this.replacement = operator;
-				// Return false to apply replacement in resolve2
-				return false;
-			}
-		}
-		else if (len == 1)
-		{
-			IValue argument = this.arguments.get(0);
-			argument = argument.resolve(markers, context);
-			
-			IValue operator = this.instance == null ? Operators.get(this.name, argument) : Operators.get(this.instance, this.name, argument);
-			if (operator != null)
-			{
-				operator.setPosition(this.position);
-				this.replacement = operator;
-				// Return false to apply replacement in resolve2
-				return false;
-			}
-			
-			this.arguments.set(0, argument);
-		}
-		else
-		{
-			for (int i = 0; i < len; i++)
-			{
-				IValue v1 = this.arguments.get(i);
-				IValue v2 = v1.resolve(markers, context);
-				if (v1 != v2)
-				{
-					this.arguments.set(i, v2);
-				}
-			}
-		}
-		
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, this.arguments);
+		IMethod method = IAccess.resolveMethod(context, this.instance, "update", this.arguments);
 		if (method != null)
 		{
 			this.method = method;
@@ -355,85 +225,6 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	@Override
 	public IValue resolve2(IContext context)
 	{
-		if (this.replacement != null)
-		{
-			return this.replacement;
-		}
-		
-		if (this.isSugarCall)
-		{
-			if (this.arguments.isEmpty())
-			{
-				IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
-				if (field != null)
-				{
-					FieldAccess access = new FieldAccess(this.position);
-					access.field = field;
-					access.instance = this.instance;
-					access.name = this.name;
-					access.qualifiedName = this.qualifiedName;
-					access.dotless = this.dotless;
-					return access;
-				}
-			}
-		}
-		// Resolve Apply Method
-		else if (this.instance == null)
-		{
-			IValue instance;
-			IType type = null;
-			IMethod method = null;
-			
-			FieldMatch field = context.resolveField(this.qualifiedName);
-			if (field == null)
-			{
-				// Find a type
-				type = new Type(this.position, this.qualifiedName).resolve(context);
-				if (!type.isResolved())
-				{
-					// No type found -> Not an apply method call
-					return null;
-				}
-				else
-				{
-					// Find the apply method of the type
-					MethodMatch match = type.resolveMethod(null, "apply", this.arguments);
-					if (match == null)
-					{
-						// No apply method found -> Not an apply method call
-						return null;
-					}
-					method = match.theMethod;
-					instance = new ClassAccess(this.position, type);
-				}
-			}
-			else
-			{
-				FieldAccess access = new FieldAccess(this.position);
-				access.field = field.theField;
-				
-				// Find the apply method of the field type
-				MethodMatch match = field.theField.getType().resolveMethod(access, "apply", this.arguments);
-				if (match == null)
-				{
-					// No apply method found -> Not an apply method call
-					return null;
-				}
-				method = match.theMethod;
-				access.name = this.name;
-				access.qualifiedName = this.qualifiedName;
-				access.dotless = this.dotless;
-				instance = access;
-			}
-			
-			ApplyMethodCall call = new ApplyMethodCall(this.position);
-			call.method = method;
-			call.instance = instance;
-			call.arguments = this.arguments;
-			
-			return call;
-		}
-		
 		return null;
 	}
 	
@@ -446,17 +237,8 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	@Override
 	public Marker getResolveError()
 	{
-		Marker marker;
-		if (this.isSugarCall && this.arguments.isEmpty())
-		{
-			marker = Markers.create(this.position, "resolve.method_field", this.name);
-		}
-		else
-		{
-			marker = Markers.create(this.position, "resolve.method", this.name);
-		}
+		Marker marker = Markers.create(this.position, "resolve.method", "update");
 		
-		marker.addInfo("Qualified Name: " + this.qualifiedName);
 		if (this.instance != null)
 		{
 			IType vtype = this.instance.getType();
@@ -562,36 +344,26 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		if (this.instance != null)
 		{
 			this.instance.toString(prefix, buffer);
-			if (this.dotless && !Formatting.Method.useJavaFormat)
+		}
+		
+		buffer.append(Formatting.Method.parametersStart);
+		Iterator<? extends IASTNode> iterator = this.arguments.iterator();
+		while (true)
+		{
+			IASTNode value = iterator.next();
+			if (iterator.hasNext())
 			{
-				buffer.append(Formatting.Method.dotlessSeperator);
+				value.toString("", buffer);
+				buffer.append(Formatting.Method.parameterSeperator);
 			}
 			else
 			{
-				buffer.append('.');
+				int len = buffer.length();
+				buffer.delete(len - 2, len);
+				buffer.append(Formatting.Method.parametersEnd).append(Formatting.Field.keyValueSeperator).append(' ');
+				value.toString("", buffer);
+				break;
 			}
-		}
-		
-		if (Formatting.Method.convertQualifiedNames)
-		{
-			buffer.append(this.qualifiedName);
-		}
-		else
-		{
-			buffer.append(this.name);
-		}
-		
-		if (this.isSugarCall && !Formatting.Method.useJavaFormat)
-		{
-			if (!this.arguments.isEmpty())
-			{
-				buffer.append(Formatting.Method.sugarCallSeperator);
-				this.arguments.get(0).toString(prefix, buffer);
-			}
-		}
-		else
-		{
-			Util.parametersToString(this.arguments, buffer, true);
 		}
 	}
 }

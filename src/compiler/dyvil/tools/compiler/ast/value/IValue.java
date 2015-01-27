@@ -35,15 +35,15 @@ public interface IValue extends IASTNode, ITyped
 	public static int	FIELD_ACCESS		= 17;
 	public static int	FIELD_ASSIGN		= 18;
 	public static int	METHOD_CALL			= 19;
-	public static int	CONSTRUCTOR_CALL	= 20;
+	public static int	APPLY_METHOD_CALL	= 20;
+	public static int	UPDATE_METHOD_CALL	= 21;
+	public static int	CONSTRUCTOR_CALL	= 22;
 	
-	public static int	CAST_OPERATOR		= 21;
-	public static int	ISOF_OPERATOR		= 22;
-	public static int	SWAP_OPERATOR		= 23;
-	public static int	BOOLEAN_AND			= 24;
-	public static int	BOOLEAN_OR			= 25;
-	public static int	INCREMENT			= 26;
-	public static int	DECREMENT			= 27;
+	public static int	CAST_OPERATOR		= 32;
+	public static int	ISOF_OPERATOR		= 33;
+	public static int	SWAP_OPERATOR		= 34;
+	public static int	BOOLEAN_AND			= 35;
+	public static int	BOOLEAN_OR			= 36;
 	
 	public static int	TUPLE				= 48;
 	public static int	LAMBDA				= 49;

@@ -12,8 +12,6 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValueList;
-import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -22,7 +20,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
-public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueList, IValued
+public class ConstructorCall extends ASTNode implements IAccess
 {
 	public IType		type;
 	
@@ -80,39 +78,6 @@ public class ConstructorCall extends ASTNode implements IAccess, IValue, IValueL
 			return 2;
 		}
 		return 0;
-	}
-	
-	@Override
-	public void setName(String name, String qualifiedName)
-	{
-	}
-	
-	@Override
-	public void setName(String name)
-	{
-	}
-	
-	@Override
-	public String getName()
-	{
-		return "new";
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
-	{
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return "<init>";
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return "<init>".equals(name);
 	}
 	
 	@Override

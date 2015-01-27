@@ -4,7 +4,12 @@ import java.util.Arrays
 
 public class Main
 {
-	public static void main(String[] args) = print { 1, 2, 3, f(3) }
+	public static void main(String[] args)
+	{
+		System out println(args(0));
+		args(0) = "Hello";
+		System out println(args(0));
+	}
 	
 	public static int f(int i) = if (i == 0) 1 else 2;
 	

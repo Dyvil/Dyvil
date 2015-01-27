@@ -294,20 +294,25 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		call.method = method;
 		call.dotless = this.dotless;
 		call.isSugarCall = true;
+		call.arguments = Util.EMPTY_VALUES;
 		return call;
 	}
 	
 	@Override
 	public IAccess resolve3(IContext context, IAccess next)
 	{
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, new SingleElementList(next));
+		List<IValue> arguments = new SingleElementList(next);
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, arguments);
 		if (method != null)
 		{
-			MethodCall call = new MethodCall(this.position, this.instance, this.name);
-			call.addValue(next);
+			MethodCall call = new MethodCall(this.position);
+			call.instance = this.instance;
+			call.name = this.name;
+			call.qualifiedName = this.qualifiedName;
 			call.method = method;
 			call.dotless = this.dotless;
 			call.isSugarCall = true;
+			call.arguments = arguments;
 			return call;
 		}
 		

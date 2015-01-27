@@ -252,7 +252,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				else
 				{
-					this.value = new MethodCall(this.value.getPosition(), this.value, "apply");
+					this.value = new ApplyMethodCall(this.value.getPosition(), this.value);
 					this.mode = PARAMETERS;
 				}
 			}
@@ -290,10 +290,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			else
 			{
-				MethodCall call = new MethodCall(token.raw());
-				call.instance = this.value;
-				call.name = "apply";
-				call.qualifiedName = "apply";
+				ApplyMethodCall call = new ApplyMethodCall(token.raw(), this.value);
 				this.value = call;
 				this.mode = 0;
 				pm.pushParser(new ExpressionParser(this), true);
@@ -410,28 +407,29 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			pm.pushParser(new ExpressionParser(assign));
 			return true;
 		}
+		else if (i == IValue.APPLY_METHOD_CALL)
+		{
+			ApplyMethodCall call = (ApplyMethodCall) this.value;
+			
+			UpdateMethodCall updateCall = new UpdateMethodCall(position);
+			updateCall.instance = call.instance;
+			updateCall.arguments = call.arguments;
+			
+			this.value = updateCall;
+			pm.pushParser(new ExpressionParser(this));
+			return true;
+		}
 		else if (i == IValue.METHOD_CALL)
 		{
 			MethodCall call = (MethodCall) this.value;
-			IValue v;
-			if (call.isName("apply"))
-			{
-				v = call.instance;
-			}
-			else
-			{
-				FieldAccess fa = new FieldAccess(position);
-				fa.instance = call.instance;
-				fa.name = call.name;
-				fa.qualifiedName = call.qualifiedName;
-				v = fa;
-			}
+			FieldAccess fa = new FieldAccess(position);
+			fa.instance = call.instance;
+			fa.name = call.name;
+			fa.qualifiedName = call.qualifiedName;
 			
-			MethodCall updateCall = new MethodCall(position);
+			UpdateMethodCall updateCall = new UpdateMethodCall(position);
 			updateCall.arguments = call.arguments;
-			updateCall.instance = v;
-			updateCall.name = "update";
-			updateCall.qualifiedName = "update";
+			updateCall.instance = fa;
 			
 			this.value = updateCall;
 			pm.pushParser(new ExpressionParser(this));
@@ -661,7 +659,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		((MethodCall) this.value).addValue(value);
+		((IValueList) this.value).addValue(value);
 	}
 	
 	@Override
