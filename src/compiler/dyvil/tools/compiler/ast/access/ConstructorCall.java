@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -20,7 +21,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
-public class ConstructorCall extends ASTNode implements IAccess
+public class ConstructorCall extends ASTNode implements IValue, IValueList
 {
 	public IType		type;
 	
@@ -78,17 +79,6 @@ public class ConstructorCall extends ASTNode implements IAccess
 			return 2;
 		}
 		return 0;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 	
 	@Override
@@ -155,7 +145,13 @@ public class ConstructorCall extends ASTNode implements IAccess
 			}
 		}
 		
-		if (!this.resolve(context, markers))
+		if (!this.type.isResolved())
+		{
+			return this;
+		}
+		
+		MethodMatch match = this.type.resolveMethod(null, "<init>", this.arguments);
+		if (match == null)
 		{
 			Marker marker = Markers.create(this.position, "resolve.constructor");
 			StringBuilder builder = new StringBuilder("Argument Types: [");
@@ -163,7 +159,10 @@ public class ConstructorCall extends ASTNode implements IAccess
 			builder.append(']');
 			marker.addInfo(builder.toString());
 			markers.add(marker);
+			return this;
 		}
+		
+		this.method = match.theMethod;
 		return this;
 	}
 	
@@ -219,45 +218,6 @@ public class ConstructorCall extends ASTNode implements IAccess
 			}
 		}
 		return this;
-	}
-	
-	@Override
-	public boolean resolve(IContext context, List<Marker> markers)
-	{
-		if (!this.type.isResolved())
-		{
-			return false;
-		}
-		
-		MethodMatch match = this.type.resolveMethod(null, "<init>", this.arguments);
-		if (match != null)
-		{
-			this.method = match.theMethod;
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public IAccess resolve2(IContext context)
-	{
-		return null;
-	}
-	
-	@Override
-	public IAccess resolve3(IContext context, IAccess next)
-	{
-		return null;
-	}
-	
-	@Override
-	public Marker getResolveError()
-	{
-		if (!this.type.isResolved())
-		{
-			return Markers.create(this.type.getPosition(), "resolve.type", this.type.toString());
-		}
-		return Markers.create(this.position, "resolve.constructor", this.type.toString());
 	}
 	
 	@Override

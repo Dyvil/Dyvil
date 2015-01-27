@@ -121,7 +121,12 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		MethodMatch method = context.resolveMethod(null, "<init>", Util.EMPTY_VALUES);
+		if (!this.type.isResolved())
+		{
+			return this;
+		}
+		
+		MethodMatch method = this.type.resolveMethod(null, "<init>", Util.EMPTY_VALUES);
 		if (method != null)
 		{
 			this.method = method.theMethod;
