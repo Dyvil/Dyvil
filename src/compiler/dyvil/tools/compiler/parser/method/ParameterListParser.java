@@ -14,6 +14,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -100,6 +101,11 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 			{
 				this.parameter.seperator = ';';
 				this.reset();
+				return true;
+			}
+			if (type == Tokens.EQUALS)
+			{
+				pm.pushParser(new ExpressionParser(this.parameter));
 				return true;
 			}
 		}

@@ -11,7 +11,7 @@ public class Main
 		System out println(args(0));
 	}
 	
-	public static int f(int i) = if (i == 0) 1 else 2;
+	public static int f(int i = 1) = if (i == 0) 1 else 2;
 	
-	public static void print(int[] array) = System out println(Arrays toString(array));
+	public static void print(int[] array = { 1, 2, 3 }) = System out println(Arrays toString(array));
 }

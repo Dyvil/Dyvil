@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.util.Modifiers;
@@ -20,6 +21,8 @@ public class Parameter extends Member implements IField
 	public int		index;
 	public char		seperator;
 	private boolean	varargs;
+	
+	public IValue	defaultValue;
 	
 	public Parameter()
 	{
@@ -49,12 +52,13 @@ public class Parameter extends Member implements IField
 	@Override
 	public void setValue(IValue value)
 	{
+		this.defaultValue = value;
 	}
 	
 	@Override
 	public IValue getValue()
 	{
-		return null;
+		return this.defaultValue;
 	}
 	
 	public void setSeperator(char seperator)
@@ -125,6 +129,11 @@ public class Parameter extends Member implements IField
 		{
 			a.resolveTypes(markers, context);
 		}
+		
+		if (this.defaultValue != null)
+		{
+			this.defaultValue.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
@@ -141,6 +150,11 @@ public class Parameter extends Member implements IField
 			
 			a.resolve(markers, context);
 		}
+		
+		if (this.defaultValue != null)
+		{
+			this.defaultValue = this.defaultValue.resolve(markers, context);
+		}
 	}
 	
 	@Override
@@ -149,6 +163,24 @@ public class Parameter extends Member implements IField
 		for (Annotation a : this.annotations)
 		{
 			a.check(markers, context);
+		}
+		
+		if (this.defaultValue != null)
+		{
+			IValue value1 = this.defaultValue.withType(this.type);
+			if (value1 == null)
+			{
+				Marker marker = Markers.create(this.defaultValue.getPosition(), "parameter.type", this.name);
+				marker.addInfo("Parameter Type: " + this.type);
+				marker.addInfo("Value Type: " + this.defaultValue.getType());
+				markers.add(marker);
+			}
+			else
+			{
+				this.defaultValue = value1;
+			}
+			
+			this.defaultValue.check(markers, context);
 		}
 	}
 	
@@ -209,5 +241,11 @@ public class Parameter extends Member implements IField
 			buffer.replace(len - 2, len, "...");
 		}
 		buffer.append(' ').append(this.name);
+		
+		if (this.defaultValue != null)
+		{
+			buffer.append(Formatting.Field.keyValueSeperator).append(' ');
+			this.defaultValue.toString(prefix, buffer);
+		}
 	}
 }

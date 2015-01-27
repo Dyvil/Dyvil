@@ -121,7 +121,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public IValue withType(IType type)
 	{
-		return this.requiredType == null ? null : this;
+		return this.isType(type) ? this : null;
 	}
 	
 	@Override
