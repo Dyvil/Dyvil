@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Short implements Integer
+public class Short implements Integer
 {
 	protected short	value;
 	
@@ -9,37 +9,13 @@ public abstract class Short implements Integer
 		this.value = value;
 	}
 	
-	@Override
-	public abstract Short $eq(byte v);
-	
-	@Override
-	public abstract Short $eq(short v);
-	
-	@Override
-	public abstract Char $eq(char v);
-	
-	@Override
-	public abstract Int $eq(int v);
-	
-	@Override
-	public abstract Long $eq(long v);
-	
-	@Override
-	public abstract Float $eq(float v);
-	
-	@Override
-	public abstract Double $eq(double v);
-	
-	@Override
-	public Number $eq(Number v)
+	public static Short create(short v)
 	{
-		return v;
-	}
-	
-	@Override
-	public Integer $eq(Integer v)
-	{
-		return v;
+		if (v >= 0 && v < ConstPool.tableSize)
+		{
+			return ConstPool.SHORTS[v];
+		}
+		return new Short(v);
 	}
 	
 	@Override
@@ -89,25 +65,25 @@ public abstract class Short implements Integer
 	@Override
 	public Short $minus()
 	{
-		return this.$eq((short) -this.value);
+		return Short.create((short) -this.value);
 	}
 	
 	@Override
 	public Short $tilde()
 	{
-		return this.$eq((short) ~this.value);
+		return Short.create((short) ~this.value);
 	}
 	
 	@Override
 	public Int sqr()
 	{
-		return this.$eq(this.value * this.value);
+		return Int.create(this.value * this.value);
 	}
 	
 	@Override
 	public Short rec()
 	{
-		return this.$eq((short) (1 / this.value));
+		return Short.create((short) (1 / this.value));
 	}
 	
 	// byte operators
@@ -151,67 +127,67 @@ public abstract class Short implements Integer
 	@Override
 	public Short $plus(byte v)
 	{
-		return this.$eq((short) (this.value + v));
+		return Short.create((short) (this.value + v));
 	}
 	
 	@Override
 	public Short $minus(byte v)
 	{
-		return this.$eq((short) (this.value - v));
+		return Short.create((short) (this.value - v));
 	}
 	
 	@Override
 	public Short $times(byte v)
 	{
-		return this.$eq((short) (this.value * v));
+		return Short.create((short) (this.value * v));
 	}
 	
 	@Override
 	public Short $div(byte v)
 	{
-		return this.$eq((short) (this.value / v));
+		return Short.create((short) (this.value / v));
 	}
 	
 	@Override
 	public Short $percent(byte v)
 	{
-		return this.$eq((short) (this.value % v));
+		return Short.create((short) (this.value % v));
 	}
 	
 	@Override
 	public Short $bar(byte v)
 	{
-		return this.$eq((short) (this.value | v));
+		return Short.create((short) (this.value | v));
 	}
 	
 	@Override
 	public Short $amp(byte v)
 	{
-		return this.$eq((short) (this.value & v));
+		return Short.create((short) (this.value & v));
 	}
 	
 	@Override
 	public Short $up(byte v)
 	{
-		return this.$eq((short) (this.value ^ v));
+		return Short.create((short) (this.value ^ v));
 	}
 	
 	@Override
 	public Short $less$less(byte v)
 	{
-		return this.$eq((short) (this.value << v));
+		return Short.create((short) (this.value << v));
 	}
 	
 	@Override
 	public Short $greater$greater(byte v)
 	{
-		return this.$eq((short) (this.value >> v));
+		return Short.create((short) (this.value >> v));
 	}
 	
 	@Override
 	public Short $greater$greater$greater(byte v)
 	{
-		return this.$eq((short) (this.value >>> v));
+		return Short.create((short) (this.value >>> v));
 	}
 	
 	// short operators
@@ -255,67 +231,67 @@ public abstract class Short implements Integer
 	@Override
 	public Short $plus(short v)
 	{
-		return this.$eq((short) (this.value + v));
+		return Short.create((short) (this.value + v));
 	}
 	
 	@Override
 	public Short $minus(short v)
 	{
-		return this.$eq((short) (this.value - v));
+		return Short.create((short) (this.value - v));
 	}
 	
 	@Override
 	public Short $times(short v)
 	{
-		return this.$eq((short) (this.value * v));
+		return Short.create((short) (this.value * v));
 	}
 	
 	@Override
 	public Short $div(short v)
 	{
-		return this.$eq((short) (this.value / v));
+		return Short.create((short) (this.value / v));
 	}
 	
 	@Override
 	public Short $percent(short v)
 	{
-		return this.$eq((short) (this.value % v));
+		return Short.create((short) (this.value % v));
 	}
 	
 	@Override
 	public Short $bar(short v)
 	{
-		return this.$eq((short) (this.value | v));
+		return Short.create((short) (this.value | v));
 	}
 	
 	@Override
 	public Short $amp(short v)
 	{
-		return this.$eq((short) (this.value & v));
+		return Short.create((short) (this.value & v));
 	}
 	
 	@Override
 	public Short $up(short v)
 	{
-		return this.$eq((short) (this.value ^ v));
+		return Short.create((short) (this.value ^ v));
 	}
 	
 	@Override
 	public Short $less$less(short v)
 	{
-		return this.$eq((short) (this.value << v));
+		return Short.create((short) (this.value << v));
 	}
 	
 	@Override
 	public Short $greater$greater(short v)
 	{
-		return this.$eq((short) (this.value >> v));
+		return Short.create((short) (this.value >> v));
 	}
 	
 	@Override
 	public Short $greater$greater$greater(short v)
 	{
-		return this.$eq((short) (this.value >>> v));
+		return Short.create((short) (this.value >>> v));
 	}
 	
 	// char operators
@@ -359,67 +335,67 @@ public abstract class Short implements Integer
 	@Override
 	public Char $plus(char v)
 	{
-		return this.$eq((char) (this.value + v));
+		return Char.create((char) (this.value + v));
 	}
 	
 	@Override
 	public Char $minus(char v)
 	{
-		return this.$eq((char) (this.value - v));
+		return Char.create((char) (this.value - v));
 	}
 	
 	@Override
 	public Char $times(char v)
 	{
-		return this.$eq((char) (this.value * v));
+		return Char.create((char) (this.value * v));
 	}
 	
 	@Override
 	public Char $div(char v)
 	{
-		return this.$eq((char) (this.value / v));
+		return Char.create((char) (this.value / v));
 	}
 	
 	@Override
 	public Char $percent(char v)
 	{
-		return this.$eq((char) (this.value % v));
+		return Char.create((char) (this.value % v));
 	}
 	
 	@Override
 	public Char $bar(char v)
 	{
-		return this.$eq((char) (this.value | v));
+		return Char.create((char) (this.value | v));
 	}
 	
 	@Override
 	public Char $amp(char v)
 	{
-		return this.$eq((char) (this.value & v));
+		return Char.create((char) (this.value & v));
 	}
 	
 	@Override
 	public Char $up(char v)
 	{
-		return this.$eq((char) (this.value ^ v));
+		return Char.create((char) (this.value ^ v));
 	}
 	
 	@Override
 	public Char $less$less(char v)
 	{
-		return this.$eq((char) (this.value << v));
+		return Char.create((char) (this.value << v));
 	}
 	
 	@Override
 	public Char $greater$greater(char v)
 	{
-		return this.$eq((char) (this.value >> v));
+		return Char.create((char) (this.value >> v));
 	}
 	
 	@Override
 	public Char $greater$greater$greater(char v)
 	{
-		return this.$eq((char) (this.value >>> v));
+		return Char.create((char) (this.value >>> v));
 	}
 	
 	// int operators
@@ -463,67 +439,67 @@ public abstract class Short implements Integer
 	@Override
 	public Int $plus(int v)
 	{
-		return this.$eq(this.value + v);
+		return Int.create(this.value + v);
 	}
 	
 	@Override
 	public Int $minus(int v)
 	{
-		return this.$eq(this.value - v);
+		return Int.create(this.value - v);
 	}
 	
 	@Override
 	public Int $times(int v)
 	{
-		return this.$eq(this.value * v);
+		return Int.create(this.value * v);
 	}
 	
 	@Override
 	public Int $div(int v)
 	{
-		return this.$eq(this.value / v);
+		return Int.create(this.value / v);
 	}
 	
 	@Override
 	public Int $percent(int v)
 	{
-		return this.$eq(this.value % v);
+		return Int.create(this.value % v);
 	}
 	
 	@Override
 	public Int $bar(int v)
 	{
-		return this.$eq(this.value | v);
+		return Int.create(this.value | v);
 	}
 	
 	@Override
 	public Int $amp(int v)
 	{
-		return this.$eq(this.value & v);
+		return Int.create(this.value & v);
 	}
 	
 	@Override
 	public Int $up(int v)
 	{
-		return this.$eq(this.value ^ v);
+		return Int.create(this.value ^ v);
 	}
 	
 	@Override
 	public Int $less$less(int v)
 	{
-		return this.$eq(this.value << v);
+		return Int.create(this.value << v);
 	}
 	
 	@Override
 	public Int $greater$greater(int v)
 	{
-		return this.$eq(this.value >> v);
+		return Int.create(this.value >> v);
 	}
 	
 	@Override
 	public Int $greater$greater$greater(int v)
 	{
-		return this.$eq(this.value >>> v);
+		return Int.create(this.value >>> v);
 	}
 	
 	// long operators
@@ -567,67 +543,67 @@ public abstract class Short implements Integer
 	@Override
 	public Long $plus(long v)
 	{
-		return this.$eq(this.value + v);
+		return Long.create(this.value + v);
 	}
 	
 	@Override
 	public Long $minus(long v)
 	{
-		return this.$eq(this.value - v);
+		return Long.create(this.value - v);
 	}
 	
 	@Override
 	public Long $times(long v)
 	{
-		return this.$eq(this.value * v);
+		return Long.create(this.value * v);
 	}
 	
 	@Override
 	public Long $div(long v)
 	{
-		return this.$eq(this.value / v);
+		return Long.create(this.value / v);
 	}
 	
 	@Override
 	public Long $percent(long v)
 	{
-		return this.$eq(this.value % v);
+		return Long.create(this.value % v);
 	}
 	
 	@Override
 	public Long $bar(long v)
 	{
-		return this.$eq(this.value | v);
+		return Long.create(this.value | v);
 	}
 	
 	@Override
 	public Long $amp(long v)
 	{
-		return this.$eq(this.value & v);
+		return Long.create(this.value & v);
 	}
 	
 	@Override
 	public Long $up(long v)
 	{
-		return this.$eq(this.value ^ v);
+		return Long.create(this.value ^ v);
 	}
 	
 	@Override
 	public Char $less$less(long v)
 	{
-		return this.$eq((char) (this.value << v));
+		return Char.create((char) (this.value << v));
 	}
 	
 	@Override
 	public Char $greater$greater(long v)
 	{
-		return this.$eq((char) (this.value >> v));
+		return Char.create((char) (this.value >> v));
 	}
 	
 	@Override
 	public Char $greater$greater$greater(long v)
 	{
-		return this.$eq((char) (this.value >>> v));
+		return Char.create((char) (this.value >>> v));
 	}
 	
 	// float operators
@@ -671,31 +647,31 @@ public abstract class Short implements Integer
 	@Override
 	public Float $plus(float v)
 	{
-		return this.$eq(this.value + v);
+		return Float.create(this.value + v);
 	}
 	
 	@Override
 	public Float $minus(float v)
 	{
-		return this.$eq(this.value - v);
+		return Float.create(this.value - v);
 	}
 	
 	@Override
 	public Float $times(float v)
 	{
-		return this.$eq(this.value * v);
+		return Float.create(this.value * v);
 	}
 	
 	@Override
 	public Float $div(float v)
 	{
-		return this.$eq(this.value / v);
+		return Float.create(this.value / v);
 	}
 	
 	@Override
 	public Float $percent(float v)
 	{
-		return this.$eq(this.value % v);
+		return Float.create(this.value % v);
 	}
 	
 	// double operators
@@ -739,31 +715,31 @@ public abstract class Short implements Integer
 	@Override
 	public Double $plus(double v)
 	{
-		return this.$eq(this.value + v);
+		return Double.create(this.value + v);
 	}
 	
 	@Override
 	public Double $minus(double v)
 	{
-		return this.$eq(this.value - v);
+		return Double.create(this.value - v);
 	}
 	
 	@Override
 	public Double $times(double v)
 	{
-		return this.$eq(this.value * v);
+		return Double.create(this.value * v);
 	}
 	
 	@Override
 	public Double $div(double v)
 	{
-		return this.$eq(this.value / v);
+		return Double.create(this.value / v);
 	}
 	
 	@Override
 	public Double $percent(double v)
 	{
-		return this.$eq(this.value % v);
+		return Double.create(this.value % v);
 	}
 	
 	// generic operators
@@ -807,74 +783,95 @@ public abstract class Short implements Integer
 	@Override
 	public Short $plus(Number v)
 	{
-		return this.$eq((short) (this.value + v.shortValue()));
+		return Short.create((short) (this.value + v.shortValue()));
 	}
 	
 	@Override
 	public Short $minus(Number v)
 	{
-		return this.$eq((short) (this.value - v.shortValue()));
+		return Short.create((short) (this.value - v.shortValue()));
 	}
 	
 	@Override
 	public Short $times(Number v)
 	{
-		return this.$eq((short) (this.value * v.shortValue()));
+		return Short.create((short) (this.value * v.shortValue()));
 	}
 	
 	@Override
 	public Short $div(Number v)
 	{
-		return this.$eq((short) (this.value / v.shortValue()));
+		return Short.create((short) (this.value / v.shortValue()));
 	}
 	
 	@Override
 	public Short $percent(Number v)
 	{
-		return this.$eq((short) (this.value % v.shortValue()));
+		return Short.create((short) (this.value % v.shortValue()));
 	}
 	
 	@Override
 	public Short $bar(Integer v)
 	{
-		return this.$eq((short) (this.value | v.shortValue()));
+		return Short.create((short) (this.value | v.shortValue()));
 	}
 	
 	@Override
 	public Short $amp(Integer v)
 	{
-		return this.$eq((short) (this.value & v.shortValue()));
+		return Short.create((short) (this.value & v.shortValue()));
 	}
 	
 	@Override
 	public Short $up(Integer v)
 	{
-		return this.$eq((short) (this.value ^ v.shortValue()));
+		return Short.create((short) (this.value ^ v.shortValue()));
 	}
 	
 	@Override
 	public Short $less$less(Integer v)
 	{
-		return this.$eq((short) (this.value << v.shortValue()));
+		return Short.create((short) (this.value << v.shortValue()));
 	}
 	
 	@Override
 	public Short $greater$greater(Integer v)
 	{
-		return this.$eq((short) (this.value >> v.shortValue()));
+		return Short.create((short) (this.value >> v.shortValue()));
 	}
 	
 	@Override
 	public Short $greater$greater$greater(Integer v)
 	{
-		return this.$eq((short) (this.value >>> v.shortValue()));
+		return Short.create((short) (this.value >>> v.shortValue()));
 	}
 	
-	// string representations
+	// Object methods
 	
 	@Override
 	public java.lang.String toString()
 	{
-		return java.lang.Long.toString(this.value);
+		return java.lang.Short.toString(this.value);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null || !(obj instanceof Number))
+		{
+			return false;
+		}
+		Number other = (Number) obj;
+		return this.value == other.shortValue();
 	}
 }

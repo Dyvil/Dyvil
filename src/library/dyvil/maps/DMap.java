@@ -15,4 +15,6 @@ public interface DMap<K, V> extends Map<K, V>
 	public V remove(Object key);
 	
 	public V $minus(Object key);
+	
+	public V apply(K key);
 }

@@ -2,7 +2,7 @@ package dyvil.lang;
 
 public interface Integer extends Number
 {
-	public Integer $eq(Integer v);
+	// unary operators
 	
 	public Integer $tilde();
 	

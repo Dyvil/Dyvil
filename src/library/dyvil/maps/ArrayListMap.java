@@ -34,4 +34,10 @@ public class ArrayListMap<K, V> extends AbstractListMap<K, V>
 	{
 		return super.remove(key);
 	}
+	
+	@Override
+	public V apply(K key)
+	{
+		return super.get(key);
+	}
 }

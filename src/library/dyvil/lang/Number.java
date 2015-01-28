@@ -18,24 +18,6 @@ public interface Number extends Ordered<Number>
 	
 	public double doubleValue();
 	
-	// Setters
-	
-	public Number $eq(byte v);
-	
-	public Number $eq(short v);
-	
-	public Number $eq(char v);
-	
-	public Number $eq(int v);
-	
-	public Number $eq(long v);
-	
-	public Number $eq(float v);
-	
-	public Number $eq(double v);
-	
-	public Number $eq(Number v);
-	
 	// Unary operators
 	
 	public Number $minus();

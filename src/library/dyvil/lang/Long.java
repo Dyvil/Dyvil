@@ -3,7 +3,7 @@ package dyvil.lang;
 import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Bytecode;
 
-public abstract class Long implements Integer
+public class Long implements Integer
 {
 	protected long	value;
 	
@@ -12,37 +12,13 @@ public abstract class Long implements Integer
 		this.value = value;
 	}
 	
-	@Override
-	public abstract Long $eq(byte v);
-	
-	@Override
-	public abstract Long $eq(short v);
-	
-	@Override
-	public abstract Long $eq(char v);
-	
-	@Override
-	public abstract Long $eq(int v);
-	
-	@Override
-	public abstract Long $eq(long v);
-	
-	@Override
-	public abstract Float $eq(float v);
-	
-	@Override
-	public abstract Double $eq(double v);
-	
-	@Override
-	public Number $eq(Number v)
+	public static Long create(long value)
 	{
-		return v;
-	}
-	
-	@Override
-	public Integer $eq(Integer v)
-	{
-		return v;
+		if (value >= 0 && value < ConstPool.tableSize)
+		{
+			return ConstPool.LONGS[(int) value];
+		}
+		return new Long(value);
 	}
 	
 	@Override
@@ -100,28 +76,28 @@ public abstract class Long implements Integer
 	@Bytecode(postfixOpcode = LNEG)
 	public Long $minus()
 	{
-		return this.$eq(-this.value);
+		return Long.create(-this.value);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = LBIN)
 	public Long $tilde()
 	{
-		return this.$eq(~this.value);
+		return Long.create(~this.value);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { DUP2, LMUL })
 	public Long sqr()
 	{
-		return this.$eq(this.value * this.value);
+		return Long.create(this.value * this.value);
 	}
 	
 	@Override
 	@Bytecode(prefixOpcode = LCONST_1, postfixOpcode = LDIV)
 	public Long rec()
 	{
-		return this.$eq(1L / this.value);
+		return Long.create(1L / this.value);
 	}
 	
 	// byte operators
@@ -165,67 +141,67 @@ public abstract class Long implements Integer
 	@Override
 	public Long $plus(byte v)
 	{
-		return this.$eq(this.value + v);
+		return Long.create(this.value + v);
 	}
 	
 	@Override
 	public Long $minus(byte v)
 	{
-		return this.$eq(this.value - v);
+		return Long.create(this.value - v);
 	}
 	
 	@Override
 	public Long $times(byte v)
 	{
-		return this.$eq(this.value * v);
+		return Long.create(this.value * v);
 	}
 	
 	@Override
 	public Long $div(byte v)
 	{
-		return this.$eq(this.value / v);
+		return Long.create(this.value / v);
 	}
 	
 	@Override
 	public Long $percent(byte v)
 	{
-		return this.$eq(this.value % v);
+		return Long.create(this.value % v);
 	}
 	
 	@Override
 	public Long $bar(byte v)
 	{
-		return this.$eq(this.value | v);
+		return Long.create(this.value | v);
 	}
 	
 	@Override
 	public Long $amp(byte v)
 	{
-		return this.$eq(this.value & v);
+		return Long.create(this.value & v);
 	}
 	
 	@Override
 	public Long $up(byte v)
 	{
-		return this.$eq(this.value ^ v);
+		return Long.create(this.value ^ v);
 	}
 	
 	@Override
 	public Long $less$less(byte v)
 	{
-		return this.$eq(this.value << v);
+		return Long.create(this.value << v);
 	}
 	
 	@Override
 	public Long $greater$greater(byte v)
 	{
-		return this.$eq(this.value >> v);
+		return Long.create(this.value >> v);
 	}
 	
 	@Override
 	public Long $greater$greater$greater(byte v)
 	{
-		return this.$eq(this.value >>> v);
+		return Long.create(this.value >>> v);
 	}
 	
 	// short operators
@@ -269,67 +245,67 @@ public abstract class Long implements Integer
 	@Override
 	public Long $plus(short v)
 	{
-		return this.$eq(this.value + v);
+		return Long.create(this.value + v);
 	}
 	
 	@Override
 	public Long $minus(short v)
 	{
-		return this.$eq(this.value - v);
+		return Long.create(this.value - v);
 	}
 	
 	@Override
 	public Long $times(short v)
 	{
-		return this.$eq(this.value * v);
+		return Long.create(this.value * v);
 	}
 	
 	@Override
 	public Long $div(short v)
 	{
-		return this.$eq(this.value / v);
+		return Long.create(this.value / v);
 	}
 	
 	@Override
 	public Long $percent(short v)
 	{
-		return this.$eq(this.value % v);
+		return Long.create(this.value % v);
 	}
 	
 	@Override
 	public Long $bar(short v)
 	{
-		return this.$eq(this.value | v);
+		return Long.create(this.value | v);
 	}
 	
 	@Override
 	public Long $amp(short v)
 	{
-		return this.$eq(this.value & v);
+		return Long.create(this.value & v);
 	}
 	
 	@Override
 	public Long $up(short v)
 	{
-		return this.$eq(this.value ^ v);
+		return Long.create(this.value ^ v);
 	}
 	
 	@Override
 	public Long $less$less(short v)
 	{
-		return this.$eq(this.value << v);
+		return Long.create(this.value << v);
 	}
 	
 	@Override
 	public Long $greater$greater(short v)
 	{
-		return this.$eq(this.value >> v);
+		return Long.create(this.value >> v);
 	}
 	
 	@Override
 	public Long $greater$greater$greater(short v)
 	{
-		return this.$eq(this.value >>> v);
+		return Long.create(this.value >>> v);
 	}
 	
 	// char operators
@@ -373,67 +349,67 @@ public abstract class Long implements Integer
 	@Override
 	public Long $plus(char v)
 	{
-		return this.$eq(this.value + v);
+		return Long.create(this.value + v);
 	}
 	
 	@Override
 	public Long $minus(char v)
 	{
-		return this.$eq(this.value - v);
+		return Long.create(this.value - v);
 	}
 	
 	@Override
 	public Long $times(char v)
 	{
-		return this.$eq(this.value * v);
+		return Long.create(this.value * v);
 	}
 	
 	@Override
 	public Long $div(char v)
 	{
-		return this.$eq(this.value / v);
+		return Long.create(this.value / v);
 	}
 	
 	@Override
 	public Long $percent(char v)
 	{
-		return this.$eq(this.value % v);
+		return Long.create(this.value % v);
 	}
 	
 	@Override
 	public Long $bar(char v)
 	{
-		return this.$eq(this.value | v);
+		return Long.create(this.value | v);
 	}
 	
 	@Override
 	public Long $amp(char v)
 	{
-		return this.$eq(this.value & v);
+		return Long.create(this.value & v);
 	}
 	
 	@Override
 	public Long $up(char v)
 	{
-		return this.$eq(this.value ^ v);
+		return Long.create(this.value ^ v);
 	}
 	
 	@Override
 	public Long $less$less(char v)
 	{
-		return this.$eq(this.value << v);
+		return Long.create(this.value << v);
 	}
 	
 	@Override
 	public Long $greater$greater(char v)
 	{
-		return this.$eq(this.value >> v);
+		return Long.create(this.value >> v);
 	}
 	
 	@Override
 	public Long $greater$greater$greater(char v)
 	{
-		return this.$eq(this.value >>> v);
+		return Long.create(this.value >>> v);
 	}
 	
 	// int operators
@@ -484,77 +460,77 @@ public abstract class Long implements Integer
 	@Bytecode(postfixOpcodes = { I2L, LADD })
 	public Long $plus(int v)
 	{
-		return this.$eq(this.value + v);
+		return Long.create(this.value + v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, LSUB })
 	public Long $minus(int v)
 	{
-		return this.$eq(this.value - v);
+		return Long.create(this.value - v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, LMUL })
 	public Long $times(int v)
 	{
-		return this.$eq(this.value * v);
+		return Long.create(this.value * v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, LDIV })
 	public Long $div(int v)
 	{
-		return this.$eq(this.value / v);
+		return Long.create(this.value / v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, LREM })
 	public Long $percent(int v)
 	{
-		return this.$eq(this.value % v);
+		return Long.create(this.value % v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, LOR })
 	public Long $bar(int v)
 	{
-		return this.$eq(this.value | v);
+		return Long.create(this.value | v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, LAND })
 	public Long $amp(int v)
 	{
-		return this.$eq(this.value & v);
+		return Long.create(this.value & v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, LXOR })
 	public Long $up(int v)
 	{
-		return this.$eq(this.value ^ v);
+		return Long.create(this.value ^ v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, LSHL })
 	public Long $less$less(int v)
 	{
-		return this.$eq(this.value << v);
+		return Long.create(this.value << v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, LSHR })
 	public Long $greater$greater(int v)
 	{
-		return this.$eq(this.value >> v);
+		return Long.create(this.value >> v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, LUSHR })
 	public Long $greater$greater$greater(int v)
 	{
-		return this.$eq(this.value >>> v);
+		return Long.create(this.value >>> v);
 	}
 	
 	// long operators
@@ -605,77 +581,77 @@ public abstract class Long implements Integer
 	@Bytecode(postfixOpcode = LADD)
 	public Long $plus(long v)
 	{
-		return this.$eq(this.value + v);
+		return Long.create(this.value + v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = LSUB)
 	public Long $minus(long v)
 	{
-		return this.$eq(this.value - v);
+		return Long.create(this.value - v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = LMUL)
 	public Long $times(long v)
 	{
-		return this.$eq(this.value * v);
+		return Long.create(this.value * v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = LDIV)
 	public Long $div(long v)
 	{
-		return this.$eq(this.value / v);
+		return Long.create(this.value / v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = LREM)
 	public Long $percent(long v)
 	{
-		return this.$eq(this.value % v);
+		return Long.create(this.value % v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = LOR)
 	public Long $bar(long v)
 	{
-		return this.$eq(this.value | v);
+		return Long.create(this.value | v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = LAND)
 	public Long $amp(long v)
 	{
-		return this.$eq(this.value & v);
+		return Long.create(this.value & v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = LXOR)
 	public Long $up(long v)
 	{
-		return this.$eq(this.value ^ v);
+		return Long.create(this.value ^ v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = LSHL)
 	public Long $less$less(long v)
 	{
-		return this.$eq(this.value << v);
+		return Long.create(this.value << v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = LSHR)
 	public Long $greater$greater(long v)
 	{
-		return this.$eq(this.value >> v);
+		return Long.create(this.value >> v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = LUSHR)
 	public Long $greater$greater$greater(long v)
 	{
-		return this.$eq(this.value >>> v);
+		return Long.create(this.value >>> v);
 	}
 	
 	// float operators
@@ -726,35 +702,35 @@ public abstract class Long implements Integer
 	@Bytecode(infixOpcode = L2F, postfixOpcode = FADD)
 	public Float $plus(float v)
 	{
-		return this.$eq(this.value + v);
+		return Float.create(this.value + v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2F, postfixOpcode = FSUB)
 	public Float $minus(float v)
 	{
-		return this.$eq(this.value - v);
+		return Float.create(this.value - v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2F, postfixOpcode = FMUL)
 	public Float $times(float v)
 	{
-		return this.$eq(this.value * v);
+		return Float.create(this.value * v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2F, postfixOpcode = FDIV)
 	public Float $div(float v)
 	{
-		return this.$eq(this.value / v);
+		return Float.create(this.value / v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2F, postfixOpcode = FREM)
 	public Float $percent(float v)
 	{
-		return this.$eq(this.value % v);
+		return Float.create(this.value % v);
 	}
 	
 	// double operators
@@ -805,35 +781,35 @@ public abstract class Long implements Integer
 	@Bytecode(infixOpcode = L2D, postfixOpcode = DADD)
 	public Double $plus(double v)
 	{
-		return this.$eq(this.value + v);
+		return Double.create(this.value + v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2D, postfixOpcode = DSUB)
 	public Double $minus(double v)
 	{
-		return this.$eq(this.value - v);
+		return Double.create(this.value - v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2D, postfixOpcode = DMUL)
 	public Double $times(double v)
 	{
-		return this.$eq(this.value * v);
+		return Double.create(this.value * v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2D, postfixOpcode = DDIV)
 	public Double $div(double v)
 	{
-		return this.$eq(this.value / v);
+		return Double.create(this.value / v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2D, postfixOpcode = DREM)
 	public Double $percent(double v)
 	{
-		return this.$eq(this.value % v);
+		return Double.create(this.value % v);
 	}
 	
 	// generic operators
@@ -877,74 +853,95 @@ public abstract class Long implements Integer
 	@Override
 	public Long $plus(Number v)
 	{
-		return this.$eq(this.value + v.longValue());
+		return Long.create(this.value + v.longValue());
 	}
 	
 	@Override
 	public Long $minus(Number v)
 	{
-		return this.$eq(this.value - v.longValue());
+		return Long.create(this.value - v.longValue());
 	}
 	
 	@Override
 	public Long $times(Number v)
 	{
-		return this.$eq(this.value * v.longValue());
+		return Long.create(this.value * v.longValue());
 	}
 	
 	@Override
 	public Long $div(Number v)
 	{
-		return this.$eq(this.value / v.longValue());
+		return Long.create(this.value / v.longValue());
 	}
 	
 	@Override
 	public Long $percent(Number v)
 	{
-		return this.$eq(this.value % v.longValue());
+		return Long.create(this.value % v.longValue());
 	}
 	
 	@Override
 	public Long $bar(Integer v)
 	{
-		return this.$eq(this.value | v.longValue());
+		return Long.create(this.value | v.longValue());
 	}
 	
 	@Override
 	public Long $amp(Integer v)
 	{
-		return this.$eq(this.value & v.longValue());
+		return Long.create(this.value & v.longValue());
 	}
 	
 	@Override
 	public Long $up(Integer v)
 	{
-		return this.$eq(this.value ^ v.longValue());
+		return Long.create(this.value ^ v.longValue());
 	}
 	
 	@Override
 	public Long $less$less(Integer v)
 	{
-		return this.$eq(this.value << v.longValue());
+		return Long.create(this.value << v.longValue());
 	}
 	
 	@Override
 	public Long $greater$greater(Integer v)
 	{
-		return this.$eq(this.value >> v.longValue());
+		return Long.create(this.value >> v.longValue());
 	}
 	
 	@Override
 	public Long $greater$greater$greater(Integer v)
 	{
-		return this.$eq(this.value >>> v.longValue());
+		return Long.create(this.value >>> v.longValue());
 	}
 	
-	// string representations
+	// Object methods
 	
 	@Override
 	public java.lang.String toString()
 	{
 		return java.lang.Long.toString(this.value);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return (int) ((this.value >>> 32) ^ this.value);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null || !(obj instanceof Number))
+		{
+			return false;
+		}
+		Number other = (Number) obj;
+		return this.value == other.longValue();
 	}
 }

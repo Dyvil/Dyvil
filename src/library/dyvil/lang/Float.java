@@ -3,7 +3,7 @@ package dyvil.lang;
 import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Bytecode;
 
-public abstract class Float implements Number
+public class Float implements Number
 {
 	protected float	value;
 	
@@ -12,31 +12,14 @@ public abstract class Float implements Number
 		this.value = value;
 	}
 	
-	@Override
-	public abstract Float $eq(byte v);
-	
-	@Override
-	public abstract Float $eq(short v);
-	
-	@Override
-	public abstract Float $eq(char v);
-	
-	@Override
-	public abstract Float $eq(int v);
-	
-	@Override
-	public abstract Float $eq(long v);
-	
-	@Override
-	public abstract Float $eq(float v);
-	
-	@Override
-	public abstract Double $eq(double v);
-	
-	@Override
-	public Number $eq(Number v)
+	public static Float create(float v)
 	{
-		return v;
+		int i = (int) v;
+		if (i >= 0 && v == i && i < ConstPool.tableSize)
+		{
+			return ConstPool.FLOATS[i];
+		}
+		return new Float(v);
 	}
 	
 	@Override
@@ -94,21 +77,21 @@ public abstract class Float implements Number
 	@Bytecode(postfixOpcode = FNEG)
 	public Float $minus()
 	{
-		return this.$eq(-this.value);
+		return Float.create(-this.value);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { DUP, FMUL })
 	public Float sqr()
 	{
-		return this.$eq(this.value * this.value);
+		return Float.create(this.value * this.value);
 	}
 	
 	@Override
 	@Bytecode(prefixOpcode = FCONST_1, postfixOpcode = FDIV)
 	public Float rec()
 	{
-		return this.$eq(1 / this.value);
+		return Float.create(1 / this.value);
 	}
 	
 	// byte operators
@@ -152,31 +135,31 @@ public abstract class Float implements Number
 	@Override
 	public Float $plus(byte v)
 	{
-		return this.$eq(this.value + v);
+		return Float.create(this.value + v);
 	}
 	
 	@Override
 	public Float $minus(byte v)
 	{
-		return this.$eq(this.value - v);
+		return Float.create(this.value - v);
 	}
 	
 	@Override
 	public Float $times(byte v)
 	{
-		return this.$eq(this.value * v);
+		return Float.create(this.value * v);
 	}
 	
 	@Override
 	public Float $div(byte v)
 	{
-		return this.$eq(this.value / v);
+		return Float.create(this.value / v);
 	}
 	
 	@Override
 	public Float $percent(byte v)
 	{
-		return this.$eq(this.value % v);
+		return Float.create(this.value % v);
 	}
 	
 	// short operators
@@ -220,31 +203,31 @@ public abstract class Float implements Number
 	@Override
 	public Float $plus(short v)
 	{
-		return this.$eq(this.value + v);
+		return Float.create(this.value + v);
 	}
 	
 	@Override
 	public Float $minus(short v)
 	{
-		return this.$eq(this.value - v);
+		return Float.create(this.value - v);
 	}
 	
 	@Override
 	public Float $times(short v)
 	{
-		return this.$eq(this.value * v);
+		return Float.create(this.value * v);
 	}
 	
 	@Override
 	public Float $div(short v)
 	{
-		return this.$eq(this.value / v);
+		return Float.create(this.value / v);
 	}
 	
 	@Override
 	public Float $percent(short v)
 	{
-		return this.$eq(this.value % v);
+		return Float.create(this.value % v);
 	}
 	
 	// char operators
@@ -288,31 +271,31 @@ public abstract class Float implements Number
 	@Override
 	public Float $plus(char v)
 	{
-		return this.$eq(this.value + v);
+		return Float.create(this.value + v);
 	}
 	
 	@Override
 	public Float $minus(char v)
 	{
-		return this.$eq(this.value - v);
+		return Float.create(this.value - v);
 	}
 	
 	@Override
 	public Float $times(char v)
 	{
-		return this.$eq(this.value * v);
+		return Float.create(this.value * v);
 	}
 	
 	@Override
 	public Float $div(char v)
 	{
-		return this.$eq(this.value / v);
+		return Float.create(this.value / v);
 	}
 	
 	@Override
 	public Float $percent(char v)
 	{
-		return this.$eq(this.value % v);
+		return Float.create(this.value % v);
 	}
 	
 	// int operators
@@ -363,35 +346,35 @@ public abstract class Float implements Number
 	@Bytecode(postfixOpcodes = { I2F, FADD })
 	public Float $plus(int v)
 	{
-		return this.$eq(this.value + v);
+		return Float.create(this.value + v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2F, FSUB })
 	public Float $minus(int v)
 	{
-		return this.$eq(this.value - v);
+		return Float.create(this.value - v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2F, FMUL })
 	public Float $times(int v)
 	{
-		return this.$eq(this.value * v);
+		return Float.create(this.value * v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2F, FDIV })
 	public Float $div(int v)
 	{
-		return this.$eq(this.value / v);
+		return Float.create(this.value / v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2F, FREM })
 	public Float $percent(int v)
 	{
-		return this.$eq(this.value % v);
+		return Float.create(this.value % v);
 	}
 	
 	// long operators
@@ -442,35 +425,35 @@ public abstract class Float implements Number
 	@Bytecode(postfixOpcodes = { L2F, FADD })
 	public Float $plus(long v)
 	{
-		return this.$eq(this.value + v);
+		return Float.create(this.value + v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { L2F, FSUB })
 	public Float $minus(long v)
 	{
-		return this.$eq(this.value - v);
+		return Float.create(this.value - v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { L2F, FMUL })
 	public Float $times(long v)
 	{
-		return this.$eq(this.value * v);
+		return Float.create(this.value * v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { L2F, FDIV })
 	public Float $div(long v)
 	{
-		return this.$eq(this.value / v);
+		return Float.create(this.value / v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { L2F, FREM })
 	public Float $percent(long v)
 	{
-		return this.$eq(this.value % v);
+		return Float.create(this.value % v);
 	}
 	
 	// float operators
@@ -521,35 +504,35 @@ public abstract class Float implements Number
 	@Bytecode(postfixOpcode = FADD)
 	public Float $plus(float v)
 	{
-		return this.$eq(this.value + v);
+		return Float.create(this.value + v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = FSUB)
 	public Float $minus(float v)
 	{
-		return this.$eq(this.value - v);
+		return Float.create(this.value - v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = FMUL)
 	public Float $times(float v)
 	{
-		return this.$eq(this.value * v);
+		return Float.create(this.value * v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = FDIV)
 	public Float $div(float v)
 	{
-		return this.$eq(this.value / v);
+		return Float.create(this.value / v);
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = FREM)
 	public Float $percent(float v)
 	{
-		return this.$eq(this.value % v);
+		return Float.create(this.value % v);
 	}
 	
 	// double operators
@@ -600,35 +583,35 @@ public abstract class Float implements Number
 	@Bytecode(infixOpcode = F2D, postfixOpcode = DADD)
 	public Double $plus(double v)
 	{
-		return this.$eq(this.value + v);
+		return Double.create(this.value + v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = F2D, postfixOpcode = DSUB)
 	public Double $minus(double v)
 	{
-		return this.$eq(this.value - v);
+		return Double.create(this.value - v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = F2D, postfixOpcode = DMUL)
 	public Double $times(double v)
 	{
-		return this.$eq(this.value * v);
+		return Double.create(this.value * v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = F2D, postfixOpcode = DDIV)
 	public Double $div(double v)
 	{
-		return this.$eq(this.value / v);
+		return Double.create(this.value / v);
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = F2D, postfixOpcode = DREM)
 	public Double $percent(double v)
 	{
-		return this.$eq(this.value % v);
+		return Double.create(this.value % v);
 	}
 	
 	// generic operators
@@ -672,38 +655,59 @@ public abstract class Float implements Number
 	@Override
 	public Float $plus(Number v)
 	{
-		return this.$eq(this.value + v.floatValue());
+		return Float.create(this.value + v.floatValue());
 	}
 	
 	@Override
 	public Float $minus(Number v)
 	{
-		return this.$eq(this.value - v.floatValue());
+		return Float.create(this.value - v.floatValue());
 	}
 	
 	@Override
 	public Float $times(Number v)
 	{
-		return this.$eq(this.value * v.floatValue());
+		return Float.create(this.value * v.floatValue());
 	}
 	
 	@Override
 	public Float $div(Number v)
 	{
-		return this.$eq(this.value / v.floatValue());
+		return Float.create(this.value / v.floatValue());
 	}
 	
 	@Override
 	public Float $percent(Number v)
 	{
-		return this.$eq(this.value % v.floatValue());
+		return Float.create(this.value % v.floatValue());
 	}
 	
-	// string representations
+	// Object methods
 	
 	@Override
 	public java.lang.String toString()
 	{
 		return java.lang.Float.toString(this.value);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return java.lang.Float.floatToIntBits(this.value);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null || !(obj instanceof Number))
+		{
+			return false;
+		}
+		Number other = (Number) obj;
+		return this.value == other.floatValue();
 	}
 }

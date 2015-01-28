@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public abstract class Char implements Integer
+public class Char implements Integer
 {
 	protected char	value;
 	
@@ -9,37 +9,13 @@ public abstract class Char implements Integer
 		this.value = value;
 	}
 	
-	@Override
-	public abstract Char $eq(byte v);
-	
-	@Override
-	public abstract Char $eq(short v);
-	
-	@Override
-	public abstract Char $eq(char v);
-	
-	@Override
-	public abstract Int $eq(int v);
-	
-	@Override
-	public abstract Long $eq(long v);
-	
-	@Override
-	public abstract Float $eq(float v);
-	
-	@Override
-	public abstract Double $eq(double v);
-	
-	@Override
-	public Number $eq(Number v)
+	public static Char create(char v)
 	{
-		return v;
-	}
-	
-	@Override
-	public Integer $eq(Integer v)
-	{
-		return v;
+		if (v >= 0 && v < ConstPool.tableSize)
+		{
+			return ConstPool.CHARS[v];
+		}
+		return new Char(v);
 	}
 	
 	@Override
@@ -89,25 +65,25 @@ public abstract class Char implements Integer
 	@Override
 	public Char $minus()
 	{
-		return this.$eq((char) -this.value);
+		return Char.create((char) -this.value);
 	}
 	
 	@Override
 	public Char $tilde()
 	{
-		return this.$eq((char) ~this.value);
+		return Char.create((char) ~this.value);
 	}
 	
 	@Override
 	public Int sqr()
 	{
-		return this.$eq(this.value * this.value);
+		return Int.create(this.value * this.value);
 	}
 	
 	@Override
 	public Char rec()
 	{
-		return this.$eq((char) (1 / this.value));
+		return Char.create((char) (1 / this.value));
 	}
 	
 	// byte operators
@@ -151,67 +127,67 @@ public abstract class Char implements Integer
 	@Override
 	public Char $plus(byte v)
 	{
-		return this.$eq((char) (this.value + v));
+		return Char.create((char) (this.value + v));
 	}
 	
 	@Override
 	public Char $minus(byte v)
 	{
-		return this.$eq((char) (this.value - v));
+		return Char.create((char) (this.value - v));
 	}
 	
 	@Override
 	public Char $times(byte v)
 	{
-		return this.$eq((char) (this.value * v));
+		return Char.create((char) (this.value * v));
 	}
 	
 	@Override
 	public Char $div(byte v)
 	{
-		return this.$eq((char) (this.value / v));
+		return Char.create((char) (this.value / v));
 	}
 	
 	@Override
 	public Char $percent(byte v)
 	{
-		return this.$eq((char) (this.value % v));
+		return Char.create((char) (this.value % v));
 	}
 	
 	@Override
 	public Char $bar(byte v)
 	{
-		return this.$eq((char) (this.value | v));
+		return Char.create((char) (this.value | v));
 	}
 	
 	@Override
 	public Char $amp(byte v)
 	{
-		return this.$eq((char) (this.value & v));
+		return Char.create((char) (this.value & v));
 	}
 	
 	@Override
 	public Char $up(byte v)
 	{
-		return this.$eq((char) (this.value ^ v));
+		return Char.create((char) (this.value ^ v));
 	}
 	
 	@Override
 	public Char $less$less(byte v)
 	{
-		return this.$eq((char) (this.value << v));
+		return Char.create((char) (this.value << v));
 	}
 	
 	@Override
 	public Char $greater$greater(byte v)
 	{
-		return this.$eq((char) (this.value >> v));
+		return Char.create((char) (this.value >> v));
 	}
 	
 	@Override
 	public Char $greater$greater$greater(byte v)
 	{
-		return this.$eq((char) (this.value >>> v));
+		return Char.create((char) (this.value >>> v));
 	}
 	
 	// short operators
@@ -255,67 +231,67 @@ public abstract class Char implements Integer
 	@Override
 	public Char $plus(short v)
 	{
-		return this.$eq((char) (this.value + v));
+		return Char.create((char) (this.value + v));
 	}
 	
 	@Override
 	public Char $minus(short v)
 	{
-		return this.$eq((char) (this.value - v));
+		return Char.create((char) (this.value - v));
 	}
 	
 	@Override
 	public Char $times(short v)
 	{
-		return this.$eq((char) (this.value * v));
+		return Char.create((char) (this.value * v));
 	}
 	
 	@Override
 	public Char $div(short v)
 	{
-		return this.$eq((char) (this.value / v));
+		return Char.create((char) (this.value / v));
 	}
 	
 	@Override
 	public Char $percent(short v)
 	{
-		return this.$eq((char) (this.value % v));
+		return Char.create((char) (this.value % v));
 	}
 	
 	@Override
 	public Char $bar(short v)
 	{
-		return this.$eq((char) (this.value | v));
+		return Char.create((char) (this.value | v));
 	}
 	
 	@Override
 	public Char $amp(short v)
 	{
-		return this.$eq((char) (this.value & v));
+		return Char.create((char) (this.value & v));
 	}
 	
 	@Override
 	public Char $up(short v)
 	{
-		return this.$eq((char) (this.value ^ v));
+		return Char.create((char) (this.value ^ v));
 	}
 	
 	@Override
 	public Char $less$less(short v)
 	{
-		return this.$eq((char) (this.value << v));
+		return Char.create((char) (this.value << v));
 	}
 	
 	@Override
 	public Char $greater$greater(short v)
 	{
-		return this.$eq((char) (this.value >> v));
+		return Char.create((char) (this.value >> v));
 	}
 	
 	@Override
 	public Char $greater$greater$greater(short v)
 	{
-		return this.$eq((char) (this.value >>> v));
+		return Char.create((char) (this.value >>> v));
 	}
 	
 	// char operators
@@ -359,67 +335,67 @@ public abstract class Char implements Integer
 	@Override
 	public Char $plus(char v)
 	{
-		return this.$eq((char) (this.value + v));
+		return Char.create((char) (this.value + v));
 	}
 	
 	@Override
 	public Char $minus(char v)
 	{
-		return this.$eq((char) (this.value - v));
+		return Char.create((char) (this.value - v));
 	}
 	
 	@Override
 	public Char $times(char v)
 	{
-		return this.$eq((char) (this.value * v));
+		return Char.create((char) (this.value * v));
 	}
 	
 	@Override
 	public Char $div(char v)
 	{
-		return this.$eq((char) (this.value / v));
+		return Char.create((char) (this.value / v));
 	}
 	
 	@Override
 	public Char $percent(char v)
 	{
-		return this.$eq((char) (this.value % v));
+		return Char.create((char) (this.value % v));
 	}
 	
 	@Override
 	public Char $bar(char v)
 	{
-		return this.$eq((char) (this.value | v));
+		return Char.create((char) (this.value | v));
 	}
 	
 	@Override
 	public Char $amp(char v)
 	{
-		return this.$eq((char) (this.value & v));
+		return Char.create((char) (this.value & v));
 	}
 	
 	@Override
 	public Char $up(char v)
 	{
-		return this.$eq((char) (this.value ^ v));
+		return Char.create((char) (this.value ^ v));
 	}
 	
 	@Override
 	public Char $less$less(char v)
 	{
-		return this.$eq((char) (this.value << v));
+		return Char.create((char) (this.value << v));
 	}
 	
 	@Override
 	public Char $greater$greater(char v)
 	{
-		return this.$eq((char) (this.value >> v));
+		return Char.create((char) (this.value >> v));
 	}
 	
 	@Override
 	public Char $greater$greater$greater(char v)
 	{
-		return this.$eq((char) (this.value >>> v));
+		return Char.create((char) (this.value >>> v));
 	}
 	
 	// int operators
@@ -463,67 +439,67 @@ public abstract class Char implements Integer
 	@Override
 	public Int $plus(int v)
 	{
-		return this.$eq(this.value + v);
+		return Int.create(this.value + v);
 	}
 	
 	@Override
 	public Int $minus(int v)
 	{
-		return this.$eq(this.value - v);
+		return Int.create(this.value - v);
 	}
 	
 	@Override
 	public Int $times(int v)
 	{
-		return this.$eq(this.value * v);
+		return Int.create(this.value * v);
 	}
 	
 	@Override
 	public Int $div(int v)
 	{
-		return this.$eq(this.value / v);
+		return Int.create(this.value / v);
 	}
 	
 	@Override
 	public Int $percent(int v)
 	{
-		return this.$eq(this.value % v);
+		return Int.create(this.value % v);
 	}
 	
 	@Override
 	public Int $bar(int v)
 	{
-		return this.$eq(this.value | v);
+		return Int.create(this.value | v);
 	}
 	
 	@Override
 	public Int $amp(int v)
 	{
-		return this.$eq(this.value & v);
+		return Int.create(this.value & v);
 	}
 	
 	@Override
 	public Int $up(int v)
 	{
-		return this.$eq(this.value ^ v);
+		return Int.create(this.value ^ v);
 	}
 	
 	@Override
 	public Int $less$less(int v)
 	{
-		return this.$eq(this.value << v);
+		return Int.create(this.value << v);
 	}
 	
 	@Override
 	public Int $greater$greater(int v)
 	{
-		return this.$eq(this.value >> v);
+		return Int.create(this.value >> v);
 	}
 	
 	@Override
 	public Int $greater$greater$greater(int v)
 	{
-		return this.$eq(this.value >>> v);
+		return Int.create(this.value >>> v);
 	}
 	
 	// long operators
@@ -567,67 +543,67 @@ public abstract class Char implements Integer
 	@Override
 	public Long $plus(long v)
 	{
-		return this.$eq(this.value + v);
+		return Long.create(this.value + v);
 	}
 	
 	@Override
 	public Long $minus(long v)
 	{
-		return this.$eq(this.value - v);
+		return Long.create(this.value - v);
 	}
 	
 	@Override
 	public Long $times(long v)
 	{
-		return this.$eq(this.value * v);
+		return Long.create(this.value * v);
 	}
 	
 	@Override
 	public Long $div(long v)
 	{
-		return this.$eq(this.value / v);
+		return Long.create(this.value / v);
 	}
 	
 	@Override
 	public Long $percent(long v)
 	{
-		return this.$eq(this.value % v);
+		return Long.create(this.value % v);
 	}
 	
 	@Override
 	public Long $bar(long v)
 	{
-		return this.$eq(this.value | v);
+		return Long.create(this.value | v);
 	}
 	
 	@Override
 	public Long $amp(long v)
 	{
-		return this.$eq(this.value & v);
+		return Long.create(this.value & v);
 	}
 	
 	@Override
 	public Long $up(long v)
 	{
-		return this.$eq(this.value ^ v);
+		return Long.create(this.value ^ v);
 	}
 	
 	@Override
 	public Char $less$less(long v)
 	{
-		return this.$eq((char) (this.value << v));
+		return Char.create((char) (this.value << v));
 	}
 	
 	@Override
 	public Char $greater$greater(long v)
 	{
-		return this.$eq((char) (this.value >> v));
+		return Char.create((char) (this.value >> v));
 	}
 	
 	@Override
 	public Char $greater$greater$greater(long v)
 	{
-		return this.$eq((char) (this.value >>> v));
+		return Char.create((char) (this.value >>> v));
 	}
 	
 	// float operators
@@ -671,31 +647,31 @@ public abstract class Char implements Integer
 	@Override
 	public Float $plus(float v)
 	{
-		return this.$eq(this.value + v);
+		return Float.create(this.value + v);
 	}
 	
 	@Override
 	public Float $minus(float v)
 	{
-		return this.$eq(this.value - v);
+		return Float.create(this.value - v);
 	}
 	
 	@Override
 	public Float $times(float v)
 	{
-		return this.$eq(this.value * v);
+		return Float.create(this.value * v);
 	}
 	
 	@Override
 	public Float $div(float v)
 	{
-		return this.$eq(this.value / v);
+		return Float.create(this.value / v);
 	}
 	
 	@Override
 	public Float $percent(float v)
 	{
-		return this.$eq(this.value % v);
+		return Float.create(this.value % v);
 	}
 	
 	// double operators
@@ -739,31 +715,31 @@ public abstract class Char implements Integer
 	@Override
 	public Double $plus(double v)
 	{
-		return this.$eq(this.value + v);
+		return Double.create(this.value + v);
 	}
 	
 	@Override
 	public Double $minus(double v)
 	{
-		return this.$eq(this.value - v);
+		return Double.create(this.value - v);
 	}
 	
 	@Override
 	public Double $times(double v)
 	{
-		return this.$eq(this.value * v);
+		return Double.create(this.value * v);
 	}
 	
 	@Override
 	public Double $div(double v)
 	{
-		return this.$eq(this.value / v);
+		return Double.create(this.value / v);
 	}
 	
 	@Override
 	public Double $percent(double v)
 	{
-		return this.$eq(this.value % v);
+		return Double.create(this.value % v);
 	}
 	
 	// generic operators
@@ -807,74 +783,95 @@ public abstract class Char implements Integer
 	@Override
 	public Char $plus(Number v)
 	{
-		return this.$eq((char) (this.value + v.charValue()));
+		return Char.create((char) (this.value + v.charValue()));
 	}
 	
 	@Override
 	public Char $minus(Number v)
 	{
-		return this.$eq((char) (this.value - v.charValue()));
+		return Char.create((char) (this.value - v.charValue()));
 	}
 	
 	@Override
 	public Char $times(Number v)
 	{
-		return this.$eq((char) (this.value * v.charValue()));
+		return Char.create((char) (this.value * v.charValue()));
 	}
 	
 	@Override
 	public Char $div(Number v)
 	{
-		return this.$eq((char) (this.value / v.charValue()));
+		return Char.create((char) (this.value / v.charValue()));
 	}
 	
 	@Override
 	public Char $percent(Number v)
 	{
-		return this.$eq((char) (this.value % v.charValue()));
+		return Char.create((char) (this.value % v.charValue()));
 	}
 	
 	@Override
 	public Char $bar(Integer v)
 	{
-		return this.$eq((char) (this.value | v.charValue()));
+		return Char.create((char) (this.value | v.charValue()));
 	}
 	
 	@Override
 	public Char $amp(Integer v)
 	{
-		return this.$eq((char) (this.value & v.charValue()));
+		return Char.create((char) (this.value & v.charValue()));
 	}
 	
 	@Override
 	public Char $up(Integer v)
 	{
-		return this.$eq((char) (this.value ^ v.charValue()));
+		return Char.create((char) (this.value ^ v.charValue()));
 	}
 	
 	@Override
 	public Char $less$less(Integer v)
 	{
-		return this.$eq((char) (this.value << v.charValue()));
+		return Char.create((char) (this.value << v.charValue()));
 	}
 	
 	@Override
 	public Char $greater$greater(Integer v)
 	{
-		return this.$eq((char) (this.value >> v.charValue()));
+		return Char.create((char) (this.value >> v.charValue()));
 	}
 	
 	@Override
 	public Char $greater$greater$greater(Integer v)
 	{
-		return this.$eq((char) (this.value >>> v.charValue()));
+		return Char.create((char) (this.value >>> v.charValue()));
 	}
 	
-	// string representations
+	// Object methods
 	
 	@Override
 	public java.lang.String toString()
 	{
-		return Character.toString(this.value);
+		return java.lang.Character.toString(this.value);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null || !(obj instanceof Number))
+		{
+			return false;
+		}
+		Number other = (Number) obj;
+		return this.value == other.charValue();
 	}
 }
