@@ -50,7 +50,7 @@ public class Long implements Integer
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {})
+	@Bytecode
 	public long longValue()
 	{
 		return this.value;
@@ -103,102 +103,119 @@ public class Long implements Integer
 	// byte operators
 	
 	@Override
-	public boolean $eq$eq(byte b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPNE })
+	public boolean $eq$eq(byte v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(byte b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPEQ })
+	public boolean $bang$eq(byte v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(byte b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPGE })
+	public boolean $less(byte v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(byte b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPGT })
+	public boolean $less$eq(byte v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(byte b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPLE })
+	public boolean $greater(byte v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(byte b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPLT })
+	public boolean $greater$eq(byte v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LADD })
 	public Long $plus(byte v)
 	{
 		return Long.create(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LSUB })
 	public Long $minus(byte v)
 	{
 		return Long.create(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LMUL })
 	public Long $times(byte v)
 	{
 		return Long.create(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LDIV })
 	public Long $div(byte v)
 	{
 		return Long.create(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LREM })
 	public Long $percent(byte v)
 	{
 		return Long.create(this.value % v);
 	}
 	
 	@Override
-	public Long $bar(byte v)
-	{
-		return Long.create(this.value | v);
-	}
-	
-	@Override
+	@Bytecode(postfixOpcodes = { I2L, LAND })
 	public Long $amp(byte v)
 	{
 		return Long.create(this.value & v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LOR })
+	public Long $bar(byte v)
+	{
+		return Long.create(this.value | v);
+	}
+	
+	@Override
+	@Bytecode(postfixOpcodes = { I2L, LXOR })
 	public Long $up(byte v)
 	{
 		return Long.create(this.value ^ v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LSHL })
 	public Long $less$less(byte v)
 	{
 		return Long.create(this.value << v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LSHR })
 	public Long $greater$greater(byte v)
 	{
 		return Long.create(this.value >> v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LUSHR })
 	public Long $greater$greater$greater(byte v)
 	{
 		return Long.create(this.value >>> v);
@@ -207,102 +224,119 @@ public class Long implements Integer
 	// short operators
 	
 	@Override
-	public boolean $eq$eq(short b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPNE })
+	public boolean $eq$eq(short v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(short b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPEQ })
+	public boolean $bang$eq(short v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(short b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPGE })
+	public boolean $less(short v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(short b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPGT })
+	public boolean $less$eq(short v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(short b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPLE })
+	public boolean $greater(short v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(short b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPLT })
+	public boolean $greater$eq(short v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LADD })
 	public Long $plus(short v)
 	{
 		return Long.create(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LSUB })
 	public Long $minus(short v)
 	{
 		return Long.create(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LMUL })
 	public Long $times(short v)
 	{
 		return Long.create(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LDIV })
 	public Long $div(short v)
 	{
 		return Long.create(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LREM })
 	public Long $percent(short v)
 	{
 		return Long.create(this.value % v);
 	}
 	
 	@Override
-	public Long $bar(short v)
-	{
-		return Long.create(this.value | v);
-	}
-	
-	@Override
+	@Bytecode(postfixOpcodes = { I2L, LAND })
 	public Long $amp(short v)
 	{
 		return Long.create(this.value & v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LOR })
+	public Long $bar(short v)
+	{
+		return Long.create(this.value | v);
+	}
+	
+	@Override
+	@Bytecode(postfixOpcodes = { I2L, LXOR })
 	public Long $up(short v)
 	{
 		return Long.create(this.value ^ v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LSHL })
 	public Long $less$less(short v)
 	{
 		return Long.create(this.value << v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LSHR })
 	public Long $greater$greater(short v)
 	{
 		return Long.create(this.value >> v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LUSHR })
 	public Long $greater$greater$greater(short v)
 	{
 		return Long.create(this.value >>> v);
@@ -311,102 +345,119 @@ public class Long implements Integer
 	// char operators
 	
 	@Override
-	public boolean $eq$eq(char b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPNE })
+	public boolean $eq$eq(char v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(char b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPEQ })
+	public boolean $bang$eq(char v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(char b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPGE })
+	public boolean $less(char v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(char b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPGT })
+	public boolean $less$eq(char v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(char b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPLE })
+	public boolean $greater(char v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(char b)
+	@Bytecode(postfixOpcodes = { I2L, IF_LCMPLT })
+	public boolean $greater$eq(char v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LADD })
 	public Long $plus(char v)
 	{
 		return Long.create(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LSUB })
 	public Long $minus(char v)
 	{
 		return Long.create(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LMUL })
 	public Long $times(char v)
 	{
 		return Long.create(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LDIV })
 	public Long $div(char v)
 	{
 		return Long.create(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LREM })
 	public Long $percent(char v)
 	{
 		return Long.create(this.value % v);
 	}
 	
 	@Override
-	public Long $bar(char v)
-	{
-		return Long.create(this.value | v);
-	}
-	
-	@Override
+	@Bytecode(postfixOpcodes = { I2L, LAND })
 	public Long $amp(char v)
 	{
 		return Long.create(this.value & v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LOR })
+	public Long $bar(char v)
+	{
+		return Long.create(this.value | v);
+	}
+	
+	@Override
+	@Bytecode(postfixOpcodes = { I2L, LXOR })
 	public Long $up(char v)
 	{
 		return Long.create(this.value ^ v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LSHL })
 	public Long $less$less(char v)
 	{
 		return Long.create(this.value << v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LSHR })
 	public Long $greater$greater(char v)
 	{
 		return Long.create(this.value >> v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L, LUSHR })
 	public Long $greater$greater$greater(char v)
 	{
 		return Long.create(this.value >>> v);
@@ -492,17 +543,17 @@ public class Long implements Integer
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2L, LOR })
-	public Long $bar(int v)
-	{
-		return Long.create(this.value | v);
-	}
-	
-	@Override
 	@Bytecode(postfixOpcodes = { I2L, LAND })
 	public Long $amp(int v)
 	{
 		return Long.create(this.value & v);
+	}
+	
+	@Override
+	@Bytecode(postfixOpcodes = { I2L, LOR })
+	public Long $bar(int v)
+	{
+		return Long.create(this.value | v);
 	}
 	
 	@Override
@@ -613,17 +664,17 @@ public class Long implements Integer
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = LOR)
-	public Long $bar(long v)
-	{
-		return Long.create(this.value | v);
-	}
-	
-	@Override
 	@Bytecode(postfixOpcode = LAND)
 	public Long $amp(long v)
 	{
 		return Long.create(this.value & v);
+	}
+	
+	@Override
+	@Bytecode(postfixOpcode = LOR)
+	public Long $bar(long v)
+	{
+		return Long.create(this.value | v);
 	}
 	
 	@Override

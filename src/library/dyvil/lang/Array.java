@@ -2,43 +2,43 @@ package dyvil.lang;
 
 import dyvil.lang.annotation.Bytecode;
 import dyvil.lang.annotation.sealed;
-import dyvil.reflect.Opcodes;
+import static dyvil.reflect.Opcodes.*;
 
 public @sealed interface Array<T>
 {
-	@Bytecode(postfixOpcode = Opcodes.ARRAYLENGTH)
+	@Bytecode(postfixOpcode = ARRAYLENGTH)
 	public int length();
 	
-	@Bytecode(postfixOpcode = Opcodes.ARRAYLENGTH)
+	@Bytecode(postfixOpcode = ARRAYLENGTH)
 	public int size();
 	
-	@Bytecode(postfixOpcode = Opcodes.AALOAD)
+	@Bytecode(postfixOpcode = AALOAD)
 	public T apply(int i);
 	
-	@Bytecode(postfixOpcode = Opcodes.AASTORE)
+	@Bytecode(postfixOpcode = AASTORE)
 	public void update(int i, T v);
 	
-	@Bytecode(postfixOpcode = Opcodes.IALOAD)
+	@Bytecode(postfixOpcode = IALOAD)
 	public int apply_int(int i);
 	
-	@Bytecode(postfixOpcode = Opcodes.IASTORE)
+	@Bytecode(postfixOpcode = IASTORE)
 	public void update_int(int i, int v);
 	
-	@Bytecode(postfixOpcode = Opcodes.LALOAD)
+	@Bytecode(postfixOpcode = LALOAD)
 	public long apply_long(int i);
 	
-	@Bytecode(postfixOpcode = Opcodes.LASTORE)
+	@Bytecode(postfixOpcode = LASTORE)
 	public void update_long(int i, long v);
 	
-	@Bytecode(postfixOpcode = Opcodes.FALOAD)
+	@Bytecode(postfixOpcode = FALOAD)
 	public float apply_float(int i);
 	
-	@Bytecode(postfixOpcode = Opcodes.FASTORE)
+	@Bytecode(postfixOpcode = FASTORE)
 	public void update_float(int i, float v);
 	
-	@Bytecode(postfixOpcode = Opcodes.DALOAD)
+	@Bytecode(postfixOpcode = DALOAD)
 	public double apply_double(int i);
 	
-	@Bytecode(postfixOpcode = Opcodes.DASTORE)
+	@Bytecode(postfixOpcode = DASTORE)
 	public void update_double(int i, double v);
 }
