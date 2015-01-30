@@ -322,7 +322,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public Marker getResolveError()
 	{
-		Marker marker = Markers.create(this.position, "resolve.method_field");
+		Marker marker = Markers.create(this.position, "resolve.method_field", this.name);
 		marker.addInfo("Qualified Name: " + this.qualifiedName);
 		marker.addInfo("Instance Type: " + this.instance.getType());
 		return marker;

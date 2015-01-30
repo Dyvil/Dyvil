@@ -167,7 +167,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 			IType type = this.requiredType;
 			for (IValue v : this.values)
 			{
-				v.check(markers, context);
+				v.check(markers, this);
 				
 				if (v.getValueType() == RETURN && v.withType(type) == null)
 				{
@@ -259,15 +259,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public Label resolveLabel(String name)
 	{
-		if ("$blockStart".equals(name))
-		{
-			return this.start;
-		}
-		else if ("$blockEnd".equals(name))
-		{
-			return this.end;
-		}
-		
 		if (this.labels != null)
 		{
 			Label label = this.labels.get(name);
@@ -289,7 +280,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitLabel(this.start);
+		writer.visitLabel2(this.start);
 		
 		// Write variable types
 		for (Entry<String, Variable> entry : this.variables.entrySet())
@@ -308,7 +299,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 			
 			v.writeStatement(writer);
 		}
-		writer.visitLabelEnd(this.end);
+		writer.visitLabel2(this.end);
 		
 		int count = 0;
 		for (Entry<String, Variable> entry : this.variables.entrySet())

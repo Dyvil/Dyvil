@@ -202,12 +202,12 @@ public class ParserManager
 				message = ex.getClass().getName();
 			}
 			ex.printStackTrace();
-			throw new SyntaxError(token, "Failed to parse " + token + ": " + message);
+			throw new SyntaxError(token, "Failed to parse token '" + token.getText() + "': " + message);
 		}
 		
 		if (!parsed)
 		{
-			throw new SyntaxError(token, "Invalid " + token + " - Delete this token");
+			throw new SyntaxError(token, "Invalid token '" + token.getText() + "' - Delete this token");
 		}
 	}
 	

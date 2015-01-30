@@ -125,7 +125,6 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 		
 		if (this.variable != null)
 		{
-			this.variable.index = context.getVariableCount();
 			this.variable.resolve(markers, context);
 		}
 		if (this.type == 0)
@@ -174,25 +173,28 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				}
 				else
 				{
+					int index = context.getVariableCount();
+					this.variable.index = index;
+					
 					Variable var = new Variable(null);
 					var.type = Type.INT;
 					var.name = "$index";
 					var.qualifiedName = "$index";
-					var.index = this.variable.index + 1;
+					var.index = index + 1;
 					this.indexVar = var;
 					
 					var = new Variable(null);
 					var.type = Type.INT;
 					var.name = "$length";
 					var.qualifiedName = "$length";
-					var.index = this.variable.index + 2;
+					var.index = index + 2;
 					this.lengthVar = var;
 					
 					var = new Variable(null);
 					var.type = valueType;
 					var.name = "$array";
 					var.qualifiedName = "$array";
-					var.index = this.variable.index + 3;
+					var.index = index + 3;
 					this.arrayVar = var;
 				}
 			}
@@ -206,6 +208,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			if (this.variable != null)
 			{
 				this.variable.check(markers, context);
+				this.variable.index = context.getVariableCount();
 			}
 			
 			if (this.condition != null)
@@ -388,12 +391,16 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 		{
 			Variable arrayVar = this.arrayVar;
 			Variable indexVar = this.indexVar;
+			Variable lengthVar = this.lengthVar;
+			
+			Label scopeLabel = new Label();
+			writer.visitLabel2(scopeLabel);
 			
 			// Local Variables
 			writer.addLocal(var.index, MethodWriter.TOP);
-			writer.addLocal(indexVar.index, indexVar.type);
-			writer.addLocal(this.lengthVar.index, this.lengthVar.type);
-			writer.addLocal(arrayVar.index, arrayVar.type);
+			writer.addLocal(indexVar.index, MethodWriter.INT);
+			writer.addLocal(lengthVar.index, MethodWriter.INT);
+			writer.addLocal(arrayVar.index, arrayVar.type);			
 			
 			// Load the array
 			var.value.writeExpression(writer);
@@ -401,7 +408,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			arrayVar.writeSet(writer);
 			// Load the length
 			writer.visitInsn(Opcodes.ARRAYLENGTH);
-			this.lengthVar.writeSet(writer);
+			lengthVar.writeSet(writer);
 			// Set index to 0
 			writer.visitLdcInsn(0);
 			indexVar.writeSet(writer);
@@ -424,16 +431,17 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Boundary Check
 			writer.visitLabel(this.updateLabel);
 			indexVar.writeGet(writer);
-			this.lengthVar.writeGet(writer);
-			writer.visitJumpInsn(Opcodes.IF_ICMPLT, this.startLabel);
-			writer.visitLabel(this.endLabel);
+			lengthVar.writeGet(writer);
+			writer.visitJumpInsn2(Opcodes.IF_ICMPLT, this.startLabel);
 			
 			// Local Variables
-			writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), this.startLabel, this.endLabel, var.index);
-			writer.visitLocalVariable("$index", "I", null, this.startLabel, this.endLabel, indexVar.index);
-			writer.visitLocalVariable("$length", "I", null, this.startLabel, this.endLabel, this.lengthVar.index);
-			writer.visitLocalVariable("$array", arrayVar.type.getExtendedName(), arrayVar.type.getSignature(), this.startLabel, this.endLabel, arrayVar.index);
 			writer.removeLocals(4);
+			writer.visitLabel(this.endLabel);
+			
+			writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), scopeLabel, this.endLabel, var.index);
+			writer.visitLocalVariable("$index", "I", null, scopeLabel, this.endLabel, indexVar.index);
+			writer.visitLocalVariable("$length", "I", null, scopeLabel, this.endLabel, lengthVar.index);
+			writer.visitLocalVariable("$array", arrayVar.type.getExtendedName(), arrayVar.type.getSignature(), scopeLabel, this.endLabel, arrayVar.index);
 			return;
 		}
 	}

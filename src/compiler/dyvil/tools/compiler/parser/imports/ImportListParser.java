@@ -6,7 +6,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
 public class ImportListParser extends Parser
@@ -24,7 +23,7 @@ public class ImportListParser extends Parser
 	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (ParserUtil.isTerminator(type))
+		if (type == Tokens.CLOSE_CURLY_BRACKET || type == Tokens.SEMICOLON)
 		{
 			pm.popParser(true);
 			return true;

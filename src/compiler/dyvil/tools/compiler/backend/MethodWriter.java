@@ -12,16 +12,18 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 
 public final class MethodWriter extends MethodVisitor
 {
-	public static final Long	LONG_MINUS_ONE	= Long.valueOf(-1);
-	public static final Integer	TOP				= jdk.internal.org.objectweb.asm.Opcodes.TOP;
+	public static final Long		LONG_MINUS_ONE	= Long.valueOf(-1);
+	public static final Integer		TOP				= jdk.internal.org.objectweb.asm.Opcodes.TOP;
+	public static final Integer		INT				= jdk.internal.org.objectweb.asm.Opcodes.INTEGER;
+	public static final Object[]	EMPTY_STACK		= new Object[0];
 	
-	private boolean				hasReturn;
-	private int					maxLocals;
-	private int					maxStack;
+	private boolean					hasReturn;
+	private int						maxLocals;
+	private int						maxStack;
 	
-	private int					localCount;
-	private Object[]			locals			= new Object[2];
-	private LinkedList			typeStack		= new LinkedList();
+	private int						localCount;
+	private Object[]				locals			= new Object[2];
+	private LinkedList				typeStack		= new LinkedList();
 	
 	public MethodWriter(MethodVisitor mv)
 	{
@@ -261,6 +263,20 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitJumpInsn(opcode, label);
 	}
 	
+	public void visitJumpInsn2(int opcode, Label label)
+	{
+		if (opcode >= IFEQ && opcode <= IFLE)
+		{
+			this.typeStack.pop();
+		}
+		if (opcode >= IF_ICMPEQ && opcode <= IF_ICMPLE)
+		{
+			this.typeStack.pop();
+			this.typeStack.pop();
+		}
+		this.mv.visitJumpInsn(opcode, label);
+	}
+	
 	@Override
 	public void visitLabel(Label label)
 	{
@@ -268,14 +284,26 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitLabel(label);
 	}
 	
-	public void visitLabelEnd(Label label)
+	public void visitLabel2(Label label)
 	{
 		this.mv.visitLabel(label);
 	}
 	
 	private void visitFrame()
 	{
+		if (this.maxStack == 0)
+		{
+			this.mv.visitFrame(F_SAME, 0, null, 0, null);
+			return;
+		}
+		
 		int len = this.typeStack.size();
+		if (len == 0)
+		{
+			this.mv.visitFrame(F_NEW, this.localCount, this.locals, 0, EMPTY_STACK);
+			return;
+		}
+		
 		Object[] o = new Object[len];
 		for (int i = 0; i < len; i++)
 		{
@@ -337,6 +365,9 @@ public final class MethodWriter extends MethodVisitor
 			return;
 		case ARRAYLENGTH:
 			this.set(INTEGER);
+			return;
+		case RETURN:
+			this.hasReturn = true;
 			return;
 		case IADD:
 		case ISUB:

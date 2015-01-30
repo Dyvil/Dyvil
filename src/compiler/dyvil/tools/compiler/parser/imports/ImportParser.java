@@ -34,6 +34,11 @@ public class ImportParser extends Parser
 			pm.popParser();
 			return true;
 		}
+		if (type == Tokens.COMMA)
+		{
+			pm.popParser(true);
+			return true;
+		}
 		
 		if (this.isInMode(IMPORT))
 		{
@@ -99,7 +104,7 @@ public class ImportParser extends Parser
 		}
 		if (this.isInMode(MULTIIMPORT))
 		{
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
 				this.container.expandPosition(token);
 				this.mode = 0;

@@ -90,10 +90,15 @@ public class Type extends ASTNode implements IType
 		DOUBLE.theClass = Package.dyvilLang.resolveClass("Double");
 		
 		ANY.theClass = Package.dyvilLang.resolveClass("Any");
+		ANY.fullName = "dyvil.lang.Any";
 		OBJECT.theClass = Package.javaLang.resolveClass("Object");
+		OBJECT.fullName = "java.lang.Object";
 		PREDEF.theClass = PREDEF_CLASS = Package.dyvilLang.resolveClass("Predef");
+		PREDEF.fullName = "dyvil.lang.Predef";
 		ARRAY.theClass = Package.dyvilLang.resolveClass("Array");
+		ARRAY.fullName = "dyvil.lang.Array";
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
+		STRING.fullName = "java.lang.String";
 		
 		ABytecode.theClass = Package.dyvilLangAnnotation.resolveClass("Bytecode");
 		AOverride.theClass = Package.javaLang.resolveClass("Override");

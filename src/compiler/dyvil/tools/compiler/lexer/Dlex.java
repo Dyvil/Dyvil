@@ -272,11 +272,6 @@ public class Dlex implements Iterable<IToken>
 					reparse = true;
 				}
 			}
-			
-			if (c == '\n')
-			{
-				lineNumber++;
-			}
 		}
 		
 		if (buf.length() > 0)

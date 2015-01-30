@@ -7,3 +7,5 @@ dbin/
 *.log
 
 *.jar
+
+src/test/dyvil/test/Main.java

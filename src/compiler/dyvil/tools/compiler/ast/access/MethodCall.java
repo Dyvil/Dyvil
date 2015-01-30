@@ -491,21 +491,23 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		
 		// Apply special compilation when dealing with boolean types
 		// Writes the postfix opcodes if a @Bytecode annotation is present.
-		
 		Label ifEnd = new Label();
 		// Condition
 		if (this.method.writePostfixBytecode(writer, ifEnd))
 		{
-			Label elseEnd = new Label();
-			
-			// If Block
-			writer.visitLdcInsn(1);
-			writer.pop();
-			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.visitLabel(ifEnd);
-			// Else Block
-			writer.visitLdcInsn(0);
-			writer.visitLabel(elseEnd);
+			if (this.method.getType() == Type.BOOLEAN)
+			{
+				Label elseEnd = new Label();
+				
+				// If Block
+				writer.visitLdcInsn(1);
+				writer.pop();
+				writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+				writer.visitLabel(ifEnd);
+				// Else Block
+				writer.visitLdcInsn(0);
+				writer.visitLabel(elseEnd);
+			}
 			return;
 		}
 		

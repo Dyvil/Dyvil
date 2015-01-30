@@ -131,7 +131,7 @@ public class Variable extends Member implements IField
 		IValue value1 = this.value.withType(this.type);
 		if (value1 == null)
 		{
-			Marker marker = Markers.create(this.value.getPosition(), "access.variable.type", this.name);
+			Marker marker = Markers.create(this.value.getPosition(), "variable.type", this.name);
 			marker.addInfo("Field Type: " + this.type);
 			marker.addInfo("Value Type: " + this.value.getType());
 			markers.add(marker);
