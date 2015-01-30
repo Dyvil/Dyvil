@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import jdk.internal.org.objectweb.asm.Label;
@@ -324,16 +322,26 @@ public class StatementList extends ValueList implements IStatement, IContext
 			buffer.append('{').append('\n');
 			String label;
 			String prefix1 = prefix + Formatting.Method.indent;
-			for (IValue value : this.values)
+			IValue prev = null;
+			
+			for (Iterator<IValue> iterator = this.values.iterator(); iterator.hasNext();)
 			{
+				IValue value = iterator.next();
 				buffer.append(prefix1);
+				
+				if (prev != null && value.getPosition().getLineNumber() - prev.getPosition().getLineNumber() > 1)
+				{
+					buffer.append('\n').append(prefix1);
+				}
 				
 				if (this.valueLabels != null && (label = this.valueLabels.get(value)) != null)
 				{
 					buffer.append(label).append(Formatting.Expression.labelSeperator);
 				}
+				
 				value.toString(prefix1, buffer);
 				buffer.append(";\n");
+				prev = value;
 			}
 			buffer.append(prefix).append('}');
 		}

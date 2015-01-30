@@ -347,9 +347,9 @@ public class CompilationUnit extends ASTNode implements IContext
 			}
 		}
 		
-		if (!this.staticImports.isEmpty())
+		if (!this.imports.isEmpty())
 		{
-			for (Import iimport : this.staticImports)
+			for (Import iimport : this.imports)
 			{
 				buffer.append(prefix);
 				iimport.toString(prefix, buffer);
@@ -361,9 +361,9 @@ public class CompilationUnit extends ASTNode implements IContext
 			}
 		}
 		
-		if (!this.imports.isEmpty())
+		if (!this.staticImports.isEmpty())
 		{
-			for (Import iimport : this.imports)
+			for (Import iimport : this.staticImports)
 			{
 				buffer.append(prefix);
 				iimport.toString(prefix, buffer);
