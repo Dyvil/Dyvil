@@ -65,7 +65,7 @@ public class Double implements Number
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = {})
+	@Bytecode
 	public double doubleValue()
 	{
 		return this.value;
@@ -97,66 +97,77 @@ public class Double implements Number
 	// byte operators
 	
 	@Override
-	public boolean $eq$eq(byte b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPNE })
+	public boolean $eq$eq(byte v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(byte b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPEQ })
+	public boolean $bang$eq(byte v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(byte b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGE })
+	public boolean $less(byte v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(byte b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGT })
+	public boolean $less$eq(byte v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(byte b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLE })
+	public boolean $greater(byte v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(byte b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLT })
+	public boolean $greater$eq(byte v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DADD })
 	public Double $plus(byte v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DSUB })
 	public Double $minus(byte v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DMUL })
 	public Double $times(byte v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DDIV })
 	public Double $div(byte v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DREM })
 	public Double $percent(byte v)
 	{
 		return Double.create(this.value % v);
@@ -165,66 +176,77 @@ public class Double implements Number
 	// short operators
 	
 	@Override
-	public boolean $eq$eq(short b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPNE })
+	public boolean $eq$eq(short v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(short b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPEQ })
+	public boolean $bang$eq(short v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(short b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGE })
+	public boolean $less(short v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(short b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGT })
+	public boolean $less$eq(short v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(short b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLE })
+	public boolean $greater(short v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(short b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLT })
+	public boolean $greater$eq(short v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DADD })
 	public Double $plus(short v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DSUB })
 	public Double $minus(short v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DMUL })
 	public Double $times(short v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DDIV })
 	public Double $div(short v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DREM })
 	public Double $percent(short v)
 	{
 		return Double.create(this.value % v);
@@ -233,66 +255,77 @@ public class Double implements Number
 	// char operators
 	
 	@Override
-	public boolean $eq$eq(char b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPNE })
+	public boolean $eq$eq(char v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(char b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPEQ })
+	public boolean $bang$eq(char v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(char b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGE })
+	public boolean $less(char v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(char b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGT })
+	public boolean $less$eq(char v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(char b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLE })
+	public boolean $greater(char v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(char b)
+	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLT })
+	public boolean $greater$eq(char v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DADD })
 	public Double $plus(char v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DSUB })
 	public Double $minus(char v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DMUL })
 	public Double $times(char v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DDIV })
 	public Double $div(char v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D, DREM })
 	public Double $percent(char v)
 	{
 		return Double.create(this.value % v);
@@ -302,44 +335,44 @@ public class Double implements Number
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2D, IF_DCMPNE })
-	public boolean $eq$eq(int b)
+	public boolean $eq$eq(int v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2D, IF_DCMPEQ })
-	public boolean $bang$eq(int b)
+	public boolean $bang$eq(int v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGE })
-	public boolean $less(int b)
+	public boolean $less(int v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGT })
-	public boolean $less$eq(int b)
+	public boolean $less$eq(int v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLE })
-	public boolean $greater(int b)
+	public boolean $greater(int v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLT })
-	public boolean $greater$eq(int b)
+	public boolean $greater$eq(int v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
@@ -381,44 +414,44 @@ public class Double implements Number
 	
 	@Override
 	@Bytecode(postfixOpcodes = { L2D, IF_DCMPNE })
-	public boolean $eq$eq(long b)
+	public boolean $eq$eq(long v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { L2D, IF_DCMPEQ })
-	public boolean $bang$eq(long b)
+	public boolean $bang$eq(long v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { L2D, IF_DCMPGE })
-	public boolean $less(long b)
+	public boolean $less(long v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { L2D, IF_DCMPGT })
-	public boolean $less$eq(long b)
+	public boolean $less$eq(long v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { L2D, IF_DCMPLE })
-	public boolean $greater(long b)
+	public boolean $greater(long v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { L2D, IF_DCMPLT })
-	public boolean $greater$eq(long b)
+	public boolean $greater$eq(long v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
@@ -460,44 +493,44 @@ public class Double implements Number
 	
 	@Override
 	@Bytecode(postfixOpcodes = { F2D, IF_DCMPNE })
-	public boolean $eq$eq(float b)
+	public boolean $eq$eq(float v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { F2D, IF_DCMPEQ })
-	public boolean $bang$eq(float b)
+	public boolean $bang$eq(float v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { F2D, IF_DCMPGE })
-	public boolean $less(float b)
+	public boolean $less(float v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { F2D, IF_DCMPGT })
-	public boolean $less$eq(float b)
+	public boolean $less$eq(float v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { F2D, IF_DCMPLE })
-	public boolean $greater(float b)
+	public boolean $greater(float v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { F2D, IF_DCMPLT })
-	public boolean $greater$eq(float b)
+	public boolean $greater$eq(float v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
@@ -539,44 +572,44 @@ public class Double implements Number
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_DCMPNE)
-	public boolean $eq$eq(double b)
+	public boolean $eq$eq(double v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_DCMPEQ)
-	public boolean $bang$eq(double b)
+	public boolean $bang$eq(double v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_DCMPGE)
-	public boolean $less(double b)
+	public boolean $less(double v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_DCMPGT)
-	public boolean $less$eq(double b)
+	public boolean $less$eq(double v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_DCMPLE)
-	public boolean $greater(double b)
+	public boolean $greater(double v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_DCMPLT)
-	public boolean $greater$eq(double b)
+	public boolean $greater$eq(double v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
@@ -617,39 +650,39 @@ public class Double implements Number
 	// generic operators
 	
 	@Override
-	public boolean $eq$eq(Number b)
+	public boolean $eq$eq(Number v)
 	{
-		return this.value == b.doubleValue();
+		return this.value == v.doubleValue();
 	}
 	
 	@Override
-	public boolean $bang$eq(Number b)
+	public boolean $bang$eq(Number v)
 	{
-		return this.value != b.doubleValue();
+		return this.value != v.doubleValue();
 	}
 	
 	@Override
-	public boolean $less(Number b)
+	public boolean $less(Number v)
 	{
-		return this.value < b.doubleValue();
+		return this.value < v.doubleValue();
 	}
 	
 	@Override
-	public boolean $less$eq(Number b)
+	public boolean $less$eq(Number v)
 	{
-		return this.value <= b.doubleValue();
+		return this.value <= v.doubleValue();
 	}
 	
 	@Override
-	public boolean $greater(Number b)
+	public boolean $greater(Number v)
 	{
-		return this.value > b.doubleValue();
+		return this.value > v.doubleValue();
 	}
 	
 	@Override
-	public boolean $greater$eq(Number b)
+	public boolean $greater$eq(Number v)
 	{
-		return this.value >= b.doubleValue();
+		return this.value >= v.doubleValue();
 	}
 	
 	@Override

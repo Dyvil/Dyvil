@@ -467,44 +467,44 @@ public class Long implements Integer
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, IF_LCMPNE })
-	public boolean $eq$eq(int b)
+	public boolean $eq$eq(int v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, IF_LCMPEQ })
-	public boolean $bang$eq(int b)
+	public boolean $bang$eq(int v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, IF_LCMPGT })
-	public boolean $less(int b)
+	public boolean $less(int v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, IF_LCMPGE })
-	public boolean $less$eq(int b)
+	public boolean $less$eq(int v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, IF_LCMPLE })
-	public boolean $greater(int b)
+	public boolean $greater(int v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcodes = { I2L, IF_LCMPLT })
-	public boolean $greater$eq(int b)
+	public boolean $greater$eq(int v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
@@ -588,44 +588,44 @@ public class Long implements Integer
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_LCMPNE)
-	public boolean $eq$eq(long b)
+	public boolean $eq$eq(long v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_LCMPEQ)
-	public boolean $bang$eq(long b)
+	public boolean $bang$eq(long v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_LCMPGE)
-	public boolean $less(long b)
+	public boolean $less(long v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_LCMPGT)
-	public boolean $less$eq(long b)
+	public boolean $less$eq(long v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_LCMPLE)
-	public boolean $greater(long b)
+	public boolean $greater(long v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
 	@Bytecode(postfixOpcode = IF_LCMPLT)
-	public boolean $greater$eq(long b)
+	public boolean $greater$eq(long v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
@@ -709,44 +709,44 @@ public class Long implements Integer
 	
 	@Override
 	@Bytecode(infixOpcode = L2F, postfixOpcode = IF_FCMPNE)
-	public boolean $eq$eq(float b)
+	public boolean $eq$eq(float v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2F, postfixOpcode = IF_FCMPEQ)
-	public boolean $bang$eq(float b)
+	public boolean $bang$eq(float v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2F, postfixOpcode = IF_FCMPGE)
-	public boolean $less(float b)
+	public boolean $less(float v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2F, postfixOpcode = IF_FCMPGT)
-	public boolean $less$eq(float b)
+	public boolean $less$eq(float v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2F, postfixOpcode = IF_FCMPLE)
-	public boolean $greater(float b)
+	public boolean $greater(float v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2F, postfixOpcode = IF_FCMPLT)
-	public boolean $greater$eq(float b)
+	public boolean $greater$eq(float v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
@@ -788,44 +788,44 @@ public class Long implements Integer
 	
 	@Override
 	@Bytecode(infixOpcode = L2D, postfixOpcode = IF_DCMPNE)
-	public boolean $eq$eq(double b)
+	public boolean $eq$eq(double v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2D, postfixOpcode = IF_DCMPEQ)
-	public boolean $bang$eq(double b)
+	public boolean $bang$eq(double v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2D, postfixOpcode = IF_DCMPGE)
-	public boolean $less(double b)
+	public boolean $less(double v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2D, postfixOpcode = IF_DCMPGT)
-	public boolean $less$eq(double b)
+	public boolean $less$eq(double v)
 	{
-		return this.value <= b;
+		return this.value <= v;
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2D, postfixOpcode = IF_DCMPLE)
-	public boolean $greater(double b)
+	public boolean $greater(double v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
 	@Bytecode(infixOpcode = L2D, postfixOpcode = IF_DCMPLT)
-	public boolean $greater$eq(double b)
+	public boolean $greater$eq(double v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
@@ -866,39 +866,39 @@ public class Long implements Integer
 	// generic operators
 	
 	@Override
-	public boolean $eq$eq(Number b)
+	public boolean $eq$eq(Number v)
 	{
-		return this.value == b.longValue();
+		return this.value == v.longValue();
 	}
 	
 	@Override
-	public boolean $bang$eq(Number b)
+	public boolean $bang$eq(Number v)
 	{
-		return this.value != b.longValue();
+		return this.value != v.longValue();
 	}
 	
 	@Override
-	public boolean $less(Number b)
+	public boolean $less(Number v)
 	{
-		return this.value < b.longValue();
+		return this.value < v.longValue();
 	}
 	
 	@Override
-	public boolean $less$eq(Number b)
+	public boolean $less$eq(Number v)
 	{
-		return this.value <= b.longValue();
+		return this.value <= v.longValue();
 	}
 	
 	@Override
-	public boolean $greater(Number b)
+	public boolean $greater(Number v)
 	{
-		return this.value > b.longValue();
+		return this.value > v.longValue();
 	}
 	
 	@Override
-	public boolean $greater$eq(Number b)
+	public boolean $greater$eq(Number v)
 	{
-		return this.value >= b.longValue();
+		return this.value >= v.longValue();
 	}
 	
 	@Override

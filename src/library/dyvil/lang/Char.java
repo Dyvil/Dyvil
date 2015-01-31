@@ -1,5 +1,8 @@
 package dyvil.lang;
 
+import static dyvil.reflect.Opcodes.*;
+import dyvil.lang.annotation.Bytecode;
+
 public class Char implements Integer
 {
 	protected char	value;
@@ -19,42 +22,49 @@ public class Char implements Integer
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2B })
 	public byte byteValue()
 	{
 		return (byte) this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2S })
 	public short shortValue()
 	{
 		return (short) this.value;
 	}
 	
 	@Override
+	@Bytecode
 	public char charValue()
 	{
 		return this.value;
 	}
 	
 	@Override
+	@Bytecode
 	public int intValue()
 	{
 		return this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2L })
 	public long longValue()
 	{
 		return this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2F })
 	public float floatValue()
 	{
 		return this.value;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { I2D })
 	public double doubleValue()
 	{
 		return this.value;
@@ -63,440 +73,512 @@ public class Char implements Integer
 	// Unary operators
 	
 	@Override
-	public Char $minus()
+	@Bytecode(postfixOpcode = INEG)
+	public Int $minus()
 	{
-		return Char.create((char) -this.value);
+		return Int.create((byte) -this.value);
 	}
 	
 	@Override
-	public Char $tilde()
+	@Bytecode(prefixOpcode = ICONST_M1, postfixOpcode = IXOR)
+	public Int $tilde()
 	{
-		return Char.create((char) ~this.value);
+		return Int.create((byte) ~this.value);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcodes = { DUP, IMUL })
 	public Int sqr()
 	{
 		return Int.create(this.value * this.value);
 	}
 	
 	@Override
-	public Char rec()
+	@Bytecode(prefixOpcode = ICONST_1, postfixOpcode = IDIV)
+	public Int rec()
 	{
-		return Char.create((char) (1 / this.value));
+		return Int.create((byte) (1 / this.value));
 	}
 	
 	// byte operators
 	
 	@Override
-	public boolean $eq$eq(byte b)
+	@Bytecode(postfixOpcode = IF_ICMPNE)
+	public boolean $eq$eq(byte v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(byte b)
+	@Bytecode(postfixOpcode = IF_ICMPEQ)
+	public boolean $bang$eq(byte v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(byte b)
+	@Bytecode(postfixOpcode = IF_ICMPGE)
+	public boolean $less(byte v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(byte b)
+	@Bytecode(postfixOpcode = IF_ICMPGT)
+	public boolean $less$eq(byte v)
 	{
-		return this.value == b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(byte b)
+	@Bytecode(postfixOpcode = IF_ICMPLE)
+	public boolean $greater(byte v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(byte b)
+	@Bytecode(postfixOpcode = IF_ICMPGT)
+	public boolean $greater$eq(byte v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
-	public Char $plus(byte v)
+	@Bytecode(postfixOpcode = IADD)
+	public Int $plus(byte v)
 	{
-		return Char.create((char) (this.value + v));
+		return Int.create(this.value + v);
 	}
 	
 	@Override
-	public Char $minus(byte v)
+	@Bytecode(postfixOpcode = ISUB)
+	public Int $minus(byte v)
 	{
-		return Char.create((char) (this.value - v));
+		return Int.create(this.value - v);
 	}
 	
 	@Override
-	public Char $times(byte v)
+	@Bytecode(postfixOpcode = IMUL)
+	public Int $times(byte v)
 	{
-		return Char.create((char) (this.value * v));
+		return Int.create(this.value * v);
 	}
 	
 	@Override
-	public Char $div(byte v)
+	@Bytecode(postfixOpcode = IDIV)
+	public Int $div(byte v)
 	{
-		return Char.create((char) (this.value / v));
+		return Int.create(this.value / v);
 	}
 	
 	@Override
-	public Char $percent(byte v)
+	@Bytecode(postfixOpcode = IREM)
+	public Int $percent(byte v)
 	{
-		return Char.create((char) (this.value % v));
+		return Int.create(this.value % v);
 	}
 	
 	@Override
-	public Char $bar(byte v)
+	@Bytecode(postfixOpcode = IAND)
+	public Int $amp(byte v)
 	{
-		return Char.create((char) (this.value | v));
+		return Int.create(this.value & v);
 	}
 	
 	@Override
-	public Char $amp(byte v)
+	@Bytecode(postfixOpcode = IOR)
+	public Int $bar(byte v)
 	{
-		return Char.create((char) (this.value & v));
+		return Int.create(this.value | v);
 	}
 	
 	@Override
-	public Char $up(byte v)
+	@Bytecode(postfixOpcode = IXOR)
+	public Int $up(byte v)
 	{
-		return Char.create((char) (this.value ^ v));
+		return Int.create(this.value ^ v);
 	}
 	
 	@Override
-	public Char $less$less(byte v)
+	@Bytecode(postfixOpcode = ISHL)
+	public Int $less$less(byte v)
 	{
-		return Char.create((char) (this.value << v));
+		return Int.create(this.value << v);
 	}
 	
 	@Override
-	public Char $greater$greater(byte v)
+	@Bytecode(postfixOpcode = ISHR)
+	public Int $greater$greater(byte v)
 	{
-		return Char.create((char) (this.value >> v));
+		return Int.create(this.value >> v);
 	}
 	
 	@Override
-	public Char $greater$greater$greater(byte v)
+	@Bytecode(postfixOpcode = IUSHR)
+	public Int $greater$greater$greater(byte v)
 	{
-		return Char.create((char) (this.value >>> v));
+		return Int.create(this.value >>> v);
 	}
 	
 	// short operators
 	
 	@Override
-	public boolean $eq$eq(short b)
+	@Bytecode(postfixOpcode = IF_ICMPNE)
+	public boolean $eq$eq(short v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(short b)
+	@Bytecode(postfixOpcode = IF_ICMPEQ)
+	public boolean $bang$eq(short v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(short b)
+	@Bytecode(postfixOpcode = IF_ICMPGE)
+	public boolean $less(short v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(short b)
+	@Bytecode(postfixOpcode = IF_ICMPGT)
+	public boolean $less$eq(short v)
 	{
-		return this.value == b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(short b)
+	@Bytecode(postfixOpcode = IF_ICMPLE)
+	public boolean $greater(short v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(short b)
+	@Bytecode(postfixOpcode = IF_ICMPGT)
+	public boolean $greater$eq(short v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
-	public Char $plus(short v)
+	@Bytecode(postfixOpcode = IADD)
+	public Int $plus(short v)
 	{
-		return Char.create((char) (this.value + v));
+		return Int.create(this.value + v);
 	}
 	
 	@Override
-	public Char $minus(short v)
+	@Bytecode(postfixOpcode = ISUB)
+	public Int $minus(short v)
 	{
-		return Char.create((char) (this.value - v));
+		return Int.create(this.value - v);
 	}
 	
 	@Override
-	public Char $times(short v)
+	@Bytecode(postfixOpcode = IMUL)
+	public Int $times(short v)
 	{
-		return Char.create((char) (this.value * v));
+		return Int.create(this.value * v);
 	}
 	
 	@Override
-	public Char $div(short v)
+	@Bytecode(postfixOpcode = IDIV)
+	public Int $div(short v)
 	{
-		return Char.create((char) (this.value / v));
+		return Int.create(this.value / v);
 	}
 	
 	@Override
-	public Char $percent(short v)
+	@Bytecode(postfixOpcode = IREM)
+	public Int $percent(short v)
 	{
-		return Char.create((char) (this.value % v));
+		return Int.create(this.value % v);
 	}
 	
 	@Override
-	public Char $bar(short v)
+	@Bytecode(postfixOpcode = IAND)
+	public Int $amp(short v)
 	{
-		return Char.create((char) (this.value | v));
+		return Int.create(this.value & v);
 	}
 	
 	@Override
-	public Char $amp(short v)
+	@Bytecode(postfixOpcode = IOR)
+	public Int $bar(short v)
 	{
-		return Char.create((char) (this.value & v));
+		return Int.create(this.value | v);
 	}
 	
 	@Override
-	public Char $up(short v)
+	@Bytecode(postfixOpcode = IXOR)
+	public Int $up(short v)
 	{
-		return Char.create((char) (this.value ^ v));
+		return Int.create(this.value ^ v);
 	}
 	
 	@Override
-	public Char $less$less(short v)
+	@Bytecode(postfixOpcode = ISHL)
+	public Int $less$less(short v)
 	{
-		return Char.create((char) (this.value << v));
+		return Int.create(this.value << v);
 	}
 	
 	@Override
-	public Char $greater$greater(short v)
+	@Bytecode(postfixOpcode = ISHR)
+	public Int $greater$greater(short v)
 	{
-		return Char.create((char) (this.value >> v));
+		return Int.create(this.value >> v);
 	}
 	
 	@Override
-	public Char $greater$greater$greater(short v)
+	@Bytecode(postfixOpcode = IUSHR)
+	public Int $greater$greater$greater(short v)
 	{
-		return Char.create((char) (this.value >>> v));
+		return Int.create(this.value >>> v);
 	}
 	
 	// char operators
 	
 	@Override
-	public boolean $eq$eq(char b)
+	@Bytecode(postfixOpcode = IF_ICMPNE)
+	public boolean $eq$eq(char v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(char b)
+	@Bytecode(postfixOpcode = IF_ICMPEQ)
+	public boolean $bang$eq(char v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(char b)
+	@Bytecode(postfixOpcode = IF_ICMPGE)
+	public boolean $less(char v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(char b)
+	@Bytecode(postfixOpcode = IF_ICMPGT)
+	public boolean $less$eq(char v)
 	{
-		return this.value == b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(char b)
+	@Bytecode(postfixOpcode = IF_ICMPLE)
+	public boolean $greater(char v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(char b)
+	@Bytecode(postfixOpcode = IF_ICMPLT)
+	public boolean $greater$eq(char v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
-	public Char $plus(char v)
+	@Bytecode(postfixOpcode = IADD)
+	public Int $plus(char v)
 	{
-		return Char.create((char) (this.value + v));
+		return Int.create(this.value + v);
 	}
 	
 	@Override
-	public Char $minus(char v)
+	@Bytecode(postfixOpcode = ISUB)
+	public Int $minus(char v)
 	{
-		return Char.create((char) (this.value - v));
+		return Int.create(this.value - v);
 	}
 	
 	@Override
-	public Char $times(char v)
+	@Bytecode(postfixOpcode = IMUL)
+	public Int $times(char v)
 	{
-		return Char.create((char) (this.value * v));
+		return Int.create(this.value * v);
 	}
 	
 	@Override
-	public Char $div(char v)
+	@Bytecode(postfixOpcode = IDIV)
+	public Int $div(char v)
 	{
-		return Char.create((char) (this.value / v));
+		return Int.create(this.value / v);
 	}
 	
 	@Override
-	public Char $percent(char v)
+	@Bytecode(postfixOpcode = IREM)
+	public Int $percent(char v)
 	{
-		return Char.create((char) (this.value % v));
+		return Int.create(this.value % v);
 	}
 	
 	@Override
-	public Char $bar(char v)
+	@Bytecode(postfixOpcode = IAND)
+	public Int $amp(char v)
 	{
-		return Char.create((char) (this.value | v));
+		return Int.create(this.value & v);
 	}
 	
 	@Override
-	public Char $amp(char v)
+	@Bytecode(postfixOpcode = IOR)
+	public Int $bar(char v)
 	{
-		return Char.create((char) (this.value & v));
+		return Int.create(this.value | v);
 	}
 	
 	@Override
-	public Char $up(char v)
+	@Bytecode(postfixOpcode = IXOR)
+	public Int $up(char v)
 	{
-		return Char.create((char) (this.value ^ v));
+		return Int.create(this.value ^ v);
 	}
 	
 	@Override
-	public Char $less$less(char v)
+	@Bytecode(postfixOpcode = ISHL)
+	public Int $less$less(char v)
 	{
-		return Char.create((char) (this.value << v));
+		return Int.create(this.value << v);
 	}
 	
 	@Override
-	public Char $greater$greater(char v)
+	@Bytecode(postfixOpcode = ISHR)
+	public Int $greater$greater(char v)
 	{
-		return Char.create((char) (this.value >> v));
+		return Int.create(this.value >> v);
 	}
 	
 	@Override
-	public Char $greater$greater$greater(char v)
+	@Bytecode(postfixOpcode = IUSHR)
+	public Int $greater$greater$greater(char v)
 	{
-		return Char.create((char) (this.value >>> v));
+		return Int.create(this.value >>> v);
 	}
 	
 	// int operators
 	
 	@Override
-	public boolean $eq$eq(int b)
+	@Bytecode(postfixOpcode = IF_ICMPNE)
+	public boolean $eq$eq(int v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(int b)
+	@Bytecode(postfixOpcode = IF_ICMPEQ)
+	public boolean $bang$eq(int v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(int b)
+	@Bytecode(postfixOpcode = IF_ICMPGE)
+	public boolean $less(int v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(int b)
+	@Bytecode(postfixOpcode = IF_ICMPGT)
+	public boolean $less$eq(int v)
 	{
-		return this.value == b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(int b)
+	@Bytecode(postfixOpcode = IF_ICMPLE)
+	public boolean $greater(int v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(int b)
+	@Bytecode(postfixOpcode = IF_ICMPLT)
+	public boolean $greater$eq(int v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = IADD)
 	public Int $plus(int v)
 	{
 		return Int.create(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = ISUB)
 	public Int $minus(int v)
 	{
 		return Int.create(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = IMUL)
 	public Int $times(int v)
 	{
 		return Int.create(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = IDIV)
 	public Int $div(int v)
 	{
 		return Int.create(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = IREM)
 	public Int $percent(int v)
 	{
 		return Int.create(this.value % v);
 	}
 	
 	@Override
-	public Int $bar(int v)
-	{
-		return Int.create(this.value | v);
-	}
-	
-	@Override
+	@Bytecode(postfixOpcode = IAND)
 	public Int $amp(int v)
 	{
 		return Int.create(this.value & v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = IOR)
+	public Int $bar(int v)
+	{
+		return Int.create(this.value | v);
+	}
+	
+	@Override
+	@Bytecode(postfixOpcode = IXOR)
 	public Int $up(int v)
 	{
 		return Int.create(this.value ^ v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = ISHL)
 	public Int $less$less(int v)
 	{
 		return Int.create(this.value << v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = ISHR)
 	public Int $greater$greater(int v)
 	{
 		return Int.create(this.value >> v);
 	}
 	
 	@Override
+	@Bytecode(postfixOpcode = IUSHR)
 	public Int $greater$greater$greater(int v)
 	{
 		return Int.create(this.value >>> v);
@@ -505,170 +587,198 @@ public class Char implements Integer
 	// long operators
 	
 	@Override
-	public boolean $eq$eq(long b)
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPNE)
+	public boolean $eq$eq(long v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(long b)
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPEQ)
+	public boolean $bang$eq(long v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(long b)
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPGE)
+	public boolean $less(long v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(long b)
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPGT)
+	public boolean $less$eq(long v)
 	{
-		return this.value == b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(long b)
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPLE)
+	public boolean $greater(long v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(long b)
+	@Bytecode(infixOpcode = I2L, postfixOpcode = IF_LCMPLT)
+	public boolean $greater$eq(long v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, postfixOpcode = LADD)
 	public Long $plus(long v)
 	{
 		return Long.create(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, postfixOpcode = LSUB)
 	public Long $minus(long v)
 	{
 		return Long.create(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, postfixOpcode = LMUL)
 	public Long $times(long v)
 	{
 		return Long.create(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, postfixOpcode = LDIV)
 	public Long $div(long v)
 	{
 		return Long.create(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, postfixOpcode = LREM)
 	public Long $percent(long v)
 	{
 		return Long.create(this.value % v);
 	}
 	
 	@Override
-	public Long $bar(long v)
-	{
-		return Long.create(this.value | v);
-	}
-	
-	@Override
+	@Bytecode(infixOpcode = I2L, postfixOpcode = LAND)
 	public Long $amp(long v)
 	{
 		return Long.create(this.value & v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2L, postfixOpcode = LOR)
+	public Long $bar(long v)
+	{
+		return Long.create(this.value | v);
+	}
+	
+	@Override
+	@Bytecode(infixOpcode = I2L, postfixOpcode = LXOR)
 	public Long $up(long v)
 	{
 		return Long.create(this.value ^ v);
 	}
 	
 	@Override
-	public Char $less$less(long v)
+	@Bytecode(postfixOpcodes = { L2I, ISHL })
+	public Int $less$less(long v)
 	{
-		return Char.create((char) (this.value << v));
+		return Int.create(this.value << v);
 	}
 	
 	@Override
-	public Char $greater$greater(long v)
+	@Bytecode(postfixOpcodes = { L2I, ISHR })
+	public Int $greater$greater(long v)
 	{
-		return Char.create((char) (this.value >> v));
+		return Int.create(this.value >> v);
 	}
 	
 	@Override
-	public Char $greater$greater$greater(long v)
+	@Bytecode(postfixOpcodes = { L2I, IUSHR })
+	public Int $greater$greater$greater(long v)
 	{
-		return Char.create((char) (this.value >>> v));
+		return Int.create(this.value >>> v);
 	}
 	
 	// float operators
 	
 	@Override
-	public boolean $eq$eq(float b)
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPNE)
+	public boolean $eq$eq(float v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(float b)
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPEQ)
+	public boolean $bang$eq(float v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(float b)
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPGE)
+	public boolean $less(float v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(float b)
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPGT)
+	public boolean $less$eq(float v)
 	{
-		return this.value == b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(float b)
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPLE)
+	public boolean $greater(float v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(float b)
+	@Bytecode(infixOpcode = I2F, postfixOpcode = IF_FCMPLT)
+	public boolean $greater$eq(float v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2F, postfixOpcode = FADD)
 	public Float $plus(float v)
 	{
 		return Float.create(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2F, postfixOpcode = FSUB)
 	public Float $minus(float v)
 	{
 		return Float.create(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2F, postfixOpcode = FMUL)
 	public Float $times(float v)
 	{
 		return Float.create(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2F, postfixOpcode = FDIV)
 	public Float $div(float v)
 	{
 		return Float.create(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2F, postfixOpcode = FREM)
 	public Float $percent(float v)
 	{
 		return Float.create(this.value % v);
@@ -677,66 +787,77 @@ public class Char implements Integer
 	// double operators
 	
 	@Override
-	public boolean $eq$eq(double b)
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPNE)
+	public boolean $eq$eq(double v)
 	{
-		return this.value == b;
+		return this.value == v;
 	}
 	
 	@Override
-	public boolean $bang$eq(double b)
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPEQ)
+	public boolean $bang$eq(double v)
 	{
-		return this.value != b;
+		return this.value != v;
 	}
 	
 	@Override
-	public boolean $less(double b)
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPGE)
+	public boolean $less(double v)
 	{
-		return this.value < b;
+		return this.value < v;
 	}
 	
 	@Override
-	public boolean $less$eq(double b)
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPGT)
+	public boolean $less$eq(double v)
 	{
-		return this.value == b;
+		return this.value <= v;
 	}
 	
 	@Override
-	public boolean $greater(double b)
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPLE)
+	public boolean $greater(double v)
 	{
-		return this.value > b;
+		return this.value > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(double b)
+	@Bytecode(infixOpcode = I2D, postfixOpcode = IF_DCMPLT)
+	public boolean $greater$eq(double v)
 	{
-		return this.value >= b;
+		return this.value >= v;
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2D, postfixOpcode = DADD)
 	public Double $plus(double v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2D, postfixOpcode = DSUB)
 	public Double $minus(double v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2D, postfixOpcode = DMUL)
 	public Double $times(double v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2D, postfixOpcode = DDIV)
 	public Double $div(double v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
+	@Bytecode(infixOpcode = I2D, postfixOpcode = DREM)
 	public Double $percent(double v)
 	{
 		return Double.create(this.value % v);
@@ -745,105 +866,105 @@ public class Char implements Integer
 	// generic operators
 	
 	@Override
-	public boolean $eq$eq(Number b)
+	public boolean $eq$eq(Number v)
 	{
-		return this.value == b.charValue();
+		return this.value == v.byteValue();
 	}
 	
 	@Override
-	public boolean $bang$eq(Number b)
+	public boolean $bang$eq(Number v)
 	{
-		return this.value != b.charValue();
+		return this.value != v.byteValue();
 	}
 	
 	@Override
-	public boolean $less(Number b)
+	public boolean $less(Number v)
 	{
-		return this.value < b.charValue();
+		return this.value < v.byteValue();
 	}
 	
 	@Override
-	public boolean $less$eq(Number b)
+	public boolean $less$eq(Number v)
 	{
-		return this.value == b.charValue();
+		return this.value <= v.byteValue();
 	}
 	
 	@Override
-	public boolean $greater(Number b)
+	public boolean $greater(Number v)
 	{
-		return this.value > b.charValue();
+		return this.value > v.byteValue();
 	}
 	
 	@Override
-	public boolean $greater$eq(Number b)
+	public boolean $greater$eq(Number v)
 	{
-		return this.value >= b.charValue();
+		return this.value >= v.byteValue();
 	}
 	
 	@Override
-	public Char $plus(Number v)
+	public Int $plus(Number v)
 	{
-		return Char.create((char) (this.value + v.charValue()));
+		return Int.create((this.value + v.intValue()));
 	}
 	
 	@Override
-	public Char $minus(Number v)
+	public Int $minus(Number v)
 	{
-		return Char.create((char) (this.value - v.charValue()));
+		return Int.create((this.value - v.intValue()));
 	}
 	
 	@Override
-	public Char $times(Number v)
+	public Int $times(Number v)
 	{
-		return Char.create((char) (this.value * v.charValue()));
+		return Int.create((this.value * v.intValue()));
 	}
 	
 	@Override
-	public Char $div(Number v)
+	public Int $div(Number v)
 	{
-		return Char.create((char) (this.value / v.charValue()));
+		return Int.create((this.value / v.intValue()));
 	}
 	
 	@Override
-	public Char $percent(Number v)
+	public Int $percent(Number v)
 	{
-		return Char.create((char) (this.value % v.charValue()));
+		return Int.create((this.value % v.intValue()));
 	}
 	
 	@Override
-	public Char $bar(Integer v)
+	public Int $bar(Integer v)
 	{
-		return Char.create((char) (this.value | v.charValue()));
+		return Int.create((this.value | v.intValue()));
 	}
 	
 	@Override
-	public Char $amp(Integer v)
+	public Int $amp(Integer v)
 	{
-		return Char.create((char) (this.value & v.charValue()));
+		return Int.create((this.value & v.intValue()));
 	}
 	
 	@Override
-	public Char $up(Integer v)
+	public Int $up(Integer v)
 	{
-		return Char.create((char) (this.value ^ v.charValue()));
+		return Int.create((this.value ^ v.intValue()));
 	}
 	
 	@Override
-	public Char $less$less(Integer v)
+	public Int $less$less(Integer v)
 	{
-		return Char.create((char) (this.value << v.charValue()));
+		return Int.create((this.value << v.intValue()));
 	}
 	
 	@Override
-	public Char $greater$greater(Integer v)
+	public Int $greater$greater(Integer v)
 	{
-		return Char.create((char) (this.value >> v.charValue()));
+		return Int.create((this.value >> v.intValue()));
 	}
 	
 	@Override
-	public Char $greater$greater$greater(Integer v)
+	public Int $greater$greater$greater(Integer v)
 	{
-		return Char.create((char) (this.value >>> v.charValue()));
+		return Int.create((this.value >>> v.intValue()));
 	}
 	
 	// Object methods
