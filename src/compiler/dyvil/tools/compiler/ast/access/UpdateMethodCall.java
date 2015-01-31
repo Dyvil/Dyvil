@@ -253,52 +253,13 @@ public class UpdateMethodCall extends ASTNode implements IAccess
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		// Writes the prefix opcodes if a @Bytecode annotation is present.
-		this.method.writePrefixBytecode(writer);
-		
-		// Writes the instance (the first operand).
-		if (this.instance != null)
-		{
-			this.instance.writeExpression(writer);
-		}
-		
-		// Writes the infix opcodes if a @Bytecode annotation is present.
-		this.method.writeInfixBytecode(writer);
-		
-		// Writes the arguments (the second operand).
-		for (IValue arg : this.arguments)
-		{
-			arg.writeExpression(writer);
-		}
-		
-		// Apply special compilation when dealing with boolean types
-		// Writes the postfix opcodes if a @Bytecode annotation is present.
-		
-		Label ifEnd = new Label();
-		// Condition
-		if (this.method.writePostfixBytecode(writer, ifEnd))
-		{
-			Label elseEnd = new Label();
-			
-			// If Block
-			writer.visitLdcInsn(1);
-			writer.pop();
-			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.visitLabel(ifEnd);
-			// Else Block
-			writer.visitLdcInsn(0);
-			writer.visitLabel(elseEnd);
-			return;
-		}
-		
-		// If no @Bytecode annotation is present, write a normal invokation.
-		this.method.writeCall(writer, this.instance == null ? false : this.instance.getValueType() == SUPER);
+		this.method.writeCall(writer, this.instance, this.arguments);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.writeExpression(writer);
+		this.method.writeCall(writer, this.instance, this.arguments);
 		
 		if (this.method.getType() != Type.VOID)
 		{
@@ -309,33 +270,7 @@ public class UpdateMethodCall extends ASTNode implements IAccess
 	@Override
 	public void writeJump(MethodWriter writer, Label dest)
 	{
-		// Writes the prefix opcodes if a @Bytecode annotation is present.
-		this.method.writePrefixBytecode(writer, dest);
-		
-		// Writes the instance (the first operand).
-		if (this.instance != null)
-		{
-			this.instance.writeExpression(writer);
-		}
-		
-		// Writes the infix opcodes if a @Bytecode annotation is present.
-		this.method.writeInfixBytecode(writer, dest);
-		
-		// Writes the arguments (the second operand).
-		for (IValue arg : this.arguments)
-		{
-			arg.writeExpression(writer);
-		}
-		
-		// Writes the postfix opcodes if a @Bytecode annotation is present.
-		if (this.method.writePostfixBytecode(writer, dest))
-		{
-			return;
-		}
-		
-		// If no @Bytecode annotation is present, write a normal invocation.
-		this.method.writeCall(writer, this.instance.getValueType() == SUPER);
-		writer.visitJumpInsn(Opcodes.IFEQ, dest);
+		this.method.writeJump(writer, dest, this.instance, this.arguments);
 	}
 	
 	@Override

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static dyvil.reflect.Opcodes.*;
+
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
@@ -44,9 +46,7 @@ public class Method extends Member implements IMethod
 	protected boolean			isConstructor;
 	
 	protected IMethod			overrideMethod;
-	protected int[]				prefixBytecode;
-	protected int[]				infixBytecode;
-	protected int[]				postfixBytecode;
+	protected int[]				intrinsicOpcodes;
 	
 	public Method(IClass iclass)
 	{
@@ -195,12 +195,22 @@ public class Method extends Member implements IMethod
 			this.modifiers |= Modifiers.SEALED;
 			return true;
 		}
-		if ("dyvil.lang.annotation.Bytecode".equals(name))
+		if ("dyvil.lang.annotation.Intrinsic".equals(name))
 		{
-			this.prefixBytecode = readOpcodes(annotation, "prefixOpcode", "prefixOpcodes");
-			this.infixBytecode = readOpcodes(annotation, "infixOpcode", "infixOpcodes");
-			this.postfixBytecode = readOpcodes(annotation, "postfixOpcode", "postfixOpcodes");
-			return false;
+			ValueList array = (ValueList) annotation.getValue("value");
+			if (array != null)
+			{
+				List<IValue> values = array.values;
+				int len = values.size();
+				int[] opcodes = new int[len];
+				for (int i = 0; i < len; i++)
+				{
+					IntValue v = (IntValue) values.get(i).foldConstants();
+					opcodes[i] = v.value;
+				}
+				this.intrinsicOpcodes = opcodes;
+				return false;
+			}
 		}
 		if ("java.lang.Deprecated".equals(name))
 		{
@@ -592,33 +602,6 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	private static int[] readOpcodes(Annotation annotation, String key1, String key2)
-	{
-		int[] opcodes = null;
-		ValueList array = (ValueList) annotation.getValue(key2);
-		if (array != null)
-		{
-			List<IValue> values = array.values;
-			int len = values.size();
-			opcodes = new int[len];
-			for (int i = 0; i < len; i++)
-			{
-				IntValue v = (IntValue) values.get(i).foldConstants();
-				opcodes[i] = v.value;
-			}
-		}
-		else
-		{
-			IValue i = annotation.getValue(key1);
-			if (i != null)
-			{
-				IntValue v = (IntValue) i.foldConstants();
-				opcodes = new int[] { v.value };
-			}
-		}
-		return opcodes;
-	}
-	
 	@Override
 	public boolean isStatic()
 	{
@@ -696,103 +679,6 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void writePrefixBytecode(MethodWriter writer)
-	{
-		if (this.prefixBytecode != null)
-		{
-			for (int i : this.prefixBytecode)
-			{
-				writer.visitInsn(i);
-			}
-		}
-	}
-	
-	@Override
-	public void writeInfixBytecode(MethodWriter writer)
-	{
-		if (this.infixBytecode != null)
-		{
-			for (int i : this.infixBytecode)
-			{
-				writer.visitInsn(i);
-			}
-		}
-	}
-	
-	@Override
-	public boolean writePostfixBytecode(MethodWriter writer)
-	{
-		if (this.postfixBytecode != null)
-		{
-			for (int i : this.postfixBytecode)
-			{
-				writer.visitInsn(i);
-			}
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public void writePrefixBytecode(MethodWriter writer, Label dest)
-	{
-		if (this.prefixBytecode != null)
-		{
-			for (int i : this.prefixBytecode)
-			{
-				if (OpcodeUtil.isJumpOpcode(i))
-				{
-					writer.visitJumpInsn(i, dest);
-				}
-				else
-				{
-					writer.visitInsn(i);
-				}
-			}
-		}
-	}
-	
-	@Override
-	public void writeInfixBytecode(MethodWriter writer, Label dest)
-	{
-		if (this.infixBytecode != null)
-		{
-			for (int i : this.infixBytecode)
-			{
-				if (OpcodeUtil.isJumpOpcode(i))
-				{
-					writer.visitJumpInsn(i, dest);
-				}
-				else
-				{
-					writer.visitInsn(i);
-				}
-			}
-		}
-	}
-	
-	@Override
-	public boolean writePostfixBytecode(MethodWriter writer, Label dest)
-	{
-		if (this.postfixBytecode != null)
-		{
-			for (int i : this.postfixBytecode)
-			{
-				if (OpcodeUtil.isJumpOpcode(i))
-				{
-					writer.visitJumpInsn(i, dest);
-				}
-				else
-				{
-					writer.visitInsn(i);
-				}
-			}
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
 	public void write(ClassWriter writer)
 	{
 		int modifiers = this.modifiers & 0xFFFF;
@@ -848,8 +734,106 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, boolean isSuperCall)
+	public void writeCall(MethodWriter writer, IValue instance, List<IValue> arguments)
 	{
+		if (this.intrinsicOpcodes != null)
+		{
+			if (this.type == Type.BOOLEAN)
+			{
+				Label ifEnd = new Label();
+				Label elseEnd = new Label();
+				this.writeIntrinsic(writer, ifEnd, instance, arguments);
+				
+				// If Block
+				writer.visitLdcInsn(1);
+				writer.pop();
+				writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+				writer.visitLabel(ifEnd);
+				// Else Block
+				writer.visitLdcInsn(0);
+				writer.visitLabel(elseEnd);
+				return;
+			}
+			this.writeIntrinsic(writer, instance, arguments);
+			return;
+		}
+		
+		this.writeInvoke(writer, instance, arguments);
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
+	{
+		if (this.intrinsicOpcodes != null)
+		{
+			this.writeIntrinsic(writer, dest, instance, arguments);
+			return;
+		}
+		
+		this.writeInvoke(writer, instance, arguments);
+		writer.visitJumpInsn(IFEQ, dest);
+	}
+	
+	private void writeIntrinsic(MethodWriter writer, IValue instance, List<IValue> arguments)
+	{
+		for (int i : this.intrinsicOpcodes)
+		{
+			if (i == INSTANCE)
+			{
+				instance.writeExpression(writer);
+			}
+			else if (i == ARGUMENTS)
+			{
+				for (IValue arg : arguments)
+				{
+					arg.writeExpression(writer);
+				}
+			}
+			else
+			{
+				writer.visitInsn(i);
+			}
+		}
+	}
+	
+	private void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
+	{
+		for (int i : this.intrinsicOpcodes)
+		{
+			if (i == INSTANCE)
+			{
+				instance.writeExpression(writer);
+			}
+			else if (i == ARGUMENTS)
+			{
+				for (IValue arg : arguments)
+				{
+					arg.writeExpression(writer);
+				}
+			}
+			else if (OpcodeUtil.isJumpOpcode(i))
+			{
+				writer.visitJumpInsn(i, dest);
+			}
+			else
+			{
+				writer.visitInsn(i);
+			}
+		}
+	}
+	
+	private void writeInvoke(MethodWriter writer, IValue instance, List<IValue> arguments)
+	{
+		if (instance != null)
+		{
+			instance.writeExpression(writer);
+		}
+		
+		for (IValue arg : arguments)
+		{
+			arg.writeExpression(writer);
+		}
+		
 		int opcode;
 		int args = this.parameters.size();
 		int modifiers = this.modifiers;
@@ -862,7 +846,12 @@ public class Method extends Member implements IMethod
 			opcode = Opcodes.INVOKEINTERFACE;
 			args++;
 		}
-		else if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE || isSuperCall)
+		else if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
+		{
+			opcode = Opcodes.INVOKESPECIAL;
+			args++;
+		}
+		else if (instance != null && instance.getValueType() == IValue.SUPER)
 		{
 			opcode = Opcodes.INVOKESPECIAL;
 			args++;

@@ -21,34 +21,6 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 	
 	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments);
 	
-	// @Bytecode
-	
-	public default void writePrefixBytecode(MethodWriter writer)
-	{
-	}
-	
-	public default void writeInfixBytecode(MethodWriter writer)
-	{
-	}
-	
-	public default boolean writePostfixBytecode(MethodWriter writer)
-	{
-		return false;
-	}
-	
-	public default void writePrefixBytecode(MethodWriter writer, Label dest)
-	{
-	}
-	
-	public default void writeInfixBytecode(MethodWriter writer, Label dest)
-	{
-	}
-	
-	public default boolean writePostfixBytecode(MethodWriter writer, Label dest)
-	{
-		return false;
-	}
-	
 	// Compilation
 	
 	public String getDescriptor();
@@ -59,7 +31,9 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 	
 	public void write(ClassWriter writer);
 	
-	public void writeCall(MethodWriter writer, boolean isSuperCall);
+	public void writeCall(MethodWriter writer, IValue instance, List<IValue> arguments);
+	
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments);
 	
 	public static IType[] getArgumentTypes(List<IValue> arguments)
 	{

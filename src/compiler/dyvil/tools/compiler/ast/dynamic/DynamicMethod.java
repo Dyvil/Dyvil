@@ -2,10 +2,7 @@ package dyvil.tools.compiler.ast.dynamic;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.Handle;
-import jdk.internal.org.objectweb.asm.Opcodes;
-import jdk.internal.org.objectweb.asm.Type;
+import jdk.internal.org.objectweb.asm.*;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -296,11 +293,13 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, boolean isSuperCall)
+	public void writeCall(MethodWriter writer, IValue instance, List<IValue> arguments)
 	{
-		String desc = this.getDescriptor();
-		jdk.internal.org.objectweb.asm.Type type = Type.getType(desc);
-		writer.visitInvokeDynamicInsn(this.name, desc, BOOTSTRAP, new Object[] { type });
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
+	{
 	}
 	
 	@Override

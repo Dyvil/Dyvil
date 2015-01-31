@@ -38,7 +38,7 @@ public class Type extends ASTNode implements IType
 	public static final Type			ARRAY		= new Type("Array");
 	public static final Type			STRING		= new Type("String");
 	
-	public static final AnnotationType	ABytecode	= new AnnotationType("Bytecode");
+	public static final AnnotationType	AIntrinsic	= new AnnotationType("Intrinsic");
 	public static final AnnotationType	AOverride	= new AnnotationType("Override");
 	public static final AnnotationType	ARetention	= new AnnotationType("Retention");
 	public static final AnnotationType	ATarget		= new AnnotationType("Target");
@@ -100,7 +100,7 @@ public class Type extends ASTNode implements IType
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
 		STRING.fullName = "java.lang.String";
 		
-		ABytecode.theClass = Package.dyvilLangAnnotation.resolveClass("Bytecode");
+		AIntrinsic.theClass = Package.dyvilLangAnnotation.resolveClass("Intrinsic");
 		AOverride.theClass = Package.javaLang.resolveClass("Override");
 		ARetention.theClass = Package.javaLangAnnotation.resolveClass("Retention");
 		ATarget.theClass = Package.javaLangAnnotation.resolveClass("Target");
