@@ -13,7 +13,7 @@ public class Predef
 	
 	// Object Operators
 	
-	@Intrinsic({ INSTANCE, IF_ACMPNE, ARGUMENTS })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPNE })
 	public static boolean $eq$eq(Object o1, Object o2)
 	{
 		return o1 == o2;
@@ -224,15 +224,18 @@ public class Predef
 	
 	// Miscellaneous
 	
-	public static @implicit void match(Object o, Pattern[] patterns)
+	public static @implicit Object match(Object o, Pattern[] patterns)
 	{
+		Option res;
 		for (Pattern p : patterns)
 		{
-			if (p.match(o))
+			res = p.match(o);
+			if (res.isDefined())
 			{
-				break;
+				return res.get();
 			}
 		}
+		throw new MatchError(o);
 	}
 	
 	public static void $qmark$qmark$qmark()
