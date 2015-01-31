@@ -1,7 +1,7 @@
 package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
-import dyvil.lang.annotation.Bytecode;
+import dyvil.lang.annotation.Intrinsic;
 
 public class Boolean implements Boolean$
 {
@@ -21,49 +21,49 @@ public class Boolean implements Boolean$
 	}
 	
 	@Override
-	@Bytecode
+	@Intrinsic({ INSTANCE })
 	public boolean booleanValue()
 	{
 		return this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IBIN)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IBIN })
 	public Boolean $bang()
 	{
 		return create(!this.value);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IF_ICMPNE)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
 	public boolean $eq$eq(boolean v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IF_ICMPEQ)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
 	public boolean $bang$eq(boolean v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IAND)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IAND })
 	public Boolean $amp(boolean v)
 	{
 		return create(this.value && v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IOR)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IOR })
 	public Boolean $bar(boolean v)
 	{
 		return create(this.value || v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IXOR)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IXOR })
 	public Boolean $up(boolean v)
 	{
 		return create(this.value ^ v);

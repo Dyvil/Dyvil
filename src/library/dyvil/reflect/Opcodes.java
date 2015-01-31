@@ -827,6 +827,9 @@ public interface Opcodes
 	 * cause problems elsewhere.
 	 */
 	
+	public static final int	INSTANCE		= -1;
+	public static final int	ARGUMENTS		= -2;
+	
 	/**
 	 * Pushes the long {@code -1} onto the stack.
 	 */

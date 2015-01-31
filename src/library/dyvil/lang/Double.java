@@ -1,7 +1,7 @@
 package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
-import dyvil.lang.annotation.Bytecode;
+import dyvil.lang.annotation.Intrinsic;
 
 public class Double implements Number
 {
@@ -23,49 +23,49 @@ public class Double implements Number
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = D2B)
+	@Intrinsic({ INSTANCE, D2B })
 	public byte byteValue()
 	{
 		return (byte) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = D2S)
+	@Intrinsic({ INSTANCE, D2S })
 	public short shortValue()
 	{
 		return (short) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = D2C)
+	@Intrinsic({ INSTANCE, D2C })
 	public char charValue()
 	{
 		return (char) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = D2I)
+	@Intrinsic({ INSTANCE, D2I })
 	public int intValue()
 	{
 		return (int) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = D2L)
+	@Intrinsic({ INSTANCE, D2L })
 	public long longValue()
 	{
 		return (long) this.value;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = D2F)
+	@Intrinsic({ INSTANCE, D2F })
 	public float floatValue()
 	{
 		return (float) this.value;
 	}
 	
 	@Override
-	@Bytecode
+	@Intrinsic({ INSTANCE })
 	public double doubleValue()
 	{
 		return this.value;
@@ -74,28 +74,28 @@ public class Double implements Number
 	// Unary operators
 	
 	@Override
-	@Bytecode
+	@Intrinsic({ INSTANCE })
 	public Double $plus()
 	{
 		return this;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = DNEG)
+	@Intrinsic({ INSTANCE, DNEG })
 	public Double $minus()
 	{
 		return Double.create(-this.value);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { DUP2, DMUL })
+	@Intrinsic({ INSTANCE, DUP2, DMUL })
 	public Double sqr()
 	{
 		return Double.create(this.value * this.value);
 	}
 	
 	@Override
-	@Bytecode(prefixOpcode = DCONST_1, postfixOpcode = DDIV)
+	@Intrinsic({ DCONST_1, INSTANCE, DDIV })
 	public Double rec()
 	{
 		return Double.create(1 / this.value);
@@ -104,77 +104,77 @@ public class Double implements Number
 	// byte operators
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPNE })
 	public boolean $eq$eq(byte v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPEQ })
 	public boolean $bang$eq(byte v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPGE })
 	public boolean $less(byte v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPGT })
 	public boolean $less$eq(byte v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPLE })
 	public boolean $greater(byte v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPLT })
 	public boolean $greater$eq(byte v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DADD })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DADD })
 	public Double $plus(byte v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DSUB })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DSUB })
 	public Double $minus(byte v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DMUL })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DMUL })
 	public Double $times(byte v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DDIV })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DDIV })
 	public Double $div(byte v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DREM })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DREM })
 	public Double $percent(byte v)
 	{
 		return Double.create(this.value % v);
@@ -183,77 +183,77 @@ public class Double implements Number
 	// short operators
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPNE })
 	public boolean $eq$eq(short v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPEQ })
 	public boolean $bang$eq(short v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPGE })
 	public boolean $less(short v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPGT })
 	public boolean $less$eq(short v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPLE })
 	public boolean $greater(short v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPLT })
 	public boolean $greater$eq(short v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DADD })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DADD })
 	public Double $plus(short v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DSUB })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DSUB })
 	public Double $minus(short v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DMUL })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DMUL })
 	public Double $times(short v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DDIV })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DDIV })
 	public Double $div(short v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DREM })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DREM })
 	public Double $percent(short v)
 	{
 		return Double.create(this.value % v);
@@ -262,77 +262,77 @@ public class Double implements Number
 	// char operators
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPNE })
 	public boolean $eq$eq(char v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPEQ })
 	public boolean $bang$eq(char v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPGE })
 	public boolean $less(char v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPGT })
 	public boolean $less$eq(char v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPLE })
 	public boolean $greater(char v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPLT })
 	public boolean $greater$eq(char v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DADD })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DADD })
 	public Double $plus(char v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DSUB })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DSUB })
 	public Double $minus(char v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DMUL })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DMUL })
 	public Double $times(char v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DDIV })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DDIV })
 	public Double $div(char v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DREM })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DREM })
 	public Double $percent(char v)
 	{
 		return Double.create(this.value % v);
@@ -341,77 +341,77 @@ public class Double implements Number
 	// int operators
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPNE })
 	public boolean $eq$eq(int v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPEQ })
 	public boolean $bang$eq(int v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPGE })
 	public boolean $less(int v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPGT })
 	public boolean $less$eq(int v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPLE })
 	public boolean $greater(int v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, IF_DCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, IF_DCMPLT })
 	public boolean $greater$eq(int v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DADD })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DADD })
 	public Double $plus(int v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DSUB })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DSUB })
 	public Double $minus(int v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DMUL })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DMUL })
 	public Double $times(int v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DDIV })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DDIV })
 	public Double $div(int v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { I2D, DREM })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DREM })
 	public Double $percent(int v)
 	{
 		return Double.create(this.value % v);
@@ -420,77 +420,77 @@ public class Double implements Number
 	// long operators
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, IF_DCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, IF_DCMPNE })
 	public boolean $eq$eq(long v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, IF_DCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, IF_DCMPEQ })
 	public boolean $bang$eq(long v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, IF_DCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, IF_DCMPGE })
 	public boolean $less(long v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, IF_DCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, IF_DCMPGT })
 	public boolean $less$eq(long v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, IF_DCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, IF_DCMPLE })
 	public boolean $greater(long v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, IF_DCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, IF_DCMPLT })
 	public boolean $greater$eq(long v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, DADD })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, DADD })
 	public Double $plus(long v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, DSUB })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, DSUB })
 	public Double $minus(long v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, DMUL })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, DMUL })
 	public Double $times(long v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, DDIV })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, DDIV })
 	public Double $div(long v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { L2D, DREM })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, DREM })
 	public Double $percent(long v)
 	{
 		return Double.create(this.value % v);
@@ -499,77 +499,77 @@ public class Double implements Number
 	// float operators
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, IF_DCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, IF_DCMPNE })
 	public boolean $eq$eq(float v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, IF_DCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, IF_DCMPEQ })
 	public boolean $bang$eq(float v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, IF_DCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, IF_DCMPGE })
 	public boolean $less(float v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, IF_DCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, IF_DCMPGT })
 	public boolean $less$eq(float v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, IF_DCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, IF_DCMPLE })
 	public boolean $greater(float v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, IF_DCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, IF_DCMPLT })
 	public boolean $greater$eq(float v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, DADD })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, DADD })
 	public Double $plus(float v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, DSUB })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, DSUB })
 	public Double $minus(float v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, DMUL })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, DMUL })
 	public Double $times(float v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, DDIV })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, DDIV })
 	public Double $div(float v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcodes = { F2D, DREM })
+	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, DREM })
 	public Double $percent(float v)
 	{
 		return Double.create(this.value % v);
@@ -578,77 +578,77 @@ public class Double implements Number
 	// double operators
 	
 	@Override
-	@Bytecode(postfixOpcode = IF_DCMPNE)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_DCMPNE })
 	public boolean $eq$eq(double v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IF_DCMPEQ)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_DCMPEQ })
 	public boolean $bang$eq(double v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IF_DCMPGE)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_DCMPGE })
 	public boolean $less(double v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IF_DCMPGT)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_DCMPGT })
 	public boolean $less$eq(double v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IF_DCMPLE)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_DCMPLE })
 	public boolean $greater(double v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = IF_DCMPLT)
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_DCMPLT })
 	public boolean $greater$eq(double v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = DADD)
+	@Intrinsic({ INSTANCE, ARGUMENTS, DADD })
 	public Double $plus(double v)
 	{
 		return Double.create(this.value + v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = DSUB)
+	@Intrinsic({ INSTANCE, ARGUMENTS, DSUB })
 	public Double $minus(double v)
 	{
 		return Double.create(this.value - v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = DMUL)
+	@Intrinsic({ INSTANCE, ARGUMENTS, DMUL })
 	public Double $times(double v)
 	{
 		return Double.create(this.value * v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = DDIV)
+	@Intrinsic({ INSTANCE, ARGUMENTS, DDIV })
 	public Double $div(double v)
 	{
 		return Double.create(this.value / v);
 	}
 	
 	@Override
-	@Bytecode(postfixOpcode = DREM)
+	@Intrinsic({ INSTANCE, ARGUMENTS, DREM })
 	public Double $percent(double v)
 	{
 		return Double.create(this.value % v);
