@@ -74,6 +74,13 @@ public class Float implements Number
 	// Unary operators
 	
 	@Override
+	@Bytecode
+	public Float $plus()
+	{
+		return this;
+	}
+	
+	@Override
 	@Bytecode(postfixOpcode = FNEG)
 	public Float $minus()
 	{

@@ -324,9 +324,8 @@ public class StatementList extends ValueList implements IStatement, IContext
 			String prefix1 = prefix + Formatting.Method.indent;
 			IValue prev = null;
 			
-			for (Iterator<IValue> iterator = this.values.iterator(); iterator.hasNext();)
+			for (IValue value : this.values)
 			{
-				IValue value = iterator.next();
 				buffer.append(prefix1);
 				
 				if (prev != null && value.getPosition().getLineNumber() - prev.getPosition().getLineNumber() > 1)

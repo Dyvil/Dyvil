@@ -73,6 +73,13 @@ public class Long implements Integer
 	// Unary operators
 	
 	@Override
+	@Bytecode
+	public Long $plus()
+	{
+		return this;
+	}
+	
+	@Override
 	@Bytecode(postfixOpcode = LNEG)
 	public Long $minus()
 	{
@@ -978,7 +985,7 @@ public class Long implements Integer
 	@Override
 	public int hashCode()
 	{
-		return (int) ((this.value >>> 32) ^ this.value);
+		return (int) (this.value >>> 32 ^ this.value);
 	}
 	
 	@Override

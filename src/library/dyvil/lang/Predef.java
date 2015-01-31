@@ -124,7 +124,7 @@ public class Predef
 	
 	public static @implicit int $hash$hash(long l)
 	{
-		return (int) (int) (l ^ (l >>> 32));
+		return (int) (l ^ l >>> 32);
 	}
 	
 	public static @implicit int $hash$hash(float f)

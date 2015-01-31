@@ -853,7 +853,7 @@ public class Method extends Member implements IMethod
 		int opcode;
 		int args = this.parameters.size();
 		int modifiers = this.modifiers;
-		if (( modifiers & Modifiers.STATIC) != 0)
+		if ((modifiers & Modifiers.STATIC) != 0)
 		{
 			opcode = Opcodes.INVOKESTATIC;
 		}

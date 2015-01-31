@@ -26,7 +26,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	public static final Handle	BOOTSTRAP	= new Handle(Opcodes.H_INVOKEVIRTUAL, "dyvil/dyn/DynamicLinker", "linkMethod",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType)Ljava/lang/invoke/CallSite;");
 	
-	public String name;
+	public String				name;
 	
 	public DynamicMethod(String name, List<IValue> arguments)
 	{

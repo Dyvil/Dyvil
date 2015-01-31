@@ -20,6 +20,8 @@ public interface Number extends Ordered<Number>
 	
 	// Unary operators
 	
+	public Number $plus();
+	
 	public Number $minus();
 	
 	public Number sqr();

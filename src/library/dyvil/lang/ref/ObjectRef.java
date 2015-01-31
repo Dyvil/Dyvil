@@ -17,7 +17,7 @@ public class ObjectRef
 	@Override
 	public boolean equals(Object obj)
 	{
-		return this.value == obj || (obj != null && obj.equals(this.value));
+		return this.value == obj || obj != null && obj.equals(this.value);
 	}
 	
 	@Override

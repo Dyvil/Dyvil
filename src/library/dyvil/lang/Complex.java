@@ -69,18 +69,24 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public Number $minus()
+	public Complex $plus()
+	{
+		return this;
+	}
+	
+	@Override
+	public Complex $minus()
 	{
 		return create(-this.real, -this.imag);
 	}
 	
-	public Number $tilde()
+	public Complex $tilde()
 	{
-		return create(this.real, -this.imag);
+		return create(-this.real, this.imag);
 	}
 	
 	@Override
-	public Number sqr()
+	public Complex sqr()
 	{
 		double r = this.real;
 		double i = this.imag;
@@ -88,7 +94,7 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public Number rec()
+	public Complex rec()
 	{
 		double r = this.real;
 		double i = this.imag;

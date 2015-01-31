@@ -73,6 +73,13 @@ public class Int implements Integer
 	// Unary operators
 	
 	@Override
+	@Bytecode
+	public Int $plus()
+	{
+		return this;
+	}
+	
+	@Override
 	@Bytecode(postfixOpcode = INEG)
 	public Int $minus()
 	{

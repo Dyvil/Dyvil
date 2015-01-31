@@ -73,6 +73,13 @@ public class Char implements Integer
 	// Unary operators
 	
 	@Override
+	@Bytecode
+	public Int $plus()
+	{
+		return Int.create(this.value);
+	}
+	
+	@Override
 	@Bytecode(postfixOpcode = INEG)
 	public Int $minus()
 	{
@@ -904,67 +911,67 @@ public class Char implements Integer
 	@Override
 	public Int $plus(Number v)
 	{
-		return Int.create((this.value + v.intValue()));
+		return Int.create(this.value + v.intValue());
 	}
 	
 	@Override
 	public Int $minus(Number v)
 	{
-		return Int.create((this.value - v.intValue()));
+		return Int.create(this.value - v.intValue());
 	}
 	
 	@Override
 	public Int $times(Number v)
 	{
-		return Int.create((this.value * v.intValue()));
+		return Int.create(this.value * v.intValue());
 	}
 	
 	@Override
 	public Int $div(Number v)
 	{
-		return Int.create((this.value / v.intValue()));
+		return Int.create(this.value / v.intValue());
 	}
 	
 	@Override
 	public Int $percent(Number v)
 	{
-		return Int.create((this.value % v.intValue()));
+		return Int.create(this.value % v.intValue());
 	}
 	
 	@Override
 	public Int $bar(Integer v)
 	{
-		return Int.create((this.value | v.intValue()));
+		return Int.create(this.value | v.intValue());
 	}
 	
 	@Override
 	public Int $amp(Integer v)
 	{
-		return Int.create((this.value & v.intValue()));
+		return Int.create(this.value & v.intValue());
 	}
 	
 	@Override
 	public Int $up(Integer v)
 	{
-		return Int.create((this.value ^ v.intValue()));
+		return Int.create(this.value ^ v.intValue());
 	}
 	
 	@Override
 	public Int $less$less(Integer v)
 	{
-		return Int.create((this.value << v.intValue()));
+		return Int.create(this.value << v.intValue());
 	}
 	
 	@Override
 	public Int $greater$greater(Integer v)
 	{
-		return Int.create((this.value >> v.intValue()));
+		return Int.create(this.value >> v.intValue());
 	}
 	
 	@Override
 	public Int $greater$greater$greater(Integer v)
 	{
-		return Int.create((this.value >>> v.intValue()));
+		return Int.create(this.value >>> v.intValue());
 	}
 	
 	// Object methods

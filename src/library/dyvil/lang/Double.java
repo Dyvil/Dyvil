@@ -74,6 +74,13 @@ public class Double implements Number
 	// Unary operators
 	
 	@Override
+	@Bytecode
+	public Double $plus()
+	{
+		return this;
+	}
+	
+	@Override
 	@Bytecode(postfixOpcode = DNEG)
 	public Double $minus()
 	{
@@ -727,7 +734,7 @@ public class Double implements Number
 	public int hashCode()
 	{
 		long bits = java.lang.Double.doubleToLongBits(this.value);
-		return (int) (bits ^ (bits >>> 32));
+		return (int) (bits ^ bits >>> 32);
 	}
 	
 	@Override

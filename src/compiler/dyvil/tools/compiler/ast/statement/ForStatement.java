@@ -400,7 +400,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			writer.addLocal(var.index, MethodWriter.TOP);
 			writer.addLocal(indexVar.index, MethodWriter.INT);
 			writer.addLocal(lengthVar.index, MethodWriter.INT);
-			writer.addLocal(arrayVar.index, arrayVar.type);			
+			writer.addLocal(arrayVar.index, arrayVar.type);
 			
 			// Load the array
 			var.value.writeExpression(writer);
