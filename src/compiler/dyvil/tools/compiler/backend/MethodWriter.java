@@ -123,6 +123,12 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitParameter(name, index);
 	}
 	
+	public void visitParameter(String name, Object type, int index)
+	{
+		this.addLocal(index, type);
+		this.mv.visitParameter(name, index);
+	}
+	
 	@Override
 	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index)
 	{
@@ -611,9 +617,12 @@ public final class MethodWriter extends MethodVisitor
 	}
 	
 	@Override
-	@Deprecated
 	public void visitTypeInsn(int opcode, String type)
 	{
+		if (opcode == NEW)
+		{
+			this.push(type);
+		}
 		this.mv.visitTypeInsn(opcode, type);
 	}
 	
@@ -737,10 +746,23 @@ public final class MethodWriter extends MethodVisitor
 		}
 	}
 	
+	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, Object returnType)
+	{
+		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
+		for (int i = 0; i < args; i++)
+		{
+			this.typeStack.pop();
+		}
+		if (returnType != null)
+		{
+			this.push(returnType);
+		}
+	}
+	
 	@Override
-	@Deprecated
 	public void visitEnd()
 	{
+		this.mv.visitMaxs(this.maxStack, this.maxLocals);
 		this.mv.visitEnd();
 	}
 	

@@ -328,9 +328,13 @@ public class StatementList extends ValueList implements IStatement, IContext
 			{
 				buffer.append(prefix1);
 				
-				if (prev != null && value.getPosition().getLineNumber() - prev.getPosition().getLineNumber() > 1)
+				if (prev != null)
 				{
-					buffer.append('\n').append(prefix1);
+					ICodePosition pos = value.getPosition();
+					if (pos != null && pos.getLineNumber() - prev.getPosition().getLineNumber() > 1)
+					{
+						buffer.append('\n').append(prefix1);
+					}
 				}
 				
 				if (this.valueLabels != null && (label = this.valueLabels.get(value)) != null)

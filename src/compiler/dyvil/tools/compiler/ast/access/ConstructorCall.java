@@ -243,10 +243,10 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 			arg.writeExpression(writer);
 		}
 		
-		String owner = this.method.getTheClass().getInternalName();
+		String owner = this.type.getInternalName();
 		String name = "<init>";
 		String desc = this.method.getDescriptor();
-		writer.visitMethodInsn(opcode, owner, name, desc, false, args, null);
+		writer.visitMethodInsn(opcode, owner, name, desc, false, args, (String) null);
 	}
 	
 	@Override
@@ -271,7 +271,7 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 			arg.writeExpression(writer);
 		}
 		
-		String owner = this.method.getTheClass().getInternalName();
+		String owner = this.type.getInternalName();
 		String name = "<init>";
 		String desc = this.method.getDescriptor();
 		writer.visitMethodInsn(opcode, owner, name, desc, false, args, null);

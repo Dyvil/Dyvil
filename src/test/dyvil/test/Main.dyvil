@@ -4,12 +4,19 @@ import java.util.{ Scanner, Arrays }
 import java.lang.Integer => jInt
 using java.lang.System._
 
-public class Main
+case class Main
 {
+	public int i = 3;
+	public String str = "test";
+	public Object o = null;
+	public boolean flag = false;
+	
 	public static void main(String[] args)
 	{
 		System out println "Sum"
 		System out println "Enter your numbers to sum them"
+		
+		System out println(new Main());
 		
 		Scanner scanner = new Scanner(System in)
 		int total = 0

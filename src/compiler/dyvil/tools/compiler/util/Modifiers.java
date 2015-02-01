@@ -166,11 +166,10 @@ public enum Modifiers
 	public static final int	IMPLICIT				= 0x00020000 | STATIC;
 	
 	/**
-	 * Dyvil module modifier. If a class is marked with this modifier, it is a
-	 * module class.
+	 * Dyvil case modifier. If a class is marked with this modifier, it is a
+	 * case class.
 	 */
-	// TODO Modules
-	public static final int	MODULE					= 0x00020000;
+	public static final int	CASE_CLASS				= 0x00020000;
 	
 	public static final int	FUNCTIONAL				= 0x00040000;
 	
@@ -200,7 +199,7 @@ public enum Modifiers
 	 */
 	public static final int	SEALED					= 0x00100000;
 	
-	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS | MODULE;
+	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS | CASE_CLASS;
 	public static final int	ACCESS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | SEALED;
 	public static final int	MEMBER_MODIFIERS		= ACCESS_MODIFIERS | STATIC | FINAL;
 	public static final int	CLASS_MODIFIERS			= MEMBER_MODIFIERS | ABSTRACT | STRICT | FUNCTIONAL;
@@ -261,10 +260,6 @@ public enum Modifiers
 		{
 			sb.append("object ");
 		}
-		else if ((mod & MODULE) == MODULE)
-		{
-			sb.append("module ");
-		}
 		else
 		{
 			sb.append("class ");
@@ -296,6 +291,10 @@ public enum Modifiers
 		if ((mod & FUNCTIONAL) == FUNCTIONAL)
 		{
 			sb.append("functional ");
+		}
+		if ((mod & CASE_CLASS) == CASE_CLASS)
+		{
+			sb.append("case ");
 		}
 	}
 	
@@ -481,8 +480,6 @@ public enum Modifiers
 			return ENUM;
 		case "object":
 			return OBJECT_CLASS;
-		case "module":
-			return MODULE;
 		}
 		return -1;
 	}
@@ -501,6 +498,8 @@ public enum Modifiers
 			return STRICT;
 		case "functional":
 			return FUNCTIONAL;
+		case "case":
+			return CASE_CLASS;
 		}
 		return -1;
 	}

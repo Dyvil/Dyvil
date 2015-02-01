@@ -28,11 +28,13 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.util.CaseClasses;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
@@ -61,12 +63,14 @@ public class CodeClass extends ASTNode implements IClass
 	
 	public CodeClass()
 	{
+		this.type = new Type(this);
 	}
 	
 	public CodeClass(ICodePosition position, CompilationUnit unit)
 	{
 		this.position = position;
 		this.unit = unit;
+		this.type = new Type(this);
 	}
 	
 	@Override
@@ -95,10 +99,6 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public Type getType()
 	{
-		if (this.type == null)
-		{
-			this.type = new Type(this);
-		}
 		return this.type;
 	}
 	
@@ -301,13 +301,13 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean isSuperType(IType type)
 	{
-		if (this.superType != null && this.superType.isAssignableFrom(type))
+		if (this.superType != null && type.isAssignableFrom(this.superType))
 		{
 			return true;
 		}
 		for (IType i : this.interfaces)
 		{
-			if (i.isAssignableFrom(type))
+			if (type.isAssignableFrom(i))
 			{
 				return true;
 			}
@@ -783,10 +783,6 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			writer.visitAnnotation("Ldyvil/lang/annotation/object;", true);
 		}
-		if ((this.modifiers & Modifiers.MODULE) != 0)
-		{
-			writer.visitAnnotation("Ldyvil/lang/annotation/module;", true);
-		}
 		if ((this.modifiers & Modifiers.SEALED) != 0)
 		{
 			writer.visitAnnotation("Ldyvil/lang/annotation/sealed;", false);
@@ -819,14 +815,17 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				if (f.hasModifier(Modifiers.STATIC))
 				{
-					FieldAssign assign = new FieldAssign(null, f.getName(), null);
+					FieldAssign assign = new FieldAssign(null);
+					assign.qualifiedName = f.getQualifiedName();
 					assign.value = v;
 					assign.field = f;
 					staticFields.addValue(assign);
 				}
 				else
 				{
-					FieldAssign assign = new FieldAssign(null, f.getName(), thisValue);
+					FieldAssign assign = new FieldAssign(null);
+					assign.qualifiedName = f.getQualifiedName();
+					assign.instance = thisValue;
 					assign.value = v;
 					assign.field = f;
 					instanceFields.addValue(assign);
@@ -848,6 +847,28 @@ public class CodeClass extends ASTNode implements IClass
 				instanceFieldsAdded = true;
 			}
 			m.write(writer);
+		}
+		
+		if ((this.modifiers & Modifiers.CASE_CLASS) != 0)
+		{
+			MethodWriter mw = new MethodWriter(writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));
+			mw.visitParameter("obj", "Ljava/lang/Object;", 0);
+			mw.addLocal(1, this.type);
+			mw.visitCode();
+			CaseClasses.writeEquals(mw, this, this.body.fields);
+			mw.visitEnd();
+			
+			mw = new MethodWriter(writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I", null, null));
+			mw.addLocal(0, this.type);
+			mw.visitCode();
+			CaseClasses.writeHashCode(mw, this, this.body.fields);
+			mw.visitEnd();
+			
+			mw = new MethodWriter(writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString", "()Ljava/lang/String;", null, null));
+			mw.addLocal(0, this.type);
+			mw.visitCode();
+			CaseClasses.writeToString(mw, this, this.body.fields);
+			mw.visitEnd();
 		}
 		
 		Method constructor = null;
