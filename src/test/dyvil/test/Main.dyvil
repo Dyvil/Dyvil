@@ -19,15 +19,21 @@ case class Main
 		System out println(new Main());
 		
 		Scanner scanner = new Scanner(System in)
+		int count = 0
 		int total = 0
 		while (true)
 		{
 			int n = scanner nextInt
 			if (n == 0) break
-			total = total + n
+			count += 1
+			total += n
 		}
 		
 		System out print "Sum: "
 		System out println(total)
+		System out print "Count: "
+		System out println(count)
+		System out print "Average: "
+		System out println(total / count)
 	}
 }

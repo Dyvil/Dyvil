@@ -16,7 +16,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class Parameter extends Member implements IField
+public class Parameter extends Member implements IVariable
 {
 	public int		index;
 	public char		seperator;
@@ -59,6 +59,18 @@ public class Parameter extends Member implements IField
 	public IValue getValue()
 	{
 		return this.defaultValue;
+	}
+	
+	@Override
+	public void setIndex(int index)
+	{
+		this.index = index;
+	}
+	
+	@Override
+	public int getIndex()
+	{
+		return this.index;
 	}
 	
 	public void setSeperator(char seperator)

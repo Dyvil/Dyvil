@@ -17,7 +17,7 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class Variable extends Member implements IField
+public class Variable extends Member implements IVariable
 {
 	public int		index;
 	public IValue	value;
@@ -44,6 +44,18 @@ public class Variable extends Member implements IField
 	public IValue getValue()
 	{
 		return this.value;
+	}
+	
+	@Override
+	public void setIndex(int index)
+	{
+		this.index = index;
+	}
+	
+	@Override
+	public int getIndex()
+	{
+		return this.index;
 	}
 	
 	@Override

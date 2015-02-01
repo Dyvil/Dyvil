@@ -363,6 +363,14 @@ public final class MethodWriter extends MethodVisitor
 		case DUP:
 			this.typeStack.push(this.typeStack.peek());
 			return;
+		case SWAP:
+		{
+			Object o1 = this.typeStack.pop();
+			Object o2 = this.typeStack.pop();
+			this.typeStack.push(o1);
+			this.typeStack.push(o2);
+			return;
+		}
 		case POP:
 			this.typeStack.pop();
 			return;

@@ -349,6 +349,24 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 			this.method = method;
 			return true;
 		}
+		
+		if (len == 1 && this.instance != null && this.qualifiedName.endsWith("$eq"))
+		{
+			String s = this.qualifiedName.substring(0, this.qualifiedName.length() - 3);
+			MethodMatch method1 = this.instance.getType().resolveMethod(null, s, this.arguments);
+			if (method1 != null)
+			{
+				AssignMethodCall call = new AssignMethodCall(this.position);
+				call.method = method1.theMethod;
+				call.instance = this.instance;
+				call.arguments = this.arguments;
+				call.name = this.name.substring(0, this.name.length() - 1);
+				call.qualifiedName = s;
+				call.dotless = this.dotless;
+				call.isSugarCall = this.isSugarCall;
+				this.replacement = call;
+			}
+		}
 		return false;
 	}
 	
