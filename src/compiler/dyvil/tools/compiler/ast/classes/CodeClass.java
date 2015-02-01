@@ -60,6 +60,8 @@ public class CodeClass extends ASTNode implements IClass
 	protected ClassBody				body;
 	protected IMethod				functionalMethod;
 	protected IField				instanceField;
+	protected IMethod				constructor;
+	protected IMethod				superConstructor;
 	
 	public CodeClass()
 	{
@@ -438,6 +440,29 @@ public class CodeClass extends ASTNode implements IClass
 		if (this.body != null)
 		{
 			this.body.resolveTypes(markers, this);
+			
+			for (IMethod m : this.body.methods)
+			{
+				if (m.isName("<init>"))
+				{
+					return;
+				}
+			}
+		}
+		
+		Method constructor = new Method(this);
+		constructor.setName("new", "<init>");
+		constructor.setType(Type.VOID);
+		constructor.setModifiers(Modifiers.PUBLIC | Modifiers.SYNTHETIC);
+		this.constructor = constructor;
+		
+		if (this.superType != null)
+		{
+			MethodMatch match = this.superType.resolveConstructor(Util.EMPTY_VALUES);
+			if (match != null)
+			{
+				this.superConstructor = match.theMethod;
+			}
 		}
 	}
 	
@@ -664,6 +689,26 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		if (this.constructor != null && arguments.isEmpty())
+		{
+			return new MethodMatch(this.constructor, 1);
+		}
+		
+		List<MethodMatch> list = new ArrayList();
+		this.getConstructorMatches(list, arguments);
+		
+		if (!list.isEmpty())
+		{
+			Collections.sort(list);
+			return list.get(0);
+		}
+		
+		return null;
+	}
+	
+	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
 		if (this.body != null)
@@ -703,6 +748,15 @@ public class CodeClass extends ASTNode implements IClass
 		if (this != Type.PREDEF_CLASS && !(this instanceof BytecodeClass))
 		{
 			Type.PREDEF_CLASS.getMethodMatches(list, instance, name, arguments);
+		}
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+		if (this.body != null)
+		{
+			this.body.getMethodMatches(list, null, "<init>", arguments);
 		}
 	}
 	
@@ -777,7 +831,7 @@ public class CodeClass extends ASTNode implements IClass
 		IField instanceField = this.instanceField;
 		StatementList instanceFields = new StatementList(null);
 		StatementList staticFields = new StatementList(null);
-		boolean instanceFieldsAdded = false;
+		boolean hasConstructor = false;
 		
 		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
 		{
@@ -793,7 +847,7 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		if ((this.modifiers & Modifiers.FUNCTIONAL) != 0)
 		{
-			writer.visitAnnotation("Ljava/lang/annotation/functional;", true);
+			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true);
 		}
 		
 		for (Annotation a : this.annotations)
@@ -810,27 +864,40 @@ public class CodeClass extends ASTNode implements IClass
 				continue;
 			}
 			
-			IValue v = f.getValue();
-			if (v != null)
+			if (f.hasModifier(Modifiers.STATIC))
 			{
-				if (f.hasModifier(Modifiers.STATIC))
-				{
-					FieldAssign assign = new FieldAssign(null);
-					assign.qualifiedName = f.getQualifiedName();
-					assign.value = v;
-					assign.field = f;
-					staticFields.addValue(assign);
-				}
-				else
-				{
-					FieldAssign assign = new FieldAssign(null);
-					assign.qualifiedName = f.getQualifiedName();
-					assign.instance = thisValue;
-					assign.value = v;
-					assign.field = f;
-					instanceFields.addValue(assign);
-				}
+				FieldAssign assign = new FieldAssign(null);
+				assign.qualifiedName = f.getQualifiedName();
+				assign.value = f.getValue();
+				assign.field = f;
+				staticFields.addValue(assign);
 			}
+			else
+			{
+				FieldAssign assign = new FieldAssign(null);
+				assign.qualifiedName = f.getQualifiedName();
+				assign.instance = thisValue;
+				assign.value = f.getValue();
+				assign.field = f;
+				instanceFields.addValue(assign);
+			}
+		}
+		
+		if (this.superConstructor != null)
+		{
+			MethodCall call = new MethodCall(null);
+			call.instance = new SuperValue(null, this.superType);
+			call.method = this.superConstructor;
+			call.name = "new";
+			call.qualifiedName = "<init>";
+			call.arguments = Util.EMPTY_VALUES;
+			instanceFields.getValues().add(0, call);
+		}
+		
+		if (this.constructor != null)
+		{
+			this.constructor.setValue(instanceFields);
+			this.constructor.write(writer);
 		}
 		
 		for (IProperty p : this.body.properties)
@@ -841,11 +908,6 @@ public class CodeClass extends ASTNode implements IClass
 		for (IMethod m : methods)
 		{
 			String name = m.getName();
-			if (name.equals("<init>"))
-			{
-				Util.prependValue(m, instanceFields);
-				instanceFieldsAdded = true;
-			}
 			m.write(writer);
 		}
 		
@@ -871,35 +933,6 @@ public class CodeClass extends ASTNode implements IClass
 			mw.visitEnd();
 		}
 		
-		Method constructor = null;
-		if (!instanceFieldsAdded && (!instanceFields.isEmpty() || instanceField != null))
-		{
-			// Create the default constructor
-			constructor = new Method(this);
-			constructor.setQualifiedName("<init>");
-			constructor.setType(Type.VOID);
-			constructor.setModifiers(Modifiers.PUBLIC | Modifiers.MANDATED);
-			
-			// If this class has a superclass...
-			if (this.superType != null)
-			{
-				IClass iclass = this.superType.getTheClass();
-				if (iclass != null)
-				{
-					IMethod m1 = iclass.getBody().getMethod("<init>");
-					// ... and the superclass has a default constructor
-					if (m1 != null)
-					{
-						// Create the call to the super constructor
-						MethodCall superConstructor = new MethodCall(null, new SuperValue(null, this.superType), "<init>");
-						superConstructor.method = m1;
-						instanceFields.getValues().add(0, superConstructor);
-					}
-				}
-			}
-			constructor.setValue(instanceFields);
-			constructor.write(writer);
-		}
 		if (instanceField != null)
 		{
 			instanceField.write(writer);

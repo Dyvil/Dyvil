@@ -179,6 +179,17 @@ public class Package implements IContext
 	}
 	
 	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		return null;
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+	}
+	
+	@Override
 	public byte getAccessibility(IMember member)
 	{
 		throw new UnsupportedOperationException();

@@ -4,13 +4,8 @@ import java.util.{ Scanner, Arrays }
 import java.lang.Integer => jInt
 using java.lang.System._
 
-case class Main
-{
-	public int i = 3;
-	public String str = "test";
-	public Object o = null;
-	public boolean flag = false;
-	
+public class Main
+{	
 	public static void main(String[] args)
 	{
 		System out println "Sum"

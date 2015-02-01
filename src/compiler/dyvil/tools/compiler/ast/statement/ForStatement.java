@@ -313,6 +313,18 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	}
 	
 	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		return this.context.resolveConstructor(arguments);
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+		this.context.getConstructorMatches(list, arguments);
+	}
+	
+	@Override
 	public byte getAccessibility(IMember member)
 	{
 		return this.context.getAccessibility(member);

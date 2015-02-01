@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
 
-final class UnknownType extends ASTNode implements IType
+public final class UnknownType extends ASTNode implements IType
 {
 	@Override
 	public void setName(String name, String qualifiedName)
@@ -73,6 +73,17 @@ final class UnknownType extends ASTNode implements IType
 	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
+	{
+	}
+	
+	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		return null;
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
 	{
 	}
 	

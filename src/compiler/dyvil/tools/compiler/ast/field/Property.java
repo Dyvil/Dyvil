@@ -6,9 +6,12 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -18,7 +21,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class Property extends Field implements IProperty
+public class Property extends Field implements IProperty, IContext
 {
 	public IValue		get;
 	public IValue		set;
@@ -188,13 +191,61 @@ public class Property extends Field implements IProperty
 	}
 	
 	@Override
+	public IType getThisType()
+	{
+		return this.theClass.getType();
+	}
+	
+	@Override
+	public Package resolvePackage(String name)
+	{
+		return this.theClass.resolvePackage(name);
+	}
+	
+	@Override
+	public IClass resolveClass(String name)
+	{
+		return this.theClass.resolveClass(name);
+	}
+	
+	@Override
 	public FieldMatch resolveField(String name)
 	{
 		if (name.equals(this.name))
 		{
 			return new FieldMatch(this.setterParameter, 1);
 		}
-		return super.resolveField(name);
+		return this.theClass.resolveField(name);
+	}
+	
+	@Override
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
+	{
+		return this.theClass.resolveMethod(instance, name, arguments);
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
+	{
+		this.theClass.getMethodMatches(list, instance, name, arguments);
+	}
+	
+	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		return this.theClass.resolveConstructor(arguments);
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+		this.theClass.getConstructorMatches(list, arguments);
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		return this.theClass.getAccessibility(member);
 	}
 	
 	@Override
@@ -238,11 +289,11 @@ public class Property extends Field implements IProperty
 		byte b = 0;
 		if (this.get != null)
 		{
-			b |= READ_ACCESS;
+			b |= IContext.READ_ACCESS;
 		}
 		if (this.set != null)
 		{
-			b |= WRITE_ACCESS;
+			b |= IContext.WRITE_ACCESS;
 		}
 		return b;
 	}

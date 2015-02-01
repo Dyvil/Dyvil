@@ -42,6 +42,16 @@ public class CaseClasses
 		while (true)
 		{
 			IField f = iterator.next();
+			
+			if (f.hasModifier(Modifiers.STATIC))
+			{
+				if (iterator.hasNext())
+				{
+					continue;
+				}
+				break;
+			}
+			
 			IType type = f.getType();
 			
 			// Get the field

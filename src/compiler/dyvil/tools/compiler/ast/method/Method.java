@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static dyvil.reflect.Opcodes.*;
-
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
@@ -38,8 +37,8 @@ public class Method extends Member implements IMethod
 {
 	private List<ITypeVariable>	generics;
 	
-	private List<Parameter>		parameters			= new ArrayList(3);
-	private List<IType>			throwsDeclarations	= new ArrayList(1);
+	private List<Parameter>		parameters	= new ArrayList(3);
+	private List<IType>			throwsDeclarations;
 	
 	private IValue				value;
 	
@@ -347,6 +346,10 @@ public class Method extends Member implements IMethod
 	@Override
 	public void addThrows(IType throwsDecl)
 	{
+		if (this.throwsDeclarations == null)
+		{
+			this.throwsDeclarations = new ArrayList(2);
+		}
 		this.throwsDeclarations.add(throwsDecl);
 	}
 	
@@ -386,6 +389,11 @@ public class Method extends Member implements IMethod
 	@Override
 	public String[] getExceptions()
 	{
+		if (this.throwsDeclarations == null)
+		{
+			return null;
+		}
+		
 		int len = this.throwsDeclarations.size();
 		if (len == 0)
 		{
@@ -409,18 +417,21 @@ public class Method extends Member implements IMethod
 			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
 		}
 		
-		int len = this.throwsDeclarations.size();
-		for (int i = 0; i < len; i++)
+		if (this.throwsDeclarations != null)
 		{
-			IType t1 = this.throwsDeclarations.get(i);
-			IType t2 = t1.resolve(context);
-			if (t1 != t2)
+			int len = this.throwsDeclarations.size();
+			for (int i = 0; i < len; i++)
 			{
-				this.throwsDeclarations.set(i, t2);
-			}
-			if (!t2.isResolved())
-			{
-				markers.add(Markers.create(t2.getPosition(), "resolve.type", t2.toString()));
+				IType t1 = this.throwsDeclarations.get(i);
+				IType t2 = t1.resolve(context);
+				if (t1 != t2)
+				{
+					this.throwsDeclarations.set(i, t2);
+				}
+				if (!t2.isResolved())
+				{
+					markers.add(Markers.create(t2.getPosition(), "resolve.type", t2.toString()));
+				}
 			}
 		}
 		
@@ -664,6 +675,18 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		return this.theClass.resolveConstructor(arguments);
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+		this.theClass.getConstructorMatches(list, arguments);
+	}
+	
+	@Override
 	public byte getAccessibility(IMember member)
 	{
 		IClass iclass = member.getTheClass();
@@ -671,7 +694,7 @@ public class Method extends Member implements IMethod
 		{
 			return READ_WRITE_ACCESS;
 		}
-		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC))
+		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC) && !member.isName("<init>"))
 		{
 			return STATIC;
 		}
@@ -780,7 +803,10 @@ public class Method extends Member implements IMethod
 		{
 			if (i == INSTANCE)
 			{
-				instance.writeExpression(writer);
+				if (instance != null)
+				{
+					instance.writeExpression(writer);
+				}
 			}
 			else if (i == ARGUMENTS)
 			{
@@ -899,7 +925,7 @@ public class Method extends Member implements IMethod
 		
 		Util.parametersToString(this.parameters, buffer, true);
 		
-		if (!this.throwsDeclarations.isEmpty())
+		if (this.throwsDeclarations != null && !this.throwsDeclarations.isEmpty())
 		{
 			buffer.append(Formatting.Method.signatureThrowsSeperator);
 			Util.astToString(this.throwsDeclarations, Formatting.Method.throwsSeperator, buffer);

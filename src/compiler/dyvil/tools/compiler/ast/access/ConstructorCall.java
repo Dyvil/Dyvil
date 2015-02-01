@@ -150,10 +150,10 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 			return this;
 		}
 		
-		MethodMatch match = this.type.resolveMethod(null, "<init>", this.arguments);
+		MethodMatch match = this.type.resolveConstructor(this.arguments);
 		if (match == null)
 		{
-			Marker marker = Markers.create(this.position, "resolve.constructor");
+			Marker marker = Markers.create(this.position, "resolve.constructor", this.type.toString());
 			StringBuilder builder = new StringBuilder("Argument Types: [");
 			Util.typesToString(this.arguments, ", ", builder);
 			builder.append(']');

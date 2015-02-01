@@ -8,11 +8,8 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.FieldVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -21,7 +18,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.util.Modifiers;
 
-public class Field extends Member implements IField, IContext
+public class Field extends Member implements IField
 {
 	private IValue	value;
 	
@@ -116,7 +113,7 @@ public class Field extends Member implements IField, IContext
 		
 		if (this.value != null)
 		{
-			this.value.resolveTypes(markers, this);
+			this.value.resolveTypes(markers, context);
 		}
 	}
 	
@@ -181,67 +178,6 @@ public class Field extends Member implements IField, IContext
 		{
 			this.value = this.value.foldConstants();
 		}
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return (this.modifiers & Modifiers.STATIC) != 0;
-	}
-	
-	@Override
-	public IType getThisType()
-	{
-		return this.theClass.getThisType();
-	}
-	
-	@Override
-	public Package resolvePackage(String name)
-	{
-		return this.theClass.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(String name)
-	{
-		return this.theClass.resolveClass(name);
-	}
-	
-	@Override
-	public FieldMatch resolveField(String name)
-	{
-		if (name.equals(this.name))
-		{
-			return new FieldMatch(this, 1);
-		}
-		return this.theClass.resolveField(name);
-	}
-	
-	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
-	{
-		return this.theClass.resolveMethod(instance, name, arguments);
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
-	{
-		this.theClass.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public byte getAccessibility(IMember member)
-	{
-		IClass iclass = member.getTheClass();
-		if (iclass == null)
-		{
-			return READ_WRITE_ACCESS;
-		}
-		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC))
-		{
-			return STATIC;
-		}
-		return this.theClass.getAccessibility(member);
 	}
 	
 	@Override

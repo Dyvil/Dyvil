@@ -79,6 +79,17 @@ public final class DynamicType extends ASTNode implements IType
 	}
 	
 	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		return null;
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+	}
+	
+	@Override
 	public byte getAccessibility(IMember member)
 	{
 		return 0;

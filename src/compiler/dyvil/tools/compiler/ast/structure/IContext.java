@@ -47,5 +47,9 @@ public interface IContext
 	
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments);
 	
+	public MethodMatch resolveConstructor(List<IValue> arguments);
+	
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments);
+	
 	public byte getAccessibility(IMember member);
 }

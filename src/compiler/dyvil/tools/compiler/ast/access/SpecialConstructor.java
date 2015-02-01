@@ -126,7 +126,7 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 			return this;
 		}
 		
-		MethodMatch method = this.type.resolveMethod(null, "<init>", Util.EMPTY_VALUES);
+		MethodMatch method = this.type.resolveConstructor(Util.EMPTY_VALUES);
 		if (method != null)
 		{
 			this.method = method.theMethod;

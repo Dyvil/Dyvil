@@ -414,6 +414,25 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		if (this.arrayDimensions > 0)
+		{
+			return null;
+		}
+		return this.theClass == null ? null : this.theClass.resolveConstructor(arguments);
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+		if (this.arrayDimensions == 0 && this.theClass != null)
+		{
+			this.theClass.getConstructorMatches(list, arguments);
+		}
+	}
+	
+	@Override
 	public byte getAccessibility(IMember member)
 	{
 		return this.theClass == null ? 0 : this.theClass.getAccessibility(member);

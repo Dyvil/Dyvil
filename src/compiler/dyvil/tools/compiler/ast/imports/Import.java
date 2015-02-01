@@ -92,6 +92,18 @@ public class Import extends ASTNode implements IContext, IImportContainer
 	}
 	
 	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		return this.last.resolveConstructor(arguments);
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+		this.last.getConstructorMatches(list, arguments);
+	}
+	
+	@Override
 	public byte getAccessibility(IMember member)
 	{
 		return READ_WRITE_ACCESS;

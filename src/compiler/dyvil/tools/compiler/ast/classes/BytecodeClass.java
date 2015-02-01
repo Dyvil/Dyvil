@@ -137,6 +137,26 @@ public class BytecodeClass extends CodeClass
 		super.getMethodMatches(list, instance, name, arguments);
 	}
 	
+	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		if (!this.typesResolved)
+		{
+			this.resolveTypes(null, Package.rootPackage);
+		}
+		return super.resolveConstructor(arguments);
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+		if (!this.typesResolved)
+		{
+			this.resolveTypes(null, Package.rootPackage);
+		}
+		super.getConstructorMatches(list, arguments);
+	}
+	
 	public boolean addSpecialMethod(String specialType, String name, IMethod method)
 	{
 		if ("get".equals(specialType))

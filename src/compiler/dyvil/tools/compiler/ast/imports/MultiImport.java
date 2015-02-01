@@ -121,6 +121,17 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		return null;
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+	}
+	
+	@Override
 	public byte getAccessibility(IMember member)
 	{
 		return 0;
