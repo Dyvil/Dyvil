@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.tools.compiler.ast.value.IValue;
+
 public interface ITyped
 {
 	public void setType(IType type);
@@ -14,5 +16,9 @@ public interface ITyped
 	public default boolean hasType()
 	{
 		return this.getType() != null;
+	}
+	
+	public default void addArrayLength(IValue size)
+	{
 	}
 }

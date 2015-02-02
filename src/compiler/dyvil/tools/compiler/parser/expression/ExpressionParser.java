@@ -309,7 +309,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = LIST_END; // matches a curly bracket
 				return true;
 			}
-			return false;
+			this.mode = ACCESS;
+			return true;
 		}
 		if (this.isInMode(PARAMETERS))
 		{
@@ -553,7 +554,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			ConstructorCall call = new ConstructorCall(token);
 			this.mode = CONSTRUCTOR;
 			this.value = call;
-			pm.pushParser(new TypeParser(call));
+			pm.pushParser(new TypeParser(this));
 			return true;
 		}
 		case Tokens.RETURN:
@@ -643,13 +644,39 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	@Override
 	public void setType(IType type)
 	{
-		this.value = new ClassAccess(type.getPosition(), type);
+		if (this.value == null)
+		{
+			this.value = new ClassAccess(type.getPosition(), type);
+		}
+		else
+		{
+			((ITyped) this.value).setType(type);
+		}
 	}
 	
 	@Override
 	public Type getType()
 	{
 		return null;
+	}
+	
+	@Override
+	public void addArrayLength(IValue size)
+	{
+		this.mode = 0;
+		int type = this.value.getValueType();
+		if (type == IValue.CONSTRUCTOR_CALL)
+		{
+			ConstructorCall call = (ConstructorCall) this.value;
+			ArrayConstructor ac = new ArrayConstructor(call.getPosition());
+			ac.lengths.add(size);
+			this.value = ac;
+		}
+		else if (type == IValue.ARRAY_CONSTRUCTOR)
+		{
+			ArrayConstructor ac = (ArrayConstructor) this.value;
+			ac.lengths.add(size);
+		}
 	}
 	
 	@Override

@@ -19,7 +19,7 @@ public class Main
 	public static void eval(Scanner scanner, String code)
 	{
 		int len = code length;
-		int[] data = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+		int[] data = new int[30000];
 		int index = 0;
 		
 		for (int i = 0; i < len; i += 1)

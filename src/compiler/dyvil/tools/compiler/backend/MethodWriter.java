@@ -663,6 +663,19 @@ public final class MethodWriter extends MethodVisitor
 	}
 	
 	@Override
+	public void visitMultiANewArrayInsn(String type, int dims)
+	{
+		this.push(type);
+		this.mv.visitMultiANewArrayInsn(type, dims);
+	}
+	
+	public void visitMultiANewArrayInsn(IType type, int dims)
+	{
+		this.push(type);
+		this.mv.visitMultiANewArrayInsn(type.getExtendedName(), dims);
+	}
+	
+	@Override
 	public void visitVarInsn(int opcode, int index)
 	{
 		if (opcode >= ILOAD && opcode <= ALOAD)
