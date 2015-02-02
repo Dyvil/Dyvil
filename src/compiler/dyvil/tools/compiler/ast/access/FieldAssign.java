@@ -26,8 +26,6 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	public String	name;
 	public String	qualifiedName;
 	
-	public IType	type;
-	
 	public IValue	instance;
 	public IField	field;
 	public IValue	value;
@@ -138,7 +136,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (this.type != null)
+		if (this.field != null)
 		{
 			this.field.resolveTypes(markers, context);
 		}
@@ -159,7 +157,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		if (this.type != null)
+		if (this.field != null)
 		{
 			this.field.resolve(markers, context);
 		}
@@ -200,12 +198,6 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		if (this.type != null)
-		{
-			this.field.check(markers, context);
-			return;
-		}
-		
 		if (this.value.getValueType() == IValue.THIS)
 		{
 			markers.add(new SyntaxError(this.position, "access.this.assign"));
@@ -258,14 +250,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.type != null)
-		{
-			this.field.foldConstants();
-		}
-		else
-		{
-			this.value = this.value.foldConstants();
-		}
+		this.value = this.value.foldConstants();
 		return this;
 	}
 	
@@ -289,13 +274,6 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		if (this.type != null)
-		{
-			this.field.getValue().writeExpression(writer);
-			this.field.writeSet(writer);
-			return;
-		}
-		
 		if (this.value == null)
 		{
 			return;
@@ -312,25 +290,18 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.type != null)
+		if (this.instance != null)
 		{
-			this.field.toString("", buffer);
+			this.instance.toString("", buffer);
+			buffer.append('.');
 		}
-		else
+		
+		buffer.append(this.name);
+		
+		if (this.value != null)
 		{
-			if (this.instance != null)
-			{
-				this.instance.toString("", buffer);
-				buffer.append('.');
-			}
-			
-			buffer.append(this.name);
-			
-			if (this.value != null)
-			{
-				buffer.append(Formatting.Field.keyValueSeperator);
-				Formatting.appendValue(this.value, prefix, buffer);
-			}
+			buffer.append(Formatting.Field.keyValueSeperator);
+			Formatting.appendValue(this.value, prefix, buffer);
 		}
 	}
 }

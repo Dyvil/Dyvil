@@ -24,7 +24,6 @@ import dyvil.tools.compiler.parser.statement.IfStatementParser;
 import dyvil.tools.compiler.parser.statement.WhileStatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.OperatorComparator;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -209,10 +208,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				
 				String name = token.value();
-				FieldAssign access = new FieldAssign(pos);
-				access.name = name;
-				access.qualifiedName = Symbols.qualify(name);
-				access.type = itype;
+				FieldInitializer access = new FieldInitializer(pos, name, itype);
 				this.value = access;
 				
 				pm.skip();
@@ -357,7 +353,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = PARAMETERS;
 			return true;
 		}
-		else if (type == Tokens.TYPE_SYMBOL_ID || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator(type1))
+		else if (type == Tokens.TYPE_SYMBOL_ID || !ParserUtil.isIdentifier(type1) && type1 != Tokens.DOT && !ParserUtil.isTerminator(type1))
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
 			call.isSugarCall = true;

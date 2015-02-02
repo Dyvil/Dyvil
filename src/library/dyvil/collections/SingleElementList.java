@@ -22,6 +22,7 @@ public class SingleElementList<E> implements List<E>
 			{
 				throw new NoSuchElementException();
 			}
+			this.returned = true;
 			return SingleElementList.this.element;
 		}
 		

@@ -11,15 +11,16 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValueList;
+import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
-public class ApplyMethodCall extends ASTNode implements IAccess
+public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueList
 {
 	public IValue		instance;
 	public List<IValue>	arguments;
@@ -145,7 +146,41 @@ public class ApplyMethodCall extends ASTNode implements IAccess
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		return AccessResolver.resolve(markers, context, this);
+		if (this.instance != null)
+		{
+			this.instance = this.instance.resolve(markers, context);
+		}
+		
+		int len = this.arguments.size();
+		for (int i = 0; i < len; i++)
+		{
+			IValue v1 = this.arguments.get(i);
+			IValue v2 = v1.resolve(markers, context);
+			if (v1 != v2)
+			{
+				this.arguments.set(i, v2);
+			}
+		}
+		
+		IMethod method = IAccess.resolveMethod(context, this.instance, "apply", this.arguments);
+		if (method != null)
+		{
+			this.method = method;
+			return this;
+		}
+		
+		Marker marker = Markers.create(this.position, "resolve.method", "apply");
+		
+		if (this.instance != null)
+		{
+			IType vtype = this.instance.getType();
+			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
+		}
+		StringBuilder builder = new StringBuilder("Argument Types: [");
+		Util.typesToString(this.arguments, ", ", builder);
+		marker.addInfo(builder.append(']').toString());
+		markers.add(marker);
+		return this;
 	}
 	
 	@Override
@@ -205,46 +240,6 @@ public class ApplyMethodCall extends ASTNode implements IAccess
 		}
 		
 		return this;
-	}
-	
-	@Override
-	public boolean resolve(IContext context, List<Marker> markers)
-	{
-		IMethod method = IAccess.resolveMethod(context, this.instance, "apply", this.arguments);
-		if (method != null)
-		{
-			this.method = method;
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public IValue resolve2(IContext context)
-	{
-		return null;
-	}
-	
-	@Override
-	public IAccess resolve3(IContext context, IAccess next)
-	{
-		return null;
-	}
-	
-	@Override
-	public Marker getResolveError()
-	{
-		Marker marker = Markers.create(this.position, "resolve.method", "apply");
-		
-		if (this.instance != null)
-		{
-			IType vtype = this.instance.getType();
-			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
-		}
-		StringBuilder builder = new StringBuilder("Argument Types: [");
-		Util.typesToString(this.arguments, ", ", builder);
-		marker.addInfo(builder.append(']').toString());
-		return marker;
 	}
 	
 	@Override

@@ -43,7 +43,16 @@ public class AccessResolver
 				}
 				else if (alternate != null)
 				{
-					return alternate;
+					if (!iterator.hasNext())
+					{
+						return alternate;
+					}
+					else
+					{
+						iterator.remove();
+						iterator.next().setValue(alternate);
+						iterator.previous();
+					}
 				}
 				else
 				{
@@ -79,49 +88,36 @@ public class AccessResolver
 				prev = null;
 			}
 			
-			if (!curr.resolve(context, markers))
+			if (next != null && !curr.resolve(context, markers))
 			{
-				curr.setValue(null);
-				if (curr.resolve(context, markers))
+				next.setValue(null);
+				if (next.resolve(context, markers))
 				{
-					prev.addValue(curr);
-					curr = null;
-					iterator.remove();
-				}
-				else
-				{
-					curr.setValue(value);
-					
-					if (next != null)
+					alternate = curr.resolve3(context, next);
+					if (alternate instanceof IAccess)
 					{
-						next.setValue(null);
-						alternate = curr.resolve3(context, next);
-						if (alternate instanceof IAccess)
+						if (next.getValue() == curr)
 						{
-							if (next.getValue() == curr)
-							{
-								next.setValue(alternate);
-							}
-							next = (IAccess) alternate;
-							curr = prev;
-							iterator.next();
-							iterator.remove();
-							iterator.previous();
-							iterator.set(next);
+							next.setValue(alternate);
 						}
-						else
-						{
-							next.setValue(curr);
-							markers.add(curr.getResolveError());
-						}
+						next = (IAccess) alternate;
+						curr = prev;
+						iterator.next();
+						iterator.remove();
+						iterator.previous();
+						iterator.set(next);
 					}
 					else
 					{
+						next.setValue(curr);
 						markers.add(curr.getResolveError());
 					}
 				}
+				else
+				{
+					markers.add(curr.getResolveError());
+				}
 			}
-			
 			next = curr;
 			curr = prev;
 		}

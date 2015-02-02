@@ -29,6 +29,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	
 	private IContext		context;
 	private IStatement		parent;
+	private int				variableCount;
 	
 	public Variable			variable;
 	
@@ -96,6 +97,8 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		this.variableCount = context.getVariableCount();
+		
 		if (this.variable != null)
 		{
 			this.variable.resolveTypes(markers, context);
@@ -114,6 +117,11 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 		
 		if (this.then != null)
 		{
+			if (this.then.isStatement())
+			{
+				((IStatement) this.then).setParent(this);
+			}
+			
 			this.then.resolveTypes(markers, context);
 		}
 	}
@@ -123,12 +131,60 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	{
 		this.context = context;
 		
-		if (this.variable != null)
+		this.variableCount = context.getVariableCount();
+		this.variable.index = this.variableCount++;
+		
+		if (this.type != 0)
 		{
-			this.variable.resolve(markers, context);
+			IType type = this.variable.type;
+			IValue value = this.variable.value;
+			this.variable.value = value.resolve(markers, context);
+			
+			IType valueType = value.getType();
+			int valueTypeDims = valueType.getArrayDimensions();
+			if (valueTypeDims != 0)
+			{
+				this.type = ARRAY;
+				if (!valueType.classEquals(type) || type.getArrayDimensions() != valueTypeDims - 1)
+				{
+					Marker marker = Markers.create(value.getPosition(), "for.array.type");
+					marker.addInfo("Array Type: " + valueType);
+					marker.addInfo("Variable Type: " + type);
+					markers.add(marker);
+				}
+				else
+				{
+					Variable var = new Variable(null);
+					var.type = Type.INT;
+					var.name = "$index";
+					var.qualifiedName = "$index";
+					var.index = this.variableCount++;
+					this.indexVar = var;
+					
+					var = new Variable(null);
+					var.type = Type.INT;
+					var.name = "$length";
+					var.qualifiedName = "$length";
+					var.index = this.variableCount++;
+					this.lengthVar = var;
+					
+					var = new Variable(null);
+					var.type = valueType;
+					var.name = "$array";
+					var.qualifiedName = "$array";
+					var.index = this.variableCount++;
+					this.arrayVar = var;
+				}
+			}
+			
+			// TODO Iterator
 		}
-		if (this.type == 0)
+		else
 		{
+			if (this.variable != null)
+			{
+				this.variable.resolve(markers, context);
+			}
 			if (this.condition != null)
 			{
 				this.condition = this.condition.resolve(markers, this);
@@ -149,83 +205,28 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		if (this.type != 0)
+		
+		this.context = context;
+		
+		if (this.variable != null)
 		{
-			IType type = this.variable.type;
-			IValue value = this.variable.value;
-			value.check(markers, context);
-			
-			IType valueType = value.getType();
-			int valueTypeDims = valueType.getArrayDimensions();
-			if (valueTypeDims != 0)
-			{
-				this.type = ARRAY;
-				if (!valueType.classEquals(type) || type.getArrayDimensions() != valueTypeDims - 1)
-				{
-					Marker marker = Markers.create(value.getPosition(), "for.array.type");
-					marker.addInfo("Array Type: " + valueType);
-					marker.addInfo("Variable Type: " + type);
-					markers.add(marker);
-				}
-				else if (this.then == null)
-				{
-					markers.add(Markers.create(this.position, "for.array.statement"));
-				}
-				else
-				{
-					int index = context.getVariableCount();
-					this.variable.index = index;
-					
-					Variable var = new Variable(null);
-					var.type = Type.INT;
-					var.name = "$index";
-					var.qualifiedName = "$index";
-					var.index = index + 1;
-					this.indexVar = var;
-					
-					var = new Variable(null);
-					var.type = Type.INT;
-					var.name = "$length";
-					var.qualifiedName = "$length";
-					var.index = index + 2;
-					this.lengthVar = var;
-					
-					var = new Variable(null);
-					var.type = valueType;
-					var.name = "$array";
-					var.qualifiedName = "$array";
-					var.index = index + 3;
-					this.arrayVar = var;
-				}
-			}
-			
-			// TODO Iterator
+			this.variable.check(markers, context);
 		}
-		else
+		
+		if (this.condition != null)
 		{
-			this.context = context;
+			this.condition.check(markers, this);
 			
-			if (this.variable != null)
+			if (!this.condition.isType(Type.BOOLEAN))
 			{
-				this.variable.check(markers, context);
-				this.variable.index = context.getVariableCount();
+				Marker marker = Markers.create(this.condition.getPosition(), "for.condition.type");
+				marker.addInfo("Condition Type: " + this.condition.getType());
+				markers.add(marker);
 			}
-			
-			if (this.condition != null)
-			{
-				this.condition.check(markers, this);
-				
-				if (!this.condition.isType(Type.BOOLEAN))
-				{
-					Marker marker = Markers.create(this.condition.getPosition(), "for.condition.type");
-					marker.addInfo("Condition Type: " + this.condition.getType());
-					markers.add(marker);
-				}
-			}
-			if (this.update != null)
-			{
-				this.update.check(markers, this);
-			}
+		}
+		if (this.update != null)
+		{
+			this.update.check(markers, this);
 		}
 		
 		if (this.then != null)
@@ -255,11 +256,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	@Override
 	public int getVariableCount()
 	{
-		if (this.type == ARRAY)
-		{
-			return 3;
-		}
-		return this.variable != null ? 1 : 0;
+		return this.variableCount;
 	}
 	
 	@Override
@@ -382,7 +379,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				this.then.writeStatement(writer);
 			}
 			// Update
-			writer.visitLabel(this.updateLabel);
+			writer.visitLabel2(this.updateLabel);
 			if (this.update != null)
 			{
 				this.update.writeStatement(writer);

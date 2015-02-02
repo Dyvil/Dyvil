@@ -1,10 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.ast.access.FieldAssign;
+import dyvil.tools.compiler.ast.access.FieldInitializer;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
@@ -109,21 +111,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 			{
 				((IStatement) v).setParent(this);
 			}
-			else if (v.getValueType() == IValue.FIELD_ASSIGN)
-			{
-				FieldAssign fa = (FieldAssign) v;
-				if (fa.type != null)
-				{
-					Variable var = new Variable(this.position);
-					var.name = fa.name;
-					var.qualifiedName = fa.qualifiedName;
-					var.type = fa.type;
-					var.value = fa.value;
-					var.index = this.variableCount++;
-					fa.field = var;
-					this.variables.put(fa.qualifiedName, var);
-				}
-			}
 			
 			v.resolveTypes(markers, this);
 		}
@@ -139,6 +126,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		
 		this.context = context;
+		this.variableCount = context.getVariableCount();
 		
 		int len = this.values.size();
 		for (int i = 0; i < len; i++)
@@ -148,6 +136,14 @@ public class StatementList extends ValueList implements IStatement, IContext
 			if (v1 != v2)
 			{
 				this.values.set(i, v2);
+			}
+			
+			if (v2.getValueType() == IValue.VARIABLE)
+			{
+				FieldInitializer fi = (FieldInitializer) v2;
+				Variable var = fi.variable;
+				var.index = this.variableCount++;
+				this.variables.put(var.qualifiedName, var);
 			}
 		}
 		return this;

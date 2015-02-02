@@ -300,6 +300,12 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	private IValue	replacement;
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.method != null;
+	}
+	
+	@Override
 	public boolean resolve(IContext context, List<Marker> markers)
 	{
 		int len = this.arguments.size();
@@ -429,6 +435,9 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 			{
 				FieldAccess access = new FieldAccess(this.position);
 				access.field = field.theField;
+				access.name = this.name;
+				access.qualifiedName = this.qualifiedName;
+				access.dotless = this.dotless;
 				
 				// Find the apply method of the field type
 				MethodMatch match = field.theField.getType().resolveMethod(access, "apply", this.arguments);
@@ -438,9 +447,6 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 					return null;
 				}
 				method = match.theMethod;
-				access.name = this.name;
-				access.qualifiedName = this.qualifiedName;
-				access.dotless = this.dotless;
 				instance = access;
 			}
 			

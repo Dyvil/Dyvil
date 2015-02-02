@@ -247,6 +247,12 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	private transient IValue	replacement;
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.field != null; 
+	}
+	
+	@Override
 	public boolean resolve(IContext context, List<Marker> markers)
 	{
 		IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
@@ -324,7 +330,10 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	{
 		Marker marker = Markers.create(this.position, "resolve.method_field", this.name);
 		marker.addInfo("Qualified Name: " + this.qualifiedName);
-		marker.addInfo("Instance Type: " + this.instance.getType());
+		if (this.instance != null)
+		{
+			marker.addInfo("Instance Type: " + this.instance.getType());
+		}
 		return marker;
 	}
 	

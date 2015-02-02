@@ -8,27 +8,29 @@ public class Main
 {	
 	public static void main(String[] args)
 	{
-		System out println "Sum"
-		System out println "Enter your numbers to sum them"
-		
-		System out println(new Main());
-		
-		Scanner scanner = new Scanner(System in)
-		int count = 0
-		int total = 0
+		Scanner scanner = new Scanner(System.in);
 		while (true)
 		{
-			int n = scanner nextInt
-			if (n == 0) break
-			count += 1
-			total += n
+			System.out.println("Enter your Brainfuck code");
+			eval(scanner, scanner nextLine);
 		}
+	}
+	
+	public static void eval(Scanner scanner, String code)
+	{
+		int len = code length;
+		int[] data = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+		int index = 0;
 		
-		System out print "Sum: "
-		System out println(total)
-		System out print "Count: "
-		System out println(count)
-		System out print "Average: "
-		System out println(total / count)
+		for (int i = 0; i < len; i += 1)
+		{
+			char c = code charAt i;
+			if (c == '>') index += 1;
+			if (c == '<') index -= 1;
+			if (c == '+') data(index) = data(index) + 1;
+			if (c == '-') data(index) = data(index) - 1;
+			if (c == '.') System out println(data(index) :> char)
+			if (c == ',') data(index) = System.in.read()
+		}
 	}
 }
