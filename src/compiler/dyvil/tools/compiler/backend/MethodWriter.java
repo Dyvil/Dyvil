@@ -326,19 +326,6 @@ public final class MethodWriter extends MethodVisitor
 			this.visitSpecialInsn(opcode);
 			return;
 		}
-		if (opcode >= IALOAD && opcode <= SALOAD)
-		{
-			Object o = this.typeStack.pop();
-			this.typeStack.pop(); // Index
-			if (o instanceof String)
-			{
-				this.push(((String) o).substring(1));
-			}
-			else
-			{
-				this.push(TOP);
-			}
-		}
 		else if (opcode >= IASTORE && opcode <= SASTORE)
 		{
 			this.typeStack.pop(); // Index
@@ -383,6 +370,33 @@ public final class MethodWriter extends MethodVisitor
 		case RETURN:
 			this.hasReturn = true;
 			return;
+		case BALOAD:
+		case SALOAD:
+		case CALOAD:
+		case IALOAD:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.push(INTEGER);
+			break;
+		case LALOAD:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.push(LONG);
+			break;
+		case FALOAD:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.push(FLOAT);
+			break;
+		case DALOAD:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.push(DOUBLE);
+			break;
+		case AALOAD:
+			this.typeStack.pop();
+			this.typeStack.pop();
+			this.push(TOP);
 		case IADD:
 		case ISUB:
 		case IMUL:

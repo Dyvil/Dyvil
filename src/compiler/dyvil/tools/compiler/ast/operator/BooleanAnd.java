@@ -127,9 +127,9 @@ public class BooleanAnd extends ASTNode implements IValue
 	public void writeJump(MethodWriter writer, Label dest)
 	{
 		this.left.writeExpression(writer);
-		writer.visitJumpInsn(Opcodes.IFEQ, dest);
+		writer.visitJumpInsn2(Opcodes.IFEQ, dest);
 		this.right.writeExpression(writer);
-		writer.visitJumpInsn(Opcodes.IFEQ, dest);
+		writer.visitJumpInsn2(Opcodes.IFEQ, dest);
 	}
 	
 	@Override
