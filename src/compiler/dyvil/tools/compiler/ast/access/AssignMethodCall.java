@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -38,6 +39,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 	public boolean		isSugarCall;
 	
 	public IMethod		method;
+	public IMethod		updateMethod;
 	
 	public AssignMethodCall(ICodePosition position)
 	{
@@ -222,9 +224,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 		
 		Marker marker = Markers.create(this.position, "resolve.method", this.name);
 		marker.addInfo("Qualified Name: " + this.qualifiedName);
-		
-		IType vtype = this.instance.getType();
-		marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
+		marker.addInfo("Instance Type: " + this.instance.getType());
 		StringBuilder builder = new StringBuilder("Argument Types: [");
 		Util.typesToString(this.arguments, ", ", builder);
 		marker.addInfo(builder.append(']').toString());
@@ -238,6 +238,29 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 		if (this.instance != null)
 		{
 			this.instance.check(markers, context);
+			
+			if (this.instance.getValueType() == APPLY_METHOD_CALL)
+			{
+				ApplyMethodCall call = (ApplyMethodCall) this.instance;
+				IValue instance1 = call.instance;
+				List<IValue> arguments1 = call.arguments;
+				arguments1.add(call);
+				
+				IType type = instance1.getType();
+				MethodMatch match = type.resolveMethod(instance1, "update", arguments1);
+				if (match != null)
+				{
+					this.updateMethod = match.theMethod;
+				}
+				else
+				{
+					Marker marker = Markers.create(this.position, "access.assign_call.update");
+					marker.addInfo("Instance Type: " + type);
+					markers.add(marker);
+				}
+				
+				arguments1.remove(arguments1.size() - 1);
+			}
 		}
 		
 		for (IValue v : this.arguments)
@@ -248,6 +271,16 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 		if (this.method != null)
 		{
 			this.method.checkArguments(markers, this.instance, this.arguments);
+			
+			IType type1 = this.instance.getType();
+			IType type2 = this.method.getType();
+			if (!Type.isSuperType(type1, type2))
+			{
+				Marker marker = Markers.create(this.position, "access.assign_call.type", this.name, this.instance.toString());
+				marker.addInfo("Field Type: " + type1);
+				marker.addInfo("Method Type: " + type2);
+				markers.add(marker);
+			}
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
@@ -318,6 +351,14 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 			writer.visitInsn(Opcodes.SWAP);
 			f.writeSet(writer);
 		}
+		else if (i == APPLY_METHOD_CALL)
+		{
+			ApplyMethodCall call = (ApplyMethodCall) this.instance;
+			call.writeExpression(writer);
+			writer.visitInsn(Opcodes.DUP);
+			this.method.writeCall(writer, null, this.arguments);
+			this.updateMethod.writeCall(writer, call, call.arguments);
+		}
 	}
 	
 	@Override
@@ -344,6 +385,16 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 			f.writeGet(writer);
 			this.method.writeCall(writer, null, this.arguments);
 			f.writeSet(writer);
+		}
+		else if (i == APPLY_METHOD_CALL)
+		{
+			ApplyMethodCall call = (ApplyMethodCall) this.instance;
+			
+			call.instance.writeExpression(writer);
+			writer.visitInsn(Opcodes.DUP);
+			call.method.writeCall(writer, null, call.arguments);
+			this.method.writeCall(writer, null, this.arguments);
+			this.updateMethod.writeCall(writer, null, call.arguments);
 		}
 	}
 	

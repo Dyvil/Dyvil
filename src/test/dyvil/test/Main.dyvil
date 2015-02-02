@@ -27,8 +27,8 @@ public class Main
 			char c = code charAt i;
 			if (c == '>') index += 1;
 			if (c == '<') index -= 1;
-			if (c == '+') data(index) = data(index) + 1;
-			if (c == '-') data(index) = data(index) - 1;
+			if (c == '+') data(index) += 1;
+			if (c == '-') data(index) -= 1;
 			if (c == '.') System out print(data(index) :> char)
 			if (c == ',') data(index) = System.in.read()
 			if (c == '[' && data(index) == 0)
