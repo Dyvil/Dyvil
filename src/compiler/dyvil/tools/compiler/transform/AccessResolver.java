@@ -88,7 +88,7 @@ public class AccessResolver
 				prev = null;
 			}
 			
-			if (next != null && !curr.resolve(context, markers))
+			if (next != null && !curr.isResolved())
 			{
 				next.setValue(null);
 				if (next.resolve(context, markers))

@@ -392,6 +392,8 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 			
 			call.instance.writeExpression(writer);
 			writer.visitInsn(Opcodes.DUP);
+			
+			// FIXME
 			call.method.writeCall(writer, null, call.arguments);
 			this.method.writeCall(writer, null, this.arguments);
 			this.updateMethod.writeCall(writer, null, call.arguments);
@@ -401,6 +403,8 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 	@Override
 	public void writeJump(MethodWriter writer, Label dest)
 	{
+		this.writeExpression(writer);
+		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
 	private boolean writeIINC(MethodWriter writer, IField f)
