@@ -208,8 +208,6 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		this.then.writeStatement(writer);
 		writer.visitJumpInsn(Opcodes.GOTO, this.start);
 		writer.visitLabel(this.end);
-		// TODO NOP
-		writer.visitInsn(Opcodes.NOP);
 	}
 	
 	@Override
