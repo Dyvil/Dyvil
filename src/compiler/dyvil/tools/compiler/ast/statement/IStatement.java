@@ -41,6 +41,11 @@ public interface IStatement extends IValue
 	
 	public IStatement getParent();
 	
+	public default boolean canVisitStack(IStatement child)
+	{
+		return false;
+	}
+	
 	public default Label resolveLabel(String name)
 	{
 		return null;

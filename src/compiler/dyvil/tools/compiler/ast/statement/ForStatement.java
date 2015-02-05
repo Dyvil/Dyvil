@@ -95,6 +95,12 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	}
 	
 	@Override
+	public boolean canVisitStack(IStatement child)
+	{
+		return true;
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.variableCount = context.getVariableCount();
@@ -379,20 +385,21 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				this.then.writeStatement(writer);
 			}
 			// Update
-			writer.visitLabel2(this.updateLabel);
+			writer.visitLabel(this.updateLabel, false);
 			if (this.update != null)
 			{
 				this.update.writeStatement(writer);
 			}
 			// Go back to Condition
 			writer.visitJumpInsn(Opcodes.GOTO, this.startLabel);
-			writer.visitLabel(this.endLabel);
+			
+			writer.removeLocals(1);
+			writer.visitLabel(this.endLabel, this.parent == null || this.parent.canVisitStack(this));
 			
 			// Variable
 			if (var != null)
 			{
 				writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), this.startLabel, this.endLabel, var.index);
-				writer.removeLocals(1);
 			}
 			return;
 		}
@@ -403,7 +410,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			Variable lengthVar = this.lengthVar;
 			
 			Label scopeLabel = new Label();
-			writer.visitLabel2(scopeLabel);
+			writer.visitLabel(scopeLabel, false);
 			
 			// Local Variables
 			writer.addLocal(var.index, MethodWriter.TOP);

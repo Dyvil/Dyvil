@@ -15,8 +15,6 @@ public final class MethodWriter extends MethodVisitor
 	public static final Object[]	EMPTY_STACK		= new Object[0];
 	
 	private boolean					hasReturn;
-	private boolean					stackChanged;
-	
 	private int						localCount;
 	private int						maxLocals;
 	private Object[]				locals			= new Object[2];
@@ -112,7 +110,6 @@ public final class MethodWriter extends MethodVisitor
 	protected void push(Object type)
 	{
 		this.ensureStack(this.stackIndex + 1);
-		this.stackChanged = true;
 		this.stack[this.stackIndex++] = type;
 	}
 	
@@ -122,14 +119,12 @@ public final class MethodWriter extends MethodVisitor
 		if (frameType != null)
 		{
 			this.ensureStack(this.stackIndex + 1);
-			this.stackChanged = true;
 			this.stack[this.stackIndex++] = type;
 		}
 	}
 	
 	public void pop()
 	{
-		this.stackChanged = true;
 		this.stackIndex--;
 		this.stackCount--;
 	}
@@ -306,7 +301,6 @@ public final class MethodWriter extends MethodVisitor
 			this.stackIndex -= 2;
 			this.stackCount -= 2;
 		}
-		this.stackChanged = true;
 		this.mv.visitJumpInsn(opcode, label);
 	}
 	
@@ -321,7 +315,6 @@ public final class MethodWriter extends MethodVisitor
 			this.stackIndex -= 2;
 			this.stackCount -= 2;
 		}
-		this.stackChanged = true;
 		this.mv.visitJumpInsn(opcode, label);
 	}
 	
@@ -330,16 +323,16 @@ public final class MethodWriter extends MethodVisitor
 	@Override
 	public void visitLabel(Label label)
 	{
-		if (this.stackChanged)
-		{
-			this.visitFrame();
-			this.stackChanged = false;
-		}
+		this.visitFrame();
 		this.mv.visitLabel(label);
 	}
 	
-	public void visitLabel2(Label label)
+	public void visitLabel(Label label, boolean stack)
 	{
+		if (stack)
+		{
+			this.visitFrame();
+		}
 		this.mv.visitLabel(label);
 	}
 	
@@ -357,7 +350,6 @@ public final class MethodWriter extends MethodVisitor
 		{
 			this.stackIndex -= 3;
 			this.stackCount -= 3;
-			this.stackChanged = true;
 		}
 		else if (opcode >= IRETURN && opcode <= ARETURN)
 		{
@@ -379,7 +371,6 @@ public final class MethodWriter extends MethodVisitor
 			return;
 		case SWAP:
 		{
-			this.stackChanged = true;
 			Object o = this.stack[this.stackIndex];
 			this.stack[this.stackIndex] = this.stack[this.stackIndex - 1];
 			this.stack[this.stackIndex - 1] = o;

@@ -87,6 +87,12 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public boolean canVisitStack(IStatement child)
+	{
+		return false;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.commonType != null)
@@ -293,7 +299,7 @@ public class IfStatement extends ASTNode implements IStatement
 		{
 			this.elseThen.writeExpression(writer);
 		}
-		writer.visitLabel(this.elseEnd);
+		writer.visitLabel(this.elseEnd, this.parent == null || this.parent.canVisitStack(this));
 	}
 	
 	@Override
@@ -309,7 +315,7 @@ public class IfStatement extends ASTNode implements IStatement
 			writer.visitLabel(this.elseStart);
 			// Else Block
 			this.elseThen.writeStatement(writer);
-			writer.visitLabel(this.elseEnd);
+			writer.visitLabel(this.elseEnd, this.parent == null || this.parent.canVisitStack(this));
 		}
 		else
 		{
@@ -317,7 +323,7 @@ public class IfStatement extends ASTNode implements IStatement
 			this.condition.writeJump(writer, this.elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.visitLabel(this.elseStart);
+			writer.visitLabel(this.elseStart, this.parent == null || this.parent.canVisitStack(this));
 		}
 	}
 	

@@ -75,6 +75,16 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
+	public boolean canVisitStack(IStatement child)
+	{
+		if (this.values.get(this.values.size() - 1) != child)
+		{
+			return true;
+		}
+		return this.variables.isEmpty() && (this.parent == null || this.parent.canVisitStack(this));
+	}
+	
+	@Override
 	public IValue withType(IType type)
 	{
 		this.requiredType = type;
@@ -286,13 +296,15 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitLabel2(this.start);
+		writer.visitLabel(this.start, false);
+		int count = 0;
 		
 		// Write variable types
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
 			writer.addLocal(var.index, var.type);
+			count++;
 		}
 		
 		String label;
@@ -305,16 +317,14 @@ public class StatementList extends ValueList implements IStatement, IContext
 			
 			v.writeStatement(writer);
 		}
-		writer.visitLabel2(this.end);
+		writer.removeLocals(count);
+		writer.visitLabel(this.end, count > 0 && (this.parent == null || this.parent.canVisitStack(this)));
 		
-		int count = 0;
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
 			writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), this.start, this.end, var.index);
-			count++;
 		}
-		writer.removeLocals(count);
 	}
 	
 	@Override

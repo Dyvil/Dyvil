@@ -93,6 +93,12 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
+	public boolean canVisitStack(IStatement child)
+	{
+		return true;
+	}
+	
+	@Override
 	public Label getContinueLabel()
 	{
 		return this.start;
@@ -109,14 +115,17 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	{
 		this.condition.resolveTypes(markers, context);
 		
-		if (this.then.isStatement())
+		if (this.then != null)
 		{
-			((IStatement) this.then).setParent(this);
-			this.then.resolveTypes(markers, context);
-		}
-		else if (this.then != null)
-		{
-			this.then.resolveTypes(markers, context);
+			if (this.then.isStatement())
+			{
+				((IStatement) this.then).setParent(this);
+				this.then.resolveTypes(markers, context);
+			}
+			else
+			{
+				this.then.resolveTypes(markers, context);
+			}
 		}
 	}
 	
@@ -207,7 +216,8 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		// While Block
 		this.then.writeStatement(writer);
 		writer.visitJumpInsn(Opcodes.GOTO, this.start);
-		writer.visitLabel(this.end);
+		
+		writer.visitLabel(this.end, this.parent == null || this.parent.canVisitStack(this));
 	}
 	
 	@Override
