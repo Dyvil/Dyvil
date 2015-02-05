@@ -1,6 +1,9 @@
 package dyvil.tools.compiler;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -151,6 +154,36 @@ public enum CompilerState
 		public void apply(List<CompilationUnit> units)
 		{
 			ClassWriter.generateJAR(DyvilCompiler.files);
+		}
+	},
+	TEST
+	{
+		@Override
+		public void apply(List<CompilationUnit> units)
+		{
+			new Thread()
+			{
+				@Override
+				public void run()
+				{
+					String mainType = DyvilCompiler.config.mainType;
+					String[] args = DyvilCompiler.config.getMainArgs();
+					try
+					{
+						Class c = Class.forName(mainType);
+						Method m = c.getMethod("main", String[].class);
+						m.invoke(null, new Object[] { args });
+					}
+					catch (Throwable ex)
+					{
+						StringBuilder builder = new StringBuilder("TEST FAILED\n\n");
+						builder.append("Main Type: ").append(mainType).append('\n');
+						builder.append("Main Args: ").append(Arrays.toString(args));
+						builder.append("\n\n----- ERROR -----\n");
+						DyvilCompiler.logger.log(Level.SEVERE, builder.toString(), ex);
+					}
+				}
+			}.start();
 		}
 	};
 	

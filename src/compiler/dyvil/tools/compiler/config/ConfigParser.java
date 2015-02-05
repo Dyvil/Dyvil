@@ -75,30 +75,33 @@ public class ConfigParser extends Parser
 		{
 		case "jar_name":
 			this.config.jarName = (String) property;
-			break;
+			return;
 		case "jar_vendor":
 			this.config.jarVendor = (String) property;
-			break;
+			return;
 		case "jar_version":
 			this.config.jarVersion = (String) property;
-			break;
+			return;
 		case "jar_format":
 			this.config.jarNameFormat = (String) property;
 		case "source_dir":
 			this.config.sourceDir = new File((String) property);
-			break;
+			return;
 		case "output_dir":
 			this.config.outputDir = new File((String) property);
-			break;
+			return;
 		case "main_type":
 			this.config.mainType = (String) property;
-			break;
+			return;
+		case "main_args":
+			this.config.mainArgs.add((String) property);
+			return;
 		case "include":
 			this.config.includeFile((String) property);
-			break;
+			return;
 		case "exclude":
 			this.config.excludeFile((String) property);
-			break;
+			return;
 		}
 	}
 }

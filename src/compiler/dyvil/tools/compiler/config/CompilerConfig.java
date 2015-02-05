@@ -21,6 +21,7 @@ public class CompilerConfig
 	public List<String>		excludedFiles	= new ArrayList();
 	
 	public String			mainType;
+	public List<String>		mainArgs		= new ArrayList();
 	
 	public CompilerConfig()
 	{
@@ -74,6 +75,11 @@ public class CompilerConfig
 		return String.format(this.jarNameFormat, this.jarName, this.jarVersion);
 	}
 	
+	public String[] getMainArgs()
+	{
+		return this.mainArgs.toArray(new String[this.mainArgs.size()]);
+	}
+	
 	@Override
 	public String toString()
 	{
@@ -84,7 +90,8 @@ public class CompilerConfig
 		builder.append(", libraryFiles=").append(this.libraries);
 		builder.append(", includedFiles=").append(this.includedFiles);
 		builder.append(", excludedFiles=").append(this.excludedFiles);
-		builder.append(", mainType=").append(this.mainType).append("]");
+		builder.append(", mainType=").append(this.mainType);
+		builder.append(", mainArgs=").append(this.mainArgs).append("]");
 		return builder.toString();
 	}
 }

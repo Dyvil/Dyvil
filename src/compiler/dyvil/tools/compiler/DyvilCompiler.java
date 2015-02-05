@@ -125,9 +125,16 @@ public class DyvilCompiler
 						return "\n";
 					}
 					
+					Throwable thrown = record.getThrown();
 					StringBuilder builder = new StringBuilder();
+					
 					builder.append('[').append(format.format(new Date(record.getMillis()))).append("] [");
 					builder.append(record.getLevel()).append("]: ").append(message).append('\n');
+					
+					if (thrown != null)
+					{
+						builder.append(thrown.getMessage()).append('\n');
+					}
 					return builder.toString();
 				}
 			};
@@ -179,6 +186,7 @@ public class DyvilCompiler
 			return;
 		case "--debug":
 			states.add(CompilerState.PRINT);
+			states.add(CompilerState.TEST);
 			debug = true;
 			return;
 		case "--pstack":
