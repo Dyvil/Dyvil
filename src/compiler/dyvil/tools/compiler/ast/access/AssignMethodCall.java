@@ -348,16 +348,25 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 			f.writeGet(writer);
 			this.method.writeCall(writer, null, this.arguments);
 			writer.visitInsn(Opcodes.DUP);
-			writer.visitInsn(Opcodes.SWAP);
 			f.writeSet(writer);
 		}
 		else if (i == APPLY_METHOD_CALL)
 		{
 			ApplyMethodCall call = (ApplyMethodCall) this.instance;
-			call.writeExpression(writer);
-			writer.visitInsn(Opcodes.DUP);
+			
+			call.instance.writeExpression(writer);
+			
+			for (IValue v : call.arguments)
+			{
+				v.writeExpression(writer);
+			}
+			
+			writer.visitInsn(Opcodes.DUP2);
+			
+			call.method.writeCall(writer, null, Util.EMPTY_VALUES);
 			this.method.writeCall(writer, null, this.arguments);
-			this.updateMethod.writeCall(writer, call, call.arguments);
+			writer.visitInsn(Opcodes.DUP_X2);
+			this.updateMethod.writeCall(writer, null, Util.EMPTY_VALUES);
 		}
 	}
 	
@@ -391,12 +400,17 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 			ApplyMethodCall call = (ApplyMethodCall) this.instance;
 			
 			call.instance.writeExpression(writer);
-			writer.visitInsn(Opcodes.DUP);
 			
-			// FIXME
-			call.method.writeCall(writer, null, call.arguments);
+			for (IValue v : call.arguments)
+			{
+				v.writeExpression(writer);
+			}
+			
+			writer.visitInsn(Opcodes.DUP2);
+			
+			call.method.writeCall(writer, null, Util.EMPTY_VALUES);
 			this.method.writeCall(writer, null, this.arguments);
-			this.updateMethod.writeCall(writer, null, call.arguments);
+			this.updateMethod.writeCall(writer, null, Util.EMPTY_VALUES);
 		}
 	}
 	

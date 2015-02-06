@@ -46,23 +46,16 @@ public class ParserManager
 	{
 		this.currentParser = parser;
 		parser.begin(this);
-		TokenIterator tokens = this.tokenize(file);
-		this.parse(file, tokens);
-	}
-	
-	public final TokenIterator tokenize(CodeFile file)
-	{
-		this.file = file;
-		
 		Dlex lexer = new Dlex(file);
 		lexer.tokenize();
-		return lexer.iterator();
+		this.parse(file, lexer.iterator());
 	}
 	
 	public final void parse(CodeFile file, TokenIterator tokens)
 	{
 		IToken token = null;
 		this.tokens = tokens;
+		this.file = file;
 		
 		try
 		{

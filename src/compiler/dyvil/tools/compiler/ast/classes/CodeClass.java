@@ -107,7 +107,6 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public IClass getTheClass()
 	{
-		// TODO Outer class
 		return this;
 	}
 	
@@ -583,8 +582,7 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public Package resolvePackage(String name)
 	{
-		// TODO
-		return null;
+		return this.unit.resolvePackage(name);
 	}
 	
 	@Override

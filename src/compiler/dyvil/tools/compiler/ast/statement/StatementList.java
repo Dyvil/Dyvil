@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -317,8 +318,16 @@ public class StatementList extends ValueList implements IStatement, IContext
 			
 			v.writeStatement(writer);
 		}
-		writer.removeLocals(count);
-		writer.visitLabel(this.end, count > 0 && (this.parent == null || this.parent.canVisitStack(this)));
+		
+		if (this.parent != null || !(this.context instanceof IMethod))
+		{
+			writer.removeLocals(count);
+			writer.visitLabel(this.end, count > 0 && (this.parent == null || this.parent.canVisitStack(this)));
+		}
+		else if (!writer.hasReturn)
+		{
+			writer.visitInsn(this.requiredType.getReturnOpcode());
+		}
 		
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{

@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
@@ -119,7 +120,9 @@ public class CompilationUnit extends ASTNode implements IContext
 	
 	public void tokenize()
 	{
-		this.tokens = DyvilCompiler.parser.tokenize(this.inputFile);
+		Dlex lexer = new Dlex(this.inputFile);
+		lexer.tokenize();
+		this.tokens = lexer.iterator();
 	}
 	
 	public void parse()

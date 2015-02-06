@@ -14,7 +14,7 @@ public final class MethodWriter extends MethodVisitor
 	public static final Integer		INT				= jdk.internal.org.objectweb.asm.Opcodes.INTEGER;
 	public static final Object[]	EMPTY_STACK		= new Object[0];
 	
-	private boolean					hasReturn;
+	public boolean					hasReturn;
 	private int						localCount;
 	private int						maxLocals;
 	private Object[]				locals			= new Object[2];
@@ -119,7 +119,7 @@ public final class MethodWriter extends MethodVisitor
 		if (frameType != null)
 		{
 			this.ensureStack(this.stackIndex + 1);
-			this.stack[this.stackIndex++] = type;
+			this.stack[this.stackIndex++] = frameType;
 		}
 	}
 	
@@ -367,8 +367,50 @@ public final class MethodWriter extends MethodVisitor
 		switch (opcode)
 		{
 		case DUP:
-			this.push(this.stack[this.stackIndex]);
+		{
+			this.ensureStack(this.stackIndex + 2);
+			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex];
+			this.stackIndex++;
 			return;
+		}
+		case DUP_X1:
+		{
+			this.ensureStack(this.stackIndex + 2);
+			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex - 1];
+			this.stackIndex++;
+			return;
+		}
+		case DUP_X2:
+		{
+			this.ensureStack(this.stackIndex + 2);
+			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex - 2];
+			this.stackIndex++;
+			return;
+		}
+		case DUP2:
+		{
+			this.ensureStack(this.stackIndex + 3);
+			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex - 1];
+			this.stack[this.stackIndex + 2] = this.stack[this.stackIndex];
+			this.stackIndex += 2;
+			return;
+		}
+		case DUP2_X1:
+		{
+			this.ensureStack(this.stackIndex + 3);
+			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex - 2];
+			this.stack[this.stackIndex + 2] = this.stack[this.stackIndex - 1];
+			this.stackIndex += 2;
+			return;
+		}
+		case DUP2_X2:
+		{
+			this.ensureStack(this.stackIndex + 3);
+			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex - 3];
+			this.stack[this.stackIndex + 2] = this.stack[this.stackIndex - 2];
+			this.stackIndex += 2;
+			return;
+		}
 		case SWAP:
 		{
 			Object o = this.stack[this.stackIndex];
@@ -377,8 +419,16 @@ public final class MethodWriter extends MethodVisitor
 			return;
 		}
 		case POP:
-			this.pop();
+		{
+			this.stackIndex--;
+			this.stackCount--;
 			return;
+		}
+		case POP2:
+		{
+			this.stackIndex -= 2;
+			this.stackCount -= 2;
+		}
 		case ACONST_NULL:
 			this.push(NULL);
 			return;
