@@ -110,42 +110,42 @@ public class Short implements Integer
 	// byte operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
 	public boolean $eq$eq(byte v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
 	public boolean $bang$eq(byte v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLT })
 	public boolean $less(byte v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
 	public boolean $less$eq(byte v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGT })
 	public boolean $greater(byte v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
 	public boolean $greater$eq(byte v)
 	{
 		return this.value >= v;
@@ -231,42 +231,42 @@ public class Short implements Integer
 	// short operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
 	public boolean $eq$eq(short v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
 	public boolean $bang$eq(short v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLT })
 	public boolean $less(short v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
 	public boolean $less$eq(short v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGT })
 	public boolean $greater(short v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
 	public boolean $greater$eq(short v)
 	{
 		return this.value >= v;
@@ -352,42 +352,42 @@ public class Short implements Integer
 	// char operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
 	public boolean $eq$eq(char v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
 	public boolean $bang$eq(char v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLT })
 	public boolean $less(char v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
 	public boolean $less$eq(char v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGT })
 	public boolean $greater(char v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGE })
 	public boolean $greater$eq(char v)
 	{
 		return this.value >= v;
@@ -473,42 +473,42 @@ public class Short implements Integer
 	// int operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
 	public boolean $eq$eq(int v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
 	public boolean $bang$eq(int v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLT })
 	public boolean $less(int v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
 	public boolean $less$eq(int v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGT })
 	public boolean $greater(int v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGE })
 	public boolean $greater$eq(int v)
 	{
 		return this.value >= v;
@@ -594,42 +594,42 @@ public class Short implements Integer
 	// long operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPNE })
+	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPEQ })
 	public boolean $eq$eq(long v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPEQ })
+	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPNE })
 	public boolean $bang$eq(long v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPGE })
+	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPLT })
 	public boolean $less(long v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPGT })
+	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPLE })
 	public boolean $less$eq(long v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPLE })
+	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPGT })
 	public boolean $greater(long v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPLT })
+	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, IF_LCMPGE })
 	public boolean $greater$eq(long v)
 	{
 		return this.value >= v;
@@ -715,42 +715,42 @@ public class Short implements Integer
 	// float operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPNE })
+	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPEQ })
 	public boolean $eq$eq(float v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPEQ })
+	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPNE })
 	public boolean $bang$eq(float v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPGE })
+	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPLT })
 	public boolean $less(float v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPGT })
+	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPLE })
 	public boolean $less$eq(float v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPLE })
+	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPGT })
 	public boolean $greater(float v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPLT })
+	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, IF_FCMPGE })
 	public boolean $greater$eq(float v)
 	{
 		return this.value >= v;
@@ -794,42 +794,42 @@ public class Short implements Integer
 	// double operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPNE })
+	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPEQ })
 	public boolean $eq$eq(double v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPEQ })
+	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPNE })
 	public boolean $bang$eq(double v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPGE })
+	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPLT })
 	public boolean $less(double v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPGT })
+	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPLE })
 	public boolean $less$eq(double v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPLE })
+	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPGT })
 	public boolean $greater(double v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPLT })
+	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, IF_DCMPGE })
 	public boolean $greater$eq(double v)
 	{
 		return this.value >= v;

@@ -5,7 +5,7 @@ import dyvil.lang.annotation.Intrinsic;
 import dyvil.lang.annotation.implicit;
 import dyvil.lang.tuple.Tuple2;
 
-public class Predef
+public final class Predef
 {
 	private Predef()
 	{
@@ -13,13 +13,13 @@ public class Predef
 	
 	// Object Operators
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPEQ })
 	public static boolean $eq$eq(Object o1, Object o2)
 	{
 		return o1 == o2;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPNE })
 	public static boolean $bang$eq(Object o1, Object o2)
 	{
 		return o1 != o2;

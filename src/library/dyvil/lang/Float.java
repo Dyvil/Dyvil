@@ -104,42 +104,42 @@ public class Float implements Number
 	// byte operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
 	public boolean $eq$eq(byte v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
 	public boolean $bang$eq(byte v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
 	public boolean $less(byte v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
 	public boolean $less$eq(byte v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
 	public boolean $greater(byte v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
 	public boolean $greater$eq(byte v)
 	{
 		return this.value >= v;
@@ -183,42 +183,42 @@ public class Float implements Number
 	// short operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
 	public boolean $eq$eq(short v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
 	public boolean $bang$eq(short v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
 	public boolean $less(short v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
 	public boolean $less$eq(short v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
 	public boolean $greater(short v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
 	public boolean $greater$eq(short v)
 	{
 		return this.value >= v;
@@ -262,42 +262,42 @@ public class Float implements Number
 	// char operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
 	public boolean $eq$eq(char v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
 	public boolean $bang$eq(char v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
 	public boolean $less(char v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
 	public boolean $less$eq(char v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
 	public boolean $greater(char v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
 	public boolean $greater$eq(char v)
 	{
 		return this.value >= v;
@@ -341,42 +341,42 @@ public class Float implements Number
 	// int operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
 	public boolean $eq$eq(int v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
 	public boolean $bang$eq(int v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
 	public boolean $less(int v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
 	public boolean $less$eq(int v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
 	public boolean $greater(int v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
 	public boolean $greater$eq(int v)
 	{
 		return this.value >= v;
@@ -420,42 +420,42 @@ public class Float implements Number
 	// long operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPEQ })
 	public boolean $eq$eq(long v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPNE })
 	public boolean $bang$eq(long v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPLT })
 	public boolean $less(long v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPLE })
 	public boolean $less$eq(long v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPGT })
 	public boolean $greater(long v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPGE })
 	public boolean $greater$eq(long v)
 	{
 		return this.value >= v;
@@ -499,42 +499,42 @@ public class Float implements Number
 	// float operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPEQ })
 	public boolean $eq$eq(float v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPNE })
 	public boolean $bang$eq(float v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPGE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPLT })
 	public boolean $less(float v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPGT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPLE })
 	public boolean $less$eq(float v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPGT })
 	public boolean $greater(float v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPGE })
 	public boolean $greater$eq(float v)
 	{
 		return this.value >= v;
@@ -578,42 +578,42 @@ public class Float implements Number
 	// double operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPNE })
+	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPEQ })
 	public boolean $eq$eq(double v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPEQ })
+	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPNE })
 	public boolean $bang$eq(double v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPGE })
+	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPLT })
 	public boolean $less(double v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPGT })
+	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPLE })
 	public boolean $less$eq(double v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPLE })
+	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPGT })
 	public boolean $greater(double v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPLT })
+	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPGE })
 	public boolean $greater$eq(double v)
 	{
 		return this.value >= v;
