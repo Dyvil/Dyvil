@@ -82,6 +82,10 @@ public class StatementList extends ValueList implements IStatement, IContext
 		{
 			return true;
 		}
+		if (this.parent == null && this.context instanceof IMethod)
+		{
+			return true;
+		}
 		return this.variables.isEmpty() && (this.parent == null || this.parent.canVisitStack(this));
 	}
 	

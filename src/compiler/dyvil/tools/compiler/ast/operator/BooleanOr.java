@@ -112,10 +112,15 @@ public class BooleanOr extends ASTNode implements IValue
 	public void writeExpression(MethodWriter writer)
 	{
 		Label label = new Label();
-		this.left.writeExpression(writer);
-		writer.visitJumpInsn(Opcodes.IFNE, label);
-		this.right.writeExpression(writer);
+		Label label2 = new Label();
+		this.left.writeJump(writer, label);
+		this.right.writeJump(writer, label);
+		writer.visitLdcInsn(0);
+		writer.visitJumpInsn(Opcodes.GOTO, label2);
+		writer.pop();
 		writer.visitLabel(label);
+		writer.visitLdcInsn(1);
+		writer.visitLabel(label2);
 	}
 	
 	@Override

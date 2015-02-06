@@ -6,10 +6,19 @@ public class Main
 {	
 	public static void main(String[] args)
 	{
-		if (1 < 2) {
-			System out println "true"
-		} else {
-			System out println "false"
-		}
+		boolean t = true
+		boolean f = false
+		if (t || t) System out println "true || true"
+		if (t || f) System out println "true || false"
+		if (f || f) System out println "false || false"
+		System out println (t || t)
+		System out println (t || f)
+		System out println (f || f)
+		if (t && t) System out println "true && true"
+		if (t && f) System out println "true && false"
+		if (f && f) System out println "false && false"
+		System out println (t && t)
+		System out println (t && f)
+		System out println (f && f)
 	}
 }
