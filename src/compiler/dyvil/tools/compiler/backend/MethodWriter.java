@@ -195,6 +195,19 @@ public final class MethodWriter extends MethodVisitor
 			this.mv.visitInsn(ICONST_5);
 			return;
 		}
+		if (value > 0)
+		{
+			if (value <= Byte.MAX_VALUE)
+			{
+				this.mv.visitIntInsn(Opcodes.BIPUSH, value);
+				return;
+			}
+			if (value <= Short.MAX_VALUE)
+			{
+				this.mv.visitIntInsn(Opcodes.SIPUSH, value);
+				return;
+			}
+		}
 		this.mv.visitLdcInsn(Integer.valueOf(value));
 	}
 	

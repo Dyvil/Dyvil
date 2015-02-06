@@ -1,0 +1,17 @@
+package dyvil.test
+
+import java.util.Arrays
+
+public class Main
+{	
+	public static void main(String[] args)
+	{
+		int i = 1;
+		int j = 1;
+		System.out.println(i += j);
+		
+		int[] arr = new int[10]
+		System out println(arr(i) += j)
+		System out println(Arrays toString(arr))
+	}
+}
