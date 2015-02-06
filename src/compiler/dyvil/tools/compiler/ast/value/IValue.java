@@ -119,6 +119,12 @@ public interface IValue extends IASTNode, ITyped
 	 */
 	public void writeStatement(MethodWriter writer);
 	
+	public default void writeJump(MethodWriter writer, Label dest)
+	{
+		this.writeExpression(writer);
+		writer.visitJumpInsn(Opcodes.IFNE, dest);
+	}
+	
 	/**
 	 * Writes this {@link IValue} to the given {@link MethodWriter}
 	 * {@code writer} as a jump expression to the given {@link Label}
@@ -131,7 +137,7 @@ public interface IValue extends IASTNode, ITyped
 	 * @param writer
 	 * @param dest
 	 */
-	public default void writeJump(MethodWriter writer, Label dest)
+	public default void writeInvJump(MethodWriter writer, Label dest)
 	{
 		this.writeExpression(writer);
 		writer.visitJumpInsn(Opcodes.IFEQ, dest);

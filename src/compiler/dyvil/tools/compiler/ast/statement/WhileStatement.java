@@ -212,7 +212,7 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		
 		// Condition
 		writer.visitLabel(this.start);
-		this.condition.writeJump(writer, this.end);
+		this.condition.writeInvJump(writer, this.end);
 		// While Block
 		this.then.writeStatement(writer);
 		writer.visitJumpInsn(Opcodes.GOTO, this.start);

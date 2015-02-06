@@ -34,7 +34,88 @@ public class OpcodeUtil
 	
 	public static boolean isJumpOpcode(int opcode)
 	{
-		return opcode >= IFEQ && opcode <= JSR || opcode == GOTO || opcode == IFNULL || opcode == IFNONNULL;
+		return opcode >= IFEQ && opcode <= JSR || opcode == GOTO || opcode == IFNULL || opcode == IFNONNULL || opcode >= IF_LCMPEQ && opcode <= IF_DCMPLE;
+	}
+	
+	public static int getInverseOpcode(int opcode)
+	{
+		switch (opcode)
+		{
+		case IFEQ:
+			return IFNE;
+		case IFNE:
+			return IFEQ;
+		case IFLT:
+			return IFGE;
+		case IFGE:
+			return IFLT;
+		case IFGT:
+			return IFLE;
+		case IFLE:
+			return IFGT;
+			
+		case IF_ICMPEQ:
+			return IF_ICMPNE;
+		case IF_ICMPNE:
+			return IF_ICMPEQ;
+		case IF_ICMPLT:
+			return IF_ICMPGE;
+		case IF_ICMPGE:
+			return IF_ICMPLT;
+		case IF_ICMPGT:
+			return IF_ICMPLE;
+		case IF_ICMPLE:
+			return IF_ICMPGT;
+			
+		case IF_ACMPEQ:
+			return IF_ACMPNE;
+		case IF_ACMPNE:
+			return IF_ACMPEQ;
+		case IFNULL:
+			return IFNONNULL;
+		case IFNONNULL:
+			return IFNULL;
+			
+		case IF_LCMPEQ:
+			return IF_LCMPNE;
+		case IF_LCMPNE:
+			return IF_LCMPEQ;
+		case IF_LCMPLT:
+			return IF_LCMPGE;
+		case IF_LCMPGE:
+			return IF_LCMPLT;
+		case IF_LCMPGT:
+			return IF_LCMPLE;
+		case IF_LCMPLE:
+			return IF_LCMPGT;
+			
+		case IF_FCMPEQ:
+			return IF_FCMPNE;
+		case IF_FCMPNE:
+			return IF_FCMPEQ;
+		case IF_FCMPLT:
+			return IF_FCMPGE;
+		case IF_FCMPGE:
+			return IF_FCMPLT;
+		case IF_FCMPGT:
+			return IF_FCMPLE;
+		case IF_FCMPLE:
+			return IF_FCMPGT;
+			
+		case IF_DCMPEQ:
+			return IF_DCMPNE;
+		case IF_DCMPNE:
+			return IF_DCMPEQ;
+		case IF_DCMPLT:
+			return IF_DCMPGE;
+		case IF_DCMPGE:
+			return IF_DCMPLT;
+		case IF_DCMPGT:
+			return IF_DCMPLE;
+		case IF_DCMPLE:
+			return IF_DCMPGT;
+		}
+		return 0;
 	}
 	
 	public static void writePrimitiveCast(PrimitiveType value, PrimitiveType cast, MethodWriter writer)

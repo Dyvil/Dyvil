@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.operator;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -99,13 +98,6 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	{
 		this.writeExpression(writer);
 		writer.visitInsn(Opcodes.IRETURN);
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label dest)
-	{
-		this.writeExpression(writer);
-		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
 	@Override

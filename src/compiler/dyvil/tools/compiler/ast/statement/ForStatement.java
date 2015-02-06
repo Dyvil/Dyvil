@@ -377,7 +377,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Condition
 			if (this.condition != null)
 			{
-				this.condition.writeJump(writer, this.endLabel);
+				this.condition.writeInvJump(writer, this.endLabel);
 			}
 			// Then
 			if (this.then != null)

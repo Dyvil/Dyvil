@@ -269,6 +269,12 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, IValue
 	}
 	
 	@Override
+	public void writeInvJump(MethodWriter writer, Label dest)
+	{
+		this.method.writeInvJump(writer, dest, this.instance, this.arguments);
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.instance != null)

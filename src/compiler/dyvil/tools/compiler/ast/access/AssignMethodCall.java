@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.access;
 import java.util.ArrayList;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.INumericValue;
@@ -412,13 +411,6 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 			this.method.writeCall(writer, null, this.arguments);
 			this.updateMethod.writeCall(writer, null, Util.EMPTY_VALUES);
 		}
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label dest)
-	{
-		this.writeExpression(writer);
-		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
 	private boolean writeIINC(MethodWriter writer, IField f)

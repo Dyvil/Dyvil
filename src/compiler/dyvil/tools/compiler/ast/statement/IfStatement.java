@@ -284,7 +284,7 @@ public class IfStatement extends ASTNode implements IStatement
 	public void writeExpression(MethodWriter writer)
 	{
 		// Condition
-		this.condition.writeJump(writer, this.elseStart);
+		this.condition.writeInvJump(writer, this.elseStart);
 		// If Block
 		this.then.writeExpression(writer);
 		writer.pop();
@@ -308,7 +308,7 @@ public class IfStatement extends ASTNode implements IStatement
 		if (this.elseThen != null)
 		{
 			// Condition
-			this.condition.writeJump(writer, this.elseStart);
+			this.condition.writeInvJump(writer, this.elseStart);
 			// If Block
 			this.then.writeStatement(writer);
 			writer.visitJumpInsn(Opcodes.GOTO, this.elseEnd);
@@ -320,7 +320,7 @@ public class IfStatement extends ASTNode implements IStatement
 		else
 		{
 			// Condition
-			this.condition.writeJump(writer, this.elseStart);
+			this.condition.writeInvJump(writer, this.elseStart);
 			// If Block
 			this.then.writeStatement(writer);
 			writer.visitLabel(this.elseStart, this.parent == null || this.parent.canVisitStack(this));

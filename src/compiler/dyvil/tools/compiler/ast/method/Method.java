@@ -794,6 +794,19 @@ public class Method extends Member implements IMethod
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
+		writer.visitJumpInsn(IFNE, dest);
+	}
+	
+	@Override
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
+	{
+		if (this.intrinsicOpcodes != null)
+		{
+			this.writeInvIntrinsic(writer, dest, instance, arguments);
+			return;
+		}
+		
+		this.writeInvoke(writer, instance, arguments);
 		writer.visitJumpInsn(IFEQ, dest);
 	}
 	
@@ -840,6 +853,32 @@ public class Method extends Member implements IMethod
 			else if (OpcodeUtil.isJumpOpcode(i))
 			{
 				writer.visitJumpInsn(i, dest);
+			}
+			else
+			{
+				writer.visitInsn(i);
+			}
+		}
+	}
+	
+	private void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
+	{
+		for (int i : this.intrinsicOpcodes)
+		{
+			if (i == INSTANCE)
+			{
+				instance.writeExpression(writer);
+			}
+			else if (i == ARGUMENTS)
+			{
+				for (IValue arg : arguments)
+				{
+					arg.writeExpression(writer);
+				}
+			}
+			else if (OpcodeUtil.isJumpOpcode(i))
+			{
+				writer.visitJumpInsn(OpcodeUtil.getInverseOpcode(i), dest);
 			}
 			else
 			{

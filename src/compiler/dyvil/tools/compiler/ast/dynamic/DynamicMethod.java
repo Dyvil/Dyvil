@@ -314,6 +314,11 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
+	{
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 	}

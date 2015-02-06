@@ -17,7 +17,7 @@ import dyvil.reflect.Opcodes;
  * compiler automatically assigns the Label of the else block to that statement.
  * That means that these opcodes have to be inverted in order for the if
  * statement to work properly. For example, the integer equality comparison ==
- * uses the {@link Opcodes#IF_ICMPNE IF_ICMPNE} opcode for the jump, since the
+ * uses the {@link Opcodes#IF_ICMPEQ IF_ICMPEQ} opcode for the jump, since the
  * JVM is supposed to jump to the else block if the two integer are
  * <i>unequal</i> (NE).
  * 

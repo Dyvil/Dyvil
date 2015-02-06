@@ -129,10 +129,17 @@ public class BooleanOr extends ASTNode implements IValue
 	public void writeJump(MethodWriter writer, Label dest)
 	{
 		Label label = new Label();
-		this.left.writeExpression(writer);
-		writer.visitJumpInsn(Opcodes.IFNE, label);
-		this.right.writeExpression(writer);
-		writer.visitJumpInsn(Opcodes.IFEQ, dest);
+		this.left.writeInvJump(writer, label);
+		this.right.writeJump(writer, dest);
+		writer.visitLabel(label);
+	}
+	
+	@Override
+	public void writeInvJump(MethodWriter writer, Label dest)
+	{
+		Label label = new Label();
+		this.left.writeJump(writer, label);
+		this.right.writeInvJump(writer, dest);
 		writer.visitLabel(label);
 	}
 	

@@ -35,6 +35,8 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 	
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments);
 	
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments);
+	
 	public static IType[] getArgumentTypes(List<IValue> arguments)
 	{
 		int len = arguments.size();

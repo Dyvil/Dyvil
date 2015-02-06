@@ -110,8 +110,7 @@ public class BooleanAnd extends ASTNode implements IValue
 	public void writeExpression(MethodWriter writer)
 	{
 		Label label = new Label();
-		this.left.writeExpression(writer);
-		writer.visitJumpInsn(Opcodes.IFEQ, label);
+		this.left.writeInvJump(writer, label);
 		this.right.writeExpression(writer);
 		writer.visitLabel(label);
 	}
@@ -126,10 +125,15 @@ public class BooleanAnd extends ASTNode implements IValue
 	@Override
 	public void writeJump(MethodWriter writer, Label dest)
 	{
-		this.left.writeExpression(writer);
-		writer.visitJumpInsn2(Opcodes.IFEQ, dest);
-		this.right.writeExpression(writer);
-		writer.visitJumpInsn2(Opcodes.IFEQ, dest);
+		this.left.writeJump(writer, dest);
+		this.right.writeJump(writer, dest);
+	}
+	
+	@Override
+	public void writeInvJump(MethodWriter writer, Label dest)
+	{
+		this.left.writeInvJump(writer, dest);
+		this.right.writeInvJump(writer, dest);
 	}
 	
 	@Override
