@@ -80,6 +80,10 @@ public class Formatting
 		public static String	whileStart			= "while (";
 		public static String	whileEnd			= ")";
 		
+		public static String	doStart				= "do";
+		public static String	doWhile				= "while (";
+		public static String	doEnd				= ")";
+		
 		public static String	forStart			= "for (";
 		public static String	forEachSeperator	= " : ";
 		public static String	forEnd				= ")";

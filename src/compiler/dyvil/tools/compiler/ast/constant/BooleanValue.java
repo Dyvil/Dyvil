@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.constant;
 
+import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
@@ -80,6 +81,24 @@ public class BooleanValue extends ASTNode implements IConstantValue
 	{
 		this.writeExpression(writer);
 		writer.visitInsn(Opcodes.IRETURN);
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label dest)
+	{
+		if (this.value)
+		{
+			writer.visitJumpInsn(Opcodes.GOTO, dest);
+		}
+	}
+	
+	@Override
+	public void writeInvJump(MethodWriter writer, Label dest)
+	{
+		if (!this.value)
+		{
+			writer.visitJumpInsn(Opcodes.GOTO, dest);
+		}
 	}
 	
 	@Override

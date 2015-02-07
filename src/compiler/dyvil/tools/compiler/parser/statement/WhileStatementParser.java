@@ -75,11 +75,11 @@ public class WhileStatementParser extends Parser implements IValued
 	{
 		if (this.mode == CONDITION_END)
 		{
-			this.statement.setCondition(value);
+			this.statement.condition = value;
 		}
 		else if (this.mode == -1)
 		{
-			this.statement.setThen(value);
+			this.statement.then = value;
 		}
 	}
 	

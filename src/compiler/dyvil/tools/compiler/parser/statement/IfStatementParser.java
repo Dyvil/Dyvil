@@ -59,6 +59,15 @@ public class IfStatementParser extends Parser implements IValued
 		{
 			if (ParserUtil.isTerminator(type))
 			{
+				// 'else' on new line after inserted semicolon
+				if (token.next().isType(Tokens.ELSE))
+				{
+					pm.skip(2);
+					pm.pushParser(new ExpressionParser(this));
+					this.mode = -1;
+					return true;
+				}
+				
 				pm.popParser(true);
 				return true;
 			}
