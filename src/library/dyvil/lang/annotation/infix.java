@@ -6,14 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for implicit methods. If a method is annotated as <i>implicit</i>,
- * the first argument is implicit. That means that when calling the static
+ * Annotation for infix methods. If a method is annotated as <i>infix</i>,
+ * the first argument is infix. That means that when calling the static
  * method {@code m(A a, B b)} on object {@code a} of type {@code A}, {@code a}
  * will be moved from in front of the dot to the position of the first argument
  * by the compiler.
  * <p>
  * <code>
- * public implicit void m(A a, B b) = ...<br>
+ * public infix void m(A a, B b) = ...<br>
  * A a = new A();<br>
  * B b = new B();<br>
  * a.m(b);
@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  * will be translated to
  * <p>
  * <code>
- * public static @implicit void m(A a, B b) { ... }<br>
+ * public static @infix void m(A a, B b) { ... }<br>
  * A a = new A();<br>
  * B b = new B();<br>
  * m(a, b);
@@ -33,6 +33,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
-public @interface implicit
+public @interface infix
 {
 }

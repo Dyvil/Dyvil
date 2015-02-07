@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import dyvil.lang.annotation.implicit;
+import dyvil.lang.annotation.infix;
 import dyvil.lang.array.Arrays;
 
 /**
@@ -18,12 +18,12 @@ import dyvil.lang.array.Arrays;
  */
 public class ArrayUtils
 {
-	public static @implicit <T> Class<T> getComponentType(T[] array)
+	public static @infix <T> Class<T> getComponentType(T[] array)
 	{
 		return (Class<T>) array.getClass().getComponentType();
 	}
 	
-	public static @implicit <T> Class getDeepComponentType(T[] array)
+	public static @infix <T> Class getDeepComponentType(T[] array)
 	{
 		Class ret = array.getClass();
 		while (true)
@@ -37,7 +37,7 @@ public class ArrayUtils
 		}
 	}
 	
-	public static @implicit <T> T[][] split(T[] array, int maxLength)
+	public static @infix <T> T[][] split(T[] array, int maxLength)
 	{
 		Class clazz = array.getClass().getComponentType();
 		int arrays = MathUtils.ceil(array.length / maxLength);
@@ -68,7 +68,7 @@ public class ArrayUtils
 		return Arrays.toArray(list, (Class<T>) arrays.getClass().getComponentType());
 	}
 	
-	public static @implicit <T> T[] removeDuplicates(T... array)
+	public static @infix <T> T[] removeDuplicates(T... array)
 	{
 		if (array != null && array.length > 0)
 		{

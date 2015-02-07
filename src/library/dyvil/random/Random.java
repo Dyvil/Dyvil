@@ -1,6 +1,6 @@
 package dyvil.random;
 
-import dyvil.lang.annotation.implicit;
+import dyvil.lang.annotation.infix;
 import dyvil.util.StringUtils;
 
 public class Random
@@ -17,12 +17,12 @@ public class Random
 	 *            the chance
 	 * @return true, if a randomly generated float is less than the given chance
 	 */
-	public static @implicit boolean nextBoolean(java.util.Random random, float chance)
+	public static @infix boolean nextBoolean(java.util.Random random, float chance)
 	{
 		return random.nextFloat() < chance;
 	}
 	
-	public static @implicit int nextInt(java.util.Random random, float f)
+	public static @infix int nextInt(java.util.Random random, float f)
 	{
 		int i = (int) f;
 		f -= i;
@@ -33,7 +33,7 @@ public class Random
 		return i;
 	}
 	
-	public static @implicit int nextInt(java.util.Random random, int min, int max)
+	public static @infix int nextInt(java.util.Random random, int min, int max)
 	{
 		if (min >= max)
 		{
@@ -42,7 +42,7 @@ public class Random
 		return min + random.nextInt(max - min + 1);
 	}
 	
-	public static @implicit long nextLong(java.util.Random random, long min, long max)
+	public static @infix long nextLong(java.util.Random random, long min, long max)
 	{
 		if (min >= max)
 		{
@@ -51,7 +51,7 @@ public class Random
 		return min + (random.nextLong() & max - min + 1);
 	}
 	
-	public static @implicit float nextFloat(java.util.Random random, float min, float max)
+	public static @infix float nextFloat(java.util.Random random, float min, float max)
 	{
 		if (min >= max)
 		{
@@ -60,7 +60,7 @@ public class Random
 		return random.nextFloat() * (max - min) + min;
 	}
 	
-	public static @implicit double nextDouble(java.util.Random random, double min, double max)
+	public static @infix double nextDouble(java.util.Random random, double min, double max)
 	{
 		if (min >= max)
 		{
@@ -80,7 +80,7 @@ public class Random
 	 *            the max length
 	 * @return the next random name
 	 */
-	public static @implicit String nextNoun(java.util.Random random, int minLength, int maxLength)
+	public static @infix String nextNoun(java.util.Random random, int minLength, int maxLength)
 	{
 		int len = nextInt(random, minLength, maxLength);
 		StringBuilder buf = new StringBuilder(len);

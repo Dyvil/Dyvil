@@ -184,9 +184,9 @@ public class Method extends Member implements IMethod
 			this.modifiers |= Modifiers.INLINE;
 			return true;
 		}
-		if ("dyvil.lang.annotation.implicit".equals(name))
+		if ("dyvil.lang.annotation.infix".equals(name))
 		{
-			this.modifiers |= Modifiers.IMPLICIT;
+			this.modifiers |= Modifiers.INFIX;
 			return true;
 		}
 		if ("dyvil.lang.annotation.sealed".equals(name))
@@ -233,14 +233,14 @@ public class Method extends Member implements IMethod
 		Parameter par;
 		IType parType;
 		
-		if (instance != null && (this.modifiers & Modifiers.IMPLICIT) == Modifiers.IMPLICIT)
+		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			par = params.get(0);
 			parType = par.type;
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
-				Marker marker = Markers.create(instance.getPosition(), "access.method.implicit_type", par.name);
+				Marker marker = Markers.create(instance.getPosition(), "access.method.infix_type", par.name);
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
 				markers.add(marker);
@@ -293,8 +293,8 @@ public class Method extends Member implements IMethod
 		int len = arguments.size();
 		List<Parameter> params = this.parameters;
 		
-		// implicit modifier implementation
-		if (instance != null && (this.modifiers & Modifiers.IMPLICIT) == Modifiers.IMPLICIT)
+		// infix modifier implementation
+		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			if (len != params.size() - 1)
 			{
@@ -730,9 +730,9 @@ public class Method extends Member implements IMethod
 		{
 			mw.visitAnnotation("Ldyvil/lang/annotation/inline;", false);
 		}
-		if ((this.modifiers & Modifiers.IMPLICIT) == Modifiers.IMPLICIT)
+		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			mw.visitAnnotation("Ldyvil/lang/annotation/implicit;", false);
+			mw.visitAnnotation("Ldyvil/lang/annotation/infix;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
 		{

@@ -2,7 +2,7 @@ package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Intrinsic;
-import dyvil.lang.annotation.implicit;
+import dyvil.lang.annotation.infix;
 import dyvil.lang.tuple.Tuple2;
 
 public final class Predef
@@ -112,27 +112,27 @@ public final class Predef
 		return result;
 	}
 	
-	public static @implicit int $hash$hash(Object o)
+	public static @infix int $hash$hash(Object o)
 	{
 		return o == null ? 0 : o.hashCode();
 	}
 	
-	public static @implicit int $hash$hash(int i)
+	public static @infix int $hash$hash(int i)
 	{
 		return i;
 	}
 	
-	public static @implicit int $hash$hash(long l)
+	public static @infix int $hash$hash(long l)
 	{
 		return (int) (l ^ l >>> 32);
 	}
 	
-	public static @implicit int $hash$hash(float f)
+	public static @infix int $hash$hash(float f)
 	{
 		return java.lang.Float.hashCode(f);
 	}
 	
-	public static @implicit int $hash$hash(double d)
+	public static @infix int $hash$hash(double d)
 	{
 		return java.lang.Double.hashCode(d);
 	}
@@ -157,7 +157,7 @@ public final class Predef
 	 * @param b
 	 * @return
 	 */
-	public static @implicit <A, B> Tuple2<A, B> $minus$greater(A a, B b)
+	public static @infix <A, B> Tuple2<A, B> $minus$greater(A a, B b)
 	{
 		return new Tuple2(a, b);
 	}
@@ -168,7 +168,7 @@ public final class Predef
 	 * @param b
 	 * @return
 	 */
-	public static @implicit <A, B> Tuple2<B, A> $less$minus(A a, B b)
+	public static @infix <A, B> Tuple2<B, A> $less$minus(A a, B b)
 	{
 		return new Tuple2(b, a);
 	}
@@ -186,7 +186,7 @@ public final class Predef
 	 *            the class
 	 * @return true, if t is an instance of c
 	 */
-	public static @implicit <T> boolean $less$colon(T t, Class<?> c)
+	public static @infix <T> boolean $less$colon(T t, Class<?> c)
 	{
 		return t == null ? false : c.isInstance(t);
 	}
@@ -202,14 +202,14 @@ public final class Predef
 	 *            the class
 	 * @return t as an instance of c
 	 */
-	public static @implicit <T, U> U $colon$greater(T t, Class<U> c)
+	public static @infix <T, U> U $colon$greater(T t, Class<U> c)
 	{
 		return t == null ? (U) null : c.cast(t);
 	}
 	
 	// Miscellaneous
 	
-	public static @implicit Object match(Object o, Pattern[] patterns)
+	public static @infix Object match(Object o, Pattern[] patterns)
 	{
 		Option res;
 		for (Pattern p : patterns)

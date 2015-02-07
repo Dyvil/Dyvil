@@ -1,6 +1,6 @@
 package dyvil.util;
 
-import dyvil.lang.annotation.implicit;
+import dyvil.lang.annotation.infix;
 
 public class MathUtils
 {
@@ -55,7 +55,7 @@ public class MathUtils
 	 * @param i
 	 * @return the abs value
 	 */
-	public static @implicit int abs(int i)
+	public static @infix int abs(int i)
 	{
 		return i < 0 ? -i : i;
 	}
@@ -66,7 +66,7 @@ public class MathUtils
 	 * @param l
 	 * @return the abs value
 	 */
-	public static @implicit long abs(long l)
+	public static @infix long abs(long l)
 	{
 		return l < 0 ? -l : l;
 	}
@@ -77,7 +77,7 @@ public class MathUtils
 	 * @param f
 	 * @return the abs value
 	 */
-	public static @implicit float abs(float f)
+	public static @infix float abs(float f)
 	{
 		return f < 0F ? -f : f;
 	}
@@ -88,7 +88,7 @@ public class MathUtils
 	 * @param d
 	 * @return the abs value
 	 */
-	public static @implicit double abs(double d)
+	public static @infix double abs(double d)
 	{
 		return d < 0D ? -d : d;
 	}
@@ -100,7 +100,7 @@ public class MathUtils
 	 * @param max
 	 * @return the abs value
 	 */
-	public static @implicit double abs(double d, double max)
+	public static @infix double abs(double d, double max)
 	{
 		if (d < 0D)
 		{
@@ -113,31 +113,31 @@ public class MathUtils
 		return d > max ? d : max;
 	}
 	
-	public static @implicit int floor(float f)
+	public static @infix int floor(float f)
 	{
 		int i = (int) f;
 		return f < i ? i - 1 : i;
 	}
 	
-	public static @implicit int floor(double d)
+	public static @infix int floor(double d)
 	{
 		int i = (int) d;
 		return d < i ? i - 1 : i;
 	}
 	
-	public static @implicit int ceil(float f)
+	public static @infix int ceil(float f)
 	{
 		int i = (int) f;
 		return f > i ? i + 1 : i;
 	}
 	
-	public static @implicit int ceil(double d)
+	public static @infix int ceil(double d)
 	{
 		int i = (int) d;
 		return d > i ? i + 1 : i;
 	}
 	
-	public static @implicit int[] $dot$dot(int min, int max)
+	public static @infix int[] $dot$dot(int min, int max)
 	{
 		int len = max - min + 1;
 		int[] arr = new int[len];
@@ -148,7 +148,7 @@ public class MathUtils
 		return arr;
 	}
 	
-	public static @implicit long[] $dot$dot(long min, long max)
+	public static @infix long[] $dot$dot(long min, long max)
 	{
 		int len = (int) (max - min + 1);
 		long[] arr = new long[len];
@@ -159,7 +159,7 @@ public class MathUtils
 		return arr;
 	}
 	
-	public static @implicit float[] $dot$dot(float min, float max)
+	public static @infix float[] $dot$dot(float min, float max)
 	{
 		int len = (int) (max - min + 1);
 		float[] arr = new float[len];
@@ -170,7 +170,7 @@ public class MathUtils
 		return arr;
 	}
 	
-	public static @implicit double[] $dot$dot(double min, double max)
+	public static @infix double[] $dot$dot(double min, double max)
 	{
 		int len = (int) (max - min + 1);
 		double[] arr = new double[len];
@@ -181,37 +181,37 @@ public class MathUtils
 		return arr;
 	}
 	
-	public static @implicit float sin(float f)
+	public static @infix float sin(float f)
 	{
 		return sinTable[(int) (f * sinFactor2) & 0xFFFF];
 	}
 	
-	public static @implicit float cos(float f)
+	public static @infix float cos(float f)
 	{
 		return sinTable[(int) (f * 10430.378F + 16384F) & 0xFFFF];
 	}
 	
-	public static @implicit float tan(float f)
+	public static @infix float tan(float f)
 	{
 		return sin(f) / cos(f);
 	}
 	
-	public static @implicit double sin(double d)
+	public static @infix double sin(double d)
 	{
 		return Math.sin(d);
 	}
 	
-	public static @implicit double cos(double d)
+	public static @infix double cos(double d)
 	{
 		return Math.cos(d);
 	}
 	
-	public static @implicit double tan(double d)
+	public static @infix double tan(double d)
 	{
 		return Math.tan(d);
 	}
 	
-	public static @implicit byte sqrt(byte b)
+	public static @infix byte sqrt(byte b)
 	{
 		if (b >= 0)
 		{
@@ -220,7 +220,7 @@ public class MathUtils
 		return 0;
 	}
 	
-	public static @implicit short sqrt(short s)
+	public static @infix short sqrt(short s)
 	{
 		int xn;
 		
@@ -256,7 +256,7 @@ public class MathUtils
 		return 0;
 	}
 	
-	public static @implicit int sqrt(int i)
+	public static @infix int sqrt(int i)
 	{
 		int xn;
 		
@@ -350,37 +350,37 @@ public class MathUtils
 		return 0;
 	}
 	
-	public static @implicit long sqrt(long l)
+	public static @infix long sqrt(long l)
 	{
 		return (long) Math.sqrt(l);
 	}
 	
-	public static @implicit float sqrt(float f)
+	public static @infix float sqrt(float f)
 	{
 		return (float) Math.sqrt(f);
 	}
 	
-	public static @implicit double sqrt(double d)
+	public static @infix double sqrt(double d)
 	{
 		return Math.sqrt(d);
 	}
 	
-	public static @implicit int truncate(double d)
+	public static @infix int truncate(double d)
 	{
 		return (int) (d + 1024D) - 1024;
 	}
 	
-	public static @implicit int bucket(int i, int factor)
+	public static @infix int bucket(int i, int factor)
 	{
 		return i < 0 ? ~(~i / factor) : i / factor;
 	}
 	
-	public static @implicit long bucket(long l, long factor)
+	public static @infix long bucket(long l, long factor)
 	{
 		return l < 0 ? ~(~l / factor) : l / factor;
 	}
 	
-	public static @implicit int clamp(int i, int min, int max)
+	public static @infix int clamp(int i, int min, int max)
 	{
 		if (i <= min)
 		{
@@ -393,7 +393,7 @@ public class MathUtils
 		return i;
 	}
 	
-	public static @implicit long clamp(long l, long min, long max)
+	public static @infix long clamp(long l, long min, long max)
 	{
 		if (l <= min)
 		{
@@ -406,7 +406,7 @@ public class MathUtils
 		return l;
 	}
 	
-	public static @implicit float clamp(float f, float min, float max)
+	public static @infix float clamp(float f, float min, float max)
 	{
 		if (f <= min)
 		{
@@ -419,7 +419,7 @@ public class MathUtils
 		return f;
 	}
 	
-	public static @implicit double clamp(double d, double min, double max)
+	public static @infix double clamp(double d, double min, double max)
 	{
 		if (d <= min)
 		{
@@ -432,7 +432,7 @@ public class MathUtils
 		return d;
 	}
 	
-	public static @implicit int interpolate(float f, int min, int max)
+	public static @infix int interpolate(float f, int min, int max)
 	{
 		if (f <= 0F)
 		{
@@ -445,7 +445,7 @@ public class MathUtils
 		return min + (int) ((max - min) * f);
 	}
 	
-	public static @implicit long interpolate(double d, long min, long max)
+	public static @infix long interpolate(double d, long min, long max)
 	{
 		if (d <= 0D)
 		{
@@ -458,7 +458,7 @@ public class MathUtils
 		return min + (long) ((max - min) * d);
 	}
 	
-	public static @implicit float interpolate(float f, float min, float max)
+	public static @infix float interpolate(float f, float min, float max)
 	{
 		if (f <= 0F)
 		{
@@ -471,7 +471,7 @@ public class MathUtils
 		return min + (max - min) * f;
 	}
 	
-	public static @implicit double interpolate(double d, double min, double max)
+	public static @infix double interpolate(double d, double min, double max)
 	{
 		if (d <= 0D)
 		{
@@ -484,7 +484,7 @@ public class MathUtils
 		return min + (max - min) * d;
 	}
 	
-	public static @implicit int $bang(int i)
+	public static @infix int $bang(int i)
 	{
 		int j = i;
 		while (i > 1)
@@ -494,7 +494,7 @@ public class MathUtils
 		return j;
 	}
 	
-	public static @implicit long $bang(long l)
+	public static @infix long $bang(long l)
 	{
 		long j = l;
 		while (l > 1)
@@ -504,7 +504,7 @@ public class MathUtils
 		return j;
 	}
 	
-	public static @implicit int nPr(int n)
+	public static @infix int nPr(int n)
 	{
 		return $bang(n);
 	}
@@ -552,12 +552,12 @@ public class MathUtils
 	 *            the number of objects to pick
 	 * @return the number of combinations
 	 */
-	public static @implicit int nCr(int n, int k)
+	public static @infix int nCr(int n, int k)
 	{
 		return $bang(n) / ($bang(k) * $bang(n - k));
 	}
 	
-	public static @implicit float average(int[] ints)
+	public static @infix float average(int[] ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -567,7 +567,7 @@ public class MathUtils
 		return total / ints.length;
 	}
 	
-	public static @implicit double average(long[] longs)
+	public static @infix double average(long[] longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -577,7 +577,7 @@ public class MathUtils
 		return total / longs.length;
 	}
 	
-	public static @implicit float average(float[] floats)
+	public static @infix float average(float[] floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -587,7 +587,7 @@ public class MathUtils
 		return total / floats.length;
 	}
 	
-	public static @implicit double average(double[] doubles)
+	public static @infix double average(double[] doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)
@@ -597,7 +597,7 @@ public class MathUtils
 		return total / doubles.length;
 	}
 	
-	public static @implicit float angle(float f)
+	public static @infix float angle(float f)
 	{
 		f %= 360F;
 		if (f >= 180F)
@@ -611,7 +611,7 @@ public class MathUtils
 		return f;
 	}
 	
-	public static @implicit double angle(double d)
+	public static @infix double angle(double d)
 	{
 		d %= 360D;
 		if (d >= 180D)
@@ -625,7 +625,7 @@ public class MathUtils
 		return d;
 	}
 	
-	public static @implicit int parseInt(String string, int _default)
+	public static @infix int parseInt(String string, int _default)
 	{
 		int i = _default;
 		try
@@ -638,7 +638,7 @@ public class MathUtils
 		return i;
 	}
 	
-	public static @implicit int parseInt(String string, int radix, int _default)
+	public static @infix int parseInt(String string, int radix, int _default)
 	{
 		int i = _default;
 		try
@@ -651,7 +651,7 @@ public class MathUtils
 		return i;
 	}
 	
-	public static @implicit long parseLong(String string, long _default)
+	public static @infix long parseLong(String string, long _default)
 	{
 		long l = _default;
 		try
@@ -664,7 +664,7 @@ public class MathUtils
 		return l;
 	}
 	
-	public static @implicit long parseLong(String string, int radix, long _default)
+	public static @infix long parseLong(String string, int radix, long _default)
 	{
 		long l = _default;
 		try
@@ -677,7 +677,7 @@ public class MathUtils
 		return l;
 	}
 	
-	public static @implicit float parseFloat(String string, float _default)
+	public static @infix float parseFloat(String string, float _default)
 	{
 		float f = _default;
 		try
@@ -690,7 +690,7 @@ public class MathUtils
 		return f;
 	}
 	
-	public static @implicit double parseDouble(String string, double _default)
+	public static @infix double parseDouble(String string, double _default)
 	{
 		double d = _default;
 		try
@@ -703,7 +703,7 @@ public class MathUtils
 		return d;
 	}
 	
-	public static @implicit int powerOfTwo(int i)
+	public static @infix int powerOfTwo(int i)
 	{
 		int j = i - 1;
 		j |= j >> 1;
@@ -714,12 +714,12 @@ public class MathUtils
 		return j + 1;
 	}
 	
-	public static @implicit boolean isPowerOfTwo(int i)
+	public static @infix boolean isPowerOfTwo(int i)
 	{
 		return (i & -i) != 0;
 	}
 	
-	public static @implicit int logBaseTwo(int i)
+	public static @infix int logBaseTwo(int i)
 	{
 		if (isPowerOfTwo(i))
 		{
@@ -731,33 +731,33 @@ public class MathUtils
 		}
 	}
 	
-	public static @implicit boolean checkBit(int i, byte bit)
+	public static @infix boolean checkBit(int i, byte bit)
 	{
 		return (i & 1 << bit) != 0;
 	}
 	
-	public static @implicit int setBit(int i, byte bit)
+	public static @infix int setBit(int i, byte bit)
 	{
 		return i | 1 << bit;
 	}
 	
-	public static @implicit int clearBit(int i, byte bit)
+	public static @infix int clearBit(int i, byte bit)
 	{
 		int bitToSet = 1 << bit;
 		return (i | bitToSet) ^ bitToSet;
 	}
 	
-	public static @implicit boolean checkBit(long l, byte bit)
+	public static @infix boolean checkBit(long l, byte bit)
 	{
 		return (l & 1L << bit) != 0;
 	}
 	
-	public static @implicit long setBit(long l, byte bit)
+	public static @infix long setBit(long l, byte bit)
 	{
 		return l | 1L << bit;
 	}
 	
-	public static @implicit long clearBit(long l, byte bit)
+	public static @infix long clearBit(long l, byte bit)
 	{
 		long bitToSet = 1L << bit;
 		return (l | bitToSet) ^ bitToSet;
