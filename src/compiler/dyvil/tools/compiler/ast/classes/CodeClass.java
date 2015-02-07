@@ -482,7 +482,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
 		{
-			this.instanceField = new Field(this, "$instance", this.getType(), Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, Collections.EMPTY_LIST);
+			this.instanceField = new Field(this, "$instance", this.getType(), Modifiers.PUBLIC | Modifiers.CONST | Modifiers.SYNTHETIC, Collections.EMPTY_LIST);
 		}
 		
 		if (this.body != null)

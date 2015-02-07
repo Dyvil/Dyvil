@@ -65,8 +65,6 @@ public class BooleanOr extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		// Argument Types were already resolved by the MethodCall, so this
-		// should never happen
 		this.left.resolveTypes(markers, context);
 		this.right.resolveTypes(markers, context);
 	}
@@ -74,10 +72,8 @@ public class BooleanOr extends ASTNode implements IValue
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		// Arguments were already resolved by the MethodCall, so this should
-		// never happen
-		this.left.resolve(markers, context);
-		this.right.resolve(markers, context);
+		this.left = this.left.resolve(markers, context);
+		this.right = this.right.resolve(markers, context);
 		return this;
 	}
 	

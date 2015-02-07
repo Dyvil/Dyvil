@@ -15,6 +15,13 @@ public class Operators
 	
 	public static IValue get(String name, IValue arg1)
 	{
+		if ("!".equals(name))
+		{
+			if (arg1.isType(Type.BOOLEAN))
+			{
+				return new BooleanNot(arg1);
+			}
+		}
 		return null;
 	}
 	

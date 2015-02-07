@@ -8,17 +8,11 @@ public class Main
 	{
 		boolean t = true
 		boolean f = false
-		if (t || t) System out println "true || true"
-		if (t || f) System out println "true || false"
-		if (f || f) System out println "false || false"
-		System out println (t || t)
-		System out println (t || f)
-		System out println (f || f)
-		if (t && t) System out println "true && true"
-		if (t && f) System out println "true && false"
-		if (f && f) System out println "false && false"
-		System out println (t && t)
-		System out println (t && f)
-		System out println (f && f)
+		if (!t) System out println "!true"
+		if (!f) System out println "!false"
+		System out println(!t)
+		System out println(!f)
+		System out println(! ! t);
+		System out println(! ! f);
 	}
 }

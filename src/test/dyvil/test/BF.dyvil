@@ -4,11 +4,11 @@ import java.util.{ Scanner, Arrays }
 import java.lang.Integer => jInt
 using java.lang.System._
 
-public class Main
+public object BF
 {	
 	public static void main(String[] args)
 	{
-		Scanner scanner = new Scanner(System.in);
+		Scanner scanner = new Scanner(System in);
 		while (true)
 		{
 			System.out.println("Enter your Brainfuck code");
@@ -18,19 +18,19 @@ public class Main
 	
 	public static void eval(Scanner scanner, String code)
 	{
-		int len = code length;
-		int[] data = new int[30000];
-		int index = 0;
+		int len = code length
+		int[] data = new int[30000]
+		int index = 0
 		
 		for (int i = 0; i < len; i += 1)
 		{
-			char c = code charAt i;
-			if (c == '>') index += 1;
-			if (c == '<') index -= 1;
-			if (c == '+') data(index) += 1;
-			if (c == '-') data(index) -= 1;
+			char c = code charAt i
+			if (c == '>') index += 1
+			if (c == '<') index -= 1
+			if (c == '+') data(index) += 1
+			if (c == '-') data(index) -= 1
 			if (c == '.') System out print(data(index) :> char)
-			if (c == ',') data(index) = System.in.read()
+			if (c == ',') data(index) = System in read
 			if (c == '[' && data(index) == 0)
 			{
 				int j = 1

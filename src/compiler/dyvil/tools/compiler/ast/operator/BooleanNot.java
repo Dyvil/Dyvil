@@ -12,30 +12,20 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class BooleanAnd extends ASTNode implements IValue
+public class BooleanNot extends ASTNode implements IValue
 {
-	public IValue	left;
 	public IValue	right;
 	
-	public BooleanAnd(IValue left, IValue right)
+	public BooleanNot(IValue right)
 	{
-		this.left = left;
-		this.right = right;
-	}
-	
-	public BooleanAnd(ICodePosition position, IValue left, IValue right)
-	{
-		this.position = position;
-		this.left = left;
 		this.right = right;
 	}
 	
 	@Override
 	public int getValueType()
 	{
-		return BOOLEAN_AND;
+		return BOOLEAN_NOT;
 	}
 	
 	@Override
@@ -65,14 +55,12 @@ public class BooleanAnd extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.left.resolveTypes(markers, context);
 		this.right.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		this.left = this.left.resolve(markers, context);
 		this.right = this.right.resolve(markers, context);
 		return this;
 	}
@@ -80,27 +68,19 @@ public class BooleanAnd extends ASTNode implements IValue
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		this.left.check(markers, context);
 		this.right.check(markers, context);
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
-		int t1 = this.left.getValueType();
-		int t2 = this.right.getValueType();
-		if (t1 == BOOLEAN && !((BooleanValue) this.left).value)
+		if (this.right.getValueType() == BOOLEAN)
 		{
-			return BooleanValue.FALSE;
+			BooleanValue b = (BooleanValue) this.right;
+			b.value = !b.value;
+			return b;
 		}
-		if (t2 == BOOLEAN && !((BooleanValue) this.left).value)
-		{
-			return BooleanValue.FALSE;
-		}
-		
-		this.left.foldConstants();
-		this.right.foldConstants();
-		
+		this.right = this.right.foldConstants();
 		return this;
 	}
 	
@@ -109,13 +89,12 @@ public class BooleanAnd extends ASTNode implements IValue
 	{
 		Label label = new Label();
 		Label label2 = new Label();
-		this.left.writeInvJump(writer, label);
 		this.right.writeInvJump(writer, label);
-		writer.visitLdcInsn(1);
+		writer.visitLdcInsn(0);
 		writer.visitJumpInsn(Opcodes.GOTO, label2);
 		writer.pop();
 		writer.visitLabel(label);
-		writer.visitLdcInsn(0);
+		writer.visitLdcInsn(1);
 		writer.visitLabel(label2);
 	}
 	
@@ -129,22 +108,19 @@ public class BooleanAnd extends ASTNode implements IValue
 	@Override
 	public void writeJump(MethodWriter writer, Label dest)
 	{
-		this.left.writeJump(writer, dest);
-		this.right.writeJump(writer, dest);
+		this.right.writeInvJump(writer, dest);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest)
 	{
-		this.left.writeInvJump(writer, dest);
-		this.right.writeInvJump(writer, dest);
+		this.right.writeJump(writer, dest);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.left.toString(prefix, buffer);
-		buffer.append(" && ");
+		buffer.append('!');
 		this.right.toString(prefix, buffer);
 	}
 }
