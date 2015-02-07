@@ -2,19 +2,19 @@ package dyvil.lang;
 
 public final class Some<T> implements Option<T>
 {
-	private final T value;
+	private final T	value;
 	
 	public Some(T value)
 	{
 		this.value = value;
 	}
-
+	
 	@Override
 	public T get()
 	{
 		return this.value;
 	}
-
+	
 	@Override
 	public boolean isEmpty()
 	{
@@ -26,13 +26,13 @@ public final class Some<T> implements Option<T>
 	{
 		return "Some(" + this.value + ")";
 	}
-
+	
 	@Override
 	public int hashCode()
 	{
 		return 31 + (this.value == null ? 0 : this.value.hashCode());
 	}
-
+	
 	@Override
 	public boolean equals(Object obj)
 	{

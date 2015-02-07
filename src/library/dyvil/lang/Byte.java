@@ -88,7 +88,7 @@ public class Byte implements Integer
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, ICONST_M1,  IXOR })
+	@Intrinsic({ INSTANCE, ARGUMENTS, ICONST_M1, IXOR })
 	public @prefix Int $tilde()
 	{
 		return Int.create((byte) ~this.value);

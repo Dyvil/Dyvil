@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.util;
+package dyvil.tools.compiler.transform;
 
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
@@ -8,6 +8,49 @@ import dyvil.tools.compiler.ast.value.IValue;
 
 public class Operators
 {
+	public static final int	PREFIX	= 1000;
+	
+	public static int index(String name)
+	{
+		switch (name)
+		{
+		case "||":
+			return 10;
+		case "&&":
+			return 20;
+		case "|":
+			return 30;
+		case "^":
+			return 40;
+		case "&":
+			return 50;
+		case "==":
+		case "!=":
+		case ":=:":
+			return 60;
+		case "<":
+		case ">":
+		case "<=":
+		case ">=":
+			return 70;
+		case "<<":
+		case ">>":
+		case ">>>":
+			return 80;
+		case "+":
+		case "-":
+			return 90;
+		case "*":
+		case "/":
+		case "%":
+			return 100;
+		case "<:":
+		case ":>":
+			return 200;
+		}
+		return 0;
+	}
+	
 	public static IValue get(IValue arg1, String name)
 	{
 		return null;

@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.ast.type;
 
+import static dyvil.reflect.Opcodes.*;
+
 import java.util.List;
 
-import static dyvil.reflect.Opcodes.*;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;

@@ -249,7 +249,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public boolean isResolved()
 	{
-		return this.field != null; 
+		return this.field != null;
 	}
 	
 	@Override

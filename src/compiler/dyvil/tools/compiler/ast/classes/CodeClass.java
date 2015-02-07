@@ -33,8 +33,8 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.CaseClasses;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
@@ -939,7 +939,7 @@ public class CodeClass extends ASTNode implements IClass
 			assign.field = instanceField;
 			ConstructorCall call = new ConstructorCall(null);
 			call.type = this.type;
-			call.method = constructor;
+			call.method = this.constructor;
 			assign.value = call;
 			staticFields.addValue(assign);
 		}

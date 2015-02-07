@@ -17,14 +17,14 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class FieldInitializer extends ASTNode implements IValue, IValued, ITyped
 {
-	public Variable variable;
+	public Variable	variable;
 	
 	public FieldInitializer(ICodePosition position, String name, IType type)
 	{
 		this.position = position;
 		this.variable = new Variable(this.position, name, type);
 	}
-
+	
 	@Override
 	public void setType(IType type)
 	{
@@ -36,7 +36,7 @@ public class FieldInitializer extends ASTNode implements IValue, IValued, ITyped
 	{
 		return this.variable.type;
 	}
-
+	
 	@Override
 	public IValue withType(IType type)
 	{
@@ -62,51 +62,51 @@ public class FieldInitializer extends ASTNode implements IValue, IValued, ITyped
 		}
 		return 0;
 	}
-
+	
 	@Override
 	public void setValue(IValue value)
 	{
 		this.variable.value = value;
 	}
-
+	
 	@Override
 	public IValue getValue()
 	{
 		return this.variable.value;
 	}
-
+	
 	@Override
 	public int getValueType()
 	{
 		return VARIABLE;
 	}
-
+	
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.variable.resolveTypes(markers, context);
 	}
-
+	
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
 		this.variable.resolve(markers, context);
 		return this;
 	}
-
+	
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
 		this.variable.check(markers, context);
 	}
-
+	
 	@Override
 	public IValue foldConstants()
 	{
 		this.variable.foldConstants();
 		return this;
 	}
-
+	
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
@@ -114,14 +114,14 @@ public class FieldInitializer extends ASTNode implements IValue, IValued, ITyped
 		writer.visitInsn(Opcodes.DUP);
 		this.variable.writeSet(writer);
 	}
-
+	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
 		this.variable.value.writeExpression(writer);
 		this.variable.writeSet(writer);
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

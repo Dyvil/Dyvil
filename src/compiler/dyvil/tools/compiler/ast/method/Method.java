@@ -1,11 +1,15 @@
 package dyvil.tools.compiler.ast.method;
 
+import static dyvil.reflect.Opcodes.ARGUMENTS;
+import static dyvil.reflect.Opcodes.IFEQ;
+import static dyvil.reflect.Opcodes.IFNE;
+import static dyvil.reflect.Opcodes.INSTANCE;
+
 import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static dyvil.reflect.Opcodes.*;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;

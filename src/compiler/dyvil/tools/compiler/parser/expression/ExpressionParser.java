@@ -23,7 +23,7 @@ import dyvil.tools.compiler.parser.statement.ForStatementParser;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
 import dyvil.tools.compiler.parser.statement.WhileStatementParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
-import dyvil.tools.compiler.transform.OperatorComparator;
+import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -261,7 +261,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				String name = token.value();
 				if (this.precedence != 0 && this.dotless)
 				{
-					int p = OperatorComparator.index(name);
+					int p = Operators.index(name);
 					if (p != 0 && this.precedence >= p)
 					{
 						pm.popParser(true);
@@ -363,7 +363,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = ACCESS;
 			
 			ExpressionParser parser = new ExpressionParser(this);
-			parser.precedence = this.prefix ? 100 : OperatorComparator.index(value);
+			parser.precedence = this.prefix ? Operators.PREFIX : Operators.index(value);
 			pm.pushParser(parser);
 			return true;
 		}

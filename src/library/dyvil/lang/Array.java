@@ -1,8 +1,8 @@
 package dyvil.lang;
 
+import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Intrinsic;
 import dyvil.lang.annotation.sealed;
-import static dyvil.reflect.Opcodes.*;
 
 public @sealed interface Array<T>
 {

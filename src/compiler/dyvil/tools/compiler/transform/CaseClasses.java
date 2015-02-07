@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.util;
+package dyvil.tools.compiler.transform;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.util.Modifiers;
 
 public class CaseClasses
 {

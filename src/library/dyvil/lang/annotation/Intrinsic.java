@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
  * actual method invocation. Instead of a {@code INVOKE} instruction, the
  * compiler inserts the opcodes specified by {@link #value()}.
  * <p>
- * The @Intrinsic annotation is also designed to work with if or while statements
- * and conditional jumps.
+ * The @Intrinsic annotation is also designed to work with if or while
+ * statements and conditional jumps.
  * 
  * @author Clashsoft
  */

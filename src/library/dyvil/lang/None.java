@@ -6,6 +6,10 @@ public final class None implements Option
 {
 	public static final None	instance	= new None();
 	
+	private None()
+	{
+	}
+	
 	@Override
 	public Object get()
 	{
@@ -27,7 +31,7 @@ public final class None implements Option
 	@Override
 	public boolean equals(Object obj)
 	{
-		return obj == this || (obj != null && this.equals(obj));
+		return obj == this;
 	}
 	
 	@Override

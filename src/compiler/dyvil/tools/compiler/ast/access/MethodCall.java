@@ -22,9 +22,9 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.ConstantFolder;
+import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
-import dyvil.tools.compiler.util.Operators;
 import dyvil.tools.compiler.util.Util;
 
 public class MethodCall extends ASTNode implements IAccess, INamed

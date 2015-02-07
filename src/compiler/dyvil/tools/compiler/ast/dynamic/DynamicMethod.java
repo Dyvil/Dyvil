@@ -2,7 +2,10 @@ package dyvil.tools.compiler.ast.dynamic;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.*;
+import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.Handle;
+import jdk.internal.org.objectweb.asm.Label;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
