@@ -1,18 +1,13 @@
 package dyvil.test
 
 import java.util.Arrays
+import java.util.Collections;
 
 public class Main
 {	
 	public static void main(String[] args)
 	{
-		boolean t = true
-		boolean f = false
-		if (!t) System out println "!true"
-		if (!f) System out println "!false"
-		System out println(!t)
-		System out println(!f)
-		System out println(! ! t);
-		System out println(! ! f);
+		int i = 2
+		System out println(-i)
 	}
 }

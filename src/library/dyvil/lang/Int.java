@@ -2,6 +2,7 @@ package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Intrinsic;
+import dyvil.lang.annotation.prefix;
 
 public class Int implements Integer
 {
@@ -73,24 +74,24 @@ public class Int implements Integer
 	// Unary operators
 	
 	@Override
-	@Intrinsic({ INSTANCE })
-	public Int $plus()
+	@Intrinsic({ INSTANCE, ARGUMENTS })
+	public @prefix Int $plus()
 	{
-		return this;
+		return Int.create(this.value);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, INEG })
-	public Int $minus()
+	@Intrinsic({ INSTANCE, ARGUMENTS, INEG })
+	public @prefix Int $minus()
 	{
-		return Int.create(-this.value);
+		return Int.create((byte) -this.value);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, IBIN })
-	public Int $tilde()
+	@Intrinsic({ INSTANCE, ARGUMENTS, ICONST_M1, IXOR })
+	public @prefix Int $tilde()
 	{
-		return Int.create(~this.value);
+		return Int.create((byte) ~this.value);
 	}
 	
 	@Override

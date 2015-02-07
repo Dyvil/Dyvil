@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import dyvil.lang.annotation.prefix;
+
 public class Complex implements Number
 {
 	protected double	real;
@@ -69,18 +71,18 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public Complex $plus()
+	public @prefix Complex $plus()
 	{
 		return this;
 	}
 	
 	@Override
-	public Complex $minus()
+	public @prefix Complex $minus()
 	{
 		return create(-this.real, -this.imag);
 	}
 	
-	public Complex $tilde()
+	public @prefix Complex $tilde()
 	{
 		return create(-this.real, this.imag);
 	}

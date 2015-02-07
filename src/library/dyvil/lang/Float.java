@@ -2,6 +2,7 @@ package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Intrinsic;
+import dyvil.lang.annotation.prefix;
 
 public class Float implements Number
 {
@@ -74,15 +75,15 @@ public class Float implements Number
 	// Unary operators
 	
 	@Override
-	@Intrinsic({ INSTANCE })
-	public Float $plus()
+	@Intrinsic({ INSTANCE, ARGUMENTS })
+	public @prefix Float $plus()
 	{
 		return this;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, FNEG })
-	public Float $minus()
+	@Intrinsic({ INSTANCE, ARGUMENTS, FNEG })
+	public @prefix Float $minus()
 	{
 		return Float.create(-this.value);
 	}

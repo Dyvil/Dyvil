@@ -179,23 +179,21 @@ public class Method extends Member implements IMethod
 	private boolean processAnnotation(Annotation annotation)
 	{
 		String name = annotation.type.fullName;
-		if ("dyvil.lang.annotation.inline".equals(name))
+		switch (name)
 		{
+		case "dyvil.lang.annotation.inline":
 			this.modifiers |= Modifiers.INLINE;
 			return true;
-		}
-		if ("dyvil.lang.annotation.infix".equals(name))
-		{
+		case "dyvil.lang.annotation.infix":
 			this.modifiers |= Modifiers.INFIX;
 			return true;
-		}
-		if ("dyvil.lang.annotation.sealed".equals(name))
-		{
+		case "dyvil.lang.annotation.prefix":
+			this.modifiers |= Modifiers.PREFIX;
+			return true;
+		case "dyvil.lang.annotation.sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return true;
-		}
-		if ("dyvil.lang.annotation.Intrinsic".equals(name))
-		{
+		case "dyvil.lang.annotation.Intrinsic":
 			ValueList array = (ValueList) annotation.getValue("value");
 			if (array != null)
 			{
@@ -208,16 +206,12 @@ public class Method extends Member implements IMethod
 					opcodes[i] = v.value;
 				}
 				this.intrinsicOpcodes = opcodes;
-				return false;
 			}
-		}
-		if ("java.lang.Deprecated".equals(name))
-		{
+			return false;
+		case "java.lang.Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
 			return true;
-		}
-		if ("java.lang.Override".equals(name))
-		{
+		case "java.lang.Override":
 			this.modifiers |= Modifiers.OVERRIDE;
 			return true;
 		}
@@ -246,6 +240,20 @@ public class Method extends Member implements IMethod
 				markers.add(marker);
 			}
 			pOff = 1;
+		}
+		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		{
+			parType = this.theClass.getType();
+			instance = arguments.get(0);
+			IValue instance1 = instance.withType(parType);
+			if (instance1 == null)
+			{
+				Marker marker = Markers.create(instance.getPosition(), "access.method.prefix_type", this.name);
+				marker.addInfo("Required Type: " + parType);
+				marker.addInfo("Value Type: " + instance.getType());
+				markers.add(marker);
+			}
+			return;
 		}
 		
 		for (int i = 0; i < len; i++)
@@ -733,6 +741,10 @@ public class Method extends Member implements IMethod
 		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			mw.visitAnnotation("Ldyvil/lang/annotation/infix;", false);
+		}
+		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		{
+			mw.visitAnnotation("Ldyvil/lang/annotation/prefix;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
 		{

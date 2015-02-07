@@ -6,25 +6,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for infix methods. When calling the infix method
- * {@code m(A a, B b)} on object {@code a} of type {@code A}, {@code a} will be
- * moved from the 'instance' position (i.e., in front of the dot) to the
- * position of the first argument by the compiler.
+ * Annotation for prefix methods. When calling the prefix method {@code m(A a)}
+ * on object {@code a} of type {@code A}, {@code a} will be moved from the
+ * position of the first argument to the position of the 'instance' (i.e., in
+ * front of the dot) by the compiler.
  * <p>
  * <code>
- * public infix void m(A a, B b) = ...<br>
+ * public prefix void m() = ...<br>
  * A a = new A();<br>
- * B b = new B();<br>
- * a.m(b);
+ * m(a)
  * </code>
  * <p>
  * will be translated to
  * <p>
  * <code>
- * public static @infix void m(A a, B b) { ... }<br>
+ * public static @prefix void m() { ... }<br>
  * A a = new A();<br>
  * B b = new B();<br>
- * m(a, b);
+ * a.m()
  * </code>
  * <p>
  *
@@ -32,6 +31,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
-public @interface infix
+public @interface prefix
 {
 }

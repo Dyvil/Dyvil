@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.util.Util;
 
 public interface IAccess extends IValue, IValued, IValueList
 {
@@ -59,6 +60,19 @@ public interface IAccess extends IValue, IValued, IValueList
 			if (type != null)
 			{
 				match = type.resolveMethod(null, name, arguments);
+				if (match != null)
+				{
+					return match.theMethod;
+				}
+			}
+		}
+		else if (arguments.size() == 1)
+		{
+			IValue v = arguments.get(0);
+			IType type = v.getType();
+			if (type != null)
+			{
+				match = type.resolveMethod(instance, name, Util.EMPTY_VALUES);
 				if (match != null)
 				{
 					return match.theMethod;

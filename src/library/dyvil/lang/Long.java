@@ -2,6 +2,7 @@ package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Intrinsic;
+import dyvil.lang.annotation.prefix;
 
 public class Long implements Integer
 {
@@ -73,22 +74,22 @@ public class Long implements Integer
 	// Unary operators
 	
 	@Override
-	@Intrinsic({ INSTANCE })
-	public Long $plus()
+	@Intrinsic({ INSTANCE, ARGUMENTS })
+	public @prefix Long $plus()
 	{
 		return this;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, LNEG })
-	public Long $minus()
+	@Intrinsic({ INSTANCE, ARGUMENTS, LNEG })
+	public @prefix Long $minus()
 	{
 		return Long.create(-this.value);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, LCONST_M1, LXOR })
-	public Long $tilde()
+	@Intrinsic({ INSTANCE, ARGUMENTS, LCONST_M1, LXOR })
+	public @prefix Long $tilde()
 	{
 		return Long.create(~this.value);
 	}

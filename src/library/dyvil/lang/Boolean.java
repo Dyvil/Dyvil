@@ -2,6 +2,7 @@ package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
 import dyvil.lang.annotation.Intrinsic;
+import dyvil.lang.annotation.prefix;
 
 public class Boolean implements Boolean$
 {
@@ -29,7 +30,7 @@ public class Boolean implements Boolean$
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IBIN })
-	public Boolean $bang()
+	public @prefix Boolean $bang()
 	{
 		return create(!this.value);
 	}
