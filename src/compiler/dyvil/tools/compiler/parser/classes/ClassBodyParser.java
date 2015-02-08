@@ -5,6 +5,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.ClassBody;
+import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
@@ -91,13 +92,25 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		if (this.isInMode(TYPE))
 		{
 			int i = 0;
-			if ((i = Modifiers.FIELD_OR_METHOD.parse(value)) != -1)
+			if ((i = Modifiers.MEMBER.parse(value)) != -1)
 			{
 				if ((this.modifiers & i) != 0)
 				{
 					throw new SyntaxError(token, "Duplicate Modifier '" + value + "' - Remove this Modifier");
 				}
 				this.modifiers |= i;
+				return true;
+			}
+			if ((i = Modifiers.CLASS_TYPE.parse(value)) != -1)
+			{
+				CodeClass codeClass = new CodeClass(null, this.theClass.getUnit(), this.modifiers, this.annotations);
+				this.theClass.getBody().addClass(codeClass);
+				codeClass.setOuterClass(this.theClass);
+				
+				ClassDeclParser parser = new ClassDeclParser(codeClass);
+				pm.pushParser(parser);
+				this.modifiers = 0;
+				this.annotations = new ArrayList();
 				return true;
 			}
 			if (value.charAt(0) == '@')

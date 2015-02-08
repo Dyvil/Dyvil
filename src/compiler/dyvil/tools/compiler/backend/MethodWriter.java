@@ -4,8 +4,10 @@ import static jdk.internal.org.objectweb.asm.Opcodes.*;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
+import jdk.internal.org.objectweb.asm.ClassWriter;
 
 public final class MethodWriter extends MethodVisitor
 {
@@ -13,6 +15,8 @@ public final class MethodWriter extends MethodVisitor
 	public static final Integer		TOP				= jdk.internal.org.objectweb.asm.Opcodes.TOP;
 	public static final Integer		INT				= jdk.internal.org.objectweb.asm.Opcodes.INTEGER;
 	public static final Object[]	EMPTY_STACK		= new Object[0];
+	
+	public ClassWriter				cw;
 	
 	public boolean					hasReturn;
 	private int						localCount;
@@ -24,9 +28,10 @@ public final class MethodWriter extends MethodVisitor
 	private int						maxStack;
 	private Object[]				stack			= new Object[3];
 	
-	public MethodWriter(MethodVisitor mv)
+	public MethodWriter(ClassWriter cw, MethodVisitor mv)
 	{
 		super(ASM5, mv);
+		this.cw = cw;
 	}
 	
 	public void setConstructor(IType type)
@@ -152,6 +157,12 @@ public final class MethodWriter extends MethodVisitor
 	{
 		this.addLocal(index, type.getFrameType());
 		this.mv.visitParameter(name, index);
+		
+		IClass iclass = type.getTheClass();
+		if (iclass != null)
+		{
+			iclass.writeInnerClassInfo(this.cw);
+		}
 	}
 	
 	public void visitParameter(String name, Object type, int index)
@@ -884,6 +895,12 @@ public final class MethodWriter extends MethodVisitor
 	
 	public void visitEnd(IType type)
 	{
+		IClass iclass = type.getTheClass();
+		if (iclass != null)
+		{
+			iclass.writeInnerClassInfo(this.cw);
+		}
+		
 		if (!this.hasReturn)
 		{
 			this.mv.visitInsn(type.getReturnOpcode());

@@ -25,7 +25,7 @@ public class Formatting
 	public static class Class
 	{
 		public static String	superClassesSeperator	= ", ";
-		public static String	bodyStart				= "\n{\n";
+		public static String	bodyStart				= "{\n";
 		public static String	bodyEnd					= "}\n";
 		public static String	bodyIndent				= "\t";
 		

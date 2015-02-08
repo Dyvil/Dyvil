@@ -297,7 +297,7 @@ public class Type extends ASTNode implements IType
 				
 				return t.getArrayType(this.arrayDimensions);
 			}
-			else if (context == Package.rootPackage)
+			else if (context == Package.rootPackage && this.fullName != null)
 			{
 				iclass = context.resolveClass(this.fullName);
 			}

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -25,8 +26,11 @@ import dyvil.tools.compiler.util.Modifiers;
 
 public class BytecodeClass extends CodeClass
 {
-	public Package	thePackage;
-	public boolean	typesResolved;
+	public Package		thePackage;
+	public boolean		typesResolved;
+	
+	private IType		outerType;
+	private List<IType>	innerTypes;
 	
 	public BytecodeClass()
 	{
@@ -46,6 +50,8 @@ public class BytecodeClass extends CodeClass
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		this.typesResolved = true;
+		
 		if (this.superType != null)
 		{
 			if (this.superType.isName("void"))
@@ -74,7 +80,21 @@ public class BytecodeClass extends CodeClass
 		}
 		
 		this.body.resolveTypes(markers, Package.rootPackage);
-		this.typesResolved = true;
+		
+		if (this.outerType != null)
+		{
+			this.outerClass = this.outerType.resolve(context).getTheClass();
+		}
+		
+		if (this.innerTypes != null)
+		{
+			for (IType t : this.innerTypes)
+			{
+				IClass iclass = t.resolve(context).getTheClass();
+				this.body.addClass(iclass);
+			}
+			this.innerTypes = null;
+		}
 	}
 	
 	@Override
@@ -95,16 +115,18 @@ public class BytecodeClass extends CodeClass
 	@Override
 	public IClass resolveClass(String name)
 	{
-		if (this.name.equals(name))
+		if (!this.typesResolved)
 		{
-			return this;
+			this.resolveTypes(null, Package.rootPackage);
 		}
-		IClass iclass = this.thePackage.resolveClass(name);
-		if (iclass != null)
+		
+		IClass clazz = this.body.getClass(name);
+		if (clazz != null)
 		{
-			return iclass;
+			return clazz;
 		}
-		return Package.rootPackage.resolveClass(name);
+		
+		return null;
 	}
 	
 	@Override
@@ -190,7 +212,11 @@ public class BytecodeClass extends CodeClass
 		this.modifiers = access;
 		this.internalName = name;
 		
-		int index = name.lastIndexOf('/');
+		int index = name.lastIndexOf('$');
+		if (index == -1)
+		{
+			index = name.lastIndexOf('/');
+		}
 		if (index == -1)
 		{
 			this.name = name;
@@ -305,5 +331,21 @@ public class BytecodeClass extends CodeClass
 				return new AnnotationVisitorImpl(Opcodes.ASM5, method, annotation);
 			}
 		};
+	}
+	
+	public void visitOuterClass(String owner, String name, String desc)
+	{
+		this.outerType = ClassFormat.internalToType(owner);
+	}
+	
+	public void visitInnerClass(String name, String outerName, String innerName, int access)
+	{
+		if (this.innerTypes == null)
+		{
+			this.innerTypes = new ArrayList(1);
+		}
+		
+		IType type = ClassFormat.internalToType(name);
+		this.innerTypes.add(type);
 	}
 }

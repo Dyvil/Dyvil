@@ -39,56 +39,59 @@ public class CaseClasses
 		writer.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false, 2, (String) null);
 		
 		// ----- Fields -----
-		Iterator<IField> iterator = fields.iterator();
-		while (true)
+		if (!fields.isEmpty())
 		{
-			IField f = iterator.next();
-			
-			if (f.hasModifier(Modifiers.STATIC))
+			Iterator<IField> iterator = fields.iterator();
+			while (true)
 			{
+				IField f = iterator.next();
+				
+				if (f.hasModifier(Modifiers.STATIC))
+				{
+					if (iterator.hasNext())
+					{
+						continue;
+					}
+					break;
+				}
+				
+				IType type = f.getType();
+				
+				// Get the field
+				writer.visitVarInsn(ALOAD, 0);
+				f.writeGet(writer);
+				
+				// Write the call to the StringBuilder#append() method that
+				// corresponds to the type of the field
+				StringBuilder desc = new StringBuilder().append('(');
+				
+				if (type.isPrimitive())
+				{
+					type.appendExtendedName(desc);
+				}
+				else if (type == Type.STRING)
+				{
+					desc.append("Ljava/lang/String;");
+				}
+				else
+				{
+					desc.append("Ljava/lang/Object;");
+				}
+				desc.append(")Ljava/lang/StringBuilder;");
+				
+				writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false, 2, "Ljava/lang/StringBuilder;");
+				
 				if (iterator.hasNext())
 				{
-					continue;
+					// Seperator Comma
+					writer.visitLdcInsn(", ");
+					writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
+							"Ljava/lang/StringBuilder;");
 				}
-				break;
-			}
-			
-			IType type = f.getType();
-			
-			// Get the field
-			writer.visitVarInsn(ALOAD, 0);
-			f.writeGet(writer);
-			
-			// Write the call to the StringBuilder#append() method that
-			// corresponds to the type of the field
-			StringBuilder desc = new StringBuilder().append('(');
-			
-			if (type.isPrimitive())
-			{
-				type.appendExtendedName(desc);
-			}
-			else if (type == Type.STRING)
-			{
-				desc.append("Ljava/lang/String;");
-			}
-			else
-			{
-				desc.append("Ljava/lang/Object;");
-			}
-			desc.append(")Ljava/lang/StringBuilder;");
-			
-			writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false, 2, "Ljava/lang/StringBuilder;");
-			
-			if (iterator.hasNext())
-			{
-				// Seperator Comma
-				writer.visitLdcInsn(", ");
-				writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
-						"Ljava/lang/StringBuilder;");
-			}
-			else
-			{
-				break;
+				else
+				{
+					break;
+				}
 			}
 		}
 		

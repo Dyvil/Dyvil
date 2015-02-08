@@ -51,6 +51,7 @@ public class ClassReader extends ClassVisitor
 	@Override
 	public void visitOuterClass(String owner, String name, String desc)
 	{
+		this.bclass.visitOuterClass(owner, name, desc);
 	}
 	
 	@Override
@@ -70,6 +71,7 @@ public class ClassReader extends ClassVisitor
 	@Override
 	public void visitInnerClass(String name, String outerName, String innerName, int access)
 	{
+		this.bclass.visitInnerClass(name, outerName, innerName, access);
 	}
 	
 	@Override

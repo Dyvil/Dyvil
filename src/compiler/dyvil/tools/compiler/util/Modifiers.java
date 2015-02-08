@@ -2,7 +2,7 @@ package dyvil.tools.compiler.util;
 
 public enum Modifiers
 {
-	ACCESS, CLASS_TYPE, CLASS, FIELD, METHOD, FIELD_OR_METHOD, PARAMETER;
+	ACCESS, CLASS_TYPE, CLASS, MEMBER, FIELD_OR_METHOD, FIELD, METHOD, PARAMETER;
 	
 	public String toString(int mod)
 	{
@@ -19,9 +19,9 @@ public enum Modifiers
 			writeAccessModifiers(mod, sb);
 			writeClassModifiers(mod, sb);
 			break;
+		case MEMBER:
 		case FIELD_OR_METHOD:
-			writeAccessModifiers(mod, sb);
-			writeFieldOrMethodModifiers(mod, sb);
+			// Do not write any Modifiers as this should never be called
 			break;
 		case FIELD:
 			writeAccessModifiers(mod, sb);
@@ -53,6 +53,18 @@ public enum Modifiers
 			if ((m = readAccessModifier(mod)) == -1)
 			{
 				m = readClassModifier(mod);
+			}
+			break;
+		case MEMBER:
+			if ((m = readAccessModifier(mod)) == -1)
+			{
+				if ((m = readClassModifier(mod)) == -1)
+				{
+					if ((m = readFieldModifier(mod)) == -1)
+					{
+						m = readMethodModifier(mod);
+					}
+				}
 			}
 			break;
 		case FIELD_OR_METHOD:
@@ -212,10 +224,10 @@ public enum Modifiers
 	 */
 	public static final int	DEPRECATED				= 0x00200000;
 	
-	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS | CASE_CLASS;
+	public static final int	CLASS_TYPE_MODIFIERS	= INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS;
 	public static final int	ACCESS_MODIFIERS		= PUBLIC | PROTECTED | PRIVATE | DEPRECATED | SEALED;
 	public static final int	MEMBER_MODIFIERS		= ACCESS_MODIFIERS | DEPRECATED | STATIC | FINAL | SYNTHETIC;
-	public static final int	CLASS_MODIFIERS			= MEMBER_MODIFIERS | ABSTRACT | STRICT | FUNCTIONAL;
+	public static final int	CLASS_MODIFIERS			= MEMBER_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL;
 	
 	public static final int	FIELD_MODIFIERS			= MEMBER_MODIFIERS | TRANSIENT | VOLATILE | LAZY;
 	public static final int	METHOD_MODIFIERS		= MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | PREFIX | DEPRECATED | BRIDGE
@@ -245,6 +257,10 @@ public enum Modifiers
 			}
 		}
 		
+		if ((mod & DEPRECATED) == DEPRECATED)
+		{
+			sb.append("deprecated ");
+		}
 		if ((mod & SEALED) == SEALED)
 		{
 			sb.append("sealed ");
@@ -304,63 +320,6 @@ public enum Modifiers
 		if ((mod & CASE_CLASS) == CASE_CLASS)
 		{
 			sb.append("case ");
-		}
-	}
-	
-	private static void writeFieldOrMethodModifiers(int mod, StringBuilder sb)
-	{
-		if ((mod & LAZY) == LAZY)
-		{
-			sb.append("lazy ");
-		}
-		else
-		{
-			if ((mod & FINAL) == FINAL)
-			{
-				sb.append("final ");
-			}
-			if ((mod & STATIC) == STATIC)
-			{
-				sb.append("static ");
-			}
-		}
-		
-		if ((mod & TRANSIENT) == TRANSIENT)
-		{
-			sb.append("transient ");
-		}
-		if ((mod & VOLATILE) == VOLATILE)
-		{
-			sb.append("volatile ");
-		}
-		
-		if ((mod & SYNCHRONIZED) == SYNCHRONIZED)
-		{
-			sb.append("synchronized ");
-		}
-		if ((mod & NATIVE) == NATIVE)
-		{
-			sb.append("native ");
-		}
-		if ((mod & STRICT) == STRICT)
-		{
-			sb.append("strictfp ");
-		}
-		if ((mod & INLINE) == INLINE)
-		{
-			sb.append("inline ");
-		}
-		if ((mod & INFIX) == INFIX)
-		{
-			sb.append("infix ");
-		}
-		if ((mod & PREFIX) == PREFIX)
-		{
-			sb.append("prefix ");
-		}
-		if ((mod & OVERRIDE) == OVERRIDE)
-		{
-			sb.append("override ");
 		}
 	}
 	

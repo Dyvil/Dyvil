@@ -41,6 +41,7 @@ import dyvil.tools.compiler.util.Util;
 public class CodeClass extends ASTNode implements IClass
 {
 	protected CompilationUnit		unit;
+	protected IClass				outerClass;
 	
 	protected int					modifiers;
 	
@@ -49,7 +50,7 @@ public class CodeClass extends ASTNode implements IClass
 	protected String				fullName;
 	protected String				internalName;
 	
-	protected List<Annotation>		annotations	= new ArrayList(1);
+	protected List<Annotation>		annotations;
 	
 	protected IType					superType	= Type.OBJECT;
 	protected List<IType>			interfaces	= new ArrayList(1);
@@ -66,12 +67,23 @@ public class CodeClass extends ASTNode implements IClass
 	public CodeClass()
 	{
 		this.type = new Type(this);
+		this.annotations = new ArrayList(1);
 	}
 	
 	public CodeClass(ICodePosition position, CompilationUnit unit)
 	{
 		this.position = position;
 		this.unit = unit;
+		this.annotations = new ArrayList(1);
+		this.type = new Type(this);
+	}
+	
+	public CodeClass(ICodePosition position, CompilationUnit unit, int modifiers, List<Annotation> annotations)
+	{
+		this.position = position;
+		this.unit = unit;
+		this.modifiers = modifiers;
+		this.annotations = annotations;
 		this.type = new Type(this);
 	}
 	
@@ -85,6 +97,18 @@ public class CodeClass extends ASTNode implements IClass
 	public Package getPackage()
 	{
 		return this.unit.pack;
+	}
+	
+	@Override
+	public void setOuterClass(IClass iclass)
+	{
+		this.outerClass = iclass;
+	}
+	
+	@Override
+	public IClass getOuterClass()
+	{
+		return this.outerClass;
 	}
 	
 	@Override
@@ -582,7 +606,7 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public Package resolvePackage(String name)
 	{
-		return this.unit.resolvePackage(name);
+		return null;
 	}
 	
 	@Override
@@ -597,6 +621,12 @@ public class CodeClass extends ASTNode implements IClass
 					return var.getTheClass();
 				}
 			}
+		}
+		
+		IClass clazz = this.body.getClass(name);
+		if (clazz != null)
+		{
+			return clazz;
 		}
 		
 		return this.unit.resolveClass(name);
@@ -816,20 +846,35 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void write(ClassWriter writer)
 	{
+		// Header
+		
 		String internalName = this.getInternalName();
 		String signature = this.getSignature();
-		String superClass = this.superType == null ? null : this.superType.getInternalName();
-		String[] interfaces = this.getInterfaceArray();
+		String superClass = null;
+		int interfaceCount = this.interfaces.size();
+		String[] interfaces = new String[interfaceCount];
+		
+		if (this.superType != null)
+		{
+			superClass = this.superType.getInternalName();
+		}
+		
+		for (int i = 0; i < interfaceCount; i++)
+		{
+			IType type = this.interfaces.get(i);
+			interfaces[i] = type.getInternalName();
+		}
+		
 		writer.visit(Opcodes.V1_8, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
 		
-		List<IField> fields = this.body.fields;
-		List<IMethod> methods = this.body.methods;
+		// Outer Class
 		
-		ThisValue thisValue = new ThisValue(null, this.type);
-		IField instanceField = this.instanceField;
-		StatementList instanceFields = new StatementList(null);
-		StatementList staticFields = new StatementList(null);
-		boolean hasConstructor = false;
+		if (this.outerClass != null)
+		{
+			writer.visitOuterClass(this.outerClass.getInternalName(), null, null);
+		}
+		
+		// Annotations
 		
 		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
 		{
@@ -852,6 +897,61 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			a.write(writer);
 		}
+		
+		// Inner Class Info
+		
+		if (this.outerClass != null)
+		{
+			this.writeInnerClassInfo(writer);
+		}
+		
+		if (this.superType != null)
+		{
+			IClass iclass = this.superType.getTheClass();
+			if (iclass != null)
+			{
+				iclass.writeInnerClassInfo(writer);
+			}
+		}
+		
+		for (int i = 0; i < interfaceCount; i++)
+		{
+			IType type = this.interfaces.get(i);
+			IClass iclass = type.getTheClass();
+			if (iclass != null)
+			{
+				iclass.writeInnerClassInfo(writer);
+			}
+		}
+		
+		// Fields, Methods and Properties
+		
+		List<IField> fields;
+		List<IMethod> methods;
+		List<IProperty> properties;
+		if (this.body != null)
+		{
+			fields = this.body.fields;
+			methods = this.body.methods;
+			properties = this.body.properties;
+			
+			for (IClass iclass : this.body.classes)
+			{
+				iclass.writeInnerClassInfo(writer);
+			}
+		}
+		else
+		{
+			fields = Collections.EMPTY_LIST;
+			methods = Collections.EMPTY_LIST;
+			properties = Collections.EMPTY_LIST;
+		}
+		
+		ThisValue thisValue = new ThisValue(null, this.type);
+		IField instanceField = this.instanceField;
+		StatementList instanceFields = new StatementList(null);
+		StatementList staticFields = new StatementList(null);
+		boolean hasConstructor = false;
 		
 		for (IField f : fields)
 		{
@@ -898,7 +998,7 @@ public class CodeClass extends ASTNode implements IClass
 			this.constructor.write(writer);
 		}
 		
-		for (IProperty p : this.body.properties)
+		for (IProperty p : properties)
 		{
 			p.write(writer);
 		}
@@ -911,23 +1011,24 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if ((this.modifiers & Modifiers.CASE_CLASS) != 0)
 		{
-			MethodWriter mw = new MethodWriter(writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));
+			MethodWriter mw = new MethodWriter(writer,
+					writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));
 			mw.visitParameter("obj", "Ljava/lang/Object;", 0);
 			mw.addLocal(1, this.type);
 			mw.visitCode();
-			CaseClasses.writeEquals(mw, this, this.body.fields);
+			CaseClasses.writeEquals(mw, this, fields);
 			mw.visitEnd();
 			
-			mw = new MethodWriter(writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I", null, null));
+			mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I", null, null));
 			mw.addLocal(0, this.type);
 			mw.visitCode();
-			CaseClasses.writeHashCode(mw, this, this.body.fields);
+			CaseClasses.writeHashCode(mw, this, fields);
 			mw.visitEnd();
 			
-			mw = new MethodWriter(writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString", "()Ljava/lang/String;", null, null));
+			mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString", "()Ljava/lang/String;", null, null));
 			mw.addLocal(0, this.type);
 			mw.visitCode();
-			CaseClasses.writeToString(mw, this, this.body.fields);
+			CaseClasses.writeToString(mw, this, fields);
 			mw.visitEnd();
 		}
 		
@@ -952,6 +1053,15 @@ public class CodeClass extends ASTNode implements IClass
 			m.setModifiers(Modifiers.STATIC | Modifiers.MANDATED);
 			m.setValue(staticFields);
 			m.write(writer);
+		}
+	}
+	
+	@Override
+	public void writeInnerClassInfo(ClassWriter writer)
+	{
+		if (this.outerClass != null)
+		{
+			writer.visitInnerClass(this.internalName, this.outerClass.getInternalName(), this.qualifiedName, this.modifiers | Modifiers.STATIC);
 		}
 	}
 	
@@ -993,6 +1103,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.body != null)
 		{
+			buffer.append('\n');
 			this.body.toString(prefix, buffer);
 		}
 		else

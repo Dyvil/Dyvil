@@ -6,6 +6,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -178,7 +179,6 @@ public class CompilationUnit extends ASTNode implements IContext
 	
 	public void compile()
 	{
-		
 		int size = this.markers.size();
 		if (size > 0)
 		{
@@ -204,13 +204,24 @@ public class CompilationUnit extends ASTNode implements IContext
 		
 		for (IClass iclass : this.classes)
 		{
-			String name = iclass.getName();
+			String name = iclass.getQualifiedName();
 			if (!name.equals(this.name))
 			{
 				name = this.name + "$" + name;
 			}
 			File file = new File(this.outputDirectory, name + ".class");
 			ClassWriter.saveClass(file, iclass);
+			
+			ClassBody body = iclass.getBody();
+			if (body != null)
+			{
+				for (IClass iclass1 : body.classes)
+				{
+					name = this.name + "$" + iclass1.getQualifiedName() + ".class";
+					file = new File(this.outputDirectory, name);
+					ClassWriter.saveClass(file, iclass1);
+				}
+			}
 		}
 	}
 	

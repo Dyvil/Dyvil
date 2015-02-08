@@ -12,7 +12,6 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -721,8 +720,7 @@ public class Method extends Member implements IMethod
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		MethodVisitor visitor = writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions());
-		MethodWriter mw = new MethodWriter(visitor);
+		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions()));
 		
 		if (this.isConstructor)
 		{

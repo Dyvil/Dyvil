@@ -22,6 +22,10 @@ public interface IClass extends IASTNode, IMember, IAnnotated, IModified, INamed
 	
 	public Package getPackage();
 	
+	public void setOuterClass(IClass iclass);
+	
+	public IClass getOuterClass();
+	
 	public boolean equals(IClass iclass);
 	
 	// Modifiers
@@ -71,4 +75,6 @@ public interface IClass extends IASTNode, IMember, IAnnotated, IModified, INamed
 	public String[] getInterfaceArray();
 	
 	public void write(ClassWriter writer);
+	
+	public void writeInnerClassInfo(ClassWriter writer);
 }

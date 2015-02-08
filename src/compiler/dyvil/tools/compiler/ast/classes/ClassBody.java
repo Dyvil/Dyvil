@@ -19,6 +19,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public class ClassBody extends ASTNode
 {
 	public IClass			theClass;
+	public List<IClass>		classes		= new ArrayList();
 	public List<IField>		fields		= new ArrayList();
 	public List<IMethod>	methods		= new ArrayList();
 	public List<IProperty>	properties	= new ArrayList();
@@ -44,6 +45,23 @@ public class ClassBody extends ASTNode
 		return this.theClass;
 	}
 	
+	public void addClass(IClass clazz)
+	{
+		this.classes.add(clazz);
+	}
+	
+	public IClass getClass(String name)
+	{
+		for (IClass c : this.classes)
+		{
+			if (c.isName(name))
+			{
+				return c;
+			}
+		}
+		return null;
+	}
+	
 	public void addField(IField field)
 	{
 		this.fields.add(field);
@@ -53,7 +71,7 @@ public class ClassBody extends ASTNode
 	{
 		for (IField field : this.fields)
 		{
-			if (name.equals(field.getName()))
+			if (field.isName(name))
 			{
 				return field;
 			}
@@ -87,7 +105,7 @@ public class ClassBody extends ASTNode
 	{
 		for (IMethod method : this.methods)
 		{
-			if (name.equals(method.getName()))
+			if (method.isName(name))
 			{
 				return method;
 			}
@@ -100,7 +118,7 @@ public class ClassBody extends ASTNode
 		outer:
 		for (IMethod method : this.methods)
 		{
-			if (!name.equals(method.getName()))
+			if (!method.isName(name))
 			{
 				continue;
 			}
@@ -140,6 +158,10 @@ public class ClassBody extends ASTNode
 	
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		for (IClass clazz : this.classes)
+		{
+			clazz.resolveTypes(markers, context);
+		}
 		for (IField field : this.fields)
 		{
 			field.resolveTypes(markers, context);
@@ -156,6 +178,10 @@ public class ClassBody extends ASTNode
 	
 	public void resolve(List<Marker> markers, IContext context)
 	{
+		for (IClass clazz : this.classes)
+		{
+			clazz.resolve(markers, context);
+		}
 		for (IField field : this.fields)
 		{
 			field.resolve(markers, context);
@@ -172,6 +198,10 @@ public class ClassBody extends ASTNode
 	
 	public void check(List<Marker> markers, IContext context)
 	{
+		for (IClass clazz : this.classes)
+		{
+			clazz.check(markers, context);
+		}
 		for (IField field : this.fields)
 		{
 			field.check(markers, context);
@@ -188,6 +218,10 @@ public class ClassBody extends ASTNode
 	
 	public void foldConstants()
 	{
+		for (IClass clazz : this.classes)
+		{
+			clazz.foldConstants();
+		}
 		for (IField field : this.fields)
 		{
 			field.foldConstants();
@@ -207,6 +241,16 @@ public class ClassBody extends ASTNode
 	{
 		buffer.append(prefix).append(Formatting.Class.bodyStart);
 		String prefix1 = prefix + Formatting.Class.bodyIndent;
+		
+		if (!this.classes.isEmpty())
+		{
+			for (IClass clazz : this.classes)
+			{
+				clazz.toString(prefix1, buffer);
+				buffer.append('\n');
+			}
+			buffer.append('\n');
+		}
 		
 		if (!this.fields.isEmpty())
 		{
