@@ -88,7 +88,7 @@ public class AccessResolver
 				prev = null;
 			}
 			
-			if (next != null && !curr.isResolved())
+			if (next != null && (!curr.isResolved() || !next.isResolved()))
 			{
 				next.setValue(null);
 				if (next.resolve(context, markers))
@@ -102,10 +102,18 @@ public class AccessResolver
 						}
 						next = (IAccess) alternate;
 						curr = prev;
-						iterator.next();
-						iterator.remove();
-						iterator.previous();
-						iterator.set(next);
+						
+						if (iterator.hasNext())
+						{
+							iterator.next();
+							iterator.remove();
+							iterator.previous();
+							iterator.set(next);
+						}
+						else
+						{
+							iterator.set(next);
+						}
 					}
 					else
 					{

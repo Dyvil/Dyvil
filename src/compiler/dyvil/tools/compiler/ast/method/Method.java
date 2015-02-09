@@ -720,7 +720,8 @@ public class Method extends Member implements IMethod
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions()));
+		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(),
+				this.getExceptions()));
 		
 		if (this.isConstructor)
 		{
@@ -773,6 +774,11 @@ public class Method extends Member implements IMethod
 	@Override
 	public void writeCall(MethodWriter writer, IValue instance, List<IValue> arguments)
 	{
+		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
+		{
+			instance = null;
+		}
+		
 		if (this.intrinsicOpcodes != null)
 		{
 			if (this.type == Type.BOOLEAN)
@@ -801,6 +807,11 @@ public class Method extends Member implements IMethod
 	@Override
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
 	{
+		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
+		{
+			instance = null;
+		}
+		
 		if (this.intrinsicOpcodes != null)
 		{
 			this.writeIntrinsic(writer, dest, instance, arguments);
@@ -814,6 +825,11 @@ public class Method extends Member implements IMethod
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
 	{
+		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
+		{
+			instance = null;
+		}
+		
 		if (this.intrinsicOpcodes != null)
 		{
 			this.writeInvIntrinsic(writer, dest, instance, arguments);

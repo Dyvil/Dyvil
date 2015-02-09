@@ -66,7 +66,7 @@ public class ClassAccess extends ASTNode implements IValue, ITyped
 		{
 			return 3;
 		}
-		else if (this.type.isSuperType(type))
+		else if (type.isSuperTypeOf(this.type))
 		{
 			return 2;
 		}
@@ -147,7 +147,7 @@ public class ClassAccess extends ASTNode implements IValue, ITyped
 			IField field = iclass.getInstanceField();
 			if (field != null)
 			{
-				field.writeGet(writer);
+				field.writeGet(writer, null);
 			}
 		}
 	}

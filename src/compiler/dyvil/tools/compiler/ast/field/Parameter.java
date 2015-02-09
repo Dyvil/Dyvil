@@ -226,14 +226,16 @@ public class Parameter extends Member implements IVariable
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer)
+	public void writeGet(MethodWriter writer, IValue instance)
 	{
 		writer.visitVarInsn(this.type.getLoadOpcode(), this.index, this.type);
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer)
+	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
+		value.writeExpression(writer);
+		
 		writer.visitVarInsn(this.type.getStoreOpcode(), this.index, null);
 	}
 	

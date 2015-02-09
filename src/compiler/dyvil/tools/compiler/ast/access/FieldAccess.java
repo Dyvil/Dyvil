@@ -86,7 +86,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		{
 			return 3;
 		}
-		else if (type1.isSuperType(type))
+		else if (Type.isSuperType(type, type1))
 		{
 			return 2;
 		}
@@ -249,7 +249,16 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public boolean isResolved()
 	{
-		return this.field != null;
+		if (this.field == null)
+		{
+			return false;
+		}
+		
+		if (this.instance != null && !(this.field instanceof Field))
+		{
+			return false;
+		}
+		return true;
 	}
 	
 	@Override
@@ -265,6 +274,11 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 				enumValue.qualifiedName = this.qualifiedName;
 				enumValue.type = field.getType();
 				this.replacement = enumValue;
+				return false;
+			}
+			
+			if (this.instance != null && !(field instanceof Field))
+			{
 				return false;
 			}
 			
@@ -340,23 +354,13 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		if (this.instance != null)
-		{
-			this.instance.writeExpression(writer);
-		}
-		
-		this.field.writeGet(writer);
+		this.field.writeGet(writer, this.instance);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		if (this.instance != null)
-		{
-			this.instance.writeExpression(writer);
-		}
-		
-		this.field.writeGet(writer);
+		this.field.writeGet(writer, this.instance);
 		writer.visitInsn(this.field.getType().getReturnOpcode());
 	}
 	

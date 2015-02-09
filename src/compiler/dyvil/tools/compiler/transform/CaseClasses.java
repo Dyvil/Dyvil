@@ -59,7 +59,7 @@ public class CaseClasses
 				
 				// Get the field
 				writer.visitVarInsn(ALOAD, 0);
-				f.writeGet(writer);
+				f.writeGet(writer, null);
 				
 				// Write the call to the StringBuilder#append() method that
 				// corresponds to the type of the field

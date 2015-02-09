@@ -80,7 +80,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 		{
 			return 3;
 		}
-		else if (type1.isSuperType(type))
+		else if (type.isSuperTypeOf(type1))
 		{
 			return 2;
 		}

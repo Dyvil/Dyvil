@@ -249,6 +249,21 @@ public class Property extends Field implements IProperty, IContext
 	}
 	
 	@Override
+	public byte getAccessibility()
+	{
+		byte b = 0;
+		if (this.get != null)
+		{
+			b |= IContext.READ_ACCESS;
+		}
+		if (this.set != null)
+		{
+			b |= IContext.WRITE_ACCESS;
+		}
+		return b;
+	}
+
+	@Override
 	public void write(ClassWriter writer)
 	{
 		if (this.getterMethod != null)
@@ -262,8 +277,13 @@ public class Property extends Field implements IProperty, IContext
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer)
+	public void writeGet(MethodWriter writer, IValue instance)
 	{
+		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.getValueType() != IValue.CLASS_ACCESS))
+		{
+			instance.writeExpression(writer);
+		}
+		
 		int opcode;
 		int args;
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
@@ -284,23 +304,15 @@ public class Property extends Field implements IProperty, IContext
 	}
 	
 	@Override
-	public byte getAccessibility()
+	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
-		byte b = 0;
-		if (this.get != null)
+		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.getValueType() != IValue.CLASS_ACCESS))
 		{
-			b |= IContext.READ_ACCESS;
+			instance.writeExpression(writer);
 		}
-		if (this.set != null)
-		{
-			b |= IContext.WRITE_ACCESS;
-		}
-		return b;
-	}
-	
-	@Override
-	public void writeSet(MethodWriter writer)
-	{
+		
+		value.writeExpression(writer);
+		
 		int opcode;
 		int args;
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)

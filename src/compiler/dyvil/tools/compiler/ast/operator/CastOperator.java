@@ -56,7 +56,7 @@ public class CastOperator extends ASTNode implements IValue
 		{
 			return 3;
 		}
-		else if (this.type.isSuperType(type))
+		else if (type.isSuperTypeOf(this.type))
 		{
 			return 2;
 		}

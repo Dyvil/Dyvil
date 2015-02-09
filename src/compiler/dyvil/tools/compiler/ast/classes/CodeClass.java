@@ -324,15 +324,15 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public boolean isSuperType(IType type)
+	public boolean isSubTypeOf(IType type)
 	{
-		if (this.superType != null && type.isAssignableFrom(this.superType))
+		if (this.superType != null && type.isSuperTypeOf(this.superType))
 		{
 			return true;
 		}
 		for (IType i : this.interfaces)
 		{
-			if (type.isAssignableFrom(i))
+			if (type.isSuperTypeOf(i))
 			{
 				return true;
 			}
@@ -669,29 +669,10 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		for (IType i : this.interfaces)
-		{
-			match = i.resolveField(name);
-			if (match != null)
-			{
-				return match;
-			}
-		}
-		
 		if (this.unit != null && this.unit.hasStaticImports())
 		{
 			// Static Imports
 			match = this.unit.resolveField(name);
-			if (match != null)
-			{
-				return match;
-			}
-		}
-		
-		// Predef
-		if (this != Type.PREDEF_CLASS)
-		{
-			match = Type.PREDEF_CLASS.resolveField(name);
 			if (match != null)
 			{
 				return match;

@@ -72,7 +72,7 @@ public class TupleType extends Type implements ITypeList
 	}
 	
 	@Override
-	public boolean isAssignableFrom(IType type)
+	public boolean isSuperTypeOf(IType type)
 	{
 		if (type instanceof TupleType)
 		{
@@ -88,7 +88,7 @@ public class TupleType extends Type implements ITypeList
 			{
 				IType t1 = this.types.get(i);
 				IType t2 = tuple.types.get(i);
-				if (!t1.isAssignableFrom(t2))
+				if (!t1.isSuperTypeOf(t2))
 				{
 					return false;
 				}

@@ -56,7 +56,7 @@ public class FieldInitializer extends ASTNode implements IValue, IValued, ITyped
 		{
 			return 3;
 		}
-		else if (this.variable.type.isSuperType(type))
+		else if (this.variable.type.isSuperTypeOf(type))
 		{
 			return 2;
 		}
@@ -112,14 +112,13 @@ public class FieldInitializer extends ASTNode implements IValue, IValued, ITyped
 	{
 		this.variable.value.writeExpression(writer);
 		writer.visitInsn(Opcodes.DUP);
-		this.variable.writeSet(writer);
+		this.variable.writeSet(writer, null, null);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.variable.value.writeExpression(writer);
-		this.variable.writeSet(writer);
+		this.variable.writeSet(writer, null, this.variable.value);
 	}
 	
 	@Override

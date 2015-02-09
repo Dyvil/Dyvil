@@ -369,8 +369,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			if (var != null)
 			{
 				writer.addLocal(var.index, var.type);
-				var.value.writeExpression(writer);
-				var.writeSet(writer);
+				var.writeSet(writer, null, var.value);
 			}
 			
 			writer.visitLabel(this.startLabel);
@@ -421,23 +420,23 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Load the array
 			var.value.writeExpression(writer);
 			writer.visitInsn(Opcodes.DUP);
-			arrayVar.writeSet(writer);
+			arrayVar.writeSet(writer, null, null);
 			// Load the length
 			writer.visitInsn(Opcodes.ARRAYLENGTH);
-			lengthVar.writeSet(writer);
+			lengthVar.writeSet(writer, null, null);
 			// Set index to 0
 			writer.visitLdcInsn(0);
-			indexVar.writeSet(writer);
+			indexVar.writeSet(writer, null, null);
 			
 			// Jump to boundary check
 			writer.visitJumpInsn(Opcodes.GOTO, this.updateLabel);
 			writer.visitLabel(this.startLabel);
 			
 			// Load the element
-			arrayVar.writeGet(writer);
-			indexVar.writeGet(writer);
+			arrayVar.writeGet(writer, null);
+			indexVar.writeGet(writer, null);
 			writer.visitInsn(arrayVar.type.getArrayLoadOpcode());
-			var.writeSet(writer);
+			var.writeSet(writer, null, null);
 			
 			// Then
 			this.then.writeStatement(writer);
@@ -446,8 +445,8 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			writer.visitIincInsn(indexVar.index, 1);
 			// Boundary Check
 			writer.visitLabel(this.updateLabel);
-			indexVar.writeGet(writer);
-			lengthVar.writeGet(writer);
+			indexVar.writeGet(writer, null);
+			lengthVar.writeGet(writer, null);
 			writer.visitJumpInsn2(Opcodes.IF_ICMPLT, this.startLabel);
 			
 			// Local Variables

@@ -224,12 +224,17 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer)
+	public void writeGet(MethodWriter writer, IValue instance)
 	{
 		if ((this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
 		{
 			this.value.writeExpression(writer);
 			return;
+		}
+		
+		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.getValueType() != IValue.CLASS_ACCESS))
+		{
+			instance.writeExpression(writer);
 		}
 		
 		String owner = this.theClass.getInternalName();
@@ -246,8 +251,15 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer)
+	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
+		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.getValueType() != IValue.CLASS_ACCESS))
+		{
+			instance.writeExpression(writer);
+		}
+		
+		value.writeExpression(writer);
+		
 		String owner = this.theClass.getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();

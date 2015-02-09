@@ -45,6 +45,7 @@ public class Type extends ASTNode implements IType
 	
 	public static IClass				PREDEF_CLASS;
 	public static IClass				STRING_CLASS;
+	public static IClass OBJECT_CLASS;
 	
 	public String						name;
 	public String						qualifiedName;
@@ -91,7 +92,7 @@ public class Type extends ASTNode implements IType
 		
 		ANY.theClass = Package.dyvilLang.resolveClass("Any");
 		ANY.fullName = "dyvil.lang.Any";
-		OBJECT.theClass = Package.javaLang.resolveClass("Object");
+		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		OBJECT.fullName = "java.lang.Object";
 		PREDEF.theClass = PREDEF_CLASS = Package.dyvilLang.resolveClass("Predef");
 		PREDEF.fullName = "dyvil.lang.Predef";
@@ -169,7 +170,7 @@ public class Type extends ASTNode implements IType
 		{
 			return true;
 		}
-		return superType.isAssignableFrom(subType);
+		return superType.isSuperTypeOf(subType);
 	}
 	
 	@Override

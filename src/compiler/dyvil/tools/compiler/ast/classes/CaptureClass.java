@@ -35,14 +35,14 @@ public class CaptureClass extends CodeClass
 	@Override
 	public boolean equals(IClass iclass)
 	{
-		if (!iclass.isSuperType(this.superType))
+		if (!iclass.isSubTypeOf(this.superType))
 		{
 			return false;
 		}
 		
 		for (IType i : this.interfaces)
 		{
-			if (!iclass.isSuperType(i))
+			if (!iclass.isSubTypeOf(i))
 			{
 				return false;
 			}

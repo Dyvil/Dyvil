@@ -268,7 +268,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		}
 		this.value.writeExpression(writer);
 		writer.visitInsn(Opcodes.DUP);
-		this.field.writeSet(writer);
+		this.field.writeSet(writer, null, null);
 	}
 	
 	@Override
@@ -279,12 +279,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 			return;
 		}
 		
-		if (this.instance != null)
-		{
-			this.instance.writeExpression(writer);
-		}
-		this.value.writeExpression(writer);
-		this.field.writeSet(writer);
+		this.field.writeSet(writer, this.instance, this.value);
 	}
 	
 	@Override

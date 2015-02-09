@@ -95,7 +95,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		{
 			return 3;
 		}
-		else if (type1.isSuperType(type))
+		else if (Type.isSuperType(type, type1))
 		{
 			return 2;
 		}
@@ -464,6 +464,17 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	@Override
 	public IAccess resolve3(IContext context, IAccess next)
 	{
+		List<IValue> list = new ArrayList(this.arguments);
+		list.add(next);
+		
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, list);
+		if (method != null)
+		{
+			this.arguments = list;
+			this.method = method;
+			return this;
+		}
+		
 		return null;
 	}
 	

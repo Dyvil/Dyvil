@@ -74,7 +74,7 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 		{
 			return 3;
 		}
-		else if (this.type.isSuperType(type))
+		else if (type.isSuperTypeOf(this.type))
 		{
 			return 2;
 		}

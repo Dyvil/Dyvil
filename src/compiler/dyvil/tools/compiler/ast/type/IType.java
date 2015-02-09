@@ -67,30 +67,28 @@ public interface IType extends IASTNode, INamed, IContext
 	
 	public IType getSuperType();
 	
-	public default boolean isSuperType(IType type)
+	/**
+	 * Returns true if {@code type} is a subtype of this type
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public default boolean isSuperTypeOf(IType type)
 	{
-		if (this.getArrayDimensions() != type.getArrayDimensions())
+		IClass thisClass = this.getTheClass();
+		IClass thatClass = type.getTheClass();
+		int arrayDimensions = type.getArrayDimensions();
+		if (arrayDimensions > 0 && thisClass == Type.OBJECT_CLASS)
+		{
+			return arrayDimensions > this.getArrayDimensions();
+		}
+		if (arrayDimensions != this.getArrayDimensions())
 		{
 			return false;
 		}
-		IClass iclass = this.getTheClass();
-		if (iclass != null)
+		if (thatClass != null)
 		{
-			return iclass.isSuperType(type);
-		}
-		return false;
-	}
-	
-	public default boolean isAssignableFrom(IType type)
-	{
-		if (this.getArrayDimensions() != type.getArrayDimensions())
-		{
-			return false;
-		}
-		IClass iclass = type.getTheClass();
-		if (iclass != null)
-		{
-			return iclass == this.getTheClass() || iclass.isSuperType(this);
+			return thatClass == thisClass || thatClass.isSubTypeOf(this);
 		}
 		return false;
 	}

@@ -54,7 +54,7 @@ public class StringValue extends ASTNode implements IConstantValue
 		{
 			return 3;
 		}
-		else if (Type.STRING_CLASS.isSuperType(type))
+		else if (Type.STRING_CLASS.isSubTypeOf(type))
 		{
 			return 2;
 		}

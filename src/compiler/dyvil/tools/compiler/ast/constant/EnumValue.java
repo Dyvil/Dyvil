@@ -71,7 +71,7 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 		{
 			return 3;
 		}
-		else if (this.type.getTheClass().isSuperType(type))
+		else if (this.type.getTheClass().isSubTypeOf(type))
 		{
 			return 2;
 		}

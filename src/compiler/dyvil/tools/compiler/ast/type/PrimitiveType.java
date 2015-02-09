@@ -75,7 +75,7 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public boolean isAssignableFrom(IType that)
+	public boolean isSuperTypeOf(IType that)
 	{
 		return false;
 	}

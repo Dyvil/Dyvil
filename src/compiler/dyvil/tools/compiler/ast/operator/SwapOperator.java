@@ -109,25 +109,25 @@ public class SwapOperator extends ASTNode implements IValue
 		{
 			leftInstance.writeExpression(writer);
 		}
-		leftField.writeGet(writer);
+		leftField.writeGet(writer, null);
 		
 		if (rightInstance != null)
 		{
 			rightInstance.writeExpression(writer);
 		}
-		rightField.writeGet(writer);
+		rightField.writeGet(writer, null);
 		
 		if (leftInstance != null)
 		{
 			leftInstance.writeExpression(writer);
 		}
-		leftField.writeSet(writer);
+		leftField.writeSet(writer, null, null);
 		
 		if (rightInstance != null)
 		{
 			rightInstance.writeExpression(writer);
 		}
-		rightField.writeSet(writer);
+		rightField.writeSet(writer, null, null);
 	}
 	
 	@Override

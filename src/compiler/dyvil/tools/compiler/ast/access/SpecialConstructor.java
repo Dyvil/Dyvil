@@ -87,7 +87,7 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 		{
 			return 3;
 		}
-		else if (this.type.isSuperType(type))
+		else if (type.isSuperTypeOf(this.type))
 		{
 			return 2;
 		}

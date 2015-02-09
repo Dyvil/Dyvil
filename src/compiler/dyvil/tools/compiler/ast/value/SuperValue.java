@@ -65,7 +65,7 @@ public final class SuperValue extends ASTNode implements IConstantValue
 		{
 			return 3;
 		}
-		else if (this.type.getTheClass().isSuperType(type))
+		else if (this.type.getTheClass().isSubTypeOf(type))
 		{
 			return 2;
 		}

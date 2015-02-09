@@ -95,7 +95,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 		{
 			return 3;
 		}
-		else if (type1.isSuperType(type))
+		else if (type.isSuperTypeOf(type1))
 		{
 			return 2;
 		}
@@ -344,10 +344,10 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 				writer.visitInsn(Opcodes.DUP);
 			}
 			
-			f.writeGet(writer);
+			f.writeGet(writer, null);
 			this.method.writeCall(writer, null, this.arguments);
 			writer.visitInsn(Opcodes.DUP);
-			f.writeSet(writer);
+			f.writeSet(writer, null, null);
 		}
 		else if (i == APPLY_METHOD_CALL)
 		{
@@ -390,9 +390,9 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 				writer.visitInsn(Opcodes.DUP);
 			}
 			
-			f.writeGet(writer);
+			f.writeGet(writer, null);
 			this.method.writeCall(writer, null, this.arguments);
-			f.writeSet(writer);
+			f.writeSet(writer, null, null);
 		}
 		else if (i == APPLY_METHOD_CALL)
 		{

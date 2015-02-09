@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.AnnotationVisitorImpl;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -38,13 +39,13 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public boolean isSuperType(IType type)
+	public boolean isSubTypeOf(IType type)
 	{
 		if (!this.typesResolved)
 		{
 			this.resolveTypes(null, Package.rootPackage);
 		}
-		return super.isSuperType(type);
+		return super.isSubTypeOf(type);
 	}
 	
 	@Override
@@ -136,17 +137,38 @@ public class BytecodeClass extends CodeClass
 		{
 			this.resolveTypes(null, Package.rootPackage);
 		}
-		return super.resolveField(name);
-	}
-	
-	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
-	{
-		if (!this.typesResolved)
+		
+		// Own properties
+		IField field = this.body.getProperty(name);
+		if (field != null)
 		{
-			this.resolveTypes(null, Package.rootPackage);
+			return new FieldMatch(field, 1);
 		}
-		return super.resolveMethod(instance, name, arguments);
+		
+		// Own fields
+		field = this.body.getField(name);
+		if (field != null)
+		{
+			return new FieldMatch(field, 1);
+		}
+		
+		if (this.instanceField != null && "instance".equals(name))
+		{
+			return new FieldMatch(this.instanceField, 1);
+		}
+		
+		FieldMatch match;
+		
+		// Inherited Fields
+		if (this.superType != null && this != Type.PREDEF_CLASS)
+		{
+			match = this.superType.resolveField(name);
+			if (match != null)
+			{
+				return match;
+			}
+		}
+		return null;
 	}
 	
 	@Override
@@ -156,17 +178,22 @@ public class BytecodeClass extends CodeClass
 		{
 			this.resolveTypes(null, Package.rootPackage);
 		}
-		super.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public MethodMatch resolveConstructor(List<IValue> arguments)
-	{
-		if (!this.typesResolved)
+		
+		this.body.getMethodMatches(list, instance, name, arguments);
+		
+		if (!list.isEmpty())
 		{
-			this.resolveTypes(null, Package.rootPackage);
+			return;
 		}
-		return super.resolveConstructor(arguments);
+		
+		if (this.superType != null)
+		{
+			this.superType.getMethodMatches(list, instance, name, arguments);
+		}
+		for (IType i : this.interfaces)
+		{
+			i.getMethodMatches(list, instance, name, arguments);
+		}
 	}
 	
 	@Override
@@ -176,7 +203,8 @@ public class BytecodeClass extends CodeClass
 		{
 			this.resolveTypes(null, Package.rootPackage);
 		}
-		super.getConstructorMatches(list, arguments);
+		
+		this.body.getMethodMatches(list, null, "<init>", arguments);
 	}
 	
 	public boolean addSpecialMethod(String specialType, String name, IMethod method)

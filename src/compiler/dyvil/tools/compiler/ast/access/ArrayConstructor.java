@@ -56,7 +56,7 @@ public class ArrayConstructor extends ASTNode implements IValue, ITyped
 		{
 			return 3;
 		}
-		else if (this.type.isSuperType(type))
+		else if (type.isSuperTypeOf(this.type))
 		{
 			return 2;
 		}

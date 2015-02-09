@@ -44,7 +44,7 @@ public interface IClass extends IASTNode, IMember, IAnnotated, IModified, INamed
 	
 	public IType getSuperType();
 	
-	public boolean isSuperType(IType type);
+	public boolean isSubTypeOf(IType type);
 	
 	// Interfaces
 	
