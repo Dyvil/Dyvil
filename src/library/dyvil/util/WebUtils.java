@@ -9,12 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
-/**
- * A utility class for everything related to connecting to the internet.
- * 
- * @author Clashsoft
- */
-public class WebUtils
+public interface WebUtils
 {
 	/**
 	 * Checks if the given website is available.

@@ -2,7 +2,7 @@ package dyvil.util;
 
 import dyvil.lang.annotation.infix;
 
-public class MathUtils
+public final class MathUtils
 {
 	/**
 	 * Used to calculate the index of a sin value in the {@link #sinTable}.
@@ -47,6 +47,17 @@ public class MathUtils
 		{
 			sinTable[i] = (float) Math.sin(i * sinFactor);
 		}
+	}
+	
+	private MathUtils()
+	{
+	}
+	
+	// TODO Make this public and add other methods
+	static int min(int a, int b, int c)
+	{
+		int d = a <= b ? a : b;
+		return (c <= d) ? c : d;
 	}
 	
 	/**
@@ -521,7 +532,7 @@ public class MathUtils
 	 *            the number of objects to pick
 	 * @return the number of combinations
 	 */
-	public static int nPr(int n, int k)
+	public static @infix int nPr(int n, int k)
 	{
 		return $bang(n) / $bang(n - k);
 	}
@@ -534,7 +545,7 @@ public class MathUtils
 	 *            the number of objects
 	 * @return the number of combinations
 	 */
-	public static int nCr(int n)
+	public static @infix int nCr(int n)
 	{
 		return 1;
 	}

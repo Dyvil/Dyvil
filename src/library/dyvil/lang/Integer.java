@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import dyvil.lang.annotation.infix;
+
 public interface Integer extends Number
 {
 	// Unary operators
@@ -89,4 +91,40 @@ public interface Integer extends Number
 	public Integer $greater$greater(Integer v);
 	
 	public Integer $greater$greater$greater(Integer v);
+	
+	// String representations
+	
+	public static @infix String toString(int v, int radix)
+	{
+		if (radix == 2)
+		{
+			return java.lang.Integer.toBinaryString(v);
+		}
+		if (radix == 8)
+		{
+			return java.lang.Integer.toOctalString(v);
+		}
+		if (radix == 16)
+		{
+			return java.lang.Integer.toHexString(v);
+		}
+		return java.lang.Integer.toString(v, radix);
+	}
+	
+	public static @infix String toString(long v, int radix)
+	{
+		if (radix == 2)
+		{
+			return java.lang.Long.toBinaryString(v);
+		}
+		if (radix == 8)
+		{
+			return java.lang.Long.toOctalString(v);
+		}
+		if (radix == 16)
+		{
+			return java.lang.Long.toHexString(v);
+		}
+		return java.lang.Long.toString(v, radix);
+	}
 }

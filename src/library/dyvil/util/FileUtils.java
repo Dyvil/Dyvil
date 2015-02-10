@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * @author Clashsoft
  */
-public class FileUtils
+public interface FileUtils
 {
 	/**
 	 * Writes the given {@link String} {@code text} to the given {@link File}

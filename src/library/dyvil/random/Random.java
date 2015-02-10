@@ -1,9 +1,8 @@
 package dyvil.random;
 
 import dyvil.lang.annotation.infix;
-import dyvil.util.StringUtils;
 
-public class Random
+public interface Random
 {
 	/**
 	 * Returns true with the given chance of {@code chance}. It does that by
@@ -69,60 +68,48 @@ public class Random
 		return random.nextDouble() * (max - min) + min;
 	}
 	
-	/**
-	 * Returns a new random name.
-	 * 
-	 * @param random
-	 *            the random
-	 * @param minLength
-	 *            the min length
-	 * @param maxLength
-	 *            the max length
-	 * @return the next random name
-	 */
-	public static @infix String nextNoun(java.util.Random random, int minLength, int maxLength)
+	public static @infix char nextChar(java.util.Random random, String s)
 	{
-		int len = nextInt(random, minLength, maxLength);
-		StringBuilder buf = new StringBuilder(len);
-		
-		char prev = StringUtils.nextLetter(random);
-		buf.append(Character.toUpperCase(prev));
-		for (int i = 1; i < len; i++)
-		{
-			char c;
-			
-			// Always add a consonant after a vowel
-			if (StringUtils.isVowel(prev))
-			{
-				c = StringUtils.nextConsonant(random);
-			}
-			else
-			{
-				int rnd = random.nextInt(6);
-				if (rnd < 4) // Add a new consonant
-				{
-					c = StringUtils.nextConsonant(random);
-					int i1 = 0;
-					while (!StringUtils.canCharFollowChar(prev, c) && i1++ <= StringUtils.CONSONANTS.length())
-					{
-						c = StringUtils.nextConsonant(random);
-					}
-					
-					if (i1 > StringUtils.CONSONANTS.length())
-					{
-						c = StringUtils.nextVowel(random);
-					}
-				}
-				else
-				{
-					c = StringUtils.nextVowel(random); // Add a new vowel
-				}
-			}
-			
-			prev = c;
-			buf.append(c);
-		}
-		
-		return buf.toString();
+		return s.charAt(random.nextInt(s.length()));
+	}
+	
+	public static @infix byte nextElement(java.util.Random random, byte[] array)
+	{
+		return array[random.nextInt(array.length)];
+	}
+	
+	public static @infix short nextElement(java.util.Random random, short[] array)
+	{
+		return array[random.nextInt(array.length)];
+	}
+	
+	public static @infix char nextElement(java.util.Random random, char[] array)
+	{
+		return array[random.nextInt(array.length)];
+	}
+	
+	public static @infix int nextElement(java.util.Random random, int[] array)
+	{
+		return array[random.nextInt(array.length)];
+	}
+	
+	public static @infix long nextElement(java.util.Random random, long[] array)
+	{
+		return array[random.nextInt(array.length)];
+	}
+	
+	public static @infix float nextElement(java.util.Random random, float[] array)
+	{
+		return array[random.nextInt(array.length)];
+	}
+	
+	public static @infix double nextElement(java.util.Random random, double[] array)
+	{
+		return array[random.nextInt(array.length)];
+	}
+	
+	public static @infix <T> T nextElement(java.util.Random random, T[] array)
+	{
+		return array[random.nextInt(array.length)];
 	}
 }

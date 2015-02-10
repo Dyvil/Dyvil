@@ -16,7 +16,7 @@ import dyvil.lang.array.Arrays;
  * @see Arrays
  * @author Clashsoft
  */
-public class ArrayUtils
+public interface ArrayUtils
 {
 	public static @infix <T> Class<T> getComponentType(T[] array)
 	{

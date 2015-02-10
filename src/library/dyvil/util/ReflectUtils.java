@@ -7,15 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * The class CSReflection.
- * <p>
- * This class adds several utils for "hacking" into the JVM, also known as
- * Reflection.
- * 
- * @author Clashsoft
- */
-public class ReflectUtils
+public final class ReflectUtils
 {
 	private static Field	modifiersField;
 	
@@ -30,6 +22,10 @@ public class ReflectUtils
 		catch (ReflectiveOperationException ignored)
 		{
 		}
+	}
+	
+	private ReflectUtils()
+	{
 	}
 	
 	/**
