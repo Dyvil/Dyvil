@@ -32,6 +32,8 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	public String		name;
 	public String		qualifiedName;
 	
+	public List<IType>	generics;
+	
 	public IValue		instance;
 	public List<IValue>	arguments;
 	
@@ -555,6 +557,13 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		else
 		{
 			buffer.append(this.name);
+		}
+		
+		if (this.generics != null)
+		{
+			buffer.append('[');
+			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
+			buffer.append(']');
 		}
 		
 		if (this.isSugarCall && !Formatting.Method.useJavaFormat)

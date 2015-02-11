@@ -2,23 +2,15 @@ package dyvil.tools.compiler.ast.generic;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
-
-public interface IGeneric extends ITypeList
+public interface IGeneric
 {
 	public void setGeneric();
 	
 	public boolean isGeneric();
 	
-	@Override
-	public default void setTypes(List<IType> types)
-	{
-	}
+	public void setTypeVariables(List<ITypeVariable> list);
 	
-	@Override
-	public default List<IType> getTypes()
-	{
-		return null;
-	}
+	public List<ITypeVariable> getTypeVariables();
+	
+	public void addTypeVariable(ITypeVariable var);
 }

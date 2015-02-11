@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.classes;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.classes.CodeClass;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
@@ -86,11 +87,12 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 			}
 			return false;
 		}
+		int type = token.type();
 		if (this.isInMode(GENERICS))
 		{
-			if ("<".equals(value))
+			if (type == Tokens.OPEN_SQUARE_BRACKET)
 			{
-				pm.pushParser(new TypeListParser(this.theClass, true));
+				pm.pushParser(new TypeListParser(this, true));
 				this.theClass.setGeneric();
 				this.mode = GENERICS_END;
 				return true;
@@ -98,7 +100,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 		}
 		if (this.isInMode(GENERICS_END))
 		{
-			if (">".equals(value))
+			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
 				this.mode = EXTENDS | IMPLEMENTS | BODY;
 				return true;
@@ -123,7 +125,6 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 				return true;
 			}
 		}
-		int type = token.type();
 		if (this.isInMode(BODY))
 		{
 			if (type == Tokens.OPEN_CURLY_BRACKET)
@@ -179,6 +180,13 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 	@Override
 	public void addType(IType type)
 	{
-		this.theClass.addInterface(type);
+		if (this.mode == GENERICS_END)
+		{
+			this.theClass.addTypeVariable((ITypeVariable) type);
+		}
+		else
+		{
+			this.theClass.addInterface(type);
+		}
 	}
 }

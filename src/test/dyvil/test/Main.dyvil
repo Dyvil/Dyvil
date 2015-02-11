@@ -2,14 +2,12 @@ package dyvil.test
 
 import java.util.Arrays
 import java.util.Collections;
+import java.util.Map;
 
-public class Main
+public class Main[T]
 {
-	abstract case class Tree
-	case class Node extends Tree
-	
-	public static void main(String[] args)
+	public static void main([String] args)
 	{
-		System out println args
+		[int] ints = new [int] 3
 	}
 }

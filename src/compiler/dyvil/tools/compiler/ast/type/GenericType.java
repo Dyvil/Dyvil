@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class GenericType extends Type implements IGeneric
+public class GenericType extends Type implements ITypeList
 {
 	public List<IType>	generics;
 	
@@ -34,18 +33,6 @@ public class GenericType extends Type implements IGeneric
 	}
 	
 	@Override
-	public void setGeneric()
-	{
-		this.generics = new ArrayList(2);
-	}
-	
-	@Override
-	public boolean isGeneric()
-	{
-		return this.generics != null;
-	}
-	
-	@Override
 	public void setTypes(List<IType> types)
 	{
 		this.generics = types;
@@ -60,6 +47,10 @@ public class GenericType extends Type implements IGeneric
 	@Override
 	public void addType(IType type)
 	{
+		if (this.generics == null)
+		{
+			this.generics = new ArrayList(2);
+		}
 		this.generics.add(type);
 	}
 	
@@ -98,16 +89,20 @@ public class GenericType extends Type implements IGeneric
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append('[');
+		}
 		buffer.append(this.name);
 		if (this.generics != null)
 		{
-			buffer.append('<');
+			buffer.append('[');
 			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
-			buffer.append('>');
-			for (int i = 0; i < this.arrayDimensions; i++)
-			{
-				buffer.append(Formatting.Type.array);
-			}
+			buffer.append(']');
+		}
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append(']');
 		}
 	}
 }

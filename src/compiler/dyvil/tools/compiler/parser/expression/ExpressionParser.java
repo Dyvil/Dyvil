@@ -85,6 +85,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				return true;
 			}
+			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			{
+				this.mode = ACCESS | VARIABLE | LAMBDA;
+				pm.pushParser(new TypeParser(this), true);
+				return true;
+			}
 			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
 				this.mode = LIST_END;
@@ -101,25 +107,23 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.prefix = true;
 				return this.getAccess(pm, token.value(), token, type);
 			}
-			else if (ParserUtil.isIdentifier(type))
+			if (ParserUtil.isIdentifier(type))
 			{
 				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
 				return true;
 			}
-			else if (this.parsePrimitive(token, type))
+			if (this.parsePrimitive(token, type))
 			{
 				this.mode = ACCESS;
 				return true;
 			}
-			else if (this.parseKeyword(pm, token, type))
+			if (this.parseKeyword(pm, token, type))
 			{
 				return true;
 			}
-			else
-			{
-				this.mode = ACCESS;
-			}
+			
+			this.mode = ACCESS;
 		}
 		if (this.isInMode(LIST_END))
 		{
@@ -310,7 +314,10 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = LIST_END; // matches a curly bracket
 				return true;
 			}
-			this.mode = ACCESS;
+			
+			pm.pushParser(new ExpressionParser(this), true);
+			((ConstructorCall) this.value).isSugarCall = true;
+			this.mode = 0;
 			return true;
 		}
 		if (this.isInMode(PARAMETERS))
@@ -665,25 +672,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	public Type getType()
 	{
 		return null;
-	}
-	
-	@Override
-	public void addArrayLength(IValue size)
-	{
-		this.mode = 0;
-		int type = this.value.getValueType();
-		if (type == IValue.CONSTRUCTOR_CALL)
-		{
-			ConstructorCall call = (ConstructorCall) this.value;
-			ArrayConstructor ac = new ArrayConstructor(call.getPosition());
-			ac.lengths.add(size);
-			this.value = ac;
-		}
-		else if (type == IValue.ARRAY_CONSTRUCTOR)
-		{
-			ArrayConstructor ac = (ArrayConstructor) this.value;
-			ac.lengths.add(size);
-		}
 	}
 	
 	@Override

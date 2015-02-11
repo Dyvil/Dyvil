@@ -70,7 +70,8 @@ public final class DynamicType extends ASTNode implements IType
 	@Override
 	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
-		return new MethodMatch(new DynamicMethod(name, arguments), 1);
+		// return new MethodMatch(new DynamicMethod(name, arguments), 1);
+		return null;
 	}
 	
 	@Override

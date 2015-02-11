@@ -8,8 +8,8 @@ import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Property;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IAnnotated;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
@@ -35,9 +35,8 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 {
 	public static final int		TYPE			= 1;
 	public static final int		NAME			= 2;
-	public static final int		FIELD			= 4;
-	public static final int		PROPERTY		= 8;
-	public static final int		GENERICS		= 16;
+	public static final int		PROPERTY_END	= 8;
+	public static final int		GENERICS_END	= 16;
 	public static final int		PARAMETERS		= 32;
 	public static final int		PARAMETERS_END	= 64;
 	public static final int		METHOD_END		= 128;
@@ -53,7 +52,6 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 	private List<Annotation>	annotations;
 	
 	private IMethod				method;
-	private IField				field;
 	
 	public ClassBodyParser(IClass theClass)
 	{
@@ -148,26 +146,27 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 				}
 				if (type == Tokens.OPEN_CURLY_BRACKET)
 				{
-					this.mode = PROPERTY;
+					this.mode = PROPERTY_END;
 					Property property = new Property(this.theClass, value, this.type, this.modifiers, this.annotations);
 					property.setPosition(token.raw());
 					this.body.addProperty(property);
-					this.field = property;
 					pm.skip();
 					pm.pushParser(new PropertyParser(this.theClass, property));
 					return true;
 				}
 				if (type == Tokens.EQUALS)
 				{
-					this.mode = FIELD;
-					this.field = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
-					this.field.setPosition(token.raw());
-					this.body.addField(this.field);
+					Field field = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
+					field.setPosition(token.raw());
+					this.body.addField(field);
+					pm.skip();
+					pm.pushParser(new ExpressionParser(field));
+					this.reset();
 					return true;
 				}
-				if (next.equals("<"))
+				if (type == Tokens.OPEN_SQUARE_BRACKET)
 				{
-					this.mode = GENERICS;
+					this.mode = GENERICS_END;
 					this.method = new Method(this.theClass, value, this.type, this.modifiers, this.annotations);
 					this.method.setPosition(token.raw());
 					this.method.setGeneric();
@@ -179,16 +178,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 			}
 			return false;
 		}
-		if (this.isInMode(FIELD))
-		{
-			if (type == Tokens.EQUALS)
-			{
-				pm.pushParser(new ExpressionParser(this.field));
-				return true;
-			}
-			return false;
-		}
-		if (this.isInMode(PROPERTY))
+		if (this.isInMode(PROPERTY_END))
 		{
 			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
@@ -197,9 +187,9 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 			}
 			return false;
 		}
-		if (this.isInMode(GENERICS))
+		if (this.isInMode(GENERICS_END))
 		{
-			if (">".equals(value))
+			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
 				this.mode = PARAMETERS;
 				return true;
@@ -281,7 +271,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 	@Override
 	public void addType(IType type)
 	{
-		this.method.addType(type);
+		this.method.addTypeVariable((ITypeVariable) type);
 	}
 	
 	@Override

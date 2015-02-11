@@ -306,9 +306,21 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void addType(IType type)
+	public void setTypeVariables(List<ITypeVariable> list)
 	{
-		this.generics.add((ITypeVariable) type);
+		this.generics = list;
+	}
+	
+	@Override
+	public List<ITypeVariable> getTypeVariables()
+	{
+		return this.generics;
+	}
+	
+	@Override
+	public void addTypeVariable(ITypeVariable var)
+	{
+		this.generics.add(var);
 	}
 	
 	@Override
@@ -1061,9 +1073,9 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.generics != null)
 		{
-			buffer.append('<');
+			buffer.append('[');
 			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
-			buffer.append('>');
+			buffer.append(']');
 		}
 		
 		if (this.superType == null)

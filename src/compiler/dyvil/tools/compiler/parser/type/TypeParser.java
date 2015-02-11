@@ -3,25 +3,20 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
 import dyvil.tools.compiler.ast.type.*;
-import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public class TypeParser extends Parser implements ITyped, IValued
+public class TypeParser extends Parser implements ITyped
 {
 	public static final int	NAME			= 1;
 	public static final int	GENERICS		= 2;
 	public static final int	GENERICS_END	= 4;
-	public static final int	TYPE_VARIABLE	= 8;
-	public static final int	ARRAY			= 16;
-	public static final int	ARRAY_LENGTH	= 32;
-	public static final int	ARRAY_END		= 64;
+	public static final int	ARRAY_END		= 8;
+	public static final int	TYPE_VARIABLE	= 16;
 	public static final int	TUPLE_END		= 128;
 	public static final int	LAMBDA_TYPE		= 256;
 	public static final int	LAMBDA_END		= 512;
@@ -36,6 +31,7 @@ public class TypeParser extends Parser implements ITyped, IValued
 	
 	private IType			type;
 	private int				arrayDimensions;
+	private int				arrayDimensions2;
 	
 	public TypeParser(ITyped typed)
 	{
@@ -64,6 +60,12 @@ public class TypeParser extends Parser implements ITyped, IValued
 				this.mode = TUPLE_END;
 				return true;
 			}
+			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			{
+				this.arrayDimensions++;
+				this.arrayDimensions2++;
+				return true;
+			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				if (this.generic)
@@ -72,10 +74,16 @@ public class TypeParser extends Parser implements ITyped, IValued
 					this.mode = TYPE_VARIABLE;
 					return true;
 				}
+				else if (token.next().isType(Tokens.OPEN_SQUARE_BRACKET))
+				{
+					this.type = new GenericType(token, token.value());
+					this.mode = GENERICS;
+					return true;
+				}
 				else
 				{
 					this.type = new Type(token, token.value());
-					this.mode = ARRAY;
+					this.mode = ARRAY_END;
 					return true;
 				}
 			}
@@ -98,7 +106,7 @@ public class TypeParser extends Parser implements ITyped, IValued
 		{
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
-				if (token.next().equals("=>"))
+				if (token.next().isType(Tokens.ARROW_OPERATOR))
 				{
 					TupleType tupleType = (TupleType) this.type;
 					this.type = new LambdaType(tupleType);
@@ -124,47 +132,55 @@ public class TypeParser extends Parser implements ITyped, IValued
 			pm.popParser(true);
 			return true;
 		}
-		if (this.isInMode(ARRAY))
-		{
-			if (type == Tokens.OPEN_SQUARE_BRACKET)
-			{
-				this.arrayDimensions++;
-				this.mode = ARRAY_LENGTH;
-				return true;
-			}
-			
-			pm.popParser(true);
-			return true;
-		}
-		if (this.isInMode(ARRAY_LENGTH))
-		{
-			if (type == Tokens.CLOSE_SQUARE_BRACKET)
-			{
-				pm.popParser();
-				return true;
-			}
-			this.mode = ARRAY_END;
-			pm.pushParser(new ExpressionParser(this), true);
-			return true;
-		}
 		if (this.isInMode(ARRAY_END))
 		{
 			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
-				pm.popParser();
-				return true;
+				this.arrayDimensions2--;
+				if (this.arrayDimensions2 == 0)
+				{
+					this.type.expandPosition(token);
+					pm.popParser();
+					return true;
+				}
 			}
-			return false;
+			
+			if (this.arrayDimensions2 > 0)
+			{
+				this.type.expandPosition(token.prev());
+				pm.popParser(true);
+				throw new SyntaxError(token.prev(), "Unclosed array brackets");
+			}
+			
+			this.type.expandPosition(token.prev());
+			pm.popParser(true);
+			return true;
 		}
 		if (this.isInMode(GENERICS))
 		{
-			if ("<".equals(token.value()))
+			if (type == Tokens.OPEN_SQUARE_BRACKET)
 			{
-				GenericType generic = (GenericType) this.type;
-				generic.setGeneric();
-				pm.pushParser(new TypeListParser(generic));
+				pm.pushParser(new TypeListParser((GenericType) this.type));
 				this.mode = GENERICS_END;
 				return true;
+			}
+			
+			if (type == Tokens.CLOSE_SQUARE_BRACKET)
+			{
+				this.arrayDimensions2--;
+				if (this.arrayDimensions2 == 0)
+				{
+					this.type.expandPosition(token);
+					pm.popParser();
+					return true;
+				}
+			}
+			
+			if (this.arrayDimensions2 > 0)
+			{
+				this.type.expandPosition(token.prev());
+				pm.popParser(true);
+				throw new SyntaxError(token.prev(), "Unclosed array brackets");
 			}
 			
 			this.type.expandPosition(token.prev());
@@ -202,9 +218,9 @@ public class TypeParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(GENERICS_END))
 		{
-			if (">".equals(token.value()))
+			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
-				this.mode = ARRAY;
+				pm.popParser();
 				return true;
 			}
 		}
@@ -236,18 +252,6 @@ public class TypeParser extends Parser implements ITyped, IValued
 	
 	@Override
 	public IType getType()
-	{
-		return null;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		this.typed.addArrayLength(value);
-	}
-	
-	@Override
-	public IValue getValue()
 	{
 		return null;
 	}

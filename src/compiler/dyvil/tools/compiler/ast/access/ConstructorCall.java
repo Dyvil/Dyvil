@@ -150,6 +150,33 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 			return this;
 		}
 		
+		if (this.type.isArrayType())
+		{
+			int dims = this.type.getArrayDimensions();
+			if (dims != len)
+			{
+				Marker marker = Markers.create(this.position, "access.constructor.array_length");
+				marker.addInfo("Type Dimensions: " + dims);
+				marker.addInfo("Number of Length Arguments: " + len);
+				markers.add(marker);
+				return this;
+			}
+			
+			for (int i = 0; i < len; i++)
+			{
+				IValue v = this.arguments.get(i);
+				IType t = v.getType();
+				if (t != Type.INT)
+				{
+					Marker marker = Markers.create(v.getPosition(), "access.constructor.arraylength_type");
+					marker.addInfo("Value Type: " + t);
+					markers.add(marker);
+				}
+			}
+			
+			return this;
+		}
+		
 		MethodMatch match = this.type.resolveConstructor(this.arguments);
 		if (match == null)
 		{
@@ -172,6 +199,11 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 		for (IValue v : this.arguments)
 		{
 			v.check(markers, context);
+		}
+		
+		if (this.type.isArrayType())
+		{
+			return;
 		}
 		
 		IClass iclass = this.type.getTheClass();
@@ -223,6 +255,28 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		if (this.type.isArrayType())
+		{
+			int len = this.arguments.size();
+			
+			if (len == 1)
+			{
+				this.arguments.get(0).writeExpression(writer);
+				this.type.setArrayDimensions(0);
+				writer.visitTypeInsn(Opcodes.ANEWARRAY, this.type);
+				this.type.setArrayDimensions(1);
+				return;
+			}
+			
+			for (int i = 0; i < len; i++)
+			{
+				this.arguments.get(i).writeExpression(writer);
+			}
+			
+			writer.visitMultiANewArrayInsn(this.type, len);
+			return;
+		}
+		
 		int opcode;
 		int args = this.arguments.size();
 		if (this.isCustom)
@@ -252,29 +306,8 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		int opcode;
-		int args = this.arguments.size();
-		if (this.isCustom)
-		{
-			opcode = Opcodes.INVOKESTATIC;
-		}
-		else
-		{
-			opcode = Opcodes.INVOKESPECIAL;
-			args++;
-			
-			writer.visitTypeInsn(Opcodes.NEW, this.type);
-		}
-		
-		for (IValue arg : this.arguments)
-		{
-			arg.writeExpression(writer);
-		}
-		
-		String owner = this.type.getInternalName();
-		String name = "<init>";
-		String desc = this.method.getDescriptor();
-		writer.visitMethodInsn(opcode, owner, name, desc, false, args, null);
+		this.writeExpression(writer);
+		writer.visitInsn(Opcodes.ARETURN);
 	}
 	
 	@Override
@@ -284,6 +317,7 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 		this.type.toString("", buffer);
 		if (this.isSugarCall && !Formatting.Method.useJavaFormat)
 		{
+			buffer.append(Formatting.Method.sugarCallSeperator);
 			this.arguments.get(0).toString("", buffer);
 		}
 		else

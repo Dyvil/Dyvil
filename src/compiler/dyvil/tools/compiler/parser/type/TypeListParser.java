@@ -42,7 +42,7 @@ public class TypeListParser extends Parser implements ITyped
 			if (ParserUtil.isCloseBracket(type))
 			{
 				this.typeList.addType(this.type);
-				pm.popParser();
+				pm.popParser(true);
 				return true;
 			}
 			if (ParserUtil.isSeperator(type))

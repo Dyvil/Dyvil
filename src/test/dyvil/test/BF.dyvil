@@ -6,20 +6,20 @@ using java.lang.System._
 
 public object BF
 {	
-	public static void main(String[] args)
+	public static void main([String] args)
 	{
 		Scanner scanner = new Scanner(System in);
 		while (true)
 		{
-			System.out.println("Enter your Brainfuck code");
-			eval(scanner, scanner nextLine);
+			System out println "Enter your Brainfuck code"
+			eval(scanner, scanner nextLine)
 		}
 	}
 	
 	public static void eval(Scanner scanner, String code)
 	{
-		int len = code length
-		int[] data = new int[30000]
+		int len = code length;
+		[int] data = new [int] 30000
 		int index = 0
 		
 		for (int i = 0; i < len; i += 1)

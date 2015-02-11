@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
 
@@ -508,10 +507,14 @@ public class Type extends ASTNode implements IType
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append('[');
+		}
 		buffer.append(this.name);
 		for (int i = 0; i < this.arrayDimensions; i++)
 		{
-			buffer.append(Formatting.Type.array);
+			buffer.append(']');
 		}
 	}
 	
