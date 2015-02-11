@@ -114,7 +114,7 @@ public final class CharUtils
 	{
 		if (c <= 256)
 		{
-			return c >= 'a' && c <= 'z';
+			return c >= 'a' && c <= 'z' || c >= 0xE0 && c <= 0xFE && c != 0xF7;
 		}
 		return Character.isLowerCase(c);
 	}
@@ -131,7 +131,7 @@ public final class CharUtils
 	{
 		if (c <= 256)
 		{
-			return c >= 'A' && c <= 'Z';
+			return c >= 'A' && c <= 'Z' || c >= 0xC0 && c <= 0xDE && c != 0xD7;
 		}
 		return Character.isUpperCase(c);
 	}
@@ -146,9 +146,9 @@ public final class CharUtils
 	 */
 	public static @infix char toLowerCase(char c)
 	{
-		if (c >= 'A' && c <= 'Z')
+		if (c >= 'A' && c <= 'Z' || c >= 0xC0 && c <= 0xDE && c != 0xD7)
 		{
-			return (char) (c - 32);
+			return (char) (c + 32);
 		}
 		if (c <= 256)
 		{
@@ -167,9 +167,9 @@ public final class CharUtils
 	 */
 	public static @infix char toUpperCase(char c)
 	{
-		if (c >= 'a' && c <= 'z')
+		if (c >= 'a' && c <= 'z' || c >= 0xE0 && c <= 0xFE && c != 0xF7)
 		{
-			return (char) (c + 32);
+			return (char) (c - 32);
 		}
 		if (c <= 256)
 		{
@@ -196,13 +196,13 @@ public final class CharUtils
 	 */
 	public static @infix char invertCase(char c)
 	{
-		if (c >= 'a' && c <= 'z')
-		{
-			return (char) (c + 32);
-		}
-		if (c >= 'A' && c <= 'Z')
+		if (c >= 'a' && c <= 'z' || c >= 0xE0 && c <= 0xFE && c != 0xF7)
 		{
 			return (char) (c - 32);
+		}
+		if (c >= 'A' && c <= 'Z' || c >= 0xC0 && c <= 0xDE && c != 0xD7)
+		{
+			return (char) (c + 32);
 		}
 		if (c <= 256)
 		{

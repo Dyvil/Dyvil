@@ -19,39 +19,15 @@ public interface StringUtils
 		return String.format(format, args);
 	}
 	
-	public static String identifier(String string)
-	{
-		int len = string.length();
-		StringBuilder result = new StringBuilder(len);
-		
-		for (int i = 0; i < len; i++)
-		{
-			char c = string.charAt(i);
-			
-			if (Character.isWhitespace(c))
-			{
-				c = '_';
-			}
-			else
-			{
-				c = Character.toLowerCase(c);
-			}
-			
-			result.append(c);
-		}
-		
-		return result.toString();
-	}
-	
-	public static List<String> getWords(String string, boolean spacesOnly)
+	public static List<String> getWords(String s, boolean spacesOnly)
 	{
 		List<String> words = new ArrayList();
 		StringBuilder temp = new StringBuilder(10);
 		char l = 0;
 		
-		for (int i = 0; i < string.length(); i++)
+		for (int i = 0; i < s.length(); i++)
 		{
-			char c = string.charAt(i);
+			char c = s.charAt(i);
 			temp.append(c);
 			if (CharUtils.isWhitespace(c) || !spacesOnly && !CharUtils.isLetter(c))
 			{
@@ -71,9 +47,9 @@ public interface StringUtils
 		return words;
 	}
 	
-	public static List<String> cutString(String string, int maxLength)
+	public static List<String> cutString(String s, int maxLength)
 	{
-		List<String> words = getWords(string, false);
+		List<String> words = getWords(s, false);
 		int size = words.size();
 		StringBuilder temp = new StringBuilder(10);
 		List<String> lines = new ArrayList();
@@ -96,22 +72,22 @@ public interface StringUtils
 		return lines;
 	}
 	
-	public static String[] lines(String string)
+	public static String[] lines(String s)
 	{
-		if (string == null)
+		if (s == null)
 		{
 			return EMPTY_STRING_ARRAY;
 		}
-		return string.split("\n");
+		return s.split("\n");
 	}
 	
-	public static List<String> lineList(String string)
+	public static List<String> lineList(String s)
 	{
-		if (string == null)
+		if (s == null)
 		{
 			return Collections.EMPTY_LIST;
 		}
-		return Arrays.asList(string.split("\n"));
+		return Arrays.asList(s.split("\n"));
 	}
 	
 	/**
@@ -163,6 +139,30 @@ public interface StringUtils
 		return a2[len2];
 	}
 	
+	public static @infix String toIdentifier(String s)
+	{
+		int len = s.length();
+		StringBuilder result = new StringBuilder(len);
+		
+		for (int i = 0; i < len; i++)
+		{
+			char c = s.charAt(i);
+			
+			if (Character.isWhitespace(c))
+			{
+				c = '_';
+			}
+			else
+			{
+				c = Character.toLowerCase(c);
+			}
+			
+			result.append(c);
+		}
+		
+		return result.toString();
+	}
+	
 	/**
 	 * Returns the acronym of the given {@link String} {@code s} by removing all
 	 * characters but those at the beginning of a new word.
@@ -175,9 +175,38 @@ public interface StringUtils
 	 *            the string
 	 * @return the initials
 	 */
-	public static String getAcronym(String s)
+	public static @infix String toAcronym(String s)
 	{
-		return s; // FIXME
+		if (s == null || s.isEmpty())
+		{
+			return "";
+		}
+		
+		int len = s.length();
+		StringBuilder builder = new StringBuilder(len >> 2);
+		
+		boolean seperator = true;
+		for (int i = 0; i < len; i++)
+		{
+			char c = s.charAt(i);
+			if (!CharUtils.isLetter(c))
+			{
+				if (CharUtils.isDigit(c))
+				{
+					builder.append(c);
+				}
+				seperator = true;
+				continue;
+			}
+			
+			if (seperator)
+			{
+				builder.append(c);
+				seperator = false;
+			}
+		}
+		
+		return builder.toString();
 	}
 	
 /**
@@ -189,7 +218,7 @@ public interface StringUtils
 	 * @param s
 	 * @return
 	 */
-	public static String removeVowels(String s)
+	public static @infix String removeVowels(String s)
 	{
 		if (s == null || s.isEmpty())
 		{
@@ -217,78 +246,122 @@ public interface StringUtils
 		return builder.toString();
 	}
 	
-	public static String toLowerCamelCase(String s)
+	public static @infix String toTitleCase(String s)
 	{
-		return s; // FIXME
-	}
-	
-	public static String toUpperCamelCase(String s)
-	{
-		return s; // FIXME
-	}
-	
-	public static String toInvertedCase(String s)
-	{
-		return s; // FIXME
-	}
-	
-	/**
-	 * Returns a new random name.
-	 * 
-	 * @param random
-	 *            the random
-	 * @param minLength
-	 *            the min length
-	 * @param maxLength
-	 *            the max length
-	 * @return the next random name
-	 */
-	public static @infix String nextNoun(java.util.Random random, int minLength, int maxLength)
-	{
-		int len = Random.nextInt(random, minLength, maxLength);
-		StringBuilder buf = new StringBuilder(len);
-		
-		char prev = CharUtils.nextUppercaseLetter(random);
-		buf.append(prev);
-		for (int i = 1; i < len; i++)
+		if (s == null || s.isEmpty())
 		{
-			char c;
-			
-			if (CharUtils.isVowel(prev))
-			{
-				// Always add a consonant after a vowel
-				c = CharUtils.nextConsonant(random);
-			}
-			else
-			{
-				int rnd = random.nextInt(6);
-				if (rnd < 4)
-				{
-					// Add a consonant
-					c = CharUtils.nextConsonant(random);
-					int i1 = 0;
-					while (!CharUtils.isCombinable(prev, c) && i1++ <= 21)
-					{
-						c = CharUtils.nextConsonant(random);
-					}
-					
-					if (i1 > 21)
-					{
-						c = CharUtils.nextVowel(random);
-					}
-				}
-				else
-				{
-					// Add a vowel
-					c = CharUtils.nextVowel(random);
-				}
-			}
-			
-			prev = c;
-			buf.append(c);
+			return "";
 		}
 		
-		return buf.toString();
+		int len = s.length();
+		StringBuilder builder = new StringBuilder(len);
+		
+		boolean seperator = true;
+		for (int i = 0; i < len; i++)
+		{
+			char c = s.charAt(i);
+			if (CharUtils.isWhitespace(c))
+			{
+				seperator = true;
+				builder.append(c);
+				continue;
+			}
+			
+			if (seperator)
+			{
+				seperator = false;
+				builder.append(CharUtils.toUpperCase(c));
+				continue;
+			}
+			builder.append(CharUtils.toLowerCase(c));
+		}
+		
+		return builder.toString();
+	}
+	
+	public static @infix String toLowerCamelCase(String s)
+	{
+		if (s == null || s.isEmpty())
+		{
+			return "";
+		}
+		
+		int len = s.length();
+		StringBuilder builder = new StringBuilder(len);
+		
+		boolean seperator = true;
+		for (int i = 0; i < len; i++)
+		{
+			char c = s.charAt(i);
+			if (CharUtils.isWhitespace(c))
+			{
+				seperator = true;
+				builder.append(c);
+				continue;
+			}
+			
+			if (seperator)
+			{
+				seperator = false;
+				builder.append(CharUtils.toLowerCase(c));
+				continue;
+			}
+			builder.append(c);
+		}
+		
+		return builder.toString();
+	}
+	
+	public static @infix String toUpperCamelCase(String s)
+	{
+		if (s == null || s.isEmpty())
+		{
+			return "";
+		}
+		
+		int len = s.length();
+		StringBuilder builder = new StringBuilder(len);
+		
+		boolean seperator = true;
+		for (int i = 0; i < len; i++)
+		{
+			char c = s.charAt(i);
+			if (CharUtils.isWhitespace(c))
+			{
+				seperator = true;
+				builder.append(c);
+				continue;
+			}
+			
+			if (seperator)
+			{
+				seperator = false;
+				builder.append(CharUtils.toUpperCase(c));
+				continue;
+			}
+			builder.append(c);
+		}
+		
+		return builder.toString();
+	}
+	
+	public static @infix String toInvertedCase(String s)
+	{
+		if (s == null || s.isEmpty())
+		{
+			return "";
+		}
+		
+		int len = s.length();
+		StringBuilder builder = new StringBuilder(len);
+		
+		for (int i = 0; i < len; i++)
+		{
+			char c = s.charAt(i);
+			builder.append(CharUtils.invertCase(c));
+		}
+		
+		return builder.toString();
 	}
 	
 	/**
@@ -374,5 +447,64 @@ public interface StringUtils
 	{
 		int index = string.indexOf(regex, min);
 		return index < max ? index : -1;
+	}
+	
+	/**
+	 * Returns a new random name.
+	 * 
+	 * @param random
+	 *            the random
+	 * @param minLength
+	 *            the min length
+	 * @param maxLength
+	 *            the max length
+	 * @return the next random name
+	 */
+	public static @infix String nextNoun(java.util.Random random, int minLength, int maxLength)
+	{
+		int len = Random.nextInt(random, minLength, maxLength);
+		StringBuilder buf = new StringBuilder(len);
+		
+		char prev = CharUtils.nextUppercaseLetter(random);
+		buf.append(prev);
+		for (int i = 1; i < len; i++)
+		{
+			char c;
+			
+			if (CharUtils.isVowel(prev))
+			{
+				// Always add a consonant after a vowel
+				c = CharUtils.nextConsonant(random);
+			}
+			else
+			{
+				int rnd = random.nextInt(6);
+				if (rnd < 4)
+				{
+					// Add a consonant
+					c = CharUtils.nextConsonant(random);
+					int i1 = 0;
+					while (!CharUtils.isCombinable(prev, c) && i1++ <= 21)
+					{
+						c = CharUtils.nextConsonant(random);
+					}
+					
+					if (i1 > 21)
+					{
+						c = CharUtils.nextVowel(random);
+					}
+				}
+				else
+				{
+					// Add a vowel
+					c = CharUtils.nextVowel(random);
+				}
+			}
+			
+			prev = c;
+			buf.append(c);
+		}
+		
+		return buf.toString();
 	}
 }

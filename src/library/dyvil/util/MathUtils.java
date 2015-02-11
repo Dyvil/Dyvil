@@ -53,11 +53,72 @@ public final class MathUtils
 	{
 	}
 	
-	// TODO Make this public and add other methods
-	static int min(int a, int b, int c)
+	public static int min(int a, int b)
+	{
+		return (a <= b) ? a : b;
+	}
+	
+	public static long min(long a, long b)
+	{
+		return (a <= b) ? a : b;
+	}
+	
+	public static float min(float a, float b)
+	{
+		return (a <= b) ? a : b;
+	}
+	
+	public static double min(double a, double b)
+	{
+		return (a <= b) ? a : b;
+	}
+	
+	public static int min(int a, int b, int c)
 	{
 		int d = a <= b ? a : b;
 		return (c <= d) ? c : d;
+	}
+	
+	public static long min(long a, long b, long c)
+	{
+		long d = a <= b ? a : b;
+		return (c <= d) ? c : d;
+	}
+	
+	public static float min(float a, float b, float c)
+	{
+		float d = a <= b ? a : b;
+		return (c <= d) ? c : d;
+	}
+	
+	public static double min(double a, double b, double c)
+	{
+		double d = a <= b ? a : b;
+		return (c <= d) ? c : d;
+	}
+	
+	public static int max(int a, int b, int c)
+	{
+		int d = a > b ? a : b;
+		return (c > d) ? c : d;
+	}
+	
+	public static long max(long a, long b, long c)
+	{
+		long d = a > b ? a : b;
+		return (c > d) ? c : d;
+	}
+	
+	public static float max(float a, float b, float c)
+	{
+		float d = a > b ? a : b;
+		return (c > d) ? c : d;
+	}
+	
+	public static double max(double a, double b, double c)
+	{
+		double d = a > b ? a : b;
+		return (c > d) ? c : d;
 	}
 	
 	/**
@@ -102,26 +163,6 @@ public final class MathUtils
 	public static @infix double abs(double d)
 	{
 		return d < 0D ? -d : d;
-	}
-	
-	/**
-	 * Returns the absolute value of this {@code double}.
-	 * 
-	 * @param i
-	 * @param max
-	 * @return the abs value
-	 */
-	public static @infix double abs(double d, double max)
-	{
-		if (d < 0D)
-		{
-			d = -d;
-		}
-		if (max < 0D)
-		{
-			max = -max;
-		}
-		return d > max ? d : max;
 	}
 	
 	public static @infix int floor(float f)
@@ -495,22 +536,42 @@ public final class MathUtils
 		return min + (max - min) * d;
 	}
 	
-	public static @infix int $bang(int i)
+	public static @infix int $bang(int v)
 	{
-		int j = i;
-		while (i > 1)
+		int j = v;
+		while (v > 1)
 		{
-			j *= --i;
+			j *= --v;
 		}
 		return j;
 	}
 	
-	public static @infix long $bang(long l)
+	public static @infix long $bang(long v)
 	{
-		long j = l;
-		while (l > 1)
+		long j = v;
+		while (v > 1L)
 		{
-			j *= --l;
+			j *= --v;
+		}
+		return j;
+	}
+	
+	public static @infix float $bang(float v)
+	{
+		float j = v;
+		while (v > 1F)
+		{
+			j *= --v;
+		}
+		return j;
+	}
+	
+	public static @infix double $bang(double v)
+	{
+		double j = v;
+		while (v > 1D)
+		{
+			j *= --v;
 		}
 		return j;
 	}
@@ -632,84 +693,6 @@ public final class MathUtils
 		if (d < -180D)
 		{
 			d += 360D;
-		}
-		return d;
-	}
-	
-	public static @infix int parseInt(String string, int _default)
-	{
-		int i = _default;
-		try
-		{
-			i = Integer.parseInt(string);
-		}
-		catch (Throwable t)
-		{
-		}
-		return i;
-	}
-	
-	public static @infix int parseInt(String string, int radix, int _default)
-	{
-		int i = _default;
-		try
-		{
-			i = Integer.parseInt(string, radix);
-		}
-		catch (Throwable t)
-		{
-		}
-		return i;
-	}
-	
-	public static @infix long parseLong(String string, long _default)
-	{
-		long l = _default;
-		try
-		{
-			l = Long.parseLong(string);
-		}
-		catch (Throwable t)
-		{
-		}
-		return l;
-	}
-	
-	public static @infix long parseLong(String string, int radix, long _default)
-	{
-		long l = _default;
-		try
-		{
-			l = Long.parseLong(string, radix);
-		}
-		catch (Throwable t)
-		{
-		}
-		return l;
-	}
-	
-	public static @infix float parseFloat(String string, float _default)
-	{
-		float f = _default;
-		try
-		{
-			f = Float.parseFloat(string);
-		}
-		catch (Throwable t)
-		{
-		}
-		return f;
-	}
-	
-	public static @infix double parseDouble(String string, double _default)
-	{
-		double d = _default;
-		try
-		{
-			d = Double.parseDouble(string);
-		}
-		catch (Throwable t)
-		{
 		}
 		return d;
 	}
