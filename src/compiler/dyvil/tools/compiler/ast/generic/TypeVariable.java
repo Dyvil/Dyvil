@@ -34,6 +34,10 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	
 	protected IClass		captureClass;
 	
+	public TypeVariable()
+	{
+	}
+	
 	public TypeVariable(String name)
 	{
 		this.name = name;
@@ -107,6 +111,11 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	public IClass getTheClass()
 	{
 		return this.captureClass;
+	}
+	
+	public void setUpperBound(IType bound)
+	{
+		this.upperBound = bound;
 	}
 	
 	@Override

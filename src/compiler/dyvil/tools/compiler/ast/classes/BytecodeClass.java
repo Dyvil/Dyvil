@@ -321,7 +321,16 @@ public class BytecodeClass extends CodeClass
 		Method method = new Method(this);
 		method.setName(Symbols.unqualify(name), name);
 		method.setModifiers(access);
-		ClassFormat.readMethodType(desc, method);
+		
+		if (signature != null)
+		{
+			method.setGeneric();
+			ClassFormat.readMethodType(signature, method);
+		}
+		else
+		{
+			ClassFormat.readMethodType(desc, method);
+		}
 		
 		List<Parameter> parameters = method.getParameters();
 		

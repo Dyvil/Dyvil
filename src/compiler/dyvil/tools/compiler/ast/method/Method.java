@@ -473,7 +473,7 @@ public class Method extends Member implements IMethod
 		
 		for (Parameter p : this.parameters)
 		{
-			p.resolveTypes(markers, context);
+			p.resolveTypes(markers, this);
 		}
 		
 		if (this.value != null)
@@ -997,11 +997,11 @@ public class Method extends Member implements IMethod
 			buffer.append(this.name);
 		}
 		
-		if (this.generics != null)
+		if (this.generics != null && !this.generics.isEmpty())
 		{
-			buffer.append('<');
+			buffer.append('[');
 			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
-			buffer.append('>');
+			buffer.append(']');
 		}
 		
 		Util.parametersToString(this.parameters, buffer, true);

@@ -4,6 +4,8 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.field.Parameter;
+import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IParameterized;
 import dyvil.tools.compiler.ast.type.IType;
@@ -12,7 +14,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 
-public class InvokeInstruction extends Instruction implements INamed, ITyped, IParameterized
+public class InvokeInstruction extends Instruction implements INamed, ITyped, IParameterized, IGeneric
 {
 	private String	owner;
 	private String	methodName;
@@ -132,5 +134,43 @@ public class InvokeInstruction extends Instruction implements INamed, ITyped, IP
 	public void addType(IType type)
 	{
 		this.args++;
+	}
+
+	@Override
+	public void setTypes(List<IType> types)
+	{
+	}
+
+	@Override
+	public List<IType> getTypes()
+	{
+		return null;
+	}
+
+	@Override
+	public void setGeneric()
+	{
+	}
+
+	@Override
+	public boolean isGeneric()
+	{
+		return false;
+	}
+
+	@Override
+	public void setTypeVariables(List<ITypeVariable> list)
+	{
+	}
+
+	@Override
+	public List<ITypeVariable> getTypeVariables()
+	{
+		return null;
+	}
+
+	@Override
+	public void addTypeVariable(ITypeVariable var)
+	{
 	}
 }

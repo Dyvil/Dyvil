@@ -132,6 +132,16 @@ public class ClassFormat
 	
 	public static IType internalToType(String internal)
 	{
+		int i = internal.indexOf('<');
+		if (i != -1)
+		{
+			GenericType type = new GenericType();
+			setInternalName(type, internal.substring(1, i));
+			int index = getMatchingBracket(internal, i, internal.length());
+			readTypeList(internal, i + 1, index, type);
+			return type;
+		}
+		
 		return internalToType(internal, new Type());
 	}
 	
@@ -148,7 +158,7 @@ public class ClassFormat
 		
 		char c = internal.charAt(i);
 		
-		if (c == 'L')
+		if (c == 'L' || c == 'T')
 		{
 			int l = len - 1;
 			if (internal.charAt(l) == ';')
@@ -190,11 +200,21 @@ public class ClassFormat
 		}
 	}
 	
-	public static <T extends ITypeList & ITyped> void readMethodType(String internal, T method)
+	public static <T extends ITypeList & ITyped & IGeneric> void readMethodType(String internal, T method)
 	{
 		int index = internal.indexOf(')');
 		
-		readTypeList(internal, 1, index, method);
+		int i = 1;
+		int len = internal.length();
+		
+		if (internal.charAt(0) == '<')
+		{
+			int j = getMatchingBracket(internal, 0, index);
+			readTypeArguments(internal, 1, j, method);
+			i = j + 2;
+		}
+		
+		readTypeList(internal, i, index, method);
 		
 		IType t = internalToType(internal.substring(index + 1));
 		method.setType(t);
@@ -210,15 +230,36 @@ public class ClassFormat
 			{
 				array++;
 			}
-			else if (c == 'L')
+			else if (c == 'L' || c == 'T')
 			{
-				int end1 = internal.indexOf(';', i);
+				int end1 = getMatchingSemicolon(internal, i, end);
 				String name = internal.substring(i + 1, end1);
 				IType type = internalToType2(name);
 				
 				type.setArrayDimensions(array);
 				array = 0;
 				list.addType(type);
+				i = end1;
+			}
+			else if (c == '*')
+			{
+				list.addType(new TypeVariable());
+			}
+			else if (c == '+' || c == '-')
+			{
+				int end1 = getMatchingSemicolon(internal, i, end);
+				String name = internal.substring(i + 1, end1 + 1);
+				IType type = internalToType(name);
+				TypeVariable var = new TypeVariable();
+				if (c == '-')
+				{
+					var.setLowerBound(type);
+				}
+				else
+				{
+					var.addUpperBound(type);
+				}
+				list.addType(var);
 				i = end1;
 			}
 			else if (array == 0)
@@ -244,9 +285,15 @@ public class ClassFormat
 		{
 			if (mode == 0)
 			{
+				if (signature.charAt(i) == '>')
+				{
+					return;
+				}
+				
 				int index = signature.indexOf(':', i);
 				String name = signature.substring(i, index);
 				var = new TypeVariable(name);
+				generic.addTypeVariable(var);
 				mode = 1;
 			}
 			else if (mode == 1)
@@ -254,53 +301,65 @@ public class ClassFormat
 				char c = signature.charAt(i);
 				if (c == ':')
 				{
+					char c1 = signature.charAt(i + 1);
+					if (c1 == '[')
+					{
+						i++;
+						array++;
+						continue;
+					}
+					
+					if (c1 == 'L' || c1 == 'T')
+					{
+						int end1 = getMatchingSemicolon(signature, i + 1, end);
+						String name = signature.substring(i + 2, end1);
+						IType type = internalToType2(name);
+						
+						type.setArrayDimensions(array);
+						array = 0;
+						var.setUpperBound(type);
+						mode = 2;
+						i = end1;
+					}
+					
 					mode = 2;
+					continue;
 				}
-				else if (c == '>')
-				{
-					generic.addTypeVariable(var);
-					start = i + 1;
-					break;
-				}
-				else
-				{
-					generic.addTypeVariable(var);
-					mode = 0;
-					i--;
-				}
+				
+				mode = 0;
+				i--;
 			}
-			else
+			else if (mode == 2)
 			{
 				char c = signature.charAt(i);
-				if (c == '[')
+				if (c == ':')
 				{
-					array++;
-				}
-				else if (c == 'L')
-				{
-					int end1 = getMatchingSemicolon(signature, i, end);
-					String name = signature.substring(i + 1, end1);
-					IType type = internalToType2(name);
+					char c1 = signature.charAt(i + 1);
+					if (c1 == '[')
+					{
+						i++;
+						array++;
+						continue;
+					}
 					
-					type.setArrayDimensions(array);
-					array = 0;
-					var.addUpperBound(type);
-					mode = 1;
-					i = end1;
+					if (c1 == 'L' || c1 == 'T')
+					{
+						int end1 = getMatchingSemicolon(signature, i + 1, end);
+						String name = signature.substring(i + 2, end1);
+						IType type = internalToType2(name);
+						
+						type.setArrayDimensions(array);
+						array = 0;
+						var.addUpperBound(type);
+						mode = 0;
+						i = end1;
+					}
+					
+					continue;
 				}
-				else if (array == 0)
-				{
-					var.addUpperBound(parseBaseType(c));
-					mode = 1;
-				}
-				else
-				{
-					IType type = parseBaseType(c).clone();
-					type.setArrayDimensions(array);
-					array = 0;
-					var.addUpperBound(type);
-					mode = 1;
-				}
+				
+				mode = 0;
+				i--;
 			}
 		}
 	}
