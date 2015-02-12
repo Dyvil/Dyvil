@@ -4,10 +4,11 @@ import java.util.Arrays
 import java.util.Collections;
 import java.util.Map;
 
-public class Main
+public class Main[T, U]
 {
 	public static void main([String] args)
 	{
-		Map m = null
 	}
+	
+	public static Map[K, V] map[K >= T, V <= U](K key, V value) = null;
 }

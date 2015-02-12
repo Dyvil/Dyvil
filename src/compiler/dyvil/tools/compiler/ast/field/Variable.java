@@ -100,9 +100,12 @@ public class Variable extends Member implements IVariable
 			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
 		}
 		
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.resolveTypes(markers, context);
+			for (Annotation a : this.annotations)
+			{
+				a.resolveTypes(markers, context);
+			}
 		}
 		
 		if (this.value != null)
@@ -114,16 +117,20 @@ public class Variable extends Member implements IVariable
 	@Override
 	public void resolve(List<Marker> markers, IContext context)
 	{
-		for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
+		if (this.annotations != null)
 		{
-			Annotation a = iterator.next();
-			if (this.processAnnotation(a))
+			Iterator<Annotation> iterator = this.annotations.iterator();
+			while (iterator.hasNext())
 			{
-				iterator.remove();
-				continue;
+				Annotation a = iterator.next();
+				if (this.processAnnotation(a))
+				{
+					iterator.remove();
+					continue;
+				}
+				
+				a.resolve(markers, context);
 			}
-			
-			a.resolve(markers, context);
 		}
 		
 		if (this.value != null)
@@ -135,9 +142,12 @@ public class Variable extends Member implements IVariable
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.check(markers, context);
+			for (Annotation a : this.annotations)
+			{
+				a.check(markers, context);
+			}
 		}
 		
 		IValue value1 = this.value.withType(this.type);
@@ -159,9 +169,12 @@ public class Variable extends Member implements IVariable
 	@Override
 	public void foldConstants()
 	{
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.foldConstants();
+			for (Annotation a : this.annotations)
+			{
+				a.foldConstants();
+			}
 		}
 		
 		this.value = this.value.foldConstants();

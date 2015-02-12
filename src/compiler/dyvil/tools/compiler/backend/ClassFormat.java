@@ -158,7 +158,7 @@ public class ClassFormat
 		
 		char c = internal.charAt(i);
 		
-		if (c == 'L' || c == 'T')
+		if (c == 'L')
 		{
 			int l = len - 1;
 			if (internal.charAt(l) == ';')
@@ -166,6 +166,15 @@ public class ClassFormat
 				internal = internal.substring(i + 1, l);
 			}
 			setInternalName(type, internal);
+		}
+		else if (c == 'T')
+		{
+			int l = len - 1;
+			if (internal.charAt(l) == ';')
+			{
+				internal = internal.substring(i + 1, l);
+			}
+			type.setName(Symbols.unqualify(internal), internal);
 		}
 		else if (len - i == 1)
 		{
@@ -230,11 +239,20 @@ public class ClassFormat
 			{
 				array++;
 			}
-			else if (c == 'L' || c == 'T')
+			else if (c == 'L')
 			{
 				int end1 = getMatchingSemicolon(internal, i, end);
-				String name = internal.substring(i + 1, end1);
-				IType type = internalToType2(name);
+				IType type = internalToType2(internal.substring(i + 1, end1));
+				
+				type.setArrayDimensions(array);
+				array = 0;
+				list.addType(type);
+				i = end1;
+			}
+			else if (c == 'T')
+			{
+				int end1 = internal.indexOf(';', i);
+				IType type = new Type(null, internal.substring(i + 1, end1));
 				
 				type.setArrayDimensions(array);
 				array = 0;
@@ -309,15 +327,25 @@ public class ClassFormat
 						continue;
 					}
 					
-					if (c1 == 'L' || c1 == 'T')
+					if (c1 == 'L')
 					{
 						int end1 = getMatchingSemicolon(signature, i + 1, end);
-						String name = signature.substring(i + 2, end1);
-						IType type = internalToType2(name);
+						IType type = internalToType2(signature.substring(i + 2, end1));
 						
 						type.setArrayDimensions(array);
-						array = 0;
 						var.setUpperBound(type);
+						array = 0;
+						mode = 2;
+						i = end1;
+					}
+					else if (c1 == 'T')
+					{
+						int end1 = signature.indexOf(';', i);
+						IType type = new Type(null, signature.substring(i + 2, end1));
+						
+						type.setArrayDimensions(array);
+						var.setUpperBound(type);
+						array = 0;
 						mode = 2;
 						i = end1;
 					}
@@ -342,16 +370,26 @@ public class ClassFormat
 						continue;
 					}
 					
-					if (c1 == 'L' || c1 == 'T')
+					if (c1 == 'L')
 					{
 						int end1 = getMatchingSemicolon(signature, i + 1, end);
-						String name = signature.substring(i + 2, end1);
-						IType type = internalToType2(name);
+						IType type = internalToType2(signature.substring(i + 2, end1));
 						
 						type.setArrayDimensions(array);
-						array = 0;
 						var.addUpperBound(type);
+						array = 0;
 						mode = 0;
+						i = end1;
+					}
+					else if (c1 == 'T')
+					{
+						int end1 = signature.indexOf(';', i + 1);
+						IType type = new Type(null, signature.substring(i + 2, end1));
+						
+						type.setArrayDimensions(array);
+						var.setUpperBound(type);
+						array = 0;
+						mode = 2;
 						i = end1;
 					}
 					

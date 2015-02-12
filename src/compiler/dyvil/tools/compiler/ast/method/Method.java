@@ -187,6 +187,11 @@ public class Method extends Member implements IMethod
 		if (!this.processAnnotation(annotation))
 		{
 			annotation.target = ElementType.METHOD;
+			
+			if (this.annotations == null)
+			{
+				this.annotations = new ArrayList(2);
+			}
 			this.annotations.add(annotation);
 		}
 	}
@@ -434,8 +439,16 @@ public class Method extends Member implements IMethod
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.type = this.type.resolve(context);
-		if (!this.type.isResolved())
+		if (this.generics != null)
+		{
+			for (ITypeVariable v : this.generics)
+			{
+				v.resolveTypes(markers, context);
+			}
+		}
+		
+		this.type = this.type.resolve(this);
+		if (!this.type.isResolved() && markers != null)
 		{
 			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
 		}
@@ -451,23 +464,18 @@ public class Method extends Member implements IMethod
 				{
 					this.throwsDeclarations.set(i, t2);
 				}
-				if (!t2.isResolved())
+				if (!t2.isResolved() && markers != null)
 				{
 					markers.add(Markers.create(t2.getPosition(), "resolve.type", t2.toString()));
 				}
 			}
 		}
 		
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.resolveTypes(markers, context);
-		}
-		
-		if (this.generics != null)
-		{
-			for (ITypeVariable v : this.generics)
+			for (Annotation a : this.annotations)
 			{
-				v.resolveTypes(markers, context);
+				a.resolveTypes(markers, context);
 			}
 		}
 		
@@ -744,9 +752,12 @@ public class Method extends Member implements IMethod
 			mw.addLocal(0, this.getThisType());
 		}
 		
-		for (Annotation annotation : this.annotations)
+		if (this.annotations != null)
 		{
-			annotation.write(mw);
+			for (Annotation annotation : this.annotations)
+			{
+				annotation.write(mw);
+			}
 		}
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,6 +73,11 @@ public class Field extends Member implements IField
 		if (!this.processAnnotation(annotation))
 		{
 			annotation.target = ElementType.FIELD;
+			
+			if (this.annotations == null)
+			{
+				this.annotations = new ArrayList(2);
+			}
 			this.annotations.add(annotation);
 		}
 	}
@@ -100,15 +106,18 @@ public class Field extends Member implements IField
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		for (Annotation a : this.annotations)
-		{
-			a.resolveTypes(markers, context);
-		}
-		
 		this.type = this.type.resolve(context);
 		if (!this.type.isResolved())
 		{
 			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
+		}
+		
+		if (this.annotations != null)
+		{
+			for (Annotation a : this.annotations)
+			{
+				a.resolveTypes(markers, context);
+			}
 		}
 		
 		if (this.value != null)
@@ -217,9 +226,12 @@ public class Field extends Member implements IField
 			fv.visitAnnotation("Ljava/lang/Deprecated;", true);
 		}
 		
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.write(fv);
+			for (Annotation a : this.annotations)
+			{
+				a.write(fv);
+			}
 		}
 	}
 	

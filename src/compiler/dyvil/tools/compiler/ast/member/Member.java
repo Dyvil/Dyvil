@@ -26,7 +26,6 @@ public abstract class Member extends ASTNode implements IMember
 	protected Member(IClass iclass)
 	{
 		this.theClass = iclass;
-		this.annotations = new ArrayList(1);
 	}
 	
 	public Member(IClass iclass, String name)
@@ -34,7 +33,6 @@ public abstract class Member extends ASTNode implements IMember
 		this.theClass = iclass;
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
-		this.annotations = new ArrayList(1);
 	}
 	
 	public Member(IClass iclass, String name, IType type)
@@ -43,7 +41,6 @@ public abstract class Member extends ASTNode implements IMember
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
 		this.type = type;
-		this.annotations = new ArrayList(1);
 	}
 	
 	public Member(IClass iclass, String name, IType type, int modifiers, List<Annotation> annotations)
@@ -77,6 +74,10 @@ public abstract class Member extends ASTNode implements IMember
 	@Override
 	public Annotation getAnnotation(IType type)
 	{
+		if (this.annotations == null)
+		{
+			return null;
+		}
 		for (Annotation a : this.annotations)
 		{
 			if (a.type.equals(type))
@@ -90,6 +91,10 @@ public abstract class Member extends ASTNode implements IMember
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
+		if (this.annotations == null)
+		{
+			this.annotations = new ArrayList(2);
+		}
 		this.annotations.add(annotation);
 	}
 	
@@ -190,11 +195,14 @@ public abstract class Member extends ASTNode implements IMember
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (Annotation annotation : this.annotations)
+		if (this.annotations != null)
 		{
-			buffer.append(prefix);
-			annotation.toString(prefix, buffer);
-			buffer.append('\n');
+			for (Annotation annotation : this.annotations)
+			{
+				buffer.append(prefix);
+				annotation.toString(prefix, buffer);
+				buffer.append('\n');
+			}
 		}
 		
 		buffer.append(prefix);

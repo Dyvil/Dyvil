@@ -7,6 +7,7 @@ import java.util.ListIterator;
 import jdk.internal.org.objectweb.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.*;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -50,6 +51,14 @@ public class BytecodeClass extends CodeClass
 	{
 		this.typesResolved = true;
 		
+		if (this.generics != null)
+		{
+			for (ITypeVariable v : this.generics)
+			{
+				v.resolveTypes(markers, context);
+			}
+		}
+		
 		if (this.superType != null)
 		{
 			if (this.superType.isName("void"))
@@ -72,12 +81,15 @@ public class BytecodeClass extends CodeClass
 			}
 		}
 		
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.resolveTypes(markers, Package.rootPackage);
+			for (Annotation a : this.annotations)
+			{
+				a.resolveTypes(markers, context);
+			}
 		}
 		
-		this.body.resolveTypes(markers, Package.rootPackage);
+		this.body.resolveTypes(markers, this);
 		
 		if (this.outerType != null)
 		{
@@ -116,6 +128,17 @@ public class BytecodeClass extends CodeClass
 		if (!this.typesResolved)
 		{
 			this.resolveTypes(null, Package.rootPackage);
+		}
+		
+		if (this.generics != null)
+		{
+			for (ITypeVariable var : this.generics)
+			{
+				if (var.isName(name))
+				{
+					return var.getTheClass();
+				}
+			}
 		}
 		
 		IClass clazz = this.body.getClass(name);

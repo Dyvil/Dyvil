@@ -67,14 +67,12 @@ public class CodeClass extends ASTNode implements IClass
 	public CodeClass()
 	{
 		this.type = new Type(this);
-		this.annotations = new ArrayList(1);
 	}
 	
 	public CodeClass(ICodePosition position, CompilationUnit unit)
 	{
 		this.position = position;
 		this.unit = unit;
-		this.annotations = new ArrayList(1);
 		this.type = new Type(this);
 	}
 	
@@ -152,6 +150,11 @@ public class CodeClass extends ASTNode implements IClass
 		if (!this.processAnnotation(annotation))
 		{
 			annotation.target = ElementType.TYPE;
+			
+			if (this.annotations == null)
+			{
+				this.annotations = new ArrayList(2);
+			}
 			this.annotations.add(annotation);
 		}
 	}
@@ -180,6 +183,11 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public Annotation getAnnotation(IType type)
 	{
+		if (this.annotations == null)
+		{
+			return null;
+		}
+		
 		for (Annotation a : this.annotations)
 		{
 			if (a.type.classEquals(type))
@@ -437,6 +445,14 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		if (this.generics != null)
+		{
+			for (ITypeVariable v : this.generics)
+			{
+				v.resolveTypes(markers, context);
+			}
+		}
+		
 		if (this.superType != null)
 		{
 			if (this.superType.isName("void"))
@@ -459,17 +475,12 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.generics != null)
+		if (this.annotations != null)
 		{
-			for (ITypeVariable v : this.generics)
+			for (Annotation a : this.annotations)
 			{
-				v.resolveTypes(markers, context);
+				a.resolveTypes(markers, this);
 			}
-		}
-		
-		for (Annotation a : this.annotations)
-		{
-			a.resolveTypes(markers, this);
 		}
 		
 		if (this.body != null)
@@ -504,16 +515,20 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void resolve(List<Marker> markers, IContext context)
 	{
-		for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
+		if (this.annotations != null)
 		{
-			Annotation a = iterator.next();
-			if (this.processAnnotation(a))
+			Iterator<Annotation> iterator = this.annotations.iterator();
+			while (iterator.hasNext())
 			{
-				iterator.remove();
-				continue;
+				Annotation a = iterator.next();
+				if (this.processAnnotation(a))
+				{
+					iterator.remove();
+					continue;
+				}
+				
+				a.resolve(markers, context);
 			}
-			
-			a.resolve(markers, context);
 		}
 		
 		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
@@ -578,9 +593,12 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.check(markers, context);
+			for (Annotation a : this.annotations)
+			{
+				a.check(markers, context);
+			}
 		}
 		
 		if (this.body != null)
@@ -592,9 +610,12 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void foldConstants()
 	{
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.foldConstants();
+			for (Annotation a : this.annotations)
+			{
+				a.foldConstants();
+			}
 		}
 		
 		if (this.body != null)
@@ -886,9 +907,12 @@ public class CodeClass extends ASTNode implements IClass
 			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true);
 		}
 		
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.write(writer);
+			for (Annotation a : this.annotations)
+			{
+				a.write(writer);
+			}
 		}
 		
 		// Inner Class Info
@@ -1061,11 +1085,14 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (Annotation annotation : this.annotations)
+		if (this.annotations != null)
 		{
-			buffer.append(prefix);
-			annotation.toString(prefix, buffer);
-			buffer.append('\n');
+			for (Annotation annotation : this.annotations)
+			{
+				buffer.append(prefix);
+				annotation.toString(prefix, buffer);
+				buffer.append('\n');
+			}
 		}
 		
 		buffer.append(prefix).append(Modifiers.CLASS.toString(this.modifiers));

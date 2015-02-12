@@ -132,14 +132,17 @@ public class Parameter extends Member implements IVariable
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.type = this.type.resolve(context);
-		if (!this.type.isResolved())
+		if (!this.type.isResolved() && markers != null)
 		{
 			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
 		}
 		
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.resolveTypes(markers, context);
+			for (Annotation a : this.annotations)
+			{
+				a.resolveTypes(markers, context);
+			}
 		}
 		
 		if (this.defaultValue != null)
@@ -242,10 +245,13 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (Annotation a : this.annotations)
+		if (this.annotations != null)
 		{
-			a.toString(prefix, buffer);
-			buffer.append(' ');
+			for (Annotation a : this.annotations)
+			{
+				a.toString(prefix, buffer);
+				buffer.append(' ');
+			}
 		}
 		
 		this.type.toString("", buffer);
