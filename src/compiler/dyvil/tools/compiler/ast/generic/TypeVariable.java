@@ -19,7 +19,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
@@ -28,13 +27,17 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	public static int		captureID;
 	
 	public String			name;
-	public String			qualifiedName;
 	
 	protected IType			upperBound;
 	protected List<IType>	upperBounds;
 	protected IType			lowerBound;
 	
 	protected IClass		captureClass;
+	
+	public TypeVariable(String name)
+	{
+		this.name = name;
+	}
 	
 	public TypeVariable(ICodePosition position)
 	{
@@ -45,14 +48,12 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	{
 		this.position = position;
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override
 	public void setName(String name, String qualifiedName)
 	{
 		this.name = name;
-		this.qualifiedName = qualifiedName;
 	}
 	
 	@Override
@@ -70,31 +71,31 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	@Override
 	public void setQualifiedName(String name)
 	{
-		this.qualifiedName = name;
+		this.name = name;
 	}
 	
 	@Override
 	public String getQualifiedName()
 	{
-		return this.qualifiedName;
+		return this.name;
 	}
 	
 	@Override
 	public boolean isName(String name)
 	{
-		return this.qualifiedName.equals(name);
+		return this.name.equals(name);
 	}
 	
 	@Override
 	public void setFullName(String name)
 	{
-		this.qualifiedName = name;
+		this.name = name;
 	}
 	
 	@Override
 	public String getFullName()
 	{
-		return this.qualifiedName;
+		return this.name;
 	}
 	
 	@Override
@@ -250,7 +251,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		buffer.append('L').append(this.qualifiedName).append(';');
+		buffer.append('L').append(this.name).append(';');
 	}
 	
 	@Override

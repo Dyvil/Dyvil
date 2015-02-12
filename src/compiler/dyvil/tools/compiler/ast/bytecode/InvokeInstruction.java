@@ -129,7 +129,7 @@ public class InvokeInstruction extends Instruction implements INamed, ITyped, IP
 	}
 	
 	@Override
-	public void addParameterType(IType type)
+	public void addType(IType type)
 	{
 		this.args++;
 	}

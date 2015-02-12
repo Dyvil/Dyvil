@@ -2,11 +2,10 @@ package dyvil.tools.compiler.backend;
 
 import java.io.File;
 
-import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.method.IParameterized;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.generic.TypeVariable;
+import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.transform.Symbols;
 
 public class ClassFormat
@@ -191,9 +190,8 @@ public class ClassFormat
 		}
 	}
 	
-	public static <T extends INamed & IParameterized & ITyped> void readMethodType(String internal, T method)
+	public static <T extends ITypeList & ITyped> void readMethodType(String internal, T method)
 	{
-		String methodName = method.getName();
 		int index = internal.indexOf(')');
 		
 		readTypeList(internal, 1, index, method);
@@ -202,7 +200,7 @@ public class ClassFormat
 		method.setType(t);
 	}
 	
-	protected static void readTypeList(String internal, int start, int end, IParameterized list)
+	protected static void readTypeList(String internal, int start, int end, ITypeList list)
 	{
 		int array = 0;
 		for (int i = start; i < end; i++)
@@ -215,32 +213,184 @@ public class ClassFormat
 			else if (c == 'L')
 			{
 				int end1 = internal.indexOf(';', i);
+				String name = internal.substring(i + 1, end1);
+				IType type = internalToType2(name);
 				
-				String s = internal.substring(i + 1, end1);
-				IType type = internalToType2(s);
 				type.setArrayDimensions(array);
 				array = 0;
-				list.addParameterType(type);
+				list.addType(type);
 				i = end1;
 			}
 			else if (array == 0)
 			{
-				list.addParameterType(parseBaseType(c));
+				list.addType(parseBaseType(c));
 			}
 			else
 			{
 				IType type = parseBaseType(c).clone();
 				type.setArrayDimensions(array);
 				array = 0;
-				list.addParameterType(type);
+				list.addType(type);
+			}
+		}
+	}
+	
+	protected static void readTypeArguments(String signature, int start, int end, IGeneric generic)
+	{
+		int array = 0;
+		int mode = 0;
+		TypeVariable var = null;
+		for (int i = start; i < end; i++)
+		{
+			if (mode == 0)
+			{
+				int index = signature.indexOf(':', i);
+				String name = signature.substring(i, index);
+				var = new TypeVariable(name);
+				mode = 1;
+			}
+			else if (mode == 1)
+			{
+				char c = signature.charAt(i);
+				if (c == ':')
+				{
+					mode = 2;
+				}
+				else if (c == '>')
+				{
+					generic.addTypeVariable(var);
+					start = i + 1;
+					break;
+				}
+				else
+				{
+					generic.addTypeVariable(var);
+					mode = 0;
+					i--;
+				}
+			}
+			else
+			{
+				char c = signature.charAt(i);
+				if (c == '[')
+				{
+					array++;
+				}
+				else if (c == 'L')
+				{
+					int end1 = getMatchingSemicolon(signature, i, end);
+					String name = signature.substring(i + 1, end1);
+					IType type = internalToType2(name);
+					
+					type.setArrayDimensions(array);
+					array = 0;
+					var.addUpperBound(type);
+					mode = 1;
+					i = end1;
+				}
+				else if (array == 0)
+				{
+					var.addUpperBound(parseBaseType(c));
+					mode = 1;
+				}
+				else
+				{
+					IType type = parseBaseType(c).clone();
+					type.setArrayDimensions(array);
+					array = 0;
+					var.addUpperBound(type);
+					mode = 1;
+				}
 			}
 		}
 	}
 	
 	protected static IType internalToType2(String internal)
 	{
+		int i = internal.indexOf('<');
+		if (i != -1)
+		{
+			GenericType type = new GenericType();
+			setInternalName(type, internal.substring(0, i));
+			int index = getMatchingBracket(internal, i, internal.length());
+			readTypeList(internal, i + 1, index, type);
+			return type;
+		}
+		
 		IType type = new Type();
 		setInternalName(type, internal);
 		return type;
+	}
+	
+	public static void readClassSignature(String signature, IClass iclass)
+	{
+		int i = 0;
+		int len = signature.length();
+		
+		if (signature.charAt(0) == '<')
+		{
+			int index = getMatchingBracket(signature, 0, len);
+			readTypeArguments(signature, 1, index, iclass);
+			i = index + 1;
+		}
+		
+		boolean superClass = true;
+		for (; i < len; i++)
+		{
+			char c = signature.charAt(i);
+			if (c == 'L')
+			{
+				int end1 = getMatchingSemicolon(signature, i, len);
+				String name = signature.substring(i + 1, end1);
+				IType type = internalToType2(name);
+				i = end1;
+				
+				if (superClass)
+				{
+					iclass.setSuperType(type);
+					superClass = false;
+				}
+				else
+				{
+					iclass.addInterface(type);
+				}
+			}
+		}
+	}
+	
+	private static int getMatchingSemicolon(String s, int start, int end)
+	{
+		int depth = 0;
+		for (int i = start; i < end; i++)
+		{
+			char c = s.charAt(i);
+			if (c == '<')
+				depth++;
+			else if (c == '>')
+				depth--;
+			else if (c == ';' && depth == 0)
+				return i;
+		}
+		return -1;
+	}
+	
+	private static int getMatchingBracket(String s, int start, int end)
+	{
+		int depth = 0;
+		for (int i = start; i < end; i++)
+		{
+			char c = s.charAt(i);
+			if (c == '<')
+				depth++;
+			else if (c == '>')
+			{
+				depth--;
+				if (depth == 0)
+				{
+					return i;
+				}
+			}
+		}
+		return -1;
 	}
 }

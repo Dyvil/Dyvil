@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import jdk.internal.org.objectweb.asm.AnnotationVisitor;
-import jdk.internal.org.objectweb.asm.FieldVisitor;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
-import jdk.internal.org.objectweb.asm.Opcodes;
+import jdk.internal.org.objectweb.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -260,20 +257,28 @@ public class BytecodeClass extends CodeClass
 			this.thePackage = Package.rootPackage.resolvePackage(name.substring(0, index));
 		}
 		
-		if (superName != null)
+		if (signature != null)
 		{
-			this.superType = ClassFormat.internalToType(superName);
+			this.generics = new ArrayList(3);
+			ClassFormat.readClassSignature(signature, this);
 		}
 		else
 		{
-			this.superType = null;
-		}
-		
-		if (interfaces != null)
-		{
-			for (String s : interfaces)
+			if (superName != null)
 			{
-				this.interfaces.add(ClassFormat.internalToType(s));
+				this.superType = ClassFormat.internalToType(superName);
+			}
+			else
+			{
+				this.superType = null;
+			}
+			
+			if (interfaces != null)
+			{
+				for (String s : interfaces)
+				{
+					this.interfaces.add(ClassFormat.internalToType(s));
+				}
 			}
 		}
 	}
@@ -347,6 +352,24 @@ public class BytecodeClass extends CodeClass
 			public void visitParameter(String name, int index)
 			{
 				parameters.get(index).setName(name);
+			}
+			
+			@Override
+			public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index)
+			{
+				if ((access & Modifiers.STATIC) == 0)
+				{
+					if (index != 0 && index <= parameters.size())
+					{
+						parameters.get(index - 1).setName(name);
+					}
+					return;
+				}
+				
+				if (index < parameters.size())
+				{
+					parameters.get(index).setName(name);
+				}
 			}
 			
 			@Override

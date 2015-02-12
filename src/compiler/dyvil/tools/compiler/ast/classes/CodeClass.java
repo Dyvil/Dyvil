@@ -1071,7 +1071,7 @@ public class CodeClass extends ASTNode implements IClass
 		buffer.append(prefix).append(Modifiers.CLASS.toString(this.modifiers));
 		buffer.append(Modifiers.CLASS_TYPE.toString(this.modifiers)).append(this.name);
 		
-		if (this.generics != null)
+		if (this.generics != null && !this.generics.isEmpty())
 		{
 			buffer.append('[');
 			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
