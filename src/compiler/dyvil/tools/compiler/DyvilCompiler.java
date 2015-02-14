@@ -17,6 +17,7 @@ import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.util.LoggerOutputStream;
 import dyvil.tools.compiler.util.Util;
 
 public class DyvilCompiler
@@ -27,6 +28,8 @@ public class DyvilCompiler
 	public static int					constantFolding;
 	
 	public static Logger				logger			= Logger.getLogger("DYVILC");
+	public static LoggerOutputStream	loggerOut		= new LoggerOutputStream(logger, "TEST-OUT");
+	public static LoggerOutputStream	loggerErr		= new LoggerOutputStream(logger, "TEST-ERR");
 	public static DateFormat			format			= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public static CompilerConfig		config			= new CompilerConfig();
@@ -185,6 +188,9 @@ public class DyvilCompiler
 			return;
 		case "print":
 			states.add(CompilerState.PRINT);
+			return;
+		case "test":
+			states.add(CompilerState.TEST);
 			return;
 		case "--debug":
 			states.add(CompilerState.PRINT);
