@@ -25,8 +25,8 @@ import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
-import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
@@ -172,7 +172,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					this.method.setGeneric();
 					this.body.addMethod(this.method);
 					pm.skip();
-					pm.pushParser(new TypeListParser(this, true));
+					pm.pushParser(new TypeVariableListParser(this.method));
 					return true;
 				}
 			}

@@ -15,6 +15,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
@@ -92,7 +93,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 		{
 			if (type == Tokens.OPEN_SQUARE_BRACKET)
 			{
-				pm.pushParser(new TypeListParser(this, true));
+				pm.pushParser(new TypeVariableListParser(this.theClass));
 				this.theClass.setGeneric();
 				this.mode = GENERICS_END;
 				return true;

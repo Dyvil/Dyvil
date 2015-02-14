@@ -651,7 +651,7 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				if (var.isName(name))
 				{
-					return var.getTheClass();
+					return var.getCaptureClass();
 				}
 			}
 		}

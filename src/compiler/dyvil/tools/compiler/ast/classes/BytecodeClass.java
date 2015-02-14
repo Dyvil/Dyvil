@@ -31,8 +31,10 @@ public class BytecodeClass extends CodeClass
 	private IType		outerType;
 	private List<IType>	innerTypes;
 	
-	public BytecodeClass()
+	public BytecodeClass(String name)
 	{
+		this.name = name;
+		this.qualifiedName = name;
 		this.body = new ClassBody(null, this);
 	}
 	
@@ -136,7 +138,7 @@ public class BytecodeClass extends CodeClass
 			{
 				if (var.isName(name))
 				{
-					return var.getTheClass();
+					return var.getCaptureClass();
 				}
 			}
 		}
@@ -277,7 +279,7 @@ public class BytecodeClass extends CodeClass
 			this.name = name.substring(index + 1);
 			this.qualifiedName = Symbols.qualify(this.name);
 			this.fullName = name.replace('/', '.');
-			this.thePackage = Package.rootPackage.resolvePackage(name.substring(0, index));
+			this.thePackage = Package.rootPackage.resolvePackage(this.fullName.substring(0, index));
 		}
 		
 		if (signature != null)

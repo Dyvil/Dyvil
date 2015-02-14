@@ -29,7 +29,7 @@ public class CaptureClass extends CodeClass
 	@Override
 	public String getSignature()
 	{
-		return this.typeVariable.getSignature();
+		return null;
 	}
 	
 	@Override

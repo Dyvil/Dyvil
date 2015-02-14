@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.TypeVariable;
+import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -16,7 +16,7 @@ public class TypeParser extends Parser implements ITyped
 	public static final int	GENERICS		= 2;
 	public static final int	GENERICS_END	= 4;
 	public static final int	ARRAY_END		= 8;
-	public static final int	TYPE_VARIABLE	= 16;
+	public static final int	WILDCARD_TYPE	= 16;
 	public static final int	TUPLE_END		= 128;
 	public static final int	LAMBDA_TYPE		= 256;
 	public static final int	LAMBDA_END		= 512;
@@ -25,7 +25,6 @@ public class TypeParser extends Parser implements ITyped
 	public static final int	LOWER			= 2;
 	
 	public ITyped			typed;
-	public boolean			generic;
 	
 	private byte			boundMode;
 	
@@ -37,13 +36,6 @@ public class TypeParser extends Parser implements ITyped
 	{
 		this.mode = NAME;
 		this.typed = typed;
-	}
-	
-	public TypeParser(ITyped typed, boolean generic)
-	{
-		this.mode = NAME;
-		this.typed = typed;
-		this.generic = generic;
 	}
 	
 	@Override
@@ -68,13 +60,7 @@ public class TypeParser extends Parser implements ITyped
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				if (this.generic)
-				{
-					this.type = new TypeVariable(token, token.value());
-					this.mode = TYPE_VARIABLE;
-					return true;
-				}
-				else if (token.next().isType(Tokens.OPEN_SQUARE_BRACKET))
+				if (token.next().isType(Tokens.OPEN_SQUARE_BRACKET))
 				{
 					this.type = new GenericType(token, token.value());
 					this.mode = GENERICS;
@@ -89,16 +75,9 @@ public class TypeParser extends Parser implements ITyped
 			}
 			if (type == Tokens.WILDCARD)
 			{
-				if (this.generic)
-				{
-					this.type = new TypeVariable(token, token.value());
-					this.mode = TYPE_VARIABLE;
-					return true;
-				}
-				else
-				{
-					throw new SyntaxError(token, "Invalid generic Wildcard Type");
-				}
+				this.type = new WildcardType(token.raw());
+				this.mode = WILDCARD_TYPE;
+				return true;
 			}
 			return false;
 		}
@@ -187,7 +166,7 @@ public class TypeParser extends Parser implements ITyped
 			pm.popParser(true);
 			return true;
 		}
-		if (this.isInMode(TYPE_VARIABLE))
+		if (this.isInMode(WILDCARD_TYPE))
 		{
 			String value = token.value();
 			if (this.boundMode == 0)

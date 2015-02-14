@@ -5,6 +5,7 @@ import java.io.File;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
+import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.transform.Symbols;
 
@@ -261,14 +262,14 @@ public class ClassFormat
 			}
 			else if (c == '*')
 			{
-				list.addType(new TypeVariable());
+				list.addType(new WildcardType());
 			}
 			else if (c == '+' || c == '-')
 			{
 				int end1 = getMatchingSemicolon(internal, i, end);
 				String name = internal.substring(i + 1, end1 + 1);
 				IType type = internalToType(name);
-				TypeVariable var = new TypeVariable();
+				WildcardType var = new WildcardType();
 				if (c == '-')
 				{
 					var.setLowerBound(type);
