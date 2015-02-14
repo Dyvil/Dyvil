@@ -308,6 +308,41 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
+		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		{
+			int parCount = this.parameters.size() - 1;
+			Parameter varParam = params.get(parCount);
+			
+			IValue value = arguments.get(parCount);
+			IValue value1 = value.withType(varParam.type);
+			if (value1 == null)
+			{
+				IType elementType = varParam.type.getElementType();
+				List<IValue> values1 = new ArrayList(len - parCount);
+				ValueList varargs = new ValueList(null, values1, varParam.type, elementType);
+				
+				while (len > parCount)
+				{
+					len--;
+					value = arguments.remove(parCount);
+					value1 = value.withType(elementType);
+					if (value1 == null)
+					{
+						Marker marker = Markers.create(value.getPosition(), "access.method.argument_type", varParam.name);
+						marker.addInfo("Required Type: " + elementType);
+						marker.addInfo("Value Type: " + value.getType());
+						markers.add(marker);
+					}
+					else
+					{
+						varargs.addValue(value1);
+					}
+				}
+				
+				arguments.add(varargs);
+			}
+		}
+		
 		for (int i = 0; i < len; i++)
 		{
 			par = params.get(i + pOff);
@@ -370,6 +405,35 @@ public class Method extends Member implements IMethod
 			match += m;
 			
 			pOff = 1;
+		}
+		else if ((this.modifiers & Modifiers.VARARGS) != 0)
+		{
+			int parCount = this.parameters.size() - 1;
+			if (len <= parCount)
+			{
+				return 0;
+			}
+			
+			Parameter varParam = params.get(parCount);
+			for (int i = 0; i < len; i++)
+			{
+				Parameter par = (i > parCount ? varParam : params.get(i + pOff));
+				IType t1 = par.type;
+				IValue argument = arguments.get(i);
+				int m = argument.getTypeMatch(t1);
+				if (m != 0)
+				{
+					return match + m;
+				}
+				m = argument.getTypeMatch(t1.getElementType());
+				if (m == 0)
+				{
+					return 0;
+				}
+				
+				match += m;
+			}
+			return match;
 		}
 		else if (len != this.parameters.size())
 		{
@@ -969,18 +1033,20 @@ public class Method extends Member implements IMethod
 	
 	private void writeInvoke(MethodWriter writer, IValue instance, List<IValue> arguments)
 	{
+		int args = 0;
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
+			args = 1;
 		}
 		
 		for (IValue arg : arguments)
 		{
 			arg.writeExpression(writer);
+			args++;
 		}
 		
 		int opcode;
-		int args = this.parameters.size();
 		int modifiers = this.modifiers;
 		if ((modifiers & Modifiers.STATIC) != 0)
 		{
@@ -989,22 +1055,18 @@ public class Method extends Member implements IMethod
 		else if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS) && (modifiers & Modifiers.ABSTRACT) != 0)
 		{
 			opcode = Opcodes.INVOKEINTERFACE;
-			args++;
 		}
 		else if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
 		{
 			opcode = Opcodes.INVOKESPECIAL;
-			args++;
 		}
 		else if (instance != null && instance.getValueType() == IValue.SUPER)
 		{
 			opcode = Opcodes.INVOKESPECIAL;
-			args++;
 		}
 		else
 		{
 			opcode = Opcodes.INVOKEVIRTUAL;
-			args++;
 		}
 		
 		String owner = this.theClass.getInternalName();

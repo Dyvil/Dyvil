@@ -7,14 +7,17 @@ public class Main
 {
 	public static void main([String] args)
 	{
-		Map[String, String] m = Map("a" -> "1",
-									"b" -> "2",
-									null -> "null")
-									
-		System out println if (m ? "a") "A" else "null"
-		m += ("c", "3")
-		m -= "b"
-		System out println(m @ null)
-		System out println m
+		Map[String, String] map1 = Map {
+										"a" -> "A",
+										"b" -> "B",
+										"c" -> "C",
+										"d" -> "D",
+										"e" -> "E",
+										"f" -> "F"
+									  	}
+		Map[String, String] map2 = Map("a" -> "1", "b" -> "2", "c" -> "3", "d" -> "4")
+		
+		System out println map1
+		System out println map2
 	}
 }

@@ -90,6 +90,11 @@ public class Parameter extends Member implements IVariable
 		this.varargs = true;
 	}
 	
+	public void setVarargs2()
+	{
+		this.varargs = true;
+	}
+	
 	public boolean isVarargs()
 	{
 		return this.varargs;

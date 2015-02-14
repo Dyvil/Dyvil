@@ -97,7 +97,15 @@ public class StatementList extends ValueList implements IStatement, IContext
 		{
 			return this;
 		}
-		return super.withType(type);
+		if (super.isType(type))
+		{
+			if (type.isArrayType())
+			{
+				return new ValueList(this.position, this.values, this.requiredType, this.elementType);
+			}
+			return this;
+		}
+		return null;
 	}
 	
 	@Override

@@ -372,7 +372,7 @@ public class BytecodeClass extends CodeClass
 		if ((access & Modifiers.VARARGS) != 0)
 		{
 			Parameter param = parameters.get(parameters.size() - 1);
-			param.setVarargs();
+			param.setVarargs2();
 		}
 		
 		boolean flag = true;

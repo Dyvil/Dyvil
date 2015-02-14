@@ -32,6 +32,7 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 	private List<Annotation>	annotations;
 	private IType				type;
 	private Parameter			parameter;
+	private boolean				varargs;
 	
 	public ParameterListParser(IParameterized parameterized)
 	{
@@ -76,11 +77,23 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 		}
 		if (this.mode == NAME)
 		{
+			if (token.equals("..."))
+			{
+				this.varargs = true;
+				return true;
+			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.parameter = new Parameter(0, token.value(), this.type, this.modifiers, this.annotations);
 				this.parameterized.addParameter(this.parameter);
 				this.mode = SEPERATOR;
+				
+				if (this.varargs)
+				{
+					this.parameter.setVarargs();
+					this.parameterized.setVarargs();
+					this.varargs = false;
+				}
 				return true;
 			}
 			return false;

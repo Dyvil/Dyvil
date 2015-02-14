@@ -211,12 +211,18 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		
 		this.context = context;
 		
 		if (this.variable != null)
 		{
-			this.variable.check(markers, context);
+			if (this.type == 0)
+			{
+				this.variable.check(markers, context);
+			}
+			else
+			{
+				this.variable.value.check(markers, context);
+			}
 		}
 		
 		if (this.condition != null)
