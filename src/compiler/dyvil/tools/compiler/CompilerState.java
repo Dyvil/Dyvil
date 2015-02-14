@@ -2,7 +2,7 @@ package dyvil.tools.compiler;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 import java.util.logging.Level;
 
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
@@ -17,7 +17,7 @@ public enum CompilerState
 	TOKENIZE
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			for (CompilationUnit cu : units)
 			{
@@ -31,7 +31,7 @@ public enum CompilerState
 	PARSE
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			for (CompilationUnit cu : units)
 			{
@@ -45,7 +45,7 @@ public enum CompilerState
 	RESOLVE_TYPES
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			for (CompilationUnit cu : units)
 			{
@@ -59,7 +59,7 @@ public enum CompilerState
 	RESOLVE
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			for (CompilationUnit cu : units)
 			{
@@ -73,7 +73,7 @@ public enum CompilerState
 	CHECK
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			for (CompilationUnit cu : units)
 			{
@@ -87,7 +87,7 @@ public enum CompilerState
 	PRINT
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			for (CompilationUnit cu : units)
 			{
@@ -98,7 +98,7 @@ public enum CompilerState
 	FORMAT
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			for (CompilationUnit cu : units)
 			{
@@ -112,7 +112,7 @@ public enum CompilerState
 	FOLD_CONSTANTS
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			for (int i = 0; i < DyvilCompiler.constantFolding; i++)
 			{
@@ -136,7 +136,7 @@ public enum CompilerState
 	COMPILE
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			for (CompilationUnit cu : units)
 			{
@@ -151,7 +151,7 @@ public enum CompilerState
 	JAR
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			ClassWriter.generateJAR(DyvilCompiler.files);
 		}
@@ -159,7 +159,7 @@ public enum CompilerState
 	TEST
 	{
 		@Override
-		public void apply(List<CompilationUnit> units)
+		public void apply(Collection<CompilationUnit> units)
 		{
 			new Thread()
 			{
@@ -187,7 +187,7 @@ public enum CompilerState
 		}
 	};
 	
-	public static void applyState(CompilerState state, List<CompilationUnit> units)
+	public static void applyState(CompilerState state, Collection<CompilationUnit> units)
 	{
 		long now = 0L;
 		if (DyvilCompiler.debug)
@@ -204,7 +204,7 @@ public enum CompilerState
 		}
 	}
 	
-	public void apply(List<CompilationUnit> units)
+	public void apply(Collection<CompilationUnit> units)
 	{
 		
 	}

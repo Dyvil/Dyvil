@@ -1,12 +1,15 @@
 package dyvil.tools.compiler.ast.structure;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -17,13 +20,15 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.library.Library;
 
-public class Package implements IContext
+public class Package implements INamed, IContext
 {
-	public static Package			rootPackage	= new RootPackage(null, null);
+	public static Package			rootPackage	= new RootPackage();
 	
+	public static Package			dyvil;
 	public static Package			dyvilLang;
 	public static Package			dyvilLangTuple;
 	public static Package			dyvilLangAnnotation;
+	public static Package			java;
 	public static Package			javaLang;
 	public static Package			javaLangAnnotation;
 	
@@ -32,11 +37,9 @@ public class Package implements IContext
 	public String					fullName;
 	public String					internalName;
 	
-	public boolean					isExternal;
-	
 	public List<CompilationUnit>	units		= new ArrayList();
-	public List<IClass>				classes		= new ArrayList();
-	public List<Package>			subPackages	= new ArrayList();
+	public Map<String, IClass>		classes		= new HashMap();
+	public Map<String, Package>		subPackages	= new HashMap();
 	
 	public Package(Package parent, String name)
 	{
@@ -60,42 +63,76 @@ public class Package implements IContext
 	
 	public static void init()
 	{
-		dyvilLang = Library.dyvilLibrary.resolvePackage("dyvil.lang");
-		dyvilLangAnnotation = Library.dyvilLibrary.resolvePackage("dyvil.lang.annotation");
-		dyvilLangTuple = Library.dyvilLibrary.resolvePackage("dyvil.lang.tuple");
-		javaLang = Library.javaLibrary.resolvePackage("java.lang");
-		javaLangAnnotation = Library.javaLibrary.resolvePackage("java.lang.annotation");
+		dyvil = Library.dyvilLibrary.resolvePackage("dyvil");
+		dyvilLang = dyvil.resolvePackage("lang");
+		dyvilLangAnnotation = dyvilLang.resolvePackage("annotation");
+		dyvilLangTuple = dyvilLang.resolvePackage("tuple");
+		java = Library.javaLibrary.resolvePackage("java");
+		javaLang = java.resolvePackage("lang");
+		javaLangAnnotation = javaLang.resolvePackage("annotation");
+	}
+	
+	@Override
+	public void setName(String name, String qualifiedName)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public String getName()
+	{
+		return this.name;
+	}
+	
+	@Override
+	public void setQualifiedName(String name)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public String getQualifiedName()
+	{
+		return this.name;
+	}
+	
+	@Override
+	public boolean isName(String name)
+	{
+		return this.name.equals(name);
 	}
 	
 	public void addCompilationUnit(CompilationUnit unit)
 	{
-		rootPackage.units.add(unit);
 		this.units.add(unit);
 	}
 	
 	public void addClass(IClass iclass)
 	{
-		this.classes.add(iclass);
+		this.classes.put(iclass.getQualifiedName(), iclass);
 	}
 	
 	public void addSubPackage(Package pack)
 	{
-		rootPackage.subPackages.add(pack);
-		this.subPackages.add(pack);
+		this.subPackages.put(pack.name, pack);
 	}
 	
 	public Package createSubPackage(String name)
 	{
-		for (Package pack : this.subPackages)
+		Package pack = this.subPackages.get(name);
+		if (pack != null)
 		{
-			if (pack.name.equals(name))
-			{
-				return pack;
-			}
+			return pack;
 		}
 		
-		Package pack = new Package(this, name);
-		this.addSubPackage(pack);
+		pack = new Package(this, name);
+		this.subPackages.put(name, pack);
 		return pack;
 	}
 	
@@ -137,28 +174,18 @@ public class Package implements IContext
 	@Override
 	public Package resolvePackage(String name)
 	{
-		for (Package pack : this.subPackages)
-		{
-			if (pack.name.equals(name))
-			{
-				return pack;
-			}
-		}
-		
-		return null;
+		return this.subPackages.get(name);
+	}
+	
+	public final Package resolvePackage2(String name)
+	{
+		return this.subPackages.get(name);
 	}
 	
 	@Override
 	public IClass resolveClass(String name)
 	{
-		for (IClass iclass : this.classes)
-		{
-			if (name.equals(iclass.getName()))
-			{
-				return iclass;
-			}
-		}
-		return null;
+		return this.classes.get(name);
 	}
 	
 	@Override
@@ -176,17 +203,19 @@ public class Package implements IContext
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
 	public MethodMatch resolveConstructor(List<IValue> arguments)
 	{
-		return null;
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
 	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
 	{
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override

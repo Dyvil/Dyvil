@@ -6,21 +6,9 @@ import dyvil.tools.compiler.library.Library;
 
 public final class RootPackage extends Package
 {
-	public RootPackage(Package parent, String name)
+	public RootPackage()
 	{
-		super(parent, name);
-	}
-	
-	@Override
-	public void addCompilationUnit(CompilationUnit unit)
-	{
-		this.units.add(unit);
-	}
-	
-	@Override
-	public void addSubPackage(Package pack)
-	{
-		this.subPackages.add(pack);
+		super(null, null);
 	}
 	
 	@Override
@@ -37,7 +25,6 @@ public final class RootPackage extends Package
 			pack = lib.resolvePackage(name);
 			if (pack != null)
 			{
-				this.subPackages.add(pack);
 				return pack;
 			}
 		}
@@ -70,6 +57,6 @@ public final class RootPackage extends Package
 	@Override
 	public String toString()
 	{
-		return "Default Package";
+		return "<default package>";
 	}
 }

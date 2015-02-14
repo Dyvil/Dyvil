@@ -5,10 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import dyvil.tools.compiler.ast.structure.ExternalPackage;
-import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.backend.ClassFormat;
-
 public class FileLibrary extends Library
 {
 	public FileLibrary(File file)
@@ -22,16 +18,9 @@ public class FileLibrary extends Library
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public boolean isSubPackage(String name)
 	{
-		File file = new File(this.file, ClassFormat.packageToInternal(name));
-		if (file.exists())
-		{
-			ExternalPackage pack = new ExternalPackage(Package.rootPackage, name, this);
-			Package.rootPackage.addSubPackage(pack);
-			return pack;
-		}
-		return null;
+		return new File(this.file, name).exists();
 	}
 	
 	@Override

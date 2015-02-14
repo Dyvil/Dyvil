@@ -10,14 +10,10 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import dyvil.tools.compiler.ast.structure.ExternalPackage;
-import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.backend.ClassFormat;
-
 public class JarLibrary extends Library
 {
 	private JarFile		jarFile;
-	private Set<String>	packages	= new TreeSet();
+	private Set<String>	packageNames	= new TreeSet();
 	
 	public JarLibrary(File file)
 	{
@@ -39,7 +35,7 @@ public class JarLibrary extends Library
 				int index = name.length();
 				while ((index = name.lastIndexOf('/', index - 1)) != -1)
 				{
-					if (!this.packages.add(name.substring(0, index)))
+					if (!this.packageNames.add(name.substring(0, index)))
 					{
 						break;
 					}
@@ -52,16 +48,9 @@ public class JarLibrary extends Library
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public boolean isSubPackage(String name)
 	{
-		String internalName = ClassFormat.packageToInternal(name);
-		if (this.packages.contains(internalName))
-		{
-			ExternalPackage pack = new ExternalPackage(Package.rootPackage, name, this);
-			Package.rootPackage.addSubPackage(pack);
-			return pack;
-		}
-		return null;
+		return this.packageNames.contains(name);
 	}
 	
 	@Override

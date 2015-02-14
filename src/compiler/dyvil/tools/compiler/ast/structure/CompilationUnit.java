@@ -98,7 +98,7 @@ public class CompilationUnit extends ASTNode implements IContext
 	public void addClass(CodeClass iclass)
 	{
 		this.classes.add(iclass);
-		this.pack.classes.add(iclass);
+		this.pack.addClass(iclass);
 	}
 	
 	public String getFullName(String name)

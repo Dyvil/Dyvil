@@ -15,7 +15,20 @@ public class ExternalPackage extends Package
 	{
 		super(parent, name);
 		this.library = library;
-		this.isExternal = true;
+	}
+	
+	@Override
+	public Package createSubPackage(String name)
+	{
+		Package pack = this.subPackages.get(name);
+		if (pack != null)
+		{
+			return pack;
+		}
+		
+		pack = new ExternalPackage(this, name, this.library);
+		this.subPackages.put(name, pack);
+		return pack;
 	}
 	
 	@Override
@@ -27,7 +40,7 @@ public class ExternalPackage extends Package
 			return pack;
 		}
 		
-		String name1 = this.name + "." + name;
+		String name1 = this.fullName + "." + name;
 		pack = this.library.resolvePackage(name1);
 		if (pack != null)
 		{
@@ -47,8 +60,8 @@ public class ExternalPackage extends Package
 			InputStream is = this.library.getInputStream(this.internalName + name + ".class");
 			if (is != null)
 			{
-				BytecodeClass bclass = new BytecodeClass();
-				this.classes.add(bclass);
+				BytecodeClass bclass = new BytecodeClass(name);
+				this.classes.put(name, bclass);
 				iclass = ClassReader.loadClass(bclass, is, false);
 			}
 		}

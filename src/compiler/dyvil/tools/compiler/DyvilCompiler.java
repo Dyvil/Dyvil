@@ -35,6 +35,7 @@ public class DyvilCompiler
 	public static ParserManager			configParser	= new ParserManager();
 	public static ParserManager			parser			= new ParserManager();
 	public static List<File>			files			= new ArrayList();
+	public static List<CompilationUnit>	units			= new ArrayList();
 	
 	static
 	{
@@ -92,20 +93,21 @@ public class DyvilCompiler
 			findUnits(new CodeFile(sourceDir, s), new File(outputDir, s), Package.rootPackage);
 		}
 		
-		int units = root.units.size();
+		int fileCount = files.size();
+		int unitCount = units.size();
 		int packages = root.subPackages.size();
-		logger.info("Compiling " + packages + (packages == 1 ? " Package, " : " Packages, ") + units
-				+ (units == 1 ? " Compilation Unit" : " Compilation Units"));
+		logger.info("Compiling " + packages + (packages == 1 ? " Package, " : " Packages, ") + fileCount + (fileCount == 1 ? " File (" : " Files (")
+				+ unitCount + (unitCount == 1 ? " Compilation Unit)" : " Compilation Units)"));
 		logger.info("");
 		
 		// Apply states
 		for (CompilerState state : DyvilCompiler.states)
 		{
-			CompilerState.applyState(state, root.units);
+			CompilerState.applyState(state, units);
 		}
 		
 		logger.info("");
-		Util.logProfile(now, units, "Compilation finished (%.1f ms, %.1f ms/CU, %.2f CU/s)");
+		Util.logProfile(now, unitCount, "Compilation finished (%.1f ms, %.1f ms/CU, %.2f CU/s)");
 	}
 	
 	public static void initLogger()
@@ -246,6 +248,7 @@ public class DyvilCompiler
 				CompilationUnit unit = new CompilationUnit(pack, (CodeFile) source, output);
 				output = unit.outputFile;
 				pack.addCompilationUnit(unit);
+				units.add(unit);
 			}
 			files.add(output);
 		}
