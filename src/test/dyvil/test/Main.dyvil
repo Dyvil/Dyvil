@@ -1,17 +1,20 @@
 package dyvil.test
 
-import java.util.Arrays
-import java.util.Collections;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.{ Arrays, Collections, Map, HashMap }
+using dyvil.maps.MapUtils._
 
-public class Main[T, U]
+public class Main
 {
 	public static void main([String] args)
 	{
-		Map[String, String] m = new HashMap
-		m.put("a", "1")
-		String s = m.get("a")
-		System out println(s)
+		Map[String, String] m = Map("a" -> "1",
+									"b" -> "2",
+									null -> "null")
+									
+		System out println if (m ? "a") "A" else "null"
+		m += ("c", "3")
+		m -= "b"
+		System out println(m @ null)
+		System out println m
 	}
 }

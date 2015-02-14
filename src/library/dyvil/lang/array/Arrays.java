@@ -54,7 +54,7 @@ public class Arrays
 	
 	public static @infix <T> T[] toArray(Collection<? extends T> collection, Class<T> type)
 	{
-		return Collections.toArray(type, collection);
+		return Collections.toArray(collection, type);
 	}
 	
 	// Generic array functions

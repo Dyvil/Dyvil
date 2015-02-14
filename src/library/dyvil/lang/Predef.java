@@ -1,8 +1,12 @@
 package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
+
+import java.util.*;
+
 import dyvil.lang.annotation.Intrinsic;
 import dyvil.lang.annotation.infix;
+import dyvil.lang.annotation.inline;
 import dyvil.lang.tuple.Tuple2;
 
 public final class Predef
@@ -141,6 +145,127 @@ public final class Predef
 	
 	// Miscellaneous
 	
+	public static @inline List<?> List()
+	{
+		return new ArrayList();
+	}
+	
+	public static <T> List<T> List(T e1)
+	{
+		ArrayList<T> list = new ArrayList(1);
+		list.add(e1);
+		return list;
+	}
+	
+	public static <T> List<T> List(T e1, T e2)
+	{
+		ArrayList<T> list = new ArrayList(2);
+		list.add(e1);
+		list.add(e2);
+		return list;
+	}
+	
+	public static <T> List<T> List(T e1, T e2, T e3)
+	{
+		ArrayList<T> list = new ArrayList(3);
+		list.add(e1);
+		list.add(e2);
+		list.add(e3);
+		return list;
+	}
+	
+	public static <T> List<T> List(T... elements)
+	{
+		int len = elements.length;
+		ArrayList<T> list = new ArrayList(len);
+		for (int i = 0; i < len; i++)
+		{
+			list.add(elements[i]);
+		}
+		return list;
+	}
+	
+	public @inline static Set<?> Set()
+	{
+		return new HashSet();
+	}
+	
+	public static <T> Set<T> Set(T e1)
+	{
+		Set<T> set = new HashSet(1);
+		set.add(e1);
+		return set;
+	}
+	
+	public static <T> Set<T> Set(T e1, T e2)
+	{
+		Set<T> set = new HashSet(2);
+		set.add(e1);
+		set.add(e2);
+		return set;
+	}
+	
+	public static <T> Set<T> Set(T e1, T e2, T e3)
+	{
+		Set<T> set = new HashSet(3);
+		set.add(e1);
+		set.add(e2);
+		set.add(e3);
+		return set;
+	}
+	
+	public static <T> Set<T> Set(T... elements)
+	{
+		int len = elements.length;
+		Set<T> set = new HashSet(len);
+		for (int i = 0; i < len; i++)
+		{
+			set.add(elements[i]);
+		}
+		return set;
+	}
+	
+	public static Map<?, ?> Map()
+	{
+		return new HashMap();
+	}
+	
+	public static <K, V> Map<K, V> Map(Tuple2<K, V> e1)
+	{
+		Map<K, V> map = new HashMap<K, V>(1);
+		map.put(e1._1, e1._2);
+		return map;
+	}
+	
+	public static <K, V> Map<K, V> Map(Tuple2<K, V> e1, Tuple2<K, V> e2)
+	{
+		Map<K, V> map = new HashMap<K, V>(2);
+		map.put(e1._1, e1._2);
+		map.put(e2._1, e2._2);
+		return map;
+	}
+	
+	public static <K, V> Map<K, V> Map(Tuple2<K, V> e1, Tuple2<K, V> e2, Tuple2<K, V> e3)
+	{
+		Map<K, V> map = new HashMap<K, V>(1);
+		map.put(e1._1, e1._2);
+		map.put(e2._1, e2._2);
+		map.put(e3._1, e3._2);
+		return map;
+	}
+	
+	public static <K, V> Map<K, V> Map(Tuple2<K, V>... entries)
+	{
+		int len = entries.length;
+		Map<K, V> map = new HashMap<K, V>(len);
+		for (int i = 0; i < len; i++)
+		{
+			Tuple2<K, V> entry = entries[i];
+			map.put(entry._1, entry._2);
+		}
+		return map;
+	}
+	
 	public static @infix Object match(Object o, Pattern[] patterns)
 	{
 		Option res;
@@ -155,7 +280,7 @@ public final class Predef
 		throw new MatchError(o);
 	}
 	
-	public static void $qmark$qmark$qmark()
+	public static @inline void $qmark$qmark$qmark()
 	{
 		throw new UnsupportedOperationException();
 	}
