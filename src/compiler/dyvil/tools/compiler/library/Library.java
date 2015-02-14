@@ -82,6 +82,7 @@ public abstract class Library
 		if (this.isSubPackage(name))
 		{
 			pack = new ExternalPackage(Package.rootPackage, name, this);
+			Package.rootPackage.addSubPackage(pack);
 			this.packages.put(name, pack);
 			return pack;
 		}
@@ -98,6 +99,7 @@ public abstract class Library
 		if (this.isSubPackage(name))
 		{
 			pack = new ExternalPackage(Package.rootPackage, name, this);
+			Package.rootPackage.addSubPackage(pack);
 			this.packages.put(name, pack);
 			return pack;
 		}

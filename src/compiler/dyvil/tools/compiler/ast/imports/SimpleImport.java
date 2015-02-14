@@ -64,6 +64,12 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	{
 		if (isStatic && this.child == null)
 		{
+			if (!(context instanceof IClass))
+			{
+				markers.add(Markers.create(this.position, "import.using"));
+				return;
+			}
+			
 			FieldMatch field = context.resolveField(this.name);
 			if (field != null)
 			{
