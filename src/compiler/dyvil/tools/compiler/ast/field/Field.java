@@ -106,11 +106,7 @@ public class Field extends Member implements IField
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.type = this.type.resolve(context);
-		if (!this.type.isResolved())
-		{
-			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
-		}
+		this.type = this.type.resolve(markers, context);
 		
 		if (this.annotations != null)
 		{

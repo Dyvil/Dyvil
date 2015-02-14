@@ -142,7 +142,7 @@ public final class DynamicType extends ASTNode implements IType
 	}
 	
 	@Override
-	public IType resolve(IContext context)
+	public IType resolve(List<Marker> markers, IContext context)
 	{
 		return this;
 	}

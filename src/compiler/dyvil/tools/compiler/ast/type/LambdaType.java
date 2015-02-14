@@ -5,6 +5,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.util.Util;
 
 public class LambdaType extends Type implements ITyped, ITypeList
@@ -53,7 +54,7 @@ public class LambdaType extends Type implements ITyped, ITypeList
 	}
 	
 	@Override
-	public Type resolve(IContext context)
+	public Type resolve(List<Marker> markers, IContext context)
 	{
 		return this;
 	}

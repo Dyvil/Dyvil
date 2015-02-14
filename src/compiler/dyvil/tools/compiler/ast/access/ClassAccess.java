@@ -76,7 +76,7 @@ public class ClassAccess extends ASTNode implements IValue, ITyped
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.type = this.type.resolve(context);
+		this.type = this.type.resolve(null, context);
 	}
 	
 	@Override

@@ -108,12 +108,7 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.type = this.type.resolve(context);
-		if (!this.type.isResolved())
-		{
-			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
-			return;
-		}
+		this.type = this.type.resolve(markers, context);
 		
 		this.list.resolveTypes(markers, this.type);
 	}

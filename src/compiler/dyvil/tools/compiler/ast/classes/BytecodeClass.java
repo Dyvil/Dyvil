@@ -69,14 +69,14 @@ public class BytecodeClass extends CodeClass
 			}
 			else
 			{
-				this.superType = this.superType.resolve(context);
+				this.superType = this.superType.resolve(markers, context);
 			}
 		}
 		
 		for (ListIterator<IType> iterator = this.interfaces.listIterator(); iterator.hasNext();)
 		{
 			IType i1 = iterator.next();
-			IType i2 = i1.resolve(context);
+			IType i2 = i1.resolve(markers, context);
 			if (i1 != i2)
 			{
 				iterator.set(i2);
@@ -95,14 +95,14 @@ public class BytecodeClass extends CodeClass
 		
 		if (this.outerType != null)
 		{
-			this.outerClass = this.outerType.resolve(context).getTheClass();
+			this.outerClass = this.outerType.resolve(markers, context).getTheClass();
 		}
 		
 		if (this.innerTypes != null)
 		{
 			for (IType t : this.innerTypes)
 			{
-				IClass iclass = t.resolve(context).getTheClass();
+				IClass iclass = t.resolve(markers, context).getTheClass();
 				this.body.addClass(iclass);
 			}
 			this.innerTypes = null;

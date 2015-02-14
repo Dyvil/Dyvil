@@ -414,7 +414,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 			if (field == null)
 			{
 				// Find a type
-				type = new Type(this.position, this.qualifiedName).resolve(context);
+				type = new Type(this.position, this.qualifiedName).resolve(null, context);
 				if (!type.isResolved())
 				{
 					// No type found -> Not an apply method call

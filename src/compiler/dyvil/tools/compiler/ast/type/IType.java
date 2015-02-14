@@ -110,7 +110,7 @@ public interface IType extends IASTNode, INamed, IContext
 	
 	// Resolve
 	
-	public IType resolve(IContext context);
+	public IType resolve(List<Marker> markers, IContext context);
 	
 	public boolean isResolved();
 	

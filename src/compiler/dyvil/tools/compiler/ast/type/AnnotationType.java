@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -9,9 +10,10 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
+import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class AnnotationType extends Type
@@ -40,12 +42,12 @@ public class AnnotationType extends Type
 	}
 	
 	@Override
-	public AnnotationType resolve(IContext context)
+	public AnnotationType resolve(List<Marker> markers, IContext context)
 	{
 		if (this.theClass == null)
 		{
 			IClass iclass;
-			if (context == Package.rootPackage)
+			if (this.fullName != null)
 			{
 				iclass = context.resolveClass(this.fullName);
 			}
@@ -58,6 +60,10 @@ public class AnnotationType extends Type
 			{
 				this.theClass = iclass;
 				this.fullName = iclass.getFullName();
+			}
+			else if (markers != null)
+			{
+				markers.add(Markers.create(this.position, "resolve.type", this.toString()));
 			}
 		}
 		return this;

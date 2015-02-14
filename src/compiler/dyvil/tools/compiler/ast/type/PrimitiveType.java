@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.Marker;
 
 public class PrimitiveType extends Type
 {
@@ -81,7 +82,7 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
-	public IType resolve(IContext context)
+	public IType resolve(List<Marker> markers, IContext context)
 	{
 		if (this.theClass == null)
 		{

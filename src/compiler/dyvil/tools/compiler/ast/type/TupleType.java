@@ -6,6 +6,7 @@ import java.util.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.util.Util;
 
 public class TupleType extends Type implements ITypeList
@@ -132,7 +133,7 @@ public class TupleType extends Type implements ITypeList
 	}
 	
 	@Override
-	public TupleType resolve(IContext context)
+	public TupleType resolve(List<Marker> markers, IContext context)
 	{
 		this.getTheClass();
 		
@@ -140,7 +141,7 @@ public class TupleType extends Type implements ITypeList
 		for (int i = 0; i < len; i++)
 		{
 			IType t1 = this.types.get(i);
-			IType t2 = t1.resolve(context);
+			IType t2 = t1.resolve(markers, context);
 			if (t1 != t2)
 			{
 				this.types.set(i, t2);

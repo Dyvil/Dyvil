@@ -278,41 +278,48 @@ public class Type extends ASTNode implements IType
 	// Resolve
 	
 	@Override
-	public IType resolve(IContext context)
+	public IType resolve(List<Marker> markers, IContext context)
 	{
-		if (this.theClass == null)
+		if (this.theClass != null)
 		{
-			IClass iclass;
-			// Try to resolve the name of this Type as a primitive type
-			IType t = resolvePrimitive(this.qualifiedName);
-			if (t != null)
+			return this;
+		}
+		
+		IClass iclass;
+		// Try to resolve the name of this Type as a primitive type
+		IType t = resolvePrimitive(this.qualifiedName);
+		if (t != null)
+		{
+			// If the array dimensions of this type are 0, we can assume
+			// that it is exactly the primitive type, so the primitive type
+			// instance is returned.
+			if (this.arrayDimensions == 0)
 			{
-				// If the array dimensions of this type are 0, we can assume
-				// that it is exactly the primitive type, so the primitive type
-				// instance is returned.
-				if (this.arrayDimensions == 0)
-				{
-					return t;
-				}
-				
-				return t.getArrayType(this.arrayDimensions);
-			}
-			else if (this.fullName != null)
-			{
-				iclass = Package.rootPackage.resolveClass(this.fullName);
-			}
-			else
-			{
-				// This type is probably not a primitive one, so resolve using
-				// the context.
-				iclass = context.resolveClass(this.qualifiedName);
+				return t;
 			}
 			
-			if (iclass != null)
-			{
-				this.theClass = iclass;
-				this.fullName = iclass.getFullName();
-			}
+			return t.getArrayType(this.arrayDimensions);
+		}
+		else if (this.fullName != null)
+		{
+			iclass = Package.rootPackage.resolveClass(this.fullName);
+		}
+		else
+		{
+			// This type is probably not a primitive one, so resolve using
+			// the context.
+			iclass = context.resolveClass(this.qualifiedName);
+		}
+		
+		if (iclass != null)
+		{
+			this.theClass = iclass;
+			this.fullName = iclass.getFullName();
+			return this;
+		}
+		if (markers != null)
+		{
+			markers.add(Markers.create(this.position, "resolve.type", this.toString()));
 		}
 		return this;
 	}

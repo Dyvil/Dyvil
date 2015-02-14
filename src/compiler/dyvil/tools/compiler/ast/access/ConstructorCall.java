@@ -119,11 +119,7 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.type = this.type.resolve(context);
-		if (!this.type.isResolved())
-		{
-			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
-		}
+		this.type = this.type.resolve(markers, context);
 		
 		for (IValue v : this.arguments)
 		{
@@ -207,6 +203,10 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 		}
 		
 		IClass iclass = this.type.getTheClass();
+		if (iclass == null)
+		{
+			return;
+		}
 		if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
 			markers.add(Markers.create(this.position, "constructor.interface", iclass.getName()));

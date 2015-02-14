@@ -87,11 +87,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.type = this.type.resolve(context);
-		if (!this.type.isResolved() && markers != null)
-		{
-			markers.add(Markers.create(this.position, "resolve.type", this.name));
-		}
+		this.type = this.type.resolve(markers, context);
 		
 		for (Entry<String, IValue> entry : this.parameters.entrySet())
 		{

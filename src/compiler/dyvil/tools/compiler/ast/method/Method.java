@@ -447,11 +447,7 @@ public class Method extends Member implements IMethod
 			}
 		}
 		
-		this.type = this.type.resolve(this);
-		if (!this.type.isResolved() && markers != null)
-		{
-			markers.add(Markers.create(this.type.getPosition(), "resolve.type", this.type.toString()));
-		}
+		this.type = this.type.resolve(markers, this);
 		
 		if (this.throwsDeclarations != null)
 		{
@@ -459,14 +455,10 @@ public class Method extends Member implements IMethod
 			for (int i = 0; i < len; i++)
 			{
 				IType t1 = this.throwsDeclarations.get(i);
-				IType t2 = t1.resolve(context);
+				IType t2 = t1.resolve(markers, context);
 				if (t1 != t2)
 				{
 					this.throwsDeclarations.set(i, t2);
-				}
-				if (!t2.isResolved() && markers != null)
-				{
-					markers.add(Markers.create(t2.getPosition(), "resolve.type", t2.toString()));
 				}
 			}
 		}
@@ -671,7 +663,7 @@ public class Method extends Member implements IMethod
 			{
 				if (var.isName(name))
 				{
-					return var.getTheClass();
+					return var.getCaptureClass();
 				}
 			}
 		}

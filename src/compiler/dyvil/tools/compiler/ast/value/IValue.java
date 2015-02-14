@@ -88,9 +88,13 @@ public interface IValue extends IASTNode, ITyped
 	{
 	}
 	
+	public IValue withType(IType type);
+	
+	@Override
+	public boolean isType(IType type);
+	
 	public int getTypeMatch(IType type);
 	
-	public IValue withType(IType type);
 	
 	public void resolveTypes(List<Marker> markers, IContext context);
 	

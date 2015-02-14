@@ -2,19 +2,15 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.type.IType;
 
 public class CaptureClass extends CodeClass
 {
 	public static int		captureID;
 	
-	public ITypeVariable	typeVariable;
-	
-	public CaptureClass(ITypeVariable typeVar, IType superType, List<IType> interfaces)
+	public CaptureClass(IType superType, List<IType> interfaces)
 	{
 		String name = "Capture$" + captureID++;
-		this.typeVariable = typeVar;
 		this.name = name;
 		this.qualifiedName = name;
 		this.internalName = superType.getInternalName();
