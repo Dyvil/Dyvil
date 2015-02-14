@@ -6,9 +6,7 @@ import static dyvil.reflect.Opcodes.IFNE;
 import static dyvil.reflect.Opcodes.INSTANCE;
 
 import java.lang.annotation.ElementType;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
@@ -239,6 +237,40 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public void setThrows(List<IType> throwsDecls)
+	{
+		this.throwsDeclarations = throwsDecls;
+	}
+	
+	@Override
+	public List<IType> getThrows()
+	{
+		return this.throwsDeclarations;
+	}
+	
+	@Override
+	public void addThrows(IType throwsDecl)
+	{
+		if (this.throwsDeclarations == null)
+		{
+			this.throwsDeclarations = new ArrayList(2);
+		}
+		this.throwsDeclarations.add(throwsDecl);
+	}
+	
+	@Override
+	public void setValue(IValue statement)
+	{
+		this.value = statement;
+	}
+	
+	@Override
+	public IValue getValue()
+	{
+		return this.value;
+	}
+	
+	@Override
 	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments)
 	{
 		int pOff = 0;
@@ -360,80 +392,40 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void setThrows(List<IType> throwsDecls)
+	public boolean hasTypeVariables()
 	{
-		this.throwsDeclarations = throwsDecls;
+		return this.generics != null || this.theClass.isGeneric();
 	}
 	
 	@Override
-	public List<IType> getThrows()
+	public IType getType(IValue instance, List<IValue> arguments, List<IType> generics)
 	{
-		return this.throwsDeclarations;
-	}
-	
-	@Override
-	public void addThrows(IType throwsDecl)
-	{
-		if (this.throwsDeclarations == null)
+		if (!this.type.hasTypeVariables())
 		{
-			this.throwsDeclarations = new ArrayList(2);
-		}
-		this.throwsDeclarations.add(throwsDecl);
-	}
-	
-	@Override
-	public void setValue(IValue statement)
-	{
-		this.value = statement;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.value;
-	}
-	
-	@Override
-	public String getDescriptor()
-	{
-		StringBuilder buf = new StringBuilder();
-		buf.append('(');
-		for (Parameter par : this.parameters)
-		{
-			buf.append(par.type.getExtendedName());
-		}
-		buf.append(')');
-		buf.append(this.isConstructor ? "V" : this.type.getExtendedName());
-		return buf.toString();
-	}
-	
-	@Override
-	public String getSignature()
-	{
-		// TODO Generic Signature
-		return null;
-	}
-	
-	@Override
-	public String[] getExceptions()
-	{
-		if (this.throwsDeclarations == null)
-		{
-			return null;
+			return this.type;
 		}
 		
-		int len = this.throwsDeclarations.size();
-		if (len == 0)
+		Map<String, IType> map = new HashMap();
+		if (generics != null)
 		{
-			return null;
+			int len = Math.min(this.generics.size(), generics.size());
+			for (int i = 0; i < len; i++)
+			{
+				ITypeVariable var = this.generics.get(i);
+				IType type = generics.get(i);
+				map.put(var.getQualifiedName(), type);
+			}
 		}
 		
-		String[] array = new String[len];
-		for (int i = 0; i < len; i++)
+		if (instance != null)
 		{
-			array[i] = this.throwsDeclarations.get(i).getInternalName();
+			instance.addGenerics(map);
 		}
-		return array;
+		for (IValue v : arguments)
+		{
+			v.addGenerics(map);
+		}
+		return this.type.getConcreteType(map);
 	}
 	
 	@Override
@@ -722,6 +714,49 @@ public class Method extends Member implements IMethod
 			return STATIC;
 		}
 		return this.theClass.getAccessibility(member);
+	}
+	
+	@Override
+	public String getDescriptor()
+	{
+		StringBuilder buf = new StringBuilder();
+		buf.append('(');
+		for (Parameter par : this.parameters)
+		{
+			buf.append(par.type.getExtendedName());
+		}
+		buf.append(')');
+		buf.append(this.isConstructor ? "V" : this.type.getExtendedName());
+		return buf.toString();
+	}
+	
+	@Override
+	public String getSignature()
+	{
+		// TODO Generic Signature
+		return null;
+	}
+	
+	@Override
+	public String[] getExceptions()
+	{
+		if (this.throwsDeclarations == null)
+		{
+			return null;
+		}
+		
+		int len = this.throwsDeclarations.size();
+		if (len == 0)
+		{
+			return null;
+		}
+		
+		String[] array = new String[len];
+		for (int i = 0; i < len; i++)
+		{
+			array[i] = this.throwsDeclarations.get(i).getInternalName();
+		}
+		return array;
 	}
 	
 	@Override

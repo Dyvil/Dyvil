@@ -1,11 +1,15 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.util.List;
+import java.util.Map;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IType extends IASTNode, INamed, IContext
 {
@@ -25,6 +29,31 @@ public interface IType extends IASTNode, INamed, IContext
 	public void setClass(IClass theClass);
 	
 	public IClass getTheClass();
+	
+	// Generics
+	
+	/**
+	 * Returns true if this is an instance of {@link GenericType}
+	 * 
+	 * @return
+	 */
+	public boolean isGeneric();
+	
+	/**
+	 * Returns true if this is or contains any type variables.
+	 * 
+	 * @return
+	 */
+	public boolean hasTypeVariables();
+	
+	/**
+	 * Returns a copy of this type with all type variables replaced.
+	 * 
+	 * @param typeVariables
+	 *            the type variables
+	 * @return
+	 */
+	public IType getConcreteType(Map<String, IType> typeVariables);
 	
 	// Arrays
 	

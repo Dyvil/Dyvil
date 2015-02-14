@@ -21,6 +21,12 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 	
 	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments);
 	
+	// Generics
+	
+	public boolean hasTypeVariables();
+	
+	public IType getType(IValue instance, List<IValue> arguments, List<IType> generics);
+	
 	// Compilation
 	
 	public String getDescriptor();

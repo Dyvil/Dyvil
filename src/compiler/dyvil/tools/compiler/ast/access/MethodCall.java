@@ -41,6 +41,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	public boolean		isSugarCall;
 	
 	public IMethod		method;
+	public IType		type;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -65,7 +66,15 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	@Override
 	public IType getType()
 	{
-		return this.method == null ? Type.NONE : this.method.getType();
+		if (this.method == null)
+		{
+			return Type.NONE;
+		}
+		if (this.type == null)
+		{
+			this.type = this.method.hasTypeVariables() ? this.method.getType(this.instance, this.arguments, this.generics) : this.method.getType();
+		}
+		return this.type;
 	}
 	
 	@Override
@@ -81,7 +90,15 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		{
 			return true;
 		}
-		return this.method == null ? false : Type.isSuperType(type, this.method.getType());
+		if (this.method == null)
+		{
+			return false;
+		}
+		if (this.type == null)
+		{
+			this.type = this.method.hasTypeVariables() ? this.method.getType(this.instance, this.arguments, this.generics) : this.method.getType();
+		}
+		return Type.isSuperType(type, this.type);
 	}
 	
 	@Override
@@ -509,6 +526,11 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	public void writeExpression(MethodWriter writer)
 	{
 		this.method.writeCall(writer, this.instance, this.arguments);
+		
+		if (this.type != this.method.getType())
+		{
+			writer.visitTypeInsn(Opcodes.CHECKCAST, this.type);
+		}
 	}
 	
 	@Override

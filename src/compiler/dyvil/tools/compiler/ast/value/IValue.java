@@ -1,12 +1,14 @@
 package dyvil.tools.compiler.ast.value;
 
 import java.util.List;
+import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -95,6 +97,14 @@ public interface IValue extends IASTNode, ITyped
 	
 	public int getTypeMatch(IType type);
 	
+	public default void addGenerics(Map<String, IType> typeVariables)
+	{
+		IType type = this.getType();
+		if (type.isGeneric())
+		{
+			((GenericType) type).addGenerics(typeVariables);
+		}
+	}
 	
 	public void resolveTypes(List<Marker> markers, IContext context);
 	

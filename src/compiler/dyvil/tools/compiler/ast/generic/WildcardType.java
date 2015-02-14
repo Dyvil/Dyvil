@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class WildcardType extends TypeVariable implements IType
@@ -98,6 +99,24 @@ public class WildcardType extends TypeVariable implements IType
 	public IClass getTheClass()
 	{
 		return this.captureClass;
+	}
+	
+	@Override
+	public boolean isGeneric()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean hasTypeVariables()
+	{
+		return false;
+	}
+	
+	@Override
+	public IType getConcreteType(Map<String, IType> typeVariables)
+	{
+		return null;
 	}
 	
 	@Override

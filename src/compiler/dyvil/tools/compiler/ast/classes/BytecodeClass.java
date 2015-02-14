@@ -49,6 +49,16 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
+	public List<ITypeVariable> getTypeVariables()
+	{
+		if (!this.typesResolved)
+		{
+			this.resolveTypes(null, Package.rootPackage);
+		}
+		return super.getTypeVariables();
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.typesResolved = true;

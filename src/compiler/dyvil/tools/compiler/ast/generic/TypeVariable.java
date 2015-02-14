@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.generic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -19,15 +20,16 @@ import dyvil.tools.compiler.util.Util;
 
 public class TypeVariable extends ASTNode implements ITypeVariable
 {
-	public static int		captureID;
+	public static int					captureID;
+	public static final CaptureClass	LOWER_CAPTURE	= new CaptureClass(Type.NONE, Collections.EMPTY_LIST);
 	
-	public String			name;
+	public String						name;
 	
-	protected IType			upperBound;
-	protected List<IType>	upperBounds;
-	protected IType			lowerBound;
+	protected IType						upperBound;
+	protected List<IType>				upperBounds;
+	protected IType						lowerBound;
 	
-	protected IClass		captureClass;
+	protected IClass					captureClass;
 	
 	public TypeVariable()
 	{
@@ -130,22 +132,77 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 		return this.lowerBound;
 	}
 	
+	@Override
+	public boolean accepts(IType type)
+	{
+		if (this.upperBound != null)
+		{
+			if (!Type.isSuperType(this.upperBound, type))
+			{
+				return false;
+			}
+		}
+		if (this.upperBounds != null)
+		{
+			for (IType t : this.upperBounds)
+			{
+				if (!Type.isSuperType(t, type))
+				{
+					return false;
+				}
+			}
+		}
+		if (this.lowerBound != null)
+		{
+			if (!Type.isSuperType(type, this.lowerBound))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	// Misc
 	
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (this.upperBounds != null)
+		if (this.lowerBound != null)
+		{
+			this.lowerBound = this.lowerBound.resolve(markers, context);
+			this.captureClass = LOWER_CAPTURE;
+			return;
+		}
+		
+		if (this.upperBound != null)
+		{
+			this.upperBound = this.upperBound.resolve(markers, context);
+			
+			if (this.upperBounds != null)
+			{
+				int len = this.upperBounds.size();
+				for (int i = 0; i < len; i++)
+				{
+					IType t1 = this.upperBounds.get(i);
+					IType t2 = t1.resolve(markers, context);
+					
+					if (t1 != t2)
+					{
+						this.upperBounds.set(i, t2);
+					}
+				}
+			}
+		}
+		else if (this.upperBounds != null)
 		{
 			for (ListIterator<IType> iterator = this.upperBounds.listIterator(); iterator.hasNext();)
 			{
 				IType t1 = iterator.next();
-				IType t2 = t1.resolve(context);
+				IType t2 = t1.resolve(markers, context);
 				
-				if (!t2.isResolved())
+				if (t1 != t2)
 				{
-					markers.add(Markers.create(t2.getPosition(), "resolve.type", t2.toString()));
-					continue;
+					iterator.set(t2);
 				}
 				
 				IClass iclass = t2.getTheClass();
@@ -160,11 +217,6 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 					this.upperBound = t2;
 					continue;
 				}
-				
-				if (t1 != t2)
-				{
-					iterator.set(t2);
-				}
 			}
 			
 			if (this.upperBounds.isEmpty())
@@ -172,17 +224,8 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 				this.upperBounds = null;
 			}
 			
-			this.captureClass = new CaptureClass(this, this.upperBound, this.upperBounds);
 		}
-		else if (this.lowerBound != null)
-		{
-			this.lowerBound = this.lowerBound.resolve(context);
-			if (!this.lowerBound.isResolved())
-			{
-				markers.add(Markers.create(this.lowerBound.getPosition(), "resolve.type", this.lowerBound.toString()));
-			}
-		}
-		this.captureClass = Type.OBJECT.theClass;
+		this.captureClass = new CaptureClass(this.upperBound == null ? Type.OBJECT : this.upperBound, this.upperBounds);
 	}
 	
 	@Override

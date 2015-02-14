@@ -22,5 +22,7 @@ public interface ITypeVariable extends INamed
 	
 	public IType getLowerBound();
 	
+	public boolean accepts(IType type);
+	
 	public void resolveTypes(List<Marker> markers, IContext context);
 }

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.type;
 import static dyvil.reflect.Opcodes.*;
 
 import java.util.List;
+import java.util.Map;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -12,6 +13,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.lexer.marker.Marker;
 
 public final class UnknownType extends ASTNode implements IType
 {
@@ -114,6 +116,24 @@ public final class UnknownType extends ASTNode implements IType
 	public IClass getTheClass()
 	{
 		return null;
+	}
+	
+	@Override
+	public boolean isGeneric()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean hasTypeVariables()
+	{
+		return false;
+	}
+	
+	@Override
+	public IType getConcreteType(Map<String, IType> typeVariables)
+	{
+		return this;
 	}
 	
 	@Override

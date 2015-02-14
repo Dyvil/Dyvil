@@ -751,6 +751,10 @@ public final class MethodWriter extends MethodVisitor
 		{
 			this.push(type);
 		}
+		if (opcode == CHECKCAST)
+		{
+			this.set(type.getFrameType());
+		}
 		this.mv.visitTypeInsn(opcode, type.getInternalName());
 	}
 	
