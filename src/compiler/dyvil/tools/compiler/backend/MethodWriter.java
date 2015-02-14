@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.backend;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
+import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
-import jdk.internal.org.objectweb.asm.ClassWriter;
 
 public final class MethodWriter extends MethodVisitor
 {

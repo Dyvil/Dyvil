@@ -20,7 +20,6 @@ public class TypeListParser extends Parser implements ITyped
 		this.typeList = typeList;
 	}
 	
-	
 	@Override
 	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{

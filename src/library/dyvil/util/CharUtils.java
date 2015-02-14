@@ -208,7 +208,7 @@ public final class CharUtils
 		{
 			return c;
 		}
-		int ch = (int) c;
+		int ch = c;
 		return (char) (Character.isUpperCase(ch) ? Character.toLowerCase(ch) : Character.toUpperCase(ch));
 	}
 	

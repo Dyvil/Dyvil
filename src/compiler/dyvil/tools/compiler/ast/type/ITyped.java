@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-
 public interface ITyped
 {
 	public void setType(IType type);

@@ -29,43 +29,43 @@ public class LoggerOutputStream extends PrintStream
 	@Override
 	public void print(boolean b)
 	{
-		write(b ? "true" : "false");
+		this.write(b ? "true" : "false");
 	}
 	
 	@Override
 	public void print(char c)
 	{
-		write(String.valueOf(c));
+		this.write(String.valueOf(c));
 	}
 	
 	@Override
 	public void print(int i)
 	{
-		write(String.valueOf(i));
+		this.write(String.valueOf(i));
 	}
 	
 	@Override
 	public void print(long l)
 	{
-		write(String.valueOf(l));
+		this.write(String.valueOf(l));
 	}
 	
 	@Override
 	public void print(float f)
 	{
-		write(String.valueOf(f));
+		this.write(String.valueOf(f));
 	}
 	
 	@Override
 	public void print(double d)
 	{
-		write(String.valueOf(d));
+		this.write(String.valueOf(d));
 	}
 	
 	@Override
 	public void print(char s[])
 	{
-		write(new String(s));
+		this.write(new String(s));
 	}
 	
 	@Override
@@ -75,55 +75,55 @@ public class LoggerOutputStream extends PrintStream
 		{
 			s = "null";
 		}
-		write(s);
+		this.write(s);
 	}
 	
 	@Override
 	public void print(Object obj)
 	{
-		write(String.valueOf(obj));
+		this.write(String.valueOf(obj));
 	}
 	
 	@Override
 	public void println(boolean b)
 	{
-		write(b ? "true" : "false");
+		this.write(b ? "true" : "false");
 	}
 	
 	@Override
 	public void println(char c)
 	{
-		write(String.valueOf(c));
+		this.write(String.valueOf(c));
 	}
 	
 	@Override
 	public void println(int i)
 	{
-		write(String.valueOf(i));
+		this.write(String.valueOf(i));
 	}
 	
 	@Override
 	public void println(long l)
 	{
-		write(String.valueOf(l));
+		this.write(String.valueOf(l));
 	}
 	
 	@Override
 	public void println(float f)
 	{
-		write(String.valueOf(f));
+		this.write(String.valueOf(f));
 	}
 	
 	@Override
 	public void println(double d)
 	{
-		write(String.valueOf(d));
+		this.write(String.valueOf(d));
 	}
 	
 	@Override
 	public void println(char s[])
 	{
-		write(new String(s));
+		this.write(new String(s));
 	}
 	
 	@Override
@@ -133,33 +133,33 @@ public class LoggerOutputStream extends PrintStream
 		{
 			s = "null";
 		}
-		write(s);
+		this.write(s);
 	}
 	
 	@Override
 	public void println(Object obj)
 	{
-		write(String.valueOf(obj));
+		this.write(String.valueOf(obj));
 	}
 	
 	@Override
 	public PrintStream printf(String format, Object... args)
 	{
-		write(String.format(format, args));
+		this.write(String.format(format, args));
 		return this;
 	}
 	
 	@Override
 	public PrintStream printf(Locale l, String format, Object... args)
 	{
-		write(String.format(l, format, args));
+		this.write(String.format(l, format, args));
 		return this;
 	}
 	
 	@Override
 	public PrintStream format(String format, Object... args)
 	{
-		write(String.format(format, args));
+		this.write(String.format(format, args));
 		return this;
 	}
 	
@@ -174,24 +174,28 @@ public class LoggerOutputStream extends PrintStream
 	public PrintStream append(CharSequence csq)
 	{
 		if (csq == null)
-			write("null");
+		{
+			this.write("null");
+		}
 		else
-			write(csq.toString());
+		{
+			this.write(csq.toString());
+		}
 		return this;
 	}
 	
 	@Override
 	public PrintStream append(CharSequence csq, int start, int end)
 	{
-		CharSequence cs = (csq == null ? "null" : csq);
-		write(cs.subSequence(start, end).toString());
+		CharSequence cs = csq == null ? "null" : csq;
+		this.write(cs.subSequence(start, end).toString());
 		return this;
 	}
 	
 	@Override
 	public PrintStream append(char c)
 	{
-		print(c);
+		this.print(c);
 		return this;
 	}
 }

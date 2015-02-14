@@ -463,11 +463,17 @@ public class ClassFormat
 		{
 			char c = s.charAt(i);
 			if (c == '<')
+			{
 				depth++;
+			}
 			else if (c == '>')
+			{
 				depth--;
+			}
 			else if (c == ';' && depth == 0)
+			{
 				return i;
+			}
 		}
 		return -1;
 	}
@@ -479,7 +485,9 @@ public class ClassFormat
 		{
 			char c = s.charAt(i);
 			if (c == '<')
+			{
 				depth++;
+			}
 			else if (c == '>')
 			{
 				depth--;

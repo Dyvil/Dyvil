@@ -12,7 +12,7 @@ public interface StringConversions
 	
 	public static @infix boolean toBoolean(String s)
 	{
-		return (s != null) && s.equalsIgnoreCase("true");
+		return s != null && s.equalsIgnoreCase("true");
 	}
 	
 	public static @infix byte toByte(String s)

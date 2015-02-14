@@ -10,7 +10,7 @@ public class DynamicMethod extends ASTNode
 													"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType)Ljava/lang/invoke/CallSite;");
 	
 	public String				name;
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public class CaptureClass extends CodeClass
 {
-	public static int		captureID;
+	public static int	captureID;
 	
 	public CaptureClass(IType superType, List<IType> interfaces)
 	{

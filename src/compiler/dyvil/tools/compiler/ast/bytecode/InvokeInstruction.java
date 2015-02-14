@@ -135,40 +135,40 @@ public class InvokeInstruction extends Instruction implements INamed, ITyped, IP
 	{
 		this.args++;
 	}
-
+	
 	@Override
 	public void setTypes(List<IType> types)
 	{
 	}
-
+	
 	@Override
 	public List<IType> getTypes()
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setGeneric()
 	{
 	}
-
+	
 	@Override
 	public boolean isGeneric()
 	{
 		return false;
 	}
-
+	
 	@Override
 	public void setTypeVariables(List<ITypeVariable> list)
 	{
 	}
-
+	
 	@Override
 	public List<ITypeVariable> getTypeVariables()
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void addTypeVariable(ITypeVariable var)
 	{

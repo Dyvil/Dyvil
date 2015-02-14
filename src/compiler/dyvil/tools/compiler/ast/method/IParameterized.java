@@ -30,10 +30,15 @@ public interface IParameterized extends ITyped, ITypeList
 	}
 	
 	@Override
-	public default void setTypes(List<IType> types) {}
+	public default void setTypes(List<IType> types)
+	{
+	}
 	
 	@Override
-	public default List<IType> getTypes() { return null; }
+	public default List<IType> getTypes()
+	{
+		return null;
+	}
 	
 	@Override
 	public default void addType(IType type)

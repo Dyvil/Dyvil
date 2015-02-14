@@ -3,7 +3,8 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -82,11 +83,11 @@ public class TypeVariableParser extends Parser implements ITyped
 	{
 		if (this.boundMode == UPPER)
 		{
-			((ITypeVariable) this.variable).addUpperBound(type);
+			this.variable.addUpperBound(type);
 		}
 		else if (this.boundMode == LOWER)
 		{
-			((ITypeVariable) this.variable).setLowerBound(type);
+			this.variable.setLowerBound(type);
 		}
 	}
 	

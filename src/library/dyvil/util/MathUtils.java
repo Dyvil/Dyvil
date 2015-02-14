@@ -55,70 +55,70 @@ public final class MathUtils
 	
 	public static int min(int a, int b)
 	{
-		return (a <= b) ? a : b;
+		return a <= b ? a : b;
 	}
 	
 	public static long min(long a, long b)
 	{
-		return (a <= b) ? a : b;
+		return a <= b ? a : b;
 	}
 	
 	public static float min(float a, float b)
 	{
-		return (a <= b) ? a : b;
+		return a <= b ? a : b;
 	}
 	
 	public static double min(double a, double b)
 	{
-		return (a <= b) ? a : b;
+		return a <= b ? a : b;
 	}
 	
 	public static int min(int a, int b, int c)
 	{
 		int d = a <= b ? a : b;
-		return (c <= d) ? c : d;
+		return c <= d ? c : d;
 	}
 	
 	public static long min(long a, long b, long c)
 	{
 		long d = a <= b ? a : b;
-		return (c <= d) ? c : d;
+		return c <= d ? c : d;
 	}
 	
 	public static float min(float a, float b, float c)
 	{
 		float d = a <= b ? a : b;
-		return (c <= d) ? c : d;
+		return c <= d ? c : d;
 	}
 	
 	public static double min(double a, double b, double c)
 	{
 		double d = a <= b ? a : b;
-		return (c <= d) ? c : d;
+		return c <= d ? c : d;
 	}
 	
 	public static int max(int a, int b, int c)
 	{
 		int d = a > b ? a : b;
-		return (c > d) ? c : d;
+		return c > d ? c : d;
 	}
 	
 	public static long max(long a, long b, long c)
 	{
 		long d = a > b ? a : b;
-		return (c > d) ? c : d;
+		return c > d ? c : d;
 	}
 	
 	public static float max(float a, float b, float c)
 	{
 		float d = a > b ? a : b;
-		return (c > d) ? c : d;
+		return c > d ? c : d;
 	}
 	
 	public static double max(double a, double b, double c)
 	{
 		double d = a > b ? a : b;
-		return (c > d) ? c : d;
+		return c > d ? c : d;
 	}
 	
 	/**

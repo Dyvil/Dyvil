@@ -258,7 +258,7 @@ public class Property extends Field implements IProperty, IContext
 		}
 		return b;
 	}
-
+	
 	@Override
 	public void write(ClassWriter writer)
 	{
