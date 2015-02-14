@@ -30,7 +30,6 @@ public interface Tokens
 	
 	// KEYWORDS
 	public int	WILDCARD				= TYPE_KEYWORD | 0x00010000;
-	public int	AT						= TYPE_KEYWORD | 0x00020000;
 	public int	NULL					= TYPE_KEYWORD | 0x00030000;
 	public int	TRUE					= TYPE_KEYWORD | 0x00040000;
 	public int	FALSE					= TYPE_KEYWORD | 0x00050000;

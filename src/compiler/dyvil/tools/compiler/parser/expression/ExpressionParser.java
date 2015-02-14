@@ -45,6 +45,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int	PARAMETERS_END	= 1024;
 	public static final int	VARIABLE		= 2048;
 	
+	// TODO Entry symbol (@ is not a keyword anymore)
 	public static final int	BYTECODE		= 4096;
 	public static final int	BYTECODE_END	= 8192;
 	
@@ -533,9 +534,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		switch (type)
 		{
 		case Tokens.WILDCARD:
-			return true;
-		case Tokens.AT:
-			this.mode = BYTECODE;
 			return true;
 		case Tokens.NULL:
 			this.value = new NullValue(token.raw());

@@ -69,8 +69,6 @@ public class ParserUtil
 		{
 		case "_":
 			return Tokens.WILDCARD;
-		case "@":
-			return Tokens.AT;
 		case ":":
 			return Tokens.COLON;
 		case "=":
