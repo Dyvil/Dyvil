@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.generic;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -20,16 +19,15 @@ import dyvil.tools.compiler.util.Util;
 
 public class TypeVariable extends ASTNode implements ITypeVariable
 {
-	public static int					captureID;
-	public static final CaptureClass	LOWER_CAPTURE	= new CaptureClass(Type.NONE, Collections.EMPTY_LIST);
+	public static int		captureID;
 	
-	public String						name;
+	public String			name;
 	
-	protected IType						upperBound;
-	protected List<IType>				upperBounds;
-	protected IType						lowerBound;
+	protected IType			upperBound;
+	protected List<IType>	upperBounds;
+	protected IType			lowerBound;
 	
-	protected IClass					captureClass;
+	protected IClass		captureClass;
 	
 	public TypeVariable()
 	{
@@ -133,7 +131,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	}
 	
 	@Override
-	public boolean accepts(IType type)
+	public boolean isSuperTypeOf(IType type)
 	{
 		if (this.upperBound != null)
 		{
@@ -170,8 +168,6 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 		if (this.lowerBound != null)
 		{
 			this.lowerBound = this.lowerBound.resolve(markers, context);
-			this.captureClass = LOWER_CAPTURE;
-			return;
 		}
 		
 		if (this.upperBound != null)
@@ -223,9 +219,26 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 			{
 				this.upperBounds = null;
 			}
-			
 		}
-		this.captureClass = new CaptureClass(this.upperBound == null ? Type.OBJECT : this.upperBound, this.upperBounds);
+		this.captureClass = new CaptureClass(this, this.upperBound == null ? Type.OBJECT : this.upperBound, this.upperBounds, this.lowerBound);
+	}
+	
+	@Override
+	public void appendSignature(StringBuilder buffer)
+	{
+		buffer.append(this.name).append(':');
+		if (this.upperBound != null)
+		{
+			this.upperBound.appendSignature(buffer);
+		}
+		if (this.upperBounds != null && !this.upperBounds.isEmpty())
+		{
+			for (IType t : this.upperBounds)
+			{
+				buffer.append(':');
+				t.appendSignature(buffer);
+			}
+		}
 	}
 	
 	@Override
@@ -245,13 +258,13 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 			buffer.append(Formatting.Type.genericLowerBound);
 			this.lowerBound.toString(prefix, buffer);
 		}
-		else if (this.upperBound != null || this.upperBounds != null)
+		if (this.upperBound != null || this.upperBounds != null)
 		{
 			buffer.append(Formatting.Type.genericUpperBound);
 			if (this.upperBound != null)
 			{
 				this.upperBound.toString(prefix, buffer);
-				if (this.upperBounds != null)
+				if (this.upperBounds != null && !this.upperBounds.isEmpty())
 				{
 					buffer.append(Formatting.Type.genericBoundSeperator);
 				}

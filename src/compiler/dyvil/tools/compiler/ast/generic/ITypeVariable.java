@@ -12,6 +12,8 @@ public interface ITypeVariable extends INamed
 {
 	public IClass getCaptureClass();
 	
+	// Bounds
+	
 	public void setUpperBounds(List<IType> bounds);
 	
 	public List<IType> getUpperBounds();
@@ -22,7 +24,15 @@ public interface ITypeVariable extends INamed
 	
 	public IType getLowerBound();
 	
-	public boolean accepts(IType type);
+	// Super Types
+	
+	public boolean isSuperTypeOf(IType type);
+	
+	// Resolve Types
 	
 	public void resolveTypes(List<Marker> markers, IContext context);
+	
+	// Compilation
+	
+	public void appendSignature(StringBuilder buffer);
 }

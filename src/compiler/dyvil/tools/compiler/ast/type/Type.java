@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -46,14 +47,14 @@ public class Type extends ASTNode implements IType
 	public static final AnnotationType	ARetention	= new AnnotationType("Retention");
 	public static final AnnotationType	ATarget		= new AnnotationType("Target");
 	
-	public static IClass BOOLEAN_CLASS;
-	public static IClass BYTE_CLASS;
-	public static IClass SHORT_CLASS;
-	public static IClass CHAR_CLASS;
-	public static IClass INT_CLASS;
-	public static IClass LONG_CLASS;
-	public static IClass FLOAT_CLASS;
-	public static IClass DOUBLE_CLASS;
+	public static IClass				BOOLEAN_CLASS;
+	public static IClass				BYTE_CLASS;
+	public static IClass				SHORT_CLASS;
+	public static IClass				CHAR_CLASS;
+	public static IClass				INT_CLASS;
+	public static IClass				LONG_CLASS;
+	public static IClass				FLOAT_CLASS;
+	public static IClass				DOUBLE_CLASS;
 	
 	public static IClass				PREDEF_CLASS;
 	public static IClass				STRING_CLASS;
@@ -360,6 +361,11 @@ public class Type extends ASTNode implements IType
 		
 		if (iclass != null)
 		{
+			if (iclass instanceof CaptureClass)
+			{
+				return new WildcardType(position, (CaptureClass) iclass);
+			}
+			
 			this.theClass = iclass;
 			this.fullName = iclass.getFullName();
 			return this;

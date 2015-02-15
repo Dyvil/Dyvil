@@ -783,22 +783,58 @@ public class Method extends Member implements IMethod
 	@Override
 	public String getDescriptor()
 	{
-		StringBuilder buf = new StringBuilder();
-		buf.append('(');
+		StringBuilder buffer = new StringBuilder();
+		buffer.append('(');
 		for (Parameter par : this.parameters)
 		{
-			buf.append(par.type.getExtendedName());
+			par.type.appendExtendedName(buffer);
 		}
-		buf.append(')');
-		buf.append(this.isConstructor ? "V" : this.type.getExtendedName());
-		return buf.toString();
+		buffer.append(')');
+		if (this.isConstructor)
+		{
+			buffer.append('V');
+		}
+		else
+		{
+			this.type.appendExtendedName(buffer);
+		}
+		return buffer.toString();
 	}
 	
 	@Override
 	public String getSignature()
 	{
-		// TODO Generic Signature
-		return null;
+		if (this.generics == null && !this.theClass.isGeneric())
+		{
+			return null;
+		}
+		
+		StringBuilder buffer = new StringBuilder();
+		if (this.generics != null)
+		{
+			buffer.append('<');
+			for (ITypeVariable var : this.generics)
+			{
+				var.appendSignature(buffer);
+			}
+			buffer.append('>');
+		}
+		
+		buffer.append('(');
+		for (Parameter par : this.parameters)
+		{
+			par.type.appendSignature(buffer);
+		}
+		buffer.append(')');
+		if (this.isConstructor)
+		{
+			buffer.append('V');
+		}
+		else
+		{
+			this.type.appendExtendedName(buffer);
+		}
+		return buffer.toString();
 	}
 	
 	@Override

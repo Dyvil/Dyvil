@@ -7,8 +7,8 @@ public class Main
 {
 	public static void main([String] args)
 	{
-		int i = 3
-		System out println("The Number is " + i)
-		System out println(i + " is the Number")
+		printLength "hello world"
 	}
+	
+	public static void printLength[T >= CharSequence](T t) = System out println(t length);
 }

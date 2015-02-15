@@ -114,7 +114,7 @@ public class GenericType extends Type implements ITypeList
 				}
 				
 				ITypeVariable var = variables.get(i);
-				if (!var.accepts(t2))
+				if (!var.isSuperTypeOf(t2))
 				{
 					Marker marker = Markers.create(t1.getPosition(), "generic.type", var.getQualifiedName());
 					marker.addInfo("Generic Type: " + t2);
@@ -180,8 +180,9 @@ public class GenericType extends Type implements ITypeList
 			{
 				t.appendSignature(buf);
 			}
-			buf.append('>').append(';');
+			buf.append('>');
 		}
+		buf.append(';');
 	}
 	
 	@Override

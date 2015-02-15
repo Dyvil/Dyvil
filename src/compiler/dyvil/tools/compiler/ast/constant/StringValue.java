@@ -44,23 +44,23 @@ public class StringValue extends ASTNode implements IConstantValue
 	@Override
 	public IValue withType(IType type)
 	{
-		return Type.isSuperType(type, Type.STRING) ? this : null;
+		return type.isSuperTypeOf(Type.STRING) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return Type.isSuperType(type, Type.STRING);
+		return type.isSuperTypeOf(Type.STRING);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type.equals(Type.STRING))
+		if (type == Type.STRING)
 		{
 			return 3;
 		}
-		else if (Type.STRING_CLASS.isSubTypeOf(type))
+		else if (type.isSuperTypeOf(Type.STRING))
 		{
 			return 2;
 		}
