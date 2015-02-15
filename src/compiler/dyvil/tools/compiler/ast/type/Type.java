@@ -294,6 +294,30 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
+	public IType getElementType()
+	{
+		Type t = this.clone();
+		t.arrayDimensions--;
+		return t;
+	}
+	
+	@Override
+	public IType getArrayType()
+	{
+		Type t = this.clone();
+		t.arrayDimensions++;
+		return t;
+	}
+	
+	@Override
+	public IType getArrayType(int dimensions)
+	{
+		Type t = this.clone();
+		t.arrayDimensions = dimensions;
+		return t;
+	}
+	
+	@Override
 	public void addArrayDimension()
 	{
 		this.arrayDimensions++;
@@ -363,7 +387,7 @@ public class Type extends ASTNode implements IType
 		{
 			if (iclass instanceof CaptureClass)
 			{
-				return new WildcardType(position, (CaptureClass) iclass);
+				return new WildcardType(this.position, this.arrayDimensions, (CaptureClass) iclass);
 			}
 			
 			this.theClass = iclass;

@@ -19,6 +19,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class WildcardType extends TypeVariable implements IType
 {
+	public int	arrayDimensions;
+	
 	public WildcardType()
 	{
 	}
@@ -28,9 +30,10 @@ public class WildcardType extends TypeVariable implements IType
 		super(position);
 	}
 	
-	public WildcardType(ICodePosition position, CaptureClass capture)
+	public WildcardType(ICodePosition position, int arrayDimensions, CaptureClass capture)
 	{
 		this.position = position;
+		this.arrayDimensions = arrayDimensions;
 		this.captureClass = capture;
 		this.name = capture.var.getName();
 		this.upperBound = capture.getSuperType();
@@ -107,7 +110,7 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public void setClass(IClass theClass)
 	{
-		this.captureClass = theClass;
+		this.captureClass = (CaptureClass) theClass;
 	}
 	
 	@Override
@@ -137,24 +140,59 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public void setArrayDimensions(int dimensions)
 	{
+		this.arrayDimensions = dimensions;
 	}
 	
 	@Override
 	public int getArrayDimensions()
 	{
-		return 0;
+		return this.arrayDimensions;
+	}
+	
+	@Override
+	public IType getElementType()
+	{
+		WildcardType t = this.clone();
+		t.arrayDimensions--;
+		return t;
+	}
+	
+	@Override
+	public IType getArrayType()
+	{
+		WildcardType t = this.clone();
+		t.arrayDimensions++;
+		return t;
+	}
+	
+	@Override
+	public IType getArrayType(int dimensions)
+	{
+		WildcardType t = this.clone();
+		t.arrayDimensions = dimensions;
+		return t;
 	}
 	
 	@Override
 	public boolean isArrayType()
 	{
-		return false;
+		return this.arrayDimensions > 0;
 	}
 	
 	@Override
 	public IType getSuperType()
 	{
 		return this.upperBound == null ? Type.NONE : this.upperBound;
+	}
+	
+	@Override
+	public boolean isSuperTypeOf(IType type)
+	{
+		if (this.arrayDimensions != type.getArrayDimensions())
+		{
+			return false;
+		}
+		return super.isSuperTypeOf(type);
 	}
 	
 	@Override
@@ -178,12 +216,20 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append('[');
+		}
 		buffer.append('L').append(this.getInternalName()).append(';');
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append('[');
+		}
 		buffer.append('T').append(this.name).append(';');
 	}
 	
@@ -218,19 +264,27 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
-	public IType clone()
+	public WildcardType clone()
 	{
-		return this;
+		return new WildcardType(this.position, this.arrayDimensions, this.captureClass);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append('[');
+		}
 		if (this.name != null)
 		{
 			buffer.append(this.name);
 			return;
 		}
 		super.toString(prefix, buffer);
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append(']');
+		}
 	}
 }

@@ -255,11 +255,14 @@ public class Parameter extends Member implements IVariable
 			}
 		}
 		
-		this.type.toString("", buffer);
 		if (this.isVarargs())
 		{
-			int len = buffer.length();
-			buffer.replace(len - 2, len, "...");
+			this.type.getElementType().toString(prefix, buffer);
+			buffer.append("...");
+		}
+		else
+		{
+			this.type.toString(prefix, buffer);
 		}
 		buffer.append(' ').append(this.name);
 		

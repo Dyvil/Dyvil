@@ -27,7 +27,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	protected List<IType>	upperBounds;
 	protected IType			lowerBound;
 	
-	protected IClass		captureClass;
+	protected CaptureClass	captureClass;
 	
 	public TypeVariable()
 	{
