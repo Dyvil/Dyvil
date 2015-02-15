@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValued;
@@ -81,6 +82,12 @@ public interface IAccess extends IValue, IValued, IValueList
 		}
 		
 		match = context.resolveMethod(instance, name, arguments);
+		if (match != null)
+		{
+			return match.theMethod;
+		}
+		
+		match = Type.PREDEF_CLASS.resolveMethod(instance, name, arguments);
 		if (match != null)
 		{
 			return match.theMethod;

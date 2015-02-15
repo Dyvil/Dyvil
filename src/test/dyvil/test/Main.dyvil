@@ -7,11 +7,8 @@ public class Main
 {
 	public static void main([String] args)
 	{
-		Int i = 3
-		Int j = i + 1
-		int k = j + 1
-		System out println i
-		System out println j
-		System out println k
+		int i = 3
+		System out println("The Number is " + i)
+		System out println(i + " is the Number")
 	}
 }

@@ -693,7 +693,7 @@ public class CodeClass extends ASTNode implements IClass
 		FieldMatch match;
 		
 		// Inherited Fields
-		if (this.superType != null && this != Type.PREDEF_CLASS)
+		if (this.superType != null)
 		{
 			match = this.superType.resolveField(name);
 			if (match != null)
@@ -780,16 +780,6 @@ public class CodeClass extends ASTNode implements IClass
 		if (this.unit != null && this.unit.hasStaticImports())
 		{
 			this.unit.getMethodMatches(list, instance, name, arguments);
-		}
-		
-		if (!list.isEmpty())
-		{
-			return;
-		}
-		
-		if (this != Type.PREDEF_CLASS && !(this instanceof BytecodeClass))
-		{
-			Type.PREDEF_CLASS.getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	

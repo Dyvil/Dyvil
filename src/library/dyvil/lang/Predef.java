@@ -18,15 +18,107 @@ public final class Predef
 	// Object Operators
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPEQ })
-	public static boolean $eq$eq(Object o1, Object o2)
+	public static @inline boolean $eq$eq(Object o1, Object o2)
 	{
 		return o1 == o2;
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPNE })
-	public static boolean $bang$eq(Object o1, Object o2)
+	public static @inline boolean $bang$eq(Object o1, Object o2)
 	{
 		return o1 != o2;
+	}
+	
+	// String Concatenation
+	
+	public static @infix @inline String $plus(String s, Object o)
+	{
+		return s + o;
+	}
+	
+	public static @infix @inline String $plus(String s, boolean v)
+	{
+		return s + v;
+	}
+	
+	public static @infix @inline String $plus(String s, byte v)
+	{
+		return s + v;
+	}
+	
+	public static @infix @inline String $plus(String s, short v)
+	{
+		return s + v;
+	}
+	
+	public static @infix @inline String $plus(String s, char v)
+	{
+		return s + v;
+	}
+	
+	public static @infix @inline String $plus(String s, int v)
+	{
+		return s + v;
+	}
+	
+	public static @infix @inline String $plus(String s, long v)
+	{
+		return s + v;
+	}
+	
+	public static @infix @inline String $plus(String s, float v)
+	{
+		return s + v;
+	}
+	
+	public static @infix @inline String $plus(String s, double v)
+	{
+		return s + v;
+	}
+	
+	public static @infix @inline String $plus(Object o, String s)
+	{
+		return o + s;
+	}
+	
+	public static @infix @inline String $plus(boolean v, String s)
+	{
+		return v + s;
+	}
+	
+	public static @infix @inline String $plus(byte v, String s)
+	{
+		return v + s;
+	}
+	
+	public static @infix @inline String $plus(short v, String s)
+	{
+		return v + s;
+	}
+	
+	public static @infix @inline String $plus(char v, String s)
+	{
+		return v + s;
+	}
+	
+	public static @infix @inline String $plus(int v, String s)
+	{
+		return v + s;
+	}
+	
+	public static @infix @inline String $plus(long v, String s)
+	{
+		return v + s;
+	}
+	
+	public static @infix @inline String $plus(float v, String s)
+	{
+		return v + s;
+	}
+	
+	public static @infix @inline String $plus(double v, String s)
+	{
+		return v + s;
 	}
 	
 	// Hashing

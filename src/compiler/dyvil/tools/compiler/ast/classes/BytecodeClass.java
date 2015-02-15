@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.AnnotationVisitorImpl;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -202,7 +201,7 @@ public class BytecodeClass extends CodeClass
 		FieldMatch match;
 		
 		// Inherited Fields
-		if (this.superType != null && this != Type.PREDEF_CLASS)
+		if (this.superType != null)
 		{
 			match = this.superType.resolveField(name);
 			if (match != null)
