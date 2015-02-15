@@ -4,6 +4,7 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.boxed.BoxedValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
@@ -45,20 +46,31 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	@Override
 	public IValue withType(IType type)
 	{
-		// TODO Boxing
-		return type == Type.BOOLEAN ? this : null;
+		if (type == Type.BOOLEAN)
+		{
+			return this;
+		}
+		return type.isSuperTypeOf(Type.BOOLEAN) ? new BoxedValue(this, Type.BOOLEAN.boxMethod) : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.BOOLEAN;
+		return type == Type.BOOLEAN || type.isSuperTypeOf(Type.BOOLEAN);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		return type == Type.BOOLEAN ? 3 : 0;
+		if (type == Type.BOOLEAN)
+		{
+			return 3;
+		}
+		if (type.isSuperTypeOf(Type.BOOLEAN))
+		{
+			return 2;
+		}
+		return 0;
 	}
 	
 	@Override
