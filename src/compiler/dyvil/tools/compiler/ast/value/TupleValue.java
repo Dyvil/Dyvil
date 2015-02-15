@@ -39,6 +39,12 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
 	public void setValues(List<IValue> list)
 	{
 		this.values = list;

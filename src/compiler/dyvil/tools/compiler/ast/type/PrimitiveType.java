@@ -3,7 +3,9 @@ package dyvil.tools.compiler.ast.type;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.tools.compiler.ast.boxed.BoxedValue;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -12,7 +14,9 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 
 public class PrimitiveType extends Type
 {
-	public int	typecode;
+	public int		typecode;
+	public IMethod	boxMethod;
+	public IMethod	unboxMethod;
 	
 	public PrimitiveType(String name, String wrapper, int typecode)
 	{
@@ -53,6 +57,18 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
+	public IValue box(IValue value)
+	{
+		return new BoxedValue(value, this.boxMethod);
+	}
+	
+	@Override
+	public IValue unbox(IValue value)
+	{
+		return new BoxedValue(value, this.unboxMethod);
+	}
+	
+	@Override
 	public IType getElementType()
 	{
 		int newDims = this.arrayDimensions - 1;
@@ -78,7 +94,7 @@ public class PrimitiveType extends Type
 	@Override
 	public boolean isSuperTypeOf(IType that)
 	{
-		return false;
+		return this.theClass == that.getTheClass();
 	}
 	
 	@Override

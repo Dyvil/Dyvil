@@ -51,6 +51,12 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
 	public void expandPosition(ICodePosition position)
 	{
 		this.list.expandPosition(position);

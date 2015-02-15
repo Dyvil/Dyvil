@@ -26,6 +26,12 @@ public class NullValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.NONE;
@@ -34,7 +40,7 @@ public class NullValue extends ASTNode implements IConstantValue
 	@Override
 	public IValue withType(IType type)
 	{
-		return this;
+		return type.isPrimitive() ? null : this;
 	}
 	
 	@Override
@@ -46,7 +52,7 @@ public class NullValue extends ASTNode implements IConstantValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		return !type.isPrimitive() ? 2 : 0;
+		return type.isPrimitive() ? 0 : 2;
 	}
 	
 	@Override

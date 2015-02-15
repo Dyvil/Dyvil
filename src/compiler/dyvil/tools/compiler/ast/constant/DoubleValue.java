@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.boxed.BoxedValue;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -38,19 +39,31 @@ public class DoubleValue extends ASTNode implements INumericValue
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Type.DOUBLE ? this : null;
+		if (type == Type.DOUBLE)
+		{
+			return this;
+		}
+		return type.isSuperTypeOf(Type.DOUBLE) ? new BoxedValue(this, Type.DOUBLE.boxMethod) : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.DOUBLE;
+		return type == Type.DOUBLE || type.isSuperTypeOf(Type.DOUBLE);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		return type == Type.DOUBLE ? 3 : 0;
+		if (type == Type.DOUBLE)
+		{
+			return 3;
+		}
+		if (type.isSuperTypeOf(Type.DOUBLE))
+		{
+			return 2;
+		}
+		return 0;
 	}
 	
 	@Override

@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
@@ -16,6 +17,16 @@ public interface IType extends IASTNode, INamed, IContext
 	public default boolean isPrimitive()
 	{
 		return false;
+	}
+	
+	public default IValue box(IValue value)
+	{
+		return null;
+	}
+	
+	public default IValue unbox(IValue value)
+	{
+		return null;
 	}
 	
 	// Full Name
@@ -107,9 +118,13 @@ public interface IType extends IASTNode, INamed, IContext
 		IClass thisClass = this.getTheClass();
 		IClass thatClass = type.getTheClass();
 		int arrayDimensions = type.getArrayDimensions();
-		if (arrayDimensions > 0 && thisClass == Type.OBJECT_CLASS)
+		if (thisClass == Type.OBJECT_CLASS)
 		{
-			return arrayDimensions > this.getArrayDimensions();
+			if (arrayDimensions > 0)
+			{
+				return arrayDimensions > this.getArrayDimensions();
+			}
+			return true;
 		}
 		if (arrayDimensions != this.getArrayDimensions())
 		{

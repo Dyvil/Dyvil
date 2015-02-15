@@ -1,23 +1,17 @@
 package dyvil.test
 
-import java.util.{ Arrays, Collections, Map, HashMap }
+import java.util.{ Arrays, Collections, Map, HashMap, List }
 using dyvil.maps.MapUtils._
 
 public class Main
 {
 	public static void main([String] args)
 	{
-		Map[String, String] map1 = Map {
-										"a" -> "A",
-										"b" -> "B",
-										"c" -> "C",
-										"d" -> "D",
-										"e" -> "E",
-										"f" -> "F"
-									  	}
-		Map[String, String] map2 = Map("a" -> "1", "b" -> "2", "c" -> "3", "d" -> "4")
-		
-		System out println map1
-		System out println map2
+		Int i = 3
+		Int j = i + 1
+		int k = j + 1
+		System out println i
+		System out println j
+		System out println k
 	}
 }

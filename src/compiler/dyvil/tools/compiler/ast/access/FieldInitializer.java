@@ -26,6 +26,18 @@ public class FieldInitializer extends ASTNode implements IValue, IValued, ITyped
 	}
 	
 	@Override
+	public int getValueType()
+	{
+		return VARIABLE;
+	}
+	
+	@Override
+	public boolean isPrimitive()
+	{
+		return this.variable.type.isPrimitive();
+	}
+	
+	@Override
 	public void setType(IType type)
 	{
 		this.variable.type = type;
@@ -73,12 +85,6 @@ public class FieldInitializer extends ASTNode implements IValue, IValued, ITyped
 	public IValue getValue()
 	{
 		return this.variable.value;
-	}
-	
-	@Override
-	public int getValueType()
-	{
-		return VARIABLE;
 	}
 	
 	@Override

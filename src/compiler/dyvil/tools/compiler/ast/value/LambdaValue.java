@@ -51,6 +51,12 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IPara
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;

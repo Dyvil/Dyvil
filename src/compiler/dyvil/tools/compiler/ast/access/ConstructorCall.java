@@ -44,6 +44,12 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
 	public void setType(IType type)
 	{
 		this.type = type;

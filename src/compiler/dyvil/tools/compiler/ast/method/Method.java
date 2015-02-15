@@ -893,7 +893,7 @@ public class Method extends Member implements IMethod
 			instance = null;
 		}
 		
-		if (this.intrinsicOpcodes != null)
+		if (this.intrinsicOpcodes != null && instance.isPrimitive())
 		{
 			if (this.type == Type.BOOLEAN)
 			{
@@ -926,7 +926,7 @@ public class Method extends Member implements IMethod
 			instance = null;
 		}
 		
-		if (this.intrinsicOpcodes != null)
+		if (this.intrinsicOpcodes != null && instance.isPrimitive())
 		{
 			this.writeIntrinsic(writer, dest, instance, arguments);
 			return;
@@ -944,7 +944,7 @@ public class Method extends Member implements IMethod
 			instance = null;
 		}
 		
-		if (this.intrinsicOpcodes != null)
+		if (this.intrinsicOpcodes != null && instance.isPrimitive())
 		{
 			this.writeInvIntrinsic(writer, dest, instance, arguments);
 			return;

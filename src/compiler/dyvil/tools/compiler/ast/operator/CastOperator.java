@@ -32,6 +32,12 @@ public class CastOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return this.type.isPrimitive();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.type;

@@ -52,12 +52,6 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 	}
 	
 	@Override
-	public IValue withType(IType type)
-	{
-		return this.isType(type) ? this : null;
-	}
-	
-	@Override
 	public boolean isType(IType type)
 	{
 		if (type == Type.NONE || type == Type.VOID)

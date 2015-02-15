@@ -30,6 +30,12 @@ public class StringValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
 	public Type getType()
 	{
 		return Type.STRING;

@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
@@ -27,6 +28,7 @@ public interface IValue extends IASTNode, ITyped
 	public static int	DOUBLE				= 8;
 	public static int	STRING				= 9;
 	public static int	ENUM				= 10;
+	public static int	BOXED				= 11;
 	
 	public static int	THIS				= 11;
 	public static int	SUPER				= 12;
@@ -82,6 +84,11 @@ public interface IValue extends IASTNode, ITyped
 		return false;
 	}
 	
+	public default boolean isPrimitive()
+	{
+		return this.getType().isPrimitive();
+	}
+	
 	@Override
 	public IType getType();
 	
@@ -90,7 +97,33 @@ public interface IValue extends IASTNode, ITyped
 	{
 	}
 	
-	public IValue withType(IType type);
+	public default IValue withType(IType type)
+	{
+		IType type1 = this.getType();
+		boolean primitive = type1.isPrimitive();
+		if (primitive != type.isPrimitive())
+		{
+			if (!Type.isSuperType(type, type1))
+			{
+				return null;
+			}
+			// Primitive -> Object
+			if (primitive)
+			{
+				return type1.box(this);
+			}
+			// Object -> Primitive
+			else
+			{
+				return type.unbox(this);
+			}
+		}
+		if (Type.isSuperType(type, type1))
+		{
+			return this;
+		}
+		return null;
+	}
 	
 	@Override
 	public boolean isType(IType type);

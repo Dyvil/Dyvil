@@ -49,6 +49,16 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
+	public ClassBody getBody()
+	{
+		if (!this.typesResolved)
+		{
+			this.resolveTypes(null, Package.rootPackage);
+		}
+		return this.body;
+	}
+	
+	@Override
 	public List<ITypeVariable> getTypeVariables()
 	{
 		if (!this.typesResolved)

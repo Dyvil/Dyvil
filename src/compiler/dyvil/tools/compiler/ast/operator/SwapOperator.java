@@ -39,6 +39,12 @@ public class SwapOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.NONE;

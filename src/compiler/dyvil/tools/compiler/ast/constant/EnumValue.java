@@ -41,6 +41,12 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
 	public void setType(IType type)
 	{
 		this.type = type;

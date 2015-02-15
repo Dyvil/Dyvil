@@ -62,12 +62,6 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public IValue withType(IType type)
-	{
-		return this.field == null ? null : Type.isSuperType(type, this.field.getType()) ? this : null;
-	}
-	
-	@Override
 	public boolean isType(IType type)
 	{
 		return this.field == null ? false : Type.isSuperType(type, this.field.getType());

@@ -46,6 +46,15 @@ public class Type extends ASTNode implements IType
 	public static final AnnotationType	ARetention	= new AnnotationType("Retention");
 	public static final AnnotationType	ATarget		= new AnnotationType("Target");
 	
+	public static IClass BOOLEAN_CLASS;
+	public static IClass BYTE_CLASS;
+	public static IClass SHORT_CLASS;
+	public static IClass CHAR_CLASS;
+	public static IClass INT_CLASS;
+	public static IClass LONG_CLASS;
+	public static IClass FLOAT_CLASS;
+	public static IClass DOUBLE_CLASS;
+	
 	public static IClass				PREDEF_CLASS;
 	public static IClass				STRING_CLASS;
 	public static IClass				OBJECT_CLASS;
@@ -84,14 +93,30 @@ public class Type extends ASTNode implements IType
 	
 	public static void init()
 	{
-		BOOLEAN.theClass = Package.dyvilLang.resolveClass("Boolean");
-		BYTE.theClass = Package.dyvilLang.resolveClass("Byte");
-		SHORT.theClass = Package.dyvilLang.resolveClass("Short");
-		CHAR.theClass = Package.dyvilLang.resolveClass("Char");
-		INT.theClass = Package.dyvilLang.resolveClass("Int");
-		LONG.theClass = Package.dyvilLang.resolveClass("Long");
-		FLOAT.theClass = Package.dyvilLang.resolveClass("Float");
-		DOUBLE.theClass = Package.dyvilLang.resolveClass("Double");
+		BOOLEAN.theClass = BOOLEAN_CLASS = Package.dyvilLang.resolveClass("Boolean");
+		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod("create");
+		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod("booleanValue");
+		BYTE.theClass = BYTE_CLASS = Package.dyvilLang.resolveClass("Byte");
+		BYTE.boxMethod = BYTE_CLASS.getBody().getMethod("create");
+		BYTE.unboxMethod = BYTE_CLASS.getBody().getMethod("byteValue");
+		SHORT.theClass = SHORT_CLASS = Package.dyvilLang.resolveClass("Short");
+		SHORT.boxMethod = SHORT_CLASS.getBody().getMethod("create");
+		SHORT.unboxMethod = SHORT_CLASS.getBody().getMethod("shortValue");
+		CHAR.theClass = CHAR_CLASS = Package.dyvilLang.resolveClass("Char");
+		CHAR.boxMethod = CHAR_CLASS.getBody().getMethod("create");
+		CHAR.unboxMethod = CHAR_CLASS.getBody().getMethod("charValue");
+		INT.theClass = INT_CLASS = Package.dyvilLang.resolveClass("Int");
+		INT.boxMethod = INT_CLASS.getBody().getMethod("create");
+		INT.unboxMethod = INT_CLASS.getBody().getMethod("intValue");
+		LONG.theClass = LONG_CLASS = Package.dyvilLang.resolveClass("Long");
+		LONG.boxMethod = LONG_CLASS.getBody().getMethod("create");
+		LONG.unboxMethod = LONG_CLASS.getBody().getMethod("longValue");
+		FLOAT.theClass = FLOAT_CLASS = Package.dyvilLang.resolveClass("Float");
+		FLOAT.boxMethod = FLOAT_CLASS.getBody().getMethod("create");
+		FLOAT.unboxMethod = FLOAT_CLASS.getBody().getMethod("floatValue");
+		DOUBLE.theClass = DOUBLE_CLASS = Package.dyvilLang.resolveClass("Double");
+		DOUBLE.boxMethod = DOUBLE_CLASS.getBody().getMethod("create");
+		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod("doubleValue");
 		
 		ANY.theClass = Package.dyvilLang.resolveClass("Any");
 		ANY.fullName = "dyvil.lang.Any";
@@ -166,10 +191,6 @@ public class Type extends ASTNode implements IType
 	public static boolean isSuperType(IType superType, IType subType)
 	{
 		if (subType == NONE && !(superType instanceof PrimitiveType))
-		{
-			return true;
-		}
-		else if (superType.equals(subType))
 		{
 			return true;
 		}

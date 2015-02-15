@@ -35,6 +35,12 @@ public final class SuperValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
 	public void setType(IType type)
 	{
 		this.type = type;

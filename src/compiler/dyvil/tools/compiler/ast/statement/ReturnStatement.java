@@ -30,6 +30,12 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return this.value.isPrimitive();
+	}
+	
+	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;

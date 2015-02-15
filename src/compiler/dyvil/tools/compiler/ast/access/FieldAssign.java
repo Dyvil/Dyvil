@@ -50,6 +50,12 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return this.field == null ? false : this.field.getType().isPrimitive();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.field == null ? Type.NONE : this.field.getType();

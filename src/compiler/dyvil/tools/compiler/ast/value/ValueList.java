@@ -64,6 +64,12 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		return true;
 	}
 	
+	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
 	private void generateTypes()
 	{
 		int len = this.values.size();

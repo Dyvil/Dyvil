@@ -29,6 +29,12 @@ public class BooleanNot extends ASTNode implements IValue
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.BOOLEAN;
@@ -37,6 +43,7 @@ public class BooleanNot extends ASTNode implements IValue
 	@Override
 	public IValue withType(IType type)
 	{
+		// TODO Boxing
 		return type == Type.BOOLEAN ? this : null;
 	}
 	

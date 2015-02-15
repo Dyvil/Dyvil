@@ -90,6 +90,16 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		if (this.isArray)
+		{
+			return false;
+		}
+		return this.requiredType.isPrimitive();
+	}
+	
+	@Override
 	public IValue withType(IType type)
 	{
 		this.requiredType = type;

@@ -112,12 +112,6 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public IValue withType(IType type)
-	{
-		return this.isType(type) ? this : null;
-	}
-	
-	@Override
 	public boolean isType(IType type)
 	{
 		if (type == Type.VOID || type == Type.NONE)

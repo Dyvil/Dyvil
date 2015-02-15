@@ -42,6 +42,12 @@ public class ClassAccess extends ASTNode implements IValue, ITyped
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.type;
