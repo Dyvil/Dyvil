@@ -17,6 +17,7 @@ import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.util.AppendableOutputStream;
 import dyvil.tools.compiler.util.LoggerOutputStream;
 import dyvil.tools.compiler.util.Util;
 
@@ -138,7 +139,7 @@ public class DyvilCompiler
 					
 					if (thrown != null)
 					{
-						builder.append(thrown.getMessage()).append('\n');
+						thrown.printStackTrace(new AppendableOutputStream(builder));
 					}
 					return builder.toString();
 				}
