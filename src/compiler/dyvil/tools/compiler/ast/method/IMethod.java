@@ -17,9 +17,9 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 
 public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower, IParameterized, IContext
 {
-	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments);
-	
 	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments);
+	
+	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments);
 	
 	// Generics
 	

@@ -1,8 +1,6 @@
 package dyvil.tools.compiler;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -219,17 +217,12 @@ public class DyvilCompiler
 			}
 		}
 		
-		System.out.println("Invalid Argument '" + s + "'");
+		System.out.println("Invalid Argument '" + s + "'. Ignoring.");
 	}
 	
 	public static void findUnits(File source, File output, Package pack)
 	{
-		if (!source.exists())
-		{
-			logger.warning(source.getPath() + " does not exist.");
-			return;
-		}
-		else if (source.isDirectory())
+		if (source.isDirectory())
 		{
 			String name = source.getName();
 			for (String s : source.list())
@@ -238,39 +231,24 @@ public class DyvilCompiler
 			}
 			return;
 		}
-		else
+		
+		String fileName = source.getPath();
+		if (!config.compileFile(fileName))
 		{
-			String fileName = source.getPath();
-			if (!config.compileFile(fileName))
-			{
-				return;
-			}
-			
-			if (fileName.endsWith("Thumbs.db") || fileName.endsWith(".DS_Store"))
-			{
-				return;
-			}
-			else if (fileName.endsWith(".dyvil"))
-			{
-				CompilationUnit unit = new CompilationUnit(pack, (CodeFile) source, output);
-				output = unit.outputFile;
-				pack.addCompilationUnit(unit);
-				units.add(unit);
-			}
-			files.add(output);
+			return;
 		}
-	}
-	
-	public static String readFile(File file)
-	{
-		try
+		
+		if (fileName.endsWith("Thumbs.db") || fileName.endsWith(".DS_Store"))
 		{
-			return new String(Files.readAllBytes(file.toPath()));
+			return;
 		}
-		catch (IOException ex)
+		else if (fileName.endsWith(".dyvil"))
 		{
-			ex.printStackTrace();
-			return null;
+			CompilationUnit unit = new CompilationUnit(pack, (CodeFile) source, output);
+			output = unit.outputFile;
+			pack.addCompilationUnit(unit);
+			units.add(unit);
 		}
+		files.add(output);
 	}
 }

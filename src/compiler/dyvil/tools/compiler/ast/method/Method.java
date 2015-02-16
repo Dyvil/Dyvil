@@ -271,6 +271,102 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments)
+	{
+		if (name == null)
+		{
+			return 1;
+		}
+		
+		if (!name.equals(this.qualifiedName))
+		{
+			return 0;
+		}
+		
+		// Only matching the name
+		if (arguments == null)
+		{
+			return 1;
+		}
+		
+		int pOff = 0;
+		int match = 1;
+		int len = arguments.size();
+		List<Parameter> params = this.parameters;
+		
+		// infix modifier implementation
+		int  mods = (this.modifiers & Modifiers.INFIX);
+		if (instance != null && mods == Modifiers.INFIX)
+		{
+			if (len != params.size() - 1)
+			{
+				return 0;
+			}
+			
+			IType t2 = params.get(0).type;
+			int m = instance.getTypeMatch(t2);
+			if (m == 0)
+			{
+				return 0;
+			}
+			match += m;
+			
+			pOff = 1;
+		}
+		else if (mods == Modifiers.STATIC && instance != null && instance.getValueType() != IValue.CLASS_ACCESS)
+		{
+			return 0;
+		}
+		else if ((this.modifiers & Modifiers.VARARGS) != 0)
+		{
+			int parCount = this.parameters.size() - 1;
+			if (len <= parCount)
+			{
+				return 0;
+			}
+			
+			Parameter varParam = params.get(parCount);
+			for (int i = 0; i < len; i++)
+			{
+				Parameter par = (i > parCount ? varParam : params.get(i + pOff));
+				IType t1 = par.type;
+				IValue argument = arguments.get(i);
+				int m = argument.getTypeMatch(t1);
+				if (m != 0)
+				{
+					return match + m;
+				}
+				m = argument.getTypeMatch(t1.getElementType());
+				if (m == 0)
+				{
+					return 0;
+				}
+				
+				match += m;
+			}
+			return match;
+		}
+		else if (len != this.parameters.size())
+		{
+			return 0;
+		}
+		
+		for (int i = 0; i < len; i++)
+		{
+			IType t1 = params.get(i + pOff).type;
+			IValue argument = arguments.get(i);
+			int m = argument.getTypeMatch(t1);
+			if (m == 0)
+			{
+				return 0;
+			}
+			match += m;
+		}
+		
+		return match;
+	}
+
+	@Override
 	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments)
 	{
 		int pOff = 0;
@@ -362,97 +458,6 @@ public class Method extends Member implements IMethod
 				arguments.set(i, value1);
 			}
 		}
-	}
-	
-	@Override
-	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments)
-	{
-		if (name == null)
-		{
-			return 1;
-		}
-		
-		if (!name.equals(this.qualifiedName))
-		{
-			return 0;
-		}
-		
-		// Only matching the name
-		if (arguments == null)
-		{
-			return 1;
-		}
-		
-		int pOff = 0;
-		int match = 1;
-		int len = arguments.size();
-		List<Parameter> params = this.parameters;
-		
-		// infix modifier implementation
-		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			if (len != params.size() - 1)
-			{
-				return 0;
-			}
-			
-			IType t2 = params.get(0).type;
-			int m = instance.getTypeMatch(t2);
-			if (m == 0)
-			{
-				return 0;
-			}
-			match += m;
-			
-			pOff = 1;
-		}
-		else if ((this.modifiers & Modifiers.VARARGS) != 0)
-		{
-			int parCount = this.parameters.size() - 1;
-			if (len <= parCount)
-			{
-				return 0;
-			}
-			
-			Parameter varParam = params.get(parCount);
-			for (int i = 0; i < len; i++)
-			{
-				Parameter par = (i > parCount ? varParam : params.get(i + pOff));
-				IType t1 = par.type;
-				IValue argument = arguments.get(i);
-				int m = argument.getTypeMatch(t1);
-				if (m != 0)
-				{
-					return match + m;
-				}
-				m = argument.getTypeMatch(t1.getElementType());
-				if (m == 0)
-				{
-					return 0;
-				}
-				
-				match += m;
-			}
-			return match;
-		}
-		else if (len != this.parameters.size())
-		{
-			return 0;
-		}
-		
-		for (int i = 0; i < len; i++)
-		{
-			IType t1 = params.get(i + pOff).type;
-			IValue argument = arguments.get(i);
-			int m = argument.getTypeMatch(t1);
-			if (m == 0)
-			{
-				return 0;
-			}
-			match += m;
-		}
-		
-		return match;
 	}
 	
 	@Override

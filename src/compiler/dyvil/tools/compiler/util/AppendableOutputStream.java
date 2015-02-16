@@ -51,7 +51,6 @@ public class AppendableOutputStream extends PrintStream
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
 		}
 	}
 	

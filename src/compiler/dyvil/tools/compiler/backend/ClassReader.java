@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import jdk.internal.org.objectweb.asm.*;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -31,7 +32,7 @@ public class ClassReader extends ClassVisitor
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
+			DyvilCompiler.logger.throwing("ClassReader", "loadClass", ex);
 		}
 		
 		return null;

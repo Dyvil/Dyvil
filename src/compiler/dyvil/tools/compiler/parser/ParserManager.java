@@ -119,7 +119,7 @@ public class ParserManager
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+			DyvilCompiler.logger.throwing("ParserManager", "parse", ex);
 		}
 	}
 	
@@ -194,7 +194,7 @@ public class ParserManager
 			{
 				message = ex.getClass().getName();
 			}
-			ex.printStackTrace();
+			DyvilCompiler.logger.throwing("ParserManager", "parseToken", ex);
 			throw new SyntaxError(token, "Failed to parse token '" + token.getText() + "': " + message);
 		}
 		

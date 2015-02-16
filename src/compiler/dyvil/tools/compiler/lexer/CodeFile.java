@@ -2,10 +2,12 @@ package dyvil.tools.compiler.lexer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -36,11 +38,11 @@ public class CodeFile extends File implements ICodePosition
 	{
 		try
 		{
-			this.code = new String(Files.readAllBytes(this.toPath()));
+			this.code = new String(Files.readAllBytes(this.toPath()), StandardCharsets.UTF_8);
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
+			DyvilCompiler.logger.throwing("CodeFile", "load", ex);
 		}
 	}
 	

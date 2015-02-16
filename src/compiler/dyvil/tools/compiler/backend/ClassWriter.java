@@ -48,7 +48,6 @@ public class ClassWriter
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
 			DyvilCompiler.logger.throwing("ClassWriter", "saveClass", ex);
 		}
 	}
