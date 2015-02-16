@@ -1,6 +1,6 @@
 package dyvil.test
 
-import java.util.{ Arrays, Collections, Map, HashMap, List }
+import java.util.{ Arrays, Collections, Map, HashMap, List, ArrayList }
 using dyvil.maps.MapUtils._
 using dyvil.collections.ListUtils._
 
@@ -8,7 +8,13 @@ public class Main
 {
 	public static void main([String] args)
 	{
-		List list = List { 1, 2, 3, 4, 5, 6 }
-		System out println Map { "a" -> 1, "b" -> 2, "c" -> 3 }
+		Map[String, String] map = new HashMap
+		for (int i = 0; i < 26; i += 1)
+		{
+			String s1 = String.valueOf((i + 'a') :> char)
+			String s2 = String.valueOf((i + 'A') :> char)
+			map += s1 -> s2
+		}
+		System out println map
 	}
 }

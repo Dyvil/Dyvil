@@ -29,6 +29,8 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 	
 	// Compilation
 	
+	public boolean isIntrinsic();
+	
 	public String getDescriptor();
 	
 	public String getSignature();

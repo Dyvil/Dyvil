@@ -84,8 +84,11 @@ public class ClassWriter
 		{
 			for (File file : files)
 			{
-				String name = file.getAbsolutePath().substring(len);
-				createEntry(file, jos, name);
+				if (file.exists())
+				{
+					String name = file.getAbsolutePath().substring(len);
+					createEntry(file, jos, name);
+				}
 			}
 			
 			jos.flush();

@@ -44,9 +44,16 @@ public class Operators
 		case "/":
 		case "%":
 			return 100;
+		case "->":
+		case "<-":
+			return 110;
 		case "<:":
 		case ":>":
 			return 200;
+		}
+		if (name.charAt(name.length() - 1) == '=')
+		{
+			return 5;
 		}
 		return 0;
 	}

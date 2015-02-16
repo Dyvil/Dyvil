@@ -2,7 +2,10 @@ package dyvil.tools.compiler.util;
 
 import static dyvil.reflect.Opcodes.*;
 import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 
 public class OpcodeUtil
@@ -118,26 +121,28 @@ public class OpcodeUtil
 		return 0;
 	}
 	
-	public static void writePrimitiveCast(PrimitiveType value, PrimitiveType cast, MethodWriter writer)
+	public static void writePrimitiveCast(IType value, PrimitiveType cast, MethodWriter writer)
 	{
-		switch (value.typecode)
+		IClass iclass = value.getTheClass();
+		if (iclass == Type.BYTE_CLASS || iclass == Type.SHORT_CLASS || iclass == Type.CHAR_CLASS || iclass == Type.INT_CLASS)
 		{
-		case Opcodes.T_BYTE:
-		case Opcodes.T_SHORT:
-		case Opcodes.T_BOOLEAN:
-		case Opcodes.T_CHAR:
-		case Opcodes.T_INT:
 			writeIntCast(cast, writer);
-			break;
-		case Opcodes.T_LONG:
+			return;
+		}
+		if (iclass == Type.LONG_CLASS)
+		{
 			writeLongCast(cast, writer);
-			break;
-		case Opcodes.T_FLOAT:
+			return;
+		}
+		if (iclass == Type.FLOAT_CLASS)
+		{
 			writeFloatCast(cast, writer);
-			break;
-		case Opcodes.T_DOUBLE:
+			return;
+		}
+		if (iclass == Type.DOUBLE_CLASS)
+		{
 			writeDoubleCast(cast, writer);
-			break;
+			return;
 		}
 	}
 	

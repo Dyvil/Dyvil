@@ -117,6 +117,7 @@ public class DyvilCompiler
 		try
 		{
 			logger.setUseParentHandlers(false);
+			logger.setLevel(Level.ALL);
 			
 			Formatter formatter = new Formatter()
 			{
@@ -143,12 +144,14 @@ public class DyvilCompiler
 				}
 			};
 			StreamHandler ch = new StreamHandler(System.out, formatter);
+			ch.setLevel(Level.ALL);
 			logger.addHandler(ch);
 			
 			if (logFile)
 			{
 				String path = new File("dyvilc.log").getAbsolutePath();
 				FileHandler fh = new FileHandler(path, true);
+				fh.setLevel(Level.ALL);
 				fh.setFormatter(formatter);
 				logger.addHandler(fh);
 			}

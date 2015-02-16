@@ -93,15 +93,15 @@ public class CastOperator extends ASTNode implements IValue
 		}
 		
 		boolean primitiveType = this.type.isPrimitive();
-		IType type = this.value.getType();
+		boolean primitiveValue = this.value.isPrimitive();
 		if (primitiveType)
 		{
-			if (!type.isPrimitive())
+			if (!primitiveValue)
 			{
 				markers.add(Markers.create(this.position, "cast.reference"));
 			}
 		}
-		else if (type.isPrimitive())
+		else if (primitiveValue)
 		{
 			markers.add(Markers.create(this.position, "cast.primitive"));
 		}
@@ -123,7 +123,7 @@ public class CastOperator extends ASTNode implements IValue
 		this.value.writeExpression(writer);
 		if (this.type.isPrimitive())
 		{
-			OpcodeUtil.writePrimitiveCast((PrimitiveType) this.value.getType(), (PrimitiveType) this.type, writer);
+			OpcodeUtil.writePrimitiveCast(this.value.getType(), (PrimitiveType) this.type, writer);
 		}
 		else
 		{

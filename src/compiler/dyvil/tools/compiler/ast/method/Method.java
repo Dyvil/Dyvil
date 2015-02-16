@@ -786,6 +786,12 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public boolean isIntrinsic()
+	{
+		return this.intrinsicOpcodes != null;
+	}
+	
+	@Override
 	public String getDescriptor()
 	{
 		StringBuilder buffer = new StringBuilder();

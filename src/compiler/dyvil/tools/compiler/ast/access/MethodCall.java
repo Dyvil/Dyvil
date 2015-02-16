@@ -64,6 +64,12 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return this.method.isIntrinsic() || this.getType().isPrimitive();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.method == null)
