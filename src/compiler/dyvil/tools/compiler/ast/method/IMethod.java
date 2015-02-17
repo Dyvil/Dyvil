@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.method;
 
 import java.util.List;
+import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
@@ -19,13 +20,15 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 {
 	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments);
 	
-	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments);
+	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments, Map<String, IType> types);
 	
 	// Generics
 	
 	public boolean hasTypeVariables();
 	
-	public IType getType(IValue instance, List<IValue> arguments, List<IType> generics);
+	public Map<String, IType> getTypeMap(IValue instance, List<IValue> arguments, List<IType> typeArguments);
+	
+	public IType getType(Map<String, IType> types);
 	
 	// Compilation
 	

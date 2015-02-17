@@ -100,6 +100,11 @@ public interface IValue extends IASTNode, ITyped
 	public default IValue withType(IType type)
 	{
 		IType type1 = this.getType();
+		if (type1 == null)
+		{
+			return null;
+		}
+		
 		boolean primitive = type1.isPrimitive();
 		if (primitive != type.isPrimitive())
 		{
@@ -130,9 +135,9 @@ public interface IValue extends IASTNode, ITyped
 	
 	public int getTypeMatch(IType type);
 	
-	public default void addGenerics(Map<String, IType> typeVariables)
+	public default void addGenerics(IType type, Map<String, IType> typeVariables)
 	{
-		IType type = this.getType();
+		type = this.getType();
 		if (type.isGeneric())
 		{
 			((GenericType) type).addGenerics(typeVariables);

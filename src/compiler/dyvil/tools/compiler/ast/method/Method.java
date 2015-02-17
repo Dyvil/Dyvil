@@ -295,7 +295,7 @@ public class Method extends Member implements IMethod
 		List<Parameter> params = this.parameters;
 		
 		// infix modifier implementation
-		int  mods = (this.modifiers & Modifiers.INFIX);
+		int mods = (this.modifiers & Modifiers.INFIX);
 		if (instance != null && mods == Modifiers.INFIX)
 		{
 			if (len != params.size() - 1)
@@ -365,9 +365,9 @@ public class Method extends Member implements IMethod
 		
 		return match;
 	}
-
+	
 	@Override
-	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments)
+	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments, Map<String, IType> types)
 	{
 		int pOff = 0;
 		int len = arguments.size();
@@ -378,7 +378,7 @@ public class Method extends Member implements IMethod
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			par = params.get(0);
-			parType = par.type;
+			parType = par.getType(types);
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
@@ -408,14 +408,15 @@ public class Method extends Member implements IMethod
 		{
 			int parCount = this.parameters.size() - 1;
 			Parameter varParam = params.get(parCount);
+			IType varParamType = varParam.getType(types);
 			
 			IValue value = arguments.get(parCount);
-			IValue value1 = value.withType(varParam.type);
+			IValue value1 = value.withType(varParamType);
 			if (value1 == null)
 			{
-				IType elementType = varParam.type.getElementType();
+				IType elementType = varParamType.getElementType();
 				List<IValue> values1 = new ArrayList(len - parCount);
-				ValueList varargs = new ValueList(null, values1, varParam.type, elementType);
+				ValueList varargs = new ValueList(null, values1, varParamType, elementType);
 				
 				while (len > parCount)
 				{
@@ -442,7 +443,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < len; i++)
 		{
 			par = params.get(i + pOff);
-			parType = par.type;
+			parType = par.getType(types);
 			
 			IValue value = arguments.get(i);
 			IValue value1 = value.withType(parType);
@@ -467,34 +468,61 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IType getType(IValue instance, List<IValue> arguments, List<IType> generics)
+	public Map<String, IType> getTypeMap(IValue instance, List<IValue> arguments, List<IType> typeArguments)
 	{
-		if (!this.type.hasTypeVariables())
-		{
-			return this.type;
-		}
-		
 		Map<String, IType> map = new HashMap();
-		if (generics != null)
+		if (typeArguments != null)
 		{
-			int len = Math.min(this.generics.size(), generics.size());
+			int len = Math.min(generics.size(), typeArguments.size());
 			for (int i = 0; i < len; i++)
 			{
-				ITypeVariable var = this.generics.get(i);
-				IType type = generics.get(i);
+				ITypeVariable var = generics.get(i);
+				IType type = typeArguments.get(i);
 				map.put(var.getQualifiedName(), type);
 			}
 		}
 		
+		int len = arguments.size();
+		int mods = this.modifiers & Modifiers.INFIX;
+		if (instance != null && mods == Modifiers.INFIX)
+		{
+			instance.addGenerics(this.parameters.get(0).type, map);
+			len--;
+			for (int i = 0; i < len; i++)
+			{
+				Parameter par = this.parameters.get(i + 1);
+				IValue v = arguments.get(i);
+				v.addGenerics(par.type, map);
+			}
+			return map;
+		}
+		if (instance == null && len == 1 && (this.modifiers & Modifiers.PREFIX) != 0)
+		{
+			arguments.get(0).addGenerics(this.parameters.get(0).type, map);
+			return map;
+		}
+		
 		if (instance != null)
 		{
-			instance.addGenerics(map);
+			instance.addGenerics(this.theClass.getThisType(), map);
 		}
-		for (IValue v : arguments)
+		for (int i = 0; i < len; i++)
 		{
-			v.addGenerics(map);
+			Parameter par = this.parameters.get(i);
+			IValue v = arguments.get(i);
+			v.addGenerics(par.type, map);
 		}
-		return this.type.getConcreteType(map);
+		return map;
+	}
+	
+	@Override
+	public IType getType(Map<String, IType> types)
+	{
+		if (types == null)
+		{
+			return this.type;
+		}
+		return this.type.getConcreteType(types);
 	}
 	
 	@Override

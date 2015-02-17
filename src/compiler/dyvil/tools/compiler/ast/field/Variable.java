@@ -146,6 +146,8 @@ public class Variable extends Member implements IVariable
 			}
 		}
 		
+		this.value.check(markers, context);
+		
 		IValue value1 = this.value.withType(this.type);
 		if (value1 == null)
 		{
@@ -158,8 +160,6 @@ public class Variable extends Member implements IVariable
 		{
 			this.value = value1;
 		}
-		
-		this.value.check(markers, context);
 	}
 	
 	@Override

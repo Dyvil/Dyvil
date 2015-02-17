@@ -192,7 +192,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments);
+			this.method.checkArguments(markers, this.instance, this.arguments, null);
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{

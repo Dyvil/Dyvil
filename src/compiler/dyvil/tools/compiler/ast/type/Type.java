@@ -276,7 +276,11 @@ public class Type extends ASTNode implements IType
 	{
 		if (this.theClass instanceof CaptureClass)
 		{
-			return typeVariables.get(this.qualifiedName);
+			IType t = typeVariables.get(this.qualifiedName);
+			if (t != null)
+			{
+				return t;
+			}
 		}
 		return this;
 	}

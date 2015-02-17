@@ -195,7 +195,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, IValue
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments);
+			this.method.checkArguments(markers, this.instance, this.arguments, null);
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{

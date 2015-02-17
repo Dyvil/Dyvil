@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.access;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -29,19 +30,20 @@ import dyvil.tools.compiler.util.Util;
 
 public class MethodCall extends ASTNode implements IAccess, INamed
 {
-	public String		name;
-	public String		qualifiedName;
+	public String				name;
+	public String				qualifiedName;
 	
-	public List<IType>	generics;
+	public List<IType>			generics;
+	public Map<String, IType>	typeArguments;
 	
-	public IValue		instance;
-	public List<IValue>	arguments;
+	public IValue				instance;
+	public List<IValue>			arguments;
 	
-	public boolean		dotless;
-	public boolean		isSugarCall;
+	public boolean				dotless;
+	public boolean				isSugarCall;
 	
-	public IMethod		method;
-	public IType		type;
+	public IMethod				method;
+	public IType				type;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -78,7 +80,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		}
 		if (this.type == null)
 		{
-			this.type = this.method.hasTypeVariables() ? this.method.getType(this.instance, this.arguments, this.generics) : this.method.getType();
+			this.type = this.typeArguments != null ? this.method.getType(this.typeArguments) : this.method.getType();
 		}
 		return this.type;
 	}
@@ -96,7 +98,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		}
 		if (this.type == null)
 		{
-			this.type = this.method.hasTypeVariables() ? this.method.getType(this.instance, this.arguments, this.generics) : this.method.getType();
+			this.type = this.typeArguments != null ? this.method.getType(this.typeArguments) : this.method.getType();
 		}
 		return Type.isSuperType(type, this.type);
 	}
@@ -240,7 +242,12 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments);
+			if (this.method.hasTypeVariables())
+			{
+				this.typeArguments = this.method.getTypeMap(this.instance, this.arguments, this.generics);
+			}
+			
+			this.method.checkArguments(markers, this.instance, this.arguments, this.typeArguments);
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{

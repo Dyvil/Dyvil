@@ -122,18 +122,30 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public boolean isGeneric()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override
 	public boolean hasTypeVariables()
 	{
-		return false;
+		return this.name != null;
 	}
 	
 	@Override
 	public IType getConcreteType(Map<String, IType> typeVariables)
 	{
+		if (this.name != null)
+		{
+			IType t = typeVariables.get(this.name);
+			if (t != null)
+			{
+				if (this.arrayDimensions > 0)
+				{
+					return t.getArrayType(this.arrayDimensions);
+				}
+				return t;
+			}
+		}
 		return this;
 	}
 	
@@ -276,12 +288,16 @@ public class WildcardType extends TypeVariable implements IType
 		{
 			buffer.append('[');
 		}
+		
 		if (this.name != null)
 		{
 			buffer.append(this.name);
-			return;
 		}
-		super.toString(prefix, buffer);
+		else
+		{
+			super.toString(prefix, buffer);
+		}
+		
 		for (int i = 0; i < this.arrayDimensions; i++)
 		{
 			buffer.append(']');

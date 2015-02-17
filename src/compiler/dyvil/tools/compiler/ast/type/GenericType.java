@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
@@ -82,6 +84,11 @@ public class GenericType extends Type implements ITypeList
 		{
 			this.theClass = iclass;
 			this.fullName = iclass.getFullName();
+			
+			if (iclass instanceof CaptureClass)
+			{
+				return new WildcardType(this.position, this.arrayDimensions, (CaptureClass) iclass);
+			}
 			
 			if (markers == null || this.generics == null)
 			{

@@ -8,13 +8,9 @@ public class Main
 {
 	public static void main([String] args)
 	{
-		Map[String, String] map = new HashMap
-		for (int i = 0; i < 26; i += 1)
-		{
-			String s1 = String.valueOf((i + 'a') :> char)
-			String s2 = String.valueOf((i + 'A') :> char)
-			map += s1 -> s2
-		}
-		System out println map
+		[String] s = get { "a", "b" }
+		System out println s
 	}
+	
+	public static [T] get[T]([T] arr) = arr;
 }

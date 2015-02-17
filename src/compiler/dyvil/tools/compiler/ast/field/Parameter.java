@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.field;
 import java.lang.annotation.ElementType;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -98,6 +99,15 @@ public class Parameter extends Member implements IVariable
 	public boolean isVarargs()
 	{
 		return this.varargs;
+	}
+	
+	public IType getType(Map<String, IType> types)
+	{
+		if (types == null)
+		{
+			return this.type;
+		}
+		return this.type.getConcreteType(types);
 	}
 	
 	@Override
