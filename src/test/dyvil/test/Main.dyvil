@@ -9,13 +9,13 @@ public class Main
 	public static void main([String] args)
 	{
 		List[String] list = List("a", "b", "c")
-		list += 1
-		String s = get(list)
+		List[List[String]] listOfLists = List(List("a", "b"), List("1", "2"))
+		String s = get(listOfLists)
+		System out println listOfLists
 		System out println s
-		System out println list
 	}
 	
 	public static T get[T]([T] array) = array(0);
 	
-	public static T get[T](List[T] list) = list.get(0);
+	public static T get[T](List[List[T]] list) = list.get(0).get(0);
 }

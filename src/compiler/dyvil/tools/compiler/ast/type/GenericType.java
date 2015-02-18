@@ -164,17 +164,31 @@ public class GenericType extends Type implements ITypeList
 				}
 			}
 		}
-		else if (type instanceof GenericType)
+		if (this.generics != null)
 		{
-			List<IType> types = ((GenericType) type).generics;
-			int len = Math.min(this.generics.size(), types.size());
-			for (int i = 0; i < len; i++)
+			if (type instanceof GenericType)
 			{
-				IType t1 = types.get(i);
-				IType t2 = this.generics.get(i);
-				System.out.println(t1 + " " + t2);
-				t1.addTypeVariables(t2, typeVariables);
-				t2.addTypeVariables(t1, typeVariables);
+				List<IType> types = ((GenericType) type).generics;
+				int len = Math.min(this.generics.size(), types.size());
+				for (int i = 0; i < len; i++)
+				{
+					IType t1 = types.get(i);
+					IType t2 = this.generics.get(i);
+					t1.addTypeVariables(t2, typeVariables);
+					t2.addTypeVariables(t1, typeVariables);
+				}
+			}
+			
+			List<ITypeVariable> variables = this.theClass.getTypeVariables();
+			if (variables != null)
+			{
+				int len = Math.min(this.generics.size(), variables.size());
+				for (int i = 0; i < len; i++)
+				{
+					ITypeVariable var = variables.get(i);
+					IType type1 = this.generics.get(i);
+					typeVariables.put(var.getQualifiedName(), type);
+				}
 			}
 		}
 	}
