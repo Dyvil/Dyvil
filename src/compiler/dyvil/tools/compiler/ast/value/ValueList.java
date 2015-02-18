@@ -68,7 +68,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public boolean isPrimitive()
 	{
-		return false;
+		return this.isArray;
 	}
 	
 	private void generateTypes()

@@ -62,30 +62,56 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public FieldMatch resolveField(String name)
 	{
+		if (this.arrayDimensions > 0)
+		{
+			return null;
+		}
+		
 		return this.captureClass.resolveField(name);
 	}
 	
 	@Override
 	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
 	{
+		if (this.arrayDimensions > 0)
+		{
+			return Type.ARRAY_CLASS.resolveMethod(instance, name, arguments);
+		}
+		
 		return this.captureClass.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
 	{
+		if (this.arrayDimensions > 0)
+		{
+			Type.ARRAY_CLASS.getMethodMatches(list, instance, name, arguments);
+			return;
+		}
+		
 		this.captureClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
 	public MethodMatch resolveConstructor(List<IValue> arguments)
 	{
+		if (this.arrayDimensions > 0)
+		{
+			return null;
+		}
+		
 		return this.captureClass.resolveConstructor(arguments);
 	}
 	
 	@Override
 	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
 	{
+		if (this.arrayDimensions > 0)
+		{
+			return;
+		}
+		
 		this.captureClass.getConstructorMatches(list, arguments);
 	}
 	
@@ -117,6 +143,12 @@ public class WildcardType extends TypeVariable implements IType
 	public IClass getTheClass()
 	{
 		return this.captureClass;
+	}
+	
+	@Override
+	public boolean isPrimitive()
+	{
+		return this.arrayDimensions != 0;
 	}
 	
 	@Override

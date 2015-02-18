@@ -56,9 +56,10 @@ public class Type extends ASTNode implements IType
 	public static IClass				FLOAT_CLASS;
 	public static IClass				DOUBLE_CLASS;
 	
-	public static IClass				PREDEF_CLASS;
-	public static IClass				STRING_CLASS;
 	public static IClass				OBJECT_CLASS;
+	public static IClass				STRING_CLASS;
+	public static IClass				PREDEF_CLASS;
+	public static IClass				ARRAY_CLASS;
 	
 	public String						name;
 	public String						qualifiedName;
@@ -125,7 +126,7 @@ public class Type extends ASTNode implements IType
 		OBJECT.fullName = "java.lang.Object";
 		PREDEF.theClass = PREDEF_CLASS = Package.dyvilLang.resolveClass("Predef");
 		PREDEF.fullName = "dyvil.lang.Predef";
-		ARRAY.theClass = Package.dyvilLang.resolveClass("Array");
+		ARRAY.theClass = ARRAY_CLASS = Package.dyvilLang.resolveClass("Array");
 		ARRAY.fullName = "dyvil.lang.Array";
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
 		STRING.fullName = "java.lang.String";
@@ -257,6 +258,12 @@ public class Type extends ASTNode implements IType
 	public IClass getTheClass()
 	{
 		return this.theClass;
+	}
+	
+	@Override
+	public boolean isPrimitive()
+	{
+		return this.arrayDimensions != 0;
 	}
 	
 	@Override
@@ -465,7 +472,7 @@ public class Type extends ASTNode implements IType
 	{
 		if (this.arrayDimensions > 0)
 		{
-			return ARRAY.resolveField(name);
+			return null;
 		}
 		
 		return this.theClass == null ? null : this.theClass.resolveField(name);
@@ -476,11 +483,7 @@ public class Type extends ASTNode implements IType
 	{
 		if (this.arrayDimensions > 0)
 		{
-			MethodMatch match = ARRAY.resolveMethod(instance, name, arguments);
-			if (match != null)
-			{
-				return match;
-			}
+			return ARRAY_CLASS.resolveMethod(instance, name, arguments);
 		}
 		
 		return this.theClass == null ? null : this.theClass.resolveMethod(instance, name, arguments);
@@ -491,7 +494,7 @@ public class Type extends ASTNode implements IType
 	{
 		if (this.arrayDimensions > 0)
 		{
-			ARRAY.getMethodMatches(list, instance, name, arguments);
+			ARRAY_CLASS.getMethodMatches(list, instance, name, arguments);
 			return;
 		}
 		

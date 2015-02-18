@@ -8,7 +8,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
@@ -137,11 +136,7 @@ public interface IValue extends IASTNode, ITyped
 	
 	public default void addGenerics(IType type, Map<String, IType> typeVariables)
 	{
-		type = this.getType();
-		if (type.isGeneric())
-		{
-			((GenericType) type).addGenerics(typeVariables);
-		}
+		this.getType().addTypeVariables(typeVariables);
 	}
 	
 	public void resolveTypes(List<Marker> markers, IContext context);

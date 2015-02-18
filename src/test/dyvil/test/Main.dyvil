@@ -8,9 +8,9 @@ public class Main
 {
 	public static void main([String] args)
 	{
-		[String] s = get { "a", "b" }
+		String s = get0 { "a", "b" }
 		System out println s
 	}
 	
-	public static [T] get[T]([T] arr) = arr;
+	public static T get0[T]([T] arr) = arr(0);
 }

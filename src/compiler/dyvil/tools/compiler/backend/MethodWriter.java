@@ -109,7 +109,7 @@ public final class MethodWriter extends MethodVisitor
 	
 	protected void set(Object type)
 	{
-		this.stack[this.stackIndex] = type;
+		this.stack[this.stackIndex - 1] = type;
 	}
 	
 	protected void push(Object type)
@@ -452,6 +452,7 @@ public final class MethodWriter extends MethodVisitor
 		{
 			this.stackIndex -= 2;
 			this.stackCount -= 2;
+			return;
 		}
 		case ACONST_NULL:
 			this.push(NULL);
@@ -469,26 +470,27 @@ public final class MethodWriter extends MethodVisitor
 			this.pop();
 			this.pop();
 			this.push(INTEGER);
-			break;
+			return;
 		case LALOAD:
 			this.pop();
 			this.pop();
 			this.push(LONG);
-			break;
+			return;
 		case FALOAD:
 			this.pop();
 			this.pop();
 			this.push(FLOAT);
-			break;
+			return;
 		case DALOAD:
 			this.pop();
 			this.pop();
 			this.push(DOUBLE);
-			break;
+			return;
 		case AALOAD:
 			this.pop();
 			this.pop();
 			this.push(TOP);
+			return;
 		case IADD:
 		case ISUB:
 		case IMUL:
@@ -536,6 +538,7 @@ public final class MethodWriter extends MethodVisitor
 		case F2I:
 		case D2I:
 			this.set(INTEGER);
+			return;
 		case I2L:
 		case F2L:
 		case D2L:

@@ -144,7 +144,8 @@ public class GenericType extends Type implements ITypeList
 		return this.theClass == null || this.theClass.isGeneric();
 	}
 	
-	public void addGenerics(Map<String, IType> types)
+	@Override
+	public void addTypeVariables(Map<String, IType> types)
 	{
 		List<ITypeVariable> variables = this.theClass.getTypeVariables();
 		if (variables != null)

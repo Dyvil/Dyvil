@@ -50,6 +50,10 @@ public interface IType extends IASTNode, INamed, IContext
 	 */
 	public boolean isGeneric();
 	
+	public default void addTypeVariables(Map<String, IType> typeVariables)
+	{
+	}
+	
 	/**
 	 * Returns true if this is or contains any type variables.
 	 * 
