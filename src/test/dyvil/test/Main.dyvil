@@ -17,5 +17,5 @@ public class Main
 	
 	public static T get[T]([T] array) = array(0);
 	
-	public static T get[T](List[List[T]] list) = list.get(0).get(0);
+	public static T get[T](List[_ >= List[T]] list) = list.get(0).get(0);
 }

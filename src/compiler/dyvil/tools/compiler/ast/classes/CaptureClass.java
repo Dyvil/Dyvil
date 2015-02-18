@@ -18,7 +18,6 @@ public class CaptureClass extends CodeClass
 		this.var = var;
 		this.name = name;
 		this.qualifiedName = name;
-		this.internalName = superType.getInternalName();
 		this.superType = superType;
 		
 		if (interfaces != null)

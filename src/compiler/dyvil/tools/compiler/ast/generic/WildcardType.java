@@ -158,6 +158,19 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
+	public void addTypeVariables(IType type, Map<String, IType> typeVariables)
+	{
+		if (this.upperBound != null)
+		{
+			this.upperBound.addTypeVariables(type, typeVariables);
+		}
+		for (IType t : this.upperBounds)
+		{
+			t.addTypeVariables(type, typeVariables);
+		}
+	}
+	
+	@Override
 	public boolean hasTypeVariables()
 	{
 		return this.name != null;
@@ -242,6 +255,7 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public IType resolve(List<Marker> markers, IContext context)
 	{
+		this.resolveTypes(markers, context);
 		return this;
 	}
 	
@@ -270,11 +284,31 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
+		if (this.name != null)
 		{
-			buffer.append('[');
+			for (int i = 0; i < this.arrayDimensions; i++)
+			{
+				buffer.append('[');
+			}
+			buffer.append('T').append(this.name).append(';');
 		}
-		buffer.append('T').append(this.name).append(';');
+		else if (this.lowerBound != null)
+		{
+			buffer.append('-');
+			this.lowerBound.appendSignature(buffer);
+		}
+		else
+		{
+			buffer.append('+');
+			if (this.upperBound != null)
+			{
+				this.upperBound.appendSignature(buffer);
+			}
+			else
+			{
+				this.upperBounds.get(0).appendSignature(buffer);
+			}
+		}
 	}
 	
 	@Override

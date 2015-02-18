@@ -218,9 +218,14 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 			if (this.upperBounds.isEmpty())
 			{
 				this.upperBounds = null;
+				
+				if (this.upperBound == null)
+				{
+					this.upperBound = Type.OBJECT;
+				}
 			}
 		}
-		this.captureClass = new CaptureClass(this, this.upperBound == null ? Type.OBJECT : this.upperBound, this.upperBounds, this.lowerBound);
+		this.captureClass = new CaptureClass(this, this.upperBound, this.upperBounds, this.lowerBound);
 	}
 	
 	@Override
