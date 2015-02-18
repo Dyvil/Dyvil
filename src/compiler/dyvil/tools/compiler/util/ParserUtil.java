@@ -129,6 +129,12 @@ public class ParserUtil
 		return type == Tokens.COMMA || type == Tokens.SEMICOLON || (type & Tokens.CLOSE_BRACKET) == Tokens.CLOSE_BRACKET;
 	}
 	
+	public static boolean isTerminator2(int type)
+	{
+		return type == Tokens.DOT || type == Tokens.COMMA || type == Tokens.SEMICOLON || type == Tokens.EQUALS
+				|| (type & Tokens.CLOSE_BRACKET) == Tokens.CLOSE_BRACKET;
+	}
+	
 	public static boolean isSeperator(int type)
 	{
 		return type == Tokens.COMMA || type == Tokens.SEMICOLON;

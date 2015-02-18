@@ -4,7 +4,6 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -163,39 +162,27 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		if (this.field != null)
+		if (this.instance != null)
 		{
-			this.field.resolve(markers, context);
+			this.instance = this.instance.resolve(markers, context);
 		}
-		else
+		
+		this.field = IAccess.resolveField(context, this.instance, this.qualifiedName);
+		
+		if (this.field == null)
 		{
-			FieldMatch match = null;
-			if (this.instance == null)
+			Marker marker = Markers.create(this.position, "resolve.field", this.name);
+			marker.addInfo("Qualified Name: " + this.qualifiedName);
+			if (this.instance != null)
 			{
-				match = context.resolveField(this.qualifiedName);
+				marker.addInfo("Instance Type: " + this.instance.getType());
 			}
-			else
-			{
-				IType type = this.instance.getType();
-				if (type != null)
-				{
-					match = type.resolveField(this.qualifiedName);
-				}
-			}
-			
-			if (match != null)
-			{
-				this.field = match.theField;
-			}
-			else
-			{
-				markers.add(Markers.create(this.position, "resolve.field", this.field));
-			}
-			
-			if (this.value != null)
-			{
-				this.value = this.value.resolve(markers, context);
-			}
+			markers.add(marker);
+		}
+		
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, context);
 		}
 		
 		return this;

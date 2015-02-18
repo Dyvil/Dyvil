@@ -160,6 +160,10 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public void addTypeVariables(IType type, Map<String, IType> typeVariables)
 	{
+		if (this.name != null && this.isSuperTypeOf(type))
+		{
+			typeVariables.put(this.name, type);
+		}
 		if (this.upperBound != null)
 		{
 			this.upperBound.addTypeVariables(type, typeVariables);
@@ -240,6 +244,16 @@ public class WildcardType extends TypeVariable implements IType
 	public IType getSuperType()
 	{
 		return this.upperBound == null ? Type.NONE : this.upperBound;
+	}
+	
+	@Override
+	public boolean equals(IType type)
+	{
+		if (this.arrayDimensions != type.getArrayDimensions())
+		{
+			return false;
+		}
+		return super.isSuperTypeOf(type);
 	}
 	
 	@Override

@@ -487,7 +487,6 @@ public class Method extends Member implements IMethod
 		if (instance != null && mods == Modifiers.INFIX)
 		{
 			instance.addTypeVariables(this.parameters.get(0).type, map);
-			len--;
 			for (int i = 0; i < len; i++)
 			{
 				Parameter par = this.parameters.get(i + 1);

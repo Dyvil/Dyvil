@@ -141,19 +141,18 @@ public interface IType extends IASTNode, INamed, IContext
 		return false;
 	}
 	
-	public default boolean classEquals(IType type)
+	public default boolean equals(IType type)
 	{
-		IClass class1 = this.getTheClass();
-		IClass class2 = type.getTheClass();
-		if (class1 == class2)
-		{
-			return true;
-		}
-		if (class1 == null)
+		if (this.getArrayDimensions() != type.getArrayDimensions())
 		{
 			return false;
 		}
-		return class1.equals(class2);
+		return this.getTheClass() == type.getTheClass();
+	}
+	
+	public default boolean classEquals(IType type)
+	{
+		return this.getTheClass() == type.getTheClass();
 	}
 	
 	// Resolve

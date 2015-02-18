@@ -363,7 +363,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = PARAMETERS;
 			return true;
 		}
-		else if (type == Tokens.TYPE_SYMBOL_ID || !ParserUtil.isIdentifier(type1) && type1 != Tokens.DOT && !ParserUtil.isTerminator(type1))
+		else if (type == Tokens.TYPE_SYMBOL_ID || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
 			call.isSugarCall = true;

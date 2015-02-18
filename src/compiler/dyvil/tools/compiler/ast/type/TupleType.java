@@ -89,12 +89,35 @@ public class TupleType extends Type implements ITypeList
 			{
 				IType t1 = this.types.get(i);
 				IType t2 = tuple.types.get(i);
-				if (!t1.isSuperTypeOf(t2))
+				if (!t1.equals(t2))
 				{
 					return false;
 				}
 			}
 			return true;
+		}
+		else if (type instanceof GenericType)
+		{
+			if (this.theClass == type.getTheClass())
+			{
+				int len = this.types.size();
+				List<IType> generics = ((GenericType) type).generics;
+				if (len != generics.size())
+				{
+					return false;
+				}
+				
+				for (int i = 0; i < len; i++)
+				{
+					IType t1 = this.types.get(i);
+					IType t2 = generics.get(i);
+					if (!t1.equals(t2))
+					{
+						return false;
+					}
+				}
+				return true;
+			}
 		}
 		return OBJECT.classEquals(type);
 	}
@@ -122,7 +145,7 @@ public class TupleType extends Type implements ITypeList
 			{
 				IType t1 = this.types.get(i);
 				IType t2 = tuple.types.get(i);
-				if (!t1.classEquals(t2))
+				if (!t1.equals(t2))
 				{
 					return false;
 				}

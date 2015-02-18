@@ -136,7 +136,8 @@ public interface IValue extends IASTNode, ITyped
 	
 	public default void addTypeVariables(IType type, Map<String, IType> typeVariables)
 	{
-		this.getType().addTypeVariables(type, typeVariables);
+		IType t = this.getType();
+		type.addTypeVariables(t, typeVariables);
 	}
 	
 	public void resolveTypes(List<Marker> markers, IContext context);

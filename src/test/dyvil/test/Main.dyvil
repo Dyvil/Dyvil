@@ -1,6 +1,7 @@
 package dyvil.test
 
 import java.util.{ Arrays, Collections, Map, HashMap, List, ArrayList }
+import dyvil.lang.tuple.Tuple2
 using dyvil.maps.MapUtils._
 using dyvil.collections.ListUtils._
 
@@ -8,14 +9,18 @@ public class Main
 {
 	public static void main([String] args)
 	{
-		List[String] list = List("a", "b", "c")
-		List[List[String]] listOfLists = List(List("a", "b"), List("1", "2"))
-		String s = get(listOfLists)
-		System out println listOfLists
-		System out println s
+		(String, String) tuple = "a" -> "b"
+		System out println tuple
+		swap(tuple)
+		System out println tuple
+		swap(tuple)
+		System out println tuple
 	}
 	
-	public static T get[T]([T] array) = array(0);
-	
-	public static T get[T](List[_ >= List[T]] list) = list.get(0).get(0);
+	public static void swap((_, _) tuple)
+	{
+		Object o = tuple._1;
+		tuple._1 = tuple._2;
+		tuple._2 = o;
+	}
 }

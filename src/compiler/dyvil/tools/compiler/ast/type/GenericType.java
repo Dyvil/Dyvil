@@ -194,6 +194,26 @@ public class GenericType extends Type implements ITypeList
 	}
 	
 	@Override
+	public IType getConcreteType(Map<String, IType> typeVariables)
+	{
+		IType t = super.getConcreteType(typeVariables);
+		if (t != this)
+		{
+			return t;
+		}
+		
+		GenericType copy = this.clone();
+		int len = this.generics.size();
+		for (int i = 0; i < len; i++)
+		{
+			IType t1 = this.generics.get(i);
+			copy.generics.set(i, t1.getConcreteType(typeVariables));
+		}
+		
+		return copy;
+	}
+	
+	@Override
 	public String getSignature()
 	{
 		if (this.generics == null)
@@ -244,5 +264,18 @@ public class GenericType extends Type implements ITypeList
 		{
 			buffer.append(']');
 		}
+	}
+	
+	@Override
+	public GenericType clone()
+	{
+		GenericType t = new GenericType();
+		t.theClass = this.theClass;
+		t.name = this.name;
+		t.qualifiedName = this.qualifiedName;
+		t.fullName = this.fullName;
+		t.arrayDimensions = this.arrayDimensions;
+		t.generics = new ArrayList(this.generics);
+		return t;
 	}
 }
