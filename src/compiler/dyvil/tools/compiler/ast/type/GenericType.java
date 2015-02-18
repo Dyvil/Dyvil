@@ -90,7 +90,7 @@ public class GenericType extends Type implements ITypeList
 				return new WildcardType(this.position, this.arrayDimensions, (CaptureClass) iclass);
 			}
 			
-			if (markers == null || this.generics == null)
+			if (this.generics == null)
 			{
 				return this;
 			}
@@ -99,13 +99,13 @@ public class GenericType extends Type implements ITypeList
 			int len = this.generics.size();
 			if (variables == null)
 			{
-				if (len != 0)
+				if (len != 0 && markers != null)
 				{
 					markers.add(Markers.create(this.position, "generic.not_generic", this.qualifiedName));
 				}
 				return this;
 			}
-			if (variables.size() != len)
+			if (variables.size() != len && markers != null)
 			{
 				markers.add(Markers.create(this.position, "generic.count"));
 				return this;
@@ -120,13 +120,16 @@ public class GenericType extends Type implements ITypeList
 					this.generics.set(i, t2);
 				}
 				
-				ITypeVariable var = variables.get(i);
-				if (!var.isSuperTypeOf(t2))
+				if (markers != null)
 				{
-					Marker marker = Markers.create(t1.getPosition(), "generic.type", var.getQualifiedName());
-					marker.addInfo("Generic Type: " + t2);
-					marker.addInfo("Type Variable: " + var);
-					markers.add(marker);
+					ITypeVariable var = variables.get(i);
+					if (!var.isSuperTypeOf(t2))
+					{
+						Marker marker = Markers.create(t1.getPosition(), "generic.type", var.getQualifiedName());
+						marker.addInfo("Generic Type: " + t2);
+						marker.addInfo("Type Variable: " + var);
+						markers.add(marker);
+					}
 				}
 			}
 			return this;
@@ -145,17 +148,33 @@ public class GenericType extends Type implements ITypeList
 	}
 	
 	@Override
-	public void addTypeVariables(Map<String, IType> types)
+	public void addTypeVariables(IType type, Map<String, IType> typeVariables)
 	{
-		List<ITypeVariable> variables = this.theClass.getTypeVariables();
-		if (variables != null)
+		if (type instanceof ITypeVariable)
 		{
-			int len = Math.min(this.generics.size(), variables.size());
+			if (type.isSuperTypeOf(this))
+			{
+				if (this.arrayDimensions > 0)
+				{
+					typeVariables.put(type.getQualifiedName(), this.getArrayType(this.arrayDimensions - type.getArrayDimensions()));
+				}
+				else
+				{
+					typeVariables.put(type.getQualifiedName(), this);
+				}
+			}
+		}
+		else if (type instanceof GenericType)
+		{
+			List<IType> types = ((GenericType) type).generics;
+			int len = Math.min(this.generics.size(), types.size());
 			for (int i = 0; i < len; i++)
 			{
-				ITypeVariable var = variables.get(i);
-				IType type = this.generics.get(i);
-				types.put(var.getQualifiedName(), type);
+				IType t1 = types.get(i);
+				IType t2 = this.generics.get(i);
+				System.out.println(t1 + " " + t2);
+				t1.addTypeVariables(t2, typeVariables);
+				t2.addTypeVariables(t1, typeVariables);
 			}
 		}
 	}

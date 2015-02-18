@@ -80,7 +80,15 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		}
 		if (this.type == null)
 		{
-			this.type = this.typeArguments != null ? this.method.getType(this.typeArguments) : this.method.getType();
+			if (this.method.hasTypeVariables())
+			{
+				if (this.typeArguments == null)
+				{
+					this.typeArguments = this.method.getTypeMap(this.instance, this.arguments, this.generics);
+				}
+				return this.type = this.method.getType(this.typeArguments);
+			}
+			return this.type = this.method.getType();
 		}
 		return this.type;
 	}
@@ -96,11 +104,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		{
 			return false;
 		}
-		if (this.type == null)
-		{
-			this.type = this.typeArguments != null ? this.method.getType(this.typeArguments) : this.method.getType();
-		}
-		return Type.isSuperType(type, this.type);
+		return Type.isSuperType(type, this.getType());
 	}
 	
 	@Override
@@ -242,7 +246,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		
 		if (this.method != null)
 		{
-			if (this.method.hasTypeVariables())
+			if (this.typeArguments == null && this.method.hasTypeVariables())
 			{
 				this.typeArguments = this.method.getTypeMap(this.instance, this.arguments, this.generics);
 			}

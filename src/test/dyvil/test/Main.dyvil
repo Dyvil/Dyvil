@@ -8,9 +8,14 @@ public class Main
 {
 	public static void main([String] args)
 	{
-		String s = get0 { "a", "b" }
+		List[String] list = List("a", "b", "c")
+		list += 1
+		String s = get(list)
 		System out println s
+		System out println list
 	}
 	
-	public static T get0[T]([T] arr) = arr(0);
+	public static T get[T]([T] array) = array(0);
+	
+	public static T get[T](List[T] list) = list.get(0);
 }

@@ -134,9 +134,9 @@ public interface IValue extends IASTNode, ITyped
 	
 	public int getTypeMatch(IType type);
 	
-	public default void addGenerics(IType type, Map<String, IType> typeVariables)
+	public default void addTypeVariables(IType type, Map<String, IType> typeVariables)
 	{
-		this.getType().addTypeVariables(typeVariables);
+		this.getType().addTypeVariables(type, typeVariables);
 	}
 	
 	public void resolveTypes(List<Marker> markers, IContext context);

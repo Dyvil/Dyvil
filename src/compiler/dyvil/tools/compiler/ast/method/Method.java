@@ -486,31 +486,31 @@ public class Method extends Member implements IMethod
 		int mods = this.modifiers & Modifiers.INFIX;
 		if (instance != null && mods == Modifiers.INFIX)
 		{
-			instance.addGenerics(this.parameters.get(0).type, map);
+			instance.addTypeVariables(this.parameters.get(0).type, map);
 			len--;
 			for (int i = 0; i < len; i++)
 			{
 				Parameter par = this.parameters.get(i + 1);
 				IValue v = arguments.get(i);
-				v.addGenerics(par.type, map);
+				v.addTypeVariables(par.type, map);
 			}
 			return map;
 		}
 		if (instance == null && len == 1 && (this.modifiers & Modifiers.PREFIX) != 0)
 		{
-			arguments.get(0).addGenerics(this.parameters.get(0).type, map);
+			arguments.get(0).addTypeVariables(this.parameters.get(0).type, map);
 			return map;
 		}
 		
 		if (instance != null)
 		{
-			instance.addGenerics(this.theClass.getThisType(), map);
+			instance.addTypeVariables(this.theClass.getThisType(), map);
 		}
 		for (int i = 0; i < len; i++)
 		{
 			Parameter par = this.parameters.get(i);
 			IValue v = arguments.get(i);
-			v.addGenerics(par.type, map);
+			v.addTypeVariables(par.type, map);
 		}
 		return map;
 	}

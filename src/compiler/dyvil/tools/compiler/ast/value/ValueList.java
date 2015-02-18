@@ -186,7 +186,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void addGenerics(IType type, Map<String, IType> typeVariables)
+	public void addTypeVariables(IType type, Map<String, IType> typeVariables)
 	{
 		if (type.isArrayType())
 		{
