@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
@@ -23,6 +24,7 @@ import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -447,10 +449,15 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		if (this.generics != null)
 		{
+			GenericType type = new GenericType(this);
+			
 			for (ITypeVariable v : this.generics)
 			{
 				v.resolveTypes(markers, context);
+				type.addType(new WildcardType(null, 0, v.getCaptureClass()));
 			}
+			
+			this.type = type;
 		}
 		
 		if (this.superType != null)
@@ -633,7 +640,7 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public Type getThisType()
 	{
-		return new Type(this);
+		return this.type;
 	}
 	
 	@Override

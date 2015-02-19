@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.generic;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -160,17 +161,20 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public void addTypeVariables(IType type, Map<String, IType> typeVariables)
 	{
-		if (this.name != null && this.isSuperTypeOf(type))
+		if (this.name != null)
 		{
 			typeVariables.put(this.name, type);
 		}
 		if (this.upperBound != null)
 		{
-			this.upperBound.addTypeVariables(type, typeVariables);
+			type.addTypeVariables(this.upperBound, typeVariables);
 		}
-		for (IType t : this.upperBounds)
+		if (this.upperBounds != null)
 		{
-			t.addTypeVariables(type, typeVariables);
+			for (IType t : this.upperBounds)
+			{
+				type.addTypeVariables(t, typeVariables);
+			}
 		}
 	}
 	
@@ -195,7 +199,29 @@ public class WildcardType extends TypeVariable implements IType
 				return t;
 			}
 		}
-		return this;
+		
+		WildcardType type = new WildcardType(this.position);
+		if (this.lowerBound != null)
+		{
+			type.lowerBound = this.lowerBound.getConcreteType(typeVariables);
+		}
+		if (this.upperBound != null)
+		{
+			type.upperBound = this.upperBound.getConcreteType(typeVariables);
+		}
+		if (this.upperBounds != null)
+		{
+			int len = this.upperBounds.size();
+			if (len > 0)
+			{
+				type.upperBounds = new ArrayList(len);
+				for (int i = 0; i < len; i++)
+				{
+					type.upperBounds.add(this.upperBounds.get(i).getConcreteType(typeVariables));
+				}
+			}
+		}
+		return type;
 	}
 	
 	@Override
@@ -282,7 +308,15 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public String getInternalName()
 	{
-		return this.upperBound == null ? "java/lang/Object" : this.upperBound.getInternalName();
+		if (this.upperBound != null)
+		{
+			return this.upperBound.getInternalName();
+		}
+		if (this.upperBounds != null && !this.upperBounds.isEmpty())
+		{
+			return this.upperBounds.get(0).getInternalName();
+		}
+		return "java/lang/Object";
 	}
 	
 	@Override

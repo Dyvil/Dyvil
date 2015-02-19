@@ -150,20 +150,6 @@ public class GenericType extends Type implements ITypeList
 	@Override
 	public void addTypeVariables(IType type, Map<String, IType> typeVariables)
 	{
-		if (type instanceof ITypeVariable)
-		{
-			if (type.isSuperTypeOf(this))
-			{
-				if (this.arrayDimensions > 0)
-				{
-					typeVariables.put(type.getQualifiedName(), this.getArrayType(this.arrayDimensions - type.getArrayDimensions()));
-				}
-				else
-				{
-					typeVariables.put(type.getQualifiedName(), this);
-				}
-			}
-		}
 		if (this.generics != null)
 		{
 			if (type instanceof GenericType)
@@ -174,22 +160,20 @@ public class GenericType extends Type implements ITypeList
 				{
 					IType t1 = types.get(i);
 					IType t2 = this.generics.get(i);
-					t1.addTypeVariables(t2, typeVariables);
+					
+					if (!t2.equals(t1) && !t1.equals(t2))
+					{
+						return;
+					}
 					t2.addTypeVariables(t1, typeVariables);
 				}
+				return;
 			}
-			
-			List<ITypeVariable> variables = this.theClass.getTypeVariables();
-			if (variables != null)
-			{
-				int len = Math.min(this.generics.size(), variables.size());
-				for (int i = 0; i < len; i++)
-				{
-					ITypeVariable var = variables.get(i);
-					IType type1 = this.generics.get(i);
-					typeVariables.put(var.getQualifiedName(), type);
-				}
-			}
+		}
+		
+		if (type instanceof ITypeVariable)
+		{
+			type.addTypeVariables(this, typeVariables);
 		}
 	}
 	
@@ -203,11 +187,14 @@ public class GenericType extends Type implements ITypeList
 		}
 		
 		GenericType copy = this.clone();
-		int len = this.generics.size();
-		for (int i = 0; i < len; i++)
+		if (this.generics != null)
 		{
-			IType t1 = this.generics.get(i);
-			copy.generics.set(i, t1.getConcreteType(typeVariables));
+			int len = this.generics.size();
+			for (int i = 0; i < len; i++)
+			{
+				IType t1 = this.generics.get(i);
+				copy.generics.set(i, t1.getConcreteType(typeVariables));
+			}
 		}
 		
 		return copy;
@@ -275,7 +262,10 @@ public class GenericType extends Type implements ITypeList
 		t.qualifiedName = this.qualifiedName;
 		t.fullName = this.fullName;
 		t.arrayDimensions = this.arrayDimensions;
-		t.generics = new ArrayList(this.generics);
+		if (this.generics != null)
+		{
+			t.generics = new ArrayList(this.generics);
+		}
 		return t;
 	}
 }

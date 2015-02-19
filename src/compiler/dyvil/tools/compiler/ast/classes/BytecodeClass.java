@@ -8,12 +8,14 @@ import jdk.internal.org.objectweb.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
+import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.AnnotationVisitorImpl;
@@ -74,10 +76,15 @@ public class BytecodeClass extends CodeClass
 		
 		if (this.generics != null)
 		{
+			GenericType type = new GenericType(this);
+			
 			for (ITypeVariable v : this.generics)
 			{
 				v.resolveTypes(markers, context);
+				type.addType(new WildcardType(null, 0, v.getCaptureClass()));
 			}
+			
+			this.type = type;
 		}
 		
 		if (this.superType != null)

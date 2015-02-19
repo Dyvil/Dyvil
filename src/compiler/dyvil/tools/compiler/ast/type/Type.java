@@ -358,6 +358,23 @@ public class Type extends ASTNode implements IType
 		return null;
 	}
 	
+
+	@Override
+	public boolean equals(IType type)
+	{
+		if (this.arrayDimensions != type.getArrayDimensions())
+		{
+			return false;
+		}
+		return this.theClass == type.getTheClass();
+	}
+	
+	@Override
+	public boolean classEquals(IType type)
+	{
+		return this.theClass == type.getTheClass();
+	}
+	
 	// Resolve
 	
 	@Override
@@ -607,48 +624,6 @@ public class Type extends ASTNode implements IType
 		{
 			buffer.append(']');
 		}
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + this.arrayDimensions;
-		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
-		return result;
-	}
-	
-	@Override
-	public final boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
-			return true;
-		}
-		if (obj == null)
-		{
-			return false;
-		}
-		if (!(obj instanceof Type))
-		{
-			return false;
-		}
-		IType other = (IType) obj;
-		if (this.arrayDimensions != other.getArrayDimensions())
-		{
-			return false;
-		}
-		return this.classEquals(other);
-	}
-	
-	public boolean equals(IType type)
-	{
-		if (this.arrayDimensions != type.getArrayDimensions())
-		{
-			return false;
-		}
-		return this.classEquals(type);
 	}
 	
 	@Override

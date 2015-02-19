@@ -538,9 +538,13 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	{
 		this.method.writeCall(writer, this.instance, this.arguments);
 		
-		if (this.type != null && this.type != this.method.getType())
+		if (this.type != null)
 		{
-			writer.visitTypeInsn(Opcodes.CHECKCAST, this.type);
+			IType methodType = this.method.getType();
+			if (this.type != methodType && !Type.isSuperType(this.type, methodType))
+			{
+				writer.visitTypeInsn(Opcodes.CHECKCAST, this.type);
+			}
 		}
 	}
 	

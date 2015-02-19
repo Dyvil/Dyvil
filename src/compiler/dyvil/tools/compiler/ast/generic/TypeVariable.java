@@ -86,7 +86,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	}
 	
 	@Override
-	public IClass getCaptureClass()
+	public CaptureClass getCaptureClass()
 	{
 		return this.captureClass;
 	}
