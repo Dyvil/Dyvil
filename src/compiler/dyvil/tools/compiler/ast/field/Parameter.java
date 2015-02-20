@@ -268,13 +268,14 @@ public class Parameter extends Member implements IVariable
 		if (this.isVarargs())
 		{
 			this.type.getElementType().toString(prefix, buffer);
-			buffer.append("...");
+			buffer.append("... ");
 		}
 		else
 		{
 			this.type.toString(prefix, buffer);
+			buffer.append(' ');
 		}
-		buffer.append(' ').append(this.name);
+		buffer.append(this.name);
 		
 		if (this.defaultValue != null)
 		{

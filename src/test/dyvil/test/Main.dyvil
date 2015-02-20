@@ -8,13 +8,6 @@ public class Main
 {
 	public static void main([String] args)
 	{
-		List[List[String]] list = List(List("a", "b", "c"), List("d", "e", "f"))
-		Map[String,List[String]] map = Map("a" -> List("a", "A"), "b" -> List("b", "B"))
-		System out println list
-		System out println map
+		(String) => String func = s => s + "a";
 	}
-	
-	public static T get[T]([T] array) = array(0);
-	
-	public static T get[T](List[_ >= List[T]] list) = list.get(0).get(0);
 }

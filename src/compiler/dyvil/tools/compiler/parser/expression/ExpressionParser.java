@@ -8,10 +8,7 @@ import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.statement.*;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.TupleType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -189,6 +186,19 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					pm.popParser();
 					pm.pushParser(new ExpressionParser(lv));
 					return true;
+				}
+				
+				if (this.value.getValueType() == IValue.TUPLE)
+				{
+					TupleType tt = getTupleType((TupleValue) this.value);
+					if (tt != null)
+					{
+						LambdaType lt = new LambdaType(tt);
+						pm.pushParser(new TypeParser(lt));
+						this.value = new ClassAccess(null, lt);
+						this.mode = VARIABLE;
+						return true;
+					}
 				}
 				return false;
 			}
@@ -458,39 +468,47 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	
 	private static LambdaValue getLambdaValue(IValue value)
 	{
-		List<Parameter> params = new ArrayList();
-		
-		int i = value.getValueType();
-		if (i == IValue.CLASS_ACCESS)
+		int type = value.getValueType();
+		if (type == IValue.CLASS_ACCESS)
 		{
 			ClassAccess ca = (ClassAccess) value;
 			Parameter param = new Parameter();
 			param.setName(ca.type.getName(), ca.type.getQualifiedName());
-			params.add(param);
+			return new LambdaValue(ca.getPosition(), param);
 		}
-		else if (i == IValue.TUPLE)
+		
+		if (type != IValue.TUPLE)
 		{
-			for (IValue v : ((TupleValue) value).getValues())
-			{
-				if (v.getValueType() != IValue.METHOD_CALL)
-				{
-					return null;
-				}
-				MethodCall mc = (MethodCall) v;
-				
-				v = mc.getValue();
-				if (!mc.dotless || v.getValueType() != IValue.CLASS_ACCESS)
-				{
-					return null;
-				}
-				
-				ClassAccess ca = (ClassAccess) v;
-				Parameter param = new Parameter();
-				param.setName(mc.name, mc.qualifiedName);
-				param.setType(ca.type);
-				params.add(param);
-			}
+			return null;
 		}
+		List<Parameter> params = new ArrayList();
+		
+		for (IValue v : ((TupleValue) value).getValues())
+		{
+			type = v.getValueType();
+			if (type == IValue.FIELD_ACCESS)
+			{
+				FieldAccess fa = (FieldAccess) v;
+				if (!fa.dotless)
+				{
+					return null;
+				}
+				
+				if (fa.instance.getValueType() != IValue.CLASS_ACCESS)
+				{
+					return null;
+				}
+				
+				Parameter param = new Parameter();
+				param.setName(fa.name, fa.qualifiedName);
+				param.setType(((ClassAccess) fa.instance).type);
+				params.add(param);
+				continue;
+			}
+			
+			return null;
+		}
+		
 		return new LambdaValue(value.getPosition(), params);
 	}
 	

@@ -11,10 +11,10 @@ import dyvil.tools.compiler.util.Util;
 
 public class TupleType extends Type implements ITypeList
 {
-	public static IClass[]	tupleClasses	= new IClass[22];
-	public static String[]	descriptors		= new String[22];
+	public static final IClass[]	tupleClasses	= new IClass[22];
+	public static final String[]	descriptors		= new String[22];
 	
-	public List<IType>		types			= new ArrayList(2);
+	public List<IType>				types			= new ArrayList(2);
 	
 	public TupleType()
 	{
@@ -171,12 +171,6 @@ public class TupleType extends Type implements ITypeList
 			}
 		}
 		return this;
-	}
-	
-	@Override
-	public String getInternalName()
-	{
-		return "dyvil/lang/tuple/Tuple" + this.types.size();
 	}
 	
 	public String getConstructorDescriptor()

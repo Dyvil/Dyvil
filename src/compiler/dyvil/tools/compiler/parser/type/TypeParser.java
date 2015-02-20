@@ -66,12 +66,10 @@ public class TypeParser extends Parser implements ITyped
 					this.mode = GENERICS;
 					return true;
 				}
-				else
-				{
-					this.type = new Type(token, token.value());
-					this.mode = ARRAY_END;
-					return true;
-				}
+				
+				this.type = new Type(token, token.value());
+				this.mode = ARRAY_END;
+				return true;
 			}
 			if (type == Tokens.WILDCARD)
 			{
@@ -226,6 +224,10 @@ public class TypeParser extends Parser implements ITyped
 		else if (this.boundMode == LOWER)
 		{
 			((ITypeVariable) this.type).setLowerBound(type);
+		}
+		else
+		{
+			((ITyped) this.type).setType(type);
 		}
 	}
 	

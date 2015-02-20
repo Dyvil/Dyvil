@@ -7,10 +7,14 @@ import jdk.internal.org.objectweb.asm.Handle;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
+import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.IParameterized;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -19,23 +23,31 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class LambdaValue extends ASTNode implements IValue, IValued, IParameterized
+public final class LambdaValue extends ASTNode implements IValue, IValued, IParameterized, IContext
 {
-	public static final Handle	BOOTSTRAP	= new Handle(
-													Opcodes.H_INVOKESTATIC,
-													"java/lang/invoke/LambdaMetafactory",
-													"metafactory",
-													"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
+	public static final Handle	BOOTSTRAP	= new Handle(Opcodes.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
+													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
+															+ "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodHandle;"
+															+ "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
 	public List<Parameter>		parameters;
 	public IValue				value;
 	
 	protected IType				type;
 	protected IMethod			method;
 	
+	private IContext			context;
+	
 	public LambdaValue(ICodePosition position)
 	{
 		this.position = position;
 		this.parameters = new ArrayList();
+	}
+	
+	public LambdaValue(ICodePosition position, Parameter parameter)
+	{
+		this.position = position;
+		this.parameters = new ArrayList(1);
+		this.parameters.add(parameter);
 	}
 	
 	public LambdaValue(ICodePosition position, List<Parameter> parameters)
@@ -107,6 +119,15 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IPara
 			IMethod method = iclass.getFunctionalMethod();
 			if (method != null)
 			{
+				if (this.parameters.size() == 1)
+				{
+					Parameter param = this.parameters.get(0);
+					if (param.type == null)
+					{
+						param.type = method.getParameters().get(0).type;
+					}
+				}
+				
 				this.type = type;
 				this.method = method;
 				return this;
@@ -142,25 +163,101 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IPara
 	{
 		for (Parameter p : this.parameters)
 		{
-			p.resolveTypes(markers, context);
+			if (p.type != null)
+			{
+				p.type = p.type.resolve(markers, context);
+			}
 		}
+		
+		this.value.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
+		this.context = context;
+		this.value = this.value.resolve(markers, this);
 		return this;
 	}
 	
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
+		this.value.check(markers, context);
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
+		this.value = this.value.foldConstants();
 		return this;
+	}
+	
+	@Override
+	public IType getThisType()
+	{
+		return this.context.getThisType();
+	}
+	
+	@Override
+	public Package resolvePackage(String name)
+	{
+		return this.context.resolvePackage(name);
+	}
+	
+	@Override
+	public IClass resolveClass(String name)
+	{
+		return this.context.resolveClass(name);
+	}
+	
+	@Override
+	public FieldMatch resolveField(String name)
+	{
+		if (this.method != null)
+		{
+			for (Parameter param : this.parameters)
+			{
+				if (param.isName(name))
+				{
+					return new FieldMatch(param, 1);
+				}
+			}
+		}
+		
+		// TODO Capturing Variables
+		
+		return this.context.resolveField(name);
+	}
+	
+	@Override
+	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
+	{
+		return this.context.resolveMethod(instance, name, arguments);
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
+	{
+		this.context.getMethodMatches(list, instance, name, arguments);
+	}
+	
+	@Override
+	public MethodMatch resolveConstructor(List<IValue> arguments)
+	{
+		return this.context.resolveConstructor(arguments);
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	{
+		this.context.getConstructorMatches(list, arguments);
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		return this.context.getAccessibility(member);
 	}
 	
 	@Override
@@ -183,7 +280,17 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IPara
 		}
 		else if (len == 1)
 		{
-			this.parameters.get(0).toString(prefix, buffer);
+			Parameter param = this.parameters.get(0);
+			if (param.type != null)
+			{
+				buffer.append('(');
+				param.toString(prefix, buffer);
+				buffer.append(')');
+			}
+			else
+			{
+				buffer.append(param.name);
+			}
 		}
 		else
 		{
