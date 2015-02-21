@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.LambdaType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -42,6 +43,9 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 	private IContext			context;
 	private int					index;
 	
+	private String				owner;
+	private String				name;
+	private String				desc;
 	private List<IVariable>		capturedFields;
 	
 	public LambdaValue(ICodePosition position)
@@ -114,33 +118,58 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 	@Override
 	public IType getType()
 	{
-		return this.type == null ? Type.NONE : this.type;
+		if (this.type == null)
+		{
+			LambdaType lt = new LambdaType();
+			for (Parameter param : this.parameters)
+			{
+				lt.argumentTypes.add(param.type == null ? Type.NONE : param.type);
+			}
+			lt.returnType = this.value.getType();
+			this.type = lt;
+			return lt;
+		}
+		return this.type;
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
 		IClass iclass = type.getTheClass();
-		if (iclass != null)
+		if (iclass == null)
 		{
-			IMethod method = iclass.getFunctionalMethod();
-			if (method != null)
+			return null;
+		}
+		IMethod method = iclass.getFunctionalMethod();
+		if (method == null)
+		{
+			return null;
+		}
+		
+		List<Parameter> params = method.getParameters();
+		int len = this.parameters.size();
+		if (len != params.size())
+		{
+			return null;
+		}
+		for (int i = 0; i < len; i++)
+		{
+			Parameter lambdaParam = this.parameters.get(i);
+			Parameter param = params.get(i);
+			if (lambdaParam.type == null)
 			{
-				if (this.parameters.size() == 1)
-				{
-					Parameter param = this.parameters.get(0);
-					if (param.type == null)
-					{
-						param.type = method.getParameters().get(0).type;
-					}
-				}
-				
-				this.type = type;
-				this.method = method;
-				return this;
+				lambdaParam.type = param.type;
+				continue;
+			}
+			if (!param.type.equals(lambdaParam.type))
+			{
+				return null;
 			}
 		}
-		return null;
+		
+		this.type = type;
+		this.method = method;
+		return this;
 	}
 	
 	@Override
@@ -185,6 +214,7 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 		IClass iclass = context.getThisType().getTheClass();
 		if (iclass != null)
 		{
+			this.owner = iclass.getInternalName();
 			ClassBody body = iclass.getBody();
 			if (body != null)
 			{
@@ -245,12 +275,20 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 			}
 		}
 		
-		// TODO Capturing Variables
-		
 		FieldMatch match = this.context.resolveField(name);
 		if (match != null && match.theField instanceof IVariable)
 		{
-			this.capturedFields.add((IVariable) match.theField);
+			IVariable var = (IVariable) match.theField;
+			if (this.capturedFields == null)
+			{
+				this.capturedFields = new ArrayList();
+				this.capturedFields.add(var);
+				return match;
+			}
+			if (!this.capturedFields.contains(var))
+			{
+				this.capturedFields.add(var);
+			}
 		}
 		
 		return match;
@@ -288,12 +326,44 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 	
 	@Override
 	public void writeExpression(MethodWriter writer)
-	{		
+	{
+		int len = 0;
+		if (this.capturedFields != null)
+		{
+			len = this.capturedFields.size();
+			for (int i = 0; i < len; i++)
+			{
+				this.capturedFields.get(i).writeGet(writer, null);
+			}
+		}
+		
+		String desc = this.getDescriptor();
+		String name = this.method.getQualifiedName();
+		jdk.internal.org.objectweb.asm.Type type = jdk.internal.org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
+		IType returnType = this.method.getType();
+		Handle handle = new Handle(Opcodes.H_INVOKESTATIC, this.owner, this.name, this.desc);
+		writer.visitInvokeDynamicInsn(name, desc, len, this.type, BOOTSTRAP, type, handle, type);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+	}
+	
+	private String getDescriptor()
+	{
+		StringBuilder buffer = new StringBuilder();
+		buffer.append('(');
+		if (this.capturedFields != null)
+		{
+			for (IVariable var : this.capturedFields)
+			{
+				var.getType().appendExtendedName(buffer);
+			}
+		}
+		buffer.append(')');
+		this.type.appendExtendedName(buffer);
+		return buffer.toString();
 	}
 	
 	private String getDescriptor(List<Parameter> params, IType returnType)
@@ -321,11 +391,12 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 	{
 		IType returnType = this.method.getType();
 		List<Parameter> params = this.method.getParameters();
-		String name = "lambda$" + this.index;
+		this.name = "lambda$" + this.index;
+		this.desc = this.getDescriptor(params, returnType);
 		// TODO Instance Lambdas (capturing this)
 		// TODO Exceptions
-		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC, name, this.getDescriptor(params, returnType),
-				null, null));
+		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC, this.name, this.desc, null,
+				null));
 		
 		// Updated Captured Field Indexes
 		

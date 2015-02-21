@@ -901,6 +901,32 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
 	}
 	
+	public void visitInvokeDynamicInsn(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs)
+	{
+		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+		for (int i = 0; i < args; i++)
+		{
+			this.pop();
+		}
+		if (returnType != null)
+		{
+			this.push(returnType);
+		}
+	}
+	
+	public void visitInvokeDynamicInsn(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs)
+	{
+		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+		for (int i = 0; i < args; i++)
+		{
+			this.pop();
+		}
+		if (returnType != null)
+		{
+			this.push(returnType);
+		}
+	}
+	
 	@Override
 	public void visitEnd()
 	{

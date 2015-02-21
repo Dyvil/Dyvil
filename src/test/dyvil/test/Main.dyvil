@@ -8,6 +8,7 @@ public class Main
 {
 	public static void main([String] args)
 	{
-		(String) => String func = s => s + "a";
+		Runnable r1 = () => System out println "Hello Lambda"
+		r1 run
 	}
 }
