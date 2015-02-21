@@ -3,20 +3,16 @@ package dyvil.tools.compiler.ast.method;
 import java.util.List;
 import java.util.Map;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
-public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower, IParameterized, IContext
+public interface IMethod extends IBaseMethod, IMember, IGeneric, IThrower
 {
 	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments);
 	
@@ -39,8 +35,6 @@ public interface IMethod extends IASTNode, IMember, IGeneric, IValued, IThrower,
 	public String getSignature();
 	
 	public String[] getExceptions();
-	
-	public void write(ClassWriter writer);
 	
 	public void writeCall(MethodWriter writer, IValue instance, List<IValue> arguments);
 	

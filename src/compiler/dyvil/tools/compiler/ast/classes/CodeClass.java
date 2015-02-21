@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -952,6 +953,14 @@ public class CodeClass extends ASTNode implements IClass
 			for (IClass iclass : this.body.classes)
 			{
 				iclass.writeInnerClassInfo(writer);
+			}
+			
+			if (this.body.lambdas != null)
+			{
+				for (IBaseMethod m : this.body.lambdas)
+				{
+					m.write(writer);
+				}
 			}
 		}
 		else

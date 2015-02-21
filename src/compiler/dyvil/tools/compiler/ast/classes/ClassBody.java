@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Parameter;
+import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -18,11 +19,13 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassBody extends ASTNode
 {
-	public IClass			theClass;
-	public List<IClass>		classes		= new ArrayList();
-	public List<IField>		fields		= new ArrayList();
-	public List<IMethod>	methods		= new ArrayList();
-	public List<IProperty>	properties	= new ArrayList();
+	public IClass				theClass;
+	public List<IClass>			classes		= new ArrayList();
+	public List<IField>			fields		= new ArrayList();
+	public List<IMethod>		methods		= new ArrayList();
+	public List<IProperty>		properties	= new ArrayList();
+	
+	public List<IBaseMethod>	lambdas;
 	
 	public ClassBody(ICodePosition position)
 	{
@@ -142,6 +145,15 @@ public class ClassBody extends ASTNode
 			return method;
 		}
 		return null;
+	}
+	
+	public void addLambda(IBaseMethod lambda)
+	{
+		if (this.lambdas == null)
+		{
+			this.lambdas = new ArrayList(2);
+		}
+		this.lambdas.add(lambda);
 	}
 	
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)

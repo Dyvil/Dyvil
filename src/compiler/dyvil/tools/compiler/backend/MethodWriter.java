@@ -2,6 +2,7 @@ package dyvil.tools.compiler.backend;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.Handle;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.reflect.Opcodes;
@@ -891,6 +892,13 @@ public final class MethodWriter extends MethodVisitor
 		{
 			this.push(returnType);
 		}
+	}
+	
+	@Override
+	@Deprecated
+	public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs)
+	{
+		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
 	}
 	
 	@Override

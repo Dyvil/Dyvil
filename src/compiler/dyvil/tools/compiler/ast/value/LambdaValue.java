@@ -3,15 +3,18 @@ package dyvil.tools.compiler.ast.value;
 import java.util.ArrayList;
 import java.util.List;
 
+import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Handle;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.IParameterized;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -21,9 +24,10 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
-public final class LambdaValue extends ASTNode implements IValue, IValued, IParameterized, IContext
+public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 {
 	public static final Handle	BOOTSTRAP	= new Handle(Opcodes.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
@@ -36,6 +40,9 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IPara
 	protected IMethod			method;
 	
 	private IContext			context;
+	private int					index;
+	
+	private List<IVariable>		capturedFields;
 	
 	public LambdaValue(ICodePosition position)
 	{
@@ -175,14 +182,25 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IPara
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		this.context = context;
-		this.value = this.value.resolve(markers, this);
+		IClass iclass = context.getThisType().getTheClass();
+		if (iclass != null)
+		{
+			ClassBody body = iclass.getBody();
+			if (body != null)
+			{
+				body.addLambda(this);
+				this.index = body.lambdas.size();
+			}
+		}
+		
 		return this;
 	}
 	
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
+		this.context = context;
+		this.value = this.value.resolve(markers, this);
 		this.value.check(markers, context);
 	}
 	
@@ -196,6 +214,8 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IPara
 	@Override
 	public IType getThisType()
 	{
+		// TODO Capture this
+		
 		return this.context.getThisType();
 	}
 	
@@ -227,7 +247,13 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IPara
 		
 		// TODO Capturing Variables
 		
-		return this.context.resolveField(name);
+		FieldMatch match = this.context.resolveField(name);
+		if (match != null && match.theField instanceof IVariable)
+		{
+			this.capturedFields.add((IVariable) match.theField);
+		}
+		
+		return match;
 	}
 	
 	@Override
@@ -262,12 +288,91 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IPara
 	
 	@Override
 	public void writeExpression(MethodWriter writer)
-	{
+	{		
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+	}
+	
+	private String getDescriptor(List<Parameter> params, IType returnType)
+	{
+		StringBuilder buffer = new StringBuilder();
+		buffer.append('(');
+		if (this.capturedFields != null)
+		{
+			for (IVariable var : this.capturedFields)
+			{
+				var.getType().appendExtendedName(buffer);
+			}
+		}
+		for (Parameter par : params)
+		{
+			par.type.appendExtendedName(buffer);
+		}
+		buffer.append(')');
+		returnType.appendExtendedName(buffer);
+		return buffer.toString();
+	}
+	
+	@Override
+	public void write(ClassWriter writer)
+	{
+		IType returnType = this.method.getType();
+		List<Parameter> params = this.method.getParameters();
+		String name = "lambda$" + this.index;
+		// TODO Instance Lambdas (capturing this)
+		// TODO Exceptions
+		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC, name, this.getDescriptor(params, returnType),
+				null, null));
+		
+		// Updated Captured Field Indexes
+		
+		int len = 0;
+		int[] prevIndex = null;
+		
+		if (this.capturedFields != null)
+		{
+			len = this.capturedFields.size();
+			prevIndex = new int[len];
+			for (int i = 0; i < len; i++)
+			{
+				IVariable var = this.capturedFields.get(i);
+				prevIndex[i] = var.getIndex();
+				var.setIndex(i);
+				
+				mw.visitParameter(var.getQualifiedName(), var.getType(), i);
+			}
+		}
+		
+		int len1 = params.size();
+		for (int i = 0; i < len1; i++)
+		{
+			Parameter param = params.get(i);
+			param.index = i + len;
+			mw.visitParameter(param.qualifiedName, param.type, param.index);
+		}
+		
+		// Write the Value
+		
+		mw.visitCode();
+		this.value.writeExpression(mw);
+		mw.visitEnd(this.method.getType());
+		
+		// Reset Captured Field Indexes
+		
+		for (int i = 0; i < len; i++)
+		{
+			IVariable var = this.capturedFields.get(i);
+			var.setIndex(prevIndex[i]);
+		}
+		
+		for (int i = 0; i < len1; i++)
+		{
+			Parameter param = params.get(i);
+			param.index = i;
+		}
 	}
 	
 	@Override
