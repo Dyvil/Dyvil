@@ -105,6 +105,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.prefix = true;
 				return this.getAccess(pm, token.value(), token, type);
 			}
+			if (type == Tokens.ARROW_OPERATOR)
+			{
+				this.mode = ACCESS | VARIABLE;
+				pm.pushParser(new TypeParser(this), true);
+				return true;
+			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.mode = ACCESS | VARIABLE | LAMBDA;
@@ -200,6 +206,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 						return true;
 					}
 				}
+				
 				return false;
 			}
 		}
@@ -481,6 +488,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			return null;
 		}
+		
 		List<Parameter> params = new ArrayList();
 		
 		for (IValue v : ((TupleValue) value).getValues())

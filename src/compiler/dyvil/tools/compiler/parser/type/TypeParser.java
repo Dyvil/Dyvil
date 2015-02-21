@@ -58,6 +58,14 @@ public class TypeParser extends Parser implements ITyped
 				this.arrayDimensions2++;
 				return true;
 			}
+			if (type == Tokens.ARROW_OPERATOR)
+			{
+				LambdaType lt = new LambdaType();
+				this.type = lt;
+				pm.pushParser(new TypeParser(lt));
+				this.mode = LAMBDA_END;
+				return true;
+			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				if (token.next().isType(Tokens.OPEN_SQUARE_BRACKET))
