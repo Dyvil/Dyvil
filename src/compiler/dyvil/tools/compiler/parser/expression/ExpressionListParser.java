@@ -21,13 +21,13 @@ public class ExpressionListParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		
 		if (this.mode == 0)
@@ -36,12 +36,12 @@ public class ExpressionListParser extends Parser implements IValued
 			{
 				this.label = token.value();
 				pm.skip();
-				return true;
+				return;
 			}
 			
 			this.mode = 1;
 			pm.pushParser(new ExpressionParser(this), true);
-			return true;
+			return;
 		}
 		if (this.mode == 1)
 		{
@@ -49,20 +49,20 @@ public class ExpressionListParser extends Parser implements IValued
 			{
 				this.valueList.setArray(true);
 				this.mode = 0;
-				return true;
+				return;
 			}
 			if (type == Tokens.SEMICOLON)
 			{
 				this.mode = 0;
-				return true;
+				return;
 			}
 			if (token.prev().type() == Tokens.CLOSE_CURLY_BRACKET)
 			{
 				pm.pushParser(new ExpressionParser(this), true);
-				return true;
+				return;
 			}
+			throw new SyntaxError(token, "Invalid Token '" + token.value() + "'");
 		}
-		return false;
 	}
 	
 	@Override

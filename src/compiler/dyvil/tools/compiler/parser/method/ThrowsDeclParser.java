@@ -21,33 +21,32 @@ public class ThrowsDeclParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		
 		if (this.mode == 0)
 		{
 			pm.pushParser(new TypeParser(this), true);
 			this.mode = 1;
-			return true;
+			return;
 		}
 		if (this.mode == 1)
 		{
 			if (ParserUtil.isSeperator(type))
 			{
 				this.mode = 0;
-				return true;
+				return;
 			}
 			
 			pm.popParser(true);
-			return true;
+			return;
 		}
-		return false;
 	}
 	
 	@Override

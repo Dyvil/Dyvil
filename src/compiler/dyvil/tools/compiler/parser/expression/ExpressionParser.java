@@ -61,13 +61,13 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == 0 || type == Tokens.SEMICOLON)
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		
 		if (this.isInMode(VALUE))
@@ -82,13 +82,13 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				{
 					pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				}
-				return true;
+				return;
 			}
 			if (type == Tokens.OPEN_SQUARE_BRACKET)
 			{
 				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
-				return true;
+				return;
 			}
 			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
@@ -100,85 +100,84 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				{
 					pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				}
-				return true;
+				return;
 			}
 			if ((type & Tokens.TYPE_SYMBOL_ID) == Tokens.TYPE_SYMBOL_ID)
 			{
 				this.prefix = true;
-				return this.getAccess(pm, token.value(), token, type);
+				this.getAccess(pm, token.value(), token, type);
+				return;
 			}
 			if (type == Tokens.ARROW_OPERATOR)
 			{
 				this.mode = ACCESS | VARIABLE;
 				pm.pushParser(new TypeParser(this), true);
-				return true;
+				return;
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
-				return true;
+				return;
 			}
 			if (this.parsePrimitive(token, type))
 			{
 				this.mode = ACCESS;
-				return true;
+				return;
 			}
 			if (this.parseKeyword(pm, token, type))
 			{
-				return true;
+				return;
 			}
 			
 			this.mode = ACCESS;
 		}
 		if (this.isInMode(LIST_END))
 		{
+			pm.popParser();
+			this.value.expandPosition(token);
 			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
-				this.value.expandPosition(token);
-				
 				if (token.next().equals("."))
 				{
 					this.mode = ACCESS_2;
 					this.dotless = false;
 					pm.skip();
-					return true;
+					return;
 				}
-				
-				pm.popParser();
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Array - '}' expected");
 		}
 		if (this.isInMode(TUPLE_END))
 		{
+			this.mode = ACCESS | VARIABLE | LAMBDA;
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				this.value.expandPosition(token);
-				this.mode = ACCESS | VARIABLE | LAMBDA;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Tuple - ')' expected", true);
 		}
 		if (this.isInMode(PARAMETERS))
 		{
+			this.mode = PARAMETERS_END;
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ExpressionListParser((IValueList) this.value));
-				this.mode = PARAMETERS_END;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Argument List - '(' expected", true);
 		}
 		if (this.isInMode(PARAMETERS_END))
 		{
+			this.mode = ACCESS;
+			this.value.expandPosition(token);
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
-				this.value.expandPosition(token);
-				this.mode = ACCESS;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Argument List - ')' expected", true);
 		}
 		if (this.isInMode(BYTECODE))
 		{
@@ -186,26 +185,26 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				Bytecode bc = new Bytecode(token);
 				pm.pushParser(new BytecodeParser(bc));
-				this.value = bc;
 				this.mode = BYTECODE_END;
-				return true;
+				this.value = bc;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Bytecode Expression - '{' expected");
 		}
 		if (this.isInMode(BYTECODE_END))
 		{
+			pm.popParser();
+			this.value.expandPosition(token);
 			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
-				this.value.expandPosition(token);
-				pm.popParser();
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Bytecode Expression - '}' expected", true);
 		}
 		if (ParserUtil.isCloseBracket(type))
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		if (this.isInMode(LAMBDA))
 		{
@@ -218,7 +217,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					this.value = lv;
 					pm.popParser();
 					pm.pushParser(new ExpressionParser(lv));
-					return true;
+					return;
 				}
 				
 				if (this.value.getValueType() == IValue.TUPLE)
@@ -230,11 +229,11 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 						pm.pushParser(new TypeParser(lt));
 						this.value = new ClassAccess(null, lt);
 						this.mode = VARIABLE;
-						return true;
+						return;
 					}
 				}
 				
-				return false;
+				throw new SyntaxError(token, "Invalid Lambda Expression");
 			}
 		}
 		if (this.isInMode(VARIABLE))
@@ -254,7 +253,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				else
 				{
-					return false;
+					throw new SyntaxError(token, "Invalid Assignment");
 				}
 				
 				String name = token.value();
@@ -264,7 +263,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.skip();
 				pm.pushParser(new ExpressionParser(access));
 				
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(ACCESS))
@@ -273,7 +272,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				this.mode = ACCESS_2;
 				this.dotless = false;
-				return true;
+				return;
 			}
 			
 			this.dotless = true;
@@ -282,11 +281,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Tokens.ELSE)
 			{
 				pm.popParser(true);
-				return true;
+				return;
 			}
 			if (type == Tokens.EQUALS)
 			{
-				return this.getAssign(pm);
+				this.getAssign(pm, token);
+				return;
 			}
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
@@ -315,16 +315,17 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					if (p != 0 && this.precedence >= p)
 					{
 						pm.popParser(true);
-						return true;
+						return;
 					}
 				}
 				
-				return this.getAccess(pm, name, token, type);
+				this.getAccess(pm, name, token, type);
+				return;
 			}
 			else if (ParserUtil.isTerminator(type))
 			{
 				pm.popParser(true);
-				return true;
+				return;
 			}
 			
 			IToken prev = token.prev();
@@ -332,7 +333,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				this.value = null;
 				pm.reparse();
-				return this.getAccess(pm, prev.value(), prev, type);
+				this.getAccess(pm, prev.value(), prev, type);
+				return;
 			}
 			else
 			{
@@ -340,7 +342,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.value = call;
 				this.mode = 0;
 				pm.pushParser(new ExpressionParser(this), true);
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(CONSTRUCTOR))
@@ -349,7 +351,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				this.mode = PARAMETERS_END;
-				return true;
+				return;
 			}
 			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
@@ -357,25 +359,25 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				pm.pushParser(new ExpressionListParser(pc.list));
 				this.value = pc;
 				this.mode = LIST_END; // matches a curly bracket
-				return true;
+				return;
 			}
 			
 			pm.pushParser(new ExpressionParser(this), true);
 			((ConstructorCall) this.value).isSugarCall = true;
 			this.mode = 0;
-			return true;
+			return;
 		}
 		
 		if (this.value != null)
 		{
 			this.value.expandPosition(token);
 			pm.popParser(true);
-			return true;
+			return;
 		}
-		return false;
+		throw new SyntaxError(token, "Invalid Expression - Invalid Token '" + token.value() + "'");
 	}
 	
-	private boolean getAccess(ParserManager pm, String value, IToken token, int type) throws SyntaxError
+	private void getAccess(ParserManager pm, String value, IToken token, int type) throws SyntaxError
 	{
 		IToken next = token.next();
 		int type1 = next.type();
@@ -385,7 +387,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			call.dotless = this.dotless;
 			this.value = call;
 			this.mode = PARAMETERS;
-			return true;
+			return;
 		}
 		else if (type == Tokens.TYPE_SYMBOL_ID || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
 		{
@@ -398,7 +400,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			ExpressionParser parser = new ExpressionParser(this);
 			parser.precedence = this.prefix ? Operators.PREFIX : Operators.index(value);
 			pm.pushParser(parser);
-			return true;
+			return;
 		}
 		else
 		{
@@ -406,11 +408,11 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			access.dotless = this.dotless;
 			this.value = access;
 			this.mode = ACCESS;
-			return true;
+			return;
 		}
 	}
 	
-	private boolean getAssign(ParserManager pm)
+	private void getAssign(ParserManager pm, IToken token) throws SyntaxError
 	{
 		ICodePosition position = this.value.getPosition();
 		int i = this.value.getValueType();
@@ -423,7 +425,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			
 			this.value = assign;
 			pm.pushParser(new ExpressionParser(assign));
-			return true;
+			return;
 		}
 		else if (i == IValue.FIELD_ACCESS)
 		{
@@ -435,7 +437,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			
 			this.value = assign;
 			pm.pushParser(new ExpressionParser(assign));
-			return true;
+			return;
 		}
 		else if (i == IValue.APPLY_METHOD_CALL)
 		{
@@ -447,7 +449,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			
 			this.value = updateCall;
 			pm.pushParser(new ExpressionParser(this));
-			return true;
+			return;
 		}
 		else if (i == IValue.METHOD_CALL)
 		{
@@ -463,10 +465,10 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			
 			this.value = updateCall;
 			pm.pushParser(new ExpressionParser(this));
-			return true;
+			return;
 		}
 		
-		return false;
+		throw new SyntaxError(token, "Invalid Assignment");
 	}
 	
 	private static TupleType getTupleType(TupleValue value)

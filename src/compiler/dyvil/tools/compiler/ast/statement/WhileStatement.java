@@ -15,7 +15,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class WhileStatement extends ASTNode implements IStatement, ILoop
@@ -160,7 +159,7 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		}
 		else
 		{
-			markers.add(new SyntaxError(this.position, "while.condition.invalid"));
+			markers.add(Markers.create(this.position, "while.condition.invalid"));
 		}
 		if (this.then != null)
 		{

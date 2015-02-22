@@ -22,7 +22,7 @@ public class PackageParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)
@@ -32,7 +32,7 @@ public class PackageParser extends Parser
 			this.unit.setPackageDeclaration(this.packageDeclaration);
 			
 			pm.popParser();
-			return true;
+			return;
 		}
 		if (ParserUtil.isIdentifier(type) || type == Tokens.DOT)
 		{
@@ -42,8 +42,8 @@ public class PackageParser extends Parser
 			}
 			
 			this.buffer.append(token.value());
-			return true;
+			return;
 		}
-		return false;
+		throw new SyntaxError(token, "Invalid Package Declaration - Invalid Token '" + token.value() + "'");
 	}
 }

@@ -26,18 +26,18 @@ public class ImportParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)
 		{
 			pm.popParser();
-			return true;
+			return;
 		}
 		if (type == Tokens.COMMA)
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		
 		if (this.isInMode(IMPORT))
@@ -53,18 +53,18 @@ public class ImportParser extends Parser
 				{
 					pm.pushParser(new ImportListParser(mi, mi));
 					this.mode = MULTIIMPORT;
-					return true;
+					return;
 				}
 				this.mode = 0;
 				pm.skip();
-				return true;
+				return;
 			}
 			if (type == Tokens.WILDCARD)
 			{
 				PackageImport pi = new PackageImport(token.raw(), this.parent);
 				this.container.addImport(pi);
 				this.mode = 0;
-				return true;
+				return;
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
@@ -73,7 +73,7 @@ public class ImportParser extends Parser
 				this.parent = si;
 				this.container = si;
 				this.mode = DOT | ALIAS;
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(DOT))
@@ -81,7 +81,7 @@ public class ImportParser extends Parser
 			if (type == Tokens.DOT)
 			{
 				this.mode = IMPORT;
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(ALIAS))
@@ -93,7 +93,7 @@ public class ImportParser extends Parser
 				{
 					((SimpleImport) this.parent).setAlias(next.value());
 					pm.skip();
-					return true;
+					return;
 				}
 				
 				this.mode = DOT | IMPORT;
@@ -106,11 +106,11 @@ public class ImportParser extends Parser
 			{
 				this.container.expandPosition(token);
 				this.mode = 0;
-				return true;
+				return;
 			}
 		}
 		
 		pm.popParser(true);
-		return true;
+		return;
 	}
 }

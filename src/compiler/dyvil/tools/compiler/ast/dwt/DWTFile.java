@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -23,6 +24,7 @@ import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.dwt.DWTParser;
@@ -89,11 +91,28 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	}
 	
 	@Override
-	public void parse()
+	public boolean parse()
 	{
 		ParserManager manager = new ParserManager(new DWTParser(this.rootNode));
 		manager.parse(this.inputFile, this.tokens);
 		this.tokens = null;
+		
+		int size = this.markers.size();
+		if (size > 0)
+		{
+			StringBuilder buffer = new StringBuilder("Syntax Errors in DWT File '");
+			buffer.append(this.inputFile).append(": ").append(size).append("\n\n");
+			
+			boolean error = false;
+			for (Marker marker : this.markers)
+			{
+				marker.log(buffer);
+			}
+			DyvilCompiler.logger.info(buffer.toString());
+			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
+			return false;
+		}
+		return true;
 	}
 	
 	@Override
@@ -106,6 +125,12 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	@Override
 	public void resolve()
 	{
+		IMethod constructor = this.rootNode.theClass.getBody().getMethod("<init>");
+		if (constructor == null)
+		{
+			this.markers.add(Markers.create(this.position, "dwt.component.constructor"));
+		}
+		
 		this.rootNode.resolve(this.markers, javaxSwing);
 	}
 	

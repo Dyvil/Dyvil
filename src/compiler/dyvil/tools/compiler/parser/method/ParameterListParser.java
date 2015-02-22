@@ -48,7 +48,7 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == TYPE)
@@ -58,35 +58,35 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 			if ((i = Modifiers.PARAMETER.parse(value)) != -1)
 			{
 				this.modifiers |= i;
-				return true;
+				return;
 			}
 			if (value.charAt(0) == '@')
 			{
 				pm.pushParser(new AnnotationParser(this), true);
-				return true;
+				return;
 			}
 			if (ParserUtil.isCloseBracket(type))
 			{
 				pm.popParser(true);
-				return true;
+				return;
 			}
 			
 			this.mode = NAME;
 			pm.pushParser(new TypeParser(this), true);
-			return true;
+			return;
 		}
 		if (this.mode == NAME)
 		{
 			if (token.equals("..."))
 			{
 				this.varargs = true;
-				return true;
+				return;
 			}
+			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.parameter = new Parameter(0, token.value(), this.type, this.modifiers, this.annotations);
 				this.parameterized.addParameter(this.parameter);
-				this.mode = SEPERATOR;
 				
 				if (this.varargs)
 				{
@@ -94,35 +94,34 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 					this.parameterized.setVarargs();
 					this.varargs = false;
 				}
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Parameter Declaration - Name expected");
 		}
 		if (this.mode == SEPERATOR)
 		{
 			if (ParserUtil.isCloseBracket(type))
 			{
 				pm.popParser(true);
-				return true;
-			}
-			if (type == Tokens.COMMA)
-			{
-				this.reset();
-				return true;
-			}
-			if (type == Tokens.SEMICOLON)
-			{
-				this.parameter.seperator = ';';
-				this.reset();
-				return true;
+				return;
 			}
 			if (type == Tokens.EQUALS)
 			{
 				pm.pushParser(new ExpressionParser(this.parameter));
-				return true;
+				return;
 			}
+			this.reset();
+			if (type == Tokens.COMMA)
+			{
+				return;
+			}
+			if (type == Tokens.SEMICOLON)
+			{
+				this.parameter.seperator = ';';
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Parameter Declaration - ',' expected");
 		}
-		return false;
 	}
 	
 	@Override

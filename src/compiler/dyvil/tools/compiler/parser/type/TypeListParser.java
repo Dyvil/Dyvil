@@ -21,14 +21,14 @@ public class TypeListParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == 0)
 		{
 			this.mode = 1;
 			pm.pushParser(new TypeParser(this), true);
-			return true;
+			return;
 		}
 		if (this.mode == 1)
 		{
@@ -36,16 +36,16 @@ public class TypeListParser extends Parser implements ITyped
 			{
 				this.typeList.addType(this.type);
 				pm.popParser(true);
-				return true;
+				return;
 			}
+			this.mode = 0;
 			if (ParserUtil.isSeperator(type))
 			{
 				this.typeList.addType(this.type);
-				this.mode = 0;
-				return true;
+				return;
 			}
+			throw new SyntaxError(token, "Invalid Type List - ',' expected");
 		}
-		return false;
 	}
 	
 	@Override

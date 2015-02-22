@@ -29,7 +29,7 @@ public class DWTParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == NAME)
@@ -39,7 +39,7 @@ public class DWTParser extends Parser implements IValued
 			{
 				this.node.setPosition(token.raw());
 				this.node.name = this.node.fullName = token.value();
-				return true;
+				return;
 			}
 			throw new SyntaxError(token, "Invalid DWT File - Name expected");
 		}
@@ -48,14 +48,14 @@ public class DWTParser extends Parser implements IValued
 			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
 				this.mode = PROPERTY_NAME;
-				return true;
+				return;
 			}
 			throw new SyntaxError(token, "Invalid Body - '{' expected");
 		}
 		if (type == Tokens.CLOSE_CURLY_BRACKET)
 		{
 			pm.popParser();
-			return true;
+			return;
 		}
 		if (this.mode == PROPERTY_NAME)
 		{
@@ -63,7 +63,7 @@ public class DWTParser extends Parser implements IValued
 			{
 				this.mode = EQUALS;
 				this.name = token.value();
-				return true;
+				return;
 			}
 			this.mode = PROPERTY_NAME;
 			throw new SyntaxError(token, "Invalid Property - Name expected");
@@ -73,7 +73,7 @@ public class DWTParser extends Parser implements IValued
 			if (type == Tokens.EQUALS || type == Tokens.COLON)
 			{
 				pm.pushParser(new DWTValueParser(this));
-				return true;
+				return;
 			}
 			this.mode = PROPERTY_NAME;
 			throw new SyntaxError(token, "Invalid Property - '=' expected");
@@ -84,8 +84,6 @@ public class DWTParser extends Parser implements IValued
 			// throw a SyntaxError
 			throw new SyntaxError(token, "Invalid Body - '}' expected");
 		}
-		
-		return false;
 	}
 	
 	@Override

@@ -20,29 +20,29 @@ public class ImportListParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.CLOSE_CURLY_BRACKET || type == Tokens.SEMICOLON)
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		
 		if (this.mode == 0)
 		{
 			pm.pushParser(new ImportParser(this.parent, this.container), true);
 			this.mode = 1;
-			return true;
+			return;
 		}
 		if (this.mode == 1)
 		{
+			this.mode = 0;
 			if (type == Tokens.COMMA)
 			{
-				this.mode = 0;
-				return true;
+				return;
 			}
+			throw new SyntaxError(token, "Invalid Import List - ',' expected", true);
 		}
-		return false;
 	}
 }

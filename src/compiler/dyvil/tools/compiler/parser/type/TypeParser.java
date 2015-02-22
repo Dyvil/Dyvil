@@ -39,7 +39,7 @@ public class TypeParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.isInMode(NAME))
@@ -50,13 +50,13 @@ public class TypeParser extends Parser implements ITyped
 				pm.pushParser(new TypeListParser(tupleType));
 				this.type = tupleType;
 				this.mode = TUPLE_END;
-				return true;
+				return;
 			}
 			if (type == Tokens.OPEN_SQUARE_BRACKET)
 			{
 				this.arrayDimensions++;
 				this.arrayDimensions2++;
-				return true;
+				return;
 			}
 			if (type == Tokens.ARROW_OPERATOR)
 			{
@@ -64,7 +64,7 @@ public class TypeParser extends Parser implements ITyped
 				this.type = lt;
 				pm.pushParser(new TypeParser(lt));
 				this.mode = LAMBDA_END;
-				return true;
+				return;
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
@@ -72,23 +72,24 @@ public class TypeParser extends Parser implements ITyped
 				{
 					this.type = new GenericType(token, token.value());
 					this.mode = GENERICS;
-					return true;
+					return;
 				}
 				
 				this.type = new Type(token, token.value());
 				this.mode = ARRAY_END;
-				return true;
+				return;
 			}
 			if (type == Tokens.WILDCARD)
 			{
 				this.type = new WildcardType(token.raw());
 				this.mode = WILDCARD_TYPE;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Type - Invalid Token '" + token.value() + "'");
 		}
 		if (this.isInMode(TUPLE_END))
 		{
+			pm.popParser();
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				if (token.next().type() == Tokens.ARROW_OPERATOR)
@@ -96,26 +97,25 @@ public class TypeParser extends Parser implements ITyped
 					TupleType tupleType = (TupleType) this.type;
 					this.type = new LambdaType(tupleType);
 					this.mode = LAMBDA_TYPE;
-					return true;
+					return;
 				}
 				
 				this.type.expandPosition(token);
-				pm.popParser();
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Tuple Type - ')' expected");
 		}
 		if (this.isInMode(LAMBDA_TYPE))
 		{
 			pm.pushParser(new TypeParser((LambdaType) this.type));
 			this.mode = LAMBDA_END;
-			return true;
+			return;
 		}
 		if (this.isInMode(LAMBDA_END))
 		{
 			this.type.expandPosition(token.prev());
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		if (this.isInMode(ARRAY_END))
 		{
@@ -126,7 +126,7 @@ public class TypeParser extends Parser implements ITyped
 				{
 					this.type.expandPosition(token);
 					pm.popParser();
-					return true;
+					return;
 				}
 			}
 			
@@ -139,7 +139,7 @@ public class TypeParser extends Parser implements ITyped
 			
 			this.type.expandPosition(token.prev());
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		if (this.isInMode(GENERICS))
 		{
@@ -147,7 +147,7 @@ public class TypeParser extends Parser implements ITyped
 			{
 				pm.pushParser(new TypeListParser((GenericType) this.type));
 				this.mode = GENERICS_END;
-				return true;
+				return;
 			}
 			
 			if (type == Tokens.CLOSE_SQUARE_BRACKET)
@@ -157,7 +157,7 @@ public class TypeParser extends Parser implements ITyped
 				{
 					this.type.expandPosition(token);
 					pm.popParser();
-					return true;
+					return;
 				}
 			}
 			
@@ -165,12 +165,12 @@ public class TypeParser extends Parser implements ITyped
 			{
 				this.type.expandPosition(token.prev());
 				pm.popParser(true);
-				throw new SyntaxError(token.prev(), "Unclosed array brackets");
+				throw new SyntaxError(token.prev(), "Invalid Array Type - ']' expected");
 			}
 			
 			this.type.expandPosition(token.prev());
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		if (this.isInMode(WILDCARD_TYPE))
 		{
@@ -181,13 +181,13 @@ public class TypeParser extends Parser implements ITyped
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = LOWER;
-					return true;
+					return;
 				}
 				else if (">=".equals(value))
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = UPPER;
-					return true;
+					return;
 				}
 			}
 			else if (this.boundMode == UPPER)
@@ -195,21 +195,21 @@ public class TypeParser extends Parser implements ITyped
 				if ("&".equals(value))
 				{
 					pm.pushParser(new TypeParser(this));
-					return true;
+					return;
 				}
 			}
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		if (this.isInMode(GENERICS_END))
 		{
+			pm.popParser();
 			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
-				pm.popParser();
-				return true;
+				return;
 			}
+			throw new SyntaxError(token, "Invalid Generic Type - ']' expected", true);
 		}
-		return false;
 	}
 	
 	@Override

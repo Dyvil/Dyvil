@@ -15,7 +15,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class DoStatement extends ASTNode implements IStatement, ILoop
@@ -166,7 +165,7 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 		}
 		else
 		{
-			markers.add(new SyntaxError(this.position, "do.condition.invalid"));
+			markers.add(Markers.create(this.position, "do.condition.invalid"));
 		}
 	}
 	

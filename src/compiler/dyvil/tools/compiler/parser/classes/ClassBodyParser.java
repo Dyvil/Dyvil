@@ -69,13 +69,13 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)
 		{
 			this.reset();
-			return true;
+			return;
 		}
 		
 		String value = token.value();
@@ -84,7 +84,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser(true);
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(TYPE))
@@ -97,7 +97,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					throw new SyntaxError(token, "Duplicate Modifier '" + value + "' - Remove this Modifier");
 				}
 				this.modifiers |= i;
-				return true;
+				return;
 			}
 			if ((i = Modifiers.CLASS_TYPE.parse(value)) != -1)
 			{
@@ -109,17 +109,17 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 				pm.pushParser(parser);
 				this.modifiers = 0;
 				this.annotations = new ArrayList();
-				return true;
+				return;
 			}
 			if (value.charAt(0) == '@')
 			{
 				pm.pushParser(new AnnotationParser(this), true);
-				return true;
+				return;
 			}
 			
 			pm.pushParser(new TypeParser(this), true);
 			this.mode = NAME;
-			return true;
+			return;
 		}
 		if (this.isInMode(NAME))
 		{
@@ -134,7 +134,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					this.body.addField(f);
 					pm.skip();
 					this.reset();
-					return true;
+					return;
 				}
 				if (type == Tokens.OPEN_PARENTHESIS)
 				{
@@ -142,7 +142,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					this.method = new Method(this.theClass, value, this.type, this.modifiers, this.annotations);
 					this.method.setPosition(token.raw());
 					this.body.addMethod(this.method);
-					return true;
+					return;
 				}
 				if (type == Tokens.OPEN_CURLY_BRACKET)
 				{
@@ -152,7 +152,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					this.body.addProperty(property);
 					pm.skip();
 					pm.pushParser(new PropertyParser(this.theClass, property));
-					return true;
+					return;
 				}
 				if (type == Tokens.EQUALS)
 				{
@@ -162,7 +162,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					pm.skip();
 					pm.pushParser(new ExpressionParser(field));
 					this.reset();
-					return true;
+					return;
 				}
 				if (type == Tokens.OPEN_SQUARE_BRACKET)
 				{
@@ -173,64 +173,65 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 					this.body.addMethod(this.method);
 					pm.skip();
 					pm.pushParser(new TypeVariableListParser(this.method));
-					return true;
+					return;
 				}
 			}
-			return false;
+			this.reset();
+			throw new SyntaxError(token, "Invalid Member Declaration - Name expected");
 		}
 		if (this.isInMode(PROPERTY_END))
 		{
+			this.reset();
 			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
-				this.reset();
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Property Declaration - '}' expected", true);
 		}
 		if (this.isInMode(GENERICS_END))
 		{
+			this.mode = PARAMETERS;
 			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
-				this.mode = PARAMETERS;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Generic Type Parameter List - ']' expected", true);
 		}
 		if (this.isInMode(PARAMETERS))
 		{
+			this.mode = PARAMETERS_END;
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ParameterListParser(this.method));
-				this.mode = PARAMETERS_END;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Parameter List - '(' expected", true);
 		}
 		if (this.isInMode(PARAMETERS_END))
 		{
+			this.mode = METHOD_END;
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
-				this.mode = METHOD_END;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Parameter List - ')' expected", true);
 		}
 		if (this.isInMode(METHOD_END))
 		{
 			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
 				pm.pushParser(new ExpressionParser(this.method), true);
-				return true;
+				return;
 			}
 			if (type == Tokens.EQUALS)
 			{
 				pm.pushParser(new ExpressionParser(this.method));
-				return true;
+				return;
 			}
 			if ("throws".equals(value))
 			{
 				pm.pushParser(new ThrowsDeclParser(this.method));
-				return true;
+				return;
 			}
 		}
 		
@@ -239,10 +240,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		{
 			this.reset();
 			pm.reparse();
-			return true;
 		}
-		
-		return false;
 	}
 	
 	@Override

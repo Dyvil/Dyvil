@@ -11,9 +11,10 @@ import dyvil.tools.compiler.util.Tokens;
 
 public class ConfigParser extends Parser
 {
-	public static final int		KEY		= 0;
-	public static final int		VALUE	= 1;
-	public static final int		ARRAY	= 2;
+	public static final int		KEY		= 1;
+	public static final int		EQUALS	= 2;
+	public static final int		VALUE	= 4;
+	public static final int		ARRAY	= 8;
 	
 	protected CompilerConfig	config;
 	
@@ -22,37 +23,44 @@ public class ConfigParser extends Parser
 	public ConfigParser(CompilerConfig config)
 	{
 		this.config = config;
+		this.mode = KEY;
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == KEY)
 		{
+			if (ParserUtil.isIdentifier(type))
+			{
+				this.mode = EQUALS;
+				this.key = token.value();
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Property - Name expected");
+		}
+		if (this.mode == EQUALS)
+		{
 			if (type == Tokens.EQUALS)
 			{
 				this.mode = VALUE;
-				return true;
+				return;
 			}
-			if (ParserUtil.isIdentifier(type))
-			{
-				this.key = token.value();
-				return true;
-			}
+			throw new SyntaxError(token, "Invalid Property - '=' expected");
 		}
 		else if (this.mode == VALUE)
 		{
 			if (type == Tokens.OPEN_SQUARE_BRACKET)
 			{
 				this.mode = ARRAY;
-				return true;
+				return;
 			}
 			
 			this.setProperty(this.key, token.object());
 			this.mode = KEY;
 			this.key = null;
-			return true;
+			return;
 		}
 		else if (this.mode == ARRAY)
 		{
@@ -60,13 +68,12 @@ public class ConfigParser extends Parser
 			{
 				this.mode = KEY;
 				this.key = null;
-				return true;
+				return;
 			}
 			
 			this.setProperty(this.key, token.object());
-			return true;
+			return;
 		}
-		return false;
 	}
 	
 	private void setProperty(String name, Object property)

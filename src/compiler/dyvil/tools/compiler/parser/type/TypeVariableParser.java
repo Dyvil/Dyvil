@@ -31,14 +31,14 @@ public class TypeVariableParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == NAME)
 		{
 			this.variable = new TypeVariable(token, token.value());
 			this.mode = TYPE_VARIABLE;
-			return true;
+			return;
 		}
 		if (this.mode == TYPE_VARIABLE)
 		{
@@ -49,13 +49,13 @@ public class TypeVariableParser extends Parser implements ITyped
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = LOWER;
-					return true;
+					return;
 				}
 				else if (">=".equals(value))
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = UPPER;
-					return true;
+					return;
 				}
 			}
 			else if (this.boundMode == UPPER)
@@ -63,13 +63,12 @@ public class TypeVariableParser extends Parser implements ITyped
 				if ("&".equals(value))
 				{
 					pm.pushParser(new TypeParser(this));
-					return true;
+					return;
 				}
 			}
 			pm.popParser(true);
-			return true;
+			return;
 		}
-		return false;
 	}
 	
 	@Override

@@ -26,48 +26,46 @@ public class WhileStatementParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		if (this.mode == -1)
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		
 		int type = token.type();
 		if (this.mode == CONDITION)
 		{
+			this.mode = CONDITION_END;
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ExpressionParser(this));
-				this.mode = CONDITION_END;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid While Statement - '(' expected", true);
 		}
 		if (this.mode == CONDITION_END)
 		{
+			this.mode = THEN;
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
-				this.mode = THEN;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid While Statement - ')' expected", true);
 		}
 		if (this.mode == THEN)
 		{
 			if (ParserUtil.isTerminator(type))
 			{
 				pm.popParser(true);
-				return true;
+				return;
 			}
 			
 			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = -1;
-			return true;
+			return;
 		}
-		
-		return false;
 	}
 	
 	@Override

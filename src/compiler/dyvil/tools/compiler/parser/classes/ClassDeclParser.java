@@ -50,7 +50,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		String value = token.value();
 		
@@ -63,18 +63,18 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 				{
 					throw new SyntaxError(token, "Duplicate Modifier '" + value + "' - Remove this Modifier");
 				}
-				return true;
+				return;
 			}
 			else if ((i = Modifiers.CLASS_TYPE.parse(value)) != -1)
 			{
 				this.theClass.addModifier(i);
 				this.mode = NAME;
-				return true;
+				return;
 			}
 			else if (value.charAt(0) == '@')
 			{
 				pm.pushParser(new AnnotationParser(this.theClass), true);
-				return true;
+				return;
 			}
 		}
 		int type = token.type();
@@ -85,7 +85,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 				this.theClass.setPosition(token.raw());
 				this.theClass.setName(value);
 				this.mode = GENERICS | EXTENDS | IMPLEMENTS | BODY;
-				return true;
+				return;
 			}
 			throw new SyntaxError(token, "Invalid Class Declaration - Name expected");
 		}
@@ -96,17 +96,17 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 				pm.pushParser(new TypeVariableListParser(this.theClass));
 				this.theClass.setGeneric();
 				this.mode = GENERICS_END;
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(GENERICS_END))
 		{
+			this.mode = EXTENDS | IMPLEMENTS | BODY;
 			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
-				this.mode = EXTENDS | IMPLEMENTS | BODY;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Generic Type Variable List - ']' expected", true);
 		}
 		if (this.isInMode(EXTENDS))
 		{
@@ -114,7 +114,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 			{
 				pm.pushParser(new TypeParser(this));
 				this.mode = IMPLEMENTS | BODY;
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(IMPLEMENTS))
@@ -123,7 +123,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 			{
 				pm.pushParser(new TypeListParser(this));
 				this.mode = BODY;
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(BODY))
@@ -132,27 +132,26 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 			{
 				pm.pushParser(new ClassBodyParser(this.theClass));
 				this.mode = BODY_END;
-				return true;
+				return;
 			}
+			pm.popParser();
 			if (ParserUtil.isTerminator(type))
 			{
 				this.theClass.expandPosition(token);
-				pm.popParser();
-				return true;
+				return;
 			}
-			throw new SyntaxError(token, "Invalid Class Declaration - '{' or ';' expected");
+			throw new SyntaxError(token, "Invalid Class Declaration - '{' or ';' expected", true);
 		}
 		if (this.isInMode(BODY_END))
 		{
+			pm.popParser();
 			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
 				this.theClass.expandPosition(token);
-				pm.popParser();
-				return true;
+				return;
 			}
-			throw new SyntaxError(token, "Invalid Class Declaration - '}' expected");
+			throw new SyntaxError(token, "Invalid Class Declaration - '}' expected", true);
 		}
-		return false;
 	}
 	
 	@Override

@@ -25,7 +25,7 @@ public class CompilationUnitParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager jcp, IToken token) throws SyntaxError
+	public void parse(ParserManager jcp, IToken token) throws SyntaxError
 	{
 		String value = token.value();
 		if (this.isInMode(PACKAGE))
@@ -34,7 +34,7 @@ public class CompilationUnitParser extends Parser
 			{
 				this.mode = IMPORT | CLASS;
 				jcp.pushParser(new PackageParser(this.unit));
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(IMPORT))
@@ -45,7 +45,7 @@ public class CompilationUnitParser extends Parser
 				Import i = new Import(token.raw());
 				this.unit.addImport(i);
 				jcp.pushParser(new ImportParser(null, i));
-				return true;
+				return;
 			}
 			if ("using".equals(value))
 			{
@@ -54,19 +54,18 @@ public class CompilationUnitParser extends Parser
 				i.isStatic = true;
 				this.unit.addStaticImport(i);
 				jcp.pushParser(new ImportParser(null, i));
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(CLASS))
 		{
 			if (token.type() == Tokens.SEMICOLON)
 			{
-				return true;
+				return;
 			}
 			
 			jcp.pushParser(new ClassDeclParser(this.unit), true);
-			return true;
+			return;
 		}
-		return false;
 	}
 }

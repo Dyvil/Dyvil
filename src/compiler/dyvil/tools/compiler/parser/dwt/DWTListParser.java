@@ -19,33 +19,32 @@ public class DWTListParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.CLOSE_SQUARE_BRACKET)
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		
 		if (this.mode == 0)
 		{
 			this.mode = 1;
 			pm.pushParser(new DWTValueParser(this), true);
-			return true;
+			return;
 		}
 		if (this.mode == 1)
 		{
 			if (type == Tokens.COMMA)
 			{
 				this.mode = 0;
-				return true;
+				return;
 			}
 			
 			pm.pushParser(new DWTValueParser(this), true);
-			return true;
+			return;
 		}
-		return false;
 	}
 	
 	@Override

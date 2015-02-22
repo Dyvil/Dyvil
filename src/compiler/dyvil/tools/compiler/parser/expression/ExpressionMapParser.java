@@ -27,13 +27,13 @@ public class ExpressionMapParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		
 		if (this.mode == NAME)
@@ -42,25 +42,27 @@ public class ExpressionMapParser extends Parser implements IValued
 			{
 				this.key = token.value();
 				pm.skip();
-				return true;
+				return;
 			}
+			this.key = "value";
 			this.mode = VALUE;
+			return;
 		}
 		if (this.mode == VALUE)
 		{
 			this.mode = SEPERATOR;
 			pm.pushTryParser(new ExpressionParser(this), token, true);
-			return true;
+			return;
 		}
 		if (this.mode == SEPERATOR)
 		{
 			if (type == Tokens.COMMA)
 			{
 				this.mode = NAME | VALUE;
-				return true;
+				return;
 			}
+			throw new SyntaxError(token, "Invalid Expression Map - ',' expected");
 		}
-		return false;
 	}
 	
 	@Override

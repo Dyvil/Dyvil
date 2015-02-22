@@ -27,13 +27,13 @@ public class DoStatementParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		if (this.mode == DO)
 		{
 			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = WHILE;
-			return true;
+			return;
 		}
 		int type = token.type();
 		if (this.mode == WHILE)
@@ -44,17 +44,17 @@ public class DoStatementParser extends Parser implements IValued
 				{
 					pm.skip(1);
 					this.mode = CONDITION;
-					return true;
+					return;
 				}
 			}
 			else if (type == Tokens.WHILE)
 			{
 				this.mode = CONDITION;
-				return true;
+				return;
 			}
 			
 			pm.popParser(true);
-			throw new SyntaxError(token, "Invalid do-while statement - 'while' expected");
+			throw new SyntaxError(token, "Invalid Do-While Statement - 'while' expected");
 		}
 		if (this.mode == CONDITION)
 		{
@@ -62,25 +62,24 @@ public class DoStatementParser extends Parser implements IValued
 			{
 				pm.pushParser(new ExpressionParser(this));
 				this.mode = CONDITION_END;
-				return true;
+				return;
 			}
 			
 			pm.pushParser(new ExpressionParser(this));
 			this.mode = CONDITION_END;
-			throw new SyntaxError(token, "Invalid do-while statement - '(' expected");
+			throw new SyntaxError(token, "Invalid Do-While Statement - '(' expected");
 		}
 		if (this.mode == CONDITION_END)
 		{
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				pm.popParser();
-				return true;
+				return;
 			}
 			
 			pm.popParser();
-			throw new SyntaxError(token, "Invalid do-while statement - ')' expected");
+			throw new SyntaxError(token, "Invalid Do-While Statement - ')' expected");
 		}
-		return false;
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.logging.Level;
 
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
@@ -35,9 +36,14 @@ public enum CompilerState
 		@Override
 		public void apply(Collection<ICompilationUnit> units)
 		{
-			for (ICompilationUnit cu : units)
+			for (Iterator<ICompilationUnit> iterator = units.iterator(); iterator.hasNext();)
 			{
-				cu.parse();
+				ICompilationUnit cu = iterator.next();
+				if (!cu.parse())
+				{
+					// If the file could not be parsed, do not attempt to link or compile it.
+					iterator.remove();
+				}
 			}
 		}
 	},

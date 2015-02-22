@@ -27,33 +27,33 @@ public class IfStatementParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		if (this.mode == -1)
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		
 		int type = token.type();
 		if (this.mode == IF)
 		{
 			this.mode = CONDITION_END;
+			pm.pushParser(new ExpressionParser(this));
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ExpressionParser(this));
-				return true;
+				return;
 			}
-			throw new SyntaxError(token, "Invalid if statement - '(' expected");
+			throw new SyntaxError(token, "Invalid if statement - '(' expected", true);
 		}
 		if (this.mode == CONDITION_END)
 		{
 			this.mode = THEN;
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
-				return true;
+				return;
 			}
-			throw new SyntaxError(token, "Invalid if statement - ')' expected");
+			throw new SyntaxError(token, "Invalid if statement - ')' expected", true);
 		}
 		if (this.mode == THEN)
 		{
@@ -65,16 +65,16 @@ public class IfStatementParser extends Parser implements IValued
 					pm.skip(2);
 					pm.pushParser(new ExpressionParser(this));
 					this.mode = -1;
-					return true;
+					return;
 				}
 				
 				pm.popParser(true);
-				return true;
+				return;
 			}
 			
 			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = ELSE;
-			return true;
+			return;
 		}
 		if (this.mode == ELSE)
 		{
@@ -82,14 +82,11 @@ public class IfStatementParser extends Parser implements IValued
 			{
 				pm.pushParser(new ExpressionParser(this));
 				this.mode = -1;
-				return true;
+				return;
 			}
 			
 			pm.popParser(true);
-			return true;
 		}
-		
-		return false;
 	}
 	
 	@Override

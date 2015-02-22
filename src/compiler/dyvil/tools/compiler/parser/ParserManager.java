@@ -95,7 +95,7 @@ public class ParserManager
 				Parser parser = this.currentParser;
 				try
 				{
-					this.parseToken(parser, token);
+					parser.parse(this, token);
 				}
 				catch (SyntaxError ex)
 				{
@@ -107,7 +107,25 @@ public class ParserManager
 					}
 					else
 					{
+						if (ex.reparse)
+						{
+							this.tokens.jump(this.currentToken);
+						}
 						this.file.markers.add(ex);
+					}
+				}
+				catch (Exception ex)
+				{
+					if (this.jumpBackToken != null)
+					{
+						tokens.jump(this.jumpBackToken);
+						this.popParser();
+						this.jumpBackToken = null;
+					}
+					else
+					{
+						DyvilCompiler.logger.throwing("ParserManager", "parseToken", ex);
+						this.file.markers.add(new SyntaxError(token, "Failed to parse token '" + token.getText() + "': " + ex.getMessage()));
 					}
 				}
 				
@@ -174,34 +192,6 @@ public class ParserManager
 		{
 		}
 		return true;
-	}
-	
-	protected void parseToken(Parser parser, IToken token) throws SyntaxError
-	{
-		boolean parsed;
-		try
-		{
-			parsed = parser.parse(this, token);
-		}
-		catch (SyntaxError error)
-		{
-			throw error;
-		}
-		catch (Exception ex)
-		{
-			String message = ex.getMessage();
-			if (message == null)
-			{
-				message = ex.getClass().getName();
-			}
-			DyvilCompiler.logger.throwing("ParserManager", "parseToken", ex);
-			throw new SyntaxError(token, "Failed to parse token '" + token.getText() + "': " + message);
-		}
-		
-		if (!parsed)
-		{
-			throw new SyntaxError(token, "Invalid token '" + token.getText() + "' - Delete this token");
-		}
 	}
 	
 	public void skip()

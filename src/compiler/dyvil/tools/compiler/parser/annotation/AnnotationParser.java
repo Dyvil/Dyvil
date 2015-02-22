@@ -26,7 +26,7 @@ public class AnnotationParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == NAME)
@@ -41,7 +41,7 @@ public class AnnotationParser extends Parser
 				pm.popParser();
 			}
 			
-			return true;
+			return;
 			}
 			throw new SyntaxError(token, "Invalid Annotation - Name expected");
 		}
@@ -51,7 +51,7 @@ public class AnnotationParser extends Parser
 			{
 				pm.pushParser(new ExpressionMapParser(this.annotation));
 				this.mode = PARAMETERS_END;
-				return true;
+				return;
 			}
 			throw new SyntaxError(token, "Invalid Annotation - '(' expected");
 		}
@@ -62,11 +62,9 @@ public class AnnotationParser extends Parser
 				this.annotation.expandPosition(token);
 				this.annotatable.addAnnotation(this.annotation);
 				pm.popParser();
-				return true;
+				return;
 			}
 			throw new SyntaxError(token, "Invalid Annotation - ')' expected");
 		}
-		
-		return false;
 	}
 }

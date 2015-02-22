@@ -26,17 +26,17 @@ public class PropertyParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)
 		{
-			return true;
+			return;
 		}
 		if (type == Tokens.CLOSE_CURLY_BRACKET)
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
 		
 		if (this.mode == 0)
@@ -45,24 +45,24 @@ public class PropertyParser extends Parser implements IValued
 			if ("get".equals(value))
 			{
 				this.mode = GET;
-				return true;
+				return;
 			}
 			if ("set".equals(value))
 			{
 				this.mode = SET;
-				return true;
+				return;
 			}
+			throw new SyntaxError(token, "Invalid Property Declaration - 'get' or 'set' expected", false);
 		}
 		if (this.isInMode(GET) || this.isInMode(SET))
 		{
 			if (type == Tokens.COLON)
 			{
 				pm.pushParser(new ExpressionParser(this));
-				return true;
+				return;
 			}
+			throw new SyntaxError(token, "Invalid Property Declaration - ':' expected");
 		}
-		
-		return false;
 	}
 	
 	@Override

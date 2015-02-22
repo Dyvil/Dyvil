@@ -33,17 +33,17 @@ public class ForStatementParser extends Parser implements IValued
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == FOR)
 		{
+			this.mode = TYPE;
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				this.mode = TYPE;
-				return true;
+				return;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid For Statement - '(' expected", true);
 		}
 		if (this.mode == TYPE)
 		{
@@ -52,12 +52,12 @@ public class ForStatementParser extends Parser implements IValued
 				// Condition
 				pm.pushParser(new ExpressionParser(this));
 				this.mode = CONDITION_END;
-				return true;
+				return;
 			}
 			
 			pm.pushParser(new TypeParser(this.forStatement), true);
 			this.mode = VARIABLE;
-			return true;
+			return;
 		}
 		if (this.mode == VARIABLE)
 		{
@@ -65,26 +65,27 @@ public class ForStatementParser extends Parser implements IValued
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.forStatement.variable.setName(token.value());
-				return true;
+				return;
 			}
 			
-				throw new SyntaxError(token, "Invalid for statement - Variable Name expected");
+			throw new SyntaxError(token, "Invalid For statement - Variable Name expected", true);
 		}
 		if (this.mode == SEPERATOR)
 		{
-			if (type == Tokens.EQUALS)
-			{
-				this.mode = VARIABLE_END;
-				pm.pushParser(new ExpressionParser(this));
-				return true;
-			}
 			if (type == Tokens.COLON)
 			{
 				this.mode = FOR_END;
 				this.forStatement.type = 3;
 				pm.pushParser(new ExpressionParser(this));
-				return true;
+				return;
 			}
+			this.mode = VARIABLE_END;
+			if (type == Tokens.EQUALS)
+			{
+				pm.pushParser(new ExpressionParser(this));
+				return;
+			}
+			throw new SyntaxError(token, "Invalid For Statement - ';' or ':' expected", true);
 		}
 		if (this.mode == VARIABLE_END)
 		{
@@ -93,13 +94,13 @@ public class ForStatementParser extends Parser implements IValued
 			{
 				if (token.next().type() == Tokens.SEMICOLON)
 				{
-					return true;
+					return;
 				}
 				
 				pm.pushParser(new ExpressionParser(this));
-				return true;
+				return;
 			}
-			throw new SyntaxError(token, "Invalid for statement - ';' expected");
+			throw new SyntaxError(token, "Invalid for statement - ';' expected", true);
 		}
 		if (this.mode == CONDITION_END)
 		{
@@ -108,41 +109,40 @@ public class ForStatementParser extends Parser implements IValued
 			{
 				if (token.next().type() == Tokens.SEMICOLON)
 				{
-					return true;
+					return;
 				}
 				
 				pm.pushParser(new ExpressionParser(this));
-				return true;
+				return;
 			}
-			throw new SyntaxError(token, "Invalid for statement - ';' expected");
+			throw new SyntaxError(token, "Invalid for statement - ';' expected", true);
 		}
 		if (this.mode == FOR_END)
 		{
 			this.mode = STATEMENT;
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
-				return true;
+				return;
 			}
-			throw new SyntaxError(token, "Invalid for statement - ')' expected");
+			throw new SyntaxError(token, "Invalid for statement - ')' expected", true);
 		}
 		if (this.mode == STATEMENT)
 		{
 			if (ParserUtil.isTerminator(type))
 			{
 				pm.popParser(true);
-				return true;
+				return;
 			}
 			
 			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = STATEMENT_END;
-			return true;
+			return;
 		}
 		if (this.mode == STATEMENT_END)
 		{
 			pm.popParser(true);
-			return true;
+			return;
 		}
-		return false;
 	}
 	
 	@Override

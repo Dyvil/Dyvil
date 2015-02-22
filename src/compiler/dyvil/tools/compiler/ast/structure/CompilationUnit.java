@@ -140,12 +140,29 @@ public class CompilationUnit extends ASTNode implements ICompilationUnit, IConte
 	}
 	
 	@Override
-	public void parse()
+	public boolean parse()
 	{
 		ParserManager manager = new ParserManager(new CompilationUnitParser(this));
 		manager.semicolonInference = true;
 		manager.parse(this.inputFile, this.tokens);
 		this.tokens = null;
+		
+		int size = this.markers.size();
+		if (size > 0)
+		{
+			StringBuilder buffer = new StringBuilder("Syntax Errors in Compilation Unit '");
+			buffer.append(this.inputFile).append(": ").append(size).append("\n\n");
+			
+			boolean error = false;
+			for (Marker marker : this.markers)
+			{
+				marker.log(buffer);
+			}
+			DyvilCompiler.logger.info(buffer.toString());
+			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
+			return false;
+		}
+		return true;
 	}
 	
 	@Override

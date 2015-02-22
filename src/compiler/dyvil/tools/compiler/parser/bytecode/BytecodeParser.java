@@ -27,7 +27,7 @@ public class BytecodeParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		if (this.isInMode(LABEL))
 		{
@@ -35,7 +35,7 @@ public class BytecodeParser extends Parser
 			{
 				this.label = token.value();
 				pm.skip();
-				return true;
+				return;
 			}
 		}
 		int type = token.type();
@@ -64,7 +64,7 @@ public class BytecodeParser extends Parser
 				insn.setPosition(token);
 				this.instruction = insn;
 				this.mode = ARGUMENTS;
-				return true;
+				return;
 			}
 		}
 		if (this.isInMode(ARGUMENTS))
@@ -72,11 +72,11 @@ public class BytecodeParser extends Parser
 			if (type == Tokens.SEMICOLON)
 			{
 				this.mode = INSTRUCTION | LABEL;
-				return true;
+				return;
 			}
 			if (type == Tokens.COMMA)
 			{
-				return true;
+				return;
 			}
 			if (!ParserUtil.isTerminator(type))
 			{
@@ -88,11 +88,11 @@ public class BytecodeParser extends Parser
 				{
 					throw new SyntaxError(token, "Invalid Argument '" + token.value() + "' for Opcode " + this.instruction.getName());
 				}
-				return true;
+				return;
 			}
 		}
 		
 		pm.popParser(true);
-		return true;
+		return;
 	}
 }

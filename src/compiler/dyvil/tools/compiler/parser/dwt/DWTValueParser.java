@@ -28,7 +28,7 @@ public class DWTValueParser extends Parser
 	}
 	
 	@Override
-	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(ParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == VALUE)
@@ -41,12 +41,12 @@ public class DWTValueParser extends Parser
 					this.valued.setValue(node);
 					pm.popParser();
 					pm.pushParser(new DWTParser(node), true);
-					return true;
+					return;
 				}
 				
 				this.valued.setValue(new DWTReference(token.raw(), token.value()));
 				pm.popParser();
-				return true;
+				return;
 			}
 			if (type == Tokens.OPEN_SQUARE_BRACKET)
 			{
@@ -54,7 +54,7 @@ public class DWTValueParser extends Parser
 				this.mode = LIST_END;
 				this.valued.setValue(list);
 				pm.pushParser(new DWTListParser(list));
-				return true;
+				return;
 			}
 			
 			IValue primitive = parsePrimitive(token, type);
@@ -62,20 +62,20 @@ public class DWTValueParser extends Parser
 			{
 				this.valued.setValue(primitive);
 				pm.popParser();
-				return true;
+				return;
 			}
 			
 			throw new SyntaxError(token, "Invalid Property Value");
 		}
 		if (this.mode == LIST_END)
 		{
+			pm.popParser();
 			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
-				pm.popParser();
-				return true;
+				return;
 			}
+			throw new SyntaxError(token, "Invalid List - ']' expected", true);
 		}
-		return false;
 	}
 	
 	public static IValue parsePrimitive(IToken token, int type) throws SyntaxError
