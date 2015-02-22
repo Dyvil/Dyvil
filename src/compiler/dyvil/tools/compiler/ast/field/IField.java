@@ -1,8 +1,11 @@
 package dyvil.tools.compiler.ast.field;
 
+import java.util.Map;
+
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -13,6 +16,8 @@ public interface IField extends IASTNode, IMember, IValued
 	{
 		return false;
 	}
+	
+	public IType getType(Map<String, IType> types);
 	
 	// Compilation
 	

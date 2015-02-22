@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.member;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -146,6 +147,15 @@ public abstract class Member extends ASTNode implements IMember
 	public IType getType()
 	{
 		return this.type;
+	}
+	
+	public IType getType(Map<String, IType> types)
+	{
+		if (types == null)
+		{
+			return this.type;
+		}
+		return this.type.getConcreteType(types);
 	}
 	
 	@Override
