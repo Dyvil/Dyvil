@@ -1,8 +1,11 @@
 package dyvil.tools.compiler.ast.dwt;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
+import jdk.internal.org.objectweb.asm.Label;
 import dyvil.collections.SingleElementList;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -26,19 +29,18 @@ import dyvil.util.StringUtils;
 
 public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String>
 {
-	public static final int			NODE		= 256;
-	public static final int			LIST		= 257;
-	public static final int			REFERENCE	= 258;
+	public static final int		NODE		= 256;
+	public static final int		LIST		= 257;
+	public static final int		REFERENCE	= 258;
 	
-	public DWTNode					parent;
+	public DWTNode				parent;
 	
-	public String					name;
-	public String					fullName;
-	public IType					type;
-	public Map<String, IValue>		properties	= new TreeMap();
+	public String				name;
+	public String				fullName;
+	public IType				type;
+	public List<DWTProperty>	properties	= new ArrayList();
 	
-	private IClass					theClass;
-	private Map<String, IMethod>	setters;
+	private IClass				theClass;
 	
 	public DWTNode()
 	{
@@ -126,7 +128,6 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 	@Override
 	public void setValues(Map<String, IValue> map)
 	{
-		this.properties = map;
 	}
 	
 	@Override
@@ -136,29 +137,28 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 		{
 			((DWTNode) value).setParent(this);
 		}
-		this.properties.put(key, value);
+		this.properties.add(new DWTProperty(this, key, value));
 	}
 	
 	@Override
 	public Map<String, IValue> getValues()
 	{
-		return this.properties;
+		return null;
 	}
 	
 	@Override
 	public IValue getValue(String key)
 	{
-		return this.properties.get(key);
+		return null;
 	}
 	
 	public void addFields(Map<String, IType> fields)
 	{
 		fields.put(this.fullName, this.type);
 		
-		String s = this.fullName + "$";
-		for (Entry<String, IValue> entry : this.properties.entrySet())
+		for (DWTProperty property : this.properties)
 		{
-			fields.put(s + entry.getKey(), entry.getValue().getType());
+			fields.put(property.fullName, property.value.getType());
 		}
 	}
 	
@@ -186,12 +186,10 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 			markers.add(Markers.create(this.position, "dwt.component.constructor"));
 		}
 		
-		this.setters = new HashMap();
-		
-		for (Entry<String, IValue> entry : this.properties.entrySet())
+		for (DWTProperty property : this.properties)
 		{
-			String key = entry.getKey();
-			IValue value = entry.getValue();
+			String key = property.key;
+			IValue value = property.value;
 			int type = value.getValueType();
 			if (type == LIST)
 			{
@@ -215,7 +213,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 				
 				if (m != null)
 				{
-					this.setters.put(key, m.theMethod);
+					property.setter = m.theMethod;
 					value.resolve(markers, m.theMethod);
 					continue;
 				}
@@ -250,23 +248,38 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 	{
 		String internal = this.type.getInternalName();
 		String extended = "L" + internal + ";";
+		Label start = new Label();
+		Label end = new Label();
+		
+		int index = writer.addLocal(extended);
+		writer.visitLabel(start, false);
 		// Constructor
 		writer.visitTypeInsn(Opcodes.NEW, internal);
+		writer.visitInsn(Opcodes.DUP);
 		writer.visitInsn(Opcodes.DUP);
 		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, internal, "<init>", "()V", 0, Type.VOID);
 		
 		writer.visitPutStatic(owner, this.fullName, extended);
+		writer.visitVarInsn(Opcodes.ASTORE, index);
 		
-		for (Entry<String, IMethod> entry : this.setters.entrySet())
+		for (DWTProperty property : this.properties)
 		{
-			String key = entry.getKey();
-			IMethod setter = entry.getValue();
-			IValue value = this.properties.get(key);
-			
-			writer.visitGetStatic(owner, this.fullName, extended, this.type);
-			value.writeExpression(writer);
-			setter.writeCall(writer, null, Collections.EMPTY_LIST);
+			IMethod setter = property.setter;
+			if (setter != null)
+			{
+				String key = property.key;
+				IValue value = property.value;
+				
+				writer.visitVarInsn(Opcodes.ALOAD, index, this.type);
+				value.writeExpression(writer);
+				writer.visitInsn(Opcodes.DUP);
+				writer.visitPutStatic(owner, property.fullName, value.getType().getExtendedName());
+				setter.writeCall(writer, null, Collections.EMPTY_LIST);
+			}
 		}
+		
+		writer.visitLabel(end, false);
+		writer.visitLocalVariable(this.name, extended, null, start, end, index);
 	}
 	
 	@Override
@@ -275,10 +288,10 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 		buffer.append(this.name).append('\n');
 		buffer.append(prefix).append('{');
 		String prefix1 = prefix + '\t';
-		for (Entry<String, IValue> entry : this.properties.entrySet())
+		for (DWTProperty property : this.properties)
 		{
-			buffer.append('\n').append(prefix1).append(entry.getKey()).append(Formatting.Field.keyValueSeperator);
-			IValue value = entry.getValue();
+			buffer.append('\n').append(prefix1).append(property.key).append(Formatting.Field.keyValueSeperator);
+			IValue value = property.value;
 			if (value.isStatement())
 			{
 				buffer.append('\n').append(prefix1);

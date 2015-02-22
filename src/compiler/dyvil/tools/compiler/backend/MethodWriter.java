@@ -78,6 +78,22 @@ public final class MethodWriter extends MethodVisitor
 		this.locals[index] = type;
 	}
 	
+	public int addLocal(IType type)
+	{
+		int index = this.localCount;
+		this.ensureLocals(index + 1);
+		this.locals[index] = type.getFrameType();
+		return index;
+	}
+	
+	public int addLocal(Object type)
+	{
+		int index = this.localCount;
+		this.ensureLocals(index + 1);
+		this.locals[index] = type;
+		return index;
+	}
+	
 	public void removeLocals(int count)
 	{
 		this.localCount -= count;

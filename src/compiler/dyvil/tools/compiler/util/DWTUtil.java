@@ -27,4 +27,16 @@ public class DWTUtil
 		}
 		return builder.toString();
 	}
+	
+	public static String getFullName(String prefix, String name)
+	{
+		StringBuilder builder = new StringBuilder(prefix);
+		int len = name.length();
+		builder.append(CharUtils.toUpperCase(name.charAt(0)));
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(name.charAt(i));
+		}
+		return builder.toString();
+	}
 }

@@ -238,6 +238,10 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 			this.type.addTypeVariables(null, typeArguments);
 			this.returnType = this.method.getType(typeArguments);
 		}
+		else
+		{
+			this.returnType = this.method.getType();
+		}
 		
 		this.context = context;
 		this.value = this.value.resolve(markers, this);
