@@ -232,15 +232,18 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		if (this.method.hasTypeVariables())
+		if (this.method != null)
 		{
-			Map<String, IType> typeArguments = new HashMap();
-			this.type.addTypeVariables(null, typeArguments);
-			this.returnType = this.method.getType(typeArguments);
-		}
-		else
-		{
-			this.returnType = this.method.getType();
+			if (this.method.hasTypeVariables())
+			{
+				Map<String, IType> typeArguments = new HashMap();
+				this.type.addTypeVariables(this.method.getType(), typeArguments);
+				this.returnType = this.method.getType(typeArguments);
+			}
+			else
+			{
+				this.returnType = this.method.getType();
+			}
 		}
 		
 		this.context = context;
