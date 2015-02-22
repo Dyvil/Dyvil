@@ -31,7 +31,7 @@ public class BytecodeParser extends Parser
 	{
 		if (this.isInMode(LABEL))
 		{
-			if (token.next().isType(Tokens.COLON))
+			if (token.next().type() == Tokens.COLON)
 			{
 				this.label = token.value();
 				pm.skip();

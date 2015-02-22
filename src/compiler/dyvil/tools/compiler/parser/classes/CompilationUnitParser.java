@@ -59,7 +59,7 @@ public class CompilationUnitParser extends Parser
 		}
 		if (this.isInMode(CLASS))
 		{
-			if (token.isType(Tokens.SEMICOLON))
+			if (token.type() == Tokens.SEMICOLON)
 			{
 				return true;
 			}
@@ -69,5 +69,4 @@ public class CompilationUnitParser extends Parser
 		}
 		return false;
 	}
-	
 }

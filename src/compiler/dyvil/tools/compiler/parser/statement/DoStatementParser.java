@@ -40,7 +40,7 @@ public class DoStatementParser extends Parser implements IValued
 		{
 			if (ParserUtil.isTerminator(type))
 			{
-				if (token.next().isType(Tokens.WHILE))
+				if (token.next().type() == Tokens.WHILE)
 				{
 					pm.skip(1);
 					this.mode = CONDITION;
@@ -54,7 +54,7 @@ public class DoStatementParser extends Parser implements IValued
 			}
 			
 			pm.popParser(true);
-			throw new SyntaxError(token, "Invalid do-while statement: 'while' expected");
+			throw new SyntaxError(token, "Invalid do-while statement - 'while' expected");
 		}
 		if (this.mode == CONDITION)
 		{
@@ -67,7 +67,7 @@ public class DoStatementParser extends Parser implements IValued
 			
 			pm.pushParser(new ExpressionParser(this));
 			this.mode = CONDITION_END;
-			throw new SyntaxError(token, "Invalid do-while statement: '(' expected");
+			throw new SyntaxError(token, "Invalid do-while statement - '(' expected");
 		}
 		if (this.mode == CONDITION_END)
 		{
@@ -78,7 +78,7 @@ public class DoStatementParser extends Parser implements IValued
 			}
 			
 			pm.popParser();
-			throw new SyntaxError(token, "Invalid do-while statement: ')' expected");
+			throw new SyntaxError(token, "Invalid do-while statement - ')' expected");
 		}
 		return false;
 	}

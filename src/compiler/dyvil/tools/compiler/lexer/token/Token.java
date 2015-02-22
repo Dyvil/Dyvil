@@ -59,18 +59,6 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public boolean isType(int type)
-	{
-		return (this.type & type) == this.type;
-	}
-	
-	@Override
-	public boolean isAnyType(int type)
-	{
-		return (this.type & type) != 0;
-	}
-	
-	@Override
 	public int index()
 	{
 		return this.index;
@@ -140,10 +128,6 @@ public class Token implements IToken
 		if (object instanceof String)
 		{
 			return this.equals((String) object);
-		}
-		else if (object instanceof Number)
-		{
-			return this.isType(((Number) object).byteValue());
 		}
 		return this.equals(object);
 	}

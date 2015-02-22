@@ -35,7 +35,7 @@ public class DWTValueParser extends Parser
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
-				if (token.next().isType(Tokens.OPEN_CURLY_BRACKET))
+				if (token.next().type() == Tokens.OPEN_CURLY_BRACKET)
 				{
 					DWTNode node = new DWTNode(token.raw(), token.value());
 					this.valued.setValue(node);

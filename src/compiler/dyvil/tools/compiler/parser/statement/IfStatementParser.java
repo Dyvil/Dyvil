@@ -38,29 +38,29 @@ public class IfStatementParser extends Parser implements IValued
 		int type = token.type();
 		if (this.mode == IF)
 		{
+			this.mode = CONDITION_END;
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ExpressionParser(this));
-				this.mode = CONDITION_END;
 				return true;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid if statement - '(' expected");
 		}
 		if (this.mode == CONDITION_END)
 		{
+			this.mode = THEN;
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
-				this.mode = THEN;
 				return true;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid if statement - ')' expected");
 		}
 		if (this.mode == THEN)
 		{
 			if (ParserUtil.isTerminator(type))
 			{
 				// 'else' on new line after inserted semicolon
-				if (token.next().isType(Tokens.ELSE))
+				if (token.next().type() == Tokens.ELSE)
 				{
 					pm.skip(2);
 					pm.pushParser(new ExpressionParser(this));

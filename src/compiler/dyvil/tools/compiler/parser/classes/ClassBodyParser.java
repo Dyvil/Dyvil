@@ -235,7 +235,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		}
 		
 		// "Insert" a semicolon after a closing curly bracket.
-		if (token.prev().isType(Tokens.CLOSE_CURLY_BRACKET))
+		if (token.prev().type() == Tokens.CLOSE_CURLY_BRACKET)
 		{
 			this.reset();
 			pm.reparse();

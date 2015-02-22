@@ -13,10 +13,6 @@ public interface IToken extends ICodePosition
 	
 	public boolean equals(String value) throws SyntaxError;
 	
-	public boolean isType(int type) throws SyntaxError;
-	
-	public boolean isAnyType(int types) throws SyntaxError;
-	
 	public int index() throws SyntaxError;
 	
 	public IToken prev() throws SyntaxError;

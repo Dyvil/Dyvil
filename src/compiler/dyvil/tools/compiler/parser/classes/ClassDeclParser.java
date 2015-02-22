@@ -87,7 +87,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 				this.mode = GENERICS | EXTENDS | IMPLEMENTS | BODY;
 				return true;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Class Declaration - Name expected");
 		}
 		if (this.isInMode(GENERICS))
 		{
@@ -140,17 +140,17 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 				pm.popParser();
 				return true;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Class Declaration - '{' or ';' expected");
 		}
 		if (this.isInMode(BODY_END))
 		{
-			if (token.isType(Tokens.CLOSE_CURLY_BRACKET))
+			if (type == Tokens.CLOSE_CURLY_BRACKET)
 			{
 				this.theClass.expandPosition(token);
 				pm.popParser();
 				return true;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid Class Declaration - '}' expected");
 		}
 		return false;
 	}

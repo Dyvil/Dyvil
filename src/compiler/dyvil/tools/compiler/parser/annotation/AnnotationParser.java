@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.expression.ExpressionMapParser;
+import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
 public class AnnotationParser extends Parser
@@ -27,37 +28,43 @@ public class AnnotationParser extends Parser
 	@Override
 	public boolean parse(ParserManager pm, IToken token) throws SyntaxError
 	{
+		int type = token.type();
 		if (this.mode == NAME)
 		{
+			if (ParserUtil.isIdentifier(type)) {
 			this.annotation = new Annotation(token.raw(), token.value().substring(1));
 			this.mode = PARAMETERS_START;
 			
-			if (!token.next().isType(Tokens.OPEN_PARENTHESIS))
+			if (token.next().type() != Tokens.OPEN_PARENTHESIS)
 			{
 				this.annotatable.addAnnotation(this.annotation);
 				pm.popParser();
 			}
 			
 			return true;
+			}
+			throw new SyntaxError(token, "Invalid Annotation - Name expected");
 		}
-		if (this.isInMode(PARAMETERS_START))
+		if (this.mode == PARAMETERS_START)
 		{
-			if (token.isType(Tokens.OPEN_PARENTHESIS))
+			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ExpressionMapParser(this.annotation));
 				this.mode = PARAMETERS_END;
 				return true;
 			}
+			throw new SyntaxError(token, "Invalid Annotation - '(' expected");
 		}
-		if (this.isInMode(PARAMETERS_END))
+		if (this.mode == PARAMETERS_END)
 		{
-			if (token.isType(Tokens.CLOSE_PARENTHESIS))
+			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
 				this.annotation.expandPosition(token);
 				this.annotatable.addAnnotation(this.annotation);
 				pm.popParser();
 				return true;
 			}
+			throw new SyntaxError(token, "Invalid Annotation - ')' expected");
 		}
 		
 		return false;

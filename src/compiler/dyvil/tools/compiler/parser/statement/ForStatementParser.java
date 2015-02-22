@@ -61,17 +61,14 @@ public class ForStatementParser extends Parser implements IValued
 		}
 		if (this.mode == VARIABLE)
 		{
+			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.forStatement.variable.setName(token.value());
-			}
-			else
-			{
-				throw new SyntaxError(token, "Invalid Variable Name");
+				return true;
 			}
 			
-			this.mode = SEPERATOR;
-			return true;
+				throw new SyntaxError(token, "Invalid for statement - Variable Name expected");
 		}
 		if (this.mode == SEPERATOR)
 		{
@@ -91,43 +88,42 @@ public class ForStatementParser extends Parser implements IValued
 		}
 		if (this.mode == VARIABLE_END)
 		{
+			this.mode = CONDITION_END;
 			if (type == Tokens.SEMICOLON)
 			{
-				if (token.next().isType(Tokens.SEMICOLON))
+				if (token.next().type() == Tokens.SEMICOLON)
 				{
-					this.mode = CONDITION_END;
 					return true;
 				}
 				
 				pm.pushParser(new ExpressionParser(this));
-				this.mode = CONDITION_END;
 				return true;
 			}
+			throw new SyntaxError(token, "Invalid for statement - ';' expected");
 		}
 		if (this.mode == CONDITION_END)
 		{
+			this.mode = FOR_END;
 			if (type == Tokens.SEMICOLON)
 			{
-				if (token.next().isType(Tokens.SEMICOLON))
+				if (token.next().type() == Tokens.SEMICOLON)
 				{
-					this.mode = FOR_END;
 					return true;
 				}
 				
 				pm.pushParser(new ExpressionParser(this));
-				this.mode = FOR_END;
 				return true;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid for statement - ';' expected");
 		}
 		if (this.mode == FOR_END)
 		{
+			this.mode = STATEMENT;
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
-				this.mode = STATEMENT;
 				return true;
 			}
-			return false;
+			throw new SyntaxError(token, "Invalid for statement - ')' expected");
 		}
 		if (this.mode == STATEMENT)
 		{
@@ -182,5 +178,4 @@ public class ForStatementParser extends Parser implements IValued
 	{
 		return null;
 	}
-	
 }

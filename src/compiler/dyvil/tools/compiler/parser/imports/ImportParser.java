@@ -49,7 +49,7 @@ public class ImportParser extends Parser
 				this.parent = mi;
 				this.container = mi;
 				
-				if (!token.next().isType(Tokens.CLOSE_CURLY_BRACKET))
+				if (token.next().type() != Tokens.CLOSE_CURLY_BRACKET)
 				{
 					pm.pushParser(new ImportListParser(mi, mi));
 					this.mode = MULTIIMPORT;
@@ -89,17 +89,15 @@ public class ImportParser extends Parser
 			if (type == Tokens.ARROW_OPERATOR)
 			{
 				IToken next = token.next();
-				if (next.isType(Tokens.TYPE_IDENTIFIER))
+				if (next.type() == Tokens.TYPE_IDENTIFIER)
 				{
 					((SimpleImport) this.parent).setAlias(next.value());
 					pm.skip();
 					return true;
 				}
-				else
-				{
-					this.mode = DOT | IMPORT;
-					throw new SyntaxError(next, "Invalid Import Alias");
-				}
+				
+				this.mode = DOT | IMPORT;
+				throw new SyntaxError(next, "Invalid Import Alias");
 			}
 		}
 		if (this.isInMode(MULTIIMPORT))

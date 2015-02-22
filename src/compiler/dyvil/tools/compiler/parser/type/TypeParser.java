@@ -68,7 +68,7 @@ public class TypeParser extends Parser implements ITyped
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				if (token.next().isType(Tokens.OPEN_SQUARE_BRACKET))
+				if (token.next().type() == Tokens.OPEN_SQUARE_BRACKET)
 				{
 					this.type = new GenericType(token, token.value());
 					this.mode = GENERICS;
@@ -91,7 +91,7 @@ public class TypeParser extends Parser implements ITyped
 		{
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
-				if (token.next().isType(Tokens.ARROW_OPERATOR))
+				if (token.next().type() == Tokens.ARROW_OPERATOR)
 				{
 					TupleType tupleType = (TupleType) this.type;
 					this.type = new LambdaType(tupleType);

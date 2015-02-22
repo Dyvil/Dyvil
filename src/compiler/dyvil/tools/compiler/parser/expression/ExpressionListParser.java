@@ -32,7 +32,7 @@ public class ExpressionListParser extends Parser implements IValued
 		
 		if (this.mode == 0)
 		{
-			if (token.next().isType(Tokens.COLON))
+			if (token.next().type() == Tokens.COLON)
 			{
 				this.label = token.value();
 				pm.skip();
@@ -56,7 +56,7 @@ public class ExpressionListParser extends Parser implements IValued
 				this.mode = 0;
 				return true;
 			}
-			if (token.prev().isType(Tokens.CLOSE_CURLY_BRACKET))
+			if (token.prev().type() == Tokens.CLOSE_CURLY_BRACKET)
 			{
 				pm.pushParser(new ExpressionParser(this), true);
 				return true;

@@ -77,7 +77,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = TUPLE_END;
 				this.value = new TupleValue(token);
 				
-				if (!token.next().isType(Tokens.CLOSE_PARENTHESIS))
+				int nextType = token.next().type();
+				if (nextType != Tokens.CLOSE_PARENTHESIS)
 				{
 					pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				}
@@ -94,7 +95,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = LIST_END;
 				this.value = new StatementList(token);
 				
-				if (!token.next().isType(Tokens.CLOSE_CURLY_BRACKET))
+				int nextType = token.next().type();
+				if (nextType != Tokens.CLOSE_CURLY_BRACKET)
 				{
 					pm.pushParser(new ExpressionListParser((IValueList) this.value));
 				}
@@ -158,6 +160,26 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			return false;
 		}
+		if (this.isInMode(PARAMETERS))
+		{
+			if (type == Tokens.OPEN_PARENTHESIS)
+			{
+				pm.pushParser(new ExpressionListParser((IValueList) this.value));
+				this.mode = PARAMETERS_END;
+				return true;
+			}
+			return false;
+		}
+		if (this.isInMode(PARAMETERS_END))
+		{
+			if (type == Tokens.CLOSE_PARENTHESIS)
+			{
+				this.value.expandPosition(token);
+				this.mode = ACCESS;
+				return true;
+			}
+			return false;
+		}
 		if (this.isInMode(BYTECODE))
 		{
 			if (type == Tokens.OPEN_CURLY_BRACKET)
@@ -179,6 +201,11 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				return true;
 			}
 			return false;
+		}
+		if (ParserUtil.isCloseBracket(type))
+		{
+			pm.popParser(true);
+			return true;
 		}
 		if (this.isInMode(LAMBDA))
 		{
@@ -212,7 +239,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(VARIABLE))
 		{
-			if (ParserUtil.isIdentifier(type) && token.next().isType(Tokens.EQUALS))
+			if (ParserUtil.isIdentifier(type) && token.next().type() == Tokens.EQUALS)
 			{
 				ICodePosition pos = token.raw();
 				IType itype;
@@ -264,7 +291,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				IToken prev = token.prev();
-				if (prev.isType(Tokens.TYPE_IDENTIFIER))
+				if (ParserUtil.isIdentifier(prev.type()))
 				{
 					this.value = new MethodCall(prev, null, prev.value());
 					this.mode = PARAMETERS;
@@ -301,7 +328,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			
 			IToken prev = token.prev();
-			if (prev.isType(Tokens.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(prev.type()))
 			{
 				this.value = null;
 				pm.reparse();
@@ -337,26 +364,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			((ConstructorCall) this.value).isSugarCall = true;
 			this.mode = 0;
 			return true;
-		}
-		if (this.isInMode(PARAMETERS))
-		{
-			if (type == Tokens.OPEN_PARENTHESIS)
-			{
-				pm.pushParser(new ExpressionListParser((IValueList) this.value));
-				this.mode = PARAMETERS_END;
-				return true;
-			}
-			return false;
-		}
-		if (this.isInMode(PARAMETERS_END))
-		{
-			if (type == Tokens.CLOSE_PARENTHESIS)
-			{
-				this.value.expandPosition(token);
-				this.mode = ACCESS;
-				return true;
-			}
-			return false;
 		}
 		
 		if (this.value != null)
@@ -636,7 +643,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			BreakStatement statement = new BreakStatement(token);
 			this.value = statement;
 			IToken next = token.next();
-			if (next.isType(Tokens.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(next.type()))
 			{
 				statement.setName(next.value());
 				pm.skip();
@@ -649,7 +656,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			ContinueStatement statement = new ContinueStatement(token);
 			this.value = statement;
 			IToken next = token.next();
-			if (next.isType(Tokens.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(next.type()))
 			{
 				statement.setName(next.value());
 				pm.skip();
@@ -662,7 +669,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			GoToStatement statement = new GoToStatement(token);
 			this.value = statement;
 			IToken next = token.next();
-			if (next.isType(Tokens.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(next.type()))
 			{
 				statement.setName(next.value());
 				pm.skip();
