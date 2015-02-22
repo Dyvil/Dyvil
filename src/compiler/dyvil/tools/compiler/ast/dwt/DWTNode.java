@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import dyvil.collections.SingleElementList;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -11,6 +12,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValueMap;
@@ -36,7 +38,6 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 	public Map<String, IValue>		properties	= new TreeMap();
 	
 	private IClass					theClass;
-	private IMethod					constructor;
 	private Map<String, IMethod>	setters;
 	
 	public DWTNode()
@@ -204,7 +205,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 						value.resolve(markers, m.theMethod);
 						continue;
 					}
-					markers.add(Markers.create(v.getPosition(), ""));
+					markers.add(Markers.create(v.getPosition(), "dwt.property.unknown", key, this.type.toString()));
 				}
 			}
 			else
@@ -218,7 +219,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 					value.resolve(markers, m.theMethod);
 					continue;
 				}
-				markers.add(Markers.create(value.getPosition(), ""));
+				markers.add(Markers.create(value.getPosition(), "dwt.property.unknown", key, this.type.toString()));
 			}
 		}
 		return this;
@@ -243,6 +244,29 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+	}
+	
+	public void write(String owner, MethodWriter writer)
+	{
+		String internal = this.type.getInternalName();
+		String extended = "L" + internal + ";";
+		// Constructor
+		writer.visitTypeInsn(Opcodes.NEW, internal);
+		writer.visitInsn(Opcodes.DUP);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, internal, "<init>", "()V", 0, Type.VOID);
+		
+		writer.visitPutStatic(owner, this.fullName, extended);
+		
+		for (Entry<String, IMethod> entry : this.setters.entrySet())
+		{
+			String key = entry.getKey();
+			IMethod setter = entry.getValue();
+			IValue value = this.properties.get(key);
+			
+			writer.visitGetStatic(owner, this.fullName, extended, this.type);
+			value.writeExpression(writer);
+			setter.writeCall(writer, null, Collections.EMPTY_LIST);
+		}
 	}
 	
 	@Override

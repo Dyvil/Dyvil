@@ -82,6 +82,10 @@ public class DWTValueParser extends Parser
 	{
 		switch (type)
 		{
+		case Tokens.TRUE:
+			return new BooleanValue(token.raw(), true);
+		case Tokens.FALSE:
+			return new BooleanValue(token.raw(), false);
 		case Tokens.TYPE_STRING:
 			return new StringValue(token.raw(), (String) token.object());
 		case Tokens.TYPE_CHAR:

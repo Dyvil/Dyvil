@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,7 +16,9 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
@@ -34,6 +37,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	public final File					outputFile;
 	
 	public final String					name;
+	public final String internalName;
 	public final Package				pack;
 	protected transient TokenIterator	tokens;
 	protected List<Marker>				markers;
@@ -53,6 +57,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		int start = name.lastIndexOf('/');
 		int end = name.lastIndexOf('.');
 		this.name = name.substring(start + 1, end);
+		this.internalName = pack.internalName + this.name;
 		
 		name = output.getPath();
 		start = name.lastIndexOf('/');
@@ -159,7 +164,9 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	
 	public void write(jdk.internal.org.objectweb.asm.ClassWriter writer)
 	{
-		writer.visit(Opcodes.V1_8, Modifiers.PUBLIC, this.pack.internalName + this.name, null, "java/lang/Object", null);
+		writer.visit(Opcodes.V1_8, Modifiers.PUBLIC, this.internalName, null, "java/lang/Object", null);
+		
+		// Write Fields
 		
 		for (Entry<String, IType> entry : this.fields.entrySet())
 		{
@@ -167,6 +174,24 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 			IType type = entry.getValue();
 			writer.visitField(Modifiers.PUBLIC | Modifiers.STATIC, name, type.getExtendedName(), null, null);
 		}
+		
+		// Write init Method
+		
+		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "init", "()V", null,
+				new String[] { "java/lang/Exception" }));
+		
+		mw.visitCode();
+		this.rootNode.write(this.internalName, mw);
+		mw.visitEnd(Type.VOID);
+		
+		// Write public static void main(String[] args)
+		
+		mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "main", "([Ljava/lang/String;)V", null,
+				new String[] { "java/lang/Exception" }));
+		mw.visitParameter("args", "[Ljava/lang/String;", 0);
+		mw.visitCode();
+		mw.visitMethodInsn(Opcodes.INVOKESTATIC, this.internalName, "init", "()V", 0, Type.VOID);
+		mw.visitEnd(Type.VOID);
 	}
 	
 	@Override
