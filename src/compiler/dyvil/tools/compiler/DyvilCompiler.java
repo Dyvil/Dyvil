@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.logging.*;
 import java.util.logging.Formatter;
 
+import dyvil.tools.compiler.ast.dwt.DWTFile;
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -239,6 +240,12 @@ public class DyvilCompiler
 		if (fileName.endsWith("Thumbs.db") || fileName.endsWith(".DS_Store"))
 		{
 			return;
+		}
+		else if (fileName.endsWith(".dwt"))
+		{
+			DWTFile dwt = new DWTFile(pack, (CodeFile) source, output);
+			output = dwt.outputFile;
+			units.add(dwt);
 		}
 		else if (fileName.endsWith(".dyvil"))
 		{
