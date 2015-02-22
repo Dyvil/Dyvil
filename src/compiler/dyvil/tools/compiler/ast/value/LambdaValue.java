@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.ast.value;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Handle;
@@ -46,6 +48,7 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 	private String				owner;
 	private String				name;
 	private String				desc;
+	private IType				returnType;
 	private List<IVariable>		capturedFields;
 	
 	public LambdaValue(ICodePosition position)
@@ -229,6 +232,13 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
+		if (this.method.hasTypeVariables())
+		{
+			Map<String, IType> typeArguments = new HashMap();
+			this.type.addTypeVariables(null, typeArguments);
+			this.returnType = this.method.getType(typeArguments);
+		}
+		
 		this.context = context;
 		this.value = this.value.resolve(markers, this);
 		this.value.check(markers, context);
@@ -340,7 +350,6 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 		String desc = this.getDescriptor();
 		String name = this.method.getQualifiedName();
 		jdk.internal.org.objectweb.asm.Type type = jdk.internal.org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
-		IType returnType = this.method.getType();
 		Handle handle = new Handle(Opcodes.H_INVOKESTATIC, this.owner, this.name, this.desc);
 		writer.visitInvokeDynamicInsn(name, desc, len, this.type, BOOTSTRAP, type, handle, type);
 	}
@@ -389,10 +398,9 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 	@Override
 	public void write(ClassWriter writer)
 	{
-		IType returnType = this.method.getType();
 		List<Parameter> params = this.method.getParameters();
 		this.name = "lambda$" + this.index;
-		this.desc = this.getDescriptor(params, returnType);
+		this.desc = this.getDescriptor(params, this.returnType);
 		// TODO Instance Lambdas (capturing this)
 		// TODO Exceptions
 		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC, this.name, this.desc, null,
