@@ -372,7 +372,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			else
 			{
 				buffer.append(Formatting.Expression.arrayStart);
-				Util.astToString(this.values, Formatting.Expression.arraySeperator, buffer);
+				Util.astToString(prefix, this.values, Formatting.Expression.arraySeperator, buffer);
 				buffer.append(Formatting.Expression.arrayEnd);
 			}
 		}

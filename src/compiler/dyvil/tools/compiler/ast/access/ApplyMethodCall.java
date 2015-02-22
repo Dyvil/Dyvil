@@ -171,7 +171,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
 		}
 		StringBuilder builder = new StringBuilder("Argument Types: [");
-		Util.typesToString(this.arguments, ", ", builder);
+		Util.typesToString("", this.arguments, ", ", builder);
 		marker.addInfo(builder.append(']').toString());
 		markers.add(marker);
 		return this;
@@ -273,6 +273,6 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 			this.instance.toString(prefix, buffer);
 		}
 		
-		Util.parametersToString(this.arguments, buffer, true);
+		Util.parametersToString(prefix, this.arguments, buffer, true);
 	}
 }

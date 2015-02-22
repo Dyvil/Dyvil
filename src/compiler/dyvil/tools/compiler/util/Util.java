@@ -79,7 +79,7 @@ public class Util
 		}
 	}
 	
-	public static void astToString(Collection list, String seperator, StringBuilder buffer)
+	public static void astToString(String prefix, Collection list, String seperator, StringBuilder buffer)
 	{
 		if (!list.isEmpty())
 		{
@@ -87,7 +87,7 @@ public class Util
 			while (true)
 			{
 				IASTNode o = (IASTNode) iterator.next();
-				o.toString("", buffer);
+				o.toString(prefix, buffer);
 				
 				if (iterator.hasNext())
 				{
@@ -101,7 +101,7 @@ public class Util
 		}
 	}
 	
-	public static void typesToString(Collection<? extends ITyped> list, String seperator, StringBuilder buffer)
+	public static void typesToString(String prefix, Collection<? extends ITyped> list, String seperator, StringBuilder buffer)
 	{
 		if (!list.isEmpty())
 		{
@@ -115,7 +115,7 @@ public class Util
 				}
 				else
 				{
-					type.toString("", buffer);
+					type.toString(prefix, buffer);
 				}
 				
 				if (iterator.hasNext())
@@ -130,14 +130,14 @@ public class Util
 		}
 	}
 	
-	public static void parametersToString(Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty)
+	public static void parametersToString(String prefix, Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty)
 	{
-		parametersToString(parameters, buffer, writeEmpty, Formatting.Method.emptyParameters, Formatting.Method.parametersStart,
-				Formatting.Method.parameterSeperator, Formatting.Method.parametersEnd);
+		parametersToString(prefix, parameters, buffer, writeEmpty, Formatting.Method.emptyParameters,
+				Formatting.Method.parametersStart, Formatting.Method.parameterSeperator, Formatting.Method.parametersEnd);
 	}
 	
-	public static void parametersToString(Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty, String empty, String start,
-			String seperator, String end)
+	public static void parametersToString(String prefix, Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty, String empty,
+			String start, String seperator, String end)
 	{
 		if (parameters.isEmpty())
 		{
@@ -153,7 +153,7 @@ public class Util
 			while (true)
 			{
 				IASTNode value = iterator.next();
-				value.toString("", buffer);
+				value.toString(prefix, buffer);
 				if (iterator.hasNext())
 				{
 					buffer.append(seperator);

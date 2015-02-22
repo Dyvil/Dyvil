@@ -1174,16 +1174,16 @@ public class Method extends Member implements IMethod
 		if (this.generics != null && !this.generics.isEmpty())
 		{
 			buffer.append('[');
-			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
+			Util.astToString(prefix, this.generics, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
 		}
 		
-		Util.parametersToString(this.parameters, buffer, true);
+		Util.parametersToString(prefix, this.parameters, buffer, true);
 		
 		if (this.throwsDeclarations != null && !this.throwsDeclarations.isEmpty())
 		{
 			buffer.append(Formatting.Method.signatureThrowsSeperator);
-			Util.astToString(this.throwsDeclarations, Formatting.Method.throwsSeperator, buffer);
+			Util.astToString(prefix, this.throwsDeclarations, Formatting.Method.throwsSeperator, buffer);
 		}
 		
 		IValue value = this.getValue();

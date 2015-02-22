@@ -276,7 +276,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 			}
 			if (this.upperBounds != null)
 			{
-				Util.astToString(this.upperBounds, Formatting.Type.genericBoundSeperator, buffer);
+				Util.astToString(prefix, this.upperBounds, Formatting.Type.genericBoundSeperator, buffer);
 			}
 		}
 	}

@@ -244,7 +244,7 @@ public class GenericType extends Type implements ITypeList
 		if (this.generics != null)
 		{
 			buffer.append('[');
-			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
+			Util.astToString(prefix, this.generics, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
 		}
 		for (int i = 0; i < this.arrayDimensions; i++)

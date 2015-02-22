@@ -528,7 +528,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
 		}
 		StringBuilder builder = new StringBuilder("Argument Types: [");
-		Util.typesToString(this.arguments, ", ", builder);
+		Util.typesToString("", this.arguments, ", ", builder);
 		marker.addInfo(builder.append(']').toString());
 		return marker;
 	}
@@ -599,7 +599,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		if (this.generics != null)
 		{
 			buffer.append('[');
-			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
+			Util.astToString(prefix, this.generics, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
 		}
 		
@@ -613,7 +613,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		}
 		else
 		{
-			Util.parametersToString(this.arguments, buffer, true);
+			Util.parametersToString(prefix, this.arguments, buffer, true);
 		}
 	}
 }

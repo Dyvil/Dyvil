@@ -6,9 +6,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
 
-import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.util.Util;
+import dyvil.util.FileUtils;
 
 public enum CompilerState
 {
@@ -18,9 +19,9 @@ public enum CompilerState
 	TOKENIZE
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
-			for (CompilationUnit cu : units)
+			for (ICompilationUnit cu : units)
 			{
 				cu.tokenize();
 			}
@@ -32,9 +33,9 @@ public enum CompilerState
 	PARSE
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
-			for (CompilationUnit cu : units)
+			for (ICompilationUnit cu : units)
 			{
 				cu.parse();
 			}
@@ -46,9 +47,9 @@ public enum CompilerState
 	RESOLVE_TYPES
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
-			for (CompilationUnit cu : units)
+			for (ICompilationUnit cu : units)
 			{
 				cu.resolveTypes();
 			}
@@ -60,9 +61,9 @@ public enum CompilerState
 	RESOLVE
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
-			for (CompilationUnit cu : units)
+			for (ICompilationUnit cu : units)
 			{
 				cu.resolve();
 			}
@@ -74,9 +75,9 @@ public enum CompilerState
 	CHECK
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
-			for (CompilationUnit cu : units)
+			for (ICompilationUnit cu : units)
 			{
 				cu.check();
 			}
@@ -88,22 +89,23 @@ public enum CompilerState
 	PRINT
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
-			for (CompilationUnit cu : units)
+			for (ICompilationUnit cu : units)
 			{
-				cu.print();
+				DyvilCompiler.logger.info(cu.getInputFile() + ":\n" + cu.toString());
 			}
 		}
 	},
 	FORMAT
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
-			for (CompilationUnit cu : units)
+			for (ICompilationUnit cu : units)
 			{
-				cu.format();
+				String s = cu.toString();
+				FileUtils.write(cu.getInputFile(), s);
 			}
 		}
 	},
@@ -113,11 +115,11 @@ public enum CompilerState
 	FOLD_CONSTANTS
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
 			for (int i = 0; i < DyvilCompiler.constantFolding; i++)
 			{
-				for (CompilationUnit cu : units)
+				for (ICompilationUnit cu : units)
 				{
 					cu.foldConstants();
 				}
@@ -137,9 +139,9 @@ public enum CompilerState
 	COMPILE
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
-			for (CompilationUnit cu : units)
+			for (ICompilationUnit cu : units)
 			{
 				cu.compile();
 			}
@@ -152,7 +154,7 @@ public enum CompilerState
 	JAR
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
 			ClassWriter.generateJAR(DyvilCompiler.files);
 		}
@@ -160,7 +162,7 @@ public enum CompilerState
 	TEST
 	{
 		@Override
-		public void apply(Collection<CompilationUnit> units)
+		public void apply(Collection<ICompilationUnit> units)
 		{
 			new Thread()
 			{
@@ -201,7 +203,7 @@ public enum CompilerState
 		}
 	};
 	
-	public static void applyState(CompilerState state, Collection<CompilationUnit> units)
+	public static void applyState(CompilerState state, Collection<ICompilationUnit> units)
 	{
 		long now = 0L;
 		if (DyvilCompiler.debug)
@@ -218,7 +220,7 @@ public enum CompilerState
 		}
 	}
 	
-	public void apply(Collection<CompilationUnit> units)
+	public void apply(Collection<ICompilationUnit> units)
 	{
 		
 	}

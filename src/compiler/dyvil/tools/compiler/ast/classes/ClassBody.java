@@ -258,8 +258,11 @@ public class ClassBody extends ASTNode
 		{
 			for (IClass clazz : this.classes)
 			{
-				clazz.toString(prefix1, buffer);
-				buffer.append('\n');
+				if (clazz != this.theClass)
+				{
+					clazz.toString(prefix1, buffer);
+					buffer.append('\n');
+				}
 			}
 			buffer.append('\n');
 		}

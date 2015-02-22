@@ -141,7 +141,7 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Import.multiImportStart);
-		Util.astToString(this.children, Formatting.Import.multiImportSeperator, buffer);
+		Util.astToString(prefix, this.children, Formatting.Import.multiImportSeperator, buffer);
 		buffer.append(Formatting.Import.multiImportEnd);
 	}
 }

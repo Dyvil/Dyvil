@@ -77,9 +77,10 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 				return true;
 			}
 		}
+		int type = token.type();
 		if (this.isInMode(NAME))
 		{
-			if (token.isType(Tokens.TYPE_IDENTIFIER))
+			if (ParserUtil.isIdentifier(type))
 			{
 				this.theClass.setPosition(token.raw());
 				this.theClass.setName(value);
@@ -88,7 +89,6 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 			}
 			return false;
 		}
-		int type = token.type();
 		if (this.isInMode(GENERICS))
 		{
 			if (type == Tokens.OPEN_SQUARE_BRACKET)

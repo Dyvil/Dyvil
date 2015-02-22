@@ -478,7 +478,7 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 		}
 		else
 		{
-			Util.astToString(this.parameters, Formatting.Method.parameterSeperator, buffer);
+			Util.astToString(prefix, this.parameters, Formatting.Method.parameterSeperator, buffer);
 		}
 		
 		buffer.append(Formatting.Expression.lambdaSeperator);

@@ -22,10 +22,10 @@ import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
-import dyvil.util.FileUtils;
 
-public class CompilationUnit extends ASTNode implements IContext
+public class CompilationUnit extends ASTNode implements ICompilationUnit, IContext
 {
 	public final CodeFile				inputFile;
 	public final File					outputDirectory;
@@ -58,6 +58,18 @@ public class CompilationUnit extends ASTNode implements IContext
 		end = name.lastIndexOf('.');
 		this.outputDirectory = new File(name.substring(0, start));
 		this.outputFile = new File(name.substring(0, end) + ".class");
+	}
+	
+	@Override
+	public CodeFile getInputFile()
+	{
+		return this.inputFile;
+	}
+	
+	@Override
+	public File getOutputFile()
+	{
+		return this.outputFile;
 	}
 	
 	public void setPackageDeclaration(PackageDecl packageDecl)
@@ -119,6 +131,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		return this.pack.internalName + name;
 	}
 	
+	@Override
 	public void tokenize()
 	{
 		Dlex lexer = new Dlex(this.inputFile);
@@ -126,13 +139,16 @@ public class CompilationUnit extends ASTNode implements IContext
 		this.tokens = lexer.iterator();
 	}
 	
+	@Override
 	public void parse()
 	{
-		DyvilCompiler.parser.setParser(new CompilationUnitParser(this));
-		DyvilCompiler.parser.parse(this.inputFile, this.tokens);
+		ParserManager manager = new ParserManager(new CompilationUnitParser(this));
+		manager.semicolonInference = true;
+		manager.parse(this.inputFile, this.tokens);
 		this.tokens = null;
 	}
 	
+	@Override
 	public void resolveTypes()
 	{
 		for (Import i : this.imports)
@@ -151,6 +167,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		}
 	}
 	
+	@Override
 	public void resolve()
 	{
 		for (IClass i : this.classes)
@@ -159,6 +176,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		}
 	}
 	
+	@Override
 	public void check()
 	{
 		this.pack.check(this.packageDeclaration, this.inputFile, this.markers);
@@ -169,6 +187,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		}
 	}
 	
+	@Override
 	public void foldConstants()
 	{
 		for (IClass i : this.classes)
@@ -177,6 +196,7 @@ public class CompilationUnit extends ASTNode implements IContext
 		}
 	}
 	
+	@Override
 	public void compile()
 	{
 		int size = this.markers.size();
@@ -223,17 +243,6 @@ public class CompilationUnit extends ASTNode implements IContext
 				}
 			}
 		}
-	}
-	
-	public void print()
-	{
-		DyvilCompiler.logger.info(this.inputFile + ":\n" + this.toString());
-	}
-	
-	public void format()
-	{
-		String s = this.toString();
-		FileUtils.write(this.inputFile, s);
 	}
 	
 	@Override
@@ -348,14 +357,6 @@ public class CompilationUnit extends ASTNode implements IContext
 	public byte getAccessibility(IMember member)
 	{
 		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder buffer = new StringBuilder();
-		this.toString("", buffer);
-		return buffer.toString();
 	}
 	
 	@Override

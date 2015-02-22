@@ -8,6 +8,7 @@ import java.util.logging.*;
 import java.util.logging.Formatter;
 
 import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.CompilerConfig;
@@ -21,28 +22,22 @@ import dyvil.tools.compiler.util.Util;
 
 public class DyvilCompiler
 {
-	public static boolean				parseStack;
-	public static boolean				logFile			= true;
-	public static boolean				debug;
-	public static int					constantFolding;
+	public static boolean					parseStack;
+	public static boolean					logFile			= true;
+	public static boolean					debug;
+	public static int						constantFolding;
 	
-	public static Logger				logger			= Logger.getLogger("DYVILC");
-	public static LoggerOutputStream	loggerOut		= new LoggerOutputStream(logger, "TEST-OUT");
-	public static LoggerOutputStream	loggerErr		= new LoggerOutputStream(logger, "TEST-ERR");
-	public static DateFormat			format			= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static Logger					logger			= Logger.getLogger("DYVILC");
+	public static LoggerOutputStream		loggerOut		= new LoggerOutputStream(logger, "TEST-OUT");
+	public static LoggerOutputStream		loggerErr		= new LoggerOutputStream(logger, "TEST-ERR");
+	public static DateFormat				format			= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	public static CompilerConfig		config			= new CompilerConfig();
-	public static Set<CompilerState>	states			= new TreeSet();
+	public static CompilerConfig			config			= new CompilerConfig();
+	public static Set<CompilerState>		states			= new TreeSet();
 	
-	public static ParserManager			configParser	= new ParserManager();
-	public static ParserManager			parser			= new ParserManager();
-	public static List<File>			files			= new ArrayList();
-	public static List<CompilationUnit>	units			= new ArrayList();
-	
-	static
-	{
-		parser.semicolonInference = true;
-	}
+	public static ParserManager				configParser	= new ParserManager();
+	public static List<File>				files			= new ArrayList();
+	public static List<ICompilationUnit>	units			= new ArrayList();
 	
 	public static void main(String[] args)
 	{

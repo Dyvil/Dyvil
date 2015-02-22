@@ -184,7 +184,7 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 		{
 			Marker marker = Markers.create(this.position, "resolve.constructor", this.type.toString());
 			StringBuilder builder = new StringBuilder("Argument Types: [");
-			Util.typesToString(this.arguments, ", ", builder);
+			Util.typesToString("", this.arguments, ", ", builder);
 			builder.append(']');
 			marker.addInfo(builder.toString());
 			markers.add(marker);
@@ -329,7 +329,7 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 		}
 		else
 		{
-			Util.parametersToString(this.arguments, buffer, true);
+			Util.parametersToString(prefix, this.arguments, buffer, true);
 		}
 	}
 }

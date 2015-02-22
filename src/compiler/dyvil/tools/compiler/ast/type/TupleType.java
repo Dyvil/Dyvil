@@ -228,6 +228,6 @@ public class TupleType extends Type implements ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		Util.parametersToString(this.types, buffer, true);
+		Util.parametersToString(prefix, this.types, buffer, true);
 	}
 }

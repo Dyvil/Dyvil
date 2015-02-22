@@ -219,7 +219,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 		marker.addInfo("Qualified Name: " + this.qualifiedName);
 		marker.addInfo("Instance Type: " + this.instance.getType());
 		StringBuilder builder = new StringBuilder("Argument Types: [");
-		Util.typesToString(this.arguments, ", ", builder);
+		Util.typesToString("", this.arguments, ", ", builder);
 		marker.addInfo(builder.append(']').toString());
 		markers.add(marker);
 		return this;
@@ -461,7 +461,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 		}
 		else
 		{
-			Util.parametersToString(this.arguments, buffer, true);
+			Util.parametersToString(prefix, this.arguments, buffer, true);
 		}
 	}
 }

@@ -174,7 +174,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, IValue
 			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
 		}
 		StringBuilder builder = new StringBuilder("Argument Types: [");
-		Util.typesToString(this.arguments, ", ", builder);
+		Util.typesToString("", this.arguments, ", ", builder);
 		marker.addInfo(builder.append(']').toString());
 		markers.add(marker);
 		return this;

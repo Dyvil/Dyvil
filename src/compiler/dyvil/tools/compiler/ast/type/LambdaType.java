@@ -106,7 +106,7 @@ public class LambdaType extends Type implements ITyped, ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		Util.parametersToString(this.argumentTypes, buffer, false);
+		Util.parametersToString(prefix, this.argumentTypes, buffer, false);
 		buffer.append(Formatting.Expression.lambdaSeperator);
 		this.returnType.toString("", buffer);
 	}

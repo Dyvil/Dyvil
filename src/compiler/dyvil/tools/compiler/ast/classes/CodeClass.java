@@ -1107,7 +1107,7 @@ public class CodeClass extends ASTNode implements IClass
 		if (this.generics != null && !this.generics.isEmpty())
 		{
 			buffer.append('[');
-			Util.astToString(this.generics, Formatting.Type.genericSeperator, buffer);
+			Util.astToString(prefix, this.generics, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
 		}
 		
@@ -1124,7 +1124,7 @@ public class CodeClass extends ASTNode implements IClass
 		if (!this.interfaces.isEmpty())
 		{
 			buffer.append(" implements ");
-			Util.astToString(this.interfaces, Formatting.Class.superClassesSeperator, buffer);
+			Util.astToString(prefix, this.interfaces, Formatting.Class.superClassesSeperator, buffer);
 		}
 		
 		if (this.body != null)
