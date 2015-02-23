@@ -40,7 +40,10 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 	public IType				type;
 	public List<DWTProperty>	properties	= new ArrayList();
 	
-	private IClass				theClass;
+	protected IClass			theClass;
+	protected IMethod			getter;
+	
+	private int varIndex;
 	
 	public DWTNode()
 	{
@@ -73,7 +76,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 	@Override
 	public IType getType()
 	{
-		return null;
+		return this.type;
 	}
 	
 	@Override
@@ -175,17 +178,16 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 		}
 		
 		this.type = this.theClass.getType();
+		
+		for (DWTProperty property : this.properties)
+		{
+			property.value.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
 	public DWTNode resolve(List<Marker> markers, IContext context)
 	{
-		IMethod constructor = this.theClass.getBody().getMethod("<init>");
-		if (constructor == null)
-		{
-			markers.add(Markers.create(this.position, "dwt.component.constructor"));
-		}
-		
 		for (DWTProperty property : this.properties)
 		{
 			String key = property.key;
@@ -195,7 +197,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 			{
 				for (IValue v : ((IValueList) value).getValues())
 				{
-					String s1 = DWTUtil.getAddMethodName(key);
+					String s1 = DWTUtil.getAdder(key);
 					MethodMatch m = this.theClass.resolveMethod(this, s1, new SingleElementList<IValue>(v));
 					
 					if (m != null)
@@ -206,15 +208,37 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 					markers.add(Markers.create(v.getPosition(), "dwt.property.unknown", key, this.type.toString()));
 				}
 			}
+			else if (type == NODE)
+			{
+				DWTNode node = ((DWTNode) value);
+				IClass iclass = node.theClass;
+				node.resolve(markers, context);
+				
+				if (iclass == null)
+				{
+					continue;
+				}
+				
+				MethodMatch getter = this.theClass.resolveMethod(this, DWTUtil.getGetter(key), Collections.EMPTY_LIST);
+				if (getter != null)
+				{
+					node.getter = getter.theMethod;
+					continue;
+				}
+				IMethod constructor = iclass.getBody().getMethod("<init>");
+				if (constructor == null)
+				{
+					markers.add(Markers.create(value.getPosition(), "dwt.component.constructor"));
+				}
+			}
 			else
 			{
-				String s1 = DWTUtil.getSetMethodName(key);
+				String s1 = DWTUtil.getSetter(key);
 				MethodMatch m = this.theClass.resolveMethod(this, s1, new SingleElementList<IValue>(value));
 				
 				if (m != null)
 				{
 					property.setter = m.theMethod;
-					value.resolve(markers, m.theMethod);
 					continue;
 				}
 				markers.add(Markers.create(value.getPosition(), "dwt.property.unknown", key, this.type.toString()));
@@ -237,6 +261,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		writer.visitVarInsn(Opcodes.ALOAD, this.varIndex, this.type);
 	}
 	
 	@Override
@@ -251,30 +276,42 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 		Label start = new Label();
 		Label end = new Label();
 		
-		int index = writer.addLocal(extended);
+		int index = this.varIndex = writer.addLocal(extended);
 		writer.visitLabel(start, false);
-		// Constructor
-		writer.visitTypeInsn(Opcodes.NEW, internal);
-		writer.visitInsn(Opcodes.DUP);
-		writer.visitInsn(Opcodes.DUP);
-		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, internal, "<init>", "()V", 0, Type.VOID);
+		if (this.getter != null)
+		{
+			// Getter
+			this.getter.writeCall(writer, this.parent, Collections.EMPTY_LIST);
+		}
+		else
+		{
+			// Constructor
+			writer.visitTypeInsn(Opcodes.NEW, internal);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitMethodInsn(Opcodes.INVOKESPECIAL, internal, "<init>", "()V", 0, Type.VOID);
+			writer.visitPutStatic(owner, this.fullName, extended);
+		}
 		
-		writer.visitPutStatic(owner, this.fullName, extended);
 		writer.visitVarInsn(Opcodes.ASTORE, index);
 		
 		for (DWTProperty property : this.properties)
 		{
 			IMethod setter = property.setter;
+			IValue value = property.value;
 			if (setter != null)
 			{
 				String key = property.key;
-				IValue value = property.value;
 				
 				writer.visitVarInsn(Opcodes.ALOAD, index, this.type);
 				value.writeExpression(writer);
 				writer.visitInsn(Opcodes.DUP);
 				writer.visitPutStatic(owner, property.fullName, value.getType().getExtendedName());
 				setter.writeCall(writer, null, Collections.EMPTY_LIST);
+			}
+			else if (value.getValueType() == NODE)
+			{
+				((DWTNode) value).write(owner, writer);
 			}
 		}
 		

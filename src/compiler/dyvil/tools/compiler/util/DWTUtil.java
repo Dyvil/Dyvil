@@ -4,26 +4,38 @@ import dyvil.util.CharUtils;
 
 public class DWTUtil
 {
-	public static String getAddMethodName(String s)
+	public static String getAdder(String methodName)
 	{
 		StringBuilder builder = new StringBuilder("add");
-		int len = s.length() - 1;
-		builder.append(CharUtils.toUpperCase(s.charAt(0)));
+		int len = methodName.length() - 1;
+		builder.append(CharUtils.toUpperCase(methodName.charAt(0)));
 		for (int i = 1; i < len; i++)
 		{
-			builder.append(s.charAt(i));
+			builder.append(methodName.charAt(i));
 		}
 		return builder.toString();
 	}
 	
-	public static String getSetMethodName(String s)
+	public static String getSetter(String methodName)
 	{
 		StringBuilder builder = new StringBuilder("set");
-		int len = s.length();
-		builder.append(CharUtils.toUpperCase(s.charAt(0)));
+		int len = methodName.length();
+		builder.append(CharUtils.toUpperCase(methodName.charAt(0)));
 		for (int i = 1; i < len; i++)
 		{
-			builder.append(s.charAt(i));
+			builder.append(methodName.charAt(i));
+		}
+		return builder.toString();
+	}
+	
+	public static String getGetter(String methodName)
+	{
+		StringBuilder builder = new StringBuilder("get");
+		int len = methodName.length();
+		builder.append(CharUtils.toUpperCase(methodName.charAt(0)));
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(methodName.charAt(i));
 		}
 		return builder.toString();
 	}
