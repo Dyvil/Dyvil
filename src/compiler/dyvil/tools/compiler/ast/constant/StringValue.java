@@ -89,6 +89,38 @@ public class StringValue extends ASTNode implements IConstantValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('"').append(this.value).append('"');
+		int len = this.value.length();
+		buffer.ensureCapacity(buffer.length() + len + 3);
+		buffer.append('"');
+		for (int i = 0; i < len; i++)
+		{
+			char c = this.value.charAt(i);
+			switch (c)
+			{
+			case '"':
+				buffer.append("\\\"");
+				continue;
+			case '\\':
+				buffer.append("\\\\");
+				continue;
+			case '\n':
+				buffer.append("\\n");
+				continue;
+			case '\t':
+				buffer.append("\\t");
+				continue;
+			case '\r':
+				buffer.append("\\r");
+				continue;
+			case '\b':
+				buffer.append("\\b");
+				continue;
+			case '\f':
+				buffer.append("\\f");
+				continue;
+			}
+			buffer.append(c);
+		}
+		buffer.append('"');
 	}
 }

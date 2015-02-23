@@ -238,6 +238,11 @@ public class Dlex implements Iterable<IToken>
 					addToken = true;
 					reparse = false;
 				}
+				else if (c == '\\' && appendEscape(buf, code.charAt(i + 1)))
+				{
+					i++;
+					continue;
+				}
 				else
 				{
 					buf.append(c);
@@ -249,6 +254,11 @@ public class Dlex implements Iterable<IToken>
 					buf.append('\'');
 					addToken = true;
 					reparse = false;
+				}
+				else if (c == '\\' && appendEscape(buf, code.charAt(i + 1)))
+				{
+					i++;
+					continue;
 				}
 				else
 				{
@@ -369,6 +379,34 @@ public class Dlex implements Iterable<IToken>
 		return 0;
 	}
 	
+	private static boolean appendEscape(StringBuilder buf, char n)
+	{
+		switch (n)
+		{
+		case '"':
+		case '\'':
+		case '\\':
+			buf.append(n);
+			return true;
+		case 'n':
+			buf.append('\n');
+			return true;
+		case 't':
+			buf.append('\t');
+			return true;
+		case 'r':
+			buf.append('\r');
+			return true;
+		case 'b':
+			buf.append('\b');
+			return true;
+		case 'f':
+			buf.append('\f');
+			return true;
+		}
+		return false;
+	}
+	
 	private Token addToken(Token prev, String s, int type, int line, int start, int len)
 	{
 		Token t;
@@ -487,32 +525,32 @@ public class Dlex implements Iterable<IToken>
 		switch (type)
 		{
 		case Tokens.TYPE_INT:
-			return Integer.parseInt(value);
+			return Integer.valueOf(value);
 		case Tokens.TYPE_INT | Tokens.MOD_BIN:
-			return Integer.parseInt(value.substring(2), 2);
+			return Integer.valueOf(value.substring(2), 2);
 		case Tokens.TYPE_INT | Tokens.MOD_OCT:
-			return Integer.parseInt(value, 8);
+			return Integer.valueOf(value, 8);
 		case Tokens.TYPE_INT | Tokens.MOD_HEX:
-			return Integer.parseInt(value.substring(2), 16);
+			return Integer.valueOf(value.substring(2), 16);
 			
 		case Tokens.TYPE_LONG:
-			return Long.parseLong(value);
+			return Long.valueOf(value);
 		case Tokens.TYPE_LONG | Tokens.MOD_BIN:
-			return Long.parseLong(value.substring(2), 2);
+			return Long.valueOf(value.substring(2), 2);
 		case Tokens.TYPE_LONG | Tokens.MOD_OCT:
-			return Long.parseLong(value, 8);
+			return Long.valueOf(value, 8);
 		case Tokens.TYPE_LONG | Tokens.MOD_HEX:
-			return Long.parseLong(value.substring(2), 16);
+			return Long.valueOf(value.substring(2), 16);
 			
 		case Tokens.TYPE_FLOAT:
-			return Float.parseFloat(value);
+			return Float.valueOf(value);
 		case Tokens.TYPE_FLOAT | Tokens.MOD_HEX:
-			return Float.parseFloat(value.substring(2));
+			return Float.valueOf(value.substring(2));
 			
 		case Tokens.TYPE_DOUBLE:
-			return Double.parseDouble(value);
+			return Double.valueOf(value);
 		case Tokens.TYPE_DOUBLE | Tokens.MOD_HEX:
-			return Double.parseDouble(value.substring(2));
+			return Double.valueOf(value.substring(2));
 			
 		case Tokens.TYPE_STRING:
 			return value.substring(1, value.length() - 1);

@@ -112,6 +112,34 @@ public class CharValue extends ASTNode implements INumericValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('\'').append(this.value).append('\'');
+		buffer.ensureCapacity(buffer.length() + 4);
+		buffer.append('"');
+		switch (this.value)
+		{
+		case '\'':
+			buffer.append("\\'");
+			break;
+		case '\\':
+			buffer.append("\\\\");
+			break;
+		case '\n':
+			buffer.append("\\n");
+			break;
+		case '\t':
+			buffer.append("\\t");
+			break;
+		case '\r':
+			buffer.append("\\r");
+			break;
+		case '\b':
+			buffer.append("\\b");
+			break;
+		case '\f':
+			buffer.append("\\f");
+			break;
+		default:
+			buffer.append(this.value);
+		}
+		buffer.append('"');
 	}
 }
