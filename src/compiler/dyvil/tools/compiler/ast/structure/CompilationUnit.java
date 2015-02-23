@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.CompilerState;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.ClassBody;
@@ -160,6 +161,11 @@ public class CompilationUnit extends ASTNode implements ICompilationUnit, IConte
 			}
 			DyvilCompiler.logger.info(buffer.toString());
 			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
+			
+			if (DyvilCompiler.states.contains(CompilerState.PRINT))
+			{
+				DyvilCompiler.logger.info("Code:\n" + this.toString());
+			}
 			return false;
 		}
 		return true;

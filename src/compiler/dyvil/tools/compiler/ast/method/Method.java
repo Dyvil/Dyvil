@@ -505,6 +505,7 @@ public class Method extends Member implements IMethod
 		{
 			instance.addTypeVariables(this.theClass.getThisType(), map);
 		}
+		len = Math.min(this.parameters.size(), len);
 		for (int i = 0; i < len; i++)
 		{
 			Parameter par = this.parameters.get(i);
@@ -1126,7 +1127,7 @@ public class Method extends Member implements IMethod
 		{
 			opcode = Opcodes.INVOKESTATIC;
 		}
-		else if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS) && (modifiers & Modifiers.ABSTRACT) != 0)
+		else if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS) && this.value == null)
 		{
 			opcode = Opcodes.INVOKEINTERFACE;
 		}

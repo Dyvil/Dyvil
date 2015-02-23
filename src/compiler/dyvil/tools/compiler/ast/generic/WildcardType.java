@@ -198,6 +198,7 @@ public class WildcardType extends TypeVariable implements IType
 				}
 				return t;
 			}
+			return this;
 		}
 		
 		WildcardType type = new WildcardType(this.position);

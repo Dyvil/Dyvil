@@ -5,8 +5,7 @@ import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValued;
 
-public interface IBaseMethod extends IASTNode, IValued, IParameterized, IContext
+public interface IBaseMethod extends IASTNode, IValued, IContext
 {
-
 	public void write(ClassWriter writer);
 }

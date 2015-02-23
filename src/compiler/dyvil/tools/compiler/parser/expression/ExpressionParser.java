@@ -6,7 +6,7 @@ import java.util.List;
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.field.Parameter;
+import dyvil.tools.compiler.ast.field.LambdaParameter;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.ast.value.*;
@@ -203,6 +203,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (ParserUtil.isCloseBracket(type))
 		{
+			this.value.expandPosition(token);
 			pm.popParser(true);
 			return;
 		}
@@ -293,14 +294,18 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				IToken prev = token.prev();
 				if (ParserUtil.isIdentifier(prev.type()))
 				{
-					this.value = new MethodCall(prev, null, prev.value());
-					this.mode = PARAMETERS;
+					MethodCall mc = new MethodCall(prev, null, prev.value());
+					this.value = mc;
+					pm.pushParser(new ExpressionListParser(mc));
 				}
 				else
 				{
-					this.value = new ApplyMethodCall(this.value.getPosition(), this.value);
-					this.mode = PARAMETERS;
+					ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value);
+					this.value = amc;
+					pm.pushParser(new ExpressionListParser(amc));
 				}
+				this.mode = PARAMETERS_END;
+				return;
 			}
 		}
 		if (this.isInMode(ACCESS_2))
@@ -322,7 +327,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.getAccess(pm, name, token, type);
 				return;
 			}
-			else if (ParserUtil.isTerminator(type))
+			if (ParserUtil.isTerminator(type))
 			{
 				pm.popParser(true);
 				return;
@@ -336,14 +341,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.getAccess(pm, prev.value(), prev, type);
 				return;
 			}
-			else
-			{
-				ApplyMethodCall call = new ApplyMethodCall(token.raw(), this.value);
-				this.value = call;
-				this.mode = 0;
-				pm.pushParser(new ExpressionParser(this), true);
-				return;
-			}
+			
+			ApplyMethodCall call = new ApplyMethodCall(token.raw(), this.value);
+			this.value = call;
+			this.mode = 0;
+			pm.pushParser(new ExpressionParser(this), true);
+			return;
 		}
 		if (this.isInMode(CONSTRUCTOR))
 		{
@@ -488,7 +491,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		if (type == IValue.CLASS_ACCESS)
 		{
 			ClassAccess ca = (ClassAccess) value;
-			Parameter param = new Parameter();
+			LambdaParameter param = new LambdaParameter();
 			param.setName(ca.type.getName(), ca.type.getQualifiedName());
 			return new LambdaValue(ca.getPosition(), param);
 		}
@@ -498,7 +501,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			return null;
 		}
 		
-		List<Parameter> params = new ArrayList();
+		List<LambdaParameter> params = new ArrayList();
 		
 		for (IValue v : ((TupleValue) value).getValues())
 		{
@@ -516,7 +519,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					return null;
 				}
 				
-				Parameter param = new Parameter();
+				LambdaParameter param = new LambdaParameter();
 				param.setName(fa.name, fa.qualifiedName);
 				param.setType(((ClassAccess) fa.instance).type);
 				params.add(param);

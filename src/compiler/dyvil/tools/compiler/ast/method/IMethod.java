@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
-public interface IMethod extends IBaseMethod, IMember, IGeneric, IThrower
+public interface IMethod extends IBaseMethod, IMember, IParameterized, IGeneric, IThrower
 {
 	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments);
 	
