@@ -239,11 +239,6 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 			this.instance.check(markers, context);
 		}
 		
-		for (IValue v : this.arguments)
-		{
-			v.check(markers, context);
-		}
-		
 		if (this.method != null)
 		{
 			if (this.typeArguments == null && this.method.hasTypeVariables())
@@ -271,6 +266,11 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 			{
 				markers.add(Markers.create(this.position, "access.method.invisible", this.name));
 			}
+		}
+
+		for (IValue v : this.arguments)
+		{
+			v.check(markers, context);
 		}
 	}
 	

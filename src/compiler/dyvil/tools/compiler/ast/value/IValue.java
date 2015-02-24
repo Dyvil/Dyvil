@@ -137,7 +137,7 @@ public interface IValue extends IASTNode, ITyped
 	public default void addTypeVariables(IType type, Map<String, IType> typeVariables)
 	{
 		IType t = this.getType();
-		if (type.equals(t))
+		if (type.isSuperTypeOf(t))
 		{
 			type.addTypeVariables(t, typeVariables);
 		}

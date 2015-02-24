@@ -201,11 +201,14 @@ public class WildcardType extends TypeVariable implements IType
 			return this;
 		}
 		
-		WildcardType type = new WildcardType(this.position);
 		if (this.lowerBound != null)
 		{
-			type.lowerBound = this.lowerBound.getConcreteType(typeVariables);
+			return this.lowerBound.getConcreteType(typeVariables);
 		}
+		
+		WildcardType type = new WildcardType(this.position);
+		type.arrayDimensions = this.arrayDimensions;
+		type.captureClass = this.captureClass;
 		if (this.upperBound != null)
 		{
 			type.upperBound = this.upperBound.getConcreteType(typeVariables);
