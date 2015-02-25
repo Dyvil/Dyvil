@@ -141,6 +141,17 @@ public interface IType extends IASTNode, INamed, IContext
 		return false;
 	}
 	
+	public default boolean isSuperTypeOf2(IType type)
+	{
+		IClass thisClass = this.getTheClass();
+		IClass thatClass = type.getTheClass();
+		if (thatClass != null)
+		{
+			return thatClass == thisClass || thatClass.isSubTypeOf(this);
+		}
+		return false;
+	}
+	
 	public default boolean equals(IType type)
 	{
 		if (this.getArrayDimensions() != type.getArrayDimensions())

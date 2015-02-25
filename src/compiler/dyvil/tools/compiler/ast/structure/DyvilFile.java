@@ -26,7 +26,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
 
-public class CompilationUnit extends ASTNode implements ICompilationUnit, IContext
+public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 {
 	public final CodeFile				inputFile;
 	public final File					outputDirectory;
@@ -42,7 +42,7 @@ public class CompilationUnit extends ASTNode implements ICompilationUnit, IConte
 	protected List<Import>				staticImports	= new ArrayList();
 	protected List<CodeClass>			classes			= new ArrayList();
 	
-	public CompilationUnit(Package pack, CodeFile input, File output)
+	public DyvilFile(Package pack, CodeFile input, File output)
 	{
 		this.position = input;
 		this.pack = pack;

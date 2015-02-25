@@ -332,6 +332,8 @@ public class BytecodeClass extends CodeClass
 				}
 			}
 		}
+		
+		this.type = new dyvil.tools.compiler.ast.type.Type(this);
 	}
 	
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)

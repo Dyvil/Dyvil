@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.imports;
 
 import dyvil.tools.compiler.ast.imports.PackageDecl;
-import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -11,12 +11,12 @@ import dyvil.tools.compiler.util.Tokens;
 
 public class PackageParser extends Parser
 {
-	protected CompilationUnit	unit;
+	protected DyvilFile	unit;
 	
 	private PackageDecl			packageDeclaration;
 	private StringBuilder		buffer	= new StringBuilder();
 	
-	public PackageParser(CompilationUnit unit)
+	public PackageParser(DyvilFile unit)
 	{
 		this.unit = unit;
 	}

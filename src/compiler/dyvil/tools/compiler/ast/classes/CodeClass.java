@@ -22,7 +22,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
@@ -43,7 +43,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
 {
-	protected CompilationUnit		unit;
+	protected DyvilFile		unit;
 	protected IClass				outerClass;
 	
 	protected int					modifiers;
@@ -72,14 +72,14 @@ public class CodeClass extends ASTNode implements IClass
 		this.type = new Type(this);
 	}
 	
-	public CodeClass(ICodePosition position, CompilationUnit unit)
+	public CodeClass(ICodePosition position, DyvilFile unit)
 	{
 		this.position = position;
 		this.unit = unit;
 		this.type = new Type(this);
 	}
 	
-	public CodeClass(ICodePosition position, CompilationUnit unit, int modifiers, List<Annotation> annotations)
+	public CodeClass(ICodePosition position, DyvilFile unit, int modifiers, List<Annotation> annotations)
 	{
 		this.position = position;
 		this.unit = unit;
@@ -89,7 +89,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public CompilationUnit getUnit()
+	public DyvilFile getUnit()
 	{
 		return this.unit;
 	}
@@ -349,13 +349,13 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean isSubTypeOf(IType type)
 	{
-		if (this.superType != null && type.isSuperTypeOf(this.superType))
+		if (this.superType != null && type.isSuperTypeOf2(this.superType))
 		{
 			return true;
 		}
 		for (IType i : this.interfaces)
 		{
-			if (type.isSuperTypeOf(i))
+			if (type.isSuperTypeOf2(i))
 			{
 				return true;
 			}

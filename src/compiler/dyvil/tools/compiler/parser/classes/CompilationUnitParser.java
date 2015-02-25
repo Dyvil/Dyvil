@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.imports.Import;
-import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -16,9 +16,9 @@ public class CompilationUnitParser extends Parser
 	private static final int	IMPORT	= 2;
 	private static final int	CLASS	= 4;
 	
-	private CompilationUnit		unit;
+	private DyvilFile		unit;
 	
-	public CompilationUnitParser(CompilationUnit unit)
+	public CompilationUnitParser(DyvilFile unit)
 	{
 		this.unit = unit;
 		this.mode = PACKAGE | IMPORT | CLASS;

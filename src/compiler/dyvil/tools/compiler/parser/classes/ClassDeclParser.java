@@ -4,7 +4,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -31,11 +31,11 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 	public static final int		BODY			= 32;
 	public static final int		BODY_END		= 64;
 	
-	protected CompilationUnit	unit;
+	protected DyvilFile	unit;
 	
 	private CodeClass			theClass;
 	
-	public ClassDeclParser(CompilationUnit unit)
+	public ClassDeclParser(DyvilFile unit)
 	{
 		this.unit = unit;
 		this.theClass = new CodeClass(null, unit);

@@ -38,7 +38,7 @@ public class Package implements INamed, IContext
 	public String					fullName;
 	public String					internalName;
 	
-	public List<CompilationUnit>	units		= new ArrayList();
+	public List<DyvilFile>	units		= new ArrayList();
 	public Map<String, IClass>		classes		= new HashMap();
 	public Map<String, Package>		subPackages	= new HashMap();
 	
@@ -110,7 +110,7 @@ public class Package implements INamed, IContext
 		return this.name.equals(name);
 	}
 	
-	public void addCompilationUnit(CompilationUnit unit)
+	public void addCompilationUnit(DyvilFile unit)
 	{
 		this.units.add(unit);
 	}

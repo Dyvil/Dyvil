@@ -11,14 +11,14 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.IModified;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 
 public interface IClass extends IASTNode, IMember, IAnnotated, IModified, INamed, IGeneric, IContext
 {
-	public CompilationUnit getUnit();
+	public DyvilFile getUnit();
 	
 	public Package getPackage();
 	

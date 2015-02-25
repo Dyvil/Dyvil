@@ -98,6 +98,12 @@ public class PrimitiveType extends Type
 	}
 	
 	@Override
+	public boolean isSuperTypeOf2(IType that)
+	{
+		return this.theClass == that.getTheClass();
+	}
+	
+	@Override
 	public IType resolve(List<Marker> markers, IContext context)
 	{
 		if (this.theClass == null)

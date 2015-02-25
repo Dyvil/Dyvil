@@ -8,7 +8,7 @@ import java.util.logging.*;
 import java.util.logging.Formatter;
 
 import dyvil.tools.compiler.ast.dwt.DWTFile;
-import dyvil.tools.compiler.ast.structure.CompilationUnit;
+import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Type;
@@ -249,7 +249,7 @@ public class DyvilCompiler
 		}
 		else if (fileName.endsWith(".dyvil"))
 		{
-			CompilationUnit unit = new CompilationUnit(pack, (CodeFile) source, output);
+			DyvilFile unit = new DyvilFile(pack, (CodeFile) source, output);
 			output = unit.outputFile;
 			pack.addCompilationUnit(unit);
 			units.add(unit);

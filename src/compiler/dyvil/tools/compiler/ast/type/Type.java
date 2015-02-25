@@ -358,6 +358,17 @@ public class Type extends ASTNode implements IType
 		return null;
 	}
 	
+	@Override
+	public boolean isSuperTypeOf2(IType type)
+	{
+		IClass thisClass = this.theClass;
+		IClass thatClass = type.getTheClass();
+		if (thatClass != null)
+		{
+			return thatClass == thisClass || thatClass.isSubTypeOf(this);
+		}
+		return false;
+	}
 
 	@Override
 	public boolean equals(IType type)
