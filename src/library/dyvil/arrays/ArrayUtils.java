@@ -1,13 +1,12 @@
-package dyvil.lang.array;
+package dyvil.arrays;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import dyvil.collections.Collections;
+import dyvil.collections.CollectionUtils;
 import dyvil.lang.annotation.infix;
-import dyvil.util.ArrayUtils;
 
 /**
  * The Arrays class provides default methods for creating, copying, converting
@@ -16,11 +15,32 @@ import dyvil.util.ArrayUtils;
  * @see ArrayUtils
  * @author Clashsoft
  */
-public class Arrays
+public class ArrayUtils
 {
 	public static @infix <T> T[] newArray(Class<T> type, int size)
 	{
 		return (T[]) Array.newInstance(type, size);
+	}
+	
+	// Component Types
+	
+	public static @infix <T> Class<T> getComponentType(T[] array)
+	{
+		return (Class<T>) array.getClass().getComponentType();
+	}
+	
+	public static @infix <T> Class getDeepComponentType(T[] array)
+	{
+		Class ret = array.getClass();
+		while (true)
+		{
+			Class c = ret.getComponentType();
+			if (c == null)
+			{
+				return ret;
+			}
+			ret = c;
+		}
 	}
 	
 	// Array Copies
@@ -49,12 +69,12 @@ public class Arrays
 	
 	public static @infix <T> T[] toArray(Collection<? extends T> collection)
 	{
-		return Collections.toArray(collection);
+		return CollectionUtils.toArray(collection);
 	}
 	
 	public static @infix <T> T[] toArray(Collection<? extends T> collection, Class<T> type)
 	{
-		return Collections.toArray(collection, type);
+		return CollectionUtils.toArray(collection, type);
 	}
 	
 	// Generic array functions

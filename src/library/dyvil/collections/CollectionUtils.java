@@ -6,7 +6,7 @@ import java.util.*;
 import dyvil.lang.annotation.infix;
 import dyvil.lang.annotation.inline;
 
-public interface Collections
+public interface CollectionUtils
 {
 	public static @infix @inline <T> boolean $qmark(Collection<T> collection, T t)
 	{
@@ -98,7 +98,7 @@ public interface Collections
 	/**
 	 * Creates an array from the given {@link Collection} {@code collection}
 	 * 
-	 * @see Collections#toArray(Collection, Class)
+	 * @see CollectionUtils#toArray(Collection, Class)
 	 * @param collection
 	 *            the collection
 	 * @return the array

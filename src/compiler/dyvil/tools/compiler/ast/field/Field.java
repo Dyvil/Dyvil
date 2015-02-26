@@ -7,6 +7,7 @@ import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.FieldVisitor;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Member;
@@ -17,7 +18,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
-import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.ModifierTypes;
 
 public class Field extends Member implements IField
 {
@@ -286,7 +287,7 @@ public class Field extends Member implements IField
 	{
 		super.toString(prefix, buffer);
 		
-		buffer.append(Modifiers.FIELD.toString(this.modifiers));
+		buffer.append(ModifierTypes.FIELD.toString(this.modifiers));
 		this.type.toString("", buffer);
 		buffer.append(' ');
 		

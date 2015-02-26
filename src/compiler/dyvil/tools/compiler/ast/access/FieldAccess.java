@@ -3,7 +3,8 @@ package dyvil.tools.compiler.ast.access;
 import java.util.Collections;
 import java.util.List;
 
-import dyvil.collections.SingleElementList;
+import dyvil.collections.mutable.SingleElementList;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.field.Field;
@@ -23,7 +24,6 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
 public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAccess

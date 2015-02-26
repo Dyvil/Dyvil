@@ -2,7 +2,7 @@ package dyvil.random;
 
 import java.util.Random;
 
-import dyvil.util.MathUtils;
+import dyvil.math.MathUtils;
 
 /**
  * A {@link Random} implementation that always returns the maximum value.

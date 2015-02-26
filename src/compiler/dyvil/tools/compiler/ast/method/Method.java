@@ -11,6 +11,7 @@ import java.util.*;
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IntValue;
@@ -30,7 +31,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.OpcodeUtil;
 import dyvil.tools.compiler.util.Util;
 
@@ -1156,7 +1157,7 @@ public class Method extends Member implements IMethod
 	{
 		super.toString(prefix, buffer);
 		
-		buffer.append(Modifiers.METHOD.toString(this.modifiers));
+		buffer.append(ModifierTypes.METHOD.toString(this.modifiers));
 		if (this.type != null)
 		{
 			this.type.toString("", buffer);

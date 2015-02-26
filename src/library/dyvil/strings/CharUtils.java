@@ -1,4 +1,4 @@
-package dyvil.util;
+package dyvil.strings;
 
 import java.util.Random;
 

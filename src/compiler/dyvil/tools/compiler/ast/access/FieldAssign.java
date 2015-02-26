@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.access;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -18,7 +19,6 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Modifiers;
 
 public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 {

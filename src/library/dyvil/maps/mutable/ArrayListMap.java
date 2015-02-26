@@ -1,4 +1,4 @@
-package dyvil.maps;
+package dyvil.maps.mutable;
 
 import java.util.ArrayList;
 import java.util.Map;

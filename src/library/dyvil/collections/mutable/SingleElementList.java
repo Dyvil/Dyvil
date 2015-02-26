@@ -1,4 +1,4 @@
-package dyvil.collections;
+package dyvil.collections.mutable;
 
 import java.lang.reflect.Array;
 import java.util.*;

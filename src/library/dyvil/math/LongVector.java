@@ -1,8 +1,8 @@
-package dyvil.collections.primitive;
+package dyvil.math;
 
 import java.util.Arrays;
 
-public class LongArrayList
+public class LongVector
 {
 	private static final int	DEFAULT_CAPACITY	= 10;
 	private static final int	MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
@@ -10,12 +10,12 @@ public class LongArrayList
 	private long[]				elementData;
 	private int					size;
 	
-	public LongArrayList()
+	public LongVector()
 	{
 		this(DEFAULT_CAPACITY);
 	}
 	
-	public LongArrayList(int initialCapacity)
+	public LongVector(int initialCapacity)
 	{
 		if (initialCapacity < 0)
 		{

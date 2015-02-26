@@ -8,7 +8,7 @@ import java.util.Objects;
 import dyvil.lang.annotation.infix;
 import dyvil.lang.annotation.inline;
 
-public interface ListUtils extends Collections
+public interface ListUtils extends CollectionUtils
 {
 	public static @infix @inline <T> T $at(List<T> list, int index)
 	{

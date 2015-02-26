@@ -5,12 +5,12 @@ import static dyvil.reflect.Opcodes.*;
 import java.util.Iterator;
 import java.util.List;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.util.Modifiers;
 
 public class CaseClasses
 {

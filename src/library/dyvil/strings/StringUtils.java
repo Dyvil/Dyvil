@@ -1,4 +1,4 @@
-package dyvil.util;
+package dyvil.strings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dyvil.lang.annotation.infix;
+import dyvil.math.MathUtils;
 import dyvil.random.Random;
 
 public interface StringUtils

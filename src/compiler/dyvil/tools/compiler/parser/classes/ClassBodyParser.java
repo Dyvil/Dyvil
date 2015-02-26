@@ -27,7 +27,7 @@ import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
-import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -90,7 +90,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 		if (this.isInMode(TYPE))
 		{
 			int i = 0;
-			if ((i = Modifiers.MEMBER.parse(value)) != -1)
+			if ((i = ModifierTypes.MEMBER.parse(value)) != -1)
 			{
 				if ((this.modifiers & i) != 0)
 				{
@@ -99,7 +99,7 @@ public class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnot
 				this.modifiers |= i;
 				return;
 			}
-			if ((i = Modifiers.CLASS_TYPE.parse(value)) != -1)
+			if ((i = ModifierTypes.CLASS_TYPE.parse(value)) != -1)
 			{
 				CodeClass codeClass = new CodeClass(null, this.theClass.getUnit(), this.modifiers, this.annotations);
 				this.theClass.getBody().addClass(codeClass);

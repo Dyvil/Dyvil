@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import jdk.internal.org.objectweb.asm.*;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -22,7 +23,6 @@ import dyvil.tools.compiler.backend.AnnotationVisitorImpl;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Modifiers;
 
 public class BytecodeClass extends CodeClass
 {

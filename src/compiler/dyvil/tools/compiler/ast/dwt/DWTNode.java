@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.collections.SingleElementList;
+import dyvil.collections.mutable.SingleElementList;
 import dyvil.reflect.Opcodes;
+import dyvil.strings.StringUtils;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -25,7 +26,6 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.DWTUtil;
-import dyvil.util.StringUtils;
 
 public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String>
 {

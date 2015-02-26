@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.access;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -18,7 +19,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
 public class SpecialConstructor extends ASTNode implements IValue, IValued

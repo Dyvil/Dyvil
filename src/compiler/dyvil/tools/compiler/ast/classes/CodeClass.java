@@ -5,6 +5,7 @@ import java.util.*;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAssign;
@@ -38,7 +39,7 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
@@ -561,7 +562,7 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = superClass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(Markers.create(this.superType.getPosition(), "class.extend.type", Modifiers.CLASS_TYPE.toString(modifiers),
+					markers.add(Markers.create(this.superType.getPosition(), "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers),
 							superClass.getName()));
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
@@ -592,7 +593,7 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = iclass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
 				{
-					markers.add(Markers.create(t.getPosition(), "class.implement.type", Modifiers.CLASS_TYPE.toString(modifiers), iclass.getName()));
+					markers.add(Markers.create(t.getPosition(), "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName()));
 				}
 				else if ((modifiers & Modifiers.DEPRECATED) != 0)
 				{
@@ -1101,8 +1102,8 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		buffer.append(prefix).append(Modifiers.CLASS.toString(this.modifiers));
-		buffer.append(Modifiers.CLASS_TYPE.toString(this.modifiers)).append(this.name);
+		buffer.append(prefix).append(ModifierTypes.CLASS.toString(this.modifiers));
+		buffer.append(ModifierTypes.CLASS_TYPE.toString(this.modifiers)).append(this.name);
 		
 		if (this.generics != null && !this.generics.isEmpty())
 		{

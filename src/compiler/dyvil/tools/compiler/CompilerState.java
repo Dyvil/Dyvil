@@ -7,10 +7,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Level;
 
+import dyvil.io.FileUtils;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.util.Util;
-import dyvil.util.FileUtils;
 
 public enum CompilerState
 {

@@ -1,4 +1,4 @@
-package dyvil.util;
+package dyvil.math;
 
 import dyvil.lang.annotation.infix;
 

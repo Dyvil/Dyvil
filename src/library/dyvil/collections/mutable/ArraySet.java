@@ -1,10 +1,10 @@
-package dyvil.collections;
+package dyvil.collections.mutable;
 
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
 
-import dyvil.lang.array.Arrays;
+import dyvil.arrays.ArrayUtils;
 
 public class ArraySet<E> extends AbstractSet<E>
 {
@@ -45,7 +45,7 @@ public class ArraySet<E> extends AbstractSet<E>
 	@Override
 	public boolean contains(Object o)
 	{
-		return Arrays.contains(this.entries, o);
+		return ArrayUtils.contains(this.entries, o);
 	}
 	
 	@Override
@@ -146,7 +146,7 @@ public class ArraySet<E> extends AbstractSet<E>
 			{
 				newCapacity = hugeCapacity(minCapacity);
 			}
-			this.entries = Arrays.copy(this.entries, newCapacity);
+			this.entries = ArrayUtils.copy(this.entries, newCapacity);
 		}
 	}
 	
@@ -174,7 +174,7 @@ public class ArraySet<E> extends AbstractSet<E>
 	@Override
 	public boolean remove(Object o)
 	{
-		int index = Arrays.indexOf(this.entries, o);
+		int index = ArrayUtils.indexOf(this.entries, o);
 		if (index != -1)
 		{
 			this.entries[index] = null;
@@ -191,7 +191,7 @@ public class ArraySet<E> extends AbstractSet<E>
 	{
 		for (Object object : c)
 		{
-			if (!Arrays.contains(this.entries, object))
+			if (!ArrayUtils.contains(this.entries, object))
 			{
 				return false;
 			}

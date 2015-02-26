@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -15,7 +16,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Modifiers;
 
 public class Variable extends Member implements IVariable
 {

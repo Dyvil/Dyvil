@@ -6,6 +6,7 @@ import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
@@ -25,7 +26,6 @@ import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
 public class MethodCall extends ASTNode implements IAccess, INamed

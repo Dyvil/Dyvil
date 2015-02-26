@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -28,7 +29,6 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.dwt.DWTParser;
-import dyvil.tools.compiler.util.Modifiers;
 
 public class DWTFile extends ASTNode implements ICompilationUnit
 {

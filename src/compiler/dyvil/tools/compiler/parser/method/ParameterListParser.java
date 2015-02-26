@@ -16,7 +16,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
-import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -55,7 +55,7 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 		{
 			int i = 0;
 			String value = token.value();
-			if ((i = Modifiers.PARAMETER.parse(value)) != -1)
+			if ((i = ModifierTypes.PARAMETER.parse(value)) != -1)
 			{
 				this.modifiers |= i;
 				return;

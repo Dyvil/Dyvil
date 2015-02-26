@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.access;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.INumericValue;
@@ -23,7 +24,6 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Modifiers;
 import dyvil.tools.compiler.util.Util;
 
 public class AssignMethodCall extends ASTNode implements IValue, IValued, IValueList, INamed

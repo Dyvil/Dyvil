@@ -6,7 +6,7 @@ import java.util.Set;
 import dyvil.lang.annotation.infix;
 import dyvil.lang.annotation.inline;
 
-public interface SetUtils extends Collections
+public interface SetUtils extends CollectionUtils
 {
 	public static @infix @inline <T> Set<T> toSet(T... array)
 	{

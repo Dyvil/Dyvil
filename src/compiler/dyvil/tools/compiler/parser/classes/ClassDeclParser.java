@@ -16,7 +16,7 @@ import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
-import dyvil.tools.compiler.util.Modifiers;
+import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -57,7 +57,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 		if (this.isInMode(MODIFIERS))
 		{
 			int i = 0;
-			if ((i = Modifiers.CLASS.parse(value)) != -1)
+			if ((i = ModifierTypes.CLASS.parse(value)) != -1)
 			{
 				if (this.theClass.addModifier(i))
 				{
@@ -65,7 +65,7 @@ public class ClassDeclParser extends Parser implements ITyped, ITypeList
 				}
 				return;
 			}
-			else if ((i = Modifiers.CLASS_TYPE.parse(value)) != -1)
+			else if ((i = ModifierTypes.CLASS_TYPE.parse(value)) != -1)
 			{
 				this.theClass.addModifier(i);
 				this.mode = NAME;

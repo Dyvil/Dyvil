@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.util;
 
-import dyvil.util.CharUtils;
+import dyvil.strings.CharUtils;
 
 public class DWTUtil
 {
