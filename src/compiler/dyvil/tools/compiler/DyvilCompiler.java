@@ -23,6 +23,9 @@ import dyvil.tools.compiler.util.Util;
 
 public class DyvilCompiler
 {
+	public static final String				VERSION			= "1.0.0";
+	public static final String				DYVIL_VERSION	= "1.0.0";
+	
 	public static boolean					parseStack;
 	public static boolean					logFile			= true;
 	public static boolean					debug;
@@ -34,7 +37,7 @@ public class DyvilCompiler
 	public static DateFormat				format			= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public static CompilerConfig			config			= new CompilerConfig();
-	public static Set<CompilerState>		states			= new TreeSet();
+	public static Set<CompilerPhase>		states			= new TreeSet();
 	
 	public static ParserManager				configParser	= new ParserManager();
 	public static List<File>				files			= new ArrayList();
@@ -62,13 +65,10 @@ public class DyvilCompiler
 		int states = DyvilCompiler.states.size();
 		int libs = config.libraries.size();
 		
-		logger.info("Compiling " + sourceDir.getAbsolutePath() + " to " + outputDir.getAbsolutePath());
-		if (debug)
-		{
-			logger.info("Applying " + states + (states == 1 ? " State: " : " States: ") + DyvilCompiler.states);
-		}
+		logger.info("Dyvil Compiler " + VERSION + " for Dyvil " + DYVIL_VERSION);
+		logger.info("");
 		
-		if (DyvilCompiler.states.contains(CompilerState.RESOLVE_TYPES))
+		if (DyvilCompiler.states.contains(CompilerPhase.RESOLVE_TYPES))
 		{
 			// Loads libraries
 			for (Library library : config.libraries)
@@ -84,6 +84,11 @@ public class DyvilCompiler
 		}
 		
 		now = System.nanoTime();
+		logger.info("Compiling '" + sourceDir + "' to '" + outputDir + "'");
+		if (debug)
+		{
+			logger.info("Applying " + states + (states == 1 ? " State: " : " States: ") + DyvilCompiler.states);
+		}
 		
 		// Scan for Packages and Compilation Units
 		for (String s : sourceDir.list())
@@ -99,9 +104,22 @@ public class DyvilCompiler
 		logger.info("");
 		
 		// Apply states
-		for (CompilerState state : DyvilCompiler.states)
+		if (debug)
 		{
-			CompilerState.applyState(state, units);
+			for (CompilerPhase state : DyvilCompiler.states)
+			{
+				DyvilCompiler.logger.info("Applying State " + state.getName());
+				long now1 = System.nanoTime();
+				state.apply(units);
+				Util.logProfile(now1, units.size(), "Finished State " + state.getName() + " (%.1f ms, %.1f ms/CU, %.2f CU/s)");
+			}
+		}
+		else
+		{
+			for (CompilerPhase state : DyvilCompiler.states)
+			{
+				state.apply(units);
+			}
 		}
 		
 		logger.info("");
@@ -129,8 +147,12 @@ public class DyvilCompiler
 					Throwable thrown = record.getThrown();
 					StringBuilder builder = new StringBuilder();
 					
-					builder.append('[').append(format.format(new Date(record.getMillis()))).append("] [");
-					builder.append(record.getLevel()).append("]: ").append(message).append('\n');
+					if (DyvilCompiler.debug)
+					{
+						builder.append('[').append(format.format(new Date(record.getMillis()))).append("] [");
+						builder.append(record.getLevel()).append("]: ");
+					}
+					builder.append(message).append('\n');
 					
 					if (thrown != null)
 					{
@@ -162,37 +184,37 @@ public class DyvilCompiler
 		switch (s)
 		{
 		case "compile":
-			states.add(CompilerState.TOKENIZE);
-			states.add(CompilerState.PARSE);
-			states.add(CompilerState.RESOLVE_TYPES);
-			states.add(CompilerState.RESOLVE);
-			states.add(CompilerState.CHECK);
-			states.add(CompilerState.COMPILE);
+			states.add(CompilerPhase.TOKENIZE);
+			states.add(CompilerPhase.PARSE);
+			states.add(CompilerPhase.RESOLVE_TYPES);
+			states.add(CompilerPhase.RESOLVE);
+			states.add(CompilerPhase.CHECK);
+			states.add(CompilerPhase.COMPILE);
 			return;
 			// case "obfuscate":
 			// case "doc":
 			// case "decompile":
 		case "optimize":
-			states.add(CompilerState.FOLD_CONSTANTS);
+			states.add(CompilerPhase.FOLD_CONSTANTS);
 			constantFolding = 1;
 			return;
 		case "jar":
-			states.add(CompilerState.JAR);
+			states.add(CompilerPhase.JAR);
 			return;
 		case "format":
-			states.add(CompilerState.TOKENIZE);
-			states.add(CompilerState.PARSE);
-			states.add(CompilerState.FORMAT);
+			states.add(CompilerPhase.TOKENIZE);
+			states.add(CompilerPhase.PARSE);
+			states.add(CompilerPhase.FORMAT);
 			return;
 		case "print":
-			states.add(CompilerState.PRINT);
+			states.add(CompilerPhase.PRINT);
 			return;
 		case "test":
-			states.add(CompilerState.TEST);
+			states.add(CompilerPhase.TEST);
 			return;
 		case "--debug":
-			states.add(CompilerState.PRINT);
-			states.add(CompilerState.TEST);
+			states.add(CompilerPhase.PRINT);
+			states.add(CompilerPhase.TEST);
 			debug = true;
 			return;
 		case "--pstack":
@@ -207,7 +229,7 @@ public class DyvilCompiler
 		{
 			try
 			{
-				states.add(CompilerState.FOLD_CONSTANTS);
+				states.add(CompilerPhase.FOLD_CONSTANTS);
 				constantFolding = Integer.parseInt(s.substring(2));
 				return;
 			}

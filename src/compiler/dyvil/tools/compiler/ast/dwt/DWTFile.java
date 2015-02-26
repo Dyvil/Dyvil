@@ -39,7 +39,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	public final File					outputFile;
 	
 	public final String					name;
-	public final String internalName;
+	public final String					internalName;
 	public final Package				pack;
 	protected transient TokenIterator	tokens;
 	protected List<Marker>				markers;
@@ -150,20 +150,25 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		int size = this.markers.size();
 		if (size > 0)
 		{
-			StringBuilder buffer = new StringBuilder("Markers in DWT File '");
-			buffer.append(this.inputFile).append(": ").append(size).append("\n\n");
+			StringBuilder builder = new StringBuilder("Problems in DWT File ").append(this.inputFile).append(":\n\n");
 			
-			boolean error = false;
+			int warnings = 0;
+			int errors = 0;
 			for (Marker marker : this.markers)
 			{
-				if (!error && marker.isError())
+				if (marker.isError())
 				{
-					error = true;
+					errors++;
 				}
-				marker.log(buffer);
+				else
+				{
+					warnings++;
+				}
+				marker.log(builder);
 			}
-			DyvilCompiler.logger.info(buffer.toString());
-			if (error)
+			builder.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
+			DyvilCompiler.logger.info(builder.toString());
+			if (errors > 0)
 			{
 				DyvilCompiler.logger.warning(this.name + " was not compiled due to errors in the DWT File");
 				return;

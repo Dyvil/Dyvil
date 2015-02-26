@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.CompilerState;
+import dyvil.tools.compiler.CompilerPhase;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.ClassBody;
@@ -162,7 +162,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 			DyvilCompiler.logger.info(buffer.toString());
 			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
 			
-			if (DyvilCompiler.states.contains(CompilerState.PRINT))
+			if (DyvilCompiler.states.contains(CompilerPhase.PRINT))
 			{
 				DyvilCompiler.logger.info("Code:\n" + this.toString());
 			}
@@ -225,22 +225,27 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 		int size = this.markers.size();
 		if (size > 0)
 		{
-			StringBuilder buffer = new StringBuilder("Markers in Compilation Unit '");
-			buffer.append(this.inputFile).append(": ").append(size).append("\n\n");
+			StringBuilder builder = new StringBuilder("Problems in Dyvil File ").append(this.inputFile).append(":\n\n");
 			
-			boolean error = false;
+			int warnings = 0;
+			int errors = 0;
 			for (Marker marker : this.markers)
 			{
-				if (!error && marker.isError())
+				if (marker.isError())
 				{
-					error = true;
+					errors++;
 				}
-				marker.log(buffer);
+				else
+				{
+					warnings++;
+				}
+				marker.log(builder);
 			}
-			DyvilCompiler.logger.info(buffer.toString());
-			if (error)
+			builder.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
+			DyvilCompiler.logger.info(builder.toString());
+			if (errors > 0)
 			{
-				DyvilCompiler.logger.warning(this.name + " was not compiled due to errors in the Compilation Unit");
+				DyvilCompiler.logger.warning(this.name + " was not compiled due to errors in the Compilation Unit\n");
 				return;
 			}
 		}
