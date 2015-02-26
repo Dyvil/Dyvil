@@ -72,6 +72,7 @@ public final class MethodWriter extends MethodVisitor
 		this.locals[index] = type.getFrameType();
 	}
 	
+	@Deprecated
 	public void addLocal(int index, Object type)
 	{
 		this.ensureLocals(index + 1);

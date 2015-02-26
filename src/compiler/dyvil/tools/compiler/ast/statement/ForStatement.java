@@ -29,7 +29,6 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	
 	private IContext		context;
 	private IStatement		parent;
-	private int				variableCount;
 	
 	public Variable			variable;
 	
@@ -44,9 +43,9 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	protected Label			updateLabel;
 	protected Label			endLabel;
 	
-	protected Variable		indexVar;
-	protected Variable		lengthVar;
-	protected Variable		arrayVar;
+	protected Variable		var1;
+	protected Variable		var2;
+	protected Variable		var3;
 	
 	public ForStatement(ICodePosition position)
 	{
@@ -103,8 +102,6 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.variableCount = context.getVariableCount();
-		
 		if (this.variable != null)
 		{
 			this.variable.resolveTypes(markers, context);
@@ -137,12 +134,9 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	{
 		this.context = context;
 		
-		this.variableCount = context.getVariableCount();
-		this.variable.index = this.variableCount++;
-		
 		if (this.type != 0)
 		{
-			IType type = this.variable.type;
+			IType varType = this.variable.type;
 			IValue value = this.variable.value;
 			this.variable.value = value.resolve(markers, context);
 			
@@ -151,11 +145,11 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			if (valueTypeDims != 0)
 			{
 				this.type = ARRAY;
-				if (!valueType.classEquals(type) || type.getArrayDimensions() != valueTypeDims - 1)
+				if (!valueType.classEquals(varType) || varType.getArrayDimensions() != valueTypeDims - 1)
 				{
 					Marker marker = Markers.create(value.getPosition(), "for.array.type");
 					marker.addInfo("Array Type: " + valueType);
-					marker.addInfo("Variable Type: " + type);
+					marker.addInfo("Variable Type: " + varType);
 					markers.add(marker);
 				}
 				else
@@ -164,26 +158,21 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 					var.type = Type.INT;
 					var.name = "$index";
 					var.qualifiedName = "$index";
-					var.index = this.variableCount++;
-					this.indexVar = var;
+					this.var1 = var;
 					
 					var = new Variable(null);
 					var.type = Type.INT;
 					var.name = "$length";
 					var.qualifiedName = "$length";
-					var.index = this.variableCount++;
-					this.lengthVar = var;
+					this.var2 = var;
 					
 					var = new Variable(null);
 					var.type = valueType;
 					var.name = "$array";
 					var.qualifiedName = "$array";
-					var.index = this.variableCount++;
-					this.arrayVar = var;
+					this.var3 = var;
 				}
 			}
-			
-			// TODO Iterator
 		}
 		else
 		{
@@ -266,12 +255,6 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public int getVariableCount()
-	{
-		return this.variableCount;
-	}
-	
-	@Override
 	public Package resolvePackage(String name)
 	{
 		return this.context.resolvePackage(name);
@@ -294,15 +277,15 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 		{
 			if ("$index".equals(name))
 			{
-				return new FieldMatch(this.indexVar, 1);
+				return new FieldMatch(this.var1, 1);
 			}
 			else if ("$length".equals(name))
 			{
-				return new FieldMatch(this.lengthVar, 1);
+				return new FieldMatch(this.var2, 1);
 			}
 			else if ("$array".equals(name))
 			{
-				return new FieldMatch(this.arrayVar, 1);
+				return new FieldMatch(this.var3, 1);
 			}
 		}
 		
@@ -410,18 +393,18 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 		}
 		if (this.type == ARRAY)
 		{
-			Variable arrayVar = this.arrayVar;
-			Variable indexVar = this.indexVar;
-			Variable lengthVar = this.lengthVar;
+			Variable arrayVar = this.var3;
+			Variable indexVar = this.var1;
+			Variable lengthVar = this.var2;
 			
 			Label scopeLabel = new Label();
 			writer.visitLabel(scopeLabel, false);
 			
 			// Local Variables
-			writer.addLocal(var.index, MethodWriter.TOP);
-			writer.addLocal(indexVar.index, MethodWriter.INT);
-			writer.addLocal(lengthVar.index, MethodWriter.INT);
-			writer.addLocal(arrayVar.index, arrayVar.type);
+			var.index = writer.addLocal(MethodWriter.TOP);
+			indexVar.index = writer.addLocal(MethodWriter.INT);
+			lengthVar.index = writer.addLocal(MethodWriter.INT);
+			arrayVar.index = writer.addLocal(arrayVar.type);
 			
 			// Load the array
 			var.value.writeExpression(writer);

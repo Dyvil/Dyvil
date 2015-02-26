@@ -42,7 +42,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int	PARAMETERS_END	= 1024;
 	public static final int	VARIABLE		= 2048;
 	
-	// TODO Entry symbol (@ is not a keyword anymore)
 	public static final int	BYTECODE		= 4096;
 	public static final int	BYTECODE_END	= 8192;
 	
@@ -116,6 +115,12 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
+				if (token.equals("@") && token.next().type() == Tokens.OPEN_CURLY_BRACKET)
+				{
+					this.mode = BYTECODE;
+					return;
+				}
+				
 				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
 				return;
@@ -203,7 +208,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (ParserUtil.isCloseBracket(type))
 		{
-			this.value.expandPosition(token);
 			pm.popParser(true);
 			return;
 		}
@@ -617,6 +621,10 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			return true;
 		}
 		case Tokens.ELSE:
+			if (!(this.parent instanceof IfStatementParser))
+			{
+				throw new SyntaxError(token, "Invalid Expression - 'else' not allowed in this location");
+			}
 			pm.popParser(true);
 			return true;
 		case Tokens.WHILE:
@@ -682,9 +690,13 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = 0;
 			return true;
 		}
-		case Tokens.SWITCH:
+		case Tokens.SWITCH: // TODO Switch Statements
 			return true;
-		case Tokens.CASE:
+		case Tokens.CASE: // TODO Patterns
+			return true;
+		case Tokens.TRY: // TODO Try-Catch Statement
+		case Tokens.CATCH:
+		case Tokens.FINALLY:
 			return true;
 		default:
 			return false;

@@ -31,7 +31,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 	private IContext				context;
 	private IStatement				parent;
 	
-	private int						variableCount;
 	public Map<String, Variable>	variables	= new HashMap();
 	
 	public Label					start;
@@ -136,7 +135,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		
 		this.context = context;
-		this.variableCount = context.getVariableCount();
 		
 		for (IValue v : this.values)
 		{
@@ -159,7 +157,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		
 		this.context = context;
-		this.variableCount = context.getVariableCount();
 		
 		int len = this.values.size();
 		for (int i = 0; i < len; i++)
@@ -175,7 +172,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 			{
 				FieldInitializer fi = (FieldInitializer) v2;
 				Variable var = fi.variable;
-				var.index = this.variableCount++;
 				this.variables.put(var.qualifiedName, var);
 			}
 		}
@@ -233,12 +229,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public IType getThisType()
 	{
 		return this.context.getThisType();
-	}
-	
-	@Override
-	public int getVariableCount()
-	{
-		return this.variableCount;
 	}
 	
 	@Override
@@ -326,7 +316,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			writer.addLocal(var.index, var.type);
+			var.index = writer.addLocal(var.type);
 			count++;
 		}
 		

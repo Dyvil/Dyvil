@@ -175,12 +175,6 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public int getVariableCount()
-	{
-		return this.parameters.size();
-	}
-	
-	@Override
 	public void addAnnotation(Annotation annotation)
 	{
 		if (!this.processAnnotation(annotation))
