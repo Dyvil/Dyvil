@@ -14,9 +14,9 @@ public interface Tokens
 	public int	TYPE_DOUBLE				= 0x00000080;
 	
 	public int	TYPE_STRING				= 0x00000100;
-	public int	TYPE_STRING_2			= 0x00000101;
+	public int	TYPE_STRING_2			= 0x00000200;
 	
-	public int	TYPE_CHAR				= 0x00000200;
+	public int	TYPE_CHAR				= 0x00000400;
 	
 	public int	TYPE_COMMENT			= 0x00001000;
 	

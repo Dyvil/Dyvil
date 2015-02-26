@@ -38,6 +38,7 @@ public class Dlex implements Iterable<IToken>
 		int subtype = 0;
 		boolean addToken = false;
 		boolean reparse = true;
+		boolean string = false;
 		for (i = 0; i < len; ++i, l = c)
 		{
 			c = code.charAt(i);
@@ -51,12 +52,12 @@ public class Dlex implements Iterable<IToken>
 					lineNumber++;
 					continue;
 				}
-				else if (c <= ' ')
+				if (c <= ' ')
 				{
 					continue;
 				}
 				
-				int m = getMode(c, code, i);
+				int m = string && l == '}' ? Tokens.TYPE_STRING_2 : getMode(c, code, i);
 				type = m & 0xFFFF;
 				subtype = m & 0xFFFF0000;
 			}
@@ -248,6 +249,32 @@ public class Dlex implements Iterable<IToken>
 					buf.append(c);
 				}
 				break;
+			case Tokens.TYPE_STRING_2:
+				if (c == '"' && (buf.length() > 1 || string))
+				{
+					buf.append('"');
+					string = false;
+					addToken = true;
+					reparse = false;
+					break;
+				}
+				else if (c == '\\' && appendEscape(buf, code.charAt(i + 1)))
+				{
+					i++;
+					continue;
+				}
+				else if (c == '$' && code.charAt(i + 1) == '{')
+				{
+					i++;
+					buf.append("${");
+					addToken = true;
+					string = true;
+				}
+				else
+				{
+					buf.append(c);
+				}
+				break;
 			case Tokens.TYPE_CHAR:
 				if (c == '\'' && buf.length() > 0)
 				{
@@ -387,6 +414,9 @@ public class Dlex implements Iterable<IToken>
 		case '\'':
 		case '\\':
 			buf.append(n);
+			return true;
+		case '$':
+			buf.append('$');
 			return true;
 		case 'n':
 			buf.append('\n');
@@ -555,7 +585,18 @@ public class Dlex implements Iterable<IToken>
 		case Tokens.TYPE_STRING:
 			return value.substring(1, value.length() - 1);
 		case Tokens.TYPE_STRING_2:
-			return value.substring(2, value.length() - 1);
+			int len = value.length();
+			int start = 0;
+			int end = len;
+			if (len > 2 && value.charAt(0) == '@' && value.charAt(1) == '"')
+			{
+				start = 2;
+			}
+			if (len > 0 && value.charAt(len - 1) == '"')
+			{
+				end = len - 1;
+			}
+			return value.substring(start, end);
 		case Tokens.TYPE_CHAR:
 			return Character.valueOf(value.charAt(1));
 		}
