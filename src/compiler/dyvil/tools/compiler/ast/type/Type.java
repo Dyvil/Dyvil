@@ -40,6 +40,7 @@ public class Type extends ASTNode implements IType
 	public static final Type			OBJECT		= new Type("Object");
 	public static final Type			PREDEF		= new Type("Predef");
 	public static final Type			ARRAY		= new Type("Array");
+	public static final Type			ITERABLE	= new Type("Iterable");
 	public static final Type			STRING		= new Type("String");
 	
 	public static final AnnotationType	AIntrinsic	= new AnnotationType("Intrinsic");
@@ -128,6 +129,8 @@ public class Type extends ASTNode implements IType
 		PREDEF.fullName = "dyvil.lang.Predef";
 		ARRAY.theClass = ARRAY_CLASS = Package.dyvilLang.resolveClass("Array");
 		ARRAY.fullName = "dyvil.lang.Array";
+		ITERABLE.theClass = Package.javaLang.resolveClass("Iterable");
+		ITERABLE.fullName = "java.lang.Iterable";
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
 		STRING.fullName = "java.lang.String";
 		
@@ -369,7 +372,7 @@ public class Type extends ASTNode implements IType
 		}
 		return false;
 	}
-
+	
 	@Override
 	public boolean equals(IType type)
 	{

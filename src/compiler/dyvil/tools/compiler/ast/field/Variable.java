@@ -190,7 +190,10 @@ public class Variable extends Member implements IVariable
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
-		value.writeExpression(writer);
+		if (value != null)
+		{
+			value.writeExpression(writer);
+		}
 		
 		writer.visitVarInsn(this.type.getStoreOpcode(), this.index, null);
 	}

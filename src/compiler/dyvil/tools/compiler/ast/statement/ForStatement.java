@@ -428,7 +428,10 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			var.writeSet(writer, null, null);
 			
 			// Then
-			this.then.writeStatement(writer);
+			if (this.then != null)
+			{
+				this.then.writeStatement(writer);
+			}
 			
 			// Increase index
 			writer.visitIincInsn(indexVar.index, 1);

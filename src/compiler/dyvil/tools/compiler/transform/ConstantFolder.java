@@ -130,9 +130,15 @@ public class ConstantFolder
 		case "$times":
 			return new IntValue(v1.intValue() * v2.intValue());
 		case "$div":
-			return new IntValue(v1.intValue() / v2.intValue());
+		{
+			int i2 = v2.intValue();
+			return i2 == 0 ? null : new IntValue(v1.intValue() / i2);
+		}
 		case "$percent":
-			return new IntValue(v1.intValue() % v2.intValue());
+		{
+			int i2 = v2.intValue();
+			return i2 == 0 ? null : new IntValue(v1.intValue() % i2);
+		}
 		case "$amp":
 			return new IntValue(v1.intValue() & v2.intValue());
 		case "$bar":
@@ -160,9 +166,15 @@ public class ConstantFolder
 		case "$times":
 			return new LongValue(v1.longValue() * v2.longValue());
 		case "$div":
-			return new LongValue(v1.longValue() / v2.longValue());
+		{
+			long l2 = v2.longValue();
+			return l2 == 0L ? null : new LongValue(v1.longValue() / l2);
+		}
 		case "$percent":
-			return new LongValue(v1.longValue() % v2.longValue());
+		{
+			long l2 = v2.longValue();
+			return l2 == 0L ? null : new LongValue(v1.longValue() % l2);
+		}
 		case "$amp":
 			return new LongValue(v1.longValue() & v2.longValue());
 		case "$bar":

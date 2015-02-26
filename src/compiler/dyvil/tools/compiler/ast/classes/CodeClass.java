@@ -44,7 +44,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
 {
-	protected DyvilFile		unit;
+	protected DyvilFile				unit;
 	protected IClass				outerClass;
 	
 	protected int					modifiers;

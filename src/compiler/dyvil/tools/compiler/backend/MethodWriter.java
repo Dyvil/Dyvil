@@ -132,7 +132,15 @@ public final class MethodWriter extends MethodVisitor
 	
 	protected void push(Object type)
 	{
-		this.ensureStack(this.stackIndex + 1);
+		if (type == LONG || type == DOUBLE)
+		{
+			this.ensureStack(this.stackIndex + 2);
+		}
+		else
+		{
+			this.ensureStack(this.stackIndex + 1);
+		}
+		
 		this.stack[this.stackIndex++] = type;
 	}
 	
@@ -472,6 +480,28 @@ public final class MethodWriter extends MethodVisitor
 			this.stackCount -= 2;
 			return;
 		}
+		case ICONST_0:
+		case ICONST_1:
+		case ICONST_2:
+		case ICONST_3:
+		case ICONST_4:
+		case ICONST_5:
+		case ICONST_M1:
+			this.push(INTEGER);
+			return;
+		case LCONST_0:
+		case LCONST_1:
+			this.push(LONG);
+			return;
+		case FCONST_0:
+		case FCONST_1:
+		case FCONST_2:
+			this.push(FLOAT);
+			return;
+		case DCONST_0:
+		case DCONST_1:
+			this.push(DOUBLE);
+			return;
 		case ACONST_NULL:
 			this.push(NULL);
 			return;

@@ -1,7 +1,0 @@
-frame
-{
-	visible = true
-	something = 7
-	title = "Dyvil Window Toolkit"
-	defaultCloseOperation = 2
-}

@@ -321,7 +321,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				if (this.precedence != 0 && this.dotless)
 				{
 					int p = Operators.index(name);
-					if (p != 0 && this.precedence >= p)
+					if (this.precedence >= p)
 					{
 						pm.popParser(true);
 						return;
