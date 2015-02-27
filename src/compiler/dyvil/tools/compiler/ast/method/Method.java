@@ -910,7 +910,7 @@ public class Method extends Member implements IMethod
 		}
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.addLocal(0, this.getThisType());
+			mw.addLocal(this.theClass.getType());
 		}
 		
 		if (this.annotations != null)
@@ -947,11 +947,27 @@ public class Method extends Member implements IMethod
 			param.write(mw);
 		}
 		
+		Label start = new Label();
+		Label end = new Label();
+		
 		if (this.value != null)
 		{
 			mw.visitCode();
+			mw.visitLabel(start, false);
 			this.value.writeExpression(mw);
+			mw.visitLabel(end, false);
 			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);
+		}
+		
+		int index = 0;
+		if ((this.modifiers & Modifiers.STATIC) == 0)
+		{
+			mw.visitLocalVariable("this", this.theClass.getType(), start, end, index++);
+		}
+		
+		for (Parameter param : this.parameters)
+		{
+			mw.visitLocalVariable(param.qualifiedName, param.type, start, end, index++);
 		}
 	}
 	

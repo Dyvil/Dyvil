@@ -203,6 +203,11 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitLocalVariable(name, desc, signature, start, end, index);
 	}
 	
+	public void visitLocalVariable(String name, IType type, Label start, Label end, int index)
+	{
+		this.mv.visitLocalVariable(name, type.getExtendedName(), type.getSignature(), start, end, index);
+	}
+	
 	// Constant Loading
 	
 	public void visitLdcInsn(int value)

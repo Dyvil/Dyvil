@@ -336,10 +336,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 			writer.removeLocals(count);
 			writer.visitLabel(this.end, count > 0 && (this.parent == null || this.parent.canVisitStack(this)));
 		}
-		else if (!writer.hasReturn)
-		{
-			writer.visitInsn(this.requiredType.getReturnOpcode());
-		}
+		writer.visitLabel(this.end, false);
 		
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{

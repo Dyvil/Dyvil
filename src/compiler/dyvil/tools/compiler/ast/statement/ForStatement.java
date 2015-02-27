@@ -357,7 +357,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Variable
 			if (var != null)
 			{
-				writer.addLocal(var.index, var.type);
+				var.index = writer.addLocal(var.type);
 				var.writeSet(writer, null, var.value);
 			}
 			
@@ -387,7 +387,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Variable
 			if (var != null)
 			{
-				writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), this.startLabel, this.endLabel, var.index);
+				writer.visitLocalVariable(var.qualifiedName, var.type, this.startLabel, this.endLabel, var.index);
 			}
 			return;
 		}
@@ -445,10 +445,10 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			writer.removeLocals(4);
 			writer.visitLabel(this.endLabel);
 			
-			writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), scopeLabel, this.endLabel, var.index);
+			writer.visitLocalVariable(var.qualifiedName, var.type, scopeLabel, this.endLabel, var.index);
 			writer.visitLocalVariable("$index", "I", null, scopeLabel, this.endLabel, indexVar.index);
 			writer.visitLocalVariable("$length", "I", null, scopeLabel, this.endLabel, lengthVar.index);
-			writer.visitLocalVariable("$array", arrayVar.type.getExtendedName(), arrayVar.type.getSignature(), scopeLabel, this.endLabel, arrayVar.index);
+			writer.visitLocalVariable("$array", arrayVar.type, scopeLabel, this.endLabel, arrayVar.index);
 			return;
 		}
 	}
