@@ -61,6 +61,12 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return this.method.isIntrinsic() || this.getType().isPrimitive();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.method == null ? Type.NONE : this.method.getType();
@@ -328,6 +334,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 			
 			if (this.writeIINC(writer, f))
 			{
+				f.writeGet(writer, null);
 				return;
 			}
 			

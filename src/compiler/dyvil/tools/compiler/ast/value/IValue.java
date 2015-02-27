@@ -104,7 +104,7 @@ public interface IValue extends IASTNode, ITyped
 			return null;
 		}
 		
-		boolean primitive = type1.isPrimitive();
+		boolean primitive = this.isPrimitive();
 		if (primitive != type.isPrimitive())
 		{
 			if (!Type.isSuperType(type, type1))

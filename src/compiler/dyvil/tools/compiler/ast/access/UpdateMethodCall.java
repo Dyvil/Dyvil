@@ -49,6 +49,12 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, IValue
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return this.method.isIntrinsic() || this.getType().isPrimitive();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.method == null ? Type.NONE : this.method.getType();
