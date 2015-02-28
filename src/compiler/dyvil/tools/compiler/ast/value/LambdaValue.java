@@ -410,9 +410,7 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 			{
 				IVariable var = this.capturedFields.get(i);
 				prevIndex[i] = var.getIndex();
-				var.setIndex(i);
-				
-				mw.visitParameter(var.getQualifiedName(), var.getType(), i);
+				var.setIndex(mw.visitParameter(var.getQualifiedName(), var.getType()));
 			}
 		}
 		
@@ -420,8 +418,7 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod
 		for (int i = 0; i < len1; i++)
 		{
 			Parameter param = params.get(i);
-			param.index = i + len;
-			mw.visitParameter(param.qualifiedName, param.type, param.index);
+			param.index = mw.visitParameter(param.qualifiedName, param.type);
 		}
 		
 		// Write the Value

@@ -216,7 +216,7 @@ public class Parameter extends Member implements IVariable
 	
 	public void write(MethodWriter writer)
 	{
-		writer.visitParameter(this.name, this.type, this.index);
+		this.index = writer.visitParameter(this.name, this.type);
 		
 		if ((this.modifiers & Modifiers.BYREF) != 0)
 		{

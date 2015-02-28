@@ -114,7 +114,7 @@ public class LambdaParameter extends Member implements IVariable
 	
 	public void write(MethodWriter writer)
 	{
-		writer.visitParameter(this.name, this.type, this.index);
+		this.index = writer.visitParameter(this.name, this.type);
 	}
 	
 	@Override

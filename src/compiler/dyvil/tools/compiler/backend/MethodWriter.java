@@ -197,9 +197,9 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitParameter(desc, index);
 	}
 	
-	public void visitParameter(String name, IType type, int index)
+	public int visitParameter(String name, IType type)
 	{
-		this.addLocal(index, type.getFrameType());
+		int index = this.addLocal(type.getFrameType());
 		this.mv.visitParameter(name, index);
 		
 		IClass iclass = type.getTheClass();
@@ -207,12 +207,14 @@ public final class MethodWriter extends MethodVisitor
 		{
 			iclass.writeInnerClassInfo(this.cw);
 		}
+		return index;
 	}
 	
-	public void visitParameter(String name, Object type, int index)
+	public int visitParameter(String name, Object type)
 	{
-		this.addLocal(index, type);
+		int index = this.addLocal(type);
 		this.mv.visitParameter(name, index);
+		return index;
 	}
 	
 	@Override
