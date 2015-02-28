@@ -488,14 +488,14 @@ public class Long implements Integer
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLT })
 	public boolean $less(int v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLT })
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLE })
 	public boolean $less$eq(int v)
 	{
 		return this.value <= v;

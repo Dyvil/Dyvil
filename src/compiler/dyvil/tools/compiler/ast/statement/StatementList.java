@@ -331,10 +331,10 @@ public class StatementList extends ValueList implements IStatement, IContext
 			v.writeStatement(writer);
 		}
 		
-		if (this.parent != null || !(this.context instanceof IMethod))
+		if (count > 0 && (this.parent != null || !(this.context instanceof IMethod)))
 		{
 			writer.removeLocals(count);
-			writer.visitLabel(this.end, count > 0 && (this.parent == null || this.parent.canVisitStack(this)));
+			writer.visitLabel(this.end, this.parent == null || this.parent.canVisitStack(this));
 		}
 		writer.visitLabel(this.end, false);
 		

@@ -20,6 +20,8 @@ public final class MethodWriter extends MethodVisitor
 	public ClassWriter				cw;
 	
 	public boolean					hasReturn;
+	
+	private int						localIndex;
 	private int						localCount;
 	private int						maxLocals;
 	private Object[]				locals			= new Object[2];
@@ -50,9 +52,6 @@ public final class MethodWriter extends MethodVisitor
 			Object[] newLocals = new Object[count];
 			System.arraycopy(this.locals, 0, newLocals, 0, this.locals.length);
 			this.locals = newLocals;
-			this.localCount = count;
-			this.maxLocals = count;
-			return;
 		}
 		if (count > this.maxLocals)
 		{
@@ -66,10 +65,12 @@ public final class MethodWriter extends MethodVisitor
 		}
 	}
 	
+	@Deprecated
 	public void addLocal(int index, IType type)
 	{
 		this.ensureLocals(index + 1);
 		this.locals[index] = type.getFrameType();
+		this.localIndex = index + 1;
 	}
 	
 	@Deprecated
@@ -77,27 +78,45 @@ public final class MethodWriter extends MethodVisitor
 	{
 		this.ensureLocals(index + 1);
 		this.locals[index] = type;
+		this.localIndex = index + 1;
 	}
 	
 	public int addLocal(IType type)
 	{
-		int index = this.localCount;
-		this.ensureLocals(index + 1);
-		this.locals[index] = type.getFrameType();
-		return index;
+		return this.addLocal(type.getFrameType());
 	}
 	
 	public int addLocal(Object type)
 	{
-		int index = this.localCount;
-		this.ensureLocals(index + 1);
-		this.locals[index] = type;
+		int index = this.localIndex;
+		if (type == LONG || type == DOUBLE)
+		{
+			this.ensureLocals(index + 2);
+			this.locals[index] = type;
+			this.locals[index + 1] = type;
+			this.localIndex += 2;
+		}
+		else
+		{
+			this.ensureLocals(index + 1);
+			this.locals[index] = type;
+			this.localIndex++;
+		}
+		
+		System.out.println("addLocal:\t" + this);
 		return index;
 	}
 	
 	public void removeLocals(int count)
 	{
-		this.localCount -= count;
+		for (int i = 0; i < count; i++) {
+			this.localCount--;
+			Object o = this.locals[--this.localIndex];
+			if (o == LONG || o == DOUBLE) {
+				this.localIndex--;
+				this.localCount--;
+			}
+		}
 	}
 	
 	// Stack Management
@@ -134,13 +153,12 @@ public final class MethodWriter extends MethodVisitor
 	{
 		if (type == LONG || type == DOUBLE)
 		{
-			this.ensureStack(this.stackIndex + 2);
+			if (this.stackIndex + 3 > this.maxStack)
+			{
+				this.maxStack = this.stackIndex + 3;
+			}
 		}
-		else
-		{
-			this.ensureStack(this.stackIndex + 1);
-		}
-		
+		this.ensureStack(this.stackIndex + 1);
 		this.stack[this.stackIndex++] = type;
 	}
 	
@@ -149,8 +167,7 @@ public final class MethodWriter extends MethodVisitor
 		Object frameType = type.getFrameType();
 		if (frameType != null)
 		{
-			this.ensureStack(this.stackIndex + 1);
-			this.stack[this.stackIndex++] = frameType;
+			this.push(frameType);
 		}
 	}
 	
@@ -167,6 +184,7 @@ public final class MethodWriter extends MethodVisitor
 	
 	private void visitFrame()
 	{
+		System.out.println("visitFrame:\t" + this);
 		this.mv.visitFrame(F_NEW, this.localCount, this.locals, this.stackCount, this.stack);
 	}
 	
@@ -340,39 +358,6 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitLdcInsn(obj);
 	}
 	
-	// Jump Instructions
-	
-	@Override
-	public void visitJumpInsn(int opcode, Label label)
-	{
-		if (opcode >= IFEQ && opcode <= IFLE)
-		{
-			this.visitFrame();
-			this.pop();
-		}
-		if (opcode >= IF_ICMPEQ && opcode <= IF_ICMPLE)
-		{
-			this.visitFrame();
-			this.stackIndex -= 2;
-			this.stackCount -= 2;
-		}
-		this.mv.visitJumpInsn(opcode, label);
-	}
-	
-	public void visitJumpInsn2(int opcode, Label label)
-	{
-		if (opcode >= IFEQ && opcode <= IFLE)
-		{
-			this.pop();
-		}
-		if (opcode >= IF_ICMPEQ && opcode <= IF_ICMPLE)
-		{
-			this.stackIndex -= 2;
-			this.stackCount -= 2;
-		}
-		this.mv.visitJumpInsn(opcode, label);
-	}
-	
 	// Labels
 	
 	@Override
@@ -423,46 +408,46 @@ public final class MethodWriter extends MethodVisitor
 		{
 		case DUP:
 		{
-			this.ensureStack(this.stackIndex + 2);
-			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex];
+			this.ensureStack(this.stackIndex + 1);
+			this.stack[this.stackIndex] = this.stack[this.stackIndex - 1];
 			this.stackIndex++;
 			return;
 		}
 		case DUP_X1:
 		{
-			this.ensureStack(this.stackIndex + 2);
-			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex - 1];
+			this.ensureStack(this.stackIndex + 1);
+			this.stack[this.stackIndex] = this.stack[this.stackIndex - 2];
 			this.stackIndex++;
 			return;
 		}
 		case DUP_X2:
 		{
-			this.ensureStack(this.stackIndex + 2);
-			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex - 2];
+			this.ensureStack(this.stackIndex + 1);
+			this.stack[this.stackIndex] = this.stack[this.stackIndex - 3];
 			this.stackIndex++;
 			return;
 		}
 		case DUP2:
 		{
-			this.ensureStack(this.stackIndex + 3);
+			this.ensureStack(this.stackIndex + 2);
+			this.stack[this.stackIndex] = this.stack[this.stackIndex - 2];
 			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex - 1];
-			this.stack[this.stackIndex + 2] = this.stack[this.stackIndex];
 			this.stackIndex += 2;
 			return;
 		}
 		case DUP2_X1:
 		{
-			this.ensureStack(this.stackIndex + 3);
+			this.ensureStack(this.stackIndex + 2);
+			this.stack[this.stackIndex] = this.stack[this.stackIndex - 3];
 			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex - 2];
-			this.stack[this.stackIndex + 2] = this.stack[this.stackIndex - 1];
 			this.stackIndex += 2;
 			return;
 		}
 		case DUP2_X2:
 		{
-			this.ensureStack(this.stackIndex + 3);
+			this.ensureStack(this.stackIndex + 2);
+			this.stack[this.stackIndex] = this.stack[this.stackIndex - 4];
 			this.stack[this.stackIndex + 1] = this.stack[this.stackIndex - 3];
-			this.stack[this.stackIndex + 2] = this.stack[this.stackIndex - 2];
 			this.stackIndex += 2;
 			return;
 		}
@@ -675,113 +660,122 @@ public final class MethodWriter extends MethodVisitor
 			this.mv.visitInsn(Opcodes.I2C);
 			this.set(INTEGER);
 			return;
+		}
+	}
+	
+	// Jump Instructions
+	
+	@Override
+	public void visitJumpInsn(int opcode, Label label)
+	{
+		if (opcode > 255)
+		{
+			visitSpecialJumpInsn(opcode, label);
+			return;
+		}
+		if (opcode >= IFEQ && opcode <= IFLE)
+		{
+			this.visitFrame();
+			this.pop();
+		}
+		if (opcode >= IF_ICMPEQ && opcode <= IF_ICMPLE)
+		{
+			this.visitFrame();
+			this.stackIndex -= 2;
+			this.stackCount -= 2;
+		}
+		this.mv.visitJumpInsn(opcode, label);
+	}
+	
+	public void visitJumpInsn2(int opcode, Label label)
+	{
+		if (opcode >= IFEQ && opcode <= IFLE)
+		{
+			this.pop();
+		}
+		if (opcode >= IF_ICMPEQ && opcode <= IF_ICMPLE)
+		{
+			this.stackIndex -= 2;
+			this.stackCount -= 2;
+		}
+		this.mv.visitJumpInsn(opcode, label);
+	}
+	
+	private void visitSpecialJumpInsn(int opcode, Label dest)
+	{
+		switch (opcode)
+		{
 		case Opcodes.IF_LCMPEQ:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.LCMP);
-			this.mv.visitInsn(Opcodes.IFEQ);
+			this.visitInsn(Opcodes.LCMP);
+			this.visitJumpInsn(Opcodes.IFEQ, dest);
 			return;
 		case Opcodes.IF_LCMPNE:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.LCMP);
-			this.mv.visitInsn(Opcodes.IFNE);
+			this.visitInsn(Opcodes.LCMP);
+			this.visitJumpInsn(Opcodes.IFNE, dest);
 			return;
 		case Opcodes.IF_LCMPLT:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.LCMP);
-			this.mv.visitInsn(Opcodes.IFLT);
+			this.visitInsn(Opcodes.LCMP);
+			this.visitJumpInsn(Opcodes.IFLT, dest);
 			return;
 		case Opcodes.IF_LCMPGE:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.LCMP);
-			this.mv.visitInsn(Opcodes.IFGE);
+			this.visitInsn(Opcodes.LCMP);
+			this.visitJumpInsn(Opcodes.IFGE, dest);
 			return;
 		case Opcodes.IF_LCMPGT:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.LCMP);
-			this.mv.visitInsn(Opcodes.IFGT);
+			this.visitInsn(Opcodes.LCMP);
+			this.visitJumpInsn(Opcodes.IFGT, dest);
 			return;
 		case Opcodes.IF_LCMPLE:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.LCMP);
-			this.mv.visitInsn(Opcodes.IFLE);
+			this.visitInsn(Opcodes.LCMP);
+			this.visitJumpInsn(Opcodes.IFLE, dest);
 			return;
 		case Opcodes.IF_FCMPEQ:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.FCMPL);
-			this.mv.visitInsn(Opcodes.IFEQ);
+			this.visitInsn(Opcodes.FCMPL);
+			this.visitJumpInsn(Opcodes.IFEQ, dest);
 			return;
 		case Opcodes.IF_FCMPNE:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.FCMPL);
-			this.mv.visitInsn(Opcodes.IFNE);
+			this.visitInsn(Opcodes.FCMPL);
+			this.visitJumpInsn(Opcodes.IFNE, dest);
 			return;
 		case Opcodes.IF_FCMPLT:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.FCMPL);
-			this.mv.visitInsn(Opcodes.IFLT);
+			this.visitInsn(Opcodes.FCMPL);
+			this.visitJumpInsn(Opcodes.IFLT, dest);
 			return;
 		case Opcodes.IF_FCMPGE:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.FCMPG);
-			this.mv.visitInsn(Opcodes.IFGE);
+			this.visitInsn(Opcodes.FCMPG);
+			this.visitJumpInsn(Opcodes.IFGE, dest);
 			return;
 		case Opcodes.IF_FCMPGT:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.FCMPG);
-			this.mv.visitInsn(Opcodes.IFGT);
+			this.visitInsn(Opcodes.FCMPG);
+			this.visitJumpInsn(Opcodes.IFGT, dest);
 			return;
 		case Opcodes.IF_FCMPLE:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.FCMPL);
-			this.mv.visitInsn(Opcodes.IFLE);
+			this.visitInsn(Opcodes.FCMPL);
+			this.visitJumpInsn(Opcodes.IFLE, dest);
 			return;
 		case Opcodes.IF_DCMPEQ:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.DCMPL);
-			this.mv.visitInsn(Opcodes.IFEQ);
+			this.visitInsn(Opcodes.DCMPL);
+			this.visitJumpInsn(Opcodes.IFEQ, dest);
 			return;
 		case Opcodes.IF_DCMPNE:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.DCMPL);
-			this.mv.visitInsn(Opcodes.IFNE);
+			this.visitInsn(Opcodes.DCMPL);
+			this.visitJumpInsn(Opcodes.IFNE, dest);
 			return;
 		case Opcodes.IF_DCMPLT:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.DCMPL);
-			this.mv.visitInsn(Opcodes.IFLT);
+			this.visitInsn(Opcodes.DCMPL);
+			this.visitJumpInsn(Opcodes.IFLT, dest);
 			return;
 		case Opcodes.IF_DCMPGE:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.DCMPG);
-			this.mv.visitInsn(Opcodes.IFGE);
+			this.visitInsn(Opcodes.DCMPG);
+			this.visitJumpInsn(Opcodes.IFGE, dest);
 			return;
 		case Opcodes.IF_DCMPGT:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.DCMPG);
-			this.mv.visitInsn(Opcodes.IFGT);
+			this.visitInsn(Opcodes.DCMPG);
+			this.visitJumpInsn(Opcodes.IFGT, dest);
 			return;
 		case Opcodes.IF_DCMPLE:
-			this.pop();
-			this.pop();
-			this.mv.visitInsn(Opcodes.DCMPL);
-			this.mv.visitInsn(Opcodes.IFLE);
+			this.visitInsn(Opcodes.DCMPL);
+			this.visitJumpInsn(Opcodes.IFLE, dest);
 			return;
 		}
 	}
@@ -1010,7 +1004,7 @@ public final class MethodWriter extends MethodVisitor
 		
 		for (int i = 0; i < this.stackCount; i++)
 		{
-			builder.append(this.stack[i]).append(", ");
+			builder.append(typeToString(this.stack[i])).append(", ");
 		}
 		
 		builder.append("], maxStack=").append(this.maxStack);
@@ -1018,11 +1012,48 @@ public final class MethodWriter extends MethodVisitor
 		
 		for (int i = 0; i < this.localCount; i++)
 		{
-			builder.append(this.locals[i]).append(", ");
+			builder.append(typeToString(this.locals[i])).append(", ");
 		}
 		
 		builder.append("], maxLocals=").append(this.maxLocals);
 		builder.append("}");
 		return builder.toString();
+	}
+	
+	private static String typeToString(Object type)
+	{
+		if (type == TOP)
+		{
+			return "top";
+		}
+		if (type == NULL)
+		{
+			return "null";
+		}
+		if (type == INTEGER)
+		{
+			return "int";
+		}
+		if (type == LONG)
+		{
+			return "long";
+		}
+		if (type == FLOAT)
+		{
+			return "float";
+		}
+		if (type == DOUBLE)
+		{
+			return "double";
+		}
+		if (type == UNINITIALIZED_THIS)
+		{
+			return "this";
+		}
+		if (type == null)
+		{
+			return "[null]";
+		}
+		return type.toString();
 	}
 }
