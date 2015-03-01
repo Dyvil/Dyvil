@@ -7,15 +7,37 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dyvil.lang.annotation.Utility;
 import dyvil.lang.annotation.infix;
+import dyvil.lang.annotation.inline;
 import dyvil.math.MathUtils;
 import dyvil.random.Random;
 
+/**
+ * The {@linkplain Utility utility interface} <b>StringUtils</b> can be used for
+ * several String-related functions such as splitting a string into a list of
+ * words, converting it to an identifier or acronym, converting to Title Case or
+ * camelCase, counting the number of times a character appears a the string,
+ * getting the index of a Regular Expression as well as several useful utility
+ * functions.
+ * 
+ * @author Clashsoft
+ * @version 1.0
+ */
+@Utility(String.class)
 public interface StringUtils
 {
-	public static final String[]	EMPTY_STRING_ARRAY	= new String[0];
-	
-	public static @infix String format(String format, Object... args)
+	/**
+	 * Formats the given {@link String} {@code format} with the given
+	 * {@code Object[] args} using {@link String#format(String, Object...)}.
+	 * 
+	 * @param format
+	 *            the format String
+	 * @param args
+	 *            the format arguments
+	 * @return the formatted String
+	 */
+	public static @infix @inline String format(String format, Object... args)
 	{
 		return String.format(format, args);
 	}
@@ -77,7 +99,7 @@ public interface StringUtils
 	{
 		if (s == null)
 		{
-			return EMPTY_STRING_ARRAY;
+			return dyvil.arrays.ArrayUtils.EMPTY_STRING_ARRAY;
 		}
 		return s.split("\n");
 	}
@@ -210,15 +232,6 @@ public interface StringUtils
 		return builder.toString();
 	}
 	
-/**
-	 * Returns a shortened acronym version of the given {@link String} {@code s} by removing the vowels.
-	 * <p>
-	 * Example:<br>
-	 * {@code getAcronym2("Hello World") returns "Hllo Wrld"
-	 * {@code getAcronym2("Clashsoft") returns "Clshsft"
-	 * @param s
-	 * @return
-	 */
 	public static @infix String removeVowels(String s)
 	{
 		if (s == null || s.isEmpty())

@@ -6,19 +6,26 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.List;
 
+import dyvil.lang.annotation.Utility;
+import dyvil.lang.annotation.infix;
+
 /**
- * {@code FileUtils} and its members can be used for several operations related
- * to files on the hard drive.
+ * The {@linkplain Utility utility interface} <b>FileUtils</b> can be used for several {@link File}
+ * -related operations such as writing or reading the file both as a String or
+ * as a List of Strings or recursively deleting directories.
  * 
  * @author Clashsoft
+ * @version 1.0
  */
+@Utility(File.class)
 public interface FileUtils
 {
 	/**
 	 * Writes the given {@link String} {@code text} to the given {@link File}
 	 * {@code file}. This operation attempts to override an existing file, and
-	 * creates a new file if no existing file was found. If an exception occurs,
-	 * its stack trace is printed.
+	 * creates a new file if no existing file exists. If an {@link IOException}
+	 * occurs, the stack trace of the exception is printed using
+	 * {@link Throwable#printStackTrace()}.
 	 * 
 	 * @param file
 	 *            the file
@@ -26,7 +33,7 @@ public interface FileUtils
 	 *            the text
 	 * @return true, if successful
 	 */
-	public static boolean write(File file, String text)
+	public static @infix boolean write(File file, String text)
 	{
 		try
 		{
@@ -49,8 +56,9 @@ public interface FileUtils
 	/**
 	 * Writes the given {@link List} {@code lines} to the given {@link File}
 	 * {@code file}. This operation attempts to override an existing file, and
-	 * creates a new file if no existing file was found. If an exception occurs,
-	 * its stack trace is printed.
+	 * creates a new file if no existing file exists. If an {@link IOException}
+	 * occurs, the stack trace of the exception is printed using
+	 * {@link Throwable#printStackTrace()}.
 	 * 
 	 * @param file
 	 *            the file
@@ -58,7 +66,7 @@ public interface FileUtils
 	 *            the lines
 	 * @return true, if successful
 	 */
-	public static boolean writeLines(File file, List<String> lines)
+	public static @infix boolean writeLines(File file, List<String> lines)
 	{
 		try
 		{
@@ -80,22 +88,21 @@ public interface FileUtils
 	/**
 	 * Reads the content of the the given {@link File} {@code file} and returns
 	 * it as a {@link String}. If the {@code file} does not exist, it returns
-	 * {@code null}. If any other {@link IOException} occurs, its stack trace is
-	 * printed.
+	 * {@code null}. If any other {@link IOException} occurs, the stack trace of
+	 * the exception is printed using {@link Throwable#printStackTrace()}.
 	 * 
 	 * @param file
 	 *            the file
 	 * @return the file content
 	 */
-	public static String read(File file)
+	public static @infix String read(File file)
 	{
+		if (!file.exists())
+		{
+			return null;
+		}
 		try
 		{
-			if (!file.exists())
-			{
-				return null;
-			}
-			
 			byte[] bytes = Files.readAllBytes(file.toPath());
 			return new String(bytes);
 		}
@@ -116,15 +123,14 @@ public interface FileUtils
 	 *            the file
 	 * @return the file content
 	 */
-	public static List<String> readLines(File file)
+	public static @infix List<String> readLines(File file)
 	{
+		if (!file.exists())
+		{
+			return null;
+		}
 		try
 		{
-			if (!file.exists())
-			{
-				return null;
-			}
-			
 			return Files.readAllLines(file.toPath(), Charset.defaultCharset());
 		}
 		catch (IOException ex)
@@ -135,15 +141,65 @@ public interface FileUtils
 	}
 	
 	/**
-	 * Returns the AppData directory of the host OS. Common paths are:
+	 * Recursively deletes the given {@link File} {@code file}. If the
+	 * {@code file} is a directory, this method deletes all sub-files of that
+	 * directory by calling itself on the sub-file. Otherwise, it simply deletes
+	 * the file using {@link File#delete()}.
+	 * 
+	 * @param file
+	 *            the file to delete
+	 */
+	public static void delete(File file)
+	{
+		if (file.isDirectory())
+		{
+			for (File f : file.listFiles())
+			{
+				delete(f);
+			}
+		}
+		file.delete();
+	}
+	
+	/**
+	 * Recursively deletes the given {@link File} {@code file}. If the
+	 * {@code file} is a directory, this method deletes all sub-files of that
+	 * directory by calling itself on the sub-file. Otherwise, it simply deletes
+	 * the file using {@link File#delete()}. The given {@code maxDepth} is used
+	 * to limit the recursive process to a maximum directory depth. If it set to
+	 * {@code 0}, it is ignored whether or not the given {@code file} is a
+	 * directory.
+	 * 
+	 * @param file
+	 *            the file to delete
+	 * @param maxDepth
+	 *            the maximum recursion depth
+	 */
+	public static void delete(File file, int maxDepth)
+	{
+		if (maxDepth > 0 && file.isDirectory())
+		{
+			for (File f : file.listFiles())
+			{
+				delete(f, maxDepth - 1);
+			}
+		}
+		file.delete();
+	}
+	
+	/**
+	 * Returns the user application data directory of the host OS. Common paths
+	 * are:
 	 * <ul>
 	 * <li>Windows: {@code %appdata%/}
 	 * <li>Mac OS: {@code $username$/Library/Application Support/}
 	 * <li>Linux: {@code $username$}
 	 * <li>Every other OS: System Property {@code user.dir}
 	 * </ul>
+	 * The {@code $username$} variable is acquired via the system property
+	 * {@code user.home}.
 	 * 
-	 * @return the AppData directory
+	 * @return the user application data directory
 	 */
 	public static String getAppdataDirectory()
 	{

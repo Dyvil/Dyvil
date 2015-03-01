@@ -9,89 +9,152 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
+import dyvil.arrays.ArrayUtils;
+import dyvil.lang.annotation.Utility;
+import dyvil.lang.annotation.infix;
+
+/**
+ * The {@linkplain Utility utility interface} <b>WebUtils</b> can be used for several
+ * {@link URL}-related operations such as checking for website availability,
+ * download the website as a {@code byte} array or saving it to a file on the
+ * disk.
+ * 
+ * @author Clashsoft
+ * @version 1.0
+ */
+@Utility(URL.class)
 public interface WebUtils
 {
 	/**
-	 * Checks if the given website is available.
+	 * Checks if the website at the given {@link String} {@code url} is
+	 * available using the HTTP request {@code HEAD}. The created
+	 * {@link HttpURLConnection} is set to not follow redirects.
 	 * 
 	 * @param url
-	 *            the URL
-	 * @return true, if available
+	 *            the URL of the website to check
+	 * @return true, if the website is available
+	 * @throws IOException
+	 *             if an IOException occurred.
 	 */
-	public static boolean checkWebsiteAvailable(String url)
+	public static boolean isAvailable(String url)
 	{
 		try
 		{
-			URL url1 = new URL(url);
-			
-			HttpURLConnection.setFollowRedirects(false);
-			HttpURLConnection con = (HttpURLConnection) url1.openConnection();
-			con.setRequestMethod("HEAD");
-			int response = con.getResponseCode();
-			return response == HttpURLConnection.HTTP_OK;
+			return isAvailable(new URL(url));
 		}
-		catch (Exception ex)
+		catch (IOException ex)
 		{
 			return false;
 		}
 	}
 	
-	public static String tryReadWebsite(String url)
+	/**
+	 * Checks if the website at the given {@link URL} {@code url} is available
+	 * using the HTTP request {@code HEAD}. The created
+	 * {@link HttpURLConnection} is set to not follow redirects.
+	 * 
+	 * @param url
+	 *            the URL of the website to check
+	 * @return true, if the website is available
+	 * @throws IOException
+	 *             if an IOException occurred.
+	 */
+	public static @infix boolean isAvailable(URL url) throws IOException
 	{
-		try
-		{
-			return readWebsite(url);
-		}
-		catch (IOException ex)
-		{
-		}
-		return null;
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setInstanceFollowRedirects(false);
+		con.setRequestMethod("HEAD");
+		return con.getResponseCode() == HttpURLConnection.HTTP_OK;
 	}
 	
 	/**
-	 * Reads the given website with the URL {@code url} or downloads its
-	 * contents and returns them as a {@link String}.
+	 * Downloads the website at the given {@link String} {@code url} and stores
+	 * it in a {@code byte} array. If the website is formatted as a sequence of
+	 * characters (i.e., it is a text or HTML), {@code new String(byte[])} can
+	 * be used to convert it to a String.
 	 * 
 	 * @param url
-	 *            the URL
-	 * @return the lines
+	 *            the URL of the website to check
+	 * @return the byte array containing the website data
+	 * @throws IOException
+	 *             if an IOException occurred.
 	 */
-	public static String readWebsite(String url) throws IOException
+	public static byte[] download(String url)
 	{
-		URL url1 = new URL(url);
-		ReadableByteChannel rbc = Channels.newChannel(url1.openStream());
+		try
+		{
+			return download(new URL(url));
+		}
+		catch (IOException ex)
+		{
+			ex.printStackTrace();
+			return ArrayUtils.EMPTY_BYTE_ARRAY;
+		}
+	}
+	
+	/**
+	 * Downloads the website at the given {@link URL} {@code url} and stores it
+	 * in a {@code byte} array. If the website is formatted as a sequence of
+	 * characters (i.e., it is a text or HTML), {@code new String(byte[])} can
+	 * be used to convert it to a String.
+	 * 
+	 * @param url
+	 *            the URL of the website to check
+	 * @return the byte array containing the website data
+	 * @throws IOException
+	 *             if an IOException occurred.
+	 */
+	public static byte[] download(URL url) throws IOException
+	{
+		ReadableByteChannel rbc = Channels.newChannel(url.openStream());
 		ByteBuffer bytebuf = ByteBuffer.allocate(1024);
 		rbc.read(bytebuf);
-		return new String(bytebuf.array());
+		return bytebuf.array();
 	}
 	
-	public static void tryDownload(String url, File output)
+	/**
+	 * Downloads the website at the given {@link String} {@code url} and saves
+	 * it at the given file.
+	 * 
+	 * @param url
+	 *            the URL of the website to check
+	 * @return true, if downloading and saving the website was successful
+	 * @throws IOException
+	 *             if an IOException occurred.
+	 */
+	public static boolean download(String url, File output)
 	{
-		try
+		try (ReadableByteChannel rbc = Channels.newChannel(new URL(url).openStream()); FileOutputStream fos = new FileOutputStream(output))
 		{
-			download(url, output);
+			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+			return true;
 		}
 		catch (IOException ex)
 		{
+			return false;
 		}
 	}
 	
 	/**
-	 * Downloads a file from the given {@code url} to the given {@link File}
-	 * {@code output}.
+	 * Downloads the website at the given {@link URL} {@code url} and saves it
+	 * at the given file.
 	 * 
 	 * @param url
-	 *            the URL
-	 * @param output
-	 *            the output file
+	 *            the URL of the website to check
+	 * @return true, if downloading and saving the website was successful
 	 * @throws IOException
+	 *             if an IOException occurred.
 	 */
-	public static void download(String url, File output) throws IOException
+	public static boolean download(URL url, File output)
 	{
-		URL url1 = new URL(url);
-		ReadableByteChannel rbc = Channels.newChannel(url1.openStream());
-		FileOutputStream fos = new FileOutputStream(output);
-		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-		fos.close();
+		try (ReadableByteChannel rbc = Channels.newChannel(url.openStream()); FileOutputStream fos = new FileOutputStream(output))
+		{
+			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+			return true;
+		}
+		catch (IOException ex)
+		{
+			return false;
+		}
 	}
 }

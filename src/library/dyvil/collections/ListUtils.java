@@ -15,17 +15,17 @@ public interface ListUtils extends CollectionUtils
 		return list.get(index);
 	}
 	
-	public static @infix @inline <T> List<T> toList(T... array)
-	{
-		return Arrays.asList(array);
-	}
-	
 	public static @infix <T> List<T> $plus(List<T> list1, List<T> list2)
 	{
 		List<T> ret = new ArrayList<T>(list1.size() + list2.size());
 		ret.addAll(list1);
 		ret.addAll(list2);
 		return ret;
+	}
+	
+	public static @infix @inline <T> List<T> toList(T... array)
+	{
+		return Arrays.asList(array);
 	}
 	
 	public static <T> List<List<T>> split(List<T> list, int maxLength)

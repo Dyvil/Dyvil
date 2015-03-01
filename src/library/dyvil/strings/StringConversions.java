@@ -1,14 +1,29 @@
 package dyvil.strings;
 
+import dyvil.lang.annotation.Utility;
 import dyvil.lang.annotation.infix;
 
-public interface StringConversions
+/**
+ * The {@linkplain Utility utility class} <b>StringVonersions</b> can be used
+ * for several String-conversions such as parsing {@code boolean}s, {@code int}s
+ * or {@code float}s or converting integers to roman numeral representations.
+ * 
+ * @author Clashsoft
+ * @version 1.0
+ */
+@Utility(String.class)
+public final class StringConversions
 {
-	public static final String[]	ROMANDIGIT	= { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
-	public static final int[]		ROMANNUMBER	= { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
+	private static final String[]	ROMANDIGIT	= { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
+	private static final int[]		ROMANNUMBER	= { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
 	
-	public static final String[]	ROMANCACHE	= {
+	private static final String[]	ROMANCACHE	= {
 			"0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX" };
+	
+	private StringConversions()
+	{
+		// no instances
+	}
 	
 	public static @infix boolean toBoolean(String s)
 	{

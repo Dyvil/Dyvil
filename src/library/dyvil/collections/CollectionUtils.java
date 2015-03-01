@@ -3,9 +3,11 @@ package dyvil.collections;
 import java.lang.reflect.Array;
 import java.util.*;
 
+import dyvil.lang.annotation.Utility;
 import dyvil.lang.annotation.infix;
 import dyvil.lang.annotation.inline;
 
+@Utility(Collection.class)
 public interface CollectionUtils
 {
 	public static @infix @inline <T> boolean $qmark(Collection<T> collection, T t)

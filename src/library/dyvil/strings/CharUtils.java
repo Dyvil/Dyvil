@@ -2,12 +2,25 @@ package dyvil.strings;
 
 import java.util.Random;
 
+import dyvil.lang.annotation.Utility;
 import dyvil.lang.annotation.infix;
 
+/**
+ * The {@linkplain Utility utility class} <b>CharUtils</b> can be used for
+ * several character-related functions such as checking if a character is a
+ * letter, a digit or a whitespace, converting it to upper- or lowercase,
+ * generating a random letter, consonant or vowel among others.
+ * 
+ * @author Clashsoft
+ * @version 1.0
+ */
+@Utility(char.class)
 public final class CharUtils
 {
-	private static final char[]		LOWER_ALPHABET		= new char[26];
-	private static final char[]		UPPER_ALPHABET		= new char[26];
+	private static final char[]		LOWER_ALPHABET		= {
+			'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+	private static final char[]		UPPER_ALPHABET		= {
+			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 	private static final char[]		LOWER_VOWELS		= { 'a', 'e', 'i', 'o', 'u' };
 	private static final char[]		UPPER_VOWELS		= { 'A', 'E', 'I', 'O', 'U' };
 	
@@ -23,17 +36,9 @@ public final class CharUtils
 			"ns", "nt", "ny", "ph", "pl", "pr", "ps", "rb", "rc", "rd", "rf", "rh", "rk", "rm", "rn", "rp", "rs", "rt", "rw", "ry", "sh", "sk", "sl", "sn",
 			"sp", "st", "tc", "th", "tl", "tm", "tr", "ts", "tw", "ty", "wh", "wl", "wn", "wt", "xc", "xp", "yh", "yn", "ys", "yt" };
 	
-	static
-	{
-		for (int i = 0; i < 26; i++)
-		{
-			LOWER_ALPHABET[i] = (char) ('a' + i);
-			UPPER_ALPHABET[i] = (char) ('A' + i);
-		}
-	}
-	
 	private CharUtils()
 	{
+		// no instances
 	}
 	
 	/**

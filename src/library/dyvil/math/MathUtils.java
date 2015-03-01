@@ -1,7 +1,25 @@
 package dyvil.math;
 
+import dyvil.lang.annotation.Utility;
 import dyvil.lang.annotation.infix;
 
+/**
+ * The {@linkplain Utility utility class} <b>MathUtils</b> can be used for
+ * several math functions such as absolute values, min, max, clamping, ranges
+ * and others. Most methods of this class are declared as {@code infix}, which
+ * means they can be called on their arguments in <i>Dyvil</i> code.
+ * 
+ * <PRE>
+ * int abs = -1 abs
+ * int floor = 4.5 floor
+ * float average = { 1F, 2.3F, 4F } average
+ * int[] range = 1 .. 4
+ * </PRE>
+ * 
+ * @author Clashsoft
+ * @version 1.0
+ */
+@Utility({ byte.class, short.class, int.class, long.class, float.class, double.class })
 public final class MathUtils
 {
 	/**
