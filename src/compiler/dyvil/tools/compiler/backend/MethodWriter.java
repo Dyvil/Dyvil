@@ -103,7 +103,6 @@ public final class MethodWriter extends MethodVisitor
 			this.localIndex++;
 		}
 		
-		System.out.println("addLocal:\t" + this);
 		return index;
 	}
 	
@@ -184,7 +183,6 @@ public final class MethodWriter extends MethodVisitor
 	
 	private void visitFrame()
 	{
-		System.out.println("visitFrame:\t" + this);
 		this.mv.visitFrame(F_NEW, this.localCount, this.locals, this.stackCount, this.stack);
 	}
 	
