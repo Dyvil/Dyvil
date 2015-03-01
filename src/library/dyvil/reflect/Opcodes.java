@@ -2,6 +2,13 @@ package dyvil.reflect;
 
 import jdk.internal.org.objectweb.asm.Label;
 
+/**
+ * The <b>Opcodes</b> interface declares all opcodes that can be used in
+ * <i>Dyvil</i> Bytecode Expressions.
+ * 
+ * @author Clashsoft
+ * @version 1.0
+ */
 public interface Opcodes
 {
 	/**
@@ -820,14 +827,23 @@ public interface Opcodes
 	
 	/*
 	 * --------------------------- SPECIAL OPCODES ---------------------------
-	 * Special Opcodes are only used for the @Bytecode annotation. They are
+	 * Special Opcodes are only used for the @Intrinsic annotation. They are
 	 * treated specially by the Dyvil Compiler in order to work with the JVM.
 	 * Because of that, these Opcodes should only ever be used in annotations
 	 * that are directly processed by the Dyvil Compiler, and they are likely to
 	 * cause problems elsewhere.
 	 */
 	
+	/**
+	 * Pushes the instance of the current {@link Intrinsic} method call onto the
+	 * stack.
+	 */
 	public static final int	INSTANCE		= -1;
+	
+	/**
+	 * Pushes all arguments of the current {@link Intrinsic} method call onto
+	 * the stack.
+	 */
 	public static final int	ARGUMENTS		= -2;
 	
 	/**
@@ -835,7 +851,16 @@ public interface Opcodes
 	 */
 	public static final int	LCONST_M1		= 264;
 	
+	/**
+	 * Removes an {@code int} value from the, bitwise-inverts it and pushes the
+	 * result back onto the stack.
+	 */
 	public static final int	IBIN			= 270;
+	
+	/**
+	 * Removes a {@code long} value from the, bitwise-inverts it and pushes the
+	 * result back onto the stack.
+	 */
 	public static final int	LBIN			= 271;
 	
 	public static final int	L2B				= 280;

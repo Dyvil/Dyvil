@@ -5,8 +5,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.SOURCE)
+/**
+ * Annotation that can be used to give a method or field multiple names at
+ * once.
+ * 
+ * @author Clashsoft
+ * @version 1.0
+ */
 @Target(ElementType.TYPE)
+@Retention(RetentionPolicy.SOURCE)
 public @interface alias
 {
 	public String[] value();

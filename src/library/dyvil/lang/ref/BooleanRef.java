@@ -84,14 +84,14 @@ public class BooleanRef implements Boolean$
 	}
 	
 	@Override
-	public int hashCode()
+	public boolean equals(Object obj)
 	{
-		return this.value ? 1237 : 1231;
+		return obj != null && obj.equals(this.value);
 	}
 	
 	@Override
-	public boolean equals(Object obj)
+	public int hashCode()
 	{
-		return super.equals(obj);
+		return this.value ? 1237 : 1231;
 	}
 }

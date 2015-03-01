@@ -5,11 +5,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import dyvil.reflect.Modifiers;
+
 /**
- * Annotation for prefix methods. When calling the prefix method {@code m(A a)}
- * on object {@code a} of type {@code A}, {@code a} will be moved from the
- * position of the first argument to the position of the 'instance' (i.e., in
- * front of the dot) by the compiler.
+ * Annotation for <b>prefix</b> methods. When calling the prefix method
+ * {@code m(A a)} on object {@code a} of type {@code A}, {@code a} will be moved
+ * from the position of the first argument to the position of the 'instance'
+ * (i.e., in front of the dot) by the compiler.
  * <p>
  * <code>
  * public prefix void m() = ...<br>
@@ -27,10 +29,12 @@ import java.lang.annotation.Target;
  * </code>
  * <p>
  *
+ * @see Modifiers#PREFIX
  * @author Clashsoft
+ * @version 1.0
  */
-@Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
+@Retention(RetentionPolicy.CLASS)
 public @interface prefix
 {
 }

@@ -1,6 +1,8 @@
 package dyvil.lang;
 
-public class ConstPool
+import dyvil.lang.annotation.sealed;
+
+@sealed final class ConstPool
 {
 	protected static final int		tableSize	= 128;
 	
@@ -24,5 +26,10 @@ public class ConstPool
 			FLOATS[i] = new Float(i);
 			DOUBLES[i] = new Double(i);
 		}
+	}
+	
+	private ConstPool()
+	{
+		// no instances
 	}
 }
