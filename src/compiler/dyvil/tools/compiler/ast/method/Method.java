@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Parameter;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
@@ -362,7 +363,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments, Map<String, IType> types)
+	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments, ITypeContext typeContext)
 	{
 		int pOff = 0;
 		int len = arguments.size();
@@ -373,7 +374,7 @@ public class Method extends Member implements IMethod
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			par = params.get(0);
-			parType = par.getType(types);
+			parType = par.getType(typeContext);
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
@@ -403,7 +404,7 @@ public class Method extends Member implements IMethod
 		{
 			int parCount = this.parameters.size() - 1;
 			Parameter varParam = params.get(parCount);
-			IType varParamType = varParam.getType(types);
+			IType varParamType = varParam.getType(typeContext);
 			
 			IValue value = arguments.get(parCount);
 			IValue value1 = value.withType(varParamType);
@@ -438,7 +439,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < len; i++)
 		{
 			par = params.get(i + pOff);
-			parType = par.getType(types);
+			parType = par.getType(typeContext);
 			
 			IValue value = arguments.get(i);
 			IValue value1 = value.withType(parType);
@@ -463,61 +464,63 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public Map<String, IType> getTypeMap(IValue instance, List<IValue> arguments, List<IType> typeArguments)
+	public IType resolveType(String name, IValue instance, List<IValue> arguments, List<IType> generics)
 	{
-		Map<String, IType> map = new HashMap();
-		if (typeArguments != null)
+		if (generics != null)
 		{
-			int len = Math.min(generics.size(), typeArguments.size());
+			int len = Math.min(this.generics.size(), generics.size());
 			for (int i = 0; i < len; i++)
 			{
-				ITypeVariable var = generics.get(i);
-				IType type = typeArguments.get(i);
-				map.put(var.getQualifiedName(), type);
+				ITypeVariable var = this.generics.get(i);
+				if (var.isName(name))
+				{
+					return generics.get(i);
+				}
 			}
 		}
 		
+		IType type;
 		int len = arguments.size();
 		int mods = this.modifiers & Modifiers.INFIX;
 		if (instance != null && mods == Modifiers.INFIX)
 		{
-			instance.addTypeVariables(this.parameters.get(0).type, map);
+			type = this.parameters.get(0).type.resolveType(name, instance.getType());
+			if (type != null)
+			{
+				return type;
+			}
+			
 			for (int i = 0; i < len; i++)
 			{
-				Parameter par = this.parameters.get(i + 1);
-				IValue v = arguments.get(i);
-				v.addTypeVariables(par.type, map);
+				type = this.parameters.get(i + 1).type.resolveType(name, arguments.get(i).getType());
+				if (type != null)
+				{
+					return type;
+				}
 			}
-			return map;
+			
+			return null;
 		}
-		if (instance == null && len == 1 && (this.modifiers & Modifiers.PREFIX) != 0)
-		{
-			arguments.get(0).addTypeVariables(this.parameters.get(0).type, map);
-			return map;
-		}
+		// TODO Prefix methods
 		
 		if (instance != null)
 		{
-			instance.addTypeVariables(this.theClass.getThisType(), map);
+			type = this.theClass.getThisType().resolveType(name, instance.getType());
+			if (type != null)
+			{
+				return type;
+			}
 		}
 		len = Math.min(this.parameters.size(), len);
 		for (int i = 0; i < len; i++)
 		{
-			Parameter par = this.parameters.get(i);
-			IValue v = arguments.get(i);
-			v.addTypeVariables(par.type, map);
+			type = this.parameters.get(i).type.resolveType(name, arguments.get(i).getType());
+			if (type != null)
+			{
+				return type;
+			}
 		}
-		return map;
-	}
-	
-	@Override
-	public IType getType(Map<String, IType> types)
-	{
-		if (types == null)
-		{
-			return this.type;
-		}
-		return this.type.getConcreteType(types);
+		return null;
 	}
 	
 	@Override

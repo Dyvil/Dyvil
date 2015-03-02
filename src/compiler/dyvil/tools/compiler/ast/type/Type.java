@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
 import java.util.List;
-import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -9,6 +8,7 @@ import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -73,7 +73,7 @@ public class Type extends ASTNode implements IType
 		super();
 	}
 	
-	protected Type(String name)
+	public Type(String name)
 	{
 		this.name = name;
 		this.qualifiedName = name;
@@ -278,20 +278,12 @@ public class Type extends ASTNode implements IType
 	@Override
 	public boolean hasTypeVariables()
 	{
-		return this.theClass instanceof CaptureClass;
+		return false;
 	}
 	
 	@Override
-	public IType getConcreteType(Map<String, IType> typeVariables)
+	public IType getConcreteType(ITypeContext context)
 	{
-		if (this.theClass instanceof CaptureClass)
-		{
-			IType t = typeVariables.get(this.qualifiedName);
-			if (t != null)
-			{
-				return t;
-			}
-		}
 		return this;
 	}
 	

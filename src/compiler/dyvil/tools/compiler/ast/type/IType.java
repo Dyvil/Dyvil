@@ -1,18 +1,18 @@
 package dyvil.tools.compiler.ast.type;
 
 import java.util.List;
-import java.util.Map;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
-public interface IType extends IASTNode, INamed, IContext
+public interface IType extends IASTNode, INamed, IContext, ITypeContext
 {
 	public default boolean isPrimitive()
 	{
@@ -50,10 +50,6 @@ public interface IType extends IASTNode, INamed, IContext
 	 */
 	public boolean isGeneric();
 	
-	public default void addTypeVariables(IType type, Map<String, IType> typeVariables)
-	{
-	}
-	
 	/**
 	 * Returns true if this is or contains any type variables.
 	 * 
@@ -68,7 +64,18 @@ public interface IType extends IASTNode, INamed, IContext
 	 *            the type variables
 	 * @return
 	 */
-	public IType getConcreteType(Map<String, IType> typeVariables);
+	public IType getConcreteType(ITypeContext context);
+	
+	@Override
+	public default IType resolveType(String name)
+	{
+		return null;
+	}
+	
+	public default IType resolveType(String name, IType concrete)
+	{
+		return null;
+	}
 	
 	// Arrays
 	

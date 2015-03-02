@@ -7,9 +7,11 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -21,14 +23,12 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class ConstructorCall extends ASTNode implements IValue, IValueList
+public final class ConstructorCall extends ASTNode implements IValue, IValueList, ITypeContext
 {
 	public IType		type;
-	
 	public List<IValue>	arguments	= new ArrayList(3);
 	
 	public boolean		isSugarCall;
-	public boolean		isCustom;
 	
 	public IMethod		method;
 	
@@ -123,13 +123,21 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public IType resolveType(String name)
+	{
+		List<IType> generics = this.type.isGeneric() ? ((GenericType) this.type).generics : null;
+		return this.method.resolveType(name, null, this.arguments, null);
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context);
 		
-		for (IValue v : this.arguments)
+		int len = this.arguments.size();
+		for (int i = 0; i < len; i++)
 		{
-			v.resolveTypes(markers, context);
+			this.arguments.get(i).resolveTypes(markers, context);
 		}
 	}
 	
@@ -223,8 +231,7 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 		}
 		else if (this.method != null)
 		{
-			// TODO Type Arguments
-			this.method.checkArguments(markers, null, this.arguments, null);
+			this.method.checkArguments(markers, null, this.arguments, this);
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
@@ -284,20 +291,9 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 			return;
 		}
 		
-		int opcode;
-		int args = this.arguments.size();
-		if (this.isCustom)
-		{
-			opcode = Opcodes.INVOKESTATIC;
-		}
-		else
-		{
-			opcode = Opcodes.INVOKESPECIAL;
-			args++;
-			
-			writer.visitTypeInsn(Opcodes.NEW, this.type);
-			writer.visitInsn(Opcodes.DUP);
-		}
+		int args = this.arguments.size() + 1;
+		writer.visitTypeInsn(Opcodes.NEW, this.type);
+		writer.visitInsn(Opcodes.DUP);
 		
 		for (IValue arg : this.arguments)
 		{
@@ -307,7 +303,7 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 		String owner = this.type.getInternalName();
 		String name = "<init>";
 		String desc = this.method.getDescriptor();
-		writer.visitMethodInsn(opcode, owner, name, desc, false, args, (String) null);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false, args, (String) null);
 	}
 	
 	@Override
@@ -329,7 +325,7 @@ public class ConstructorCall extends ASTNode implements IValue, IValueList
 		}
 		else
 		{
-			Util.parametersToString(prefix, this.arguments, buffer, true);
+			Util.parametersToString(prefix, this.arguments, buffer, Formatting.Method.useJavaFormat);
 		}
 	}
 }

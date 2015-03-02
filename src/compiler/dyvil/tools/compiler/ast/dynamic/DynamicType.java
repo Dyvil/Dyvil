@@ -3,11 +3,11 @@ package dyvil.tools.compiler.ast.dynamic;
 import static dyvil.reflect.Opcodes.*;
 
 import java.util.List;
-import java.util.Map;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -133,7 +133,7 @@ public final class DynamicType extends ASTNode implements IType
 	}
 	
 	@Override
-	public IType getConcreteType(Map<String, IType> typeVariables)
+	public IType getConcreteType(ITypeContext context)
 	{
 		return this;
 	}

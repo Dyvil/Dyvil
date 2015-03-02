@@ -9,6 +9,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -23,7 +24,7 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class UpdateMethodCall extends ASTNode implements IValue, IValued, IValueList
+public class UpdateMethodCall extends ASTNode implements IValue, IValued, IValueList, ITypeContext
 {
 	public IValue		instance;
 	public List<IValue>	arguments;
@@ -133,6 +134,12 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, IValue
 	}
 	
 	@Override
+	public IType resolveType(String name)
+	{
+		return this.method.resolveType(name, this.instance, this.arguments, null);
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.instance != null)
@@ -201,7 +208,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, IValue
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, null);
+			this.method.checkArguments(markers, this.instance, this.arguments, this);
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{

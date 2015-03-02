@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.access;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -10,6 +9,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -17,6 +17,8 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValueList;
+import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -28,22 +30,20 @@ import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Util;
 
-public class MethodCall extends ASTNode implements IAccess, INamed
+public final class MethodCall extends ASTNode implements IAccess, IValue, IValued, IValueList, ITypeContext, INamed
 {
-	public String				name;
-	public String				qualifiedName;
+	public IValue		instance;
+	public String		name;
+	public String		qualifiedName;
+	public List<IType>	generics;
+	public List<IValue>	arguments;
 	
-	public List<IType>			generics;
-	public Map<String, IType>	typeArguments;
+	public boolean		dotless;
+	public boolean		isSugarCall;
 	
-	public IValue				instance;
-	public List<IValue>			arguments;
+	public IMethod		method;
 	
-	public boolean				dotless;
-	public boolean				isSugarCall;
-	
-	public IMethod				method;
-	public IType				type;
+	private IType		type;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -68,7 +68,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.method.isIntrinsic() || this.getType().isPrimitive();
+		return this.method != null && (this.method.isIntrinsic() || this.getType().isPrimitive());
 	}
 	
 	@Override
@@ -82,11 +82,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		{
 			if (this.method.hasTypeVariables())
 			{
-				if (this.typeArguments == null)
-				{
-					this.typeArguments = this.method.getTypeMap(this.instance, this.arguments, this.generics);
-				}
-				return this.type = this.method.getType(this.typeArguments);
+				return this.type = this.method.getType(this);
 			}
 			return this.type = this.method.getType();
 		}
@@ -212,16 +208,38 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 	}
 	
 	@Override
+	public IType resolveType(String name)
+	{
+		return this.method.resolveType(name, this.instance, this.arguments, this.generics);
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		int len;
+		if (this.generics != null)
+		{
+			len = this.generics.size();
+			for (int i = 0; i < len; i++)
+			{
+				IType t1 = this.generics.get(i);
+				IType t2 = t1.resolve(markers, context);
+				if (t1 != t2)
+				{
+					this.generics.set(i, t2);
+				}
+			}
+		}
+		
 		if (this.instance != null)
 		{
 			this.instance.resolveTypes(markers, context);
 		}
 		
-		for (IValue v : this.arguments)
+		len = this.arguments.size();
+		for (int i = 0; i < len; i++)
 		{
-			v.resolveTypes(markers, context);
+			this.arguments.get(i).resolveTypes(markers, context);
 		}
 	}
 	
@@ -241,12 +259,7 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 		
 		if (this.method != null)
 		{
-			if (this.typeArguments == null && this.method.hasTypeVariables())
-			{
-				this.typeArguments = this.method.getTypeMap(this.instance, this.arguments, this.generics);
-			}
-			
-			this.method.checkArguments(markers, this.instance, this.arguments, this.typeArguments);
+			this.method.checkArguments(markers, this.instance, this.arguments, this);
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
@@ -268,10 +281,11 @@ public class MethodCall extends ASTNode implements IAccess, INamed
 				markers.add(Markers.create(this.position, "access.method.invisible", this.name));
 			}
 		}
-
-		for (IValue v : this.arguments)
+		
+		int len = this.arguments.size();
+		for (int i = 0; i < len; i++)
 		{
-			v.check(markers, context);
+			this.arguments.get(i).check(markers, context);
 		}
 	}
 	

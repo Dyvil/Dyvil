@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.value;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -183,23 +182,6 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			return 3;
 		}
 		return 0;
-	}
-	
-	@Override
-	public void addTypeVariables(IType type, Map<String, IType> typeVariables)
-	{
-		if (type.isArrayType())
-		{
-			if (this.requiredType == null || this.requiredType.hasTypeVariables())
-			{
-				this.generateTypes();
-			}
-			if (type.isSuperTypeOf(this.requiredType))
-			{
-				this.isArray = true;
-				typeVariables.put(type.getQualifiedName(), this.elementType);
-			}
-		}
 	}
 	
 	@Override

@@ -23,6 +23,11 @@ public class ClassAccess extends ASTNode implements IValue, ITyped
 {
 	public IType	type;
 	
+	public ClassAccess(IType type)
+	{
+		this.type = type;
+	}
+	
 	public ClassAccess(ICodePosition position, IType type)
 	{
 		this.position = position;

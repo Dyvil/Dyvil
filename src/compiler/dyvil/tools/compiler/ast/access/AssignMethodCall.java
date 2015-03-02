@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.INumericValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -26,7 +27,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Util;
 
-public class AssignMethodCall extends ASTNode implements IValue, IValued, IValueList, INamed
+public class AssignMethodCall extends ASTNode implements IValue, IValued, IValueList, ITypeContext, INamed
 {
 	public String		name;
 	public String		qualifiedName;
@@ -187,6 +188,12 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 	}
 	
 	@Override
+	public IType resolveType(String name)
+	{
+		return this.method.resolveType(name, this.instance, this.arguments, null);
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		if (this.instance != null)
@@ -269,7 +276,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, IValue
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, null);
+			this.method.checkArguments(markers, this.instance, this.arguments, this);
 			
 			IType type1 = this.instance.getType();
 			IType type2 = this.method.getType();

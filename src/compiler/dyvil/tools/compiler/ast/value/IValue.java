@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.ast.value;
 
 import java.util.List;
-import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -134,15 +134,6 @@ public interface IValue extends IASTNode, ITyped
 	
 	public int getTypeMatch(IType type);
 	
-	public default void addTypeVariables(IType type, Map<String, IType> typeVariables)
-	{
-		IType t = this.getType();
-		if (type.isSuperTypeOf(t))
-		{
-			type.addTypeVariables(t, typeVariables);
-		}
-	}
-	
 	public void resolveTypes(List<Marker> markers, IContext context);
 	
 	public IValue resolve(List<Marker> markers, IContext context);
@@ -261,6 +252,12 @@ public interface IValue extends IASTNode, ITyped
 				valueList.addValue(new DoubleValue(d));
 			}
 			return valueList;
+		}
+		else if (c == jdk.internal.org.objectweb.asm.Type.class)
+		{
+			jdk.internal.org.objectweb.asm.Type type = (jdk.internal.org.objectweb.asm.Type) o;
+			IType itype = new Type(type.getClassName());
+			return new ClassAccess(itype);
 		}
 		return null;
 	}

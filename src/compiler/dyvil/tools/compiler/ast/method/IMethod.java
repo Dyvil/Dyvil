@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.method;
 
 import java.util.List;
-import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -16,15 +16,13 @@ public interface IMethod extends IBaseMethod, IMember, IParameterized, IGeneric,
 {
 	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments);
 	
-	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments, Map<String, IType> types);
+	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments, ITypeContext typeContext);
 	
 	// Generics
 	
 	public boolean hasTypeVariables();
 	
-	public Map<String, IType> getTypeMap(IValue instance, List<IValue> arguments, List<IType> typeArguments);
-	
-	public IType getType(Map<String, IType> types);
+	public IType resolveType(String name, IValue instance, List<IValue> arguments, List<IType> generics);
 	
 	// Compilation
 	

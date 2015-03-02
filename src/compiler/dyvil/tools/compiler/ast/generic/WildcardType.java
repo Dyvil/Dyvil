@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.generic;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.CaptureClass;
@@ -159,23 +158,73 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
-	public void addTypeVariables(IType type, Map<String, IType> typeVariables)
+	public IType resolveType(String name)
 	{
 		if (this.name != null)
 		{
-			typeVariables.put(this.name, type);
+			if (this.name.equals(name))
+			{
+				return this;
+			}
+			return null;
 		}
+		
+		IType type;
 		if (this.upperBound != null)
 		{
-			type.addTypeVariables(this.upperBound, typeVariables);
+			type = this.upperBound.resolveType(name);
+			if (type != null)
+			{
+				return type;
+			}
 		}
 		if (this.upperBounds != null)
 		{
 			for (IType t : this.upperBounds)
 			{
-				type.addTypeVariables(t, typeVariables);
+				type = t.resolveType(name);
+				if (type != null)
+				{
+					return type;
+				}
 			}
 		}
+		return null;
+	}
+	
+	@Override
+	public IType resolveType(String name, IType concrete)
+	{
+		if (this.name != null)
+		{
+			if (this.name.equals(name) && this.isSuperTypeOf(concrete))
+			{
+				return concrete;
+			}
+			return null;
+		}
+		
+		IType type;
+		if (this.upperBound != null)
+		{
+			type = this.upperBound.resolveType(name, concrete);
+			if (type != null)
+			{
+				return type;
+			}
+		}
+		if (this.upperBounds != null)
+		{
+			for (IType t : this.upperBounds)
+			{
+				type = t.resolveType(name, concrete);
+				if (type != null)
+				{
+					return type;
+				}
+			}
+		}
+		return null;
 	}
 	
 	@Override
@@ -185,11 +234,11 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
-	public IType getConcreteType(Map<String, IType> typeVariables)
+	public IType getConcreteType(ITypeContext context)
 	{
 		if (this.name != null)
 		{
-			IType t = typeVariables.get(this.name);
+			IType t = context.resolveType(this.name);
 			if (t != null)
 			{
 				if (this.arrayDimensions > 0)
@@ -203,7 +252,7 @@ public class WildcardType extends TypeVariable implements IType
 		
 		if (this.lowerBound != null)
 		{
-			return this.lowerBound.getConcreteType(typeVariables);
+			return this.lowerBound.getConcreteType(context);
 		}
 		
 		WildcardType type = new WildcardType(this.position);
@@ -211,7 +260,7 @@ public class WildcardType extends TypeVariable implements IType
 		type.captureClass = this.captureClass;
 		if (this.upperBound != null)
 		{
-			type.upperBound = this.upperBound.getConcreteType(typeVariables);
+			type.upperBound = this.upperBound.getConcreteType(context);
 		}
 		if (this.upperBounds != null)
 		{
@@ -221,7 +270,7 @@ public class WildcardType extends TypeVariable implements IType
 				type.upperBounds = new ArrayList(len);
 				for (int i = 0; i < len; i++)
 				{
-					type.upperBounds.add(this.upperBounds.get(i).getConcreteType(typeVariables));
+					type.upperBounds.add(this.upperBounds.get(i).getConcreteType(context));
 				}
 			}
 		}

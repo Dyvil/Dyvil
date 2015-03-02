@@ -2,12 +2,12 @@ package dyvil.tools.compiler.ast.member;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.transform.Symbols;
@@ -149,13 +149,10 @@ public abstract class Member extends ASTNode implements IMember
 		return this.type;
 	}
 	
-	public IType getType(Map<String, IType> types)
+	@Override
+	public IType getType(ITypeContext context)
 	{
-		if (types == null)
-		{
-			return this.type;
-		}
-		return this.type.getConcreteType(types);
+		return this.type.getConcreteType(context);
 	}
 	
 	@Override

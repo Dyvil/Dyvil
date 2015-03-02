@@ -40,7 +40,6 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 	{
 		this.position = cc.getPosition();
 		this.type = cc.type;
-		this.isCustom = cc.isCustom;
 		this.list = new StatementList(position);
 	}
 	

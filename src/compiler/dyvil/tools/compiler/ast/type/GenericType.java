@@ -2,10 +2,10 @@ package dyvil.tools.compiler.ast.type;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -60,6 +60,69 @@ public class GenericType extends Type implements ITypeList
 			this.generics = new ArrayList(2);
 		}
 		this.generics.add(type);
+	}
+	
+	@Override
+	public boolean isGeneric()
+	{
+		return this.theClass == null || this.theClass.isGeneric();
+	}
+	
+	@Override
+	public IType resolveType(String name)
+	{
+		List<ITypeVariable> typeVariables = this.theClass.getTypeVariables();
+		int len = Math.min(typeVariables.size(), this.generics.size());
+		for (int i = 0; i < len; i++)
+		{
+			if (typeVariables.get(i).isName(name))
+			{
+				return this.generics.get(i);
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public IType resolveType(String name, IType concrete)
+	{
+		if (!concrete.isGeneric())
+		{
+			return null;
+		}
+		
+		IType type;
+		List<IType> generics = ((GenericType) concrete).generics;
+		if (this.isSuperTypeOf(concrete))
+		{
+			int len = this.generics.size();
+			for (int i = 0; i < len; i++)
+			{
+				type = this.generics.get(i).resolveType(name, generics.get(i));
+				if (type != null)
+				{
+					return type;
+				}
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public IType getConcreteType(ITypeContext context)
+	{
+		GenericType copy = this.clone();
+		if (this.generics != null)
+		{
+			int len = this.generics.size();
+			for (int i = 0; i < len; i++)
+			{
+				IType t1 = this.generics.get(i);
+				copy.generics.set(i, t1.getConcreteType(context));
+			}
+		}
+		
+		return copy;
 	}
 	
 	@Override
@@ -139,82 +202,6 @@ public class GenericType extends Type implements ITypeList
 			markers.add(Markers.create(this.position, "resolve.type", this.toString()));
 		}
 		return this;
-	}
-	
-	@Override
-	public boolean isGeneric()
-	{
-		return this.theClass == null || this.theClass.isGeneric();
-	}
-	
-	@Override
-	public void addTypeVariables(IType type, Map<String, IType> typeVariables)
-	{
-		if (this.generics != null)
-		{
-			if (type instanceof GenericType)
-			{
-				List<IType> types = ((GenericType) type).generics;
-				int len = Math.min(this.generics.size(), types.size());
-				for (int i = 0; i < len; i++)
-				{
-					IType t1 = types.get(i);
-					IType t2 = this.generics.get(i);
-					
-					if (!t2.equals(t1) && !t1.equals(t2))
-					{
-						return;
-					}
-					t2.addTypeVariables(t1, typeVariables);
-				}
-				return;
-			}
-			
-			List<ITypeVariable> generics = this.theClass.getTypeVariables();
-			int len = Math.min(this.generics.size(), generics.size());
-			for (int i = 0; i < len; i++)
-			{
-				ITypeVariable var = generics.get(i);
-				IType t2 = this.generics.get(i);
-				
-				if (var.isSuperTypeOf(t2))
-				{
-					typeVariables.put(var.getQualifiedName(), t2);
-				}
-			}
-		}
-		
-		if (type instanceof ITypeVariable)
-		{
-			String name = ((ITypeVariable) type).getQualifiedName();
-			if (name == null && type.equals(this))
-			{
-				type.addTypeVariables(this, typeVariables);
-			}
-		}
-	}
-	
-	@Override
-	public IType getConcreteType(Map<String, IType> typeVariables)
-	{
-		IType t = super.getConcreteType(typeVariables);
-		if (t != this)
-		{
-			return t;
-		}
-		
-		GenericType copy = this.clone();
-		if (this.generics != null)
-		{
-			int len = this.generics.size();
-			for (int i = 0; i < len; i++)
-			{
-				IType t1 = this.generics.get(i);
-				copy.generics.set(i, t1.getConcreteType(typeVariables));
-			}
-		}
-		
-		return copy;
 	}
 	
 	@Override
