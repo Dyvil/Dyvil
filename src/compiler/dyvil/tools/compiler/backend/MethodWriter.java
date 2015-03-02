@@ -12,24 +12,26 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 
 public final class MethodWriter extends MethodVisitor
 {
-	public static final Long		LONG_MINUS_ONE	= Long.valueOf(-1);
-	public static final Integer		TOP				= jdk.internal.org.objectweb.asm.Opcodes.TOP;
-	public static final Integer		INT				= jdk.internal.org.objectweb.asm.Opcodes.INTEGER;
-	public static final Object[]	EMPTY_STACK		= new Object[0];
+	public static final Long	LONG_MINUS_ONE	= Long.valueOf(-1);
+	public static final Integer	TOP				= jdk.internal.org.objectweb.asm.Opcodes.TOP;
+	public static final Integer	INT				= jdk.internal.org.objectweb.asm.Opcodes.INTEGER;
+	public static final Integer	LONG			= jdk.internal.org.objectweb.asm.Opcodes.LONG;
+	public static final Integer	FLOAT			= jdk.internal.org.objectweb.asm.Opcodes.FLOAT;
+	public static final Integer	DOUBLE			= jdk.internal.org.objectweb.asm.Opcodes.DOUBLE;
 	
-	public ClassWriter				cw;
+	public ClassWriter			cw;
 	
-	public boolean					hasReturn;
+	public boolean				hasReturn;
 	
-	private int						localIndex;
-	private int						localCount;
-	private int						maxLocals;
-	private Object[]				locals			= new Object[2];
+	private int					localIndex;
+	private int					localCount;
+	private int					maxLocals;
+	private Object[]			locals			= new Object[2];
 	
-	private int						stackIndex;
-	private int						stackCount;
-	private int						maxStack;
-	private Object[]				stack			= new Object[3];
+	private int					stackIndex;
+	private int					stackCount;
+	private int					maxStack;
+	private Object[]			stack			= new Object[3];
 	
 	public MethodWriter(ClassWriter cw, MethodVisitor mv)
 	{
@@ -108,10 +110,12 @@ public final class MethodWriter extends MethodVisitor
 	
 	public void removeLocals(int count)
 	{
-		for (int i = 0; i < count; i++) {
+		for (int i = 0; i < count; i++)
+		{
 			this.localCount--;
 			Object o = this.locals[--this.localIndex];
-			if (o == LONG || o == DOUBLE) {
+			if (o == LONG || o == DOUBLE)
+			{
 				this.localIndex--;
 				this.localCount--;
 			}
@@ -677,6 +681,17 @@ public final class MethodWriter extends MethodVisitor
 		{
 			this.visitFrame();
 			this.pop();
+		}
+		if (opcode == IFNULL || opcode == IFNONNULL)
+		{
+			this.visitFrame();
+			this.pop();
+		}
+		if (opcode == IF_ACMPEQ || opcode == IF_ACMPNE)
+		{
+			this.visitFrame();
+			this.stackIndex -= 2;
+			this.stackCount -= 2;
 		}
 		if (opcode >= IF_ICMPEQ && opcode <= IF_ICMPLE)
 		{
