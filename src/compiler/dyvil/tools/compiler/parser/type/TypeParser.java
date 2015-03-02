@@ -10,7 +10,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public class TypeParser extends Parser implements ITyped
+public final class TypeParser extends Parser implements ITyped
 {
 	public static final int	NAME			= 1;
 	public static final int	GENERICS		= 2;
@@ -89,6 +89,7 @@ public class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(TUPLE_END))
 		{
+			this.end();
 			pm.popParser();
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
@@ -114,6 +115,7 @@ public class TypeParser extends Parser implements ITyped
 		if (this.isInMode(LAMBDA_END))
 		{
 			this.type.expandPosition(token.prev());
+			this.end();
 			pm.popParser(true);
 			return;
 		}
@@ -125,6 +127,7 @@ public class TypeParser extends Parser implements ITyped
 				if (this.arrayDimensions2 == 0)
 				{
 					this.type.expandPosition(token);
+					this.end();
 					pm.popParser();
 					return;
 				}
@@ -133,11 +136,13 @@ public class TypeParser extends Parser implements ITyped
 			if (this.arrayDimensions2 > 0)
 			{
 				this.type.expandPosition(token.prev());
+				this.end();
 				pm.popParser(true);
 				throw new SyntaxError(token.prev(), "Unclosed array brackets");
 			}
 			
 			this.type.expandPosition(token.prev());
+			this.end();
 			pm.popParser(true);
 			return;
 		}
@@ -156,6 +161,7 @@ public class TypeParser extends Parser implements ITyped
 				if (this.arrayDimensions2 == 0)
 				{
 					this.type.expandPosition(token);
+					this.end();
 					pm.popParser();
 					return;
 				}
@@ -164,11 +170,13 @@ public class TypeParser extends Parser implements ITyped
 			if (this.arrayDimensions2 > 0)
 			{
 				this.type.expandPosition(token.prev());
+				this.end();
 				pm.popParser(true);
 				throw new SyntaxError(token.prev(), "Invalid Array Type - ']' expected");
 			}
 			
 			this.type.expandPosition(token.prev());
+			this.end();
 			pm.popParser(true);
 			return;
 		}
@@ -198,11 +206,13 @@ public class TypeParser extends Parser implements ITyped
 					return;
 				}
 			}
+			this.end();
 			pm.popParser(true);
 			return;
 		}
 		if (this.isInMode(GENERICS_END))
 		{
+			this.end();
 			pm.popParser();
 			if (type == Tokens.CLOSE_SQUARE_BRACKET)
 			{
@@ -212,8 +222,7 @@ public class TypeParser extends Parser implements ITyped
 		}
 	}
 	
-	@Override
-	public void end(ParserManager pm)
+	public void end()
 	{
 		if (this.type != null)
 		{

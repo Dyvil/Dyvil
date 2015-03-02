@@ -65,6 +65,10 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		int type = token.type();
 		if (this.mode == 0 || type == Tokens.SEMICOLON)
 		{
+			if (this.value != null)
+			{
+				this.field.setValue(this.value);
+			}
 			pm.popParser(true);
 			return;
 		}
@@ -139,6 +143,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(LIST_END))
 		{
+			this.field.setValue(this.value);
 			pm.popParser();
 			this.value.expandPosition(token);
 			if (type == Tokens.CLOSE_CURLY_BRACKET)
@@ -198,6 +203,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(BYTECODE_END))
 		{
+			this.field.setValue(this.value);
 			pm.popParser();
 			this.value.expandPosition(token);
 			if (type == Tokens.CLOSE_CURLY_BRACKET)
@@ -208,6 +214,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (ParserUtil.isCloseBracket(type))
 		{
+			this.field.setValue(this.value);
 			pm.popParser(true);
 			return;
 		}
@@ -220,6 +227,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				{
 					lv.expandPosition(token);
 					this.value = lv;
+					this.field.setValue(this.value);
 					pm.popParser();
 					pm.pushParser(new ExpressionParser(lv));
 					return;
@@ -285,6 +293,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			
 			if (type == Tokens.ELSE)
 			{
+				this.field.setValue(this.value);
 				pm.popParser(true);
 				return;
 			}
@@ -323,6 +332,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 					int p = Operators.index(name);
 					if (this.precedence >= p)
 					{
+						this.field.setValue(this.value);
 						pm.popParser(true);
 						return;
 					}
@@ -333,6 +343,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			if (ParserUtil.isTerminator(type))
 			{
+				this.field.setValue(this.value);
 				pm.popParser(true);
 				return;
 			}
@@ -378,6 +389,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		if (this.value != null)
 		{
 			this.value.expandPosition(token);
+			this.field.setValue(this.value);
 			pm.popParser(true);
 			return;
 		}
@@ -536,8 +548,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		return new LambdaValue(value.getPosition(), params);
 	}
 	
-	@Override
-	public void end(ParserManager pm)
+	public void end()
 	{
 		if (this.value != null)
 		{
@@ -621,12 +632,15 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			return true;
 		}
 		case Tokens.ELSE:
+		{
 			if (!(this.parent instanceof IfStatementParser))
 			{
 				throw new SyntaxError(token, "Invalid Expression - 'else' not allowed in this location");
 			}
+			this.field.setValue(this.value);
 			pm.popParser(true);
 			return true;
+		}
 		case Tokens.WHILE:
 		{
 			WhileStatement statement = new WhileStatement(token);

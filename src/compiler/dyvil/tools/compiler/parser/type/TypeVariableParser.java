@@ -66,15 +66,10 @@ public class TypeVariableParser extends Parser implements ITyped
 					return;
 				}
 			}
+			this.typed.addTypeVariable(this.variable);
 			pm.popParser(true);
 			return;
 		}
-	}
-	
-	@Override
-	public void end(ParserManager pm)
-	{
-		this.typed.addTypeVariable(this.variable);
 	}
 	
 	@Override

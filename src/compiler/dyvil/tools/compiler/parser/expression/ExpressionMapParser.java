@@ -38,7 +38,7 @@ public class ExpressionMapParser extends Parser implements IValued
 		
 		if (this.mode == NAME)
 		{
-			if (token.next().type() == Tokens.EQUALS)
+			if (token.next().type() == Tokens.COLON)
 			{
 				this.key = token.value();
 				pm.skip();
@@ -51,7 +51,7 @@ public class ExpressionMapParser extends Parser implements IValued
 		if (this.mode == VALUE)
 		{
 			this.mode = SEPERATOR;
-			pm.pushTryParser(new ExpressionParser(this), token, true);
+			pm.pushParser(new ExpressionParser(this), true);
 			return;
 		}
 		if (this.mode == SEPERATOR)

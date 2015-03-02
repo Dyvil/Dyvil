@@ -39,13 +39,11 @@ public class ParserManager
 	public ParserManager(Parser parser)
 	{
 		this.currentParser = parser;
-		this.currentParser.begin(this);
 	}
 	
 	public final void parse(CodeFile file, Parser parser)
 	{
 		this.currentParser = parser;
-		parser.begin(this);
 		Dlex lexer = new Dlex(file);
 		lexer.tokenize();
 		this.parse(file, lexer.iterator());
@@ -219,7 +217,6 @@ public class ParserManager
 	public void setParser(Parser parser)
 	{
 		this.currentParser = parser;
-		parser.begin(this);
 	}
 	
 	public void pushParser(Parser parser)
@@ -229,7 +226,6 @@ public class ParserManager
 			parser.setParent(this.currentParser);
 		}
 		this.currentParser = parser;
-		parser.begin(this);
 	}
 	
 	public void pushParser(Parser parser, boolean reparse)
@@ -239,7 +235,6 @@ public class ParserManager
 			parser.setParent(this.currentParser);
 		}
 		this.currentParser = parser;
-		parser.begin(this);
 		if (reparse)
 		{
 			this.tokens.jump(this.currentToken);
@@ -253,7 +248,6 @@ public class ParserManager
 		this.jumpBackToken = null;
 		if (this.currentParser != null)
 		{
-			this.currentParser.end(this);
 			this.currentParser = this.currentParser.getParent();
 		}
 	}
@@ -265,7 +259,6 @@ public class ParserManager
 		this.jumpBackToken = null;
 		if (this.currentParser != null)
 		{
-			this.currentParser.end(this);
 			this.currentParser = this.currentParser.getParent();
 		}
 		

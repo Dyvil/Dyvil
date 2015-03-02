@@ -75,13 +75,5 @@ public abstract class Parser<T>
 		return (this.mode & mode) == mode;
 	}
 	
-	public void begin(ParserManager pm)
-	{
-	}
-	
 	public abstract void parse(ParserManager pm, IToken token) throws SyntaxError;
-	
-	public void end(ParserManager pm)
-	{
-	}
 }
