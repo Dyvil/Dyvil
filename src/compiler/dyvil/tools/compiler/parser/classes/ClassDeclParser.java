@@ -20,7 +20,7 @@ import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public class ClassDeclParser extends Parser implements ITyped, ITypeList
+public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 {
 	public static final int		MODIFIERS		= 0;
 	public static final int		NAME			= 1;

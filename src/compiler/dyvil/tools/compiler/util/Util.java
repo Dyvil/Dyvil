@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.strings.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -165,6 +166,42 @@ public class Util
 			}
 			buffer.append(end);
 		}
+	}
+	
+	public static String getAdder(String methodName)
+	{
+		StringBuilder builder = new StringBuilder("add");
+		int len = methodName.length() - 1;
+		builder.append(CharUtils.toUpperCase(methodName.charAt(0)));
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(methodName.charAt(i));
+		}
+		return builder.toString();
+	}
+	
+	public static String getSetter(String methodName)
+	{
+		StringBuilder builder = new StringBuilder("set");
+		int len = methodName.length();
+		builder.append(CharUtils.toUpperCase(methodName.charAt(0)));
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(methodName.charAt(i));
+		}
+		return builder.toString();
+	}
+	
+	public static String getGetter(String methodName)
+	{
+		StringBuilder builder = new StringBuilder("get");
+		int len = methodName.length();
+		builder.append(CharUtils.toUpperCase(methodName.charAt(0)));
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(methodName.charAt(i));
+		}
+		return builder.toString();
 	}
 	
 	public static void prependValue(IMethod method, IValue value)

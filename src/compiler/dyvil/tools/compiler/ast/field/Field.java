@@ -235,12 +235,6 @@ public class Field extends Member implements IField
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		if ((this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
-		{
-			this.value.writeExpression(writer);
-			return;
-		}
-		
 		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.getValueType() != IValue.CLASS_ACCESS))
 		{
 			instance.writeExpression(writer);

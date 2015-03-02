@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.util;
+package dyvil.io;
 
 import java.io.PrintStream;
 import java.util.Locale;

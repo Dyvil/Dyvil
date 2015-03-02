@@ -1,6 +1,7 @@
 package dyvil.reflect;
 
 import jdk.internal.org.objectweb.asm.Label;
+import dyvil.lang.annotation.Intrinsic;
 
 /**
  * The <b>Opcodes</b> interface declares all opcodes that can be used in
@@ -893,4 +894,115 @@ public interface Opcodes
 	public static final int	IF_DCMPGE		= 315;
 	public static final int	IF_DCMPGT		= 316;
 	public static final int	IF_DCMPLE		= 317;
+	
+	public static boolean isReturnOpcode(int op)
+	{
+		return op == RETURN || op == ARETURN || op == IRETURN || op == LRETURN || op == FRETURN || op == DRETURN;
+	}
+	
+	public static boolean isInvokeOpcode(int op)
+	{
+		return op == INVOKEVIRTUAL || op == INVOKEINTERFACE || op == INVOKESPECIAL || op == INVOKESTATIC;
+	}
+	
+	public static boolean isLoadOpcode(int opcode)
+	{
+		return opcode == ALOAD || opcode == ILOAD || opcode == LLOAD || opcode == FLOAD || opcode == DLOAD;
+	}
+	
+	public static boolean isStoreOpcode(int opcode)
+	{
+		return opcode == ASTORE || opcode == ISTORE || opcode == LSTORE || opcode == FSTORE || opcode == DSTORE || opcode == RET;
+	}
+	
+	public static boolean isFieldOpcode(int opcode)
+	{
+		return opcode == PUTFIELD || opcode == GETFIELD || opcode == PUTSTATIC || opcode == GETSTATIC;
+	}
+	
+	public static boolean isJumpOpcode(int opcode)
+	{
+		return opcode >= IFEQ && opcode <= JSR || opcode == GOTO || opcode == IFNULL || opcode == IFNONNULL || opcode >= IF_LCMPEQ && opcode <= IF_DCMPLE;
+	}
+	
+	public static int getInverseOpcode(int opcode)
+	{
+		switch (opcode)
+		{
+		case IFEQ:
+			return IFNE;
+		case IFNE:
+			return IFEQ;
+		case IFLT:
+			return IFGE;
+		case IFGE:
+			return IFLT;
+		case IFGT:
+			return IFLE;
+		case IFLE:
+			return IFGT;
+			
+		case IF_ICMPEQ:
+			return IF_ICMPNE;
+		case IF_ICMPNE:
+			return IF_ICMPEQ;
+		case IF_ICMPLT:
+			return IF_ICMPGE;
+		case IF_ICMPGE:
+			return IF_ICMPLT;
+		case IF_ICMPGT:
+			return IF_ICMPLE;
+		case IF_ICMPLE:
+			return IF_ICMPGT;
+			
+		case IF_ACMPEQ:
+			return IF_ACMPNE;
+		case IF_ACMPNE:
+			return IF_ACMPEQ;
+		case IFNULL:
+			return IFNONNULL;
+		case IFNONNULL:
+			return IFNULL;
+			
+		case IF_LCMPEQ:
+			return IF_LCMPNE;
+		case IF_LCMPNE:
+			return IF_LCMPEQ;
+		case IF_LCMPLT:
+			return IF_LCMPGE;
+		case IF_LCMPGE:
+			return IF_LCMPLT;
+		case IF_LCMPGT:
+			return IF_LCMPLE;
+		case IF_LCMPLE:
+			return IF_LCMPGT;
+			
+		case IF_FCMPEQ:
+			return IF_FCMPNE;
+		case IF_FCMPNE:
+			return IF_FCMPEQ;
+		case IF_FCMPLT:
+			return IF_FCMPGE;
+		case IF_FCMPGE:
+			return IF_FCMPLT;
+		case IF_FCMPGT:
+			return IF_FCMPLE;
+		case IF_FCMPLE:
+			return IF_FCMPGT;
+			
+		case IF_DCMPEQ:
+			return IF_DCMPNE;
+		case IF_DCMPNE:
+			return IF_DCMPEQ;
+		case IF_DCMPLT:
+			return IF_DCMPGE;
+		case IF_DCMPGE:
+			return IF_DCMPLT;
+		case IF_DCMPGT:
+			return IF_DCMPLE;
+		case IF_DCMPLE:
+			return IF_DCMPGT;
+		}
+		return 0;
+	}
 }

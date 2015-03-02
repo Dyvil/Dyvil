@@ -6,12 +6,14 @@ import static dyvil.reflect.Opcodes.IFNE;
 import static dyvil.reflect.Opcodes.INSTANCE;
 
 import java.lang.annotation.ElementType;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IntValue;
@@ -33,7 +35,6 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
-import dyvil.tools.compiler.util.OpcodeUtil;
 import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
@@ -1083,7 +1084,7 @@ public class Method extends Member implements IMethod
 					arg.writeExpression(writer);
 				}
 			}
-			else if (OpcodeUtil.isJumpOpcode(i))
+			else if (Opcodes.isJumpOpcode(i))
 			{
 				writer.visitJumpInsn(i, dest);
 			}
@@ -1109,9 +1110,9 @@ public class Method extends Member implements IMethod
 					arg.writeExpression(writer);
 				}
 			}
-			else if (OpcodeUtil.isJumpOpcode(i))
+			else if (Opcodes.isJumpOpcode(i))
 			{
-				writer.visitJumpInsn(OpcodeUtil.getInverseOpcode(i), dest);
+				writer.visitJumpInsn(Opcodes.getInverseOpcode(i), dest);
 			}
 			else
 			{

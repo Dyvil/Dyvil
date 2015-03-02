@@ -17,7 +17,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ClassBody extends ASTNode
+public final class ClassBody extends ASTNode
 {
 	public IClass				theClass;
 	public List<IClass>			classes		= new ArrayList();

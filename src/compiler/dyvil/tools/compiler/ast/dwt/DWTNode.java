@@ -25,7 +25,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.DWTUtil;
+import dyvil.tools.compiler.util.Util;
 
 public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String>
 {
@@ -197,7 +197,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 			{
 				for (IValue v : ((IValueList) value).getValues())
 				{
-					String s1 = DWTUtil.getAdder(key);
+					String s1 = Util.getAdder(key);
 					MethodMatch m = this.theClass.resolveMethod(this, s1, new SingleElementList<IValue>(v));
 					
 					if (m != null)
@@ -219,7 +219,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 					continue;
 				}
 				
-				MethodMatch getter = this.theClass.resolveMethod(this, DWTUtil.getGetter(key), Collections.EMPTY_LIST);
+				MethodMatch getter = this.theClass.resolveMethod(this, Util.getGetter(key), Collections.EMPTY_LIST);
 				if (getter != null)
 				{
 					node.getter = getter.theMethod;
@@ -233,7 +233,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 			}
 			else
 			{
-				String s1 = DWTUtil.getSetter(key);
+				String s1 = Util.getSetter(key);
 				MethodMatch m = this.theClass.resolveMethod(this, s1, new SingleElementList<IValue>(value));
 				
 				if (m != null)

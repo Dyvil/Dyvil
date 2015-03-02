@@ -10,7 +10,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public class ExpressionListParser extends Parser implements IValued
+public final class ExpressionListParser extends Parser implements IValued
 {
 	protected IValueList	valueList;
 	private String			label;

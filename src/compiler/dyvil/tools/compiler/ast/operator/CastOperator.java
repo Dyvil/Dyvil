@@ -1,9 +1,12 @@
 package dyvil.tools.compiler.ast.operator;
 
+import static dyvil.reflect.Opcodes.*;
+
 import java.util.List;
 
-import dyvil.reflect.Opcodes;
+import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
@@ -12,7 +15,6 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
-import dyvil.tools.compiler.util.OpcodeUtil;
 
 public class CastOperator extends ASTNode implements IValue
 {
@@ -123,7 +125,7 @@ public class CastOperator extends ASTNode implements IValue
 		this.value.writeExpression(writer);
 		if (this.type.isPrimitive())
 		{
-			OpcodeUtil.writePrimitiveCast(this.value.getType(), (PrimitiveType) this.type, writer);
+			writePrimitiveCast(this.value.getType(), (PrimitiveType) this.type, writer);
 		}
 		else
 		{
@@ -144,5 +146,142 @@ public class CastOperator extends ASTNode implements IValue
 		this.value.toString(prefix, buffer);
 		buffer.append(" :> ");
 		this.type.toString(prefix, buffer);
+	}
+	
+	public static void writePrimitiveCast(IType value, PrimitiveType cast, MethodWriter writer)
+	{
+		IClass iclass = value.getTheClass();
+		if (iclass == Type.BYTE_CLASS || iclass == Type.SHORT_CLASS || iclass == Type.CHAR_CLASS || iclass == Type.INT_CLASS)
+		{
+			writeIntCast(cast, writer);
+			return;
+		}
+		if (iclass == Type.LONG_CLASS)
+		{
+			writeLongCast(cast, writer);
+			return;
+		}
+		if (iclass == Type.FLOAT_CLASS)
+		{
+			writeFloatCast(cast, writer);
+			return;
+		}
+		if (iclass == Type.DOUBLE_CLASS)
+		{
+			writeDoubleCast(cast, writer);
+			return;
+		}
+	}
+	
+	private static void writeIntCast(PrimitiveType cast, MethodWriter writer)
+	{
+		switch (cast.typecode)
+		{
+		case Opcodes.T_BOOLEAN:
+		case Opcodes.T_BYTE:
+		case Opcodes.T_SHORT:
+		case Opcodes.T_CHAR:
+		case Opcodes.T_INT:
+			break;
+		case Opcodes.T_LONG:
+			writer.visitInsn(I2L);
+			break;
+		case Opcodes.T_FLOAT:
+			writer.visitInsn(I2F);
+			break;
+		case Opcodes.T_DOUBLE:
+			writer.visitInsn(I2D);
+			break;
+		}
+	}
+	
+	private static void writeLongCast(PrimitiveType cast, MethodWriter writer)
+	{
+		switch (cast.typecode)
+		{
+		case Opcodes.T_BOOLEAN:
+			writer.visitInsn(L2I);
+			break;
+		case Opcodes.T_BYTE:
+			writer.visitInsn(L2B);
+			break;
+		case Opcodes.T_SHORT:
+			writer.visitInsn(L2S);
+			break;
+		case Opcodes.T_CHAR:
+			writer.visitInsn(L2C);
+			break;
+		case Opcodes.T_INT:
+			writer.visitInsn(L2I);
+			break;
+		case Opcodes.T_LONG:
+			break;
+		case Opcodes.T_FLOAT:
+			writer.visitInsn(L2F);
+			break;
+		case Opcodes.T_DOUBLE:
+			writer.visitInsn(L2D);
+			break;
+		}
+	}
+	
+	private static void writeFloatCast(PrimitiveType cast, MethodWriter writer)
+	{
+		switch (cast.typecode)
+		{
+		case Opcodes.T_BOOLEAN:
+			writer.visitInsn(F2I);
+			break;
+		case Opcodes.T_BYTE:
+			writer.visitInsn(F2B);
+			break;
+		case Opcodes.T_SHORT:
+			writer.visitInsn(F2S);
+			break;
+		case Opcodes.T_CHAR:
+			writer.visitInsn(F2C);
+			break;
+		case Opcodes.T_INT:
+			writer.visitInsn(F2I);
+			break;
+		case Opcodes.T_LONG:
+			writer.visitInsn(F2L);
+			break;
+		case Opcodes.T_FLOAT:
+			break;
+		case Opcodes.T_DOUBLE:
+			writer.visitInsn(F2D);
+			break;
+		}
+	}
+	
+	private static void writeDoubleCast(PrimitiveType cast, MethodWriter writer)
+	{
+		switch (cast.typecode)
+		{
+		case Opcodes.T_BOOLEAN:
+			writer.visitInsn(D2I);
+			break;
+		case Opcodes.T_BYTE:
+			writer.visitInsn(D2B);
+			break;
+		case Opcodes.T_SHORT:
+			writer.visitInsn(D2S);
+			break;
+		case Opcodes.T_CHAR:
+			writer.visitInsn(D2C);
+			break;
+		case Opcodes.T_INT:
+			writer.visitInsn(D2I);
+			break;
+		case Opcodes.T_LONG:
+			writer.visitInsn(D2L);
+			break;
+		case Opcodes.T_FLOAT:
+			writer.visitInsn(D2F);
+			break;
+		case Opcodes.T_DOUBLE:
+			break;
+		}
 	}
 }

@@ -9,7 +9,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class TypeListParser extends Parser implements ITyped
+public final class TypeListParser extends Parser implements ITyped
 {
 	protected ITypeList	typeList;
 	
