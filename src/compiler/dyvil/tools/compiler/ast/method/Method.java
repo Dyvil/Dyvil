@@ -325,9 +325,12 @@ public class Method extends Member implements IMethod
 			
 			int m;
 			Parameter varParam = params.get(parCount);
+			varParam.index = parCount;
 			for (int i = 0; i < parCount; i++)
 			{
-				m = arguments.getTypeMatch(params.get(i + pOff));
+				Parameter par = params.get(i + pOff);
+				par.index = i + pOff;
+				m = arguments.getTypeMatch(par);
 				if (m == 0)
 				{
 					return 0;
@@ -345,14 +348,16 @@ public class Method extends Member implements IMethod
 			}
 			return match;
 		}
-		else if (len != this.parameters.size())
+		else if (len > params.size())
 		{
 			return 0;
 		}
 		
 		for (int i = 0; i < len; i++)
 		{
-			int m = arguments.getTypeMatch(params.get(i + pOff));
+			Parameter par = params.get(i + pOff);
+			par.index = i;
+			int m = arguments.getTypeMatch(par);
 			if (m == 0)
 			{
 				return 0;
@@ -405,12 +410,14 @@ public class Method extends Member implements IMethod
 		{
 			len = this.parameters.size() - 1;
 			par = params.get(len);
+			par.index = len;
 			arguments.checkVarargsValue(markers, par, typeContext);
 		}
 		
 		for (int i = 0; i < len; i++)
 		{
 			par = params.get(i + pOff);
+			par.index = i;
 			arguments.checkValue(markers, par, typeContext);
 		}
 	}

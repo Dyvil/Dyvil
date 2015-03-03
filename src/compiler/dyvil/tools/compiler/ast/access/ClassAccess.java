@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -17,7 +18,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
 public class ClassAccess extends ASTNode implements IValue, ITyped
 {
@@ -104,7 +104,7 @@ public class ClassAccess extends ASTNode implements IValue, ITyped
 			return access;
 		}
 		
-		MethodMatch m = context.resolveMethod(null, qualifiedName, Util.EMPTY_VALUES);
+		MethodMatch m = context.resolveMethod(null, qualifiedName, EmptyArguments.INSTANCE);
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position);
@@ -112,7 +112,7 @@ public class ClassAccess extends ASTNode implements IValue, ITyped
 			call.qualifiedName = qualifiedName;
 			call.method = m.theMethod;
 			call.dotless = true;
-			call.arguments = Util.EMPTY_VALUES;
+			call.arguments = EmptyArguments.INSTANCE;
 			return call;
 		}
 		

@@ -21,7 +21,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ConstructorCall extends ASTNode implements IValue, ITypeContext
+public final class ConstructorCall extends ASTNode implements IValue, ICall, ITypeContext
 {
 	public IType		type;
 	public IArguments	arguments;
@@ -81,6 +81,18 @@ public final class ConstructorCall extends ASTNode implements IValue, ITypeConte
 			return 2;
 		}
 		return 0;
+	}
+	
+	@Override
+	public void setArguments(IArguments arguments)
+	{
+		this.arguments = arguments;
+	}
+	
+	@Override
+	public IArguments getArguments()
+	{
+		return this.arguments;
 	}
 	
 	@Override

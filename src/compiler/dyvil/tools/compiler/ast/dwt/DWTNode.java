@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -128,11 +129,6 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 	}
 	
 	@Override
-	public void setValues(Map<String, IValue> map)
-	{
-	}
-	
-	@Override
 	public void addValue(String key, IValue value)
 	{
 		if (value.getValueType() == NODE)
@@ -140,12 +136,6 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 			((DWTNode) value).setParent(this);
 		}
 		this.properties.add(new DWTProperty(this, key, value));
-	}
-	
-	@Override
-	public Map<String, IValue> getValues()
-	{
-		return null;
 	}
 	
 	@Override
@@ -218,7 +208,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 					continue;
 				}
 				
-				MethodMatch getter = this.theClass.resolveMethod(this, Util.getGetter(key), Util.EMPTY_VALUES);
+				MethodMatch getter = this.theClass.resolveMethod(this, Util.getGetter(key), EmptyArguments.INSTANCE);
 				if (getter != null)
 				{
 					node.getter = getter.theMethod;
@@ -280,7 +270,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 		if (this.getter != null)
 		{
 			// Getter
-			this.getter.writeCall(writer, this.parent, Util.EMPTY_VALUES);
+			this.getter.writeCall(writer, this.parent, EmptyArguments.INSTANCE);
 		}
 		else
 		{
@@ -306,7 +296,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 				value.writeExpression(writer);
 				writer.visitInsn(Opcodes.DUP);
 				writer.visitPutStatic(owner, property.fullName, value.getType().getExtendedName());
-				setter.writeCall(writer, null, Util.EMPTY_VALUES);
+				setter.writeCall(writer, null, EmptyArguments.INSTANCE);
 			}
 			else if (value.getValueType() == NODE)
 			{

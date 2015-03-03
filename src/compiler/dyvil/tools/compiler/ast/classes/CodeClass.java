@@ -22,6 +22,7 @@ import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.DyvilFile;
@@ -514,7 +515,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.superType != null)
 		{
-			MethodMatch match = this.superType.resolveConstructor(Util.EMPTY_VALUES);
+			MethodMatch match = this.superType.resolveConstructor(EmptyArguments.INSTANCE);
 			if (match != null)
 			{
 				this.superConstructor = match.theMethod;
@@ -1013,7 +1014,7 @@ public class CodeClass extends ASTNode implements IClass
 			call.method = this.superConstructor;
 			call.name = "new";
 			call.qualifiedName = "<init>";
-			call.arguments = Util.EMPTY_VALUES;
+			call.arguments = EmptyArguments.INSTANCE;
 			instanceFields.addValue(0, call);
 		}
 		

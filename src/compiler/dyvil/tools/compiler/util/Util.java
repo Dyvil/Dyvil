@@ -11,8 +11,6 @@ import dyvil.strings.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -23,7 +21,6 @@ import dyvil.tools.compiler.config.Formatting;
 public class Util
 {
 	public static final List<ITyped>	EMPTY_TYPES		= Collections.EMPTY_LIST;
-	public static final IArguments		EMPTY_VALUES	= new EmptyArguments();
 	
 	public static final Predicate<?>	ISNULL			= a -> a == null;
 	

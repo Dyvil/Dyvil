@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -24,7 +25,6 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Util;
 
 public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAccess
 {
@@ -144,7 +144,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public IArguments getArguments()
 	{
-		return Util.EMPTY_VALUES;
+		return EmptyArguments.INSTANCE;
 	}
 	
 	@Override
@@ -274,7 +274,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 			return this.replacement;
 		}
 		
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, Util.EMPTY_VALUES);
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, EmptyArguments.INSTANCE);
 		if (method != null)
 		{
 			return this.toMethodCall(method);
@@ -291,7 +291,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		call.qualifiedName = this.qualifiedName;
 		call.method = method;
 		call.dotless = this.dotless;
-		call.arguments = Util.EMPTY_VALUES;
+		call.arguments = EmptyArguments.INSTANCE;
 		return call;
 	}
 	

@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -35,7 +36,7 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 	public String		name;
 	public String		qualifiedName;
 	public List<IType>	generics;
-	public IArguments	arguments	= Util.EMPTY_VALUES;
+	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
 	public boolean		dotless;
 	

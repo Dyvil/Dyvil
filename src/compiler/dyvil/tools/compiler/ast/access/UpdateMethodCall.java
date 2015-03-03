@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -21,12 +22,11 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
 public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeContext
 {
 	public IValue		instance;
-	public IArguments	arguments	= Util.EMPTY_VALUES;
+	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
 	public IMethod		method;
 	

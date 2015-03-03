@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -19,7 +20,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
 public class SpecialConstructor extends ASTNode implements IValue, IValued
 {
@@ -126,7 +126,7 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 			return this;
 		}
 		
-		MethodMatch method = this.type.resolveConstructor(Util.EMPTY_VALUES);
+		MethodMatch method = this.type.resolveConstructor(EmptyArguments.INSTANCE);
 		if (method != null)
 		{
 			this.method = method.theMethod;

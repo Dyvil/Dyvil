@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.util.Util;
 
 public class SingleArgument implements IArguments, IValued
 {
@@ -44,7 +43,7 @@ public class SingleArgument implements IArguments, IValued
 	@Override
 	public IArguments dropFirstValue()
 	{
-		return Util.EMPTY_VALUES;
+		return EmptyArguments.INSTANCE;
 	}
 	
 	@Override

@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -24,7 +25,6 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Util;
 
 public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeContext, INamed
 {
@@ -32,7 +32,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	public String		qualifiedName;
 	
 	public IValue		instance;
-	public IArguments	arguments	= Util.EMPTY_VALUES;
+	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
 	public boolean		dotless;
 	
@@ -310,10 +310,10 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			
 			writer.visitInsn(Opcodes.DUP2);
 			
-			call.method.writeCall(writer, null, Util.EMPTY_VALUES);
+			call.method.writeCall(writer, null, EmptyArguments.INSTANCE);
 			this.method.writeCall(writer, null, this.arguments);
 			writer.visitInsn(Opcodes.DUP_X2);
-			this.updateMethod.writeCall(writer, null, Util.EMPTY_VALUES);
+			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE);
 		}
 	}
 	
@@ -355,9 +355,9 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			
 			writer.visitInsn(Opcodes.DUP2);
 			
-			call.method.writeCall(writer, null, Util.EMPTY_VALUES);
+			call.method.writeCall(writer, null, EmptyArguments.INSTANCE);
 			this.method.writeCall(writer, null, this.arguments);
-			this.updateMethod.writeCall(writer, null, Util.EMPTY_VALUES);
+			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE);
 		}
 	}
 	

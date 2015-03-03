@@ -16,7 +16,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 
-public class ArgumentList implements IArguments, IValueList, IASTNode
+public final class ArgumentList implements IArguments, IValueList, IASTNode
 {
 	private IValue[]	values;
 	private int			size;

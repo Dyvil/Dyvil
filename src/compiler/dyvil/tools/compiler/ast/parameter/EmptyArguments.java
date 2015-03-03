@@ -10,10 +10,25 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
-public class EmptyArguments implements IArguments
+public final class EmptyArguments implements IArguments
 {
+	public static final EmptyArguments	VISIBLE		= new EmptyArguments(true);
+	public static final EmptyArguments	INSTANCE	= new EmptyArguments(false);
+	
+	private boolean						visible;
+	
+	private EmptyArguments()
+	{
+	}
+	
+	private EmptyArguments(boolean visible)
+	{
+		this.visible = visible;
+	}
+	
 	@Override
 	public Iterator<IValue> iterator()
 	{
@@ -70,6 +85,12 @@ public class EmptyArguments implements IArguments
 	@Override
 	public void writeValue(Parameter param, MethodWriter writer)
 	{
+		if (param.defaultValue != null)
+		{
+			param.defaultValue.writeExpression(writer);
+			return;
+		}
+		
 		if (param.varargs)
 		{
 			writer.visitLdcInsn(0);
@@ -80,7 +101,7 @@ public class EmptyArguments implements IArguments
 	@Override
 	public int getTypeMatch(Parameter param)
 	{
-		return 0;
+		return param.defaultValue != null ? 3 : 0;
 	}
 	
 	@Override
@@ -122,5 +143,9 @@ public class EmptyArguments implements IArguments
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		if (this.visible)
+		{
+			buffer.append(Formatting.Method.emptyParameters);
+		}
 	}
 }

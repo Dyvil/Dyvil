@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -14,14 +15,9 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.util.Util;
 
-public interface IAccess extends IValue, IValued
+public interface IAccess extends IValue, IValued, ICall
 {
-	public void setArguments(IArguments arguments);
-	
-	public IArguments getArguments();
-	
 	public boolean isResolved();
 	
 	public boolean resolve(IContext context, List<Marker> markers);
@@ -77,7 +73,7 @@ public interface IAccess extends IValue, IValued
 			IType type = v.getType();
 			if (type != null)
 			{
-				match = type.resolveMethod(instance, name, Util.EMPTY_VALUES);
+				match = type.resolveMethod(instance, name, EmptyArguments.INSTANCE);
 				if (match != null)
 				{
 					return match.theMethod;

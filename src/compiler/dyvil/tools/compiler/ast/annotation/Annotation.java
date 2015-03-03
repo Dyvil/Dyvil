@@ -62,18 +62,6 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	}
 	
 	@Override
-	public void setValues(Map<String, IValue> map)
-	{
-		this.parameters = map;
-	}
-	
-	@Override
-	public Map<String, IValue> getValues()
-	{
-		return this.parameters;
-	}
-	
-	@Override
 	public void addValue(String key, IValue value)
 	{
 		this.parameters.put(key, value);
