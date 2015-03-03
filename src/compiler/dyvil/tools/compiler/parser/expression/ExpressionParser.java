@@ -6,7 +6,9 @@ import java.util.List;
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.field.LambdaParameter;
+import dyvil.tools.compiler.ast.parameter.LambdaParameter;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.ast.value.*;
@@ -49,6 +51,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	protected int			precedence;
 	
 	private IValue			value;
+	private IValueList		valueList;
 	
 	private boolean			dotless;
 	private boolean			prefix;
@@ -78,12 +81,13 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				this.mode = TUPLE_END;
-				this.value = new TupleValue(token);
+				TupleValue tv = new TupleValue(token);
+				this.value = tv;
 				
 				int nextType = token.next().type();
 				if (nextType != Tokens.CLOSE_PARENTHESIS)
 				{
-					pm.pushParser(new ExpressionListParser((IValueList) this.value));
+					pm.pushParser(new ExpressionListParser(tv));
 				}
 				return;
 			}
@@ -96,12 +100,13 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
 				this.mode = LIST_END;
-				this.value = new StatementList(token);
+				StatementList sl = new StatementList(token);
+				this.value = sl;
 				
 				int nextType = token.next().type();
 				if (nextType != Tokens.CLOSE_CURLY_BRACKET)
 				{
-					pm.pushParser(new ExpressionListParser((IValueList) this.value));
+					pm.pushParser(new ExpressionListParser(sl));
 				}
 				return;
 			}
@@ -174,7 +179,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = PARAMETERS_END;
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ExpressionListParser((IValueList) this.value));
+				pm.pushParser(new ExpressionListParser(this.valueList));
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Argument List - '(' expected", true);
@@ -305,17 +310,22 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				IToken prev = token.prev();
+				
 				if (ParserUtil.isIdentifier(prev.type()))
 				{
 					MethodCall mc = new MethodCall(prev, null, prev.value());
+					ArgumentList list = new ArgumentList();
+					mc.arguments = list;
 					this.value = mc;
-					pm.pushParser(new ExpressionListParser(mc));
+					pm.pushParser(new ExpressionListParser(list));
 				}
 				else
 				{
 					ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value);
+					ArgumentList list = new ArgumentList();
+					amc.arguments = list;
 					this.value = amc;
-					pm.pushParser(new ExpressionListParser(amc));
+					pm.pushParser(new ExpressionListParser(list));
 				}
 				this.mode = PARAMETERS_END;
 				return;
@@ -367,7 +377,10 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ExpressionListParser((IValueList) this.value));
+				ConstructorCall cc = ((ConstructorCall) this.value);
+				ArgumentList list = new ArgumentList();
+				cc.arguments = list;
+				pm.pushParser(new ExpressionListParser(list));
 				this.mode = PARAMETERS_END;
 				return;
 			}
@@ -381,7 +394,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			
 			pm.pushParser(new ExpressionParser(this), true);
-			((ConstructorCall) this.value).isSugarCall = true;
 			this.mode = 0;
 			return;
 		}
@@ -403,20 +415,24 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		if (type1 == Tokens.OPEN_PARENTHESIS)
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
+			ArgumentList list = new ArgumentList();
 			call.dotless = this.dotless;
+			call.arguments = list;
 			this.value = call;
+			this.valueList = list;
 			this.mode = PARAMETERS;
 			return;
 		}
 		else if (type == Tokens.TYPE_SYMBOL_ID || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
-			call.isSugarCall = true;
+			SingleArgument sa = new SingleArgument();
+			call.arguments = sa;
 			call.dotless = this.dotless;
 			this.value = call;
 			this.mode = ACCESS;
 			
-			ExpressionParser parser = new ExpressionParser(this);
+			ExpressionParser parser = new ExpressionParser(sa);
 			parser.precedence = this.prefix ? Operators.PREFIX : Operators.index(value);
 			pm.pushParser(parser);
 			return;
@@ -493,7 +509,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	private static TupleType getTupleType(TupleValue value)
 	{
 		TupleType t = new TupleType();
-		for (IValue v : value.getValues())
+		for (IValue v : value)
 		{
 			ClassAccess ca = (ClassAccess) v;
 			t.addType(ca.type);
@@ -519,7 +535,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		
 		List<LambdaParameter> params = new ArrayList();
 		
-		for (IValue v : ((TupleValue) value).getValues())
+		for (IValue v : (TupleValue) value)
 		{
 			type = v.getValueType();
 			if (type == IValue.FIELD_ACCESS)
@@ -739,7 +755,14 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		((IValueList) this.value).addValue(value);
+		if (this.valueList != null)
+		{
+			this.valueList.addValue(value);
+		}
+		else
+		{
+			((IValueList) this.value).addValue(value);
+		}
 	}
 	
 	@Override

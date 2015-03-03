@@ -13,6 +13,8 @@ import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
@@ -220,7 +222,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
 	{
 		if (!this.typesResolved)
 		{
@@ -245,7 +247,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
 	{
 		if (!this.typesResolved)
 		{

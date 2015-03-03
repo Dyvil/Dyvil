@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 
@@ -38,13 +39,13 @@ public interface IContext
 	
 	public FieldMatch resolveField(String name);
 	
-	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments);
+	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments);
 	
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments);
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments);
 	
-	public MethodMatch resolveConstructor(List<IValue> arguments);
+	public MethodMatch resolveConstructor(IArguments arguments);
 	
-	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments);
+	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments);
 	
 	public byte getAccessibility(IMember member);
 }

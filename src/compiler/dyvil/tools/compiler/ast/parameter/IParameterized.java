@@ -1,8 +1,7 @@
-package dyvil.tools.compiler.ast.method;
+package dyvil.tools.compiler.ast.parameter;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;

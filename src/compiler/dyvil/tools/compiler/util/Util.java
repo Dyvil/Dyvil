@@ -11,6 +11,8 @@ import dyvil.strings.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -21,7 +23,7 @@ import dyvil.tools.compiler.config.Formatting;
 public class Util
 {
 	public static final List<ITyped>	EMPTY_TYPES		= Collections.EMPTY_LIST;
-	public static final List<IValue>	EMPTY_VALUES	= Collections.EMPTY_LIST;
+	public static final IArguments	EMPTY_VALUES	= new EmptyArguments();
 	
 	public static final Predicate<?>	ISNULL			= a -> a == null;
 	
@@ -133,8 +135,8 @@ public class Util
 	
 	public static void parametersToString(String prefix, Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty)
 	{
-		parametersToString(prefix, parameters, buffer, writeEmpty, Formatting.Method.emptyParameters,
-				Formatting.Method.parametersStart, Formatting.Method.parameterSeperator, Formatting.Method.parametersEnd);
+		parametersToString(prefix, parameters, buffer, writeEmpty, Formatting.Method.emptyParameters, Formatting.Method.parametersStart,
+				Formatting.Method.parameterSeperator, Formatting.Method.parametersEnd);
 	}
 	
 	public static void parametersToString(String prefix, Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty, String empty,
@@ -209,8 +211,7 @@ public class Util
 		IValue value1 = method.getValue();
 		if (value1 instanceof IValueList)
 		{
-			List<IValue> list = ((IValueList) value1).getValues();
-			list.add(0, value);
+			((IValueList) value1).addValue(0, value);
 		}
 		else if (value1 != null)
 		{

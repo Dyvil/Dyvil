@@ -12,13 +12,14 @@ import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.field.LambdaParameter;
-import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.LambdaParameter;
+import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -311,25 +312,25 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod, I
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
 	{
 		return this.context.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
 	{
 		this.context.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public MethodMatch resolveConstructor(List<IValue> arguments)
+	public MethodMatch resolveConstructor(IArguments arguments)
 	{
 		return this.context.resolveConstructor(arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
 	{
 		this.context.getConstructorMatches(list, arguments);
 	}

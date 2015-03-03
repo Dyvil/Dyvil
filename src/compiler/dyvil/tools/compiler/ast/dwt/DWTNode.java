@@ -1,12 +1,10 @@
 package dyvil.tools.compiler.ast.dwt;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import jdk.internal.org.objectweb.asm.Label;
-import dyvil.collections.mutable.SingleElementList;
 import dyvil.reflect.Opcodes;
 import dyvil.strings.StringUtils;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -14,6 +12,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -195,10 +194,10 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 			int type = value.getValueType();
 			if (type == LIST)
 			{
-				for (IValue v : ((IValueList) value).getValues())
+				for (IValue v : (IValueList) value)
 				{
 					String s1 = Util.getAdder(key);
-					MethodMatch m = this.theClass.resolveMethod(this, s1, new SingleElementList<IValue>(v));
+					MethodMatch m = this.theClass.resolveMethod(this, s1, new SingleArgument(value));
 					
 					if (m != null)
 					{
@@ -219,7 +218,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 					continue;
 				}
 				
-				MethodMatch getter = this.theClass.resolveMethod(this, Util.getGetter(key), Collections.EMPTY_LIST);
+				MethodMatch getter = this.theClass.resolveMethod(this, Util.getGetter(key), Util.EMPTY_VALUES);
 				if (getter != null)
 				{
 					node.getter = getter.theMethod;
@@ -234,7 +233,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 			else
 			{
 				String s1 = Util.getSetter(key);
-				MethodMatch m = this.theClass.resolveMethod(this, s1, new SingleElementList<IValue>(value));
+				MethodMatch m = this.theClass.resolveMethod(this, s1, new SingleArgument(value));
 				
 				if (m != null)
 				{
@@ -281,7 +280,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 		if (this.getter != null)
 		{
 			// Getter
-			this.getter.writeCall(writer, this.parent, Collections.EMPTY_LIST);
+			this.getter.writeCall(writer, this.parent, Util.EMPTY_VALUES);
 		}
 		else
 		{
@@ -307,7 +306,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 				value.writeExpression(writer);
 				writer.visitInsn(Opcodes.DUP);
 				writer.visitPutStatic(owner, property.fullName, value.getType().getExtendedName());
-				setter.writeCall(writer, null, Collections.EMPTY_LIST);
+				setter.writeCall(writer, null, Util.EMPTY_VALUES);
 			}
 			else if (value.getValueType() == NODE)
 			{

@@ -112,7 +112,6 @@ public class ClassAccess extends ASTNode implements IValue, ITyped
 			call.qualifiedName = qualifiedName;
 			call.method = m.theMethod;
 			call.dotless = true;
-			call.isSugarCall = true;
 			call.arguments = Util.EMPTY_VALUES;
 			return call;
 		}

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.value;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import dyvil.reflect.Opcodes;
@@ -185,12 +186,6 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void setValues(List<IValue> list)
-	{
-		this.values = list;
-	}
-	
-	@Override
 	public void setValue(int index, IValue value)
 	{
 		this.values.set(index, value);
@@ -203,15 +198,21 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public List<IValue> getValues()
+	public void addValue(int index, IValue value)
 	{
-		return this.values;
+		this.values.add(index, value);
 	}
 	
 	@Override
 	public IValue getValue(int index)
 	{
 		return this.values.get(index);
+	}
+	
+	@Override
+	public Iterator<IValue> iterator()
+	{
+		return this.values.iterator();
 	}
 	
 	public boolean isEmpty()

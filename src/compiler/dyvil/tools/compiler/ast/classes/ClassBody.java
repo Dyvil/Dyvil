@@ -7,10 +7,11 @@ import java.util.List;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
@@ -156,7 +157,7 @@ public final class ClassBody extends ASTNode
 		this.lambdas.add(lambda);
 	}
 	
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
 	{
 		for (IMethod method : this.methods)
 		{

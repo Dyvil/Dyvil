@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.field;
+package dyvil.tools.compiler.ast.parameter;
 
 import java.lang.annotation.ElementType;
 import java.util.List;
@@ -7,6 +7,7 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;

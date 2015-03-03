@@ -1,16 +1,12 @@
 package dyvil.tools.compiler.ast.value;
 
-import java.util.List;
-
-public interface IValueList
+public interface IValueList extends Iterable<IValue>
 {
-	public void setValues(List<IValue> list);
-	
 	public void setValue(int index, IValue value);
 	
 	public void addValue(IValue value);
 	
-	public List<IValue> getValues();
+	public void addValue(int index, IValue value);
 	
 	public IValue getValue(int index);
 	

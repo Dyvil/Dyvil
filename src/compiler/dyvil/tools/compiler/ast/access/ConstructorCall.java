@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -10,25 +9,22 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
-public final class ConstructorCall extends ASTNode implements IValue, IValueList, ITypeContext
+public final class ConstructorCall extends ASTNode implements IValue, ITypeContext
 {
 	public IType		type;
-	public List<IValue>	arguments	= new ArrayList(3);
-	
-	public boolean		isSugarCall;
+	public IArguments arguments;
 	
 	public IMethod		method;
 	
@@ -88,41 +84,6 @@ public final class ConstructorCall extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void setValues(List<IValue> list)
-	{
-		this.arguments = list;
-	}
-	
-	@Override
-	public void setValue(int index, IValue value)
-	{
-		this.arguments.set(index, value);
-	}
-	
-	@Override
-	public void addValue(IValue value)
-	{
-		this.arguments.add(value);
-	}
-	
-	@Override
-	public List<IValue> getValues()
-	{
-		return this.arguments;
-	}
-	
-	@Override
-	public IValue getValue(int index)
-	{
-		return this.arguments.get(index);
-	}
-	
-	public void setSugar(boolean sugar)
-	{
-		this.isSugarCall = sugar;
-	}
-	
-	@Override
 	public IType resolveType(String name)
 	{
 		List<IType> generics = this.type.isGeneric() ? ((GenericType) this.type).generics : null;
@@ -133,27 +94,13 @@ public final class ConstructorCall extends ASTNode implements IValue, IValueList
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context);
-		
-		int len = this.arguments.size();
-		for (int i = 0; i < len; i++)
-		{
-			this.arguments.get(i).resolveTypes(markers, context);
-		}
+		this.arguments.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		int len = this.arguments.size();
-		for (int i = 0; i < len; i++)
-		{
-			IValue v1 = this.arguments.get(i);
-			IValue v2 = v1.resolve(markers, context);
-			if (v1 != v2)
-			{
-				this.arguments.set(i, v2);
-			}
-		}
+		this.arguments.resolve(markers, context);
 		
 		if (!this.type.isResolved())
 		{
@@ -162,6 +109,7 @@ public final class ConstructorCall extends ASTNode implements IValue, IValueList
 		
 		if (this.type.isArrayType())
 		{
+			int len = this.arguments.size();
 			int dims = this.type.getArrayDimensions();
 			if (dims != len)
 			{
@@ -172,9 +120,12 @@ public final class ConstructorCall extends ASTNode implements IValue, IValueList
 				return this;
 			}
 			
+			// TODO Handle this cast
+			ArgumentList paramList = (ArgumentList) this.arguments;
+			
 			for (int i = 0; i < len; i++)
 			{
-				IValue v = this.arguments.get(i);
+				IValue v = paramList.getValue(i);
 				IType t = v.getType();
 				if (t != Type.INT)
 				{
@@ -191,9 +142,8 @@ public final class ConstructorCall extends ASTNode implements IValue, IValueList
 		if (match == null)
 		{
 			Marker marker = Markers.create(this.position, "resolve.constructor", this.type.toString());
-			StringBuilder builder = new StringBuilder("Argument Types: [");
-			Util.typesToString("", this.arguments, ", ", builder);
-			builder.append(']');
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			// FIXME Util.typesToString("", this.arguments, ", ", builder);
 			marker.addInfo(builder.toString());
 			markers.add(marker);
 			return this;
@@ -253,16 +203,7 @@ public final class ConstructorCall extends ASTNode implements IValue, IValueList
 	@Override
 	public IValue foldConstants()
 	{
-		int len = this.arguments.size();
-		for (int i = 0; i < len; i++)
-		{
-			IValue v1 = this.arguments.get(i);
-			IValue v2 = v1.foldConstants();
-			if (v1 != v2)
-			{
-				this.arguments.set(i, v2);
-			}
-		}
+		this.arguments.foldConstants();
 		return this;
 	}
 	
@@ -275,16 +216,19 @@ public final class ConstructorCall extends ASTNode implements IValue, IValueList
 			
 			if (len == 1)
 			{
-				this.arguments.get(0).writeExpression(writer);
+				this.arguments.getFirstValue().writeExpression(writer);
 				this.type.setArrayDimensions(0);
 				writer.visitTypeInsn(Opcodes.ANEWARRAY, this.type);
 				this.type.setArrayDimensions(1);
 				return;
 			}
 			
+			// TODO Handle this cast
+			ArgumentList paramList = (ArgumentList) this.arguments;
+			
 			for (int i = 0; i < len; i++)
 			{
-				this.arguments.get(i).writeExpression(writer);
+				paramList.getValue(i).writeExpression(writer);
 			}
 			
 			writer.visitMultiANewArrayInsn(this.type, len);
@@ -318,14 +262,6 @@ public final class ConstructorCall extends ASTNode implements IValue, IValueList
 	{
 		buffer.append("new ");
 		this.type.toString("", buffer);
-		if (this.isSugarCall && !Formatting.Method.useJavaFormat)
-		{
-			buffer.append(Formatting.Method.sugarCallSeperator);
-			this.arguments.get(0).toString("", buffer);
-		}
-		else
-		{
-			Util.parametersToString(prefix, this.arguments, buffer, Formatting.Method.useJavaFormat);
-		}
+		this.arguments.toString(prefix, buffer);
 	}
 }

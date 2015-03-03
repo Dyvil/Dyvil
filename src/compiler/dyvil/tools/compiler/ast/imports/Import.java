@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -80,25 +81,25 @@ public class Import extends ASTNode implements IContext, IImportContainer
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
 	{
 		return this.last.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
 	{
 		this.last.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public MethodMatch resolveConstructor(List<IValue> arguments)
+	public MethodMatch resolveConstructor(IArguments arguments)
 	{
 		return this.last.resolveConstructor(arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
 	{
 		this.last.getConstructorMatches(list, arguments);
 	}

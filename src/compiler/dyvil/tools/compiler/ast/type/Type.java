@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -502,7 +503,7 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -513,7 +514,7 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -528,7 +529,7 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
-	public MethodMatch resolveConstructor(List<IValue> arguments)
+	public MethodMatch resolveConstructor(IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -538,7 +539,7 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
 	{
 		if (this.arrayDimensions == 0 && this.theClass != null)
 		{

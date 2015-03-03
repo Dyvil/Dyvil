@@ -1,9 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.Collections;
 import java.util.List;
 
-import dyvil.collections.mutable.SingleElementList;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.EnumValue;
@@ -11,6 +9,8 @@ import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -137,30 +137,14 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	}
 	
 	@Override
-	public void setValues(List<IValue> list)
+	public void setArguments(IArguments arguments)
 	{
 	}
 	
 	@Override
-	public void setValue(int index, IValue value)
+	public IArguments getArguments()
 	{
-	}
-	
-	@Override
-	public void addValue(IValue value)
-	{
-	}
-	
-	@Override
-	public List<IValue> getValues()
-	{
-		return Collections.EMPTY_LIST;
-	}
-	
-	@Override
-	public IValue getValue(int index)
-	{
-		return null;
+		return Util.EMPTY_VALUES;
 	}
 	
 	@Override
@@ -307,7 +291,6 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 		call.qualifiedName = this.qualifiedName;
 		call.method = method;
 		call.dotless = this.dotless;
-		call.isSugarCall = true;
 		call.arguments = Util.EMPTY_VALUES;
 		return call;
 	}
@@ -315,7 +298,7 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 	@Override
 	public IAccess resolve3(IContext context, IAccess next)
 	{
-		List<IValue> arguments = new SingleElementList(next);
+		IArguments arguments = new SingleArgument(next);
 		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, arguments);
 		if (method != null)
 		{
@@ -325,7 +308,6 @@ public class FieldAccess extends ASTNode implements IValue, INamed, IValued, IAc
 			call.qualifiedName = this.qualifiedName;
 			call.method = method;
 			call.dotless = this.dotless;
-			call.isSugarCall = true;
 			call.arguments = arguments;
 			return call;
 		}

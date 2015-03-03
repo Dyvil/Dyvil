@@ -22,6 +22,7 @@ import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -725,7 +726,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
 	{
 		List<MethodMatch> list = new ArrayList();
 		this.getMethodMatches(list, instance, name, arguments);
@@ -740,7 +741,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public MethodMatch resolveConstructor(List<IValue> arguments)
+	public MethodMatch resolveConstructor(IArguments arguments)
 	{
 		if (this.constructor != null && arguments.isEmpty())
 		{
@@ -760,7 +761,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
 	{
 		if (this.body != null)
 		{
@@ -793,7 +794,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
 	{
 		if (this.body != null)
 		{
@@ -1013,7 +1014,7 @@ public class CodeClass extends ASTNode implements IClass
 			call.name = "new";
 			call.qualifiedName = "<init>";
 			call.arguments = Util.EMPTY_VALUES;
-			instanceFields.getValues().add(0, call);
+			instanceFields.addValue(0, call);
 		}
 		
 		if (this.constructor != null)

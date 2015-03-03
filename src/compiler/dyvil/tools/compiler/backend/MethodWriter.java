@@ -807,10 +807,14 @@ public final class MethodWriter extends MethodVisitor
 	
 	public void visitTypeInsn(int opcode, IType type)
 	{
-		if ((opcode == ANEWARRAY || opcode == NEWARRAY) && type instanceof PrimitiveType)
+		if (opcode == ANEWARRAY || opcode == NEWARRAY)
 		{
-			this.mv.visitIntInsn(NEWARRAY, ((PrimitiveType) type).typecode);
-			return;
+			this.push("[" + type.getExtendedName());
+			if (type instanceof PrimitiveType)
+			{
+				this.mv.visitIntInsn(NEWARRAY, ((PrimitiveType) type).typecode);
+				return;
+			}
 		}
 		if (opcode == NEW)
 		{

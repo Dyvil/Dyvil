@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.member.IAnnotated;
-import dyvil.tools.compiler.ast.method.IParameterized;
+import dyvil.tools.compiler.ast.parameter.IParameterized;
+import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;

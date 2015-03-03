@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
@@ -13,11 +12,11 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -30,20 +29,19 @@ import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Util;
 
-public final class MethodCall extends ASTNode implements IAccess, IValue, IValued, IValueList, ITypeContext, INamed
+public final class MethodCall extends ASTNode implements IAccess, IValue, IValued, ITypeContext, INamed
 {
-	public IValue		instance;
-	public String		name;
-	public String		qualifiedName;
-	public List<IType>	generics;
-	public List<IValue>	arguments;
+	public IValue			instance;
+	public String			name;
+	public String			qualifiedName;
+	public List<IType>		generics;
+	public IArguments	arguments	= Util.EMPTY_VALUES;
 	
-	public boolean		dotless;
-	public boolean		isSugarCall;
+	public boolean			dotless;
 	
-	public IMethod		method;
+	public IMethod			method;
 	
-	private IType		type;
+	private IType			type;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -56,7 +54,6 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 		this.instance = instance;
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
-		this.arguments = new ArrayList(3);
 	}
 	
 	@Override
@@ -173,38 +170,15 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 	}
 	
 	@Override
-	public void setValues(List<IValue> list)
+	public void setArguments(IArguments arguments)
 	{
-		this.arguments = list;
+		this.arguments = arguments;
 	}
 	
 	@Override
-	public void setValue(int index, IValue value)
-	{
-		this.arguments.set(index, value);
-	}
-	
-	@Override
-	public void addValue(IValue value)
-	{
-		this.arguments.add(value);
-	}
-	
-	@Override
-	public List<IValue> getValues()
+	public IArguments getArguments()
 	{
 		return this.arguments;
-	}
-	
-	@Override
-	public IValue getValue(int index)
-	{
-		return this.arguments.get(index);
-	}
-	
-	public void setSugar(boolean sugar)
-	{
-		this.isSugarCall = sugar;
 	}
 	
 	@Override
@@ -235,12 +209,7 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 		{
 			this.instance.resolveTypes(markers, context);
 		}
-		
-		len = this.arguments.size();
-		for (int i = 0; i < len; i++)
-		{
-			this.arguments.get(i).resolveTypes(markers, context);
-		}
+		this.arguments.resolveTypes(markers, context);
 	}
 	
 	@Override
@@ -282,20 +251,16 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 			}
 		}
 		
-		int len = this.arguments.size();
-		for (int i = 0; i < len; i++)
-		{
-			this.arguments.get(i).check(markers, context);
-		}
+		this.arguments.check(markers, context);
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
-		int len = this.arguments.size();
-		if (len == 1)
+		this.arguments.foldConstants();
+		if (this.arguments.size() == 1)
 		{
-			IValue argument = this.arguments.get(0);
+			IValue argument = (IValue) this.arguments;
 			if (argument.isConstant())
 			{
 				if (this.instance != null)
@@ -321,7 +286,6 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 			{
 				this.instance = this.instance.foldConstants();
 			}
-			this.arguments.set(0, argument.foldConstants());
 			return this;
 		}
 		
@@ -329,16 +293,6 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 		{
 			this.instance = this.instance.foldConstants();
 		}
-		for (int i = 0; i < len; i++)
-		{
-			IValue v1 = this.arguments.get(i);
-			IValue v2 = v1.foldConstants();
-			if (v1 != v2)
-			{
-				this.arguments.set(i, v2);
-			}
-		}
-		
 		return this;
 	}
 	
@@ -367,7 +321,7 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 		}
 		else if (len == 1)
 		{
-			IValue argument = this.arguments.get(0);
+			IValue argument = this.arguments.getFirstValue();
 			argument = argument.resolve(markers, context);
 			
 			IValue operator = this.instance == null ? Operators.get(this.name, argument) : Operators.get(this.instance, this.name, argument);
@@ -379,19 +333,11 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 				return false;
 			}
 			
-			this.arguments.set(0, argument);
+			this.arguments.setFirstValue(argument);
 		}
 		else
 		{
-			for (int i = 0; i < len; i++)
-			{
-				IValue v1 = this.arguments.get(i);
-				IValue v2 = v1.resolve(markers, context);
-				if (v1 != v2)
-				{
-					this.arguments.set(i, v2);
-				}
-			}
+			this.arguments.resolve(markers, context);
 		}
 		
 		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, this.arguments);
@@ -414,7 +360,6 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 				call.name = this.name.substring(0, this.name.length() - 1);
 				call.qualifiedName = s;
 				call.dotless = this.dotless;
-				call.isSugarCall = this.isSugarCall;
 				this.replacement = call;
 			}
 		}
@@ -429,8 +374,6 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 			return this.replacement;
 		}
 		
-		if (this.isSugarCall)
-		{
 			if (this.arguments.isEmpty())
 			{
 				IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
@@ -445,7 +388,6 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 					return access;
 				}
 			}
-		}
 		// Resolve Apply Method
 		else if (this.instance == null)
 		{
@@ -509,9 +451,7 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 	@Override
 	public IAccess resolve3(IContext context, IAccess next)
 	{
-		List<IValue> list = new ArrayList(this.arguments);
-		list.add(next);
-		
+		IArguments list = this.arguments.addLastValue(next);
 		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, list);
 		if (method != null)
 		{
@@ -519,7 +459,6 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 			this.method = method;
 			return this;
 		}
-		
 		return null;
 	}
 	
@@ -527,7 +466,7 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 	public Marker getResolveError()
 	{
 		Marker marker;
-		if (this.isSugarCall && this.arguments.isEmpty())
+		if (this.arguments.isEmpty())
 		{
 			marker = Markers.create(this.position, "resolve.method_field", this.name);
 		}
@@ -542,9 +481,9 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 			IType vtype = this.instance.getType();
 			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
 		}
-		StringBuilder builder = new StringBuilder("Argument Types: [");
-		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.append(']').toString());
+		StringBuilder builder = new StringBuilder("Argument Types: ");
+		// FIXME Util.typesToString("", this.arguments, ", ", builder);
+		marker.addInfo(builder.toString());
 		return marker;
 	}
 	
@@ -618,17 +557,6 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 			buffer.append(']');
 		}
 		
-		if (this.isSugarCall && !Formatting.Method.useJavaFormat)
-		{
-			if (!this.arguments.isEmpty())
-			{
-				buffer.append(Formatting.Method.sugarCallSeperator);
-				this.arguments.get(0).toString(prefix, buffer);
-			}
-		}
-		else
-		{
-			Util.parametersToString(prefix, this.arguments, buffer, true);
-		}
+		this.arguments.toString(prefix, buffer);
 	}
 }

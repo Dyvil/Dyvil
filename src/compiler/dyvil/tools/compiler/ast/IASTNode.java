@@ -4,11 +4,18 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IASTNode
 {
-	public void setPosition(ICodePosition position);
+	public default void setPosition(ICodePosition position)
+	{
+	}
 	
-	public ICodePosition getPosition();
+	public default ICodePosition getPosition()
+	{
+		return null;
+	}
 	
-	public void expandPosition(ICodePosition position);
+	public default void expandPosition(ICodePosition position)
+	{
+	}
 	
 	public void toString(String prefix, StringBuilder buffer);
 }

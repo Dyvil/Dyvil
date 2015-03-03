@@ -226,7 +226,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 		if (valueType == IValue.VALUE_LIST)
 		{
 			AnnotationVisitor arrayVisitor = visitor.visitArray(key);
-			for (IValue v : ((IValueList) value).getValues())
+			for (IValue v : (IValueList) value)
 			{
 				visitValue(arrayVisitor, null, v);
 			}

@@ -93,7 +93,7 @@ public class AnnotationType extends Type
 				IValueList values = (IValueList) target.getValue("value");
 				if (values != null)
 				{
-					for (IValue v : values.getValues())
+					for (IValue v : values)
 					{
 						EnumValue value = (EnumValue) v;
 						this.targets.add(ElementType.valueOf(value.name));

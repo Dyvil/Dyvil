@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.boxed;
 
-import java.util.Collections;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
@@ -10,6 +9,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.util.Util;
 
 public class BoxedValue extends ASTNode implements IValue
 {
@@ -84,7 +84,7 @@ public class BoxedValue extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		this.boxingMethod.writeCall(writer, this.boxed, Collections.EMPTY_LIST);
+		this.boxingMethod.writeCall(writer, this.boxed, Util.EMPTY_VALUES);
 	}
 	
 	@Override

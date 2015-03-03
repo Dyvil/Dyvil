@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Label;
@@ -9,24 +8,23 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
-public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueList, ITypeContext
+public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeContext
 {
-	public IValue		instance;
-	public List<IValue>	arguments;
+	public IValue			instance;
+	public IArguments	arguments;
 	
-	public IMethod		method;
+	public IMethod			method;
 	
 	public ApplyMethodCall(ICodePosition position)
 	{
@@ -37,7 +35,6 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 	{
 		this.position = position;
 		this.instance = instance;
-		this.arguments = new ArrayList(3);
 	}
 	
 	@Override
@@ -100,34 +97,14 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 		return this.instance;
 	}
 	
-	@Override
-	public void setValues(List<IValue> list)
+	public void setArguments(IArguments arguments)
 	{
-		this.arguments = list;
+		this.arguments = arguments;
 	}
 	
-	@Override
-	public void setValue(int index, IValue value)
-	{
-		this.arguments.set(index, value);
-	}
-	
-	@Override
-	public void addValue(IValue value)
-	{
-		this.arguments.add(value);
-	}
-	
-	@Override
-	public List<IValue> getValues()
+	public IArguments getArguments()
 	{
 		return this.arguments;
-	}
-	
-	@Override
-	public IValue getValue(int index)
-	{
-		return this.arguments.get(index);
 	}
 	
 	@Override
@@ -158,16 +135,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 			this.instance = this.instance.resolve(markers, context);
 		}
 		
-		int len = this.arguments.size();
-		for (int i = 0; i < len; i++)
-		{
-			IValue v1 = this.arguments.get(i);
-			IValue v2 = v1.resolve(markers, context);
-			if (v1 != v2)
-			{
-				this.arguments.set(i, v2);
-			}
-		}
+		this.arguments.resolve(markers, context);
 		
 		IMethod method = IAccess.resolveMethod(context, this.instance, "apply", this.arguments);
 		if (method != null)
@@ -183,9 +151,9 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 			IType vtype = this.instance.getType();
 			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
 		}
-		StringBuilder builder = new StringBuilder("Argument Types: [");
-		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.append(']').toString());
+		StringBuilder builder = new StringBuilder("Argument Types: ");
+		// FIXME Util.typesToString("", this.arguments, ", ", builder);
+		marker.addInfo(builder.toString());
 		markers.add(marker);
 		return this;
 	}
@@ -198,9 +166,9 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 			this.instance.check(markers, context);
 		}
 		
-		for (IValue v : this.arguments)
+		if (this.arguments != null)
 		{
-			v.check(markers, context);
+			this.arguments.check(markers, context);
 		}
 		
 		if (this.method != null)
@@ -234,16 +202,6 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 		if (this.instance != null)
 		{
 			this.instance = this.instance.foldConstants();
-		}
-		int len = this.arguments.size();
-		for (int i = 0; i < len; i++)
-		{
-			IValue v1 = this.arguments.get(i);
-			IValue v2 = v1.foldConstants();
-			if (v1 != v2)
-			{
-				this.arguments.set(i, v2);
-			}
 		}
 		
 		return this;
@@ -286,6 +244,6 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, IValueL
 			this.instance.toString(prefix, buffer);
 		}
 		
-		Util.parametersToString(prefix, this.arguments, buffer, true);
+		this.arguments.toString(prefix, buffer);
 	}
 }

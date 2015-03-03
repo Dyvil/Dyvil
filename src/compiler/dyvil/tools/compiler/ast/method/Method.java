@@ -18,11 +18,12 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.field.Parameter;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -268,7 +269,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public int getSignatureMatch(String name, IValue instance, List<IValue> arguments)
+	public int getSignatureMatch(String name, IValue instance, IArguments arguments)
 	{
 		if (name == null)
 		{
@@ -322,23 +323,21 @@ public class Method extends Member implements IMethod
 				return 0;
 			}
 			
+			int m;
 			Parameter varParam = params.get(parCount);
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < parCount; i++)
 			{
-				Parameter par = (i > parCount ? varParam : params.get(i + pOff));
-				IType t1 = par.type;
-				IValue argument = arguments.get(i);
-				int m = argument.getTypeMatch(t1);
-				if (m != 0)
-				{
-					return match + m;
-				}
-				m = argument.getTypeMatch(t1.getElementType());
-				if (m == 0)
-				{
+				m = arguments.getTypeMatch(params.get(i + pOff));
+				if (m == 0) {
 					return 0;
 				}
-				
+				match += m;
+			}
+			for (int i = parCount; i < len; i++) {
+				m = arguments.getVarargsTypeMatch(varParam);
+				if (m == 0) {
+					return 0;
+				}
 				match += m;
 			}
 			return match;
@@ -350,9 +349,7 @@ public class Method extends Member implements IMethod
 		
 		for (int i = 0; i < len; i++)
 		{
-			IType t1 = params.get(i + pOff).type;
-			IValue argument = arguments.get(i);
-			int m = argument.getTypeMatch(t1);
+			int m = arguments.getTypeMatch(params.get(i + pOff));
 			if (m == 0)
 			{
 				return 0;
@@ -364,7 +361,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void checkArguments(List<Marker> markers, IValue instance, List<IValue> arguments, ITypeContext typeContext)
+	public void checkArguments(List<Marker> markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
 		int pOff = 0;
 		int len = arguments.size();
@@ -389,7 +386,7 @@ public class Method extends Member implements IMethod
 		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			parType = this.theClass.getType();
-			instance = arguments.get(0);
+			instance = arguments.getFirstValue();
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
@@ -403,58 +400,15 @@ public class Method extends Member implements IMethod
 		
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
-			int parCount = this.parameters.size() - 1;
-			Parameter varParam = params.get(parCount);
-			IType varParamType = varParam.getType(typeContext);
-			
-			IValue value = arguments.get(parCount);
-			IValue value1 = value.withType(varParamType);
-			if (value1 == null)
-			{
-				IType elementType = varParamType.getElementType();
-				List<IValue> values1 = new ArrayList(len - parCount);
-				ValueList varargs = new ValueList(null, values1, varParamType, elementType);
-				
-				while (len > parCount)
-				{
-					len--;
-					value = arguments.remove(parCount);
-					value1 = value.withType(elementType);
-					if (value1 == null)
-					{
-						Marker marker = Markers.create(value.getPosition(), "access.method.argument_type", varParam.name);
-						marker.addInfo("Required Type: " + elementType);
-						marker.addInfo("Value Type: " + value.getType());
-						markers.add(marker);
-					}
-					else
-					{
-						varargs.addValue(value1);
-					}
-				}
-				
-				arguments.add(varargs);
-			}
+			len = this.parameters.size() - 1;
+			par = params.get(len);
+			arguments.checkVarargsValue(markers, par, typeContext);
 		}
 		
 		for (int i = 0; i < len; i++)
 		{
 			par = params.get(i + pOff);
-			parType = par.getType(typeContext);
-			
-			IValue value = arguments.get(i);
-			IValue value1 = value.withType(parType);
-			if (value1 == null)
-			{
-				Marker marker = Markers.create(value.getPosition(), "access.method.argument_type", par.name);
-				marker.addInfo("Required Type: " + parType);
-				marker.addInfo("Value Type: " + value.getType());
-				markers.add(marker);
-			}
-			else
-			{
-				arguments.set(i, value1);
-			}
+			arguments.checkValue(markers, par, typeContext);
 		}
 	}
 	
@@ -465,7 +419,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IType resolveType(String name, IValue instance, List<IValue> arguments, List<IType> generics)
+	public IType resolveType(String name, IValue instance, IArguments arguments, List<IType> generics)
 	{
 		if (generics != null)
 		{
@@ -483,6 +437,7 @@ public class Method extends Member implements IMethod
 		IType type;
 		int len = arguments.size();
 		int mods = this.modifiers & Modifiers.INFIX;
+		Parameter param;
 		if (instance != null && mods == Modifiers.INFIX)
 		{
 			type = this.parameters.get(0).type.resolveType(name, instance.getType());
@@ -493,7 +448,8 @@ public class Method extends Member implements IMethod
 			
 			for (int i = 0; i < len; i++)
 			{
-				type = this.parameters.get(i + 1).type.resolveType(name, arguments.get(i).getType());
+				param = this.parameters.get(i + 1);
+				type = param.type.resolveType(name, arguments.getType(param));
 				if (type != null)
 				{
 					return type;
@@ -515,7 +471,8 @@ public class Method extends Member implements IMethod
 		len = Math.min(this.parameters.size(), len);
 		for (int i = 0; i < len; i++)
 		{
-			type = this.parameters.get(i).type.resolveType(name, arguments.get(i).getType());
+			param = this.parameters.get(i);
+			type = param.type.resolveType(name, arguments.getType(param));
 			if (type != null)
 			{
 				return type;
@@ -774,25 +731,25 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, List<IValue> arguments)
+	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
 	{
 		return this.theClass.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, List<IValue> arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public MethodMatch resolveConstructor(List<IValue> arguments)
+	public MethodMatch resolveConstructor(IArguments arguments)
 	{
 		return this.theClass.resolveConstructor(arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, List<IValue> arguments)
+	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
 	{
 		this.theClass.getConstructorMatches(list, arguments);
 	}
@@ -976,7 +933,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, List<IValue> arguments)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments)
 	{
 		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
 		{
@@ -1009,7 +966,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
 	{
 		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
 		{
@@ -1027,7 +984,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
 	{
 		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
 		{
@@ -1044,7 +1001,7 @@ public class Method extends Member implements IMethod
 		writer.visitJumpInsn(IFEQ, dest);
 	}
 	
-	private void writeIntrinsic(MethodWriter writer, IValue instance, List<IValue> arguments)
+	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments)
 	{
 		for (int i : this.intrinsicOpcodes)
 		{
@@ -1057,9 +1014,10 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				for (IValue arg : arguments)
+				int len = this.parameters.size();
+				for (int j = 0; j < len; j++)
 				{
-					arg.writeExpression(writer);
+					arguments.writeValue(this.parameters.get(j), writer);
 				}
 			}
 			else
@@ -1069,7 +1027,7 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	private void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
+	private void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
 	{
 		for (int i : this.intrinsicOpcodes)
 		{
@@ -1079,9 +1037,10 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				for (IValue arg : arguments)
+				int len = this.parameters.size();
+				for (int j = 0; j < len; j++)
 				{
-					arg.writeExpression(writer);
+					arguments.writeValue(this.parameters.get(j), writer);
 				}
 			}
 			else if (Opcodes.isJumpOpcode(i))
@@ -1095,7 +1054,7 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	private void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, List<IValue> arguments)
+	private void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
 	{
 		for (int i : this.intrinsicOpcodes)
 		{
@@ -1105,9 +1064,10 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				for (IValue arg : arguments)
+				int len = this.parameters.size();
+				for (int j = 0; j < len; j++)
 				{
-					arg.writeExpression(writer);
+					arguments.writeValue(this.parameters.get(j), writer);
 				}
 			}
 			else if (Opcodes.isJumpOpcode(i))
@@ -1121,7 +1081,7 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	private void writeInvoke(MethodWriter writer, IValue instance, List<IValue> arguments)
+	private void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments)
 	{
 		int args = 0;
 		if (instance != null)
@@ -1130,11 +1090,12 @@ public class Method extends Member implements IMethod
 			args = 1;
 		}
 		
-		for (IValue arg : arguments)
+		int len = this.parameters.size();
+		for (int i = 0; i < len; i++)
 		{
-			arg.writeExpression(writer);
-			args++;
+			arguments.writeValue(this.parameters.get(i), writer);
 		}
+		args += len;
 		
 		int opcode;
 		int modifiers = this.modifiers;
