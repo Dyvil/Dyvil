@@ -63,6 +63,7 @@ public class Formatting
 		public static boolean	useJavaFormat				= false;
 		public static String	dotlessSeperator			= " ";
 		public static String	sugarCallSeperator			= " ";
+		public static String	keyValueSeperator			= ": ";
 		
 		public static String	throwsSeperator				= ", ";
 		public static String	signatureThrowsSeperator	= " throws ";

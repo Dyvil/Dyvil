@@ -6,9 +6,7 @@ import java.util.List;
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.LambdaParameter;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
+import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.ast.value.*;
@@ -27,7 +25,7 @@ import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public class ExpressionParser extends Parser implements ITyped, IValued
+public class ExpressionParser extends Parser implements ITyped
 {
 	public static final int	VALUE			= 1;
 	public static final int	LIST_END		= 2;
@@ -51,7 +49,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	protected int			precedence;
 	
 	private IValue			value;
-	private IValueList		valueList;
 	
 	private boolean			dotless;
 	private boolean			prefix;
@@ -179,7 +176,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = PARAMETERS_END;
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ExpressionListParser(this.valueList));
+				ICall call = (ICall) this.value;
+				call.setArguments(this.getArguments(pm, token.next()));
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Argument List - '(' expected", true);
@@ -310,22 +308,21 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
 				IToken prev = token.prev();
+				IToken next = token.next();
+				IArguments args;
+				args = getArguments(pm, next);
 				
 				if (ParserUtil.isIdentifier(prev.type()))
 				{
 					MethodCall mc = new MethodCall(prev, null, prev.value());
-					ArgumentList list = new ArgumentList();
-					mc.arguments = list;
+					mc.arguments = args;
 					this.value = mc;
-					pm.pushParser(new ExpressionListParser(list));
 				}
 				else
 				{
 					ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value);
-					ArgumentList list = new ArgumentList();
-					amc.arguments = list;
+					amc.arguments = args;
 					this.value = amc;
-					pm.pushParser(new ExpressionListParser(list));
 				}
 				this.mode = PARAMETERS_END;
 				return;
@@ -368,16 +365,18 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			
 			ApplyMethodCall call = new ApplyMethodCall(token.raw(), this.value);
+			SingleArgument sa = new SingleArgument();
+			call.arguments = sa;
 			this.value = call;
 			this.mode = 0;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(sa), true);
 			return;
 		}
 		if (this.isInMode(CONSTRUCTOR))
 		{
+			ConstructorCall cc = (ConstructorCall) this.value;
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				ConstructorCall cc = (ConstructorCall) this.value;
 				ArgumentList list = new ArgumentList();
 				cc.arguments = list;
 				pm.pushParser(new ExpressionListParser(list));
@@ -393,7 +392,9 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				return;
 			}
 			
-			pm.pushParser(new ExpressionParser(this), true);
+			SingleArgument sa = new SingleArgument();
+			cc.arguments = sa;
+			pm.pushParser(new ExpressionParser(sa), true);
 			this.mode = 0;
 			return;
 		}
@@ -408,6 +409,25 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		throw new SyntaxError(token, "Invalid Expression - Invalid Token '" + token.value() + "'");
 	}
 	
+	private IArguments getArguments(ParserManager pm, IToken next) throws SyntaxError
+	{
+		int type = next.type();
+		if (type == Tokens.CLOSE_PARENTHESIS)
+		{
+			return EmptyArguments.VISIBLE;
+		}
+		if (ParserUtil.isIdentifier(type) && next.next().type() == Tokens.COLON)
+		{
+			ArgumentMap map = new ArgumentMap();
+			pm.pushParser(new ExpressionMapParser(map));
+			return map;
+		}
+		
+		ArgumentList list = new ArgumentList();
+		pm.pushParser(new ExpressionListParser(list));
+		return list;
+	}
+	
 	private void getAccess(ParserManager pm, String value, IToken token, int type) throws SyntaxError
 	{
 		IToken next = token.next();
@@ -415,11 +435,8 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		if (type1 == Tokens.OPEN_PARENTHESIS)
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
-			ArgumentList list = new ArgumentList();
 			call.dotless = this.dotless;
-			call.arguments = list;
 			this.value = call;
-			this.valueList = list;
 			this.mode = PARAMETERS;
 			return;
 		}
@@ -483,7 +500,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			updateCall.arguments = call.arguments;
 			
 			this.value = updateCall;
-			pm.pushParser(new ExpressionParser(this));
+			pm.pushParser(new ExpressionParser(updateCall));
 			return;
 		}
 		else if (i == IValue.METHOD_CALL)
@@ -499,7 +516,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			updateCall.instance = fa;
 			
 			this.value = updateCall;
-			pm.pushParser(new ExpressionParser(this));
+			pm.pushParser(new ExpressionParser(updateCall));
 			return;
 		}
 		
@@ -748,25 +765,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	
 	@Override
 	public Type getType()
-	{
-		return null;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		if (this.valueList != null)
-		{
-			this.valueList.addValue(value);
-		}
-		else
-		{
-			((IValueList) this.value).addValue(value);
-		}
-	}
-	
-	@Override
-	public IValue getValue()
 	{
 		return null;
 	}

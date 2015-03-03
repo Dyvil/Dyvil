@@ -38,6 +38,7 @@ public class ExpressionMapParser extends Parser implements IValued
 		
 		if (this.mode == NAME)
 		{
+			this.mode = VALUE;
 			if (token.next().type() == Tokens.COLON)
 			{
 				this.key = token.value();
@@ -45,7 +46,6 @@ public class ExpressionMapParser extends Parser implements IValued
 				return;
 			}
 			this.key = "value";
-			this.mode = VALUE;
 			return;
 		}
 		if (this.mode == VALUE)
@@ -58,7 +58,7 @@ public class ExpressionMapParser extends Parser implements IValued
 		{
 			if (type == Tokens.COMMA)
 			{
-				this.mode = NAME | VALUE;
+				this.mode = NAME;
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Expression Map - ',' expected");
