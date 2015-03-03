@@ -674,7 +674,7 @@ public final class MethodWriter extends MethodVisitor
 	{
 		if (opcode > 255)
 		{
-			visitSpecialJumpInsn(opcode, label);
+			this.visitSpecialJumpInsn(opcode, label);
 			return;
 		}
 		if (opcode >= IFEQ && opcode <= IFLE)

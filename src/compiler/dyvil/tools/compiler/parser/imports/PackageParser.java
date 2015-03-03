@@ -11,10 +11,10 @@ import dyvil.tools.compiler.util.Tokens;
 
 public class PackageParser extends Parser
 {
-	protected DyvilFile	unit;
+	protected DyvilFile		unit;
 	
-	private PackageDecl			packageDeclaration;
-	private StringBuilder		buffer	= new StringBuilder();
+	private PackageDecl		packageDeclaration;
+	private StringBuilder	buffer	= new StringBuilder();
 	
 	public PackageParser(DyvilFile unit)
 	{

@@ -32,7 +32,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	public String		qualifiedName;
 	
 	public IValue		instance;
-	public IArguments	arguments = Util.EMPTY_VALUES;
+	public IArguments	arguments	= Util.EMPTY_VALUES;
 	
 	public boolean		dotless;
 	

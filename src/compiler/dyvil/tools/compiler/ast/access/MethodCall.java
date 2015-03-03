@@ -31,17 +31,17 @@ import dyvil.tools.compiler.util.Util;
 
 public final class MethodCall extends ASTNode implements IAccess, IValue, IValued, ITypeContext, INamed
 {
-	public IValue			instance;
-	public String			name;
-	public String			qualifiedName;
-	public List<IType>		generics;
+	public IValue		instance;
+	public String		name;
+	public String		qualifiedName;
+	public List<IType>	generics;
 	public IArguments	arguments	= Util.EMPTY_VALUES;
 	
-	public boolean			dotless;
+	public boolean		dotless;
 	
-	public IMethod			method;
+	public IMethod		method;
 	
-	private IType			type;
+	private IType		type;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -374,20 +374,20 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 			return this.replacement;
 		}
 		
-			if (this.arguments.isEmpty())
+		if (this.arguments.isEmpty())
+		{
+			IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
+			if (field != null)
 			{
-				IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
-				if (field != null)
-				{
-					FieldAccess access = new FieldAccess(this.position);
-					access.field = field;
-					access.instance = this.instance;
-					access.name = this.name;
-					access.qualifiedName = this.qualifiedName;
-					access.dotless = this.dotless;
-					return access;
-				}
+				FieldAccess access = new FieldAccess(this.position);
+				access.field = field;
+				access.instance = this.instance;
+				access.name = this.name;
+				access.qualifiedName = this.qualifiedName;
+				access.dotless = this.dotless;
+				return access;
 			}
+		}
 		// Resolve Apply Method
 		else if (this.instance == null)
 		{

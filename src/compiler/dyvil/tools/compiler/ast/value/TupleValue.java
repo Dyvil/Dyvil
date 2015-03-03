@@ -68,7 +68,7 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	{
 		return this.values.get(index);
 	}
-
+	
 	@Override
 	public Iterator<IValue> iterator()
 	{
@@ -197,8 +197,8 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		Util.parametersToString(prefix, this.values, buffer, true, Formatting.Expression.emptyTuple,
-				Formatting.Expression.tupleStart, Formatting.Expression.tupleSeperator, Formatting.Expression.tupleEnd);
+		Util.parametersToString(prefix, this.values, buffer, true, Formatting.Expression.emptyTuple, Formatting.Expression.tupleStart,
+				Formatting.Expression.tupleSeperator, Formatting.Expression.tupleEnd);
 	}
 	
 	@Override

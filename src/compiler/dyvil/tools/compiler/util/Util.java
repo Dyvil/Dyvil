@@ -23,7 +23,7 @@ import dyvil.tools.compiler.config.Formatting;
 public class Util
 {
 	public static final List<ITyped>	EMPTY_TYPES		= Collections.EMPTY_LIST;
-	public static final IArguments	EMPTY_VALUES	= new EmptyArguments();
+	public static final IArguments		EMPTY_VALUES	= new EmptyArguments();
 	
 	public static final Predicate<?>	ISNULL			= a -> a == null;
 	

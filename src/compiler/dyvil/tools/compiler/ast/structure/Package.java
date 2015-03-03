@@ -23,25 +23,25 @@ import dyvil.tools.compiler.library.Library;
 
 public class Package implements INamed, IContext
 {
-	public static Package			rootPackage	= new RootPackage();
+	public static Package		rootPackage	= new RootPackage();
 	
-	public static Package			dyvil;
-	public static Package			dyvilLang;
-	public static Package			dyvilLangAnnotation;
-	public static Package			dyvilLangFunction;
-	public static Package			dyvilLangTuple;
-	public static Package			java;
-	public static Package			javaLang;
-	public static Package			javaLangAnnotation;
+	public static Package		dyvil;
+	public static Package		dyvilLang;
+	public static Package		dyvilLangAnnotation;
+	public static Package		dyvilLangFunction;
+	public static Package		dyvilLangTuple;
+	public static Package		java;
+	public static Package		javaLang;
+	public static Package		javaLangAnnotation;
 	
-	public Package					parent;
-	public String					name;
-	public String					fullName;
-	public String					internalName;
+	public Package				parent;
+	public String				name;
+	public String				fullName;
+	public String				internalName;
 	
-	public List<DyvilFile>	units		= new ArrayList();
-	public Map<String, IClass>		classes		= new HashMap();
-	public Map<String, Package>		subPackages	= new HashMap();
+	public List<DyvilFile>		units		= new ArrayList();
+	public Map<String, IClass>	classes		= new HashMap();
+	public Map<String, Package>	subPackages	= new HashMap();
 	
 	public Package(Package parent, String name)
 	{

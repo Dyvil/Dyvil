@@ -16,7 +16,7 @@ public class CompilationUnitParser extends Parser
 	private static final int	IMPORT	= 2;
 	private static final int	CLASS	= 4;
 	
-	private DyvilFile		unit;
+	private DyvilFile			unit;
 	
 	public CompilationUnitParser(DyvilFile unit)
 	{

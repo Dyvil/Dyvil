@@ -31,17 +31,18 @@ public class AnnotationParser extends Parser
 		int type = token.type();
 		if (this.mode == NAME)
 		{
-			if (ParserUtil.isIdentifier(type)) {
-			this.annotation = new Annotation(token.raw(), token.value().substring(1));
-			this.mode = PARAMETERS_START;
-			
-			if (token.next().type() != Tokens.OPEN_PARENTHESIS)
+			if (ParserUtil.isIdentifier(type))
 			{
-				this.annotatable.addAnnotation(this.annotation);
-				pm.popParser();
-			}
-			
-			return;
+				this.annotation = new Annotation(token.raw(), token.value().substring(1));
+				this.mode = PARAMETERS_START;
+				
+				if (token.next().type() != Tokens.OPEN_PARENTHESIS)
+				{
+					this.annotatable.addAnnotation(this.annotation);
+					pm.popParser();
+				}
+				
+				return;
 			}
 			throw new SyntaxError(token, "Invalid Annotation - Name expected");
 		}

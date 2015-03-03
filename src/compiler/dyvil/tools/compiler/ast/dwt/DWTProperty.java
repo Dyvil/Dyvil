@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 
 public class DWTProperty
 {
-	public DWTNode node;
+	public DWTNode	node;
 	public String	fullName;
 	public String	key;
 	public IValue	value;

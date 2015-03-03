@@ -244,7 +244,7 @@ public interface ArrayUtils
 	{
 		return indexOf(array, v, 0);
 	}
-
+	
 	public static @infix <T> int indexOf(T[] array, T v, int start)
 	{
 		for (; start < array.length; start++)
@@ -256,12 +256,12 @@ public interface ArrayUtils
 		}
 		return -1;
 	}
-
+	
 	public static @infix int lastIndexOf(int[] array, int v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
-
+	
 	public static @infix int lastIndexOf(int[] array, int v, int start)
 	{
 		for (; start >= 0; start--)
@@ -273,12 +273,12 @@ public interface ArrayUtils
 		}
 		return -1;
 	}
-
+	
 	public static @infix int lastIndexOf(long[] array, long v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
-
+	
 	public static @infix int lastIndexOf(long[] array, long v, int start)
 	{
 		for (; start >= 0; start--)
@@ -290,12 +290,12 @@ public interface ArrayUtils
 		}
 		return -1;
 	}
-
+	
 	public static @infix int lastIndexOf(float[] array, float v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
-
+	
 	public static @infix int lastIndexOf(float[] array, float v, int start)
 	{
 		for (; start >= 0; start--)
@@ -307,7 +307,7 @@ public interface ArrayUtils
 		}
 		return -1;
 	}
-
+	
 	public static @infix int lastIndexOf(double[] array, double v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
@@ -329,7 +329,7 @@ public interface ArrayUtils
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
-
+	
 	public static @infix <T> int lastIndexOf(T[] array, T v, int start)
 	{
 		for (; start >= 0; start--)
@@ -341,27 +341,27 @@ public interface ArrayUtils
 		}
 		return -1;
 	}
-
+	
 	public static @infix boolean contains(int[] array, int v)
 	{
 		return indexOf(array, v, 0) != -1;
 	}
-
+	
 	public static @infix boolean contains(long[] array, long v)
 	{
 		return indexOf(array, v, 0) != -1;
 	}
-
+	
 	public static @infix boolean contains(float[] array, float v)
 	{
 		return indexOf(array, v, 0) != -1;
 	}
-
+	
 	public static @infix boolean contains(double[] array, double v)
 	{
 		return indexOf(array, v, 0) != -1;
 	}
-
+	
 	public static @infix <T> boolean contains(T[] array, T v)
 	{
 		return indexOf(array, v, 0) != -1;

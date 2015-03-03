@@ -100,7 +100,9 @@ public class SingleArgument implements IArguments, IValued
 	public void writeValue(Parameter param, MethodWriter writer)
 	{
 		if (param.index == 0)
+		{
 			this.value.writeExpression(writer);
+		}
 	}
 	
 	@Override

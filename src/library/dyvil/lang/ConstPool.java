@@ -2,7 +2,8 @@ package dyvil.lang;
 
 import dyvil.lang.annotation.sealed;
 
-@sealed final class ConstPool
+@sealed
+final class ConstPool
 {
 	protected static final int		tableSize	= 128;
 	

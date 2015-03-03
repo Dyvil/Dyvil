@@ -21,10 +21,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeContext
 {
-	public IValue			instance;
+	public IValue		instance;
 	public IArguments	arguments;
 	
-	public IMethod			method;
+	public IMethod		method;
 	
 	public ApplyMethodCall(ICodePosition position)
 	{

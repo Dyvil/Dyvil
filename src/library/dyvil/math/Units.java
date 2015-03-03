@@ -102,25 +102,25 @@ public final class Units
 	
 	public static int $times(int unit1, int unit2)
 	{
-		int m = ((unit1 >> METER_SHIFT + unit2 >> METER_SHIFT) & METER_MASK) << METER_SHIFT;
-		int s = ((unit1 >> SECOND_SHIFT + unit2 >> SECOND_SHIFT) & SECOND_MASK) << SECOND_SHIFT;
-		int kg = ((unit1 >> KILOGRAM_SHIFT + unit2 >> KILOGRAM_SHIFT) & KILOGRAM_MASK) << KILOGRAM_SHIFT;
-		int mol = ((unit1 >> MOL_SHIFT + unit2 >> MOL_SHIFT) & MOL_MASK) << MOL_SHIFT;
-		int cd = ((unit1 >> CANDELA_SHIFT + unit2 >> CANDELA_SHIFT) & CANDELA_MASK) << CANDELA_SHIFT;
-		int a = ((unit1 >> AMPERE_SHIFT + unit2 >> AMPERE_SHIFT) & AMPERE_MASK) << AMPERE_SHIFT;
-		int k = ((unit1 >> KELVIN_SHIFT + unit2 >> KELVIN_SHIFT) & KELVIN_MASK) << KELVIN_SHIFT;
+		int m = (unit1 >> METER_SHIFT + unit2 >> METER_SHIFT & METER_MASK) << METER_SHIFT;
+		int s = (unit1 >> SECOND_SHIFT + unit2 >> SECOND_SHIFT & SECOND_MASK) << SECOND_SHIFT;
+		int kg = (unit1 >> KILOGRAM_SHIFT + unit2 >> KILOGRAM_SHIFT & KILOGRAM_MASK) << KILOGRAM_SHIFT;
+		int mol = (unit1 >> MOL_SHIFT + unit2 >> MOL_SHIFT & MOL_MASK) << MOL_SHIFT;
+		int cd = (unit1 >> CANDELA_SHIFT + unit2 >> CANDELA_SHIFT & CANDELA_MASK) << CANDELA_SHIFT;
+		int a = (unit1 >> AMPERE_SHIFT + unit2 >> AMPERE_SHIFT & AMPERE_MASK) << AMPERE_SHIFT;
+		int k = (unit1 >> KELVIN_SHIFT + unit2 >> KELVIN_SHIFT & KELVIN_MASK) << KELVIN_SHIFT;
 		return m | s | kg | mol | cd | a | k;
 	}
 	
 	public static int $div(int unit1, int unit2)
 	{
-		int m = ((unit1 >> METER_SHIFT - unit2 >> METER_SHIFT) & METER_MASK) << METER_SHIFT;
-		int s = ((unit1 >> SECOND_SHIFT - unit2 >> SECOND_SHIFT) & SECOND_MASK) << SECOND_SHIFT;
-		int kg = ((unit1 >> KILOGRAM_SHIFT - unit2 >> KILOGRAM_SHIFT) & KILOGRAM_MASK) << KILOGRAM_SHIFT;
-		int mol = ((unit1 >> MOL_SHIFT - unit2 >> MOL_SHIFT) & MOL_MASK) << MOL_SHIFT;
-		int cd = ((unit1 >> CANDELA_SHIFT - unit2 >> CANDELA_SHIFT) & CANDELA_MASK) << CANDELA_SHIFT;
-		int a = ((unit1 >> AMPERE_SHIFT - unit2 >> AMPERE_SHIFT) & AMPERE_MASK) << AMPERE_SHIFT;
-		int k = ((unit1 >> KELVIN_SHIFT - unit2 >> KELVIN_SHIFT) & KELVIN_MASK) << KELVIN_SHIFT;
+		int m = (unit1 >> METER_SHIFT - unit2 >> METER_SHIFT & METER_MASK) << METER_SHIFT;
+		int s = (unit1 >> SECOND_SHIFT - unit2 >> SECOND_SHIFT & SECOND_MASK) << SECOND_SHIFT;
+		int kg = (unit1 >> KILOGRAM_SHIFT - unit2 >> KILOGRAM_SHIFT & KILOGRAM_MASK) << KILOGRAM_SHIFT;
+		int mol = (unit1 >> MOL_SHIFT - unit2 >> MOL_SHIFT & MOL_MASK) << MOL_SHIFT;
+		int cd = (unit1 >> CANDELA_SHIFT - unit2 >> CANDELA_SHIFT & CANDELA_MASK) << CANDELA_SHIFT;
+		int a = (unit1 >> AMPERE_SHIFT - unit2 >> AMPERE_SHIFT & AMPERE_MASK) << AMPERE_SHIFT;
+		int k = (unit1 >> KELVIN_SHIFT - unit2 >> KELVIN_SHIFT & KELVIN_MASK) << KELVIN_SHIFT;
 		return m | s | kg | mol | cd | a | k;
 	}
 }

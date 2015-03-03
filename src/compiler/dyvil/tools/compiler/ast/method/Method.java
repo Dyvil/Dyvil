@@ -293,7 +293,7 @@ public class Method extends Member implements IMethod
 		List<Parameter> params = this.parameters;
 		
 		// infix modifier implementation
-		int mods = (this.modifiers & Modifiers.INFIX);
+		int mods = this.modifiers & Modifiers.INFIX;
 		if (instance != null && mods == Modifiers.INFIX)
 		{
 			if (len != params.size() - 1)
@@ -328,14 +328,17 @@ public class Method extends Member implements IMethod
 			for (int i = 0; i < parCount; i++)
 			{
 				m = arguments.getTypeMatch(params.get(i + pOff));
-				if (m == 0) {
+				if (m == 0)
+				{
 					return 0;
 				}
 				match += m;
 			}
-			for (int i = parCount; i < len; i++) {
+			for (int i = parCount; i < len; i++)
+			{
 				m = arguments.getVarargsTypeMatch(varParam);
-				if (m == 0) {
+				if (m == 0)
+				{
 					return 0;
 				}
 				match += m;

@@ -6,8 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that can be used to give a method or field multiple names at
- * once.
+ * Annotation that can be used to give a method or field multiple names at once.
  * 
  * @author Clashsoft
  * @version 1.0

@@ -22,18 +22,18 @@ import dyvil.tools.compiler.util.Tokens;
 
 public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 {
-	public static final int		MODIFIERS		= 0;
-	public static final int		NAME			= 1;
-	public static final int		GENERICS		= 2;
-	public static final int		GENERICS_END	= 4;
-	public static final int		EXTENDS			= 8;
-	public static final int		IMPLEMENTS		= 16;
-	public static final int		BODY			= 32;
-	public static final int		BODY_END		= 64;
+	public static final int	MODIFIERS		= 0;
+	public static final int	NAME			= 1;
+	public static final int	GENERICS		= 2;
+	public static final int	GENERICS_END	= 4;
+	public static final int	EXTENDS			= 8;
+	public static final int	IMPLEMENTS		= 16;
+	public static final int	BODY			= 32;
+	public static final int	BODY_END		= 64;
 	
-	protected DyvilFile	unit;
+	protected DyvilFile		unit;
 	
-	private CodeClass			theClass;
+	private CodeClass		theClass;
 	
 	public ClassDeclParser(DyvilFile unit)
 	{

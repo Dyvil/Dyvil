@@ -10,9 +10,9 @@ import dyvil.lang.annotation.Utility;
 import dyvil.lang.annotation.infix;
 
 /**
- * The {@linkplain Utility utility interface} <b>FileUtils</b> can be used for several {@link File}
- * -related operations such as writing or reading the file both as a String or
- * as a List of Strings or recursively deleting directories.
+ * The {@linkplain Utility utility interface} <b>FileUtils</b> can be used for
+ * several {@link File} -related operations such as writing or reading the file
+ * both as a String or as a List of Strings or recursively deleting directories.
  * 
  * @author Clashsoft
  * @version 1.0

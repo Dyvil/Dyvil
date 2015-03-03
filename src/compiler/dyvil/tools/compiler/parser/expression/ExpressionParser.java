@@ -6,8 +6,8 @@ import java.util.List;
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.parameter.LambdaParameter;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.LambdaParameter;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.*;
@@ -377,7 +377,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				ConstructorCall cc = ((ConstructorCall) this.value);
+				ConstructorCall cc = (ConstructorCall) this.value;
 				ArgumentList list = new ArgumentList();
 				cc.arguments = list;
 				pm.pushParser(new ExpressionListParser(list));

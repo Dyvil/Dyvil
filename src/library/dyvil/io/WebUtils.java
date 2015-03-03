@@ -14,10 +14,10 @@ import dyvil.lang.annotation.Utility;
 import dyvil.lang.annotation.infix;
 
 /**
- * The {@linkplain Utility utility interface} <b>WebUtils</b> can be used for several
- * {@link URL}-related operations such as checking for website availability,
- * download the website as a {@code byte} array or saving it to a file on the
- * disk.
+ * The {@linkplain Utility utility interface} <b>WebUtils</b> can be used for
+ * several {@link URL}-related operations such as checking for website
+ * availability, download the website as a {@code byte} array or saving it to a
+ * file on the disk.
  * 
  * @author Clashsoft
  * @version 1.0

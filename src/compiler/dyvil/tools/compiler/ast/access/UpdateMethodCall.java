@@ -26,7 +26,7 @@ import dyvil.tools.compiler.util.Util;
 public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeContext
 {
 	public IValue		instance;
-	public IArguments	arguments = Util.EMPTY_VALUES;
+	public IArguments	arguments	= Util.EMPTY_VALUES;
 	
 	public IMethod		method;
 	
@@ -106,7 +106,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	{
 		return this.method.resolveType(name, this.instance, this.arguments, null);
 	}
-		
+	
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{

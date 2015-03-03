@@ -20,7 +20,7 @@ public class DWTParser extends Parser implements IValued
 	
 	public DWTNode			node;
 	
-	private String	name;
+	private String			name;
 	
 	public DWTParser(DWTNode node)
 	{

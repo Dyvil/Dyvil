@@ -1,6 +1,5 @@
 package dyvil.math;
 
-
 class UnitUtils
 {
 	static final int			METER_MASK			= 0x0000000F;

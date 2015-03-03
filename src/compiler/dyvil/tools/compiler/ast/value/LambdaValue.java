@@ -176,7 +176,8 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod, I
 	public IType resolveType(String name)
 	{
 		IType type = this.type.resolveType(name);
-		if (type == null) {
+		if (type == null)
+		{
 			System.out.println("what now? " + name);
 		}
 		return type;

@@ -42,7 +42,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 	protected IClass			theClass;
 	protected IMethod			getter;
 	
-	private int varIndex;
+	private int					varIndex;
 	
 	public DWTNode()
 	{
@@ -209,7 +209,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String
 			}
 			else if (type == NODE)
 			{
-				DWTNode node = ((DWTNode) value);
+				DWTNode node = (DWTNode) value;
 				IClass iclass = node.theClass;
 				node.resolve(markers, context);
 				

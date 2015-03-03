@@ -14,8 +14,8 @@ public class LambdaType extends Type implements ITyped, ITypeList
 {
 	public static IClass[]	functionClasses	= new IClass[22];
 	
-	public IType		returnType;
-	public List<IType>	argumentTypes;
+	public IType			returnType;
+	public List<IType>		argumentTypes;
 	
 	public LambdaType()
 	{
