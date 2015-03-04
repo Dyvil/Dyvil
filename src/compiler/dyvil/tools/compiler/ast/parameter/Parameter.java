@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import java.lang.annotation.ElementType;
-import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
@@ -34,20 +33,6 @@ public class Parameter extends Member implements IVariable
 	{
 		super(null, name, type);
 		this.index = index;
-	}
-	
-	public Parameter(int index, String name, IType type, int modifiers, List<Annotation> annotations)
-	{
-		super(null, name, type, modifiers, annotations);
-		this.index = index;
-		this.seperator = ',';
-	}
-	
-	public Parameter(int index, String name, IType type, int modifiers, List<Annotation> annotations, char seperator)
-	{
-		super(null, name, type, modifiers, annotations);
-		this.index = index;
-		this.seperator = seperator;
 	}
 	
 	@Override
@@ -114,16 +99,7 @@ public class Parameter extends Member implements IVariable
 	}
 	
 	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		if (!this.processAnnotation(annotation))
-		{
-			annotation.target = ElementType.PARAMETER;
-			this.annotations.add(annotation);
-		}
-	}
-	
-	private boolean processAnnotation(Annotation annotation)
+	public boolean processAnnotation(Annotation annotation)
 	{
 		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.byref".equals(name))
@@ -135,17 +111,15 @@ public class Parameter extends Member implements IVariable
 	}
 	
 	@Override
+	public ElementType getAnnotationType()
+	{
+		return ElementType.PARAMETER;
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
-		
-		if (this.annotations != null)
-		{
-			for (Annotation a : this.annotations)
-			{
-				a.resolveTypes(markers, context);
-			}
-		}
+		super.resolveTypes(markers, context);
 		
 		if (this.defaultValue != null)
 		{
@@ -156,17 +130,7 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void resolve(List<Marker> markers, IContext context)
 	{
-		for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
-		{
-			Annotation a = iterator.next();
-			if (this.processAnnotation(a))
-			{
-				iterator.remove();
-				continue;
-			}
-			
-			a.resolve(markers, context);
-		}
+		super.resolve(markers, context);
 		
 		if (this.defaultValue != null)
 		{
@@ -177,10 +141,7 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		for (Annotation a : this.annotations)
-		{
-			a.check(markers, context);
-		}
+		super.check(markers, context);
 		
 		if (this.defaultValue != null)
 		{
@@ -198,15 +159,6 @@ public class Parameter extends Member implements IVariable
 			}
 			
 			this.defaultValue.check(markers, context);
-		}
-	}
-	
-	@Override
-	public void foldConstants()
-	{
-		for (Annotation a : this.annotations)
-		{
-			a.foldConstants();
 		}
 	}
 	
@@ -247,16 +199,13 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			for (Annotation a : this.annotations)
-			{
-				a.toString(prefix, buffer);
-				buffer.append(' ');
-			}
+			this.annotations[i].toString(prefix, buffer);
+			buffer.append(' ');
 		}
 		
-		if (this.isVarargs())
+		if (this.varargs)
 		{
 			this.type.getElementType().toString(prefix, buffer);
 			buffer.append("... ");

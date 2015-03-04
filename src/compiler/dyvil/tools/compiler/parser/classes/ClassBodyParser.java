@@ -1,8 +1,5 @@
 package dyvil.tools.compiler.parser.classes;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
@@ -10,7 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IAnnotated;
+import dyvil.tools.compiler.ast.member.IAnnotationList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.type.IType;
@@ -31,27 +28,28 @@ import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public final class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnotated
+public final class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnotationList
 {
-	public static final int		TYPE			= 1;
-	public static final int		NAME			= 2;
-	public static final int		PROPERTY_END	= 8;
-	public static final int		GENERICS_END	= 16;
-	public static final int		PARAMETERS		= 32;
-	public static final int		PARAMETERS_END	= 64;
-	public static final int		METHOD_END		= 128;
-	public static final int		BODY_END		= 256;
+	public static final int	TYPE			= 1;
+	public static final int	NAME			= 2;
+	public static final int	PROPERTY_END	= 8;
+	public static final int	GENERICS_END	= 16;
+	public static final int	PARAMETERS		= 32;
+	public static final int	PARAMETERS_END	= 64;
+	public static final int	METHOD_END		= 128;
+	public static final int	BODY_END		= 256;
 	
-	public static final int		DEFAULT_MODE	= TYPE | BODY_END;
+	public static final int	DEFAULT_MODE	= TYPE | BODY_END;
 	
-	protected IClass			theClass;
-	protected ClassBody			body;
+	protected IClass		theClass;
+	protected ClassBody		body;
 	
-	private IType				type;
-	private int					modifiers;
-	private List<Annotation>	annotations;
+	private IType			type;
+	private int				modifiers;
+	private Annotation[]	annotations		= new Annotation[2];
+	private int				annotationCount;
 	
-	private IMethod				method;
+	private IMethod			method;
 	
 	public ClassBodyParser(IClass theClass)
 	{
@@ -65,7 +63,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	{
 		this.mode = DEFAULT_MODE;
 		this.modifiers = 0;
-		this.annotations = new ArrayList();
+		this.annotationCount = 0;
 	}
 	
 	@Override
@@ -101,14 +99,14 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 			}
 			if ((i = ModifierTypes.CLASS_TYPE.parse(value)) != -1)
 			{
-				CodeClass codeClass = new CodeClass(null, this.theClass.getUnit(), this.modifiers, this.annotations);
-				this.theClass.getBody().addClass(codeClass);
+				CodeClass codeClass = new CodeClass(null, this.theClass.getUnit(), this.modifiers);
+				codeClass.setAnnotations(this.getAnnotations(), this.annotationCount);
 				codeClass.setOuterClass(this.theClass);
+				this.theClass.getBody().addClass(codeClass);
 				
 				ClassDeclParser parser = new ClassDeclParser(codeClass);
 				pm.pushParser(parser);
 				this.modifiers = 0;
-				this.annotations = new ArrayList();
 				return;
 			}
 			if (value.charAt(0) == '@')
@@ -129,9 +127,12 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				type = next.type();
 				if (type == Tokens.SEMICOLON)
 				{
-					Field f = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
-					f.setPosition(token.raw());
+					Field f = new Field(this.theClass, value, this.type);
+					f.position = token.raw();
+					f.modifiers = this.modifiers;
+					f.setAnnotations(this.getAnnotations(), this.annotationCount);
 					this.body.addField(f);
+					
 					pm.skip();
 					this.reset();
 					return;
@@ -139,38 +140,51 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				if (type == Tokens.OPEN_PARENTHESIS)
 				{
 					this.mode = PARAMETERS;
-					this.method = new Method(this.theClass, value, this.type, this.modifiers, this.annotations);
-					this.method.setPosition(token.raw());
+					
+					Method m = new Method(this.theClass, value, this.type);
+					m.modifiers = this.modifiers;
+					m.position = token.raw();
+					m.setAnnotations(this.getAnnotations(), this.annotationCount);
+					this.method = m;
 					this.body.addMethod(this.method);
 					return;
 				}
 				if (type == Tokens.OPEN_CURLY_BRACKET)
 				{
 					this.mode = PROPERTY_END;
-					Property property = new Property(this.theClass, value, this.type, this.modifiers, this.annotations);
-					property.setPosition(token.raw());
-					this.body.addProperty(property);
+					Property p = new Property(this.theClass, value, this.type);
+					p.position = token.raw();
+					p.modifiers = this.modifiers;
+					p.setAnnotations(this.getAnnotations(), this.annotationCount);
+					this.body.addProperty(p);
+					
 					pm.skip();
-					pm.pushParser(new PropertyParser(this.theClass, property));
+					pm.pushParser(new PropertyParser(this.theClass, p));
 					return;
 				}
 				if (type == Tokens.EQUALS)
 				{
-					Field field = new Field(this.theClass, value, this.type, this.modifiers, this.annotations);
-					field.setPosition(token.raw());
-					this.body.addField(field);
+					Field f = new Field(this.theClass, value, this.type);
+					f.position = token.raw();
+					f.modifiers = this.modifiers;
+					f.setAnnotations(this.getAnnotations(), this.annotationCount);
+					this.body.addField(f);
+					
 					pm.skip();
-					pm.pushParser(new ExpressionParser(field));
+					pm.pushParser(new ExpressionParser(f));
 					this.reset();
 					return;
 				}
 				if (type == Tokens.OPEN_SQUARE_BRACKET)
 				{
-					this.mode = GENERICS_END;
-					this.method = new Method(this.theClass, value, this.type, this.modifiers, this.annotations);
-					this.method.setPosition(token.raw());
-					this.method.setGeneric();
+					Method m = new Method(this.theClass, value, this.type);
+					m.modifiers = this.modifiers;
+					m.position = token.raw();
+					m.setAnnotations(this.getAnnotations(), this.annotationCount);
+					this.method = m;
 					this.body.addMethod(this.method);
+					
+					this.mode = GENERICS_END;
 					pm.skip();
 					pm.pushParser(new TypeVariableListParser(this.method));
 					return;
@@ -250,35 +264,45 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	}
 	
 	@Override
-	public Type getType()
-	{
-		return null;
-	}
-	
-	@Override
-	public void setTypes(List<IType> types)
-	{
-	}
-	
-	@Override
-	public List<IType> getTypes()
-	{
-		return null;
-	}
-	
-	@Override
 	public void addType(IType type)
 	{
 		this.method.addTypeVariable((ITypeVariable) type);
 	}
 	
+	private Annotation[] getAnnotations()
+	{
+		Annotation[] a = new Annotation[annotationCount];
+		System.arraycopy(this.annotations, 0, a, 0, this.annotationCount);
+		return a;
+	}
+	
 	@Override
-	public void setAnnotations(List<Annotation> annotations)
+	public void addAnnotation(Annotation annotation)
+	{
+		int index = this.annotationCount++;
+		if (this.annotationCount > this.annotations.length)
+		{
+			Annotation[] temp = new Annotation[this.annotationCount];
+			System.arraycopy(this.annotations, 0, temp, 0, index);
+			this.annotations = temp;
+		}
+		this.annotations[index] = annotation;
+	}
+	
+	// Override Methods
+	
+	@Override
+	public void setAnnotation(int index, Annotation annotation)
 	{
 	}
 	
 	@Override
-	public List<Annotation> getAnnotations()
+	public void removeAnnotation(int index)
+	{
+	}
+	
+	@Override
+	public Annotation getAnnotation(int index)
 	{
 		return null;
 	}
@@ -290,8 +314,25 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	}
 	
 	@Override
-	public void addAnnotation(Annotation annotation)
+	public Type getType()
 	{
-		this.annotations.add(annotation);
+		return null;
+	}
+
+	@Override
+	public int typeCount()
+	{
+		return 0;
+	}
+
+	@Override
+	public void setType(int index, IType type)
+	{
+	}
+
+	@Override
+	public IType getType(int index)
+	{
+		return null;
 	}
 }

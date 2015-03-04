@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.List;
-
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -17,32 +15,18 @@ public interface IParameterized extends ITyped, ITypeList
 		return false;
 	}
 	
-	public void setParameters(List<Parameter> parameters);
+	public int parameterCount();
 	
-	public List<Parameter> getParameters();
+	public void setParameter(int index, Parameter param);
 	
-	public default void addParameter(Parameter parameter)
-	{
-		List<Parameter> parameters = this.getParameters();
-		parameter.index = parameters.size();
-		parameters.add(parameter);
-	}
+	public void addParameter(Parameter param);
 	
-	@Override
-	public default void setTypes(List<IType> types)
-	{
-	}
-	
-	@Override
-	public default List<IType> getTypes()
-	{
-		return null;
-	}
+	public Parameter getParameter(int index);
 	
 	@Override
 	public default void addType(IType type)
 	{
-		int index = this.getParameters().size();
+		int index = this.parameterCount();
 		this.addParameter(new Parameter(index, "par" + index, type));
 	}
 }

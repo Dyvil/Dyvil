@@ -16,13 +16,12 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
-import dyvil.tools.compiler.config.Formatting;
 
 public class Util
 {
-	public static final List<ITyped>	EMPTY_TYPES		= Collections.EMPTY_LIST;
+	public static final List<ITyped>	EMPTY_TYPES	= Collections.EMPTY_LIST;
 	
-	public static final Predicate<?>	ISNULL			= a -> a == null;
+	public static final Predicate<?>	ISNULL		= a -> a == null;
 	
 	public static IType[] getTypes(List<IValue> values)
 	{
@@ -101,6 +100,20 @@ public class Util
 		}
 	}
 	
+	public static void astToString(String prefix, IASTNode[] array, int size, String seperator, StringBuilder buffer)
+	{
+		for (int i = 0; i < size; i++)
+		{
+			IASTNode o = array[i];
+			o.toString(prefix, buffer);
+			if (i + 1 == size)
+			{
+				break;
+			}
+			buffer.append(seperator);
+		}
+	}
+	
 	public static void typesToString(String prefix, Collection<? extends ITyped> list, String seperator, StringBuilder buffer)
 	{
 		if (!list.isEmpty())
@@ -127,43 +140,6 @@ public class Util
 					break;
 				}
 			}
-		}
-	}
-	
-	public static void parametersToString(String prefix, Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty)
-	{
-		parametersToString(prefix, parameters, buffer, writeEmpty, Formatting.Method.emptyParameters, Formatting.Method.parametersStart,
-				Formatting.Method.parameterSeperator, Formatting.Method.parametersEnd);
-	}
-	
-	public static void parametersToString(String prefix, Collection<? extends IASTNode> parameters, StringBuilder buffer, boolean writeEmpty, String empty,
-			String start, String seperator, String end)
-	{
-		if (parameters.isEmpty())
-		{
-			if (writeEmpty)
-			{
-				buffer.append(empty);
-			}
-		}
-		else
-		{
-			buffer.append(start);
-			Iterator<? extends IASTNode> iterator = parameters.iterator();
-			while (true)
-			{
-				IASTNode value = iterator.next();
-				value.toString(prefix, buffer);
-				if (iterator.hasNext())
-				{
-					buffer.append(seperator);
-				}
-				else
-				{
-					break;
-				}
-			}
-			buffer.append(end);
 		}
 	}
 	

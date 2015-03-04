@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.member;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.reflect.Modifiers;
@@ -10,19 +9,21 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.transform.Symbols;
 
 public abstract class Member extends ASTNode implements IMember
 {
-	public IClass				theClass;
+	public IClass			theClass;
 	
-	protected List<Annotation>	annotations;
+	protected Annotation[]	annotations;
+	protected int			annotationCount;
 	
-	public int					modifiers;
+	public int				modifiers;
 	
-	public IType				type;
-	public String				name;
-	public String				qualifiedName;
+	public IType			type;
+	public String			name;
+	public String			qualifiedName;
 	
 	protected Member(IClass iclass)
 	{
@@ -44,14 +45,13 @@ public abstract class Member extends ASTNode implements IMember
 		this.type = type;
 	}
 	
-	public Member(IClass iclass, String name, IType type, int modifiers, List<Annotation> annotations)
+	public Member(IClass iclass, String name, IType type, int modifiers)
 	{
 		this.theClass = iclass;
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
 		this.type = type;
 		this.modifiers = modifiers;
-		this.annotations = annotations;
 	}
 	
 	@Override
@@ -61,19 +61,67 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
-	public void setAnnotations(List<Annotation> annotations)
+	public void setAnnotations(Annotation[] annotations, int count)
 	{
 		this.annotations = annotations;
+		this.annotationCount = count;
 	}
 	
 	@Override
-	public List<Annotation> getAnnotations()
+	public void setAnnotation(int index, Annotation annotation)
 	{
-		return this.annotations;
+		this.annotations[index] = annotation;
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public final void addAnnotation(Annotation annotation)
+	{
+		if (!this.processAnnotation(annotation))
+		{
+			annotation.target = this.getAnnotationType();
+			
+			if (this.annotations == null)
+			{
+				this.annotations = new Annotation[3];
+				this.annotations[0] = annotation;
+				this.annotationCount = 1;
+				return;
+			}
+			
+			int index = this.annotationCount++;
+			if (this.annotationCount > this.annotations.length)
+			{
+				Annotation[] temp = new Annotation[this.annotationCount];
+				System.arraycopy(this.annotations, 0, temp, 0, index);
+				this.annotations = temp;
+			}
+			this.annotations[index] = annotation;
+		}
+	}
+	
+	@Override
+	public final void removeAnnotation(int index)
+	{
+		int numMoved = this.annotationCount - index - 1;
+		if (numMoved > 0)
+		{
+			System.arraycopy(this.annotations, index + 1, this.annotations, index, numMoved);
+		}
+		this.annotations[--this.annotationCount] = null;
+	}
+	
+	@Override
+	public final Annotation getAnnotation(int index)
+	{
+		if (this.annotations == null)
+		{
+			return null;
+		}
+		return this.annotations[index];
+	}
+	
+	@Override
+	public final Annotation getAnnotation(IType type)
 	{
 		if (this.annotations == null)
 		{
@@ -87,16 +135,6 @@ public abstract class Member extends ASTNode implements IMember
 			}
 		}
 		return null;
-	}
-	
-	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		if (this.annotations == null)
-		{
-			this.annotations = new ArrayList(2);
-		}
-		this.annotations.add(annotation);
 	}
 	
 	@Override
@@ -200,16 +238,58 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
+	public void resolveTypes(List<Marker> markers, IContext context)
+	{
+		this.type = this.type.resolve(markers, context);
+		
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			this.annotations[i].resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolve(List<Marker> markers, IContext context)
+	{
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			Annotation a = this.annotations[i];
+			if (this.processAnnotation(a))
+			{
+				this.removeAnnotation(i--);
+				continue;
+			}
+			
+			a.resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void check(List<Marker> markers, IContext context)
+	{
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			this.annotations[i].check(markers, context);
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			this.annotations[i].foldConstants();
+		}
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			for (Annotation annotation : this.annotations)
-			{
-				buffer.append(prefix);
-				annotation.toString(prefix, buffer);
-				buffer.append('\n');
-			}
+			buffer.append(prefix);
+			this.annotations[i].toString(prefix, buffer);
+			buffer.append('\n');
 		}
 		
 		buffer.append(prefix);

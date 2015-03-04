@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.generic;
 
-import java.util.List;
 
 public interface IGeneric
 {
@@ -8,9 +7,11 @@ public interface IGeneric
 	
 	public boolean isGeneric();
 	
-	public void setTypeVariables(List<ITypeVariable> list);
+	public int genericCount();
 	
-	public List<ITypeVariable> getTypeVariables();
+	public void setTypeVariable(int index, ITypeVariable var);
 	
 	public void addTypeVariable(ITypeVariable var);
+	
+	public ITypeVariable getTypeVariable(int index);
 }

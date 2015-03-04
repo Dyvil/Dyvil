@@ -1,7 +1,10 @@
 package dyvil.tools.compiler.ast.classes;
 
 import java.lang.annotation.ElementType;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
@@ -17,8 +20,8 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -46,29 +49,31 @@ import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
 {
-	protected DyvilFile				unit;
-	protected IClass				outerClass;
+	protected DyvilFile			unit;
+	protected IClass			outerClass;
 	
-	protected int					modifiers;
+	protected Annotation[]		annotations;
+	protected int				annotationCount;
+	protected int				modifiers;
 	
-	protected String				name;
-	protected String				qualifiedName;
-	protected String				fullName;
-	protected String				internalName;
+	protected String			name;
+	protected String			qualifiedName;
+	protected String			fullName;
+	protected String			internalName;
 	
-	protected List<Annotation>		annotations;
+	protected ITypeVariable[]	generics;
+	protected int				genericCount;
 	
-	protected IType					superType	= Type.OBJECT;
-	protected List<IType>			interfaces	= new ArrayList(1);
+	protected IType				superType	= Type.OBJECT;
+	protected List<IType>		interfaces	= new ArrayList(1);
 	
-	protected Type					type;
-	protected List<ITypeVariable>	generics;
+	protected Type				type;
 	
-	protected ClassBody				body;
-	protected IMethod				functionalMethod;
-	protected IField				instanceField;
-	protected IMethod				constructor;
-	protected IMethod				superConstructor;
+	protected ClassBody			body;
+	protected IMethod			functionalMethod;
+	protected IField			instanceField;
+	protected IMethod			constructor;
+	protected IMethod			superConstructor;
 	
 	public CodeClass()
 	{
@@ -82,12 +87,11 @@ public class CodeClass extends ASTNode implements IClass
 		this.type = new Type(this);
 	}
 	
-	public CodeClass(ICodePosition position, DyvilFile unit, int modifiers, List<Annotation> annotations)
+	public CodeClass(ICodePosition position, DyvilFile unit, int modifiers)
 	{
 		this.position = position;
 		this.unit = unit;
 		this.modifiers = modifiers;
-		this.annotations = annotations;
 		this.type = new Type(this);
 	}
 	
@@ -139,15 +143,16 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void setAnnotations(List<Annotation> annotations)
+	public void setAnnotations(Annotation[] annotations, int count)
 	{
 		this.annotations = annotations;
+		this.annotationCount = count;
 	}
 	
 	@Override
-	public List<Annotation> getAnnotations()
+	public void setAnnotation(int index, Annotation annotation)
 	{
-		return this.annotations;
+		this.annotations[index] = annotation;
 	}
 	
 	@Override
@@ -159,13 +164,36 @@ public class CodeClass extends ASTNode implements IClass
 			
 			if (this.annotations == null)
 			{
-				this.annotations = new ArrayList(2);
+				this.annotations = new Annotation[3];
+				this.annotations[0] = annotation;
+				this.annotationCount = 1;
+				return;
 			}
-			this.annotations.add(annotation);
+			
+			int index = this.annotationCount++;
+			if (this.annotationCount > this.annotations.length)
+			{
+				Annotation[] temp = new Annotation[this.annotationCount];
+				System.arraycopy(this.annotations, 0, temp, 0, index);
+				this.annotations = temp;
+			}
+			this.annotations[index] = annotation;
 		}
 	}
 	
-	private boolean processAnnotation(Annotation annotation)
+	@Override
+	public final void removeAnnotation(int index)
+	{
+		int numMoved = this.annotationCount - index - 1;
+		if (numMoved > 0)
+		{
+			System.arraycopy(this.annotations, index + 1, this.annotations, index, numMoved);
+		}
+		this.annotations[--this.annotationCount] = null;
+	}
+	
+	@Override
+	public boolean processAnnotation(Annotation annotation)
 	{
 		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.sealed".equals(name))
@@ -187,6 +215,18 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public ElementType getAnnotationType()
+	{
+		return ElementType.TYPE;
+	}
+	
+	@Override
+	public Annotation getAnnotation(int index)
+	{
+		return this.annotations[index];
+	}
+	
+	@Override
 	public Annotation getAnnotation(IType type)
 	{
 		if (this.annotations == null)
@@ -194,8 +234,9 @@ public class CodeClass extends ASTNode implements IClass
 			return null;
 		}
 		
-		for (Annotation a : this.annotations)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
+			Annotation a = this.annotations[i];
 			if (a.type.classEquals(type))
 			{
 				return a;
@@ -307,10 +348,12 @@ public class CodeClass extends ASTNode implements IClass
 		return this.fullName;
 	}
 	
+	// Generics
+	
 	@Override
 	public void setGeneric()
 	{
-		this.generics = new ArrayList(2);
+		this.generics = new ITypeVariable[2];
 	}
 	
 	@Override
@@ -320,22 +363,45 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void setTypeVariables(List<ITypeVariable> list)
+	public int genericCount()
 	{
-		this.generics = list;
+		return this.genericCount;
 	}
 	
 	@Override
-	public List<ITypeVariable> getTypeVariables()
+	public void setTypeVariable(int index, ITypeVariable var)
 	{
-		return this.generics;
+		this.generics[index] = var;
 	}
 	
 	@Override
 	public void addTypeVariable(ITypeVariable var)
 	{
-		this.generics.add(var);
+		if (this.generics == null)
+		{
+			this.generics = new ITypeVariable[3];
+			this.generics[0] = var;
+			this.genericCount = 1;
+			return;
+		}
+		
+		int index = this.genericCount++;
+		if (this.genericCount > this.generics.length)
+		{
+			ITypeVariable[] temp = new ITypeVariable[this.genericCount];
+			System.arraycopy(this.generics, 0, temp, 0, index);
+			this.generics = temp;
+		}
+		this.generics[index] = var;
 	}
+	
+	@Override
+	public ITypeVariable getTypeVariable(int index)
+	{
+		return this.generics[index];
+	}
+	
+	// Super Types
 	
 	@Override
 	public void setSuperType(IType type)
@@ -451,14 +517,15 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (this.generics != null)
+		if (this.genericCount > 0)
 		{
 			GenericType type = new GenericType(this);
 			
-			for (ITypeVariable v : this.generics)
+			for (int i = 0; i < this.genericCount; i++)
 			{
-				v.resolveTypes(markers, context);
-				type.addType(new WildcardType(null, 0, v.getCaptureClass()));
+				ITypeVariable var = this.generics[i];
+				var.resolveTypes(markers, context);
+				type.addType(new WildcardType(null, 0, var.getCaptureClass()));
 			}
 			
 			this.type = type;
@@ -486,12 +553,9 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			for (Annotation a : this.annotations)
-			{
-				a.resolveTypes(markers, this);
-			}
+			this.annotations[i].resolveTypes(markers, this);
 		}
 		
 		if (this.body != null)
@@ -526,25 +590,23 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void resolve(List<Marker> markers, IContext context)
 	{
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			Iterator<Annotation> iterator = this.annotations.iterator();
-			while (iterator.hasNext())
+			Annotation a = this.annotations[i];
+			if (this.processAnnotation(a))
 			{
-				Annotation a = iterator.next();
-				if (this.processAnnotation(a))
-				{
-					iterator.remove();
-					continue;
-				}
-				
-				a.resolve(markers, context);
+				this.removeAnnotation(i--);
+				continue;
 			}
+			
+			a.resolve(markers, context);
 		}
 		
 		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
 		{
-			this.instanceField = new Field(this, "$instance", this.getType(), Modifiers.PUBLIC | Modifiers.CONST | Modifiers.SYNTHETIC, Collections.EMPTY_LIST);
+			Field f = new Field(this, "$instance", this.getType());
+			f.modifiers = Modifiers.PUBLIC | Modifiers.CONST | Modifiers.SYNTHETIC;
+			this.instanceField = f;
 		}
 		
 		if (this.body != null)
@@ -604,12 +666,9 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			for (Annotation a : this.annotations)
-			{
-				a.check(markers, context);
-			}
+			this.annotations[i].check(markers, context);
 		}
 		
 		if (this.body != null)
@@ -621,12 +680,9 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void foldConstants()
 	{
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			for (Annotation a : this.annotations)
-			{
-				a.foldConstants();
-			}
+			this.annotations[i].foldConstants();
 		}
 		
 		if (this.body != null)
@@ -656,14 +712,12 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public IClass resolveClass(String name)
 	{
-		if (this.generics != null)
+		for (int i = 0; i < this.genericCount; i++)
 		{
-			for (ITypeVariable var : this.generics)
+			ITypeVariable var = this.generics[i];
+			if (var.isName(name))
 			{
-				if (var.isName(name))
-				{
-					return var.getCaptureClass();
-				}
+				return var.getCaptureClass();
 			}
 		}
 		
@@ -908,12 +962,9 @@ public class CodeClass extends ASTNode implements IClass
 			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true);
 		}
 		
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			for (Annotation a : this.annotations)
-			{
-				a.write(writer);
-			}
+			this.annotations[i].write(writer);
 		}
 		
 		// Inner Class Info
@@ -960,7 +1011,7 @@ public class CodeClass extends ASTNode implements IClass
 			
 			if (this.body.lambdas != null)
 			{
-				for (IBaseMethod m : this.body.lambdas)
+				for (IClassCompilable m : this.body.lambdas)
 				{
 					m.write(writer);
 				}
@@ -1094,23 +1145,20 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			for (Annotation annotation : this.annotations)
-			{
-				buffer.append(prefix);
-				annotation.toString(prefix, buffer);
-				buffer.append('\n');
-			}
+			buffer.append(prefix);
+			this.annotations[i].toString(prefix, buffer);
+			buffer.append('\n');
 		}
 		
 		buffer.append(prefix).append(ModifierTypes.CLASS.toString(this.modifiers));
 		buffer.append(ModifierTypes.CLASS_TYPE.toString(this.modifiers)).append(this.name);
 		
-		if (this.generics != null && !this.generics.isEmpty())
+		if (this.genericCount > 0)
 		{
 			buffer.append('[');
-			Util.astToString(prefix, this.generics, Formatting.Type.genericSeperator, buffer);
+			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
 		}
 		

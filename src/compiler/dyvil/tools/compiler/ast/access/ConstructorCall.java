@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -98,8 +99,8 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 	@Override
 	public IType resolveType(String name)
 	{
-		List<IType> generics = this.type.isGeneric() ? ((GenericType) this.type).generics : null;
-		return this.method.resolveType(name, null, this.arguments, null);
+		ITypeList generics = this.type.isGeneric() ? (GenericType) this.type : null;
+		return this.method.resolveType(name, null, this.arguments, generics);
 	}
 	
 	@Override

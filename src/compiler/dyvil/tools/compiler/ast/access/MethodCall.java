@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
@@ -30,12 +31,15 @@ import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Util;
 
-public final class MethodCall extends ASTNode implements IAccess, IValue, IValued, ITypeContext, INamed
+public final class MethodCall extends ASTNode implements IAccess, INamed, IValue, IValued, ITypeList, ITypeContext
 {
 	public IValue		instance;
 	public String		name;
 	public String		qualifiedName;
-	public List<IType>	generics;
+	
+	public IType[]		generics;
+	public int			genericCount;
+	
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
 	public boolean		dotless;
@@ -183,27 +187,56 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 	}
 	
 	@Override
+	public int typeCount()
+	{
+		return this.genericCount;
+	}
+	
+	@Override
+	public void setType(int index, IType type)
+	{
+		this.generics[index] = type;
+	}
+	
+	@Override
+	public void addType(IType type)
+	{
+		if (this.generics == null)
+		{
+			this.generics = new IType[3];
+			this.generics[0] = type;
+			this.genericCount = 1;
+			return;
+		}
+		
+		int index = this.genericCount++;
+		if (this.genericCount > this.generics.length)
+		{
+			IType[] temp = new IType[this.genericCount];
+			System.arraycopy(this.generics, 0, temp, 0, index);
+			this.generics = temp;
+		}
+		this.generics[index] = type;
+	}
+	
+	@Override
+	public IType getType(int index)
+	{
+		return this.generics[index];
+	};
+	
+	@Override
 	public IType resolveType(String name)
 	{
-		return this.method.resolveType(name, this.instance, this.arguments, this.generics);
+		return this.method.resolveType(name, this.instance, this.arguments, this);
 	}
 	
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		int len;
-		if (this.generics != null)
+		for (int i = 0; i < this.genericCount; i++)
 		{
-			len = this.generics.size();
-			for (int i = 0; i < len; i++)
-			{
-				IType t1 = this.generics.get(i);
-				IType t2 = t1.resolve(markers, context);
-				if (t1 != t2)
-				{
-					this.generics.set(i, t2);
-				}
-			}
+			this.generics[i] = this.generics[i].resolve(markers, context);
 		}
 		
 		if (this.instance != null)
@@ -554,7 +587,7 @@ public final class MethodCall extends ASTNode implements IAccess, IValue, IValue
 		if (this.generics != null)
 		{
 			buffer.append('[');
-			Util.astToString(prefix, this.generics, Formatting.Type.genericSeperator, buffer);
+			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
 		}
 		

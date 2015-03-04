@@ -1,29 +1,30 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.util.Util;
 
-public class TupleType extends Type implements ITypeList
+public final class TupleType extends Type implements ITypeList
 {
 	public static final IClass[]	tupleClasses	= new IClass[22];
 	public static final String[]	descriptors		= new String[22];
 	
-	public List<IType>				types			= new ArrayList(2);
+	protected IType[] types;
+	protected int typeCount;
 	
 	public TupleType()
 	{
-		this.types = new ArrayList(2);
+		this.types = new IType[2];
 	}
 	
 	public TupleType(int size)
 	{
-		this.types = new ArrayList(size);
+		this.types = new IType[size];
 	}
 	
 	@Override
@@ -32,23 +33,40 @@ public class TupleType extends Type implements ITypeList
 		return false;
 	}
 	
-	@Override
-	public void setTypes(List<IType> types)
-	{
-		this.types = types;
-	}
+	// ITypeList Overrides
 	
-	@Override
-	public List<IType> getTypes()
-	{
-		return this.types;
-	}
-	
-	@Override
-	public void addType(IType type)
-	{
-		this.types.add(type);
-	}
+		@Override
+		public int typeCount()
+		{
+			return 0;
+		}
+		
+		@Override
+		public void setType(int index, IType type)
+		{
+			this.types[index] = type;
+		}
+		
+		@Override
+		public void addType(IType type)
+		{
+			int index = this.typeCount++;
+			if (this.typeCount > this.types.length)
+			{
+				IType[] temp = new IType[this.typeCount];
+				System.arraycopy(this.types, 0, temp, 0, index);
+				this.types = temp;
+			}
+			this.types[index] = type;
+		}
+		
+		@Override
+		public IType getType(int index)
+		{
+			return this.types[index];
+		}
+		
+		// IType Overrides
 	
 	@Override
 	public IClass getTheClass()
@@ -58,16 +76,15 @@ public class TupleType extends Type implements ITypeList
 			return this.theClass;
 		}
 		
-		int len = this.types.size();
-		IClass iclass = tupleClasses[len];
+		IClass iclass = tupleClasses[this.typeCount];
 		if (iclass != null)
 		{
 			this.theClass = iclass;
 			return iclass;
 		}
 		
-		iclass = Package.dyvilLangTuple.resolveClass("Tuple" + len);
-		tupleClasses[len] = iclass;
+		iclass = Package.dyvilLangTuple.resolveClass("Tuple" + this.typeCount);
+		tupleClasses[this.typeCount] = iclass;
 		this.theClass = iclass;
 		return iclass;
 	}
@@ -79,45 +96,36 @@ public class TupleType extends Type implements ITypeList
 		{
 			TupleType tuple = (TupleType) type;
 			
-			int len = this.types.size();
-			if (len != tuple.types.size())
+			if (this.typeCount != tuple.typeCount)
 			{
 				return false;
 			}
 			
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < this.typeCount; i++)
 			{
-				IType t1 = this.types.get(i);
-				IType t2 = tuple.types.get(i);
-				if (!t1.equals(t2))
+				if (!this.types[i].equals(tuple.types[i]))
 				{
 					return false;
 				}
 			}
 			return true;
 		}
-		else if (type instanceof GenericType)
+		else if (this.theClass == type.getTheClass() && type instanceof GenericType)
 		{
-			if (this.theClass == type.getTheClass())
-			{
-				int len = this.types.size();
-				List<IType> generics = ((GenericType) type).generics;
-				if (len != generics.size())
+				GenericType generic = (GenericType) type;
+				if (this.typeCount != generic.typeCount())
 				{
 					return false;
 				}
 				
-				for (int i = 0; i < len; i++)
+				for (int i = 0; i < this.typeCount; i++)
 				{
-					IType t1 = this.types.get(i);
-					IType t2 = generics.get(i);
-					if (!t1.equals(t2))
+					if (!this.types[i].equals(generic.getType(i)))
 					{
 						return false;
 					}
 				}
 				return true;
-			}
 		}
 		return OBJECT.classEquals(type);
 	}
@@ -135,17 +143,14 @@ public class TupleType extends Type implements ITypeList
 		{
 			TupleType tuple = (TupleType) type;
 			
-			int len = this.types.size();
-			if (len != tuple.types.size())
+			if (this.typeCount != tuple.typeCount)
 			{
 				return false;
 			}
 			
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < this.typeCount; i++)
 			{
-				IType t1 = this.types.get(i);
-				IType t2 = tuple.types.get(i);
-				if (!t1.equals(t2))
+				if (!this.types[i].equals(tuple.types[i]))
 				{
 					return false;
 				}
@@ -160,22 +165,16 @@ public class TupleType extends Type implements ITypeList
 	{
 		this.getTheClass();
 		
-		int len = this.types.size();
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.typeCount; i++)
 		{
-			IType t1 = this.types.get(i);
-			IType t2 = t1.resolve(markers, context);
-			if (t1 != t2)
-			{
-				this.types.set(i, t2);
-			}
+			this.types[i] = this.types[i].resolve(markers, context);
 		}
 		return this;
 	}
 	
 	public String getConstructorDescriptor()
 	{
-		int len = this.types.size();
+		int len = this.typeCount;
 		if (len < 22)
 		{
 			String s = descriptors[len];
@@ -228,6 +227,8 @@ public class TupleType extends Type implements ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		Util.parametersToString(prefix, this.types, buffer, true);
+		buffer.append(Formatting.Expression.tupleStart);
+		Util.astToString(prefix, this.types, this.typeCount, Formatting.Expression.tupleSeperator, buffer);
+		buffer.append(Formatting.Expression.tupleEnd);
 	}
 }

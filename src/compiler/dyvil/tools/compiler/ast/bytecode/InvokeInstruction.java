@@ -1,20 +1,15 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import java.util.List;
-
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.parameter.IParameterized;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 
-public class InvokeInstruction extends Instruction implements INamed, ITyped, IParameterized, IGeneric
+public class InvokeInstruction extends Instruction implements INamed, IBaseMethod
 {
 	private String	owner;
 	private String	methodName;
@@ -114,37 +109,9 @@ public class InvokeInstruction extends Instruction implements INamed, ITyped, IP
 	}
 	
 	@Override
-	public void setParameters(List<Parameter> parameters)
-	{
-	}
-	
-	@Override
-	public List<Parameter> getParameters()
-	{
-		return null;
-	}
-	
-	@Override
-	public void addParameter(Parameter parameter)
-	{
-		this.args++;
-	}
-	
-	@Override
 	public void addType(IType type)
 	{
 		this.args++;
-	}
-	
-	@Override
-	public void setTypes(List<IType> types)
-	{
-	}
-	
-	@Override
-	public List<IType> getTypes()
-	{
-		return null;
 	}
 	
 	@Override
@@ -159,18 +126,24 @@ public class InvokeInstruction extends Instruction implements INamed, ITyped, IP
 	}
 	
 	@Override
-	public void setTypeVariables(List<ITypeVariable> list)
+	public int genericCount()
 	{
+		return 0;
 	}
 	
 	@Override
-	public List<ITypeVariable> getTypeVariables()
+	public void setTypeVariable(int index, ITypeVariable var)
 	{
-		return null;
 	}
 	
 	@Override
 	public void addTypeVariable(ITypeVariable var)
 	{
+	}
+	
+	@Override
+	public ITypeVariable getTypeVariable(int index)
+	{
+		return null;
 	}
 }

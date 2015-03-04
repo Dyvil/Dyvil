@@ -1,15 +1,12 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.List;
-
 public interface ITypeList
 {
-	public void setTypes(List<IType> types);
+	public int typeCount();
 	
-	public List<IType> getTypes();
+	public void setType(int index, IType type);
 	
-	public default void addType(IType type)
-	{
-		this.getTypes().add(type);
-	}
+	public void addType(IType type);
+	
+	public IType getType(int index);
 }

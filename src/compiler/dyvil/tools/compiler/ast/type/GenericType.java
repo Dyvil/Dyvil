@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.classes.CaptureClass;
@@ -16,9 +15,10 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class GenericType extends Type implements ITypeList
+public final class GenericType extends Type implements ITypeList
 {
-	public List<IType>	generics;
+	protected IType[]	generics	= new IType[2];
+	protected int		genericCount;
 	
 	public GenericType()
 	{
@@ -40,27 +40,40 @@ public class GenericType extends Type implements ITypeList
 		super(iclass);
 	}
 	
+	// ITypeList Overrides
+	
 	@Override
-	public void setTypes(List<IType> types)
+	public int typeCount()
 	{
-		this.generics = types;
+		return 0;
 	}
 	
 	@Override
-	public List<IType> getTypes()
+	public void setType(int index, IType type)
 	{
-		return this.generics;
+		this.generics[index] = type;
 	}
 	
 	@Override
 	public void addType(IType type)
 	{
-		if (this.generics == null)
+		int index = this.genericCount++;
+		if (this.genericCount > this.generics.length)
 		{
-			this.generics = new ArrayList(2);
+			IType[] temp = new IType[this.genericCount];
+			System.arraycopy(this.generics, 0, temp, 0, index);
+			this.generics = temp;
 		}
-		this.generics.add(type);
+		this.generics[index] = type;
 	}
+	
+	@Override
+	public IType getType(int index)
+	{
+		return this.generics[index];
+	}
+	
+	// IType Overrides
 	
 	@Override
 	public boolean isGeneric()
@@ -71,13 +84,12 @@ public class GenericType extends Type implements ITypeList
 	@Override
 	public IType resolveType(String name)
 	{
-		List<ITypeVariable> typeVariables = this.theClass.getTypeVariables();
-		int len = Math.min(typeVariables.size(), this.generics.size());
+		int len = Math.min(this.theClass.genericCount(), this.genericCount);
 		for (int i = 0; i < len; i++)
 		{
-			if (typeVariables.get(i).isName(name))
+			if (this.theClass.getTypeVariable(i).isName(name))
 			{
-				return this.generics.get(i);
+				return this.generics[i];
 			}
 		}
 		return null;
@@ -92,13 +104,12 @@ public class GenericType extends Type implements ITypeList
 		}
 		
 		IType type;
-		List<IType> generics = ((GenericType) concrete).generics;
 		if (this.isSuperTypeOf(concrete))
 		{
-			int len = this.generics.size();
-			for (int i = 0; i < len; i++)
+			IType[] generics = ((GenericType) concrete).generics;
+			for (int i = 0; i < this.genericCount; i++)
 			{
-				type = this.generics.get(i).resolveType(name, generics.get(i));
+				type = this.generics[i].resolveType(name, generics[i]);
 				if (type != null)
 				{
 					return type;
@@ -112,16 +123,10 @@ public class GenericType extends Type implements ITypeList
 	public IType getConcreteType(ITypeContext context)
 	{
 		GenericType copy = this.clone();
-		if (this.generics != null)
+		for (int i = 0; i < this.genericCount; i++)
 		{
-			int len = this.generics.size();
-			for (int i = 0; i < len; i++)
-			{
-				IType t1 = this.generics.get(i);
-				copy.generics.set(i, t1.getConcreteType(context));
-			}
+			copy.generics[i] = this.generics[i].getConcreteType(context);
 		}
-		
 		return copy;
 	}
 	
@@ -158,37 +163,36 @@ public class GenericType extends Type implements ITypeList
 				return this;
 			}
 			
-			List<ITypeVariable> variables = iclass.getTypeVariables();
-			int len = this.generics.size();
-			if (variables == null)
+			int varCount = this.theClass.genericCount();
+			if (varCount == 0)
 			{
-				if (len != 0 && markers != null)
+				if (this.genericCount != 0 && markers != null)
 				{
 					markers.add(Markers.create(this.position, "generic.not_generic", this.qualifiedName));
 				}
 				return this;
 			}
-			if (variables.size() != len && markers != null)
+			if (varCount != this.genericCount && markers != null)
 			{
 				markers.add(Markers.create(this.position, "generic.count"));
 				return this;
 			}
 			
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < this.genericCount; i++)
 			{
-				IType t1 = this.generics.get(i);
+				IType t1 = this.generics[i];
 				IType t2 = t1.resolve(markers, context);
 				if (t1 != t2)
 				{
-					this.generics.set(i, t2);
+					this.generics[i] = t2;
 				}
 				
 				if (markers != null)
 				{
-					ITypeVariable var = variables.get(i);
+					ITypeVariable var = this.theClass.getTypeVariable(i);
 					if (!var.isSuperTypeOf(t2))
 					{
-						Marker marker = Markers.create(t1.getPosition(), "generic.type", var.getQualifiedName());
+						Marker marker = Markers.create(t2.getPosition(), "generic.type", var.getQualifiedName());
 						marker.addInfo("Generic Type: " + t2);
 						marker.addInfo("Type Variable: " + var);
 						markers.add(marker);
@@ -248,7 +252,7 @@ public class GenericType extends Type implements ITypeList
 		if (this.generics != null)
 		{
 			buffer.append('[');
-			Util.astToString(prefix, this.generics, Formatting.Type.genericSeperator, buffer);
+			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
 		}
 		for (int i = 0; i < this.arrayDimensions; i++)
@@ -268,7 +272,8 @@ public class GenericType extends Type implements ITypeList
 		t.arrayDimensions = this.arrayDimensions;
 		if (this.generics != null)
 		{
-			t.generics = new ArrayList(this.generics);
+			t.generics = new IType[this.genericCount];
+			System.arraycopy(this.generics, 0, t.generics, 0, this.genericCount);
 		}
 		return t;
 	}

@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
-public class PrimitiveType extends Type
+public final class PrimitiveType extends Type
 {
 	public int		typecode;
 	public IMethod	boxMethod;

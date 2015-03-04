@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.annotation;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.member.IAnnotated;
+import dyvil.tools.compiler.ast.member.IAnnotationList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -16,11 +16,11 @@ public class AnnotationParser extends Parser
 	public static final int	PARAMETERS_START	= 1;
 	public static final int	PARAMETERS_END		= 2;
 	
-	protected IAnnotated	annotatable;
+	protected IAnnotationList	annotatable;
 	
 	private Annotation		annotation;
 	
-	public AnnotationParser(IAnnotated annotatable)
+	public AnnotationParser(IAnnotationList annotatable)
 	{
 		this.annotatable = annotatable;
 	}

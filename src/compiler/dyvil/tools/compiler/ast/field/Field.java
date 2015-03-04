@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
@@ -39,11 +37,6 @@ public class Field extends Member implements IField
 		super(iclass, name, type);
 	}
 	
-	public Field(IClass iclass, String name, IType type, int modifiers, List<Annotation> annotations)
-	{
-		super(iclass, name, type, modifiers, annotations);
-	}
-	
 	@Override
 	public void setValue(IValue value)
 	{
@@ -69,21 +62,7 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		if (!this.processAnnotation(annotation))
-		{
-			annotation.target = ElementType.FIELD;
-			
-			if (this.annotations == null)
-			{
-				this.annotations = new ArrayList(2);
-			}
-			this.annotations.add(annotation);
-		}
-	}
-	
-	private boolean processAnnotation(Annotation annotation)
+	public boolean processAnnotation(Annotation annotation)
 	{
 		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.lazy".equals(name))
@@ -105,17 +84,15 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
+	public ElementType getAnnotationType()
+	{
+		return ElementType.FIELD;
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
-		
-		if (this.annotations != null)
-		{
-			for (Annotation a : this.annotations)
-			{
-				a.resolveTypes(markers, context);
-			}
-		}
+		super.resolveTypes(markers, context);
 		
 		if (this.value != null)
 		{
@@ -126,17 +103,7 @@ public class Field extends Member implements IField
 	@Override
 	public void resolve(List<Marker> markers, IContext context)
 	{
-		for (Iterator<Annotation> iterator = this.annotations.iterator(); iterator.hasNext();)
-		{
-			Annotation a = iterator.next();
-			if (this.processAnnotation(a))
-			{
-				iterator.remove();
-				continue;
-			}
-			
-			a.resolve(markers, context);
-		}
+		super.resolve(markers, context);
 		
 		if (this.value != null)
 		{
@@ -147,10 +114,7 @@ public class Field extends Member implements IField
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		for (Annotation a : this.annotations)
-		{
-			a.check(markers, context);
-		}
+		super.check(markers, context);
 		
 		if (this.value != null)
 		{
@@ -175,10 +139,7 @@ public class Field extends Member implements IField
 	@Override
 	public void foldConstants()
 	{
-		for (Annotation a : this.annotations)
-		{
-			a.foldConstants();
-		}
+		super.foldConstants();
 		
 		if (this.value != null)
 		{
@@ -199,9 +160,9 @@ public class Field extends Member implements IField
 			}
 			MethodWriter mw = new MethodWriter(writer, writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name, desc, signature, null));
 			
-			for (Annotation a : this.annotations)
+			for (int i = 0; i < this.annotationCount; i++)
 			{
-				a.write(mw);
+				this.annotations[i].write(mw);
 			}
 			
 			mw.visitAnnotation("Ldyvil/lang/annotation/lazy;", false);
@@ -223,12 +184,9 @@ public class Field extends Member implements IField
 			fv.visitAnnotation("Ljava/lang/Deprecated;", true);
 		}
 		
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			for (Annotation a : this.annotations)
-			{
-				a.write(fv);
-			}
+			this.annotations[i].write(fv);
 		}
 	}
 	

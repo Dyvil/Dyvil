@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.parser.classes;
 
-import java.util.List;
-
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.structure.DyvilFile;
@@ -161,23 +159,6 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 	}
 	
 	@Override
-	public IType getType()
-	{
-		return null;
-	}
-	
-	@Override
-	public void setTypes(List<IType> types)
-	{
-	}
-	
-	@Override
-	public List<IType> getTypes()
-	{
-		return null;
-	}
-	
-	@Override
 	public void addType(IType type)
 	{
 		if (this.mode == GENERICS_END)
@@ -188,5 +169,30 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 		{
 			this.theClass.addInterface(type);
 		}
+	}
+	
+	// Override Methods
+	
+	@Override
+	public IType getType()
+	{
+		return null;
+	}
+
+	@Override
+	public int typeCount()
+	{
+		return 0;
+	}
+
+	@Override
+	public void setType(int index, IType type)
+	{
+	}
+
+	@Override
+	public IType getType(int index)
+	{
+		return null;
 	}
 }

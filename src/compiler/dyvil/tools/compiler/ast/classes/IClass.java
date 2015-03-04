@@ -6,7 +6,7 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.IGeneric;
-import dyvil.tools.compiler.ast.member.IAnnotated;
+import dyvil.tools.compiler.ast.member.IAnnotationList;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.IModified;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 
-public interface IClass extends IASTNode, IMember, IAnnotated, IModified, INamed, IGeneric, IContext
+public interface IClass extends IASTNode, IMember, IAnnotationList, IModified, INamed, IGeneric, IContext
 {
 	public DyvilFile getUnit();
 	

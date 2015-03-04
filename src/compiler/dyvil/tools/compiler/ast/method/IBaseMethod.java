@@ -1,11 +1,18 @@
 package dyvil.tools.compiler.ast.method;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
-import dyvil.tools.compiler.ast.IASTNode;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.value.IValued;
+import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.ast.type.ITyped;
 
-public interface IBaseMethod extends IASTNode, IValued, IContext
+public interface IBaseMethod extends ITyped, ITypeList, IGeneric
 {
-	public void write(ClassWriter writer);
+	@Override
+	public default int typeCount() { return 0; }
+	
+	@Override
+	public default void setType(int index, IType type) {}
+	
+	@Override
+	public default IType getType(int index) { return null; }
 }

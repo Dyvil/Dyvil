@@ -6,7 +6,11 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.method.IBaseMethod;
+import dyvil.tools.compiler.ast.type.GenericType;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.transform.Symbols;
 
 public class ClassFormat
@@ -210,7 +214,7 @@ public class ClassFormat
 		}
 	}
 	
-	public static <T extends ITypeList & ITyped & IGeneric> void readMethodType(String internal, T method)
+	public static void readMethodType(String internal, IBaseMethod method)
 	{
 		int index = internal.indexOf(')');
 		

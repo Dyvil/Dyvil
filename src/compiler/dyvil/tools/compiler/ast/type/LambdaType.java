@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -10,27 +9,28 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.util.Util;
 
-public class LambdaType extends Type implements ITyped, ITypeList
+public final class LambdaType extends Type implements ITyped, ITypeList
 {
-	public static IClass[]	functionClasses	= new IClass[22];
+	public static final IClass[]	functionClasses	= new IClass[22];
 	
-	public IType			returnType;
-	public List<IType>		argumentTypes;
+	public IType					returnType;
+	protected IType[]				parameterTypes	= new IType[2];
+	protected int					parameterCount;
 	
 	public LambdaType()
 	{
-		this.argumentTypes = new ArrayList(2);
 	}
 	
 	public LambdaType(IType type)
 	{
-		this.argumentTypes = new ArrayList(1);
-		this.argumentTypes.add(type);
+		this.parameterTypes[0] = type;
+		this.parameterCount = 1;
 	}
 	
 	public LambdaType(TupleType tupleType)
 	{
-		this.argumentTypes = tupleType.types;
+		this.parameterTypes = tupleType.types;
+		this.parameterCount = tupleType.typeCount;
 	}
 	
 	@Override
@@ -45,23 +45,40 @@ public class LambdaType extends Type implements ITyped, ITypeList
 		return this.returnType;
 	}
 	
+	// ITypeList Overrides
+	
 	@Override
-	public void setTypes(List<IType> types)
+	public int typeCount()
 	{
-		this.argumentTypes = types;
+		return 0;
 	}
 	
 	@Override
-	public List<IType> getTypes()
+	public void setType(int index, IType type)
 	{
-		return this.argumentTypes;
+		this.parameterTypes[index] = type;
 	}
 	
 	@Override
 	public void addType(IType type)
 	{
-		this.argumentTypes.add(type);
+		int index = this.parameterCount++;
+		if (this.parameterCount > this.parameterTypes.length)
+		{
+			IType[] temp = new IType[this.parameterCount];
+			System.arraycopy(this.parameterTypes, 0, temp, 0, index);
+			this.parameterTypes = temp;
+		}
+		this.parameterTypes[index] = type;
 	}
+	
+	@Override
+	public IType getType(int index)
+	{
+		return this.parameterTypes[index];
+	}
+	
+	// IType Overrides
 	
 	@Override
 	public IClass getTheClass()
@@ -71,16 +88,15 @@ public class LambdaType extends Type implements ITyped, ITypeList
 			return this.theClass;
 		}
 		
-		int len = this.argumentTypes.size();
-		IClass iclass = functionClasses[len];
+		IClass iclass = functionClasses[this.parameterCount];
 		if (iclass != null)
 		{
 			this.theClass = iclass;
 			return iclass;
 		}
 		
-		iclass = Package.dyvilLangFunction.resolveClass("Function" + len);
-		functionClasses[len] = iclass;
+		iclass = Package.dyvilLangFunction.resolveClass("Function" + this.parameterCount);
+		functionClasses[this.parameterCount] = iclass;
 		this.theClass = iclass;
 		return iclass;
 	}
@@ -90,23 +106,20 @@ public class LambdaType extends Type implements ITyped, ITypeList
 	{
 		this.getTheClass();
 		
-		int len = this.argumentTypes.size();
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IType t1 = this.argumentTypes.get(i);
-			IType t2 = t1.resolve(markers, context);
-			if (t1 != t2)
-			{
-				this.argumentTypes.set(i, t2);
-			}
+			this.parameterTypes[i] = this.parameterTypes[i].resolve(markers, context);
 		}
+		this.returnType = this.returnType.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		Util.parametersToString(prefix, this.argumentTypes, buffer, false);
+		buffer.append(Formatting.Method.parametersStart);
+		Util.astToString(prefix, this.parameterTypes, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
+		buffer.append(Formatting.Method.parametersEnd);
 		buffer.append(Formatting.Expression.lambdaSeperator);
 		this.returnType.toString("", buffer);
 	}

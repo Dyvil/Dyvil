@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
-import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
@@ -59,16 +58,7 @@ public class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		if (!this.processAnnotation(annotation))
-		{
-			annotation.target = ElementType.LOCAL_VARIABLE;
-			this.annotations.add(annotation);
-		}
-	}
-	
-	private boolean processAnnotation(Annotation annotation)
+	public boolean processAnnotation(Annotation annotation)
 	{
 		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.lazy".equals(name))
@@ -77,6 +67,12 @@ public class Variable extends Member implements IVariable
 			return true;
 		}
 		return false;
+	}
+	
+	@Override
+	public ElementType getAnnotationType()
+	{
+		return ElementType.LOCAL_VARIABLE;
 	}
 	
 	@Override
@@ -94,15 +90,7 @@ public class Variable extends Member implements IVariable
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
-		
-		if (this.annotations != null)
-		{
-			for (Annotation a : this.annotations)
-			{
-				a.resolveTypes(markers, context);
-			}
-		}
+		super.resolveTypes(markers, context);
 		
 		if (this.value != null)
 		{
@@ -113,21 +101,7 @@ public class Variable extends Member implements IVariable
 	@Override
 	public void resolve(List<Marker> markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			Iterator<Annotation> iterator = this.annotations.iterator();
-			while (iterator.hasNext())
-			{
-				Annotation a = iterator.next();
-				if (this.processAnnotation(a))
-				{
-					iterator.remove();
-					continue;
-				}
-				
-				a.resolve(markers, context);
-			}
-		}
+		super.resolve(markers, context);
 		
 		if (this.value != null)
 		{
@@ -138,13 +112,7 @@ public class Variable extends Member implements IVariable
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			for (Annotation a : this.annotations)
-			{
-				a.check(markers, context);
-			}
-		}
+		super.check(markers, context);
 		
 		IValue value1 = this.value.withType(this.type);
 		if (value1 == null)
@@ -165,13 +133,7 @@ public class Variable extends Member implements IVariable
 	@Override
 	public void foldConstants()
 	{
-		if (this.annotations != null)
-		{
-			for (Annotation a : this.annotations)
-			{
-				a.foldConstants();
-			}
-		}
+		super.foldConstants();
 		
 		this.value = this.value.foldConstants();
 	}

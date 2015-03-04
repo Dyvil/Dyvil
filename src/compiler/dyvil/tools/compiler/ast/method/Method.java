@@ -7,7 +7,6 @@ import static dyvil.reflect.Opcodes.INSTANCE;
 
 import java.lang.annotation.ElementType;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
@@ -27,6 +26,7 @@ import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ValueList;
@@ -40,12 +40,14 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
-	private List<ITypeVariable>	generics;
+	protected ITypeVariable[]	generics;
+	protected int				genericCount;
 	
-	private List<Parameter>		parameters	= new ArrayList(3);
-	private List<IType>			throwsDeclarations;
+	protected Parameter[]		parameters	= new Parameter[3];
+	protected int				parameterCount;
+	public List<IType>			throwsDeclarations;
 	
-	private IValue				value;
+	public IValue				value;
 	
 	protected boolean			isConstructor;
 	
@@ -72,16 +74,6 @@ public class Method extends Member implements IMethod
 		if (name.equals("new"))
 		{
 			this.isConstructor = true;
-		}
-	}
-	
-	public Method(IClass iclass, String name, IType type, int modifiers, List<Annotation> annotations)
-	{
-		super(iclass, name, type, modifiers, annotations);
-		if (name.equals("new"))
-		{
-			this.isConstructor = true;
-			this.qualifiedName = "<init>";
 		}
 	}
 	
@@ -120,31 +112,52 @@ public class Method extends Member implements IMethod
 	@Override
 	public void setGeneric()
 	{
-		this.generics = new ArrayList(2);
+		this.generics = new ITypeVariable[2];
 	}
 	
 	@Override
 	public boolean isGeneric()
 	{
-		return this.generics != null;
+		return this.genericCount > 0;
 	}
 	
 	@Override
-	public void setTypeVariables(List<ITypeVariable> list)
+	public int genericCount()
 	{
-		this.generics = list;
+		return this.genericCount;
 	}
 	
 	@Override
-	public List<ITypeVariable> getTypeVariables()
+	public void setTypeVariable(int index, ITypeVariable var)
 	{
-		return this.generics;
+		this.generics[index] = var;
 	}
 	
 	@Override
 	public void addTypeVariable(ITypeVariable var)
 	{
-		this.generics.add(var);
+		if (this.generics == null)
+		{
+			this.generics = new ITypeVariable[3];
+			this.generics[0] = var;
+			this.genericCount = 1;
+			return;
+		}
+		
+		int index = this.genericCount++;
+		if (this.genericCount > this.generics.length)
+		{
+			ITypeVariable[] temp = new ITypeVariable[this.genericCount];
+			System.arraycopy(this.generics, 0, temp, 0, index);
+			this.generics = temp;
+		}
+		this.generics[index] = var;
+	}
+	
+	@Override
+	public ITypeVariable getTypeVariable(int index)
+	{
+		return this.generics[index];
 	}
 	
 	@Override
@@ -160,39 +173,38 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void setParameters(List<Parameter> parameters)
+	public int parameterCount()
 	{
-		this.parameters = parameters;
+		return this.parameterCount;
 	}
 	
 	@Override
-	public List<Parameter> getParameters()
+	public void setParameter(int index, Parameter param)
 	{
-		return this.parameters;
+		this.parameters[index] = param;
 	}
 	
 	@Override
-	public void addParameter(Parameter parameter)
+	public void addParameter(Parameter param)
 	{
-		this.parameters.add(parameter);
-	}
-	
-	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		if (!this.processAnnotation(annotation))
+		int index = this.parameterCount++;
+		if (this.parameterCount > this.parameters.length)
 		{
-			annotation.target = ElementType.METHOD;
-			
-			if (this.annotations == null)
-			{
-				this.annotations = new ArrayList(2);
-			}
-			this.annotations.add(annotation);
+			Parameter[] temp = new Parameter[this.parameterCount];
+			System.arraycopy(this.parameters, 0, temp, 0, index);
+			this.parameters = temp;
 		}
+		this.parameters[index] = param;
 	}
 	
-	private boolean processAnnotation(Annotation annotation)
+	@Override
+	public Parameter getParameter(int index)
+	{
+		return this.parameters[index];
+	}
+	
+	@Override
+	public boolean processAnnotation(Annotation annotation)
 	{
 		String name = annotation.type.fullName;
 		switch (name)
@@ -232,6 +244,12 @@ public class Method extends Member implements IMethod
 			return true;
 		}
 		return false;
+	}
+	
+	@Override
+	public ElementType getAnnotationType()
+	{
+		return ElementType.METHOD;
 	}
 	
 	@Override
@@ -290,18 +308,17 @@ public class Method extends Member implements IMethod
 		int pOff = 0;
 		int match = 1;
 		int len = arguments.size();
-		List<Parameter> params = this.parameters;
 		
 		// infix modifier implementation
 		int mods = this.modifiers & Modifiers.INFIX;
 		if (instance != null && mods == Modifiers.INFIX)
 		{
-			if (len != params.size() - 1)
+			if (len != this.parameterCount - 1)
 			{
 				return 0;
 			}
 			
-			IType t2 = params.get(0).type;
+			IType t2 = this.parameters[0].type;
 			int m = instance.getTypeMatch(t2);
 			if (m == 0)
 			{
@@ -317,18 +334,18 @@ public class Method extends Member implements IMethod
 		}
 		else if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
-			int parCount = this.parameters.size() - 1;
+			int parCount = this.parameterCount - 1;
 			if (len <= parCount)
 			{
 				return 0;
 			}
 			
 			int m;
-			Parameter varParam = params.get(parCount);
+			Parameter varParam = this.parameters[parCount];
 			varParam.index = parCount;
 			for (int i = 0; i < parCount; i++)
 			{
-				Parameter par = params.get(i + pOff);
+				Parameter par = this.parameters[i + pOff];
 				par.index = i + pOff;
 				m = arguments.getTypeMatch(par);
 				if (m == 0)
@@ -348,14 +365,14 @@ public class Method extends Member implements IMethod
 			}
 			return match;
 		}
-		else if (len > params.size())
+		else if (len > this.parameterCount)
 		{
 			return 0;
 		}
 		
 		for (int i = 0; i < len; i++)
 		{
-			Parameter par = params.get(i + pOff);
+			Parameter par = this.parameters[i + pOff];
 			par.index = i;
 			int m = arguments.getTypeMatch(par);
 			if (m == 0)
@@ -373,13 +390,12 @@ public class Method extends Member implements IMethod
 	{
 		int pOff = 0;
 		int len = arguments.size();
-		List<Parameter> params = this.parameters;
 		Parameter par;
 		IType parType;
 		
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			par = params.get(0);
+			par = this.parameters[0];
 			parType = par.getType(typeContext);
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
@@ -408,15 +424,15 @@ public class Method extends Member implements IMethod
 		
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
-			len = this.parameters.size() - 1;
-			par = params.get(len);
+			len = this.parameterCount - 1;
+			par = this.parameters[len];
 			par.index = len;
 			arguments.checkVarargsValue(markers, par, typeContext);
 		}
 		
 		for (int i = 0; i < len; i++)
 		{
-			par = params.get(i + pOff);
+			par = this.parameters[i + pOff];
 			par.index = i;
 			arguments.checkValue(markers, par, typeContext);
 		}
@@ -429,17 +445,17 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IType resolveType(String name, IValue instance, IArguments arguments, List<IType> generics)
+	public IType resolveType(String name, IValue instance, IArguments arguments, ITypeList generics)
 	{
-		if (generics != null)
+		if (this.genericCount > 0)
 		{
-			int len = Math.min(this.generics.size(), generics.size());
+			int len = Math.min(this.genericCount, generics.typeCount());
 			for (int i = 0; i < len; i++)
 			{
-				ITypeVariable var = this.generics.get(i);
+				ITypeVariable var = this.generics[i];
 				if (var.isName(name))
 				{
-					return generics.get(i);
+					return generics.getType(i);
 				}
 			}
 		}
@@ -450,7 +466,7 @@ public class Method extends Member implements IMethod
 		Parameter param;
 		if (instance != null && mods == Modifiers.INFIX)
 		{
-			type = this.parameters.get(0).type.resolveType(name, instance.getType());
+			type = this.parameters[0].type.resolveType(name, instance.getType());
 			if (type != null)
 			{
 				return type;
@@ -458,7 +474,7 @@ public class Method extends Member implements IMethod
 			
 			for (int i = 0; i < len; i++)
 			{
-				param = this.parameters.get(i + 1);
+				param = this.parameters[i + 1];
 				type = param.type.resolveType(name, arguments.getType(param));
 				if (type != null)
 				{
@@ -478,10 +494,10 @@ public class Method extends Member implements IMethod
 				return type;
 			}
 		}
-		len = Math.min(this.parameters.size(), len);
+		len = Math.min(this.parameterCount, len);
 		for (int i = 0; i < len; i++)
 		{
-			param = this.parameters.get(i);
+			param = this.parameters[i];
 			type = param.type.resolveType(name, arguments.getType(param));
 			if (type != null)
 			{
@@ -494,15 +510,12 @@ public class Method extends Member implements IMethod
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		if (this.generics != null)
+		for (int i = 0; i < this.genericCount; i++)
 		{
-			for (ITypeVariable v : this.generics)
-			{
-				v.resolveTypes(markers, context);
-			}
+			this.generics[i].resolveTypes(markers, context);
 		}
 		
-		this.type = this.type.resolve(markers, this);
+		super.resolveTypes(markers, this);
 		
 		if (this.throwsDeclarations != null)
 		{
@@ -518,17 +531,9 @@ public class Method extends Member implements IMethod
 			}
 		}
 		
-		if (this.annotations != null)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			for (Annotation a : this.annotations)
-			{
-				a.resolveTypes(markers, context);
-			}
-		}
-		
-		for (Parameter p : this.parameters)
-		{
-			p.resolveTypes(markers, this);
+			this.parameters[i].resolveTypes(markers, this);
 		}
 		
 		if (this.value != null)
@@ -548,29 +553,20 @@ public class Method extends Member implements IMethod
 				IClass iclass = t.getTheClass();
 				if (iclass != null)
 				{
-					this.overrideMethod = iclass.getBody().getMethod(this.name, this.parameters);
+					this.overrideMethod = iclass.getBody().getMethod(this.name, this.parameters, this.parameterCount);
 				}
 			}
 		}
 		
-		Iterator<Annotation> iterator = this.annotations.iterator();
-		while (iterator.hasNext())
-		{
-			Annotation a = iterator.next();
-			if (this.processAnnotation(a))
-			{
-				iterator.remove();
-				continue;
-			}
-			a.resolve(markers, context);
-		}
+		super.resolve(markers, context);
 		
 		int index = this.hasModifier(Modifiers.STATIC) ? 0 : 1;
 		
-		for (Parameter p : this.parameters)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			p.index = index++;
-			p.resolve(markers, context);
+			Parameter param = this.parameters[i];
+			param.index = index++;
+			param.resolve(markers, context);
 		}
 		
 		if (this.value != null)
@@ -615,14 +611,11 @@ public class Method extends Member implements IMethod
 			}
 		}
 		
-		for (Annotation a : this.annotations)
-		{
-			a.check(markers, context);
-		}
+		super.check(markers, context);
 		
-		for (Parameter p : this.parameters)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			p.check(markers, context);
+			this.parameters[i].check(markers, context);
 		}
 		
 		if (this.value != null)
@@ -675,14 +668,11 @@ public class Method extends Member implements IMethod
 	@Override
 	public void foldConstants()
 	{
-		for (Annotation a : this.annotations)
-		{
-			a.foldConstants();
-		}
+		super.foldConstants();
 		
-		for (Parameter p : this.parameters)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			p.foldConstants();
+			this.parameters[i].foldConstants();
 		}
 		
 		if (this.value != null)
@@ -712,14 +702,12 @@ public class Method extends Member implements IMethod
 	@Override
 	public IClass resolveClass(String name)
 	{
-		if (this.generics != null)
+		for (int i = 0; i < this.genericCount; i++)
 		{
-			for (ITypeVariable var : this.generics)
+			ITypeVariable var = this.generics[i];
+			if (var.isName(name))
 			{
-				if (var.isName(name))
-				{
-					return var.getCaptureClass();
-				}
+				return var.getCaptureClass();
 			}
 		}
 		
@@ -729,8 +717,9 @@ public class Method extends Member implements IMethod
 	@Override
 	public FieldMatch resolveField(String name)
 	{
-		for (Parameter param : this.parameters)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
+			Parameter param = this.parameters[i];
 			if (param.isName(name))
 			{
 				return new FieldMatch(param, 1);
@@ -790,9 +779,9 @@ public class Method extends Member implements IMethod
 	{
 		StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
-		for (Parameter par : this.parameters)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			par.type.appendExtendedName(buffer);
+			this.parameters[i].type.appendExtendedName(buffer);
 		}
 		buffer.append(')');
 		if (this.isConstructor)
@@ -815,20 +804,20 @@ public class Method extends Member implements IMethod
 		}
 		
 		StringBuilder buffer = new StringBuilder();
-		if (this.generics != null)
+		if (this.genericCount > 0)
 		{
 			buffer.append('<');
-			for (ITypeVariable var : this.generics)
+			for (int i = 0; i < this.genericCount; i++)
 			{
-				var.appendSignature(buffer);
+				this.generics[i].appendSignature(buffer);
 			}
 			buffer.append('>');
 		}
 		
 		buffer.append('(');
-		for (Parameter par : this.parameters)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			par.type.appendSignature(buffer);
+			this.parameters[i].type.appendSignature(buffer);
 		}
 		buffer.append(')');
 		if (this.isConstructor)
@@ -884,12 +873,9 @@ public class Method extends Member implements IMethod
 			mw.addLocal(this.theClass.getType());
 		}
 		
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			for (Annotation annotation : this.annotations)
-			{
-				annotation.write(mw);
-			}
+			this.annotations[i].write(mw);
 		}
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
@@ -913,9 +899,9 @@ public class Method extends Member implements IMethod
 			mw.visitAnnotation("Ldyvil/lang/annotation/sealed;", false);
 		}
 		
-		for (Parameter param : this.parameters)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			param.write(mw);
+			this.parameters[i].write(mw);
 		}
 		
 		Label start = new Label();
@@ -930,15 +916,15 @@ public class Method extends Member implements IMethod
 			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);
 		}
 		
-		int index = 0;
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.visitLocalVariable("this", this.theClass.getType(), start, end, index++);
+			mw.visitLocalVariable("this", this.theClass.getType(), start, end, 0);
 		}
 		
-		for (Parameter param : this.parameters)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			mw.visitLocalVariable(param.qualifiedName, param.type, start, end, index++);
+			Parameter param = this.parameters[i];
+			mw.visitLocalVariable(param.qualifiedName, param.type, start, end, param.index);
 		}
 	}
 	
@@ -1024,10 +1010,9 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				int len = this.parameters.size();
-				for (int j = 0; j < len; j++)
+				for (int j = 0; j < this.parameterCount; j++)
 				{
-					arguments.writeValue(this.parameters.get(j), writer);
+					arguments.writeValue(this.parameters[j], writer);
 				}
 			}
 			else
@@ -1047,10 +1032,9 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				int len = this.parameters.size();
-				for (int j = 0; j < len; j++)
+				for (int j = 0; j < this.parameterCount; j++)
 				{
-					arguments.writeValue(this.parameters.get(j), writer);
+					arguments.writeValue(this.parameters[j], writer);
 				}
 			}
 			else if (Opcodes.isJumpOpcode(i))
@@ -1074,10 +1058,9 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				int len = this.parameters.size();
-				for (int j = 0; j < len; j++)
+				for (int j = 0; j < this.parameterCount; j++)
 				{
-					arguments.writeValue(this.parameters.get(j), writer);
+					arguments.writeValue(this.parameters[j], writer);
 				}
 			}
 			else if (Opcodes.isJumpOpcode(i))
@@ -1100,12 +1083,11 @@ public class Method extends Member implements IMethod
 			args = 1;
 		}
 		
-		int len = this.parameters.size();
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			arguments.writeValue(this.parameters.get(i), writer);
+			arguments.writeValue(this.parameters[i], writer);
 		}
-		args += len;
+		args += this.parameterCount;
 		
 		int opcode;
 		int modifiers = this.modifiers;
@@ -1158,14 +1140,16 @@ public class Method extends Member implements IMethod
 			buffer.append(this.name);
 		}
 		
-		if (this.generics != null && !this.generics.isEmpty())
+		if (this.genericCount > 0)
 		{
 			buffer.append('[');
-			Util.astToString(prefix, this.generics, Formatting.Type.genericSeperator, buffer);
+			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
 		}
 		
-		Util.parametersToString(prefix, this.parameters, buffer, true);
+		buffer.append(Formatting.Method.parametersStart);
+		Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
+		buffer.append(Formatting.Method.parametersEnd);
 		
 		if (this.throwsDeclarations != null && !this.throwsDeclarations.isEmpty())
 		{

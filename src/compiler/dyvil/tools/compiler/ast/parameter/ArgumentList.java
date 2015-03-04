@@ -3,8 +3,8 @@ package dyvil.tools.compiler.ast.parameter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
+import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -35,26 +35,7 @@ public final class ArgumentList implements IArguments, IValueList, IASTNode
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new Iterator()
-		{
-			private int	index	= 0;
-			
-			@Override
-			public Object next()
-			{
-				if (this.index >= ArgumentList.this.size)
-				{
-					throw new NoSuchElementException("ParameterListIterator.next()");
-				}
-				return ArgumentList.this.values[this.index++];
-			}
-			
-			@Override
-			public boolean hasNext()
-			{
-				return this.index < ArgumentList.this.size;
-			}
-		};
+		return new ArrayIterator(this.values, this.size);
 	}
 	
 	@Override

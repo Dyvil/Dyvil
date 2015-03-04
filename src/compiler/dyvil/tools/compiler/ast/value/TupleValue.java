@@ -197,8 +197,9 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		Util.parametersToString(prefix, this.values, buffer, true, Formatting.Expression.emptyTuple, Formatting.Expression.tupleStart,
-				Formatting.Expression.tupleSeperator, Formatting.Expression.tupleEnd);
+		buffer.append(Formatting.Expression.tupleStart);
+		Util.astToString(prefix, this.values, Formatting.Expression.tupleSeperator, buffer);
+		buffer.append(Formatting.Expression.tupleEnd);
 	}
 	
 	@Override

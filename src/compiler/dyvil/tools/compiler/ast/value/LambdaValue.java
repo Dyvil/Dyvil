@@ -13,8 +13,8 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -32,7 +32,7 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class LambdaValue extends ASTNode implements IValue, IBaseMethod, ITypeContext
+public final class LambdaValue extends ASTNode implements IValue, IValued, IClassCompilable, IContext, ITypeContext
 {
 	public static final Handle		BOOTSTRAP	= new Handle(Opcodes.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
 														"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
@@ -111,7 +111,7 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod, I
 			LambdaType lt = new LambdaType();
 			for (LambdaParameter param : this.parameters)
 			{
-				lt.argumentTypes.add(param.type == null ? Type.NONE : param.type);
+				lt.addType(param.type == null ? Type.NONE : param.type);
 			}
 			lt.returnType = this.value.getType();
 			this.type = lt;
@@ -140,16 +140,15 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod, I
 			return false;
 		}
 		
-		List<Parameter> params = method.getParameters();
 		int len = this.parameters.size();
-		if (len != params.size())
+		if (len != method.parameterCount())
 		{
 			return false;
 		}
 		for (int i = 0; i < len; i++)
 		{
 			LambdaParameter lambdaParam = this.parameters.get(i);
-			Parameter param = params.get(i);
+			Parameter param = method.getParameter(i);
 			if (lambdaParam.type == null)
 			{
 				lambdaParam.type = param.type;
@@ -227,12 +226,11 @@ public final class LambdaValue extends ASTNode implements IValue, IBaseMethod, I
 			{
 				this.returnType = this.method.getType(this);
 				
-				List<Parameter> parameters = this.method.getParameters();
 				int len = this.parameters.size();
 				for (int i = 0; i < len; i++)
 				{
 					LambdaParameter param = this.parameters.get(i);
-					param.baseType = parameters.get(i).type;
+					param.baseType = method.getParameter(i).type;
 					param.type = param.type.getConcreteType(this);
 				}
 			}

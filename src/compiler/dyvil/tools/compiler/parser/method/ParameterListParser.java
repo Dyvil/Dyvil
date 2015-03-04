@@ -1,14 +1,12 @@
 package dyvil.tools.compiler.parser.method;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.member.IAnnotated;
+import dyvil.tools.compiler.ast.member.IAnnotationList;
 import dyvil.tools.compiler.ast.parameter.IParameterized;
 import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.Parser;
@@ -20,7 +18,7 @@ import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public class ParameterListParser extends Parser implements IAnnotated, ITyped
+public class ParameterListParser extends Parser implements IAnnotationList, ITyped
 {
 	public static final int		TYPE		= 1;
 	public static final int		NAME		= 2;
@@ -29,7 +27,9 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 	protected IParameterized	parameterized;
 	
 	private int					modifiers;
-	private List<Annotation>	annotations;
+	private Annotation[]		annotations	= new Annotation[2];
+	private int					annotationCount;
+	
 	private IType				type;
 	private Parameter			parameter;
 	private boolean				varargs;
@@ -44,7 +44,6 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 	{
 		this.mode = TYPE;
 		this.modifiers = 0;
-		this.annotations = new ArrayList();
 	}
 	
 	@Override
@@ -85,7 +84,9 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.parameter = new Parameter(0, token.value(), this.type, this.modifiers, this.annotations);
+				this.parameter = new Parameter(0, token.value(), this.type);
+				this.parameter.modifiers = this.modifiers;
+				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.parameterized.addParameter(this.parameter);
 				
 				if (this.varargs)
@@ -125,12 +126,45 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 	}
 	
 	@Override
-	public void setAnnotations(List<Annotation> annotations)
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+	
+	private Annotation[] getAnnotations()
+	{
+		Annotation[] a = new Annotation[annotationCount];
+		System.arraycopy(this.annotations, 0, a, 0, this.annotationCount);
+		return a;
+	}
+	
+	@Override
+	public void addAnnotation(Annotation annotation)
+	{
+		int index = this.annotationCount++;
+		if (this.annotationCount > this.annotations.length)
+		{
+			Annotation[] temp = new Annotation[this.annotationCount];
+			System.arraycopy(this.annotations, 0, temp, 0, index);
+			this.annotations = temp;
+		}
+		this.annotations[index] = annotation;
+	}
+	
+	// Override Methods
+	
+	@Override
+	public void setAnnotation(int index, Annotation annotation)
 	{
 	}
 	
 	@Override
-	public List<Annotation> getAnnotations()
+	public void removeAnnotation(int index)
+	{
+	}
+	
+	@Override
+	public Annotation getAnnotation(int index)
 	{
 		return null;
 	}
@@ -142,19 +176,7 @@ public class ParameterListParser extends Parser implements IAnnotated, ITyped
 	}
 	
 	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		this.annotations.add(annotation);
-	}
-	
-	@Override
-	public void setType(IType type)
-	{
-		this.type = type;
-	}
-	
-	@Override
-	public IType getType()
+	public Type getType()
 	{
 		return null;
 	}

@@ -7,7 +7,7 @@ import java.util.List;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.method.IBaseMethod;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -26,7 +26,7 @@ public final class ClassBody extends ASTNode
 	public List<IMethod>		methods		= new ArrayList();
 	public List<IProperty>		properties	= new ArrayList();
 	
-	public List<IBaseMethod>	lambdas;
+	public List<IClassCompilable>	lambdas;
 	
 	public ClassBody(ICodePosition position)
 	{
@@ -117,7 +117,7 @@ public final class ClassBody extends ASTNode
 		return null;
 	}
 	
-	public IMethod getMethod(String name, List<Parameter> parameters)
+	public IMethod getMethod(String name, Parameter[] parameters, int parameterCount)
 	{
 		outer:
 		for (IMethod method : this.methods)
@@ -127,17 +127,15 @@ public final class ClassBody extends ASTNode
 				continue;
 			}
 			
-			List<Parameter> parameters2 = method.getParameters();
-			int len = parameters.size();
-			if (len != parameters2.size())
+			if (parameterCount != method.parameterCount())
 			{
 				continue;
 			}
 			
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < parameterCount; i++)
 			{
-				Parameter par1 = parameters.get(i);
-				Parameter par2 = parameters2.get(i);
+				Parameter par1 = parameters[i];
+				Parameter par2 = method.getParameter(i);
 				if (!par1.getType().equals(par2.getType()))
 				{
 					continue outer;
@@ -148,7 +146,7 @@ public final class ClassBody extends ASTNode
 		return null;
 	}
 	
-	public void addLambda(IBaseMethod lambda)
+	public void addLambda(IClassCompilable lambda)
 	{
 		if (this.lambdas == null)
 		{

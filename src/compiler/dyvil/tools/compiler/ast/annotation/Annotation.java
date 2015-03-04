@@ -35,6 +35,11 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	public Map<String, IValue>	parameters	= new HashMap();
 	public ElementType			target;
 	
+	public Annotation(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
 	public Annotation(ICodePosition position, AnnotationType type)
 	{
 		this.position = position;

@@ -3,7 +3,7 @@ package dyvil.tools.compiler.backend;
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.constant.EnumValue;
-import dyvil.tools.compiler.ast.member.IAnnotated;
+import dyvil.tools.compiler.ast.member.IAnnotationList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -12,10 +12,10 @@ import dyvil.tools.compiler.ast.value.ValueList;
 
 public class AnnotationVisitorImpl extends AnnotationVisitor
 {
-	private IAnnotated	annotated;
+	private IAnnotationList	annotated;
 	private Annotation	annotation;
 	
-	public AnnotationVisitorImpl(int api, IAnnotated annotated, Annotation annotation)
+	public AnnotationVisitorImpl(int api, IAnnotationList annotated, Annotation annotation)
 	{
 		super(api);
 		this.annotated = annotated;

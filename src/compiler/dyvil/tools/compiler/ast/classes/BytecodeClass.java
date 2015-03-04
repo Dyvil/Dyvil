@@ -62,13 +62,13 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public List<ITypeVariable> getTypeVariables()
+	public ITypeVariable getTypeVariable(int index)
 	{
 		if (!this.typesResolved)
 		{
 			this.resolveTypes(null, Package.rootPackage);
 		}
-		return super.getTypeVariables();
+		return super.getTypeVariable(index);
 	}
 	
 	@Override
@@ -111,12 +111,9 @@ public class BytecodeClass extends CodeClass
 			}
 		}
 		
-		if (this.annotations != null)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			for (Annotation a : this.annotations)
-			{
-				a.resolveTypes(markers, context);
-			}
+			this.annotations[i].resolveTypes(markers, context);
 		}
 		
 		this.body.resolveTypes(markers, this);
@@ -279,8 +276,10 @@ public class BytecodeClass extends CodeClass
 		IProperty property = this.body.getProperty(name);
 		if (property == null)
 		{
-			property = new Property(this, name, method.getType(), method.getModifiers() & ~Modifiers.SYNTHETIC, method.getAnnotations());
-			this.body.addProperty(property);
+			Property prop = new Property(this, name, method.getType());
+			prop.modifiers = method.getModifiers() & ~Modifiers.SYNTHETIC;
+			this.body.addProperty(prop);
+			return prop;
 		}
 		return property;
 	}
@@ -312,7 +311,7 @@ public class BytecodeClass extends CodeClass
 		
 		if (signature != null)
 		{
-			this.generics = new ArrayList(3);
+			this.generics = new ITypeVariable[2];
 			ClassFormat.readClassSignature(signature, this);
 		}
 		else
@@ -387,11 +386,10 @@ public class BytecodeClass extends CodeClass
 			ClassFormat.readMethodType(desc, method);
 		}
 		
-		List<Parameter> parameters = method.getParameters();
-		
+		int parCount = method.parameterCount();
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			Parameter param = parameters.get(parameters.size() - 1);
+			Parameter param = method.getParameter(parCount - 1);
 			param.setVarargs2();
 		}
 		
@@ -415,7 +413,7 @@ public class BytecodeClass extends CodeClass
 			@Override
 			public void visitParameter(String name, int index)
 			{
-				parameters.get(index).setName(name);
+				method.getParameter(index).setName(name);
 			}
 			
 			@Override
@@ -423,16 +421,16 @@ public class BytecodeClass extends CodeClass
 			{
 				if ((access & Modifiers.STATIC) == 0)
 				{
-					if (index != 0 && index <= parameters.size())
+					if (index != 0 && index <= parCount)
 					{
-						parameters.get(index - 1).setName(name);
+						method.getParameter(index - 1).setName(name);
 					}
 					return;
 				}
 				
-				if (index < parameters.size())
+				if (index < parCount)
 				{
-					parameters.get(index).setName(name);
+					method.getParameter(index).setName(name);
 				}
 			}
 			

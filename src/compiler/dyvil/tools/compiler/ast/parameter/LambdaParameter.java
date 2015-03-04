@@ -4,7 +4,6 @@ import java.lang.annotation.ElementType;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -67,24 +66,15 @@ public class LambdaParameter extends Member implements IVariable
 	}
 	
 	@Override
-	public void addAnnotation(Annotation annotation)
+	public boolean processAnnotation(Annotation annotation)
 	{
-		if (!this.processAnnotation(annotation))
-		{
-			annotation.target = ElementType.PARAMETER;
-			this.annotations.add(annotation);
-		}
+		return false;
 	}
 	
-	private boolean processAnnotation(Annotation annotation)
+	@Override
+	public ElementType getAnnotationType()
 	{
-		String name = annotation.type.fullName;
-		if ("dyvil.lang.annotation.byref".equals(name))
-		{
-			this.modifiers |= Modifiers.BYREF;
-			return true;
-		}
-		return false;
+		return null;
 	}
 	
 	@Override

@@ -4,7 +4,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class ASTNode implements IASTNode
 {
-	protected ICodePosition	position;
+	public ICodePosition	position;
 	
 	@Override
 	public void setPosition(ICodePosition position)
