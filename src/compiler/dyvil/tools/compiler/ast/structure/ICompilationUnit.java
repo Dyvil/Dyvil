@@ -13,7 +13,7 @@ public interface ICompilationUnit extends IASTNode
 	
 	public void tokenize();
 	
-	public boolean parse();
+	public void parse();
 	
 	public void resolveTypes();
 	

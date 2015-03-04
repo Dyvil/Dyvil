@@ -19,6 +19,8 @@ import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.phase.CompilerPhase;
+import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.util.Util;
 
 public final class DyvilCompiler
@@ -37,7 +39,7 @@ public final class DyvilCompiler
 	public static DateFormat				format			= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public static CompilerConfig			config			= new CompilerConfig();
-	public static Set<CompilerPhase>		states			= new TreeSet();
+	public static Set<ICompilerPhase>		states			= new TreeSet();
 	
 	public static ParserManager				configParser	= new ParserManager();
 	public static List<File>				files			= new ArrayList();
@@ -45,13 +47,13 @@ public final class DyvilCompiler
 	
 	public static void main(String[] args)
 	{
+		long now = System.nanoTime();
+		
 		// Sets up States from arguments
 		for (int i = 1; i < args.length; i++)
 		{
 			addStates(args[i]);
 		}
-		
-		long now = System.nanoTime();
 		
 		// Sets up the logger
 		initLogger();
@@ -68,8 +70,15 @@ public final class DyvilCompiler
 		logger.info("Dyvil Compiler " + VERSION + " for Dyvil " + DYVIL_VERSION);
 		logger.info("");
 		
+		if (debug)
+		{
+			logger.fine("Startup Time: " + ((System.nanoTime() - now) / 1000000L) + " ms");
+		}
+		
 		if (DyvilCompiler.states.contains(CompilerPhase.RESOLVE_TYPES))
 		{
+			now = System.nanoTime();
+			
 			// Loads libraries
 			for (Library library : config.libraries)
 			{
@@ -106,7 +115,7 @@ public final class DyvilCompiler
 		// Apply states
 		if (debug)
 		{
-			for (CompilerPhase state : DyvilCompiler.states)
+			for (ICompilerPhase state : DyvilCompiler.states)
 			{
 				DyvilCompiler.logger.info("Applying State " + state.getName());
 				long now1 = System.nanoTime();
@@ -116,7 +125,7 @@ public final class DyvilCompiler
 		}
 		else
 		{
-			for (CompilerPhase state : DyvilCompiler.states)
+			for (ICompilerPhase state : DyvilCompiler.states)
 			{
 				state.apply(units);
 			}

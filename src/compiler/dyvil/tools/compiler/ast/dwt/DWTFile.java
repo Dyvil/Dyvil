@@ -91,7 +91,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	}
 	
 	@Override
-	public boolean parse()
+	public void parse()
 	{
 		ParserManager manager = new ParserManager(new DWTParser(this.rootNode));
 		manager.parse(this.inputFile, this.tokens);
@@ -110,9 +110,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 			}
 			DyvilCompiler.logger.info(buffer.toString());
 			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
-			return false;
 		}
-		return true;
 	}
 	
 	@Override

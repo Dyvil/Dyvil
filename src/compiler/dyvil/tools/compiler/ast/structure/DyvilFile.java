@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import dyvil.tools.compiler.CompilerPhase;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.ClassBody;
@@ -26,6 +25,7 @@ import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
+import dyvil.tools.compiler.phase.CompilerPhase;
 
 public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 {
@@ -142,7 +142,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 	}
 	
 	@Override
-	public boolean parse()
+	public void parse()
 	{
 		ParserManager manager = new ParserManager(new CompilationUnitParser(this));
 		manager.semicolonInference = true;
@@ -167,9 +167,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 			{
 				DyvilCompiler.logger.info("Code:\n" + this.toString());
 			}
-			return false;
 		}
-		return true;
 	}
 	
 	@Override
