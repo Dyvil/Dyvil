@@ -24,7 +24,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator(this.values);
+		return new ArrayIterator(this.values, this.size);
 	}
 	
 	public Iterator<KeyValuePair> entryIterator()

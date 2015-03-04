@@ -369,7 +369,7 @@ public class Method extends Member implements IMethod
 			return 0;
 		}
 		
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
 			Parameter par = this.parameters[i + pOff];
 			par.index = i;
@@ -429,7 +429,7 @@ public class Method extends Member implements IMethod
 			arguments.checkVarargsValue(markers, par, typeContext);
 		}
 		
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
 			par = this.parameters[i + pOff];
 			par.index = i;

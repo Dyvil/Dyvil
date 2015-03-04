@@ -76,14 +76,15 @@ public class BytecodeClass extends CodeClass
 	{
 		this.typesResolved = true;
 		
-		if (this.generics != null)
+		if (this.genericCount > 0)
 		{
 			GenericType type = new GenericType(this);
 			
-			for (ITypeVariable v : this.generics)
+			for (int i = 0; i < this.genericCount; i++)
 			{
-				v.resolveTypes(markers, context);
-				type.addType(new WildcardType(null, 0, v.getCaptureClass()));
+				ITypeVariable var = this.generics[i];
+				var.resolveTypes(markers, context);
+				type.addType(new WildcardType(null, 0, var.getCaptureClass()));
 			}
 			
 			this.type = type;
@@ -157,14 +158,12 @@ public class BytecodeClass extends CodeClass
 			this.resolveTypes(null, Package.rootPackage);
 		}
 		
-		if (this.generics != null)
+		for (int i = 0; i < this.genericCount; i++)
 		{
-			for (ITypeVariable var : this.generics)
+			ITypeVariable var = this.generics[i];
+			if (var.isName(name))
 			{
-				if (var.isName(name))
-				{
-					return var.getCaptureClass();
-				}
+				return var.getCaptureClass();
 			}
 		}
 		

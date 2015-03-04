@@ -172,7 +172,12 @@ public final class ArgumentList implements IArguments, IValueList, IASTNode
 			}
 			return;
 		}
-		this.values[param.index].writeExpression(writer);
+		if (param.index < this.size)
+		{
+			this.values[param.index].writeExpression(writer);
+			return;
+		}
+		param.defaultValue.writeExpression(writer);
 	}
 	
 	@Override
@@ -233,9 +238,9 @@ public final class ArgumentList implements IArguments, IValueList, IASTNode
 	@Override
 	public int getTypeMatch(Parameter param)
 	{
-		if (param.index > this.size)
+		if (param.index >= this.size)
 		{
-			return 0;
+			return param.defaultValue != null ? 3 : 0;
 		}
 		
 		return this.values[param.index].getTypeMatch(param.type);

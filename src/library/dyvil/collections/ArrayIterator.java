@@ -12,6 +12,7 @@ public final class ArrayIterator<E> implements Iterator<E>
 	public ArrayIterator(E[] array)
 	{
 		this.array = array;
+		this.size = array.length;
 	}
 	
 	public ArrayIterator(E[] array, int size)

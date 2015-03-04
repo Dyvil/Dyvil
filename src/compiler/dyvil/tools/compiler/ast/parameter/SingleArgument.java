@@ -101,13 +101,20 @@ public class SingleArgument implements IArguments, IValued
 		if (param.index == 0)
 		{
 			this.value.writeExpression(writer);
+			return;
 		}
+		
+		param.defaultValue.writeExpression(writer);
 	}
 	
 	@Override
 	public int getTypeMatch(Parameter param)
 	{
-		return param.index == 0 ? this.value.getTypeMatch(param.type) : 0;
+		if (param.index == 0)
+		{
+			return this.value.getTypeMatch(param.type);
+		}
+		return param.defaultValue != null ? 3 : 0;
 	}
 	
 	@Override

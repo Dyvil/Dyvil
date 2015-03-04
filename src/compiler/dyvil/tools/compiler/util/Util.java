@@ -117,6 +117,11 @@ public class Util
 	public static void typesToString(String prefix, Iterable<? extends ITyped> list, String seperator, StringBuilder buffer)
 	{
 		Iterator<? extends ITyped> iterator = list.iterator();
+		if (!iterator.hasNext())
+		{
+			return;
+		}
+		
 		while (true)
 		{
 			IType type = iterator.next().getType();
