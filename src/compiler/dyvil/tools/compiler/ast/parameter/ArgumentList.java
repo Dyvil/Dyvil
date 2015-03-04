@@ -131,7 +131,7 @@ public final class ArgumentList implements IArguments, IValueList, IASTNode
 	@Override
 	public IValue getValue(int index)
 	{
-		if (index > this.size)
+		if (index >= this.size)
 		{
 			return null;
 		}
@@ -183,10 +183,11 @@ public final class ArgumentList implements IArguments, IValueList, IASTNode
 	@Override
 	public void checkValue(List<Marker> markers, Parameter param, ITypeContext context)
 	{
-		if (param.index > this.size)
+		if (param.index >= this.size)
 		{
 			return;
 		}
+		
 		IType type = param.type.getConcreteType(context);
 		IValue value = this.values[param.index];
 		IValue value1 = value.withType(type);
@@ -249,7 +250,7 @@ public final class ArgumentList implements IArguments, IValueList, IASTNode
 	@Override
 	public int getVarargsTypeMatch(Parameter param)
 	{
-		if (param.index > this.size)
+		if (param.index >= this.size)
 		{
 			return 0;
 		}

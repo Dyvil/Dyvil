@@ -6,6 +6,7 @@ import java.util.ListIterator;
 
 import jdk.internal.org.objectweb.asm.*;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -265,6 +266,17 @@ public class BytecodeClass extends CodeClass
 		{
 			IProperty property = this.getProperty(name, method);
 			property.setSetterMethod(method);
+			return false;
+		}
+		if ("parDefault".equals(specialType))
+		{
+			int i = name.indexOf('$');
+			IMethod method1 = this.body.getMethod(name.substring(0, i));
+			int parIndex = Integer.parseInt(name.substring(i + 1));
+			
+			MethodCall call = new MethodCall(null);
+			call.method = method;
+			method1.getParameter(parIndex).defaultValue = call;
 			return false;
 		}
 		return true;

@@ -1008,14 +1008,6 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				iclass.writeInnerClassInfo(writer);
 			}
-			
-			if (this.body.lambdas != null)
-			{
-				for (IClassCompilable m : this.body.lambdas)
-				{
-					m.write(writer);
-				}
-			}
 		}
 		else
 		{
@@ -1084,6 +1076,14 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			String name = m.getName();
 			m.write(writer);
+		}
+		
+		if (this.body != null && this.body.compilables != null)
+		{
+			for (IClassCompilable m : this.body.compilables)
+			{
+				m.write(writer);
+			}
 		}
 		
 		if ((this.modifiers & Modifiers.CASE_CLASS) != 0)

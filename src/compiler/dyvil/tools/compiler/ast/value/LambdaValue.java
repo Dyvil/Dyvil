@@ -211,8 +211,8 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 			ClassBody body = iclass.getBody();
 			if (body != null)
 			{
-				body.addLambda(this);
-				this.index = body.lambdas.size() - 1;
+				body.addCompilable(this);
+				this.index = body.compilables.size() - 1;
 			}
 		}
 		

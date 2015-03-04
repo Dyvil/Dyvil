@@ -26,7 +26,7 @@ public final class ClassBody extends ASTNode
 	public List<IMethod>		methods		= new ArrayList();
 	public List<IProperty>		properties	= new ArrayList();
 	
-	public List<IClassCompilable>	lambdas;
+	public List<IClassCompilable>	compilables;
 	
 	public ClassBody(ICodePosition position)
 	{
@@ -146,13 +146,13 @@ public final class ClassBody extends ASTNode
 		return null;
 	}
 	
-	public void addLambda(IClassCompilable lambda)
+	public void addCompilable(IClassCompilable compilable)
 	{
-		if (this.lambdas == null)
+		if (this.compilables == null)
 		{
-			this.lambdas = new ArrayList(2);
+			this.compilables = new ArrayList(2);
 		}
-		this.lambdas.add(lambda);
+		this.compilables.add(compilable);
 	}
 	
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)

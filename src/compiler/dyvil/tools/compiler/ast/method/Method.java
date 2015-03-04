@@ -182,6 +182,7 @@ public class Method extends Member implements IMethod
 	public void setParameter(int index, Parameter param)
 	{
 		this.parameters[index] = param;
+		param.method = this;
 	}
 	
 	@Override
@@ -195,6 +196,7 @@ public class Method extends Member implements IMethod
 			this.parameters = temp;
 		}
 		this.parameters[index] = param;
+		param.method = this;
 	}
 	
 	@Override
@@ -573,6 +575,11 @@ public class Method extends Member implements IMethod
 			Parameter param = this.parameters[i];
 			param.index = index++;
 			param.resolve(markers, context);
+			
+			if (param.defaultValue != null)
+			{
+				this.theClass.getBody().addCompilable(param);
+			}
 		}
 		
 		if (this.value != null)

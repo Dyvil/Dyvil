@@ -7,7 +7,9 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -16,8 +18,10 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 
-public class Parameter extends Member implements IVariable
+public class Parameter extends Member implements IVariable, IClassCompilable
 {
+	public IMethod	method;
+	
 	public int		index;
 	public char		seperator;
 	public boolean	varargs;
@@ -165,6 +169,17 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void write(ClassWriter writer)
 	{
+		if (this.defaultValue == null)
+		{
+			return;
+		}
+		
+		String name = "parDefault$" + this.method.getQualifiedName() + "$" + this.index;
+		String desc = "()" + this.type.getExtendedName();
+		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name, desc, null, null));
+		mw.visitCode();
+		this.defaultValue.writeExpression(mw);
+		mw.visitEnd(this.type);
 	}
 	
 	public void write(MethodWriter writer)
