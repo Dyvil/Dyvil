@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.value;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -18,19 +18,22 @@ import dyvil.tools.compiler.util.Util;
 
 public class TupleValue extends ASTNode implements IValue, IValueList
 {
-	private List<IValue>	values;
-	private TupleType		tupleType;
+	private IValue[]	values;
+	private int			valueCount;
+	
+	private TupleType	tupleType;
 	
 	public TupleValue(ICodePosition position)
 	{
 		this.position = position;
-		this.values = new ArrayList(3);
+		this.values = new IValue[3];
 	}
 	
-	public TupleValue(ICodePosition position, List<IValue> values)
+	public TupleValue(ICodePosition position, IValue[] values)
 	{
 		this.position = position;
 		this.values = values;
+		this.valueCount = values.length;
 	}
 	
 	@Override
@@ -46,48 +49,68 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public Iterator<IValue> iterator()
+	{
+		return new ArrayIterator(this.values);
+	}
+	
+	@Override
+	public int valueCount()
+	{
+		return this.valueCount;
+	}
+	
+	@Override
+	public boolean isEmpty()
+	{
+		return this.valueCount == 0;
+	}
+	
+	@Override
 	public void setValue(int index, IValue value)
 	{
-		this.values.set(index, value);
+		this.values[index] = value;
 	}
 	
 	@Override
 	public void addValue(IValue value)
 	{
-		this.values.add(value);
+		int index = this.valueCount++;
+		if (this.valueCount > this.values.length)
+		{
+			IValue[] temp = new IValue[this.valueCount];
+			System.arraycopy(this.values, 0, temp, 0, index);
+			this.values = temp;
+		}
+		this.values[index] = value;
 	}
 	
 	@Override
 	public void addValue(int index, IValue value)
 	{
-		this.values.add(index, value);
+		int i = this.valueCount++;
+		System.arraycopy(this.values, index, this.values, index + 1, i - index + 1);
+		this.values[index] = value;
 	}
 	
 	@Override
 	public IValue getValue(int index)
 	{
-		return this.values.get(index);
-	}
-	
-	@Override
-	public Iterator<IValue> iterator()
-	{
-		return this.values.iterator();
+		return this.values[index];
 	}
 	
 	@Override
 	public IType getType()
 	{
-		int len = this.values.size();
 		if (this.tupleType != null)
 		{
 			return this.tupleType;
 		}
 		
-		TupleType t = new TupleType(len);
-		for (int i = 0; i < len; i++)
+		TupleType t = new TupleType(this.valueCount);
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v = this.values.get(i);
+			IValue v = this.values[i];
 			t.addType(v.getType());
 		}
 		return this.tupleType = t;
@@ -102,9 +125,9 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public boolean isType(IType type)
 	{
-		if (this.values.size() == 1)
+		if (this.valueCount == 1)
 		{
-			return this.values.get(0).isType(type);
+			return this.values[0].isType(type);
 		}
 		
 		IType type1 = this.getType();
@@ -114,9 +137,9 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (this.values.size() == 1)
+		if (this.valueCount == 1)
 		{
-			return this.values.get(0).getTypeMatch(type);
+			return this.values[0].getTypeMatch(type);
 		}
 		
 		IType t = this.getType();
@@ -151,20 +174,14 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		if (this.values.size() == 1)
+		if (this.valueCount == 1)
 		{
-			return this.values.get(0).resolve(markers, context);
+			return this.values[0].resolve(markers, context);
 		}
 		
-		int len = this.values.size();
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v1 = this.values.get(i);
-			IValue v2 = v1.resolve(markers, context);
-			if (v1 != v2)
-			{
-				this.values.set(i, v2);
-			}
+			this.values[i] = this.values[i].resolve(markers, context);
 		}
 		return this;
 	}
@@ -181,15 +198,9 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public IValue foldConstants()
 	{
-		int len = this.values.size();
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v1 = this.values.get(i);
-			IValue v2 = v1.foldConstants();
-			if (v1 != v2)
-			{
-				this.values.set(i, v2);
-			}
+			this.values[i] = this.values[i].foldConstants();
 		}
 		return this;
 	}
@@ -198,7 +209,7 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Expression.tupleStart);
-		Util.astToString(prefix, this.values, Formatting.Expression.tupleSeperator, buffer);
+		Util.astToString(prefix, this.values, this.valueCount, Formatting.Expression.tupleSeperator, buffer);
 		buffer.append(Formatting.Expression.tupleEnd);
 	}
 	
@@ -214,10 +225,9 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 			v.writeExpression(writer);
 		}
 		
-		int args = this.values.size() + 1;
 		String owner = t.getInternalName();
 		String desc = t.getConstructorDescriptor();
-		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false, args, t);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false, this.valueCount + 1, t);
 	}
 	
 	@Override

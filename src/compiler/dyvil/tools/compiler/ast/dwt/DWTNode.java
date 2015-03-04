@@ -27,7 +27,7 @@ import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class DWTNode extends ASTNode implements IValue, INamed, IValueMap<String>
+public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 {
 	public static final int		NODE		= 256;
 	public static final int		LIST		= 257;

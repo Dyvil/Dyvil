@@ -50,7 +50,7 @@ public class AnnotationParser extends Parser
 		{
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ExpressionMapParser(this.annotation));
+				pm.pushParser(new ExpressionMapParser(this.annotation.arguments));
 				this.mode = PARAMETERS_END;
 				return;
 			}

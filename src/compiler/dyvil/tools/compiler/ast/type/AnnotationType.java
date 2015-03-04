@@ -80,7 +80,7 @@ public class AnnotationType extends Type
 			Annotation retention = this.theClass.getAnnotation(Type.ARetention);
 			if (retention != null)
 			{
-				EnumValue value = (EnumValue) retention.getValue("value");
+				EnumValue value = (EnumValue) retention.arguments.getValue("value");
 				this.retention = RetentionPolicy.valueOf(value.name);
 			}
 		}
@@ -90,7 +90,7 @@ public class AnnotationType extends Type
 			Annotation target = this.theClass.getAnnotation(Type.ATarget);
 			if (target != null)
 			{
-				IValueList values = (IValueList) target.getValue("value");
+				IValueList values = (IValueList) target.arguments.getValue("value");
 				if (values != null)
 				{
 					for (IValue v : values)

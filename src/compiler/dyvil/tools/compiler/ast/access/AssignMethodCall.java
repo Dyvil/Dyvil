@@ -25,6 +25,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.util.Util;
 
 public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeContext, INamed
 {
@@ -185,7 +186,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		marker.addInfo("Qualified Name: " + this.qualifiedName);
 		marker.addInfo("Instance Type: " + this.instance.getType());
 		StringBuilder builder = new StringBuilder("Argument Types: [");
-		// FIXME Util.typesToString("", this.arguments, ", ", builder);
+		Util.typesToString("", this.arguments, ", ", builder);
 		marker.addInfo(builder.append(']').toString());
 		markers.add(marker);
 		return this;

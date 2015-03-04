@@ -1,10 +1,11 @@
 package dyvil.tools.compiler.ast.value;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -18,7 +19,8 @@ import dyvil.tools.compiler.util.Util;
 
 public class ValueList extends ASTNode implements IValue, IValueList
 {
-	public List<IValue>	values;
+	protected IValue[]	values;
+	protected int		valueCount;
 	
 	protected boolean	isArray;
 	protected IType		requiredType;
@@ -27,21 +29,22 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	public ValueList(ICodePosition position)
 	{
 		this.position = position;
-		this.values = new ArrayList(3);
+		this.values = new IValue[3];
 	}
 	
 	public ValueList(ICodePosition position, boolean array)
 	{
 		this.position = position;
 		this.isArray = array;
-		this.values = new ArrayList(3);
+		this.values = new IValue[3];
 	}
 	
-	public ValueList(ICodePosition position, List<IValue> values, IType type, IType elementType)
+	public ValueList(ICodePosition position, IValue[] values, IType type, IType elementType)
 	{
 		this.position = position;
 		this.isArray = true;
 		this.values = values;
+		this.valueCount = values.length;
 		this.requiredType = type;
 		this.elementType = elementType;
 	}
@@ -55,9 +58,9 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public boolean isConstant()
 	{
-		for (IValue v : this.values)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			if (!v.isConstant())
+			if (!this.values[i].isConstant())
 			{
 				return false;
 			}
@@ -73,7 +76,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	
 	private void generateTypes()
 	{
-		int len = this.values.size();
+		int len = this.valueCount;
 		if (len == 0)
 		{
 			this.elementType = Type.VOID;
@@ -81,7 +84,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			return;
 		}
 		
-		IType t = this.values.get(0).getType();
+		IType t = this.values[0].getType();
 		if (t == null)
 		{
 			this.elementType = Type.VOID;
@@ -92,7 +95,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		{
 			for (int i = 1; i < len; i++)
 			{
-				IValue v = this.values.get(i);
+				IValue v = this.values[i];
 				IType t1 = v.getType();
 				if (t1 == null)
 				{
@@ -113,7 +116,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public IType getType()
 	{
-		if (this.values == null || this.values.isEmpty())
+		if (this.valueCount == 0)
 		{
 			return Type.VOID;
 		}
@@ -145,9 +148,9 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			this.requiredType = type;
 			
 			// Check for every value if it is the element type
-			for (IValue v : this.values)
+			for (int i = 0; i < this.valueCount; i++)
 			{
-				if (!v.isType(type1))
+				if (!this.values[i].isType(type1))
 				{
 					// If not, this is not the type
 					return false;
@@ -171,9 +174,9 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			this.requiredType = type;
 			
 			// Check for every value if it is the element type
-			for (IValue v : this.values)
+			for (int i = 0; i < this.valueCount; i++)
 			{
-				if (!v.isType(type1))
+				if (!this.values[i].isType(type1))
 				{
 					// If not, this is not the type
 					return 1;
@@ -186,38 +189,54 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public Iterator<IValue> iterator()
+	{
+		return new ArrayIterator(this.values);
+	}
+	
+	@Override
+	public int valueCount()
+	{
+		return this.valueCount;
+	}
+	
+	@Override
+	public boolean isEmpty()
+	{
+		return this.valueCount == 0;
+	}
+	
+	@Override
 	public void setValue(int index, IValue value)
 	{
-		this.values.set(index, value);
+		this.values[index] = value;
 	}
 	
 	@Override
 	public void addValue(IValue value)
 	{
-		this.values.add(value);
+		int index = this.valueCount++;
+		if (this.valueCount > this.values.length)
+		{
+			IValue[] temp = new IValue[this.valueCount];
+			System.arraycopy(this.values, 0, temp, 0, index);
+			this.values = temp;
+		}
+		this.values[index] = value;
 	}
 	
 	@Override
 	public void addValue(int index, IValue value)
 	{
-		this.values.add(index, value);
+		int i = this.valueCount++;
+		System.arraycopy(this.values, index, this.values, index + 1, i - index + 1);
+		this.values[index] = value;
 	}
 	
 	@Override
 	public IValue getValue(int index)
 	{
-		return this.values.get(index);
-	}
-	
-	@Override
-	public Iterator<IValue> iterator()
-	{
-		return this.values.iterator();
-	}
-	
-	public boolean isEmpty()
-	{
-		return this.values.isEmpty();
+		return this.values[index];
 	}
 	
 	@Override
@@ -235,24 +254,18 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		for (IValue v : this.values)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			v.resolveTypes(markers, context);
+			this.values[i].resolveTypes(markers, context);
 		}
 	}
 	
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		int len = this.values.size();
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v1 = this.values.get(i);
-			IValue v2 = v1.resolve(markers, context);
-			if (v1 != v2)
-			{
-				this.values.set(i, v2);
-			}
+			this.values[i].resolveTypes(markers, context);
 		}
 		return this;
 	}
@@ -261,10 +274,9 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	public void check(List<Marker> markers, IContext context)
 	{
 		IType type = this.elementType;
-		int len = this.values.size();
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue value = this.values.get(i);
+			IValue value = this.values[i];
 			IValue value1 = value.withType(type);
 			
 			if (value1 == null)
@@ -277,7 +289,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			else
 			{
 				value = value1;
-				this.values.set(i, value1);
+				this.values[i] = value1;
 			}
 			value.check(markers, context);
 		}
@@ -286,15 +298,9 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public IValue foldConstants()
 	{
-		int len = this.values.size();
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v1 = this.values.get(i);
-			IValue v2 = v1.foldConstants();
-			if (v1 != v2)
-			{
-				this.values.set(i, v2);
-			}
+			this.values[i] = this.values[i].foldConstants();
 		}
 		return this;
 	}
@@ -305,28 +311,23 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		if (this.isArray)
 		{
 			IType type = this.elementType;
-			int len = this.values.size();
 			int opcode = type.getArrayStoreOpcode();
 			
-			writer.visitLdcInsn(len);
+			writer.visitLdcInsn(this.valueCount);
 			writer.visitTypeInsn(Opcodes.ANEWARRAY, type);
 			
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < this.valueCount; i++)
 			{
 				writer.visitInsn(Opcodes.DUP);
-				IValue value = this.values.get(i);
+				IValue value = this.values[i];
 				writer.visitLdcInsn(i);
 				value.writeExpression(writer);
 				writer.visitInsn(opcode);
 			}
+			return;
 		}
-		else
-		{
-			for (IValue ivalue : this.values)
-			{
-				ivalue.writeExpression(writer);
-			}
-		}
+		
+		DyvilCompiler.logger.warning("ValueList.writeExpression() - Not an Array");
 	}
 	
 	@Override
@@ -337,10 +338,8 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			this.writeExpression(writer);
 			return;
 		}
-		for (IValue ivalue : this.values)
-		{
-			ivalue.writeExpression(writer);
-		}
+		
+		DyvilCompiler.logger.warning("ValueList.writeStatement() - Not an Array");
 	}
 	
 	@Override
@@ -348,38 +347,37 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		if (this.isArray)
 		{
-			if (this.values.isEmpty())
+			if (this.valueCount == 0)
 			{
 				buffer.append(Formatting.Expression.emptyArray);
 			}
 			else
 			{
 				buffer.append(Formatting.Expression.arrayStart);
-				Util.astToString(prefix, this.values, Formatting.Expression.arraySeperator, buffer);
+				Util.astToString(prefix, this.values, this.valueCount, Formatting.Expression.arraySeperator, buffer);
 				buffer.append(Formatting.Expression.arrayEnd);
 			}
 		}
 		else
 		{
-			int len = this.values.size();
-			if (len == 0)
+			if (this.valueCount == 0)
 			{
 				buffer.append(Formatting.Expression.emptyExpression);
 			}
-			else if (len == 1)
+			else if (this.valueCount == 1)
 			{
 				buffer.append(Formatting.Expression.arrayStart);
-				this.values.get(0).toString("", buffer);
+				this.values[0].toString("", buffer);
 				buffer.append(Formatting.Expression.arrayEnd);
 			}
 			else
 			{
 				buffer.append('{').append('\n');
 				String prefix1 = prefix + Formatting.Method.indent;
-				for (IValue value : this.values)
+				for (int i = 0; i < this.valueCount; i++)
 				{
 					buffer.append(prefix1);
-					value.toString(prefix1, buffer);
+					this.values[i].toString(prefix1, buffer);
 					buffer.append(";\n");
 				}
 				buffer.append(prefix).append('}');

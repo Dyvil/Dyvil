@@ -21,6 +21,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Util;
 
 public final class ConstructorCall extends ASTNode implements IValue, ICall, ITypeContext
 {
@@ -155,9 +156,9 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 		if (match == null)
 		{
 			Marker marker = Markers.create(this.position, "resolve.constructor", this.type.toString());
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			// FIXME Util.typesToString("", this.arguments, ", ", builder);
-			marker.addInfo(builder.toString());
+			StringBuilder builder = new StringBuilder("Argument Types: [");
+			Util.typesToString("", this.arguments, ", ", builder);
+			marker.addInfo(builder.append(']').toString());
 			markers.add(marker);
 			return this;
 		}

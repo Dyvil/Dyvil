@@ -222,15 +222,14 @@ public class Method extends Member implements IMethod
 			this.modifiers |= Modifiers.SEALED;
 			return true;
 		case "dyvil.lang.annotation.Intrinsic":
-			ValueList array = (ValueList) annotation.getValue("value");
+			ValueList array = (ValueList) annotation.arguments.getValue("value");
 			if (array != null)
 			{
-				List<IValue> values = array.values;
-				int len = values.size();
+				int len = array.valueCount();
 				int[] opcodes = new int[len];
 				for (int i = 0; i < len; i++)
 				{
-					IntValue v = (IntValue) values.get(i).foldConstants();
+					IntValue v = (IntValue) array.getValue(i).foldConstants();
 					opcodes[i] = v.value;
 				}
 				this.intrinsicOpcodes = opcodes;
@@ -462,9 +461,8 @@ public class Method extends Member implements IMethod
 		
 		IType type;
 		int len = arguments.size();
-		int mods = this.modifiers & Modifiers.INFIX;
 		Parameter param;
-		if (instance != null && mods == Modifiers.INFIX)
+		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			type = this.parameters[0].type.resolveType(name, instance.getType());
 			if (type != null)
@@ -484,7 +482,15 @@ public class Method extends Member implements IMethod
 			
 			return null;
 		}
-		// TODO Prefix methods
+		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		{
+			type = this.theClass.getThisType().resolveType(name, arguments.getFirstValue().getType());
+			if (type != null)
+			{
+				return type;
+			}
+			return null;
+		}
 		
 		if (instance != null)
 		{

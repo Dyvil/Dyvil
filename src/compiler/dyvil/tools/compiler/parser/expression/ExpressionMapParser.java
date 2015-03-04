@@ -18,7 +18,7 @@ public class ExpressionMapParser extends Parser implements IValued
 	
 	protected IValueMap		valueMap;
 	
-	private Object			key;
+	private String			key;
 	
 	public ExpressionMapParser(IValueMap valueMap)
 	{

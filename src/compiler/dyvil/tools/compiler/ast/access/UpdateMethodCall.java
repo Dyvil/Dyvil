@@ -22,6 +22,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Util;
 
 public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeContext
 {
@@ -144,9 +145,9 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			IType vtype = this.instance.getType();
 			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
 		}
-		StringBuilder builder = new StringBuilder("Argument Types: ");
-		// FIXME Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.toString());
+		StringBuilder builder = new StringBuilder("Argument Types: [");
+		Util.typesToString("", this.arguments, ", ", builder);
+		marker.addInfo(builder.append(']').toString());
 		markers.add(marker);
 		return this;
 	}

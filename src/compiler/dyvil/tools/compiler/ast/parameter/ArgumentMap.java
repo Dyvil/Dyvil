@@ -2,7 +2,9 @@ package dyvil.tools.compiler.ast.parameter;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
+import dyvil.collections.ArrayIterator;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -13,7 +15,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 
-public final class ArgumentMap implements IArguments, IValueMap<String>
+public final class ArgumentMap implements IArguments, IValueMap
 {
 	private String[]	keys	= new String[3];
 	private IValue[]	values	= new IValue[3];
@@ -22,7 +24,32 @@ public final class ArgumentMap implements IArguments, IValueMap<String>
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return null;
+		return new ArrayIterator(this.values);
+	}
+	
+	public Iterator<KeyValuePair> entryIterator()
+	{
+		return new Iterator<KeyValuePair>()
+		{
+			private int	index;
+			
+			@Override
+			public KeyValuePair next()
+			{
+				if (this.index >= size)
+				{
+					throw new NoSuchElementException("ArrayIterator.next()");
+				}
+				int index = this.index++;
+				return new KeyValuePair(keys[index], values[index]);
+			}
+			
+			@Override
+			public boolean hasNext()
+			{
+				return this.index < this.index;
+			}
+		};
 	}
 	
 	@Override

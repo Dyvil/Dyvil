@@ -2,6 +2,10 @@ package dyvil.tools.compiler.ast.value;
 
 public interface IValueList extends Iterable<IValue>
 {
+	public int valueCount();
+	
+	public boolean isEmpty();
+	
 	public void setValue(int index, IValue value);
 	
 	public void addValue(IValue value);

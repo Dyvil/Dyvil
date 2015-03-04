@@ -1,8 +1,5 @@
 package dyvil.tools.compiler.parser.expression;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
@@ -550,10 +547,13 @@ public class ExpressionParser extends Parser implements ITyped
 			return null;
 		}
 		
-		List<LambdaParameter> params = new ArrayList();
+		TupleValue tv = (TupleValue) value;
+		int len = tv.valueCount();
+		LambdaParameter[] params = new LambdaParameter[len];
 		
-		for (IValue v : (TupleValue) value)
+		for (int i = 0; i < len; i++)
 		{
+			IValue v = tv.getValue(i);
 			type = v.getValueType();
 			if (type == IValue.FIELD_ACCESS)
 			{
@@ -571,14 +571,14 @@ public class ExpressionParser extends Parser implements ITyped
 				LambdaParameter param = new LambdaParameter();
 				param.setName(fa.name, fa.qualifiedName);
 				param.setType(((ClassAccess) fa.instance).type);
-				params.add(param);
+				params[i] = param;
 				continue;
 			}
 			
 			return null;
 		}
 		
-		return new LambdaValue(value.getPosition(), params);
+		return new LambdaValue(tv.position, params);
 	}
 	
 	public void end()

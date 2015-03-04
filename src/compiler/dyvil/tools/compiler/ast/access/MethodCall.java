@@ -515,9 +515,9 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, IValue
 			IType vtype = this.instance.getType();
 			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
 		}
-		StringBuilder builder = new StringBuilder("Argument Types: ");
-		// FIXME Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.toString());
+		StringBuilder builder = new StringBuilder("Argument Types: [");
+		Util.typesToString("", this.arguments, ", ", builder);
+		marker.addInfo(builder.append(']').toString());
 		return marker;
 	}
 	

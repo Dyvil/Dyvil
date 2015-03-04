@@ -78,7 +78,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public boolean canVisitStack(IStatement child)
 	{
-		if (this.values.get(this.values.size() - 1) != child)
+		if (child != this.values[this.valueCount - 1])
 		{
 			return true;
 		}
@@ -129,16 +129,18 @@ public class StatementList extends ValueList implements IStatement, IContext
 	{
 		if (this.isArray)
 		{
-			for (IValue v : this.values)
+			for (int i = 0; i < this.valueCount; i++)
 			{
-				v.resolveTypes(markers, context);
+				this.values[i].resolveTypes(markers, context);
 			}
+			return;
 		}
 		
 		this.context = context;
 		
-		for (IValue v : this.values)
+		for (int i = 0; i < this.valueCount; i++)
 		{
+			IValue v = this.values[i];
 			if (v.isStatement())
 			{
 				((IStatement) v).setParent(this);
@@ -153,20 +155,22 @@ public class StatementList extends ValueList implements IStatement, IContext
 	{
 		if (this.isArray)
 		{
+			// Remove unnecessary null entries
+			IValue[] values = new IValue[this.valueCount];
+			System.arraycopy(this.values, 0, values, 0, this.valueCount);
 			// Convert this to a simpler ValueList for performance
-			return new ValueList(this.position, this.values, this.requiredType, this.elementType).resolve(markers, context);
+			return new ValueList(this.position, values, this.requiredType, this.elementType).resolve(markers, context);
 		}
 		
 		this.context = context;
 		
-		int len = this.values.size();
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v1 = this.values.get(i);
+			IValue v1 = this.values[i];
 			IValue v2 = v1.resolve(markers, this);
 			if (v1 != v2)
 			{
-				this.values.set(i, v2);
+				this.values[i] = v2;
 			}
 			
 			if (v2.getValueType() == IValue.VARIABLE)
@@ -189,8 +193,9 @@ public class StatementList extends ValueList implements IStatement, IContext
 		else
 		{
 			IType type = this.requiredType;
-			for (IValue v : this.values)
+			for (int i = 0; i < this.valueCount; i++)
 			{
+				IValue v = this.values[i];
 				v.check(markers, this);
 				
 				if (v.getValueType() == RETURN && v.withType(type) == null)
@@ -207,14 +212,13 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public IValue foldConstants()
 	{
-		int len = this.values.size();
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v1 = this.values.get(i);
+			IValue v1 = this.values[i];
 			IValue v2 = v1.foldConstants();
 			if (v1 != v2)
 			{
-				this.values.set(i, v2);
+				this.values[i] = v2;
 			}
 		}
 		return this;
@@ -322,8 +326,9 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		
 		String label;
-		for (IValue v : this.values)
+		for (int i = 0; i < this.valueCount; i++)
 		{
+			IValue v = this.values[i];
 			if (this.valueLabels != null && (label = this.valueLabels.get(v)) != null)
 			{
 				writer.visitLabel(this.labels.get(label));
@@ -349,8 +354,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		int len = this.values.size();
-		if (len == 0)
+		if (this.valueCount == 0)
 		{
 			buffer.append(Formatting.Expression.emptyExpression);
 		}
@@ -361,8 +365,9 @@ public class StatementList extends ValueList implements IStatement, IContext
 			String prefix1 = prefix + Formatting.Method.indent;
 			IValue prev = null;
 			
-			for (IValue value : this.values)
+			for (int i = 0; i < this.valueCount; i++)
 			{
+				IValue value = this.values[i];
 				buffer.append(prefix1);
 				
 				if (prev != null)

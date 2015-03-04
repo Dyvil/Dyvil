@@ -114,31 +114,28 @@ public class Util
 		}
 	}
 	
-	public static void typesToString(String prefix, Collection<? extends ITyped> list, String seperator, StringBuilder buffer)
+	public static void typesToString(String prefix, Iterable<? extends ITyped> list, String seperator, StringBuilder buffer)
 	{
-		if (!list.isEmpty())
+		Iterator<? extends ITyped> iterator = list.iterator();
+		while (true)
 		{
-			Iterator<? extends ITyped> iterator = list.iterator();
-			while (true)
+			IType type = iterator.next().getType();
+			if (type == null)
 			{
-				IType type = iterator.next().getType();
-				if (type == null)
-				{
-					buffer.append("unknown");
-				}
-				else
-				{
-					type.toString(prefix, buffer);
-				}
-				
-				if (iterator.hasNext())
-				{
-					buffer.append(seperator);
-				}
-				else
-				{
-					break;
-				}
+				buffer.append("unknown");
+			}
+			else
+			{
+				type.toString(prefix, buffer);
+			}
+			
+			if (iterator.hasNext())
+			{
+				buffer.append(seperator);
+			}
+			else
+			{
+				break;
 			}
 		}
 	}

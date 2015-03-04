@@ -18,6 +18,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Util;
 
 public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeContext
 {
@@ -151,9 +152,9 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 			IType vtype = this.instance.getType();
 			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
 		}
-		StringBuilder builder = new StringBuilder("Argument Types: ");
-		// FIXME Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.toString());
+		StringBuilder builder = new StringBuilder("Argument Types: [");
+		Util.typesToString("", this.arguments, ", ", builder);
+		marker.addInfo(builder.append(']').toString());
 		markers.add(marker);
 		return this;
 	}

@@ -2,8 +2,8 @@ package dyvil.tools.compiler.ast.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.Iterator;
+import java.util.List;
 
 import jdk.internal.org.objectweb.asm.AnnotationVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -21,19 +22,19 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
-import dyvil.tools.compiler.ast.value.IValueMap;
+import dyvil.tools.compiler.ast.value.IValueMap.KeyValuePair;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class Annotation extends ASTNode implements ITyped, IValueMap<String>
+public class Annotation extends ASTNode implements ITyped
 {
-	public String				name;
-	public AnnotationType		type;
-	public Map<String, IValue>	parameters	= new HashMap();
-	public ElementType			target;
+	public String			name;
+	public AnnotationType	type;
+	// TODO Use IArguments and clean up the annotation system
+	public ArgumentMap		arguments	= new ArgumentMap();
+	public ElementType		target;
 	
 	public Annotation(ICodePosition position)
 	{
@@ -66,36 +67,16 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 		return this.type;
 	}
 	
-	@Override
-	public void addValue(String key, IValue value)
-	{
-		this.parameters.put(key, value);
-	}
-	
-	@Override
-	public IValue getValue(String key)
-	{
-		return this.parameters.get(key);
-	}
-	
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context);
-		
-		for (Entry<String, IValue> entry : this.parameters.entrySet())
-		{
-			entry.getValue().resolveTypes(markers, context);
-		}
+		this.arguments.resolveTypes(markers, context);
 	}
 	
 	public void resolve(List<Marker> markers, IContext context)
 	{
 		this.type.readMetaAnnotations();
-		
-		for (Entry<String, IValue> entry : this.parameters.entrySet())
-		{
-			entry.getValue().resolve(markers, context);
-		}
+		this.arguments.resolveTypes(markers, context);
 	}
 	
 	public void check(List<Marker> markers, IContext context)
@@ -115,31 +96,30 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 			markers.add(error);
 		}
 		
-		for (Entry<String, IValue> entry : this.parameters.entrySet())
+		for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
 		{
-			String key = entry.getKey();
-			IMethod m = theClass.getBody().getMethod(key);
+			KeyValuePair entry = iterator.next();
+			IMethod m = theClass.getBody().getMethod(entry.key);
 			if (m == null)
 			{
-				markers.add(Markers.create(this.position, "annotation.method", this.name, key));
+				markers.add(Markers.create(this.position, "annotation.method", this.name, entry.key));
 				continue;
 			}
 			
-			IValue value = entry.getValue();
-			value.check(markers, context);
+			entry.value.check(markers, context);
 			
-			if (!value.isConstant())
+			if (!entry.value.isConstant())
 			{
-				markers.add(Markers.create(value.getPosition(), "annotation.constant", key));
+				markers.add(Markers.create(entry.value.getPosition(), "annotation.constant", entry.key));
 				continue;
 			}
 			
 			IType type = m.getType();
-			if (!value.isType(type))
+			if (!entry.value.isType(type))
 			{
-				Marker marker = Markers.create(value.getPosition(), "annotation.type", key);
+				Marker marker = Markers.create(entry.value.getPosition(), "annotation.type", entry.key);
 				marker.addInfo("Required Type: " + type);
-				marker.addInfo("Value Type: " + value.getType());
+				marker.addInfo("Value Type: " + entry.value.getType());
 				markers.add(marker);
 			}
 		}
@@ -147,10 +127,7 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	
 	public void foldConstants()
 	{
-		for (Entry<String, IValue> entry : this.parameters.entrySet())
-		{
-			entry.getValue().foldConstants();
-		}
+		this.arguments.foldConstants();
 	}
 	
 	public void write(ClassWriter writer)
@@ -161,9 +138,10 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 			boolean visible = retention == RetentionPolicy.RUNTIME;
 			
 			AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
-			for (Entry<String, IValue> entry : this.parameters.entrySet())
+			for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
 			{
-				visitValue(visitor, entry.getKey(), entry.getValue());
+				KeyValuePair entry = iterator.next();
+				visitValue(visitor, entry.key, entry.value);
 			}
 		}
 	}
@@ -176,9 +154,10 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 			boolean visible = retention == RetentionPolicy.RUNTIME;
 			
 			AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
-			for (Entry<String, IValue> entry : this.parameters.entrySet())
+			for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
 			{
-				visitValue(visitor, entry.getKey(), entry.getValue());
+				KeyValuePair entry = iterator.next();
+				visitValue(visitor, entry.key, entry.value);
 			}
 		}
 	}
@@ -191,9 +170,10 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 			boolean visible = retention == RetentionPolicy.RUNTIME;
 			
 			AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
-			for (Entry<String, IValue> entry : this.parameters.entrySet())
+			for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
 			{
-				visitValue(visitor, entry.getKey(), entry.getValue());
+				KeyValuePair entry = iterator.next();
+				visitValue(visitor, entry.key, entry.value);
 			}
 		}
 	}
@@ -206,9 +186,10 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 			boolean visible = retention == RetentionPolicy.RUNTIME;
 			
 			AnnotationVisitor visitor = writer.visitParameterAnnotation(index, this.type.getExtendedName(), visible);
-			for (Entry<String, IValue> entry : this.parameters.entrySet())
+			for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
 			{
-				visitValue(visitor, entry.getKey(), entry.getValue());
+				KeyValuePair entry = iterator.next();
+				visitValue(visitor, entry.key, entry.value);
 			}
 		}
 	}
@@ -239,27 +220,6 @@ public class Annotation extends ASTNode implements ITyped, IValueMap<String>
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append('@').append(this.name);
-		if (!this.parameters.isEmpty())
-		{
-			buffer.append(Formatting.Method.parametersStart);
-			
-			Iterator<Entry<String, IValue>> iterator = this.parameters.entrySet().iterator();
-			while (true)
-			{
-				Entry<String, IValue> e = iterator.next();
-				buffer.append(e.getKey()).append(Formatting.Field.keyValueSeperator);
-				e.getValue().toString("", buffer);
-				if (iterator.hasNext())
-				{
-					buffer.append(Formatting.Method.parameterSeperator);
-				}
-				else
-				{
-					break;
-				}
-			}
-			
-			buffer.append(Formatting.Method.parametersEnd);
-		}
+		this.arguments.toString(prefix, buffer);
 	}
 }

@@ -45,6 +45,12 @@ public final class ArgumentList implements IArguments, IValueList, IASTNode
 	}
 	
 	@Override
+	public int valueCount()
+	{
+		return this.size;
+	}
+	
+	@Override
 	public boolean isEmpty()
 	{
 		return this.size > 0;

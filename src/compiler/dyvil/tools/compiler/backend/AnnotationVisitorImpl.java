@@ -25,7 +25,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 	@Override
 	public void visit(String key, Object value)
 	{
-		this.annotation.addValue(key, IValue.fromObject(value));
+		this.annotation.arguments.addValue(key, IValue.fromObject(value));
 	}
 	
 	private static IValue getEnumValue(String enumClass, String name)
@@ -41,7 +41,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 		IValue enumValue = getEnumValue(enumClass, name);
 		if (enumValue != null)
 		{
-			this.annotation.addValue(key, enumValue);
+			this.annotation.arguments.addValue(key, enumValue);
 		}
 	}
 	
@@ -49,7 +49,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 	public AnnotationVisitor visitArray(String key)
 	{
 		ValueList valueList = new ValueList(null, true);
-		this.annotation.addValue(key, valueList);
+		this.annotation.arguments.addValue(key, valueList);
 		return new AnnotationVisitorArray(this.api, valueList);
 	}
 	
