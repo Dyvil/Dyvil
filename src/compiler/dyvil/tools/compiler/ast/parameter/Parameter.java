@@ -174,9 +174,11 @@ public class Parameter extends Member implements IVariable, IClassCompilable
 			return;
 		}
 		
+		// Copy the access modifiers and add the STATIC modifier
+		int modifiers = this.method.getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
 		String name = "parDefault$" + this.method.getQualifiedName() + "$" + this.index;
 		String desc = "()" + this.type.getExtendedName();
-		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name, desc, null, null));
+		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(modifiers, name, desc, null, null));
 		mw.visitCode();
 		this.defaultValue.writeExpression(mw);
 		mw.visitEnd(this.type);
