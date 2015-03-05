@@ -17,6 +17,11 @@ public final class ThisValue extends ASTNode implements IConstantValue
 {
 	public IType	type;
 	
+	public ThisValue(IType type)
+	{
+		this.type = type;
+	}
+	
 	public ThisValue(ICodePosition position)
 	{
 		this.position = position;

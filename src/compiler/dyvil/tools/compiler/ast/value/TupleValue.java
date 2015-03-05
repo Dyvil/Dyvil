@@ -162,8 +162,9 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
 		TupleType type = new TupleType();
-		for (IValue v : this.values)
+		for (int i = 0; i < this.valueCount; i++)
 		{
+			IValue v = this.values[i];
 			v.resolveTypes(markers, context);
 			type.addType(v.getType());
 		}
@@ -189,9 +190,9 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		for (IValue v : this.values)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			v.check(markers, context);
+			this.values[i].check(markers, context);
 		}
 	}
 	
@@ -220,9 +221,9 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 		writer.visitTypeInsn(Opcodes.NEW, t);
 		writer.visitInsn(Opcodes.DUP);
 		
-		for (IValue v : this.values)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			v.writeExpression(writer);
+			this.values[i].writeExpression(writer);
 		}
 		
 		String owner = t.getInternalName();
@@ -233,9 +234,9 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		for (IValue v : this.values)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			v.writeStatement(writer);
+			this.values[i].writeStatement(writer);
 		}
 	}
 }

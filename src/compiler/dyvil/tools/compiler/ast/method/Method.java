@@ -290,12 +290,7 @@ public class Method extends Member implements IMethod
 	@Override
 	public int getSignatureMatch(String name, IValue instance, IArguments arguments)
 	{
-		if (name == null)
-		{
-			return 1;
-		}
-		
-		if (!name.equals(this.qualifiedName))
+		if (name != null && !name.equals(this.qualifiedName))
 		{
 			return 0;
 		}

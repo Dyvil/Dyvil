@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.GenericType;
@@ -26,7 +27,7 @@ import dyvil.tools.compiler.util.Util;
 public final class ConstructorCall extends ASTNode implements IValue, ICall, ITypeContext
 {
 	public IType		type;
-	public IArguments	arguments;
+	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
 	public IMethod		method;
 	

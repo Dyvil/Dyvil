@@ -41,7 +41,14 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	public int					parameterCount;
 	public IValue				value;
 	
+	/**
+	 * The instantiated type this lambda expression represents
+	 */
 	protected IType				type;
+	
+	/**
+	 * The abstract method this lambda expression implements
+	 */
 	protected IMethod			method;
 	
 	private IContext			context;
@@ -250,6 +257,9 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		this.context = context;
 		this.value = this.value.resolve(markers, this);
 		this.value.check(markers, context);
+		
+		this.name = "lambda$" + this.index;
+		this.desc = this.getLambdaDescriptor();
 	}
 	
 	@Override
@@ -447,9 +457,6 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	public void write(ClassWriter writer)
 	{
 		// TODO Exceptions
-		
-		this.name = "lambda$" + this.index;
-		this.desc = this.getLambdaDescriptor();
 		
 		boolean instance = this.thisType != null;
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
