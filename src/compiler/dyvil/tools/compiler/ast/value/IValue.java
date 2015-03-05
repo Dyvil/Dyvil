@@ -53,7 +53,8 @@ public interface IValue extends IASTNode, ITyped
 	
 	public static int	TUPLE				= 48;
 	public static int	LAMBDA				= 49;
-	public static int	BYTECODE			= 50;
+	public static int	FUNCTION			= 50;
+	public static int	BYTECODE			= 51;
 	
 	public static int	RETURN				= 64;
 	public static int	IF					= 65;

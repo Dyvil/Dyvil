@@ -24,23 +24,25 @@ import dyvil.tools.compiler.util.Tokens;
 
 public class ExpressionParser extends Parser implements ITyped
 {
-	public static final int	VALUE			= 1;
-	public static final int	LIST_END		= 2;
-	public static final int	TUPLE_END		= 4;
+	public static final int	VALUE				= 0x1;
+	public static final int	LIST_END			= 0x2;
+	public static final int	TUPLE_END			= 0x4;
 	
-	public static final int	ACCESS			= 8;
-	public static final int	ACCESS_2		= 16;
+	public static final int	ACCESS				= 0x8;
+	public static final int	ACCESS_2			= 0x10;
 	
-	public static final int	LAMBDA			= 32;
-	public static final int	STATEMENT		= 64;
-	public static final int	TYPE			= 128;
-	public static final int	CONSTRUCTOR		= 256;
-	public static final int	PARAMETERS		= 512;
-	public static final int	PARAMETERS_END	= 1024;
-	public static final int	VARIABLE		= 2048;
+	public static final int	LAMBDA				= 0x20;
+	public static final int	STATEMENT			= 0x40;
+	public static final int	TYPE				= 0x80;
+	public static final int	CONSTRUCTOR			= 0x100;
+	public static final int	PARAMETERS			= 0x200;
+	public static final int	PARAMETERS_END		= 0x400;
+	public static final int	VARIABLE			= 0x800;
 	
-	public static final int	BYTECODE		= 4096;
-	public static final int	BYTECODE_END	= 8192;
+	public static final int	BYTECODE			= 0x1000;
+	public static final int	BYTECODE_END		= 0x2000;
+	
+	public static final int	FUNCTION_POINTER	= 0x4000;
 	
 	protected IValued		field;
 	protected int			precedence;
@@ -189,6 +191,19 @@ public class ExpressionParser extends Parser implements ITyped
 			}
 			throw new SyntaxError(token, "Invalid Argument List - ')' expected", true);
 		}
+		if (this.isInMode(FUNCTION_POINTER))
+		{
+			// TODO Constructor Function Pointers
+			pm.popParser();
+			if (ParserUtil.isIdentifier(type))
+			{
+				FunctionValue fl = new FunctionValue(token.raw(), token.value());
+				fl.instance = this.value;
+				this.field.setValue(fl);
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Function Pointer - Identifier expected");
+		}
 		if (this.isInMode(BYTECODE))
 		{
 			if (type == Tokens.OPEN_CURLY_BRACKET)
@@ -285,6 +300,11 @@ public class ExpressionParser extends Parser implements ITyped
 			{
 				this.mode = ACCESS_2;
 				this.dotless = false;
+				return;
+			}
+			if (type == Tokens.HASH)
+			{
+				this.mode = FUNCTION_POINTER;
 				return;
 			}
 			

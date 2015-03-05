@@ -73,6 +73,8 @@ public class ParserUtil
 			return Tokens.COLON;
 		case "=":
 			return Tokens.EQUALS;
+		case "#":
+			return Tokens.HASH;
 		case "=>":
 			return Tokens.ARROW_OPERATOR;
 		case "null":

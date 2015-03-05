@@ -73,7 +73,8 @@ public interface Tokens
 	public int	SEMICOLON				= TYPE_SYMBOL | 0x00040000;
 	public int	COMMA					= TYPE_SYMBOL | 0x00080000;
 	public int	EQUALS					= TYPE_SYMBOL | 0x00100000;
-	public int	ARROW_OPERATOR			= TYPE_SYMBOL | 0x00200000;
+	public int	HASH					= TYPE_SYMBOL | 0x00200000;
+	public int	ARROW_OPERATOR			= TYPE_SYMBOL | 0x00400000;
 	
 	// COMMENTS
 	public int	MOD_LINE				= 0x00010000;
