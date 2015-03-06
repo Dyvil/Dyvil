@@ -647,6 +647,46 @@ public final class MathUtils
 		return $bang(n) / ($bang(k) * $bang(n - k));
 	}
 	
+	public static @infix int sum(int[] ints)
+	{
+		int total = 0;
+		for (int i : ints)
+		{
+			total += i;
+		}
+		return total;
+	}
+	
+	public static @infix long sum(long[] longs)
+	{
+		long total = 0L;
+		for (long l : longs)
+		{
+			total += l;
+		}
+		return total;
+	}
+	
+	public static @infix float sum(float[] floats)
+	{
+		float total = 0L;
+		for (float f : floats)
+		{
+			total += f;
+		}
+		return total;
+	}
+	
+	public static @infix double sum(double[] doubles)
+	{
+		double total = 0L;
+		for (double d : doubles)
+		{
+			total += d;
+		}
+		return total;
+	}
+	
 	public static @infix float average(int[] ints)
 	{
 		int total = 0;
@@ -654,7 +694,7 @@ public final class MathUtils
 		{
 			total += i;
 		}
-		return total / ints.length;
+		return total / (float) ints.length;
 	}
 	
 	public static @infix double average(long[] longs)
@@ -664,7 +704,7 @@ public final class MathUtils
 		{
 			total += l;
 		}
-		return total / longs.length;
+		return total / (double) longs.length;
 	}
 	
 	public static @infix float average(float[] floats)
