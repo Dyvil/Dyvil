@@ -366,7 +366,7 @@ public final class PrimitiveType extends Type
 	{
 		if (this.arrayDimensions > 0)
 		{
-			MethodMatch match = ARRAY.resolveMethod(instance, name + "_" + this.name, arguments);
+			MethodMatch match = ARRAY.resolveMethod(instance, name, arguments);
 			if (match != null)
 			{
 				return match;
@@ -381,7 +381,7 @@ public final class PrimitiveType extends Type
 	{
 		if (this.arrayDimensions > 0)
 		{
-			ARRAY.getMethodMatches(list, instance, name + "_" + this.name, arguments);
+			ARRAY.getMethodMatches(list, instance, name, arguments);
 			return;
 		}
 		
