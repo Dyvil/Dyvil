@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.access.FieldInitializer;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -34,33 +33,42 @@ public class StatementList extends ValueList implements IStatement, IContext
 	
 	public Map<String, Variable>	variables	= new HashMap();
 	
-	public Label					start;
-	public Label					end;
-	
-	public Map<String, Label>		labels;
-	public Map<IValue, String>		valueLabels;
+	public Label[]					labels;
 	
 	public StatementList(ICodePosition position)
 	{
 		super(position);
-		
-		this.start = new Label();
-		this.end = new Label();
 	}
 	
 	@Override
 	public void addLabel(String name, IValue value)
 	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			if (this.values[i] == value)
+			{
+				Label label = new Label(name, value);
+				this.setLabel(i, label);
+				return;
+			}
+		}
+	}
+	
+	private void setLabel(int index, Label label)
+	{
 		if (this.labels == null)
 		{
-			this.labels = new HashMap();
-			this.valueLabels = new HashMap();
+			this.labels = new Label[index + 1];
+			this.labels[index] = label;
+			return;
 		}
-		
-		Label label = new Label();
-		label.info = value;
-		this.labels.put(name, label);
-		this.valueLabels.put(value, name);
+		if (index >= this.labels.length)
+		{
+			Label[] temp = new Label[index + 1];
+			System.arraycopy(this.labels, 0, temp, 0, this.labels.length);
+			this.labels = temp;
+		}
+		this.labels[index] = label;
 	}
 	
 	@Override
@@ -295,10 +303,12 @@ public class StatementList extends ValueList implements IStatement, IContext
 	{
 		if (this.labels != null)
 		{
-			Label label = this.labels.get(name);
-			if (label != null)
+			for (Label label : this.labels)
 			{
-				return label;
+				if (label != null && name.equals(label.name))
+				{
+					return label;
+				}
 			}
 		}
 		
@@ -314,7 +324,10 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitLabel(this.start, false);
+		jdk.internal.org.objectweb.asm.Label start = new jdk.internal.org.objectweb.asm.Label();
+		jdk.internal.org.objectweb.asm.Label end = new jdk.internal.org.objectweb.asm.Label();
+		
+		writer.visitLabel(start, false);
 		int count = 0;
 		
 		// Write variable types
@@ -325,13 +338,16 @@ public class StatementList extends ValueList implements IStatement, IContext
 			count++;
 		}
 		
-		String label;
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue v = this.values[i];
-			if (this.valueLabels != null && (label = this.valueLabels.get(v)) != null)
+			if (this.labels != null)
 			{
-				writer.visitLabel(this.labels.get(label));
+				Label l = this.labels[i];
+				if (l != null)
+				{
+					writer.visitLabel(l.target);
+				}
 			}
 			
 			v.writeStatement(writer);
@@ -340,14 +356,14 @@ public class StatementList extends ValueList implements IStatement, IContext
 		if (count > 0 && (this.parent != null || !(this.context instanceof IMethod)))
 		{
 			writer.removeLocals(count);
-			writer.visitLabel(this.end, this.parent == null || this.parent.canVisitStack(this));
+			writer.visitLabel(end, this.parent == null || this.parent.canVisitStack(this));
 		}
-		writer.visitLabel(this.end, false);
+		writer.visitLabel(end, false);
 		
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), this.start, this.end, var.index);
+			writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), start, end, var.index);
 		}
 	}
 	
@@ -361,7 +377,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 		else
 		{
 			buffer.append('{').append('\n');
-			String label;
 			String prefix1 = prefix + Formatting.Method.indent;
 			IValue prev = null;
 			
@@ -379,9 +394,13 @@ public class StatementList extends ValueList implements IStatement, IContext
 					}
 				}
 				
-				if (this.valueLabels != null && (label = this.valueLabels.get(value)) != null)
+				if (this.labels != null)
 				{
-					buffer.append(label).append(Formatting.Expression.labelSeperator);
+					Label l = this.labels[i];
+					if (l != null)
+					{
+						buffer.append(l.name).append(Formatting.Expression.labelSeperator);
+					}
 				}
 				
 				value.toString(prefix1, buffer);

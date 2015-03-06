@@ -2,10 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
-
-import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
-
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -31,8 +28,8 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	{
 		this.position = position;
 		
-		this.startLabel = new Label();
-		this.endLabel = new Label();
+		this.startLabel = new Label("$whileStart");
+		this.endLabel = new Label("$whileEnd");
 	}
 	
 	public void setCondition(IValue condition)
@@ -212,13 +209,13 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		}
 		
 		// Condition
-		writer.visitLabel(this.startLabel);
-		this.condition.writeInvJump(writer, this.endLabel);
+		writer.visitLabel(this.startLabel.target);
+		this.condition.writeInvJump(writer, this.endLabel.target);
 		// While Block
 		this.then.writeStatement(writer);
-		writer.visitJumpInsn(Opcodes.GOTO, this.startLabel);
+		writer.visitJumpInsn(Opcodes.GOTO, this.startLabel.target);
 		
-		writer.visitLabel(this.endLabel, this.parent == null || this.parent.canVisitStack(this));
+		writer.visitLabel(this.endLabel.target, this.parent == null || this.parent.canVisitStack(this));
 	}
 	
 	@Override

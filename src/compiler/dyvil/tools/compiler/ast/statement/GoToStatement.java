@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -93,13 +92,13 @@ public class GoToStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitJumpInsn(Opcodes.GOTO, this.label);
+		writer.visitJumpInsn(Opcodes.GOTO, this.label.target);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitJumpInsn(Opcodes.GOTO, this.label);
+		writer.visitJumpInsn(Opcodes.GOTO, this.label.target);
 	}
 	
 	@Override

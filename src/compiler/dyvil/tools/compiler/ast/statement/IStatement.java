@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.statement;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;

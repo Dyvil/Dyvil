@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -69,17 +68,13 @@ public class ContinueStatement extends ASTNode implements IStatement
 			{
 				markers.add(Markers.create(this.position, "resolve.label", this.name));
 			}
-			else if (this.label.info instanceof IValue)
+			else if (this.label.value instanceof ILoop)
 			{
-				IValue value = (IValue) this.label.info;
-				if (value instanceof ILoop)
-				{
-					this.label = ((ILoop) value).getContinueLabel();
-				}
-				else
-				{
-					markers.add(Markers.create(this.position, "continue.invalid.label", this.name));
-				}
+				this.label = ((ILoop) this.label.value).getContinueLabel();
+			}
+			else
+			{
+				markers.add(Markers.create(this.position, "continue.invalid.label", this.name));
 			}
 		}
 		else
@@ -118,13 +113,13 @@ public class ContinueStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitJumpInsn(Opcodes.GOTO, this.label);
+		writer.visitJumpInsn(Opcodes.GOTO, this.label.target);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitJumpInsn(Opcodes.GOTO, this.label);
+		writer.visitJumpInsn(Opcodes.GOTO, this.label.target);
 	}
 	
 	@Override

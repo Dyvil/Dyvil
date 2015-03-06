@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -52,9 +51,9 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	{
 		this.position = position;
 		
-		this.startLabel = new Label();
-		this.updateLabel = new Label();
-		this.endLabel = new Label();
+		this.startLabel = new Label("$forStart");
+		this.updateLabel = new Label("$forUpdate");
+		this.endLabel = new Label("$forEnd");
 	}
 	
 	@Override
@@ -352,6 +351,10 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		jdk.internal.org.objectweb.asm.Label startLabel = this.startLabel.target;
+		jdk.internal.org.objectweb.asm.Label updateLabel = this.updateLabel.target;
+		jdk.internal.org.objectweb.asm.Label endLabel = this.endLabel.target;
+		
 		Variable var = this.variable;
 		if (this.type == DEFAULT)
 		{
@@ -362,11 +365,11 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				var.writeSet(writer, null, var.value);
 			}
 			
-			writer.visitLabel(this.startLabel);
+			writer.visitLabel(startLabel);
 			// Condition
 			if (this.condition != null)
 			{
-				this.condition.writeInvJump(writer, this.endLabel);
+				this.condition.writeInvJump(writer, endLabel);
 			}
 			// Then
 			if (this.then != null)
@@ -374,21 +377,21 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				this.then.writeStatement(writer);
 			}
 			// Update
-			writer.visitLabel(this.updateLabel, false);
+			writer.visitLabel(updateLabel, false);
 			if (this.update != null)
 			{
 				this.update.writeStatement(writer);
 			}
 			// Go back to Condition
-			writer.visitJumpInsn(Opcodes.GOTO, this.startLabel);
+			writer.visitJumpInsn(Opcodes.GOTO, startLabel);
 			
 			writer.removeLocals(1);
-			writer.visitLabel(this.endLabel, this.parent == null || this.parent.canVisitStack(this));
+			writer.visitLabel(endLabel, this.parent == null || this.parent.canVisitStack(this));
 			
 			// Variable
 			if (var != null)
 			{
-				writer.visitLocalVariable(var.qualifiedName, var.type, this.startLabel, this.endLabel, var.index);
+				writer.visitLocalVariable(var.qualifiedName, var.type, startLabel, endLabel, var.index);
 			}
 			return;
 		}
@@ -398,7 +401,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			Variable indexVar = this.var1;
 			Variable lengthVar = this.var2;
 			
-			Label scopeLabel = new Label();
+			jdk.internal.org.objectweb.asm.Label scopeLabel = new jdk.internal.org.objectweb.asm.Label();
 			writer.visitLabel(scopeLabel, false);
 			
 			// Local Variables
@@ -419,8 +422,8 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			indexVar.writeSet(writer, null, null);
 			
 			// Jump to boundary check
-			writer.visitJumpInsn(Opcodes.GOTO, this.updateLabel);
-			writer.visitLabel(this.startLabel);
+			writer.visitJumpInsn(Opcodes.GOTO, updateLabel);
+			writer.visitLabel(startLabel);
 			
 			// Load the element
 			arrayVar.writeGet(writer, null);
@@ -437,19 +440,19 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Increase index
 			writer.visitIincInsn(indexVar.index, 1);
 			// Boundary Check
-			writer.visitLabel(this.updateLabel);
+			writer.visitLabel(updateLabel);
 			indexVar.writeGet(writer, null);
 			lengthVar.writeGet(writer, null);
-			writer.visitJumpInsn2(Opcodes.IF_ICMPLT, this.startLabel);
+			writer.visitJumpInsn2(Opcodes.IF_ICMPLT, startLabel);
 			
 			// Local Variables
 			writer.removeLocals(4);
-			writer.visitLabel(this.endLabel);
+			writer.visitLabel(endLabel);
 			
-			writer.visitLocalVariable(var.qualifiedName, var.type, scopeLabel, this.endLabel, var.index);
-			writer.visitLocalVariable("$index", "I", null, scopeLabel, this.endLabel, indexVar.index);
-			writer.visitLocalVariable("$length", "I", null, scopeLabel, this.endLabel, lengthVar.index);
-			writer.visitLocalVariable("$array", arrayVar.type, scopeLabel, this.endLabel, arrayVar.index);
+			writer.visitLocalVariable(var.qualifiedName, var.type, scopeLabel, endLabel, var.index);
+			writer.visitLocalVariable("$index", "I", null, scopeLabel, endLabel, indexVar.index);
+			writer.visitLocalVariable("$length", "I", null, scopeLabel, endLabel, lengthVar.index);
+			writer.visitLocalVariable("$array", arrayVar.type, scopeLabel, endLabel, arrayVar.index);
 			return;
 		}
 	}

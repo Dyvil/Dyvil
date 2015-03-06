@@ -2,10 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
-
-import com.sun.xml.internal.ws.org.objectweb.asm.Opcodes;
-
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -32,9 +29,9 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	{
 		this.position = position;
 		
-		this.startLabel = new Label();
-		this.conditionLabel = new Label();
-		this.endLabel = new Label();
+		this.startLabel = new Label("$doStart");
+		this.conditionLabel = new Label("$doCondition");
+		this.endLabel = new Label("$doEnd");
 	}
 	
 	public void setCondition(IValue condition)
@@ -214,13 +211,13 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 		}
 		
 		// Do Block
-		writer.visitLabel(this.startLabel);
+		writer.visitLabel(this.startLabel.target);
 		this.then.writeStatement(writer);
 		// Condition
-		writer.visitLabel(this.conditionLabel);
-		this.condition.writeJump(writer, this.startLabel);
+		writer.visitLabel(this.conditionLabel.target);
+		this.condition.writeJump(writer, this.startLabel.target);
 		
-		writer.visitLabel(this.endLabel, this.parent == null || this.parent.canVisitStack(this));
+		writer.visitLabel(this.endLabel.target, this.parent == null || this.parent.canVisitStack(this));
 	}
 	
 	@Override

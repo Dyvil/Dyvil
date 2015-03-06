@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
@@ -26,15 +25,9 @@ public class IfStatement extends ASTNode implements IStatement
 	
 	private IStatement	parent;
 	
-	private Label		elseStart;
-	private Label		elseEnd;
-	
 	public IfStatement(ICodePosition position)
 	{
 		this.position = position;
-		
-		this.elseStart = new Label();
-		this.elseEnd = new Label();
 	}
 	
 	@Override
@@ -261,28 +254,22 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public Label resolveLabel(String name)
 	{
-		switch (name)
-		{
-		case "$ifEnd":
-		case "$elseStart":
-			return this.elseStart;
-		case "$elseEnd":
-			return this.elseThen == null ? this.elseStart : this.elseEnd;
-		}
-		
 		return this.parent == null ? null : this.parent.resolveLabel(name);
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		jdk.internal.org.objectweb.asm.Label elseStart = new jdk.internal.org.objectweb.asm.Label();
+		jdk.internal.org.objectweb.asm.Label elseEnd = new jdk.internal.org.objectweb.asm.Label();
+		
 		// Condition
-		this.condition.writeInvJump(writer, this.elseStart);
+		this.condition.writeInvJump(writer, elseStart);
 		// If Block
 		this.then.writeExpression(writer);
 		writer.pop();
-		writer.visitJumpInsn(Opcodes.GOTO, this.elseEnd);
-		writer.visitLabel(this.elseStart);
+		writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+		writer.visitLabel(elseStart);
 		// Else Block
 		if (this.elseThen == null)
 		{
@@ -292,31 +279,34 @@ public class IfStatement extends ASTNode implements IStatement
 		{
 			this.elseThen.writeExpression(writer);
 		}
-		writer.visitLabel(this.elseEnd, this.parent == null || this.parent.canVisitStack(this));
+		writer.visitLabel(elseEnd, this.parent == null || this.parent.canVisitStack(this));
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		jdk.internal.org.objectweb.asm.Label elseStart = new jdk.internal.org.objectweb.asm.Label();
+		jdk.internal.org.objectweb.asm.Label elseEnd = new jdk.internal.org.objectweb.asm.Label();
+		
 		if (this.elseThen != null)
 		{
 			// Condition
-			this.condition.writeInvJump(writer, this.elseStart);
+			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.visitJumpInsn(Opcodes.GOTO, this.elseEnd);
-			writer.visitLabel(this.elseStart);
+			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+			writer.visitLabel(elseStart);
 			// Else Block
 			this.elseThen.writeStatement(writer);
-			writer.visitLabel(this.elseEnd, this.parent == null || this.parent.canVisitStack(this));
+			writer.visitLabel(elseEnd, this.parent == null || this.parent.canVisitStack(this));
 		}
 		else
 		{
 			// Condition
-			this.condition.writeInvJump(writer, this.elseStart);
+			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.visitLabel(this.elseStart, this.parent == null || this.parent.canVisitStack(this));
+			writer.visitLabel(elseStart, this.parent == null || this.parent.canVisitStack(this));
 		}
 	}
 	
