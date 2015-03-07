@@ -38,6 +38,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
@@ -1080,7 +1081,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if ((this.modifiers & Modifiers.CASE_CLASS) != 0)
 		{
-			MethodWriter mw = new MethodWriter(writer,
+			MethodWriter mw = new MethodWriterImpl(writer,
 					writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));
 			mw.addLocal(this.type);
 			mw.visitParameter("obj", "Ljava/lang/Object;");
@@ -1088,13 +1089,13 @@ public class CodeClass extends ASTNode implements IClass
 			CaseClasses.writeEquals(mw, this, fields);
 			mw.visitEnd();
 			
-			mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I", null, null));
+			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I", null, null));
 			mw.addLocal(this.type);
 			mw.visitCode();
 			CaseClasses.writeHashCode(mw, this, fields);
 			mw.visitEnd();
 			
-			mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString", "()Ljava/lang/String;", null, null));
+			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString", "()Ljava/lang/String;", null, null));
 			mw.addLocal(this.type);
 			mw.visitCode();
 			CaseClasses.writeToString(mw, this, fields);

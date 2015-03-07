@@ -1,27 +1,22 @@
 package dyvil.tools.compiler.backend;
 
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
+import jdk.internal.org.objectweb.asm.*;
 import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.Handle;
-import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 
-public final class MethodWriter extends MethodVisitor
+public final class MethodWriterImpl implements MethodWriter
 {
 	public static final Long	LONG_MINUS_ONE	= Long.valueOf(-1);
-	public static final Integer	TOP				= jdk.internal.org.objectweb.asm.Opcodes.TOP;
-	public static final Integer	INT				= jdk.internal.org.objectweb.asm.Opcodes.INTEGER;
-	public static final Integer	LONG			= jdk.internal.org.objectweb.asm.Opcodes.LONG;
-	public static final Integer	FLOAT			= jdk.internal.org.objectweb.asm.Opcodes.FLOAT;
-	public static final Integer	DOUBLE			= jdk.internal.org.objectweb.asm.Opcodes.DOUBLE;
 	
 	public ClassWriter			cw;
+	protected MethodVisitor mv;
 	
-	public boolean				hasReturn;
+	private boolean				visitFrame;
+	private boolean				hasReturn;
 	
 	private int					localIndex;
 	private int					localCount;
@@ -33,96 +28,38 @@ public final class MethodWriter extends MethodVisitor
 	private int					maxStack;
 	private Object[]			stack			= new Object[3];
 	
-	public MethodWriter(ClassWriter cw, MethodVisitor mv)
+	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
 	{
-		super(ASM5, mv);
 		this.cw = cw;
+		this.mv = mv;
 	}
 	
+	@Override
 	public void setConstructor(IType type)
 	{
 		this.locals[0] = UNINITIALIZED_THIS;
 		this.push(UNINITIALIZED_THIS);
 	}
 	
-	// Locals
-	
-	private void ensureLocals(int count)
+	@Override
+	public void visitCode()
 	{
-		if (count > this.locals.length)
-		{
-			Object[] newLocals = new Object[count];
-			System.arraycopy(this.locals, 0, newLocals, 0, this.locals.length);
-			this.locals = newLocals;
-		}
-		if (count > this.maxLocals)
-		{
-			this.maxLocals = count;
-			this.localCount = count;
-			return;
-		}
-		if (count > this.localCount)
-		{
-			this.localCount = count;
-		}
+		this.mv.visitCode();
 	}
 	
-	@Deprecated
-	public void addLocal(int index, IType type)
+	@Override
+	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		this.ensureLocals(index + 1);
-		this.locals[index] = type.getFrameType();
-		this.localIndex = index + 1;
+		return this.mv.visitAnnotation(type, visible);
+	}
+
+	@Override
+	public AnnotationVisitor visitParameterAnnotation(int index, String type, boolean visible)
+	{
+		return this.mv.visitParameterAnnotation(index, type, visible);
 	}
 	
-	@Deprecated
-	public void addLocal(int index, Object type)
-	{
-		this.ensureLocals(index + 1);
-		this.locals[index] = type;
-		this.localIndex = index + 1;
-	}
-	
-	public int addLocal(IType type)
-	{
-		return this.addLocal(type.getFrameType());
-	}
-	
-	public int addLocal(Object type)
-	{
-		int index = this.localIndex;
-		if (type == LONG || type == DOUBLE)
-		{
-			this.ensureLocals(index + 2);
-			this.locals[index] = type;
-			this.locals[index + 1] = type;
-			this.localIndex += 2;
-		}
-		else
-		{
-			this.ensureLocals(index + 1);
-			this.locals[index] = type;
-			this.localIndex++;
-		}
-		
-		return index;
-	}
-	
-	public void removeLocals(int count)
-	{
-		for (int i = 0; i < count; i++)
-		{
-			this.localCount--;
-			Object o = this.locals[--this.localIndex];
-			if (o == LONG || o == DOUBLE)
-			{
-				this.localIndex--;
-				this.localCount--;
-			}
-		}
-	}
-	
-	// Stack Management
+	// Stack
 	
 	private void ensureStack(int count)
 	{
@@ -147,12 +84,20 @@ public final class MethodWriter extends MethodVisitor
 		}
 	}
 	
-	protected void set(Object type)
+	@Override
+	public void set(Object type)
 	{
 		this.stack[this.stackIndex - 1] = type;
 	}
 	
-	protected void push(Object type)
+	@Override
+	public void set(IType type)
+	{
+		this.stack[this.stackIndex - 1] = type.getFrameType();
+	}
+	
+	@Override
+	public void push(Object type)
 	{
 		if (type == LONG || type == DOUBLE)
 		{
@@ -165,6 +110,7 @@ public final class MethodWriter extends MethodVisitor
 		this.stack[this.stackIndex++] = type;
 	}
 	
+	@Override
 	public void push(IType type)
 	{
 		Object frameType = type.getFrameType();
@@ -174,12 +120,21 @@ public final class MethodWriter extends MethodVisitor
 		}
 	}
 	
+	@Override
 	public void pop()
 	{
 		this.stackIndex--;
 		this.stackCount--;
 	}
 	
+	@Override
+	public void pop(int count)
+	{
+		this.stackIndex -= count;
+		this.stackCount -= count;
+	}
+	
+	@Override
 	public Object peek()
 	{
 		return this.stack[this.stackIndex];
@@ -188,17 +143,12 @@ public final class MethodWriter extends MethodVisitor
 	private void visitFrame()
 	{
 		this.mv.visitFrame(F_NEW, this.localCount, this.locals, this.stackCount, this.stack);
+		this.visitFrame = false;
 	}
 	
 	// Parameters
 	
 	@Override
-	@Deprecated
-	public void visitParameter(String desc, int index)
-	{
-		this.mv.visitParameter(desc, index);
-	}
-	
 	public int visitParameter(String name, IType type)
 	{
 		int index = this.addLocal(type.getFrameType());
@@ -212,6 +162,7 @@ public final class MethodWriter extends MethodVisitor
 		return index;
 	}
 	
+	@Override
 	public int visitParameter(String name, Object type)
 	{
 		int index = this.addLocal(type);
@@ -219,21 +170,92 @@ public final class MethodWriter extends MethodVisitor
 		return index;
 	}
 	
+	// Locals
+	
+	private void ensureLocals(int count)
+	{
+		if (count > this.locals.length)
+		{
+			Object[] newLocals = new Object[count];
+			System.arraycopy(this.locals, 0, newLocals, 0, this.locals.length);
+			this.locals = newLocals;
+		}
+		if (count > this.maxLocals)
+		{
+			this.maxLocals = count;
+			this.localCount = count;
+			return;
+		}
+		if (count > this.localCount)
+		{
+			this.localCount = count;
+		}
+	}
+
+	@Override
+	public int addLocal(IType type)
+	{
+		return this.addLocal(type.getFrameType());
+	}
+
+	@Override
+	public int addLocal(Object type)
+	{
+		int index = this.localIndex;
+		if (type == LONG || type == DOUBLE)
+		{
+			this.ensureLocals(index + 2);
+			this.locals[index] = type;
+			this.locals[index + 1] = type;
+			this.localIndex += 2;
+		}
+		else
+		{
+			this.ensureLocals(index + 1);
+			this.locals[index] = type;
+			this.localIndex++;
+		}
+		
+		return index;
+	}
+
+	@Override
+	public void removeLocals(int count)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			this.localCount--;
+			Object o = this.locals[--this.localIndex];
+			if (o == LONG || o == DOUBLE)
+			{
+				this.localIndex--;
+				this.localCount--;
+			}
+		}
+	}
+
 	@Override
 	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index)
 	{
 		this.mv.visitLocalVariable(name, desc, signature, start, end, index);
 	}
 	
+	@Override
 	public void visitLocalVariable(String name, IType type, Label start, Label end, int index)
 	{
 		this.mv.visitLocalVariable(name, type.getExtendedName(), type.getSignature(), start, end, index);
 	}
 	
-	// Constant Loading
+	// Constants
 	
+	@Override
 	public void visitLdcInsn(int value)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		this.push(INTEGER);
 		switch (value)
 		{
@@ -275,8 +297,14 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitLdcInsn(Integer.valueOf(value));
 	}
 	
+	@Override
 	public void visitLdcInsn(long value)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		this.push(LONG);
 		if (value == 0L)
 		{
@@ -291,8 +319,14 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitLdcInsn(Long.valueOf(value));
 	}
 	
+	@Override
 	public void visitLdcInsn(float value)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		this.push(FLOAT);
 		if (value == 0F)
 		{
@@ -312,8 +346,14 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitLdcInsn(Float.valueOf(value));
 	}
 	
+	@Override
 	public void visitLdcInsn(double value)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		this.push(DOUBLE);
 		if (value == 0D)
 		{
@@ -328,8 +368,14 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitLdcInsn(Double.valueOf(value));
 	}
 	
+	@Override
 	public void visitLdcInsn(String value)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		this.push("Ljava/lang/String;");
 		this.mv.visitLdcInsn(value);
 	}
@@ -338,6 +384,11 @@ public final class MethodWriter extends MethodVisitor
 	@Deprecated
 	public void visitLdcInsn(Object obj)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		Class c = obj.getClass();
 		if (c == String.class)
 		{
@@ -367,16 +418,13 @@ public final class MethodWriter extends MethodVisitor
 	@Override
 	public void visitLabel(Label label)
 	{
-		this.visitFrame();
+		this.visitFrame = true;
 		this.mv.visitLabel(label);
 	}
 	
-	public void visitLabel(Label label, boolean stack)
+	@Override
+	public void visitLabel2(Label label)
 	{
-		if (stack)
-		{
-			this.visitFrame();
-		}
 		this.mv.visitLabel(label);
 	}
 	
@@ -385,6 +433,11 @@ public final class MethodWriter extends MethodVisitor
 	@Override
 	public void visitInsn(int opcode)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		if (opcode > 255)
 		{
 			this.visitSpecialInsn(opcode);
@@ -604,7 +657,7 @@ public final class MethodWriter extends MethodVisitor
 		}
 	}
 	
-	public void visitSpecialInsn(int opcode)
+	private void visitSpecialInsn(int opcode)
 	{
 		switch (opcode)
 		{
@@ -674,6 +727,11 @@ public final class MethodWriter extends MethodVisitor
 	{
 		if (opcode > 255)
 		{
+			if (this.visitFrame)
+			{
+				this.visitFrame();
+			}
+			
 			this.visitSpecialJumpInsn(opcode, label);
 			return;
 		}
@@ -699,11 +757,22 @@ public final class MethodWriter extends MethodVisitor
 			this.stackIndex -= 2;
 			this.stackCount -= 2;
 		}
+		if (opcode == GOTO || opcode == JSR || opcode == ATHROW)
+		{
+			this.visitFrame();
+			this.visitFrame = true;
+		}
 		this.mv.visitJumpInsn(opcode, label);
 	}
 	
+	@Override
 	public void visitJumpInsn2(int opcode, Label label)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		if (opcode >= IFEQ && opcode <= IFLE)
 		{
 			this.pop();
@@ -798,15 +867,33 @@ public final class MethodWriter extends MethodVisitor
 	@Override
 	public void visitTypeInsn(int opcode, String type)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
+		if (opcode == ANEWARRAY || opcode == NEWARRAY)
+		{
+			this.push("[" + type);
+		}
 		if (opcode == NEW)
 		{
 			this.push(type);
 		}
+		if (opcode == CHECKCAST) {
+			this.set(type);
+		}
 		this.mv.visitTypeInsn(opcode, type);
 	}
 	
+	@Override
 	public void visitTypeInsn(int opcode, IType type)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		if (opcode == ANEWARRAY || opcode == NEWARRAY)
 		{
 			this.push("[" + type.getExtendedName());
@@ -830,19 +917,46 @@ public final class MethodWriter extends MethodVisitor
 	@Override
 	public void visitMultiANewArrayInsn(String type, int dims)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		this.push(type);
 		this.mv.visitMultiANewArrayInsn(type, dims);
 	}
 	
+	@Override
 	public void visitMultiANewArrayInsn(IType type, int dims)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		this.push(type);
 		this.mv.visitMultiANewArrayInsn(type.getExtendedName(), dims);
 	}
 	
 	@Override
+	public void visitIincInsn(int var, int value)
+	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
+		this.mv.visitIincInsn(var, value);
+	}
+	
+	@Override
 	public void visitVarInsn(int opcode, int index)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		if (opcode >= ILOAD && opcode <= ALOAD)
 		{
 			this.push(this.locals[index]);
@@ -854,28 +968,14 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitVarInsn(opcode, index);
 	}
 	
-	public void visitVarInsn(int opcode, int index, IType type)
-	{
-		if (type != null)
-		{
-			this.push(type);
-		}
-		else
-		{
-			this.pop();
-		}
-		this.mv.visitVarInsn(opcode, index);
-	}
-	
 	@Override
-	@Deprecated
-	public void visitFieldInsn(int opcode, String owner, String name, String desc)
-	{
-		this.mv.visitFieldInsn(opcode, owner, name, desc);
-	}
-	
 	public void visitGetStatic(String owner, String name, String desc, IType type)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		if (type != null)
 		{
 			this.push(type);
@@ -883,43 +983,69 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitFieldInsn(GETSTATIC, owner, name, desc);
 	}
 	
+	@Override
 	public void visitPutStatic(String owner, String name, String desc)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		this.pop(); // Value
 		this.mv.visitFieldInsn(PUTSTATIC, owner, name, desc);
 	}
 	
+	@Override
 	public void visitGetField(String owner, String name, String desc, IType type)
 	{
-		this.pop(); // Instance
-		if (type != null)
+		if (this.visitFrame)
 		{
-			this.push(type);
+			this.visitFrame();
 		}
+		
+		this.pop(); // Instance
+		this.push(type);
 		this.mv.visitFieldInsn(GETFIELD, owner, name, desc);
 	}
 	
+	@Override
 	public void visitPutField(String owner, String name, String desc)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
 		this.pop(); // Instance
 		this.pop(); // Value
 		this.mv.visitFieldInsn(PUTFIELD, owner, name, desc);
 	}
 	
 	@Override
-	@Deprecated
-	public void visitMethodInsn(int opcode, String owner, String name, String desc)
+	public void visitMethodInsn(int opcode, String owner, String name, String desc, int args, Object returnType)
 	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
 		this.mv.visitMethodInsn(opcode, owner, name, desc, false);
+		this.pop(args);
+		if (returnType != null)
+		{
+			this.push(returnType);
+		}
 	}
-	
+
+	@Override
 	public void visitMethodInsn(int opcode, String owner, String name, String desc, int args, IType returnType)
 	{
-		this.mv.visitMethodInsn(opcode, owner, name, desc, false);
-		for (int i = 0; i < args; i++)
+		if (this.visitFrame)
 		{
-			this.pop();
+			this.visitFrame();
 		}
+		
+		this.mv.visitMethodInsn(opcode, owner, name, desc, false);
+		this.pop(args);
 		if (returnType != null)
 		{
 			this.push(returnType);
@@ -927,32 +1053,31 @@ public final class MethodWriter extends MethodVisitor
 	}
 	
 	@Override
-	@Deprecated
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface)
-	{
-		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
-	}
-	
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, IType returnType)
-	{
-		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
-		for (int i = 0; i < args; i++)
-		{
-			this.pop();
-		}
-		if (returnType != null)
-		{
-			this.push(returnType);
-		}
-	}
-	
 	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, Object returnType)
 	{
-		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
-		for (int i = 0; i < args; i++)
+		if (this.visitFrame)
 		{
-			this.pop();
+			this.visitFrame();
 		}
+		
+		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
+		this.pop(args);
+		if (returnType != null)
+		{
+			this.push(returnType);
+		}
+	}
+
+	@Override
+	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, IType returnType)
+	{
+		if (this.visitFrame)
+		{
+			this.visitFrame();
+		}
+		
+		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
+		this.pop(args);
 		if (returnType != null)
 		{
 			this.push(returnType);
@@ -960,32 +1085,31 @@ public final class MethodWriter extends MethodVisitor
 	}
 	
 	@Override
-	@Deprecated
-	public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs)
-	{
-		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
-	}
-	
 	public void visitInvokeDynamicInsn(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs)
 	{
-		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
-		for (int i = 0; i < args; i++)
+		if (this.visitFrame)
 		{
-			this.pop();
+			this.visitFrame();
 		}
+		
+		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+		this.pop(args);
 		if (returnType != null)
 		{
 			this.push(returnType);
 		}
 	}
 	
+	@Override
 	public void visitInvokeDynamicInsn(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs)
 	{
-		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
-		for (int i = 0; i < args; i++)
+		if (this.visitFrame)
 		{
-			this.pop();
+			this.visitFrame();
 		}
+		
+		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+		this.pop(args);
 		if (returnType != null)
 		{
 			this.push(returnType);
@@ -999,6 +1123,7 @@ public final class MethodWriter extends MethodVisitor
 		this.mv.visitEnd();
 	}
 	
+	@Override
 	public void visitEnd(IType type)
 	{
 		IClass iclass = type.getTheClass();
@@ -1009,6 +1134,9 @@ public final class MethodWriter extends MethodVisitor
 		
 		if (!this.hasReturn)
 		{
+			if (this.visitFrame)
+				this.visitFrame();
+			
 			this.mv.visitInsn(type.getReturnOpcode());
 		}
 		this.mv.visitMaxs(this.maxStack, this.maxLocals);

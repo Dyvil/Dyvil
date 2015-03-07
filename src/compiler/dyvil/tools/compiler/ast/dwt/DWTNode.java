@@ -250,7 +250,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitVarInsn(Opcodes.ALOAD, this.varIndex, this.type);
+		writer.visitVarInsn(Opcodes.ALOAD, this.varIndex);
 	}
 	
 	@Override
@@ -266,7 +266,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		Label end = new Label();
 		
 		int index = this.varIndex = writer.addLocal(extended);
-		writer.visitLabel(start, false);
+		writer.visitLabel2(start);
 		if (this.getter != null)
 		{
 			// Getter
@@ -290,7 +290,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 			IValue value = property.value;
 			if (setter != null)
 			{
-				writer.visitVarInsn(Opcodes.ALOAD, index, this.type);
+				writer.visitVarInsn(Opcodes.ALOAD, index);
 				value.writeExpression(writer);
 				writer.visitInsn(Opcodes.DUP);
 				writer.visitPutStatic(owner, property.fullName, value.getType().getExtendedName());
@@ -302,7 +302,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 			}
 		}
 		
-		writer.visitLabel(end, false);
+		writer.visitLabel2(end);
 		writer.visitLocalVariable(this.name, extended, null, start, end, index);
 	}
 	

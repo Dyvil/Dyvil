@@ -108,13 +108,13 @@ public final class ThisValue extends ASTNode implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitVarInsn(Opcodes.ALOAD, 0, this.type);
+		writer.visitVarInsn(Opcodes.ALOAD, 0);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitVarInsn(Opcodes.ALOAD, 0, this.type);
+		writer.visitVarInsn(Opcodes.ALOAD, 0);
 		writer.visitInsn(Opcodes.ARETURN);
 	}
 }

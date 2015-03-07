@@ -84,20 +84,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public boolean canVisitStack(IStatement child)
-	{
-		if (child != this.values[this.valueCount - 1])
-		{
-			return true;
-		}
-		if (this.parent == null && this.context instanceof IMethod)
-		{
-			return true;
-		}
-		return this.variables.isEmpty() && (this.parent == null || this.parent.canVisitStack(this));
-	}
-	
-	@Override
 	public boolean isPrimitive()
 	{
 		if (this.isArray)
@@ -327,7 +313,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		jdk.internal.org.objectweb.asm.Label start = new jdk.internal.org.objectweb.asm.Label();
 		jdk.internal.org.objectweb.asm.Label end = new jdk.internal.org.objectweb.asm.Label();
 		
-		writer.visitLabel(start, false);
+		writer.visitLabel2(start);
 		int count = 0;
 		
 		// Write variable types
@@ -356,9 +342,12 @@ public class StatementList extends ValueList implements IStatement, IContext
 		if (count > 0 && (this.parent != null || !(this.context instanceof IMethod)))
 		{
 			writer.removeLocals(count);
-			writer.visitLabel(end, this.parent == null || this.parent.canVisitStack(this));
+			writer.visitLabel(end);
 		}
-		writer.visitLabel(end, false);
+		else
+		{
+			writer.visitLabel2(end);
+		}
 		
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{

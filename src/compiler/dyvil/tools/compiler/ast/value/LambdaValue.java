@@ -25,6 +25,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.LambdaType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
@@ -386,7 +387,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		int handleType;
 		if (this.thisType != null)
 		{
-			writer.visitVarInsn(Opcodes.ALOAD, 0, this.thisType);
+			writer.visitVarInsn(Opcodes.ALOAD, 0);
 			handleType = Opcodes.H_INVOKESPECIAL;
 			len = 1 + this.capturedFieldCount;
 		}
@@ -468,7 +469,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		
 		boolean instance = this.thisType != null;
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
-		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(modifiers, this.name, this.desc, null, null));
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name, this.desc, null, null));
 		
 		// Updated Captured Field Indexes
 		

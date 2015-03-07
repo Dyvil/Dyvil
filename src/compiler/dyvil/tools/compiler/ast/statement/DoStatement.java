@@ -91,12 +91,6 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public boolean canVisitStack(IStatement child)
-	{
-		return true;
-	}
-	
-	@Override
 	public Label getContinueLabel()
 	{
 		return this.conditionLabel;
@@ -217,7 +211,7 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 		writer.visitLabel(this.conditionLabel.target);
 		this.condition.writeJump(writer, this.startLabel.target);
 		
-		writer.visitLabel(this.endLabel.target, this.parent == null || this.parent.canVisitStack(this));
+		writer.visitLabel(this.endLabel.target);
 	}
 	
 	@Override

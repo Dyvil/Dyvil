@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
@@ -200,7 +201,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		
 		// Write init Method
 		
-		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "init", "()V", null,
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "init", "()V", null,
 				new String[] { "java/lang/Exception" }));
 		
 		mw.visitCode();
@@ -209,7 +210,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		
 		// Write public static void main(String[] args)
 		
-		mw = new MethodWriter(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "main", "([Ljava/lang/String;)V", null,
+		mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "main", "([Ljava/lang/String;)V", null,
 				new String[] { "java/lang/Exception" }));
 		mw.visitParameter("args", "[Ljava/lang/String;");
 		mw.visitCode();

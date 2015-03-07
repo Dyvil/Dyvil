@@ -25,7 +25,7 @@ public class IntInstruction extends Instruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.visitIntInsn(this.opcode, this.value);
+		// FIXME writer.visitIntInsn(this.opcode, this.value);
 	}
 	
 	@Override

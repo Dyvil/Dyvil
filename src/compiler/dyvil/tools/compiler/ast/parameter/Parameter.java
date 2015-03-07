@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
@@ -177,7 +178,7 @@ public class Parameter extends Member implements IVariable
 		int modifiers = this.method.getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
 		String name = "parDefault$" + this.method.getQualifiedName() + "$" + this.index;
 		String desc = "()" + this.type.getExtendedName();
-		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(modifiers, name, desc, null, null));
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
 		mw.visitCode();
 		this.defaultValue.writeExpression(mw);
 		mw.visitEnd(this.type);
@@ -201,7 +202,7 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		writer.visitVarInsn(this.type.getLoadOpcode(), this.index, this.type);
+		writer.visitVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
 	@Override
@@ -209,7 +210,7 @@ public class Parameter extends Member implements IVariable
 	{
 		value.writeExpression(writer);
 		
-		writer.visitVarInsn(this.type.getStoreOpcode(), this.index, null);
+		writer.visitVarInsn(this.type.getStoreOpcode(), this.index);
 	}
 	
 	@Override

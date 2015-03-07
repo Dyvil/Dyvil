@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
@@ -157,7 +158,7 @@ public class Field extends Member implements IField
 			{
 				signature = "()" + signature;
 			}
-			MethodWriter mw = new MethodWriter(writer, writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name, desc, signature, null));
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name, desc, signature, null));
 			
 			for (int i = 0; i < this.annotationCount; i++)
 			{
