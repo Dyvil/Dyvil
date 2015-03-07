@@ -116,13 +116,13 @@ public final class SuperValue extends ASTNode implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitVarInsn(Opcodes.ALOAD, 0);
+		writer.writeVarInsn(Opcodes.ALOAD, 0);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitVarInsn(Opcodes.ALOAD, 0);
-		writer.visitInsn(Opcodes.ARETURN);
+		writer.writeVarInsn(Opcodes.ALOAD, 0);
+		writer.writeInsn(Opcodes.ARETURN);
 	}
 }

@@ -259,7 +259,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 		jdk.internal.org.objectweb.asm.Type type1 = jdk.internal.org.objectweb.asm.Type.getMethodType(this.functionalMethod.getDescriptor());
 		jdk.internal.org.objectweb.asm.Type type2 = jdk.internal.org.objectweb.asm.Type.getMethodType(methodDesc);
 		Handle handle = new Handle(handleType, this.method.getTheClass().getInternalName(), this.method.getQualifiedName(), methodDesc);
-		writer.visitInvokeDynamicInsn(name, desc, len, this.type, LambdaValue.BOOTSTRAP, type1, handle, type2);
+		writer.writeInvokeDynamic(name, desc, len, this.type, LambdaValue.BOOTSTRAP, type1, handle, type2);
 	}
 	
 	@Override

@@ -54,13 +54,13 @@ public class FieldInstruction extends Instruction
 		switch (this.opcode)
 		{
 		case GETSTATIC:
-			writer.visitGetStatic(this.owner, this.fieldName, this.desc, this.type);
+			writer.writeGetStatic(this.owner, this.fieldName, this.desc, this.type);
 		case PUTSTATIC:
-			writer.visitPutStatic(this.owner, this.fieldName, this.desc);
+			writer.writePutStatic(this.owner, this.fieldName, this.desc);
 		case GETFIELD:
-			writer.visitGetField(this.owner, this.fieldName, this.desc, this.type);
+			writer.writeGetField(this.owner, this.fieldName, this.desc, this.type);
 		case PUTFIELD:
-			writer.visitPutField(this.owner, this.fieldName, this.desc);
+			writer.writePutField(this.owner, this.fieldName, this.desc);
 		}
 	}
 	

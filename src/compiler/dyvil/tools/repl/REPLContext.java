@@ -27,6 +27,66 @@ public class REPLContext implements IValued, IDyvilUnit
 	
 	private Map<String, Variable>	variables	= new HashMap();
 	
+	private IValue					value;
+	
+	public void processValue()
+	{
+		List<Marker> markers = new ArrayList();
+		String name;
+		Variable var;
+		
+		if (value.getValueType() == IValue.VARIABLE)
+		{
+			var = ((FieldInitializer) value).variable;
+			name = var.qualifiedName;
+			value = var.value;
+			
+			if (var.value == null)
+			{
+				return;
+			}
+			
+			var.resolve(markers, this);
+			var.check(markers, this);
+			var.foldConstants();
+		}
+		else
+		{
+			name = "res" + resultIndex++;
+			var = new Variable(null, name, null);
+			value = value.resolve(markers, this);
+			value.check(markers, this);
+			value = value.foldConstants();
+			var.setValue(value);
+			var.setType(value.getType());
+		}
+		
+		if (!markers.isEmpty())
+		{
+			StringBuilder buf = new StringBuilder();
+			String code = DyvilREPL.currentCode;
+			boolean error = false;
+			for (Marker m : markers)
+			{
+				if (!error && m.isError())
+				{
+					error = true;
+				}
+				m.log(code, buf);
+			}
+			
+			System.out.println(buf.toString());
+			
+			if (error)
+			{
+				return;
+			}
+		}
+		
+		this.variables.put(name, var);
+		System.out.println(var.toString());
+	}
+	
 	@Override
 	public void setPackage(Package pack)
 	{
@@ -140,65 +200,12 @@ public class REPLContext implements IValued, IDyvilUnit
 	@Override
 	public void setValue(IValue value)
 	{
-		List<Marker> markers = new ArrayList();
-		String name;
-		Variable var;
-		
-		if (value.getValueType() == IValue.VARIABLE)
-		{
-			var = ((FieldInitializer) value).variable;
-			name = var.qualifiedName;
-			value = var.value;
-			
-			if (var.value == null)
-			{
-				return;
-			}
-			
-			var.resolve(markers, this);
-			var.check(markers, this);
-			var.foldConstants();
-		}
-		else
-		{
-			name = "res" + resultIndex++;
-			var = new Variable(null, name, null);
-			value = value.resolve(markers, this);
-			value.check(markers, this);
-			value = value.foldConstants();
-			var.setValue(value);
-			var.setType(value.getType());
-		}
-		
-		if (!markers.isEmpty())
-		{
-			StringBuilder buf = new StringBuilder();
-			String code = DyvilREPL.currentCode;
-			boolean error = false;
-			for (Marker m : markers)
-			{
-				if (!error && m.isError())
-				{
-					error = true;
-				}
-				m.log(code, buf);
-			}
-			
-			System.out.println(buf.toString());
-			
-			if (error)
-			{
-				return;
-			}
-		}
-		
-		this.variables.put(name, var);
-		System.out.println(var.toString());
+		this.value = value;
 	}
 	
 	@Override
 	public IValue getValue()
 	{
-		return null;
+		return this.value;
 	}
 }

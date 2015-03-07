@@ -113,13 +113,13 @@ public class BreakStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitJumpInsn(Opcodes.GOTO, this.label.target);
+		writer.writeFrameJump(Opcodes.GOTO, this.label.target);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitJumpInsn(Opcodes.GOTO, this.label.target);
+		writer.writeFrameJump(Opcodes.GOTO, this.label.target);
 	}
 	
 	@Override

@@ -193,7 +193,7 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	public void writeExpression(MethodWriter writer)
 	{
 		this.writeStatement(writer);
-		writer.visitInsn(Opcodes.ACONST_NULL);
+		writer.writeInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override
@@ -205,13 +205,13 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 		}
 		
 		// Do Block
-		writer.visitLabel(this.startLabel.target);
+		writer.writeFrameLabel(this.startLabel.target);
 		this.then.writeStatement(writer);
 		// Condition
-		writer.visitLabel(this.conditionLabel.target);
+		writer.writeFrameLabel(this.conditionLabel.target);
 		this.condition.writeJump(writer, this.startLabel.target);
 		
-		writer.visitLabel(this.endLabel.target);
+		writer.writeFrameLabel(this.endLabel.target);
 	}
 	
 	@Override

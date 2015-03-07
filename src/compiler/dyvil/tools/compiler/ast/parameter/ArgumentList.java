@@ -157,16 +157,16 @@ public final class ArgumentList implements IArguments, IValueList
 			int len = this.size - param.index;
 			int opcode = type.getArrayStoreOpcode();
 			
-			writer.visitLdcInsn(len);
-			writer.visitTypeInsn(Opcodes.ANEWARRAY, type);
+			writer.writeLDC(len);
+			writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
 			
 			for (int i = 0; i < len; i++)
 			{
-				writer.visitInsn(Opcodes.DUP);
+				writer.writeInsn(Opcodes.DUP);
 				IValue value = this.values[param.index + i];
-				writer.visitLdcInsn(i);
+				writer.writeLDC(i);
 				value.writeExpression(writer);
-				writer.visitInsn(opcode);
+				writer.writeInsn(opcode);
 			}
 			return;
 		}

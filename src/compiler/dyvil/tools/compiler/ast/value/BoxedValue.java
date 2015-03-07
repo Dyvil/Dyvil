@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.boxed;
+package dyvil.tools.compiler.ast.value;
 
 import java.util.List;
 
@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 

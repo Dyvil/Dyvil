@@ -262,7 +262,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 			this.instance.writeExpression(writer);
 		}
 		this.value.writeExpression(writer);
-		writer.visitInsn(Opcodes.DUP);
+		writer.writeInsn(Opcodes.DUP);
 		this.field.writeSet(writer, null, null);
 	}
 	

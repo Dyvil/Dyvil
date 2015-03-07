@@ -5,11 +5,11 @@ import java.util.List;
 import jdk.internal.org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.boxed.BoxedValue;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.BoxedValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -130,19 +130,19 @@ public class BooleanAnd extends ASTNode implements IValue
 		Label label2 = new Label();
 		this.left.writeInvJump(writer, label);
 		this.right.writeInvJump(writer, label);
-		writer.visitLdcInsn(1);
-		writer.visitJumpInsn(Opcodes.GOTO, label2);
+		writer.writeLDC(1);
+		writer.writeFrameJump(Opcodes.GOTO, label2);
 		writer.pop();
-		writer.visitLabel(label);
-		writer.visitLdcInsn(0);
-		writer.visitLabel(label2);
+		writer.writeFrameLabel(label);
+		writer.writeLDC(0);
+		writer.writeFrameLabel(label2);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
 		this.writeExpression(writer);
-		writer.visitInsn(Opcodes.IRETURN);
+		writer.writeInsn(Opcodes.IRETURN);
 	}
 	
 	@Override

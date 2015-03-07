@@ -100,7 +100,7 @@ public class SwapOperator extends ASTNode implements IValue
 	public void writeExpression(MethodWriter writer)
 	{
 		this.writeStatement(writer);
-		writer.visitInsn(Opcodes.ACONST_NULL);
+		writer.writeInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override

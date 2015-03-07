@@ -204,18 +204,18 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "init", "()V", null,
 				new String[] { "java/lang/Exception" }));
 		
-		mw.visitCode();
+		mw.begin();
 		this.rootNode.write(this.internalName, mw);
-		mw.visitEnd(Type.VOID);
+		mw.end(Type.VOID);
 		
 		// Write public static void main(String[] args)
 		
 		mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "main", "([Ljava/lang/String;)V", null,
 				new String[] { "java/lang/Exception" }));
 		mw.visitParameter("args", "[Ljava/lang/String;");
-		mw.visitCode();
-		mw.visitMethodInsn(Opcodes.INVOKESTATIC, this.internalName, "init", "()V", 0, Type.VOID);
-		mw.visitEnd(Type.VOID);
+		mw.begin();
+		mw.writeInvokeInsn(Opcodes.INVOKESTATIC, this.internalName, "init", "()V", 0, Type.VOID);
+		mw.end(Type.VOID);
 	}
 	
 	@Override

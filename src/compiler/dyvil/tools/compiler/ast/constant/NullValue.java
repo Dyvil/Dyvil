@@ -64,14 +64,14 @@ public class NullValue extends ASTNode implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitInsn(Opcodes.ACONST_NULL);
+		writer.writeInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitInsn(Opcodes.ACONST_NULL);
-		writer.visitInsn(Opcodes.RETURN);
+		writer.writeInsn(Opcodes.ACONST_NULL);
+		writer.writeInsn(Opcodes.RETURN);
 	}
 	
 	@Override

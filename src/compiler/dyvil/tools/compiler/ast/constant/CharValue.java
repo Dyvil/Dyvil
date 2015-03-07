@@ -2,9 +2,9 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.boxed.BoxedValue;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.BoxedValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -99,14 +99,14 @@ public class CharValue extends ASTNode implements INumericValue
 	@Override
 	public void writeExpression(MethodWriter visitor)
 	{
-		visitor.visitLdcInsn(this.value);
+		visitor.writeLDC(this.value);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitLdcInsn(this.value);
-		writer.visitInsn(Opcodes.IRETURN);
+		writer.writeLDC(this.value);
+		writer.writeInsn(Opcodes.IRETURN);
 	}
 	
 	@Override

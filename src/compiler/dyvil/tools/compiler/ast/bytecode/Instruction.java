@@ -41,7 +41,7 @@ public class Instruction extends ASTNode
 	
 	public void write(MethodWriter writer)
 	{
-		writer.visitInsn(this.opcode);
+		writer.writeInsn(this.opcode);
 	}
 	
 	public void resolve(List<Marker> markers, Bytecode bytecode)

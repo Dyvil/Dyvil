@@ -153,7 +153,7 @@ public class Annotation extends ASTNode implements ITyped
 		{
 			boolean visible = retention == RetentionPolicy.RUNTIME;
 			
-			AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
+			AnnotationVisitor visitor = writer.addAnnotation(this.type.getExtendedName(), visible);
 			for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
 			{
 				KeyValuePair entry = iterator.next();
@@ -185,7 +185,7 @@ public class Annotation extends ASTNode implements ITyped
 		{
 			boolean visible = retention == RetentionPolicy.RUNTIME;
 			
-			AnnotationVisitor visitor = writer.visitParameterAnnotation(index, this.type.getExtendedName(), visible);
+			AnnotationVisitor visitor = writer.addParameterAnnotation(index, this.type.getExtendedName(), visible);
 			for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
 			{
 				KeyValuePair entry = iterator.next();

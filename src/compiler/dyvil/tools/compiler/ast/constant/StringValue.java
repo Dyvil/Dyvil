@@ -76,14 +76,14 @@ public class StringValue extends ASTNode implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitLdcInsn(this.value);
+		writer.writeLDC(this.value);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		writer.visitLdcInsn(this.value);
-		writer.visitInsn(Opcodes.ARETURN);
+		writer.writeLDC(this.value);
+		writer.writeInsn(Opcodes.ARETURN);
 	}
 	
 	@Override

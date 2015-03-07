@@ -4,11 +4,11 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.boxed.BoxedValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.BoxedValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -109,14 +109,14 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	public void writeExpression(MethodWriter writer)
 	{
 		this.value.writeExpression(writer);
-		writer.visitTypeInsn(Opcodes.INSTANCEOF, this.type);
+		writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
 		this.writeExpression(writer);
-		writer.visitInsn(Opcodes.IRETURN);
+		writer.writeInsn(Opcodes.IRETURN);
 	}
 	
 	@Override

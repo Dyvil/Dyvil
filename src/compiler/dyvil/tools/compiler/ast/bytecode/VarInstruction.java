@@ -25,7 +25,7 @@ public class VarInstruction extends Instruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.visitVarInsn(this.opcode, this.index);
+		writer.writeVarInsn(this.opcode, this.index);
 	}
 	
 	@Override

@@ -339,7 +339,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	public void writeExpression(MethodWriter writer)
 	{
 		this.writeStatement(writer);
-		writer.visitInsn(Opcodes.ACONST_NULL);
+		writer.writeInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override
@@ -355,11 +355,11 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Variable
 			if (var != null)
 			{
-				var.index = writer.addLocal(var.type);
+				var.index = writer.registerLocal(var.type);
 				var.writeSet(writer, null, var.value);
 			}
 			
-			writer.visitLabel(startLabel);
+			writer.writeFrameLabel(startLabel);
 			// Condition
 			if (this.condition != null)
 			{
@@ -371,21 +371,21 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				this.then.writeStatement(writer);
 			}
 			// Update
-			writer.visitLabel2(updateLabel);
+			writer.writeLabel(updateLabel);
 			if (this.update != null)
 			{
 				this.update.writeStatement(writer);
 			}
 			// Go back to Condition
-			writer.visitJumpInsn(Opcodes.GOTO, startLabel);
+			writer.writeFrameJump(Opcodes.GOTO, startLabel);
 			
 			writer.removeLocals(1);
-			writer.visitLabel(endLabel);
+			writer.writeFrameLabel(endLabel);
 			
 			// Variable
 			if (var != null)
 			{
-				writer.visitLocalVariable(var.qualifiedName, var.type, startLabel, endLabel, var.index);
+				writer.writeLocal(var.qualifiedName, var.type, startLabel, endLabel, var.index);
 			}
 			return;
 		}
@@ -396,33 +396,33 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			Variable lengthVar = this.var2;
 			
 			jdk.internal.org.objectweb.asm.Label scopeLabel = new jdk.internal.org.objectweb.asm.Label();
-			writer.visitLabel2(scopeLabel);
+			writer.writeLabel(scopeLabel);
 			
 			// Local Variables
-			var.index = writer.addLocal(MethodWriter.TOP);
-			indexVar.index = writer.addLocal(MethodWriter.INT);
-			lengthVar.index = writer.addLocal(MethodWriter.INT);
-			arrayVar.index = writer.addLocal(arrayVar.type);
+			var.index = writer.registerLocal(MethodWriter.TOP);
+			indexVar.index = writer.registerLocal(MethodWriter.INT);
+			lengthVar.index = writer.registerLocal(MethodWriter.INT);
+			arrayVar.index = writer.registerLocal(arrayVar.type);
 			
 			// Load the array
 			var.value.writeExpression(writer);
-			writer.visitInsn(Opcodes.DUP);
+			writer.writeInsn(Opcodes.DUP);
 			arrayVar.writeSet(writer, null, null);
 			// Load the length
-			writer.visitInsn(Opcodes.ARRAYLENGTH);
+			writer.writeInsn(Opcodes.ARRAYLENGTH);
 			lengthVar.writeSet(writer, null, null);
 			// Set index to 0
-			writer.visitLdcInsn(0);
+			writer.writeLDC(0);
 			indexVar.writeSet(writer, null, null);
 			
 			// Jump to boundary check
-			writer.visitJumpInsn(Opcodes.GOTO, updateLabel);
-			writer.visitLabel(startLabel);
+			writer.writeFrameJump(Opcodes.GOTO, updateLabel);
+			writer.writeFrameLabel(startLabel);
 			
 			// Load the element
 			arrayVar.writeGet(writer, null);
 			indexVar.writeGet(writer, null);
-			writer.visitInsn(arrayVar.type.getArrayLoadOpcode());
+			writer.writeInsn(arrayVar.type.getArrayLoadOpcode());
 			var.writeSet(writer, null, null);
 			
 			// Then
@@ -432,21 +432,21 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			}
 			
 			// Increase index
-			writer.visitIincInsn(indexVar.index, 1);
+			writer.writeIINC(indexVar.index, 1);
 			// Boundary Check
-			writer.visitLabel(updateLabel);
+			writer.writeFrameLabel(updateLabel);
 			indexVar.writeGet(writer, null);
 			lengthVar.writeGet(writer, null);
-			writer.visitJumpInsn2(Opcodes.IF_ICMPLT, startLabel);
+			writer.writeJump(Opcodes.IF_ICMPLT, startLabel);
 			
 			// Local Variables
 			writer.removeLocals(4);
-			writer.visitLabel(endLabel);
+			writer.writeFrameLabel(endLabel);
 			
-			writer.visitLocalVariable(var.qualifiedName, var.type, scopeLabel, endLabel, var.index);
-			writer.visitLocalVariable("$index", "I", null, scopeLabel, endLabel, indexVar.index);
-			writer.visitLocalVariable("$length", "I", null, scopeLabel, endLabel, lengthVar.index);
-			writer.visitLocalVariable("$array", arrayVar.type, scopeLabel, endLabel, arrayVar.index);
+			writer.writeLocal(var.qualifiedName, var.type, scopeLabel, endLabel, var.index);
+			writer.writeLocal("$index", "I", null, scopeLabel, endLabel, indexVar.index);
+			writer.writeLocal("$length", "I", null, scopeLabel, endLabel, lengthVar.index);
+			writer.writeLocal("$array", arrayVar.type, scopeLabel, endLabel, arrayVar.index);
 			return;
 		}
 	}

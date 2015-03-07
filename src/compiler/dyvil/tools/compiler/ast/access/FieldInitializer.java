@@ -116,7 +116,7 @@ public class FieldInitializer extends ASTNode implements IValue, IValued
 	public void writeExpression(MethodWriter writer)
 	{
 		this.variable.value.writeExpression(writer);
-		writer.visitInsn(Opcodes.DUP);
+		writer.writeInsn(Opcodes.DUP);
 		this.variable.writeSet(writer, null, null);
 	}
 	

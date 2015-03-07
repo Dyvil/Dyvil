@@ -215,7 +215,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		
 		if (this.method.getType() != Type.VOID)
 		{
-			writer.visitInsn(Opcodes.POP);
+			writer.writeInsn(Opcodes.POP);
 		}
 	}
 	

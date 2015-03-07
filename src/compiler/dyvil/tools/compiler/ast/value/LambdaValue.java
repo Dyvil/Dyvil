@@ -387,7 +387,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		int handleType;
 		if (this.thisType != null)
 		{
-			writer.visitVarInsn(Opcodes.ALOAD, 0);
+			writer.writeVarInsn(Opcodes.ALOAD, 0);
 			handleType = Opcodes.H_INVOKESPECIAL;
 			len = 1 + this.capturedFieldCount;
 		}
@@ -407,7 +407,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		jdk.internal.org.objectweb.asm.Type type1 = jdk.internal.org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
 		jdk.internal.org.objectweb.asm.Type type2 = jdk.internal.org.objectweb.asm.Type.getMethodType(this.getSpecialDescriptor());
 		Handle handle = new Handle(handleType, this.owner, this.name, this.desc);
-		writer.visitInvokeDynamicInsn(name, desc, len, this.type, BOOTSTRAP, type1, handle, type2);
+		writer.writeInvokeDynamic(name, desc, len, this.type, BOOTSTRAP, type1, handle, type2);
 	}
 	
 	@Override
@@ -477,7 +477,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		
 		if (instance)
 		{
-			mw.addLocal(this.thisType);
+			mw.registerLocal(this.thisType);
 		}
 		
 		if (this.capturedFieldCount > 0)
@@ -499,9 +499,9 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		
 		// Write the Value
 		
-		mw.visitCode();
+		mw.begin();
 		this.value.writeExpression(mw);
-		mw.visitEnd(this.method.getType());
+		mw.end(this.method.getType());
 		
 		// Reset Captured Field Indexes
 		

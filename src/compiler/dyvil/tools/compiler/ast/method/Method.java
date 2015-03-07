@@ -302,7 +302,7 @@ public class Method extends Member implements IMethod
 			return 1;
 		}
 		
-		int pOff = 0;
+		int parIndex = 0;
 		int match = 1;
 		int len = arguments.size();
 		
@@ -323,13 +323,9 @@ public class Method extends Member implements IMethod
 			}
 			match += m;
 			
-			pOff = 1;
+			parIndex = 1;
 		}
-		else if (mods == Modifiers.STATIC && instance != null && instance.getValueType() != IValue.CLASS_ACCESS)
-		{
-			return 0;
-		}
-		else if ((this.modifiers & Modifiers.VARARGS) != 0)
+		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			int parCount = this.parameterCount - 1;
 			if (len <= parCount)
@@ -342,8 +338,8 @@ public class Method extends Member implements IMethod
 			varParam.index = parCount;
 			for (int i = 0; i < parCount; i++)
 			{
-				Parameter par = this.parameters[i + pOff];
-				par.index = i + pOff;
+				Parameter par = this.parameters[i + parIndex];
+				par.index = i;
 				m = arguments.getTypeMatch(par);
 				if (m == 0)
 				{
@@ -367,10 +363,10 @@ public class Method extends Member implements IMethod
 			return 0;
 		}
 		
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; parIndex < this.parameterCount; parIndex++)
 		{
-			Parameter par = this.parameters[i + pOff];
-			par.index = i;
+			Parameter par = this.parameters[parIndex];
+			par.index = i++;
 			int m = arguments.getTypeMatch(par);
 			if (m == 0)
 			{
@@ -385,7 +381,7 @@ public class Method extends Member implements IMethod
 	@Override
 	public void checkArguments(List<Marker> markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
-		int pOff = 0;
+		int parIndex = 0;
 		int len = arguments.size();
 		Parameter par;
 		IType parType;
@@ -402,7 +398,7 @@ public class Method extends Member implements IMethod
 				marker.addInfo("Value Type: " + instance.getType());
 				markers.add(marker);
 			}
-			pOff = 1;
+			parIndex = 1;
 		}
 		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
@@ -427,10 +423,10 @@ public class Method extends Member implements IMethod
 			arguments.checkVarargsValue(markers, par, typeContext);
 		}
 		
-		for (int i = 0; i < this.parameterCount; i++)
+		for (; parIndex < this.parameterCount; parIndex++)
 		{
-			par = this.parameters[i + pOff];
-			par.index = i;
+			par = this.parameters[parIndex];
+			par.index = parIndex;
 			arguments.checkValue(markers, par, typeContext);
 		}
 	}
@@ -879,7 +875,7 @@ public class Method extends Member implements IMethod
 		}
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.addLocal(this.theClass.getType());
+			mw.registerLocal(this.theClass.getType());
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)
@@ -889,23 +885,23 @@ public class Method extends Member implements IMethod
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
 		{
-			mw.visitAnnotation("Ldyvil/lang/annotation/inline;", false);
+			mw.addAnnotation("Ldyvil/lang/annotation/inline;", false);
 		}
 		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			mw.visitAnnotation("Ldyvil/lang/annotation/infix;", false);
+			mw.addAnnotation("Ldyvil/lang/annotation/infix;", false);
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			mw.visitAnnotation("Ldyvil/lang/annotation/prefix;", false);
+			mw.addAnnotation("Ldyvil/lang/annotation/prefix;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
 		{
-			mw.visitAnnotation("Ljava/lang/Deprecated;", true);
+			mw.addAnnotation("Ljava/lang/Deprecated;", true);
 		}
 		if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
 		{
-			mw.visitAnnotation("Ldyvil/lang/annotation/sealed;", false);
+			mw.addAnnotation("Ldyvil/lang/annotation/sealed;", false);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -918,22 +914,22 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
-			mw.visitCode();
-			mw.visitLabel2(start);
+			mw.begin();
+			mw.writeLabel(start);
 			this.value.writeExpression(mw);
-			mw.visitLabel2(end);
-			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);
+			mw.writeLabel(end);
+			mw.end(this.isConstructor ? Type.VOID : this.type);
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.visitLocalVariable("this", this.theClass.getType(), start, end, 0);
+			mw.writeLocal("this", this.theClass.getType(), start, end, 0);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			Parameter param = this.parameters[i];
-			mw.visitLocalVariable(param.qualifiedName, param.type, start, end, param.index);
+			mw.writeLocal(param.qualifiedName, param.type, start, end, param.index);
 		}
 	}
 	
@@ -954,13 +950,13 @@ public class Method extends Member implements IMethod
 				this.writeIntrinsic(writer, ifEnd, instance, arguments);
 				
 				// If Block
-				writer.visitLdcInsn(1);
+				writer.writeLDC(1);
 				writer.pop();
-				writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
-				writer.visitLabel(ifEnd);
+				writer.writeFrameJump(Opcodes.GOTO, elseEnd);
+				writer.writeFrameLabel(ifEnd);
 				// Else Block
-				writer.visitLdcInsn(0);
-				writer.visitLabel(elseEnd);
+				writer.writeLDC(0);
+				writer.writeFrameLabel(elseEnd);
 				return;
 			}
 			this.writeIntrinsic(writer, instance, arguments);
@@ -985,7 +981,7 @@ public class Method extends Member implements IMethod
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
-		writer.visitJumpInsn(IFNE, dest);
+		writer.writeFrameJump(IFNE, dest);
 	}
 	
 	@Override
@@ -1003,7 +999,7 @@ public class Method extends Member implements IMethod
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
-		writer.visitJumpInsn(IFEQ, dest);
+		writer.writeFrameJump(IFEQ, dest);
 	}
 	
 	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments)
@@ -1026,7 +1022,7 @@ public class Method extends Member implements IMethod
 			}
 			else
 			{
-				writer.visitInsn(i);
+				writer.writeInsn(i);
 			}
 		}
 	}
@@ -1048,11 +1044,11 @@ public class Method extends Member implements IMethod
 			}
 			else if (Opcodes.isJumpOpcode(i))
 			{
-				writer.visitJumpInsn(i, dest);
+				writer.writeFrameJump(i, dest);
 			}
 			else
 			{
-				writer.visitInsn(i);
+				writer.writeInsn(i);
 			}
 		}
 	}
@@ -1074,11 +1070,11 @@ public class Method extends Member implements IMethod
 			}
 			else if (Opcodes.isJumpOpcode(i))
 			{
-				writer.visitJumpInsn(Opcodes.getInverseOpcode(i), dest);
+				writer.writeFrameJump(Opcodes.getInverseOpcode(i), dest);
 			}
 			else
 			{
-				writer.visitInsn(i);
+				writer.writeInsn(i);
 			}
 		}
 	}
@@ -1125,7 +1121,7 @@ public class Method extends Member implements IMethod
 		String name = this.qualifiedName;
 		String desc = this.getDescriptor();
 		IType type = this.type;
-		writer.visitMethodInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);
+		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);
 	}
 	
 	@Override

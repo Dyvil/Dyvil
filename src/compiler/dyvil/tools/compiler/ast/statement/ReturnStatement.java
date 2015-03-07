@@ -163,11 +163,11 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 		{
 			this.value.writeExpression(writer);
 			IType type = this.value.getType();
-			writer.visitInsn(type.getReturnOpcode());
+			writer.writeInsn(type.getReturnOpcode());
 		}
 		else
 		{
-			writer.visitInsn(Opcodes.RETURN);
+			writer.writeInsn(Opcodes.RETURN);
 		}
 	}
 }

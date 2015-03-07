@@ -179,9 +179,9 @@ public class Parameter extends Member implements IVariable
 		String name = "parDefault$" + this.method.getQualifiedName() + "$" + this.index;
 		String desc = "()" + this.type.getExtendedName();
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
-		mw.visitCode();
+		mw.begin();
 		this.defaultValue.writeExpression(mw);
-		mw.visitEnd(this.type);
+		mw.end(this.type);
 	}
 	
 	public void write(MethodWriter writer)
@@ -190,7 +190,7 @@ public class Parameter extends Member implements IVariable
 		
 		if ((this.modifiers & Modifiers.BYREF) != 0)
 		{
-			writer.visitParameterAnnotation(this.index, "Ldyvil/lang/annotation/byref;", true);
+			writer.addParameterAnnotation(this.index, "Ldyvil/lang/annotation/byref;", true);
 		}
 		
 		for (Annotation a : this.annotations)
@@ -202,7 +202,7 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		writer.visitVarInsn(this.type.getLoadOpcode(), this.index);
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
 	@Override
@@ -210,7 +210,7 @@ public class Parameter extends Member implements IVariable
 	{
 		value.writeExpression(writer);
 		
-		writer.visitVarInsn(this.type.getStoreOpcode(), this.index);
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}
 	
 	@Override

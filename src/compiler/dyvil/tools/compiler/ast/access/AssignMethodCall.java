@@ -290,12 +290,12 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			if (instance != null)
 			{
 				instance.writeExpression(writer);
-				writer.visitInsn(Opcodes.DUP);
+				writer.writeInsn(Opcodes.DUP);
 			}
 			
 			f.writeGet(writer, null);
 			this.method.writeCall(writer, null, this.arguments);
-			writer.visitInsn(Opcodes.DUP);
+			writer.writeInsn(Opcodes.DUP);
 			f.writeSet(writer, null, null);
 		}
 		else if (i == APPLY_METHOD_CALL)
@@ -309,11 +309,11 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 				v.writeExpression(writer);
 			}
 			
-			writer.visitInsn(Opcodes.DUP2);
+			writer.writeInsn(Opcodes.DUP2);
 			
 			call.method.writeCall(writer, null, EmptyArguments.INSTANCE);
 			this.method.writeCall(writer, null, this.arguments);
-			writer.visitInsn(Opcodes.DUP_X2);
+			writer.writeInsn(Opcodes.DUP_X2);
 			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE);
 		}
 	}
@@ -336,7 +336,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			if (instance != null)
 			{
 				instance.writeExpression(writer);
-				writer.visitInsn(Opcodes.DUP);
+				writer.writeInsn(Opcodes.DUP);
 			}
 			
 			f.writeGet(writer, null);
@@ -354,7 +354,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 				v.writeExpression(writer);
 			}
 			
-			writer.visitInsn(Opcodes.DUP2);
+			writer.writeInsn(Opcodes.DUP2);
 			
 			call.method.writeCall(writer, null, EmptyArguments.INSTANCE);
 			this.method.writeCall(writer, null, this.arguments);
@@ -373,7 +373,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 				if (IValue.isNumeric(value1.getValueType()))
 				{
 					int count = ((INumericValue) value1).intValue();
-					writer.visitIincInsn(((IVariable) f).getIndex(), minus ? -count : count);
+					writer.writeIINC(((IVariable) f).getIndex(), minus ? -count : count);
 					return true;
 				}
 			}

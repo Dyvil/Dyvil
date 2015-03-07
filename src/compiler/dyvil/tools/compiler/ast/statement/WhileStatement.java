@@ -191,7 +191,7 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	public void writeExpression(MethodWriter writer)
 	{
 		this.writeStatement(writer);
-		writer.visitInsn(Opcodes.ACONST_NULL);
+		writer.writeInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override
@@ -203,13 +203,13 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		}
 		
 		// Condition
-		writer.visitLabel(this.startLabel.target);
+		writer.writeFrameLabel(this.startLabel.target);
 		this.condition.writeInvJump(writer, this.endLabel.target);
 		// While Block
 		this.then.writeStatement(writer);
-		writer.visitJumpInsn(Opcodes.GOTO, this.startLabel.target);
+		writer.writeFrameJump(Opcodes.GOTO, this.startLabel.target);
 		
-		writer.visitLabel(this.endLabel.target);
+		writer.writeFrameLabel(this.endLabel.target);
 	}
 	
 	@Override

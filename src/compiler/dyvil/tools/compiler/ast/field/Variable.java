@@ -146,7 +146,7 @@ public class Variable extends Member implements IVariable
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		writer.visitVarInsn(this.type.getLoadOpcode(), this.index);
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
 	@Override
@@ -157,7 +157,7 @@ public class Variable extends Member implements IVariable
 			value.writeExpression(writer);
 		}
 		
-		writer.visitVarInsn(this.type.getStoreOpcode(), this.index);
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}
 	
 	@Override

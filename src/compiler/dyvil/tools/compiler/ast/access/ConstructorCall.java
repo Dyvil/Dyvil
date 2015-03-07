@@ -233,7 +233,7 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 			{
 				this.arguments.getFirstValue().writeExpression(writer);
 				this.type.setArrayDimensions(0);
-				writer.visitTypeInsn(Opcodes.ANEWARRAY, this.type);
+				writer.writeTypeInsn(Opcodes.ANEWARRAY, this.type);
 				this.type.setArrayDimensions(1);
 				return;
 			}
@@ -246,13 +246,13 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 				paramList.getValue(i).writeExpression(writer);
 			}
 			
-			writer.visitMultiANewArrayInsn(this.type, len);
+			writer.writeNewArray(this.type, len);
 			return;
 		}
 		
 		int args = this.arguments.size() + 1;
-		writer.visitTypeInsn(Opcodes.NEW, this.type);
-		writer.visitInsn(Opcodes.DUP);
+		writer.writeTypeInsn(Opcodes.NEW, this.type);
+		writer.writeInsn(Opcodes.DUP);
 		
 		for (IValue arg : this.arguments)
 		{
@@ -262,14 +262,14 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 		String owner = this.type.getInternalName();
 		String name = "<init>";
 		String desc = this.method.getDescriptor();
-		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false, args, (String) null);
+		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false, args, (String) null);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
 		this.writeExpression(writer);
-		writer.visitInsn(Opcodes.ARETURN);
+		writer.writeInsn(Opcodes.ARETURN);
 	}
 	
 	@Override

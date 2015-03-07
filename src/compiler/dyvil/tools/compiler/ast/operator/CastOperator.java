@@ -129,7 +129,7 @@ public class CastOperator extends ASTNode implements IValue
 		}
 		else
 		{
-			writer.visitTypeInsn(Opcodes.CHECKCAST, this.type);
+			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type);
 		}
 	}
 	
@@ -137,7 +137,7 @@ public class CastOperator extends ASTNode implements IValue
 	public void writeStatement(MethodWriter writer)
 	{
 		this.writeExpression(writer);
-		writer.visitInsn(this.type.getReturnOpcode());
+		writer.writeInsn(this.type.getReturnOpcode());
 	}
 	
 	@Override
@@ -184,13 +184,13 @@ public class CastOperator extends ASTNode implements IValue
 		case Opcodes.T_INT:
 			break;
 		case Opcodes.T_LONG:
-			writer.visitInsn(I2L);
+			writer.writeInsn(I2L);
 			break;
 		case Opcodes.T_FLOAT:
-			writer.visitInsn(I2F);
+			writer.writeInsn(I2F);
 			break;
 		case Opcodes.T_DOUBLE:
-			writer.visitInsn(I2D);
+			writer.writeInsn(I2D);
 			break;
 		}
 	}
@@ -200,27 +200,27 @@ public class CastOperator extends ASTNode implements IValue
 		switch (cast.typecode)
 		{
 		case Opcodes.T_BOOLEAN:
-			writer.visitInsn(L2I);
+			writer.writeInsn(L2I);
 			break;
 		case Opcodes.T_BYTE:
-			writer.visitInsn(L2B);
+			writer.writeInsn(L2B);
 			break;
 		case Opcodes.T_SHORT:
-			writer.visitInsn(L2S);
+			writer.writeInsn(L2S);
 			break;
 		case Opcodes.T_CHAR:
-			writer.visitInsn(L2C);
+			writer.writeInsn(L2C);
 			break;
 		case Opcodes.T_INT:
-			writer.visitInsn(L2I);
+			writer.writeInsn(L2I);
 			break;
 		case Opcodes.T_LONG:
 			break;
 		case Opcodes.T_FLOAT:
-			writer.visitInsn(L2F);
+			writer.writeInsn(L2F);
 			break;
 		case Opcodes.T_DOUBLE:
-			writer.visitInsn(L2D);
+			writer.writeInsn(L2D);
 			break;
 		}
 	}
@@ -230,27 +230,27 @@ public class CastOperator extends ASTNode implements IValue
 		switch (cast.typecode)
 		{
 		case Opcodes.T_BOOLEAN:
-			writer.visitInsn(F2I);
+			writer.writeInsn(F2I);
 			break;
 		case Opcodes.T_BYTE:
-			writer.visitInsn(F2B);
+			writer.writeInsn(F2B);
 			break;
 		case Opcodes.T_SHORT:
-			writer.visitInsn(F2S);
+			writer.writeInsn(F2S);
 			break;
 		case Opcodes.T_CHAR:
-			writer.visitInsn(F2C);
+			writer.writeInsn(F2C);
 			break;
 		case Opcodes.T_INT:
-			writer.visitInsn(F2I);
+			writer.writeInsn(F2I);
 			break;
 		case Opcodes.T_LONG:
-			writer.visitInsn(F2L);
+			writer.writeInsn(F2L);
 			break;
 		case Opcodes.T_FLOAT:
 			break;
 		case Opcodes.T_DOUBLE:
-			writer.visitInsn(F2D);
+			writer.writeInsn(F2D);
 			break;
 		}
 	}
@@ -260,25 +260,25 @@ public class CastOperator extends ASTNode implements IValue
 		switch (cast.typecode)
 		{
 		case Opcodes.T_BOOLEAN:
-			writer.visitInsn(D2I);
+			writer.writeInsn(D2I);
 			break;
 		case Opcodes.T_BYTE:
-			writer.visitInsn(D2B);
+			writer.writeInsn(D2B);
 			break;
 		case Opcodes.T_SHORT:
-			writer.visitInsn(D2S);
+			writer.writeInsn(D2S);
 			break;
 		case Opcodes.T_CHAR:
-			writer.visitInsn(D2C);
+			writer.writeInsn(D2C);
 			break;
 		case Opcodes.T_INT:
-			writer.visitInsn(D2I);
+			writer.writeInsn(D2I);
 			break;
 		case Opcodes.T_LONG:
-			writer.visitInsn(D2L);
+			writer.writeInsn(D2L);
 			break;
 		case Opcodes.T_FLOAT:
-			writer.visitInsn(D2F);
+			writer.writeInsn(D2F);
 			break;
 		case Opcodes.T_DOUBLE:
 			break;

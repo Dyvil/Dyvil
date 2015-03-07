@@ -336,7 +336,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	public void writeStatement(MethodWriter writer)
 	{
 		this.field.writeGet(writer, this.instance);
-		writer.visitInsn(this.field.getType().getReturnOpcode());
+		writer.writeInsn(this.field.getType().getReturnOpcode());
 	}
 	
 	@Override

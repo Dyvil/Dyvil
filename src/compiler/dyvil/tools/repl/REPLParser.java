@@ -1,5 +1,6 @@
-package dyvil.tools.repl.parser;
+package dyvil.tools.repl;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -11,7 +12,7 @@ import dyvil.tools.compiler.util.Tokens;
 
 public class REPLParser implements IParserManager
 {
-	private Parser	parser	= Parser.rootParser;
+	private Parser	parser;
 	private int		skip;
 	private boolean	reparse;
 	
@@ -35,10 +36,10 @@ public class REPLParser implements IParserManager
 		try
 		{
 			int type = prev.type();
-			if (!ParserUtil.isSeperator(type) && type != (Tokens.TYPE_IDENTIFIER | Tokens.MOD_LETTER))
+			if (!ParserUtil.isSeperator(type) && type != (Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL))
 			{
-				Token semicolon = new Token(0, ";", Tokens.SEMICOLON, ";", token.endLine(), token.endIndex(), token.endIndex() + 1);
-				semicolon.setNext(token);
+				Token semicolon = new Token(prev.index() + 1, ";", Tokens.SEMICOLON, ";", prev.endLine(), prev.endIndex(), prev.endIndex() + 1);
+				semicolon.setPrev(prev);
 				prev.setNext(semicolon);
 			}
 		}
@@ -70,12 +71,21 @@ public class REPLParser implements IParserManager
 			}
 			catch (SyntaxError ex)
 			{
+				StringBuilder buf = new StringBuilder();
+				ex.log(DyvilREPL.currentCode, buf);
+				buf.append('\n');
+				System.out.println(buf.toString());
 				return false;
 			}
 			catch (Exception ex)
 			{
 				ex.printStackTrace();
 				return false;
+			}
+			
+			if (DyvilCompiler.parseStack)
+			{
+				System.out.println(token + ":\t\t" + this.parser.getName() + " @ " + this.parser.getMode());
 			}
 		}
 		

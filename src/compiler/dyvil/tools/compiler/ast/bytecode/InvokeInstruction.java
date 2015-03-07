@@ -55,7 +55,7 @@ public class InvokeInstruction extends Instruction implements INamed, IBaseMetho
 	public void write(MethodWriter writer)
 	{
 		IType type = this.type == Type.VOID ? null : this.type;
-		writer.visitMethodInsn(this.opcode, this.owner, this.methodName, this.desc, false, this.args, type);
+		writer.writeInvokeInsn(this.opcode, this.owner, this.methodName, this.desc, false, this.args, type);
 	}
 	
 	@Override

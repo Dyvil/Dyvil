@@ -63,7 +63,7 @@ public class LocalInstruction extends Instruction
 	public void write(MethodWriter writer)
 	{
 		// FIXME Register the local variable using addLocal
-		writer.visitLocalVariable(this.varName, this.type, this.startLabel, this.endLabel, this.index);
+		writer.writeLocal(this.varName, this.type, this.startLabel, this.endLabel, this.index);
 	}
 	
 	@Override

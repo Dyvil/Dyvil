@@ -3,12 +3,12 @@ package dyvil.tools.compiler.ast.type;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
-import dyvil.tools.compiler.ast.boxed.BoxedValue;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.value.BoxedValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -310,7 +310,7 @@ public final class PrimitiveType extends Type
 	{
 		if (this.arrayDimensions > 0)
 		{
-			writer.visitInsn(Opcodes.ACONST_NULL);
+			writer.writeInsn(Opcodes.ACONST_NULL);
 			return;
 		}
 		switch (this.typecode)
@@ -320,16 +320,16 @@ public final class PrimitiveType extends Type
 		case Opcodes.T_SHORT:
 		case Opcodes.T_CHAR:
 		case Opcodes.T_INT:
-			writer.visitLdcInsn(0);
+			writer.writeLDC(0);
 			break;
 		case Opcodes.T_LONG:
-			writer.visitLdcInsn(0L);
+			writer.writeLDC(0L);
 			break;
 		case Opcodes.T_FLOAT:
-			writer.visitLdcInsn(0F);
+			writer.writeLDC(0F);
 			break;
 		case Opcodes.T_DOUBLE:
-			writer.visitLdcInsn(0D);
+			writer.writeLDC(0D);
 			break;
 		}
 	}

@@ -250,7 +250,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		writer.visitVarInsn(Opcodes.ALOAD, this.varIndex);
+		writer.writeVarInsn(Opcodes.ALOAD, this.varIndex);
 	}
 	
 	@Override
@@ -265,8 +265,8 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		Label start = new Label();
 		Label end = new Label();
 		
-		int index = this.varIndex = writer.addLocal(extended);
-		writer.visitLabel2(start);
+		int index = this.varIndex = writer.registerLocal(extended);
+		writer.writeLabel(start);
 		if (this.getter != null)
 		{
 			// Getter
@@ -275,14 +275,14 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		else
 		{
 			// Constructor
-			writer.visitTypeInsn(Opcodes.NEW, internal);
-			writer.visitInsn(Opcodes.DUP);
-			writer.visitInsn(Opcodes.DUP);
-			writer.visitMethodInsn(Opcodes.INVOKESPECIAL, internal, "<init>", "()V", 0, Type.VOID);
-			writer.visitPutStatic(owner, this.fullName, extended);
+			writer.writeTypeInsn(Opcodes.NEW, internal);
+			writer.writeInsn(Opcodes.DUP);
+			writer.writeInsn(Opcodes.DUP);
+			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, internal, "<init>", "()V", 0, Type.VOID);
+			writer.writePutStatic(owner, this.fullName, extended);
 		}
 		
-		writer.visitVarInsn(Opcodes.ASTORE, index);
+		writer.writeVarInsn(Opcodes.ASTORE, index);
 		
 		for (DWTProperty property : this.properties)
 		{
@@ -290,10 +290,10 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 			IValue value = property.value;
 			if (setter != null)
 			{
-				writer.visitVarInsn(Opcodes.ALOAD, index);
+				writer.writeVarInsn(Opcodes.ALOAD, index);
 				value.writeExpression(writer);
-				writer.visitInsn(Opcodes.DUP);
-				writer.visitPutStatic(owner, property.fullName, value.getType().getExtendedName());
+				writer.writeInsn(Opcodes.DUP);
+				writer.writePutStatic(owner, property.fullName, value.getType().getExtendedName());
 				setter.writeCall(writer, null, EmptyArguments.INSTANCE);
 			}
 			else if (value.getValueType() == NODE)
@@ -302,8 +302,8 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 			}
 		}
 		
-		writer.visitLabel2(end);
-		writer.visitLocalVariable(this.name, extended, null, start, end, index);
+		writer.writeLabel(end);
+		writer.writeLocal(this.name, extended, null, start, end, index);
 	}
 	
 	@Override

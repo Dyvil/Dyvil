@@ -234,7 +234,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	public default void writeDefaultValue(MethodWriter writer)
 	{
-		writer.visitInsn(Opcodes.ACONST_NULL);
+		writer.writeInsn(Opcodes.ACONST_NULL);
 	}
 	
 	// Misc

@@ -93,8 +93,8 @@ public final class EmptyArguments implements IArguments
 		
 		if (param.varargs)
 		{
-			writer.visitLdcInsn(0);
-			writer.visitTypeInsn(Opcodes.ANEWARRAY, param.type);
+			writer.writeLDC(0);
+			writer.writeTypeInsn(Opcodes.ANEWARRAY, param.type);
 		}
 	}
 	

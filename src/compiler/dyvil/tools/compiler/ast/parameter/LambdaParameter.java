@@ -111,11 +111,11 @@ public class LambdaParameter extends Member implements IVariable
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		writer.visitVarInsn(this.type.getLoadOpcode(), this.index);
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
 		
 		if (this.baseType != this.type)
 		{
-			writer.visitTypeInsn(Opcodes.CHECKCAST, this.type);
+			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type);
 		}
 	}
 	
@@ -124,7 +124,7 @@ public class LambdaParameter extends Member implements IVariable
 	{
 		value.writeExpression(writer);
 		
-		writer.visitVarInsn(this.type.getStoreOpcode(), this.index);
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}
 	
 	@Override

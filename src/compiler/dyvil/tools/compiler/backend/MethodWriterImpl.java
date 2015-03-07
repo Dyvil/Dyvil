@@ -42,19 +42,19 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitCode()
+	public void begin()
 	{
 		this.mv.visitCode();
 	}
 	
 	@Override
-	public AnnotationVisitor visitAnnotation(String type, boolean visible)
+	public AnnotationVisitor addAnnotation(String type, boolean visible)
 	{
 		return this.mv.visitAnnotation(type, visible);
 	}
 
 	@Override
-	public AnnotationVisitor visitParameterAnnotation(int index, String type, boolean visible)
+	public AnnotationVisitor addParameterAnnotation(int index, String type, boolean visible)
 	{
 		return this.mv.visitParameterAnnotation(index, type, visible);
 	}
@@ -151,7 +151,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public int visitParameter(String name, IType type)
 	{
-		int index = this.addLocal(type.getFrameType());
+		int index = this.registerLocal(type.getFrameType());
 		this.mv.visitParameter(name, index);
 		
 		IClass iclass = type.getTheClass();
@@ -165,7 +165,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public int visitParameter(String name, Object type)
 	{
-		int index = this.addLocal(type);
+		int index = this.registerLocal(type);
 		this.mv.visitParameter(name, index);
 		return index;
 	}
@@ -193,13 +193,13 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 
 	@Override
-	public int addLocal(IType type)
+	public int registerLocal(IType type)
 	{
-		return this.addLocal(type.getFrameType());
+		return this.registerLocal(type.getFrameType());
 	}
 
 	@Override
-	public int addLocal(Object type)
+	public int registerLocal(Object type)
 	{
 		int index = this.localIndex;
 		if (type == LONG || type == DOUBLE)
@@ -235,13 +235,13 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 
 	@Override
-	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index)
+	public void writeLocal(String name, String desc, String signature, Label start, Label end, int index)
 	{
 		this.mv.visitLocalVariable(name, desc, signature, start, end, index);
 	}
 	
 	@Override
-	public void visitLocalVariable(String name, IType type, Label start, Label end, int index)
+	public void writeLocal(String name, IType type, Label start, Label end, int index)
 	{
 		this.mv.visitLocalVariable(name, type.getExtendedName(), type.getSignature(), start, end, index);
 	}
@@ -249,7 +249,7 @@ public final class MethodWriterImpl implements MethodWriter
 	// Constants
 	
 	@Override
-	public void visitLdcInsn(int value)
+	public void writeLDC(int value)
 	{
 		if (this.visitFrame)
 		{
@@ -298,7 +298,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitLdcInsn(long value)
+	public void writeLDC(long value)
 	{
 		if (this.visitFrame)
 		{
@@ -320,7 +320,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitLdcInsn(float value)
+	public void writeLDC(float value)
 	{
 		if (this.visitFrame)
 		{
@@ -347,7 +347,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitLdcInsn(double value)
+	public void writeLDC(double value)
 	{
 		if (this.visitFrame)
 		{
@@ -369,7 +369,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitLdcInsn(String value)
+	public void writeLDC(String value)
 	{
 		if (this.visitFrame)
 		{
@@ -382,7 +382,7 @@ public final class MethodWriterImpl implements MethodWriter
 	
 	@Override
 	@Deprecated
-	public void visitLdcInsn(Object obj)
+	public void writeLDC(Object obj)
 	{
 		if (this.visitFrame)
 		{
@@ -416,14 +416,14 @@ public final class MethodWriterImpl implements MethodWriter
 	// Labels
 	
 	@Override
-	public void visitLabel(Label label)
+	public void writeFrameLabel(Label label)
 	{
 		this.visitFrame = true;
 		this.mv.visitLabel(label);
 	}
 	
 	@Override
-	public void visitLabel2(Label label)
+	public void writeLabel(Label label)
 	{
 		this.mv.visitLabel(label);
 	}
@@ -431,7 +431,7 @@ public final class MethodWriterImpl implements MethodWriter
 	// Other Instructions
 	
 	@Override
-	public void visitInsn(int opcode)
+	public void writeInsn(int opcode)
 	{
 		if (this.visitFrame)
 		{
@@ -723,7 +723,7 @@ public final class MethodWriterImpl implements MethodWriter
 	// Jump Instructions
 	
 	@Override
-	public void visitJumpInsn(int opcode, Label label)
+	public void writeFrameJump(int opcode, Label label)
 	{
 		if (opcode > 255)
 		{
@@ -766,7 +766,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitJumpInsn2(int opcode, Label label)
+	public void writeJump(int opcode, Label label)
 	{
 		if (this.visitFrame)
 		{
@@ -790,82 +790,82 @@ public final class MethodWriterImpl implements MethodWriter
 		switch (opcode)
 		{
 		case Opcodes.IF_LCMPEQ:
-			this.visitInsn(Opcodes.LCMP);
-			this.visitJumpInsn(Opcodes.IFEQ, dest);
+			this.writeInsn(Opcodes.LCMP);
+			this.writeFrameJump(Opcodes.IFEQ, dest);
 			return;
 		case Opcodes.IF_LCMPNE:
-			this.visitInsn(Opcodes.LCMP);
-			this.visitJumpInsn(Opcodes.IFNE, dest);
+			this.writeInsn(Opcodes.LCMP);
+			this.writeFrameJump(Opcodes.IFNE, dest);
 			return;
 		case Opcodes.IF_LCMPLT:
-			this.visitInsn(Opcodes.LCMP);
-			this.visitJumpInsn(Opcodes.IFLT, dest);
+			this.writeInsn(Opcodes.LCMP);
+			this.writeFrameJump(Opcodes.IFLT, dest);
 			return;
 		case Opcodes.IF_LCMPGE:
-			this.visitInsn(Opcodes.LCMP);
-			this.visitJumpInsn(Opcodes.IFGE, dest);
+			this.writeInsn(Opcodes.LCMP);
+			this.writeFrameJump(Opcodes.IFGE, dest);
 			return;
 		case Opcodes.IF_LCMPGT:
-			this.visitInsn(Opcodes.LCMP);
-			this.visitJumpInsn(Opcodes.IFGT, dest);
+			this.writeInsn(Opcodes.LCMP);
+			this.writeFrameJump(Opcodes.IFGT, dest);
 			return;
 		case Opcodes.IF_LCMPLE:
-			this.visitInsn(Opcodes.LCMP);
-			this.visitJumpInsn(Opcodes.IFLE, dest);
+			this.writeInsn(Opcodes.LCMP);
+			this.writeFrameJump(Opcodes.IFLE, dest);
 			return;
 		case Opcodes.IF_FCMPEQ:
-			this.visitInsn(Opcodes.FCMPL);
-			this.visitJumpInsn(Opcodes.IFEQ, dest);
+			this.writeInsn(Opcodes.FCMPL);
+			this.writeFrameJump(Opcodes.IFEQ, dest);
 			return;
 		case Opcodes.IF_FCMPNE:
-			this.visitInsn(Opcodes.FCMPL);
-			this.visitJumpInsn(Opcodes.IFNE, dest);
+			this.writeInsn(Opcodes.FCMPL);
+			this.writeFrameJump(Opcodes.IFNE, dest);
 			return;
 		case Opcodes.IF_FCMPLT:
-			this.visitInsn(Opcodes.FCMPL);
-			this.visitJumpInsn(Opcodes.IFLT, dest);
+			this.writeInsn(Opcodes.FCMPL);
+			this.writeFrameJump(Opcodes.IFLT, dest);
 			return;
 		case Opcodes.IF_FCMPGE:
-			this.visitInsn(Opcodes.FCMPG);
-			this.visitJumpInsn(Opcodes.IFGE, dest);
+			this.writeInsn(Opcodes.FCMPG);
+			this.writeFrameJump(Opcodes.IFGE, dest);
 			return;
 		case Opcodes.IF_FCMPGT:
-			this.visitInsn(Opcodes.FCMPG);
-			this.visitJumpInsn(Opcodes.IFGT, dest);
+			this.writeInsn(Opcodes.FCMPG);
+			this.writeFrameJump(Opcodes.IFGT, dest);
 			return;
 		case Opcodes.IF_FCMPLE:
-			this.visitInsn(Opcodes.FCMPL);
-			this.visitJumpInsn(Opcodes.IFLE, dest);
+			this.writeInsn(Opcodes.FCMPL);
+			this.writeFrameJump(Opcodes.IFLE, dest);
 			return;
 		case Opcodes.IF_DCMPEQ:
-			this.visitInsn(Opcodes.DCMPL);
-			this.visitJumpInsn(Opcodes.IFEQ, dest);
+			this.writeInsn(Opcodes.DCMPL);
+			this.writeFrameJump(Opcodes.IFEQ, dest);
 			return;
 		case Opcodes.IF_DCMPNE:
-			this.visitInsn(Opcodes.DCMPL);
-			this.visitJumpInsn(Opcodes.IFNE, dest);
+			this.writeInsn(Opcodes.DCMPL);
+			this.writeFrameJump(Opcodes.IFNE, dest);
 			return;
 		case Opcodes.IF_DCMPLT:
-			this.visitInsn(Opcodes.DCMPL);
-			this.visitJumpInsn(Opcodes.IFLT, dest);
+			this.writeInsn(Opcodes.DCMPL);
+			this.writeFrameJump(Opcodes.IFLT, dest);
 			return;
 		case Opcodes.IF_DCMPGE:
-			this.visitInsn(Opcodes.DCMPG);
-			this.visitJumpInsn(Opcodes.IFGE, dest);
+			this.writeInsn(Opcodes.DCMPG);
+			this.writeFrameJump(Opcodes.IFGE, dest);
 			return;
 		case Opcodes.IF_DCMPGT:
-			this.visitInsn(Opcodes.DCMPG);
-			this.visitJumpInsn(Opcodes.IFGT, dest);
+			this.writeInsn(Opcodes.DCMPG);
+			this.writeFrameJump(Opcodes.IFGT, dest);
 			return;
 		case Opcodes.IF_DCMPLE:
-			this.visitInsn(Opcodes.DCMPL);
-			this.visitJumpInsn(Opcodes.IFLE, dest);
+			this.writeInsn(Opcodes.DCMPL);
+			this.writeFrameJump(Opcodes.IFLE, dest);
 			return;
 		}
 	}
 	
 	@Override
-	public void visitTypeInsn(int opcode, String type)
+	public void writeTypeInsn(int opcode, String type)
 	{
 		if (this.visitFrame)
 		{
@@ -887,7 +887,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitTypeInsn(int opcode, IType type)
+	public void writeTypeInsn(int opcode, IType type)
 	{
 		if (this.visitFrame)
 		{
@@ -915,7 +915,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitMultiANewArrayInsn(String type, int dims)
+	public void writeNewArray(String type, int dims)
 	{
 		if (this.visitFrame)
 		{
@@ -927,7 +927,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitMultiANewArrayInsn(IType type, int dims)
+	public void writeNewArray(IType type, int dims)
 	{
 		if (this.visitFrame)
 		{
@@ -939,7 +939,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitIincInsn(int var, int value)
+	public void writeIINC(int var, int value)
 	{
 		if (this.visitFrame)
 		{
@@ -950,7 +950,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitVarInsn(int opcode, int index)
+	public void writeVarInsn(int opcode, int index)
 	{
 		if (this.visitFrame)
 		{
@@ -969,7 +969,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitGetStatic(String owner, String name, String desc, IType type)
+	public void writeGetStatic(String owner, String name, String desc, IType type)
 	{
 		if (this.visitFrame)
 		{
@@ -984,7 +984,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitPutStatic(String owner, String name, String desc)
+	public void writePutStatic(String owner, String name, String desc)
 	{
 		if (this.visitFrame)
 		{
@@ -996,7 +996,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitGetField(String owner, String name, String desc, IType type)
+	public void writeGetField(String owner, String name, String desc, IType type)
 	{
 		if (this.visitFrame)
 		{
@@ -1009,7 +1009,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitPutField(String owner, String name, String desc)
+	public void writePutField(String owner, String name, String desc)
 	{
 		if (this.visitFrame)
 		{
@@ -1022,7 +1022,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, int args, Object returnType)
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, Object returnType)
 	{
 		if (this.visitFrame)
 		{
@@ -1037,7 +1037,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 
 	@Override
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, int args, IType returnType)
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, IType returnType)
 	{
 		if (this.visitFrame)
 		{
@@ -1053,7 +1053,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, Object returnType)
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, Object returnType)
 	{
 		if (this.visitFrame)
 		{
@@ -1069,7 +1069,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 
 	@Override
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, IType returnType)
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, IType returnType)
 	{
 		if (this.visitFrame)
 		{
@@ -1085,7 +1085,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitInvokeDynamicInsn(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs)
+	public void writeInvokeDynamic(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs)
 	{
 		if (this.visitFrame)
 		{
@@ -1101,7 +1101,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitInvokeDynamicInsn(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs)
+	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs)
 	{
 		if (this.visitFrame)
 		{
@@ -1117,14 +1117,14 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitEnd()
+	public void end()
 	{
 		this.mv.visitMaxs(this.maxStack, this.maxLocals);
 		this.mv.visitEnd();
 	}
 	
 	@Override
-	public void visitEnd(IType type)
+	public void end(IType type)
 	{
 		IClass iclass = type.getTheClass();
 		if (iclass != null)

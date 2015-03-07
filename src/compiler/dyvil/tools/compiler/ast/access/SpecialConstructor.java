@@ -187,14 +187,14 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 			opcode = Opcodes.INVOKESPECIAL;
 			args = 1;
 			
-			writer.visitTypeInsn(Opcodes.NEW, this.type);
-			writer.visitInsn(Opcodes.DUP);
+			writer.writeTypeInsn(Opcodes.NEW, this.type);
+			writer.writeInsn(Opcodes.DUP);
 		}
 		
 		String owner = this.method.getTheClass().getInternalName();
 		String name = "<init>";
 		String desc = "()V";
-		writer.visitMethodInsn(opcode, owner, name, desc, false, args, null);
+		writer.writeInvokeInsn(opcode, owner, name, desc, false, args, null);
 		
 		this.list.writeExpression(writer);
 	}
@@ -213,13 +213,13 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 			opcode = Opcodes.INVOKESPECIAL;
 			args = 1;
 			
-			writer.visitTypeInsn(Opcodes.NEW, this.type);
+			writer.writeTypeInsn(Opcodes.NEW, this.type);
 		}
 		
 		String owner = this.method.getTheClass().getInternalName();
 		String name = "<init>";
 		String desc = "()V";
-		writer.visitMethodInsn(opcode, owner, name, desc, false, args, null);
+		writer.writeInvokeInsn(opcode, owner, name, desc, false, args, null);
 		
 		this.list.writeExpression(writer);
 	}

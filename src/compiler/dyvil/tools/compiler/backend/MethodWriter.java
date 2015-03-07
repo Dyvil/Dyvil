@@ -17,13 +17,13 @@ public interface MethodWriter
 	
 	// Annotations
 	
-	public AnnotationVisitor visitAnnotation(String type, boolean visible);
+	public AnnotationVisitor addAnnotation(String type, boolean visible);
 	
-	public AnnotationVisitor visitParameterAnnotation(int index, String type, boolean visible);
+	public AnnotationVisitor addParameterAnnotation(int index, String type, boolean visible);
 	
 	// Code
 	
-	public void visitCode();
+	public void begin();
 	
 	// Stack
 	
@@ -49,83 +49,83 @@ public interface MethodWriter
 	
 	// Local Variables
 	
-	public int addLocal(Object type);
+	public int registerLocal(Object type);
 	
-	public int addLocal(IType type);
+	public int registerLocal(IType type);
 	
 	public void removeLocals(int count);
 	
-	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index);
+	public void writeLocal(String name, String desc, String signature, Label start, Label end, int index);
 	
-	public void visitLocalVariable(String name, IType type, Label start, Label end, int index);
+	public void writeLocal(String name, IType type, Label start, Label end, int index);
 	
 	// Constants
 	
-	public void visitLdcInsn(int value);
+	public void writeLDC(int value);
 	
-	public void visitLdcInsn(long value);
+	public void writeLDC(long value);
 	
-	public void visitLdcInsn(float value);
+	public void writeLDC(float value);
 	
-	public void visitLdcInsn(double value);
+	public void writeLDC(double value);
 	
-	public void visitLdcInsn(String value);
+	public void writeLDC(String value);
 	
-	public void visitLdcInsn(Object value);
+	public void writeLDC(Object value);
 	
 	// Labels
 	
-	public void visitLabel(Label label);
+	public void writeFrameLabel(Label label);
 	
-	public void visitLabel2(Label label);
+	public void writeLabel(Label label);
 	
 	// Instructions
 	
-	public void visitInsn(int opcode);
+	public void writeInsn(int opcode);
 	
-	public void visitJumpInsn(int opcode, Label label);
+	public void writeFrameJump(int opcode, Label label);
 	
-	public void visitJumpInsn2(int opcode, Label label);
+	public void writeJump(int opcode, Label label);
 	
-	public void visitTypeInsn(int opcode, String type);
+	public void writeTypeInsn(int opcode, String type);
 	
-	public void visitTypeInsn(int opcode, IType type);
+	public void writeTypeInsn(int opcode, IType type);
 	
-	public void visitMultiANewArrayInsn(String type, int dims);
+	public void writeNewArray(String type, int dims);
 	
-	public void visitMultiANewArrayInsn(IType type, int dims);
+	public void writeNewArray(IType type, int dims);
 	
-	public void visitVarInsn(int opcode, int var);
+	public void writeVarInsn(int opcode, int var);
 	
-	public void visitIincInsn(int var, int value);
+	public void writeIINC(int var, int value);
 	
 	// Field Instructions
 	
-	public void visitGetStatic(String owner, String name, String desc, IType type);
+	public void writeGetStatic(String owner, String name, String desc, IType type);
 	
-	public void visitPutStatic(String owner, String name, String desc);
+	public void writePutStatic(String owner, String name, String desc);
 	
-	public void visitGetField(String owner, String name, String desc, IType type);
+	public void writeGetField(String owner, String name, String desc, IType type);
 	
-	public void visitPutField(String owner, String name, String desc);
+	public void writePutField(String owner, String name, String desc);
 	
 	// Invoke Instructions
 	
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, int args, Object returnType);
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, Object returnType);
 	
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, int args, IType returnType);
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, IType returnType);
 	
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, Object returnType);
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, Object returnType);
 	
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, IType returnType);
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, IType returnType);
 	
-	public void visitInvokeDynamicInsn(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs);
+	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs);
 	
-	public void visitInvokeDynamicInsn(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs);
+	public void writeInvokeDynamic(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs);
 	
 	// End
 	
-	public void visitEnd();
+	public void end();
 	
-	public void visitEnd(IType type);
+	public void end(IType type);
 }

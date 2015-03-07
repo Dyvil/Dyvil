@@ -285,7 +285,7 @@ public class Property extends Field implements IProperty, IContext
 		String owner = this.theClass.getInternalName();
 		String name = "get$" + this.qualifiedName;
 		String desc = "()" + this.type.getExtendedName();
-		writer.visitMethodInsn(opcode, owner, name, desc, false, args, this.type);
+		writer.writeInvokeInsn(opcode, owner, name, desc, false, args, this.type);
 	}
 	
 	@Override
@@ -314,7 +314,7 @@ public class Property extends Field implements IProperty, IContext
 		String owner = this.theClass.getInternalName();
 		String name = "set$" + this.qualifiedName;
 		String desc = "(" + this.type.getExtendedName() + ")V";
-		writer.visitMethodInsn(opcode, owner, name, desc, false, args, (String) null);
+		writer.writeInvokeInsn(opcode, owner, name, desc, false, args, (String) null);
 	}
 	
 	@Override

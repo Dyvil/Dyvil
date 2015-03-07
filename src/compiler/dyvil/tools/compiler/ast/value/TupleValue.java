@@ -218,8 +218,8 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	public void writeExpression(MethodWriter writer)
 	{
 		TupleType t = this.tupleType;
-		writer.visitTypeInsn(Opcodes.NEW, t);
-		writer.visitInsn(Opcodes.DUP);
+		writer.writeTypeInsn(Opcodes.NEW, t);
+		writer.writeInsn(Opcodes.DUP);
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
@@ -228,7 +228,7 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 		
 		String owner = t.getInternalName();
 		String desc = t.getConstructorDescriptor();
-		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false, this.valueCount + 1, t);
+		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false, this.valueCount + 1, t);
 	}
 	
 	@Override

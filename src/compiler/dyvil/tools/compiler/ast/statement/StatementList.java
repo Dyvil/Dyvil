@@ -313,14 +313,14 @@ public class StatementList extends ValueList implements IStatement, IContext
 		jdk.internal.org.objectweb.asm.Label start = new jdk.internal.org.objectweb.asm.Label();
 		jdk.internal.org.objectweb.asm.Label end = new jdk.internal.org.objectweb.asm.Label();
 		
-		writer.visitLabel2(start);
+		writer.writeLabel(start);
 		int count = 0;
 		
 		// Write variable types
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			var.index = writer.addLocal(var.type);
+			var.index = writer.registerLocal(var.type);
 			count++;
 		}
 		
@@ -332,7 +332,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 				Label l = this.labels[i];
 				if (l != null)
 				{
-					writer.visitLabel(l.target);
+					writer.writeFrameLabel(l.target);
 				}
 			}
 			
@@ -342,17 +342,17 @@ public class StatementList extends ValueList implements IStatement, IContext
 		if (count > 0 && (this.parent != null || !(this.context instanceof IMethod)))
 		{
 			writer.removeLocals(count);
-			writer.visitLabel(end);
+			writer.writeFrameLabel(end);
 		}
 		else
 		{
-			writer.visitLabel2(end);
+			writer.writeLabel(end);
 		}
 		
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			writer.visitLocalVariable(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), start, end, var.index);
+			writer.writeLocal(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), start, end, var.index);
 		}
 	}
 	

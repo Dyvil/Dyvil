@@ -165,11 +165,11 @@ public class Field extends Member implements IField
 				this.annotations[i].write(mw);
 			}
 			
-			mw.visitAnnotation("Ldyvil/lang/annotation/lazy;", false);
+			mw.addAnnotation("Ldyvil/lang/annotation/lazy;", false);
 			
-			mw.visitCode();
+			mw.begin();
 			this.value.writeExpression(mw);
-			mw.visitEnd(this.type);
+			mw.end(this.type);
 			
 			return;
 		}
@@ -203,11 +203,11 @@ public class Field extends Member implements IField
 		String desc = this.type.getExtendedName();
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
 		{
-			writer.visitGetStatic(owner, name, desc, this.type);
+			writer.writeGetStatic(owner, name, desc, this.type);
 		}
 		else
 		{
-			writer.visitGetField(owner, name, desc, this.type);
+			writer.writeGetField(owner, name, desc, this.type);
 		}
 	}
 	
@@ -226,11 +226,11 @@ public class Field extends Member implements IField
 		String desc = this.type.getExtendedName();
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
 		{
-			writer.visitPutStatic(owner, name, desc);
+			writer.writePutStatic(owner, name, desc);
 		}
 		else
 		{
-			writer.visitPutField(owner, name, desc);
+			writer.writePutField(owner, name, desc);
 		}
 	}
 	

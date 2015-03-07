@@ -25,7 +25,7 @@ public class IIncInstruction extends Instruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.visitIincInsn(this.opcode, this.value);
+		writer.writeIINC(this.opcode, this.value);
 	}
 	
 	@Override

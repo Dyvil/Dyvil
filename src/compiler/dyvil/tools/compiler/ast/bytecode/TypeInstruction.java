@@ -27,7 +27,7 @@ public class TypeInstruction extends Instruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.visitTypeInsn(this.opcode, this.type);
+		writer.writeTypeInsn(this.opcode, this.type);
 	}
 	
 	@Override

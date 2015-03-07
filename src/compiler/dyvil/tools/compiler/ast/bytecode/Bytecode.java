@@ -110,11 +110,11 @@ public class Bytecode extends ASTNode implements IValue
 		{
 			if (i.label != null)
 			{
-				writer.visitLabel(i.label);
+				writer.writeFrameLabel(i.label);
 			}
 			i.write(writer);
 		}
-		writer.visitLabel(this.endLabel);
+		writer.writeFrameLabel(this.endLabel);
 	}
 	
 	@Override
@@ -124,11 +124,11 @@ public class Bytecode extends ASTNode implements IValue
 		{
 			if (i.label != null)
 			{
-				writer.visitLabel(i.label);
+				writer.writeFrameLabel(i.label);
 			}
 			i.write(writer);
 		}
-		writer.visitLabel(this.endLabel);
+		writer.writeFrameLabel(this.endLabel);
 	}
 	
 	@Override

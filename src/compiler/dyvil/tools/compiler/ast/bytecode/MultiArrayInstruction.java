@@ -33,7 +33,7 @@ public class MultiArrayInstruction extends Instruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.visitMultiANewArrayInsn(this.type, this.dims);
+		writer.writeNewArray(this.type, this.dims);
 	}
 	
 	@Override

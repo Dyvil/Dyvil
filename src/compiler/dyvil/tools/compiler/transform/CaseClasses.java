@@ -23,47 +23,47 @@ public class CaseClasses
 		String extended = "L" + theClass.getInternalName() + ";";
 		
 		// Write check 'if (this == obj)'
-		writer.visitVarInsn(ALOAD, 0);
-		writer.visitVarInsn(ALOAD, 1);
+		writer.writeVarInsn(ALOAD, 0);
+		writer.writeVarInsn(ALOAD, 1);
 		// if
-		writer.visitJumpInsn(IF_ACMPNE, label = new Label());
+		writer.writeFrameJump(IF_ACMPNE, label = new Label());
 		// then
-		writer.visitLdcInsn(1);
-		writer.visitInsn(IRETURN); // return true
+		writer.writeLDC(1);
+		writer.writeInsn(IRETURN); // return true
 		// else
-		writer.visitLabel(label);
+		writer.writeFrameLabel(label);
 		
 		// Write check 'if (obj == null)'
-		writer.visitVarInsn(ALOAD, 1);
+		writer.writeVarInsn(ALOAD, 1);
 		// if
-		writer.visitJumpInsn(IFNONNULL, label = new Label());
+		writer.writeFrameJump(IFNONNULL, label = new Label());
 		// then
-		writer.visitLdcInsn(0);
-		writer.visitInsn(IRETURN); // return false
+		writer.writeLDC(0);
+		writer.writeInsn(IRETURN); // return false
 		// else
-		writer.visitLabel(label);
+		writer.writeFrameLabel(label);
 		
 		// Write check 'if (this.getClass() != obj.getClass())'
 		// this.getClass()
-		writer.visitVarInsn(ALOAD, 0);
-		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 1, "Ljava/lang/Class;");
+		writer.writeVarInsn(ALOAD, 0);
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 1, "Ljava/lang/Class;");
 		// obj.getClass()
-		writer.visitVarInsn(ALOAD, 1);
-		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 1, "Ljava/lang/Class;");
+		writer.writeVarInsn(ALOAD, 1);
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 1, "Ljava/lang/Class;");
 		// if
-		writer.visitJumpInsn(IF_ACMPEQ, label = new Label());
+		writer.writeFrameJump(IF_ACMPEQ, label = new Label());
 		// then
-		writer.visitLdcInsn(0);
-		writer.visitInsn(IRETURN);
+		writer.writeLDC(0);
+		writer.writeInsn(IRETURN);
 		// else
-		writer.visitLabel(label);
+		writer.writeFrameLabel(label);
 		
 		// var = (ClassName) obj
-		writer.visitVarInsn(ALOAD, 1);
-		writer.visitTypeInsn(CHECKCAST, extended);
+		writer.writeVarInsn(ALOAD, 1);
+		writer.writeTypeInsn(CHECKCAST, extended);
 		// 'var' variable that stores the casted 'obj' parameter
-		writer.addLocal(extended);
-		writer.visitVarInsn(ASTORE, 2);
+		writer.registerLocal(extended);
+		writer.writeVarInsn(ASTORE, 2);
 		
 		Iterator<IField> iterator = fields.iterator();
 		while (iterator.hasNext())
@@ -82,8 +82,8 @@ public class CaseClasses
 			writeEquals(writer, f);
 		}
 		
-		writer.visitLdcInsn(1);
-		writer.visitInsn(IRETURN);
+		writer.writeLDC(1);
+		writer.writeInsn(IRETURN);
 	}
 	
 	private static void writeEquals(MethodWriter writer, IField field)
@@ -92,10 +92,10 @@ public class CaseClasses
 		if (type.isPrimitive())
 		{
 			// Push 'this'
-			writer.visitVarInsn(ALOAD, 0);
+			writer.writeVarInsn(ALOAD, 0);
 			field.writeGet(writer, null);
 			// Push 'var'
-			writer.visitVarInsn(ALOAD, 2);
+			writer.writeVarInsn(ALOAD, 2);
 			field.writeGet(writer, null);
 			
 			Label label = new Label();
@@ -106,21 +106,21 @@ public class CaseClasses
 			case Opcodes.T_SHORT:
 			case Opcodes.T_CHAR:
 			case Opcodes.T_INT:
-				writer.visitJumpInsn(IF_ICMPEQ, label);
+				writer.writeFrameJump(IF_ICMPEQ, label);
 				break;
 			case Opcodes.T_LONG:
-				writer.visitJumpInsn(IF_LCMPEQ, label);
+				writer.writeFrameJump(IF_LCMPEQ, label);
 				break;
 			case Opcodes.T_FLOAT:
-				writer.visitJumpInsn(IF_FCMPEQ, label);
+				writer.writeFrameJump(IF_FCMPEQ, label);
 				break;
 			case Opcodes.T_DOUBLE:
-				writer.visitJumpInsn(IF_FCMPEQ, label);
+				writer.writeFrameJump(IF_FCMPEQ, label);
 				break;
 			}
-			writer.visitLdcInsn(0);
-			writer.visitInsn(IRETURN);
-			writer.visitLabel(label);
+			writer.writeLDC(0);
+			writer.writeInsn(IRETURN);
+			writer.writeFrameLabel(label);
 			return;
 		}
 		
@@ -130,30 +130,30 @@ public class CaseClasses
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
-		writer.visitVarInsn(ALOAD, 0);
+		writer.writeVarInsn(ALOAD, 0);
 		field.writeGet(writer, null);
-		writer.visitJumpInsn(IFNONNULL, elseLabel);
-		writer.visitVarInsn(ALOAD, 2);
+		writer.writeFrameJump(IFNONNULL, elseLabel);
+		writer.writeVarInsn(ALOAD, 2);
 		field.writeGet(writer, null);
-		writer.visitJumpInsn(IFNULL, endLabel);
-		writer.visitLdcInsn(0);
-		writer.visitInsn(IRETURN);
-		writer.visitLabel(elseLabel);
-		writer.visitVarInsn(ALOAD, 0);
+		writer.writeFrameJump(IFNULL, endLabel);
+		writer.writeLDC(0);
+		writer.writeInsn(IRETURN);
+		writer.writeFrameLabel(elseLabel);
+		writer.writeVarInsn(ALOAD, 0);
 		field.writeGet(writer, null);
-		writer.visitVarInsn(ALOAD, 2);
+		writer.writeVarInsn(ALOAD, 2);
 		field.writeGet(writer, null);
-		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 2, MethodWriter.INT);
-		writer.visitJumpInsn(IFNE, endLabel);
-		writer.visitLdcInsn(0);
-		writer.visitInsn(IRETURN);
-		writer.visitLabel(endLabel);
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 2, MethodWriter.INT);
+		writer.writeFrameJump(IFNE, endLabel);
+		writer.writeLDC(0);
+		writer.writeInsn(IRETURN);
+		writer.writeFrameLabel(endLabel);
 	}
 	
 	public static void writeHashCode(MethodWriter writer, CodeClass theClass, List<IField> fields)
 	{
 		Iterator<IField> iterator = fields.iterator();
-		writer.visitLdcInsn(31);
+		writer.writeLDC(31);
 		while (iterator.hasNext())
 		{
 			IField f = iterator.next();
@@ -170,18 +170,18 @@ public class CaseClasses
 			// Write the hashing strategy for the field
 			writeHashCode(writer, f);
 			// Add the hash to the previous result
-			writer.visitInsn(IADD);
-			writer.visitLdcInsn(31);
+			writer.writeInsn(IADD);
+			writer.writeLDC(31);
 			// Multiply the result by 31
-			writer.visitInsn(IMUL);
+			writer.writeInsn(IMUL);
 		}
 		
-		writer.visitInsn(IRETURN);
+		writer.writeInsn(IRETURN);
 	}
 	
 	private static void writeHashCode(MethodWriter writer, IField field)
 	{
-		writer.visitVarInsn(ALOAD, 0);
+		writer.writeVarInsn(ALOAD, 0);
 		field.writeGet(writer, null);
 		
 		IType type = field.getType();
@@ -196,15 +196,15 @@ public class CaseClasses
 				Label elseLabel = new Label();
 				Label endLabel = new Label();
 				// if
-				writer.visitJumpInsn(IFEQ, elseLabel);
+				writer.writeFrameJump(IFEQ, elseLabel);
 				// then
-				writer.visitLdcInsn(1231);
+				writer.writeLDC(1231);
 				writer.pop();
-				writer.visitJumpInsn(GOTO, endLabel);
+				writer.writeFrameJump(GOTO, endLabel);
 				// else
-				writer.visitLabel(elseLabel);
-				writer.visitLdcInsn(1237);
-				writer.visitLabel(endLabel);
+				writer.writeFrameLabel(elseLabel);
+				writer.writeLDC(1237);
+				writer.writeFrameLabel(endLabel);
 				return;
 			}
 			case Opcodes.T_BYTE:
@@ -219,25 +219,25 @@ public class CaseClasses
 				// Write a long hashing snippet by XORing the value by the value
 				// bit-shifted 32 bits to the right, and then converting the
 				// result to an integer. l1 = (int) (l ^ (l >>> 32))
-				writer.visitInsn(DUP2);
-				writer.visitLdcInsn(32);
-				writer.visitInsn(LUSHR);
-				writer.visitInsn(LOR);
-				writer.visitInsn(L2I);
+				writer.writeInsn(DUP2);
+				writer.writeLDC(32);
+				writer.writeInsn(LUSHR);
+				writer.writeInsn(LOR);
+				writer.writeInsn(L2I);
 				return;
 			case Opcodes.T_FLOAT:
 				// Write a float hashing snippet using Float.floatToIntBits
-				writer.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "floatToIntBits", "(F)I", false, 1, MethodWriter.FLOAT);
+				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Float", "floatToIntBits", "(F)I", false, 1, MethodWriter.FLOAT);
 				return;
 			case Opcodes.T_DOUBLE:
 				// Write a double hashing snippet using Double.doubleToLongBits
 				// and long hashing
-				writer.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)L", false, 1, MethodWriter.DOUBLE);
-				writer.visitInsn(DUP2);
-				writer.visitLdcInsn(32);
-				writer.visitInsn(LUSHR);
-				writer.visitInsn(LOR);
-				writer.visitInsn(L2I);
+				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)L", false, 1, MethodWriter.DOUBLE);
+				writer.writeInsn(DUP2);
+				writer.writeLDC(32);
+				writer.writeInsn(LUSHR);
+				writer.writeInsn(LOR);
+				writer.writeInsn(L2I);
 				return;
 			}
 		}
@@ -248,27 +248,27 @@ public class CaseClasses
 		// Write an Object hashing snippet
 		
 		// if
-		writer.visitInsn(DUP);
-		writer.visitJumpInsn(IFNULL, elseLabel);
+		writer.writeInsn(DUP);
+		writer.writeFrameJump(IFNULL, elseLabel);
 		// then
-		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false, 0, null);
-		writer.visitJumpInsn(GOTO, endLabel);
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false, 0, null);
+		writer.writeFrameJump(GOTO, endLabel);
 		// else
-		writer.visitLabel(elseLabel);
-		writer.visitInsn(POP);
-		writer.visitLdcInsn(0);
-		writer.visitLabel(endLabel);
+		writer.writeFrameLabel(elseLabel);
+		writer.writeInsn(POP);
+		writer.writeLDC(0);
+		writer.writeFrameLabel(endLabel);
 	}
 	
 	public static void writeToString(MethodWriter writer, CodeClass theClass, List<IField> fields)
 	{
 		// ----- StringBuilder Constructor -----
-		writer.visitTypeInsn(NEW, "java/lang/StringBuilder");
-		writer.visitInsn(DUP);
+		writer.writeTypeInsn(NEW, "java/lang/StringBuilder");
+		writer.writeInsn(DUP);
 		// Call the StringBuilder(String) constructor with the "[ClassName]("
 		// argument
-		writer.visitLdcInsn(theClass.getName() + "(");
-		writer.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false, 2, (String) null);
+		writer.writeLDC(theClass.getName() + "(");
+		writer.writeInvokeInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false, 2, (String) null);
 		
 		// ----- Fields -----
 		if (!fields.isEmpty())
@@ -290,7 +290,7 @@ public class CaseClasses
 				IType type = f.getType();
 				
 				// Get the field
-				writer.visitVarInsn(ALOAD, 0);
+				writer.writeVarInsn(ALOAD, 0);
 				f.writeGet(writer, null);
 				
 				// Write the call to the StringBuilder#append() method that
@@ -311,13 +311,13 @@ public class CaseClasses
 				}
 				desc.append(")Ljava/lang/StringBuilder;");
 				
-				writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false, 2, "Ljava/lang/StringBuilder;");
+				writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false, 2, "Ljava/lang/StringBuilder;");
 				
 				if (iterator.hasNext())
 				{
 					// Separator Comma
-					writer.visitLdcInsn(", ");
-					writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
+					writer.writeLDC(", ");
+					writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
 							"Ljava/lang/StringBuilder;");
 				}
 				else
@@ -328,15 +328,15 @@ public class CaseClasses
 		}
 		
 		// ----- Append Closing Parenthesis -----
-		writer.visitLdcInsn(")");
+		writer.writeLDC(")");
 		// Write the call to the StringBuilder#append(String) method
-		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
 				"Ljava/lang/StringBuilder;");
 		
 		// ----- ToString -----
 		// Write the call to the StringBuilder#toString() method
-		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false, 1, "Ljava/lang/String;");
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false, 1, "Ljava/lang/String;");
 		// Write the return
-		writer.visitInsn(ARETURN);
+		writer.writeInsn(ARETURN);
 	}
 }

@@ -221,7 +221,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 		
 		if (this.method.getType() != Type.VOID)
 		{
-			writer.visitInsn(Opcodes.POP);
+			writer.writeInsn(Opcodes.POP);
 		}
 	}
 	

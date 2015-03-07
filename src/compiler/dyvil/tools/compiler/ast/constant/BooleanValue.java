@@ -3,9 +3,9 @@ package dyvil.tools.compiler.ast.constant;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.boxed.BoxedValue;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.value.BoxedValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -87,11 +87,11 @@ public class BooleanValue extends ASTNode implements IConstantValue
 	{
 		if (this.value)
 		{
-			writer.visitLdcInsn(1);
+			writer.writeLDC(1);
 		}
 		else
 		{
-			writer.visitLdcInsn(0);
+			writer.writeLDC(0);
 		}
 	}
 	
@@ -99,7 +99,7 @@ public class BooleanValue extends ASTNode implements IConstantValue
 	public void writeStatement(MethodWriter writer)
 	{
 		this.writeExpression(writer);
-		writer.visitInsn(Opcodes.IRETURN);
+		writer.writeInsn(Opcodes.IRETURN);
 	}
 	
 	@Override
@@ -107,7 +107,7 @@ public class BooleanValue extends ASTNode implements IConstantValue
 	{
 		if (this.value)
 		{
-			writer.visitJumpInsn(Opcodes.GOTO, dest);
+			writer.writeFrameJump(Opcodes.GOTO, dest);
 		}
 	}
 	
@@ -116,7 +116,7 @@ public class BooleanValue extends ASTNode implements IConstantValue
 	{
 		if (!this.value)
 		{
-			writer.visitJumpInsn(Opcodes.GOTO, dest);
+			writer.writeFrameJump(Opcodes.GOTO, dest);
 		}
 	}
 	

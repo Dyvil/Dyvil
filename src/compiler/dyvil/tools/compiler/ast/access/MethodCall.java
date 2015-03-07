@@ -527,7 +527,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			IType methodType = this.method.getType();
 			if (this.type != methodType && !Type.isSuperType(this.type, methodType))
 			{
-				writer.visitTypeInsn(Opcodes.CHECKCAST, this.type);
+				writer.writeTypeInsn(Opcodes.CHECKCAST, this.type);
 			}
 		}
 	}
@@ -539,7 +539,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		
 		if (this.method.getType() != Type.VOID)
 		{
-			writer.visitInsn(Opcodes.POP);
+			writer.writeInsn(Opcodes.POP);
 		}
 	}
 	
