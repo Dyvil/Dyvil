@@ -31,6 +31,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ValueList;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
@@ -869,7 +870,7 @@ public class Method extends Member implements IMethod
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		MethodWriter mw = new MethodWriter(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(),
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(),
 				this.getExceptions()));
 		
 		if (this.isConstructor)
@@ -918,9 +919,9 @@ public class Method extends Member implements IMethod
 		if (this.value != null)
 		{
 			mw.visitCode();
-			mw.visitLabel(start, false);
+			mw.visitLabel2(start);
 			this.value.writeExpression(mw);
-			mw.visitLabel(end, false);
+			mw.visitLabel2(end);
 			mw.visitEnd(this.isConstructor ? Type.VOID : this.type);
 		}
 		

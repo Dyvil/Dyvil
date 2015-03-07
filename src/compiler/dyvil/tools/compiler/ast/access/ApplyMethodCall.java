@@ -47,7 +47,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.method.isIntrinsic() || this.getType().isPrimitive();
+		return this.method != null && (this.method.isIntrinsic() || this.getType().isPrimitive());
 	}
 	
 	@Override

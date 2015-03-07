@@ -116,6 +116,6 @@ public abstract class Marker extends Exception
 		{
 			return code.length();
 		}
-		return i + 1;
+		return i;
 	}
 }

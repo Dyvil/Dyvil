@@ -17,6 +17,7 @@ import dyvil.tools.compiler.parser.statement.DoStatementParser;
 import dyvil.tools.compiler.parser.statement.ForStatementParser;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
 import dyvil.tools.compiler.parser.statement.WhileStatementParser;
+import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -37,12 +38,14 @@ public class ExpressionParser extends Parser implements ITyped
 	public static final int	CONSTRUCTOR			= 0x100;
 	public static final int	PARAMETERS			= 0x200;
 	public static final int	PARAMETERS_END		= 0x400;
-	public static final int	VARIABLE			= 0x800;
-	
-	public static final int	BYTECODE			= 0x1000;
-	public static final int	BYTECODE_END		= 0x2000;
+	public static final int	GENERICS			= 0x800;
+	public static final int	GENERICS_END		= 0x1000;
+	public static final int	VARIABLE			= 0x2000;
 	
 	public static final int	FUNCTION_POINTER	= 0x4000;
+	
+	public static final int	BYTECODE			= 0x8000;
+	public static final int	BYTECODE_END		= 0x10000;
 	
 	protected IValued		field;
 	protected int			precedence;
@@ -200,6 +203,25 @@ public class ExpressionParser extends Parser implements ITyped
 			}
 			throw new SyntaxError(token, "Invalid Argument List - ')' expected", true);
 		}
+		if (this.isInMode(GENERICS))
+		{
+			this.mode = GENERICS_END;
+			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			{
+				pm.pushParser(new TypeListParser(((ITypeList) this.value)));
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Generic Type Arguments - '[' expected");
+		}
+		if (this.isInMode(GENERICS_END))
+		{
+			this.mode = ACCESS;
+			if (type == Tokens.CLOSE_SQUARE_BRACKET)
+			{
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Generic Type Arguments - ']' expected");
+		}
 		if (this.isInMode(FUNCTION_POINTER))
 		{
 			// TODO Constructor Function Pointers
@@ -337,9 +359,24 @@ public class ExpressionParser extends Parser implements ITyped
 				IArguments args;
 				args = this.getArguments(pm, next);
 				
-				if (ParserUtil.isIdentifier(prev.type()))
+				int prevType = prev.type();
+				if (ParserUtil.isIdentifier(prevType))
 				{
 					MethodCall mc = new MethodCall(prev, null, prev.value());
+					mc.arguments = args;
+					this.value = mc;
+				}
+				else if (prevType == Tokens.CLOSE_SQUARE_BRACKET)
+				{
+					MethodCall mc;
+					if (this.value.getValueType() == IValue.CLASS_ACCESS)
+					{
+						mc = ((ClassAccess) this.value).toMethodCall();
+					}
+					else
+					{
+						mc = (MethodCall) this.value;
+					}
 					mc.arguments = args;
 					this.value = mc;
 				}
@@ -465,7 +502,15 @@ public class ExpressionParser extends Parser implements ITyped
 			this.mode = PARAMETERS;
 			return;
 		}
-		else if (type == Tokens.TYPE_SYMBOL_ID || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
+		if (type1 == Tokens.OPEN_SQUARE_BRACKET)
+		{
+			MethodCall call = new MethodCall(token, this.value, value);
+			call.dotless = this.dotless;
+			this.value = call;
+			this.mode = GENERICS;
+			return;
+		}
+		if (type == Tokens.TYPE_SYMBOL_ID || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
 			SingleArgument sa = new SingleArgument();
@@ -479,14 +524,12 @@ public class ExpressionParser extends Parser implements ITyped
 			pm.pushParser(parser);
 			return;
 		}
-		else
-		{
-			FieldAccess access = new FieldAccess(token, this.value, value);
-			access.dotless = this.dotless;
-			this.value = access;
-			this.mode = ACCESS;
-			return;
-		}
+		
+		FieldAccess access = new FieldAccess(token, this.value, value);
+		access.dotless = this.dotless;
+		this.value = access;
+		this.mode = ACCESS;
+		return;
 	}
 	
 	private void getAssign(IParserManager pm, IToken token) throws SyntaxError

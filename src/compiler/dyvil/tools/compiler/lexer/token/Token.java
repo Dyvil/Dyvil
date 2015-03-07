@@ -173,7 +173,7 @@ public class Token implements IToken
 	@Override
 	public ICodePosition to(ICodePosition end)
 	{
-		return new CodePosition(this.lineNumber, end.endLine(), this.start, end.endLine());
+		return new CodePosition(this.lineNumber, end.endLine(), this.start, end.endIndex());
 	}
 	
 	@Override

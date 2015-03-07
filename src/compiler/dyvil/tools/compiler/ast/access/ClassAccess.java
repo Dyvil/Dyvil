@@ -7,9 +7,11 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -111,6 +113,13 @@ public class ClassAccess extends ASTNode implements IValue
 			call.qualifiedName = qualifiedName;
 			call.method = m.theMethod;
 			call.dotless = true;
+			if (this.type.isGeneric())
+			{
+				// Copy generic Type arguments
+				GenericType generic = (GenericType) this.type;
+				call.generics = generic.generics;
+				call.genericCount = generic.genericCount;
+			}
 			call.arguments = EmptyArguments.INSTANCE;
 			return call;
 		}
@@ -121,6 +130,22 @@ public class ClassAccess extends ASTNode implements IValue
 		}
 		
 		return this;
+	}
+	
+	public MethodCall toMethodCall() {
+		MethodCall call = new MethodCall(this.position);
+		call.name = this.type.getName();
+		call.qualifiedName = this.type.getQualifiedName();
+		call.dotless = true;
+		if (this.type.isGeneric())
+		{
+			// Copy generic Type arguments
+			GenericType generic = (GenericType) this.type;
+			call.generics = generic.generics;
+			call.genericCount = generic.genericCount;
+		}
+		call.arguments = EmptyArguments.INSTANCE;
+		return call;
 	}
 	
 	@Override

@@ -17,8 +17,8 @@ import dyvil.tools.compiler.util.Util;
 
 public final class GenericType extends Type implements ITypeList
 {
-	protected IType[]	generics	= new IType[2];
-	protected int		genericCount;
+	public IType[]	generics	= new IType[2];
+	public int		genericCount;
 	
 	public GenericType()
 	{
@@ -232,9 +232,9 @@ public final class GenericType extends Type implements ITypeList
 		if (this.generics != null)
 		{
 			buf.append('<');
-			for (IType t : this.generics)
+			for (int i = 0; i < this.genericCount; i++)
 			{
-				t.appendSignature(buf);
+				this.generics[i].appendSignature(buf);
 			}
 			buf.append('>');
 		}
