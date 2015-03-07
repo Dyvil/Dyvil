@@ -118,10 +118,7 @@ public interface IValue extends IASTNode, ITyped
 				return type1.box(this);
 			}
 			// Object -> Primitive
-			else
-			{
-				return type.unbox(this);
-			}
+			return type.unbox(this);
 		}
 		if (Type.isSuperType(type, type1))
 		{

@@ -274,7 +274,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	
 	private Annotation[] getAnnotations()
 	{
-		Annotation[] a = new Annotation[annotationCount];
+		Annotation[] a = new Annotation[this.annotationCount];
 		System.arraycopy(this.annotations, 0, a, 0, this.annotationCount);
 		return a;
 	}
@@ -321,18 +321,18 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	{
 		return null;
 	}
-
+	
 	@Override
 	public int typeCount()
 	{
 		return 0;
 	}
-
+	
 	@Override
 	public void setType(int index, IType type)
 	{
 	}
-
+	
 	@Override
 	public IType getType(int index)
 	{

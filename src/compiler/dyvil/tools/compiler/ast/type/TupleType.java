@@ -14,8 +14,8 @@ public final class TupleType extends Type implements ITypeList
 	public static final IClass[]	tupleClasses	= new IClass[22];
 	public static final String[]	descriptors		= new String[22];
 	
-	protected IType[] types;
-	protected int typeCount;
+	protected IType[]				types;
+	protected int					typeCount;
 	
 	public TupleType()
 	{
@@ -35,38 +35,38 @@ public final class TupleType extends Type implements ITypeList
 	
 	// ITypeList Overrides
 	
-		@Override
-		public int typeCount()
+	@Override
+	public int typeCount()
+	{
+		return 0;
+	}
+	
+	@Override
+	public void setType(int index, IType type)
+	{
+		this.types[index] = type;
+	}
+	
+	@Override
+	public void addType(IType type)
+	{
+		int index = this.typeCount++;
+		if (this.typeCount > this.types.length)
 		{
-			return 0;
+			IType[] temp = new IType[this.typeCount];
+			System.arraycopy(this.types, 0, temp, 0, index);
+			this.types = temp;
 		}
-		
-		@Override
-		public void setType(int index, IType type)
-		{
-			this.types[index] = type;
-		}
-		
-		@Override
-		public void addType(IType type)
-		{
-			int index = this.typeCount++;
-			if (this.typeCount > this.types.length)
-			{
-				IType[] temp = new IType[this.typeCount];
-				System.arraycopy(this.types, 0, temp, 0, index);
-				this.types = temp;
-			}
-			this.types[index] = type;
-		}
-		
-		@Override
-		public IType getType(int index)
-		{
-			return this.types[index];
-		}
-		
-		// IType Overrides
+		this.types[index] = type;
+	}
+	
+	@Override
+	public IType getType(int index)
+	{
+		return this.types[index];
+	}
+	
+	// IType Overrides
 	
 	@Override
 	public IClass getTheClass()
@@ -112,20 +112,20 @@ public final class TupleType extends Type implements ITypeList
 		}
 		else if (this.theClass == type.getTheClass() && type instanceof GenericType)
 		{
-				GenericType generic = (GenericType) type;
-				if (this.typeCount != generic.typeCount())
+			GenericType generic = (GenericType) type;
+			if (this.typeCount != generic.typeCount())
+			{
+				return false;
+			}
+			
+			for (int i = 0; i < this.typeCount; i++)
+			{
+				if (!this.types[i].equals(generic.getType(i)))
 				{
 					return false;
 				}
-				
-				for (int i = 0; i < this.typeCount; i++)
-				{
-					if (!this.types[i].equals(generic.getType(i)))
-					{
-						return false;
-					}
-				}
-				return true;
+			}
+			return true;
 		}
 		return OBJECT.classEquals(type);
 	}

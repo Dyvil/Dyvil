@@ -21,7 +21,6 @@ import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.phase.CompilerPhase;
 import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.util.Util;
 
@@ -73,10 +72,10 @@ public final class DyvilCompiler
 		
 		if (debug)
 		{
-			logger.fine("Startup Time: " + ((System.nanoTime() - now) / 1000000L) + " ms");
+			logger.fine("Startup Time: " + (System.nanoTime() - now) / 1000000L + " ms");
 		}
 		
-		if (DyvilCompiler.states.contains(CompilerPhase.RESOLVE_TYPES))
+		if (DyvilCompiler.states.contains(ICompilerPhase.RESOLVE_TYPES))
 		{
 			now = System.nanoTime();
 			
@@ -201,37 +200,37 @@ public final class DyvilCompiler
 		switch (s)
 		{
 		case "compile":
-			states.add(CompilerPhase.TOKENIZE);
-			states.add(CompilerPhase.PARSE);
-			states.add(CompilerPhase.RESOLVE_TYPES);
-			states.add(CompilerPhase.RESOLVE);
-			states.add(CompilerPhase.CHECK);
-			states.add(CompilerPhase.COMPILE);
+			states.add(ICompilerPhase.TOKENIZE);
+			states.add(ICompilerPhase.PARSE);
+			states.add(ICompilerPhase.RESOLVE_TYPES);
+			states.add(ICompilerPhase.RESOLVE);
+			states.add(ICompilerPhase.CHECK);
+			states.add(ICompilerPhase.COMPILE);
 			return;
 			// case "obfuscate":
 			// case "doc":
 			// case "decompile":
 		case "optimize":
-			states.add(CompilerPhase.FOLD_CONSTANTS);
+			states.add(ICompilerPhase.FOLD_CONSTANTS);
 			constantFolding = 1;
 			return;
 		case "jar":
-			states.add(CompilerPhase.JAR);
+			states.add(ICompilerPhase.JAR);
 			return;
 		case "format":
-			states.add(CompilerPhase.TOKENIZE);
-			states.add(CompilerPhase.PARSE);
-			states.add(CompilerPhase.FORMAT);
+			states.add(ICompilerPhase.TOKENIZE);
+			states.add(ICompilerPhase.PARSE);
+			states.add(ICompilerPhase.FORMAT);
 			return;
 		case "print":
-			states.add(CompilerPhase.PRINT);
+			states.add(ICompilerPhase.PRINT);
 			return;
 		case "test":
-			states.add(CompilerPhase.TEST);
+			states.add(ICompilerPhase.TEST);
 			return;
 		case "--debug":
-			states.add(CompilerPhase.PRINT);
-			states.add(CompilerPhase.TEST);
+			states.add(ICompilerPhase.PRINT);
+			states.add(ICompilerPhase.TEST);
 			debug = true;
 			return;
 		case "--pstack":
@@ -246,7 +245,7 @@ public final class DyvilCompiler
 		{
 			try
 			{
-				states.add(CompilerPhase.FOLD_CONSTANTS);
+				states.add(ICompilerPhase.FOLD_CONSTANTS);
 				constantFolding = Integer.parseInt(s.substring(2));
 				return;
 			}

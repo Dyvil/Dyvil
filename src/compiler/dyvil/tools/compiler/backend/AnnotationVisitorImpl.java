@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.value.ValueList;
 public class AnnotationVisitorImpl extends AnnotationVisitor
 {
 	private IAnnotationList	annotated;
-	private Annotation	annotation;
+	private Annotation		annotation;
 	
 	public AnnotationVisitorImpl(int api, IAnnotationList annotated, Annotation annotation)
 	{

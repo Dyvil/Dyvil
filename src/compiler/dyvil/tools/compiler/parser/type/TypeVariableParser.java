@@ -40,7 +40,6 @@ public class TypeVariableParser extends Parser implements ITyped
 	@Override
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
-		int type = token.type();
 		if (this.mode == NAME)
 		{
 			this.variable = new TypeVariable(token, token.value());

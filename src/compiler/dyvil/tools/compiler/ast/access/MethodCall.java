@@ -19,7 +19,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -31,7 +30,7 @@ import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Util;
 
-public final class MethodCall extends ASTNode implements IAccess, INamed, IValue, IValued, ITypeList, ITypeContext
+public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeList, ITypeContext
 {
 	public IValue		instance;
 	public String		name;
@@ -439,18 +438,15 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, IValue
 					// No type found -> Not an apply method call
 					return null;
 				}
-				else
+				// Find the apply method of the type
+				MethodMatch match = type.resolveMethod(null, "apply", this.arguments);
+				if (match == null)
 				{
-					// Find the apply method of the type
-					MethodMatch match = type.resolveMethod(null, "apply", this.arguments);
-					if (match == null)
-					{
-						// No apply method found -> Not an apply method call
-						return null;
-					}
-					method = match.theMethod;
-					instance = new ClassAccess(this.position, type);
+					// No apply method found -> Not an apply method call
+					return null;
 				}
+				method = match.theMethod;
+				instance = new ClassAccess(this.position, type);
 			}
 			else
 			{

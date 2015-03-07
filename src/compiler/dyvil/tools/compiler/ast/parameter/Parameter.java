@@ -7,7 +7,6 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -18,7 +17,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 
-public class Parameter extends Member implements IVariable, IClassCompilable
+public class Parameter extends Member implements IVariable
 {
 	public IMethod	method;
 	

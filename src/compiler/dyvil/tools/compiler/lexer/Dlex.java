@@ -344,10 +344,7 @@ public class Dlex
 			{
 				return Tokens.TYPE_STRING_2;
 			}
-			else
-			{
-				return Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL;
-			}
+			return Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL;
 		case '0':
 			n = code.charAt(i + 1);
 			if (n == 'b')

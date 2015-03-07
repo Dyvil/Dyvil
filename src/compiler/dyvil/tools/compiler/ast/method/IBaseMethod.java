@@ -8,11 +8,19 @@ import dyvil.tools.compiler.ast.type.ITyped;
 public interface IBaseMethod extends ITyped, ITypeList, IGeneric
 {
 	@Override
-	public default int typeCount() { return 0; }
+	public default int typeCount()
+	{
+		return 0;
+	}
 	
 	@Override
-	public default void setType(int index, IType type) {}
+	public default void setType(int index, IType type)
+	{
+	}
 	
 	@Override
-	public default IType getType(int index) { return null; }
+	public default IType getType(int index)
+	{
+		return null;
+	}
 }

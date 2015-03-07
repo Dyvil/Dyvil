@@ -40,15 +40,12 @@ public final class RootPackage extends Package
 		{
 			return super.resolveClass(name);
 		}
-		else
+		String packageName = name.substring(0, index);
+		String className = name.substring(index + 1);
+		Package pack = this.resolvePackage(packageName);
+		if (pack != null)
 		{
-			String packageName = name.substring(0, index);
-			String className = name.substring(index + 1);
-			Package pack = this.resolvePackage(packageName);
-			if (pack != null)
-			{
-				return pack.resolveClass(className);
-			}
+			return pack.resolveClass(className);
 		}
 		
 		return null;

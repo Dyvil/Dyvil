@@ -123,7 +123,6 @@ public class Field extends Member implements IField
 			{
 				Marker marker = Markers.create(this.value.getPosition(), "field.type", this.name);
 				marker.addInfo("Field Type: " + this.type);
-				IType vtype = this.value.getType();
 				marker.addInfo("Value Type: " + this.value.getType());
 				markers.add(marker);
 			}

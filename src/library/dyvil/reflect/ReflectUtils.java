@@ -307,7 +307,7 @@ public final class ReflectUtils
 	 *            the arguments
 	 * @return the result
 	 */
-	public static <T, R> R invoke(Method method, Object instance, Object[] args)
+	public static <R> R invoke(Method method, Object instance, Object[] args)
 	{
 		try
 		{
@@ -467,7 +467,7 @@ public final class ReflectUtils
 	 *            the instance
 	 * @return the value
 	 */
-	public static <T, R> R getValue(Field field, Object instance)
+	public static <R> R getValue(Field field, Object instance)
 	{
 		try
 		{

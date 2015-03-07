@@ -44,10 +44,7 @@ public class ClassFormat
 			{
 				throw new UnsatisfiedLinkError("No installed Dyvil Runtime Library found!");
 			}
-			else
-			{
-				dyvilRTJar = new File(s);
-			}
+			dyvilRTJar = new File(s);
 		}
 	}
 	
@@ -217,9 +214,7 @@ public class ClassFormat
 	public static void readMethodType(String internal, IBaseMethod method)
 	{
 		int index = internal.indexOf(')');
-		
 		int i = 1;
-		int len = internal.length();
 		
 		if (internal.charAt(0) == '<')
 		{

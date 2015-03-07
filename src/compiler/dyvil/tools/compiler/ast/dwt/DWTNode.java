@@ -290,8 +290,6 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 			IValue value = property.value;
 			if (setter != null)
 			{
-				String key = property.key;
-				
 				writer.visitVarInsn(Opcodes.ALOAD, index, this.type);
 				value.writeExpression(writer);
 				writer.visitInsn(Opcodes.DUP);

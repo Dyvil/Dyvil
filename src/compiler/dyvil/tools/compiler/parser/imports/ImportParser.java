@@ -10,10 +10,10 @@ import dyvil.tools.compiler.util.Tokens;
 
 public class ImportParser extends Parser
 {
-	public static final int	IMPORT		= 1;
-	public static final int	DOT			= 2;
-	public static final int	ALIAS		= 4;
-	public static final int	MULTIIMPORT	= 8;
+	public static final int		IMPORT		= 1;
+	public static final int		DOT			= 2;
+	public static final int		ALIAS		= 4;
+	public static final int		MULTIIMPORT	= 8;
 	
 	protected IImport			parent;
 	protected IImportContainer	container;

@@ -77,13 +77,10 @@ public final class PrimitiveType extends Type
 		{
 			return fromTypecode(this.typecode);
 		}
-		else
-		{
-			PrimitiveType t = new PrimitiveType(this.name, this.qualifiedName, this.typecode);
-			t.theClass = this.theClass;
-			t.arrayDimensions = newDims;
-			return t;
-		}
+		PrimitiveType t = new PrimitiveType(this.name, this.qualifiedName, this.typecode);
+		t.theClass = this.theClass;
+		t.arrayDimensions = newDims;
+		return t;
 	}
 	
 	@Override

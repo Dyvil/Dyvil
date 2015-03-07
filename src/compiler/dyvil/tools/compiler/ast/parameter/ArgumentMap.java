@@ -36,12 +36,12 @@ public final class ArgumentMap implements IArguments, IValueMap
 			@Override
 			public KeyValuePair next()
 			{
-				if (this.index >= size)
+				if (this.index >= ArgumentMap.this.size)
 				{
 					throw new NoSuchElementException("ArrayIterator.next()");
 				}
 				int index = this.index++;
-				return new KeyValuePair(keys[index], values[index]);
+				return new KeyValuePair(ArgumentMap.this.keys[index], ArgumentMap.this.values[index]);
 			}
 			
 			@Override
@@ -75,10 +75,10 @@ public final class ArgumentMap implements IArguments, IValueMap
 		int hash = key.hashCode();
 		for (int i = 0; i < this.size; i++)
 		{
-			String s = keys[i];
+			String s = this.keys[i];
 			if (s.hashCode() == hash && s.equals(key))
 			{
-				return values[i];
+				return this.values[i];
 			}
 		}
 		return null;
@@ -139,10 +139,10 @@ public final class ArgumentMap implements IArguments, IValueMap
 		int hash = key.hashCode();
 		for (int i = 0; i < this.size; i++)
 		{
-			String s = keys[i];
+			String s = this.keys[i];
 			if (s.hashCode() == hash && s.equals(key))
 			{
-				values[i].writeExpression(writer);
+				this.values[i].writeExpression(writer);
 				return;
 			}
 		}
@@ -160,10 +160,10 @@ public final class ArgumentMap implements IArguments, IValueMap
 		int hash = key.hashCode();
 		for (int i = 0; i < this.size; i++)
 		{
-			String s = keys[i];
+			String s = this.keys[i];
 			if (s.hashCode() == hash && s.equals(key))
 			{
-				return values[i].getTypeMatch(param.type);
+				return this.values[i].getTypeMatch(param.type);
 			}
 		}
 		return param.defaultValue != null ? 3 : 0;
@@ -182,7 +182,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 		int hash = key.hashCode();
 		for (int i = 0; i < this.size; i++)
 		{
-			String s = keys[i];
+			String s = this.keys[i];
 			if (s.hashCode() == hash && s.equals(key))
 			{
 				IType type = param.getType(context);

@@ -25,7 +25,7 @@ import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
-import dyvil.tools.compiler.phase.CompilerPhase;
+import dyvil.tools.compiler.phase.ICompilerPhase;
 
 public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 {
@@ -152,7 +152,6 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 			StringBuilder buffer = new StringBuilder("Syntax Errors in Compilation Unit '");
 			buffer.append(this.inputFile).append(": ").append(size).append("\n\n");
 			
-			boolean error = false;
 			for (Marker marker : this.markers)
 			{
 				marker.log(buffer);
@@ -160,7 +159,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 			DyvilCompiler.logger.info(buffer.toString());
 			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
 			
-			if (DyvilCompiler.states.contains(CompilerPhase.PRINT))
+			if (DyvilCompiler.states.contains(ICompilerPhase.PRINT))
 			{
 				DyvilCompiler.logger.info("Code:\n" + this.toString());
 			}

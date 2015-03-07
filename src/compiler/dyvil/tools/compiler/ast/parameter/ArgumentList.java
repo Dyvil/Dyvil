@@ -1,12 +1,10 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -16,7 +14,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 
-public final class ArgumentList implements IArguments, IValueList, IASTNode
+public final class ArgumentList implements IArguments, IValueList
 {
 	private IValue[]	values;
 	private int			size;
@@ -218,7 +216,6 @@ public final class ArgumentList implements IArguments, IValueList, IASTNode
 		}
 		
 		IType elementType = varParamType.getElementType();
-		List<IValue> values1 = new ArrayList(this.size - param.index);
 		
 		int i = param.index;
 		for (; i < this.size; i++)

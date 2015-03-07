@@ -112,7 +112,7 @@ public class Property extends Field implements IProperty, IContext
 			getter.modifiers = this.modifiers | Modifiers.SYNTHETIC;
 			getter.value = this.get;
 			getter.setAnnotations(this.annotations, this.annotationCount);
-			this.getterMethod= getter;
+			this.getterMethod = getter;
 			this.get = this.get.resolve(markers, this);
 		}
 		if (this.set != null)

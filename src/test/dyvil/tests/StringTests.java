@@ -1,8 +1,9 @@
 package dyvil.tests;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 import dyvil.strings.StringUtils;
 
 public class StringTests

@@ -101,12 +101,9 @@ public abstract class AbstractListMap<K, V> extends AbstractMap<K, V> implements
 		{
 			return entry.setValue(value);
 		}
-		else
-		{
-			entry = new ListMapEntry<K, V>(key, value);
-			this.entries.add(entry);
-			return null;
-		}
+		entry = new ListMapEntry<K, V>(key, value);
+		this.entries.add(entry);
+		return null;
 	}
 	
 	@Override

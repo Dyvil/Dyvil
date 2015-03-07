@@ -336,7 +336,7 @@ public class ExpressionParser extends Parser implements ITyped
 				IToken prev = token.prev();
 				IToken next = token.next();
 				IArguments args;
-				args = getArguments(pm, next);
+				args = this.getArguments(pm, next);
 				
 				if (ParserUtil.isIdentifier(prev.type()))
 				{

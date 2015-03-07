@@ -46,7 +46,6 @@ public interface StringUtils
 	{
 		List<String> words = new ArrayList();
 		StringBuilder temp = new StringBuilder(10);
-		char l = 0;
 		
 		for (int i = 0; i < s.length(); i++)
 		{
@@ -58,8 +57,6 @@ public interface StringUtils
 				temp.delete(0, temp.length());
 				continue;
 			}
-			
-			l = c;
 		}
 		
 		if (temp.length() > 0)
@@ -73,11 +70,9 @@ public interface StringUtils
 	public static List<String> cutString(String s, int maxLength)
 	{
 		List<String> words = getWords(s, false);
-		int size = words.size();
 		StringBuilder temp = new StringBuilder(10);
 		List<String> lines = new ArrayList();
 		
-		int i = 0;
 		for (String word : words)
 		{
 			if (temp.length() + word.length() >= maxLength)

@@ -98,7 +98,6 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 			StringBuilder buffer = new StringBuilder("Syntax Errors in DWT File '");
 			buffer.append(this.inputFile).append(": ").append(size).append("\n\n");
 			
-			boolean error = false;
 			for (Marker marker : this.markers)
 			{
 				marker.log(buffer);

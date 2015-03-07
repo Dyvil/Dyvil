@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
 public class FoldConstants implements ICompilerPhase
 {
-	private int id;
+	private int	id;
 	
 	public FoldConstants(int id)
 	{

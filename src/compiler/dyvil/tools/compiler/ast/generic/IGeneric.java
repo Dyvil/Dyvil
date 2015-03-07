@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.generic;
 
-
 public interface IGeneric
 {
 	public void setGeneric();

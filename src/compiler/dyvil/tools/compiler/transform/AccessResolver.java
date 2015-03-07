@@ -47,12 +47,9 @@ public class AccessResolver
 					{
 						return alternate;
 					}
-					else
-					{
-						iterator.remove();
-						iterator.next().setValue(alternate);
-						iterator.previous();
-					}
+					iterator.remove();
+					iterator.next().setValue(alternate);
+					iterator.previous();
 				}
 				else
 				{

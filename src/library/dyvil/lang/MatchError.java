@@ -18,16 +18,13 @@ public class MatchError extends RuntimeException
 		{
 			return "null";
 		}
-		else
+		try
 		{
-			try
-			{
-				return this.match.toString() + " (of class " + this.match.getClass().getName() + ")";
-			}
-			catch (Throwable t)
-			{
-				return "An instance of class " + this.match.getClass().getName();
-			}
+			return this.match.toString() + " (of class " + this.match.getClass().getName() + ")";
+		}
+		catch (Throwable t)
+		{
+			return "An instance of class " + this.match.getClass().getName();
 		}
 	}
 }

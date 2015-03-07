@@ -1020,7 +1020,6 @@ public class CodeClass extends ASTNode implements IClass
 		IField instanceField = this.instanceField;
 		StatementList instanceFields = new StatementList(null);
 		StatementList staticFields = new StatementList(null);
-		boolean hasConstructor = false;
 		
 		for (IField f : fields)
 		{
@@ -1074,7 +1073,6 @@ public class CodeClass extends ASTNode implements IClass
 		
 		for (IMethod m : methods)
 		{
-			String name = m.getName();
 			m.write(writer);
 		}
 		

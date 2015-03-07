@@ -358,63 +358,57 @@ public final class MathUtils
 				xn = xn + 1 + i / xn >> 1;
 				return xn * xn > i ? --xn : xn;
 			}
+			if (i >= 0x100000)
+			{
+				if (i >= 0x400000)
+				{
+					xn = sqrtTable[i >> 16] << 4;
+				}
+				else
+				{
+					xn = sqrtTable[i >> 14] << 3;
+				}
+			}
+			else if (i >= 0x40000)
+			{
+				xn = sqrtTable[i >> 12] << 2;
+			}
 			else
 			{
-				if (i >= 0x100000)
-				{
-					if (i >= 0x400000)
-					{
-						xn = sqrtTable[i >> 16] << 4;
-					}
-					else
-					{
-						xn = sqrtTable[i >> 14] << 3;
-					}
-				}
-				else if (i >= 0x40000)
-				{
-					xn = sqrtTable[i >> 12] << 2;
-				}
-				else
-				{
-					xn = sqrtTable[i >> 10] << 1;
-				}
-				
-				xn = xn + 1 + i / xn >> 1;
-				
-				return xn * xn > i ? --xn : xn;
+				xn = sqrtTable[i >> 10] << 1;
 			}
+			
+			xn = xn + 1 + i / xn >> 1;
+			
+			return xn * xn > i ? --xn : xn;
 		}
-		else
+		if (i >= 0x100)
 		{
-			if (i >= 0x100)
+			if (i >= 0x1000)
 			{
-				if (i >= 0x1000)
+				if (i >= 0x4000)
 				{
-					if (i >= 0x4000)
-					{
-						xn = sqrtTable[i >> 8] + 1;
-					}
-					else
-					{
-						xn = (sqrtTable[i >> 6] >> 1) + 1;
-					}
-				}
-				else if (i >= 0x400)
-				{
-					xn = (sqrtTable[i >> 4] >> 2) + 1;
+					xn = sqrtTable[i >> 8] + 1;
 				}
 				else
 				{
-					xn = (sqrtTable[i >> 2] >> 3) + 1;
+					xn = (sqrtTable[i >> 6] >> 1) + 1;
 				}
-				
-				return xn * xn > i ? --xn : xn;
 			}
-			else if (i >= 0)
+			else if (i >= 0x400)
 			{
-				return sqrtTable[i] >> 4;
+				xn = (sqrtTable[i >> 4] >> 2) + 1;
 			}
+			else
+			{
+				xn = (sqrtTable[i >> 2] >> 3) + 1;
+			}
+			
+			return xn * xn > i ? --xn : xn;
+		}
+		else if (i >= 0)
+		{
+			return sqrtTable[i] >> 4;
 		}
 		
 		return 0;
@@ -777,10 +771,7 @@ public final class MathUtils
 		{
 			return deBruijnBits[(int) (i * 125613361L >> 27) & 0x1F];
 		}
-		else
-		{
-			return deBruijnBits[(int) (powerOfTwo(i) * 125613361L >> 27) & 0x1F] - 1;
-		}
+		return deBruijnBits[(int) (powerOfTwo(i) * 125613361L >> 27) & 0x1F] - 1;
 	}
 	
 	public static @infix boolean checkBit(int i, byte bit)

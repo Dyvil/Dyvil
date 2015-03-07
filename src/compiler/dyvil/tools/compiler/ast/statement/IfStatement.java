@@ -224,17 +224,9 @@ public class IfStatement extends ASTNode implements IStatement
 		
 		if (this.condition.isConstant())
 		{
-			int type = this.condition.getValueType();
-			if (type == BOOLEAN)
+			if (this.condition.getValueType() == BOOLEAN)
 			{
-				if (((BooleanValue) this.condition).value)
-				{
-					return this.then;
-				}
-				else
-				{
-					return this.elseThen;
-				}
+				return ((BooleanValue) this.condition).value ? this.then : this.elseThen;
 			}
 			return this;
 		}

@@ -240,7 +240,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 				for (int i = 0; i < this.parameterCount; i++)
 				{
 					LambdaParameter param = this.parameters[i];
-					param.baseType = method.getParameter(i).type;
+					param.baseType = this.method.getParameter(i).type;
 					param.type = param.type.getConcreteType(this);
 				}
 			}

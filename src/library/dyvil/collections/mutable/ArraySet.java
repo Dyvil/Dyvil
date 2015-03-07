@@ -86,20 +86,17 @@ public class ArraySet<E> extends AbstractSet<E>
 		{
 			return this.toArray;
 		}
-		else
+		Object[] o = new Object[this.size];
+		for (int i = 0, i0 = 0; i < this.entries.length; i++)
 		{
-			Object[] o = new Object[this.size];
-			for (int i = 0, i0 = 0; i < this.entries.length; i++)
+			if (this.entries[i] != null)
 			{
-				if (this.entries[i] != null)
-				{
-					o[i0] = this.entries[i];
-					i0++;
-				}
+				o[i0] = this.entries[i];
+				i0++;
 			}
-			java.util.Arrays.sort(o);
-			return this.toArray = o;
 		}
+		java.util.Arrays.sort(o);
+		return this.toArray = o;
 	}
 	
 	@Override

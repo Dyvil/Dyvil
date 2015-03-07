@@ -138,7 +138,7 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 	
 	private Annotation[] getAnnotations()
 	{
-		Annotation[] a = new Annotation[annotationCount];
+		Annotation[] a = new Annotation[this.annotationCount];
 		System.arraycopy(this.annotations, 0, a, 0, this.annotationCount);
 		return a;
 	}

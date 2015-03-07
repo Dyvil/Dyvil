@@ -20,11 +20,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ClassBody extends ASTNode
 {
-	public IClass				theClass;
-	public List<IClass>			classes		= new ArrayList();
-	public List<IField>			fields		= new ArrayList();
-	public List<IMethod>		methods		= new ArrayList();
-	public List<IProperty>		properties	= new ArrayList();
+	public IClass					theClass;
+	public List<IClass>				classes		= new ArrayList();
+	public List<IField>				fields		= new ArrayList();
+	public List<IMethod>			methods		= new ArrayList();
+	public List<IProperty>			properties	= new ArrayList();
 	
 	public List<IClassCompilable>	compilables;
 	
