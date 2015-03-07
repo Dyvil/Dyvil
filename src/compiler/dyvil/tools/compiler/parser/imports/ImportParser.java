@@ -3,8 +3,8 @@ package dyvil.tools.compiler.parser.imports;
 import dyvil.tools.compiler.ast.imports.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -15,8 +15,8 @@ public class ImportParser extends Parser
 	public static final int	ALIAS		= 4;
 	public static final int	MULTIIMPORT	= 8;
 	
-	public IImport			parent;
-	public IImportContainer	container;
+	protected IImport			parent;
+	protected IImportContainer	container;
 	
 	public ImportParser(IImport parent, IImportContainer container)
 	{
@@ -26,7 +26,13 @@ public class ImportParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = IMPORT;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)

@@ -4,11 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class CodeFile extends File implements ICodePosition
@@ -16,8 +13,6 @@ public class CodeFile extends File implements ICodePosition
 	private static final long	serialVersionUID	= 130988432718494125L;
 	
 	private String				code;
-	
-	public List<Marker>			markers				= new ArrayList();
 	
 	public CodeFile(File parent, String child)
 	{

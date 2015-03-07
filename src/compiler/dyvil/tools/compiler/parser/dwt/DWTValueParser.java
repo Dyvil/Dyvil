@@ -9,8 +9,8 @@ import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.ast.value.ValueList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -19,7 +19,7 @@ public class DWTValueParser extends Parser
 	public static final int	VALUE		= 1;
 	public static final int	LIST_END	= 2;
 	
-	public IValued			valued;
+	protected IValued		valued;
 	
 	public DWTValueParser(IValued valued)
 	{
@@ -28,7 +28,13 @@ public class DWTValueParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = VALUE;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == VALUE)

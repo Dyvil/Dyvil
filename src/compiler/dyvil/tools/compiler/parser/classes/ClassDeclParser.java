@@ -8,8 +8,8 @@ import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
@@ -30,8 +30,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 	public static final int	BODY_END		= 64;
 	
 	protected DyvilFile		unit;
-	
-	private CodeClass		theClass;
+	protected CodeClass		theClass;
 	
 	public ClassDeclParser(DyvilFile unit)
 	{
@@ -48,7 +47,13 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = NAME;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		String value = token.value();
 		
@@ -178,18 +183,18 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 	{
 		return null;
 	}
-
+	
 	@Override
 	public int typeCount()
 	{
 		return 0;
 	}
-
+	
 	@Override
 	public void setType(int index, IType type)
 	{
 	}
-
+	
 	@Override
 	public IType getType(int index)
 	{

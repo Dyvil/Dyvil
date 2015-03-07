@@ -21,7 +21,7 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
-import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
+import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
@@ -29,26 +29,25 @@ import dyvil.tools.compiler.phase.CompilerPhase;
 
 public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 {
-	public final CodeFile				inputFile;
-	public final File					outputDirectory;
-	public final File					outputFile;
+	public final CodeFile		inputFile;
+	public final File			outputDirectory;
+	public final File			outputFile;
 	
-	public final String					name;
-	public final Package				pack;
-	protected transient TokenIterator	tokens;
-	protected List<Marker>				markers;
+	public final String			name;
+	public final Package		pack;
+	protected TokenIterator		tokens;
+	protected List<Marker>		markers			= new ArrayList();
 	
-	protected PackageDecl				packageDeclaration;
-	protected List<Import>				imports			= new ArrayList();
-	protected List<Import>				staticImports	= new ArrayList();
-	protected List<CodeClass>			classes			= new ArrayList();
+	protected PackageDecl		packageDeclaration;
+	protected List<Import>		imports			= new ArrayList();
+	protected List<Import>		staticImports	= new ArrayList();
+	protected List<CodeClass>	classes			= new ArrayList();
 	
 	public DyvilFile(Package pack, CodeFile input, File output)
 	{
 		this.position = input;
 		this.pack = pack;
 		this.inputFile = input;
-		this.markers = input.markers;
 		
 		String name = input.getAbsolutePath();
 		int start = name.lastIndexOf('/');
@@ -136,9 +135,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 	@Override
 	public void tokenize()
 	{
-		Dlex lexer = new Dlex(this.inputFile);
-		lexer.tokenize();
-		this.tokens = lexer.iterator();
+		this.tokens = Dlex.tokenIterator(this.inputFile.getCode(), this.inputFile);
 	}
 	
 	@Override
@@ -146,7 +143,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 	{
 		ParserManager manager = new ParserManager(new CompilationUnitParser(this));
 		manager.semicolonInference = true;
-		manager.parse(this.inputFile, this.tokens);
+		manager.parse(this.markers, this.tokens);
 		this.tokens = null;
 		
 		int size = this.markers.size();

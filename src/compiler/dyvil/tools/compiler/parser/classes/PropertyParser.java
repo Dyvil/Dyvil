@@ -6,8 +6,8 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -16,8 +16,8 @@ public class PropertyParser extends Parser implements IValued
 	public static final int	GET	= 1;
 	public static final int	SET	= 2;
 	
-	public IContext			context;
-	public Property			property;
+	protected IContext		context;
+	protected Property		property;
 	
 	public PropertyParser(IContext context, Property property)
 	{
@@ -26,7 +26,13 @@ public class PropertyParser extends Parser implements IValued
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = 0;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)
@@ -54,7 +60,7 @@ public class PropertyParser extends Parser implements IValued
 			}
 			throw new SyntaxError(token, "Invalid Property Declaration - 'get' or 'set' expected", false);
 		}
-		if (this.isInMode(GET) || this.isInMode(SET))
+		if (this.mode > 0) // SET or GET
 		{
 			if (type == Tokens.COLON)
 			{

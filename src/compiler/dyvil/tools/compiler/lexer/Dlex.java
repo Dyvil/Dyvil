@@ -1,32 +1,28 @@
 package dyvil.tools.compiler.lexer;
 
 import static dyvil.tools.compiler.util.ParserUtil.*;
-
-import java.util.Iterator;
-
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public class Dlex implements Iterable<IToken>
+public class Dlex
 {
-	protected final CodeFile	file;
-	protected IToken			first;
-	
-	public Dlex(CodeFile file)
+	private Dlex()
 	{
-		this.file = file;
 	}
 	
-	public void tokenize()
+	public static TokenIterator tokenIterator(String code, CodeFile file)
 	{
-		String code = this.file.getCode();
+		return new TokenIterator(tokenize(code, file));
+	}
+	
+	public static IToken tokenize(String code, CodeFile file)
+	{
 		int len = code.length();
 		
 		StringBuilder buf = new StringBuilder(20);
-		Token first = new Token(-1, "", (byte) 0, null, null, 0, -1, -1);
+		Token first = new Token(-1, "", (byte) 0, null, file, 0, -1, -1);
 		Token prev = first;
 		int start = 0;
 		int lineNumber = 1;
@@ -296,7 +292,7 @@ public class Dlex implements Iterable<IToken>
 			
 			if (addToken)
 			{
-				prev = this.addToken(prev, buf, type | subtype, lineNumber, start);
+				prev = addToken(prev, buf, type | subtype, lineNumber, start);
 				addToken = false;
 				type = 0;
 				
@@ -313,10 +309,10 @@ public class Dlex implements Iterable<IToken>
 		
 		if (buf.length() > 0)
 		{
-			this.addToken(prev, buf, type | subtype, lineNumber, start);
+			addToken(prev, buf, type | subtype, lineNumber, start);
 		}
 		
-		this.first = first.next();
+		return first.next();
 	}
 	
 	private static int getMode(char c, String code, int i)
@@ -437,117 +433,29 @@ public class Dlex implements Iterable<IToken>
 		return false;
 	}
 	
-	private Token addToken(Token prev, String s, int type, int line, int start, int len)
+	private static Token addToken(Token prev, String s, int type, int line, int start, int len)
 	{
 		Token t;
 		if ((type & Tokens.TYPE_IDENTIFIER) != 0)
 		{
 			type = ParserUtil.getKeywordType(s, type);
-			t = new Token(0, s, type, s, this.file, line, start, start + len);
+			t = new Token(0, s, type, s, prev.file, line, start, start + len);
 		}
 		else
 		{
-			t = new Token(0, s, type, parse(type, s), this.file, line, start, start + len);
+			t = new Token(0, s, type, parse(type, s), prev.file, line, start, start + len);
 		}
 		
 		prev.setNext(t);
 		return t;
 	}
 	
-	private Token addToken(Token prev, StringBuilder buf, int type, int line, int start)
+	private static Token addToken(Token prev, StringBuilder buf, int type, int line, int start)
 	{
 		String s = buf.toString();
 		int len = buf.length();
 		buf.delete(0, len);
-		return this.addToken(prev, s, type, line, start, len);
-	}
-	
-	@Override
-	public TokenIterator iterator()
-	{
-		return new TokenIterator(this.first);
-	}
-	
-	public static class TokenIterator implements Iterator<IToken>
-	{
-		protected IToken	first;
-		protected IToken	next;
-		
-		public TokenIterator(IToken first)
-		{
-			this.first = first;
-			this.next = first;
-		}
-		
-		public void reset()
-		{
-			this.next = this.first;
-		}
-		
-		public void jump(IToken next)
-		{
-			this.next = next;
-		}
-		
-		@Override
-		public boolean hasNext()
-		{
-			return this.next instanceof Token;
-		}
-		
-		@Override
-		public IToken next()
-		{
-			try
-			{
-				IToken next = this.next;
-				this.next = next.next();
-				return next;
-			}
-			catch (SyntaxError ex)
-			{
-				return null;
-			}
-		}
-		
-		@Override
-		public void remove()
-		{
-			try
-			{
-				IToken prev = this.next.prev();
-				IToken next = this.next.next();
-				
-				prev.setNext(next);
-				next.setPrev(prev);
-				this.next = next;
-			}
-			catch (SyntaxError ex)
-			{
-			}
-		}
-	}
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder buf = new StringBuilder('[');
-		
-		try
-		{
-			for (IToken token : this)
-			{
-				buf.append(token.value());
-				buf.append(',');
-			}
-		}
-		catch (SyntaxError ex)
-		{
-		}
-		
-		buf.setCharAt(buf.length() - 1, ']');
-		
-		return buf.toString();
+		return addToken(prev, s, type, line, start, len);
 	}
 	
 	public static Object parse(int type, String value)

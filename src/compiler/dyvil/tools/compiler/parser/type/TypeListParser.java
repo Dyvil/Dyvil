@@ -5,8 +5,8 @@ import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class TypeListParser extends Parser implements ITyped
@@ -21,7 +21,14 @@ public final class TypeListParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = 0;
+		this.type = null;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == 0)

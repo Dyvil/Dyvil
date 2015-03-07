@@ -5,8 +5,8 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -18,7 +18,7 @@ public class DWTParser extends Parser implements IValued
 	public static final int	EQUALS			= 8;
 	public static final int	BODY_END		= 64;
 	
-	public DWTNode			node;
+	protected DWTNode		node;
 	
 	private String			name;
 	
@@ -29,7 +29,14 @@ public class DWTParser extends Parser implements IValued
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = NAME;
+		this.name = null;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == NAME)

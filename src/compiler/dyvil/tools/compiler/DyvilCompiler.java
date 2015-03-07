@@ -17,6 +17,8 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.compiler.lexer.Dlex;
+import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.phase.CompilerPhase;
@@ -41,7 +43,6 @@ public final class DyvilCompiler
 	public static CompilerConfig			config			= new CompilerConfig();
 	public static Set<ICompilerPhase>		states			= new TreeSet();
 	
-	public static ParserManager				configParser	= new ParserManager();
 	public static List<File>				files			= new ArrayList();
 	public static List<ICompilationUnit>	units			= new ArrayList();
 	
@@ -59,7 +60,7 @@ public final class DyvilCompiler
 		initLogger();
 		
 		// Loads the config
-		configParser.parse(new CodeFile(args[0]), new ConfigParser(config));
+		loadConfig(args[0]);
 		
 		File sourceDir = config.sourceDir;
 		File outputDir = config.outputDir;
@@ -135,7 +136,7 @@ public final class DyvilCompiler
 		Util.logProfile(now, unitCount, "Compilation finished (%.1f ms, %.1f ms/CU, %.2f CU/s)");
 	}
 	
-	public static void initLogger()
+	private static void initLogger()
 	{
 		try
 		{
@@ -188,7 +189,14 @@ public final class DyvilCompiler
 		}
 	}
 	
-	public static void addStates(String s)
+	private static void loadConfig(String source)
+	{
+		CodeFile file = new CodeFile(source);
+		TokenIterator tokens = Dlex.tokenIterator(file.getCode(), file);
+		new ParserManager(new ConfigParser(config)).parse(null, tokens);
+	}
+	
+	private static void addStates(String s)
 	{
 		switch (s)
 		{
@@ -250,7 +258,7 @@ public final class DyvilCompiler
 		System.out.println("Invalid Argument '" + s + "'. Ignoring.");
 	}
 	
-	public static void findUnits(File source, File output, Package pack)
+	private static void findUnits(File source, File output, Package pack)
 	{
 		if (source.isDirectory())
 		{

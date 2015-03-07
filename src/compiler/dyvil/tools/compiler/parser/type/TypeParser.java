@@ -5,8 +5,8 @@ import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -24,7 +24,7 @@ public final class TypeParser extends Parser implements ITyped
 	public static final int	UPPER			= 1;
 	public static final int	LOWER			= 2;
 	
-	public ITyped			typed;
+	protected ITyped		typed;
 	
 	private byte			boundMode;
 	
@@ -34,12 +34,22 @@ public final class TypeParser extends Parser implements ITyped
 	
 	public TypeParser(ITyped typed)
 	{
-		this.mode = NAME;
 		this.typed = typed;
+		this.mode = NAME;
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = NAME;
+		this.boundMode = 0;
+		this.type = null;
+		this.arrayDimensions = 0;
+		this.arrayDimensions2 = 0;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.isInMode(NAME))

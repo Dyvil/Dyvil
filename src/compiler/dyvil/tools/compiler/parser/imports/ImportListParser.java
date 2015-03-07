@@ -4,14 +4,14 @@ import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.IImportContainer;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.Tokens;
 
 public class ImportListParser extends Parser
 {
-	public IImport			parent;
-	public IImportContainer	container;
+	protected IImport			parent;
+	protected IImportContainer	container;
 	
 	public ImportListParser(IImport parent, IImportContainer container)
 	{
@@ -20,7 +20,13 @@ public class ImportListParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = 0;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.CLOSE_CURLY_BRACKET || type == Tokens.SEMICOLON)

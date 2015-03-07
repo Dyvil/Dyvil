@@ -9,8 +9,8 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
@@ -37,17 +37,22 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 	public ParameterListParser(IParameterized parameterized)
 	{
 		this.parameterized = parameterized;
-		this.reset();
-	}
-	
-	private void reset()
-	{
 		this.mode = TYPE;
-		this.modifiers = 0;
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = TYPE;
+		this.modifiers = 0;
+		this.annotationCount = 0;
+		this.type = null;
+		this.parameter = null;
+		this.varargs = false;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == TYPE)

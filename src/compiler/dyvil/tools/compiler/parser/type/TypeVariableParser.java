@@ -7,8 +7,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 
 public class TypeVariableParser extends Parser implements ITyped
 {
@@ -18,20 +18,27 @@ public class TypeVariableParser extends Parser implements ITyped
 	public static final int	UPPER			= 1;
 	public static final int	LOWER			= 2;
 	
-	public IGeneric			typed;
+	protected IGeneric		typed;
 	
 	private byte			boundMode;
-	
 	private ITypeVariable	variable;
 	
 	public TypeVariableParser(IGeneric typed)
 	{
-		this.mode = NAME;
 		this.typed = typed;
+		this.mode = NAME;
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = NAME;
+		this.boundMode = 0;
+		this.variable = null;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == NAME)

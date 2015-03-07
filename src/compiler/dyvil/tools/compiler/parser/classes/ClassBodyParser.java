@@ -16,8 +16,8 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
@@ -56,18 +56,21 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		this.theClass = theClass;
 		this.body = new ClassBody(null, theClass);
 		theClass.setBody(this.body);
-		this.reset();
+		this.mode = DEFAULT_MODE;
 	}
 	
-	private void reset()
+	@Override
+	public void reset()
 	{
 		this.mode = DEFAULT_MODE;
 		this.modifiers = 0;
 		this.annotationCount = 0;
+		this.type = null;
+		this.method = null;
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)

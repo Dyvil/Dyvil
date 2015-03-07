@@ -10,8 +10,8 @@ import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
 import dyvil.tools.compiler.parser.statement.DoStatementParser;
 import dyvil.tools.compiler.parser.statement.ForStatementParser;
@@ -59,7 +59,16 @@ public class ExpressionParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = VALUE;
+		this.value = null;
+		this.dotless = false;
+		this.prefix = false;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.mode == 0 || type == Tokens.SEMICOLON)
@@ -426,7 +435,7 @@ public class ExpressionParser extends Parser implements ITyped
 		throw new SyntaxError(token, "Invalid Expression - Invalid Token '" + token.value() + "'");
 	}
 	
-	private IArguments getArguments(ParserManager pm, IToken next) throws SyntaxError
+	private IArguments getArguments(IParserManager pm, IToken next) throws SyntaxError
 	{
 		int type = next.type();
 		if (type == Tokens.CLOSE_PARENTHESIS)
@@ -445,7 +454,7 @@ public class ExpressionParser extends Parser implements ITyped
 		return list;
 	}
 	
-	private void getAccess(ParserManager pm, String value, IToken token, int type) throws SyntaxError
+	private void getAccess(IParserManager pm, String value, IToken token, int type) throws SyntaxError
 	{
 		IToken next = token.next();
 		int type1 = next.type();
@@ -481,7 +490,7 @@ public class ExpressionParser extends Parser implements ITyped
 		}
 	}
 	
-	private void getAssign(ParserManager pm, IToken token) throws SyntaxError
+	private void getAssign(IParserManager pm, IToken token) throws SyntaxError
 	{
 		ICodePosition position = this.value.getPosition();
 		int i = this.value.getValueType();
@@ -635,7 +644,7 @@ public class ExpressionParser extends Parser implements ITyped
 		return false;
 	}
 	
-	public boolean parseKeyword(ParserManager pm, IToken token, int type) throws SyntaxError
+	public boolean parseKeyword(IParserManager pm, IToken token, int type) throws SyntaxError
 	{
 		switch (type)
 		{

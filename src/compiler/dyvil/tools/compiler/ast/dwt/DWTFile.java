@@ -5,10 +5,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Modifier;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.reflect.Modifiers;
@@ -23,7 +21,7 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
-import dyvil.tools.compiler.lexer.Dlex.TokenIterator;
+import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.library.Library;
@@ -32,28 +30,27 @@ import dyvil.tools.compiler.parser.dwt.DWTParser;
 
 public class DWTFile extends ASTNode implements ICompilationUnit
 {
-	public static final Package			javaxSwing	= Library.javaLibrary.resolvePackage("javax.swing");
+	public static final Package		javaxSwing	= Library.javaLibrary.resolvePackage("javax.swing");
 	
-	public final CodeFile				inputFile;
-	public final File					outputDirectory;
-	public final File					outputFile;
+	public final CodeFile			inputFile;
+	public final File				outputDirectory;
+	public final File				outputFile;
 	
-	public final String					name;
-	public final String					internalName;
-	public final Package				pack;
-	protected transient TokenIterator	tokens;
-	protected List<Marker>				markers;
+	public final String				name;
+	public final String				internalName;
+	public final Package			pack;
+	protected TokenIterator			tokens;
+	protected List<Marker>			markers		= new ArrayList();
 	
-	protected DWTNode					rootNode;
+	protected DWTNode				rootNode;
 	
-	protected Map<String, IType>		fields		= new TreeMap();
+	protected Map<String, IType>	fields		= new TreeMap();
 	
 	public DWTFile(Package pack, CodeFile input, File output)
 	{
 		this.position = input;
 		this.pack = pack;
 		this.inputFile = input;
-		this.markers = input.markers;
 		
 		String name = input.getAbsolutePath();
 		int start = name.lastIndexOf('/');
@@ -85,16 +82,14 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	@Override
 	public void tokenize()
 	{
-		Dlex lexer = new Dlex(this.inputFile);
-		lexer.tokenize();
-		this.tokens = lexer.iterator();
+		this.tokens = Dlex.tokenIterator(this.inputFile.getCode(), this.inputFile);
 	}
 	
 	@Override
 	public void parse()
 	{
 		ParserManager manager = new ParserManager(new DWTParser(this.rootNode));
-		manager.parse(this.inputFile, this.tokens);
+		manager.parse(this.markers, this.tokens);
 		this.tokens = null;
 		
 		int size = this.markers.size();

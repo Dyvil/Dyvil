@@ -5,8 +5,8 @@ import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.Tokens;
 
 public class DWTListParser extends Parser implements IValued
@@ -19,7 +19,12 @@ public class DWTListParser extends Parser implements IValued
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (type == Tokens.CLOSE_SQUARE_BRACKET)

@@ -4,12 +4,18 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 
-public abstract class Parser<T>
+public abstract class Parser
 {
 	public static final Parser	rootParser	= new Parser()
 											{
+												
 												@Override
-												public void parse(ParserManager pm, IToken token) throws SyntaxError
+												public void reset()
+												{
+												};
+												
+												@Override
+												public void parse(IParserManager pm, IToken token) throws SyntaxError
 												{
 													throw new SyntaxError(token, "Root Parser");
 												}
@@ -17,8 +23,8 @@ public abstract class Parser<T>
 	
 	protected int				mode;
 	
-	public Parser				parent;
-	public String				name;
+	protected Parser			parent;
+	protected String			name;
 	
 	public Parser()
 	{
@@ -38,11 +44,6 @@ public abstract class Parser<T>
 		}
 	}
 	
-	public Parser getParent()
-	{
-		return this.parent;
-	}
-	
 	protected String computeName()
 	{
 		String s = this.getClass().getSimpleName();
@@ -52,6 +53,15 @@ public abstract class Parser<T>
 			s = s.substring(0, index);
 		}
 		return s.toLowerCase();
+	}
+	
+	public final boolean isInMode(int mode)
+	{
+		if (mode == 0)
+		{
+			return this.mode == 0;
+		}
+		return (this.mode & mode) == mode;
 	}
 	
 	public void setParent(Parser parent)
@@ -66,14 +76,12 @@ public abstract class Parser<T>
 		}
 	}
 	
-	public final boolean isInMode(int mode)
+	public Parser getParent()
 	{
-		if (mode == 0)
-		{
-			return this.mode == 0;
-		}
-		return (this.mode & mode) == mode;
+		return this.parent;
 	}
 	
-	public abstract void parse(ParserManager pm, IToken token) throws SyntaxError;
+	public abstract void reset();
+	
+	public abstract void parse(IParserManager pm, IToken token) throws SyntaxError;
 }

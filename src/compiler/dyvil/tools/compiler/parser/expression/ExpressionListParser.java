@@ -5,14 +5,15 @@ import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
 public final class ExpressionListParser extends Parser implements IValued
 {
 	protected IValueList	valueList;
+	
 	private String			label;
 	
 	public ExpressionListParser(IValueList valueList)
@@ -21,7 +22,14 @@ public final class ExpressionListParser extends Parser implements IValued
 	}
 	
 	@Override
-	public void parse(ParserManager pm, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = 0;
+		this.label = null;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))

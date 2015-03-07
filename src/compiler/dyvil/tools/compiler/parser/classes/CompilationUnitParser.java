@@ -4,8 +4,8 @@ import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
 import dyvil.tools.compiler.util.Tokens;
@@ -25,7 +25,13 @@ public class CompilationUnitParser extends Parser
 	}
 	
 	@Override
-	public void parse(ParserManager jcp, IToken token) throws SyntaxError
+	public void reset()
+	{
+		this.mode = PACKAGE | IMPORT | CLASS;
+	}
+	
+	@Override
+	public void parse(IParserManager jcp, IToken token) throws SyntaxError
 	{
 		String value = token.value();
 		if (this.isInMode(PACKAGE))
