@@ -2,8 +2,9 @@ package dyvil.tools.compiler.lexer.token;
 
 import java.util.Objects;
 
-import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.position.CodePosition;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Token implements IToken
 {
@@ -16,19 +17,17 @@ public class Token implements IToken
 	public final String		value;
 	public final Object		object;
 	
-	public final CodeFile	file;
 	public final int		lineNumber;
 	public final int		start;
 	public final int		end;
 	
-	public Token(int index, String value, int type, Object object, CodeFile file, int lineNumber, int start, int end)
+	public Token(int index, String value, int type, Object object, int lineNumber, int start, int end)
 	{
 		this.index = index;
 		this.value = value;
 		this.type = type;
 		this.object = object;
 		
-		this.file = file;
 		this.lineNumber = lineNumber;
 		this.start = start;
 		this.end = end;
@@ -65,39 +64,27 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public CodeFile getFile()
-	{
-		return this.file;
-	}
-	
-	@Override
-	public int getType()
-	{
-		return this.type;
-	}
-	
-	@Override
-	public String getText()
-	{
-		return this.value;
-	}
-	
-	@Override
-	public int getLineNumber()
-	{
-		return this.lineNumber;
-	}
-	
-	@Override
-	public int getStart()
+	public int startIndex()
 	{
 		return this.start;
 	}
 	
 	@Override
-	public int getEnd()
+	public int endIndex()
 	{
 		return this.end;
+	}
+	
+	@Override
+	public int startLine()
+	{
+		return this.lineNumber;
+	}
+	
+	@Override
+	public int endLine()
+	{
+		return this.lineNumber;
 	}
 	
 	@Override
@@ -105,7 +92,7 @@ public class Token implements IToken
 	{
 		if (this.prev == null)
 		{
-			this.prev = new FakeToken(this.file);
+			this.prev = new FakeToken();
 			this.prev.setNext(this);
 		}
 		return this.prev;
@@ -116,7 +103,7 @@ public class Token implements IToken
 	{
 		if (this.next == null)
 		{
-			this.next = new FakeToken(this.file);
+			this.next = new FakeToken();
 			this.next.setPrev(this);
 		}
 		return this.next;
@@ -175,6 +162,18 @@ public class Token implements IToken
 	public void setNext(IToken next)
 	{
 		this.next = next;
+	}
+	
+	@Override
+	public ICodePosition raw()
+	{
+		return new CodePosition(this.lineNumber, this.start, this.end);
+	}
+	
+	@Override
+	public ICodePosition to(ICodePosition end)
+	{
+		return new CodePosition(this.lineNumber, end.endLine(), this.start, end.endLine());
 	}
 	
 	@Override

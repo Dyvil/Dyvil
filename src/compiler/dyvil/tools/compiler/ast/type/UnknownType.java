@@ -234,6 +234,6 @@ public final class UnknownType extends ASTNode implements IType
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("unknown");
+		buffer.append("Object");
 	}
 }

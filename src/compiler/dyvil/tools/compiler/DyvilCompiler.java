@@ -191,7 +191,7 @@ public final class DyvilCompiler
 	private static void loadConfig(String source)
 	{
 		CodeFile file = new CodeFile(source);
-		TokenIterator tokens = Dlex.tokenIterator(file.getCode(), file);
+		TokenIterator tokens = Dlex.tokenIterator(file.getCode());
 		new ParserManager(new ConfigParser(config)).parse(null, tokens);
 	}
 	

@@ -12,17 +12,17 @@ public class Dlex
 	{
 	}
 	
-	public static TokenIterator tokenIterator(String code, CodeFile file)
+	public static TokenIterator tokenIterator(String code)
 	{
-		return new TokenIterator(tokenize(code, file));
+		return new TokenIterator(tokenize(code));
 	}
 	
-	public static IToken tokenize(String code, CodeFile file)
+	public static IToken tokenize(String code)
 	{
 		int len = code.length();
 		
 		StringBuilder buf = new StringBuilder(20);
-		Token first = new Token(-1, "", (byte) 0, null, file, 0, -1, -1);
+		Token first = new Token(-1, "", (byte) 0, null, 0, -1, -1);
 		Token prev = first;
 		int start = 0;
 		int lineNumber = 1;
@@ -436,11 +436,11 @@ public class Dlex
 		if ((type & Tokens.TYPE_IDENTIFIER) != 0)
 		{
 			type = ParserUtil.getKeywordType(s, type);
-			t = new Token(0, s, type, s, prev.file, line, start, start + len);
+			t = new Token(0, s, type, s, line, start, start + len);
 		}
 		else
 		{
-			t = new Token(0, s, type, parse(type, s), prev.file, line, start, start + len);
+			t = new Token(0, s, type, parse(type, s), line, start, start + len);
 		}
 		
 		prev.setNext(t);

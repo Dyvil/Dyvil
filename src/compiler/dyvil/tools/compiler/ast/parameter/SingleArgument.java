@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,13 +30,13 @@ public class SingleArgument implements IArguments, IValued
 	@Override
 	public int size()
 	{
-		return 1;
+		return this.value != null ? 1 : 0;
 	}
 	
 	@Override
 	public boolean isEmpty()
 	{
-		return false;
+		return this.value != null;
 	}
 	
 	// 'Variations'
@@ -134,49 +135,77 @@ public class SingleArgument implements IArguments, IValued
 	
 	@Override
 	public void checkValue(List<Marker> markers, Parameter param, ITypeContext context)
-	{
-		
+	{	
 	}
 	
 	@Override
 	public void checkVarargsValue(List<Marker> markers, Parameter param, ITypeContext context)
 	{
-		
 	}
 	
 	@Override
 	public Iterator<IValue> iterator()
 	{
+		if (this.value == null)
+		{
+			return Collections.emptyIterator();
+		}
+		
 		return new SingletonIterator<IValue>(this.value);
 	}
 	
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		if (this.value == null)
+		{
+			return;
+		}
+		
 		this.value.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public void resolve(List<Marker> markers, IContext context)
 	{
+		if (this.value == null)
+		{
+			return;
+		}
+		
 		this.value = this.value.resolve(markers, context);
 	}
 	
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
+		if (this.value == null)
+		{
+			return;
+		}
+		
 		this.value.check(markers, context);
 	}
 	
 	@Override
 	public void foldConstants()
 	{
+		if (this.value == null)
+		{
+			return;
+		}
+		
 		this.value = this.value.foldConstants();
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		if (this.value == null)
+		{
+			return;
+		}
+		
 		buffer.append(' ');
 		this.value.toString(prefix, buffer);
 	}

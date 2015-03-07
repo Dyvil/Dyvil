@@ -54,27 +54,26 @@ public abstract class Marker extends Exception
 	
 	public abstract boolean isError();
 	
-	public void log(StringBuilder buf)
+	public void log(String code, StringBuilder buf)
 	{
 		String type = this.getMarkerType();
 		String message = this.getMessage();
 		
-		buf.append("line ").append(this.position.getLineNumber()).append(": ").append(type);
+		buf.append("line ").append(this.position.startLine()).append(": ").append(type);
 		if (message != null)
 		{
 			buf.append(": ").append(message);
 		}
 		
-		int prevNL = this.position.getPrevNewline();
-		int nextNL = this.position.getNextNewline();
-		String code = this.position.getFile().getCode();
+		int prevNL = prevNL(code, this.position.startIndex());
+		int nextNL = nextNL(code, this.position.endIndex());
 		String line = code.substring(prevNL, nextNL);
 		
 		// Append Line
 		buf.append('\n').append(line).append('\n');
 		
 		// Append ^
-		for (int i = prevNL; i < this.position.getStart(); i++)
+		for (int i = prevNL; i < this.position.startIndex(); i++)
 		{
 			char c = code.charAt(i);
 			if (c == '\t')
@@ -98,5 +97,25 @@ public abstract class Marker extends Exception
 			buf.append('\n');
 		}
 		buf.append('\n');
+	}
+	
+	private static int prevNL(String code, int start)
+	{
+		int i = code.lastIndexOf('\n', start);
+		if (i < 0)
+		{
+			return 0;
+		}
+		return i + 1;
+	}
+	
+	private static int nextNL(String code, int end)
+	{
+		int i = code.indexOf('\n', end);
+		if (i < 0)
+		{
+			return code.length();
+		}
+		return i + 1;
 	}
 }

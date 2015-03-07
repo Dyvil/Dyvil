@@ -1,19 +1,12 @@
 package dyvil.tools.compiler.lexer.token;
 
-import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class FakeToken implements IToken
 {
-	private CodeFile	file;
-	
 	private IToken		prev;
 	private IToken		next;
-	
-	public FakeToken(CodeFile file)
-	{
-		this.file = file;
-	}
 	
 	@Override
 	public String value() throws SyntaxError
@@ -46,39 +39,39 @@ public class FakeToken implements IToken
 	}
 	
 	@Override
-	public CodeFile getFile()
+	public int startIndex()
 	{
-		return this.file;
+		return -1;
 	}
 	
 	@Override
-	public int getType()
+	public int endIndex()
+	{
+		return -1;
+	}
+	
+	@Override
+	public int startLine()
 	{
 		return 0;
 	}
 	
 	@Override
-	public String getText()
+	public int endLine()
 	{
-		return "";
+		return 0;
 	}
 	
 	@Override
-	public int getLineNumber()
+	public ICodePosition raw()
 	{
-		return -1;
+		return null;
 	}
 	
 	@Override
-	public int getStart()
+	public ICodePosition to(ICodePosition end)
 	{
-		return -1;
-	}
-	
-	@Override
-	public int getEnd()
-	{
-		return -1;
+		return null;
 	}
 	
 	@Override

@@ -145,7 +145,7 @@ public class Package implements INamed, IContext
 		{
 			if (this.fullName != null)
 			{
-				markers.add(Markers.create(new CodePosition(file, 0, 1, 0, 1), "package.missing"));
+				markers.add(Markers.create(new CodePosition(0, 0, 1), "package.missing"));
 			}
 			return;
 		}

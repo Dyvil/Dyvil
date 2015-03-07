@@ -293,7 +293,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		this.arguments.foldConstants();
 		if (this.arguments.size() == 1)
 		{
-			IValue argument = (IValue) this.arguments;
+			IValue argument = this.arguments.getFirstValue();
 			if (argument.isConstant())
 			{
 				if (this.instance != null)

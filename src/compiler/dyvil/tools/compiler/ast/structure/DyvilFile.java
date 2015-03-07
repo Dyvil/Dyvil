@@ -45,7 +45,6 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	
 	public DyvilFile(Package pack, CodeFile input, File output)
 	{
-		this.position = input;
 		this.pack = pack;
 		this.inputFile = input;
 		
@@ -155,7 +154,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	@Override
 	public void tokenize()
 	{
-		this.tokens = Dlex.tokenIterator(this.inputFile.getCode(), this.inputFile);
+		this.tokens = Dlex.tokenIterator(this.inputFile.getCode());
 	}
 	
 	@Override
@@ -169,14 +168,15 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 		int size = this.markers.size();
 		if (size > 0)
 		{
-			StringBuilder buffer = new StringBuilder("Syntax Errors in Compilation Unit '");
-			buffer.append(this.inputFile).append(": ").append(size).append("\n\n");
+			StringBuilder buf = new StringBuilder("Syntax Errors in Compilation Unit '");
+			String code = this.inputFile.getCode();
+			buf.append(this.inputFile).append(": ").append(size).append("\n\n");
 			
 			for (Marker marker : this.markers)
 			{
-				marker.log(buffer);
+				marker.log(code, buf);
 			}
-			DyvilCompiler.logger.info(buffer.toString());
+			DyvilCompiler.logger.info(buf.toString());
 			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
 			
 			if (DyvilCompiler.states.contains(ICompilerPhase.PRINT))
@@ -240,7 +240,8 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 		int size = this.markers.size();
 		if (size > 0)
 		{
-			StringBuilder builder = new StringBuilder("Problems in Dyvil File ").append(this.inputFile).append(":\n\n");
+			StringBuilder buf = new StringBuilder("Problems in Dyvil File ").append(this.inputFile).append(":\n\n");
+			String code = this.inputFile.getCode();
 			
 			int warnings = 0;
 			int errors = 0;
@@ -254,10 +255,10 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 				{
 					warnings++;
 				}
-				marker.log(builder);
+				marker.log(code, buf);
 			}
-			builder.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
-			DyvilCompiler.logger.info(builder.toString());
+			buf.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
+			DyvilCompiler.logger.info(buf.toString());
 			if (errors > 0)
 			{
 				DyvilCompiler.logger.warning(this.name + " was not compiled due to errors in the Compilation Unit\n");

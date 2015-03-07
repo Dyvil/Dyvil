@@ -388,7 +388,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 				if (prev != null)
 				{
 					ICodePosition pos = value.getPosition();
-					if (pos != null && pos.getLineNumber() - prev.getPosition().getLineNumber() > 1)
+					if (pos != null && pos.endLine() - prev.getPosition().startLine() > 1)
 					{
 						buffer.append('\n').append(prefix1);
 					}

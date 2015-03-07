@@ -1,66 +1,61 @@
 package dyvil.tools.compiler.lexer.position;
 
-import dyvil.tools.compiler.lexer.CodeFile;
-
 public class CodePosition implements ICodePosition
 {
-	public CodeFile	file;
+	public int	startLine;
+	public int	endLine;
+	public int	start;
+	public int	end;
 	
-	public int		type;
-	public String	text;
-	
-	public int		line;
-	public int		start;
-	public int		end;
-	
-	public CodePosition(CodeFile file, int type, int line, int start, int end)
+	public CodePosition(int line, int start, int end)
 	{
-		this(file, type, file.getCode().substring(start, end), line, start, end);
+		this.startLine = line;
+		this.endLine = line;
+		this.start = start;
+		this.end = end;
 	}
 	
-	public CodePosition(CodeFile file, int type, String text, int line, int start, int end)
+	public CodePosition(int startLine, int endLine, int start, int end)
 	{
-		this.file = file;
-		this.type = type;
-		this.text = text;
-		this.line = line;
+		this.startLine = startLine;
+		this.endLine = endLine;
 		this.start = start;
 		this.end = end;
 	}
 	
 	@Override
-	public CodeFile getFile()
-	{
-		return this.file;
-	}
-	
-	@Override
-	public int getType()
-	{
-		return this.type;
-	}
-	
-	@Override
-	public String getText()
-	{
-		return this.text;
-	}
-	
-	@Override
-	public int getLineNumber()
-	{
-		return this.line;
-	}
-	
-	@Override
-	public int getStart()
+	public int startIndex()
 	{
 		return this.start;
 	}
 	
 	@Override
-	public int getEnd()
+	public int endIndex()
 	{
 		return this.end;
+	}
+	
+	@Override
+	public int startLine()
+	{
+		return this.startLine;
+	}
+	
+	@Override
+	public int endLine()
+	{
+		return 0;
+	}
+	
+	@Override
+	public ICodePosition raw()
+	{
+		return this;
+	}
+	
+	@Override
+	public ICodePosition to(ICodePosition end)
+	{
+		return new CodePosition(this.startLine, end.endLine(), this.start, end.endIndex());
 	}
 }

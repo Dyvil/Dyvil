@@ -119,7 +119,7 @@ public class ParserManager implements IParserManager
 					// else
 					{
 						DyvilCompiler.logger.throwing("ParserManager", "parseToken", ex);
-						markers.add(new SyntaxError(token, "Failed to parse token '" + token.getText() + "': " + ex.getMessage()));
+						markers.add(new SyntaxError(token, "Failed to parse token '" + token.value() + "': " + ex.getMessage()));
 					}
 				}
 				
@@ -165,8 +165,8 @@ public class ParserManager implements IParserManager
 				return true;
 			}
 			
-			int prevLN = prev.getLineNumber();
-			if (prevLN == token.getLineNumber())
+			int prevLN = prev.endLine();
+			if (prevLN == token.startLine())
 			{
 				return true;
 			}
@@ -177,8 +177,8 @@ public class ParserManager implements IParserManager
 				return true;
 			}
 			
-			int prevEnd = prev.getEnd();
-			Token semicolon = new Token(0, ";", Tokens.SEMICOLON, ";", prev.getFile(), prevLN, prevEnd, prevEnd + 1);
+			int prevEnd = prev.endIndex();
+			Token semicolon = new Token(0, ";", Tokens.SEMICOLON, ";", prevLN, prevEnd, prevEnd + 1);
 			semicolon.setNext(token);
 			prev.setNext(semicolon);
 		}
