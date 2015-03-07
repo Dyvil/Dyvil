@@ -211,19 +211,27 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		IClass iclass = context.getThisType().getTheClass();
-		if (iclass != null)
+		// Value gets resolved in check()
+		
+		IType type = context.getThisType();
+		if (type == null)
 		{
-			this.owner = iclass.getInternalName();
-			ClassBody body = iclass.getBody();
-			if (body != null)
-			{
-				body.addCompilable(this);
-				this.index = body.compilables.size() - 1;
-			}
+			return this;
 		}
 		
-		// Value gets resolved in check()
+		IClass iclass = type.getTheClass();
+		if (iclass == null)
+		{
+			return this;
+		}
+		
+		this.owner = iclass.getInternalName();
+		ClassBody body = iclass.getBody();
+		if (body != null)
+		{
+			body.addCompilable(this);
+			this.index = body.compilables.size() - 1;
+		}
 		
 		return this;
 	}

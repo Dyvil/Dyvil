@@ -3,12 +3,12 @@ package dyvil.tools.compiler.parser;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public abstract class Parser
 {
 	public static final Parser	rootParser	= new Parser()
 											{
-												
 												@Override
 												public void reset()
 												{
@@ -17,7 +17,10 @@ public abstract class Parser
 												@Override
 												public void parse(IParserManager pm, IToken token) throws SyntaxError
 												{
-													throw new SyntaxError(token, "Root Parser");
+													if (!ParserUtil.isTerminator(token.type()))
+													{
+														throw new SyntaxError(token, "Root Parser");
+													}
 												}
 											};
 	
@@ -53,6 +56,16 @@ public abstract class Parser
 			s = s.substring(0, index);
 		}
 		return s.toLowerCase();
+	}
+	
+	public String getName()
+	{
+		return this.name;
+	}
+	
+	public int getMode()
+	{
+		return this.mode;
 	}
 	
 	public final boolean isInMode(int mode)

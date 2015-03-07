@@ -60,7 +60,7 @@ public interface IAccess extends IValue, IValued, ICall
 			IType type = instance.getType();
 			if (type != null)
 			{
-				match = type.resolveMethod(null, name, arguments);
+				match = type.resolveMethod(instance, name, arguments);
 				if (match != null)
 				{
 					return match.theMethod;

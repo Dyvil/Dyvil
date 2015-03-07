@@ -250,8 +250,7 @@ public class ExpressionParser extends Parser implements ITyped
 				if (lv != null)
 				{
 					lv.expandPosition(token);
-					this.value = lv;
-					this.field.setValue(this.value);
+					this.field.setValue(lv);
 					pm.popParser();
 					pm.pushParser(new ExpressionParser(lv));
 					return;
