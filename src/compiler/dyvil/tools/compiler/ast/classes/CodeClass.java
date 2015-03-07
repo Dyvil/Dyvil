@@ -28,8 +28,8 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -49,7 +49,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
 {
-	protected DyvilFile			unit;
+	protected IDyvilUnit			unit;
 	protected IClass			outerClass;
 	
 	protected Annotation[]		annotations;
@@ -80,14 +80,14 @@ public class CodeClass extends ASTNode implements IClass
 		this.type = new Type(this);
 	}
 	
-	public CodeClass(ICodePosition position, DyvilFile unit)
+	public CodeClass(ICodePosition position, IDyvilUnit unit)
 	{
 		this.position = position;
 		this.unit = unit;
 		this.type = new Type(this);
 	}
 	
-	public CodeClass(ICodePosition position, DyvilFile unit, int modifiers)
+	public CodeClass(ICodePosition position, IDyvilUnit unit, int modifiers)
 	{
 		this.position = position;
 		this.unit = unit;
@@ -96,15 +96,9 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public DyvilFile getUnit()
+	public IDyvilUnit getUnit()
 	{
 		return this.unit;
-	}
-	
-	@Override
-	public Package getPackage()
-	{
-		return this.unit.pack;
 	}
 	
 	@Override
@@ -903,7 +897,7 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.PACKAGE)
 		{
-			if (iclass.getPackage() == this.unit.pack)
+			if (this.unit.getPackage() == iclass.getUnit().getPackage())
 			{
 				return member.getAccessibility();
 			}

@@ -8,16 +8,13 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.IDyvilUnit;
 import dyvil.tools.compiler.ast.type.IType;
 
 public interface IClass extends IASTNode, IMember, IGeneric, IContext
 {
-	public DyvilFile getUnit();
-	
-	public Package getPackage();
+	public IDyvilUnit getUnit();
 	
 	public void setOuterClass(IClass iclass);
 	

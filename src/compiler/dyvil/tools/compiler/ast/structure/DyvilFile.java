@@ -7,7 +7,6 @@ import java.util.List;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.ClassBody;
-import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.Import;
@@ -27,21 +26,22 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
 import dyvil.tools.compiler.phase.ICompilerPhase;
 
-public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
+public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 {
-	public final CodeFile		inputFile;
-	public final File			outputDirectory;
-	public final File			outputFile;
+	public final CodeFile	inputFile;
+	public final File		outputDirectory;
+	public final File		outputFile;
 	
-	public final String			name;
-	public final Package		pack;
-	protected TokenIterator		tokens;
-	protected List<Marker>		markers			= new ArrayList();
+	public final String		name;
+	public Package			pack;
 	
-	protected PackageDecl		packageDeclaration;
-	protected List<Import>		imports			= new ArrayList();
-	protected List<Import>		staticImports	= new ArrayList();
-	protected List<CodeClass>	classes			= new ArrayList();
+	protected TokenIterator	tokens;
+	protected List<Marker>	markers			= new ArrayList();
+	
+	protected PackageDecl	packageDeclaration;
+	protected List<Import>	imports			= new ArrayList();
+	protected List<Import>	staticImports	= new ArrayList();
+	protected List<IClass>	classes			= new ArrayList();
 	
 	public DyvilFile(Package pack, CodeFile input, File output)
 	{
@@ -73,11 +73,25 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 		return this.outputFile;
 	}
 	
+	@Override
+	public void setPackage(Package pack)
+	{
+		this.pack = pack;
+	}
+	
+	@Override
+	public Package getPackage()
+	{
+		return this.pack;
+	}
+	
+	@Override
 	public void setPackageDeclaration(PackageDecl packageDecl)
 	{
 		this.packageDeclaration = packageDecl;
 	}
 	
+	@Override
 	public PackageDecl getPackageDeclaration()
 	{
 		return this.packageDeclaration;
@@ -88,32 +102,37 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 		return this.imports;
 	}
 	
+	@Override
 	public void addImport(Import iimport)
 	{
 		this.imports.add(iimport);
 	}
 	
+	@Override
 	public void addStaticImport(Import iimport)
 	{
 		this.staticImports.add(iimport);
 	}
 	
+	@Override
 	public boolean hasStaticImports()
 	{
 		return !this.staticImports.isEmpty();
 	}
 	
-	public List<CodeClass> getClasses()
+	public List<IClass> getClasses()
 	{
 		return this.classes;
 	}
 	
-	public void addClass(CodeClass iclass)
+	@Override
+	public void addClass(IClass iclass)
 	{
 		this.classes.add(iclass);
 		this.pack.addClass(iclass);
 	}
 	
+	@Override
 	public String getFullName(String name)
 	{
 		if (!name.equals(this.name))
@@ -123,6 +142,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IContext
 		return this.pack.fullName + '.' + name;
 	}
 	
+	@Override
 	public String getInternalName(String name)
 	{
 		if (!name.equals(this.name))

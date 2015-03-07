@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.parser.imports;
 
 import dyvil.tools.compiler.ast.imports.PackageDecl;
-import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -11,14 +10,12 @@ import dyvil.tools.compiler.util.Tokens;
 
 public class PackageParser extends Parser
 {
-	protected DyvilFile		unit;
-	
-	private PackageDecl		packageDeclaration;
+	protected PackageDecl	packageDeclaration;
 	private StringBuilder	buffer	= new StringBuilder();
 	
-	public PackageParser(DyvilFile unit)
+	public PackageParser(PackageDecl pack)
 	{
-		this.unit = unit;
+		this.packageDeclaration = pack;
 	}
 	
 	@Override
@@ -34,20 +31,13 @@ public class PackageParser extends Parser
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)
 		{
-			this.packageDeclaration.expandPosition(token);
 			this.packageDeclaration.setPackage(this.buffer.toString());
-			this.unit.setPackageDeclaration(this.packageDeclaration);
 			
 			pm.popParser();
 			return;
 		}
 		if (ParserUtil.isIdentifier(type) || type == Tokens.DOT)
 		{
-			if (this.packageDeclaration == null)
-			{
-				this.packageDeclaration = new PackageDecl(token, null);
-			}
-			
 			this.buffer.append(token.value());
 			return;
 		}

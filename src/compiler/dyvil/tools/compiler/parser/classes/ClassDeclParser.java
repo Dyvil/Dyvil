@@ -2,7 +2,6 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -29,27 +28,18 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 	public static final int	BODY			= 32;
 	public static final int	BODY_END		= 64;
 	
-	protected DyvilFile		unit;
 	protected CodeClass		theClass;
 	
-	public ClassDeclParser(DyvilFile unit)
+	public ClassDeclParser(CodeClass theClass)
 	{
-		this.unit = unit;
-		this.theClass = new CodeClass(null, unit);
-		this.unit.addClass(this.theClass);
-	}
-	
-	protected ClassDeclParser(CodeClass theClass)
-	{
-		this.unit = theClass.getUnit();
 		this.theClass = theClass;
-		this.mode = NAME;
+		this.mode = MODIFIERS;
 	}
 	
 	@Override
 	public void reset()
 	{
-		this.mode = NAME;
+		this.mode = MODIFIERS;
 	}
 	
 	@Override

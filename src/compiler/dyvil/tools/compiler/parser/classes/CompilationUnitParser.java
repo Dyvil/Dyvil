@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.parser.classes;
 
+import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.imports.Import;
-import dyvil.tools.compiler.ast.structure.DyvilFile;
+import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.structure.IDyvilUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -16,9 +18,9 @@ public class CompilationUnitParser extends Parser
 	private static final int	IMPORT	= 2;
 	private static final int	CLASS	= 4;
 	
-	private DyvilFile			unit;
+	protected IDyvilUnit			unit;
 	
-	public CompilationUnitParser(DyvilFile unit)
+	public CompilationUnitParser(IDyvilUnit unit)
 	{
 		this.unit = unit;
 		this.mode = PACKAGE | IMPORT | CLASS;
@@ -39,7 +41,10 @@ public class CompilationUnitParser extends Parser
 			if ("package".equals(value))
 			{
 				this.mode = IMPORT | CLASS;
-				jcp.pushParser(new PackageParser(this.unit));
+				
+				PackageDecl pack = new PackageDecl(token.raw());
+				this.unit.setPackageDeclaration(pack);
+				jcp.pushParser(new PackageParser(pack));
 				return;
 			}
 		}
@@ -70,8 +75,11 @@ public class CompilationUnitParser extends Parser
 				return;
 			}
 			
-			jcp.pushParser(new ClassDeclParser(this.unit), true);
+			CodeClass c = new CodeClass(null, this.unit);
+			this.unit.addClass(c);
+			jcp.pushParser(new ClassDeclParser(c), true);
 			return;
 		}
+		throw new SyntaxError(token, "Invalid Token - Delete this token");
 	}
 }
