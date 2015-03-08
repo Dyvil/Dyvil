@@ -141,6 +141,11 @@ public class MatchExpression extends ASTNode implements IValue
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			ICase c = this.cases[i];
+			if (this.exhaustive)
+			{
+				markers.add(Markers.create(c.getPosition(), "pattern.dead"));
+			}
+			
 			IPattern pattern = c.getPattern();
 			if (pattern.getPatternType() == IPattern.WILDCARD)
 			{

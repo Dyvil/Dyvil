@@ -170,7 +170,7 @@ public class PatternValue extends ASTNode implements IValue, ICase
 			buffer.append(" if ");
 			this.condition.toString(prefix, buffer);
 		}
-		buffer.append(": ");
+		buffer.append(" : ");
 		this.value.toString(prefix, buffer);
 	}
 }
