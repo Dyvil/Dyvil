@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import dyvil.collections.SingletonIterator;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -17,6 +18,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 public class SingleArgument implements IArguments, IValued
 {
 	private IValue	value;
+	private boolean	varargs;
 	
 	public SingleArgument()
 	{
@@ -85,33 +87,21 @@ public class SingleArgument implements IArguments, IValued
 	// Used by Methods
 	
 	@Override
-	public IValue getValue(Parameter param)
+	public IValue getValue(int index, Parameter param)
 	{
-		return param.index == 0 ? this.value : null;
+		return index == 0 ? this.value : null;
 	}
 	
 	@Override
-	public IType getType(Parameter param)
+	public IType getType(int index, Parameter param)
 	{
-		return param.index == 0 ? this.value.getType() : Type.NONE;
+		return index == 0 ? this.value.getType() : Type.NONE;
 	}
 	
 	@Override
-	public void writeValue(Parameter param, MethodWriter writer)
+	public int getTypeMatch(int index, Parameter param)
 	{
-		if (param.index == 0)
-		{
-			this.value.writeExpression(writer);
-			return;
-		}
-		
-		param.defaultValue.writeExpression(writer);
-	}
-	
-	@Override
-	public int getTypeMatch(Parameter param)
-	{
-		if (param.index == 0)
+		if (index == 0)
 		{
 			return this.value.getTypeMatch(param.type);
 		}
@@ -119,28 +109,84 @@ public class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(Parameter param)
+	public int getVarargsTypeMatch(int index, Parameter param)
 	{
-		if (param.index == 0)
+		if (index != 0)
 		{
-			int m = this.value.getTypeMatch(param.type);
-			if (m != 0)
-			{
-				return m;
-			}
-			return this.value.getTypeMatch(param.type.getElementType());
+			return 3;
 		}
-		return 0;
+		
+		int m = this.value.getTypeMatch(param.type);
+		if (m != 0)
+		{
+			return m;
+		}
+		return this.value.getTypeMatch(param.type.getElementType());
 	}
 	
 	@Override
-	public void checkValue(List<Marker> markers, Parameter param, ITypeContext context)
-	{	
-	}
-	
-	@Override
-	public void checkVarargsValue(List<Marker> markers, Parameter param, ITypeContext context)
+	public void checkValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
 	{
+		if (index != 0)
+		{
+			return;
+		}
+		this.value = this.value.withType(param.type);
+	}
+	
+	@Override
+	public void checkVarargsValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
+	{
+		if (index != 0)
+		{
+			return;
+		}
+		
+		IValue value1 = this.value.withType(param.type);
+		if (value1 != null)
+		{
+			this.value = value1;
+			this.varargs = true;
+			return;
+		}
+		
+		this.value = this.value.withType(param.type.getElementType());
+	}
+	
+	@Override
+	public void writeValue(int index, String name, IValue defaultValue, MethodWriter writer)
+	{
+		if (index == 0)
+		{
+			this.value.writeExpression(writer);
+			return;
+		}
+		
+		defaultValue.writeExpression(writer);
+	}
+	
+	@Override
+	public void writeVarargsValue(int index, String name, IType type, MethodWriter writer)
+	{
+		if (index != 0)
+		{
+			return;
+		}
+		if (this.varargs)
+		{
+			// Write the value as is (it is an array)
+			this.value.writeExpression(writer);
+			return;
+		}
+		
+		// Write an array with one element
+		type = type.getElementType();
+		writer.writeLDC(1);
+		writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
+		writer.writeInsn(Opcodes.DUP);
+		writer.writeLDC(0);
+		this.value.writeExpression(writer);
+		writer.writeInsn(type.getArrayStoreOpcode());
 	}
 	
 	@Override

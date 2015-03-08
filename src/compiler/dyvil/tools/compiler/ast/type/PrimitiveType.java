@@ -90,12 +90,6 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public boolean isSuperTypeOf(IType that)
-	{
-		return this.theClass == that.getTheClass();
-	}
-	
-	@Override
 	public boolean isSuperTypeOf2(IType that)
 	{
 		return this.theClass == that.getTheClass();

@@ -19,6 +19,8 @@ public final class ArgumentList implements IArguments, IValueList
 	private IValue[]	values;
 	private int			size;
 	
+	private boolean		varargs;
+	
 	public ArgumentList()
 	{
 		this.values = new IValue[3];
@@ -137,57 +139,56 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public IValue getValue(Parameter param)
+	public IValue getValue(int index, Parameter param)
 	{
-		return this.values[param.index];
+		return this.values[index];
 	}
 	
 	@Override
-	public IType getType(Parameter param)
+	public IType getType(int index, Parameter param)
 	{
-		return this.values[param.index].getType();
+		return this.values[index].getType();
 	}
 	
 	@Override
-	public void writeValue(Parameter param, MethodWriter writer)
+	public int getTypeMatch(int index, Parameter param)
 	{
-		if (param.varargs)
+		if (index >= this.size)
 		{
-			IType type = param.type.getElementType();
-			int len = this.size - param.index;
-			int opcode = type.getArrayStoreOpcode();
-			
-			writer.writeLDC(len);
-			writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
-			
-			for (int i = 0; i < len; i++)
-			{
-				writer.writeInsn(Opcodes.DUP);
-				IValue value = this.values[param.index + i];
-				writer.writeLDC(i);
-				value.writeExpression(writer);
-				writer.writeInsn(opcode);
-			}
-			return;
+			return param.defaultValue != null ? 3 : 0;
 		}
-		if (param.index < this.size)
-		{
-			this.values[param.index].writeExpression(writer);
-			return;
-		}
-		param.defaultValue.writeExpression(writer);
+		
+		return this.values[index].getTypeMatch(param.type);
 	}
 	
 	@Override
-	public void checkValue(List<Marker> markers, Parameter param, ITypeContext context)
+	public int getVarargsTypeMatch(int index, Parameter param)
 	{
-		if (param.index >= this.size)
+		if (index >= this.size)
+		{
+			return 0;
+		}
+		
+		IValue argument = this.values[index];
+		IType type = param.getType();
+		int m = argument.getTypeMatch(type);
+		if (m != 0)
+		{
+			return m;
+		}
+		return argument.getTypeMatch(type.getElementType());
+	}
+	
+	@Override
+	public void checkValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
+	{
+		if (index >= this.size)
 		{
 			return;
 		}
 		
 		IType type = param.type.getConcreteType(context);
-		IValue value = this.values[param.index];
+		IValue value = this.values[index];
 		IValue value1 = value.withType(type);
 		if (value1 == null)
 		{
@@ -198,29 +199,29 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 		else
 		{
-			this.values[param.index] = value;
+			this.values[index] = value;
 		}
 	}
 	
 	@Override
-	public void checkVarargsValue(List<Marker> markers, Parameter param, ITypeContext context)
+	public void checkVarargsValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
 	{
 		IType varParamType = param.getType(context);
 		
-		IValue value = this.values[param.index];
+		IValue value = this.values[index];
 		IValue value1 = value.withType(varParamType);
 		if (value1 != null)
 		{
-			this.values[param.index] = value1;
+			this.values[index] = value1;
+			this.varargs = true;
 			return;
 		}
 		
 		IType elementType = varParamType.getElementType();
 		
-		int i = param.index;
-		for (; i < this.size; i++)
+		for (; index < this.size; index++)
 		{
-			value = this.values[i];
+			value = this.values[index];
 			value1 = value.withType(elementType);
 			if (value1 == null)
 			{
@@ -229,37 +230,52 @@ public final class ArgumentList implements IArguments, IValueList
 				marker.addInfo("Value Type: " + value.getType());
 				markers.add(marker);
 			}
-			this.values[i] = value;
+			this.values[index] = value;
 		}
 	}
 	
 	@Override
-	public int getTypeMatch(Parameter param)
+	public void writeValue(int index, String name, IValue defaultValue, MethodWriter writer)
 	{
-		if (param.index >= this.size)
+		if (index < this.size)
 		{
-			return param.defaultValue != null ? 3 : 0;
+			this.values[index].writeExpression(writer);
+			return;
 		}
-		
-		return this.values[param.index].getTypeMatch(param.type);
+		defaultValue.writeExpression(writer);
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(Parameter param)
+	public void writeVarargsValue(int index, String name, IType type, MethodWriter writer)
 	{
-		if (param.index >= this.size)
+		if (this.varargs)
 		{
-			return 0;
+			this.values[index].writeExpression(writer);
+			return;
 		}
 		
-		IValue argument = this.values[param.index];
-		IType type = param.getType();
-		int m = argument.getTypeMatch(type);
-		if (m != 0)
+		type = type.getElementType();
+		int len = this.size - index;
+		if (len < 0)
 		{
-			return m;
+			writer.writeLDC(0);
+			writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
+			return;
 		}
-		return argument.getTypeMatch(type.getElementType());
+		
+		int opcode = type.getArrayStoreOpcode();
+		
+		writer.writeLDC(len);
+		writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
+		
+		for (int i = 0; i < len; i++)
+		{
+			writer.writeInsn(Opcodes.DUP);
+			IValue value = this.values[index + i];
+			writer.writeLDC(i);
+			value.writeExpression(writer);
+			writer.writeInsn(opcode);
+		}
 	}
 	
 	@Override

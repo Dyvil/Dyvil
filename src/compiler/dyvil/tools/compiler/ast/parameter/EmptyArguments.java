@@ -71,52 +71,49 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public IValue getValue(Parameter param)
+	public IValue getValue(int index, Parameter param)
 	{
 		return null;
 	}
 	
 	@Override
-	public IType getType(Parameter param)
+	public IType getType(int index, Parameter param)
 	{
 		return null;
 	}
 	
 	@Override
-	public void writeValue(Parameter param, MethodWriter writer)
+	public void writeValue(int index, String name, IValue defaultValue, MethodWriter writer)
 	{
-		if (param.defaultValue != null)
-		{
-			param.defaultValue.writeExpression(writer);
-			return;
-		}
-		
-		if (param.varargs)
-		{
-			writer.writeLDC(0);
-			writer.writeTypeInsn(Opcodes.ANEWARRAY, param.type);
-		}
+		defaultValue.writeExpression(writer);
 	}
 	
 	@Override
-	public int getTypeMatch(Parameter param)
+	public void writeVarargsValue(int index, String name, IType type, MethodWriter writer)
+	{
+		writer.writeLDC(0);
+		writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
+	}
+	
+	@Override
+	public int getTypeMatch(int index, Parameter param)
 	{
 		return param.defaultValue != null ? 3 : 0;
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(Parameter param)
+	public int getVarargsTypeMatch(int index, Parameter param)
 	{
 		return 3;
 	}
 	
 	@Override
-	public void checkValue(List<Marker> markers, Parameter param, ITypeContext context)
+	public void checkValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
 	{
 	}
 	
 	@Override
-	public void checkVarargsValue(List<Marker> markers, Parameter param, ITypeContext context)
+	public void checkVarargsValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
 	{
 	}
 	

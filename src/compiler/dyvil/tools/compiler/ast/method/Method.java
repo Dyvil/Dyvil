@@ -325,11 +325,6 @@ public class Method extends Member implements IMethod
 		int mods = this.modifiers & Modifiers.INFIX;
 		if (instance != null && mods == Modifiers.INFIX)
 		{
-			if (len != this.parameterCount - 1)
-			{
-				return 0;
-			}
-			
 			IType t2 = this.parameters[0].type;
 			int m = instance.getTypeMatch(t2);
 			if (m == 0)
@@ -350,21 +345,19 @@ public class Method extends Member implements IMethod
 			
 			int m;
 			Parameter varParam = this.parameters[parCount];
-			varParam.index = parCount;
-			for (int i = 0; i < parCount; i++)
+			for (int i = parIndex; i < parCount; i++)
 			{
 				Parameter par = this.parameters[i + parIndex];
-				par.index = i;
-				m = arguments.getTypeMatch(par);
+				m = arguments.getTypeMatch(i, par);
 				if (m == 0)
 				{
 					return 0;
 				}
 				match += m;
 			}
-			for (int i = parCount; i < len; i++)
+			for (int i = parCount + parIndex; i < len; i++)
 			{
-				m = arguments.getVarargsTypeMatch(varParam);
+				m = arguments.getVarargsTypeMatch(i, varParam);
 				if (m == 0)
 				{
 					return 0;
@@ -378,11 +371,10 @@ public class Method extends Member implements IMethod
 			return 0;
 		}
 		
-		for (int i = 0; parIndex < this.parameterCount; parIndex++)
+		for (int i = 0; parIndex < this.parameterCount; parIndex++, i++)
 		{
 			Parameter par = this.parameters[parIndex];
-			par.index = i++;
-			int m = arguments.getTypeMatch(par);
+			int m = arguments.getTypeMatch(i, par);
 			if (m == 0)
 			{
 				return 0;
@@ -396,7 +388,6 @@ public class Method extends Member implements IMethod
 	@Override
 	public void checkArguments(List<Marker> markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
-		int parIndex = 0;
 		int len = arguments.size();
 		Parameter par;
 		IType parType;
@@ -413,7 +404,13 @@ public class Method extends Member implements IMethod
 				marker.addInfo("Value Type: " + instance.getType());
 				markers.add(marker);
 			}
-			parIndex = 1;
+			
+			if ((this.modifiers & Modifiers.VARARGS) != 0)
+			{
+				par = this.parameters[this.parameterCount - 1];
+				arguments.checkVarargsValue(this.parameterCount - 2, par, markers, typeContext);
+			}
+			return;
 		}
 		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
@@ -434,15 +431,20 @@ public class Method extends Member implements IMethod
 		{
 			len = this.parameterCount - 1;
 			par = this.parameters[len];
-			par.index = len;
-			arguments.checkVarargsValue(markers, par, typeContext);
+			arguments.checkVarargsValue(len, par, markers, typeContext);
+			
+			for (int i = 0; i < len; i++)
+			{
+				par = this.parameters[i];
+				arguments.checkValue(i, par, markers, typeContext);
+			}
+			return;
 		}
 		
-		for (; parIndex < this.parameterCount; parIndex++)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			par = this.parameters[parIndex];
-			par.index = parIndex;
-			arguments.checkValue(markers, par, typeContext);
+			par = this.parameters[i];
+			arguments.checkValue(i, par, markers, typeContext);
 		}
 	}
 	
@@ -482,7 +484,7 @@ public class Method extends Member implements IMethod
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i + 1];
-				type = param.type.resolveType(name, arguments.getType(param));
+				type = param.type.resolveType(name, arguments.getType(i, param));
 				if (type != null)
 				{
 					return type;
@@ -513,7 +515,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < len; i++)
 		{
 			param = this.parameters[i];
-			type = param.type.resolveType(name, arguments.getType(param));
+			type = param.type.resolveType(name, arguments.getType(i, param));
 			if (type != null)
 			{
 				return type;
@@ -1002,6 +1004,60 @@ public class Method extends Member implements IMethod
 		writer.writeFrameJump(IFEQ, dest);
 	}
 	
+	private int writeArguments(MethodWriter writer, IArguments arguments)
+	{
+		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		{
+			int len = this.parameterCount;
+			if ((this.modifiers & Modifiers.VARARGS) != 0)
+			{
+				len--;
+				Parameter param;
+				for (int i = 1, j = 0; i < len; i++, j++)
+				{
+					param = this.parameters[i];
+					arguments.writeValue(j, param.qualifiedName, param.defaultValue, writer);
+				}
+				param = this.parameters[len];
+				arguments.writeVarargsValue(len - 1, param.qualifiedName, param.type, writer);
+				return this.parameterCount;
+			}
+			
+			for (int i = 1, j = 0; i < this.parameterCount; i++, j++)
+			{
+				Parameter param = this.parameters[i];
+				arguments.writeValue(j, param.qualifiedName, param.defaultValue, writer);
+			}
+			return this.parameterCount - 1;
+		}
+		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		{
+			arguments.writeValue(0, "this", null, writer);
+			return 1;
+		}
+		
+		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		{
+			int len = this.parameterCount - 1;
+			Parameter param;
+			for (int i = 0; i < len; i++)
+			{
+				param = this.parameters[i];
+				arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
+			}
+			param = this.parameters[len];
+			arguments.writeVarargsValue(len, param.qualifiedName, param.type, writer);
+			return this.parameterCount;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			Parameter param = this.parameters[i];
+			arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
+		}
+		return this.parameterCount;
+	}
+	
 	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments)
 	{
 		for (int i : this.intrinsicOpcodes)
@@ -1015,10 +1071,7 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				for (int j = 0; j < this.parameterCount; j++)
-				{
-					arguments.writeValue(this.parameters[j], writer);
-				}
+				this.writeArguments(writer, arguments);
 			}
 			else
 			{
@@ -1037,10 +1090,7 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				for (int j = 0; j < this.parameterCount; j++)
-				{
-					arguments.writeValue(this.parameters[j], writer);
-				}
+				this.writeArguments(writer, arguments);
 			}
 			else if (Opcodes.isJumpOpcode(i))
 			{
@@ -1063,10 +1113,7 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				for (int j = 0; j < this.parameterCount; j++)
-				{
-					arguments.writeValue(this.parameters[j], writer);
-				}
+				this.writeArguments(writer, arguments);
 			}
 			else if (Opcodes.isJumpOpcode(i))
 			{
@@ -1088,11 +1135,7 @@ public class Method extends Member implements IMethod
 			args = 1;
 		}
 		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			arguments.writeValue(this.parameters[i], writer);
-		}
-		args += this.parameterCount;
+		args += this.writeArguments(writer, arguments);
 		
 		int opcode;
 		int modifiers = this.modifiers;

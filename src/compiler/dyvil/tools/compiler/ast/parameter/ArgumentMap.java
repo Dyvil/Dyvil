@@ -121,40 +121,19 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public IValue getValue(Parameter param)
+	public IValue getValue(int index, Parameter param)
 	{
 		return this.getValue(param.qualifiedName);
 	}
 	
 	@Override
-	public IType getType(Parameter param)
+	public IType getType(int index, Parameter param)
 	{
 		return this.getValue(param.qualifiedName).getType();
 	}
 	
 	@Override
-	public void writeValue(Parameter param, MethodWriter writer)
-	{
-		String key = param.qualifiedName;
-		int hash = key.hashCode();
-		for (int i = 0; i < this.size; i++)
-		{
-			String s = this.keys[i];
-			if (s.hashCode() == hash && s.equals(key))
-			{
-				this.values[i].writeExpression(writer);
-				return;
-			}
-		}
-		
-		if (param.defaultValue != null)
-		{
-			param.defaultValue.writeExpression(writer);
-		}
-	}
-	
-	@Override
-	public int getTypeMatch(Parameter param)
+	public int getTypeMatch(int index, Parameter param)
 	{
 		String key = param.qualifiedName;
 		int hash = key.hashCode();
@@ -168,15 +147,15 @@ public final class ArgumentMap implements IArguments, IValueMap
 		}
 		return param.defaultValue != null ? 3 : 0;
 	}
-	
+
 	@Override
-	public int getVarargsTypeMatch(Parameter param)
+	public int getVarargsTypeMatch(int index, Parameter param)
 	{
-		return 0;
+		return this.getTypeMatch(index, param);
 	}
-	
+
 	@Override
-	public void checkValue(List<Marker> markers, Parameter param, ITypeContext context)
+	public void checkValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
 	{
 		String key = param.qualifiedName;
 		int hash = key.hashCode();
@@ -205,10 +184,34 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void checkVarargsValue(List<Marker> markers, Parameter param, ITypeContext context)
+	public void checkVarargsValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
 	{
+		this.checkValue(index, param, markers, context);
 	}
 	
+	@Override
+	public void writeValue(int index, String name, IValue defaultValue, MethodWriter writer)
+	{
+		int hash = name.hashCode();
+		for (int i = 0; i < this.size; i++)
+		{
+			String s = this.keys[i];
+			if (s.hashCode() == hash && s.equals(name))
+			{
+				this.values[i].writeExpression(writer);
+				return;
+			}
+		}
+		
+		defaultValue.writeExpression(writer);
+	}
+	
+	@Override
+	public void writeVarargsValue(int index, String name, IType type, MethodWriter writer)
+	{
+		this.writeValue(index, name, null, writer);
+	}
+
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
