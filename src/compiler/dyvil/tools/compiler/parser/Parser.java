@@ -31,7 +31,6 @@ public abstract class Parser
 	
 	public Parser()
 	{
-		this.parent = rootParser;
 		if (DyvilCompiler.parseStack)
 		{
 			this.name = this.computeName();

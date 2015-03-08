@@ -23,7 +23,6 @@ public class ParserManager implements IParserManager
 	
 	public ParserManager()
 	{
-		this(Parser.rootParser);
 	}
 	
 	/**
@@ -106,6 +105,18 @@ public class ParserManager implements IParserManager
 							this.reparse = true;
 						}
 						markers.add(ex);
+					}
+				}
+				catch (NullPointerException npe)
+				{
+					if (this.parser == null)
+					{
+						markers.add(new SyntaxError(token, "Unexpected End of Input"));
+					}
+					else
+					{
+						DyvilCompiler.logger.throwing("ParserManager", "parseToken", npe);
+						markers.add(new SyntaxError(token, "Failed to parse token '" + token.value() + "': " + npe.getMessage()));
 					}
 				}
 				catch (Exception ex)
