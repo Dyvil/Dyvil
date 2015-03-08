@@ -6,6 +6,41 @@ public class MatchError extends RuntimeException
 	
 	private Object				match;
 	
+	public MatchError(byte match)
+	{
+		this.match = match;
+	}
+	
+	public MatchError(short match)
+	{
+		this.match = match;
+	}
+	
+	public MatchError(char match)
+	{
+		this.match = match;
+	}
+	
+	public MatchError(int match)
+	{
+		this.match = match;
+	}
+	
+	public MatchError(long match)
+	{
+		this.match = match;
+	}
+	
+	public MatchError(float match)
+	{
+		this.match = match;
+	}
+	
+	public MatchError(double match)
+	{
+		this.match = match;
+	}
+	
 	public MatchError(Object match)
 	{
 		this.match = match;

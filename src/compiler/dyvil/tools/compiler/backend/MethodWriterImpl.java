@@ -537,6 +537,9 @@ public final class MethodWriterImpl implements MethodWriter
 		case RETURN:
 			this.hasReturn = true;
 			return;
+		case ATHROW:
+			this.pop();
+			return;
 		case BALOAD:
 		case SALOAD:
 		case CALOAD:

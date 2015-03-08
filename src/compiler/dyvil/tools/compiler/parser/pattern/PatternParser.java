@@ -61,6 +61,8 @@ public class PatternParser extends Parser implements IValued
 			return new BooleanPattern(token.raw(), true);
 		case Tokens.FALSE:
 			return new BooleanPattern(token.raw(), false);
+		case Tokens.WILDCARD:
+			return new WildcardPattern(token.raw());
 		case Tokens.TYPE_STRING:
 			return new StringPattern(token.raw(), (String) token.object());
 		case Tokens.TYPE_CHAR:

@@ -2,6 +2,8 @@ package dyvil.tools.compiler.ast.pattern;
 
 import java.util.List;
 
+import org.objectweb.asm.Label;
+
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -84,22 +86,42 @@ public class PatternValue extends ASTNode implements IValue, ICase
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
+		if (this.condition != null)
+		{
+			this.condition.resolveTypes(markers, context);
+		}
+		this.value.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public PatternValue resolve(List<Marker> markers, IContext context)
 	{
+		if (this.condition != null)
+		{
+			this.condition = this.condition.resolve(markers, context);
+		}
+		this.value = this.value.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
+		if (this.condition != null)
+		{
+			this.condition.check(markers, context);
+		}
+		this.value.check(markers, context);
 	}
 	
 	@Override
 	public PatternValue foldConstants()
 	{
+		if (this.condition != null)
+		{
+			this.condition = this.condition.foldConstants();
+		}
+		this.value = this.value.foldConstants();
 		return this;
 	}
 	
@@ -111,6 +133,28 @@ public class PatternValue extends ASTNode implements IValue, ICase
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+	}
+	
+	@Override
+	public void writeExpression(MethodWriter writer, Label elseLabel)
+	{
+		this.pattern.writeJump(writer, elseLabel);
+		if (this.condition != null)
+		{
+			this.condition.writeInvJump(writer, elseLabel);
+		}
+		this.value.writeExpression(writer);
+	}
+	
+	@Override
+	public void writeStatement(MethodWriter writer, Label elseLabel)
+	{
+		this.pattern.writeJump(writer, elseLabel);
+		if (this.condition != null)
+		{
+			this.condition.writeInvJump(writer, elseLabel);
+		}
+		this.value.writeStatement(writer);
 	}
 	
 	@Override

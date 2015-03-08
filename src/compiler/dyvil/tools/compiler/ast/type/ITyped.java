@@ -10,9 +10,4 @@ public interface ITyped
 	{
 		return this.getType() == type;
 	}
-	
-	public default boolean hasType()
-	{
-		return this.getType() != null;
-	}
 }
