@@ -20,6 +20,12 @@ public class CharPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public int getPatternType()
+	{
+		return CHAR;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.CHAR;
@@ -29,6 +35,12 @@ public class CharPattern extends ASTNode implements IPattern
 	public boolean isType(IType type)
 	{
 		return type == Type.CHAR || type.isSuperTypeOf(Type.CHAR);
+	}
+	
+	@Override
+	public int intValue()
+	{
+		return this.value;
 	}
 	
 	@Override

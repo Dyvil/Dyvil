@@ -17,6 +17,12 @@ public final class WildcardPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public int getPatternType()
+	{
+		return WILDCARD;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.ANY;

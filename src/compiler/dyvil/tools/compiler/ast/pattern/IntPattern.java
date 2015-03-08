@@ -20,6 +20,12 @@ public class IntPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public int getPatternType()
+	{
+		return INT;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.INT;
@@ -29,6 +35,12 @@ public class IntPattern extends ASTNode implements IPattern
 	public boolean isType(IType type)
 	{
 		return type == Type.INT || type.isSuperTypeOf(Type.INT);
+	}
+	
+	@Override
+	public int intValue()
+	{
+		return this.value;
 	}
 	
 	@Override

@@ -20,6 +20,12 @@ public class StringPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public int getPatternType()
+	{
+		return STRING;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.STRING;

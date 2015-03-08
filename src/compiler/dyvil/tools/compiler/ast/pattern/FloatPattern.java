@@ -20,6 +20,12 @@ public class FloatPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public int getPatternType()
+	{
+		return FLOAT;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.FLOAT;

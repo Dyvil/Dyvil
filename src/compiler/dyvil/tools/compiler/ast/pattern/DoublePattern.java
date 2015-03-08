@@ -20,6 +20,12 @@ public class DoublePattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public int getPatternType()
+	{
+		return DOUBLE;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.DOUBLE;

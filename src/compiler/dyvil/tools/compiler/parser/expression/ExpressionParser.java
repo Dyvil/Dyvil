@@ -25,7 +25,7 @@ import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public class ExpressionParser extends Parser implements ITyped
+public class ExpressionParser extends Parser implements ITyped, IValued
 {
 	public static final int	VALUE				= 0x1;
 	public static final int	LIST_END			= 0x2;
@@ -49,7 +49,8 @@ public class ExpressionParser extends Parser implements ITyped
 	public static final int	BYTECODE			= 0x8000;
 	public static final int	BYTECODE_END		= 0x10000;
 	
-	public static final int	PATTERN_END			= 0x20000;
+	public static final int	PATTERN_IF			= 0x20000;
+	public static final int	PATTERN_END			= 0x40000;
 	
 	protected IValued		field;
 	protected int			precedence;
@@ -157,6 +158,15 @@ public class ExpressionParser extends Parser implements ITyped
 			}
 			
 			this.mode = ACCESS;
+		}
+		if (this.isInMode(PATTERN_IF))
+		{
+			this.mode = PATTERN_END;
+			if (type == Tokens.IF)
+			{
+				pm.pushParser(new ExpressionParser(this));
+				return;
+			}
 		}
 		if (this.isInMode(PATTERN_END))
 		{
@@ -836,7 +846,7 @@ public class ExpressionParser extends Parser implements ITyped
 		{
 			PatternValue pattern = new PatternValue(token.raw());
 			pm.pushParser(new PatternParser(pattern));
-			this.mode = PATTERN_END;
+			this.mode = PATTERN_IF;
 			this.value = pattern;
 			return true;
 		}
@@ -866,6 +876,21 @@ public class ExpressionParser extends Parser implements ITyped
 	
 	@Override
 	public Type getType()
+	{
+		return null;
+	}
+	
+	@Override
+	public void setValue(IValue value)
+	{
+		if (this.mode == PATTERN_END)
+		{
+			((PatternValue) this.value).setCondition(value);
+		}
+	}
+	
+	@Override
+	public IValue getValue()
 	{
 		return null;
 	}

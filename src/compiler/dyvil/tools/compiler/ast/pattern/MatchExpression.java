@@ -142,9 +142,12 @@ public class MatchExpression extends ASTNode implements IValue
 		{
 			ICase c = this.cases[i];
 			IPattern pattern = c.getPattern();
-			if (pattern.getClass() == WildcardPattern.class)
+			if (pattern.getPatternType() == IPattern.WILDCARD)
 			{
-				this.exhaustive = true;
+				if (c.getCondition() == null)
+				{
+					this.exhaustive = true;
+				}
 			}
 			else if (!pattern.isType(type))
 			{

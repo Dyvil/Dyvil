@@ -20,6 +20,12 @@ public class BooleanPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public int getPatternType()
+	{
+		return BOOLEAN;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.BOOLEAN;
@@ -29,6 +35,12 @@ public class BooleanPattern extends ASTNode implements IPattern
 	public boolean isType(IType type)
 	{
 		return type == Type.BOOLEAN || type.isSuperTypeOf(Type.BOOLEAN);
+	}
+	
+	@Override
+	public int intValue()
+	{
+		return this.value ? 1 : 0;
 	}
 	
 	@Override

@@ -20,6 +20,12 @@ public class LongPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public int getPatternType()
+	{
+		return LONG;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Type.LONG;
