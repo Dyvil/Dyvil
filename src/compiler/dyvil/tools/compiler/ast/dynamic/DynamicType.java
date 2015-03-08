@@ -73,8 +73,7 @@ public final class DynamicType extends ASTNode implements IType
 	@Override
 	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
 	{
-		// return new MethodMatch(new DynamicMethod(name, arguments), 1);
-		return null;
+		return new MethodMatch(new DynamicMethod(name), 1);
 	}
 	
 	@Override
@@ -96,7 +95,7 @@ public final class DynamicType extends ASTNode implements IType
 	@Override
 	public byte getAccessibility(IMember member)
 	{
-		return 0;
+		return IContext.READ_WRITE_ACCESS;
 	}
 	
 	@Override
@@ -160,6 +159,18 @@ public final class DynamicType extends ASTNode implements IType
 	public IType getSuperType()
 	{
 		return this;
+	}
+	
+	@Override
+	public boolean isSuperTypeOf(IType type)
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean isSuperTypeOf2(IType type)
+	{
+		return true;
 	}
 	
 	@Override
