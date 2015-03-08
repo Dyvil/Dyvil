@@ -381,36 +381,15 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	@Deprecated
-	public void writeLDC(Object obj)
+	public void writeLDC(Type type)
 	{
 		if (this.visitFrame)
 		{
 			this.visitFrame();
 		}
 		
-		Class c = obj.getClass();
-		if (c == String.class)
-		{
-			this.push("Ljava/lang/String;");
-		}
-		else if (c == Integer.class)
-		{
-			this.push(INT);
-		}
-		else if (c == Long.class)
-		{
-			this.push(LONG);
-		}
-		else if (c == Float.class)
-		{
-			this.push(FLOAT);
-		}
-		else if (c == Double.class)
-		{
-			this.push(DOUBLE);
-		}
-		this.mv.visitLdcInsn(obj);
+		this.push("Ljava/lang/Class;");
+		this.mv.visitLdcInsn(type);
 	}
 	
 	// Labels

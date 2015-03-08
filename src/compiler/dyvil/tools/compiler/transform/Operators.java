@@ -58,11 +58,6 @@ public class Operators
 		return 0;
 	}
 	
-	public static IValue get(IValue arg1, String name)
-	{
-		return null;
-	}
-	
 	public static IValue get(String name, IValue arg1)
 	{
 		if ("!".equals(name))

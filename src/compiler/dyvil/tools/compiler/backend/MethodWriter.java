@@ -1,9 +1,6 @@
 package dyvil.tools.compiler.backend;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
 import dyvil.tools.compiler.ast.type.IType;
 
@@ -97,7 +94,7 @@ public interface MethodWriter
 	
 	public void writeLDC(String value);
 	
-	public void writeLDC(Object value);
+	public void writeLDC(Type value);
 	
 	// Labels
 	

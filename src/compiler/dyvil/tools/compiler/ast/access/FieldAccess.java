@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
@@ -241,6 +242,18 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	@Override
 	public boolean resolve(IContext context, List<Marker> markers)
 	{
+		if (this.instance != null && this.instance.getValueType() == CLASS_ACCESS)
+		{
+			if (this.qualifiedName.equals("class"))
+			{
+				ClassOperator co = new ClassOperator(((ClassAccess) this.instance).type);
+				co.position = this.position;
+				co.dotless = this.dotless;
+				this.replacement = co;
+				return false;
+			}
+		}
+		
 		IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
 		if (field != null)
 		{

@@ -3,10 +3,11 @@ package dyvil.tools.compiler.ast.value;
 import java.util.List;
 
 import org.objectweb.asm.Label;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
-import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -50,6 +51,7 @@ public interface IValue extends IASTNode, ITyped
 	public static int	BOOLEAN_AND			= 35;
 	public static int	BOOLEAN_OR			= 36;
 	public static int	BOOLEAN_NOT			= 37;
+	public static int	CLASS_OPERATOR		= 38;
 	
 	public static int	TUPLE				= 48;
 	public static int	LAMBDA				= 49;
@@ -255,7 +257,7 @@ public interface IValue extends IASTNode, ITyped
 		{
 			org.objectweb.asm.Type type = (org.objectweb.asm.Type) o;
 			IType itype = new Type(type.getClassName());
-			return new ClassAccess(itype);
+			return new ClassOperator(itype);
 		}
 		return null;
 	}

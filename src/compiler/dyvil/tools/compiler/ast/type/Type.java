@@ -44,6 +44,7 @@ public class Type extends ASTNode implements IType
 	public static final Type			ARRAY		= new Type("Array");
 	public static final Type			ITERABLE	= new Type("Iterable");
 	public static final Type			STRING		= new Type("String");
+	public static final Type			CLASS		= new Type("Class");
 	
 	public static final AnnotationType	AIntrinsic	= new AnnotationType("Intrinsic");
 	public static final AnnotationType	AOverride	= new AnnotationType("Override");
@@ -63,6 +64,7 @@ public class Type extends ASTNode implements IType
 	public static IClass				STRING_CLASS;
 	public static IClass				PREDEF_CLASS;
 	public static IClass				ARRAY_CLASS;
+	public static IClass				CLASS_CLASS;
 	
 	public String						name;
 	public String						qualifiedName;
@@ -135,6 +137,8 @@ public class Type extends ASTNode implements IType
 		ITERABLE.fullName = "java.lang.Iterable";
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
 		STRING.fullName = "java.lang.String";
+		CLASS.theClass = CLASS_CLASS = Package.javaLang.resolveClass("Class");
+		CLASS.fullName = "java.lang.Class";
 		
 		AIntrinsic.theClass = Package.dyvilLangAnnotation.resolveClass("Intrinsic");
 		AOverride.theClass = Package.javaLang.resolveClass("Override");
