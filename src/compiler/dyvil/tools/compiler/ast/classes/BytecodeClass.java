@@ -53,7 +53,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public ClassBody getBody()
+	public IClassBody getBody()
 	{
 		if (!this.typesResolved)
 		{

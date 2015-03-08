@@ -7,8 +7,8 @@ import jdk.internal.org.objectweb.asm.Handle;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -227,11 +227,11 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		}
 		
 		this.owner = iclass.getInternalName();
-		ClassBody body = iclass.getBody();
+		IClassBody body = iclass.getBody();
 		if (body != null)
 		{
+			this.index = body.compilableCount();
 			body.addCompilable(this);
-			this.index = body.compilables.size() - 1;
 		}
 		
 		return this;

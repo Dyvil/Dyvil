@@ -1,14 +1,11 @@
 package dyvil.tools.compiler.transform;
 
 import static dyvil.reflect.Opcodes.*;
-
-import java.util.Iterator;
-import java.util.List;
-
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.CodeClass;
+import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
@@ -17,7 +14,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 
 public class CaseClasses
 {
-	public static void writeEquals(MethodWriter writer, CodeClass theClass, List<IField> fields)
+	public static void writeEquals(MethodWriter writer, CodeClass theClass, IClassBody body)
 	{
 		Label label;
 		String extended = "L" + theClass.getInternalName() + ";";
@@ -65,21 +62,15 @@ public class CaseClasses
 		writer.registerLocal(extended);
 		writer.writeVarInsn(ASTORE, 2);
 		
-		Iterator<IField> iterator = fields.iterator();
-		while (iterator.hasNext())
+		int len = body.fieldCount();
+		for (int i = 0; i < len; i++)
 		{
-			IField f = iterator.next();
+			IField f = body.getField(i);
 			
-			if (f.hasModifier(Modifiers.STATIC))
+			if (!f.hasModifier(Modifiers.STATIC))
 			{
-				if (iterator.hasNext())
-				{
-					continue;
-				}
-				break;
+				writeEquals(writer, f);
 			}
-			
-			writeEquals(writer, f);
 		}
 		
 		writer.writeLDC(1);
@@ -150,30 +141,24 @@ public class CaseClasses
 		writer.writeFrameLabel(endLabel);
 	}
 	
-	public static void writeHashCode(MethodWriter writer, CodeClass theClass, List<IField> fields)
+	public static void writeHashCode(MethodWriter writer, CodeClass theClass, IClassBody body)
 	{
-		Iterator<IField> iterator = fields.iterator();
 		writer.writeLDC(31);
-		while (iterator.hasNext())
+		int len = body.fieldCount();
+		for (int i = 0; i < len; i++)
 		{
-			IField f = iterator.next();
+			IField f = body.getField(i);
 			
-			if (f.hasModifier(Modifiers.STATIC))
+			if (!f.hasModifier(Modifiers.STATIC))
 			{
-				if (iterator.hasNext())
-				{
-					continue;
-				}
-				break;
+				// Write the hashing strategy for the field
+				writeHashCode(writer, f);
+				// Add the hash to the previous result
+				writer.writeInsn(IADD);
+				writer.writeLDC(31);
+				// Multiply the result by 31
+				writer.writeInsn(IMUL);
 			}
-			
-			// Write the hashing strategy for the field
-			writeHashCode(writer, f);
-			// Add the hash to the previous result
-			writer.writeInsn(IADD);
-			writer.writeLDC(31);
-			// Multiply the result by 31
-			writer.writeInsn(IMUL);
 		}
 		
 		writer.writeInsn(IRETURN);
@@ -260,7 +245,7 @@ public class CaseClasses
 		writer.writeFrameLabel(endLabel);
 	}
 	
-	public static void writeToString(MethodWriter writer, CodeClass theClass, List<IField> fields)
+	public static void writeToString(MethodWriter writer, CodeClass theClass, IClassBody body)
 	{
 		// ----- StringBuilder Constructor -----
 		writer.writeTypeInsn(NEW, "java/lang/StringBuilder");
@@ -271,58 +256,20 @@ public class CaseClasses
 		writer.writeInvokeInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false, 2, (String) null);
 		
 		// ----- Fields -----
-		if (!fields.isEmpty())
+		int len = body.fieldCount();
+		for (int i = 0; i < len; i++)
 		{
-			Iterator<IField> iterator = fields.iterator();
-			while (true)
+			IField f = body.getField(i);
+			
+			if (!f.hasModifier(Modifiers.STATIC))
 			{
-				IField f = iterator.next();
-				
-				if (f.hasModifier(Modifiers.STATIC))
-				{
-					if (iterator.hasNext())
-					{
-						continue;
-					}
-					break;
-				}
-				
-				IType type = f.getType();
-				
-				// Get the field
-				writer.writeVarInsn(ALOAD, 0);
-				f.writeGet(writer, null);
-				
-				// Write the call to the StringBuilder#append() method that
-				// corresponds to the type of the field
-				StringBuilder desc = new StringBuilder().append('(');
-				
-				if (type.isPrimitive())
-				{
-					type.appendExtendedName(desc);
-				}
-				else if (type == Type.STRING)
-				{
-					desc.append("Ljava/lang/String;");
-				}
-				else
-				{
-					desc.append("Ljava/lang/Object;");
-				}
-				desc.append(")Ljava/lang/StringBuilder;");
-				
-				writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false, 2, "Ljava/lang/StringBuilder;");
-				
-				if (iterator.hasNext())
+				writeToString(writer, f);
+				if (i + 1 < len)
 				{
 					// Separator Comma
 					writer.writeLDC(", ");
 					writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
 							"Ljava/lang/StringBuilder;");
-				}
-				else
-				{
-					break;
 				}
 			}
 		}
@@ -338,5 +285,34 @@ public class CaseClasses
 		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false, 1, "Ljava/lang/String;");
 		// Write the return
 		writer.writeInsn(ARETURN);
+	}
+	
+	private static void writeToString(MethodWriter writer, IField field)
+	{
+		IType type = field.getType();
+		
+		// Get the field
+		writer.writeVarInsn(ALOAD, 0);
+		field.writeGet(writer, null);
+		
+		// Write the call to the StringBuilder#append() method that
+		// corresponds to the type of the field
+		StringBuilder desc = new StringBuilder().append('(');
+		
+		if (type.isPrimitive())
+		{
+			type.appendExtendedName(desc);
+		}
+		else if (type == Type.STRING)
+		{
+			desc.append("Ljava/lang/String;");
+		}
+		else
+		{
+			desc.append("Ljava/lang/Object;");
+		}
+		desc.append(")Ljava/lang/StringBuilder;");
+		
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false, 2, "Ljava/lang/StringBuilder;");
 	}
 }

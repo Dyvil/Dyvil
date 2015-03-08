@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.ast.classes;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -18,15 +17,23 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ClassBody extends ASTNode
+public final class ClassBody extends ASTNode implements IClassBody
 {
-	public IClass					theClass;
-	public List<IClass>				classes		= new ArrayList();
-	public List<IField>				fields		= new ArrayList();
-	public List<IMethod>			methods		= new ArrayList();
-	public List<IProperty>			properties	= new ArrayList();
+	public IClass				theClass;
 	
-	public List<IClassCompilable>	compilables;
+	public IClass[]				classes;
+	public int					classCount;
+	
+	private IField[]			fields		= new IField[3];
+	private int					fieldCount;
+	private IMethod[]			methods		= new IMethod[3];
+	private int					methodCount;
+	private IProperty[]			properties	= new IProperty[3];
+	private int					propertyCount;
+	private IClassCompilable[]	compilables;
+	private int					compilableCount;
+	
+	protected IMethod			functionalMethod;
 	
 	public ClassBody(ICodePosition position)
 	{
@@ -39,25 +46,59 @@ public final class ClassBody extends ASTNode
 		this.theClass = iclass;
 	}
 	
+	@Override
 	public void setTheClass(IClass theClass)
 	{
 		this.theClass = theClass;
 	}
 	
+	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;
 	}
 	
-	public void addClass(IClass clazz)
+	// Nested Classes
+	
+	@Override
+	public int classCount()
 	{
-		this.classes.add(clazz);
+		return this.classCount;
 	}
 	
+	@Override
+	public void addClass(IClass iclass)
+	{
+		if (this.classes == null)
+		{
+			this.classes = new IClass[2];
+			this.classes[0] = iclass;
+			this.classCount = 1;
+			return;
+		}
+		
+		int index = this.classCount++;
+		if (this.classCount > this.classes.length)
+		{
+			IClass[] temp = new IClass[this.classCount];
+			System.arraycopy(this.classes, 0, temp, 0, index);
+			this.classes = temp;
+		}
+		this.classes[index] = iclass;
+	}
+	
+	@Override
+	public IClass getClass(int index)
+	{
+		return this.classes[index];
+	}
+	
+	@Override
 	public IClass getClass(String name)
 	{
-		for (IClass c : this.classes)
+		for (int i = 0; i < this.classCount; i++)
 		{
+			IClass c = this.classes[i];
 			if (c.isName(name))
 			{
 				return c;
@@ -66,184 +107,310 @@ public final class ClassBody extends ASTNode
 		return null;
 	}
 	
+	// Fields
+	
+	@Override
+	public int fieldCount()
+	{
+		return this.fieldCount;
+	}
+	
+	@Override
 	public void addField(IField field)
 	{
-		this.fields.add(field);
+		int index = this.fieldCount++;
+		if (this.fieldCount > this.fields.length)
+		{
+			IField[] temp = new IField[this.fieldCount];
+			System.arraycopy(this.fields, 0, temp, 0, index);
+			this.fields = temp;
+		}
+		this.fields[index] = field;
 	}
 	
+	@Override
+	public IField getField(int index)
+	{
+		return this.fields[index];
+	}
+	
+	@Override
 	public IField getField(String name)
 	{
-		for (IField field : this.fields)
+		for (int i = 0; i < this.fieldCount; i++)
 		{
-			if (field.isName(name))
+			IField f = this.fields[i];
+			if (f.isName(name))
 			{
-				return field;
+				return f;
 			}
 		}
 		return null;
 	}
 	
-	public void addProperty(IProperty prop)
+	// Properties
+	
+	@Override
+	public int propertyCount()
 	{
-		this.properties.add(prop);
+		return this.propertyCount;
 	}
 	
+	@Override
+	public void addProperty(IProperty property)
+	{
+		int index = this.propertyCount++;
+		if (this.propertyCount > this.properties.length)
+		{
+			IProperty[] temp = new IProperty[this.propertyCount];
+			System.arraycopy(this.properties, 0, temp, 0, index);
+			this.properties = temp;
+		}
+		this.properties[index] = property;
+	}
+	
+	@Override
+	public IProperty getProperty(int index)
+	{
+		return this.properties[index];
+	}
+	
+	@Override
 	public IProperty getProperty(String name)
 	{
-		for (IProperty prop : this.properties)
+		for (int i = 0; i < this.propertyCount; i++)
 		{
-			if (prop.isName(name))
+			IProperty p = this.properties[i];
+			if (p.isName(name))
 			{
-				return prop;
+				return p;
 			}
 		}
 		return null;
 	}
 	
+	// Methods
+	
+	@Override
+	public int methodCount()
+	{
+		return this.methodCount;
+	}
+	
+	@Override
 	public void addMethod(IMethod method)
 	{
-		this.methods.add(method);
+		int index = this.methodCount++;
+		if (this.methodCount > this.methods.length)
+		{
+			IMethod[] temp = new IMethod[this.methodCount];
+			System.arraycopy(this.methods, 0, temp, 0, index);
+			this.methods = temp;
+		}
+		this.methods[index] = method;
 	}
 	
+	@Override
+	public IMethod getMethod(int index)
+	{
+		return this.methods[index];
+	}
+	
+	@Override
 	public IMethod getMethod(String name)
 	{
-		for (IMethod method : this.methods)
+		for (int i = 0; i < this.methodCount; i++)
 		{
-			if (method.isName(name))
+			IMethod m = this.methods[i];
+			if (m.isName(name))
 			{
-				return method;
+				return m;
 			}
 		}
 		return null;
 	}
 	
+	@Override
 	public IMethod getMethod(String name, Parameter[] parameters, int parameterCount)
 	{
 		outer:
-		for (IMethod method : this.methods)
+		for (int i = 0; i < this.methodCount; i++)
 		{
-			if (!method.isName(name))
+			IMethod m = this.methods[i];
+			if (!m.isName(name))
 			{
 				continue;
 			}
 			
-			if (parameterCount != method.parameterCount())
+			if (parameterCount != m.parameterCount())
 			{
 				continue;
 			}
 			
-			for (int i = 0; i < parameterCount; i++)
+			for (int p = 0; p < parameterCount; p++)
 			{
-				Parameter par1 = parameters[i];
-				Parameter par2 = method.getParameter(i);
+				Parameter par1 = parameters[p];
+				Parameter par2 = m.getParameter(p);
 				if (!par1.getType().equals(par2.getType()))
 				{
 					continue outer;
 				}
 			}
-			return method;
+			return m;
 		}
 		return null;
 	}
 	
-	public void addCompilable(IClassCompilable compilable)
-	{
-		if (this.compilables == null)
-		{
-			this.compilables = new ArrayList(2);
-		}
-		this.compilables.add(compilable);
-	}
-	
+	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
 	{
-		for (IMethod method : this.methods)
+		for (int i = 0; i < this.methodCount; i++)
 		{
-			int match = method.getSignatureMatch(name, instance, arguments);
+			IMethod m = this.methods[i];
+			int match = m.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
-				list.add(new MethodMatch(method, match));
+				list.add(new MethodMatch(m, match));
 			}
 		}
 	}
 	
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		if (this.functionalMethod != null)
+		{
+			return this.functionalMethod;
+		}
+		
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			IMethod m = this.methods[i];
+			if (m.hasModifier(Modifiers.ABSTRACT))
+			{
+				this.functionalMethod = m;
+				return m;
+			}
+		}
+		return null;
+	}
+	
+	// Other Compilables
+	
+	@Override
+	public int compilableCount()
+	{
+		return this.compilableCount;
+	}
+	
+	@Override
+	public void addCompilable(IClassCompilable compilable)
+	{
+		if (this.compilables == null)
+		{
+			this.compilables = new IClassCompilable[2];
+			this.compilables[0] = compilable;
+			this.compilableCount = 1;
+			return;
+		}
+		
+		int index = this.compilableCount++;
+		if (this.compilableCount > this.compilables.length)
+		{
+			IClassCompilable[] temp = new IClassCompilable[this.compilableCount];
+			System.arraycopy(this.compilables, 0, temp, 0, index);
+			this.compilables = temp;
+		}
+		this.compilables[index] = compilable;
+	}
+	
+	@Override
+	public IClassCompilable getCompilable(int index)
+	{
+		return this.compilables[index];
+	}
+	
+	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
-		for (IClass clazz : this.classes)
+		for (int i = 0; i < this.classCount; i++)
 		{
-			clazz.resolveTypes(markers, context);
+			this.classes[i].resolveTypes(markers, context);
 		}
-		for (IField field : this.fields)
+		for (int i = 0; i < this.fieldCount; i++)
 		{
-			field.resolveTypes(markers, context);
+			this.fields[i].resolveTypes(markers, context);
 		}
-		for (IProperty prop : this.properties)
+		for (int i = 0; i < this.propertyCount; i++)
 		{
-			prop.resolveTypes(markers, context);
+			this.properties[i].resolveTypes(markers, context);
 		}
-		for (IMethod method : this.methods)
+		for (int i = 0; i < this.methodCount; i++)
 		{
-			method.resolveTypes(markers, context);
+			this.methods[i].resolveTypes(markers, context);
 		}
 	}
 	
+	@Override
 	public void resolve(List<Marker> markers, IContext context)
 	{
-		for (IClass clazz : this.classes)
+		for (int i = 0; i < this.classCount; i++)
 		{
-			clazz.resolve(markers, context);
+			this.classes[i].resolve(markers, context);
 		}
-		for (IField field : this.fields)
+		for (int i = 0; i < this.fieldCount; i++)
 		{
-			field.resolve(markers, context);
+			this.fields[i].resolve(markers, context);
 		}
-		for (IProperty prop : this.properties)
+		for (int i = 0; i < this.propertyCount; i++)
 		{
-			prop.resolve(markers, context);
+			this.properties[i].resolve(markers, context);
 		}
-		for (IMethod method : this.methods)
+		for (int i = 0; i < this.methodCount; i++)
 		{
-			method.resolve(markers, context);
+			this.methods[i].resolve(markers, context);
 		}
 	}
 	
+	@Override
 	public void check(List<Marker> markers, IContext context)
 	{
-		for (IClass clazz : this.classes)
+		for (int i = 0; i < this.classCount; i++)
 		{
-			clazz.check(markers, context);
+			this.classes[i].check(markers, context);
 		}
-		for (IField field : this.fields)
+		for (int i = 0; i < this.fieldCount; i++)
 		{
-			field.check(markers, context);
+			this.fields[i].check(markers, context);
 		}
-		for (IProperty prop : this.properties)
+		for (int i = 0; i < this.propertyCount; i++)
 		{
-			prop.check(markers, context);
+			this.properties[i].check(markers, context);
 		}
-		for (IMethod method : this.methods)
+		for (int i = 0; i < this.methodCount; i++)
 		{
-			method.check(markers, context);
+			this.methods[i].check(markers, context);
 		}
 	}
 	
+	@Override
 	public void foldConstants()
 	{
-		for (IClass clazz : this.classes)
+		for (int i = 0; i < this.classCount; i++)
 		{
-			clazz.foldConstants();
+			this.classes[i].foldConstants();
 		}
-		for (IField field : this.fields)
+		for (int i = 0; i < this.fieldCount; i++)
 		{
-			field.foldConstants();
+			this.fields[i].foldConstants();
 		}
-		for (IProperty prop : this.properties)
+		for (int i = 0; i < this.propertyCount; i++)
 		{
-			prop.foldConstants();
+			this.properties[i].foldConstants();
 		}
-		for (IMethod method : this.methods)
+		for (int i = 0; i < this.methodCount; i++)
 		{
-			method.foldConstants();
+			this.methods[i].foldConstants();
 		}
 	}
 	
@@ -253,55 +420,53 @@ public final class ClassBody extends ASTNode
 		buffer.append(prefix).append(Formatting.Class.bodyStart);
 		String prefix1 = prefix + Formatting.Class.bodyIndent;
 		
-		if (!this.classes.isEmpty())
+		if (this.classCount > 0)
 		{
-			for (IClass clazz : this.classes)
+			for (int i = 0; i < this.classCount; i++)
 			{
-				if (clazz != this.theClass)
+				IClass c = this.classes[i];
+				if (c != this.theClass)
 				{
-					clazz.toString(prefix1, buffer);
+					c.toString(prefix1, buffer);
 					buffer.append('\n');
 				}
 			}
 			buffer.append('\n');
 		}
 		
-		if (!this.fields.isEmpty())
+		if (this.fieldCount > 0)
 		{
-			for (IField field : this.fields)
+			for (int i = 0; i < this.fieldCount; i++)
 			{
-				field.toString(prefix1, buffer);
+				this.fields[i].toString(prefix1, buffer);
 				buffer.append('\n');
 			}
 			buffer.append('\n');
 		}
 		
-		if (!this.properties.isEmpty())
+		if (this.propertyCount > 0)
 		{
-			for (IProperty prop : this.properties)
+			for (int i = 0; i < this.propertyCount; i++)
 			{
-				prop.toString(prefix1, buffer);
-				buffer.append('\n');
+				this.properties[i].toString(prefix1, buffer);
+				if (i + 1 < this.propertyCount)
+				{
+					buffer.append('\n');
+				}
 			}
 			buffer.append('\n');
 		}
 		
-		if (!this.methods.isEmpty())
+		if (this.methodCount > 0)
 		{
-			Iterator<IMethod> iterator = this.methods.iterator();
-			while (true)
+			for (int i = 0; i < this.methodCount; i++)
 			{
-				IMethod method = iterator.next();
+				IMethod method = this.methods[i];
 				method.toString(prefix1, buffer);
 				buffer.append('\n');
-				
-				if (iterator.hasNext())
+				if (i + 1 < this.methodCount)
 				{
 					buffer.append('\n');
-				}
-				else
-				{
-					break;
 				}
 			}
 		}

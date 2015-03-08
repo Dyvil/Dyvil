@@ -6,8 +6,8 @@ import java.util.List;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
@@ -276,11 +276,13 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 			File file = new File(this.outputDirectory, name + ".class");
 			ClassWriter.saveClass(file, iclass);
 			
-			ClassBody body = iclass.getBody();
+			IClassBody body = iclass.getBody();
 			if (body != null)
 			{
-				for (IClass iclass1 : body.classes)
+				int len = body.classCount();
+				for (int i = 0; i < len; i++)
 				{
+					IClass iclass1 = body.getClass(i);
 					name = this.name + "$" + iclass1.getQualifiedName() + ".class";
 					file = new File(this.outputDirectory, name);
 					ClassWriter.saveClass(file, iclass1);

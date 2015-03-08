@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser.method;
 
-import dyvil.tools.compiler.ast.method.IThrower;
+import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
@@ -16,11 +16,11 @@ public class ThrowsDeclParser extends Parser implements ITyped
 	private static final int	TYPE		= 0;
 	private static final int	SEPERATOR	= 1;
 	
-	protected IThrower			thrower;
+	protected IExceptionList			exceptionList;
 	
-	public ThrowsDeclParser(IThrower thrower)
+	public ThrowsDeclParser(IExceptionList list)
 	{
-		this.thrower = thrower;
+		this.exceptionList = list;
 	}
 	
 	@Override
@@ -61,7 +61,7 @@ public class ThrowsDeclParser extends Parser implements ITyped
 	@Override
 	public void setType(IType type)
 	{
-		this.thrower.addThrows(type);
+		this.exceptionList.addException(type);
 	}
 	
 	@Override

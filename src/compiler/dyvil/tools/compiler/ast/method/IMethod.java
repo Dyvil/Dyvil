@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
-public interface IMethod extends IASTNode, IBaseMethod, IValued, IContext, IClassCompilable, IMember, IParameterized, IThrower
+public interface IMethod extends IASTNode, IBaseMethod, IValued, IContext, IClassCompilable, IMember, IParameterized, IExceptionList
 {
 	public int getSignatureMatch(String name, IValue instance, IArguments arguments);
 	

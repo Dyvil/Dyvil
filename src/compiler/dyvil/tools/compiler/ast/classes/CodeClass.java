@@ -17,10 +17,8 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
@@ -50,7 +48,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
 {
-	protected IDyvilUnit			unit;
+	protected IDyvilUnit		unit;
 	protected IClass			outerClass;
 	
 	protected Annotation[]		annotations;
@@ -68,10 +66,9 @@ public class CodeClass extends ASTNode implements IClass
 	protected IType				superType	= Type.OBJECT;
 	protected List<IType>		interfaces	= new ArrayList(1);
 	
-	protected Type				type;
+	protected IType				type;
 	
-	protected ClassBody			body;
-	protected IMethod			functionalMethod;
+	protected IClassBody		body;
 	protected IField			instanceField;
 	protected IMethod			constructor;
 	protected IMethod			superConstructor;
@@ -126,7 +123,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.type;
 	}
@@ -446,13 +443,13 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void setBody(ClassBody body)
+	public void setBody(IClassBody body)
 	{
 		this.body = body;
 	}
 	
 	@Override
-	public ClassBody getBody()
+	public IClassBody getBody()
 	{
 		return this.body;
 	}
@@ -466,23 +463,11 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		if (this.functionalMethod == null)
+		if (this.body == null)
 		{
-			if ((this.modifiers & Modifiers.FUNCTIONAL) != Modifiers.FUNCTIONAL)
-			{
-				return null;
-			}
-			
-			for (IMethod m : this.body.methods)
-			{
-				if (m.hasModifier(Modifiers.ABSTRACT))
-				{
-					this.functionalMethod = m;
-					return m;
-				}
-			}
+			return null;
 		}
-		return this.functionalMethod;
+		return this.body.getFunctionalMethod();
 	}
 	
 	@Override
@@ -557,12 +542,9 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			this.body.resolveTypes(markers, this);
 			
-			for (IMethod m : this.body.methods)
+			if (this.body.getMethod("<init>") != null)
 			{
-				if (m.isName("<init>"))
-				{
-					return;
-				}
+				return;
 			}
 		}
 		
@@ -693,7 +675,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public Type getThisType()
+	public IType getThisType()
 	{
 		return this.type;
 	}
@@ -990,25 +972,22 @@ public class CodeClass extends ASTNode implements IClass
 		
 		// Fields, Methods and Properties
 		
-		List<IField> fields;
-		List<IMethod> methods;
-		List<IProperty> properties;
+		int fields = 0;
+		int methods = 0;
+		int properties = 0;
+		int compilables = 0;
 		if (this.body != null)
 		{
-			fields = this.body.fields;
-			methods = this.body.methods;
-			properties = this.body.properties;
+			fields = this.body.fieldCount();
+			methods = this.body.methodCount();
+			properties = this.body.propertyCount();
+			compilables = this.body.compilableCount();
 			
-			for (IClass iclass : this.body.classes)
+			int classes = this.body.classCount();
+			for (int i = 0; i < classes; i++)
 			{
-				iclass.writeInnerClassInfo(writer);
+				this.body.getClass(i).writeInnerClassInfo(writer);
 			}
-		}
-		else
-		{
-			fields = Collections.EMPTY_LIST;
-			methods = Collections.EMPTY_LIST;
-			properties = Collections.EMPTY_LIST;
 		}
 		
 		ThisValue thisValue = new ThisValue(null, this.type);
@@ -1016,8 +995,9 @@ public class CodeClass extends ASTNode implements IClass
 		StatementList instanceFields = new StatementList(null);
 		StatementList staticFields = new StatementList(null);
 		
-		for (IField f : fields)
+		for (int i = 0; i < fields; i++)
 		{
+			IField f = this.body.getField(i);
 			f.write(writer);
 			
 			if (f.hasModifier(Modifiers.LAZY))
@@ -1061,44 +1041,41 @@ public class CodeClass extends ASTNode implements IClass
 			this.constructor.write(writer);
 		}
 		
-		for (IProperty p : properties)
+		for (int i = 0; i < properties; i++)
 		{
-			p.write(writer);
+			this.body.getProperty(i).write(writer);
 		}
 		
-		for (IMethod m : methods)
+		for (int i = 0; i < methods; i++)
 		{
-			m.write(writer);
+			this.body.getMethod(i).write(writer);
 		}
 		
-		if (this.body != null && this.body.compilables != null)
+		for (int i = 0; i < compilables; i++)
 		{
-			for (IClassCompilable m : this.body.compilables)
-			{
-				m.write(writer);
-			}
+			this.body.getCompilable(i).write(writer);
 		}
 		
 		if ((this.modifiers & Modifiers.CASE_CLASS) != 0)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer,
-					writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null,
+					null));
 			mw.registerLocal(this.type);
 			mw.visitParameter("obj", "Ljava/lang/Object;");
 			mw.begin();
-			CaseClasses.writeEquals(mw, this, fields);
+			CaseClasses.writeEquals(mw, this, this.body);
 			mw.end();
 			
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I", null, null));
 			mw.registerLocal(this.type);
 			mw.begin();
-			CaseClasses.writeHashCode(mw, this, fields);
+			CaseClasses.writeHashCode(mw, this, this.body);
 			mw.end();
 			
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString", "()Ljava/lang/String;", null, null));
 			mw.registerLocal(this.type);
 			mw.begin();
-			CaseClasses.writeToString(mw, this, fields);
+			CaseClasses.writeToString(mw, this, this.body);
 			mw.end();
 		}
 		

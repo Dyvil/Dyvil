@@ -6,7 +6,6 @@ import static dyvil.reflect.Opcodes.IFNE;
 import static dyvil.reflect.Opcodes.INSTANCE;
 
 import java.lang.annotation.ElementType;
-import java.util.ArrayList;
 import java.util.List;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
@@ -46,7 +45,8 @@ public class Method extends Member implements IMethod
 	
 	protected Parameter[]		parameters	= new Parameter[3];
 	protected int				parameterCount;
-	public List<IType>			throwsDeclarations;
+	protected IType[]			exceptions;
+	protected int				exceptionCount;
 	
 	public IValue				value;
 	
@@ -255,25 +255,40 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void setThrows(List<IType> throwsDecls)
+	public void exceptionCount()
 	{
-		this.throwsDeclarations = throwsDecls;
 	}
 	
 	@Override
-	public List<IType> getThrows()
+	public void setException(int index, IType exception)
 	{
-		return this.throwsDeclarations;
 	}
 	
 	@Override
-	public void addThrows(IType throwsDecl)
+	public void addException(IType exception)
 	{
-		if (this.throwsDeclarations == null)
+		if (this.exceptions == null)
 		{
-			this.throwsDeclarations = new ArrayList(2);
+			this.exceptions = new IType[3];
+			this.exceptions[0] = exception;
+			this.exceptionCount = 1;
+			return;
 		}
-		this.throwsDeclarations.add(throwsDecl);
+		
+		int index = this.exceptionCount++;
+		if (this.exceptionCount > this.exceptions.length)
+		{
+			IType[] temp = new IType[this.exceptionCount];
+			System.arraycopy(this.exceptions, 0, temp, 0, index);
+			this.exceptions = temp;
+		}
+		this.exceptions[index] = exception;
+	}
+	
+	@Override
+	public IType getException(int index)
+	{
+		return this.exceptions[index];
 	}
 	
 	@Override
@@ -517,18 +532,9 @@ public class Method extends Member implements IMethod
 		
 		super.resolveTypes(markers, this);
 		
-		if (this.throwsDeclarations != null)
+		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			int len = this.throwsDeclarations.size();
-			for (int i = 0; i < len; i++)
-			{
-				IType t1 = this.throwsDeclarations.get(i);
-				IType t2 = t1.resolve(markers, context);
-				if (t1 != t2)
-				{
-					this.throwsDeclarations.set(i, t2);
-				}
-			}
+			this.exceptions[i] = this.exceptions[i].resolve(markers, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -839,21 +845,15 @@ public class Method extends Member implements IMethod
 	@Override
 	public String[] getExceptions()
 	{
-		if (this.throwsDeclarations == null)
+		if (this.exceptionCount == 0)
 		{
 			return null;
 		}
 		
-		int len = this.throwsDeclarations.size();
-		if (len == 0)
+		String[] array = new String[this.exceptionCount];
+		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			return null;
-		}
-		
-		String[] array = new String[len];
-		for (int i = 0; i < len; i++)
-		{
-			array[i] = this.throwsDeclarations.get(i).getInternalName();
+			array[i] = this.exceptions[i].getInternalName();
 		}
 		return array;
 	}
@@ -1156,10 +1156,10 @@ public class Method extends Member implements IMethod
 		Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
 		buffer.append(Formatting.Method.parametersEnd);
 		
-		if (this.throwsDeclarations != null && !this.throwsDeclarations.isEmpty())
+		if (this.exceptionCount > 0)
 		{
 			buffer.append(Formatting.Method.signatureThrowsSeperator);
-			Util.astToString(prefix, this.throwsDeclarations, Formatting.Method.throwsSeperator, buffer);
+			Util.astToString(prefix, this.exceptions, this.exceptionCount, Formatting.Method.throwsSeperator, buffer);
 		}
 		
 		IValue value = this.getValue();

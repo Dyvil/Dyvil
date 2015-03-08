@@ -50,9 +50,9 @@ public interface IClass extends IASTNode, IMember, IGeneric, IContext
 	
 	// Body
 	
-	public void setBody(ClassBody body);
+	public void setBody(IClassBody body);
 	
-	public ClassBody getBody();
+	public IClassBody getBody();
 	
 	public IField getInstanceField();
 	
