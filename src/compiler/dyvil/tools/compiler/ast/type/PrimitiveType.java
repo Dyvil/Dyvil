@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -30,21 +30,21 @@ public final class PrimitiveType extends Type
 	{
 		switch (typecode)
 		{
-		case Opcodes.T_BOOLEAN:
+		case MethodWriter.T_BOOLEAN:
 			return BOOLEAN;
-		case Opcodes.T_BYTE:
+		case MethodWriter.T_BYTE:
 			return BYTE;
-		case Opcodes.T_SHORT:
+		case MethodWriter.T_SHORT:
 			return SHORT;
-		case Opcodes.T_CHAR:
+		case MethodWriter.T_CHAR:
 			return CHAR;
-		case Opcodes.T_INT:
+		case MethodWriter.T_INT:
 			return INT;
-		case Opcodes.T_LONG:
+		case MethodWriter.T_LONG:
 			return LONG;
-		case Opcodes.T_FLOAT:
+		case MethodWriter.T_FLOAT:
 			return FLOAT;
-		case Opcodes.T_DOUBLE:
+		case MethodWriter.T_DOUBLE:
 			return DOUBLE;
 		default:
 			return VOID;
@@ -114,21 +114,21 @@ public final class PrimitiveType extends Type
 	{
 		switch (this.typecode)
 		{
-		case Opcodes.T_BOOLEAN:
+		case MethodWriter.T_BOOLEAN:
 			return "Z";
-		case Opcodes.T_BYTE:
+		case MethodWriter.T_BYTE:
 			return "B";
-		case Opcodes.T_SHORT:
+		case MethodWriter.T_SHORT:
 			return "S";
-		case Opcodes.T_CHAR:
+		case MethodWriter.T_CHAR:
 			return "C";
-		case Opcodes.T_INT:
+		case MethodWriter.T_INT:
 			return "I";
-		case Opcodes.T_LONG:
+		case MethodWriter.T_LONG:
 			return "J";
-		case Opcodes.T_FLOAT:
+		case MethodWriter.T_FLOAT:
 			return "F";
-		case Opcodes.T_DOUBLE:
+		case MethodWriter.T_DOUBLE:
 			return "D";
 		default:
 			return "V";
@@ -154,18 +154,18 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case Opcodes.T_BOOLEAN:
-		case Opcodes.T_BYTE:
-		case Opcodes.T_SHORT:
-		case Opcodes.T_CHAR:
-		case Opcodes.T_INT:
-			return Opcodes.INTEGER;
-		case Opcodes.T_LONG:
-			return Opcodes.LONG;
-		case Opcodes.T_FLOAT:
-			return Opcodes.FLOAT;
-		case Opcodes.T_DOUBLE:
-			return Opcodes.DOUBLE;
+		case MethodWriter.T_BOOLEAN:
+		case MethodWriter.T_BYTE:
+		case MethodWriter.T_SHORT:
+		case MethodWriter.T_CHAR:
+		case MethodWriter.T_INT:
+			return MethodWriter.INT;
+		case MethodWriter.T_LONG:
+			return MethodWriter.LONG;
+		case MethodWriter.T_FLOAT:
+			return MethodWriter.FLOAT;
+		case MethodWriter.T_DOUBLE:
+			return MethodWriter.DOUBLE;
 		default:
 			return null;
 		}
@@ -180,17 +180,17 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case Opcodes.T_BOOLEAN:
-		case Opcodes.T_BYTE:
-		case Opcodes.T_SHORT:
-		case Opcodes.T_CHAR:
-		case Opcodes.T_INT:
+		case MethodWriter.T_BOOLEAN:
+		case MethodWriter.T_BYTE:
+		case MethodWriter.T_SHORT:
+		case MethodWriter.T_CHAR:
+		case MethodWriter.T_INT:
 			return Opcodes.ILOAD;
-		case Opcodes.T_LONG:
+		case MethodWriter.T_LONG:
 			return Opcodes.LLOAD;
-		case Opcodes.T_FLOAT:
+		case MethodWriter.T_FLOAT:
 			return Opcodes.FLOAD;
-		case Opcodes.T_DOUBLE:
+		case MethodWriter.T_DOUBLE:
 			return Opcodes.DLOAD;
 		default:
 			return 0;
@@ -202,20 +202,20 @@ public final class PrimitiveType extends Type
 	{
 		switch (this.typecode)
 		{
-		case Opcodes.T_BOOLEAN:
-		case Opcodes.T_BYTE:
+		case MethodWriter.T_BOOLEAN:
+		case MethodWriter.T_BYTE:
 			return Opcodes.BALOAD;
-		case Opcodes.T_SHORT:
+		case MethodWriter.T_SHORT:
 			return Opcodes.SALOAD;
-		case Opcodes.T_CHAR:
+		case MethodWriter.T_CHAR:
 			return Opcodes.CALOAD;
-		case Opcodes.T_INT:
+		case MethodWriter.T_INT:
 			return Opcodes.IALOAD;
-		case Opcodes.T_LONG:
+		case MethodWriter.T_LONG:
 			return Opcodes.LALOAD;
-		case Opcodes.T_FLOAT:
+		case MethodWriter.T_FLOAT:
 			return Opcodes.FALOAD;
-		case Opcodes.T_DOUBLE:
+		case MethodWriter.T_DOUBLE:
 			return Opcodes.DALOAD;
 		default:
 			return 0;
@@ -231,17 +231,17 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case Opcodes.T_BOOLEAN:
-		case Opcodes.T_BYTE:
-		case Opcodes.T_SHORT:
-		case Opcodes.T_CHAR:
-		case Opcodes.T_INT:
+		case MethodWriter.T_BOOLEAN:
+		case MethodWriter.T_BYTE:
+		case MethodWriter.T_SHORT:
+		case MethodWriter.T_CHAR:
+		case MethodWriter.T_INT:
 			return Opcodes.ISTORE;
-		case Opcodes.T_LONG:
+		case MethodWriter.T_LONG:
 			return Opcodes.LSTORE;
-		case Opcodes.T_FLOAT:
+		case MethodWriter.T_FLOAT:
 			return Opcodes.FSTORE;
-		case Opcodes.T_DOUBLE:
+		case MethodWriter.T_DOUBLE:
 			return Opcodes.DSTORE;
 		default:
 			return 0;
@@ -253,20 +253,20 @@ public final class PrimitiveType extends Type
 	{
 		switch (this.typecode)
 		{
-		case Opcodes.T_BOOLEAN:
-		case Opcodes.T_BYTE:
+		case MethodWriter.T_BOOLEAN:
+		case MethodWriter.T_BYTE:
 			return Opcodes.BASTORE;
-		case Opcodes.T_SHORT:
+		case MethodWriter.T_SHORT:
 			return Opcodes.SASTORE;
-		case Opcodes.T_CHAR:
+		case MethodWriter.T_CHAR:
 			return Opcodes.CASTORE;
-		case Opcodes.T_INT:
+		case MethodWriter.T_INT:
 			return Opcodes.IASTORE;
-		case Opcodes.T_LONG:
+		case MethodWriter.T_LONG:
 			return Opcodes.LASTORE;
-		case Opcodes.T_FLOAT:
+		case MethodWriter.T_FLOAT:
 			return Opcodes.FASTORE;
-		case Opcodes.T_DOUBLE:
+		case MethodWriter.T_DOUBLE:
 			return Opcodes.DASTORE;
 		default:
 			return 0;
@@ -282,17 +282,17 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case Opcodes.T_BOOLEAN:
-		case Opcodes.T_BYTE:
-		case Opcodes.T_SHORT:
-		case Opcodes.T_CHAR:
-		case Opcodes.T_INT:
+		case MethodWriter.T_BOOLEAN:
+		case MethodWriter.T_BYTE:
+		case MethodWriter.T_SHORT:
+		case MethodWriter.T_CHAR:
+		case MethodWriter.T_INT:
 			return Opcodes.IRETURN;
-		case Opcodes.T_LONG:
+		case MethodWriter.T_LONG:
 			return Opcodes.LRETURN;
-		case Opcodes.T_FLOAT:
+		case MethodWriter.T_FLOAT:
 			return Opcodes.FRETURN;
-		case Opcodes.T_DOUBLE:
+		case MethodWriter.T_DOUBLE:
 			return Opcodes.DRETURN;
 		default:
 			return Opcodes.RETURN;
@@ -309,20 +309,20 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case Opcodes.T_BOOLEAN:
-		case Opcodes.T_BYTE:
-		case Opcodes.T_SHORT:
-		case Opcodes.T_CHAR:
-		case Opcodes.T_INT:
+		case MethodWriter.T_BOOLEAN:
+		case MethodWriter.T_BYTE:
+		case MethodWriter.T_SHORT:
+		case MethodWriter.T_CHAR:
+		case MethodWriter.T_INT:
 			writer.writeLDC(0);
 			break;
-		case Opcodes.T_LONG:
+		case MethodWriter.T_LONG:
 			writer.writeLDC(0L);
 			break;
-		case Opcodes.T_FLOAT:
+		case MethodWriter.T_FLOAT:
 			writer.writeLDC(0F);
 			break;
-		case Opcodes.T_DOUBLE:
+		case MethodWriter.T_DOUBLE:
 			writer.writeLDC(0D);
 			break;
 		}

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.bytecode;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
+import org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;

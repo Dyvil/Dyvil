@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.ClassWriter;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.IGeneric;

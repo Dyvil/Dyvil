@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 

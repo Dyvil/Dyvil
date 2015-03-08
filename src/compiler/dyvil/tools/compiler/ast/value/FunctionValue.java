@@ -3,8 +3,8 @@ package dyvil.tools.compiler.ast.value;
 import java.util.ArrayList;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Handle;
-import jdk.internal.org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Handle;
+
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -239,14 +239,14 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 		StringBuilder descBuf = new StringBuilder("(");
 		if (this.instance != null && this.instance.getValueType() != CLASS_ACCESS)
 		{
-			handleType = Opcodes.H_INVOKEVIRTUAL;
+			handleType = MethodWriter.H_INVOKEVIRTUAL;
 			this.instance.writeExpression(writer);
 			this.instance.getType().appendExtendedName(descBuf);
 			len = 1;
 		}
 		else
 		{
-			handleType = Opcodes.H_INVOKESTATIC;
+			handleType = MethodWriter.H_INVOKESTATIC;
 			len = 0;
 		}
 		
@@ -256,8 +256,8 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 		String name = this.method.getQualifiedName();
 		String desc = descBuf.toString();
 		String methodDesc = this.method.getDescriptor();
-		jdk.internal.org.objectweb.asm.Type type1 = jdk.internal.org.objectweb.asm.Type.getMethodType(this.functionalMethod.getDescriptor());
-		jdk.internal.org.objectweb.asm.Type type2 = jdk.internal.org.objectweb.asm.Type.getMethodType(methodDesc);
+		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.functionalMethod.getDescriptor());
+		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(methodDesc);
 		Handle handle = new Handle(handleType, this.method.getTheClass().getInternalName(), this.method.getQualifiedName(), methodDesc);
 		writer.writeInvokeDynamic(name, desc, len, this.type, LambdaValue.BOOTSTRAP, type1, handle, type2);
 	}

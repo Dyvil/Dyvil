@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -28,14 +29,14 @@ public class Type extends ASTNode implements IType
 	public static final DynamicType		DYNAMIC		= new DynamicType();
 	
 	public static final PrimitiveType	VOID		= new PrimitiveType("void", "Void", 0);
-	public static final PrimitiveType	BOOLEAN		= new PrimitiveType("boolean", "Boolean", Opcodes.T_BOOLEAN);
-	public static final PrimitiveType	BYTE		= new PrimitiveType("byte", "Byte", Opcodes.T_BOOLEAN);
-	public static final PrimitiveType	SHORT		= new PrimitiveType("short", "Short", Opcodes.T_SHORT);
-	public static final PrimitiveType	CHAR		= new PrimitiveType("char", "Char", Opcodes.T_CHAR);
-	public static final PrimitiveType	INT			= new PrimitiveType("int", "Int", Opcodes.T_INT);
-	public static final PrimitiveType	LONG		= new PrimitiveType("long", "Long", Opcodes.T_LONG);
-	public static final PrimitiveType	FLOAT		= new PrimitiveType("float", "Float", Opcodes.T_FLOAT);
-	public static final PrimitiveType	DOUBLE		= new PrimitiveType("double", "Double", Opcodes.T_DOUBLE);
+	public static final PrimitiveType	BOOLEAN		= new PrimitiveType("boolean", "Boolean", MethodWriter.T_BOOLEAN);
+	public static final PrimitiveType	BYTE		= new PrimitiveType("byte", "Byte", MethodWriter.T_BOOLEAN);
+	public static final PrimitiveType	SHORT		= new PrimitiveType("short", "Short", MethodWriter.T_SHORT);
+	public static final PrimitiveType	CHAR		= new PrimitiveType("char", "Char", MethodWriter.T_CHAR);
+	public static final PrimitiveType	INT			= new PrimitiveType("int", "Int", MethodWriter.T_INT);
+	public static final PrimitiveType	LONG		= new PrimitiveType("long", "Long", MethodWriter.T_LONG);
+	public static final PrimitiveType	FLOAT		= new PrimitiveType("float", "Float", MethodWriter.T_FLOAT);
+	public static final PrimitiveType	DOUBLE		= new PrimitiveType("double", "Double", MethodWriter.T_DOUBLE);
 	
 	public static final Type			ANY			= new Type("Any");
 	public static final Type			OBJECT		= new Type("Object");

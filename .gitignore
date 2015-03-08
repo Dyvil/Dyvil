@@ -6,8 +6,6 @@ dbin/
 *.log*
 *.log
 
-*.jar
-
 src/test/dyvil/test/JavaTest.java
 
 src/test/dyvil/test/*

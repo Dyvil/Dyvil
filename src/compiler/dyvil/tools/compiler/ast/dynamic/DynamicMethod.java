@@ -3,10 +3,10 @@ package dyvil.tools.compiler.ast.dynamic;
 import java.lang.annotation.ElementType;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.Handle;
-import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.Opcodes;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
+
 import dyvil.arrays.ArrayUtils;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -30,7 +30,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 
 public class DynamicMethod extends ASTNode implements IMethod
 {
-	public static final Handle	BOOTSTRAP	= new Handle(Opcodes.H_INVOKESTATIC, "dyvil/dyn/DynamicLinker", "linkMethod",
+	public static final Handle	BOOTSTRAP	= new Handle(MethodWriter.H_INVOKESTATIC, "dyvil/dyn/DynamicLinker", "linkMethod",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
 	
 	public String				name;

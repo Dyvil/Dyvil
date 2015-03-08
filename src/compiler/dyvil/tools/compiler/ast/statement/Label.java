@@ -7,7 +7,7 @@ public class Label
 	public String								name;
 	public IValue								value;
 	
-	public jdk.internal.org.objectweb.asm.Label	target	= new jdk.internal.org.objectweb.asm.Label();
+	public org.objectweb.asm.Label	target	= new org.objectweb.asm.Label();
 	
 	public Label(String name)
 	{

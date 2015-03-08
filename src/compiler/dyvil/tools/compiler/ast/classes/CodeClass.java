@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.Opcodes;
+import org.objectweb.asm.ClassWriter;
+
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
@@ -911,7 +911,7 @@ public class CodeClass extends ASTNode implements IClass
 			interfaces[i] = type.getInternalName();
 		}
 		
-		writer.visit(Opcodes.V1_8, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
+		writer.visit(MethodWriter.V1_8, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
 		
 		// Outer Class
 		

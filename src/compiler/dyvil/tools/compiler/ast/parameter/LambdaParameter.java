@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.parameter;
 import java.lang.annotation.ElementType;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.IVariable;

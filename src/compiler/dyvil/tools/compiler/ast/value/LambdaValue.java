@@ -2,10 +2,11 @@ package dyvil.tools.compiler.ast.value;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.Handle;
-import jdk.internal.org.objectweb.asm.Opcodes;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
+
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
@@ -34,7 +35,7 @@ import dyvil.tools.compiler.util.Util;
 
 public final class LambdaValue extends ASTNode implements IValue, IValued, IClassCompilable, IContext, ITypeContext
 {
-	public static final Handle	BOOTSTRAP	= new Handle(Opcodes.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
+	public static final Handle	BOOTSTRAP	= new Handle(MethodWriter.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
 															+ "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodHandle;"
 															+ "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
@@ -388,12 +389,12 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		if (this.thisType != null)
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, 0);
-			handleType = Opcodes.H_INVOKESPECIAL;
+			handleType = MethodWriter.H_INVOKESPECIAL;
 			len = 1 + this.capturedFieldCount;
 		}
 		else
 		{
-			handleType = Opcodes.H_INVOKESTATIC;
+			handleType = MethodWriter.H_INVOKESTATIC;
 			len = this.capturedFieldCount;
 		}
 		
@@ -404,8 +405,8 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		
 		String desc = this.getInvokeDescriptor();
 		String name = this.method.getQualifiedName();
-		jdk.internal.org.objectweb.asm.Type type1 = jdk.internal.org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
-		jdk.internal.org.objectweb.asm.Type type2 = jdk.internal.org.objectweb.asm.Type.getMethodType(this.getSpecialDescriptor());
+		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
+		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(this.getSpecialDescriptor());
 		Handle handle = new Handle(handleType, this.owner, this.name, this.desc);
 		writer.writeInvokeDynamic(name, desc, len, this.type, BOOTSTRAP, type1, handle, type2);
 	}

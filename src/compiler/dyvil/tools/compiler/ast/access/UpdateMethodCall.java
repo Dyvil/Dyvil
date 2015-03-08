@@ -3,8 +3,8 @@ package dyvil.tools.compiler.ast.access;
 import java.util.Iterator;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Label;
+import dyvil.reflect.Opcodes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.IASTNode;

@@ -7,7 +7,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.config.CompilerConfig;
@@ -40,7 +39,7 @@ public class ClassWriter
 		
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 		{
-			jdk.internal.org.objectweb.asm.ClassWriter writer = new jdk.internal.org.objectweb.asm.ClassWriter(Opcodes.ASM5);
+			org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(MethodWriter.ASM5);
 			iclass.write(writer);
 			writer.visitEnd();
 			byte[] bytes = writer.toByteArray();

@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.transform;
 
 import static dyvil.reflect.Opcodes.*;
-import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.Opcodes;
+
+import org.objectweb.asm.Label;
+
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
@@ -92,20 +93,20 @@ public class CaseClasses
 			Label label = new Label();
 			switch (((PrimitiveType) type).typecode)
 			{
-			case Opcodes.T_BOOLEAN:
-			case Opcodes.T_BYTE:
-			case Opcodes.T_SHORT:
-			case Opcodes.T_CHAR:
-			case Opcodes.T_INT:
+			case MethodWriter.T_BOOLEAN:
+			case MethodWriter.T_BYTE:
+			case MethodWriter.T_SHORT:
+			case MethodWriter.T_CHAR:
+			case MethodWriter.T_INT:
 				writer.writeFrameJump(IF_ICMPEQ, label);
 				break;
-			case Opcodes.T_LONG:
+			case MethodWriter.T_LONG:
 				writer.writeFrameJump(IF_LCMPEQ, label);
 				break;
-			case Opcodes.T_FLOAT:
+			case MethodWriter.T_FLOAT:
 				writer.writeFrameJump(IF_FCMPEQ, label);
 				break;
-			case Opcodes.T_DOUBLE:
+			case MethodWriter.T_DOUBLE:
 				writer.writeFrameJump(IF_FCMPEQ, label);
 				break;
 			}
@@ -174,7 +175,7 @@ public class CaseClasses
 		{
 			switch (((PrimitiveType) type).typecode)
 			{
-			case Opcodes.T_BOOLEAN:
+			case MethodWriter.T_BOOLEAN:
 			{
 				// Write boolean hashing by using 1231 if the value is true and
 				// 1237 if the value is false
@@ -192,15 +193,15 @@ public class CaseClasses
 				writer.writeFrameLabel(endLabel);
 				return;
 			}
-			case Opcodes.T_BYTE:
+			case MethodWriter.T_BYTE:
 				return;
-			case Opcodes.T_SHORT:
+			case MethodWriter.T_SHORT:
 				return;
-			case Opcodes.T_CHAR:
+			case MethodWriter.T_CHAR:
 				return;
-			case Opcodes.T_INT:
+			case MethodWriter.T_INT:
 				return;
-			case Opcodes.T_LONG:
+			case MethodWriter.T_LONG:
 				// Write a long hashing snippet by XORing the value by the value
 				// bit-shifted 32 bits to the right, and then converting the
 				// result to an integer. l1 = (int) (l ^ (l >>> 32))
@@ -210,11 +211,11 @@ public class CaseClasses
 				writer.writeInsn(LOR);
 				writer.writeInsn(L2I);
 				return;
-			case Opcodes.T_FLOAT:
+			case MethodWriter.T_FLOAT:
 				// Write a float hashing snippet using Float.floatToIntBits
 				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Float", "floatToIntBits", "(F)I", false, 1, MethodWriter.FLOAT);
 				return;
-			case Opcodes.T_DOUBLE:
+			case MethodWriter.T_DOUBLE:
 				// Write a double hashing snippet using Double.doubleToLongBits
 				// and long hashing
 				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)L", false, 1, MethodWriter.DOUBLE);

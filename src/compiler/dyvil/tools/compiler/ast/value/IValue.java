@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.value;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
+import org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.access.ClassAccess;
@@ -251,9 +251,9 @@ public interface IValue extends IASTNode, ITyped
 			}
 			return valueList;
 		}
-		else if (c == jdk.internal.org.objectweb.asm.Type.class)
+		else if (c == org.objectweb.asm.Type.class)
 		{
-			jdk.internal.org.objectweb.asm.Type type = (jdk.internal.org.objectweb.asm.Type) o;
+			org.objectweb.asm.Type type = (org.objectweb.asm.Type) o;
 			IType itype = new Type(type.getClassName());
 			return new ClassAccess(itype);
 		}

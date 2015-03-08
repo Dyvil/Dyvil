@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -246,8 +246,8 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		jdk.internal.org.objectweb.asm.Label elseStart = new jdk.internal.org.objectweb.asm.Label();
-		jdk.internal.org.objectweb.asm.Label elseEnd = new jdk.internal.org.objectweb.asm.Label();
+		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
+		org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
 		
 		// Condition
 		this.condition.writeInvJump(writer, elseStart);
@@ -271,8 +271,8 @@ public class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		jdk.internal.org.objectweb.asm.Label elseStart = new jdk.internal.org.objectweb.asm.Label();
-		jdk.internal.org.objectweb.asm.Label elseEnd = new jdk.internal.org.objectweb.asm.Label();
+		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
+		org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
 		
 		if (this.elseThen != null)
 		{

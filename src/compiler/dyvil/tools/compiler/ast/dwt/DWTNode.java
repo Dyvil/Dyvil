@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import jdk.internal.org.objectweb.asm.Label;
+import org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.strings.StringUtils;
 import dyvil.tools.compiler.ast.ASTNode;

@@ -8,8 +8,8 @@ import static dyvil.reflect.Opcodes.INSTANCE;
 import java.lang.annotation.ElementType;
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.Label;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;

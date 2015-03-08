@@ -1,17 +1,43 @@
 package dyvil.tools.compiler.backend;
 
-import jdk.internal.org.objectweb.asm.AnnotationVisitor;
-import jdk.internal.org.objectweb.asm.Handle;
-import jdk.internal.org.objectweb.asm.Label;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
+
 import dyvil.tools.compiler.ast.type.IType;
 
 public interface MethodWriter
 {
-	Integer	TOP				= jdk.internal.org.objectweb.asm.Opcodes.TOP;
-	Integer	INT				= jdk.internal.org.objectweb.asm.Opcodes.INTEGER;
-	Integer	LONG			= jdk.internal.org.objectweb.asm.Opcodes.LONG;
-	Integer	FLOAT			= jdk.internal.org.objectweb.asm.Opcodes.FLOAT;
-	Integer	DOUBLE			= jdk.internal.org.objectweb.asm.Opcodes.DOUBLE;
+	int		V1_8				= Opcodes.V1_8;
+	int		ASM5				= Opcodes.ASM5;
+	
+	int		H_GETFIELD			= Opcodes.H_GETFIELD;
+	int		H_GETSTATIC			= Opcodes.H_GETSTATIC;
+	int		H_PUTFIELD			= Opcodes.H_PUTFIELD;
+	int		H_PUTSTATIC			= Opcodes.H_PUTSTATIC;
+	int		H_INVOKEVIRTUAL		= Opcodes.H_INVOKEVIRTUAL;
+	int		H_INVOKESTATIC		= Opcodes.H_INVOKESTATIC;
+	int		H_INVOKESPECIAL		= Opcodes.H_INVOKESPECIAL;
+	int		H_NEWINVOKESPECIAL	= Opcodes.H_NEWINVOKESPECIAL;
+	int		H_INVOKEINTERFACE	= Opcodes.H_INVOKEINTERFACE;
+	
+	int		T_BOOLEAN			= 4;
+	int		T_CHAR				= 5;
+	int		T_FLOAT				= 6;
+	int		T_DOUBLE			= 7;
+	int		T_BYTE				= 8;
+	int		T_SHORT				= 9;
+	int		T_INT				= 10;
+	int		T_LONG				= 11;
+	
+	Integer	UNINITIALIZED_THIS	= Opcodes.UNINITIALIZED_THIS;
+	Integer	NULL				= Opcodes.NULL;
+	Integer	TOP					= Opcodes.TOP;
+	Integer	INT					= Opcodes.INTEGER;
+	Integer	LONG				= Opcodes.LONG;
+	Integer	FLOAT				= Opcodes.FLOAT;
+	Integer	DOUBLE				= Opcodes.DOUBLE;
 	
 	public void setConstructor(IType type);
 	

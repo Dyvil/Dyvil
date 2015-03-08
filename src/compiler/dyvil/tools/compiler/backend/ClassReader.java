@@ -3,7 +3,7 @@ package dyvil.tools.compiler.backend;
 import java.io.IOException;
 import java.io.InputStream;
 
-import jdk.internal.org.objectweb.asm.*;
+import org.objectweb.asm.*;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.BytecodeClass;
@@ -24,7 +24,7 @@ public class ClassReader extends ClassVisitor
 	{
 		try
 		{
-			jdk.internal.org.objectweb.asm.ClassReader reader = new jdk.internal.org.objectweb.asm.ClassReader(is);
+			org.objectweb.asm.ClassReader reader = new org.objectweb.asm.ClassReader(is);
 			ClassReader visitor = new ClassReader(bclass);
 			reader.accept(visitor, 0);
 			

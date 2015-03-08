@@ -4,7 +4,7 @@ import static dyvil.reflect.Opcodes.*;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
+import org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.backend.ClassFormat;

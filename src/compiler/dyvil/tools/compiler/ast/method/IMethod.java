@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.method;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Label;
+import org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassCompilable;

@@ -8,8 +8,8 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.Map.Entry;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -173,7 +173,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(this.outputFile)))
 		{
-			jdk.internal.org.objectweb.asm.ClassWriter writer = new jdk.internal.org.objectweb.asm.ClassWriter(Opcodes.ASM5);
+			org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(MethodWriter.ASM5);
 			this.write(writer);
 			writer.visitEnd();
 			byte[] bytes = writer.toByteArray();
@@ -186,9 +186,9 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		
 	}
 	
-	public void write(jdk.internal.org.objectweb.asm.ClassWriter writer)
+	public void write(org.objectweb.asm.ClassWriter writer)
 	{
-		writer.visit(Opcodes.V1_8, Modifiers.PUBLIC, this.internalName, null, "java/lang/Object", null);
+		writer.visit(MethodWriter.V1_8, Modifiers.PUBLIC, this.internalName, null, "java/lang/Object", null);
 		
 		// Write Fields
 		

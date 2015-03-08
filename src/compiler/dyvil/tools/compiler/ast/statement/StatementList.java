@@ -310,8 +310,8 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		jdk.internal.org.objectweb.asm.Label start = new jdk.internal.org.objectweb.asm.Label();
-		jdk.internal.org.objectweb.asm.Label end = new jdk.internal.org.objectweb.asm.Label();
+		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
+		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
 		
 		writer.writeLabel(start);
 		int count = 0;

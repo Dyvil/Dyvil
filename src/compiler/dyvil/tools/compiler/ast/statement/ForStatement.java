@@ -345,9 +345,9 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		jdk.internal.org.objectweb.asm.Label startLabel = this.startLabel.target;
-		jdk.internal.org.objectweb.asm.Label updateLabel = this.updateLabel.target;
-		jdk.internal.org.objectweb.asm.Label endLabel = this.endLabel.target;
+		org.objectweb.asm.Label startLabel = this.startLabel.target;
+		org.objectweb.asm.Label updateLabel = this.updateLabel.target;
+		org.objectweb.asm.Label endLabel = this.endLabel.target;
 		
 		Variable var = this.variable;
 		if (this.type == DEFAULT)
@@ -395,7 +395,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			Variable indexVar = this.var1;
 			Variable lengthVar = this.var2;
 			
-			jdk.internal.org.objectweb.asm.Label scopeLabel = new jdk.internal.org.objectweb.asm.Label();
+			org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
 			writer.writeLabel(scopeLabel);
 			
 			// Local Variables

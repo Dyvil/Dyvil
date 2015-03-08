@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.value;
 
 import java.util.List;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.structure.IContext;

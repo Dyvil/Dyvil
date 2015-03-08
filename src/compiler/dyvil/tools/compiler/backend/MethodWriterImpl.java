@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.backend;
 
-import static jdk.internal.org.objectweb.asm.Opcodes.*;
-import jdk.internal.org.objectweb.asm.*;
-import jdk.internal.org.objectweb.asm.ClassWriter;
+import static dyvil.reflect.Opcodes.*;
+import org.objectweb.asm.*;
+import org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
@@ -142,7 +142,7 @@ public final class MethodWriterImpl implements MethodWriter
 	
 	private void visitFrame()
 	{
-		this.mv.visitFrame(F_NEW, this.localCount, this.locals, this.stackCount, this.stack);
+		this.mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, this.localCount, this.locals, this.stackCount, this.stack);
 		this.visitFrame = false;
 	}
 	
@@ -256,7 +256,7 @@ public final class MethodWriterImpl implements MethodWriter
 			this.visitFrame();
 		}
 		
-		this.push(INTEGER);
+		this.push(INT);
 		switch (value)
 		{
 		case -1:
@@ -396,7 +396,7 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		else if (c == Integer.class)
 		{
-			this.push(INTEGER);
+			this.push(INT);
 		}
 		else if (c == Long.class)
 		{
@@ -534,7 +534,7 @@ public final class MethodWriterImpl implements MethodWriter
 		case ICONST_4:
 		case ICONST_5:
 		case ICONST_M1:
-			this.push(INTEGER);
+			this.push(INT);
 			return;
 		case LCONST_0:
 		case LCONST_1:
@@ -553,7 +553,7 @@ public final class MethodWriterImpl implements MethodWriter
 			this.push(NULL);
 			return;
 		case ARRAYLENGTH:
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		case RETURN:
 			this.hasReturn = true;
@@ -564,7 +564,7 @@ public final class MethodWriterImpl implements MethodWriter
 		case IALOAD:
 			this.pop();
 			this.pop();
-			this.push(INTEGER);
+			this.push(INT);
 			return;
 		case LALOAD:
 			this.pop();
@@ -596,7 +596,7 @@ public final class MethodWriterImpl implements MethodWriter
 		case IUSHR:
 			this.pop();
 			this.pop();
-			this.push(INTEGER);
+			this.push(INT);
 			return;
 		case LADD:
 		case LSUB:
@@ -632,7 +632,7 @@ public final class MethodWriterImpl implements MethodWriter
 		case L2I:
 		case F2I:
 		case D2I:
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		case I2L:
 		case F2L:
@@ -652,7 +652,7 @@ public final class MethodWriterImpl implements MethodWriter
 		case DCMPG:
 			this.pop();
 			this.pop();
-			this.push(INTEGER);
+			this.push(INT);
 			return;
 		}
 	}
@@ -675,47 +675,47 @@ public final class MethodWriterImpl implements MethodWriter
 		case Opcodes.L2B:
 			this.mv.visitInsn(Opcodes.L2I);
 			this.mv.visitInsn(Opcodes.I2B);
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		case Opcodes.L2S:
 			this.mv.visitInsn(Opcodes.L2I);
 			this.mv.visitInsn(Opcodes.I2S);
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		case Opcodes.L2C:
 			this.mv.visitInsn(Opcodes.L2I);
 			this.mv.visitInsn(Opcodes.I2C);
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		case Opcodes.F2B:
 			this.mv.visitInsn(Opcodes.F2I);
 			this.mv.visitInsn(Opcodes.I2B);
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		case Opcodes.F2S:
 			this.mv.visitInsn(Opcodes.F2I);
 			this.mv.visitInsn(Opcodes.I2S);
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		case Opcodes.F2C:
 			this.mv.visitInsn(Opcodes.F2I);
 			this.mv.visitInsn(Opcodes.I2C);
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		case Opcodes.D2B:
 			this.mv.visitInsn(Opcodes.D2I);
 			this.mv.visitInsn(Opcodes.I2B);
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		case Opcodes.D2S:
 			this.mv.visitInsn(Opcodes.D2I);
 			this.mv.visitInsn(Opcodes.I2S);
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		case Opcodes.D2C:
 			this.mv.visitInsn(Opcodes.D2I);
 			this.mv.visitInsn(Opcodes.I2C);
-			this.set(INTEGER);
+			this.set(INT);
 			return;
 		}
 	}
@@ -1177,7 +1177,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			return "null";
 		}
-		if (type == INTEGER)
+		if (type == INT)
 		{
 			return "int";
 		}
