@@ -44,12 +44,12 @@ public interface Tokens
 	public int	FOR						= TYPE_KEYWORD | 0x000E0000;
 	public int	BREAK					= TYPE_KEYWORD | 0x000F0000;
 	public int	CONTINUE				= TYPE_KEYWORD | 0x00100000;
-	public int	GOTO					= TYPE_KEYWORD | 0x00200000;
-	public int	SWITCH					= TYPE_KEYWORD | 0x00300000;
-	public int	CASE					= TYPE_KEYWORD | 0x00400000;
-	public int	TRY						= TYPE_KEYWORD | 0x00500000;
-	public int	CATCH					= TYPE_KEYWORD | 0x00600000;
-	public int	FINALLY					= TYPE_KEYWORD | 0x00700000;
+	public int	GOTO					= TYPE_KEYWORD | 0x00110000;
+	public int	CASE					= TYPE_KEYWORD | 0x00120000;
+	public int	TRY						= TYPE_KEYWORD | 0x00130000;
+	public int	CATCH					= TYPE_KEYWORD | 0x00140000;
+	public int	FINALLY					= TYPE_KEYWORD | 0x00150000;
+	public int	SYNCHRONIZED			= TYPE_KEYWORD | 0x00160000;
 	
 	// BRACKETS
 	public int	MOD_PARENTHESIS			= 0x00010000;

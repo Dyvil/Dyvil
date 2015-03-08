@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.pattern.PatternValue;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.ast.value.*;
@@ -13,6 +14,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
+import dyvil.tools.compiler.parser.pattern.PatternParser;
 import dyvil.tools.compiler.parser.statement.DoStatementParser;
 import dyvil.tools.compiler.parser.statement.ForStatementParser;
 import dyvil.tools.compiler.parser.statement.IfStatementParser;
@@ -47,6 +49,8 @@ public class ExpressionParser extends Parser implements ITyped
 	public static final int	BYTECODE			= 0x8000;
 	public static final int	BYTECODE_END		= 0x10000;
 	
+	public static final int	PATTERN_END			= 0x20000;
+	
 	protected IValued		field;
 	protected int			precedence;
 	
@@ -74,7 +78,7 @@ public class ExpressionParser extends Parser implements ITyped
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (this.mode == 0 || type == Tokens.SEMICOLON)
+		if (this.mode == 0 || type == Tokens.SEMICOLON || type == Tokens.COMMA)
 		{
 			if (this.value != null)
 			{
@@ -153,6 +157,26 @@ public class ExpressionParser extends Parser implements ITyped
 			}
 			
 			this.mode = ACCESS;
+		}
+		if (this.isInMode(PATTERN_END))
+		{
+			this.field.setValue(this.value);
+			pm.popParser();
+			pm.pushParser(new ExpressionParser((IValued) this.value));
+			if (type == Tokens.COLON)
+			{
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Pattern - ':' expected");
+		}
+		if (type == Tokens.COLON)
+		{
+			if (this.value != null)
+			{
+				this.field.setValue(this.value);
+			}
+			pm.popParser(true);
+			return;
 		}
 		if (this.isInMode(LIST_END))
 		{
@@ -808,13 +832,19 @@ public class ExpressionParser extends Parser implements ITyped
 			this.mode = 0;
 			return true;
 		}
-		case Tokens.SWITCH: // TODO Switch Statements
+		case Tokens.CASE:
+		{
+			PatternValue pattern = new PatternValue(token.raw());
+			pm.pushParser(new PatternParser(pattern));
+			this.mode = PATTERN_END;
+			this.value = pattern;
 			return true;
-		case Tokens.CASE: // TODO Patterns
-			return true;
+		}
 		case Tokens.TRY: // TODO Try-Catch Statement
 		case Tokens.CATCH:
 		case Tokens.FINALLY:
+			return true;
+		case Tokens.SYNCHRONIZED: // TODO Synchronized Blocks
 			return true;
 		default:
 			return false;

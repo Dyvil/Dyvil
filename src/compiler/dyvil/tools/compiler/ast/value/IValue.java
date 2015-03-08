@@ -54,9 +54,11 @@ public interface IValue extends IASTNode, ITyped
 	public static int	CLASS_OPERATOR		= 38;
 	
 	public static int	TUPLE				= 48;
-	public static int	LAMBDA				= 49;
-	public static int	FUNCTION			= 50;
-	public static int	BYTECODE			= 51;
+	public static int	CASE_STATEMENT				= 49;
+	public static int	MATCH				= 50;
+	public static int	LAMBDA				= 51;
+	public static int	FUNCTION			= 52;
+	public static int	BYTECODE			= 53;
 	
 	public static int	RETURN				= 64;
 	public static int	IF					= 65;

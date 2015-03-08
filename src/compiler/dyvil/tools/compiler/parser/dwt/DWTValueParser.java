@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser.dwt;
 
-import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.dwt.DWTList;
 import dyvil.tools.compiler.ast.dwt.DWTNode;
 import dyvil.tools.compiler.ast.dwt.DWTReference;
@@ -63,7 +62,7 @@ public class DWTValueParser extends Parser
 				return;
 			}
 			
-			IValue primitive = parsePrimitive(token, type);
+			IValue primitive = ParserUtil.parsePrimitive(token, type);
 			if (primitive != null)
 			{
 				this.valued.setValue(primitive);
@@ -82,29 +81,5 @@ public class DWTValueParser extends Parser
 			}
 			throw new SyntaxError(token, "Invalid List - ']' expected", true);
 		}
-	}
-	
-	public static IValue parsePrimitive(IToken token, int type) throws SyntaxError
-	{
-		switch (type)
-		{
-		case Tokens.TRUE:
-			return new BooleanValue(token.raw(), true);
-		case Tokens.FALSE:
-			return new BooleanValue(token.raw(), false);
-		case Tokens.TYPE_STRING:
-			return new StringValue(token.raw(), (String) token.object());
-		case Tokens.TYPE_CHAR:
-			return new CharValue(token.raw(), (Character) token.object());
-		case Tokens.TYPE_INT:
-			return new IntValue(token.raw(), (Integer) token.object());
-		case Tokens.TYPE_LONG:
-			return new LongValue(token.raw(), (Long) token.object());
-		case Tokens.TYPE_FLOAT:
-			return new FloatValue(token.raw(), (Float) token.object());
-		case Tokens.TYPE_DOUBLE:
-			return new DoubleValue(token.raw(), (Double) token.object());
-		}
-		return null;
 	}
 }

@@ -3,8 +3,12 @@ package dyvil.tools.compiler.transform;
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.operator.*;
+import dyvil.tools.compiler.ast.pattern.ICase;
+import dyvil.tools.compiler.ast.pattern.MatchExpression;
+import dyvil.tools.compiler.ast.pattern.PatternValue;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValueList;
 
 public class Operators
 {
@@ -114,6 +118,32 @@ public class Operators
 				return new BooleanOr(arg1, arg2);
 			}
 			return null;
+		}
+		if ("match".equals(name))
+		{
+			if (arg2.getValueType() == IValue.VALUE_LIST)
+			{
+				IValueList list = (IValueList) arg2;
+				int len = list.valueCount();
+				ICase[] cases = new ICase[len];
+				for (int i = 0; i < len; i++)
+				{
+					IValue v = list.getValue(i);
+					if (v.getValueType() != IValue.CASE_STATEMENT)
+					{
+						// All values have to be patterns.
+						return null;
+					}
+					
+					cases[i] = (PatternValue) v;
+				}
+				
+				return new MatchExpression(arg1, cases);
+			}
+			if (arg2.getValueType() == IValue.CASE_STATEMENT)
+			{
+				return new MatchExpression(arg1, new ICase[] { (ICase) arg2 });
+			}
 		}
 		return null;
 	}
