@@ -8,16 +8,21 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.Markers;
 
 public class MatchExpression extends ASTNode implements IValue
 {
 	private IValue	value;
 	private ICase[]	cases;
 	private int		caseCount;
+	private boolean	exhaustive;
+	
+	private IType	type;
 	
 	public MatchExpression(IValue value, ICase[] cases)
 	{
@@ -33,21 +38,78 @@ public class MatchExpression extends ASTNode implements IValue
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			if (this.cases[i].getValue().isPrimitive())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
 	public IType getType()
 	{
-		return null;
+		if (this.type != null)
+		{
+			return this.type;
+		}
+		
+		int len = this.caseCount;
+		if (len == 0)
+		{
+			this.type = Type.VOID;
+			return this.type;
+		}
+		
+		IType t = this.cases[0].getValue().getType();
+		for (int i = 1; i < len; i++)
+		{
+			IType t1 = this.cases[i].getValue().getType();
+			t = Type.findCommonSuperType(t, t1);
+			if (t == null)
+			{
+				return this.type = Type.VOID;
+			}
+		}
+		
+		return this.type = t;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		this.type = type;
+		return IValue.super.withType(type);
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return false;
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			if (!this.cases[i].getValue().isType(type))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		return 0;
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			if (!this.cases[i].getValue().isType(type))
+			{
+				return 0;
+			}
+		}
+		return 3;
 	}
 	
 	@Override
@@ -75,9 +137,28 @@ public class MatchExpression extends ASTNode implements IValue
 	public void check(List<Marker> markers, IContext context)
 	{
 		this.value.check(markers, context);
+		IType type = this.value.getType();
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			this.cases[i].check(markers, context);
+			ICase c = this.cases[i];
+			IPattern pattern = c.getPattern();
+			if (pattern.getClass() == WildcardPattern.class)
+			{
+				this.exhaustive = true;
+			}
+			else if (!pattern.isType(type))
+			{
+				Marker m = Markers.create(pattern.getPosition(), "pattern.type");
+				m.addInfo("Pattern Type: " + pattern.getType());
+				m.addInfo("Value Type: " + type);
+				markers.add(m);
+			}
+			c.check(markers, context);
+		}
+		
+		if (type == Type.BOOLEAN && this.caseCount >= 2)
+		{
+			this.exhaustive = true;
 		}
 	}
 	
@@ -103,7 +184,7 @@ public class MatchExpression extends ASTNode implements IValue
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
-		for (int i = 0; i < this.caseCount; )
+		for (int i = 0; i < this.caseCount;)
 		{
 			writer.writeVarInsn(loadOpcode, var);
 			this.cases[i].writeExpression(writer, elseLabel);
@@ -154,6 +235,10 @@ public class MatchExpression extends ASTNode implements IValue
 	
 	private void writeError(MethodWriter writer, IType type, int loadOpcode, int var)
 	{
+		if (this.exhaustive)
+		{
+			return;
+		}
 		writer.writeTypeInsn(Opcodes.NEW, "dyvil/lang/MatchError");
 		writer.writeInsn(Opcodes.DUP);
 		writer.writeVarInsn(loadOpcode, var);

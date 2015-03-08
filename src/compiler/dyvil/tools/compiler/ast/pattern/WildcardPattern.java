@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class WildcardPattern extends ASTNode implements IPattern
+public final class WildcardPattern extends ASTNode implements IPattern
 {
 	public WildcardPattern(ICodePosition position)
 	{
