@@ -7,16 +7,14 @@ import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.TupleType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class TupleValue extends ASTNode implements IValue, IValueList
+public final class TupleValue extends ASTNode implements IValue, IValueList
 {
 	private IValue[]	values;
 	private int			valueCount;
@@ -100,7 +98,7 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public IType getType()
+	public TupleType getType()
 	{
 		if (this.tupleType != null)
 		{
@@ -110,8 +108,7 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 		TupleType t = new TupleType(this.valueCount);
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v = this.values[i];
-			t.addType(v.getType());
+			t.addType(this.values[i].getType());
 		}
 		return this.tupleType = t;
 	}
@@ -119,7 +116,17 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public IValue withType(IType type)
 	{
-		return this.isType(type) ? this : null;
+		if (this.valueCount == 1)
+		{
+			return this.values[0].withType(type);
+		}
+		
+		if (TupleType.isSuperType(type, this.values, this.valueCount))
+		{
+			this.getType();
+			return this;
+		}
+		return null;
 	}
 	
 	@Override
@@ -130,8 +137,7 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 			return this.values[0].isType(type);
 		}
 		
-		IType type1 = this.getType();
-		return Type.isSuperType(type, type1);
+		return TupleType.isSuperType(type, this.values, this.valueCount);
 	}
 	
 	@Override
@@ -207,14 +213,6 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append(Formatting.Expression.tupleStart);
-		Util.astToString(prefix, this.values, this.valueCount, Formatting.Expression.tupleSeperator, buffer);
-		buffer.append(Formatting.Expression.tupleEnd);
-	}
-	
-	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 		TupleType t = this.tupleType;
@@ -238,5 +236,13 @@ public class TupleValue extends ASTNode implements IValue, IValueList
 		{
 			this.values[i].writeStatement(writer);
 		}
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(Formatting.Expression.tupleStart);
+		Util.astToString(prefix, this.values, this.valueCount, Formatting.Expression.tupleSeperator, buffer);
+		buffer.append(Formatting.Expression.tupleEnd);
 	}
 }

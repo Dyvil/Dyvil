@@ -38,7 +38,7 @@ public final class TupleType extends Type implements ITypeList
 	@Override
 	public int typeCount()
 	{
-		return 0;
+		return this.typeCount;
 	}
 	
 	@Override
@@ -92,6 +92,33 @@ public final class TupleType extends Type implements ITypeList
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
+		if (this.arrayDimensions != type.getArrayDimensions())
+		{
+			return false;
+		}
+		
+		if (type.isGeneric())
+		{
+			if (this.theClass != type.getTheClass())
+			{
+				return false;
+			}
+			
+			GenericType generic = (GenericType) type;
+			if (this.typeCount != generic.typeCount())
+			{
+				return false;
+			}
+			
+			for (int i = 0; i < this.typeCount; i++)
+			{
+				if (!generic.getType(i).equals(this.types[i]))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 		if (type instanceof TupleType)
 		{
 			TupleType tuple = (TupleType) type;
@@ -103,24 +130,7 @@ public final class TupleType extends Type implements ITypeList
 			
 			for (int i = 0; i < this.typeCount; i++)
 			{
-				if (!this.types[i].equals(tuple.types[i]))
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-		else if (this.theClass == type.getTheClass() && type instanceof GenericType)
-		{
-			GenericType generic = (GenericType) type;
-			if (this.typeCount != generic.typeCount())
-			{
-				return false;
-			}
-			
-			for (int i = 0; i < this.typeCount; i++)
-			{
-				if (!this.types[i].equals(generic.getType(i)))
+				if (!tuple.types[i].equals(this.types[i]))
 				{
 					return false;
 				}
@@ -128,6 +138,51 @@ public final class TupleType extends Type implements ITypeList
 			return true;
 		}
 		return OBJECT.classEquals(type);
+	}
+	
+	public static boolean isSuperType(IType type, ITyped[] typedArray, int count)
+	{
+		if (type.isGeneric())
+		{
+			if (type.getTheClass().getInternalName().equals("dyvil/lang/tuple/Tuple" + count))
+			{
+				return false;
+			}
+			
+			GenericType generic = (GenericType) type;
+			if (count != generic.typeCount())
+			{
+				return false;
+			}
+			
+			for (int i = 0; i < count; i++)
+			{
+				if (!typedArray[i].isType(generic.getType(i)))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		if (type instanceof TupleType)
+		{
+			TupleType tuple = (TupleType) type;
+			
+			if (count != tuple.typeCount)
+			{
+				return false;
+			}
+			
+			for (int i = 0; i < count; i++)
+			{
+				if (!typedArray[i].isType(tuple.getType(i)))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		return type.classEquals(Type.OBJECT) || type.classEquals(Type.ANY);
 	}
 	
 	@Override
@@ -139,25 +194,7 @@ public final class TupleType extends Type implements ITypeList
 	@Override
 	public boolean classEquals(IType type)
 	{
-		if (type instanceof TupleType)
-		{
-			TupleType tuple = (TupleType) type;
-			
-			if (this.typeCount != tuple.typeCount)
-			{
-				return false;
-			}
-			
-			for (int i = 0; i < this.typeCount; i++)
-			{
-				if (!this.types[i].equals(tuple.types[i]))
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
+		return this.isSuperTypeOf(type);
 	}
 	
 	@Override

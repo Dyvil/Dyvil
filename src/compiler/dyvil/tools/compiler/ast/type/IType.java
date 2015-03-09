@@ -44,7 +44,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	// Generics
 	
 	/**
-	 * Returns true if this is an instance of {@link GenericType}
+	 * Returns true if this is an instance of {@link GenericType}.
 	 * 
 	 * @return
 	 */

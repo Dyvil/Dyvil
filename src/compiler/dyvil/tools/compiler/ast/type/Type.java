@@ -125,10 +125,10 @@ public class Type extends ASTNode implements IType
 		DOUBLE.boxMethod = DOUBLE_CLASS.getBody().getMethod("create");
 		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod("doubleValue");
 		
-		ANY.theClass = Package.dyvilLang.resolveClass("Any");
-		ANY.fullName = "dyvil.lang.Any";
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		OBJECT.fullName = "java.lang.Object";
+		ANY.theClass = OBJECT_CLASS;
+		ANY.fullName = "dyvil.lang.Any";
 		PREDEF.theClass = PREDEF_CLASS = Package.dyvilLang.resolveClass("Predef");
 		PREDEF.fullName = "dyvil.lang.Predef";
 		ARRAY.theClass = ARRAY_CLASS = Package.dyvilLang.resolveClass("Array");
