@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.pattern;
 
 import org.objectweb.asm.Label;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
@@ -16,7 +15,7 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	private String		name;
 	private IPattern	pattern;
 	private Variable	variable;
-	private IType type;
+	private IType		type;
 	
 	public BindingPattern(ICodePosition position, String name)
 	{
@@ -88,19 +87,27 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		if (this.variable != null)
 		{
-			this.variable.index = writer.registerLocal(this.type);
 			this.variable.type = this.type;
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index);
+			Object frameType = this.type.getFrameType();
+			if (writer.getLocal(varIndex) == frameType)
+			{
+				this.variable.index = varIndex;
+			}
+			else
+			{
+				this.variable.index = writer.registerLocal(frameType);
+				writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
+				writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index);
+			}
 		}
 		
 		if (this.pattern != null)
 		{
-			this.pattern.writeJump(writer, elseLabel);
+			this.pattern.writeJump(writer, varIndex, elseLabel);
 		}
 	}
 	

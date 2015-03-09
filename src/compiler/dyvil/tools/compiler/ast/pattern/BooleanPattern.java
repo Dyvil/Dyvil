@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class BooleanPattern extends ASTNode implements IPattern
+public final class BooleanPattern extends ASTNode implements IPattern
 {
 	private boolean	value;
 	
@@ -44,8 +44,9 @@ public class BooleanPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
+		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
 		writer.writeFrameJump(this.value ? Opcodes.IFEQ : Opcodes.IFNE, elseLabel);
 	}
 	

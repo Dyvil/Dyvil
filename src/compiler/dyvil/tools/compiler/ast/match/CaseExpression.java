@@ -213,9 +213,9 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer, Label elseLabel)
+	public void writeExpression(MethodWriter writer, int varIndex, Label elseLabel)
 	{
-		this.pattern.writeJump(writer, elseLabel);
+		this.pattern.writeJump(writer, varIndex, elseLabel);
 		if (this.condition != null)
 		{
 			this.condition.writeInvJump(writer, elseLabel);
@@ -224,10 +224,10 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer, Label elseLabel)
+	public void writeStatement(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		int locals = writer.localCount();
-		this.pattern.writeJump(writer, elseLabel);
+		this.pattern.writeJump(writer, varIndex, elseLabel);
 		if (this.condition != null)
 		{
 			this.condition.writeInvJump(writer, elseLabel);
@@ -250,6 +250,9 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 			this.condition.toString(prefix, buffer);
 		}
 		buffer.append(" : ");
-		this.value.toString(prefix, buffer);
+		if (this.value != null)
+		{
+			this.value.toString(prefix, buffer);
+		}
 	}
 }

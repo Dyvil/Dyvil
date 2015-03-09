@@ -188,7 +188,6 @@ public class MatchExpression extends ASTNode implements IValue
 	{
 		IType type = this.value.getType();
 		int var = writer.registerLocal(type);
-		int loadOpcode = type.getLoadOpcode();
 		this.value.writeExpression(writer);
 		writer.writeVarInsn(type.getStoreOpcode(), var);
 		
@@ -196,8 +195,7 @@ public class MatchExpression extends ASTNode implements IValue
 		Label endLabel = new Label();
 		for (int i = 0; i < this.caseCount;)
 		{
-			writer.writeVarInsn(loadOpcode, var);
-			this.cases[i].writeExpression(writer, elseLabel);
+			this.cases[i].writeExpression(writer, var, elseLabel);
 			writer.writeJump(Opcodes.GOTO, endLabel);
 			writer.writeFrameLabel(elseLabel);
 			
@@ -208,7 +206,7 @@ public class MatchExpression extends ASTNode implements IValue
 		}
 		
 		writer.writeFrameLabel(elseLabel);
-		this.writeError(writer, type, loadOpcode, var);
+		this.writeError(writer, type, type.getLoadOpcode(), var);
 		writer.removeLocals(1);
 		writer.writeFrameLabel(endLabel);
 	}
@@ -218,7 +216,6 @@ public class MatchExpression extends ASTNode implements IValue
 	{
 		IType type = this.value.getType();
 		int var = writer.registerLocal(type);
-		int loadOpcode = type.getLoadOpcode();
 		this.value.writeExpression(writer);
 		writer.writeVarInsn(type.getStoreOpcode(), var);
 		
@@ -226,8 +223,7 @@ public class MatchExpression extends ASTNode implements IValue
 		Label endLabel = new Label();
 		for (int i = 0; i < this.caseCount;)
 		{
-			writer.writeVarInsn(loadOpcode, var);
-			this.cases[i].writeStatement(writer, elseLabel);
+			this.cases[i].writeStatement(writer, var, elseLabel);
 			writer.writeJump(Opcodes.GOTO, endLabel);
 			writer.writeFrameLabel(elseLabel);
 			if (++i < this.caseCount)
@@ -238,7 +234,7 @@ public class MatchExpression extends ASTNode implements IValue
 		
 		// MatchError
 		writer.writeFrameLabel(elseLabel);
-		this.writeError(writer, type, loadOpcode, var);
+		this.writeError(writer, type, type.getLoadOpcode(), var);
 		writer.removeLocals(1);
 		writer.writeFrameLabel(endLabel);
 	}

@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class StringPattern extends ASTNode implements IPattern
+public final class StringPattern extends ASTNode implements IPattern
 {
 	private String	value;
 	
@@ -38,9 +38,10 @@ public class StringPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeLDC(this.value);
+		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false, 2, MethodWriter.INT);
 		writer.writeFrameJump(Opcodes.IFEQ, elseLabel);
 	}

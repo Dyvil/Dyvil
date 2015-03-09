@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class LongPattern extends ASTNode implements IPattern
+public final class LongPattern extends ASTNode implements IPattern
 {
 	private long	value;
 	
@@ -38,8 +38,9 @@ public class LongPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
+		writer.writeVarInsn(Opcodes.LLOAD, varIndex);
 		writer.writeLDC(this.value);
 		writer.writeFrameJump(Opcodes.IF_LCMPNE, elseLabel);
 	}

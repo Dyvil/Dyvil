@@ -32,7 +32,7 @@ public interface ICase extends IASTNode, IValued, IPatterned
 	
 	// Compilation
 	
-	public void writeExpression(MethodWriter writer, Label elseLabel);
+	public void writeExpression(MethodWriter writer, int varIndex, Label elseLabel);
 	
-	public void writeStatement(MethodWriter writer, Label elseLabel);
+	public void writeStatement(MethodWriter writer, int varIndex, Label elseLabel);
 }
