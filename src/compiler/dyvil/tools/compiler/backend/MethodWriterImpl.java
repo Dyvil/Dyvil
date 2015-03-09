@@ -149,7 +149,7 @@ public final class MethodWriterImpl implements MethodWriter
 	// Parameters
 	
 	@Override
-	public int visitParameter(String name, IType type)
+	public int registerParameter(String name, IType type)
 	{
 		int index = this.registerLocal(type.getFrameType());
 		this.mv.visitParameter(name, index);
@@ -163,7 +163,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public int visitParameter(String name, Object type)
+	public int registerParameter(String name, Object type)
 	{
 		int index = this.registerLocal(type);
 		this.mv.visitParameter(name, index);
@@ -190,6 +190,12 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.localCount = count;
 		}
+	}
+	
+	@Override
+	public int localCount()
+	{
+		return this.localCount;
 	}
 
 	@Override
@@ -229,7 +235,6 @@ public final class MethodWriterImpl implements MethodWriter
 			if (o == LONG || o == DOUBLE)
 			{
 				this.localIndex--;
-				this.localCount--;
 			}
 		}
 	}

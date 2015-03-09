@@ -2,14 +2,13 @@ package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 
-public class InvokeInstruction extends Instruction implements INamed, IBaseMethod
+public class InvokeInstruction extends Instruction implements IBaseMethod
 {
 	private String	owner;
 	private String	methodName;

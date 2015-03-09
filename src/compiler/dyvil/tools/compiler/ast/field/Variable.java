@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.util.List;
 
 import org.objectweb.asm.ClassWriter;
+
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.member.Member;
@@ -15,6 +16,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Symbols;
 
 public class Variable extends Member implements IVariable
 {
@@ -23,13 +25,20 @@ public class Variable extends Member implements IVariable
 	
 	public Variable(ICodePosition position)
 	{
-		super(null);
 		this.position = position;
+	}
+	
+	public Variable(ICodePosition position, IType type)
+	{
+		this.position = position;
+		this.type = type;
 	}
 	
 	public Variable(ICodePosition position, String name, IType type)
 	{
-		super(null, name, type);
+		this.name = name;
+		this.qualifiedName = Symbols.qualify(name);
+		this.type = type;
 		this.position = position;
 	}
 	

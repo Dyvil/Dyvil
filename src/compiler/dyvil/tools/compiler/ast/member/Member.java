@@ -25,6 +25,10 @@ public abstract class Member extends ASTNode implements IMember
 	public String			name;
 	public String			qualifiedName;
 	
+	protected Member()
+	{	
+	}
+	
 	protected Member(IClass iclass)
 	{
 		this.theClass = iclass;
@@ -35,6 +39,12 @@ public abstract class Member extends ASTNode implements IMember
 		this.theClass = iclass;
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
+	}
+	
+	public Member(IClass iclass, IType type)
+	{
+		this.theClass = iclass;
+		this.type = type;
 	}
 	
 	public Member(IClass iclass, String name, IType type)

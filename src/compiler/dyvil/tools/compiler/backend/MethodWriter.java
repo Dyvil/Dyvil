@@ -66,11 +66,13 @@ public interface MethodWriter
 	
 	// Parameters
 	
-	public int visitParameter(String name, Object type);
+	public int registerParameter(String name, Object type);
 	
-	public int visitParameter(String name, IType type);
+	public int registerParameter(String name, IType type);
 	
 	// Local Variables
+	
+	public int localCount();
 	
 	public int registerLocal(Object type);
 	

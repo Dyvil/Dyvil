@@ -1061,7 +1061,7 @@ public class CodeClass extends ASTNode implements IClass
 			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null,
 					null));
 			mw.registerLocal(this.type);
-			mw.visitParameter("obj", "Ljava/lang/Object;");
+			mw.registerParameter("obj", "Ljava/lang/Object;");
 			mw.begin();
 			CaseClasses.writeEquals(mw, this, this.body);
 			mw.end();

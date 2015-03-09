@@ -488,14 +488,14 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 			{
 				IVariable var = this.capturedFields[i];
 				prevIndex[i] = var.getIndex();
-				var.setIndex(mw.visitParameter(var.getQualifiedName(), var.getType()));
+				var.setIndex(mw.registerParameter(var.getQualifiedName(), var.getType()));
 			}
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			LambdaParameter param = this.parameters[i];
-			param.index = mw.visitParameter(param.qualifiedName, param.type);
+			param.index = mw.registerParameter(param.qualifiedName, param.type);
 		}
 		
 		// Write the Value

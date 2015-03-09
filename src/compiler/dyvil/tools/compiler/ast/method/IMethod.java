@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.method;
 import java.util.List;
 
 import org.objectweb.asm.Label;
+
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
@@ -17,7 +18,7 @@ import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 
-public interface IMethod extends IASTNode, IBaseMethod, IValued, IContext, IClassCompilable, IMember, IParameterized, IExceptionList
+public interface IMethod extends IASTNode, IMember, IBaseMethod, IValued, IContext, IClassCompilable, IParameterized, IExceptionList
 {
 	public int getSignatureMatch(String name, IValue instance, IArguments arguments);
 	

@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 
-public interface IBaseMethod extends ITyped, ITypeList, IGeneric
+public interface IBaseMethod extends INamed, ITyped, ITypeList, IGeneric
 {
 	@Override
 	public default int typeCount()
