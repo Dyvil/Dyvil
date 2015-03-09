@@ -28,7 +28,7 @@ import dyvil.tools.compiler.util.Tokens;
 public class ExpressionParser extends Parser implements ITyped, IValued
 {
 	public static final int	VALUE				= 0x1;
-	public static final int	LIST_END			= 0x2;
+	public static final int	ARRAY_END			= 0x2;
 	public static final int	TUPLE_END			= 0x4;
 	
 	public static final int	ACCESS				= 0x8;
@@ -112,7 +112,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
-				this.mode = LIST_END;
+				this.mode = ARRAY_END;
 				StatementList sl = new StatementList(token);
 				this.value = sl;
 				
@@ -188,7 +188,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser(true);
 			return;
 		}
-		if (this.isInMode(LIST_END))
+		if (this.isInMode(ARRAY_END))
 		{
 			this.field.setValue(this.value);
 			pm.popParser();
@@ -484,7 +484,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				SpecialConstructor pc = new SpecialConstructor(token, (ConstructorCall) this.value);
 				pm.pushParser(new ExpressionListParser(pc.list));
 				this.value = pc;
-				this.mode = LIST_END; // matches a curly bracket
+				this.mode = ARRAY_END; // matches a curly bracket
 				return;
 			}
 			

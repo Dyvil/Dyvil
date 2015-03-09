@@ -80,6 +80,10 @@ public interface MethodWriter
 	
 	public void removeLocals(int count);
 	
+	public Object getLocal(int index);
+	
+	public IType getLocalType(int index);
+	
 	public void writeLocal(String name, String desc, String signature, Label start, Label end, int index);
 	
 	public void writeLocal(String name, IType type, Label start, Label end, int index);

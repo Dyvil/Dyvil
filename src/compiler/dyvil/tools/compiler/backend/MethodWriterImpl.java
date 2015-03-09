@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.backend;
 
 import static dyvil.reflect.Opcodes.*;
+
 import org.objectweb.asm.*;
 import org.objectweb.asm.ClassWriter;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
@@ -13,7 +15,7 @@ public final class MethodWriterImpl implements MethodWriter
 	public static final Long	LONG_MINUS_ONE	= Long.valueOf(-1);
 	
 	public ClassWriter			cw;
-	protected MethodVisitor mv;
+	protected MethodVisitor		mv;
 	
 	private boolean				visitFrame;
 	private boolean				hasReturn;
@@ -52,7 +54,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		return this.mv.visitAnnotation(type, visible);
 	}
-
+	
 	@Override
 	public AnnotationVisitor addParameterAnnotation(int index, String type, boolean visible)
 	{
@@ -197,13 +199,13 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		return this.localCount;
 	}
-
+	
 	@Override
 	public int registerLocal(IType type)
 	{
 		return this.registerLocal(type.getFrameType());
 	}
-
+	
 	@Override
 	public int registerLocal(Object type)
 	{
@@ -224,7 +226,7 @@ public final class MethodWriterImpl implements MethodWriter
 		
 		return index;
 	}
-
+	
 	@Override
 	public void removeLocals(int count)
 	{
@@ -238,7 +240,40 @@ public final class MethodWriterImpl implements MethodWriter
 			}
 		}
 	}
-
+	
+	@Override
+	public Object getLocal(int index)
+	{
+		return this.locals[index];
+	}
+	
+	@Override
+	public IType getLocalType(int index)
+	{
+		Object o = this.locals[index];
+		if (o == INT)
+		{
+			return dyvil.tools.compiler.ast.type.Type.INT;
+		}
+		if (o == LONG)
+		{
+			return dyvil.tools.compiler.ast.type.Type.LONG;
+		}
+		if (o == FLOAT)
+		{
+			return dyvil.tools.compiler.ast.type.Type.FLOAT;
+		}
+		if (o == DOUBLE)
+		{
+			return dyvil.tools.compiler.ast.type.Type.DOUBLE;
+		}
+		if (o == NULL)
+		{
+			return dyvil.tools.compiler.ast.type.Type.NONE;
+		}
+		return dyvil.tools.compiler.ast.type.Type.OBJECT;
+	}
+	
 	@Override
 	public void writeLocal(String name, String desc, String signature, Label start, Label end, int index)
 	{
@@ -867,7 +902,8 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.push(type);
 		}
-		if (opcode == CHECKCAST) {
+		if (opcode == CHECKCAST)
+		{
 			this.set(type);
 		}
 		this.mv.visitTypeInsn(opcode, type);
@@ -1022,7 +1058,7 @@ public final class MethodWriterImpl implements MethodWriter
 			this.push(returnType);
 		}
 	}
-
+	
 	@Override
 	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, IType returnType)
 	{
@@ -1054,7 +1090,7 @@ public final class MethodWriterImpl implements MethodWriter
 			this.push(returnType);
 		}
 	}
-
+	
 	@Override
 	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, IType returnType)
 	{

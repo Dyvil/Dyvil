@@ -57,12 +57,15 @@ public class ExternalPackage extends Package
 		IClass iclass = super.resolveClass(name);
 		if (iclass == null)
 		{
-			InputStream is = this.library.getInputStream(this.internalName + name + ".class");
-			if (is != null)
+			synchronized (this)
 			{
-				BytecodeClass bclass = new BytecodeClass(name);
-				this.classes.put(name, bclass);
-				iclass = ClassReader.loadClass(bclass, is, false);
+				InputStream is = this.library.getInputStream(this.internalName + name + ".class");
+				if (is != null)
+				{
+					BytecodeClass bclass = new BytecodeClass(name);
+					this.classes.put(name, bclass);
+					iclass = ClassReader.loadClass(bclass, is, false);
+				}
 			}
 		}
 		return iclass;
