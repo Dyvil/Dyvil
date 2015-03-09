@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
 public class PatternParser extends Parser implements IValued
@@ -14,9 +15,9 @@ public class PatternParser extends Parser implements IValued
 	public static final int	PATTERN	= 1;
 	public static final int	IF		= 2;
 	
-	protected ICase	patterned;
+	protected IPatterned	patterned;
 	
-	public PatternParser(ICase patterned)
+	public PatternParser(IPatterned patterned)
 	{
 		this.patterned = patterned;
 		this.mode = PATTERN;
@@ -40,6 +41,28 @@ public class PatternParser extends Parser implements IValued
 		
 		if (this.mode == PATTERN)
 		{
+			if (ParserUtil.isIdentifier(type))
+			{
+				int nextType = token.next().type();
+				if (nextType == Tokens.EQUALS)
+				{
+					BindingPattern bp = new BindingPattern(token.raw(), token.value());
+					this.patterned.setPattern(bp);
+					this.patterned = bp;
+					pm.skip();
+					return;
+				}
+				// TODO Case Class Patterns
+			}
+			if (type == Tokens.OPEN_CURLY_BRACKET)
+			{
+				// TODO Array Patterns
+			}
+			if (type == Tokens.OPEN_PARENTHESIS)
+			{
+				// TODO Tuple Patterns
+			}
+			
 			IPattern p = parsePrimitive(token, type);
 			if (p != null)
 			{
@@ -63,6 +86,8 @@ public class PatternParser extends Parser implements IValued
 			return new BooleanPattern(token.raw(), false);
 		case Tokens.WILDCARD:
 			return new WildcardPattern(token.raw());
+		case Tokens.NULL:
+			return new NullPattern(token.raw());
 		case Tokens.TYPE_STRING:
 			return new StringPattern(token.raw(), (String) token.object());
 		case Tokens.TYPE_CHAR:
@@ -78,12 +103,12 @@ public class PatternParser extends Parser implements IValued
 		}
 		return null;
 	}
-
+	
 	@Override
 	public void setValue(IValue value)
 	{
 	}
-
+	
 	@Override
 	public IValue getValue()
 	{

@@ -1,24 +1,34 @@
-package dyvil.tools.compiler.ast.pattern;
+package dyvil.tools.compiler.ast.match;
 
 import java.util.List;
 
 import org.objectweb.asm.Label;
 
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class PatternValue extends ASTNode implements IValue, ICase
+public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 {
-	private IPattern	pattern;
-	private IValue		condition;
-	private IValue		value;
+	private IPattern			pattern;
+	private IValue				condition;
+	private IValue				value;
 	
-	public PatternValue(ICodePosition position)
+	private transient IContext	context;
+	
+	public CaseExpression(ICodePosition position)
 	{
 		this.position = position;
 	}
@@ -83,6 +93,70 @@ public class PatternValue extends ASTNode implements IValue, ICase
 		return this.condition;
 	}
 	
+	// IContext
+	
+	@Override
+	public IType getThisType()
+	{
+		return this.context.getThisType();
+	}
+	
+	@Override
+	public Package resolvePackage(String name)
+	{
+		return this.context.resolvePackage(name);
+	}
+	
+	@Override
+	public IClass resolveClass(String name)
+	{
+		return this.context.resolveClass(name);
+	}
+	
+	@Override
+	public FieldMatch resolveField(String name)
+	{
+		IField f = this.pattern.resolveField(name);
+		if (f != null)
+		{
+			return new FieldMatch(f, 1);
+		}
+		
+		return this.context.resolveField(name);
+	}
+	
+	@Override
+	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	{
+		return this.context.resolveMethod(instance, name, arguments);
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	{
+		this.context.getMethodMatches(list, instance, name, arguments);
+	}
+	
+	@Override
+	public MethodMatch resolveConstructor(IArguments arguments)
+	{
+		return this.context.resolveConstructor(arguments);
+	}
+	
+	@Override
+	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
+	{
+		this.context.getConstructorMatches(list, arguments);
+	}
+	
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		return this.context.getAccessibility(member);
+	}
+	
+	// Phases
+	
 	@Override
 	public void resolveTypes(List<Marker> markers, IContext context)
 	{
@@ -94,13 +168,16 @@ public class PatternValue extends ASTNode implements IValue, ICase
 	}
 	
 	@Override
-	public PatternValue resolve(List<Marker> markers, IContext context)
+	public CaseExpression resolve(List<Marker> markers, IContext context)
 	{
+		this.context = context;
 		if (this.condition != null)
 		{
-			this.condition = this.condition.resolve(markers, context);
+			this.condition = this.condition.resolve(markers, this);
 		}
-		this.value = this.value.resolve(markers, context);
+		
+		this.value = this.value.resolve(markers, this);
+		this.context = null;
 		return this;
 	}
 	
@@ -115,7 +192,7 @@ public class PatternValue extends ASTNode implements IValue, ICase
 	}
 	
 	@Override
-	public PatternValue foldConstants()
+	public CaseExpression foldConstants()
 	{
 		if (this.condition != null)
 		{
@@ -149,12 +226,14 @@ public class PatternValue extends ASTNode implements IValue, ICase
 	@Override
 	public void writeStatement(MethodWriter writer, Label elseLabel)
 	{
+		int locals = writer.localCount();
 		this.pattern.writeJump(writer, elseLabel);
 		if (this.condition != null)
 		{
 			this.condition.writeInvJump(writer, elseLabel);
 		}
 		this.value.writeStatement(writer);
+		writer.removeLocals(writer.localCount() - locals);
 	}
 	
 	@Override

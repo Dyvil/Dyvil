@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.pattern;
+package dyvil.tools.compiler.ast.match;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import org.objectweb.asm.Label;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -125,19 +126,9 @@ public class MatchExpression extends ASTNode implements IValue
 	@Override
 	public IValue resolve(List<Marker> markers, IContext context)
 	{
-		this.value = this.value.resolve(markers, context);
-		for (int i = 0; i < this.caseCount; i++)
-		{
-			this.cases[i] = this.cases[i].resolve(markers, context);
-		}
-		return this;
-	}
-	
-	@Override
-	public void check(List<Marker> markers, IContext context)
-	{
-		this.value.check(markers, context);
 		IType type = this.value.getType();
+		
+		this.value = this.value.resolve(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			ICase c = this.cases[i];
@@ -161,12 +152,23 @@ public class MatchExpression extends ASTNode implements IValue
 				m.addInfo("Value Type: " + type);
 				markers.add(m);
 			}
-			c.check(markers, context);
+			this.cases[i] = c.resolve(markers, context);
 		}
 		
 		if (type == Type.BOOLEAN && this.caseCount >= 2)
 		{
 			this.exhaustive = true;
+		}
+		return this;
+	}
+	
+	@Override
+	public void check(List<Marker> markers, IContext context)
+	{
+		this.value.check(markers, context);
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			this.cases[i].check(markers, context);
 		}
 	}
 	

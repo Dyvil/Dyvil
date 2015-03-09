@@ -3,12 +3,14 @@ package dyvil.tools.compiler.ast.access;
 import java.util.List;
 
 import org.objectweb.asm.Label;
-import dyvil.reflect.Opcodes;
+
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.match.MatchExpression;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -344,9 +346,30 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		if (len == 1)
 		{
 			IValue argument = this.arguments.getFirstValue();
-			argument = argument.resolve(markers, context);
+			IValue operator;
 			
-			IValue operator = this.instance == null ? Operators.get(this.name, argument) : Operators.get(this.instance, this.name, argument);
+			if (this.instance != null)
+			{
+				if ("match".equals(this.name))
+				{
+					MatchExpression me = Operators.getMatchExpression(this.instance, argument);
+					if (me != null)
+					{
+						me.resolve(markers, context);
+						me.position = this.position;
+						this.replacement = me;
+						return false;
+					}
+				}
+				
+				argument = argument.resolve(markers, context);
+				operator = Operators.get(this.instance, this.name, argument);
+			}
+			else
+			{
+				argument = argument.resolve(markers, context);
+				operator = Operators.get(this.name, argument);
+			}
 			if (operator != null)
 			{
 				operator.setPosition(this.position);

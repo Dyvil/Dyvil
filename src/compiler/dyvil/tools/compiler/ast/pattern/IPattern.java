@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.pattern;
 import org.objectweb.asm.Label;
 
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 
@@ -19,6 +20,12 @@ public interface IPattern extends IASTNode
 	public static int	DOUBLE		= 8;
 	public static int	STRING		= 9;
 	
+	public static int	TUPLE		= 16;
+	public static int	ARRAY		= 17;
+	public static int	LIST		= 18;
+	
+	public static int	BINDING		= 32;
+	
 	public static int	WILDCARD	= 64;
 	
 	public int getPatternType();
@@ -26,6 +33,11 @@ public interface IPattern extends IASTNode
 	public IType getType();
 	
 	public boolean isType(IType type);
+	
+	public default IField resolveField(String name)
+	{
+		return null;
+	}
 	
 	public default int intValue()
 	{

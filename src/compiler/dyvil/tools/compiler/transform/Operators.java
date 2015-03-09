@@ -2,10 +2,10 @@ package dyvil.tools.compiler.transform;
 
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.match.ICase;
+import dyvil.tools.compiler.ast.match.MatchExpression;
+import dyvil.tools.compiler.ast.match.CaseExpression;
 import dyvil.tools.compiler.ast.operator.*;
-import dyvil.tools.compiler.ast.pattern.ICase;
-import dyvil.tools.compiler.ast.pattern.MatchExpression;
-import dyvil.tools.compiler.ast.pattern.PatternValue;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
@@ -119,31 +119,33 @@ public class Operators
 			}
 			return null;
 		}
-		if ("match".equals(name))
+		return null;
+	}
+	
+	public static MatchExpression getMatchExpression(IValue arg1, IValue arg2)
+	{
+		if (arg2.getValueType() == IValue.VALUE_LIST)
 		{
-			if (arg2.getValueType() == IValue.VALUE_LIST)
+			IValueList list = (IValueList) arg2;
+			int len = list.valueCount();
+			ICase[] cases = new ICase[len];
+			for (int i = 0; i < len; i++)
 			{
-				IValueList list = (IValueList) arg2;
-				int len = list.valueCount();
-				ICase[] cases = new ICase[len];
-				for (int i = 0; i < len; i++)
+				IValue v = list.getValue(i);
+				if (v.getValueType() != IValue.CASE_STATEMENT)
 				{
-					IValue v = list.getValue(i);
-					if (v.getValueType() != IValue.CASE_STATEMENT)
-					{
-						// All values have to be patterns.
-						return null;
-					}
-					
-					cases[i] = (PatternValue) v;
+					// All values have to be patterns.
+					return null;
 				}
 				
-				return new MatchExpression(arg1, cases);
+				cases[i] = (CaseExpression) v;
 			}
-			if (arg2.getValueType() == IValue.CASE_STATEMENT)
-			{
-				return new MatchExpression(arg1, new ICase[] { (ICase) arg2 });
-			}
+			
+			return new MatchExpression(arg1, cases);
+		}
+		if (arg2.getValueType() == IValue.CASE_STATEMENT)
+		{
+			return new MatchExpression(arg1, new ICase[] { (ICase) arg2 });
 		}
 		return null;
 	}

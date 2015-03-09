@@ -3,8 +3,8 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.match.CaseExpression;
 import dyvil.tools.compiler.ast.parameter.*;
-import dyvil.tools.compiler.ast.pattern.PatternValue;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.ast.value.*;
@@ -844,7 +844,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		case Tokens.CASE:
 		{
-			PatternValue pattern = new PatternValue(token.raw());
+			CaseExpression pattern = new CaseExpression(token.raw());
 			pm.pushParser(new PatternParser(pattern));
 			this.mode = PATTERN_IF;
 			this.value = pattern;
@@ -885,7 +885,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	{
 		if (this.mode == PATTERN_END)
 		{
-			((PatternValue) this.value).setCondition(value);
+			((CaseExpression) this.value).setCondition(value);
 		}
 	}
 	
