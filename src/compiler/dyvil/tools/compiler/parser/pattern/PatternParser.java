@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.parser.pattern;
 
 import dyvil.tools.compiler.ast.pattern.*;
-import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -10,7 +8,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public class PatternParser extends Parser implements IValued
+public class PatternParser extends Parser
 {
 	public static final int	PATTERN	= 1;
 	public static final int	IF		= 2;
@@ -101,17 +99,6 @@ public class PatternParser extends Parser implements IValued
 		case Tokens.TYPE_DOUBLE:
 			return new DoublePattern(token.raw(), (Double) token.object());
 		}
-		return null;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-	}
-	
-	@Override
-	public IValue getValue()
-	{
 		return null;
 	}
 }

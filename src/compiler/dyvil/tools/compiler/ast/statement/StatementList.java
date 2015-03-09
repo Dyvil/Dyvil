@@ -131,7 +131,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		
 		this.context = context;
-		
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue v = this.values[i];
@@ -142,6 +141,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 			
 			v.resolveTypes(markers, this);
 		}
+		this.context = null;
 	}
 	
 	@Override
@@ -157,7 +157,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		
 		this.context = context;
-		
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue v1 = this.values[i];
@@ -174,6 +173,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 				this.variables.put(var.qualifiedName, var);
 			}
 		}
+		this.context = null;
 		return this;
 	}
 	
@@ -186,6 +186,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		}
 		else
 		{
+			this.context = context;
 			IType type = this.requiredType;
 			for (int i = 0; i < this.valueCount; i++)
 			{
@@ -200,6 +201,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 					markers.add(marker);
 				}
 			}
+			this.context = null;
 		}
 	}
 	

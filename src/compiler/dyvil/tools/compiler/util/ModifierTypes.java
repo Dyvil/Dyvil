@@ -268,13 +268,17 @@ public enum ModifierTypes
 	
 	private static void writeParameterModifier(int mod, StringBuilder sb)
 	{
+		if ((mod & Modifiers.LAZY) == Modifiers.LAZY)
+		{
+			sb.append("lazy ");
+		}
 		if ((mod & Modifiers.FINAL) == Modifiers.FINAL)
 		{
 			sb.append("final ");
 		}
-		if ((mod & Modifiers.BYREF) == Modifiers.BYREF)
+		if ((mod & Modifiers.VAR) == Modifiers.VAR)
 		{
-			sb.append("byref ");
+			sb.append("var ");
 		}
 	}
 	
@@ -392,8 +396,8 @@ public enum ModifierTypes
 		{
 		case "final":
 			return Modifiers.FINAL;
-		case "byref":
-			return Modifiers.BYREF;
+		case "var":
+			return Modifiers.VAR;
 		}
 		return -1;
 	}

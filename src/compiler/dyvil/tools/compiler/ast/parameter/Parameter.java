@@ -106,9 +106,14 @@ public class Parameter extends Member implements IVariable
 	public boolean processAnnotation(Annotation annotation)
 	{
 		String name = annotation.type.fullName;
-		if ("dyvil.lang.annotation.byref".equals(name))
+		if ("dyvil.lang.annotation.var".equals(name))
 		{
-			this.modifiers |= Modifiers.BYREF;
+			this.modifiers |= Modifiers.VAR;
+			return true;
+		}
+		if ("dyvil.lang.annotation.lazy".equals(name))
+		{
+			this.modifiers |= Modifiers.LAZY;
 			return true;
 		}
 		return false;
@@ -188,7 +193,7 @@ public class Parameter extends Member implements IVariable
 	{
 		this.index = writer.registerParameter(this.name, this.type);
 		
-		if ((this.modifiers & Modifiers.BYREF) != 0)
+		if ((this.modifiers & Modifiers.VAR) != 0)
 		{
 			writer.addParameterAnnotation(this.index, "Ldyvil/lang/annotation/byref;", true);
 		}
