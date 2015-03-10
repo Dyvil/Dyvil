@@ -46,5 +46,7 @@ public interface IPattern extends IASTNode, ITyped
 		return 0;
 	}
 	
+	public void writeJump(MethodWriter writer, Label elseLabel);
+	
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel);
 }

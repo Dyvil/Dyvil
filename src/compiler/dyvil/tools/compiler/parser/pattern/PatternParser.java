@@ -10,10 +10,13 @@ import dyvil.tools.compiler.util.Tokens;
 
 public class PatternParser extends Parser
 {
-	public static final int	PATTERN	= 1;
-	public static final int	IF		= 2;
+	public static final int	PATTERN		= 1;
+	public static final int	ARRAY_END	= 2;
+	public static final int	TUPLE_END	= 4;
 	
 	protected IPatterned	patterned;
+	
+	private IPattern pattern;
 	
 	public PatternParser(IPatterned patterned)
 	{
@@ -54,11 +57,17 @@ public class PatternParser extends Parser
 			}
 			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
-				// TODO Array Patterns
+				this.mode = ARRAY_END;
+				return;
 			}
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				// TODO Tuple Patterns
+				TuplePattern tp = new TuplePattern(token);
+				this.pattern = tp;
+				this.patterned.setPattern(tp);
+				this.mode = TUPLE_END;
+				pm.pushParser(new PatternListParser(tp));
+				return;
 			}
 			
 			IPattern p = parsePrimitive(token, type);
@@ -71,6 +80,30 @@ public class PatternParser extends Parser
 			}
 			
 			throw new SyntaxError(token, "Invalid Pattern");
+		}
+		if (this.mode == ARRAY_END)
+		{
+			if (type == Tokens.CLOSE_CURLY_BRACKET)
+			{
+				this.pattern.expandPosition(token);
+				pm.popParser();
+				return;
+			}
+			this.pattern.expandPosition(token.prev());
+			pm.popParser(true);
+			throw new SyntaxError(token, "Invalid Array Pattern - '}' expected");
+		}
+		if (this.mode == TUPLE_END)
+		{
+			if (type == Tokens.CLOSE_PARENTHESIS)
+			{
+				this.pattern.expandPosition(token);
+				pm.popParser();
+				return;
+			}
+			this.pattern.expandPosition(token.prev());
+			pm.popParser(true);
+			throw new SyntaxError(token, "Invalid Tuple Pattern - ')' expected");
 		}
 	}
 	

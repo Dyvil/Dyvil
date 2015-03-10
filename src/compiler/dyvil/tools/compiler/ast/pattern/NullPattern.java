@@ -35,6 +35,12 @@ public final class NullPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public void writeJump(MethodWriter writer, Label elseLabel)
+	{
+		writer.writeJumpInsn(Opcodes.IFNONNULL, elseLabel);
+	}
+	
+	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);

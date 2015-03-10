@@ -38,6 +38,14 @@ public final class StringPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public void writeJump(MethodWriter writer, Label elseLabel)
+	{
+		writer.writeLDC(this.value);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 2, MethodWriter.INT);
+		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
+	}
+	
+	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeLDC(this.value);

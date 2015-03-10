@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.pattern;
 
 import org.objectweb.asm.Label;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -31,6 +32,12 @@ public final class WildcardPattern extends ASTNode implements IPattern
 	public boolean isType(IType type)
 	{
 		return true;
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label elseLabel)
+	{
+		writer.writeInsn(Opcodes.POP);
 	}
 	
 	@Override

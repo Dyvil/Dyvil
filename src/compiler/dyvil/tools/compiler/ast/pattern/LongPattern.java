@@ -38,6 +38,13 @@ public final class LongPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public void writeJump(MethodWriter writer, Label elseLabel)
+	{
+		writer.writeLDC(this.value);
+		writer.writeJumpInsn(Opcodes.IF_LCMPNE, elseLabel);
+	}
+	
+	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.LLOAD, varIndex);

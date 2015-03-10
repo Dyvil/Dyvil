@@ -44,6 +44,12 @@ public final class BooleanPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public void writeJump(MethodWriter writer, Label elseLabel)
+	{
+		writer.writeJumpInsn(this.value ? Opcodes.IFEQ : Opcodes.IFNE, elseLabel);
+	}
+	
+	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.ILOAD, varIndex);

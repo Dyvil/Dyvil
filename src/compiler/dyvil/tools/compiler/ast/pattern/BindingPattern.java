@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.pattern;
 
 import org.objectweb.asm.Label;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
@@ -84,6 +85,22 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 		this.variable.qualifiedName = this.name;
 		this.variable.type = this.type;
 		return this.variable;
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label elseLabel)
+	{
+		if (this.variable != null)
+		{
+			this.variable.index = writer.registerLocal(this.type.getFrameType());
+			writer.writeInsn(Opcodes.DUP);
+			writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index);
+		}
+		
+		if (this.pattern != null)
+		{
+			this.pattern.writeJump(writer, elseLabel);
+		}
 	}
 	
 	@Override

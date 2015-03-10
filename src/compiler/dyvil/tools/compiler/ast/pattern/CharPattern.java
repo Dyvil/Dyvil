@@ -44,6 +44,13 @@ public final class CharPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public void writeJump(MethodWriter writer, Label elseLabel)
+	{
+		writer.writeLDC(this.value);
+		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+	}
+	
+	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
