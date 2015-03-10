@@ -24,7 +24,7 @@ public class CaseClasses
 		writer.writeVarInsn(ALOAD, 0);
 		writer.writeVarInsn(ALOAD, 1);
 		// if
-		writer.writeFrameJump(IF_ACMPNE, label = new Label());
+		writer.writeJumpInsn(IF_ACMPNE, label = new Label());
 		// then
 		writer.writeLDC(1);
 		writer.writeInsn(IRETURN); // return true
@@ -34,7 +34,7 @@ public class CaseClasses
 		// Write check 'if (obj == null)'
 		writer.writeVarInsn(ALOAD, 1);
 		// if
-		writer.writeFrameJump(IFNONNULL, label = new Label());
+		writer.writeJumpInsn(IFNONNULL, label = new Label());
 		// then
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN); // return false
@@ -49,7 +49,7 @@ public class CaseClasses
 		writer.writeVarInsn(ALOAD, 1);
 		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 1, "Ljava/lang/Class;");
 		// if
-		writer.writeFrameJump(IF_ACMPEQ, label = new Label());
+		writer.writeJumpInsn(IF_ACMPEQ, label = new Label());
 		// then
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN);
@@ -98,16 +98,16 @@ public class CaseClasses
 			case MethodWriter.T_SHORT:
 			case MethodWriter.T_CHAR:
 			case MethodWriter.T_INT:
-				writer.writeFrameJump(IF_ICMPEQ, label);
+				writer.writeJumpInsn(IF_ICMPEQ, label);
 				break;
 			case MethodWriter.T_LONG:
-				writer.writeFrameJump(IF_LCMPEQ, label);
+				writer.writeJumpInsn(IF_LCMPEQ, label);
 				break;
 			case MethodWriter.T_FLOAT:
-				writer.writeFrameJump(IF_FCMPEQ, label);
+				writer.writeJumpInsn(IF_FCMPEQ, label);
 				break;
 			case MethodWriter.T_DOUBLE:
-				writer.writeFrameJump(IF_FCMPEQ, label);
+				writer.writeJumpInsn(IF_FCMPEQ, label);
 				break;
 			}
 			writer.writeLDC(0);
@@ -124,10 +124,10 @@ public class CaseClasses
 		Label endLabel = new Label();
 		writer.writeVarInsn(ALOAD, 0);
 		field.writeGet(writer, null);
-		writer.writeFrameJump(IFNONNULL, elseLabel);
+		writer.writeJumpInsn(IFNONNULL, elseLabel);
 		writer.writeVarInsn(ALOAD, 2);
 		field.writeGet(writer, null);
-		writer.writeFrameJump(IFNULL, endLabel);
+		writer.writeJumpInsn(IFNULL, endLabel);
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN);
 		writer.writeFrameLabel(elseLabel);
@@ -136,7 +136,7 @@ public class CaseClasses
 		writer.writeVarInsn(ALOAD, 2);
 		field.writeGet(writer, null);
 		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 2, MethodWriter.INT);
-		writer.writeFrameJump(IFNE, endLabel);
+		writer.writeJumpInsn(IFNE, endLabel);
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN);
 		writer.writeFrameLabel(endLabel);
@@ -182,11 +182,11 @@ public class CaseClasses
 				Label elseLabel = new Label();
 				Label endLabel = new Label();
 				// if
-				writer.writeFrameJump(IFEQ, elseLabel);
+				writer.writeJumpInsn(IFEQ, elseLabel);
 				// then
 				writer.writeLDC(1231);
 				writer.pop();
-				writer.writeFrameJump(GOTO, endLabel);
+				writer.writeJumpInsn(GOTO, endLabel);
 				// else
 				writer.writeFrameLabel(elseLabel);
 				writer.writeLDC(1237);
@@ -235,10 +235,10 @@ public class CaseClasses
 		
 		// if
 		writer.writeInsn(DUP);
-		writer.writeFrameJump(IFNULL, elseLabel);
+		writer.writeJumpInsn(IFNULL, elseLabel);
 		// then
 		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false, 0, null);
-		writer.writeFrameJump(GOTO, endLabel);
+		writer.writeJumpInsn(GOTO, endLabel);
 		// else
 		writer.writeFrameLabel(elseLabel);
 		writer.writeInsn(POP);

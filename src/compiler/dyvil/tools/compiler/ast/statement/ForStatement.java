@@ -377,7 +377,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				this.update.writeStatement(writer);
 			}
 			// Go back to Condition
-			writer.writeFrameJump(Opcodes.GOTO, startLabel);
+			writer.writeJumpInsn(Opcodes.GOTO, startLabel);
 			
 			writer.removeLocals(1);
 			writer.writeFrameLabel(endLabel);
@@ -416,7 +416,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			indexVar.writeSet(writer, null, null);
 			
 			// Jump to boundary check
-			writer.writeFrameJump(Opcodes.GOTO, updateLabel);
+			writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
 			writer.writeFrameLabel(startLabel);
 			
 			// Load the element
@@ -437,7 +437,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			writer.writeFrameLabel(updateLabel);
 			indexVar.writeGet(writer, null);
 			lengthVar.writeGet(writer, null);
-			writer.writeJump(Opcodes.IF_ICMPLT, startLabel);
+			writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 			
 			// Local Variables
 			writer.removeLocals(4);

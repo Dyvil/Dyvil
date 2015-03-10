@@ -167,7 +167,7 @@ public interface IValue extends IASTNode, ITyped
 	public default void writeJump(MethodWriter writer, Label dest)
 	{
 		this.writeExpression(writer);
-		writer.writeFrameJump(Opcodes.IFNE, dest);
+		writer.writeJumpInsn(Opcodes.IFNE, dest);
 	}
 	
 	/**
@@ -185,7 +185,7 @@ public interface IValue extends IASTNode, ITyped
 	public default void writeInvJump(MethodWriter writer, Label dest)
 	{
 		this.writeExpression(writer);
-		writer.writeFrameJump(Opcodes.IFEQ, dest);
+		writer.writeJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
 	public static IValue fromObject(Object o)

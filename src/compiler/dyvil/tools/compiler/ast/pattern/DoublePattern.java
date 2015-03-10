@@ -42,7 +42,7 @@ public final class DoublePattern extends ASTNode implements IPattern
 	{
 		writer.writeVarInsn(Opcodes.DLOAD, varIndex);
 		writer.writeLDC(this.value);
-		writer.writeFrameJump(Opcodes.IF_DCMPNE, elseLabel);
+		writer.writeJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
 	}
 	
 	@Override

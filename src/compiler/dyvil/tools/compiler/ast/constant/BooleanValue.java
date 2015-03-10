@@ -107,7 +107,7 @@ public class BooleanValue extends ASTNode implements IConstantValue
 	{
 		if (this.value)
 		{
-			writer.writeFrameJump(Opcodes.GOTO, dest);
+			writer.writeJumpInsn(Opcodes.GOTO, dest);
 		}
 	}
 	
@@ -116,7 +116,7 @@ public class BooleanValue extends ASTNode implements IConstantValue
 	{
 		if (!this.value)
 		{
-			writer.writeFrameJump(Opcodes.GOTO, dest);
+			writer.writeJumpInsn(Opcodes.GOTO, dest);
 		}
 	}
 	

@@ -48,7 +48,7 @@ public final class IntPattern extends ASTNode implements IPattern
 	{
 		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
 		writer.writeLDC(this.value);
-		writer.writeFrameJump(Opcodes.IF_ICMPNE, elseLabel);
+		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 	}
 	
 	@Override

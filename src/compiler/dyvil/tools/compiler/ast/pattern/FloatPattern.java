@@ -42,7 +42,7 @@ public final class FloatPattern extends ASTNode implements IPattern
 	{
 		writer.writeVarInsn(Opcodes.FLOAD, varIndex);
 		writer.writeLDC(this.value);
-		writer.writeFrameJump(Opcodes.IF_FCMPNE, elseLabel);
+		writer.writeJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
 	}
 	
 	@Override

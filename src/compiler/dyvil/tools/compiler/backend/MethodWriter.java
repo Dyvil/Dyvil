@@ -104,17 +104,15 @@ public interface MethodWriter
 	
 	// Labels
 	
-	public void writeFrameLabel(Label label);
-	
 	public void writeLabel(Label label);
+	
+	public void writeFrameLabel(Label label);
 	
 	// Instructions
 	
 	public void writeInsn(int opcode);
 	
-	public void writeFrameJump(int opcode, Label label);
-	
-	public void writeJump(int opcode, Label label);
+	public void writeJumpInsn(int opcode, Label label);
 	
 	public void writeTypeInsn(int opcode, String type);
 	

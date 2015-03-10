@@ -464,8 +464,9 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		else if (opcode >= IASTORE && opcode <= SASTORE)
 		{
-			this.stackIndex -= 3;
-			this.stackCount -= 3;
+			this.pop();
+			this.pop();
+			this.pop();
 		}
 		else if (opcode >= IRETURN && opcode <= ARETURN)
 		{
@@ -536,14 +537,13 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		case POP:
 		{
-			this.stackIndex--;
-			this.stackCount--;
+			this.pop();
 			return;
 		}
 		case POP2:
 		{
-			this.stackIndex -= 2;
-			this.stackCount -= 2;
+			this.pop();
+			this.pop();
 			return;
 		}
 		case ICONST_0:
@@ -745,64 +745,39 @@ public final class MethodWriterImpl implements MethodWriter
 	// Jump Instructions
 	
 	@Override
-	public void writeFrameJump(int opcode, Label label)
-	{
-		if (opcode > 255)
-		{
-			if (this.visitFrame)
-			{
-				this.visitFrame();
-			}
-			
-			this.visitSpecialJumpInsn(opcode, label);
-			return;
-		}
-		if (opcode >= IFEQ && opcode <= IFLE)
-		{
-			this.visitFrame();
-			this.pop();
-		}
-		if (opcode == IFNULL || opcode == IFNONNULL)
-		{
-			this.visitFrame();
-			this.pop();
-		}
-		if (opcode == IF_ACMPEQ || opcode == IF_ACMPNE)
-		{
-			this.visitFrame();
-			this.stackIndex -= 2;
-			this.stackCount -= 2;
-		}
-		if (opcode >= IF_ICMPEQ && opcode <= IF_ICMPLE)
-		{
-			this.visitFrame();
-			this.stackIndex -= 2;
-			this.stackCount -= 2;
-		}
-		if (opcode == GOTO || opcode == JSR || opcode == ATHROW)
-		{
-			this.visitFrame();
-			this.visitFrame = true;
-		}
-		this.mv.visitJumpInsn(opcode, label);
-	}
-	
-	@Override
-	public void writeJump(int opcode, Label label)
+	public void writeJumpInsn(int opcode, Label label)
 	{
 		if (this.visitFrame)
 		{
 			this.visitFrame();
 		}
 		
+		if (opcode > 255)
+		{
+			this.visitSpecialJumpInsn(opcode, label);
+			return;
+		}
 		if (opcode >= IFEQ && opcode <= IFLE)
 		{
 			this.pop();
 		}
+		if (opcode == IFNULL || opcode == IFNONNULL)
+		{
+			this.pop();
+		}
+		if (opcode == IF_ACMPEQ || opcode == IF_ACMPNE)
+		{
+			this.pop();
+			this.pop();
+		}
 		if (opcode >= IF_ICMPEQ && opcode <= IF_ICMPLE)
 		{
-			this.stackIndex -= 2;
-			this.stackCount -= 2;
+			this.pop();
+			this.pop();
+		}
+		if (opcode == GOTO || opcode == JSR || opcode == ATHROW)
+		{
+			this.visitFrame = true;
 		}
 		this.mv.visitJumpInsn(opcode, label);
 	}
@@ -813,75 +788,75 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 		case Opcodes.IF_LCMPEQ:
 			this.writeInsn(Opcodes.LCMP);
-			this.writeFrameJump(Opcodes.IFEQ, dest);
+			this.writeJumpInsn(Opcodes.IFEQ, dest);
 			return;
 		case Opcodes.IF_LCMPNE:
 			this.writeInsn(Opcodes.LCMP);
-			this.writeFrameJump(Opcodes.IFNE, dest);
+			this.writeJumpInsn(Opcodes.IFNE, dest);
 			return;
 		case Opcodes.IF_LCMPLT:
 			this.writeInsn(Opcodes.LCMP);
-			this.writeFrameJump(Opcodes.IFLT, dest);
+			this.writeJumpInsn(Opcodes.IFLT, dest);
 			return;
 		case Opcodes.IF_LCMPGE:
 			this.writeInsn(Opcodes.LCMP);
-			this.writeFrameJump(Opcodes.IFGE, dest);
+			this.writeJumpInsn(Opcodes.IFGE, dest);
 			return;
 		case Opcodes.IF_LCMPGT:
 			this.writeInsn(Opcodes.LCMP);
-			this.writeFrameJump(Opcodes.IFGT, dest);
+			this.writeJumpInsn(Opcodes.IFGT, dest);
 			return;
 		case Opcodes.IF_LCMPLE:
 			this.writeInsn(Opcodes.LCMP);
-			this.writeFrameJump(Opcodes.IFLE, dest);
+			this.writeJumpInsn(Opcodes.IFLE, dest);
 			return;
 		case Opcodes.IF_FCMPEQ:
 			this.writeInsn(Opcodes.FCMPL);
-			this.writeFrameJump(Opcodes.IFEQ, dest);
+			this.writeJumpInsn(Opcodes.IFEQ, dest);
 			return;
 		case Opcodes.IF_FCMPNE:
 			this.writeInsn(Opcodes.FCMPL);
-			this.writeFrameJump(Opcodes.IFNE, dest);
+			this.writeJumpInsn(Opcodes.IFNE, dest);
 			return;
 		case Opcodes.IF_FCMPLT:
 			this.writeInsn(Opcodes.FCMPL);
-			this.writeFrameJump(Opcodes.IFLT, dest);
+			this.writeJumpInsn(Opcodes.IFLT, dest);
 			return;
 		case Opcodes.IF_FCMPGE:
 			this.writeInsn(Opcodes.FCMPG);
-			this.writeFrameJump(Opcodes.IFGE, dest);
+			this.writeJumpInsn(Opcodes.IFGE, dest);
 			return;
 		case Opcodes.IF_FCMPGT:
 			this.writeInsn(Opcodes.FCMPG);
-			this.writeFrameJump(Opcodes.IFGT, dest);
+			this.writeJumpInsn(Opcodes.IFGT, dest);
 			return;
 		case Opcodes.IF_FCMPLE:
 			this.writeInsn(Opcodes.FCMPL);
-			this.writeFrameJump(Opcodes.IFLE, dest);
+			this.writeJumpInsn(Opcodes.IFLE, dest);
 			return;
 		case Opcodes.IF_DCMPEQ:
 			this.writeInsn(Opcodes.DCMPL);
-			this.writeFrameJump(Opcodes.IFEQ, dest);
+			this.writeJumpInsn(Opcodes.IFEQ, dest);
 			return;
 		case Opcodes.IF_DCMPNE:
 			this.writeInsn(Opcodes.DCMPL);
-			this.writeFrameJump(Opcodes.IFNE, dest);
+			this.writeJumpInsn(Opcodes.IFNE, dest);
 			return;
 		case Opcodes.IF_DCMPLT:
 			this.writeInsn(Opcodes.DCMPL);
-			this.writeFrameJump(Opcodes.IFLT, dest);
+			this.writeJumpInsn(Opcodes.IFLT, dest);
 			return;
 		case Opcodes.IF_DCMPGE:
 			this.writeInsn(Opcodes.DCMPG);
-			this.writeFrameJump(Opcodes.IFGE, dest);
+			this.writeJumpInsn(Opcodes.IFGE, dest);
 			return;
 		case Opcodes.IF_DCMPGT:
 			this.writeInsn(Opcodes.DCMPG);
-			this.writeFrameJump(Opcodes.IFGT, dest);
+			this.writeJumpInsn(Opcodes.IFGT, dest);
 			return;
 		case Opcodes.IF_DCMPLE:
 			this.writeInsn(Opcodes.DCMPL);
-			this.writeFrameJump(Opcodes.IFLE, dest);
+			this.writeJumpInsn(Opcodes.IFLE, dest);
 			return;
 		}
 	}

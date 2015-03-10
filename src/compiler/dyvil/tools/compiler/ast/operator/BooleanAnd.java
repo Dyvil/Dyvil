@@ -131,7 +131,7 @@ public class BooleanAnd extends ASTNode implements IValue
 		this.left.writeInvJump(writer, label);
 		this.right.writeInvJump(writer, label);
 		writer.writeLDC(1);
-		writer.writeFrameJump(Opcodes.GOTO, label2);
+		writer.writeJumpInsn(Opcodes.GOTO, label2);
 		writer.pop();
 		writer.writeFrameLabel(label);
 		writer.writeLDC(0);

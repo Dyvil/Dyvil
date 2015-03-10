@@ -254,7 +254,7 @@ public class IfStatement extends ASTNode implements IStatement
 		// If Block
 		this.then.writeExpression(writer);
 		writer.pop();
-		writer.writeFrameJump(Opcodes.GOTO, elseEnd);
+		writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
 		writer.writeFrameLabel(elseStart);
 		// Else Block
 		if (this.elseThen == null)
@@ -272,15 +272,15 @@ public class IfStatement extends ASTNode implements IStatement
 	public void writeStatement(MethodWriter writer)
 	{
 		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
 		
 		if (this.elseThen != null)
 		{
+			org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
 			// Condition
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.writeFrameJump(Opcodes.GOTO, elseEnd);
+			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
 			writer.writeFrameLabel(elseStart);
 			// Else Block
 			this.elseThen.writeStatement(writer);

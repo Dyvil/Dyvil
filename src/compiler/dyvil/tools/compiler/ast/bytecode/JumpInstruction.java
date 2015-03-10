@@ -41,7 +41,7 @@ public class JumpInstruction extends Instruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.writeFrameJump(this.opcode, this.destLabel);
+		writer.writeJumpInsn(this.opcode, this.destLabel);
 	}
 	
 	@Override

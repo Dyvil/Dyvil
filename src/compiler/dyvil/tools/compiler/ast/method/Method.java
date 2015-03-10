@@ -954,7 +954,7 @@ public class Method extends Member implements IMethod
 				// If Block
 				writer.writeLDC(1);
 				writer.pop();
-				writer.writeFrameJump(Opcodes.GOTO, elseEnd);
+				writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
 				writer.writeFrameLabel(ifEnd);
 				// Else Block
 				writer.writeLDC(0);
@@ -983,7 +983,7 @@ public class Method extends Member implements IMethod
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
-		writer.writeFrameJump(IFNE, dest);
+		writer.writeJumpInsn(IFNE, dest);
 	}
 	
 	@Override
@@ -1001,7 +1001,7 @@ public class Method extends Member implements IMethod
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
-		writer.writeFrameJump(IFEQ, dest);
+		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
 	private int writeArguments(MethodWriter writer, IArguments arguments)
@@ -1094,7 +1094,7 @@ public class Method extends Member implements IMethod
 			}
 			else if (Opcodes.isJumpOpcode(i))
 			{
-				writer.writeFrameJump(i, dest);
+				writer.writeJumpInsn(i, dest);
 			}
 			else
 			{
@@ -1117,7 +1117,7 @@ public class Method extends Member implements IMethod
 			}
 			else if (Opcodes.isJumpOpcode(i))
 			{
-				writer.writeFrameJump(Opcodes.getInverseOpcode(i), dest);
+				writer.writeJumpInsn(Opcodes.getInverseOpcode(i), dest);
 			}
 			else
 			{

@@ -196,7 +196,7 @@ public class MatchExpression extends ASTNode implements IValue
 		for (int i = 0; i < this.caseCount;)
 		{
 			this.cases[i].writeExpression(writer, var, elseLabel);
-			writer.writeJump(Opcodes.GOTO, endLabel);
+			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 			writer.writeFrameLabel(elseLabel);
 			
 			if (++i < this.caseCount)
@@ -224,7 +224,7 @@ public class MatchExpression extends ASTNode implements IValue
 		for (int i = 0; i < this.caseCount;)
 		{
 			this.cases[i].writeStatement(writer, var, elseLabel);
-			writer.writeJump(Opcodes.GOTO, endLabel);
+			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 			writer.writeFrameLabel(elseLabel);
 			if (++i < this.caseCount)
 			{

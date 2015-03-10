@@ -42,7 +42,7 @@ public final class LongPattern extends ASTNode implements IPattern
 	{
 		writer.writeVarInsn(Opcodes.LLOAD, varIndex);
 		writer.writeLDC(this.value);
-		writer.writeFrameJump(Opcodes.IF_LCMPNE, elseLabel);
+		writer.writeJumpInsn(Opcodes.IF_LCMPNE, elseLabel);
 	}
 	
 	@Override

@@ -38,7 +38,7 @@ public final class NullPattern extends ASTNode implements IPattern
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeFrameJump(Opcodes.IFNONNULL, elseLabel);
+		writer.writeJumpInsn(Opcodes.IFNONNULL, elseLabel);
 	}
 	
 	@Override

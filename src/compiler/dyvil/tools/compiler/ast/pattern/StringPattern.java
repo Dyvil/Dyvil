@@ -42,8 +42,8 @@ public final class StringPattern extends ASTNode implements IPattern
 	{
 		writer.writeLDC(this.value);
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false, 2, MethodWriter.INT);
-		writer.writeFrameJump(Opcodes.IFEQ, elseLabel);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 2, MethodWriter.INT);
+		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
 	}
 	
 	@Override
