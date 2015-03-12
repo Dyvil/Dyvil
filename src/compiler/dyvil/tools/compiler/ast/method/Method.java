@@ -578,7 +578,7 @@ public class Method extends Member implements IMethod
 			
 			if (param.defaultValue != null)
 			{
-				this.theClass.getBody().addCompilable(param);
+				this.theClass.addCompilable(param);
 			}
 		}
 		

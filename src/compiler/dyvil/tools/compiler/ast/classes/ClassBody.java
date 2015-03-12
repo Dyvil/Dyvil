@@ -6,7 +6,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -15,9 +14,8 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ClassBody extends ASTNode implements IClassBody
+public class ClassBody extends ASTNode implements IClassBody
 {
 	public IClass				theClass;
 	
@@ -30,19 +28,11 @@ public final class ClassBody extends ASTNode implements IClassBody
 	private int					methodCount;
 	private IProperty[]			properties	= new IProperty[3];
 	private int					propertyCount;
-	private IClassCompilable[]	compilables;
-	private int					compilableCount;
 	
 	protected IMethod			functionalMethod;
 	
-	public ClassBody(ICodePosition position)
+	public ClassBody(IClass iclass)
 	{
-		this.position = position;
-	}
-	
-	public ClassBody(ICodePosition position, IClass iclass)
-	{
-		this.position = position;
 		this.theClass = iclass;
 	}
 	
@@ -293,41 +283,6 @@ public final class ClassBody extends ASTNode implements IClassBody
 			}
 		}
 		return null;
-	}
-	
-	// Other Compilables
-	
-	@Override
-	public int compilableCount()
-	{
-		return this.compilableCount;
-	}
-	
-	@Override
-	public void addCompilable(IClassCompilable compilable)
-	{
-		if (this.compilables == null)
-		{
-			this.compilables = new IClassCompilable[2];
-			this.compilables[0] = compilable;
-			this.compilableCount = 1;
-			return;
-		}
-		
-		int index = this.compilableCount++;
-		if (this.compilableCount > this.compilables.length)
-		{
-			IClassCompilable[] temp = new IClassCompilable[this.compilableCount];
-			System.arraycopy(this.compilables, 0, temp, 0, index);
-			this.compilables = temp;
-		}
-		this.compilables[index] = compilable;
-	}
-	
-	@Override
-	public IClassCompilable getCompilable(int index)
-	{
-		return this.compilables[index];
 	}
 	
 	@Override

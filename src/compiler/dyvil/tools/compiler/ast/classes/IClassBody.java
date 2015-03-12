@@ -5,7 +5,6 @@ import java.util.List;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -42,6 +41,11 @@ public interface IClassBody extends IASTNode
 	
 	public IField getField(String name);
 	
+	public default IField getInstanceField()
+	{
+		return null;
+	}
+	
 	// Properties
 	
 	public int propertyCount();
@@ -66,15 +70,10 @@ public interface IClassBody extends IASTNode
 	
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments);
 	
-	public IMethod getFunctionalMethod();
-	
-	// Other Compilables (Lambda Expressions, ...)
-	
-	public int compilableCount();
-	
-	public void addCompilable(IClassCompilable compilable);
-	
-	public IClassCompilable getCompilable(int index);
+	public default IMethod getFunctionalMethod()
+	{
+		return null;
+	}
 	
 	// Phases
 	

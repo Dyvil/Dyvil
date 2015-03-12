@@ -2,9 +2,9 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.objectweb.asm.*;
+
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -39,7 +39,6 @@ public class BytecodeClass extends CodeClass
 	{
 		this.name = name;
 		this.qualifiedName = name;
-		this.body = new ClassBody(null, this);
 	}
 	
 	@Override
@@ -103,14 +102,9 @@ public class BytecodeClass extends CodeClass
 			}
 		}
 		
-		for (ListIterator<IType> iterator = this.interfaces.listIterator(); iterator.hasNext();)
+		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			IType i1 = iterator.next();
-			IType i2 = i1.resolve(markers, context);
-			if (i1 != i2)
-			{
-				iterator.set(i2);
-			}
+			this.interfaces[i] = this.interfaces[i].resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)
@@ -237,9 +231,9 @@ public class BytecodeClass extends CodeClass
 		{
 			this.superType.getMethodMatches(list, instance, name, arguments);
 		}
-		for (IType i : this.interfaces)
+		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			i.getMethodMatches(list, instance, name, arguments);
+			this.interfaces[i].getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	
@@ -300,6 +294,12 @@ public class BytecodeClass extends CodeClass
 		this.modifiers = access;
 		this.internalName = name;
 		
+		this.body = new ClassBody(this);
+		if (interfaces != null)
+		{
+			this.interfaces = new IType[interfaces.length];
+		}
+		
 		int index = name.lastIndexOf('$');
 		if (index == -1)
 		{
@@ -338,9 +338,11 @@ public class BytecodeClass extends CodeClass
 			
 			if (interfaces != null)
 			{
-				for (String s : interfaces)
+				this.interfaceCount = interfaces.length;
+				this.interfaces = new IType[this.interfaceCount];
+				for (int i = 0; i < this.interfaceCount; i++)
 				{
-					this.interfaces.add(ClassFormat.internalToType(s));
+					this.interfaces[i] = ClassFormat.internalToType(interfaces[i]);
 				}
 			}
 		}

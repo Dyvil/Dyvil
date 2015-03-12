@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.ast.classes;
 
-import java.util.List;
-
 import org.objectweb.asm.ClassWriter;
+
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -19,8 +19,6 @@ public interface IClass extends IASTNode, IMember, IGeneric, IContext
 	public void setOuterClass(IClass iclass);
 	
 	public IClass getOuterClass();
-	
-	public boolean equals(IClass iclass);
 	
 	// Modifiers
 	
@@ -42,11 +40,13 @@ public interface IClass extends IASTNode, IMember, IGeneric, IContext
 	
 	// Interfaces
 	
-	public void setInterfaces(List<IType> interfaces);
+	public int interfaceCount();
 	
-	public List<IType> getInterfaces();
+	public void setInterface(int index, IType type);
 	
 	public void addInterface(IType type);
+	
+	public IType getInterface(int index);
 	
 	// Body
 	
@@ -59,6 +59,14 @@ public interface IClass extends IASTNode, IMember, IGeneric, IContext
 	public IMethod getFunctionalMethod();
 	
 	public boolean isMember(IMember member);
+	
+	// Other Compilables (Lambda Expressions, ...)
+	
+	public int compilableCount();
+	
+	public void addCompilable(IClassCompilable compilable);
+	
+	public IClassCompilable getCompilable(int index);
 	
 	// Compilation
 	

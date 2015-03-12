@@ -4,7 +4,6 @@ import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.objectweb.asm.ClassWriter;
 
@@ -19,6 +18,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
@@ -48,30 +48,33 @@ import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
 {
-	protected IDyvilUnit		unit;
-	protected IClass			outerClass;
+	protected IDyvilUnit			unit;
+	protected IClass				outerClass;
 	
-	protected Annotation[]		annotations;
-	protected int				annotationCount;
-	protected int				modifiers;
+	protected Annotation[]			annotations;
+	protected int					annotationCount;
+	protected int					modifiers;
 	
-	protected String			name;
-	protected String			qualifiedName;
-	protected String			fullName;
-	protected String			internalName;
+	protected String				name;
+	protected String				qualifiedName;
+	protected String				fullName;
+	protected String				internalName;
 	
-	protected ITypeVariable[]	generics;
-	protected int				genericCount;
+	protected ITypeVariable[]		generics;
+	protected int					genericCount;
 	
-	protected IType				superType	= Type.OBJECT;
-	protected List<IType>		interfaces	= new ArrayList(1);
+	protected IType					superType	= Type.OBJECT;
+	protected IType[]				interfaces;
+	protected int					interfaceCount;
 	
-	protected IType				type;
+	protected IType					type;
 	
-	protected IClassBody		body;
-	protected IField			instanceField;
-	protected IMethod			constructor;
-	protected IMethod			superConstructor;
+	protected IClassBody			body;
+	protected IField				instanceField;
+	protected IClassCompilable[]	compilables;
+	protected int					compilableCount;
+	protected IMethod				constructor;
+	protected IMethod				superConstructor;
 	
 	public CodeClass()
 	{
@@ -83,6 +86,7 @@ public class CodeClass extends ASTNode implements IClass
 		this.position = position;
 		this.unit = unit;
 		this.type = new Type(this);
+		this.interfaces = new IType[1];
 	}
 	
 	public CodeClass(ICodePosition position, IDyvilUnit unit, int modifiers)
@@ -91,6 +95,7 @@ public class CodeClass extends ASTNode implements IClass
 		this.unit = unit;
 		this.modifiers = modifiers;
 		this.type = new Type(this);
+		this.interfaces = new IType[1];
 	}
 	
 	@Override
@@ -109,12 +114,6 @@ public class CodeClass extends ASTNode implements IClass
 	public IClass getOuterClass()
 	{
 		return this.outerClass;
-	}
-	
-	@Override
-	public boolean equals(IClass iclass)
-	{
-		return this == iclass;
 	}
 	
 	@Override
@@ -414,9 +413,9 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			return true;
 		}
-		for (IType i : this.interfaces)
+		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			if (type.isSuperTypeOf2(i))
+			if (type.isSuperTypeOf2(this.interfaces[i]))
 			{
 				return true;
 			}
@@ -425,22 +424,37 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void setInterfaces(List<IType> interfaces)
+	public int interfaceCount()
 	{
-		this.interfaces = interfaces;
+		return this.interfaceCount;
 	}
 	
 	@Override
-	public List<IType> getInterfaces()
+	public void setInterface(int index, IType type)
 	{
-		return this.interfaces;
+		this.interfaces[index] = type;
 	}
 	
 	@Override
 	public void addInterface(IType type)
 	{
-		this.interfaces.add(type);
+		int index = this.interfaceCount++;
+		if (index > this.interfaces.length)
+		{
+			IType[] temp = new IType[this.interfaces.length + 1];
+			System.arraycopy(this.interfaces, 0, temp, 0, this.interfaces.length);
+			this.interfaces = temp;
+		}
+		this.interfaces[index] = type;
 	}
+	
+	@Override
+	public IType getInterface(int index)
+	{
+		return this.interfaces[index];
+	}
+	
+	// Body
 	
 	@Override
 	public void setBody(IClassBody body)
@@ -485,11 +499,10 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public String[] getInterfaceArray()
 	{
-		int len = this.interfaces.size();
-		String[] interfaces = new String[len];
-		for (int i = 0; i < len; i++)
+		String[] interfaces = new String[this.interfaceCount];
+		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			interfaces[i] = this.interfaces.get(i).getInternalName();
+			interfaces[i] = this.interfaces[i].getInternalName();
 		}
 		return interfaces;
 	}
@@ -523,19 +536,14 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		for (ListIterator<IType> iterator = this.interfaces.listIterator(); iterator.hasNext();)
+		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			IType i1 = iterator.next();
-			IType i2 = i1.resolve(markers, context);
-			if (i1 != i2)
-			{
-				iterator.set(i2);
-			}
+			this.interfaces[i] = this.interfaces[i].resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)
 		{
-			this.annotations[i].resolveTypes(markers, this);
+			this.annotations[i].resolveTypes(markers, context);
 		}
 		
 		if (this.body != null)
@@ -626,19 +634,20 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		for (IType t : this.interfaces)
+		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			IClass iclass = t.getTheClass();
+			IType type = this.interfaces[i];
+			IClass iclass = type.getTheClass();
 			if (iclass != null)
 			{
 				int modifiers = iclass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
 				{
-					markers.add(Markers.create(t.getPosition(), "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName()));
+					markers.add(Markers.create(type.getPosition(), "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName()));
 				}
 				else if ((modifiers & Modifiers.DEPRECATED) != 0)
 				{
-					markers.add(Markers.create(t.getPosition(), "class.implement.deprecated", iclass.getName()));
+					markers.add(Markers.create(type.getPosition(), "class.implement.deprecated", iclass.getName()));
 				}
 			}
 		}
@@ -809,9 +818,9 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			this.superType.getMethodMatches(list, instance, name, arguments);
 		}
-		for (IType i : this.interfaces)
+		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			i.getMethodMatches(list, instance, name, arguments);
+			this.interfaces[i].getMethodMatches(list, instance, name, arguments);
 		}
 		
 		if (!list.isEmpty())
@@ -870,9 +879,9 @@ public class CodeClass extends ASTNode implements IClass
 				return member.getAccessibility();
 			}
 			
-			for (IType i : this.interfaces)
+			for (int i = 0; i < this.interfaceCount; i++)
 			{
-				if (i.getTheClass() == iclass)
+				if (this.interfaces[i].getTheClass() == iclass)
 				{
 					return member.getAccessibility();
 				}
@@ -890,6 +899,39 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public int compilableCount()
+	{
+		return this.compilableCount;
+	}
+	
+	@Override
+	public void addCompilable(IClassCompilable compilable)
+	{
+		if (this.compilables == null)
+		{
+			this.compilables = new IClassCompilable[2];
+			this.compilables[0] = compilable;
+			this.compilableCount = 1;
+			return;
+		}
+		
+		int index = this.compilableCount++;
+		if (this.compilableCount > this.compilables.length)
+		{
+			IClassCompilable[] temp = new IClassCompilable[this.compilableCount];
+			System.arraycopy(this.compilables, 0, temp, 0, index);
+			this.compilables = temp;
+		}
+		this.compilables[index] = compilable;
+	}
+	
+	@Override
+	public IClassCompilable getCompilable(int index)
+	{
+		return this.compilables[index];
+	}
+	
+	@Override
 	public void write(ClassWriter writer)
 	{
 		// Header
@@ -897,18 +939,11 @@ public class CodeClass extends ASTNode implements IClass
 		String internalName = this.getInternalName();
 		String signature = this.getSignature();
 		String superClass = null;
-		int interfaceCount = this.interfaces.size();
-		String[] interfaces = new String[interfaceCount];
+		String[] interfaces = this.getInterfaceArray();
 		
 		if (this.superType != null)
 		{
 			superClass = this.superType.getInternalName();
-		}
-		
-		for (int i = 0; i < interfaceCount; i++)
-		{
-			IType type = this.interfaces.get(i);
-			interfaces[i] = type.getInternalName();
 		}
 		
 		writer.visit(MethodWriter.V1_8, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
@@ -962,7 +997,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		for (int i = 0; i < interfaceCount; i++)
 		{
-			IType type = this.interfaces.get(i);
+			IType type = this.interfaces[i];
 			IClass iclass = type.getTheClass();
 			if (iclass != null)
 			{
@@ -975,13 +1010,11 @@ public class CodeClass extends ASTNode implements IClass
 		int fields = 0;
 		int methods = 0;
 		int properties = 0;
-		int compilables = 0;
 		if (this.body != null)
 		{
 			fields = this.body.fieldCount();
 			methods = this.body.methodCount();
 			properties = this.body.propertyCount();
-			compilables = this.body.compilableCount();
 			
 			int classes = this.body.classCount();
 			for (int i = 0; i < classes; i++)
@@ -1051,9 +1084,9 @@ public class CodeClass extends ASTNode implements IClass
 			this.body.getMethod(i).write(writer);
 		}
 		
-		for (int i = 0; i < compilables; i++)
+		for (int i = 0; i < this.compilableCount; i++)
 		{
-			this.body.getCompilable(i).write(writer);
+			this.compilables[i].write(writer);
 		}
 		
 		if ((this.modifiers & Modifiers.CASE_CLASS) != 0)
@@ -1142,10 +1175,10 @@ public class CodeClass extends ASTNode implements IClass
 			this.superType.toString("", buffer);
 		}
 		
-		if (!this.interfaces.isEmpty())
+		if (this.interfaceCount > 0)
 		{
 			buffer.append(" implements ");
-			Util.astToString(prefix, this.interfaces, Formatting.Class.superClassesSeperator, buffer);
+			Util.astToString(prefix, this.interfaces, this.interfaceCount, Formatting.Class.superClassesSeperator, buffer);
 		}
 		
 		if (this.body != null)

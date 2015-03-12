@@ -15,10 +15,6 @@ public interface ITypeVariable extends IASTNode, INamed
 	
 	// Bounds
 	
-	public void setUpperBounds(List<IType> bounds);
-	
-	public List<IType> getUpperBounds();
-	
 	public void addUpperBound(IType bound);
 	
 	public void setLowerBound(IType bound);

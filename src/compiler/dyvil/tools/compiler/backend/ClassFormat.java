@@ -333,7 +333,7 @@ public class ClassFormat
 						IType type = internalToType2(signature.substring(i + 2, end1));
 						
 						type.setArrayDimensions(array);
-						var.setUpperBound(type);
+						var.addUpperBound(type);
 						array = 0;
 						mode = 2;
 						i = end1;
@@ -344,7 +344,7 @@ public class ClassFormat
 						IType type = new Type(null, signature.substring(i + 2, end1));
 						
 						type.setArrayDimensions(array);
-						var.setUpperBound(type);
+						var.addUpperBound(type);
 						array = 0;
 						mode = 2;
 						i = end1;
@@ -387,7 +387,7 @@ public class ClassFormat
 						IType type = new Type(null, signature.substring(i + 2, end1));
 						
 						type.setArrayDimensions(array);
-						var.setUpperBound(type);
+						var.addUpperBound(type);
 						array = 0;
 						mode = 2;
 						i = end1;

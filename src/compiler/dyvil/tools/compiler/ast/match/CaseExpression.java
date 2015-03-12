@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class CaseExpression extends ASTNode implements IValue, ICase, IContext
@@ -164,7 +165,10 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 		{
 			this.condition.resolveTypes(markers, context);
 		}
-		this.value.resolveTypes(markers, context);
+		if (this.value != null)
+		{
+			this.value.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
@@ -176,7 +180,10 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 			this.condition = this.condition.resolve(markers, this);
 		}
 		
-		this.value = this.value.resolve(markers, this);
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, this);
+		}
 		this.context = null;
 		return this;
 	}
@@ -188,7 +195,14 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 		{
 			this.condition.check(markers, context);
 		}
-		this.value.check(markers, context);
+		if (this.value != null)
+		{
+			this.value.check(markers, context);
+		}
+		else
+		{
+			markers.add(Markers.create(this.position, "case.invalid"));
+		}
 	}
 	
 	@Override
@@ -198,7 +212,10 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 		{
 			this.condition = this.condition.foldConstants();
 		}
-		this.value = this.value.foldConstants();
+		if (this.value != null)
+		{
+			this.value = this.value.foldConstants();
+		}
 		return this;
 	}
 	

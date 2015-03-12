@@ -54,7 +54,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	public ClassBodyParser(IClass theClass)
 	{
 		this.theClass = theClass;
-		this.body = new ClassBody(null, theClass);
+		this.body = new ClassBody(theClass);
 		theClass.setBody(this.body);
 		this.mode = DEFAULT_MODE;
 	}

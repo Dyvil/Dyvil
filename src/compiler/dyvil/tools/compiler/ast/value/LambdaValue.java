@@ -9,7 +9,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -228,12 +227,8 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		}
 		
 		this.owner = iclass.getInternalName();
-		IClassBody body = iclass.getBody();
-		if (body != null)
-		{
-			this.index = body.compilableCount();
-			body.addCompilable(this);
-		}
+		this.index = iclass.compilableCount();
+		iclass.addCompilable(this);
 		
 		return this;
 	}
