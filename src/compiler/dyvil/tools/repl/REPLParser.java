@@ -33,22 +33,17 @@ public class REPLParser implements IParserManager
 			index++;
 			prev = token;
 		}
-		try
+		
+		int type = prev.type();
+		if (!ParserUtil.isSeperator(type) && type != (Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL))
 		{
-			int type = prev.type();
-			if (!ParserUtil.isSeperator(type) && type != (Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL))
-			{
-				Token semicolon = new Token(prev.index() + 1, ";", Tokens.SEMICOLON, ";", prev.endLine(), prev.endIndex(), prev.endIndex() + 1);
-				semicolon.setPrev(prev);
-				prev.setNext(semicolon);
-			}
-		}
-		catch (SyntaxError ignored)
-		{
+			Token semicolon = new Token(prev.index() + 1, ";", Tokens.SEMICOLON, ";", prev.endLine(), prev.endIndex(), prev.endIndex() + 1);
+			semicolon.setPrev(prev);
+			prev.setNext(semicolon);
 		}
 		
 		tokens.reset();
-		while (tokens.hasNext())
+		while (true)
 		{
 			if (this.reparse)
 			{
@@ -57,6 +52,11 @@ public class REPLParser implements IParserManager
 			else
 			{
 				token = tokens.next();
+				
+				if (token == null)
+				{
+					break;
+				}
 			}
 			
 			if (this.skip > 0)
@@ -73,7 +73,6 @@ public class REPLParser implements IParserManager
 			{
 				StringBuilder buf = new StringBuilder();
 				ex.log(DyvilREPL.currentCode, buf);
-				buf.append('\n');
 				System.out.println(buf.toString());
 				return false;
 			}
@@ -81,6 +80,11 @@ public class REPLParser implements IParserManager
 			{
 				ex.printStackTrace();
 				return false;
+			}
+			
+			if (this.parser == null)
+			{
+				break;
 			}
 			
 			if (DyvilCompiler.parseStack)

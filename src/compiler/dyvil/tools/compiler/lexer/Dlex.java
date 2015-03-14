@@ -312,7 +312,7 @@ public class Dlex
 			addToken(prev, buf, type | subtype, lineNumber, start);
 		}
 		
-		return first.next();
+		return first.getNext();
 	}
 	
 	private static int getMode(char c, String code, int i)

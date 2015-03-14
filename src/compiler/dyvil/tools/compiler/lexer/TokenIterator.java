@@ -4,11 +4,11 @@ import java.util.Iterator;
 
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
 
 public class TokenIterator implements Iterator<IToken>
 {
 	protected IToken	first;
+	protected IToken	lastReturned;
 	protected IToken	next;
 	
 	public TokenIterator(IToken first)
@@ -19,33 +19,31 @@ public class TokenIterator implements Iterator<IToken>
 	
 	public void reset()
 	{
+		this.lastReturned = null;
 		this.next = this.first;
 	}
 	
 	public void jump(IToken next)
 	{
+		this.lastReturned = next.getPrev();
 		this.next = next;
 	}
 	
 	@Override
 	public boolean hasNext()
 	{
-		return this.next instanceof Token;
+		return this.lastReturned != null ? this.lastReturned.hasNext() : this.next != null;
 	}
 	
 	@Override
 	public IToken next()
 	{
-		try
+		this.lastReturned = this.next;
+		if (this.next != null)
 		{
-			IToken next = this.next;
-			this.next = next.next();
-			return next;
+			this.next = this.next.getNext();
 		}
-		catch (SyntaxError ex)
-		{
-			return null;
-		}
+		return this.lastReturned;
 	}
 	
 	@Override
@@ -53,11 +51,12 @@ public class TokenIterator implements Iterator<IToken>
 	{
 		try
 		{
-			IToken prev = this.next.prev();
+			IToken prev = this.lastReturned;
 			IToken next = this.next.next();
 			
 			prev.setNext(next);
 			next.setPrev(prev);
+			this.lastReturned = prev;
 			this.next = next;
 		}
 		catch (SyntaxError ex)

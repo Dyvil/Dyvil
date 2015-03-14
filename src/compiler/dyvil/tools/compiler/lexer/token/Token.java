@@ -58,6 +58,12 @@ public class Token implements IToken
 	}
 	
 	@Override
+	public void setIndex(int index)
+	{
+		this.index = index;
+	}
+
+	@Override
 	public int index()
 	{
 		return this.index;
@@ -88,50 +94,47 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public IToken prev()
+	public void setPrev(IToken prev)
+	{
+		this.prev = prev;
+	}
+
+	@Override
+	public void setNext(IToken next)
+	{
+		this.next = next;
+	}
+
+	@Override
+	public IToken prev() throws SyntaxError
 	{
 		if (this.prev == null)
 		{
-			this.prev = new FakeToken();
-			this.prev.setNext(this);
+			throw new SyntaxError(this, "Unexpected End of Input");
 		}
 		return this.prev;
 	}
 	
 	@Override
-	public IToken next()
+	public IToken next() throws SyntaxError
 	{
 		if (this.next == null)
 		{
-			this.next = new FakeToken();
-			this.next.setPrev(this);
+			throw new SyntaxError(this, "Unexpected End of Input");
 		}
 		return this.next;
 	}
 	
 	@Override
-	public boolean match(Object object) throws SyntaxError
+	public IToken getPrev()
 	{
-		if (object instanceof String)
-		{
-			return this.equals((String) object);
-		}
-		return this.equals(object);
+		return this.prev;
 	}
 	
 	@Override
-	public boolean match(Object... objects) throws SyntaxError
+	public IToken getNext()
 	{
-		IToken token = this;
-		for (Object object : objects)
-		{
-			if (!token.match(object))
-			{
-				return false;
-			}
-			token = token.next();
-		}
-		return true;
+		return this.next;
 	}
 	
 	@Override
@@ -147,21 +150,28 @@ public class Token implements IToken
 	}
 	
 	@Override
-	public void setIndex(int index)
+	public boolean match(Object object)
 	{
-		this.index = index;
+		if (object instanceof String)
+		{
+			return this.equals((String) object);
+		}
+		return this.equals(object);
 	}
 	
 	@Override
-	public void setPrev(IToken prev)
+	public boolean match(Object... objects)
 	{
-		this.prev = prev;
-	}
-	
-	@Override
-	public void setNext(IToken next)
-	{
-		this.next = next;
+		IToken token = this;
+		for (Object object : objects)
+		{
+			if (!token.match(object))
+			{
+				return false;
+			}
+			token = token.getNext();
+		}
+		return true;
 	}
 	
 	@Override

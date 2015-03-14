@@ -41,108 +41,99 @@ public class ParserManager implements IParserManager
 	
 	public final void parse(List<Marker> markers, TokenIterator tokens)
 	{
-		IToken token = null;
 		this.tokens = tokens;
 		
-		try
+		IToken token = null;
+		IToken prev = null;
+		while (tokens.hasNext())
 		{
-			IToken prev = null;
-			while (tokens.hasNext())
+			token = tokens.next();
+			if (!this.retainToken((Token) token, prev))
 			{
-				token = tokens.next();
-				if (!this.retainToken((Token) token, prev))
-				{
-					tokens.remove();
-				}
-				prev = token;
+				tokens.remove();
 			}
-			
-			int index = 0;
-			tokens.reset();
-			while (tokens.hasNext())
-			{
-				token = tokens.next();
-				token.setIndex(index);
-				token.setPrev(prev);
-				index++;
-				prev = token;
-			}
-			
-			tokens.reset();
-			while (tokens.hasNext())
-			{
-				if (this.reparse)
-				{
-					this.reparse = false;
-				}
-				else
-				{
-					token = tokens.next();
-				}
-				
-				if (this.skip > 0)
-				{
-					this.skip--;
-					continue;
-				}
-				
-				try
-				{
-					this.parser.parse(this, token);
-				}
-				catch (SyntaxError ex)
-				{
-					// if (this.jumpBackToken != null)
-					// {
-					// tokens.jump(this.jumpBackToken);
-					// this.popParser();
-					// this.jumpBackToken = null;
-					// }
-					// else
-					{
-						if (ex.reparse)
-						{
-							this.reparse = true;
-						}
-						markers.add(ex);
-					}
-				}
-				catch (NullPointerException npe)
-				{
-					if (this.parser == null)
-					{
-						markers.add(new SyntaxError(token, "Unexpected End of Input"));
-					}
-					else
-					{
-						DyvilCompiler.logger.throwing("ParserManager", "parseToken", npe);
-						markers.add(new SyntaxError(token, "Failed to parse token '" + token.value() + "': " + npe.getMessage()));
-					}
-				}
-				catch (Exception ex)
-				{
-					// if (this.jumpBackToken != null)
-					// {
-					// tokens.jump(this.jumpBackToken);
-					// this.popParser();
-					// this.jumpBackToken = null;
-					// }
-					// else
-					{
-						DyvilCompiler.logger.throwing("ParserManager", "parseToken", ex);
-						markers.add(new SyntaxError(token, "Failed to parse token '" + token.value() + "': " + ex.getMessage()));
-					}
-				}
-				
-				if (DyvilCompiler.parseStack)
-				{
-					System.out.println(token + ":\t\t" + this.parser.name + " @ " + this.parser.mode);
-				}
-			}
+			prev = token;
 		}
-		catch (Exception ex)
+		
+		int index = 0;
+		tokens.reset();
+		while (tokens.hasNext())
 		{
-			DyvilCompiler.logger.throwing("ParserManager", "parse", ex);
+			token = tokens.next();
+			token.setIndex(index);
+			token.setPrev(prev);
+			index++;
+			prev = token;
+		}
+		
+		tokens.reset();
+		while (true)
+		{
+			if (this.reparse)
+			{
+				this.reparse = false;
+			}
+			else
+			{
+				token = tokens.next();
+				
+				if (token == null)
+				{
+					break;
+				}
+			}
+			
+			if (this.skip > 0)
+			{
+				this.skip--;
+				continue;
+			}
+			
+			try
+			{
+				this.parser.parse(this, token);
+			}
+			catch (SyntaxError ex)
+			{
+				// if (this.jumpBackToken != null)
+				// {
+				// tokens.jump(this.jumpBackToken);
+				// this.popParser();
+				// this.jumpBackToken = null;
+				// }
+				// else
+				{
+					if (ex.reparse)
+					{
+						this.reparse = true;
+					}
+					markers.add(ex);
+				}
+			}
+			catch (Exception ex)
+			{
+				// if (this.jumpBackToken != null)
+				// {
+				// tokens.jump(this.jumpBackToken);
+				// this.popParser();
+				// this.jumpBackToken = null;
+				// }
+				// else
+				{
+					DyvilCompiler.logger.throwing("ParserManager", "parseToken", ex);
+					markers.add(new SyntaxError(token, "Failed to parse token '" + token.value() + "': " + ex.getMessage()));
+				}
+			}
+			
+			if (this.parser == null)
+			{
+				break;
+			}
+			
+			if (DyvilCompiler.parseStack)
+			{
+				System.out.println(token + ":\t\t" + this.parser.name + " @ " + this.parser.mode);
+			}
 		}
 	}
 	
@@ -163,39 +154,33 @@ public class ParserManager implements IParserManager
 			return true;
 		}
 		
-		try
+		int type = token.type();
+		if (!ParserUtil.isIdentifier(type) && (type & Tokens.TYPE_KEYWORD) == 0)
 		{
-			int type = token.type();
-			if (!ParserUtil.isIdentifier(type) && (type & Tokens.TYPE_KEYWORD) == 0)
-			{
-				return true;
-			}
-			
-			if (prev == null)
-			{
-				return true;
-			}
-			
-			int prevLN = prev.endLine();
-			if (prevLN == token.startLine())
-			{
-				return true;
-			}
-			
-			int type1 = prev.type();
-			if (ParserUtil.isSeperator(type1))
-			{
-				return true;
-			}
-			
-			int prevEnd = prev.endIndex();
-			Token semicolon = new Token(0, ";", Tokens.SEMICOLON, ";", prevLN, prevEnd, prevEnd + 1);
-			semicolon.setNext(token);
-			prev.setNext(semicolon);
+			return true;
 		}
-		catch (SyntaxError error)
+		
+		if (prev == null)
 		{
+			return true;
 		}
+		
+		int prevLN = prev.endLine();
+		if (prevLN == token.startLine())
+		{
+			return true;
+		}
+		
+		int type1 = prev.type();
+		if (ParserUtil.isSeperator(type1))
+		{
+			return true;
+		}
+		
+		int prevEnd = prev.endIndex();
+		Token semicolon = new Token(0, ";", Tokens.SEMICOLON, ";", prevLN, prevEnd, prevEnd + 1);
+		semicolon.setNext(token);
+		prev.setNext(semicolon);
 		return true;
 	}
 	

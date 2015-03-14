@@ -5,31 +5,35 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IToken extends ICodePosition
 {
-	public String value() throws SyntaxError;
+	public String value();
 	
-	public Object object() throws SyntaxError;
+	public Object object();
 	
-	public int type() throws SyntaxError;
+	public int type();
 	
-	public boolean equals(String value) throws SyntaxError;
+	public boolean equals(String value);
 	
-	public int index() throws SyntaxError;
+	public void setIndex(int index);
+	
+	public int index();
 	
 	public IToken prev() throws SyntaxError;
 	
 	public IToken next() throws SyntaxError;
 	
-	public boolean match(Object object) throws SyntaxError;
+	public IToken getPrev();
 	
-	public boolean match(Object... objects) throws SyntaxError;
+	public IToken getNext();
+	
+	public void setPrev(IToken prev);
+	
+	public void setNext(IToken next);
 	
 	public boolean hasPrev();
 	
 	public boolean hasNext();
 	
-	public void setIndex(int index);
+	public boolean match(Object object);
 	
-	public void setPrev(IToken prev);
-	
-	public void setNext(IToken next);
+	public boolean match(Object... objects);
 }
