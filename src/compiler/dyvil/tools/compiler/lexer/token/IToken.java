@@ -13,6 +13,11 @@ public interface IToken extends ICodePosition
 	
 	public boolean equals(String value);
 	
+	public default boolean isInferred()
+	{
+		return false;
+	}
+	
 	public void setIndex(int index);
 	
 	public int index();
@@ -32,8 +37,4 @@ public interface IToken extends ICodePosition
 	public boolean hasPrev();
 	
 	public boolean hasNext();
-	
-	public boolean match(Object object);
-	
-	public boolean match(Object... objects);
 }

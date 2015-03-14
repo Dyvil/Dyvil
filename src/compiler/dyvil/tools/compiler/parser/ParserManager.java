@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.lexer.token.InferredSemicolon;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
@@ -178,7 +179,7 @@ public class ParserManager implements IParserManager
 		}
 		
 		int prevEnd = prev.endIndex();
-		Token semicolon = new Token(0, ";", Tokens.SEMICOLON, ";", prevLN, prevEnd, prevEnd + 1);
+		IToken semicolon = new InferredSemicolon(0, prevLN, prevEnd);
 		semicolon.setNext(token);
 		prev.setNext(semicolon);
 		return true;

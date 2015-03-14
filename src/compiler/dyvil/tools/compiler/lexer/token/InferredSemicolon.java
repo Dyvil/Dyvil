@@ -1,60 +1,56 @@
 package dyvil.tools.compiler.lexer.token;
 
-import java.util.Objects;
-
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Tokens;
 
-public class Token implements IToken
+public class InferredSemicolon implements IToken
 {
 	public IToken			prev;
 	public IToken			next;
 	
 	public int				index;
 	
-	public final int		type;
-	public final String		value;
-	public final Object		object;
-	
 	public final int		lineNumber;
 	public final int		start;
-	public final int		end;
 	
-	public Token(int index, String value, int type, Object object, int lineNumber, int start, int end)
+	public InferredSemicolon(int index, int lineNumber, int start)
 	{
 		this.index = index;
-		this.value = value;
-		this.type = type;
-		this.object = object;
 		
 		this.lineNumber = lineNumber;
 		this.start = start;
-		this.end = end;
+	}
+	
+	@Override
+	public boolean isInferred()
+	{
+		return true;
 	}
 	
 	@Override
 	public String value()
 	{
-		return this.value;
+		return ";";
 	}
 	
 	@Override
 	public Object object()
 	{
-		return this.object;
+		return ";";
 	}
 	
 	@Override
 	public int type()
 	{
-		return this.type;
+		return Tokens.SEMICOLON;
 	}
 	
 	@Override
 	public boolean equals(String value)
 	{
-		return Objects.equals(this.value, value);
+		return ";".equals(value);
 	}
 	
 	@Override
@@ -78,7 +74,7 @@ public class Token implements IToken
 	@Override
 	public int endIndex()
 	{
-		return this.end;
+		return this.start + 1;
 	}
 	
 	@Override
@@ -152,7 +148,7 @@ public class Token implements IToken
 	@Override
 	public ICodePosition raw()
 	{
-		return new CodePosition(this.lineNumber, this.start, this.end);
+		return new CodePosition(this.lineNumber, this.start, this.start + 1);
 	}
 	
 	@Override
@@ -164,6 +160,6 @@ public class Token implements IToken
 	@Override
 	public String toString()
 	{
-		return "Token #" + this.index + ": (line " + this.lineNumber + "): \"" + this.value + "\"";
+		return "Inferred Semicolon #" + this.index + " (line " + this.lineNumber + ")";
 	}
 }
