@@ -31,6 +31,11 @@ public class REPLContext implements IValued, IDyvilUnit
 	
 	public void processValue()
 	{
+		if (this.value == null)
+		{
+			return;
+		}
+		
 		List<Marker> markers = new ArrayList();
 		String name;
 		Variable var;
@@ -46,6 +51,7 @@ public class REPLContext implements IValued, IDyvilUnit
 				return;
 			}
 			
+			var.resolveTypes(markers, this);
 			var.resolve(markers, this);
 			var.check(markers, this);
 			var.foldConstants();
@@ -54,6 +60,7 @@ public class REPLContext implements IValued, IDyvilUnit
 		{
 			name = "res" + resultIndex++;
 			var = new Variable(null, name, null);
+			value.resolveTypes(markers, this);
 			value = value.resolve(markers, this);
 			value.check(markers, this);
 			value = value.foldConstants();

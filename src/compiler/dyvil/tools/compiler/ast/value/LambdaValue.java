@@ -57,7 +57,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	
 	private String				owner;
 	private String				name;
-	private String				desc;
+	private String				lambdaDesc;
 	private IType				returnType;
 	private IVariable[]			capturedFields;
 	private int					capturedFieldCount;
@@ -262,9 +262,6 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		this.context = context;
 		this.value = this.value.resolve(markers, this);
 		this.value.check(markers, context);
-		
-		this.name = "lambda$" + this.index;
-		this.desc = this.getLambdaDescriptor();
 	}
 	
 	@Override
@@ -379,6 +376,9 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		this.name = "lambda$" + this.index;
+		this.lambdaDesc = this.getLambdaDescriptor();
+		
 		int len;
 		int handleType;
 		if (this.thisType != null)
@@ -398,17 +398,29 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 			this.capturedFields[i].writeGet(writer, null);
 		}
 		
-		String desc = this.getInvokeDescriptor();
-		String name = this.method.getQualifiedName();
+		String name = this.getName();
+		String desc = this.getLambdaDescriptor();
+		String invokedName = this.method.getQualifiedName();
+		String invokedType = this.getInvokeDescriptor();
 		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
 		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(this.getSpecialDescriptor());
-		Handle handle = new Handle(handleType, this.owner, this.name, this.desc);
-		writer.writeInvokeDynamic(name, desc, len, this.type, BOOTSTRAP, type1, handle, type2);
+		Handle handle = new Handle(handleType, this.owner, name, desc);
+		writer.writeInvokeDynamic(invokedName, invokedType, len, this.type, BOOTSTRAP, type1, handle, type2);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+	}
+	
+	private String getName()
+	{
+		if (this.name != null)
+		{
+			return this.name;
+		}
+		
+		return this.name = "lambda$" + this.index;
 	}
 	
 	private String getInvokeDescriptor()
@@ -443,6 +455,11 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	
 	private String getLambdaDescriptor()
 	{
+		if (this.lambdaDesc != null)
+		{
+			return this.lambdaDesc;
+		}
+		
 		StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
 		for (int i = 0; i < this.capturedFieldCount; i++)
@@ -455,7 +472,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		}
 		buffer.append(')');
 		this.returnType.appendExtendedName(buffer);
-		return buffer.toString();
+		return this.lambdaDesc = buffer.toString();
 	}
 	
 	@Override
@@ -465,7 +482,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		
 		boolean instance = this.thisType != null;
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name, this.desc, null, null));
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.getName(), this.getLambdaDescriptor(), null, null));
 		
 		// Updated Captured Field Indexes
 		
