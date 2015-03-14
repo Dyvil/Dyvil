@@ -15,10 +15,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
-import dyvil.tools.compiler.parser.statement.DoStatementParser;
-import dyvil.tools.compiler.parser.statement.ForStatementParser;
-import dyvil.tools.compiler.parser.statement.IfStatementParser;
-import dyvil.tools.compiler.parser.statement.WhileStatementParser;
+import dyvil.tools.compiler.parser.statement.*;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Operators;
@@ -773,7 +770,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (!(this.parent instanceof IfStatementParser))
 			{
-				throw new SyntaxError(token, "Invalid Expression - 'else' not allowed in this location");
+				throw new SyntaxError(token, "Invalid Expression - 'else' not allowed at this location");
 			}
 			this.field.setValue(this.value);
 			pm.popParser(true);
@@ -850,10 +847,34 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = pattern;
 			return true;
 		}
-		case Tokens.TRY: // TODO Try-Catch Statement
-		case Tokens.CATCH:
-		case Tokens.FINALLY:
+		case Tokens.TRY:
+		{
+			TryStatement statement = new TryStatement(token.raw());
+			pm.pushParser(new TryStatementParser(statement));
+			this.mode = 0;
+			this.value = statement;
 			return true;
+		}
+		case Tokens.CATCH:
+		{
+			if (!(this.parent instanceof TryStatementParser))
+			{
+				throw new SyntaxError(token, "Invalid Expression - 'catch' not allowed at this location");
+			}
+			this.field.setValue(this.value);
+			pm.popParser(true);
+			return true;
+		}
+		case Tokens.FINALLY:
+		{
+			if (!(this.parent instanceof TryStatementParser))
+			{
+				throw new SyntaxError(token, "Invalid Expression - 'finally' not allowed at this location");
+			}
+			this.field.setValue(this.value);
+			pm.popParser(true);
+			return true;
+		}
 		case Tokens.SYNCHRONIZED: // TODO Synchronized Blocks
 			return true;
 		default:

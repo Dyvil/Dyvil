@@ -63,17 +63,8 @@ public class IfStatementParser extends Parser implements IValued
 		}
 		if (this.mode == THEN)
 		{
-			if (ParserUtil.isTerminator(type))
-			{
-				// 'else' on new line after inserted semicolon
-				if (token.next().type() == Tokens.ELSE)
-				{
-					pm.skip(2);
-					pm.pushParser(new ExpressionParser(this));
-					this.mode = -1;
-					return;
-				}
-				
+			if (ParserUtil.isTerminator(type) && !token.isInferred())
+			{	
 				pm.popParser(true);
 				return;
 			}

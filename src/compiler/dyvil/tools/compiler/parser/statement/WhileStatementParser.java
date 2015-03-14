@@ -62,7 +62,7 @@ public class WhileStatementParser extends Parser implements IValued
 		}
 		if (this.mode == THEN)
 		{
-			if (ParserUtil.isTerminator(type))
+			if (ParserUtil.isTerminator(type) && !token.isInferred())
 			{
 				pm.popParser(true);
 				return;

@@ -54,7 +54,7 @@ public interface IValue extends IASTNode, ITyped
 	public static int	CLASS_OPERATOR		= 38;
 	
 	public static int	TUPLE				= 48;
-	public static int	CASE_STATEMENT				= 49;
+	public static int	CASE_STATEMENT		= 49;
 	public static int	MATCH				= 50;
 	public static int	LAMBDA				= 51;
 	public static int	FUNCTION			= 52;
@@ -66,6 +66,8 @@ public interface IValue extends IASTNode, ITyped
 	public static int	FOR					= 67;
 	public static int	WHILE				= 68;
 	public static int	DO_WHILE			= 69;
+	public static int	TRY					= 70;
+	public static int	SYNCHRONIZED		= 71;
 	
 	public static int	BREAK				= 72;
 	public static int	CONTINUE			= 73;

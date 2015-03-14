@@ -114,6 +114,14 @@ public class ParserUtil
 			return Tokens.GOTO;
 		case "case":
 			return Tokens.CASE;
+		case "try":
+			return Tokens.TRY;
+		case "catch":
+			return Tokens.CATCH;
+		case "finally":
+			return Tokens.FINALLY;
+		case "synchronized":
+			return Tokens.SYNCHRONIZED;
 		default:
 			return type;
 		}

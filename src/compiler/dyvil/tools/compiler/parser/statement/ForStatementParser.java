@@ -134,7 +134,7 @@ public class ForStatementParser extends Parser implements IValued
 		}
 		if (this.mode == STATEMENT)
 		{
-			if (ParserUtil.isTerminator(type))
+			if (ParserUtil.isTerminator(type) && !token.isInferred())
 			{
 				pm.popParser(true);
 				return;

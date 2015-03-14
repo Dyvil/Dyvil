@@ -89,6 +89,9 @@ public class Formatting
 		public static String	forStart			= "for (";
 		public static String	forEachSeperator	= " : ";
 		public static String	forEnd				= ")";
+		
+		public static String	catchStart			= "catch (";
+		public static String	catchEnd			= ")";
 	}
 	
 	public static class Expression
