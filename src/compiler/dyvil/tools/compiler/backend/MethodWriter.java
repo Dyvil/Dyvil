@@ -64,6 +64,8 @@ public interface MethodWriter
 	
 	public Object peek();
 	
+	public void writeFrame();
+	
 	// Parameters
 	
 	public int registerParameter(String name, Object type);
@@ -149,6 +151,14 @@ public interface MethodWriter
 	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs);
 	
 	public void writeInvokeDynamic(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs);
+	
+	// Blocks
+	
+	public void writeFinallyBlock(Label start, Label end, Label handler);
+	
+	public void writeTryCatchBlock(Label start, Label end, Label handler, String type);
+	
+	public void writeTryCatchBlock(Label start, Label end, Label handler, IType type);
 	
 	// End
 	

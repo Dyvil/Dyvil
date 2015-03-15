@@ -142,7 +142,8 @@ public final class MethodWriterImpl implements MethodWriter
 		return this.stack[this.stackIndex];
 	}
 	
-	private void visitFrame()
+	@Override
+	public void writeFrame()
 	{
 		this.mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, this.localCount, this.locals, this.stackCount, this.stack);
 		this.visitFrame = false;
@@ -293,7 +294,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.push(INT);
@@ -342,7 +343,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.push(LONG);
@@ -364,7 +365,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.push(FLOAT);
@@ -391,7 +392,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.push(DOUBLE);
@@ -413,7 +414,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.push("Ljava/lang/String;");
@@ -425,7 +426,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.push("Ljava/lang/Class;");
@@ -454,7 +455,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		if (opcode > 255)
@@ -749,7 +750,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		if (opcode > 255)
@@ -866,7 +867,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		if (opcode == ANEWARRAY || opcode == NEWARRAY)
@@ -889,7 +890,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		if (opcode == ANEWARRAY || opcode == NEWARRAY)
@@ -917,7 +918,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.push(type);
@@ -929,7 +930,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.push(type);
@@ -941,7 +942,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.mv.visitIincInsn(var, value);
@@ -952,7 +953,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		if (opcode >= ILOAD && opcode <= ALOAD)
@@ -971,7 +972,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		if (type != null)
@@ -986,7 +987,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.pop(); // Value
@@ -998,7 +999,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.pop(); // Instance
@@ -1011,7 +1012,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.pop(); // Instance
@@ -1024,7 +1025,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		this.mv.visitMethodInsn(opcode, owner, name, desc, false);
 		this.pop(args);
@@ -1039,7 +1040,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.mv.visitMethodInsn(opcode, owner, name, desc, false);
@@ -1055,7 +1056,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
@@ -1071,26 +1072,10 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
-		this.pop(args);
-		if (returnType != null)
-		{
-			this.push(returnType);
-		}
-	}
-	
-	@Override
-	public void writeInvokeDynamic(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs)
-	{
-		if (this.visitFrame)
-		{
-			this.visitFrame();
-		}
-		
-		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
 		this.pop(args);
 		if (returnType != null)
 		{
@@ -1103,7 +1088,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.visitFrame();
+			this.writeFrame();
 		}
 		
 		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
@@ -1112,6 +1097,40 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.push(returnType);
 		}
+	}
+
+	@Override
+	public void writeInvokeDynamic(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs)
+	{
+		if (this.visitFrame)
+		{
+			this.writeFrame();
+		}
+		
+		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+		this.pop(args);
+		if (returnType != null)
+		{
+			this.push(returnType);
+		}
+	}
+	
+	@Override
+	public void writeFinallyBlock(Label start, Label end, Label handler)
+	{
+		this.mv.visitTryCatchBlock(start, end, handler, null);
+	}
+	
+	@Override
+	public void writeTryCatchBlock(Label start, Label end, Label handler, String type)
+	{
+		this.mv.visitTryCatchBlock(start, end, handler, type);
+	}
+	
+	@Override
+	public void writeTryCatchBlock(Label start, Label end, Label handler, IType type)
+	{
+		this.mv.visitTryCatchBlock(start, end, handler, type.getInternalName());
 	}
 	
 	@Override
@@ -1133,7 +1152,7 @@ public final class MethodWriterImpl implements MethodWriter
 		if (!this.hasReturn)
 		{
 			if (this.visitFrame)
-				this.visitFrame();
+				this.writeFrame();
 			
 			this.mv.visitInsn(type.getReturnOpcode());
 		}
