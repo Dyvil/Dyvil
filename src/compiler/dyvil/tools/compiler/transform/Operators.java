@@ -2,7 +2,7 @@ package dyvil.tools.compiler.transform;
 
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
-import dyvil.tools.compiler.ast.match.CaseExpression;
+import dyvil.tools.compiler.ast.match.CaseStatement;
 import dyvil.tools.compiler.ast.match.ICase;
 import dyvil.tools.compiler.ast.match.MatchExpression;
 import dyvil.tools.compiler.ast.operator.*;
@@ -138,7 +138,7 @@ public class Operators
 					return null;
 				}
 				
-				cases[i] = (CaseExpression) v;
+				cases[i] = (CaseStatement) v;
 			}
 			
 			return new MatchExpression(arg1, cases);

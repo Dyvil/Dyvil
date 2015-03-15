@@ -993,7 +993,7 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		for (int i = 0; i < interfaceCount; i++)
+		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			IType type = this.interfaces[i];
 			IClass iclass = type.getTheClass();

@@ -502,7 +502,6 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		return null;
 	}
 	
-	
 	@Override
 	public void addResolveError(MarkerList markers)
 	{

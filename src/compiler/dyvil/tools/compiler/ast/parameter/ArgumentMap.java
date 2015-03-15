@@ -146,13 +146,13 @@ public final class ArgumentMap implements IArguments, IValueMap
 		}
 		return param.defaultValue != null ? 3 : 0;
 	}
-
+	
 	@Override
 	public int getVarargsTypeMatch(int index, Parameter param)
 	{
 		return this.getTypeMatch(index, param);
 	}
-
+	
 	@Override
 	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context)
 	{
@@ -210,7 +210,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	{
 		this.writeValue(index, name, null, writer);
 	}
-
+	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{

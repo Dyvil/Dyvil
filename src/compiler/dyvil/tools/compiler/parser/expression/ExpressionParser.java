@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.match.CaseExpression;
+import dyvil.tools.compiler.ast.match.CaseStatement;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.*;
@@ -239,7 +239,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = GENERICS_END;
 			if (type == Tokens.OPEN_SQUARE_BRACKET)
 			{
-				pm.pushParser(new TypeListParser(((ITypeList) this.value)));
+				pm.pushParser(new TypeListParser((ITypeList) this.value));
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Generic Type Arguments - '[' expected");
@@ -841,7 +841,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		case Tokens.CASE:
 		{
-			CaseExpression pattern = new CaseExpression(token.raw());
+			CaseStatement pattern = new CaseStatement(token.raw());
 			pm.pushParser(new PatternParser(pattern));
 			this.mode = PATTERN_IF;
 			this.value = pattern;
@@ -906,7 +906,7 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	{
 		if (this.mode == PATTERN_END)
 		{
-			((CaseExpression) this.value).setCondition(value);
+			((CaseStatement) this.value).setCondition(value);
 		}
 	}
 	

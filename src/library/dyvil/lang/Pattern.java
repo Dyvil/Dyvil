@@ -1,7 +1,7 @@
 package dyvil.lang;
 
 @FunctionalInterface
-public interface Pattern
+public interface Pattern<T, R>
 {
-	public Option match(Object t);
+	public Option<R> match(T t);
 }

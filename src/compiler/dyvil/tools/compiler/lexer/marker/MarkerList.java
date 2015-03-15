@@ -93,7 +93,7 @@ public final class MarkerList implements Iterable<Marker>
 		if (index >= this.markers.length)
 		{
 			Marker[] temp = new Marker[this.markerCount];
-			System.arraycopy(markers, 0, temp, 0, markers.length);
+			System.arraycopy(this.markers, 0, temp, 0, this.markers.length);
 			this.markers = temp;
 		}
 		this.markers[index] = marker;

@@ -16,7 +16,7 @@ public class ThrowsDeclParser extends Parser implements ITyped
 	private static final int	TYPE		= 0;
 	private static final int	SEPERATOR	= 1;
 	
-	protected IExceptionList			exceptionList;
+	protected IExceptionList	exceptionList;
 	
 	public ThrowsDeclParser(IExceptionList list)
 	{

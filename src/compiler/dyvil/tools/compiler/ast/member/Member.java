@@ -24,7 +24,7 @@ public abstract class Member extends ASTNode implements IMember
 	public String			qualifiedName;
 	
 	protected Member()
-	{	
+	{
 	}
 	
 	protected Member(IClass iclass)

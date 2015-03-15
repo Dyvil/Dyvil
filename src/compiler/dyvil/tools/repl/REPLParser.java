@@ -4,7 +4,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
+import dyvil.tools.compiler.lexer.token.InferredSemicolon;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -37,7 +37,7 @@ public class REPLParser implements IParserManager
 		int type = prev.type();
 		if (!ParserUtil.isSeperator(type) && type != (Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL))
 		{
-			Token semicolon = new Token(prev.index() + 1, ";", Tokens.SEMICOLON, ";", prev.endLine(), prev.endIndex(), prev.endIndex() + 1);
+			IToken semicolon = new InferredSemicolon(prev.index() + 1, prev.endLine(), prev.endIndex());
 			semicolon.setPrev(prev);
 			prev.setNext(semicolon);
 		}

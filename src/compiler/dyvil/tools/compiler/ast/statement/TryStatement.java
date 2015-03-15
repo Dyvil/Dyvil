@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -13,6 +14,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class TryStatement extends ASTNode implements IStatement
 {
+	private static IType	THROWABLE;
+	
 	public IValue			action;
 	private CatchBlock[]	catchBlocks	= new CatchBlock[1];
 	private int				catchBlockCount;
@@ -25,6 +28,15 @@ public class TryStatement extends ASTNode implements IStatement
 		this.position = position;
 	}
 	
+	private static IType getThrowableType()
+	{
+		if (THROWABLE == null)
+		{
+			THROWABLE = new Type(Package.javaLang.resolveClass("Throwable"));
+		}
+		return THROWABLE;
+	}
+	
 	@Override
 	public int getValueType()
 	{
@@ -34,13 +46,13 @@ public class TryStatement extends ASTNode implements IStatement
 	@Override
 	public IType getType()
 	{
-		return null;
+		return Type.NONE;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return false;
+		return type == Type.VOID || type == Type.NONE;
 	}
 	
 	@Override
@@ -55,7 +67,7 @@ public class TryStatement extends ASTNode implements IStatement
 		if (index >= this.catchBlocks.length)
 		{
 			CatchBlock[] temp = new CatchBlock[this.catchBlockCount];
-			System.arraycopy(catchBlocks, 0, temp, 0, catchBlocks.length);
+			System.arraycopy(this.catchBlocks, 0, temp, 0, this.catchBlocks.length);
 			this.catchBlocks = temp;
 		}
 		
@@ -132,12 +144,13 @@ public class TryStatement extends ASTNode implements IStatement
 			this.action.check(markers, context);
 		}
 		
+		IType throwable = getThrowableType();
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
 			block.action.check(markers, context);
 			
-			if (!Type.THROWABLE.isSuperTypeOf(block.type))
+			if (!throwable.isSuperTypeOf(block.type))
 			{
 				markers.add(block.type.getPosition(), "try.catch.type");
 			}

@@ -16,7 +16,7 @@ public class PatternParser extends Parser
 	
 	protected IPatterned	patterned;
 	
-	private IPattern pattern;
+	private IPattern		pattern;
 	
 	public PatternParser(IPatterned patterned)
 	{

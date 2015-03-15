@@ -1098,7 +1098,7 @@ public final class MethodWriterImpl implements MethodWriter
 			this.push(returnType);
 		}
 	}
-
+	
 	@Override
 	public void writeInvokeDynamic(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs)
 	{
@@ -1152,7 +1152,9 @@ public final class MethodWriterImpl implements MethodWriter
 		if (!this.hasReturn)
 		{
 			if (this.visitFrame)
+			{
 				this.writeFrame();
+			}
 			
 			this.mv.visitInsn(type.getReturnOpcode());
 		}

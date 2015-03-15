@@ -8,18 +8,18 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Token implements IToken
 {
-	public IToken			prev;
-	public IToken			next;
+	public IToken		prev;
+	public IToken		next;
 	
-	public int				index;
+	public int			index;
 	
-	public final int		type;
-	public final String		value;
-	public final Object		object;
+	public final int	type;
+	public final String	value;
+	public final Object	object;
 	
-	public final int		lineNumber;
-	public final int		start;
-	public final int		end;
+	public final int	lineNumber;
+	public final int	start;
+	public final int	end;
 	
 	public Token(int index, String value, int type, Object object, int lineNumber, int start, int end)
 	{
@@ -62,7 +62,7 @@ public class Token implements IToken
 	{
 		this.index = index;
 	}
-
+	
 	@Override
 	public int index()
 	{
@@ -98,13 +98,13 @@ public class Token implements IToken
 	{
 		this.prev = prev;
 	}
-
+	
 	@Override
 	public void setNext(IToken next)
 	{
 		this.next = next;
 	}
-
+	
 	@Override
 	public IToken prev() throws SyntaxError
 	{

@@ -7,13 +7,13 @@ import dyvil.tools.compiler.util.Tokens;
 
 public class InferredSemicolon implements IToken
 {
-	public IToken			prev;
-	public IToken			next;
+	public IToken		prev;
+	public IToken		next;
 	
-	public int				index;
+	public int			index;
 	
-	public final int		lineNumber;
-	public final int		start;
+	public final int	lineNumber;
+	public final int	start;
 	
 	public InferredSemicolon(int index, int lineNumber, int start)
 	{
@@ -58,7 +58,7 @@ public class InferredSemicolon implements IToken
 	{
 		this.index = index;
 	}
-
+	
 	@Override
 	public int index()
 	{
@@ -94,13 +94,13 @@ public class InferredSemicolon implements IToken
 	{
 		this.prev = prev;
 	}
-
+	
 	@Override
 	public void setNext(IToken next)
 	{
 		this.next = next;
 	}
-
+	
 	@Override
 	public IToken prev() throws SyntaxError
 	{

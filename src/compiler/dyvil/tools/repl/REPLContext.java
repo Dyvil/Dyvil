@@ -40,11 +40,11 @@ public class REPLContext implements IValued, IDyvilUnit
 		String name;
 		Variable var;
 		
-		if (value.getValueType() == IValue.VARIABLE)
+		if (this.value.getValueType() == IValue.VARIABLE)
 		{
-			var = ((FieldInitializer) value).variable;
+			var = ((FieldInitializer) this.value).variable;
 			name = var.qualifiedName;
-			value = var.value;
+			this.value = var.value;
 			
 			if (var.value == null)
 			{
@@ -58,14 +58,14 @@ public class REPLContext implements IValued, IDyvilUnit
 		}
 		else
 		{
-			name = "res" + resultIndex++;
+			name = "res" + this.resultIndex++;
 			var = new Variable(null, name, null);
-			value.resolveTypes(markers, this);
-			value = value.resolve(markers, this);
-			value.check(markers, this);
-			value = value.foldConstants();
-			var.setValue(value);
-			var.setType(value.getType());
+			this.value.resolveTypes(markers, this);
+			this.value = this.value.resolve(markers, this);
+			this.value.check(markers, this);
+			this.value = this.value.foldConstants();
+			var.setValue(this.value);
+			var.setType(this.value.getType());
 		}
 		
 		if (!markers.isEmpty())

@@ -15,12 +15,13 @@ import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class CaseExpression extends ASTNode implements IValue, ICase, IContext
+public final class CaseStatement extends ASTNode implements IValue, ICase, IContext
 {
 	private IPattern			pattern;
 	private IValue				condition;
@@ -28,7 +29,7 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 	
 	private transient IContext	context;
 	
-	public CaseExpression(ICodePosition position)
+	public CaseStatement(ICodePosition position)
 	{
 		this.position = position;
 	}
@@ -42,13 +43,13 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 	@Override
 	public IType getType()
 	{
-		return null;
+		return Type.NONE;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return false;
+		return type == Type.VOID || type == Type.NONE;
 	}
 	
 	@Override
@@ -171,7 +172,7 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 	}
 	
 	@Override
-	public CaseExpression resolve(MarkerList markers, IContext context)
+	public CaseStatement resolve(MarkerList markers, IContext context)
 	{
 		this.context = context;
 		if (this.condition != null)
@@ -205,7 +206,7 @@ public class CaseExpression extends ASTNode implements IValue, ICase, IContext
 	}
 	
 	@Override
-	public CaseExpression foldConstants()
+	public CaseStatement foldConstants()
 	{
 		if (this.condition != null)
 		{

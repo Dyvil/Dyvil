@@ -128,7 +128,8 @@ public class ClassAccess extends ASTNode implements IValue
 		return this;
 	}
 	
-	public MethodCall toMethodCall() {
+	public MethodCall toMethodCall()
+	{
 		MethodCall call = new MethodCall(this.position);
 		call.name = this.type.getName();
 		call.qualifiedName = this.type.getQualifiedName();

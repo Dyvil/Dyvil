@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.lexer.position;
 
-
 public interface ICodePosition
-{	
+{
 	public int startIndex();
 	
 	public int endIndex();

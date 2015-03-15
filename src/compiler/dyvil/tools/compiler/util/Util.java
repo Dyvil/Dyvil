@@ -208,7 +208,7 @@ public class Util
 		}
 		if (nanos < 1000000L)
 		{
-			return (nanos / 1000000D) + " ms";
+			return nanos / 1000000D + " ms";
 		}
 		
 		long l = 0L;

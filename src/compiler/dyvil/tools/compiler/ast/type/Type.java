@@ -41,10 +41,8 @@ public class Type extends ASTNode implements IType
 	public static final Type			OBJECT		= new Type("Object");
 	public static final Type			PREDEF		= new Type("Predef");
 	public static final Type			ARRAY		= new Type("Array");
-	public static final Type			ITERABLE	= new Type("Iterable");
 	public static final Type			STRING		= new Type("String");
 	public static final Type			CLASS		= new Type("Class");
-	public static final Type			THROWABLE	= new Type("Throwable");
 	
 	public static final AnnotationType	AIntrinsic	= new AnnotationType("Intrinsic");
 	public static final AnnotationType	AOverride	= new AnnotationType("Override");
@@ -133,14 +131,10 @@ public class Type extends ASTNode implements IType
 		PREDEF.fullName = "dyvil.lang.Predef";
 		ARRAY.theClass = ARRAY_CLASS = Package.dyvilLang.resolveClass("Array");
 		ARRAY.fullName = "dyvil.lang.Array";
-		ITERABLE.theClass = Package.javaLang.resolveClass("Iterable");
-		ITERABLE.fullName = "java.lang.Iterable";
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
 		STRING.fullName = "java.lang.String";
 		CLASS.theClass = CLASS_CLASS = Package.javaLang.resolveClass("Class");
 		CLASS.fullName = "java.lang.Class";
-		THROWABLE.theClass = Package.javaLang.resolveClass("Throwable");
-		THROWABLE.fullName = "java.lang.Throwable";
 		
 		AIntrinsic.theClass = Package.dyvilLangAnnotation.resolveClass("Intrinsic");
 		AOverride.theClass = Package.javaLang.resolveClass("Override");
