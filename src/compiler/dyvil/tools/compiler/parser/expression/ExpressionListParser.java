@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValued;
@@ -76,12 +77,14 @@ public final class ExpressionListParser extends Parser implements IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		this.valueList.addValue(value);
-		
 		if (this.label != null)
 		{
-			this.valueList.addLabel(this.label, value);
+			this.valueList.addValue(value, new Label(this.label, value));
 			this.label = null;
+		}
+		else
+		{
+			this.valueList.addValue(value);
 		}
 	}
 	

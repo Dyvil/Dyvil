@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.value;
 
+import dyvil.tools.compiler.ast.statement.Label;
+
 public interface IValueList extends Iterable<IValue>
 {
 	public int valueCount();
@@ -9,6 +11,11 @@ public interface IValueList extends Iterable<IValue>
 	public void setValue(int index, IValue value);
 	
 	public void addValue(IValue value);
+	
+	public default void addValue(IValue value, Label label)
+	{
+		this.addValue(value);
+	}
 	
 	public void addValue(int index, IValue value);
 	
@@ -21,9 +28,5 @@ public interface IValueList extends Iterable<IValue>
 	public default boolean isArray()
 	{
 		return false;
-	}
-	
-	public default void addLabel(String name, IValue value)
-	{
 	}
 }

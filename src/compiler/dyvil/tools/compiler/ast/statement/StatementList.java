@@ -41,37 +41,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public void addLabel(String name, IValue value)
-	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			if (this.values[i] == value)
-			{
-				Label label = new Label(name, value);
-				this.setLabel(i, label);
-				return;
-			}
-		}
-	}
-	
-	private void setLabel(int index, Label label)
-	{
-		if (this.labels == null)
-		{
-			this.labels = new Label[index + 1];
-			this.labels[index] = label;
-			return;
-		}
-		if (index >= this.labels.length)
-		{
-			Label[] temp = new Label[index + 1];
-			System.arraycopy(this.labels, 0, temp, 0, this.labels.length);
-			this.labels = temp;
-		}
-		this.labels[index] = label;
-	}
-	
-	@Override
 	public void setParent(IStatement parent)
 	{
 		this.parent = parent;
@@ -116,6 +85,33 @@ public class StatementList extends ValueList implements IStatement, IContext
 	public boolean isType(IType type)
 	{
 		return type == Type.VOID || type == Type.NONE || super.isType(type);
+	}
+	
+	@Override
+	public void addValue(IValue value, Label label)
+	{
+		int index = this.valueCount++;
+		if (this.valueCount > this.values.length)
+		{
+			IValue[] temp = new IValue[this.valueCount];
+			System.arraycopy(this.values, 0, temp, 0, index);
+			this.values = temp;
+		}
+		this.values[index] = value;
+		
+		if (this.labels == null)
+		{
+			this.labels = new Label[index + 1];
+			this.labels[index] = label;
+			return;
+		}
+		if (index >= this.labels.length)
+		{
+			Label[] temp = new Label[index + 1];
+			System.arraycopy(this.labels, 0, temp, 0, this.labels.length);
+			this.labels = temp;
+		}
+		this.labels[index] = label;
 	}
 	
 	@Override

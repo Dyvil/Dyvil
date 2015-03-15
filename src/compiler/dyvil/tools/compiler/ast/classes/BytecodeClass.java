@@ -3,7 +3,10 @@ package dyvil.tools.compiler.ast.classes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.asm.*;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.MethodCall;
@@ -24,6 +27,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.AnnotationVisitorImpl;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.backend.SimpleMethodVisitor;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.transform.Symbols;
 
@@ -421,42 +425,7 @@ public class BytecodeClass extends CodeClass
 			this.body.addMethod(method);
 		}
 		
-		return new MethodVisitor(Opcodes.ASM5)
-		{
-			@Override
-			public void visitParameter(String name, int index)
-			{
-				method.getParameter(index).setName(name);
-			}
-			
-			@Override
-			public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index)
-			{
-				if ((access & Modifiers.STATIC) == 0)
-				{
-					if (index != 0 && index <= parCount)
-					{
-						method.getParameter(index - 1).setName(name);
-					}
-					return;
-				}
-				
-				if (index < parCount)
-				{
-					method.getParameter(index).setName(name);
-				}
-			}
-			
-			@Override
-			public AnnotationVisitor visitAnnotation(String name, boolean visible)
-			{
-				AnnotationType type = new AnnotationType();
-				ClassFormat.internalToType(name, type);
-				Annotation annotation = new Annotation(null, type);
-				
-				return new AnnotationVisitorImpl(Opcodes.ASM5, method, annotation);
-			}
-		};
+		return new SimpleMethodVisitor(Opcodes.ASM5, method);
 	}
 	
 	public void visitOuterClass(String owner, String name, String desc)
