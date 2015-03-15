@@ -355,8 +355,9 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Variable
 			if (var != null)
 			{
+				var.value.writeExpression(writer);
 				var.index = writer.registerLocal(var.type);
-				var.writeSet(writer, null, var.value);
+				writer.writeVarInsn(var.type.getStoreOpcode(), var.index);
 			}
 			
 			writer.writeFrameLabel(startLabel);
@@ -398,14 +399,14 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
 			writer.writeLabel(scopeLabel);
 			
+			// Load the array
+			var.value.writeExpression(writer);
 			// Local Variables
 			var.index = writer.registerLocal(MethodWriter.TOP);
 			indexVar.index = writer.registerLocal(MethodWriter.INT);
 			lengthVar.index = writer.registerLocal(MethodWriter.INT);
 			arrayVar.index = writer.registerLocal(arrayVar.type);
 			
-			// Load the array
-			var.value.writeExpression(writer);
 			writer.writeInsn(Opcodes.DUP);
 			arrayVar.writeSet(writer, null, null);
 			// Load the length

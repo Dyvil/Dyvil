@@ -953,7 +953,6 @@ public class Method extends Member implements IMethod
 				
 				// If Block
 				writer.writeLDC(1);
-				writer.pop();
 				writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
 				writer.writeFrameLabel(ifEnd);
 				// Else Block

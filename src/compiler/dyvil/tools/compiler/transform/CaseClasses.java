@@ -185,7 +185,6 @@ public class CaseClasses
 				writer.writeJumpInsn(IFEQ, elseLabel);
 				// then
 				writer.writeLDC(1231);
-				writer.pop();
 				writer.writeJumpInsn(GOTO, endLabel);
 				// else
 				writer.writeFrameLabel(elseLabel);

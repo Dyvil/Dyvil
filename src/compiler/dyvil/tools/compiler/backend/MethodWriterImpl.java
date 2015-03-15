@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 
 public final class MethodWriterImpl implements MethodWriter
 {
-	public static final Long	LONG_MINUS_ONE	= Long.valueOf(-1);
+	private static final Long	LONG_MINUS_ONE	= Long.valueOf(-1);
 	
 	public ClassWriter			cw;
 	protected MethodVisitor		mv;
@@ -438,6 +438,15 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeFrameLabel(Label label)
 	{
+		if (this.visitFrame && label.info != null)
+		{
+			int i = this.stackCount - (Integer) label.info;
+			if (i > 0)
+			{
+				this.pop(i);
+			}
+		}
+		
 		this.visitFrame = true;
 		this.mv.visitLabel(label);
 	}
@@ -756,25 +765,30 @@ public final class MethodWriterImpl implements MethodWriter
 		if (opcode > 255)
 		{
 			this.visitSpecialJumpInsn(opcode, label);
+			label.info = this.stackCount;
 			return;
 		}
 		if (opcode >= IFEQ && opcode <= IFLE)
 		{
 			this.pop();
+			label.info = this.stackCount;
 		}
 		if (opcode == IFNULL || opcode == IFNONNULL)
 		{
 			this.pop();
+			label.info = this.stackCount;
 		}
 		if (opcode == IF_ACMPEQ || opcode == IF_ACMPNE)
 		{
 			this.pop();
 			this.pop();
+			label.info = this.stackCount;
 		}
 		if (opcode >= IF_ICMPEQ && opcode <= IF_ICMPLE)
 		{
 			this.pop();
 			this.pop();
+			label.info = this.stackCount;
 		}
 		if (opcode == GOTO || opcode == JSR || opcode == ATHROW)
 		{

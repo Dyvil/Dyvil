@@ -251,7 +251,6 @@ public class IfStatement extends ASTNode implements IStatement
 		this.condition.writeInvJump(writer, elseStart);
 		// If Block
 		this.then.writeExpression(writer);
-		writer.pop();
 		writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
 		writer.writeFrameLabel(elseStart);
 		// Else Block

@@ -15,7 +15,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 {
 	public String			name;
 	
-	protected IType[]		upperBounds;
+	protected IType[]		upperBounds	= new IType[1];
 	protected int			upperBoundCount;
 	protected IType			lowerBound;
 	
@@ -86,7 +86,14 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	@Override
 	public void addUpperBound(IType bound)
 	{
-		// FIXME
+		int index = this.upperBoundCount++;
+		if (index >= this.upperBounds.length)
+		{
+			IType[] temp = new IType[this.upperBoundCount];
+			System.arraycopy(upperBounds, 0, temp, 0, upperBounds.length);
+			this.upperBounds = temp;
+		}
+		this.upperBounds[index] = bound;
 	}
 	
 	@Override
