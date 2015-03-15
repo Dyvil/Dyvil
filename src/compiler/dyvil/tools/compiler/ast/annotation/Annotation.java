@@ -3,11 +3,11 @@ package dyvil.tools.compiler.ast.annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Iterator;
-import java.util.List;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
+
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -25,7 +25,7 @@ import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValueMap.KeyValuePair;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Annotation extends ASTNode implements ITyped
@@ -67,30 +67,30 @@ public class Annotation extends ASTNode implements ITyped
 		return this.type;
 	}
 	
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context);
 		this.arguments.resolveTypes(markers, context);
 	}
 	
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		this.type.readMetaAnnotations();
 		this.arguments.resolveTypes(markers, context);
 	}
 	
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		IClass theClass = this.type.theClass;
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{
-			markers.add(Markers.create(this.position, "annotation.type", this.name));
+			markers.add(this.position, "annotation.type", this.name);
 			return;
 		}
 		
 		if (!this.type.isTarget(this.target))
 		{
-			Marker error = Markers.create(this.position, "annotation.target", this.name);
+			Marker error = markers.create(this.position, "annotation.target", this.name);
 			error.addInfo("Element Target: " + this.target);
 			error.addInfo("Allowed Targets: " + this.type.getTargets());
 			markers.add(error);
@@ -102,7 +102,7 @@ public class Annotation extends ASTNode implements ITyped
 			IMethod m = theClass.getBody().getMethod(entry.key);
 			if (m == null)
 			{
-				markers.add(Markers.create(this.position, "annotation.method", this.name, entry.key));
+				markers.add(this.position, "annotation.method", this.name, entry.key);
 				continue;
 			}
 			
@@ -110,17 +110,17 @@ public class Annotation extends ASTNode implements ITyped
 			
 			if (!entry.value.isConstant())
 			{
-				markers.add(Markers.create(entry.value.getPosition(), "annotation.constant", entry.key));
+				markers.add(entry.value.getPosition(), "annotation.constant", entry.key);
 				continue;
 			}
 			
 			IType type = m.getType();
 			if (!entry.value.isType(type))
 			{
-				Marker marker = Markers.create(entry.value.getPosition(), "annotation.type", entry.key);
+				Marker marker = markers.create(entry.value.getPosition(), "annotation.type", entry.key);
 				marker.addInfo("Required Type: " + type);
 				marker.addInfo("Value Type: " + entry.value.getType());
-				markers.add(marker);
+				
 			}
 		}
 	}

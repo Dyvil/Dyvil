@@ -23,7 +23,7 @@ import dyvil.tools.compiler.ast.value.ValueList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class StatementList extends ValueList implements IStatement, IContext
@@ -119,7 +119,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.isArray)
 		{
@@ -145,7 +145,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (this.isArray)
 		{
@@ -178,7 +178,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.isArray)
 		{
@@ -195,10 +195,10 @@ public class StatementList extends ValueList implements IStatement, IContext
 				
 				if (v.getValueType() == RETURN && v.withType(type) == null)
 				{
-					Marker marker = Markers.create(v.getPosition(), "return.type");
+					Marker marker = markers.create(v.getPosition(), "return.type");
 					marker.addInfo("Block Type: " + type);
 					marker.addInfo("Returning Type: " + v.getType());
-					markers.add(marker);
+					
 				}
 			}
 			this.context = null;

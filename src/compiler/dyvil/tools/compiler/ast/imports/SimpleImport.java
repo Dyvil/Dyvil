@@ -15,8 +15,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class SimpleImport extends ASTNode implements IImport, IImportContainer
@@ -61,13 +60,13 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context, boolean isStatic)
+	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic)
 	{
 		if (isStatic && this.child == null)
 		{
 			if (!(context instanceof IClass))
 			{
-				markers.add(Markers.create(this.position, "import.using"));
+				markers.add(this.position, "import.using");
 				return;
 			}
 			
@@ -86,7 +85,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 				return;
 			}
 			
-			markers.add(Markers.create(this.position, "resolve.method_field", this.name));
+			markers.add(this.position, "resolve.method_field", this.name);
 			return;
 		}
 		
@@ -112,7 +111,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 			return;
 		}
 		
-		markers.add(Markers.create(this.position, "resolve.package", this.name));
+		markers.add(this.position, "resolve.package", this.name);
 	}
 	
 	@Override

@@ -1,6 +1,5 @@
 package dyvil.tools.repl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +19,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class REPLContext implements IValued, IDyvilUnit
 {
@@ -36,7 +36,7 @@ public class REPLContext implements IValued, IDyvilUnit
 			return;
 		}
 		
-		List<Marker> markers = new ArrayList();
+		MarkerList markers = new MarkerList();
 		String name;
 		Variable var;
 		
@@ -72,19 +72,14 @@ public class REPLContext implements IValued, IDyvilUnit
 		{
 			StringBuilder buf = new StringBuilder();
 			String code = DyvilREPL.currentCode;
-			boolean error = false;
 			for (Marker m : markers)
 			{
-				if (!error && m.isError())
-				{
-					error = true;
-				}
 				m.log(code, buf);
 			}
 			
 			System.out.println(buf.toString());
 			
-			if (error)
+			if (markers.getErrors() > 0)
 			{
 				return;
 			}

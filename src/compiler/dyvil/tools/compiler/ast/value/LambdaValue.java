@@ -27,8 +27,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
@@ -194,7 +193,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -210,7 +209,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		// Value gets resolved in check()
 		
@@ -234,7 +233,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.method != null)
 		{
@@ -256,7 +255,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		}
 		else
 		{
-			markers.add(Markers.create(this.position, "lambda.method"));
+			markers.add(this.position, "lambda.method");
 		}
 		
 		this.context = context;

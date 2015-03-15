@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.match;
 
-import java.util.List;
-
 import org.objectweb.asm.Label;
 
 import dyvil.reflect.Opcodes;
@@ -14,7 +12,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class MatchExpression extends ASTNode implements IValue
 {
@@ -114,7 +112,7 @@ public class MatchExpression extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.value.resolveTypes(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
@@ -124,7 +122,7 @@ public class MatchExpression extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		IType type = this.value.getType();
 		
@@ -134,7 +132,7 @@ public class MatchExpression extends ASTNode implements IValue
 			ICase c = this.cases[i];
 			if (this.exhaustive)
 			{
-				markers.add(Markers.create(c.getPosition(), "pattern.dead"));
+				markers.add(c.getPosition(), "pattern.dead");
 			}
 			
 			IPattern pattern = c.getPattern();
@@ -147,10 +145,9 @@ public class MatchExpression extends ASTNode implements IValue
 			}
 			else if (!pattern.isType(type))
 			{
-				Marker m = Markers.create(pattern.getPosition(), "pattern.type");
-				m.addInfo("Pattern Type: " + pattern.getType());
-				m.addInfo("Value Type: " + type);
-				markers.add(m);
+				Marker marker = markers.create(pattern.getPosition(), "pattern.type");
+				marker.addInfo("Pattern Type: " + pattern.getType());
+				marker.addInfo("Value Type: " + type);
 			}
 			this.cases[i] = c.resolve(markers, context);
 		}
@@ -163,7 +160,7 @@ public class MatchExpression extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		this.value.check(markers, context);
 		for (int i = 0; i < this.caseCount; i++)

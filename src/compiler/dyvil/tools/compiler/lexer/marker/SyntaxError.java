@@ -35,4 +35,10 @@ public class SyntaxError extends Marker
 	{
 		return true;
 	}
+	
+	@Override
+	public boolean isWarning()
+	{
+		return false;
+	}
 }

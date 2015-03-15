@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.parser;
 
-import java.util.List;
-
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lexer.TokenIterator;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.InferredSemicolon;
@@ -40,7 +38,7 @@ public class ParserManager implements IParserManager
 		this.parser = parser;
 	}
 	
-	public final void parse(List<Marker> markers, TokenIterator tokens)
+	public final void parse(MarkerList markers, TokenIterator tokens)
 	{
 		this.tokens = tokens;
 		

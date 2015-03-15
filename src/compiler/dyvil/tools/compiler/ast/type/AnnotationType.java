@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.type;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -12,8 +11,7 @@ import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class AnnotationType extends Type
@@ -42,7 +40,7 @@ public class AnnotationType extends Type
 	}
 	
 	@Override
-	public AnnotationType resolve(List<Marker> markers, IContext context)
+	public AnnotationType resolve(MarkerList markers, IContext context)
 	{
 		if (this.theClass == null)
 		{
@@ -63,7 +61,7 @@ public class AnnotationType extends Type
 			}
 			else if (markers != null)
 			{
-				markers.add(Markers.create(this.position, "resolve.type", this.toString()));
+				markers.add(this.position, "resolve.type", this.toString());
 			}
 		}
 		return this;

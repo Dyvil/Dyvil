@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import java.lang.annotation.ElementType;
-import java.util.List;
 
 import org.objectweb.asm.ClassWriter;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class LambdaParameter extends Member implements IVariable
 {
@@ -78,18 +78,18 @@ public class LambdaParameter extends Member implements IVariable
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context);
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 	}
 	

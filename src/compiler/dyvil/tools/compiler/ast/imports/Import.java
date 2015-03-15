@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Import extends ASTNode implements IImportContainer
@@ -31,7 +31,7 @@ public class Import extends ASTNode implements IImportContainer
 		this.theImport = iimport;
 	}
 	
-	public void resolveTypes(List<Marker> markers)
+	public void resolveTypes(MarkerList markers)
 	{
 		this.theImport.resolveTypes(markers, Package.rootPackage, this.isStatic);
 		

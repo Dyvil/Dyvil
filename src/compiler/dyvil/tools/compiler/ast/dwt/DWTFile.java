@@ -5,8 +5,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -24,7 +25,7 @@ import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.dwt.DWTParser;
@@ -41,7 +42,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	public final String				internalName;
 	public final Package			pack;
 	protected TokenIterator			tokens;
-	protected List<Marker>			markers		= new ArrayList();
+	protected MarkerList			markers		= new MarkerList();
 	
 	protected DWTNode				rootNode;
 	
@@ -121,7 +122,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		IMethod constructor = this.rootNode.theClass.getBody().getMethod("<init>");
 		if (constructor == null)
 		{
-			this.markers.add(Markers.create(this.position, "dwt.component.constructor"));
+			this.markers.add(this.position, "dwt.component.constructor");
 		}
 		
 		this.rootNode.resolve(this.markers, javaxSwing);

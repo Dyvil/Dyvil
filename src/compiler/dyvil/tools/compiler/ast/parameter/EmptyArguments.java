@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.parameter;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -11,7 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class EmptyArguments implements IArguments
 {
@@ -108,27 +107,27 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public void checkValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
+	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context)
 	{
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
+	public void checkVarargsValue(int index, Parameter param, MarkerList markers, ITypeContext context)
 	{
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 	}
 	

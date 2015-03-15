@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class DynamicType extends ASTNode implements IType
 {
@@ -174,7 +174,7 @@ public final class DynamicType extends ASTNode implements IType
 	}
 	
 	@Override
-	public IType resolve(List<Marker> markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context)
 	{
 		return this;
 	}

@@ -1,14 +1,11 @@
 package dyvil.tools.compiler.ast.statement;
 
-import java.util.List;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class BreakStatement extends ASTNode implements IStatement
@@ -47,16 +44,16 @@ public class BreakStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (this.parent == null)
 		{
-			markers.add(Markers.create(this.position, "break.invalid"));
+			markers.add(this.position, "break.invalid");
 			return this;
 		}
 		
@@ -66,7 +63,7 @@ public class BreakStatement extends ASTNode implements IStatement
 			
 			if (this.label == null)
 			{
-				markers.add(Markers.create(this.position, "resolve.label", this.name));
+				markers.add(this.position, "resolve.label", this.name);
 			}
 			else if (this.label.value instanceof ILoop)
 			{
@@ -74,7 +71,7 @@ public class BreakStatement extends ASTNode implements IStatement
 			}
 			else
 			{
-				markers.add(Markers.create(this.position, "break.invalid.label", this.name));
+				markers.add(this.position, "break.invalid.label", this.name);
 			}
 		}
 		else
@@ -92,7 +89,7 @@ public class BreakStatement extends ASTNode implements IStatement
 			
 			if (this.label == null)
 			{
-				markers.add(Markers.create(this.position, "break.invalid"));
+				markers.add(this.position, "break.invalid");
 			}
 		}
 		
@@ -100,7 +97,7 @@ public class BreakStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 	}
 	

@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
-import java.util.List;
 
 import org.objectweb.asm.ClassWriter;
 
@@ -14,7 +13,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
 
@@ -97,7 +96,7 @@ public class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
 		
@@ -108,7 +107,7 @@ public class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
 		
@@ -119,17 +118,17 @@ public class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
 		
 		IValue value1 = this.value.withType(this.type);
 		if (value1 == null)
 		{
-			Marker marker = Markers.create(this.value.getPosition(), "variable.type", this.name);
+			Marker marker = markers.create(this.value.getPosition(), "variable.type", this.name);
 			marker.addInfo("Field Type: " + this.type);
 			marker.addInfo("Value Type: " + this.value.getType());
-			markers.add(marker);
+			
 		}
 		else
 		{

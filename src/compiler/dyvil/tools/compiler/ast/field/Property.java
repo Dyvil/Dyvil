@@ -3,8 +3,9 @@ package dyvil.tools.compiler.ast.field;
 import java.util.List;
 
 import org.objectweb.asm.ClassWriter;
-import dyvil.reflect.Opcodes;
+
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -21,7 +22,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.ModifierTypes;
 
 public class Property extends Field implements IProperty, IContext
@@ -87,7 +88,7 @@ public class Property extends Field implements IProperty, IContext
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
 		
@@ -102,7 +103,7 @@ public class Property extends Field implements IProperty, IContext
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
 		
@@ -128,13 +129,13 @@ public class Property extends Field implements IProperty, IContext
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
 		
 		if (this.get == null && this.set == null)
 		{
-			markers.add(Markers.create(this.position, "property.empty", this.name));
+			markers.add(this.position, "property.empty", this.name);
 		}
 		else
 		{
@@ -143,10 +144,10 @@ public class Property extends Field implements IProperty, IContext
 				IValue get1 = this.get.withType(this.type);
 				if (get1 == null)
 				{
-					Marker marker = Markers.create(this.get.getPosition(), "property.getter.type", this.name);
+					Marker marker = markers.create(this.get.getPosition(), "property.getter.type", this.name);
 					marker.addInfo("Property Type: " + this.type);
 					marker.addInfo("Getter Value Type: " + this.get.getType());
-					markers.add(marker);
+					
 				}
 				else
 				{
@@ -155,7 +156,7 @@ public class Property extends Field implements IProperty, IContext
 			}
 			if (this.set != null && !this.set.isType(Type.VOID))
 			{
-				markers.add(Markers.create(this.set.getPosition(), "property.setter.type", this.name));
+				markers.add(this.set.getPosition(), "property.setter.type", this.name);
 			}
 		}
 	}

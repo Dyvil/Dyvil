@@ -1,11 +1,9 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import java.util.List;
-
 import org.objectweb.asm.Label;
+
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class JumpInstruction extends Instruction
 {
@@ -29,12 +27,12 @@ public class JumpInstruction extends Instruction
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, Bytecode bytecode)
+	public void resolve(MarkerList markers, Bytecode bytecode)
 	{
 		this.destLabel = bytecode.getLabel(this.dest);
 		if (this.destLabel == null)
 		{
-			markers.add(Markers.create(this.position, "resolve.label", this.dest));
+			markers.add(this.position, "resolve.label", this.dest);
 		}
 	}
 	

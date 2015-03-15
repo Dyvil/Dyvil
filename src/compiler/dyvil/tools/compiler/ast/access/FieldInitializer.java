@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.List;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.Variable;
@@ -11,7 +9,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class FieldInitializer extends ASTNode implements IValue, IValued
@@ -81,20 +79,20 @@ public class FieldInitializer extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.variable.resolveTypes(markers, context);
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.variable.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		this.variable.check(markers, context);
 	}

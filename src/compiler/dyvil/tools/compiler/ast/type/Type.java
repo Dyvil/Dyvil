@@ -18,8 +18,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
 
@@ -393,7 +392,7 @@ public class Type extends ASTNode implements IType
 	// Resolve
 	
 	@Override
-	public IType resolve(List<Marker> markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context)
 	{
 		if (this.theClass != null)
 		{
@@ -439,7 +438,7 @@ public class Type extends ASTNode implements IType
 		}
 		if (markers != null)
 		{
-			markers.add(Markers.create(this.position, "resolve.type", this.toString()));
+			markers.add(this.position, "resolve.type", this.toString());
 		}
 		return this;
 	}

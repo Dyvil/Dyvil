@@ -1,12 +1,10 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.List;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
 
 public final class LambdaType extends Type implements ITyped, ITypeList
@@ -102,7 +100,7 @@ public final class LambdaType extends Type implements ITyped, ITypeList
 	}
 	
 	@Override
-	public LambdaType resolve(List<Marker> markers, IContext context)
+	public LambdaType resolve(MarkerList markers, IContext context)
 	{
 		this.getTheClass();
 		

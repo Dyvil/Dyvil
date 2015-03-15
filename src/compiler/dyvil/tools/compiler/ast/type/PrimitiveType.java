@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.BoxedValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class PrimitiveType extends Type
 {
@@ -96,7 +96,7 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public IType resolve(List<Marker> markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context)
 	{
 		if (this.theClass == null)
 		{

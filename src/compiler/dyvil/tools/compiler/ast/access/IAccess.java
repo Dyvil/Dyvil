@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.List;
-
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -14,19 +12,19 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IAccess extends IValue, IValued, ICall
 {
 	public boolean isResolved();
 	
-	public boolean resolve(IContext context, List<Marker> markers);
+	public boolean resolve(IContext context, MarkerList markers);
 	
 	public IValue resolve2(IContext context);
 	
 	public IAccess resolve3(IContext context, IAccess next);
 	
-	public Marker getResolveError();
+	public void addResolveError(MarkerList markers);
 	
 	public static IField resolveField(IContext context, ITyped instance, String name)
 	{

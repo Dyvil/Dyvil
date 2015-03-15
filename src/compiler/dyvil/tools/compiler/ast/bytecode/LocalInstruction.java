@@ -1,12 +1,11 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import java.util.List;
-
 import org.objectweb.asm.Label;
+
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class LocalInstruction extends Instruction
 {
@@ -54,7 +53,7 @@ public class LocalInstruction extends Instruction
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, Bytecode bytecode)
+	public void resolve(MarkerList markers, Bytecode bytecode)
 	{
 		this.endLabel = bytecode.endLabel;
 	}

@@ -1,9 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.List;
-
-import dyvil.reflect.Opcodes;
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -15,7 +13,7 @@ import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
@@ -139,7 +137,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.field != null)
 		{
@@ -160,7 +158,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -171,13 +169,13 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		
 		if (this.field == null)
 		{
-			Marker marker = Markers.create(this.position, "resolve.field", this.name);
+			Marker marker = markers.create(this.position, "resolve.field", this.name);
 			marker.addInfo("Qualified Name: " + this.qualifiedName);
 			if (this.instance != null)
 			{
 				marker.addInfo("Instance Type: " + this.instance.getType());
 			}
-			markers.add(marker);
+			
 		}
 		
 		if (this.value != null)
@@ -189,7 +187,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.value.getValueType() == IValue.THIS)
 		{
@@ -205,11 +203,11 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		IValue value1 = this.value.withType(type);
 		if (value1 == null)
 		{
-			Marker marker = Markers.create(this.value.getPosition(), "access.assign.type", this.name);
+			Marker marker = markers.create(this.value.getPosition(), "access.assign.type", this.name);
 			marker.addInfo("Field Type: " + type);
 			IType vtype = this.value.getType();
 			marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
-			markers.add(marker);
+			
 		}
 		else
 		{
@@ -220,25 +218,25 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		
 		if (this.field.hasModifier(Modifiers.FINAL))
 		{
-			markers.add(Markers.create(this.position, "access.final.field", this.name));
+			markers.add(this.position, "access.final.field", this.name);
 		}
 		if (this.field.hasModifier(Modifiers.DEPRECATED))
 		{
-			markers.add(Markers.create(this.position, "access.field.deprecated", this.name));
+			markers.add(this.position, "access.field.deprecated", this.name);
 		}
 		
 		byte access = context.getAccessibility(this.field);
 		if (access == IContext.STATIC)
 		{
-			markers.add(Markers.create(this.position, "access.static.field", this.name));
+			markers.add(this.position, "access.static.field", this.name);
 		}
 		else if (access == IContext.SEALED)
 		{
-			markers.add(Markers.create(this.position, "access.sealed.field", this.name));
+			markers.add(this.position, "access.sealed.field", this.name);
 		}
 		else if ((access & IContext.WRITE_ACCESS) == 0)
 		{
-			markers.add(Markers.create(this.position, "access.invisible.field", this.name));
+			markers.add(this.position, "access.invisible.field", this.name);
 		}
 	}
 	

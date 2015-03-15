@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import java.util.Iterator;
-import java.util.List;
 
 import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
@@ -12,7 +11,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ArgumentList implements IArguments, IValueList
 {
@@ -180,7 +179,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void checkValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
+	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context)
 	{
 		if (index >= this.size)
 		{
@@ -192,10 +191,10 @@ public final class ArgumentList implements IArguments, IValueList
 		IValue value1 = value.withType(type);
 		if (value1 == null)
 		{
-			Marker marker = Markers.create(value.getPosition(), "access.method.argument_type", param.name);
+			Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.name);
 			marker.addInfo("Required Type: " + type);
 			marker.addInfo("Value Type: " + value.getType());
-			markers.add(marker);
+			
 		}
 		else
 		{
@@ -204,7 +203,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
+	public void checkVarargsValue(int index, Parameter param, MarkerList markers, ITypeContext context)
 	{
 		IType varParamType = param.getType(context);
 		
@@ -225,10 +224,10 @@ public final class ArgumentList implements IArguments, IValueList
 			value1 = value.withType(elementType);
 			if (value1 == null)
 			{
-				Marker marker = Markers.create(value.getPosition(), "access.method.argument_type", param.name);
+				Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.name);
 				marker.addInfo("Required Type: " + elementType);
 				marker.addInfo("Value Type: " + value.getType());
-				markers.add(marker);
+				
 			}
 			this.values[index] = value;
 		}
@@ -279,7 +278,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -288,7 +287,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -297,7 +296,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.size; i++)
 		{

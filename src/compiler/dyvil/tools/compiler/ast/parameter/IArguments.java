@@ -1,14 +1,12 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.List;
-
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IArguments extends IASTNode, Iterable<IValue>
 {
@@ -38,9 +36,9 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public int getVarargsTypeMatch(int index, Parameter param);
 	
-	public void checkValue(int index, Parameter param, List<Marker> markers, ITypeContext context);
+	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context);
 	
-	public void checkVarargsValue(int index, Parameter param, List<Marker> markers, ITypeContext context);
+	public void checkVarargsValue(int index, Parameter param, MarkerList markers, ITypeContext context);
 	
 	public void writeValue(int index, String name, IValue defaultValue, MethodWriter writer);
 	
@@ -48,11 +46,11 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	// Phase Methdos
 	
-	public void resolveTypes(List<Marker> markers, IContext context);
+	public void resolveTypes(MarkerList markers, IContext context);
 	
-	public void resolve(List<Marker> markers, IContext context);
+	public void resolve(MarkerList markers, IContext context);
 	
-	public void check(List<Marker> markers, IContext context);
+	public void check(MarkerList markers, IContext context);
 	
 	public void foldConstants();
 }

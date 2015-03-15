@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
@@ -94,7 +94,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.variable != null)
 		{
@@ -124,7 +124,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.context = context;
 		
@@ -141,10 +141,10 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				this.type = ARRAY;
 				if (!valueType.classEquals(varType) || varType.getArrayDimensions() != valueTypeDims - 1)
 				{
-					Marker marker = Markers.create(value.getPosition(), "for.array.type");
+					Marker marker = markers.create(value.getPosition(), "for.array.type");
 					marker.addInfo("Array Type: " + valueType);
 					marker.addInfo("Variable Type: " + varType);
-					markers.add(marker);
+					
 				}
 				else
 				{
@@ -192,7 +192,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		this.context = context;
 		
@@ -214,9 +214,9 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			
 			if (!this.condition.isType(Type.BOOLEAN))
 			{
-				Marker marker = Markers.create(this.condition.getPosition(), "for.condition.type");
+				Marker marker = markers.create(this.condition.getPosition(), "for.condition.type");
 				marker.addInfo("Condition Type: " + this.condition.getType());
-				markers.add(marker);
+				
 			}
 		}
 		if (this.update != null)

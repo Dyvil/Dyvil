@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.value;
 
-import java.util.List;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
@@ -9,8 +7,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ThisValue extends ASTNode implements IConstantValue
@@ -84,13 +81,13 @@ public final class ThisValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.type == null)
 		{
 			if (context.isStatic())
 			{
-				markers.add(Markers.create(this.position, "access.this.static"));
+				markers.add(this.position, "access.this.static");
 			}
 			else
 			{

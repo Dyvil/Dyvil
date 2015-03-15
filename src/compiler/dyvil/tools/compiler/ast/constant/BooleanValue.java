@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.constant;
 
 import org.objectweb.asm.Label;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;

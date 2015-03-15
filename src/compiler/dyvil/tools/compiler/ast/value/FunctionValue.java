@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
 
@@ -181,7 +181,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -190,7 +190,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -216,7 +216,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{

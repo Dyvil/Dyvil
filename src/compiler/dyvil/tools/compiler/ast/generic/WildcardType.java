@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class WildcardType extends TypeVariable implements IType
@@ -314,7 +314,7 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
-	public IType resolve(List<Marker> markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context)
 	{
 		this.resolveTypes(markers, context);
 		return this;

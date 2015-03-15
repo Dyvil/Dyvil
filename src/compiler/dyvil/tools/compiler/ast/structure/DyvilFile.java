@@ -22,6 +22,7 @@ import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
 import dyvil.tools.compiler.phase.ICompilerPhase;
@@ -36,7 +37,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	public Package			pack;
 	
 	protected TokenIterator	tokens;
-	protected List<Marker>	markers			= new ArrayList();
+	protected MarkerList	markers			= new MarkerList();
 	
 	protected PackageDecl	packageDeclaration;
 	protected List<Import>	imports			= new ArrayList();
@@ -243,18 +244,10 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 			StringBuilder buf = new StringBuilder("Problems in Dyvil File ").append(this.inputFile).append(":\n\n");
 			String code = this.inputFile.getCode();
 			
-			int warnings = 0;
-			int errors = 0;
+			int warnings = this.markers.getWarnings();
+			int errors = this.markers.getErrors();
 			for (Marker marker : this.markers)
 			{
-				if (marker.isError())
-				{
-					errors++;
-				}
-				else
-				{
-					warnings++;
-				}
 				marker.log(code, buf);
 			}
 			buf.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");

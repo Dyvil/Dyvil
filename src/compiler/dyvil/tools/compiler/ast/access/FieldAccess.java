@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.List;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.EnumValue;
@@ -21,7 +19,7 @@ import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.Symbols;
@@ -148,7 +146,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -157,13 +155,13 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		return AccessResolver.resolve(markers, context, this);
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -176,33 +174,33 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 			{
 				if (this.instance != null && this.instance.getValueType() != CLASS_ACCESS)
 				{
-					markers.add(Markers.create(this.position, "access.field.static", this.name));
+					markers.add(this.position, "access.field.static", this.name);
 					this.instance = null;
 				}
 			}
 			else if (this.instance == null && this.field instanceof Field)
 			{
-				markers.add(Markers.create(this.position, "access.field.unqualified", this.name));
+				markers.add(this.position, "access.field.unqualified", this.name);
 				this.instance = new ThisValue(this.position, this.field.getTheClass().getType());
 			}
 			
 			if (this.field.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(Markers.create(this.position, "access.field.deprecated", this.name));
+				markers.add(this.position, "access.field.deprecated", this.name);
 			}
 			
 			byte access = context.getAccessibility(this.field);
 			if (access == IContext.STATIC)
 			{
-				markers.add(Markers.create(this.position, "access.field.instance", this.name));
+				markers.add(this.position, "access.field.instance", this.name);
 			}
 			else if (access == IContext.SEALED)
 			{
-				markers.add(Markers.create(this.position, "access.field.sealed", this.name));
+				markers.add(this.position, "access.field.sealed", this.name);
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(Markers.create(this.position, "access.field.invisible", this.name));
+				markers.add(this.position, "access.field.invisible", this.name);
 			}
 		}
 	}
@@ -240,7 +238,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	}
 	
 	@Override
-	public boolean resolve(IContext context, List<Marker> markers)
+	public boolean resolve(IContext context, MarkerList markers)
 	{
 		if (this.instance != null && this.instance.getValueType() == CLASS_ACCESS)
 		{
@@ -328,15 +326,14 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	}
 	
 	@Override
-	public Marker getResolveError()
+	public void addResolveError(MarkerList markers)
 	{
-		Marker marker = Markers.create(this.position, "resolve.method_field", this.name);
+		Marker marker = markers.create(this.position, "resolve.method_field", this.name);
 		marker.addInfo("Qualified Name: " + this.qualifiedName);
 		if (this.instance != null)
 		{
 			marker.addInfo("Instance Type: " + this.instance.getType());
 		}
-		return marker;
 	}
 	
 	@Override

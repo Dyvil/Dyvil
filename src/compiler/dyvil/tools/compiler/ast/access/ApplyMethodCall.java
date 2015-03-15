@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.List;
-
 import org.objectweb.asm.Label;
 
 import dyvil.reflect.Modifiers;
@@ -17,7 +15,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
@@ -116,7 +114,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -130,7 +128,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -146,7 +144,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 			return this;
 		}
 		
-		Marker marker = Markers.create(this.position, "resolve.method", "apply");
+		Marker marker = markers.create(this.position, "resolve.method", "apply");
 		
 		if (this.instance != null)
 		{
@@ -156,12 +154,12 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 		StringBuilder builder = new StringBuilder("Argument Types: [");
 		Util.typesToString("", this.arguments, ", ", builder);
 		marker.addInfo(builder.append(']').toString());
-		markers.add(marker);
+		
 		return this;
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -179,21 +177,21 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(Markers.create(this.position, "access.method.deprecated", "apply"));
+				markers.add(this.position, "access.method.deprecated", "apply");
 			}
 			
 			byte access = context.getAccessibility(this.method);
 			if (access == IContext.STATIC)
 			{
-				markers.add(Markers.create(this.position, "access.method.instance", "apply"));
+				markers.add(this.position, "access.method.instance", "apply");
 			}
 			else if (access == IContext.SEALED)
 			{
-				markers.add(Markers.create(this.position, "access.method.sealed", "apply"));
+				markers.add(this.position, "access.method.sealed", "apply");
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(Markers.create(this.position, "access.method.invisible", "apply"));
+				markers.add(this.position, "access.method.invisible", "apply");
 			}
 		}
 	}

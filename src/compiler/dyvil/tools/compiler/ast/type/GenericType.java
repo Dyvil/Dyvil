@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.List;
-
 import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -11,7 +9,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
@@ -131,7 +129,7 @@ public final class GenericType extends Type implements ITypeList
 	}
 	
 	@Override
-	public IType resolve(List<Marker> markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context)
 	{
 		if (this.theClass != null)
 		{
@@ -168,13 +166,13 @@ public final class GenericType extends Type implements ITypeList
 			{
 				if (this.genericCount != 0 && markers != null)
 				{
-					markers.add(Markers.create(this.position, "generic.not_generic", this.qualifiedName));
+					markers.add(this.position, "generic.not_generic", this.qualifiedName);
 				}
 				return this;
 			}
 			if (varCount != this.genericCount && markers != null)
 			{
-				markers.add(Markers.create(this.position, "generic.count"));
+				markers.add(this.position, "generic.count");
 				return this;
 			}
 			
@@ -192,10 +190,10 @@ public final class GenericType extends Type implements ITypeList
 					ITypeVariable var = this.theClass.getTypeVariable(i);
 					if (!var.isSuperTypeOf(t2))
 					{
-						Marker marker = Markers.create(t2.getPosition(), "generic.type", var.getQualifiedName());
+						Marker marker = markers.create(t2.getPosition(), "generic.type", var.getQualifiedName());
 						marker.addInfo("Generic Type: " + t2);
 						marker.addInfo("Type Variable: " + var);
-						markers.add(marker);
+						
 					}
 				}
 			}
@@ -203,7 +201,7 @@ public final class GenericType extends Type implements ITypeList
 		}
 		if (markers != null)
 		{
-			markers.add(Markers.create(this.position, "resolve.type", this.toString()));
+			markers.add(this.position, "resolve.type", this.toString());
 		}
 		return this;
 	}

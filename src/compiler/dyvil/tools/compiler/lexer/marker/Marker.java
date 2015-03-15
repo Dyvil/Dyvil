@@ -13,6 +13,10 @@ public abstract class Marker extends Exception
 	
 	public ICodePosition		position;
 	
+	protected Marker()
+	{
+	}
+	
 	public Marker(ICodePosition position)
 	{
 		super();
@@ -53,6 +57,8 @@ public abstract class Marker extends Exception
 	public abstract String getMarkerType();
 	
 	public abstract boolean isError();
+	
+	public abstract boolean isWarning();
 	
 	public void log(String code, StringBuilder buf)
 	{

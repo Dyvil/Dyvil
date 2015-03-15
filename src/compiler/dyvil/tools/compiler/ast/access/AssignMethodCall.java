@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.List;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -22,7 +20,7 @@ import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Util;
@@ -157,7 +155,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -171,7 +169,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.arguments.resolve(markers, context);
 		
@@ -182,18 +180,18 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			return this;
 		}
 		
-		Marker marker = Markers.create(this.position, "resolve.method", this.name);
+		Marker marker = markers.create(this.position, "resolve.method", this.name);
 		marker.addInfo("Qualified Name: " + this.qualifiedName);
 		marker.addInfo("Instance Type: " + this.instance.getType());
 		StringBuilder builder = new StringBuilder("Argument Types: [");
 		Util.typesToString("", this.arguments, ", ", builder);
 		marker.addInfo(builder.append(']').toString());
-		markers.add(marker);
+		
 		return this;
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -213,9 +211,9 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 				}
 				else
 				{
-					Marker marker = Markers.create(this.position, "access.assign_call.update");
+					Marker marker = markers.create(this.position, "access.assign_call.update");
 					marker.addInfo("Instance Type: " + type);
-					markers.add(marker);
+					
 				}
 			}
 		}
@@ -233,29 +231,29 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			IType type2 = this.method.getType();
 			if (!Type.isSuperType(type1, type2))
 			{
-				Marker marker = Markers.create(this.position, "access.assign_call.type", this.name, this.instance.toString());
+				Marker marker = markers.create(this.position, "access.assign_call.type", this.name, this.instance.toString());
 				marker.addInfo("Field Type: " + type1);
 				marker.addInfo("Method Type: " + type2);
-				markers.add(marker);
+				
 			}
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(Markers.create(this.position, "access.method.deprecated", this.name));
+				markers.add(this.position, "access.method.deprecated", this.name);
 			}
 			
 			byte access = context.getAccessibility(this.method);
 			if (access == IContext.STATIC)
 			{
-				markers.add(Markers.create(this.position, "access.method.instance", this.name));
+				markers.add(this.position, "access.method.instance", this.name);
 			}
 			else if (access == IContext.SEALED)
 			{
-				markers.add(Markers.create(this.position, "access.method.sealed", this.name));
+				markers.add(this.position, "access.method.sealed", this.name);
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(Markers.create(this.position, "access.method.invisible", this.name));
+				markers.add(this.position, "access.method.invisible", this.name);
 			}
 		}
 	}

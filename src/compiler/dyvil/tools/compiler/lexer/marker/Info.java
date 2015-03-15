@@ -27,4 +27,10 @@ public class Info extends Marker
 	{
 		return false;
 	}
+	
+	@Override
+	public boolean isWarning()
+	{
+		return false;
+	}
 }

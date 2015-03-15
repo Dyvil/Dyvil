@@ -38,8 +38,7 @@ import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.transform.Symbols;
@@ -508,7 +507,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.genericCount > 0)
 		{
@@ -573,7 +572,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.annotationCount; i++)
 		{
@@ -601,7 +600,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.superType != null)
 		{
@@ -611,16 +610,15 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = superClass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(Markers.create(this.superType.getPosition(), "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers),
-							superClass.getName()));
+					markers.add(this.superType.getPosition(), "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName());
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
-					markers.add(Markers.create(this.superType.getPosition(), "class.extend.final", superClass.getName()));
+					markers.add(this.superType.getPosition(), "class.extend.final", superClass.getName());
 				}
 				else if ((modifiers & Modifiers.DEPRECATED) != 0)
 				{
-					markers.add(Markers.create(this.superType.getPosition(), "class.extend.deprecated", superClass.getName()));
+					markers.add(this.superType.getPosition(), "class.extend.deprecated", superClass.getName());
 				}
 			}
 		}
@@ -630,7 +628,7 @@ public class CodeClass extends ASTNode implements IClass
 			IMethod m = this.body.getMethod("<init>");
 			if (m != null)
 			{
-				markers.add(Markers.create(m.getPosition(), "class.object.constructor", this.name));
+				markers.add(m.getPosition(), "class.object.constructor", this.name);
 			}
 		}
 		
@@ -643,11 +641,11 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = iclass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
 				{
-					markers.add(Markers.create(type.getPosition(), "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName()));
+					markers.add(type.getPosition(), "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName());
 				}
 				else if ((modifiers & Modifiers.DEPRECATED) != 0)
 				{
-					markers.add(Markers.create(type.getPosition(), "class.implement.deprecated", iclass.getName()));
+					markers.add(type.getPosition(), "class.implement.deprecated", iclass.getName());
 				}
 			}
 		}

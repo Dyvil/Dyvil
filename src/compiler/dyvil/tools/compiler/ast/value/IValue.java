@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.value;
 
-import java.util.List;
-
 import org.objectweb.asm.Label;
 
 import dyvil.reflect.Opcodes;
@@ -13,7 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IValue extends IASTNode, ITyped
 {
@@ -138,11 +136,11 @@ public interface IValue extends IASTNode, ITyped
 	
 	public int getTypeMatch(IType type);
 	
-	public void resolveTypes(List<Marker> markers, IContext context);
+	public void resolveTypes(MarkerList markers, IContext context);
 	
-	public IValue resolve(List<Marker> markers, IContext context);
+	public IValue resolve(MarkerList markers, IContext context);
 	
-	public void check(List<Marker> markers, IContext context);
+	public void check(MarkerList markers, IContext context);
 	
 	public IValue foldConstants();
 	

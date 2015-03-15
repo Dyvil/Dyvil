@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.ast.operator;
 
-import java.util.List;
-
 import org.objectweb.asm.Label;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
@@ -12,7 +11,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.BoxedValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class BooleanNot extends ASTNode implements IValue
 {
@@ -72,20 +71,20 @@ public class BooleanNot extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.right.resolveTypes(markers, context);
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.right = this.right.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		this.right.check(markers, context);
 	}

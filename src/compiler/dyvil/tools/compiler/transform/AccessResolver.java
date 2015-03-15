@@ -1,17 +1,16 @@
 package dyvil.tools.compiler.transform;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
 
 import dyvil.tools.compiler.ast.access.IAccess;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class AccessResolver
 {
-	public static IValue resolve(List<Marker> markers, IContext context, IAccess access)
+	public static IValue resolve(MarkerList markers, IContext context, IAccess access)
 	{
 		LinkedList<IAccess> chain = getCallChain(markers, context, access);
 		
@@ -65,7 +64,7 @@ public class AccessResolver
 		}
 		else if (chain.size() == 1)
 		{
-			markers.add(access.getResolveError());
+			access.addResolveError(markers);
 			return access;
 		}
 		
@@ -115,12 +114,12 @@ public class AccessResolver
 					else
 					{
 						next.setValue(curr);
-						markers.add(curr.getResolveError());
+						curr.addResolveError(markers);
 					}
 				}
 				else
 				{
-					markers.add(curr.getResolveError());
+					curr.addResolveError(markers);
 				}
 			}
 			next = curr;
@@ -130,7 +129,7 @@ public class AccessResolver
 		return chain.getLast();
 	}
 	
-	public static LinkedList<IAccess> getCallChain(List<Marker> markers, IContext context, IAccess iaccess)
+	public static LinkedList<IAccess> getCallChain(MarkerList markers, IContext context, IAccess iaccess)
 	{
 		LinkedList<IAccess> list = new LinkedList();
 		while (true)

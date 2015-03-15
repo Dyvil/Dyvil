@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ClassBody extends ASTNode implements IClassBody
 {
@@ -286,7 +286,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.classCount; i++)
 		{
@@ -307,7 +307,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.classCount; i++)
 		{
@@ -328,7 +328,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.classCount; i++)
 		{

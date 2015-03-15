@@ -26,7 +26,7 @@ import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class DynamicMethod extends ASTNode implements IMethod
 {
@@ -210,17 +210,17 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 	}
 	
@@ -369,7 +369,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void checkArguments(List<Marker> markers, IValue instance, IArguments arguments, ITypeContext typeContext)
+	public void checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
 	}
 	

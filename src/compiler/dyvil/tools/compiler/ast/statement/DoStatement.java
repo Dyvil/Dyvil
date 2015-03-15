@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.statement;
 
-import java.util.List;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -11,7 +9,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class DoStatement extends ASTNode implements IStatement, ILoop
@@ -103,7 +101,7 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.then != null)
 		{
@@ -124,7 +122,7 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (this.then != null)
 		{
@@ -138,7 +136,7 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.then != null)
 		{
@@ -148,15 +146,15 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 		{
 			if (!this.condition.isType(Type.BOOLEAN))
 			{
-				Marker marker = Markers.create(this.condition.getPosition(), "do.condition.type");
+				Marker marker = markers.create(this.condition.getPosition(), "do.condition.type");
 				marker.addInfo("Condition Type: " + this.condition.getType());
-				markers.add(marker);
+				
 			}
 			this.condition.check(markers, context);
 		}
 		else
 		{
-			markers.add(Markers.create(this.position, "do.condition.invalid"));
+			markers.add(this.position, "do.condition.invalid");
 		}
 	}
 	

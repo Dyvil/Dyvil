@@ -16,8 +16,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.lexer.CodeFile;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.library.Library;
 
@@ -139,26 +138,26 @@ public class Package implements INamed, IContext
 		return pack;
 	}
 	
-	public void check(PackageDecl packageDecl, CodeFile file, List<Marker> markers)
+	public void check(PackageDecl packageDecl, CodeFile file, MarkerList markers)
 	{
 		if (packageDecl == null)
 		{
 			if (this.fullName != null)
 			{
-				markers.add(Markers.create(new CodePosition(0, 0, 1), "package.missing"));
+				markers.add(new CodePosition(0, 0, 1), "package.missing");
 			}
 			return;
 		}
 		
 		if (this.fullName == null)
 		{
-			markers.add(Markers.create(packageDecl.getPosition(), "package.default"));
+			markers.add(packageDecl.getPosition(), "package.default");
 			return;
 		}
 		
 		if (!this.fullName.equals(packageDecl.thePackage))
 		{
-			markers.add(Markers.create(packageDecl.getPosition(), "package.invalid"));
+			markers.add(packageDecl.getPosition(), "package.invalid");
 		}
 	}
 	

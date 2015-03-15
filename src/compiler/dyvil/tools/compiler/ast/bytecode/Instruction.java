@@ -2,14 +2,13 @@ package dyvil.tools.compiler.ast.bytecode;
 
 import static dyvil.reflect.Opcodes.*;
 
-import java.util.List;
-
 import org.objectweb.asm.Label;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class Instruction extends ASTNode
 {
@@ -44,7 +43,7 @@ public class Instruction extends ASTNode
 		writer.writeInsn(this.opcode);
 	}
 	
-	public void resolve(List<Marker> markers, Bytecode bytecode)
+	public void resolve(MarkerList markers, Bytecode bytecode)
 	{
 	}
 	

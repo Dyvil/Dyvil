@@ -13,8 +13,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class PackageImport extends ASTNode implements IImport
@@ -31,13 +30,13 @@ public class PackageImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context, boolean isStatic)
+	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic)
 	{
 		if (isStatic)
 		{
 			if (!(context instanceof CodeClass))
 			{
-				markers.add(Markers.create(this.position, "Invalid Wildcard Import"));
+				markers.add(this.position, "Invalid Wildcard Import");
 				return;
 			}
 			

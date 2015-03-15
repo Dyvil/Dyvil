@@ -1,9 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.List;
-
-import dyvil.reflect.Opcodes;
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -17,8 +15,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.ast.value.ValueList;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class SpecialConstructor extends ASTNode implements IValue, IValued
@@ -111,7 +108,7 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context);
 		
@@ -119,7 +116,7 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (!this.type.isResolved())
 		{
@@ -134,32 +131,32 @@ public class SpecialConstructor extends ASTNode implements IValue, IValued
 			return this;
 		}
 		
-		markers.add(Markers.create(this.position, "resolve.constructor", this.type.toString()));
+		markers.add(this.position, "resolve.constructor", this.type.toString());
 		return this;
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		IClass iclass = this.type.getTheClass();
 		if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
-			markers.add(Markers.create(this.position, "constructor.interface", iclass.getName()));
+			markers.add(this.position, "constructor.interface", iclass.getName());
 		}
 		else if (iclass.hasModifier(Modifiers.ABSTRACT))
 		{
-			markers.add(Markers.create(this.position, "constructor.abstract", iclass.getName()));
+			markers.add(this.position, "constructor.abstract", iclass.getName());
 		}
 		else if (this.method != null)
 		{
 			byte access = context.getAccessibility(this.method);
 			if (access == IContext.SEALED)
 			{
-				markers.add(Markers.create(this.position, "access.constructor.sealed", iclass.getName()));
+				markers.add(this.position, "access.constructor.sealed", iclass.getName());
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(Markers.create(this.position, "access.constructor.invisible", iclass.getName()));
+				markers.add(this.position, "access.constructor.invisible", iclass.getName());
 			}
 			
 			this.list.check(markers, this.method);

@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.List;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -15,8 +13,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassAccess extends ASTNode implements IValue
@@ -85,13 +82,13 @@ public class ClassAccess extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolve(null, context);
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		String qualifiedName = this.type.getQualifiedName();
 		FieldMatch f = context.resolveField(qualifiedName);
@@ -125,7 +122,7 @@ public class ClassAccess extends ASTNode implements IValue
 		
 		if (!this.type.isResolved())
 		{
-			markers.add(Markers.create(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any", this.type.toString()));
+			markers.add(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any", this.type.toString());
 		}
 		
 		return this;
@@ -148,19 +145,19 @@ public class ClassAccess extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		IClass iclass = this.type.getTheClass();
 		if (iclass != null)
 		{
 			if (iclass.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(Markers.create(this.position, "access.type.deprecated", iclass.getName()));
+				markers.add(this.position, "access.type.deprecated", iclass.getName());
 			}
 			
 			if (context.getAccessibility(iclass) == IContext.SEALED)
 			{
-				markers.add(Markers.create(this.position, "access.type.sealed", iclass.getName()));
+				markers.add(this.position, "access.type.sealed", iclass.getName());
 			}
 		}
 	}

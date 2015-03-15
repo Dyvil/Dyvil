@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.ast.access;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.objectweb.asm.Label;
-import dyvil.reflect.Opcodes;
+
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -20,7 +20,7 @@ import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
@@ -109,7 +109,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -123,7 +123,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -138,7 +138,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			return this;
 		}
 		
-		Marker marker = Markers.create(this.position, "resolve.method", "update");
+		Marker marker = markers.create(this.position, "resolve.method", "update");
 		
 		if (this.instance != null)
 		{
@@ -148,12 +148,12 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		StringBuilder builder = new StringBuilder("Argument Types: [");
 		Util.typesToString("", this.arguments, ", ", builder);
 		marker.addInfo(builder.append(']').toString());
-		markers.add(marker);
+		
 		return this;
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -171,21 +171,21 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(Markers.create(this.position, "access.method.deprecated", "update"));
+				markers.add(this.position, "access.method.deprecated", "update");
 			}
 			
 			byte access = context.getAccessibility(this.method);
 			if (access == IContext.STATIC)
 			{
-				markers.add(Markers.create(this.position, "access.method.instance", "update"));
+				markers.add(this.position, "access.method.instance", "update");
 			}
 			else if (access == IContext.SEALED)
 			{
-				markers.add(Markers.create(this.position, "access.method.sealed", "update"));
+				markers.add(this.position, "access.method.sealed", "update");
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(Markers.create(this.position, "access.method.invisible", "update"));
+				markers.add(this.position, "access.method.invisible", "update");
 			}
 		}
 	}

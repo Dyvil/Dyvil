@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.parameter;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import dyvil.collections.SingletonIterator;
 import dyvil.reflect.Opcodes;
@@ -13,7 +12,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class SingleArgument implements IArguments, IValued
 {
@@ -125,7 +124,7 @@ public class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void checkValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
+	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context)
 	{
 		if (index != 0)
 		{
@@ -135,7 +134,7 @@ public class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, Parameter param, List<Marker> markers, ITypeContext context)
+	public void checkVarargsValue(int index, Parameter param, MarkerList markers, ITypeContext context)
 	{
 		if (index != 0)
 		{
@@ -201,7 +200,7 @@ public class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.value == null)
 		{
@@ -212,7 +211,7 @@ public class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		if (this.value == null)
 		{
@@ -223,7 +222,7 @@ public class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.value == null)
 		{

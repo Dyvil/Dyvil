@@ -1,13 +1,11 @@
 package dyvil.tools.compiler.ast.generic;
 
-import java.util.List;
-
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface ITypeVariable extends IASTNode, INamed
 {
@@ -27,7 +25,7 @@ public interface ITypeVariable extends IASTNode, INamed
 	
 	// Resolve Types
 	
-	public void resolveTypes(List<Marker> markers, IContext context);
+	public void resolveTypes(MarkerList markers, IContext context);
 	
 	// Compilation
 	

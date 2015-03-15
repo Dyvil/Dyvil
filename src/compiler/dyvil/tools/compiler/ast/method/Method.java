@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
+
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -33,7 +34,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
@@ -386,7 +387,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void checkArguments(List<Marker> markers, IValue instance, IArguments arguments, ITypeContext typeContext)
+	public void checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
 		int len = arguments.size();
 		Parameter par;
@@ -399,10 +400,10 @@ public class Method extends Member implements IMethod
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
-				Marker marker = Markers.create(instance.getPosition(), "access.method.infix_type", par.name);
+				Marker marker = markers.create(instance.getPosition(), "access.method.infix_type", par.name);
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
-				markers.add(marker);
+				
 			}
 			
 			if ((this.modifiers & Modifiers.VARARGS) != 0)
@@ -419,10 +420,10 @@ public class Method extends Member implements IMethod
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
-				Marker marker = Markers.create(instance.getPosition(), "access.method.prefix_type", this.name);
+				Marker marker = markers.create(instance.getPosition(), "access.method.prefix_type", this.name);
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
-				markers.add(marker);
+				
 			}
 			return;
 		}
@@ -525,7 +526,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.genericCount; i++)
 		{
@@ -551,7 +552,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void resolve(List<Marker> markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
@@ -589,7 +590,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
@@ -597,28 +598,28 @@ public class Method extends Member implements IMethod
 			{
 				if ((this.modifiers & Modifiers.OVERRIDE) != 0)
 				{
-					markers.add(Markers.create(this.position, "method.override", this.name));
+					markers.add(this.position, "method.override", this.name);
 				}
 			}
 			else if (!this.isConstructor)
 			{
 				if ((this.modifiers & Modifiers.OVERRIDE) == 0)
 				{
-					markers.add(Markers.create(this.position, "method.overrides", this.name));
+					markers.add(this.position, "method.overrides", this.name);
 				}
 				else if (this.overrideMethod.hasModifier(Modifiers.FINAL))
 				{
-					markers.add(Markers.create(this.position, "method.override.final", this.name));
+					markers.add(this.position, "method.override.final", this.name);
 				}
 				else
 				{
 					IType type = this.overrideMethod.getType();
 					if (!Type.isSuperType(type, this.type))
 					{
-						Marker marker = Markers.create(this.position, "method.override.type", this.name);
+						Marker marker = markers.create(this.position, "method.override.type", this.name);
 						marker.addInfo("Return Type: " + this.type);
 						marker.addInfo("Overriden Return Type: " + type);
-						markers.add(marker);
+						
 					}
 				}
 			}
@@ -637,9 +638,8 @@ public class Method extends Member implements IMethod
 			{
 				if (!this.value.isType(Type.VOID))
 				{
-					Marker error = Markers.create(this.position, "constructor.return");
-					error.addInfo("Expression Type: " + this.value.getType());
-					markers.add(error);
+					Marker marker = markers.create(this.position, "constructor.return");
+					marker.addInfo("Expression Type: " + this.value.getType());
 				}
 			}
 			else
@@ -647,10 +647,10 @@ public class Method extends Member implements IMethod
 				IValue value1 = this.value.withType(this.type);
 				if (value1 == null)
 				{
-					Marker marker = Markers.create(this.position, "method.type", this.name);
+					Marker marker = markers.create(this.position, "method.type", this.name);
 					marker.addInfo("Return Type: " + this.type);
 					marker.addInfo("Value Type: " + this.value.getType());
-					markers.add(marker);
+					
 				}
 				else
 				{
@@ -662,7 +662,7 @@ public class Method extends Member implements IMethod
 		// If the method does not have an implementation and is static
 		else if (this.isStatic())
 		{
-			markers.add(Markers.create(this.position, "method.static", this.name));
+			markers.add(this.position, "method.static", this.name);
 		}
 		// Or not declared abstract and a member of a non-abstract class
 		else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
@@ -673,7 +673,7 @@ public class Method extends Member implements IMethod
 			}
 			else
 			{
-				markers.add(Markers.create(this.position, "method.unimplemented", this.name));
+				markers.add(this.position, "method.unimplemented", this.name);
 			}
 		}
 	}

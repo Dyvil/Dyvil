@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.ast.constant;
 
-import java.util.List;
-
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IConstantValue extends IValue
 {
@@ -17,18 +15,18 @@ public interface IConstantValue extends IValue
 	}
 	
 	@Override
-	public default void resolveTypes(List<Marker> markers, IContext context)
+	public default void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public default IValue resolve(List<Marker> markers, IContext context)
+	public default IValue resolve(MarkerList markers, IContext context)
 	{
 		return this;
 	}
 	
 	@Override
-	public default void check(List<Marker> markers, IContext context)
+	public default void check(MarkerList markers, IContext context)
 	{
 	}
 	

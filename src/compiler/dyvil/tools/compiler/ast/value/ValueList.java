@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.value;
 
 import java.util.Iterator;
-import java.util.List;
 
 import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
@@ -13,7 +12,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
@@ -240,7 +239,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
@@ -249,7 +248,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
@@ -259,7 +258,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.elementType == null)
 		{
@@ -279,10 +278,10 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			
 			if (value1 == null)
 			{
-				Marker marker = Markers.create(value.getPosition(), "array.element.type");
+				Marker marker = markers.create(value.getPosition(), "array.element.type");
 				marker.addInfo("Array Type: " + this.requiredType);
 				marker.addInfo("Array Element Type: " + value.getType());
-				markers.add(marker);
+				
 			}
 			else
 			{

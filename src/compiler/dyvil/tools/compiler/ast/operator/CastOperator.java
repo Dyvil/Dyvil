@@ -1,9 +1,6 @@
 package dyvil.tools.compiler.ast.operator;
 
 import static dyvil.reflect.Opcodes.*;
-
-import java.util.List;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -13,8 +10,7 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class CastOperator extends ASTNode implements IValue
 {
@@ -72,26 +68,26 @@ public class CastOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.value.resolveTypes(markers, context);
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.value = this.value.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		this.value.check(markers, context);
 		
 		if (this.type == Type.VOID)
 		{
-			markers.add(Markers.create(this.position, "cast.void"));
+			markers.add(this.position, "cast.void");
 		}
 		
 		boolean primitiveType = this.type.isPrimitive();
@@ -100,16 +96,16 @@ public class CastOperator extends ASTNode implements IValue
 		{
 			if (!primitiveValue)
 			{
-				markers.add(Markers.create(this.position, "cast.reference"));
+				markers.add(this.position, "cast.reference");
 			}
 		}
 		else if (primitiveValue)
 		{
-			markers.add(Markers.create(this.position, "cast.primitive"));
+			markers.add(this.position, "cast.primitive");
 		}
 		else if (this.value.isType(this.type))
 		{
-			markers.add(Markers.create(this.position, "cast.unnecessary"));
+			markers.add(this.position, "cast.unnecessary");
 		}
 	}
 	

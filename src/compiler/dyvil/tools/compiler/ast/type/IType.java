@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.List;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -10,7 +8,7 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IType extends IASTNode, INamed, IContext, ITypeContext
 {
@@ -175,7 +173,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	// Resolve
 	
-	public IType resolve(List<Marker> markers, IContext context);
+	public IType resolve(MarkerList markers, IContext context);
 	
 	public boolean isResolved();
 	

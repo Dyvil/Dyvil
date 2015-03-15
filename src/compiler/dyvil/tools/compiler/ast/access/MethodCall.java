@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.List;
-
 import org.objectweb.asm.Label;
 
 import dyvil.reflect.Modifiers;
@@ -24,7 +22,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.ConstantFolder;
@@ -233,7 +231,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.genericCount; i++)
 		{
@@ -248,13 +246,13 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	}
 	
 	@Override
-	public IValue resolve(List<Marker> markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		return AccessResolver.resolve(markers, context, this);
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -267,22 +265,22 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(Markers.create(this.position, "access.method.deprecated", this.name));
+				markers.add(this.position, "access.method.deprecated", this.name);
 			}
 			
 			IContext context1 = this.instance == null ? context : this.instance.getType();
 			byte access = context1.getAccessibility(this.method);
 			if (access == IContext.STATIC)
 			{
-				markers.add(Markers.create(this.position, "access.method.instance", this.name));
+				markers.add(this.position, "access.method.instance", this.name);
 			}
 			else if (access == IContext.SEALED)
 			{
-				markers.add(Markers.create(this.position, "access.method.sealed", this.name));
+				markers.add(this.position, "access.method.sealed", this.name);
 			}
 			else if ((access & IContext.READ_ACCESS) == 0)
 			{
-				markers.add(Markers.create(this.position, "access.method.invisible", this.name));
+				markers.add(this.position, "access.method.invisible", this.name);
 			}
 		}
 		
@@ -340,7 +338,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	}
 	
 	@Override
-	public boolean resolve(IContext context, List<Marker> markers)
+	public boolean resolve(IContext context, MarkerList markers)
 	{
 		int len = this.arguments.size();
 		if (len == 1)
@@ -504,17 +502,18 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		return null;
 	}
 	
+	
 	@Override
-	public Marker getResolveError()
+	public void addResolveError(MarkerList markers)
 	{
 		Marker marker;
 		if (this.arguments.isEmpty())
 		{
-			marker = Markers.create(this.position, "resolve.method_field", this.name);
+			marker = markers.create(this.position, "resolve.method_field", this.name);
 		}
 		else
 		{
-			marker = Markers.create(this.position, "resolve.method", this.name);
+			marker = markers.create(this.position, "resolve.method", this.name);
 		}
 		
 		marker.addInfo("Qualified Name: " + this.qualifiedName);
@@ -526,7 +525,6 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		StringBuilder builder = new StringBuilder("Argument Types: [");
 		Util.typesToString("", this.arguments, ", ", builder);
 		marker.addInfo(builder.append(']').toString());
-		return marker;
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.asm.Label;
+
 import dyvil.reflect.Opcodes;
 import dyvil.strings.StringUtils;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -22,8 +23,7 @@ import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValueMap;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.Markers;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
@@ -155,14 +155,14 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	}
 	
 	@Override
-	public void resolveTypes(List<Marker> markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		String s = "J" + StringUtils.toTitleCase(this.name);
 		this.theClass = DWTFile.javaxSwing.resolveClass(s);
 		
 		if (this.theClass == null)
 		{
-			markers.add(Markers.create(this.position, "dwt.component.type", this.name, s));
+			markers.add(this.position, "dwt.component.type", this.name, s);
 			return;
 		}
 		
@@ -175,7 +175,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	}
 	
 	@Override
-	public DWTNode resolve(List<Marker> markers, IContext context)
+	public DWTNode resolve(MarkerList markers, IContext context)
 	{
 		for (DWTProperty property : this.properties)
 		{
@@ -194,7 +194,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 						value.resolve(markers, m.theMethod);
 						continue;
 					}
-					markers.add(Markers.create(v.getPosition(), "dwt.property.unknown", key, this.type.toString()));
+					markers.add(v.getPosition(), "dwt.property.unknown", key, this.type.toString());
 				}
 			}
 			else if (type == NODE)
@@ -217,7 +217,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				IMethod constructor = iclass.getBody().getMethod("<init>");
 				if (constructor == null)
 				{
-					markers.add(Markers.create(value.getPosition(), "dwt.component.constructor"));
+					markers.add(value.getPosition(), "dwt.component.constructor");
 				}
 			}
 			else
@@ -230,14 +230,14 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 					property.setter = m.theMethod;
 					continue;
 				}
-				markers.add(Markers.create(value.getPosition(), "dwt.property.unknown", key, this.type.toString()));
+				markers.add(value.getPosition(), "dwt.property.unknown", key, this.type.toString());
 			}
 		}
 		return this;
 	}
 	
 	@Override
-	public void check(List<Marker> markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 	}
 	
