@@ -45,6 +45,7 @@ public class Type extends ASTNode implements IType
 	public static final Type			ITERABLE	= new Type("Iterable");
 	public static final Type			STRING		= new Type("String");
 	public static final Type			CLASS		= new Type("Class");
+	public static final Type			THROWABLE	= new Type("Throwable");
 	
 	public static final AnnotationType	AIntrinsic	= new AnnotationType("Intrinsic");
 	public static final AnnotationType	AOverride	= new AnnotationType("Override");
@@ -139,6 +140,8 @@ public class Type extends ASTNode implements IType
 		STRING.fullName = "java.lang.String";
 		CLASS.theClass = CLASS_CLASS = Package.javaLang.resolveClass("Class");
 		CLASS.fullName = "java.lang.Class";
+		THROWABLE.theClass = Package.javaLang.resolveClass("Throwable");
+		THROWABLE.fullName = "java.lang.Throwable";
 		
 		AIntrinsic.theClass = Package.dyvilLangAnnotation.resolveClass("Intrinsic");
 		AOverride.theClass = Package.javaLang.resolveClass("Override");

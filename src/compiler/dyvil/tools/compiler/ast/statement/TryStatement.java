@@ -6,10 +6,12 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.Markers;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class TryStatement extends ASTNode implements IStatement
@@ -137,6 +139,11 @@ public class TryStatement extends ASTNode implements IStatement
 		{
 			CatchBlock block = this.catchBlocks[i];
 			block.action.check(markers, context);
+			
+			if (!Type.THROWABLE.isSuperTypeOf(block.type))
+			{
+				markers.add(Markers.create(block.type.getPosition(), "try.catch.type"));
+			}
 		}
 		
 		if (this.finallyBlock != null)
@@ -217,9 +224,22 @@ public class TryStatement extends ASTNode implements IStatement
 			writer.writeTryCatchBlock(tryStart, tryEnd, handlerLabel, block.type);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
-		writer.writeFrameLabel(endLabel);
 		
-		// TODO Finally Blocks
+		if (this.finallyBlock != null)
+		{
+			org.objectweb.asm.Label finallyLabel = new org.objectweb.asm.Label();
+			
+			writer.push("java/lang/Throwable");
+			writer.writeLabel(finallyLabel);
+			writer.writeInsn(Opcodes.POP);
+			writer.writeFrameLabel(endLabel);
+			this.finallyBlock.writeExpression(writer);
+			writer.writeFinallyBlock(tryStart, tryEnd, finallyLabel);
+		}
+		else
+		{
+			writer.writeFrameLabel(endLabel);
+		}
 	}
 	
 	@Override
