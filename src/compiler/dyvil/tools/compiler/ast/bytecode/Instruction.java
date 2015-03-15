@@ -1,9 +1,6 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import static dyvil.reflect.Opcodes.*;
-
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -14,8 +11,6 @@ public class Instruction extends ASTNode
 {
 	protected int		opcode;
 	protected String	name;
-	
-	protected Label		label;
 	
 	public Instruction(int opcode, String name)
 	{

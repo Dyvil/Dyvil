@@ -1,13 +1,7 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.objectweb.asm.Label;
-
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -19,10 +13,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Bytecode extends ASTNode implements IValue
 {
-	private List<Instruction>	instructions	= new ArrayList();
-	
-	private Map<String, Label>	labels			= new HashMap();
-	public Label				endLabel		= new Label();
+	private Instruction[]	instructions;
+	private int				instructionCount;
+	private Label[]			labels;
 	
 	public Bytecode(ICodePosition position)
 	{
@@ -61,21 +54,61 @@ public class Bytecode extends ASTNode implements IValue
 	
 	public void addInstruction(Instruction insn)
 	{
-		this.instructions.add(insn);
+		int index = this.instructionCount++;
+		if (index >= this.instructions.length)
+		{
+			Instruction[] temp = new Instruction[this.instructionCount];
+			System.arraycopy(instructions, 0, temp, 0, instructions.length);
+			this.instructions = temp;
+		}
+		this.instructions[index] = insn;
 	}
 	
-	public void addInstruction(Instruction insn, String label)
+	public void addInstruction(Instruction insn, Label label)
 	{
-		this.instructions.add(insn);
-		Label l = new Label();
-		l.info = label;
-		insn.label = l;
-		this.labels.put(label, l);
+		int index = this.instructionCount++;
+		if (index >= this.instructions.length)
+		{
+			Instruction[] temp = new Instruction[this.instructionCount];
+			System.arraycopy(instructions, 0, temp, 0, instructions.length);
+			this.instructions = temp;
+		}
+		this.instructions[index] = insn;
+		
+		if (this.labels == null)
+		{
+			this.labels = new Label[index + 1];
+			this.labels[index] = label;
+			return;
+		}
+		if (index >= this.labels.length)
+		{
+			Label[] temp = new Label[index + 1];
+			System.arraycopy(this.labels, 0, temp, 0, this.labels.length);
+			this.labels = temp;
+		}
+		this.labels[index] = label;
 	}
 	
-	public Label getLabel(String name)
+	public Label resolveLabel(String name)
 	{
-		return this.labels.get(name);
+		if (this.labels == null)
+		{
+			return null;
+		}
+		
+		for (int i = 0; i < this.instructionCount; i++)
+		{
+			for (Label label : this.labels)
+			{
+				if (label != null && name.equals(label.name))
+				{
+					return label;
+				}
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override
@@ -107,49 +140,47 @@ public class Bytecode extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		for (Instruction i : this.instructions)
-		{
-			if (i.label != null)
-			{
-				writer.writeFrameLabel(i.label);
-			}
-			i.write(writer);
-		}
-		writer.writeFrameLabel(this.endLabel);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		for (Instruction i : this.instructions)
+		for (int i = 0; i < this.instructionCount; i++)
 		{
-			if (i.label != null)
+			if (this.labels != null)
 			{
-				writer.writeFrameLabel(i.label);
+				Label l = this.labels[i];
+				if (l != null)
+				{
+					writer.writeFrameLabel(l.target);
+				}
 			}
-			i.write(writer);
+			this.instructions[i].write(writer);
 		}
-		writer.writeFrameLabel(this.endLabel);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.instructions.isEmpty())
+		if (this.instructionCount == 0)
 		{
 			buffer.append('@').append(Formatting.Expression.emptyExpression);
 		}
 		else
 		{
 			buffer.append('\n').append(prefix).append("@{\n");
-			for (Instruction i : this.instructions)
+			for (int i = 0; i < this.instructionCount; i++)
 			{
 				buffer.append(prefix).append(Formatting.Method.indent);
-				if (i.label != null)
+				if (this.labels != null)
 				{
-					buffer.append(i.label.info).append(": ");
+					Label l = this.labels[i];
+					if (l != null)
+					{
+						buffer.append(l.name).append(Formatting.Expression.labelSeperator);
+					}
 				}
-				i.toString("", buffer);
+				this.instructions[i].toString("", buffer);
 				buffer.append(";\n");
 			}
 			buffer.append(prefix).append('}');

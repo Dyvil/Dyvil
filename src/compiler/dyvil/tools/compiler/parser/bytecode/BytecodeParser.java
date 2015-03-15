@@ -2,6 +2,7 @@ package dyvil.tools.compiler.parser.bytecode;
 
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.bytecode.Instruction;
+import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -61,7 +62,7 @@ public class BytecodeParser extends Parser
 				
 				if (this.label != null)
 				{
-					this.bytecode.addInstruction(insn, this.label);
+					this.bytecode.addInstruction(insn, new Label(this.label));
 					this.label = null;
 				}
 				else

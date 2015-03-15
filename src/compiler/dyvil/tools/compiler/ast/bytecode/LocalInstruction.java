@@ -55,13 +55,11 @@ public class LocalInstruction extends Instruction
 	@Override
 	public void resolve(MarkerList markers, Bytecode bytecode)
 	{
-		this.endLabel = bytecode.endLabel;
 	}
 	
 	@Override
 	public void write(MethodWriter writer)
 	{
-		// FIXME Register the local variable using addLocal
 		writer.writeLocal(this.varName, this.type, this.startLabel, this.endLabel, this.index);
 	}
 	
