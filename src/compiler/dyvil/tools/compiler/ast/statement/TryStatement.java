@@ -53,9 +53,9 @@ public class TryStatement extends ASTNode implements IStatement
 	public void addCatchBlock(CatchBlock block)
 	{
 		int index = this.catchBlockCount++;
-		if (index > this.catchBlocks.length)
+		if (index >= this.catchBlocks.length)
 		{
-			CatchBlock[] temp = new CatchBlock[index];
+			CatchBlock[] temp = new CatchBlock[this.catchBlockCount];
 			System.arraycopy(catchBlocks, 0, temp, 0, catchBlocks.length);
 			this.catchBlocks = temp;
 		}
