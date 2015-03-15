@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import dyvil.strings.CharUtils;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
@@ -201,11 +200,37 @@ public class Util
 		}
 	}
 	
-	public static void logProfile(long now, int operations, String format)
+	public static String toTime(long nanos)
 	{
-		now = System.nanoTime() - now;
-		float n = now / 1000000F;
-		float f = n / operations;
-		DyvilCompiler.logger.info(String.format(format, n, f, 1000F / f));
+		if (nanos < 1000L)
+		{
+			return nanos + " ns";
+		}
+		if (nanos < 1000000L)
+		{
+			return (nanos / 1000000D) + " ms";
+		}
+		
+		long l = 0L;
+		StringBuilder builder = new StringBuilder();
+		if (nanos >= 60_000_000_000L) // minutes
+		{
+			l = nanos / 60_000_000_000L;
+			builder.append(l).append(" min ");
+			nanos -= l;
+		}
+		if (nanos >= 1_000_000_000L) // seconds
+		{
+			l = nanos / 1_000_000_000L;
+			builder.append(l).append(" s ");
+			nanos -= l;
+		}
+		if (nanos >= 1_000_000L)
+		{
+			l = nanos / 1_000_000L;
+			builder.append(l).append(" ms ");
+			nanos -= l;
+		}
+		return builder.deleteCharAt(builder.length() - 1).toString();
 	}
 }

@@ -29,7 +29,7 @@ public final class TestThread extends Thread
 			
 			now = System.currentTimeMillis() - now;
 			
-			DyvilCompiler.logger.log(Level.INFO, "Test completed without Errors (" + now + " ms)");
+			DyvilCompiler.logger.log(Level.INFO, "Test completed (" + Util.toTime(now) + ")");
 		}
 		catch (Throwable ex)
 		{

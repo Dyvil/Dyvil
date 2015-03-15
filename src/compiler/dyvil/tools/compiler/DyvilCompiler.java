@@ -89,7 +89,8 @@ public final class DyvilCompiler
 			Package.init();
 			Type.init();
 			
-			Util.logProfile(now, libs, "Loaded " + libs + (libs == 1 ? " Library " : " Libraries ") + "(%.1f ms, %.1f ms/L, %.2f L/s)");
+			now = System.nanoTime() - now;
+			logger.info("Loaded " + libs + (libs == 1 ? " Library " : " Libraries ") + "(" + Util.toTime(now) + ")");
 		}
 		
 		now = System.nanoTime();
@@ -117,10 +118,11 @@ public final class DyvilCompiler
 		{
 			for (ICompilerPhase state : DyvilCompiler.states)
 			{
-				DyvilCompiler.logger.info("Applying State " + state.getName());
+				logger.info("Applying " + state.getName());
 				long now1 = System.nanoTime();
 				state.apply(units);
-				Util.logProfile(now1, units.size(), "Finished State " + state.getName() + " (%.1f ms, %.1f ms/CU, %.2f CU/s)");
+				now1 = System.nanoTime() - now1;
+				logger.info("Completed " + state.getName() + " (" + Util.toTime(now1) + ")");
 			}
 		}
 		else
@@ -131,8 +133,9 @@ public final class DyvilCompiler
 			}
 		}
 		
+		now = System.nanoTime() - now;
 		logger.info("");
-		Util.logProfile(now, unitCount, "Compilation finished (%.1f ms, %.1f ms/CU, %.2f CU/s)");
+		logger.info("Compilation finished (" + Util.toTime(now) + ")");
 	}
 	
 	private static void initLogger()
