@@ -1,27 +1,23 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class TypeInstruction extends Instruction
+public class TypeInstruction implements IInstruction
 {
-	private IType	type;
+	private int		opcode;
+	private String	type;
 	
-	public TypeInstruction(int opcode, String name)
+	public TypeInstruction(int opcode, String type)
 	{
-		super(opcode, name);
+		this.opcode = opcode;
+		this.type = type;
 	}
 	
 	@Override
-	public boolean addArgument(Object arg)
+	public void resolve(MarkerList markers, Bytecode bytecode)
 	{
-		if (arg instanceof String && this.type == null)
-		{
-			this.type = ClassFormat.internalToType((String) arg);
-			return true;
-		}
-		return false;
 	}
 	
 	@Override
@@ -33,6 +29,6 @@ public class TypeInstruction extends Instruction
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.name).append(' ').append(this.type);
+		buffer.append(Opcodes.toString(this.opcode)).append(' ').append(this.type);
 	}
 }

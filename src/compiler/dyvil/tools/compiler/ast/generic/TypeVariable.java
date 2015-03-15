@@ -111,7 +111,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (this.upperBounds != null)
+		if (this.upperBoundCount > 0)
 		{
 			for (int i = 0; i < this.upperBoundCount; i++)
 			{

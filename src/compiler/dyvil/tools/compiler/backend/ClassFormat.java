@@ -18,8 +18,6 @@ public class ClassFormat
 	public static File				javaRTJar;
 	public static File				dyvilRTJar;
 	
-	private static final String[]	OPCODES	= org.objectweb.asm.util.Printer.OPCODES;
-	
 	static
 	{
 		String s = System.getProperty("sun.boot.class.path");
@@ -86,24 +84,6 @@ public class ClassFormat
 			return "L" + name.replace('.', '/') + ";";
 		}
 		return name;
-	}
-	
-	public static String opcodeToString(int opcode)
-	{
-		return OPCODES[opcode];
-	}
-	
-	public static int parseOpcode(String opcode)
-	{
-		int len = OPCODES.length;
-		for (int i = 0; i < len; i++)
-		{
-			if (opcode.equalsIgnoreCase(OPCODES[i]))
-			{
-				return i;
-			}
-		}
-		return -1;
 	}
 	
 	private static IType parseBaseType(char c)

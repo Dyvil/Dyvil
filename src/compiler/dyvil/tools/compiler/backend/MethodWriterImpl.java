@@ -149,6 +149,24 @@ public final class MethodWriterImpl implements MethodWriter
 		this.visitFrame = false;
 	}
 	
+	@Override
+	public void writeFrame(int type, int stackCount, Object[] stack, int localCount, Object[] locals)
+	{
+		this.mv.visitFrame(type, stackCount, stack, localCount, locals);
+		if (type == org.objectweb.asm.Opcodes.F_NEW)
+		{
+			this.stackCount = stackCount;
+			this.stack = stack;
+			this.localCount = localCount;
+			this.locals = locals;
+		}
+		else
+		{
+			throw new RuntimeException();
+		}
+		this.visitFrame = false;
+	}
+	
 	// Parameters
 	
 	@Override
@@ -1200,7 +1218,7 @@ public final class MethodWriterImpl implements MethodWriter
 		return builder.toString();
 	}
 	
-	private static String typeToString(Object type)
+	public static String typeToString(Object type)
 	{
 		if (type == TOP)
 		{

@@ -868,8 +868,7 @@ public class Method extends Member implements IMethod
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(),
-				this.getExceptions()));
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions()));
 		
 		if (this.isConstructor)
 		{

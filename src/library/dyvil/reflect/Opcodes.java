@@ -1,6 +1,9 @@
 package dyvil.reflect;
 
 import jdk.internal.org.objectweb.asm.Label;
+
+import org.objectweb.asm.util.Printer;
+
 import dyvil.lang.annotation.Intrinsic;
 
 /**
@@ -894,6 +897,24 @@ public interface Opcodes
 	public static final int	IF_DCMPGE		= 315;
 	public static final int	IF_DCMPGT		= 316;
 	public static final int	IF_DCMPLE		= 317;
+	
+	public static String toString(int op)
+	{
+		return Printer.OPCODES[op];
+	}
+	
+	public static int parseOpcode(String opcode)
+	{
+		int len = Printer.OPCODES.length;
+		for (int i = 0; i < len; i++)
+		{
+			if (opcode.equalsIgnoreCase(Printer.OPCODES[i]))
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
 	
 	public static boolean isReturnOpcode(int op)
 	{

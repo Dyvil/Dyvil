@@ -13,7 +13,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Bytecode extends ASTNode implements IValue
 {
-	private Instruction[]	instructions;
+	private IInstruction[]	instructions	= new IInstruction[3];
 	private int				instructionCount;
 	private Label[]			labels;
 	
@@ -52,29 +52,47 @@ public class Bytecode extends ASTNode implements IValue
 		return 0;
 	}
 	
-	public void addInstruction(Instruction insn)
+	public void addInstruction(IInstruction insn)
 	{
 		int index = this.instructionCount++;
 		if (index >= this.instructions.length)
 		{
-			Instruction[] temp = new Instruction[this.instructionCount];
+			IInstruction[] temp = new IInstruction[this.instructionCount];
 			System.arraycopy(instructions, 0, temp, 0, instructions.length);
 			this.instructions = temp;
 		}
 		this.instructions[index] = insn;
 	}
 	
-	public void addInstruction(Instruction insn, Label label)
+	public void addInstruction(IInstruction insn, Label label)
 	{
 		int index = this.instructionCount++;
 		if (index >= this.instructions.length)
 		{
-			Instruction[] temp = new Instruction[this.instructionCount];
+			IInstruction[] temp = new IInstruction[this.instructionCount];
 			System.arraycopy(instructions, 0, temp, 0, instructions.length);
 			this.instructions = temp;
 		}
 		this.instructions[index] = insn;
 		
+		if (this.labels == null)
+		{
+			this.labels = new Label[index + 1];
+			this.labels[index] = label;
+			return;
+		}
+		if (index >= this.labels.length)
+		{
+			Label[] temp = new Label[index + 1];
+			System.arraycopy(this.labels, 0, temp, 0, this.labels.length);
+			this.labels = temp;
+		}
+		this.labels[index] = label;
+	}
+	
+	public void addLabel(Label label)
+	{
+		int index = this.instructionCount;
 		if (this.labels == null)
 		{
 			this.labels = new Label[index + 1];
@@ -97,14 +115,16 @@ public class Bytecode extends ASTNode implements IValue
 			return null;
 		}
 		
-		for (int i = 0; i < this.instructionCount; i++)
+		for (Label label : this.labels)
 		{
-			for (Label label : this.labels)
+			if (label == null)
 			{
-				if (label != null && name.equals(label.name))
-				{
-					return label;
-				}
+				continue;
+			}
+			
+			if (name.equals(label.name))
+			{
+				return label;
 			}
 		}
 		
@@ -119,7 +139,7 @@ public class Bytecode extends ASTNode implements IValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		for (Instruction i : this.instructions)
+		for (IInstruction i : this.instructions)
 		{
 			i.resolve(markers, this);
 		}
@@ -172,7 +192,7 @@ public class Bytecode extends ASTNode implements IValue
 			for (int i = 0; i < this.instructionCount; i++)
 			{
 				buffer.append(prefix).append(Formatting.Method.indent);
-				if (this.labels != null)
+				if (this.labels != null && i < this.labels.length)
 				{
 					Label l = this.labels[i];
 					if (l != null)

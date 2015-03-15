@@ -19,4 +19,21 @@ public class Label
 		this.name = name;
 		this.value = value;
 	}
+	
+	public Label(org.objectweb.asm.Label target)
+	{
+		this.target = target;
+	}
+	
+	public Label(org.objectweb.asm.Label target, String name)
+	{
+		this.target = target;
+		this.name = name;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this.name != null ? this.name : this.target.info.toString();
+	}
 }

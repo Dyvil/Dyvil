@@ -66,6 +66,8 @@ public interface MethodWriter
 	
 	public void writeFrame();
 	
+	public void writeFrame(int type, int stackCount, Object[] stack, int localCount, Object[] locals);
+	
 	// Parameters
 	
 	public int registerParameter(String name, Object type);

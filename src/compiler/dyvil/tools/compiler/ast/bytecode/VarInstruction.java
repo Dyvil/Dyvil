@@ -1,25 +1,23 @@
 package dyvil.tools.compiler.ast.bytecode;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class VarInstruction extends Instruction
+public class VarInstruction implements IInstruction
 {
-	private int	index	= -1;
+	private int opcode;
+	private int	index;
 	
-	public VarInstruction(int opcode, String name)
+	public VarInstruction(int opcode, int index)
 	{
-		super(opcode, name);
+		this.opcode = opcode;
+		this.index = index;
 	}
 	
 	@Override
-	public boolean addArgument(Object arg)
+	public void resolve(MarkerList markers, Bytecode bytecode)
 	{
-		if (arg instanceof Integer && this.index == -1)
-		{
-			this.index = ((Integer) arg).intValue();
-			return true;
-		}
-		return false;
 	}
 	
 	@Override
@@ -31,6 +29,6 @@ public class VarInstruction extends Instruction
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.name).append(' ').append(this.index);
+		buffer.append(Opcodes.toString(this.opcode)).append(' ').append(this.index);
 	}
 }

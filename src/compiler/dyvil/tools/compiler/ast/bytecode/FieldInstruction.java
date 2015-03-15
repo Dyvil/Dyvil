@@ -4,48 +4,32 @@ import static dyvil.reflect.Opcodes.GETFIELD;
 import static dyvil.reflect.Opcodes.GETSTATIC;
 import static dyvil.reflect.Opcodes.PUTFIELD;
 import static dyvil.reflect.Opcodes.PUTSTATIC;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class FieldInstruction extends Instruction
+public class FieldInstruction implements IInstruction
 {
+	private int opcode;
 	private String	owner;
 	private String	fieldName;
 	private String	desc;
 	private IType	type;
 	
-	public FieldInstruction(int opcode, String name)
+	public FieldInstruction(int opcode, String owner, String name, String desc)
 	{
-		super(opcode, name);
+		this.opcode = opcode;
+		this.owner = owner;
+		this.fieldName = name;
+		this.desc = desc;
+		this.type = ClassFormat.internalToType(desc);
 	}
 	
 	@Override
-	public boolean addArgument(Object arg)
+	public void resolve(MarkerList markers, Bytecode bytecode)
 	{
-		if (arg instanceof String)
-		{
-			if (this.owner == null)
-			{
-				this.owner = ClassFormat.packageToInternal((String) arg);
-				return true;
-			}
-			else if (this.fieldName == null)
-			{
-				this.fieldName = (String) arg;
-				return true;
-			}
-			else if (this.desc == null)
-			{
-				this.desc = ClassFormat.userToInternal((String) arg);
-				if (this.opcode == GETSTATIC || this.opcode == GETFIELD)
-				{
-					this.type = ClassFormat.internalToType(this.desc);
-				}
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	@Override
@@ -67,9 +51,9 @@ public class FieldInstruction extends Instruction
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.name).append(' ');
-		buffer.append('"').append(this.owner);
-		buffer.append("\", \"").append(this.fieldName);
-		buffer.append("\", \"").append(this.desc).append('"');
+		buffer.append(Opcodes.toString(this.opcode)).append(' ');
+		buffer.append(this.owner).append('.');
+		buffer.append(this.fieldName).append(':');
+		buffer.append(this.desc);
 	}
 }

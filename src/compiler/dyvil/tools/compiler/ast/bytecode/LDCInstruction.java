@@ -1,16 +1,16 @@
 package dyvil.tools.compiler.ast.bytecode;
 
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class IIncInstruction implements IInstruction
+public class LDCInstruction implements IInstruction
 {
-	private int index;
-	private int	value;
+	private IValue	argument;
 	
-	public IIncInstruction(int index, int value)
+	public LDCInstruction(Object object)
 	{
-		this.value = value;
+		this.argument = IValue.fromObject(object);
 	}
 	
 	@Override
@@ -21,12 +21,12 @@ public class IIncInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.writeIINC(this.index, this.value);
+		this.argument.writeExpression(writer);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("IINC ").append(this.value);
+		buffer.append("LDC ").append(this.argument);
 	}
 }
