@@ -104,20 +104,19 @@ public class Parameter extends Member implements IVariable
 	}
 	
 	@Override
-	public boolean processAnnotation(Annotation annotation)
+	public boolean addRawAnnotation(String type)
 	{
-		String name = annotation.type.fullName;
 		if ("dyvil.lang.annotation.var".equals(name))
 		{
 			this.modifiers |= Modifiers.VAR;
-			return true;
+			return false;
 		}
 		if ("dyvil.lang.annotation.lazy".equals(name))
 		{
 			this.modifiers |= Modifiers.LAZY;
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	@Override

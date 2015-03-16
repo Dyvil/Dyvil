@@ -153,27 +153,24 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		if (!this.processAnnotation(annotation))
+		annotation.target = ElementType.TYPE;
+		
+		if (this.annotations == null)
 		{
-			annotation.target = ElementType.TYPE;
-			
-			if (this.annotations == null)
-			{
-				this.annotations = new Annotation[3];
-				this.annotations[0] = annotation;
-				this.annotationCount = 1;
-				return;
-			}
-			
-			int index = this.annotationCount++;
-			if (this.annotationCount > this.annotations.length)
-			{
-				Annotation[] temp = new Annotation[this.annotationCount];
-				System.arraycopy(this.annotations, 0, temp, 0, index);
-				this.annotations = temp;
-			}
-			this.annotations[index] = annotation;
+			this.annotations = new Annotation[3];
+			this.annotations[0] = annotation;
+			this.annotationCount = 1;
+			return;
 		}
+		
+		int index = this.annotationCount++;
+		if (this.annotationCount > this.annotations.length)
+		{
+			Annotation[] temp = new Annotation[this.annotationCount];
+			System.arraycopy(this.annotations, 0, temp, 0, index);
+			this.annotations = temp;
+		}
+		this.annotations[index] = annotation;
 	}
 	
 	@Override
@@ -188,25 +185,24 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public boolean processAnnotation(Annotation annotation)
+	public boolean addRawAnnotation(String type)
 	{
-		String name = annotation.type.fullName;
-		if ("dyvil.lang.annotation.sealed".equals(name))
+		if ("dyvil.lang.annotation.sealed".equals(type))
 		{
 			this.modifiers |= Modifiers.SEALED;
-			return true;
+			return false;
 		}
-		if ("java.lang.Deprecated".equals(name))
+		if ("java.lang.Deprecated".equals(type))
 		{
 			this.modifiers |= Modifiers.DEPRECATED;
-			return true;
+			return false;
 		}
-		if ("java.lang.FunctionalInterface".equals(name))
+		if ("java.lang.FunctionalInterface".equals(type))
 		{
 			this.modifiers |= Modifiers.FUNCTIONAL;
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -639,7 +635,7 @@ public class CodeClass extends ASTNode implements IClass
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			if (this.processAnnotation(a))
+			if (this.addRawAnnotation(a.type.fullName))
 			{
 				this.removeAnnotation(i--);
 				continue;

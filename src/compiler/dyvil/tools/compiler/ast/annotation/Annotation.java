@@ -36,6 +36,12 @@ public class Annotation extends ASTNode implements ITyped
 	public ArgumentMap		arguments	= new ArgumentMap();
 	public ElementType		target;
 	
+	public Annotation(AnnotationType type)
+	{
+		this.type = type;
+		this.name = type.name;
+	}
+	
 	public Annotation(ICodePosition position)
 	{
 		this.position = position;
@@ -82,6 +88,12 @@ public class Annotation extends ASTNode implements ITyped
 	public void check(MarkerList markers, IContext context)
 	{
 		IClass theClass = this.type.theClass;
+		
+		if (theClass == null)
+		{
+			return;
+		}
+		
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{
 			markers.add(this.position, "annotation.type", this.name);

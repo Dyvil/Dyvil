@@ -5,7 +5,6 @@ import java.lang.annotation.ElementType;
 import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -66,15 +65,14 @@ public class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public boolean processAnnotation(Annotation annotation)
+	public boolean addRawAnnotation(String type)
 	{
-		String name = annotation.type.fullName;
-		if ("dyvil.lang.annotation.lazy".equals(name))
+		if ("dyvil.lang.annotation.lazy".equals(type))
 		{
 			this.modifiers |= Modifiers.LAZY;
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	@Override

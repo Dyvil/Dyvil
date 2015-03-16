@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.backend;
+package dyvil.tools.compiler.backend.visitor;
 
 import org.objectweb.asm.*;
 
@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.AnnotationType;
+import dyvil.tools.compiler.backend.ClassFormat;
 
 public class BytecodeVisitor extends MethodVisitor
 {
@@ -36,11 +37,14 @@ public class BytecodeVisitor extends MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		AnnotationType a = new AnnotationType();
-		ClassFormat.internalToType(type, a);
-		Annotation annotation = new Annotation(null, a);
-		
-		return new AnnotationVisitorImpl(Opcodes.ASM5, method, annotation);
+		String packName = ClassFormat.internalToPackage(type);
+		if (this.method.addRawAnnotation(packName))
+		{
+			AnnotationType atype = new AnnotationType(packName);
+			Annotation annotation = new Annotation(atype);
+			return new AnnotationVisitorImpl(this.method, annotation);
+		}
+		return null;
 	}
 	
 	@Override

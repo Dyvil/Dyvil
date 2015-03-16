@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.backend;
+package dyvil.tools.compiler.backend.visitor;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
@@ -9,14 +9,15 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.AnnotationType;
+import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class SimpleMethodVisitor extends MethodVisitor
 {
 	private final IMethod	method;
 	
-	public SimpleMethodVisitor(int api, IMethod method)
+	public SimpleMethodVisitor(IMethod method)
 	{
-		super(api);
+		super(Opcodes.ASM5);
 		this.method = method;
 	}
 	
@@ -45,12 +46,15 @@ public final class SimpleMethodVisitor extends MethodVisitor
 	}
 	
 	@Override
-	public AnnotationVisitor visitAnnotation(String name, boolean visible)
+	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		AnnotationType type = new AnnotationType();
-		ClassFormat.internalToType(name, type);
-		Annotation annotation = new Annotation(null, type);
-		
-		return new AnnotationVisitorImpl(Opcodes.ASM5, method, annotation);
+		String packName = ClassFormat.internalToPackage2(type);
+		if (this.method.addRawAnnotation(packName))
+		{
+			AnnotationType atype = new AnnotationType(packName);
+			Annotation annotation = new Annotation(atype);
+			return new AnnotationVisitorImpl(this.method, annotation);
+		}
+		return null;
 	}
 }

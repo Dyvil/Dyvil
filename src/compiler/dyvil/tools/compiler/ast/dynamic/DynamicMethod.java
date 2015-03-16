@@ -180,12 +180,6 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public boolean processAnnotation(Annotation annotation)
-	{
-		return false;
-	}
-	
-	@Override
 	public ElementType getAnnotationType()
 	{
 		return null;

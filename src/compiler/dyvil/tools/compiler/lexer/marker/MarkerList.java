@@ -106,7 +106,7 @@ public final class MarkerList implements Iterable<Marker>
 	
 	public void add(ICodePosition position, String key, Object... args)
 	{
-		this.create(position, key);
+		this.create(position, key, args);
 	}
 	
 	public Marker create(ICodePosition position, String key)

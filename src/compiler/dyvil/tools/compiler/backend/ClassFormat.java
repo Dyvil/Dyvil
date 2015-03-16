@@ -15,8 +15,8 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public class ClassFormat
 {
-	public static File				javaRTJar;
-	public static File				dyvilRTJar;
+	public static File	javaRTJar;
+	public static File	dyvilRTJar;
 	
 	static
 	{
@@ -54,6 +54,23 @@ public class ClassFormat
 	public static String internalToPackage(String name)
 	{
 		return name.replace('/', '.');
+	}
+	
+	public static String internalToPackage2(String name)
+	{
+		int len = name.length() - 1;
+		StringBuilder builder = new StringBuilder(len - 1);
+		for (int i = 1; i < len; i++)
+		{
+			char c = name.charAt(i);
+			if (c == '/')
+			{
+				builder.append('.');
+				continue;
+			}
+			builder.append(c);
+		}
+		return builder.toString();
 	}
 	
 	public static String userToInternal(String name)

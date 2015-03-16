@@ -264,7 +264,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 				return false;
 			}
 			
-			if (this.instance != null && !(this.field.isField()))
+			if (this.instance != null && !(field.isField()))
 			{
 				return false;
 			}

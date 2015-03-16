@@ -5,7 +5,6 @@ import java.lang.annotation.ElementType;
 import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -65,9 +64,9 @@ public class LambdaParameter extends Member implements IVariable
 	}
 	
 	@Override
-	public boolean processAnnotation(Annotation annotation)
+	public boolean addRawAnnotation(String type)
 	{
-		return false;
+		return true;
 	}
 	
 	@Override

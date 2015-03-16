@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.AnnotationType;
+import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
 
 public class ClassReader extends ClassVisitor
 {
@@ -62,7 +63,7 @@ public class ClassReader extends ClassVisitor
 		AnnotationType type = new AnnotationType();
 		ClassFormat.internalToType(name, type);
 		Annotation annotation = new Annotation(null, type);
-		return new AnnotationVisitorImpl(this.api, this.bclass, annotation);
+		return new AnnotationVisitorImpl(this.bclass, annotation);
 	}
 	
 	@Override

@@ -66,27 +66,24 @@ public abstract class Member extends ASTNode implements IMember
 	@Override
 	public final void addAnnotation(Annotation annotation)
 	{
-		if (!this.processAnnotation(annotation))
+		annotation.target = this.getAnnotationType();
+		
+		if (this.annotations == null)
 		{
-			annotation.target = this.getAnnotationType();
-			
-			if (this.annotations == null)
-			{
-				this.annotations = new Annotation[3];
-				this.annotations[0] = annotation;
-				this.annotationCount = 1;
-				return;
-			}
-			
-			int index = this.annotationCount++;
-			if (this.annotationCount > this.annotations.length)
-			{
-				Annotation[] temp = new Annotation[this.annotationCount];
-				System.arraycopy(this.annotations, 0, temp, 0, index);
-				this.annotations = temp;
-			}
-			this.annotations[index] = annotation;
+			this.annotations = new Annotation[3];
+			this.annotations[0] = annotation;
+			this.annotationCount = 1;
+			return;
 		}
+		
+		int index = this.annotationCount++;
+		if (this.annotationCount > this.annotations.length)
+		{
+			Annotation[] temp = new Annotation[this.annotationCount];
+			System.arraycopy(this.annotations, 0, temp, 0, index);
+			this.annotations = temp;
+		}
+		this.annotations[index] = annotation;
 	}
 	
 	@Override
@@ -244,7 +241,8 @@ public abstract class Member extends ASTNode implements IMember
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			if (this.processAnnotation(a))
+			String fullName = a.type.fullName;
+			if (fullName != null && !this.addRawAnnotation(fullName))
 			{
 				this.removeAnnotation(i--);
 				continue;

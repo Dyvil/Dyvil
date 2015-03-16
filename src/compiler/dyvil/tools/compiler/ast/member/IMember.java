@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.member;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -13,10 +11,6 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 public interface IMember extends INamed, ITyped, IModified, IAnnotationList
 {
 	public void setAnnotations(Annotation[] annotations, int count);
-	
-	public boolean processAnnotation(Annotation annotation);
-	
-	public ElementType getAnnotationType();
 	
 	public default IClass getTheClass()
 	{

@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.parser.classes;
 
+import java.lang.annotation.ElementType;
+
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
@@ -73,13 +75,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (type == Tokens.SEMICOLON)
-		{
-			this.reset();
-			return;
-		}
 		
-		String value = token.value();
 		if (this.isInMode(BODY_END))
 		{
 			if (type == Tokens.CLOSE_CURLY_BRACKET)
@@ -88,8 +84,20 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				return;
 			}
 		}
+		String value = token.value();
 		if (this.isInMode(TYPE))
 		{
+			if (type == Tokens.SEMICOLON)
+			{
+				if (token.isInferred())
+				{
+					return;
+				}
+				
+				this.reset();
+				return;
+			}
+			
 			int i = 0;
 			if ((i = ModifierTypes.MEMBER.parse(value)) != -1)
 			{
@@ -124,77 +132,79 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		}
 		if (this.isInMode(NAME))
 		{
-			if (ParserUtil.isIdentifier(type) || type == Tokens.NEW)
+			if (!ParserUtil.isIdentifier(type) && type != Tokens.NEW)
 			{
-				IToken next = token.next();
-				type = next.type();
-				if (type == Tokens.SEMICOLON)
-				{
-					Field f = new Field(this.theClass, value, this.type);
-					f.position = token.raw();
-					f.modifiers = this.modifiers;
-					f.setAnnotations(this.getAnnotations(), this.annotationCount);
-					this.body.addField(f);
-					
-					pm.skip();
-					this.reset();
-					return;
-				}
-				if (type == Tokens.OPEN_PARENTHESIS)
-				{
-					this.mode = PARAMETERS;
-					
-					Method m = new Method(this.theClass, value, this.type);
-					m.modifiers = this.modifiers;
-					m.position = token.raw();
-					m.setAnnotations(this.getAnnotations(), this.annotationCount);
-					this.method = m;
-					this.body.addMethod(this.method);
-					return;
-				}
-				if (type == Tokens.OPEN_CURLY_BRACKET)
-				{
-					this.mode = PROPERTY_END;
-					Property p = new Property(this.theClass, value, this.type);
-					p.position = token.raw();
-					p.modifiers = this.modifiers;
-					p.setAnnotations(this.getAnnotations(), this.annotationCount);
-					this.body.addProperty(p);
-					
-					pm.skip();
-					pm.pushParser(new PropertyParser(this.theClass, p));
-					return;
-				}
-				if (type == Tokens.EQUALS)
-				{
-					Field f = new Field(this.theClass, value, this.type);
-					f.position = token.raw();
-					f.modifiers = this.modifiers;
-					f.setAnnotations(this.getAnnotations(), this.annotationCount);
-					this.body.addField(f);
-					
-					pm.skip();
-					pm.pushParser(new ExpressionParser(f));
-					this.reset();
-					return;
-				}
-				if (type == Tokens.OPEN_SQUARE_BRACKET)
-				{
-					Method m = new Method(this.theClass, value, this.type);
-					m.modifiers = this.modifiers;
-					m.position = token.raw();
-					m.setAnnotations(this.getAnnotations(), this.annotationCount);
-					this.method = m;
-					this.body.addMethod(this.method);
-					
-					this.mode = GENERICS_END;
-					pm.skip();
-					pm.pushParser(new TypeVariableListParser(this.method));
-					return;
-				}
+				this.reset();
+				throw new SyntaxError(token, "Invalid Member Declaration - Name expected");
 			}
-			this.reset();
-			throw new SyntaxError(token, "Invalid Member Declaration - Name expected");
+			
+			IToken next = token.next();
+			type = next.type();
+			if (type == Tokens.SEMICOLON)
+			{
+				Field f = new Field(this.theClass, value, this.type);
+				f.position = token.raw();
+				f.modifiers = this.modifiers;
+				f.setAnnotations(this.getAnnotations(), this.annotationCount);
+				this.body.addField(f);
+				
+				pm.skip();
+				this.reset();
+				return;
+			}
+			if (type == Tokens.OPEN_PARENTHESIS)
+			{
+				this.mode = PARAMETERS;
+				
+				Method m = new Method(this.theClass, value, this.type);
+				m.modifiers = this.modifiers;
+				m.position = token.raw();
+				m.setAnnotations(this.getAnnotations(), this.annotationCount);
+				this.method = m;
+				this.body.addMethod(this.method);
+				return;
+			}
+			if (type == Tokens.OPEN_CURLY_BRACKET)
+			{
+				this.mode = PROPERTY_END;
+				Property p = new Property(this.theClass, value, this.type);
+				p.position = token.raw();
+				p.modifiers = this.modifiers;
+				p.setAnnotations(this.getAnnotations(), this.annotationCount);
+				this.body.addProperty(p);
+				
+				pm.skip();
+				pm.pushParser(new PropertyParser(this.theClass, p));
+				return;
+			}
+			if (type == Tokens.EQUALS)
+			{
+				Field f = new Field(this.theClass, value, this.type);
+				f.position = token.raw();
+				f.modifiers = this.modifiers;
+				f.setAnnotations(this.getAnnotations(), this.annotationCount);
+				this.body.addField(f);
+				
+				pm.skip();
+				pm.pushParser(new ExpressionParser(f));
+				this.reset();
+				return;
+			}
+			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			{
+				Method m = new Method(this.theClass, value, this.type);
+				m.modifiers = this.modifiers;
+				m.position = token.raw();
+				m.setAnnotations(this.getAnnotations(), this.annotationCount);
+				this.method = m;
+				this.body.addMethod(this.method);
+				
+				this.mode = GENERICS_END;
+				pm.skip();
+				pm.pushParser(new TypeVariableListParser(this.method));
+				return;
+			}
+			return;
 		}
 		if (this.isInMode(PROPERTY_END))
 		{
@@ -235,6 +245,11 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		}
 		if (this.isInMode(METHOD_END))
 		{
+			if (type == Tokens.SEMICOLON)
+			{
+				this.reset();
+				return;
+			}
 			if (type == Tokens.OPEN_CURLY_BRACKET)
 			{
 				pm.pushParser(new ExpressionParser(this.method), true);
@@ -250,13 +265,6 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				pm.pushParser(new ThrowsDeclParser(this.method));
 				return;
 			}
-		}
-		
-		// "Insert" a semicolon after a closing curly bracket.
-		if (token.prev().type() == Tokens.CLOSE_CURLY_BRACKET)
-		{
-			this.reset();
-			pm.reparse();
 		}
 	}
 	
@@ -312,6 +320,12 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	
 	@Override
 	public Annotation getAnnotation(IType type)
+	{
+		return null;
+	}
+	
+	@Override
+	public ElementType getAnnotationType()
 	{
 		return null;
 	}

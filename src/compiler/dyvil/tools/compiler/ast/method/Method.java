@@ -51,7 +51,7 @@ public class Method extends Member implements IMethod
 	protected IType[]			exceptions;
 	protected int				exceptionCount;
 	
-	public IValue			value;
+	public IValue				value;
 	
 	protected boolean			isConstructor;
 	
@@ -240,45 +240,30 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public boolean processAnnotation(Annotation annotation)
+	public boolean addRawAnnotation(String type)
 	{
-		String name = annotation.type.fullName;
-		switch (name)
+		switch (type)
 		{
 		case "dyvil.lang.annotation.inline":
 			this.modifiers |= Modifiers.INLINE;
-			return true;
+			return false;
 		case "dyvil.lang.annotation.infix":
 			this.modifiers |= Modifiers.INFIX;
-			return true;
+			return false;
 		case "dyvil.lang.annotation.prefix":
 			this.modifiers |= Modifiers.PREFIX;
-			return true;
+			return false;
 		case "dyvil.lang.annotation.sealed":
 			this.modifiers |= Modifiers.SEALED;
-			return true;
-		case "dyvil.lang.annotation.Intrinsic":
-			ValueList array = (ValueList) annotation.arguments.getValue("value");
-			if (array != null)
-			{
-				int len = array.valueCount();
-				int[] opcodes = new int[len];
-				for (int i = 0; i < len; i++)
-				{
-					IntValue v = (IntValue) array.getValue(i).foldConstants();
-					opcodes[i] = v.value;
-				}
-				this.intrinsicOpcodes = opcodes;
-			}
 			return false;
 		case "java.lang.Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
-			return true;
+			return false;
 		case "java.lang.Override":
 			this.modifiers |= Modifiers.OVERRIDE;
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -571,6 +556,29 @@ public class Method extends Member implements IMethod
 		}
 		
 		super.resolveTypes(markers, this);
+		
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			Annotation annotation = this.annotations[i];
+			if (!"dyvil.lang.annotation.Intrinsic".equals(annotation.type.fullName))
+			{
+				continue;
+			}
+			
+			ValueList array = (ValueList) annotation.arguments.getValue("value");
+			if (array != null)
+			{
+				int len = array.valueCount();
+				int[] opcodes = new int[len];
+				for (int j = 0; j < len; j++)
+				{
+					IntValue v = (IntValue) array.getValue(j).foldConstants();
+					opcodes[j] = v.value;
+				}
+				this.intrinsicOpcodes = opcodes;
+			}
+			break;
+		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{

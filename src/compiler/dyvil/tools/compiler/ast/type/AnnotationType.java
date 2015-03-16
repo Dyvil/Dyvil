@@ -21,12 +21,13 @@ public class AnnotationType extends Type
 	
 	public AnnotationType()
 	{
-		super();
 	}
 	
-	public AnnotationType(String name)
+	public AnnotationType(String packageName)
 	{
-		super(name);
+		int index = packageName.lastIndexOf('.');
+		this.fullName = packageName;
+		this.name = this.qualifiedName = packageName.substring(index + 1);
 	}
 	
 	public AnnotationType(ICodePosition position, String name)

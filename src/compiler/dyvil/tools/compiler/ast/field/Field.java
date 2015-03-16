@@ -6,7 +6,6 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -78,25 +77,24 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public boolean processAnnotation(Annotation annotation)
+	public boolean addRawAnnotation(String type)
 	{
-		String name = annotation.type.fullName;
-		if ("dyvil.lang.annotation.lazy".equals(name))
+		if ("dyvil.lang.annotation.lazy".equals(type))
 		{
 			this.modifiers |= Modifiers.LAZY;
-			return true;
+			return false;
 		}
-		if ("dyvil.lang.annotation.sealed".equals(name))
+		if ("dyvil.lang.annotation.sealed".equals(type))
 		{
 			this.modifiers |= Modifiers.SEALED;
-			return true;
+			return false;
 		}
-		if ("java.lang.Deprecated".equals(name))
+		if ("java.lang.Deprecated".equals(type))
 		{
 			this.modifiers |= Modifiers.DEPRECATED;
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	@Override

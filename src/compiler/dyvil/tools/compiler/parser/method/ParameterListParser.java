@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.parser.method;
 
+import java.lang.annotation.ElementType;
+
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.member.IAnnotationList;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
@@ -176,6 +178,12 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 	
 	@Override
 	public Annotation getAnnotation(IType type)
+	{
+		return null;
+	}
+	
+	@Override
+	public ElementType getAnnotationType()
 	{
 		return null;
 	}

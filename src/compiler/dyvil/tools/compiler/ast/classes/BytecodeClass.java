@@ -3,14 +3,11 @@ package dyvil.tools.compiler.ast.classes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.MethodCall;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
@@ -21,13 +18,13 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.backend.AnnotationVisitorImpl;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.backend.SimpleMethodVisitor;
+import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
+import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
+import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.transform.Symbols;
 
@@ -373,22 +370,22 @@ public class BytecodeClass extends CodeClass
 			return null;
 		}
 		
-		return new FieldVisitor(Opcodes.ASM5)
-		{
-			@Override
-			public AnnotationVisitor visitAnnotation(String name, boolean visible)
-			{
-				AnnotationType type = new AnnotationType();
-				ClassFormat.internalToType(name, type);
-				Annotation annotation = new Annotation(null, type);
-				
-				return new AnnotationVisitorImpl(Opcodes.ASM5, field, annotation);
-			}
-		};
+		return new SimpleFieldVisitor(field);
 	}
 	
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
+		if ((this.modifiers & Modifiers.ANNOTATION) != 0)
+		{
+			Parameter param = new Parameter();
+			param.modifiers = access;
+			param.name = Symbols.unqualify(name);
+			param.qualifiedName = name;
+			param.type = ClassFormat.internalToType(desc.substring(desc.lastIndexOf(')') + 1));
+			this.addParameter(param);
+			return new AnnotationClassVisitor(param);
+		}
+		
 		Method method = new Method(this);
 		method.setName(Symbols.unqualify(name), name);
 		method.setModifiers(access);
@@ -425,7 +422,7 @@ public class BytecodeClass extends CodeClass
 			this.body.addMethod(method);
 		}
 		
-		return new SimpleMethodVisitor(Opcodes.ASM5, method);
+		return new SimpleMethodVisitor(method);
 	}
 	
 	public void visitOuterClass(String owner, String name, String desc)
