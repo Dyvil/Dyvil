@@ -63,7 +63,13 @@ public class CaseClasses
 		writer.registerLocal(extended);
 		writer.writeVarInsn(ASTORE, 2);
 		
-		int len = body.fieldCount();
+		int len = theClass.parameterCount();
+		for (int i = 0; i < len; i++)
+		{
+			writeEquals(writer, theClass.getParameter(i));
+		}
+		
+		len = body.fieldCount();
 		for (int i = 0; i < len; i++)
 		{
 			IField f = body.getField(i);
@@ -145,7 +151,20 @@ public class CaseClasses
 	public static void writeHashCode(MethodWriter writer, CodeClass theClass, IClassBody body)
 	{
 		writer.writeLDC(31);
-		int len = body.fieldCount();
+		
+		int len = theClass.parameterCount();
+		for (int i = 0; i < len; i++)
+		{
+			// Write the hashing strategy for the field
+			writeHashCode(writer, theClass.getParameter(i));
+			// Add the hash to the previous result
+			writer.writeInsn(IADD);
+			writer.writeLDC(31);
+			// Multiply the result by 31
+			writer.writeInsn(IMUL);
+		}
+		
+		len = body.fieldCount();
 		for (int i = 0; i < len; i++)
 		{
 			IField f = body.getField(i);
@@ -256,21 +275,36 @@ public class CaseClasses
 		writer.writeInvokeInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false, 2, (String) null);
 		
 		// ----- Fields -----
-		int len = body.fieldCount();
-		for (int i = 0; i < len; i++)
+		int params = theClass.parameterCount();
+		int fields = body.fieldCount();
+		for (int i = 0; i < params; i++)
+		{
+			writeToString(writer, theClass.getParameter(i));
+			if (fields > 0 || i + 1 < params)
+			{
+				// Separator Comma
+				writer.writeLDC(", ");
+				writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
+						"Ljava/lang/StringBuilder;");
+			}
+		}
+		
+		for (int i = 0; i < fields; i++)
 		{
 			IField f = body.getField(i);
 			
-			if (!f.hasModifier(Modifiers.STATIC))
+			if (f.hasModifier(Modifiers.STATIC))
 			{
-				writeToString(writer, f);
-				if (i + 1 < len)
-				{
-					// Separator Comma
-					writer.writeLDC(", ");
-					writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
-							"Ljava/lang/StringBuilder;");
-				}
+				continue;
+			}
+			
+			writeToString(writer, f);
+			if (i + 1 < fields)
+			{
+				// Separator Comma
+				writer.writeLDC(", ");
+				writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
+						"Ljava/lang/StringBuilder;");
 			}
 		}
 		

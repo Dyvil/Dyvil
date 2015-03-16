@@ -6,9 +6,11 @@ import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.member.IModified;
+import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -20,13 +22,13 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class Parameter extends Member implements IVariable
 {
-	public IMethod	method;
+	public IParameterized	parameterized;
 	
-	public int		index;
-	public char		seperator;
-	public boolean	varargs;
+	public int				index;
+	public char				seperator;
+	public boolean			varargs;
 	
-	public IValue	defaultValue;
+	public IValue			defaultValue;
 	
 	public Parameter()
 	{
@@ -142,7 +144,9 @@ public class Parameter extends Member implements IVariable
 		
 		if (this.defaultValue != null)
 		{
+			IClass iclass = context.getThisType().getTheClass();
 			this.defaultValue = this.defaultValue.resolve(markers, context);
+			iclass.addCompilable(this);
 		}
 	}
 	
@@ -179,8 +183,8 @@ public class Parameter extends Member implements IVariable
 		}
 		
 		// Copy the access modifiers and add the STATIC modifier
-		int modifiers = this.method.getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
-		String name = "parDefault$" + this.method.getQualifiedName() + "$" + this.index;
+		int modifiers = ((IModified) this.parameterized).getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
+		String name = "parDefault$" + ((INamed) this.parameterized).getQualifiedName() + "$" + this.index;
 		String desc = "()" + this.type.getExtendedName();
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
 		mw.begin();
@@ -206,6 +210,12 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
+		if (this.parameterized.isClass())
+		{
+			writer.writeGetField(((IClass) this.parameterized).getInternalName(), qualifiedName, this.getDescription(), type);
+			return;
+		}
+		
 		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
@@ -213,6 +223,12 @@ public class Parameter extends Member implements IVariable
 	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
 		value.writeExpression(writer);
+		
+		if (this.parameterized.isClass())
+		{
+			writer.writePutField(((IClass) this.parameterized).getInternalName(), qualifiedName, this.getDescription());
+			return;
+		}
 		
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}

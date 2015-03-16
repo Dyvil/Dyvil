@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.method;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.member.IAnnotationList;
-import dyvil.tools.compiler.ast.parameter.IParameterized;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -24,7 +24,7 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 	public static final int		NAME		= 2;
 	public static final int		SEPERATOR	= 4;
 	
-	protected IParameterized	parameterized;
+	protected IParameterList	paramList;
 	
 	private int					modifiers;
 	private Annotation[]		annotations	= new Annotation[2];
@@ -34,9 +34,9 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 	private Parameter			parameter;
 	private boolean				varargs;
 	
-	public ParameterListParser(IParameterized parameterized)
+	public ParameterListParser(IParameterList paramList)
 	{
-		this.parameterized = parameterized;
+		this.paramList = paramList;
 		this.mode = TYPE;
 	}
 	
@@ -92,12 +92,12 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 				this.parameter = new Parameter(0, token.value(), this.type);
 				this.parameter.modifiers = this.modifiers;
 				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);
-				this.parameterized.addParameter(this.parameter);
+				this.paramList.addParameter(this.parameter);
 				
 				if (this.varargs)
 				{
 					this.parameter.setVarargs();
-					this.parameterized.setVarargs();
+					this.paramList.setVarargs();
 					this.varargs = false;
 				}
 				return;

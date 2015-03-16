@@ -326,6 +326,11 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public void setParameters(Parameter[] parameters, int parameterCount)
+	{
+	}
+	
+	@Override
 	public void setParameter(int index, Parameter param)
 	{
 	}

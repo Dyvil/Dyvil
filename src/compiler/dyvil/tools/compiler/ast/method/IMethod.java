@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterized;
+import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
@@ -21,6 +22,17 @@ public interface IMethod extends IASTNode, IMember, IBaseMethod, IValued, IConte
 	public int getSignatureMatch(String name, IValue instance, IArguments arguments);
 	
 	public void checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext);
+	
+	// Misc
+	
+	public void setParameters(Parameter[] parameters, int parameterCount);
+	
+	@Override
+	public default void addType(IType type)
+	{
+		int index = this.parameterCount();
+		this.addParameter(new Parameter(index, "par" + index, type));
+	}
 	
 	// Generics
 	

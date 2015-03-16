@@ -8,12 +8,19 @@ import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IParameterized;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.IDyvilUnit;
 import dyvil.tools.compiler.ast.type.IType;
 
-public interface IClass extends IASTNode, IMember, IGeneric, IContext
+public interface IClass extends IASTNode, IMember, IGeneric, IContext, IParameterized
 {
+	@Override
+	public default boolean isClass()
+	{
+		return true;
+	}
+	
 	public IDyvilUnit getUnit();
 	
 	public void setOuterClass(IClass iclass);

@@ -10,6 +10,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
@@ -19,16 +20,18 @@ import dyvil.tools.compiler.util.Tokens;
 
 public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 {
-	public static final int	MODIFIERS		= 0;
-	public static final int	NAME			= 1;
-	public static final int	GENERICS		= 2;
-	public static final int	GENERICS_END	= 4;
-	public static final int	EXTENDS			= 8;
-	public static final int	IMPLEMENTS		= 16;
-	public static final int	BODY			= 32;
-	public static final int	BODY_END		= 64;
+	private static final int	MODIFIERS		= 0;
+	private static final int	NAME			= 1;
+	private static final int	PARAMETERS		= 2;
+	private static final int	PARAMETERS_END	= 4;
+	private static final int	GENERICS		= 8;
+	private static final int	GENERICS_END	= 16;
+	private static final int	EXTENDS			= 32;
+	private static final int	IMPLEMENTS		= 64;
+	private static final int	BODY			= 128;
+	private static final int	BODY_END		= 256;
 	
-	protected CodeClass		theClass;
+	protected CodeClass			theClass;
 	
 	public ClassDeclParser(CodeClass theClass)
 	{
@@ -77,10 +80,28 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 			{
 				this.theClass.setPosition(token.raw());
 				this.theClass.setName(value);
-				this.mode = GENERICS | EXTENDS | IMPLEMENTS | BODY;
+				this.mode = PARAMETERS | GENERICS | EXTENDS | IMPLEMENTS | BODY;
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Class Declaration - Name expected");
+		}
+		if (this.isInMode(PARAMETERS))
+		{
+			if (type == Tokens.OPEN_PARENTHESIS)
+			{
+				pm.pushParser(new ParameterListParser(this.theClass));
+				this.mode = PARAMETERS_END;
+				return;
+			}
+		}
+		if (this.isInMode(PARAMETERS_END))
+		{
+			this.mode = GENERICS | EXTENDS | IMPLEMENTS | BODY;
+			if (type == Tokens.CLOSE_PARENTHESIS)
+			{
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Class Parameter List - ')' expected", true);
 		}
 		if (this.isInMode(GENERICS))
 		{

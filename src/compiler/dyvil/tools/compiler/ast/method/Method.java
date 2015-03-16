@@ -197,6 +197,15 @@ public class Method extends Member implements IMethod
 		return (this.modifiers & Modifiers.VARARGS) != 0;
 	}
 	
+	// Parameters
+	
+	@Override
+	public void setParameters(Parameter[] parameters, int parameterCount)
+	{
+		this.parameters = parameters;
+		this.parameterCount = parameterCount;
+	}
+	
 	@Override
 	public int parameterCount()
 	{
@@ -207,7 +216,7 @@ public class Method extends Member implements IMethod
 	public void setParameter(int index, Parameter param)
 	{
 		this.parameters[index] = param;
-		param.method = this;
+		param.parameterized = this;
 	}
 	
 	@Override
@@ -221,7 +230,7 @@ public class Method extends Member implements IMethod
 			this.parameters = temp;
 		}
 		this.parameters[index] = param;
-		param.method = this;
+		param.parameterized = this;
 	}
 	
 	@Override
@@ -604,11 +613,6 @@ public class Method extends Member implements IMethod
 			Parameter param = this.parameters[i];
 			param.index = index++;
 			param.resolve(markers, context);
-			
-			if (param.defaultValue != null)
-			{
-				this.theClass.addCompilable(param);
-			}
 		}
 		
 		if (this.value != null)
