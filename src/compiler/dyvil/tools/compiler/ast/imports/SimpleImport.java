@@ -66,7 +66,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 		{
 			if (!(context instanceof IClass))
 			{
-				markers.add(this.position, "import.using");
+				markers.add(this.position, "import.using.invalid");
 				return;
 			}
 			

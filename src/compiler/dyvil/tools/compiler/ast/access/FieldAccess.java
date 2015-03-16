@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.access;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.EnumValue;
-import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -178,7 +177,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 					this.instance = null;
 				}
 			}
-			else if (this.instance == null && this.field instanceof Field)
+			else if (this.instance == null && this.field.isField())
 			{
 				markers.add(this.position, "access.field.unqualified", this.name);
 				this.instance = new ThisValue(this.position, this.field.getTheClass().getType());
@@ -230,7 +229,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 			return false;
 		}
 		
-		if (this.instance != null && !(this.field instanceof Field))
+		if (this.instance != null && !(this.field.isField()))
 		{
 			return false;
 		}
@@ -265,7 +264,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 				return false;
 			}
 			
-			if (this.instance != null && !(field instanceof Field))
+			if (this.instance != null && !(this.field.isField()))
 			{
 				return false;
 			}

@@ -152,7 +152,7 @@ public class IfStatement extends ASTNode implements IStatement
 		
 		if (this.elseThen != null)
 		{
-			if (this.elseThen instanceof IStatement)
+			if (this.elseThen.isStatement())
 			{
 				((IStatement) this.elseThen).setParent(this);
 			}

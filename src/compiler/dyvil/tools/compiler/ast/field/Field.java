@@ -42,6 +42,12 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
+	public boolean isField()
+	{
+		return true;
+	}
+	
+	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;

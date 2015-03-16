@@ -34,9 +34,9 @@ public class PackageImport extends ASTNode implements IImport
 	{
 		if (isStatic)
 		{
-			if (!(context instanceof CodeClass))
+			if (!(context instanceof IClass))
 			{
-				markers.add(this.position, "Invalid Wildcard Import");
+				markers.add(this.position, "import.package.invalid");
 				return;
 			}
 			

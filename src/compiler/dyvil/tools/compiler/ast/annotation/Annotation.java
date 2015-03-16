@@ -210,7 +210,7 @@ public class Annotation extends ASTNode implements ITyped
 			EnumValue enumValue = (EnumValue) value;
 			visitor.visitEnum(key, enumValue.type.getExtendedName(), enumValue.name);
 		}
-		else if (value instanceof IConstantValue)
+		else if (value.isConstant())
 		{
 			visitor.visit(key, ((IConstantValue) value).toObject());
 		}

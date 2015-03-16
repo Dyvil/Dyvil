@@ -362,7 +362,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	
 	private boolean writeIINC(MethodWriter writer, IField f)
 	{
-		if (this.arguments.size() == 1 && f.getType() == Type.INT && f instanceof IVariable)
+		if (this.arguments.size() == 1 && f.getType() == Type.INT && f.isVariable())
 		{
 			boolean minus = false;
 			if ("$plus".equals(this.qualifiedName) || (minus = "$minus".equals(this.qualifiedName)))

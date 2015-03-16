@@ -14,6 +14,16 @@ public interface IField extends IASTNode, IMember, IClassCompilable, IValued
 		return false;
 	}
 	
+	public default boolean isField()
+	{
+		return false;
+	}
+	
+	public default boolean isVariable()
+	{
+		return true;
+	}
+	
 	// Compilation
 	
 	public void writeGet(MethodWriter writer, IValue instance);
