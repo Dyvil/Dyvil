@@ -390,12 +390,11 @@ public class Method extends Member implements IMethod
 	public void checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
 		int len = arguments.size();
-		Parameter par;
 		IType parType;
 		
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			par = this.parameters[0];
+			Parameter par = this.parameters[0];
 			parType = par.getType(typeContext);
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
@@ -403,13 +402,22 @@ public class Method extends Member implements IMethod
 				Marker marker = markers.create(instance.getPosition(), "access.method.infix_type", par.name);
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
-				
 			}
 			
 			if ((this.modifiers & Modifiers.VARARGS) != 0)
 			{
-				par = this.parameters[this.parameterCount - 1];
-				arguments.checkVarargsValue(this.parameterCount - 2, par, markers, typeContext);
+				arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1], markers, typeContext);
+				
+				for (int i = 0; i < this.parameterCount - 2; i++)
+				{
+					arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
+				}
+				return;
+			}
+			
+			for (int i = 0; i < this.parameterCount - 1; i++)
+			{
+				arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
 			}
 			return;
 		}
@@ -431,21 +439,18 @@ public class Method extends Member implements IMethod
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			len = this.parameterCount - 1;
-			par = this.parameters[len];
-			arguments.checkVarargsValue(len, par, markers, typeContext);
+			arguments.checkVarargsValue(len, this.parameters[len], markers, typeContext);
 			
 			for (int i = 0; i < len; i++)
 			{
-				par = this.parameters[i];
-				arguments.checkValue(i, par, markers, typeContext);
+				arguments.checkValue(i, this.parameters[i], markers, typeContext);
 			}
 			return;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			par = this.parameters[i];
-			arguments.checkValue(i, par, markers, typeContext);
+			arguments.checkValue(i, this.parameters[i], markers, typeContext);
 		}
 	}
 	
@@ -868,7 +873,8 @@ public class Method extends Member implements IMethod
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(), this.getExceptions()));
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(),
+				this.getExceptions()));
 		
 		if (this.isConstructor)
 		{

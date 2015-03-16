@@ -144,7 +144,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 		if (this.upperBoundCount > 0)
 		{
 			// The first upper bound is meant to be a class bound.
-			IType type = this.upperBounds[0];
+			IType type = this.upperBounds[0] = this.upperBounds[0].resolve(markers, context);
 			IClass iclass = type.getTheClass();
 			if (iclass != null)
 			{
@@ -172,7 +172,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 			// not.
 			for (int i = 1; i < this.upperBoundCount; i++)
 			{
-				type = this.upperBounds[i];
+				type = this.upperBounds[i] = this.upperBounds[i].resolve(markers, context);
 				iclass = type.getTheClass();
 				if (iclass != null && !iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{

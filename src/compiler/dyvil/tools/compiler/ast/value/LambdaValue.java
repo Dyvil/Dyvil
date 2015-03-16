@@ -517,7 +517,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		
 		// Reset Captured Field Indexes
 		
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			IVariable var = this.capturedFields[i];
 			var.setIndex(prevIndex[i]);

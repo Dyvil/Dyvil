@@ -176,25 +176,26 @@ public final class GenericType extends Type implements ITypeList
 				return this;
 			}
 			
+			if (markers == null)
+			{
+				for (int i = 0; i < this.genericCount; i++)
+				{
+					this.generics[i] = this.generics[i].resolve(markers, context);
+				}
+				return this;
+			}
+			
 			for (int i = 0; i < this.genericCount; i++)
 			{
 				IType t1 = this.generics[i];
-				IType t2 = t1.resolve(markers, context);
-				if (t1 != t2)
-				{
-					this.generics[i] = t2;
-				}
+				IType t2 = this.generics[i] = t1.resolve(markers, context);
 				
-				if (markers != null)
+				ITypeVariable var = this.theClass.getTypeVariable(i);
+				if (!var.isSuperTypeOf(t2))
 				{
-					ITypeVariable var = this.theClass.getTypeVariable(i);
-					if (!var.isSuperTypeOf(t2))
-					{
-						Marker marker = markers.create(t2.getPosition(), "generic.type", var.getQualifiedName());
-						marker.addInfo("Generic Type: " + t2);
-						marker.addInfo("Type Variable: " + var);
-						
-					}
+					Marker marker = markers.create(t2.getPosition(), "generic.type", var.getQualifiedName());
+					marker.addInfo("Generic Type: " + t2);
+					marker.addInfo("Type Variable: " + var);
 				}
 			}
 			return this;
