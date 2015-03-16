@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.member;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -12,8 +11,6 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public abstract class Member extends ASTNode implements IMember
 {
-	public IClass			theClass;
-	
 	protected Annotation[]	annotations;
 	protected int			annotationCount;
 	
@@ -27,45 +24,30 @@ public abstract class Member extends ASTNode implements IMember
 	{
 	}
 	
-	protected Member(IClass iclass)
+	protected Member(String name)
 	{
-		this.theClass = iclass;
-	}
-	
-	public Member(IClass iclass, String name)
-	{
-		this.theClass = iclass;
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
 	}
 	
-	public Member(IClass iclass, IType type)
+	public Member(IType type)
 	{
-		this.theClass = iclass;
 		this.type = type;
 	}
 	
-	public Member(IClass iclass, String name, IType type)
+	public Member(String name, IType type)
 	{
-		this.theClass = iclass;
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
 		this.type = type;
 	}
 	
-	public Member(IClass iclass, String name, IType type, int modifiers)
+	public Member(String name, IType type, int modifiers)
 	{
-		this.theClass = iclass;
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
 		this.type = type;
 		this.modifiers = modifiers;
-	}
-	
-	@Override
-	public IClass getTheClass()
-	{
-		return this.theClass;
 	}
 	
 	@Override

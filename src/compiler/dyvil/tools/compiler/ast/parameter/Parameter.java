@@ -30,12 +30,11 @@ public class Parameter extends Member implements IVariable
 	
 	public Parameter()
 	{
-		super(null);
 	}
 	
 	public Parameter(int index, String name, IType type)
 	{
-		super(null, name, type);
+		super(name, type);
 		this.index = index;
 	}
 	

@@ -41,6 +41,8 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
+	protected IClass			theClass;
+	
 	protected ITypeVariable[]	generics;
 	protected int				genericCount;
 	
@@ -49,7 +51,7 @@ public class Method extends Member implements IMethod
 	protected IType[]			exceptions;
 	protected int				exceptionCount;
 	
-	public IValue				value;
+	public IValue			value;
 	
 	protected boolean			isConstructor;
 	
@@ -58,25 +60,46 @@ public class Method extends Member implements IMethod
 	
 	public Method(IClass iclass)
 	{
-		super(iclass);
+		this.theClass = iclass;
 	}
 	
 	public Method(IClass iclass, String name)
 	{
-		super(iclass, name);
+		this.theClass = iclass;
+		
 		if (name.equals("new"))
 		{
 			this.isConstructor = true;
+			this.name = "new";
+			this.qualifiedName = "<init>";
+			return;
 		}
+		
+		this.name = name;
+		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	public Method(IClass iclass, String name, IType type)
 	{
-		super(iclass, name, type);
+		this.theClass = iclass;
+		this.type = type;
+		
 		if (name.equals("new"))
 		{
 			this.isConstructor = true;
+			this.name = "new";
+			this.qualifiedName = "<init>";
+			return;
 		}
+		
+		this.name = name;
+		this.qualifiedName = Symbols.qualify(name);
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		return this.theClass;
 	}
 	
 	@Override

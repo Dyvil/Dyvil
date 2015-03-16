@@ -21,12 +21,11 @@ public class LambdaParameter extends Member implements IVariable
 	
 	public LambdaParameter()
 	{
-		super(null);
 	}
 	
 	public LambdaParameter(int index, String name, IType type)
 	{
-		super(null, name, type);
+		super(name, type);
 		this.index = index;
 	}
 	

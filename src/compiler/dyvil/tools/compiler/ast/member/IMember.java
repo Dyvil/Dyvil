@@ -18,7 +18,10 @@ public interface IMember extends INamed, ITyped, IModified, IAnnotationList
 	
 	public ElementType getAnnotationType();
 	
-	public IClass getTheClass();
+	public default IClass getTheClass()
+	{
+		return null;
+	}
 	
 	public int getAccessLevel();
 	

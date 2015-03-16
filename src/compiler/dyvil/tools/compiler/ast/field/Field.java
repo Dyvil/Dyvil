@@ -21,21 +21,30 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 public class Field extends Member implements IField
 {
+	protected IClass theClass;
 	private IValue	value;
 	
 	public Field(IClass iclass)
 	{
-		super(iclass);
+		this.theClass =iclass;
 	}
 	
 	public Field(IClass iclass, String name)
 	{
-		super(iclass, name);
+		super(name);
+		this.theClass = iclass;
 	}
 	
 	public Field(IClass iclass, String name, IType type)
 	{
-		super(iclass, name, type);
+		super(name, type);
+		this.theClass = iclass;
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		return this.theClass;
 	}
 	
 	@Override
