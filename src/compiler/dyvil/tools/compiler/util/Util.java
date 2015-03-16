@@ -8,13 +8,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import dyvil.strings.CharUtils;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class Util
 {
@@ -178,6 +181,21 @@ public class Util
 			builder.append(methodName.charAt(i));
 		}
 		return builder.toString();
+	}
+	
+	public static IConstantValue constant(IValue value, MarkerList markers)
+	{
+		int depth = DyvilCompiler.maxConstantDepth;
+		while (!value.isConstant())
+		{
+			if (--depth < 0)
+			{
+				markers.add(value.getPosition(), "value.constant", value.toString(), DyvilCompiler.maxConstantDepth);
+				return value.getType().getDefaultValue();
+			}
+			value = value.foldConstants();
+		}
+		return (IConstantValue) value;
 	}
 	
 	public static void prependValue(IMethod method, IValue value)

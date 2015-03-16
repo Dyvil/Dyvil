@@ -174,7 +174,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(this.outputFile)))
 		{
-			org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(MethodWriter.ASM5);
+			org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(DyvilCompiler.asmVersion);
 			this.write(writer);
 			writer.visitEnd();
 			byte[] bytes = writer.toByteArray();
@@ -189,7 +189,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	
 	public void write(org.objectweb.asm.ClassWriter writer)
 	{
-		writer.visit(MethodWriter.V1_8, Modifiers.PUBLIC, this.internalName, null, "java/lang/Object", null);
+		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC, this.internalName, null, "java/lang/Object", null);
 		
 		// Write Fields
 		

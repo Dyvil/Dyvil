@@ -3,9 +3,9 @@ package dyvil.tools.compiler.backend.visitor;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.AnnotationType;
@@ -17,7 +17,7 @@ public final class SimpleMethodVisitor extends MethodVisitor
 	
 	public SimpleMethodVisitor(IMethod method)
 	{
-		super(Opcodes.ASM5);
+		super(DyvilCompiler.asmVersion);
 		this.method = method;
 	}
 	

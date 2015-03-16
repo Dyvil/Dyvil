@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.backend.visitor;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Opcodes;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.member.IAnnotationList;
@@ -19,7 +19,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 	
 	public AnnotationVisitorImpl(IAnnotationList annotated, Annotation annotation)
 	{
-		super(Opcodes.ASM5);
+		super(DyvilCompiler.asmVersion);
 		this.annotated = annotated;
 		this.annotation = annotation;
 	}

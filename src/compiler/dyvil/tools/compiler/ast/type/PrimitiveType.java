@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.type;
 import java.util.List;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -326,6 +327,32 @@ public final class PrimitiveType extends Type
 			writer.writeLDC(0D);
 			break;
 		}
+	}
+	
+	@Override
+	public IConstantValue getDefaultValue()
+	{
+		if (this.arrayDimensions > 0)
+		{
+			return NullValue.getNull();
+		}
+		switch (this.typecode)
+		{
+		case MethodWriter.T_BOOLEAN:
+			return BooleanValue.TRUE;
+		case MethodWriter.T_BYTE:
+		case MethodWriter.T_SHORT:
+		case MethodWriter.T_CHAR:
+		case MethodWriter.T_INT:
+			return IntValue.getNull();
+		case MethodWriter.T_LONG:
+			return LongValue.getNull();
+		case MethodWriter.T_FLOAT:
+			return FloatValue.getNull();
+		case MethodWriter.T_DOUBLE:
+			return DoubleValue.getNull();
+		}
+		return null;
 	}
 	
 	@Override

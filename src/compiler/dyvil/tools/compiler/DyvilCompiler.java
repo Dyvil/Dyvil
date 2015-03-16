@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.logging.*;
 import java.util.logging.Formatter;
 
+import org.objectweb.asm.Opcodes;
+
 import dyvil.io.AppendableOutputStream;
 import dyvil.io.LoggerOutputStream;
 import dyvil.tools.compiler.ast.dwt.DWTFile;
@@ -26,24 +28,28 @@ import dyvil.tools.compiler.util.Util;
 
 public final class DyvilCompiler
 {
-	public static final String				VERSION			= "1.0.0";
-	public static final String				DYVIL_VERSION	= "1.0.0";
+	public static final String				VERSION				= "1.0.0";
+	public static final String				DYVIL_VERSION		= "1.0.0";
 	
 	public static boolean					parseStack;
-	public static boolean					logFile			= true;
+	public static boolean					logFile				= true;
 	public static boolean					debug;
 	public static int						constantFolding;
 	
-	public static Logger					logger			= Logger.getLogger("DYVILC");
-	public static LoggerOutputStream		loggerOut		= new LoggerOutputStream(logger, "TEST-OUT");
-	public static LoggerOutputStream		loggerErr		= new LoggerOutputStream(logger, "TEST-ERR");
-	public static DateFormat				format			= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static int						classVersion		= Opcodes.V1_8;
+	public static int						asmVersion			= Opcodes.ASM5;
+	public static int						maxConstantDepth	= 10;
 	
-	public static CompilerConfig			config			= new CompilerConfig();
-	public static Set<ICompilerPhase>		states			= new TreeSet();
+	public static Logger					logger				= Logger.getLogger("DYVILC");
+	public static LoggerOutputStream		loggerOut			= new LoggerOutputStream(logger, "TEST-OUT");
+	public static LoggerOutputStream		loggerErr			= new LoggerOutputStream(logger, "TEST-ERR");
+	public static DateFormat				format				= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	public static List<File>				files			= new ArrayList();
-	public static List<ICompilationUnit>	units			= new ArrayList();
+	public static CompilerConfig			config				= new CompilerConfig();
+	public static Set<ICompilerPhase>		states				= new TreeSet();
+	
+	public static List<File>				files				= new ArrayList();
+	public static List<ICompilationUnit>	units				= new ArrayList();
 	
 	public static void main(String[] args)
 	{

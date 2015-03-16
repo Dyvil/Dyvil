@@ -6,9 +6,6 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public interface MethodWriter
 {
-	int		V1_8				= Opcodes.V1_8;
-	int		ASM5				= Opcodes.ASM5;
-	
 	int		H_GETFIELD			= Opcodes.H_GETFIELD;
 	int		H_GETSTATIC			= Opcodes.H_GETSTATIC;
 	int		H_PUTFIELD			= Opcodes.H_PUTFIELD;

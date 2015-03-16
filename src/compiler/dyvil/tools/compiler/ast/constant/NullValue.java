@@ -10,6 +10,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class NullValue extends ASTNode implements IConstantValue
 {
+	private static NullValue	NULL;
+	
 	public NullValue()
 	{
 	}
@@ -19,10 +21,19 @@ public class NullValue extends ASTNode implements IConstantValue
 		this.position = position;
 	}
 	
+	public static NullValue getNull()
+	{
+		if (NULL == null)
+		{
+			NULL = new NullValue();
+		}
+		return NULL;
+	}
+	
 	@Override
 	public int getValueType()
 	{
-		return NULL;
+		return IValue.NULL;
 	}
 	
 	@Override

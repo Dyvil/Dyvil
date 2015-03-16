@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.type;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constant.IConstantValue;
+import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -233,6 +235,11 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	public default void writeDefaultValue(MethodWriter writer)
 	{
 		writer.writeInsn(Opcodes.ACONST_NULL);
+	}
+	
+	public default IConstantValue getDefaultValue()
+	{
+		return NullValue.getNull();
 	}
 	
 	// Misc

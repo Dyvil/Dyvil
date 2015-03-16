@@ -8,6 +8,7 @@ import java.util.List;
 import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAssign;
@@ -1030,7 +1031,7 @@ public class CodeClass extends ASTNode implements IClass
 			superClass = this.superType.getInternalName();
 		}
 		
-		writer.visit(MethodWriter.V1_8, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
+		writer.visit(DyvilCompiler.classVersion, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
 		
 		// Outer Class
 		

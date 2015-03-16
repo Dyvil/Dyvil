@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.backend.visitor;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Opcodes;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -17,7 +17,7 @@ public class ValueAnnotationVisitor extends AnnotationVisitor
 	
 	public ValueAnnotationVisitor(IValued valued)
 	{
-		super(Opcodes.ASM5);
+		super(DyvilCompiler.asmVersion);
 		this.valued = valued;
 	}
 	

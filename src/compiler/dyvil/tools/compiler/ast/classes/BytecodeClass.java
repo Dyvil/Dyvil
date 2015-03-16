@@ -358,6 +358,11 @@ public class BytecodeClass extends CodeClass
 		field.setModifiers(access);
 		field.setType(ClassFormat.internalToType(desc));
 		
+		if (value != null)
+		{
+			field.setValue(IValue.fromObject(value));
+		}
+		
 		if ((this.modifiers & Modifiers.OBJECT_CLASS) == 0 || (access & Modifiers.SYNTHETIC) == 0)
 		{
 			this.body.addField(field);

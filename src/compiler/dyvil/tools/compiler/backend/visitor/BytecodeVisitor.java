@@ -3,6 +3,7 @@ package dyvil.tools.compiler.backend.visitor;
 import org.objectweb.asm.*;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -18,7 +19,7 @@ public class BytecodeVisitor extends MethodVisitor
 	
 	public BytecodeVisitor(IMethod method)
 	{
-		super(Opcodes.ASM5);
+		super(DyvilCompiler.asmVersion);
 		this.method = method;
 	}
 	
