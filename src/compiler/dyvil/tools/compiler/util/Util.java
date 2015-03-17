@@ -10,7 +10,6 @@ import java.util.function.Predicate;
 import dyvil.strings.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
-import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -183,7 +182,7 @@ public class Util
 		return builder.toString();
 	}
 	
-	public static IConstantValue constant(IValue value, MarkerList markers)
+	public static IValue constant(IValue value, MarkerList markers)
 	{
 		int depth = DyvilCompiler.maxConstantDepth;
 		while (!value.isConstant())
@@ -195,7 +194,7 @@ public class Util
 			}
 			value = value.foldConstants();
 		}
-		return (IConstantValue) value;
+		return value;
 	}
 	
 	public static void prependValue(IMethod method, IValue value)

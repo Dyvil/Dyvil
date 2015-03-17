@@ -5,9 +5,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IConstantValue extends IValue
-{
-	public Object toObject();
-	
+{	
 	@Override
 	public default boolean isConstant()
 	{

@@ -25,6 +25,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
@@ -565,17 +566,21 @@ public class Method extends Member implements IMethod
 				continue;
 			}
 			
-			ValueList array = (ValueList) annotation.arguments.getValue("value");
-			if (array != null)
+			try
 			{
+				ValueList array = (ValueList) annotation.arguments.getValue(0, AnnotationType.VALUE);
+				
 				int len = array.valueCount();
 				int[] opcodes = new int[len];
 				for (int j = 0; j < len; j++)
 				{
-					IntValue v = (IntValue) array.getValue(j).foldConstants();
+					IntValue v = (IntValue) array.getValue(j);
 					opcodes[j] = v.value;
 				}
 				this.intrinsicOpcodes = opcodes;
+			}
+			catch (NullPointerException | ClassCastException ex)
+			{
 			}
 			break;
 		}

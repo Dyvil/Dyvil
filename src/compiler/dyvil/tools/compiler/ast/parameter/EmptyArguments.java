@@ -70,6 +70,11 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
+	public void setValue(int index, Parameter param, IValue value)
+	{
+	}
+	
+	@Override
 	public IValue getValue(int index, Parameter param)
 	{
 		return null;

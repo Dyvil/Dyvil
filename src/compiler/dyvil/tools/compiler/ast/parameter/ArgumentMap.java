@@ -120,6 +120,22 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
+	public void setValue(int index, Parameter param, IValue value)
+	{
+		String key = param.qualifiedName;
+		int hash = key.hashCode();
+		for (int i = 0; i < this.size; i++)
+		{
+			String s = this.keys[i];
+			if (s.hashCode() == hash && s.equals(key))
+			{
+				this.values[i] = value;
+				return;
+			}
+		}
+	}
+	
+	@Override
 	public IValue getValue(int index, Parameter param)
 	{
 		return this.getValue(param.qualifiedName);
@@ -171,7 +187,6 @@ public final class ArgumentMap implements IArguments, IValueMap
 					Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.name);
 					marker.addInfo("Required Type: " + type);
 					marker.addInfo("Value Type: " + value.getType());
-					
 				}
 				else
 				{

@@ -68,7 +68,9 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 			}
 			if (value.charAt(0) == '@')
 			{
-				pm.pushParser(new AnnotationParser(this), true);
+				Annotation annotation = new Annotation(token.raw(), value.substring(1));
+				this.addAnnotation(annotation);
+				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}
 			if (ParserUtil.isCloseBracket(type))

@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
-import java.util.Iterator;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -12,9 +11,8 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
-import dyvil.tools.compiler.ast.constant.IConstantValue;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.ArgumentMap;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -22,18 +20,17 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
-import dyvil.tools.compiler.ast.value.IValueMap.KeyValuePair;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Util;
 
 public class Annotation extends ASTNode implements ITyped
 {
 	public String			name;
 	public AnnotationType	type;
-	// TODO Use IArguments and clean up the annotation system
-	public ArgumentMap		arguments	= new ArgumentMap();
+	public IArguments		arguments;
 	public ElementType		target;
 	
 	public Annotation(AnnotationType type)
@@ -82,7 +79,7 @@ public class Annotation extends ASTNode implements ITyped
 	public void resolve(MarkerList markers, IContext context)
 	{
 		this.type.readMetaAnnotations();
-		this.arguments.resolveTypes(markers, context);
+		this.arguments.resolve(markers, context);
 	}
 	
 	public void check(MarkerList markers, IContext context)
@@ -108,31 +105,26 @@ public class Annotation extends ASTNode implements ITyped
 			markers.add(error);
 		}
 		
-		for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
+		int count = theClass.parameterCount();
+		for (int i = 0; i < count; i++)
 		{
-			KeyValuePair entry = iterator.next();
-			IMethod m = theClass.getBody().getMethod(entry.key);
-			if (m == null)
-			{
-				markers.add(this.position, "annotation.method", this.name, entry.key);
-				continue;
-			}
+			Parameter param = theClass.getParameter(i);
+			IType type = param.getType();
+			IValue value = this.arguments.getValue(i, param);
+			IValue value1 = value.withType(type);
 			
-			entry.value.check(markers, context);
-			
-			if (!entry.value.isConstant())
+			if (value1 == null)
 			{
-				markers.add(entry.value.getPosition(), "annotation.constant", entry.key);
-				continue;
-			}
-			
-			IType type = m.getType();
-			if (!entry.value.isType(type))
-			{
-				Marker marker = markers.create(entry.value.getPosition(), "annotation.type", entry.key);
+				Marker marker = markers.create(value.getPosition(), "annotation.type", param.qualifiedName);
 				marker.addInfo("Required Type: " + type);
-				marker.addInfo("Value Type: " + entry.value.getType());
-				
+				marker.addInfo("Value Type: " + value.getType());
+				continue;
+			}
+			
+			value1 = Util.constant(value1, markers);
+			if (value1 != value)
+			{
+				this.arguments.setValue(i, param, value1);
 			}
 		}
 	}
@@ -144,65 +136,44 @@ public class Annotation extends ASTNode implements ITyped
 	
 	public void write(ClassWriter writer)
 	{
-		RetentionPolicy retention = this.type.retention;
-		if (retention != RetentionPolicy.SOURCE)
+		if (this.type.retention != RetentionPolicy.SOURCE)
 		{
-			boolean visible = retention == RetentionPolicy.RUNTIME;
-			
-			AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
-			for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
-			{
-				KeyValuePair entry = iterator.next();
-				visitValue(visitor, entry.key, entry.value);
-			}
+			this.write(writer.visitAnnotation(this.type.getExtendedName(), this.type.retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	
 	public void write(MethodWriter writer)
 	{
-		RetentionPolicy retention = this.type.retention;
-		if (retention != RetentionPolicy.SOURCE)
+		if (this.type.retention != RetentionPolicy.SOURCE)
 		{
-			boolean visible = retention == RetentionPolicy.RUNTIME;
-			
-			AnnotationVisitor visitor = writer.addAnnotation(this.type.getExtendedName(), visible);
-			for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
-			{
-				KeyValuePair entry = iterator.next();
-				visitValue(visitor, entry.key, entry.value);
-			}
+			this.write(writer.addAnnotation(this.type.getExtendedName(), this.type.retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	
 	public void write(FieldVisitor writer)
 	{
-		RetentionPolicy retention = this.type.retention;
-		if (retention != RetentionPolicy.SOURCE)
+		if (this.type.retention != RetentionPolicy.SOURCE)
 		{
-			boolean visible = retention == RetentionPolicy.RUNTIME;
-			
-			AnnotationVisitor visitor = writer.visitAnnotation(this.type.getExtendedName(), visible);
-			for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
-			{
-				KeyValuePair entry = iterator.next();
-				visitValue(visitor, entry.key, entry.value);
-			}
+			this.write(writer.visitAnnotation(this.type.getExtendedName(), this.type.retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	
 	public void write(MethodWriter writer, int index)
 	{
-		RetentionPolicy retention = this.type.retention;
-		if (retention != RetentionPolicy.SOURCE)
+		if (this.type.retention != RetentionPolicy.SOURCE)
 		{
-			boolean visible = retention == RetentionPolicy.RUNTIME;
-			
-			AnnotationVisitor visitor = writer.addParameterAnnotation(index, this.type.getExtendedName(), visible);
-			for (Iterator<KeyValuePair> iterator = this.arguments.entryIterator(); iterator.hasNext();)
-			{
-				KeyValuePair entry = iterator.next();
-				visitValue(visitor, entry.key, entry.value);
-			}
+			this.write(writer.addParameterAnnotation(index, this.type.getExtendedName(), this.type.retention == RetentionPolicy.RUNTIME));
+		}
+	}
+	
+	private void write(AnnotationVisitor visitor)
+	{
+		IClass iclass = this.type.getTheClass();
+		int count = iclass.parameterCount();
+		for (int i = 0; i < count; i++)
+		{
+			Parameter param = iclass.getParameter(i);
+			visitValue(visitor, param.qualifiedName, this.arguments.getValue(i, param));
 		}
 	}
 	
@@ -224,7 +195,7 @@ public class Annotation extends ASTNode implements ITyped
 		}
 		else if (value.isConstant())
 		{
-			visitor.visit(key, ((IConstantValue) value).toObject());
+			visitor.visit(key, value.toObject());
 		}
 	}
 	

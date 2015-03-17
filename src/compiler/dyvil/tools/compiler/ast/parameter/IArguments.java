@@ -28,6 +28,8 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	// Used by Methods
 	
+	public void setValue(int index, Parameter param, IValue value);
+	
 	public IValue getValue(int index, Parameter param);
 	
 	public IType getType(int index, Parameter param);

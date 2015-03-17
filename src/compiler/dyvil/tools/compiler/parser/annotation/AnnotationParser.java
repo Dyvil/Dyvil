@@ -1,29 +1,31 @@
 package dyvil.tools.compiler.parser.annotation;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.member.IAnnotationList;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.ArgumentMap;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.expression.ExpressionListParser;
 import dyvil.tools.compiler.parser.expression.ExpressionMapParser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
 public class AnnotationParser extends Parser
 {
-	public static final int		NAME				= 1;
-	public static final int		PARAMETERS_START	= 2;
-	public static final int		PARAMETERS_END		= 4;
+	public static final int	NAME				= 1;
+	public static final int	PARAMETERS_START	= 2;
+	public static final int	PARAMETERS_END		= 4;
 	
-	protected IAnnotationList	annotatable;
+	private Annotation		annotation;
 	
-	private Annotation			annotation;
-	
-	public AnnotationParser(IAnnotationList annotatable)
+	public AnnotationParser(Annotation annotation)
 	{
-		this.annotatable = annotatable;
-		this.mode = NAME;
+		this.annotation = annotation;
+		this.mode = PARAMETERS_START;
 	}
 	
 	@Override
@@ -41,15 +43,7 @@ public class AnnotationParser extends Parser
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.annotation = new Annotation(token.raw(), token.value().substring(1));
 				this.mode = PARAMETERS_START;
-				
-				if (token.next().type() != Tokens.OPEN_PARENTHESIS)
-				{
-					this.annotatable.addAnnotation(this.annotation);
-					pm.popParser();
-				}
-				
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Annotation - Name expected");
@@ -58,18 +52,40 @@ public class AnnotationParser extends Parser
 		{
 			if (type == Tokens.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ExpressionMapParser(this.annotation.arguments));
+				IToken next = token.next();
+				if (ParserUtil.isIdentifier(next.type()) && next.next().type() == Tokens.COLON)
+				{
+					ArgumentMap map = new ArgumentMap();
+					this.annotation.arguments = map;
+					pm.pushParser(new ExpressionMapParser(map));
+				}
+				else
+				{
+					ArgumentList list = new ArgumentList();
+					this.annotation.arguments = list;
+					pm.pushParser(new ExpressionListParser(list));
+				}
+				
 				this.mode = PARAMETERS_END;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Annotation - '(' expected");
+			
+			if (!ParserUtil.isIdentifier(type) && !ParserUtil.isTerminator2(type))
+			{
+				SingleArgument arg = new SingleArgument();
+				this.annotation.arguments = arg;
+				pm.popParser();
+				pm.pushParser(new ExpressionParser(arg), true);
+				return;
+			}
+			
+			pm.popParser(true);
+			return;
 		}
 		if (this.mode == PARAMETERS_END)
 		{
 			if (type == Tokens.CLOSE_PARENTHESIS)
 			{
-				this.annotation.expandPosition(token);
-				this.annotatable.addAnnotation(this.annotation);
 				pm.popParser();
 				return;
 			}

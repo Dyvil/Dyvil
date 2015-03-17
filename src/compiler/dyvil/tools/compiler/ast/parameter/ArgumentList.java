@@ -86,12 +86,15 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
+	public void setValue(int index, Parameter param, IValue value)
+	{
+		this.values[index] = value;
+	}
+	
+	@Override
 	public void setValue(int index, IValue value)
 	{
-		if (index > 0 && index < this.size)
-		{
-			this.values[index] = value;
-		}
+		this.values[index] = value;
 	}
 	
 	@Override

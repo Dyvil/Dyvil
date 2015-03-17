@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
+import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
@@ -16,8 +17,15 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class AnnotationType extends Type
 {
-	public RetentionPolicy	retention;
-	public Set<ElementType>	targets;
+	public static final Parameter	VALUE	= new Parameter();
+	
+	static
+	{
+		VALUE.name = VALUE.qualifiedName = "value";
+	}
+	
+	public RetentionPolicy			retention;
+	public Set<ElementType>			targets;
 	
 	public AnnotationType()
 	{
@@ -79,26 +87,32 @@ public class AnnotationType extends Type
 			Annotation retention = this.theClass.getAnnotation(Type.ARetention);
 			if (retention != null)
 			{
-				EnumValue value = (EnumValue) retention.arguments.getValue("value");
+				EnumValue value = (EnumValue) retention.arguments.getValue(0, null);
 				this.retention = RetentionPolicy.valueOf(value.name);
 			}
 		}
-		if (this.targets == null)
+		if (this.targets != null)
 		{
-			this.targets = new TreeSet();
-			Annotation target = this.theClass.getAnnotation(Type.ATarget);
-			if (target != null)
-			{
-				IValueList values = (IValueList) target.arguments.getValue("value");
-				if (values != null)
-				{
-					for (IValue v : values)
-					{
-						EnumValue value = (EnumValue) v;
-						this.targets.add(ElementType.valueOf(value.name));
-					}
-				}
-			}
+			return;
+		}
+		this.targets = new TreeSet();
+		
+		Annotation target = this.theClass.getAnnotation(Type.ATarget);
+		if (target == null)
+		{
+			return;
+		}
+		
+		IValueList values = (IValueList) target.arguments.getValue(0, VALUE);
+		if (values == null)
+		{
+			return;
+		}
+		
+		for (IValue v : values)
+		{
+			EnumValue value = (EnumValue) v;
+			this.targets.add(ElementType.valueOf(value.name));
 		}
 	}
 	

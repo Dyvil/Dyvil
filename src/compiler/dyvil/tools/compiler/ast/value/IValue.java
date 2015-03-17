@@ -188,6 +188,11 @@ public interface IValue extends IASTNode, ITyped
 		writer.writeJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
+	public default Object toObject()
+	{
+		return null;
+	}
+	
 	public static IValue fromObject(Object o)
 	{
 		if (o == null)

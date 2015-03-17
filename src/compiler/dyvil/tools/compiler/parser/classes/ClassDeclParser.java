@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.classes;
 
+import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.type.IType;
@@ -69,7 +70,9 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 			}
 			else if (value.charAt(0) == '@')
 			{
-				pm.pushParser(new AnnotationParser(this.theClass), true);
+				Annotation annotation = new Annotation(token.raw(), value.substring(1));
+				this.theClass.addAnnotation(annotation);
+				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}
 		}

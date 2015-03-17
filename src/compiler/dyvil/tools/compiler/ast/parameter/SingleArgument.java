@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class SingleArgument implements IArguments, IValued
+public final class SingleArgument implements IArguments, IValued
 {
 	private IValue	value;
 	private boolean	varargs;
@@ -84,6 +84,15 @@ public class SingleArgument implements IArguments, IValued
 	}
 	
 	// Used by Methods
+	
+	@Override
+	public void setValue(int index, Parameter param, IValue value)
+	{
+		if (index == 0)
+		{
+			this.value = value;
+		}
+	}
 	
 	@Override
 	public IValue getValue(int index, Parameter param)

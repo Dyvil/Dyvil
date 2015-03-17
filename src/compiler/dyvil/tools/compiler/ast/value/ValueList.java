@@ -252,7 +252,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i].resolveTypes(markers, context);
+			this.values[i] = this.values[i].resolve(markers, context);
 		}
 		return this;
 	}
