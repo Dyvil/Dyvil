@@ -29,7 +29,7 @@ public class TryStatement extends ASTNode implements IStatement
 		this.position = position;
 	}
 	
-	private static IType getThrowableType()
+	public static IType getThrowable()
 	{
 		if (THROWABLE == null)
 		{
@@ -167,7 +167,7 @@ public class TryStatement extends ASTNode implements IStatement
 			this.action.check(markers, context);
 		}
 		
-		IType throwable = getThrowableType();
+		IType throwable = getThrowable();
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];

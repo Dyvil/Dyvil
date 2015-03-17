@@ -122,6 +122,8 @@ public class ParserUtil
 			return Tokens.FINALLY;
 		case "synchronized":
 			return Tokens.SYNCHRONIZED;
+		case "throw":
+			return Tokens.THROW;
 		default:
 			return type;
 		}

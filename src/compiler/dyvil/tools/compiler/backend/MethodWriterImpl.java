@@ -137,6 +137,13 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
+	public void clear()
+	{
+		this.stackIndex = 0;
+		this.stackCount = 0;
+	}
+	
+	@Override
 	public Object peek()
 	{
 		return this.stack[this.stackIndex];
@@ -498,7 +505,8 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		else if (opcode >= IRETURN && opcode <= ARETURN)
 		{
-			this.pop();
+			this.clear();
+			this.hasReturn = true;
 		}
 		else
 		{
@@ -603,10 +611,12 @@ public final class MethodWriterImpl implements MethodWriter
 			this.set(INT);
 			return;
 		case RETURN:
+			this.clear();
 			this.hasReturn = true;
 			return;
 		case ATHROW:
-			this.pop();
+			this.clear();
+			this.visitFrame = true;
 			return;
 		case BALOAD:
 		case SALOAD:

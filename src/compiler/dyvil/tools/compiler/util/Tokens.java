@@ -49,7 +49,8 @@ public interface Tokens
 	public int	TRY						= TYPE_KEYWORD | 0x00130000;
 	public int	CATCH					= TYPE_KEYWORD | 0x00140000;
 	public int	FINALLY					= TYPE_KEYWORD | 0x00150000;
-	public int	SYNCHRONIZED			= TYPE_KEYWORD | 0x00160000;
+	public int	THROW					= TYPE_KEYWORD | 0x00160000;
+	public int	SYNCHRONIZED			= TYPE_KEYWORD | 0x00170000;
 	
 	// BRACKETS
 	public int	MOD_PARENTHESIS			= 0x00010000;

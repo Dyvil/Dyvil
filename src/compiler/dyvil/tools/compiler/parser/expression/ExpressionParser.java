@@ -867,6 +867,14 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser(true);
 			return true;
 		}
+		case Tokens.THROW:
+		{
+			ThrowStatement statement = new ThrowStatement(token.raw());
+			pm.pushParser(new ExpressionParser(statement));
+			this.mode = 0;
+			this.value = statement;
+			return true;
+		}
 		case Tokens.SYNCHRONIZED: // TODO Synchronized Blocks
 			return true;
 		default:

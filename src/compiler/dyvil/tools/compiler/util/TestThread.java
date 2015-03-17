@@ -40,7 +40,7 @@ public final class TestThread extends Thread
 			builder.append("Main Type: ").append(mainType).append('\n');
 			builder.append("Main Args: ").append(Arrays.toString(args));
 			builder.append("\n\n----- ERROR -----\n");
-			DyvilCompiler.logger.log(Level.SEVERE, builder.toString(), ex);
+			DyvilCompiler.logger.log(Level.SEVERE, builder.toString(), ex.getCause());
 			
 			return;
 		}

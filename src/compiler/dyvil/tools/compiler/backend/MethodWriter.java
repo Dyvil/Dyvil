@@ -59,6 +59,8 @@ public interface MethodWriter
 	
 	public void pop(int count);
 	
+	public void clear();
+	
 	public Object peek();
 	
 	public void writeFrame();

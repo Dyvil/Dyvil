@@ -65,11 +65,12 @@ public interface IValue extends IASTNode, ITyped
 	public static int	WHILE				= 68;
 	public static int	DO_WHILE			= 69;
 	public static int	TRY					= 70;
-	public static int	SYNCHRONIZED		= 71;
+	public static int	THROW				= 71;
+	public static int	SYNCHRONIZED		= 72;
 	
-	public static int	BREAK				= 72;
-	public static int	CONTINUE			= 73;
-	public static int	GOTO				= 74;
+	public static int	BREAK				= 80;
+	public static int	CONTINUE			= 81;
+	public static int	GOTO				= 82;
 	
 	public int getValueType();
 	
