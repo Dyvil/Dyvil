@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.lexer.marker;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import dyvil.collections.ArrayIterator;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -10,11 +8,29 @@ import dyvil.tools.compiler.util.I18n;
 
 public final class MarkerList implements Iterable<Marker>
 {
-	public enum MarkerType
+	public static enum MarkerType
 	{
 		IGNORE, INFO, WARNING, ERROR;
 		
 		static Map<String, MarkerType>	map	= new HashMap();
+	}
+	
+	public static class MarkerComparator implements Comparator<Marker>
+	{
+		public static final MarkerComparator	instance	= new MarkerComparator();
+		
+		private MarkerComparator()
+		{
+		}
+		
+		@Override
+		public int compare(Marker o1, Marker o2)
+		{
+			int start1 = o1.position.startIndex();
+			int start2 = o2.position.startIndex();
+			
+			return start1 == start2 ? 0 : start1 < start2 ? -1 : 0;
+		}
 	}
 	
 	private Marker[]	markers;
@@ -71,6 +87,11 @@ public final class MarkerList implements Iterable<Marker>
 	public boolean isEmpty()
 	{
 		return this.markerCount == 0;
+	}
+	
+	public void sort()
+	{
+		Arrays.sort(this.markers, MarkerComparator.instance);
 	}
 	
 	public void add(Marker marker)

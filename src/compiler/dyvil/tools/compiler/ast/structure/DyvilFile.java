@@ -255,6 +255,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 			
 			int warnings = this.markers.getWarnings();
 			int errors = this.markers.getErrors();
+			this.markers.sort();
 			for (Marker marker : this.markers)
 			{
 				marker.log(code, buf);
