@@ -52,6 +52,8 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public void resolve(MarkerList markers, IContext context);
 	
+	public void checkTypes(MarkerList markers, IContext context);
+	
 	public void check(MarkerList markers, IContext context);
 	
 	public void foldConstants();

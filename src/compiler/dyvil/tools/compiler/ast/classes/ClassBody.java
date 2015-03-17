@@ -328,6 +328,27 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].checkTypes(markers, context);
+		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			this.fields[i].checkTypes(markers, context);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			this.properties[i].checkTypes(markers, context);
+		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].checkTypes(markers, context);
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.classCount; i++)

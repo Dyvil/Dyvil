@@ -97,6 +97,11 @@ public class BreakStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}

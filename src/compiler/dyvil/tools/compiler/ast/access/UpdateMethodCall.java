@@ -116,10 +116,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			this.instance.resolveTypes(markers, context);
 		}
 		
-		for (IValue v : this.arguments)
-		{
-			v.resolveTypes(markers, context);
-		}
+		this.arguments.resolveTypes(markers, context);
 	}
 	
 	@Override
@@ -153,6 +150,21 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance.checkTypes(markers, context);
+		}
+		
+		if (this.method != null)
+		{
+			this.method.checkArguments(markers, instance, arguments, this);
+		}
+		this.arguments.check(markers, context);
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
@@ -160,15 +172,10 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			this.instance.check(markers, context);
 		}
 		
-		for (IValue v : this.arguments)
-		{
-			v.check(markers, context);
-		}
+		this.arguments.check(markers, context);
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, this);
-			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
 				markers.add(this.position, "access.method.deprecated", "update");

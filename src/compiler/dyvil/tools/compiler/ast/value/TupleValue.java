@@ -195,6 +195,15 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i].checkTypes(markers, context);
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.valueCount; i++)

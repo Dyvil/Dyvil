@@ -14,7 +14,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class DoStatement extends ASTNode implements IStatement, ILoop
 {
-	public IValue		then;
+	public IValue		action;
 	public IValue		condition;
 	
 	private IStatement	parent;
@@ -44,12 +44,12 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	
 	public void setThen(IValue then)
 	{
-		this.then = then;
+		this.action = then;
 	}
 	
 	public IValue getThen()
 	{
-		return this.then;
+		return this.action;
 	}
 	
 	@Override
@@ -103,16 +103,16 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.then != null)
+		if (this.action != null)
 		{
-			if (this.then.isStatement())
+			if (this.action.isStatement())
 			{
-				((IStatement) this.then).setParent(this);
-				this.then.resolveTypes(markers, context);
+				((IStatement) this.action).setParent(this);
+				this.action.resolveTypes(markers, context);
 			}
 			else
 			{
-				this.then.resolveTypes(markers, context);
+				this.action.resolveTypes(markers, context);
 			}
 		}
 		if (this.condition != null)
@@ -124,9 +124,9 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.then != null)
+		if (this.action != null)
 		{
-			this.then = this.then.resolve(markers, context);
+			this.action = this.action.resolve(markers, context);
 		}
 		if (this.condition != null)
 		{
@@ -136,20 +136,38 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.then != null)
+		if (this.action != null)
 		{
-			this.then.check(markers, context);
+			this.action.check(markers, context);
 		}
 		if (this.condition != null)
 		{
-			if (!this.condition.isType(Type.BOOLEAN))
+			IValue condition1 = this.condition.withType(Type.BOOLEAN);
+			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "do.condition.type");
 				marker.addInfo("Condition Type: " + this.condition.getType());
-				
 			}
+			else
+			{
+				this.condition = condition1;
+			}
+			
+			this.condition.checkTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (this.action != null)
+		{
+			this.action.check(markers, context);
+		}
+		if (this.condition != null)
+		{
 			this.condition.check(markers, context);
 		}
 		else
@@ -161,9 +179,9 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.then != null)
+		if (this.action != null)
 		{
-			this.then = this.then.foldConstants();
+			this.action = this.action.foldConstants();
 		}
 		if (this.condition != null)
 		{
@@ -197,14 +215,14 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		if (this.then == null)
+		if (this.action == null)
 		{
 			this.condition.writeStatement(writer);
 		}
 		
 		// Do Block
 		writer.writeFrameLabel(this.startLabel.target);
-		this.then.writeStatement(writer);
+		this.action.writeStatement(writer);
 		// Condition
 		writer.writeFrameLabel(this.conditionLabel.target);
 		this.condition.writeJump(writer, this.startLabel.target);
@@ -216,18 +234,18 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Statements.doStart);
-		if (this.then != null)
+		if (this.action != null)
 		{
-			if (this.then.isStatement())
+			if (this.action.isStatement())
 			{
 				buffer.append('\n').append(prefix);
-				this.then.toString(prefix, buffer);
+				this.action.toString(prefix, buffer);
 				buffer.append('\n').append(prefix);
 			}
 			else
 			{
 				buffer.append(' ');
-				this.then.toString(prefix, buffer);
+				this.action.toString(prefix, buffer);
 				buffer.append(' ');
 			}
 		}

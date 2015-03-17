@@ -476,14 +476,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = PARAMETERS_END;
 				return;
 			}
-			if (type == Tokens.OPEN_CURLY_BRACKET)
-			{
-				SpecialConstructor pc = new SpecialConstructor(token, (ConstructorCall) this.value);
-				pm.pushParser(new ExpressionListParser(pc.list));
-				this.value = pc;
-				this.mode = ARRAY_END; // matches a curly bracket
-				return;
-			}
 			
 			SingleArgument sa = new SingleArgument();
 			cc.arguments = sa;

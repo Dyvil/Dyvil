@@ -168,12 +168,19 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.method != null)
+		{
+			this.method.checkArguments(markers, null, arguments, this);
+		}
+		this.arguments.checkTypes(markers, context);
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		for (IValue v : this.arguments)
-		{
-			v.check(markers, context);
-		}
+		this.arguments.check(markers, context);
 		
 		if (this.type.isArrayType())
 		{
@@ -193,10 +200,9 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 		{
 			markers.add(this.position, "constructor.abstract", iclass.getName());
 		}
-		else if (this.method != null)
+		
+		if (this.method != null)
 		{
-			this.method.checkArguments(markers, null, this.arguments, this);
-			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
 				markers.add(this.position, "access.constructor.deprecated", iclass.getName());

@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -137,6 +138,28 @@ public class TryStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.action != null)
+		{
+			this.action.checkTypes(markers, context);
+		}
+		
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			CatchBlock block = this.catchBlocks[i];
+			block.context = context;
+			block.action.checkTypes(markers, block);
+			block.context = null;
+		}
+		
+		if (this.finallyBlock != null)
+		{
+			this.finallyBlock.checkTypes(markers, context);
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.action != null)
@@ -148,12 +171,18 @@ public class TryStatement extends ASTNode implements IStatement
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			block.action.check(markers, context);
-			
-			if (!throwable.isSuperTypeOf(block.type))
+			IValue action1 = block.action.withType(throwable);
+			if (action1 == null)
 			{
-				markers.add(block.type.getPosition(), "try.catch.type");
+				Marker marker = markers.create(block.type.getPosition(), "try.catch.type");
+				marker.addInfo("Exception Type: " + block.type);
 			}
+			else
+			{
+				block.action = action1;
+			}
+			
+			block.action.check(markers, context);
 		}
 		
 		if (this.finallyBlock != null)

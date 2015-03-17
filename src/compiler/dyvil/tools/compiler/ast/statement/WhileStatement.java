@@ -15,7 +15,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public class WhileStatement extends ASTNode implements IStatement, ILoop
 {
 	public IValue		condition;
-	public IValue		then;
+	public IValue		action;
 	
 	private IStatement	parent;
 	
@@ -42,12 +42,12 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	
 	public void setThen(IValue then)
 	{
-		this.then = then;
+		this.action = then;
 	}
 	
 	public IValue getThen()
 	{
-		return this.then;
+		return this.action;
 	}
 	
 	@Override
@@ -63,9 +63,15 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.VOID || type == Type.NONE ? this : null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
-		return type.classEquals(Type.VOID);
+		return type == Type.VOID || type == Type.NONE;
 	}
 	
 	@Override
@@ -105,16 +111,16 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		{
 			this.condition.resolveTypes(markers, context);
 		}
-		if (this.then != null)
+		if (this.action != null)
 		{
-			if (this.then.isStatement())
+			if (this.action.isStatement())
 			{
-				((IStatement) this.then).setParent(this);
-				this.then.resolveTypes(markers, context);
+				((IStatement) this.action).setParent(this);
+				this.action.resolveTypes(markers, context);
 			}
 			else
 			{
-				this.then.resolveTypes(markers, context);
+				this.action.resolveTypes(markers, context);
 			}
 		}
 	}
@@ -126,11 +132,34 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		{
 			this.condition = this.condition.resolve(markers, context);
 		}
-		if (this.then != null)
+		if (this.action != null)
 		{
-			this.then = this.then.resolve(markers, context);
+			this.action = this.action.resolve(markers, context);
 		}
 		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.condition != null)
+		{
+			IValue condition1 = this.condition.withType(Type.BOOLEAN);
+			if (condition1 == null)
+			{
+				Marker marker = markers.create(this.condition.getPosition(), "while.condition.type");
+				marker.addInfo("Condition Type: " + this.condition.getType());
+			}
+			else
+			{
+				this.condition = condition1;
+			}
+			this.condition.checkTypes(markers, context);
+		}
+		if (this.action != null)
+		{
+			this.action.checkTypes(markers, context);
+		}
 	}
 	
 	@Override
@@ -138,21 +167,15 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	{
 		if (this.condition != null)
 		{
-			if (!this.condition.isType(Type.BOOLEAN))
-			{
-				Marker marker = markers.create(this.condition.getPosition(), "while.condition.type");
-				marker.addInfo("Condition Type: " + this.condition.getType());
-				
-			}
 			this.condition.check(markers, context);
 		}
 		else
 		{
 			markers.add(this.position, "while.condition.invalid");
 		}
-		if (this.then != null)
+		if (this.action != null)
 		{
-			this.then.check(markers, context);
+			this.action.check(markers, context);
 		}
 	}
 	
@@ -163,9 +186,9 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		{
 			this.condition = this.condition.foldConstants();
 		}
-		if (this.then != null)
+		if (this.action != null)
 		{
-			this.then = this.then.foldConstants();
+			this.action = this.action.foldConstants();
 		}
 		return this;
 	}
@@ -195,7 +218,7 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		if (this.then == null)
+		if (this.action == null)
 		{
 			this.condition.writeStatement(writer);
 		}
@@ -204,7 +227,7 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		writer.writeFrameLabel(this.startLabel.target);
 		this.condition.writeInvJump(writer, this.endLabel.target);
 		// While Block
-		this.then.writeStatement(writer);
+		this.action.writeStatement(writer);
 		writer.writeJumpInsn(Opcodes.GOTO, this.startLabel.target);
 		
 		writer.writeFrameLabel(this.endLabel.target);
@@ -220,17 +243,17 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		}
 		buffer.append(Formatting.Statements.whileEnd);
 		
-		if (this.then != null)
+		if (this.action != null)
 		{
-			if (this.then.isStatement())
+			if (this.action.isStatement())
 			{
 				buffer.append('\n').append(prefix);
-				this.then.toString(prefix, buffer);
+				this.action.toString(prefix, buffer);
 			}
 			else
 			{
 				buffer.append(' ');
-				this.then.toString(prefix, buffer);
+				this.action.toString(prefix, buffer);
 			}
 		}
 	}

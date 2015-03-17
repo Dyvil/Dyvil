@@ -252,6 +252,21 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance.checkTypes(markers, context);
+		}
+		
+		if (this.method != null)
+		{
+			this.method.checkArguments(markers, this.instance, this.arguments, this);
+		}
+		this.arguments.checkTypes(markers, context);
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
@@ -261,8 +276,6 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, this);
-			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
 				markers.add(this.position, "access.method.deprecated", this.name);

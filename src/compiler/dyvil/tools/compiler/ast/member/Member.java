@@ -262,6 +262,15 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			this.annotations[i].checkTypes(markers, context);
+		}
+	}
+	
+	@Override
 	public void foldConstants()
 	{
 		for (int i = 0; i < this.annotationCount; i++)

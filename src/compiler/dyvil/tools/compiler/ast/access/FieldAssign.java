@@ -187,11 +187,11 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.value.getValueType() == IValue.THIS)
+		if (this.instance != null)
 		{
-			markers.add(new SyntaxError(this.position, "access.this.assign"));
+			this.instance.checkTypes(markers, context);
 		}
 		
 		if (this.field == null)
@@ -205,16 +205,32 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 		{
 			Marker marker = markers.create(this.value.getPosition(), "access.assign.type", this.name);
 			marker.addInfo("Field Type: " + type);
-			IType vtype = this.value.getType();
-			marker.addInfo("Value Type: " + (vtype == null ? "unknown" : vtype));
-			
+			marker.addInfo("Value Type: " + this.value.getType());
 		}
 		else
 		{
 			this.value = value1;
 		}
 		
-		value1.check(markers, context);
+		this.value.checkTypes(markers, context);
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance.check(markers, context);
+		}
+		
+		if (this.value.getValueType() == IValue.THIS)
+		{
+			markers.add(new SyntaxError(this.position, "access.this.assign"));
+		}
+		else
+		{
+			this.value.check(markers, context);
+		}
 		
 		if (this.field.hasModifier(Modifiers.FINAL))
 		{

@@ -116,22 +116,29 @@ public class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
-		super.check(markers, context);
+		super.checkTypes(markers, context);
 		
 		IValue value1 = this.value.withType(this.type);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.value.getPosition(), "variable.type", this.name);
-			marker.addInfo("Field Type: " + this.type);
+			marker.addInfo("Variable Type: " + this.type);
 			marker.addInfo("Value Type: " + this.value.getType());
-			
 		}
 		else
 		{
 			this.value = value1;
 		}
+		
+		this.value.checkTypes(markers, context);
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		super.check(markers, context);
 		
 		this.value.check(markers, context);
 	}

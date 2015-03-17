@@ -180,16 +180,34 @@ public class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.condition != null)
+		{
+			IValue condition1 = this.condition.withType(Type.BOOLEAN);
+			if (condition1 == null)
+			{
+				Marker marker = markers.create(this.condition.getPosition(), "if.condition.type");
+				marker.addInfo("Condition Type: " + this.condition.getType());
+			}
+			else
+			{
+				this.condition = condition1;
+			}
+			
+			this.condition.checkTypes(markers, context);
+		}
+		if (this.then != null)
+		{
+			this.then.checkTypes(markers, context);
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.condition != null)
 		{
-			if (!this.condition.isType(Type.BOOLEAN))
-			{
-				Marker marker = markers.create(this.condition.getPosition(), "if.condition.type");
-				marker.addInfo("Condition Type: " + this.condition.getType());
-				
-			}
 			this.condition.check(markers, context);
 		}
 		else

@@ -14,7 +14,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class BooleanOr extends ASTNode implements IValue
+public final class BooleanOr extends ASTNode implements IValue
 {
 	public IValue	left;
 	public IValue	right;
@@ -93,6 +93,13 @@ public class BooleanOr extends ASTNode implements IValue
 		this.left = this.left.resolve(markers, context);
 		this.right = this.right.resolve(markers, context);
 		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.left.checkTypes(markers, context);
+		this.right.checkTypes(markers, context);
 	}
 	
 	@Override

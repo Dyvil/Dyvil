@@ -129,6 +129,11 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	}
 	
 	@Override
+	public void checkTypes()
+	{
+	}
+	
+	@Override
 	public void check()
 	{
 	}

@@ -23,29 +23,29 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 {
-	public static final int	DEFAULT		= 0;
-	public static final int	ITERATOR	= 1;
-	public static final int	ARRAY		= 2;
+	public static final int		DEFAULT		= 0;
+	public static final int		ITERATOR	= 1;
+	public static final int		ARRAY		= 2;
 	
-	private IContext		context;
-	private IStatement		parent;
+	private transient IContext	context;
+	private IStatement			parent;
 	
-	public Variable			variable;
+	public Variable				variable;
 	
-	public IValue			condition;
-	public IValue			update;
+	public IValue				condition;
+	public IValue				update;
 	
-	public byte				type;
+	public byte					type;
 	
-	public IValue			then;
+	public IValue				then;
 	
-	protected Label			startLabel;
-	protected Label			updateLabel;
-	protected Label			endLabel;
+	protected Label				startLabel;
+	protected Label				updateLabel;
+	protected Label				endLabel;
 	
-	protected Variable		var1;
-	protected Variable		var2;
-	protected Variable		var3;
+	protected Variable			var1;
+	protected Variable			var2;
+	protected Variable			var3;
 	
 	public ForStatement(ICodePosition position)
 	{
@@ -91,149 +91,6 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	public IStatement getParent()
 	{
 		return this.parent;
-	}
-	
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		if (this.variable != null)
-		{
-			this.variable.resolveTypes(markers, context);
-		}
-		if (this.type == 0)
-		{
-			if (this.condition != null)
-			{
-				this.condition.resolveTypes(markers, context);
-			}
-			if (this.update != null)
-			{
-				this.update.resolveTypes(markers, context);
-			}
-		}
-		
-		if (this.then != null)
-		{
-			if (this.then.isStatement())
-			{
-				((IStatement) this.then).setParent(this);
-			}
-			
-			this.then.resolveTypes(markers, context);
-		}
-	}
-	
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
-	{
-		this.context = context;
-		
-		if (this.type != 0)
-		{
-			IType varType = this.variable.type;
-			IValue value = this.variable.value;
-			this.variable.value = value.resolve(markers, context);
-			
-			IType valueType = value.getType();
-			int valueTypeDims = valueType.getArrayDimensions();
-			if (valueTypeDims != 0)
-			{
-				this.type = ARRAY;
-				if (!valueType.classEquals(varType) || varType.getArrayDimensions() != valueTypeDims - 1)
-				{
-					Marker marker = markers.create(value.getPosition(), "for.array.type");
-					marker.addInfo("Array Type: " + valueType);
-					marker.addInfo("Variable Type: " + varType);
-					
-				}
-				else
-				{
-					Variable var = new Variable(null);
-					var.type = Type.INT;
-					var.name = "$index";
-					var.qualifiedName = "$index";
-					this.var1 = var;
-					
-					var = new Variable(null);
-					var.type = Type.INT;
-					var.name = "$length";
-					var.qualifiedName = "$length";
-					this.var2 = var;
-					
-					var = new Variable(null);
-					var.type = valueType;
-					var.name = "$array";
-					var.qualifiedName = "$array";
-					this.var3 = var;
-				}
-			}
-		}
-		else
-		{
-			if (this.variable != null)
-			{
-				this.variable.resolve(markers, context);
-			}
-			if (this.condition != null)
-			{
-				this.condition = this.condition.resolve(markers, this);
-			}
-			if (this.update != null)
-			{
-				this.update = this.update.resolve(markers, this);
-			}
-		}
-		
-		if (this.then != null)
-		{
-			this.then = this.then.resolve(markers, this);
-		}
-		return this;
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		this.context = context;
-		
-		if (this.variable != null)
-		{
-			if (this.type == 0)
-			{
-				this.variable.check(markers, context);
-			}
-			else
-			{
-				this.variable.value.check(markers, context);
-			}
-		}
-		
-		if (this.condition != null)
-		{
-			this.condition.check(markers, this);
-			
-			if (!this.condition.isType(Type.BOOLEAN))
-			{
-				Marker marker = markers.create(this.condition.getPosition(), "for.condition.type");
-				marker.addInfo("Condition Type: " + this.condition.getType());
-				
-			}
-		}
-		if (this.update != null)
-		{
-			this.update.check(markers, this);
-		}
-		
-		if (this.then != null)
-		{
-			this.then.check(markers, this);
-		}
-	}
-	
-	@Override
-	public IValue foldConstants()
-	{
-		return this;
 	}
 	
 	@Override
@@ -333,6 +190,183 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 		}
 		
 		return this.parent == null ? null : this.parent.resolveLabel(name);
+	}
+	
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		if (this.variable != null)
+		{
+			this.variable.resolveTypes(markers, context);
+		}
+		if (this.type == 0)
+		{
+			if (this.condition != null)
+			{
+				this.condition.resolveTypes(markers, context);
+			}
+			if (this.update != null)
+			{
+				this.update.resolveTypes(markers, context);
+			}
+		}
+		
+		if (this.then != null)
+		{
+			if (this.then.isStatement())
+			{
+				((IStatement) this.then).setParent(this);
+			}
+			
+			this.then.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		this.context = context;
+		
+		if (this.type != 0)
+		{
+			IType varType = this.variable.type;
+			IValue value = this.variable.value;
+			this.variable.value = value.resolve(markers, context);
+			
+			IType valueType = value.getType();
+			int valueTypeDims = valueType.getArrayDimensions();
+			if (valueTypeDims != 0)
+			{
+				this.type = ARRAY;
+				if (!valueType.classEquals(varType) || varType.getArrayDimensions() != valueTypeDims - 1)
+				{
+					Marker marker = markers.create(value.getPosition(), "for.array.type");
+					marker.addInfo("Array Type: " + valueType);
+					marker.addInfo("Variable Type: " + varType);
+					
+				}
+				else
+				{
+					Variable var = new Variable(null);
+					var.type = Type.INT;
+					var.name = "$index";
+					var.qualifiedName = "$index";
+					this.var1 = var;
+					
+					var = new Variable(null);
+					var.type = Type.INT;
+					var.name = "$length";
+					var.qualifiedName = "$length";
+					this.var2 = var;
+					
+					var = new Variable(null);
+					var.type = valueType;
+					var.name = "$array";
+					var.qualifiedName = "$array";
+					this.var3 = var;
+				}
+			}
+		}
+		else
+		{
+			if (this.variable != null)
+			{
+				this.variable.resolve(markers, context);
+			}
+			if (this.condition != null)
+			{
+				this.condition = this.condition.resolve(markers, this);
+			}
+			if (this.update != null)
+			{
+				this.update = this.update.resolve(markers, this);
+			}
+		}
+		
+		if (this.then != null)
+		{
+			this.then = this.then.resolve(markers, this);
+		}
+		
+		this.context = null;
+		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.variable != null)
+		{
+			if (this.type == 0)
+			{
+				this.variable.checkTypes(markers, context);
+			}
+			else
+			{
+				this.variable.value.checkTypes(markers, context);
+			}
+		}
+		if (this.update != null)
+		{
+			this.update.checkTypes(markers, this);
+		}
+		if (this.condition != null)
+		{
+			IValue condition1 = this.condition.withType(Type.BOOLEAN);
+			if (condition1 == null)
+			{
+				Marker marker = markers.create(this.condition.getPosition(), "for.condition.type");
+				marker.addInfo("Condition Type: " + this.condition.getType());
+			}
+			else
+			{
+				this.condition = condition1;
+			}
+			
+			this.condition.checkTypes(markers, this);
+		}
+		if (this.then != null)
+		{
+			this.then.checkTypes(markers, this);
+		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		this.context = context;
+		
+		if (this.variable != null)
+		{
+			if (this.type == 0)
+			{
+				this.variable.check(markers, context);
+			}
+			else
+			{
+				this.variable.value.check(markers, context);
+			}
+		}
+		if (this.update != null)
+		{
+			this.update.check(markers, this);
+		}
+		if (this.condition != null)
+		{
+			this.condition.check(markers, this);
+		}
+		if (this.then != null)
+		{
+			this.then.check(markers, this);
+		}
+		
+		this.context = null;
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		return this;
 	}
 	
 	@Override

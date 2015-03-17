@@ -174,31 +174,45 @@ public class StatementList extends ValueList implements IStatement, IContext
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.isArray)
+		{
+			super.checkTypes(markers, context);
+		}
+		
+		this.context = context;
+		IType type = this.requiredType;
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			IValue v = this.values[i];
+			v.checkTypes(markers, this);
+			
+			if (v.getValueType() == RETURN && v.withType(type) == null)
+			{
+				Marker marker = markers.create(v.getPosition(), "return.type");
+				marker.addInfo("Block Type: " + type);
+				marker.addInfo("Returning Type: " + v.getType());
+			}
+		}
+		this.context = null;
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.isArray)
 		{
 			super.check(markers, context);
+			return;
 		}
-		else
+		
+		this.context = context;
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.context = context;
-			IType type = this.requiredType;
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				IValue v = this.values[i];
-				v.check(markers, this);
-				
-				if (v.getValueType() == RETURN && v.withType(type) == null)
-				{
-					Marker marker = markers.create(v.getPosition(), "return.type");
-					marker.addInfo("Block Type: " + type);
-					marker.addInfo("Returning Type: " + v.getType());
-					
-				}
-			}
-			this.context = null;
+			this.values[i].check(markers, context);
 		}
+		this.context = null;
 	}
 	
 	@Override

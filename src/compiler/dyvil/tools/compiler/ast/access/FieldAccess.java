@@ -160,6 +160,27 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance.checkTypes(markers, context);
+			
+			if (this.field != null && this.field.hasModifier(Modifiers.STATIC) && this.instance.getValueType() != CLASS_ACCESS)
+			{
+				markers.add(this.position, "access.field.static", this.name);
+				this.instance = null;
+				return;
+			}			
+		}
+		else if (this.field.isField())
+		{
+			markers.add(this.position, "access.field.unqualified", this.name);
+			this.instance = new ThisValue(this.position, this.field.getTheClass().getType());
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
@@ -169,20 +190,6 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 		
 		if (this.field != null)
 		{
-			if (this.field.hasModifier(Modifiers.STATIC))
-			{
-				if (this.instance != null && this.instance.getValueType() != CLASS_ACCESS)
-				{
-					markers.add(this.position, "access.field.static", this.name);
-					this.instance = null;
-				}
-			}
-			else if (this.instance == null && this.field.isField())
-			{
-				markers.add(this.position, "access.field.unqualified", this.name);
-				this.instance = new ThisValue(this.position, this.field.getTheClass().getType());
-			}
-			
 			if (this.field.hasModifier(Modifiers.DEPRECATED))
 			{
 				markers.add(this.position, "access.field.deprecated", this.name);

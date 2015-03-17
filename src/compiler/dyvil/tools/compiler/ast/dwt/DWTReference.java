@@ -54,6 +54,11 @@ public class DWTReference extends ASTNode implements IValue
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}

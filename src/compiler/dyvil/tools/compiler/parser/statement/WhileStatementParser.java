@@ -83,7 +83,7 @@ public class WhileStatementParser extends Parser implements IValued
 		}
 		else if (this.mode == -1)
 		{
-			this.statement.then = value;
+			this.statement.action = value;
 		}
 	}
 	

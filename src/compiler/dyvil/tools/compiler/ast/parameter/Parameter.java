@@ -150,9 +150,9 @@ public class Parameter extends Member implements IVariable
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
-		super.check(markers, context);
+		super.checkTypes(markers, context);
 		
 		if (this.defaultValue != null)
 		{
@@ -168,7 +168,17 @@ public class Parameter extends Member implements IVariable
 			{
 				this.defaultValue = value1;
 			}
-			
+			this.defaultValue.checkTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		super.check(markers, context);
+		
+		if (this.defaultValue != null)
+		{
 			this.defaultValue.check(markers, context);
 		}
 	}

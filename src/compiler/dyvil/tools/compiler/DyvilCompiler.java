@@ -213,6 +213,7 @@ public final class DyvilCompiler
 			states.add(ICompilerPhase.PARSE);
 			states.add(ICompilerPhase.RESOLVE_TYPES);
 			states.add(ICompilerPhase.RESOLVE);
+			states.add(ICompilerPhase.CHECK_TYPES);
 			states.add(ICompilerPhase.CHECK);
 			states.add(ICompilerPhase.COMPILE);
 			return;

@@ -214,6 +214,11 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}

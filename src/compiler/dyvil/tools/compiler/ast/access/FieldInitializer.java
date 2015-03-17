@@ -92,6 +92,12 @@ public class FieldInitializer extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.variable.checkTypes(markers, context);
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.variable.check(markers, context);

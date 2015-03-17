@@ -140,6 +140,8 @@ public interface IValue extends IASTNode, ITyped
 	
 	public IValue resolve(MarkerList markers, IContext context);
 	
+	public void checkTypes(MarkerList markers, IContext context);
+	
 	public void check(MarkerList markers, IContext context);
 	
 	public IValue foldConstants();

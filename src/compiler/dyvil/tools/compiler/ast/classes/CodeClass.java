@@ -664,6 +664,25 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].checkTypes(markers, this);
+		}
+		
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			this.annotations[i].checkTypes(markers, context);
+		}
+		
+		if (this.body != null)
+		{
+			this.body.checkTypes(markers, this);
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.superType != null)

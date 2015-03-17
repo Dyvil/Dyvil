@@ -82,6 +82,13 @@ public class SwapOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.left.checkTypes(markers, context);
+		this.right.checkTypes(markers, context);
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.left.check(markers, context);

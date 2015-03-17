@@ -237,6 +237,11 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}

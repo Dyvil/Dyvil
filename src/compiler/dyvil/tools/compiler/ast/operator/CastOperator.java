@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class CastOperator extends ASTNode implements IValue
+public final class CastOperator extends ASTNode implements IValue
 {
 	public IValue	value;
 	public IType	type;
@@ -78,6 +78,18 @@ public class CastOperator extends ASTNode implements IValue
 	{
 		this.value = this.value.resolve(markers, context);
 		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		IValue value1 = this.value.withType(this.type);
+		if (value1 != null)
+		{
+			this.value = value1;
+		}
+		
+		this.value.checkTypes(markers, context);
 	}
 	
 	@Override

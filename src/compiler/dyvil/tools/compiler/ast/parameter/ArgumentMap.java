@@ -245,6 +245,15 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.values[i].checkTypes(markers, context);
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.size; i++)

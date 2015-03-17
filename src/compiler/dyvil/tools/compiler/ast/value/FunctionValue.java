@@ -216,6 +216,15 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance.checkTypes(markers, context);
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)

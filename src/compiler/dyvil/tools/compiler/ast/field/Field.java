@@ -20,12 +20,12 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 public class Field extends Member implements IField
 {
-	protected IClass theClass;
-	private IValue	value;
+	protected IClass	theClass;
+	private IValue		value;
 	
 	public Field(IClass iclass)
 	{
-		this.theClass =iclass;
+		this.theClass = iclass;
 	}
 	
 	public Field(IClass iclass, String name)
@@ -126,9 +126,9 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
-		super.check(markers, context);
+		super.checkTypes(markers, context);
 		
 		if (this.value != null)
 		{
@@ -145,6 +145,17 @@ public class Field extends Member implements IField
 				this.value = value1;
 			}
 			
+			this.value.checkTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		super.check(markers, context);
+		
+		if (this.value != null)
+		{
 			this.value.check(markers, context);
 		}
 	}

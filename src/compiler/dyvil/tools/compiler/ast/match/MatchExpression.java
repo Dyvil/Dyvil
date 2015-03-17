@@ -160,6 +160,16 @@ public class MatchExpression extends ASTNode implements IValue
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.value.checkTypes(markers, context);
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			this.cases[i].checkTypes(markers, context);
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.value.check(markers, context);

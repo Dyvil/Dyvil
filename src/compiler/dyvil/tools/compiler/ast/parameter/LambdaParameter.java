@@ -87,6 +87,11 @@ public class LambdaParameter extends Member implements IVariable
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}

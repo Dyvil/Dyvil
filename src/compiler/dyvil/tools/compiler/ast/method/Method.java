@@ -635,6 +635,38 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		super.checkTypes(markers, context);
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].checkTypes(markers, context);
+		}
+		
+		if (this.value != null)
+		{
+			IValue value1 = this.value.withType(this.type);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(this.position, "method.type", this.name);
+				marker.addInfo("Return Type: " + this.type);
+				marker.addInfo("Value Type: " + this.value.getType());
+				
+			}
+			else
+			{
+				this.value = value1;
+			}
+			this.value.checkTypes(markers, context);
+		}
+		else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
+		{
+			this.modifiers |= Modifiers.ABSTRACT;
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -664,7 +696,6 @@ public class Method extends Member implements IMethod
 						Marker marker = markers.create(this.position, "method.override.type", this.name);
 						marker.addInfo("Return Type: " + this.type);
 						marker.addInfo("Overriden Return Type: " + type);
-						
 					}
 				}
 			}
@@ -687,22 +718,7 @@ public class Method extends Member implements IMethod
 					marker.addInfo("Expression Type: " + this.value.getType());
 				}
 			}
-			else
-			{
-				IValue value1 = this.value.withType(this.type);
-				if (value1 == null)
-				{
-					Marker marker = markers.create(this.position, "method.type", this.name);
-					marker.addInfo("Return Type: " + this.type);
-					marker.addInfo("Value Type: " + this.value.getType());
-					
-				}
-				else
-				{
-					this.value = value1;
-				}
-				this.value.check(markers, context);
-			}
+			this.value.check(markers, context);
 		}
 		// If the method does not have an implementation and is static
 		else if (this.isStatic())
@@ -710,16 +726,9 @@ public class Method extends Member implements IMethod
 			markers.add(this.position, "method.static", this.name);
 		}
 		// Or not declared abstract and a member of a non-abstract class
-		else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
+		else if ((this.modifiers & Modifiers.ABSTRACT) == 0 && !this.theClass.isAbstract())
 		{
-			if (this.theClass.isAbstract())
-			{
-				this.modifiers |= Modifiers.ABSTRACT;
-			}
-			else
-			{
-				markers.add(this.position, "method.unimplemented", this.name);
-			}
+			markers.add(this.position, "method.unimplemented", this.name);
 		}
 	}
 	

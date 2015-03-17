@@ -121,10 +121,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 			this.instance.resolveTypes(markers, context);
 		}
 		
-		for (IValue v : this.arguments)
-		{
-			v.resolveTypes(markers, context);
-		}
+		this.arguments.resolveTypes(markers, context);
 	}
 	
 	@Override
@@ -159,6 +156,21 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance.checkTypes(markers, context);
+		}
+		
+		if (this.method != null)
+		{
+			this.method.checkArguments(markers, this.instance, this.arguments, this);
+		}
+		this.arguments.checkTypes(markers, context);
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
@@ -166,15 +178,10 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 			this.instance.check(markers, context);
 		}
 		
-		if (this.arguments != null)
-		{
-			this.arguments.check(markers, context);
-		}
+		this.arguments.check(markers, context);
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, this);
-			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
 				markers.add(this.position, "access.method.deprecated", "apply");

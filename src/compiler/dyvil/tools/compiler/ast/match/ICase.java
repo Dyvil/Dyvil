@@ -24,6 +24,8 @@ public interface ICase extends IASTNode, IValued, IPatterned
 	
 	public ICase resolve(MarkerList markers, IContext context);
 	
+	public void checkTypes(MarkerList markers, IContext context);
+	
 	public void check(MarkerList markers, IContext context);
 	
 	public ICase foldConstants();

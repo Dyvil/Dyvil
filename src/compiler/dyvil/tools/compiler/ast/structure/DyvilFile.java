@@ -216,6 +216,15 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	}
 	
 	@Override
+	public void checkTypes()
+	{
+		for (IClass i : this.classes)
+		{
+			i.checkTypes(this.markers, this);
+		}
+	}
+	
+	@Override
 	public void check()
 	{
 		this.pack.check(this.packageDeclaration, this.inputFile, this.markers);

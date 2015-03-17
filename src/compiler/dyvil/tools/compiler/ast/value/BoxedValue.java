@@ -58,17 +58,26 @@ public class BoxedValue extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		this.boxed.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		return null;
+		this.boxed = this.boxed.resolve(markers, context);
+		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.boxed.checkTypes(markers, context);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.boxed.checkTypes(markers, context);
 	}
 	
 	@Override

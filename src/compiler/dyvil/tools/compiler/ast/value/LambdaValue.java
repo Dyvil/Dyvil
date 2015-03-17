@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -27,11 +26,12 @@ import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class LambdaValue extends ASTNode implements IValue, IValued, IClassCompilable, IContext, ITypeContext
+public final class LambdaValue extends ASTNode implements IValue, IValued, IClassCompilable, IContext
 {
 	public static final Handle	BOOTSTRAP	= new Handle(MethodWriter.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
@@ -182,95 +182,6 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	}
 	
 	@Override
-	public IType resolveType(String name)
-	{
-		IType type = this.type.resolveType(name);
-		if (type == null)
-		{
-			System.out.println("what now? " + name);
-		}
-		return type;
-	}
-	
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			LambdaParameter param = this.parameters[i];
-			if (param.type != null)
-			{
-				param.type = param.type.resolve(markers, context);
-			}
-		}
-		
-		this.context = context;
-		this.value.resolveTypes(markers, this);
-	}
-	
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
-	{
-		// Value gets resolved in check()
-		
-		IType type = context.getThisType();
-		if (type == null)
-		{
-			return this;
-		}
-		
-		IClass iclass = type.getTheClass();
-		if (iclass == null)
-		{
-			return this;
-		}
-		
-		this.owner = iclass.getInternalName();
-		this.index = iclass.compilableCount();
-		iclass.addCompilable(this);
-		
-		return this;
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		if (this.method != null)
-		{
-			if (this.method.hasTypeVariables())
-			{
-				this.returnType = this.method.getType(this);
-				
-				for (int i = 0; i < this.parameterCount; i++)
-				{
-					LambdaParameter param = this.parameters[i];
-					param.baseType = this.method.getParameter(i).type;
-					param.type = param.type.getConcreteType(this);
-				}
-			}
-			else
-			{
-				this.returnType = this.method.getType();
-			}
-		}
-		else
-		{
-			markers.add(this.position, "lambda.method");
-		}
-		
-		this.context = context;
-		this.value = this.value.resolve(markers, this);
-		this.value.check(markers, context);
-	}
-	
-	@Override
-	public IValue foldConstants()
-	{
-		this.value = this.value.foldConstants();
-		return this;
-	}
-	
-	@Override
 	public boolean isStatic()
 	{
 		return this.context.isStatic();
@@ -370,6 +281,108 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	public byte getAccessibility(IMember member)
 	{
 		return this.context.getAccessibility(member);
+	}
+	
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			LambdaParameter param = this.parameters[i];
+			if (param.type != null)
+			{
+				param.type = param.type.resolve(markers, context);
+			}
+		}
+		
+		this.context = context;
+		this.value.resolveTypes(markers, this);
+		this.context = null;
+	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		// Value gets resolved in check()
+		
+		IType type = context.getThisType();
+		if (type == null)
+		{
+			return this;
+		}
+		
+		IClass iclass = type.getTheClass();
+		if (iclass == null)
+		{
+			return this;
+		}
+		
+		this.owner = iclass.getInternalName();
+		this.index = iclass.compilableCount();
+		iclass.addCompilable(this);
+		
+		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.context = context;
+		
+		this.value = this.value.resolve(markers, this);
+		
+		if (this.method != null)
+		{
+			if (this.method.hasTypeVariables())
+			{
+				for (int i = 0; i < this.parameterCount; i++)
+				{
+					LambdaParameter param = this.parameters[i];
+					param.baseType = this.method.getParameter(i).type;
+					param.type = param.type.getConcreteType(this.type);
+				}
+				
+				this.returnType = this.method.getType(this.type);
+			}
+			else
+			{
+				this.returnType = this.method.getType();
+			}
+			
+			IValue value1 = this.value.withType(this.returnType);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(this.value.getPosition(), "lambda.type");
+				marker.addInfo("Method Return Type: " + this.returnType);
+				marker.addInfo("Value Type: " + this.value.getType());
+			}
+			else
+			{
+				this.value = value1;
+			}
+		}
+		else
+		{
+			markers.add(this.position, "lambda.method");
+		}
+		
+		this.value.checkTypes(markers, this);
+		
+		this.context = null;
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		
+		this.value.check(markers, context);
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		this.value = this.value.foldConstants();
+		return this;
 	}
 	
 	@Override

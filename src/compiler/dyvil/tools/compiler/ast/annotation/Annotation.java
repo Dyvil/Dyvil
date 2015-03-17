@@ -82,27 +82,12 @@ public class Annotation extends ASTNode implements ITyped
 		this.arguments.resolve(markers, context);
 	}
 	
-	public void check(MarkerList markers, IContext context)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
 		IClass theClass = this.type.theClass;
-		
 		if (theClass == null)
 		{
 			return;
-		}
-		
-		if (!theClass.hasModifier(Modifiers.ANNOTATION))
-		{
-			markers.add(this.position, "annotation.type", this.name);
-			return;
-		}
-		
-		if (!this.type.isTarget(this.target))
-		{
-			Marker error = markers.create(this.position, "annotation.target", this.name);
-			error.addInfo("Element Target: " + this.target);
-			error.addInfo("Allowed Targets: " + this.type.getTargets());
-			markers.add(error);
 		}
 		
 		int count = theClass.parameterCount();
@@ -126,6 +111,29 @@ public class Annotation extends ASTNode implements ITyped
 			{
 				this.arguments.setValue(i, param, value1);
 			}
+		}
+	}
+	
+	public void check(MarkerList markers, IContext context)
+	{
+		IClass theClass = this.type.theClass;
+		if (theClass == null)
+		{
+			return;
+		}
+		
+		if (!theClass.hasModifier(Modifiers.ANNOTATION))
+		{
+			markers.add(this.position, "annotation.type", this.name);
+			return;
+		}
+		
+		if (!this.type.isTarget(this.target))
+		{
+			Marker error = markers.create(this.position, "annotation.target", this.name);
+			error.addInfo("Element Target: " + this.target);
+			error.addInfo("Allowed Targets: " + this.type.getTargets());
+			markers.add(error);
 		}
 	}
 	

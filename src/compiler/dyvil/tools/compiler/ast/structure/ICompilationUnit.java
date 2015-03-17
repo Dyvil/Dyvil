@@ -19,6 +19,8 @@ public interface ICompilationUnit extends IASTNode
 	
 	public void resolve();
 	
+	public void checkTypes();
+	
 	public void check();
 	
 	public void foldConstants();

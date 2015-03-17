@@ -4,10 +4,16 @@ import java.util.Collection;
 
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lexer.Dlex;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.util.TestThread;
 
@@ -34,7 +40,19 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	ICompilerPhase	RESOLVE			= new ParallelCompilerPhase(40, "RESOLVE", ICompilationUnit::resolve);
 	
 	/**
-	 * Checks for semantical errors.
+	 * Resolves other things such as lambda expressions or annotations and
+	 * checks types. This will be called after {@link IValue#withType(IType)}
+	 * has been called. Mainly used by
+	 * {@link IMethod#checkArguments(MarkerList, IValue, IArguments, ITypeContext)}
+	 * .
+	 */
+	ICompilerPhase	CHECK_TYPES		= new ParallelCompilerPhase(45, "CHECK_TYPES", ICompilationUnit::checkTypes);
+	
+	/**
+	 * Checks for semantical errors. The general contract of this method is that
+	 * it should not be mandatory for a compilation to succeed (given that
+	 * everything is correct). Thus, it should not do any more linking or
+	 * resolving.
 	 */
 	ICompilerPhase	CHECK			= new ParallelCompilerPhase(50, "CHECK", ICompilationUnit::check);
 	

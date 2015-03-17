@@ -189,12 +189,27 @@ public final class CaseStatement extends ASTNode implements IValue, ICase, ICont
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.condition != null)
+		{
+			this.condition.checkTypes(markers, context);
+		}
+		
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.condition != null)
 		{
 			this.condition.check(markers, context);
 		}
+		
 		if (this.value != null)
 		{
 			this.value.check(markers, context);

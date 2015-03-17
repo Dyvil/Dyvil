@@ -13,13 +13,13 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class BooleanNot extends ASTNode implements IValue
+public final class BooleanNot extends ASTNode implements IValue
 {
-	public IValue	right;
+	public IValue	value;
 	
 	public BooleanNot(IValue right)
 	{
-		this.right = right;
+		this.value = right;
 	}
 	
 	@Override
@@ -73,32 +73,38 @@ public class BooleanNot extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.right.resolveTypes(markers, context);
+		this.value.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.right = this.right.resolve(markers, context);
+		this.value = this.value.resolve(markers, context);
 		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.value.checkTypes(markers, context);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.right.check(markers, context);
+		this.value.check(markers, context);
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.right.getValueType() == BOOLEAN)
+		if (this.value.getValueType() == BOOLEAN)
 		{
-			BooleanValue b = (BooleanValue) this.right;
+			BooleanValue b = (BooleanValue) this.value;
 			b.value = !b.value;
 			return b;
 		}
-		this.right = this.right.foldConstants();
+		this.value = this.value.foldConstants();
 		return this;
 	}
 	
@@ -107,7 +113,7 @@ public class BooleanNot extends ASTNode implements IValue
 	{
 		Label label = new Label();
 		Label label2 = new Label();
-		this.right.writeInvJump(writer, label);
+		this.value.writeInvJump(writer, label);
 		writer.writeLDC(0);
 		writer.writeJumpInsn(Opcodes.GOTO, label2);
 		writer.writeFrameLabel(label);
@@ -125,19 +131,19 @@ public class BooleanNot extends ASTNode implements IValue
 	@Override
 	public void writeJump(MethodWriter writer, Label dest)
 	{
-		this.right.writeInvJump(writer, dest);
+		this.value.writeInvJump(writer, dest);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest)
 	{
-		this.right.writeJump(writer, dest);
+		this.value.writeJump(writer, dest);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append('!');
-		this.right.toString(prefix, buffer);
+		this.value.toString(prefix, buffer);
 	}
 }

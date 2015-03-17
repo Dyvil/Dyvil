@@ -99,7 +99,7 @@ public class DoStatementParser extends Parser implements IValued
 	{
 		if (this.mode == WHILE)
 		{
-			this.statement.then = value;
+			this.statement.action = value;
 		}
 		else if (this.mode == CONDITION_END)
 		{

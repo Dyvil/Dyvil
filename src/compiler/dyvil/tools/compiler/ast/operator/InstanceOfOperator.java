@@ -72,6 +72,7 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		this.type = this.type.resolve(markers, context);
 		this.value.resolveTypes(markers, context);
 	}
 	
@@ -83,8 +84,16 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.value.checkTypes(markers, context);
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.value.check(markers, context);
+		
 		if (this.type.isPrimitive())
 		{
 			markers.add(this.position, "instanceof.primitive");

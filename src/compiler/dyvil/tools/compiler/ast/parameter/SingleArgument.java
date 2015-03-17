@@ -211,34 +211,37 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.value == null)
+		if (this.value != null)
 		{
-			return;
+			this.value.resolveTypes(markers, context);
 		}
-		
-		this.value.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if (this.value == null)
+		if (this.value != null)
 		{
-			return;
+			this.value = this.value.resolve(markers, context);
 		}
-		
-		this.value = this.value.resolve(markers, context);
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.value == null)
+		if (this.value != null)
 		{
-			return;
+			this.value.check(markers, context);
 		}
-		
-		this.value.check(markers, context);
 	}
 	
 	@Override

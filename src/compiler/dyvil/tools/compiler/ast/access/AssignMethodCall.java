@@ -162,10 +162,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			this.instance.resolveTypes(markers, context);
 		}
 		
-		for (IValue v : this.arguments)
-		{
-			v.resolveTypes(markers, context);
-		}
+		this.arguments.resolveTypes(markers, context);
 	}
 	
 	@Override
@@ -191,11 +188,11 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
-			this.instance.check(markers, context);
+			this.instance.checkTypes(markers, context);
 			
 			if (this.instance.getValueType() == APPLY_METHOD_CALL)
 			{
@@ -213,20 +210,29 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 				{
 					Marker marker = markers.create(this.position, "access.assign_call.update");
 					marker.addInfo("Instance Type: " + type);
-					
 				}
 			}
-		}
-		
-		for (IValue v : this.arguments)
-		{
-			v.check(markers, context);
 		}
 		
 		if (this.method != null)
 		{
 			this.method.checkArguments(markers, this.instance, this.arguments, this);
-			
+		}
+		this.arguments.checkTypes(markers, context);
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance.check(markers, context);
+		}
+		
+		this.arguments.check(markers, context);
+		
+		if (this.method != null)
+		{
 			IType type1 = this.instance.getType();
 			IType type2 = this.method.getType();
 			if (!Type.isSuperType(type1, type2))
@@ -234,7 +240,6 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 				Marker marker = markers.create(this.position, "access.assign_call.type", this.name, this.instance.toString());
 				marker.addInfo("Field Type: " + type1);
 				marker.addInfo("Method Type: " + type2);
-				
 			}
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))

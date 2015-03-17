@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
+import java.lang.annotation.ElementType;
 import java.util.List;
 
 import org.objectweb.asm.ClassWriter;
@@ -9,6 +10,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -25,8 +27,10 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.ModifierTypes;
 
-public class Property extends Field implements IProperty, IContext
+public class Property extends Member implements IProperty, IContext
 {
+	private IClass theClass;
+	
 	public IValue		get;
 	public IValue		set;
 	
@@ -36,17 +40,36 @@ public class Property extends Field implements IProperty, IContext
 	
 	public Property(IClass iclass)
 	{
-		super(iclass);
+		this.theClass = iclass;
 	}
 	
 	public Property(IClass iclass, String name)
 	{
-		super(iclass, name);
+		super(name);
+		this.theClass = iclass;
 	}
 	
 	public Property(IClass iclass, String name, IType type)
 	{
-		super(iclass, name, type);
+		super(name, type);
+		this.theClass = iclass;
+	}
+	
+	@Override
+	public ElementType getAnnotationType()
+	{
+		return ElementType.FIELD;
+	}
+	
+	@Override
+	public void setValue(IValue value)
+	{
+	}
+	
+	@Override
+	public IValue getValue()
+	{
+		return null;
 	}
 	
 	@Override
@@ -129,6 +152,32 @@ public class Property extends Field implements IProperty, IContext
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		super.checkTypes(markers, context);
+		
+		if (this.get != null)
+		{
+			IValue get1 = this.get.withType(this.type);
+			if (get1 == null)
+			{
+				Marker marker = markers.create(this.get.getPosition(), "property.getter.type", this.name);
+				marker.addInfo("Property Type: " + this.type);
+				marker.addInfo("Getter Value Type: " + this.get.getType());
+				
+			}
+			else
+			{
+				this.get = get1;
+			}
+		}
+		if (this.set != null && !this.set.isType(Type.VOID))
+		{
+			markers.add(this.set.getPosition(), "property.setter.type", this.name);
+		}
+	}
+	
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
@@ -136,28 +185,6 @@ public class Property extends Field implements IProperty, IContext
 		if (this.get == null && this.set == null)
 		{
 			markers.add(this.position, "property.empty", this.name);
-		}
-		else
-		{
-			if (this.get != null)
-			{
-				IValue get1 = this.get.withType(this.type);
-				if (get1 == null)
-				{
-					Marker marker = markers.create(this.get.getPosition(), "property.getter.type", this.name);
-					marker.addInfo("Property Type: " + this.type);
-					marker.addInfo("Getter Value Type: " + this.get.getType());
-					
-				}
-				else
-				{
-					this.get = get1;
-				}
-			}
-			if (this.set != null && !this.set.isType(Type.VOID))
-			{
-				markers.add(this.set.getPosition(), "property.setter.type", this.name);
-			}
 		}
 	}
 	
@@ -247,6 +274,20 @@ public class Property extends Field implements IProperty, IContext
 			b |= IContext.WRITE_ACCESS;
 		}
 		return b;
+	}
+	
+	// Compilation
+	
+	@Override
+	public String getDescription()
+	{
+		return null;
+	}
+
+	@Override
+	public String getSignature()
+	{
+		return null;
 	}
 	
 	@Override
