@@ -58,7 +58,7 @@ public class Bytecode extends ASTNode implements IValue
 		if (index >= this.instructions.length)
 		{
 			IInstruction[] temp = new IInstruction[this.instructionCount];
-			System.arraycopy(instructions, 0, temp, 0, instructions.length);
+			System.arraycopy(this.instructions, 0, temp, 0, this.instructions.length);
 			this.instructions = temp;
 		}
 		this.instructions[index] = insn;
@@ -70,7 +70,7 @@ public class Bytecode extends ASTNode implements IValue
 		if (index >= this.instructions.length)
 		{
 			IInstruction[] temp = new IInstruction[this.instructionCount];
-			System.arraycopy(instructions, 0, temp, 0, instructions.length);
+			System.arraycopy(this.instructions, 0, temp, 0, this.instructions.length);
 			this.instructions = temp;
 		}
 		this.instructions[index] = insn;

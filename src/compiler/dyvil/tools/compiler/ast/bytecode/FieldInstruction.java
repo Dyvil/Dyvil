@@ -12,7 +12,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class FieldInstruction implements IInstruction
 {
-	private int opcode;
+	private int		opcode;
 	private String	owner;
 	private String	fieldName;
 	private String	desc;

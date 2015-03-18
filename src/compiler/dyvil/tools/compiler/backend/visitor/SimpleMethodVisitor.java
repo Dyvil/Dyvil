@@ -24,7 +24,7 @@ public final class SimpleMethodVisitor extends MethodVisitor
 	@Override
 	public void visitParameter(String name, int index)
 	{
-		method.getParameter(index).setName(name);
+		this.method.getParameter(index).setName(name);
 	}
 	
 	@Override
@@ -34,14 +34,14 @@ public final class SimpleMethodVisitor extends MethodVisitor
 		{
 			if (index != 0 && index <= this.method.parameterCount())
 			{
-				method.getParameter(index - 1).setName(name);
+				this.method.getParameter(index - 1).setName(name);
 			}
 			return;
 		}
 		
 		if (index < this.method.parameterCount())
 		{
-			method.getParameter(index).setName(name);
+			this.method.getParameter(index).setName(name);
 		}
 	}
 	

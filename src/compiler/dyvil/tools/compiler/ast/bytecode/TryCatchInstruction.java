@@ -6,10 +6,10 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class TryCatchInstruction implements IInstruction
 {
-	private Label start;
-	private Label end;
-	private Label handler;
-	private String type;
+	private Label	start;
+	private Label	end;
+	private Label	handler;
+	private String	type;
 	
 	public TryCatchInstruction(Label start, Label end, Label handler, String type)
 	{
@@ -18,7 +18,7 @@ public class TryCatchInstruction implements IInstruction
 		this.handler = handler;
 		this.type = type;
 	}
-
+	
 	@Override
 	public void resolve(MarkerList markers, Bytecode bytecode)
 	{
@@ -34,5 +34,5 @@ public class TryCatchInstruction implements IInstruction
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("TRYCATCHBLOCK ").append(this.type).append(" [").append(this.start).append(' ').append(this.end).append(" => ").append(this.handler);
-	}	
+	}
 }

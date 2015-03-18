@@ -7,7 +7,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class Instruction extends ASTNode implements IInstruction
 {
-	protected int		opcode;
+	protected int	opcode;
 	
 	public Instruction(int opcode)
 	{

@@ -159,7 +159,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, instance, arguments, this);
+			this.method.checkArguments(markers, this.instance, this.arguments, this);
 		}
 		this.arguments.check(markers, context);
 	}

@@ -159,11 +159,11 @@ public final class MatchExpression extends ASTNode implements IValue
 					this.exhaustive = true;
 				}
 			}
-			else if (!pattern.isType(type))
+			else if (!pattern.isType(this.type))
 			{
 				Marker marker = markers.create(pattern.getPosition(), "pattern.type");
 				marker.addInfo("Pattern Type: " + pattern.getType());
-				marker.addInfo("Value Type: " + type);
+				marker.addInfo("Value Type: " + this.type);
 			}
 			
 			this.cases[i].checkTypes(markers, context);

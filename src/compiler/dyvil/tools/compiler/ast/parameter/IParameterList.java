@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-
 public interface IParameterList
 {
 	public int parameterCount();

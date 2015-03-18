@@ -17,7 +17,7 @@ public class LookupSwitchInstruction implements IInstruction
 		this.keys = keys;
 		this.handlers = handlers;
 	}
-
+	
 	@Override
 	public void resolve(MarkerList markers, Bytecode bytecode)
 	{

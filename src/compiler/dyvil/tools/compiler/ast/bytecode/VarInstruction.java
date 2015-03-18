@@ -6,7 +6,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class VarInstruction implements IInstruction
 {
-	private int opcode;
+	private int	opcode;
 	private int	index;
 	
 	public VarInstruction(int opcode, int index)

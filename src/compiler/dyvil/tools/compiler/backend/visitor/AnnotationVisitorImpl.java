@@ -17,7 +17,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 {
 	private IAnnotationList	annotated;
 	private Annotation		annotation;
-	private ArgumentMap arguments;
+	private ArgumentMap		arguments;
 	
 	public AnnotationVisitorImpl(IAnnotationList annotated, Annotation annotation)
 	{

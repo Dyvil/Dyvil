@@ -8,7 +8,7 @@ import dyvil.tools.compiler.parser.Parser;
 
 public class BytecodeParser extends Parser
 {
-	public Bytecode			bytecode;
+	public Bytecode	bytecode;
 	
 	public BytecodeParser(Bytecode bytecode)
 	{

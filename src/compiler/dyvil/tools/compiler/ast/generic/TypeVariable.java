@@ -90,7 +90,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 		if (index >= this.upperBounds.length)
 		{
 			IType[] temp = new IType[this.upperBoundCount];
-			System.arraycopy(upperBounds, 0, temp, 0, upperBounds.length);
+			System.arraycopy(this.upperBounds, 0, temp, 0, this.upperBounds.length);
 			this.upperBounds = temp;
 		}
 		this.upperBounds[index] = bound;

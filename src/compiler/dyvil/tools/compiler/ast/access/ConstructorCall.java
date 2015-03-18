@@ -172,7 +172,7 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 	{
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, null, arguments, this);
+			this.method.checkArguments(markers, null, this.arguments, this);
 		}
 		this.arguments.checkTypes(markers, context);
 	}
@@ -258,25 +258,25 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 		writer.writeTypeInsn(Opcodes.NEW, this.type);
 		writer.writeInsn(Opcodes.DUP);
 		
-		int args = method.parameterCount();
-		if ((this.method.isVarargs()))
+		int args = this.method.parameterCount();
+		if (this.method.isVarargs())
 		{
 			int len = args - 1;
 			Parameter param;
 			for (int i = 0; i < len; i++)
 			{
-				param = method.getParameter(i);
-				arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
+				param = this.method.getParameter(i);
+				this.arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
 			}
-			param = method.getParameter(len);
-			arguments.writeVarargsValue(len, param.qualifiedName, param.type, writer);
+			param = this.method.getParameter(len);
+			this.arguments.writeVarargsValue(len, param.qualifiedName, param.type, writer);
 		}
 		else
 		{
 			for (int i = 0; i < args; i++)
 			{
-				Parameter param = method.getParameter(i);
-				arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
+				Parameter param = this.method.getParameter(i);
+				this.arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
 			}
 		}
 		

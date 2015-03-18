@@ -5,7 +5,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class IIncInstruction implements IInstruction
 {
-	private int index;
+	private int	index;
 	private int	value;
 	
 	public IIncInstruction(int index, int value)

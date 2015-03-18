@@ -171,7 +171,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 				markers.add(this.position, "access.field.static", this.name);
 				this.instance = null;
 				return;
-			}			
+			}
 		}
 		else if (this.field != null && this.field.isField())
 		{
@@ -236,7 +236,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 			return false;
 		}
 		
-		if (this.instance != null && !(this.field.isField()))
+		if (this.instance != null && !this.field.isField())
 		{
 			return false;
 		}
@@ -271,7 +271,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 				return false;
 			}
 			
-			if (this.instance != null && !(field.isField()))
+			if (this.instance != null && !field.isField())
 			{
 				return false;
 			}

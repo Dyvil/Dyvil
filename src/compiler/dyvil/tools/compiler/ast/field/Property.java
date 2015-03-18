@@ -29,7 +29,7 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 public class Property extends Member implements IProperty, IContext
 {
-	private IClass theClass;
+	private IClass		theClass;
 	
 	public IValue		get;
 	public IValue		set;
@@ -283,7 +283,7 @@ public class Property extends Member implements IProperty, IContext
 	{
 		return null;
 	}
-
+	
 	@Override
 	public String getSignature()
 	{

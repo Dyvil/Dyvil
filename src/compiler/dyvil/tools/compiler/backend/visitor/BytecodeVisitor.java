@@ -207,12 +207,12 @@ public class BytecodeVisitor extends MethodVisitor
 		{
 			if (index != 0 && index <= this.method.parameterCount())
 			{
-				method.getParameter(index - 1).setName(name);
+				this.method.getParameter(index - 1).setName(name);
 			}
 		}
 		else if (index < this.method.parameterCount())
 		{
-			method.getParameter(index).setName(name);
+			this.method.getParameter(index).setName(name);
 		}
 	}
 	

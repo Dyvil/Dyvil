@@ -106,12 +106,12 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public boolean addRawAnnotation(String type)
 	{
-		if ("dyvil.lang.annotation.var".equals(name))
+		if ("dyvil.lang.annotation.var".equals(this.name))
 		{
 			this.modifiers |= Modifiers.VAR;
 			return false;
 		}
-		if ("dyvil.lang.annotation.lazy".equals(name))
+		if ("dyvil.lang.annotation.lazy".equals(this.name))
 		{
 			this.modifiers |= Modifiers.LAZY;
 			return false;
@@ -221,7 +221,7 @@ public class Parameter extends Member implements IVariable
 	{
 		if (this.parameterized.isClass())
 		{
-			writer.writeGetField(((IClass) this.parameterized).getInternalName(), qualifiedName, this.getDescription(), type);
+			writer.writeGetField(((IClass) this.parameterized).getInternalName(), this.qualifiedName, this.getDescription(), this.type);
 			return;
 		}
 		
@@ -235,7 +235,7 @@ public class Parameter extends Member implements IVariable
 		
 		if (this.parameterized.isClass())
 		{
-			writer.writePutField(((IClass) this.parameterized).getInternalName(), qualifiedName, this.getDescription());
+			writer.writePutField(((IClass) this.parameterized).getInternalName(), this.qualifiedName, this.getDescription());
 			return;
 		}
 		
