@@ -120,11 +120,12 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	@Override
 	public FieldMatch resolveField(String name)
 	{
-		if (this.variable.isName(name))
+		if (this.variable != null && this.variable.isName(name))
 		{
 			return new FieldMatch(this.variable, 1);
 		}
-		else if (this.type == ARRAY)
+		
+		if (this.type == ARRAY)
 		{
 			if ("$index".equals(name))
 			{

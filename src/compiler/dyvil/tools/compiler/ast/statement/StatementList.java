@@ -64,18 +64,21 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public IValue withType(IType type)
 	{
-		this.requiredType = type;
-		if (type == Type.VOID)
+		if (type == Type.VOID || type == Type.NONE)
 		{
+			this.elementType = this.requiredType = Type.VOID;
 			return this;
 		}
-		if (super.isType(type))
+		
+		if (this.valueCount > 0 && this.values[this.valueCount - 1].isType(type))
 		{
-			if (type.isArrayType())
-			{
-				return new ValueList(this.position, this.values, this.requiredType, this.elementType);
-			}
+			this.elementType = this.requiredType = type;
 			return this;
+		}
+		
+		if (type.isArrayType())
+		{
+			return new ValueList(this.position, this.values, this.valueCount, type, type.getElementType());
 		}
 		return null;
 	}
@@ -83,7 +86,45 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.VOID || type == Type.NONE || super.isType(type);
+		if (type == Type.VOID || type == Type.NONE)
+		{
+			return true;
+		}
+		
+		if (this.valueCount > 0 && this.values[this.valueCount - 1].isType(type))
+		{
+			return true;
+		}
+		
+		if (type.isArrayType())
+		{
+			return super.isType(type);
+		}
+		return false;
+	}
+	
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (type == Type.VOID || type == Type.NONE)
+		{
+			return 3;
+		}
+		
+		if (this.valueCount > 0)
+		{
+			int m = this.values[this.valueCount - 1].getTypeMatch(type);
+			if (m > 0)
+			{
+				return m;
+			}
+		}
+		
+		if (type.isArrayType())
+		{
+			return super.getTypeMatch(type);
+		}
+		return 0;
 	}
 	
 	@Override
@@ -144,11 +185,8 @@ public class StatementList extends ValueList implements IStatement, IContext
 	{
 		if (this.isArray)
 		{
-			// Remove unnecessary null entries
-			IValue[] values = new IValue[this.valueCount];
-			System.arraycopy(this.values, 0, values, 0, this.valueCount);
 			// Convert this to a simpler ValueList for performance
-			return new ValueList(this.position, values, this.requiredType, this.elementType).resolve(markers, context);
+			return new ValueList(this.position, this.values, this.valueCount, this.requiredType, this.elementType).resolve(markers, context);
 		}
 		
 		this.context = context;
@@ -175,36 +213,53 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.isArray)
+		// this.isArray has already been checked in resolve
+		
+		if (this.valueCount == 0)
 		{
-			super.checkTypes(markers, context);
+			return;
 		}
 		
 		this.context = context;
-		IType type = this.requiredType;
-		for (int i = 0; i < this.valueCount; i++)
+		int len = this.valueCount - 1;
+		for (int i = 0; i < len; i++)
 		{
 			IValue v = this.values[i];
-			v.checkTypes(markers, this);
-			
-			if (v.getValueType() == RETURN && v.withType(type) == null)
+			IValue v1 = v.withType(Type.VOID);
+			if (v1 == null)
 			{
-				Marker marker = markers.create(v.getPosition(), "return.type");
-				marker.addInfo("Block Type: " + type);
+				Marker marker = markers.create(v.getPosition(), "statement.type");
 				marker.addInfo("Returning Type: " + v.getType());
 			}
+			else
+			{
+				v = this.values[i] = v1;
+			}
+			
+			v.checkTypes(markers, this);
 		}
+		
+		IValue lastValue = this.values[len];
+		IValue value1 = lastValue.withType(this.requiredType);
+		if (value1 == null)
+		{
+			Marker marker = markers.create(lastValue.getPosition(), "block.type");
+			marker.addInfo("Block Type: " + this.requiredType);
+			marker.addInfo("Returning Type: " + lastValue.getType());
+		}
+		else
+		{
+			lastValue = this.values[len] = value1;
+		}
+		lastValue.checkTypes(markers, this);
+		
 		this.context = null;
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.isArray)
-		{
-			super.check(markers, context);
-			return;
-		}
+		// this.isArray has already been checked in resolve
 		
 		this.context = context;
 		for (int i = 0; i < this.valueCount; i++)
@@ -217,6 +272,11 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public IValue foldConstants()
 	{
+		if (this.valueCount == 1)
+		{
+			return this.values[0].foldConstants();
+		}
+		
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue v1 = this.values[i];
@@ -315,7 +375,51 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		this.writeStatement(writer);
+		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
+		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
+		
+		writer.writeLabel(start);
+		int count = writer.localCount();
+		int len = this.valueCount - 1;
+		
+		if (this.labels == null)
+		{
+			for (int i = 0; i < len; i++)
+			{
+				this.values[i].writeStatement(writer);
+			}
+			this.values[len].writeExpression(writer);
+		}
+		else
+		{
+			for (int i = 0; i < len; i++)
+			{
+				Label l = this.labels[i];
+				if (l != null)
+				{
+					writer.writeFrameLabel(l.target);
+				}
+				
+				this.values[i].writeStatement(writer);
+			}
+			
+			Label l = this.labels[len];
+			if (l != null)
+			{
+				writer.writeFrameLabel(l.target);
+			}
+			
+			this.values[len].writeExpression(writer);
+		}
+		
+		writer.resetLocals(count);
+		writer.writeLabel(end);
+		
+		for (Entry<String, Variable> entry : this.variables.entrySet())
+		{
+			Variable var = entry.getValue();
+			writer.writeLocal(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), start, end, var.index);
+		}
 	}
 	
 	@Override
@@ -327,19 +431,25 @@ public class StatementList extends ValueList implements IStatement, IContext
 		writer.writeLabel(start);
 		int count = writer.localCount();
 		
-		for (int i = 0; i < this.valueCount; i++)
+		if (this.labels == null)
 		{
-			IValue v = this.values[i];
-			if (this.labels != null)
+			for (int i = 0; i < this.valueCount; i++)
+			{
+				this.values[i].writeStatement(writer);
+			}
+		}
+		else
+		{
+			for (int i = 0; i < this.valueCount; i++)
 			{
 				Label l = this.labels[i];
 				if (l != null)
 				{
 					writer.writeFrameLabel(l.target);
 				}
+				
+				this.values[i].writeStatement(writer);
 			}
-			
-			v.writeStatement(writer);
 		}
 		
 		writer.resetLocals(count);

@@ -91,9 +91,15 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.VOID ? this : IAccess.super.withType(type);
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Type.NONE || type == Type.VOID)
+		if (type == Type.VOID)
 		{
 			return true;
 		}

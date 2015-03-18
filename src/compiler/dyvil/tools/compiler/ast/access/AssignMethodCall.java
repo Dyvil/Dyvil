@@ -70,9 +70,15 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.VOID ? this : IValue.super.withType(type);
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Type.NONE || type == Type.VOID)
+		if (type == Type.VOID)
 		{
 			return true;
 		}

@@ -38,12 +38,12 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		this.values = new IValue[3];
 	}
 	
-	public ValueList(ICodePosition position, IValue[] values, IType type, IType elementType)
+	public ValueList(ICodePosition position, IValue[] values, int valueCount, IType type, IType elementType)
 	{
 		this.position = position;
 		this.isArray = true;
 		this.values = values;
-		this.valueCount = values.length;
+		this.valueCount = valueCount;
 		this.requiredType = type;
 		this.elementType = elementType;
 	}
@@ -120,59 +120,92 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public IValue withType(IType type)
 	{
-		return this.isType(type) ? this : null;
+		if (!type.isArrayType())
+		{
+			return null;
+		}
+		
+		// If the type is an array type, get it's element type
+		IType type1 = type.getElementType();
+		
+		// Check for every value if it is the element type
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			if (!this.values[i].isType(type1))
+			{
+				// If not, this is not the type
+				return null;
+			}
+		}
+		
+		this.isArray = true;
+		this.elementType = type1;
+		this.requiredType = type;
+		return this;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type.isArrayType())
+		if (!type.isArrayType())
 		{
-			// If the type is an array type, get it's element type
-			IType type1 = type.getElementType();
-			this.isArray = true;
-			this.elementType = type1;
-			this.requiredType = type;
-			
-			// Check for every value if it is the element type
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				if (!this.values[i].isType(type1))
-				{
-					// If not, this is not the type
-					return false;
-				}
-			}
-			
+			return false;
+		}
+		
+		// Skip getting the element type if this is an empty array
+		if (this.valueCount == 0)
+		{
 			return true;
 		}
-		return false;
+		
+		// If the type is an array type, get it's element type
+		IType type1 = type.getElementType();
+		
+		// Check for every value if it is the element type
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			if (!this.values[i].isType(type1))
+			{
+				// If not, this is not the type
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type.isArrayType())
+		if (!type.isArrayType())
 		{
-			// If the type is an array type, get it's element type
-			IType type1 = type.getElementType();
-			this.isArray = true;
-			this.elementType = type1;
-			this.requiredType = type;
-			
-			// Check for every value if it is the element type
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				if (!this.values[i].isType(type1))
-				{
-					// If not, this is not the type
-					return 1;
-				}
-			}
-			
+			return 0;
+		}
+		
+		// Skip getting the element type if this is an empty array
+		if (this.valueCount == 0)
+		{
 			return 3;
 		}
-		return 0;
+		
+		// If the type is an array type, get it's element type
+		IType type1 = type.getElementType();
+		int total = 0;
+		
+		// Get the type match for every value in the array
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			int m = this.values[i].getTypeMatch(type1);
+			if (m == 0)
+			{
+				// If the type match for one value is zero, return 0
+				return 0;
+			}
+			total += m;
+		}
+		
+		// Divide by the count
+		return total / this.valueCount;
 	}
 	
 	@Override

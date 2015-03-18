@@ -47,6 +47,12 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.VOID ? this : IValue.super.withType(type);
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		return Type.isSuperType(type, this.variable.type);

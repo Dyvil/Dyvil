@@ -160,7 +160,7 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		this.writeStatement(writer);
+		this.value.writeExpression(writer);
 	}
 	
 	@Override
@@ -171,10 +171,8 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 			this.value.writeExpression(writer);
 			IType type = this.value.getType();
 			writer.writeInsn(type.getReturnOpcode());
+			return;
 		}
-		else
-		{
-			writer.writeInsn(Opcodes.RETURN);
-		}
+		writer.writeInsn(Opcodes.RETURN);
 	}
 }
