@@ -74,7 +74,7 @@ public class BytecodeVisitor extends MethodVisitor
 	@Override
 	public void visitFrame(int type, int stackCount, Object[] stack, int localCount, Object[] locals)
 	{
-		this.bytecode.addInstruction(new FrameInstruction(type, stackCount, stack, localCount, locals));
+		// Ignore Stack Map Frames as they are computed by MethodWriter anyway.
 	}
 	
 	@Override

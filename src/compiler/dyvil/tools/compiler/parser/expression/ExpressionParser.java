@@ -22,7 +22,7 @@ import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public class ExpressionParser extends Parser implements ITyped, IValued
+public final class ExpressionParser extends Parser implements ITyped, IValued
 {
 	public static final int	VALUE				= 0x1;
 	public static final int	ARRAY_END			= 0x2;
@@ -43,7 +43,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 	
 	public static final int	FUNCTION_POINTER	= 0x4000;
 	
-	public static final int	BYTECODE			= 0x8000;
 	public static final int	BYTECODE_END		= 0x10000;
 	
 	public static final int	PATTERN_IF			= 0x20000;
@@ -122,6 +121,16 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			if ((type & Tokens.TYPE_SYMBOL_ID) == Tokens.TYPE_SYMBOL_ID)
 			{
+				if (token.equals("@") && token.next().type() == Tokens.OPEN_CURLY_BRACKET)
+				{
+					Bytecode bc = new Bytecode(token);
+					pm.skip();
+					pm.pushParser(new BytecodeParser(bc));
+					this.mode = BYTECODE_END;
+					this.value = bc;
+					return;
+				}
+				
 				this.prefix = true;
 				this.getAccess(pm, token.value(), token, type);
 				return;
@@ -134,12 +143,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				if (token.equals("@") && token.next().type() == Tokens.OPEN_CURLY_BRACKET)
-				{
-					this.mode = BYTECODE;
-					return;
-				}
-				
 				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
 				return;
@@ -265,18 +268,6 @@ public class ExpressionParser extends Parser implements ITyped, IValued
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Function Pointer - Identifier expected");
-		}
-		if (this.isInMode(BYTECODE))
-		{
-			if (type == Tokens.OPEN_CURLY_BRACKET)
-			{
-				Bytecode bc = new Bytecode(token);
-				pm.pushParser(new BytecodeParser(bc));
-				this.mode = BYTECODE_END;
-				this.value = bc;
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Bytecode Expression - '{' expected");
 		}
 		if (this.isInMode(BYTECODE_END))
 		{

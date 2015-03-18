@@ -11,7 +11,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class Bytecode extends ASTNode implements IValue
+public final class Bytecode extends ASTNode implements IValue
 {
 	private IInstruction[]	instructions	= new IInstruction[3];
 	private int				instructionCount;
@@ -139,9 +139,9 @@ public class Bytecode extends ASTNode implements IValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		for (IInstruction i : this.instructions)
+		for (int i = 0; i < this.instructionCount; i++)
 		{
-			i.resolve(markers, this);
+			this.instructions[i].resolve(markers, this);
 		}
 		return this;
 	}
@@ -172,7 +172,7 @@ public class Bytecode extends ASTNode implements IValue
 	{
 		for (int i = 0; i < this.instructionCount; i++)
 		{
-			if (this.labels != null)
+			if (this.labels != null && i < this.labels.length)
 			{
 				Label l = this.labels[i];
 				if (l != null)
@@ -180,6 +180,7 @@ public class Bytecode extends ASTNode implements IValue
 					writer.writeFrameLabel(l.target);
 				}
 			}
+			
 			this.instructions[i].write(writer);
 		}
 	}
@@ -193,20 +194,28 @@ public class Bytecode extends ASTNode implements IValue
 		}
 		else
 		{
-			buffer.append('\n').append(prefix).append("@{\n");
+			buffer.append("@ {\n");
+			String prefix1 = prefix + Formatting.Method.indent;
+			boolean label = false;
 			for (int i = 0; i < this.instructionCount; i++)
 			{
-				buffer.append(prefix).append(Formatting.Method.indent);
+				buffer.append(prefix1);
 				if (this.labels != null && i < this.labels.length)
 				{
 					Label l = this.labels[i];
 					if (l != null)
 					{
-						buffer.append(l.name).append(Formatting.Expression.labelSeperator);
+						buffer.append(l.name).append(Formatting.Expression.labelSeperator).append(prefix1);
+						label = true;
 					}
 				}
-				this.instructions[i].toString("", buffer);
-				buffer.append(";\n");
+				
+				if (label)
+				{
+					buffer.append(' ');
+				}
+				this.instructions[i].toString(prefix1, buffer);
+				buffer.append('\n');
 			}
 			buffer.append(prefix).append('}');
 		}

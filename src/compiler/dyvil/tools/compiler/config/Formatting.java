@@ -97,7 +97,7 @@ public class Formatting
 	public static class Expression
 	{
 		public static String	emptyExpression	= "{ }";
-		public static String	labelSeperator	= ": ";
+		public static String	labelSeperator	= ": \n";
 		
 		public static boolean	convertTuples	= true;
 		public static String	emptyTuple		= "()";

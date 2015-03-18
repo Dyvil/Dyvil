@@ -13,6 +13,11 @@ public class LDCInstruction implements IInstruction
 		this.argument = IValue.fromObject(object);
 	}
 	
+	public LDCInstruction(IValue value)
+	{
+		this.argument = value;
+	}
+	
 	@Override
 	public void resolve(MarkerList markers, Bytecode bytecode)
 	{

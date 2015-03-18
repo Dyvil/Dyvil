@@ -10,6 +10,7 @@ public class IIncInstruction implements IInstruction
 	
 	public IIncInstruction(int index, int value)
 	{
+		this.index = index;
 		this.value = value;
 	}
 	
