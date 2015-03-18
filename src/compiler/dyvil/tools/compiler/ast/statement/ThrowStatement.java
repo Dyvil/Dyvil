@@ -54,7 +54,7 @@ public class ThrowStatement extends ASTNode implements IValue, IValued
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.NONE || type == Type.VOID;
+		return type == Type.VOID;
 	}
 	
 	@Override
@@ -103,7 +103,7 @@ public class ThrowStatement extends ASTNode implements IValue, IValued
 	public IValue foldConstants()
 	{
 		this.value = this.value.foldConstants();
-		return null;
+		return this;
 	}
 	
 	@Override

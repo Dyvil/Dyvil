@@ -34,6 +34,11 @@ public class REPLParser implements IParserManager
 			prev = token;
 		}
 		
+		if (prev == null)
+		{
+			return false;
+		}
+		
 		int type = prev.type();
 		if (!ParserUtil.isSeperator(type) && type != (Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL))
 		{

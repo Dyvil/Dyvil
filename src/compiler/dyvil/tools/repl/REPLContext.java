@@ -4,9 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.FieldInitializer;
+import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
@@ -72,12 +75,13 @@ public class REPLContext implements IValued, IDyvilUnit
 		{
 			StringBuilder buf = new StringBuilder();
 			String code = DyvilREPL.currentCode;
+			markers.sort();
 			for (Marker m : markers)
 			{
 				m.log(code, buf);
 			}
 			
-			System.out.println(buf.toString());
+			System.err.println(buf.toString());
 			
 			if (markers.getErrors() > 0)
 			{
@@ -162,12 +166,25 @@ public class REPLContext implements IValued, IDyvilUnit
 	@Override
 	public IClass resolveClass(String name)
 	{
-		return null;
+		// Standart Dyvil Classes
+		IClass iclass = Package.dyvilLang.resolveClass(name);
+		if (iclass != null)
+		{
+			return iclass;
+		}
+		
+		// Standart Java Classes
+		return Package.javaLang.resolveClass(name);
 	}
 	
 	@Override
 	public FieldMatch resolveField(String name)
 	{
+		IField f = this.variables.get(name);
+		if (f != null)
+		{
+			return new FieldMatch(f, 1);
+		}
 		return null;
 	}
 	
@@ -196,7 +213,28 @@ public class REPLContext implements IValued, IDyvilUnit
 	@Override
 	public byte getAccessibility(IMember member)
 	{
-		return 0;
+		IClass iclass = member.getTheClass();
+		if (iclass == this || iclass == null)
+		{
+			return member.getAccessibility();
+		}
+		
+		int level = member.getAccessLevel();
+		if ((level & Modifiers.SEALED) != 0)
+		{
+			if (iclass instanceof BytecodeClass)
+			{
+				return SEALED;
+			}
+			// Clear the SEALED bit by ANDing with 0b1111
+			level &= 0b1111;
+		}
+		if (level == Modifiers.PUBLIC)
+		{
+			return member.getAccessibility();
+		}
+		
+		return INVISIBLE;
 	}
 	
 	@Override
