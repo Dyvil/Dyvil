@@ -60,7 +60,6 @@ public class CaseClasses
 		writer.writeVarInsn(ALOAD, 1);
 		writer.writeTypeInsn(CHECKCAST, extended);
 		// 'var' variable that stores the casted 'obj' parameter
-		writer.registerLocal(extended);
 		writer.writeVarInsn(ASTORE, 2);
 		
 		int len = theClass.parameterCount();

@@ -393,7 +393,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			if (var != null)
 			{
 				var.value.writeExpression(writer);
-				var.index = writer.registerLocal(var.type);
+				var.index = locals;
 				writer.writeVarInsn(var.type.getStoreOpcode(), var.index);
 			}
 			
@@ -441,10 +441,10 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Load the array
 			var.value.writeExpression(writer);
 			// Local Variables
-			var.index = writer.registerLocal(MethodWriter.TOP);
-			indexVar.index = writer.registerLocal(MethodWriter.INT);
-			lengthVar.index = writer.registerLocal(MethodWriter.INT);
-			arrayVar.index = writer.registerLocal(arrayVar.type);
+			var.index = locals + 1;
+			indexVar.index = locals + 2;
+			lengthVar.index = locals + 3;
+			arrayVar.index = locals + 4;
 			
 			writer.writeInsn(Opcodes.DUP);
 			arrayVar.writeSet(writer, null, null);

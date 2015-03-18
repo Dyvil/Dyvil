@@ -20,7 +20,6 @@ public final class MethodWriterImpl implements MethodWriter
 	private boolean				visitFrame;
 	private boolean				hasReturn;
 	
-	private int					localIndex;
 	private int					localCount;
 	private int					maxLocals;
 	private Object[]			locals			= new Object[2];
@@ -40,7 +39,15 @@ public final class MethodWriterImpl implements MethodWriter
 	public void setConstructor(IType type)
 	{
 		this.locals[0] = UNINITIALIZED_THIS;
+		this.localCount++;
 		this.push(UNINITIALIZED_THIS);
+	}
+	
+	@Override
+	public void setInstance(IType type)
+	{
+		this.locals[0] = type.getFrameType();
+		this.localCount++;
 	}
 	
 	@Override
@@ -179,7 +186,8 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public int registerParameter(String name, IType type)
 	{
-		int index = this.registerLocal(type.getFrameType());
+		int index = this.localCount;
+		this.setLocal(index, type.getFrameType());
 		this.mv.visitParameter(name, index);
 		
 		IClass iclass = type.getTheClass();
@@ -193,7 +201,8 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public int registerParameter(String name, Object type)
 	{
-		int index = this.registerLocal(type);
+		int index = this.localCount;
+		this.setLocal(index, type);
 		this.mv.visitParameter(name, index);
 		return index;
 	}
@@ -226,45 +235,25 @@ public final class MethodWriterImpl implements MethodWriter
 		return this.localCount;
 	}
 	
-	@Override
-	public int registerLocal(IType type)
+	private void setLocal(int index, Object type)
 	{
-		return this.registerLocal(type.getFrameType());
-	}
-	
-	@Override
-	public int registerLocal(Object type)
-	{
-		int index = this.localIndex;
 		if (type == LONG || type == DOUBLE)
 		{
 			this.ensureLocals(index + 2);
 			this.locals[index] = type;
 			this.locals[index + 1] = TOP;
-			this.localIndex += 2;
 		}
 		else
 		{
 			this.ensureLocals(index + 1);
 			this.locals[index] = type;
-			this.localIndex++;
 		}
-		
-		return index;
-	}
-	
-	@Override
-	public void removeLocals(int count)
-	{
-		this.localCount -= count;
-		this.localIndex -= count;
 	}
 	
 	@Override
 	public void resetLocals(int count)
 	{
 		this.localCount = count;
-		this.localIndex = count;
 	}
 	
 	@Override
@@ -273,8 +262,7 @@ public final class MethodWriterImpl implements MethodWriter
 		return this.locals[index];
 	}
 	
-	@Override
-	public IType getLocalType(int index)
+	protected IType getLocalType(int index)
 	{
 		Object o = this.locals[index];
 		if (o == INT)
@@ -1004,7 +992,9 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		else if (opcode >= ISTORE && opcode <= ASTORE)
 		{
-			this.pop();
+			this.stackCount--;
+			Object type = this.stack[--this.stackIndex];
+			this.setLocal(index, type);
 		}
 		this.mv.visitVarInsn(opcode, index);
 	}

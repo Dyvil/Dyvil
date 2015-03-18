@@ -236,7 +236,6 @@ public class TryStatement extends ASTNode implements IStatement
 		{
 			CatchBlock block = this.catchBlocks[i];
 			org.objectweb.asm.Label handlerLabel = new org.objectweb.asm.Label();
-			int varIndex;
 			
 			writer.push(block.type);
 			// Check if the block's variable is actually used
@@ -244,17 +243,18 @@ public class TryStatement extends ASTNode implements IStatement
 			{
 				// If yes register a new local variable for the exception and
 				// store it.
+				int localCount = writer.localCount();
+				
 				writer.writeLabel(handlerLabel);
 				writer.writeFrame();
-				varIndex = block.variable.index = writer.registerLocal(block.type);
-				writer.writeVarInsn(Opcodes.ASTORE, varIndex);
+				writer.writeVarInsn(Opcodes.ASTORE, localCount);
+				block.variable.index = localCount;
 				block.action.writeStatement(writer);
-				writer.removeLocals(1);
+				writer.resetLocals(localCount);
 			}
 			// Otherwise pop the exception from the stack
 			else
 			{
-				varIndex = -1;
 				writer.writeFrameLabel(handlerLabel);
 				writer.writeInsn(Opcodes.POP);
 				block.action.writeStatement(writer);

@@ -502,7 +502,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		
 		if (instance)
 		{
-			mw.registerLocal(this.thisType);
+			mw.setInstance(this.thisType);
 		}
 		
 		if (this.capturedFieldCount > 0)

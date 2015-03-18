@@ -158,7 +158,7 @@ public class Dlex
 					}
 					else if (c == 'd' || c == 'D')
 					{
-						type = Tokens.TYPE_FLOAT;
+						type = Tokens.TYPE_DOUBLE;
 						addToken = true;
 						reparse = false;
 					}

@@ -92,9 +92,8 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	{
 		if (this.variable != null)
 		{
-			this.variable.index = writer.registerLocal(this.type.getFrameType());
 			writer.writeInsn(Opcodes.DUP);
-			writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index);
+			writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
 		}
 		
 		if (this.pattern != null)
@@ -109,16 +108,14 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 		if (this.variable != null)
 		{
 			this.variable.type = this.type;
-			Object frameType = this.type.getFrameType();
-			if (writer.getLocal(varIndex) == frameType)
+			if (writer.getLocal(varIndex) == this.type.getFrameType())
 			{
 				this.variable.index = varIndex;
 			}
 			else
 			{
-				this.variable.index = writer.registerLocal(frameType);
 				writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
-				writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index);
+				writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
 			}
 		}
 		

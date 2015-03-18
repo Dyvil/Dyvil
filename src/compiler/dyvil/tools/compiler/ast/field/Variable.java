@@ -18,7 +18,7 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public class Variable extends Member implements IVariable
 {
-	public int		index;
+	public int		index	= -1;
 	public IValue	value;
 	
 	public Variable(ICodePosition position)
@@ -170,7 +170,14 @@ public class Variable extends Member implements IVariable
 			value.writeExpression(writer);
 		}
 		
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		if (this.index == -1)
+		{
+			writer.writeVarInsn(this.type.getStoreOpcode(), this.index = writer.localCount());
+		}
+		else
+		{
+			writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		}
 	}
 	
 	@Override

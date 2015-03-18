@@ -220,6 +220,11 @@ public class StatementList extends ValueList implements IStatement, IContext
 			return;
 		}
 		
+		if (this.requiredType == null)
+		{
+			this.elementType = this.requiredType = Type.VOID;
+		}
+		
 		this.context = context;
 		int len = this.valueCount - 1;
 		for (int i = 0; i < len; i++)
@@ -375,6 +380,12 @@ public class StatementList extends ValueList implements IStatement, IContext
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		if (this.requiredType == Type.VOID)
+		{
+			this.writeStatement(writer);
+			return;
+		}
+		
 		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
 		

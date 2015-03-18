@@ -35,6 +35,8 @@ public interface MethodWriter
 	
 	public void setConstructor(IType type);
 	
+	public void setInstance(IType type);
+	
 	// Annotations
 	
 	public AnnotationVisitor addAnnotation(String type, boolean visible);
@@ -77,17 +79,9 @@ public interface MethodWriter
 	
 	public int localCount();
 	
-	public int registerLocal(Object type);
-	
-	public int registerLocal(IType type);
-	
-	public void removeLocals(int count);
-	
 	public void resetLocals(int count);
 	
 	public Object getLocal(int index);
-	
-	public IType getLocalType(int index);
 	
 	public void writeLocal(String name, String desc, String signature, Label start, Label end, int index);
 	

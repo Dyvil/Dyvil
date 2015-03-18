@@ -194,18 +194,17 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		int locals = writer.localCount();
+		int varIndex = writer.localCount();
 		
 		IType type = this.value.getType();
-		int var = writer.registerLocal(type);
 		this.value.writeExpression(writer);
-		writer.writeVarInsn(type.getStoreOpcode(), var);
+		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
 		for (int i = 0; i < this.caseCount;)
 		{
-			this.cases[i].writeExpression(writer, var, elseLabel);
+			this.cases[i].writeExpression(writer, varIndex, elseLabel);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 			writer.writeFrameLabel(elseLabel);
 			
@@ -216,26 +215,25 @@ public final class MatchExpression extends ASTNode implements IValue
 		}
 		
 		writer.writeFrameLabel(elseLabel);
-		this.writeError(writer, type, type.getLoadOpcode(), var);
-		writer.resetLocals(locals);
+		this.writeError(writer, type, type.getLoadOpcode(), varIndex);
+		writer.resetLocals(varIndex);
 		writer.writeFrameLabel(endLabel);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		int locals = writer.localCount();
+		int varIndex = writer.localCount();
 		
 		IType type = this.value.getType();
-		int var = writer.registerLocal(type);
 		this.value.writeExpression(writer);
-		writer.writeVarInsn(type.getStoreOpcode(), var);
+		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
 		for (int i = 0; i < this.caseCount;)
 		{
-			this.cases[i].writeStatement(writer, var, elseLabel);
+			this.cases[i].writeStatement(writer, varIndex, elseLabel);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 			writer.writeFrameLabel(elseLabel);
 			if (++i < this.caseCount)
@@ -246,8 +244,8 @@ public final class MatchExpression extends ASTNode implements IValue
 		
 		// MatchError
 		writer.writeFrameLabel(elseLabel);
-		this.writeError(writer, type, type.getLoadOpcode(), var);
-		writer.resetLocals(locals);
+		this.writeError(writer, type, type.getLoadOpcode(), varIndex);
+		writer.resetLocals(varIndex);
 		writer.writeFrameLabel(endLabel);
 	}
 	
