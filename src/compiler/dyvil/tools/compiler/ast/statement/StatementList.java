@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -326,15 +325,7 @@ public class StatementList extends ValueList implements IStatement, IContext
 		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
 		
 		writer.writeLabel(start);
-		int count = 0;
-		
-		// Write variable types
-		for (Entry<String, Variable> entry : this.variables.entrySet())
-		{
-			Variable var = entry.getValue();
-			var.index = writer.registerLocal(var.type);
-			count++;
-		}
+		int count = writer.localCount();
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
@@ -351,15 +342,8 @@ public class StatementList extends ValueList implements IStatement, IContext
 			v.writeStatement(writer);
 		}
 		
-		if (count > 0 && (this.parent != null || !(this.context instanceof IMethod)))
-		{
-			writer.removeLocals(count);
-			writer.writeFrameLabel(end);
-		}
-		else
-		{
-			writer.writeLabel(end);
-		}
+		writer.resetLocals(count);
+		writer.writeLabel(end);
 		
 		for (Entry<String, Variable> entry : this.variables.entrySet())
 		{

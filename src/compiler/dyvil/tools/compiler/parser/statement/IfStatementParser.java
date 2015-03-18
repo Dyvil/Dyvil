@@ -85,6 +85,7 @@ public class IfStatementParser extends Parser implements IValued
 			}
 			
 			pm.popParser(true);
+			return;
 		}
 	}
 	

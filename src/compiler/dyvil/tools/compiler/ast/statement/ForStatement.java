@@ -386,6 +386,8 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 		Variable var = this.variable;
 		if (this.type == DEFAULT)
 		{
+			int locals = writer.localCount();
+			
 			// Variable
 			if (var != null)
 			{
@@ -414,7 +416,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Go back to Condition
 			writer.writeJumpInsn(Opcodes.GOTO, startLabel);
 			
-			writer.removeLocals(1);
+			writer.resetLocals(locals);
 			writer.writeFrameLabel(endLabel);
 			
 			// Variable
@@ -426,6 +428,8 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 		}
 		if (this.type == ARRAY)
 		{
+			int locals = writer.localCount();
+			
 			Variable arrayVar = this.var3;
 			Variable indexVar = this.var1;
 			Variable lengthVar = this.var2;
@@ -475,7 +479,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 			
 			// Local Variables
-			writer.removeLocals(4);
+			writer.resetLocals(locals);
 			writer.writeFrameLabel(endLabel);
 			
 			writer.writeLocal(var.qualifiedName, var.type, scopeLabel, endLabel, var.index);

@@ -265,7 +265,7 @@ public final class CaseStatement extends ASTNode implements IValue, ICase, ICont
 			this.condition.writeInvJump(writer, elseLabel);
 		}
 		this.value.writeStatement(writer);
-		writer.removeLocals(writer.localCount() - locals);
+		writer.resetLocals(locals);
 	}
 	
 	@Override

@@ -14,7 +14,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class MatchExpression extends ASTNode implements IValue
+public final class MatchExpression extends ASTNode implements IValue
 {
 	private IValue	value;
 	private ICase[]	cases;
@@ -129,6 +129,22 @@ public class MatchExpression extends ASTNode implements IValue
 		this.value = this.value.resolve(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
 		{
+			this.cases[i] = this.cases[i].resolve(markers, context);
+		}
+		
+		if (type == Type.BOOLEAN && this.caseCount >= 2)
+		{
+			this.exhaustive = true;
+		}
+		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.value.checkTypes(markers, context);
+		for (int i = 0; i < this.caseCount; i++)
+		{
 			ICase c = this.cases[i];
 			if (this.exhaustive)
 			{
@@ -149,22 +165,7 @@ public class MatchExpression extends ASTNode implements IValue
 				marker.addInfo("Pattern Type: " + pattern.getType());
 				marker.addInfo("Value Type: " + type);
 			}
-			this.cases[i] = c.resolve(markers, context);
-		}
-		
-		if (type == Type.BOOLEAN && this.caseCount >= 2)
-		{
-			this.exhaustive = true;
-		}
-		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		this.value.checkTypes(markers, context);
-		for (int i = 0; i < this.caseCount; i++)
-		{
+			
 			this.cases[i].checkTypes(markers, context);
 		}
 	}
@@ -193,6 +194,8 @@ public class MatchExpression extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		int locals = writer.localCount();
+		
 		IType type = this.value.getType();
 		int var = writer.registerLocal(type);
 		this.value.writeExpression(writer);
@@ -214,13 +217,15 @@ public class MatchExpression extends ASTNode implements IValue
 		
 		writer.writeFrameLabel(elseLabel);
 		this.writeError(writer, type, type.getLoadOpcode(), var);
-		writer.removeLocals(1);
+		writer.resetLocals(locals);
 		writer.writeFrameLabel(endLabel);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		int locals = writer.localCount();
+		
 		IType type = this.value.getType();
 		int var = writer.registerLocal(type);
 		this.value.writeExpression(writer);
@@ -242,7 +247,7 @@ public class MatchExpression extends ASTNode implements IValue
 		// MatchError
 		writer.writeFrameLabel(elseLabel);
 		this.writeError(writer, type, type.getLoadOpcode(), var);
-		writer.removeLocals(1);
+		writer.resetLocals(locals);
 		writer.writeFrameLabel(endLabel);
 	}
 	

@@ -70,7 +70,7 @@ public final class ExpressionListParser extends Parser implements IValued
 				pm.pushParser(new ExpressionParser(this), true);
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Token '" + token.value() + "'");
+			throw new SyntaxError(token, "Invalid Expression List - ',' or ';' expected");
 		}
 	}
 	

@@ -12,7 +12,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class FieldInitializer extends ASTNode implements IValue, IValued
+public final class FieldInitializer extends ASTNode implements IValue, IValued
 {
 	public Variable	variable;
 	
@@ -121,7 +121,9 @@ public class FieldInitializer extends ASTNode implements IValue, IValued
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.variable.writeSet(writer, null, this.variable.value);
+		this.variable.value.writeExpression(writer);
+		this.variable.index = writer.registerLocal(this.variable.type);
+		this.variable.writeSet(writer, null, null);
 	}
 	
 	@Override

@@ -240,7 +240,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.ensureLocals(index + 2);
 			this.locals[index] = type;
-			this.locals[index + 1] = type;
+			this.locals[index + 1] = TOP;
 			this.localIndex += 2;
 		}
 		else
@@ -256,15 +256,15 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void removeLocals(int count)
 	{
-		for (int i = 0; i < count; i++)
-		{
-			this.localCount--;
-			Object o = this.locals[--this.localIndex];
-			if (o == LONG || o == DOUBLE)
-			{
-				this.localIndex--;
-			}
-		}
+		this.localCount -= count;
+		this.localIndex -= count;
+	}
+	
+	@Override
+	public void resetLocals(int count)
+	{
+		this.localCount = count;
+		this.localIndex = count;
 	}
 	
 	@Override

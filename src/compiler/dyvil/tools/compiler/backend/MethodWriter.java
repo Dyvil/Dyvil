@@ -83,6 +83,8 @@ public interface MethodWriter
 	
 	public void removeLocals(int count);
 	
+	public void resetLocals(int count);
+	
 	public Object getLocal(int index);
 	
 	public IType getLocalType(int index);

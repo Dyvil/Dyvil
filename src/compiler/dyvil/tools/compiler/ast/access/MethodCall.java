@@ -222,7 +222,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	public IType getType(int index)
 	{
 		return this.generics[index];
-	};
+	}
 	
 	@Override
 	public IType resolveType(String name)
@@ -248,6 +248,14 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		this.arguments.resolve(markers, context);
+		
+		IValue op = this.resolveOperator(markers, this.instance == null ? null : this.instance.getType());
+		if (op != null)
+		{
+			return op;
+		}
+		
 		return AccessResolver.resolve(markers, context, this);
 	}
 	
@@ -350,50 +358,51 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		return this.method != null;
 	}
 	
-	@Override
-	public boolean resolve(IContext context, MarkerList markers)
+	private IValue resolveOperator(MarkerList markers, IContext context)
 	{
 		int len = this.arguments.size();
-		if (len == 1)
+		if (len != 1)
 		{
-			IValue argument = this.arguments.getFirstValue();
-			IValue operator;
-			
-			if (this.instance != null)
+			return null;
+		}
+		
+		IValue argument = this.arguments.getFirstValue();
+		IValue operator;
+		
+		if (this.instance != null)
+		{
+			if ("match".equals(this.name))
 			{
-				if ("match".equals(this.name))
+				MatchExpression me = Operators.getMatchExpression(this.instance, argument);
+				if (me != null)
 				{
-					MatchExpression me = Operators.getMatchExpression(this.instance, argument);
-					if (me != null)
-					{
-						me.resolve(markers, context);
-						me.position = this.position;
-						this.replacement = me;
-						return false;
-					}
+					me.position = this.position;
+					return me;
 				}
-				
-				argument = argument.resolve(markers, context);
-				operator = Operators.get(this.instance, this.name, argument);
-			}
-			else
-			{
-				argument = argument.resolve(markers, context);
-				operator = Operators.get(this.name, argument);
-			}
-			if (operator != null)
-			{
-				operator.setPosition(this.position);
-				this.replacement = operator;
-				// Return false to apply replacement in resolve2
-				return false;
 			}
 			
-			this.arguments.setFirstValue(argument);
+			operator = Operators.get(this.instance, this.name, argument);
 		}
 		else
 		{
-			this.arguments.resolve(markers, context);
+			operator = Operators.get(this.name, argument);
+		}
+		if (operator != null)
+		{
+			operator.setPosition(this.position);
+			return operator;
+		}
+		return null;
+	}
+	
+	@Override
+	public boolean resolve(IContext context, MarkerList markers)
+	{
+		IValue op = this.resolveOperator(markers, context);
+		if (op != null)
+		{
+			this.replacement = op;
+			return false;
 		}
 		
 		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, this.arguments);
@@ -403,7 +412,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			return true;
 		}
 		
-		if (len == 1 && this.instance != null && this.qualifiedName.endsWith("$eq"))
+		if (this.arguments.size() == 1 && this.instance != null && this.qualifiedName.endsWith("$eq"))
 		{
 			String s = this.qualifiedName.substring(0, this.qualifiedName.length() - 3);
 			MethodMatch method1 = this.instance.getType().resolveMethod(null, s, this.arguments);

@@ -173,7 +173,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 				return;
 			}			
 		}
-		else if (this.field.isField())
+		else if (this.field != null && this.field.isField())
 		{
 			markers.add(this.position, "access.field.unqualified", this.name);
 			this.instance = new ThisValue(this.position, this.field.getTheClass().getType());
