@@ -5,7 +5,7 @@ import java.util.Objects;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Keywords;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Tokens;
 
 public final class SymbolToken implements IToken
@@ -39,7 +39,7 @@ public final class SymbolToken implements IToken
 	@Override
 	public String text()
 	{
-		return Keywords.symbolToString(this.type);
+		return Symbols.symbolToString(this.type);
 	}
 	
 	@Override
@@ -51,7 +51,7 @@ public final class SymbolToken implements IToken
 	@Override
 	public boolean equals(String value)
 	{
-		return Objects.equals(Keywords.symbolToString(this.type), value);
+		return Objects.equals(Symbols.symbolToString(this.type), value);
 	}
 	
 	@Override
@@ -149,6 +149,6 @@ public final class SymbolToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Symbol '" + Keywords.symbolToString(this.type) + "' (line " + this.lineNumber + ")";
+		return "Symbol '" + Symbols.symbolToString(this.type) + "' (line " + this.lineNumber + ")";
 	}
 }

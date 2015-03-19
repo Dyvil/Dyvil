@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -52,14 +53,14 @@ public class DWTParser extends Parser implements IValued
 		}
 		if (this.mode == BODY)
 		{
-			if (type == Tokens.OPEN_CURLY_BRACKET)
+			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				this.mode = PROPERTY_NAME;
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Body - '{' expected");
 		}
-		if (type == Tokens.CLOSE_CURLY_BRACKET)
+		if (type == Symbols.CLOSE_CURLY_BRACKET)
 		{
 			pm.popParser();
 			return;

@@ -19,6 +19,8 @@ import dyvil.tools.compiler.parser.statement.*;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Operators;
+import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.util.Keywords;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -87,33 +89,33 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		
 		if (this.isInMode(VALUE))
 		{
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				this.mode = TUPLE_END;
 				TupleValue tv = new TupleValue(token);
 				this.value = tv;
 				
 				int nextType = token.next().type();
-				if (nextType != Tokens.CLOSE_PARENTHESIS)
+				if (nextType != Symbols.CLOSE_PARENTHESIS)
 				{
 					pm.pushParser(new ExpressionListParser(tv));
 				}
 				return;
 			}
-			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				this.mode = ACCESS | VARIABLE | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
 				return;
 			}
-			if (type == Tokens.OPEN_CURLY_BRACKET)
+			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				this.mode = ARRAY_END;
 				StatementList sl = new StatementList(token);
 				this.value = sl;
 				
 				int nextType = token.next().type();
-				if (nextType != Tokens.CLOSE_CURLY_BRACKET)
+				if (nextType != Symbols.CLOSE_CURLY_BRACKET)
 				{
 					pm.pushParser(new ExpressionListParser(sl));
 				}
@@ -121,7 +123,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			if ((type & Tokens.SYMBOL_IDENTIFIER) == Tokens.SYMBOL_IDENTIFIER)
 			{
-				if (token.equals("@") && token.next().type() == Tokens.OPEN_CURLY_BRACKET)
+				if (token.equals("@") && token.next().type() == Symbols.OPEN_CURLY_BRACKET)
 				{
 					Bytecode bc = new Bytecode(token);
 					pm.skip();
@@ -162,7 +164,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		if (this.isInMode(PATTERN_IF))
 		{
 			this.mode = PATTERN_END;
-			if (type == Tokens.IF)
+			if (type == Keywords.IF)
 			{
 				pm.pushParser(new ExpressionParser(this));
 				return;
@@ -193,7 +195,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.field.setValue(this.value);
 			pm.popParser();
 			this.value.expandPosition(token);
-			if (type == Tokens.CLOSE_CURLY_BRACKET)
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				if (token.next().equals("."))
 				{
@@ -209,7 +211,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		if (this.isInMode(TUPLE_END))
 		{
 			this.mode = ACCESS | VARIABLE | LAMBDA;
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				this.value.expandPosition(token);
 				return;
@@ -219,7 +221,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		if (this.isInMode(PARAMETERS))
 		{
 			this.mode = PARAMETERS_END;
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				ICall call = (ICall) this.value;
 				call.setArguments(this.getArguments(pm, token.next()));
@@ -231,7 +233,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			this.mode = ACCESS;
 			this.value.expandPosition(token);
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}
@@ -240,7 +242,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		if (this.isInMode(GENERICS))
 		{
 			this.mode = GENERICS_END;
-			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.pushParser(new TypeListParser((ITypeList) this.value));
 				return;
@@ -250,7 +252,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		if (this.isInMode(GENERICS_END))
 		{
 			this.mode = ACCESS;
-			if (type == Tokens.CLOSE_SQUARE_BRACKET)
+			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
 			}
@@ -274,7 +276,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.field.setValue(this.value);
 			pm.popParser();
 			this.value.expandPosition(token);
-			if (type == Tokens.CLOSE_CURLY_BRACKET)
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				return;
 			}
@@ -363,7 +365,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.dotless = true;
 			this.mode = ACCESS_2;
 			
-			if (type == Tokens.ELSE)
+			if (type == Keywords.ELSE)
 			{
 				this.field.setValue(this.value);
 				pm.popParser(true);
@@ -374,7 +376,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				this.getAssign(pm, token);
 				return;
 			}
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				IToken prev = token.prev();
 				IToken next = token.next();
@@ -388,7 +390,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 					mc.arguments = args;
 					this.value = mc;
 				}
-				else if (prevType == Tokens.CLOSE_SQUARE_BRACKET)
+				else if (prevType == Symbols.CLOSE_SQUARE_BRACKET)
 				{
 					MethodCall mc;
 					if (this.value.getValueType() == IValue.CLASS_ACCESS)
@@ -459,7 +461,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		if (this.isInMode(CONSTRUCTOR))
 		{
 			ConstructorCall cc = (ConstructorCall) this.value;
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				ArgumentList list = new ArgumentList();
 				cc.arguments = list;
@@ -488,7 +490,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	private IArguments getArguments(IParserManager pm, IToken next) throws SyntaxError
 	{
 		int type = next.type();
-		if (type == Tokens.CLOSE_PARENTHESIS)
+		if (type == Symbols.CLOSE_PARENTHESIS)
 		{
 			return EmptyArguments.VISIBLE;
 		}
@@ -508,7 +510,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	{
 		IToken next = token.next();
 		int type1 = next.type();
-		if (type1 == Tokens.OPEN_PARENTHESIS)
+		if (type1 == Symbols.OPEN_PARENTHESIS)
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
 			call.dotless = this.dotless;
@@ -516,7 +518,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = PARAMETERS;
 			return;
 		}
-		if (type1 == Tokens.OPEN_SQUARE_BRACKET)
+		if (type1 == Symbols.OPEN_SQUARE_BRACKET)
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
 			call.dotless = this.dotless;
@@ -706,27 +708,27 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		{
 		case Tokens.WILDCARD:
 			return true;
-		case Tokens.NULL:
+		case Keywords.NULL:
 			this.value = new NullValue(token.raw());
 			this.mode = ACCESS;
 			return true;
-		case Tokens.TRUE:
+		case Keywords.TRUE:
 			this.value = new BooleanValue(token.raw(), true);
 			this.mode = ACCESS;
 			return true;
-		case Tokens.FALSE:
+		case Keywords.FALSE:
 			this.value = new BooleanValue(token.raw(), false);
 			this.mode = ACCESS;
 			return true;
-		case Tokens.THIS:
+		case Keywords.THIS:
 			this.value = new ThisValue(token.raw());
 			this.mode = ACCESS;
 			return true;
-		case Tokens.SUPER:
+		case Keywords.SUPER:
 			this.value = new SuperValue(token.raw());
 			this.mode = ACCESS;
 			return true;
-		case Tokens.NEW:
+		case Keywords.NEW:
 		{
 			ConstructorCall call = new ConstructorCall(token);
 			this.mode = CONSTRUCTOR;
@@ -734,14 +736,14 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.pushParser(new TypeParser(this));
 			return true;
 		}
-		case Tokens.RETURN:
+		case Keywords.RETURN:
 		{
 			ReturnStatement rs = new ReturnStatement(token.raw());
 			this.value = rs;
 			pm.pushParser(new ExpressionParser(rs));
 			return true;
 		}
-		case Tokens.IF:
+		case Keywords.IF:
 		{
 			IfStatement is = new IfStatement(token.raw());
 			this.value = is;
@@ -749,7 +751,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = 0;
 			return true;
 		}
-		case Tokens.ELSE:
+		case Keywords.ELSE:
 		{
 			if (!(this.parent instanceof IfStatementParser))
 			{
@@ -759,7 +761,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser(true);
 			return true;
 		}
-		case Tokens.WHILE:
+		case Keywords.WHILE:
 		{
 			WhileStatement statement = new WhileStatement(token);
 			this.value = statement;
@@ -767,7 +769,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = 0;
 			return true;
 		}
-		case Tokens.DO:
+		case Keywords.DO:
 		{
 			DoStatement statement = new DoStatement(token);
 			this.value = statement;
@@ -775,7 +777,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = 0;
 			return true;
 		}
-		case Tokens.FOR:
+		case Keywords.FOR:
 		{
 			ForStatement statement = new ForStatement(token);
 			this.value = statement;
@@ -783,7 +785,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = 0;
 			return true;
 		}
-		case Tokens.BREAK:
+		case Keywords.BREAK:
 		{
 			BreakStatement statement = new BreakStatement(token);
 			this.value = statement;
@@ -796,7 +798,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = 0;
 			return true;
 		}
-		case Tokens.CONTINUE:
+		case Keywords.CONTINUE:
 		{
 			ContinueStatement statement = new ContinueStatement(token);
 			this.value = statement;
@@ -809,7 +811,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = 0;
 			return true;
 		}
-		case Tokens.GOTO:
+		case Keywords.GOTO:
 		{
 			GoToStatement statement = new GoToStatement(token);
 			this.value = statement;
@@ -822,7 +824,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = 0;
 			return true;
 		}
-		case Tokens.CASE:
+		case Keywords.CASE:
 		{
 			CaseStatement pattern = new CaseStatement(token.raw());
 			pm.pushParser(new PatternParser(pattern));
@@ -830,7 +832,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = pattern;
 			return true;
 		}
-		case Tokens.TRY:
+		case Keywords.TRY:
 		{
 			TryStatement statement = new TryStatement(token.raw());
 			pm.pushParser(new TryStatementParser(statement));
@@ -838,7 +840,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = statement;
 			return true;
 		}
-		case Tokens.CATCH:
+		case Keywords.CATCH:
 		{
 			if (!(this.parent instanceof TryStatementParser))
 			{
@@ -848,7 +850,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser(true);
 			return true;
 		}
-		case Tokens.FINALLY:
+		case Keywords.FINALLY:
 		{
 			if (!(this.parent instanceof TryStatementParser))
 			{
@@ -858,7 +860,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser(true);
 			return true;
 		}
-		case Tokens.THROW:
+		case Keywords.THROW:
 		{
 			ThrowStatement statement = new ThrowStatement(token.raw());
 			pm.pushParser(new ExpressionParser(statement));
@@ -866,7 +868,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = statement;
 			return true;
 		}
-		case Tokens.SYNCHRONIZED: // TODO Synchronized Blocks
+		case Keywords.SYNCHRONIZED: // TODO Synchronized Blocks
 			return true;
 		default:
 			return false;

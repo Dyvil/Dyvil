@@ -11,6 +11,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionListParser;
 import dyvil.tools.compiler.parser.expression.ExpressionMapParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -50,7 +51,7 @@ public class AnnotationParser extends Parser
 		}
 		if (this.mode == PARAMETERS_START)
 		{
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()) && next.next().type() == Tokens.COLON)
@@ -84,7 +85,7 @@ public class AnnotationParser extends Parser
 		}
 		if (this.mode == PARAMETERS_END)
 		{
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				pm.popParser();
 				return;

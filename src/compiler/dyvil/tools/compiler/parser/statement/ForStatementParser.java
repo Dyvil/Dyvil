@@ -9,6 +9,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -45,7 +46,7 @@ public class ForStatementParser extends Parser implements IValued
 		if (this.mode == FOR)
 		{
 			this.mode = TYPE;
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				return;
 			}
@@ -126,7 +127,7 @@ public class ForStatementParser extends Parser implements IValued
 		if (this.mode == FOR_END)
 		{
 			this.mode = STATEMENT;
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}

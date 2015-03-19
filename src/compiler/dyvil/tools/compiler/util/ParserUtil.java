@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.transform.Symbols;
 
 public class ParserUtil
 {
@@ -75,18 +76,18 @@ public class ParserUtil
 	
 	public static boolean isCloseBracket(int type)
 	{
-		return (type & Tokens.CLOSE_BRACKET) == Tokens.CLOSE_BRACKET;
+		return (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET;
 	}
 	
 	public static boolean isTerminator(int type)
 	{
-		return type == Tokens.COMMA || type == Tokens.SEMICOLON || (type & Tokens.CLOSE_BRACKET) == Tokens.CLOSE_BRACKET;
+		return type == Tokens.COMMA || type == Tokens.SEMICOLON || (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET;
 	}
 	
 	public static boolean isTerminator2(int type)
 	{
 		return type == Tokens.DOT || type == Tokens.COMMA || type == Tokens.SEMICOLON || type == Tokens.EQUALS
-				|| (type & Tokens.CLOSE_BRACKET) == Tokens.CLOSE_BRACKET;
+				|| (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET;
 	}
 	
 	public static boolean isSeperator(int type)
@@ -98,9 +99,9 @@ public class ParserUtil
 	{
 		switch (type)
 		{
-		case Tokens.TRUE:
+		case Keywords.TRUE:
 			return new BooleanValue(token.raw(), true);
-		case Tokens.FALSE:
+		case Keywords.FALSE:
 			return new BooleanValue(token.raw(), false);
 		case Tokens.STRING:
 			return new StringValue(token.raw(), token.stringValue());

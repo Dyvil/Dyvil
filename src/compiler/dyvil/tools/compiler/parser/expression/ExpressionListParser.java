@@ -8,6 +8,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -65,7 +66,7 @@ public final class ExpressionListParser extends Parser implements IValued
 				this.mode = 0;
 				return;
 			}
-			if (token.prev().type() == Tokens.CLOSE_CURLY_BRACKET)
+			if (token.prev().type() == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.pushParser(new ExpressionParser(this), true);
 				return;

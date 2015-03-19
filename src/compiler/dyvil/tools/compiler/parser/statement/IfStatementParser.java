@@ -8,8 +8,9 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.util.Keywords;
 import dyvil.tools.compiler.util.ParserUtil;
-import dyvil.tools.compiler.util.Tokens;
 
 public class IfStatementParser extends Parser implements IValued
 {
@@ -46,7 +47,7 @@ public class IfStatementParser extends Parser implements IValued
 		{
 			this.mode = CONDITION_END;
 			pm.pushParser(new ExpressionParser(this));
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				return;
 			}
@@ -55,7 +56,7 @@ public class IfStatementParser extends Parser implements IValued
 		if (this.mode == CONDITION_END)
 		{
 			this.mode = THEN;
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}
@@ -77,7 +78,7 @@ public class IfStatementParser extends Parser implements IValued
 		}
 		if (this.mode == ELSE)
 		{
-			if (type == Tokens.ELSE)
+			if (type == Keywords.ELSE)
 			{
 				pm.pushParser(new ExpressionParser(this));
 				this.mode = -1;

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -54,7 +55,7 @@ public final class TypeParser extends Parser implements ITyped
 		int type = token.type();
 		if (this.isInMode(NAME))
 		{
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				TupleType tupleType = new TupleType();
 				pm.pushParser(new TypeListParser(tupleType));
@@ -62,7 +63,7 @@ public final class TypeParser extends Parser implements ITyped
 				this.mode = TUPLE_END;
 				return;
 			}
-			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				this.arrayDimensions++;
 				this.arrayDimensions2++;
@@ -78,7 +79,7 @@ public final class TypeParser extends Parser implements ITyped
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				if (token.next().type() == Tokens.OPEN_SQUARE_BRACKET)
+				if (token.next().type() == Symbols.OPEN_SQUARE_BRACKET)
 				{
 					this.type = new GenericType(token, token.text());
 					this.mode = GENERICS;
@@ -101,7 +102,7 @@ public final class TypeParser extends Parser implements ITyped
 		{
 			this.end();
 			pm.popParser();
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				if (token.next().type() == Tokens.ARROW_OPERATOR)
 				{
@@ -131,7 +132,7 @@ public final class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(ARRAY_END))
 		{
-			if (type == Tokens.CLOSE_SQUARE_BRACKET)
+			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				this.arrayDimensions2--;
 				if (this.arrayDimensions2 == 0)
@@ -158,14 +159,14 @@ public final class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(GENERICS))
 		{
-			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.pushParser(new TypeListParser((GenericType) this.type));
 				this.mode = GENERICS_END;
 				return;
 			}
 			
-			if (type == Tokens.CLOSE_SQUARE_BRACKET)
+			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				this.arrayDimensions2--;
 				if (this.arrayDimensions2 == 0)
@@ -224,7 +225,7 @@ public final class TypeParser extends Parser implements ITyped
 		{
 			this.end();
 			pm.popParser();
-			if (type == Tokens.CLOSE_SQUARE_BRACKET)
+			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
 			}

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Tokens;
 
 public class DWTListParser extends Parser implements IValued
@@ -27,7 +28,7 @@ public class DWTListParser extends Parser implements IValued
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (type == Tokens.CLOSE_SQUARE_BRACKET)
+		if (type == Symbols.CLOSE_SQUARE_BRACKET)
 		{
 			pm.popParser(true);
 			return;

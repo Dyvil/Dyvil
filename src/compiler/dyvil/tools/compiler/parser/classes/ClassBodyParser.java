@@ -26,6 +26,8 @@ import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
+import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.util.Keywords;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
@@ -78,7 +80,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		
 		if (this.isInMode(BODY_END))
 		{
-			if (type == Tokens.CLOSE_CURLY_BRACKET)
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser(true);
 				return;
@@ -134,7 +136,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		}
 		if (this.isInMode(NAME))
 		{
-			if (!ParserUtil.isIdentifier(type) && type != Tokens.NEW)
+			if (!ParserUtil.isIdentifier(type) && type != Keywords.NEW)
 			{
 				this.reset();
 				throw new SyntaxError(token, "Invalid Member Declaration - Name expected");
@@ -154,7 +156,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				this.reset();
 				return;
 			}
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				this.mode = PARAMETERS;
 				
@@ -166,7 +168,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				this.body.addMethod(this.method);
 				return;
 			}
-			if (type == Tokens.OPEN_CURLY_BRACKET)
+			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				this.mode = PROPERTY_END;
 				Property p = new Property(this.theClass, value, this.type);
@@ -192,7 +194,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				this.reset();
 				return;
 			}
-			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				Method m = new Method(this.theClass, value, this.type);
 				m.modifiers = this.modifiers;
@@ -211,7 +213,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		if (this.isInMode(PROPERTY_END))
 		{
 			this.reset();
-			if (type == Tokens.CLOSE_CURLY_BRACKET)
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				return;
 			}
@@ -220,7 +222,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		if (this.isInMode(GENERICS_END))
 		{
 			this.mode = PARAMETERS;
-			if (type == Tokens.CLOSE_SQUARE_BRACKET)
+			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
 			}
@@ -229,7 +231,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		if (this.isInMode(PARAMETERS))
 		{
 			this.mode = PARAMETERS_END;
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ParameterListParser(this.method));
 				return;
@@ -239,7 +241,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		if (this.isInMode(PARAMETERS_END))
 		{
 			this.mode = METHOD_END;
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}
@@ -252,7 +254,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				this.reset();
 				return;
 			}
-			if (type == Tokens.OPEN_CURLY_BRACKET)
+			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				pm.pushParser(new ExpressionParser(this.method), true);
 				return;

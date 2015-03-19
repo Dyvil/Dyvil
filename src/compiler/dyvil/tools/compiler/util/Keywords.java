@@ -2,70 +2,74 @@ package dyvil.tools.compiler.util;
 
 public interface Keywords
 {
-	public static int getSymbolType(String s)
-	{
-		switch (s)
-		{
-		case "_":
-			return Tokens.WILDCARD;
-		case ":":
-			return Tokens.COLON;
-		case "=":
-			return Tokens.EQUALS;
-		case "#":
-			return Tokens.HASH;
-		case "=>":
-			return Tokens.ARROW_OPERATOR;
-		}
-		return 0;
-	}
-	
+	int	NULL					= Tokens.KEYWORD | 0x00010000;
+	int	TRUE					= Tokens.KEYWORD | 0x00020000;
+	int	FALSE					= Tokens.KEYWORD | 0x00030000;
+	int	THIS					= Tokens.KEYWORD | 0x00040000;
+	int	SUPER					= Tokens.KEYWORD | 0x00050000;
+	int	NEW						= Tokens.KEYWORD | 0x00060000;
+	int	RETURN					= Tokens.KEYWORD | 0x00070000;
+	int	IF						= Tokens.KEYWORD | 0x00080000;
+	int	ELSE					= Tokens.KEYWORD | 0x00090000;
+	int	WHILE					= Tokens.KEYWORD | 0x000A0000;
+	int	DO						= Tokens.KEYWORD | 0x000B0000;
+	int	FOR						= Tokens.KEYWORD | 0x000C0000;
+	int	BREAK					= Tokens.KEYWORD | 0x000D0000;
+	int	CONTINUE				= Tokens.KEYWORD | 0x000E0000;
+	int	GOTO					= Tokens.KEYWORD | 0x000F0000;
+	int	CASE					= Tokens.KEYWORD | 0x00100000;
+	int	TRY						= Tokens.KEYWORD | 0x00110000;
+	int	CATCH					= Tokens.KEYWORD | 0x00120000;
+	int	FINALLY					= Tokens.KEYWORD | 0x00130000;
+	int	THROW					= Tokens.KEYWORD | 0x00140000;
+	int	SYNCHRONIZED			= Tokens.KEYWORD | 0x00150000;
+
 	public static int getKeywordType(String s)
 	{
 		switch (s)
 		{
 		case "null":
-			return Tokens.NULL;
+			return Keywords.NULL;
 		case "true":
-			return Tokens.TRUE;
+			return Keywords.TRUE;
 		case "false":
-			return Tokens.FALSE;
+			return Keywords.FALSE;
 		case "this":
-			return Tokens.THIS;
+			return Keywords.THIS;
 		case "super":
-			return Tokens.SUPER;
+			return Keywords.SUPER;
 		case "new":
-			return Tokens.NEW;
+			return Keywords.NEW;
 		case "return":
-			return Tokens.RETURN;
+			return Keywords.RETURN;
 		case "if":
-			return Tokens.IF;
+			return Keywords.IF;
 		case "else":
-			return Tokens.ELSE;
+			return Keywords.ELSE;
 		case "while":
-			return Tokens.WHILE;
+			return Keywords.WHILE;
 		case "do":
-			return Tokens.DO;
+			return Keywords.DO;
 		case "for":
-			return Tokens.FOR;
+			return Keywords.FOR;
 		case "break":
-			return Tokens.BREAK;
+			return Keywords.BREAK;
 		case "continue":
-			return Tokens.CONTINUE;
+			return Keywords.CONTINUE;
 		case "goto":
-			return Tokens.GOTO;
+			return Keywords.GOTO;
 		case "case":
-			return Tokens.CASE;
+			return Keywords.CASE;
 		case "try":
-			return Tokens.TRY;
+			return Keywords.TRY;
 		case "catch":
-			return Tokens.CATCH;
+			return Keywords.CATCH;
 		case "finally":
-			return Tokens.FINALLY;
+			return Keywords.FINALLY;
 		case "synchronized":
-			return Tokens.SYNCHRONIZED;
+			return Keywords.SYNCHRONIZED;
 		case "throw":
-			return Tokens.THROW;
+			return Keywords.THROW;
 		}
 		return 0;
 	}
@@ -74,41 +78,5 @@ public interface Keywords
 	{
 		// FIXME
 		return "";
-	}
-	
-	public static String symbolToString(int type)
-	{
-		switch (type)
-		{
-		case Tokens.DOT:
-			return ".";
-		case Tokens.COLON:
-			return ":";
-		case Tokens.SEMICOLON:
-			return ";";
-		case Tokens.COMMA:
-			return ",";
-		case Tokens.WILDCARD:
-			return "_";
-		case Tokens.EQUALS:
-			return "=";
-		case Tokens.HASH:
-			return "#";
-		case Tokens.ARROW_OPERATOR:
-			return "=>";
-		case Tokens.OPEN_PARENTHESIS:
-			return "(";
-		case Tokens.CLOSE_PARENTHESIS:
-			return ")";
-		case Tokens.OPEN_SQUARE_BRACKET:
-			return "[";
-		case Tokens.CLOSE_SQUARE_BRACKET:
-			return "]";
-		case Tokens.OPEN_CURLY_BRACKET:
-			return "{";
-		case Tokens.CLOSE_CURLY_BRACKET:
-			return "}";
-		}
-		return null;
 	}
 }

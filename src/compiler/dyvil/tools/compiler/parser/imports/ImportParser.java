@@ -5,6 +5,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -48,14 +49,14 @@ public class ImportParser extends Parser
 		
 		if (this.isInMode(IMPORT))
 		{
-			if (type == Tokens.OPEN_CURLY_BRACKET)
+			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				MultiImport mi = new MultiImport(token, this.parent);
 				this.container.addImport(mi);
 				this.parent = mi;
 				this.container = mi;
 				
-				if (token.next().type() != Tokens.CLOSE_CURLY_BRACKET)
+				if (token.next().type() != Symbols.CLOSE_CURLY_BRACKET)
 				{
 					pm.pushParser(new ImportListParser(mi, mi));
 					this.mode = MULTIIMPORT;
@@ -108,7 +109,7 @@ public class ImportParser extends Parser
 		}
 		if (this.isInMode(MULTIIMPORT))
 		{
-			if (type == Tokens.CLOSE_CURLY_BRACKET)
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				this.container.expandPosition(token);
 				this.mode = 0;

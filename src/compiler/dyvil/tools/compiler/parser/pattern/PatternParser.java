@@ -5,6 +5,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.util.Keywords;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -55,12 +57,12 @@ public class PatternParser extends Parser
 				}
 				// TODO Case Class Patterns
 			}
-			if (type == Tokens.OPEN_CURLY_BRACKET)
+			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				this.mode = ARRAY_END;
 				return;
 			}
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				TuplePattern tp = new TuplePattern(token);
 				this.pattern = tp;
@@ -83,7 +85,7 @@ public class PatternParser extends Parser
 		}
 		if (this.mode == ARRAY_END)
 		{
-			if (type == Tokens.CLOSE_CURLY_BRACKET)
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				this.pattern.expandPosition(token);
 				pm.popParser();
@@ -95,7 +97,7 @@ public class PatternParser extends Parser
 		}
 		if (this.mode == TUPLE_END)
 		{
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				this.pattern.expandPosition(token);
 				pm.popParser();
@@ -111,13 +113,13 @@ public class PatternParser extends Parser
 	{
 		switch (type)
 		{
-		case Tokens.TRUE:
+		case Keywords.TRUE:
 			return new BooleanPattern(token.raw(), true);
-		case Tokens.FALSE:
+		case Keywords.FALSE:
 			return new BooleanPattern(token.raw(), false);
 		case Tokens.WILDCARD:
 			return new WildcardPattern(token.raw());
-		case Tokens.NULL:
+		case Keywords.NULL:
 			return new NullPattern(token.raw());
 		case Tokens.STRING:
 			return new StringPattern(token.raw(), token.stringValue());

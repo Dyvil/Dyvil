@@ -15,9 +15,9 @@ import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
-import dyvil.tools.compiler.util.Tokens;
 
 public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 {
@@ -90,7 +90,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 		}
 		if (this.isInMode(PARAMETERS))
 		{
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ParameterListParser(this.theClass));
 				this.mode = PARAMETERS_END;
@@ -100,7 +100,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 		if (this.isInMode(PARAMETERS_END))
 		{
 			this.mode = GENERICS | EXTENDS | IMPLEMENTS | BODY;
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}
@@ -108,7 +108,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 		}
 		if (this.isInMode(GENERICS))
 		{
-			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.pushParser(new TypeVariableListParser(this.theClass));
 				this.theClass.setGeneric();
@@ -119,7 +119,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 		if (this.isInMode(GENERICS_END))
 		{
 			this.mode = EXTENDS | IMPLEMENTS | BODY;
-			if (type == Tokens.CLOSE_SQUARE_BRACKET)
+			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
 			}
@@ -145,7 +145,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 		}
 		if (this.isInMode(BODY))
 		{
-			if (type == Tokens.OPEN_CURLY_BRACKET)
+			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				pm.pushParser(new ClassBodyParser(this.theClass));
 				this.mode = BODY_END;
@@ -162,7 +162,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 		if (this.isInMode(BODY_END))
 		{
 			pm.popParser();
-			if (type == Tokens.CLOSE_CURLY_BRACKET)
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				this.theClass.expandPosition(token);
 				return;

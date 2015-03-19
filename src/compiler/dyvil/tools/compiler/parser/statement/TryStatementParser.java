@@ -10,8 +10,9 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.util.Keywords;
 import dyvil.tools.compiler.util.ParserUtil;
-import dyvil.tools.compiler.util.Tokens;
 
 public class TryStatementParser extends Parser implements IValued
 {
@@ -49,13 +50,13 @@ public class TryStatementParser extends Parser implements IValued
 		int type = token.type();
 		if (this.mode == CATCH)
 		{
-			if (type == Tokens.CATCH)
+			if (type == Keywords.CATCH)
 			{
 				this.statement.addCatchBlock(this.catchBlock = new CatchBlock(token.raw()));
 				this.mode = CATCH_OPEN;
 				return;
 			}
-			if (type == Tokens.FINALLY)
+			if (type == Keywords.FINALLY)
 			{
 				pm.popParser();
 				pm.pushParser(new ExpressionParser(this));
@@ -76,7 +77,7 @@ public class TryStatementParser extends Parser implements IValued
 		{
 			this.mode = CATCH_VAR;
 			pm.pushParser(new TypeParser(this.catchBlock));
-			if (type == Tokens.OPEN_PARENTHESIS)
+			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				return;
 			}
@@ -96,7 +97,7 @@ public class TryStatementParser extends Parser implements IValued
 		{
 			this.mode = CATCH;
 			pm.pushParser(new ExpressionParser(this.catchBlock));
-			if (type == Tokens.CLOSE_PARENTHESIS)
+			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.lexer;
 import static dyvil.tools.compiler.util.ParserUtil.*;
 import static dyvil.tools.compiler.util.Tokens.*;
 import dyvil.tools.compiler.lexer.token.*;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Keywords;
 
 public class Dlex
@@ -359,17 +360,17 @@ public class Dlex
 			}
 			return INT;
 		case '(':
-			return OPEN_PARENTHESIS;
+			return Symbols.OPEN_PARENTHESIS;
 		case ')':
-			return CLOSE_PARENTHESIS;
+			return Symbols.CLOSE_PARENTHESIS;
 		case '[':
-			return OPEN_SQUARE_BRACKET;
+			return Symbols.OPEN_SQUARE_BRACKET;
 		case ']':
-			return CLOSE_SQUARE_BRACKET;
+			return Symbols.CLOSE_SQUARE_BRACKET;
 		case '{':
-			return OPEN_CURLY_BRACKET;
+			return Symbols.OPEN_CURLY_BRACKET;
 		case '}':
-			return CLOSE_CURLY_BRACKET;
+			return Symbols.CLOSE_CURLY_BRACKET;
 		case '.':
 			n = code.charAt(i + 1);
 			if (n == '.')
@@ -445,7 +446,7 @@ public class Dlex
 		case LETTER_IDENTIFIER | SYMBOL_IDENTIFIER:
 		case SYMBOL_IDENTIFIER:
 		{
-			int i = Keywords.getSymbolType(s);
+			int i = Symbols.getSymbolType(s);
 			if (i == 0)
 			{
 				return new IdentifierToken(prev, s, type, line, start, start + len);
@@ -462,14 +463,14 @@ public class Dlex
 		case WILDCARD:
 		case ARROW_OPERATOR:
 			/* Brackets */
-		case OPEN_BRACKET:
-		case CLOSE_BRACKET:
-		case OPEN_PARENTHESIS:
-		case CLOSE_PARENTHESIS:
-		case OPEN_SQUARE_BRACKET:
-		case CLOSE_SQUARE_BRACKET:
-		case OPEN_CURLY_BRACKET:
-		case CLOSE_CURLY_BRACKET:
+		case Symbols.OPEN_BRACKET:
+		case Symbols.CLOSE_BRACKET:
+		case Symbols.OPEN_PARENTHESIS:
+		case Symbols.CLOSE_PARENTHESIS:
+		case Symbols.OPEN_SQUARE_BRACKET:
+		case Symbols.CLOSE_SQUARE_BRACKET:
+		case Symbols.OPEN_CURLY_BRACKET:
+		case Symbols.CLOSE_CURLY_BRACKET:
 			return new SymbolToken(prev, type, line, start);
 		case INT:
 			return new IntToken(prev, Integer.parseInt(s, 10), line, start, start + len);

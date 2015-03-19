@@ -8,6 +8,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.util.Keywords;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -40,7 +42,7 @@ public final class BytecodeParser extends Parser
 			return;
 		}
 		
-		if (type == Tokens.CLOSE_CURLY_BRACKET)
+		if (type == Symbols.CLOSE_CURLY_BRACKET)
 		{
 			pm.popParser(true);
 			return;
@@ -49,7 +51,7 @@ public final class BytecodeParser extends Parser
 		if (this.mode == INSTRUCTION)
 		{
 			IInstruction insn = null;
-			if (type == Tokens.GOTO)
+			if (type == Keywords.GOTO)
 			{
 				IToken next = token.next();
 				if (!ParserUtil.isIdentifier(next.type()))

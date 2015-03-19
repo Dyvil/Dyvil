@@ -10,8 +10,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
-import dyvil.tools.compiler.util.Tokens;
 
 public class DWTValueParser extends Parser
 {
@@ -40,7 +40,7 @@ public class DWTValueParser extends Parser
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
-				if (token.next().type() == Tokens.OPEN_CURLY_BRACKET)
+				if (token.next().type() == Symbols.OPEN_CURLY_BRACKET)
 				{
 					DWTNode node = new DWTNode(token.raw(), token.text());
 					this.valued.setValue(node);
@@ -53,7 +53,7 @@ public class DWTValueParser extends Parser
 				pm.popParser();
 				return;
 			}
-			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				ValueList list = new DWTList(token);
 				this.mode = LIST_END;
@@ -75,7 +75,7 @@ public class DWTValueParser extends Parser
 		if (this.mode == LIST_END)
 		{
 			pm.popParser();
-			if (type == Tokens.CLOSE_SQUARE_BRACKET)
+			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
 			}

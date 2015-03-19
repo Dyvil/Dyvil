@@ -6,6 +6,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -58,7 +59,7 @@ public class ConfigParser extends Parser
 		}
 		else if (this.mode == VALUE)
 		{
-			if (type == Tokens.OPEN_SQUARE_BRACKET)
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				this.mode = ARRAY;
 				return;
@@ -71,7 +72,7 @@ public class ConfigParser extends Parser
 		}
 		else if (this.mode == ARRAY)
 		{
-			if (type == Tokens.CLOSE_SQUARE_BRACKET)
+			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				this.mode = KEY;
 				this.key = null;
