@@ -14,13 +14,13 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.token.Token;
+import dyvil.tools.compiler.lexer.token.IdentifierToken;
 import dyvil.tools.compiler.util.TestThread;
 
 public interface ICompilerPhase extends Comparable<ICompilerPhase>
 {
 	/**
-	 * Splits the input file into {@link Token Tokens} using {@link Dlex}.
+	 * Splits the input file into {@link IdentifierToken Tokens} using {@link Dlex}.
 	 */
 	ICompilerPhase	TOKENIZE		= new ParallelCompilerPhase(10, "TOKENIZE", ICompilationUnit::tokenize);
 	

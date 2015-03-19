@@ -6,7 +6,6 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.InferredSemicolon;
-import dyvil.tools.compiler.lexer.token.Token;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
@@ -47,21 +46,18 @@ public class ParserManager implements IParserManager
 		while (tokens.hasNext())
 		{
 			token = tokens.next();
-			if (!this.retainToken((Token) token, prev))
+			if (!this.retainToken(token, prev))
 			{
 				tokens.remove();
 			}
 			prev = token;
 		}
 		
-		int index = 0;
 		tokens.reset();
 		while (tokens.hasNext())
 		{
 			token = tokens.next();
-			token.setIndex(index);
 			token.setPrev(prev);
-			index++;
 			prev = token;
 		}
 		
@@ -120,7 +116,7 @@ public class ParserManager implements IParserManager
 				// else
 				{
 					DyvilCompiler.logger.throwing("ParserManager", "parseToken", ex);
-					markers.add(new SyntaxError(token, "Failed to parse token '" + token.value() + "': " + ex.getMessage()));
+					markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
 				}
 			}
 			
@@ -146,7 +142,7 @@ public class ParserManager implements IParserManager
 	 *            the token
 	 * @return true, if the token should be parser
 	 */
-	public boolean retainToken(Token token, IToken prev)
+	public boolean retainToken(IToken token, IToken prev)
 	{
 		if (!this.semicolonInference)
 		{
@@ -154,7 +150,7 @@ public class ParserManager implements IParserManager
 		}
 		
 		int type = token.type();
-		if (!ParserUtil.isIdentifier(type) && (type & Tokens.TYPE_KEYWORD) == 0)
+		if (!ParserUtil.isIdentifier(type) && (type & Tokens.KEYWORD) == 0)
 		{
 			return true;
 		}
@@ -177,7 +173,7 @@ public class ParserManager implements IParserManager
 		}
 		
 		int prevEnd = prev.endIndex();
-		IToken semicolon = new InferredSemicolon(0, prevLN, prevEnd);
+		IToken semicolon = new InferredSemicolon(prevLN, prevEnd);
 		semicolon.setNext(token);
 		prev.setNext(semicolon);
 		return true;

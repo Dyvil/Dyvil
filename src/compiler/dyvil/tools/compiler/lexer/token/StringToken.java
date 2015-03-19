@@ -5,42 +5,59 @@ import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Tokens;
 
-public class InferredSemicolon implements IToken
+public final class StringToken implements IToken
 {
-	public IToken		prev;
-	public IToken		next;
+	private IToken		prev;
+	private IToken		next;
 	
-	public final int	lineNumber;
-	public final int	start;
+	private final int	lineNumber;
+	private final int	start;
+	private final int	end;
 	
-	public InferredSemicolon(int lineNumber, int start)
+	private String			value;
+	
+	public StringToken(IToken prev, String value, int lineNumber, int start, int end)
 	{
+		this.prev = prev;
+		prev.setNext(this);
+		this.value = value;
+		
 		this.lineNumber = lineNumber;
 		this.start = start;
+		this.end = end;
 	}
 	
-	@Override
-	public boolean isInferred()
+	public StringToken(String value, int lineNumber, int start, int end)
 	{
-		return true;
+		this.value = value;
+		
+		this.lineNumber = lineNumber;
+		this.start = start;
+		this.end = end;
 	}
 	
 	@Override
 	public String text()
 	{
-		return ";";
+		return null;
 	}
 	
 	@Override
 	public int type()
 	{
-		return Tokens.SEMICOLON;
+		return Tokens.STRING;
 	}
 	
 	@Override
 	public boolean equals(String value)
 	{
-		return ";".equals(value);
+		return false;
+	}
+	
+	@Override
+	public String stringValue()
+	{
+		return this.value;
 	}
 	
 	@Override
@@ -52,7 +69,7 @@ public class InferredSemicolon implements IToken
 	@Override
 	public int endIndex()
 	{
-		return this.start + 1;
+		return this.end;
 	}
 	
 	@Override
@@ -126,7 +143,7 @@ public class InferredSemicolon implements IToken
 	@Override
 	public ICodePosition raw()
 	{
-		return new CodePosition(this.lineNumber, this.start, this.start + 1);
+		return new CodePosition(this.lineNumber, this.start, this.endIndex());
 	}
 	
 	@Override
@@ -138,6 +155,6 @@ public class InferredSemicolon implements IToken
 	@Override
 	public String toString()
 	{
-		return "Inferred Semicolon (line " + this.lineNumber + ")";
+		return "String \"" + this.value + "\" (line " + this.lineNumber + ")";
 	}
 }

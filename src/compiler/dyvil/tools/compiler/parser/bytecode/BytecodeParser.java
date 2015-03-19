@@ -48,9 +48,21 @@ public final class BytecodeParser extends Parser
 		
 		if (this.mode == INSTRUCTION)
 		{
-			if (ParserUtil.isIdentifier(type) || type == Tokens.GOTO)
+			IInstruction insn = null;
+			if (type == Tokens.GOTO)
 			{
-				String name = token.value();
+				IToken next = token.next();
+				if (!ParserUtil.isIdentifier(next.type()))
+				{
+					throw new SyntaxError(token, "Invalid Jump Instruction - Identifier expected");
+				}
+				
+				pm.skip();
+				insn = new JumpInstruction(Opcodes.GOTO, new Label(next.text()));
+			}
+			if (ParserUtil.isIdentifier(type))
+			{
+				String name = token.text();
 				if (token.next().type() == Tokens.COLON)
 				{
 					pm.skip();
@@ -64,7 +76,10 @@ public final class BytecodeParser extends Parser
 					throw new SyntaxError(token, "Invalid Instruction - Unknown Instruction Name '" + name + "'");
 				}
 				
-				IInstruction insn = handleOpcode(pm, token, opcode);
+				insn = handleOpcode(pm, token, opcode);
+			}
+			if (insn != null)
+			{
 				if (this.label != null)
 				{
 					this.bytecode.addInstruction(insn, new Label(this.label));
@@ -195,67 +210,67 @@ public final class BytecodeParser extends Parser
 		case Opcodes.IINC:
 		{
 			IToken next = token.next();
-			if (next.type() != Tokens.TYPE_INT)
+			if (next.type() != Tokens.INT)
 			{
 				throw new SyntaxError(next, "Invalid IINC Instruction - Integer expected");
 			}
 			
 			IToken next2 = next.next();
-			if (next2.type() != Tokens.TYPE_INT)
+			if (next2.type() != Tokens.INT)
 			{
 				throw new SyntaxError(next2, "Invalid IINC Instruction - Integer expected");
 			}
 			
 			pm.skip(2);
-			return new IIncInstruction((Integer) next.object(), (Integer) next2.object());
+			return new IIncInstruction(next.intValue(), next2.intValue());
 		}
 		/* IntInstructions */
 		case Opcodes.BIPUSH:
 		case Opcodes.SIPUSH:
 		{
 			IToken next = token.next();
-			if (next.type() != Tokens.TYPE_INT)
+			if (next.type() != Tokens.INT)
 			{
 				throw new SyntaxError(token, "Invalid Int Instruction - Integer expected");
 			}
 			
 			pm.skip();
-			return new IntInstruction(opcode, (Integer) next.object());
+			return new IntInstruction(opcode, next.intValue());
 		}
 		/* LDCInstruction */
 		case Opcodes.LDC:
 		{
 			IToken next = token.next();
 			int nextType = next.type();
-			if (nextType == Tokens.TYPE_STRING)
+			if (nextType == Tokens.STRING)
 			{
 				pm.skip();
-				return new LDCInstruction(new StringValue((String) next.object()));
+				return new LDCInstruction(new StringValue(next.stringValue()));
 			}
-			if (nextType == Tokens.TYPE_CHAR)
+			if (nextType == Tokens.CHAR)
 			{
 				pm.skip();
-				return new LDCInstruction(new CharValue((Character) next.object()));
+				return new LDCInstruction(new CharValue(next.charValue()));
 			}
-			if (nextType == Tokens.TYPE_INT)
+			if (nextType == Tokens.INT)
 			{
 				pm.skip();
-				return new LDCInstruction(new IntValue((Integer) next.object()));
+				return new LDCInstruction(new IntValue(next.intValue()));
 			}
-			if (nextType == Tokens.TYPE_LONG)
+			if (nextType == Tokens.LONG)
 			{
 				pm.skip();
-				return new LDCInstruction(new LongValue((Long) next.object()));
+				return new LDCInstruction(new LongValue(next.longValue()));
 			}
-			if (nextType == Tokens.TYPE_FLOAT)
+			if (nextType == Tokens.FLOAT)
 			{
 				pm.skip();
-				return new LDCInstruction(new FloatValue((Float) next.object()));
+				return new LDCInstruction(new FloatValue(next.floatValue()));
 			}
-			if (nextType == Tokens.TYPE_DOUBLE)
+			if (nextType == Tokens.DOUBLE)
 			{
 				pm.skip();
-				return new LDCInstruction(new DoubleValue((Double) next.object()));
+				return new LDCInstruction(new DoubleValue(next.doubleValue()));
 			}
 			return null;
 		}
@@ -272,13 +287,13 @@ public final class BytecodeParser extends Parser
 		case Opcodes.ASTORE:
 		{
 			IToken next = token.next();
-			if (next.type() != Tokens.TYPE_INT)
+			if (next.type() != Tokens.INT)
 			{
 				throw new SyntaxError(token, "Invalid Var Instruction - Integer expected");
 			}
 			
 			pm.skip();
-			return new VarInstruction(opcode, (Integer) next.object());
+			return new VarInstruction(opcode, next.intValue());
 		}
 		/* Jump Instructions */
 		case Opcodes.IFEQ:
@@ -306,7 +321,7 @@ public final class BytecodeParser extends Parser
 			}
 			
 			pm.skip();
-			return new JumpInstruction(opcode, new Label(next.value()));
+			return new JumpInstruction(opcode, new Label(next.text()));
 		}
 		/* TODO TableSwitchInstruction */
 		case Opcodes.TABLESWITCH:

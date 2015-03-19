@@ -49,7 +49,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 	@Override
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
-		String value = token.value();
+		String value = token.text();
 		
 		if (this.isInMode(MODIFIERS))
 		{

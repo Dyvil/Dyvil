@@ -1,46 +1,61 @@
 package dyvil.tools.compiler.lexer.token;
 
+import java.util.Objects;
+
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Tokens;
 
-public class InferredSemicolon implements IToken
+public class IdentifierToken implements IToken
 {
 	public IToken		prev;
 	public IToken		next;
 	
+	public final int	type;
+	public final String	value;
+	
 	public final int	lineNumber;
 	public final int	start;
+	public final int	end;
 	
-	public InferredSemicolon(int lineNumber, int start)
+	public IdentifierToken(IToken prev, String value, int type, int lineNumber, int start, int end)
 	{
+		this.prev = prev;
+		prev.setNext(this);
+		this.value = value;
+		this.type = type;
+		
 		this.lineNumber = lineNumber;
 		this.start = start;
+		this.end = end;
 	}
 	
-	@Override
-	public boolean isInferred()
+	public IdentifierToken(String value, int type, int lineNumber, int start, int end)
 	{
-		return true;
+		this.value = value;
+		this.type = type;
+		
+		this.lineNumber = lineNumber;
+		this.start = start;
+		this.end = end;
 	}
 	
 	@Override
 	public String text()
 	{
-		return ";";
+		return this.value;
 	}
 	
 	@Override
 	public int type()
 	{
-		return Tokens.SEMICOLON;
+		return this.type;
 	}
 	
 	@Override
 	public boolean equals(String value)
 	{
-		return ";".equals(value);
+		return Objects.equals(this.value, value);
 	}
 	
 	@Override
@@ -52,7 +67,7 @@ public class InferredSemicolon implements IToken
 	@Override
 	public int endIndex()
 	{
-		return this.start + 1;
+		return this.end;
 	}
 	
 	@Override
@@ -126,7 +141,7 @@ public class InferredSemicolon implements IToken
 	@Override
 	public ICodePosition raw()
 	{
-		return new CodePosition(this.lineNumber, this.start, this.start + 1);
+		return new CodePosition(this.lineNumber, this.start, this.end);
 	}
 	
 	@Override
@@ -138,6 +153,6 @@ public class InferredSemicolon implements IToken
 	@Override
 	public String toString()
 	{
-		return "Inferred Semicolon (line " + this.lineNumber + ")";
+		return "Identifier '" + this.value + "' (line " + this.lineNumber + ")";
 	}
 }

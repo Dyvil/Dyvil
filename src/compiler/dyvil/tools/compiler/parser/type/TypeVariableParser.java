@@ -42,13 +42,13 @@ public class TypeVariableParser extends Parser implements ITyped
 	{
 		if (this.mode == NAME)
 		{
-			this.variable = new TypeVariable(token, token.value());
+			this.variable = new TypeVariable(token, token.text());
 			this.mode = TYPE_VARIABLE;
 			return;
 		}
 		if (this.mode == TYPE_VARIABLE)
 		{
-			String value = token.value();
+			String value = token.text();
 			if (this.boundMode == 0)
 			{
 				if ("<=".equals(value))

@@ -70,7 +70,7 @@ public class ForStatementParser extends Parser implements IValued
 			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.forStatement.variable.setName(token.value());
+				this.forStatement.variable.setName(token.text());
 				return;
 			}
 			

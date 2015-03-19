@@ -47,7 +47,7 @@ public class PatternParser extends Parser
 				int nextType = token.next().type();
 				if (nextType == Tokens.EQUALS)
 				{
-					BindingPattern bp = new BindingPattern(token.raw(), token.value());
+					BindingPattern bp = new BindingPattern(token.raw(), token.text());
 					this.patterned.setPattern(bp);
 					this.patterned = bp;
 					pm.skip();
@@ -119,18 +119,18 @@ public class PatternParser extends Parser
 			return new WildcardPattern(token.raw());
 		case Tokens.NULL:
 			return new NullPattern(token.raw());
-		case Tokens.TYPE_STRING:
-			return new StringPattern(token.raw(), (String) token.object());
-		case Tokens.TYPE_CHAR:
-			return new CharPattern(token.raw(), (Character) token.object());
-		case Tokens.TYPE_INT:
-			return new IntPattern(token.raw(), (Integer) token.object());
-		case Tokens.TYPE_LONG:
-			return new LongPattern(token.raw(), (Long) token.object());
-		case Tokens.TYPE_FLOAT:
-			return new FloatPattern(token.raw(), (Float) token.object());
-		case Tokens.TYPE_DOUBLE:
-			return new DoublePattern(token.raw(), (Double) token.object());
+		case Tokens.STRING:
+			return new StringPattern(token.raw(), token.stringValue());
+		case Tokens.CHAR:
+			return new CharPattern(token.raw(), token.charValue());
+		case Tokens.INT:
+			return new IntPattern(token.raw(), token.intValue());
+		case Tokens.LONG:
+			return new LongPattern(token.raw(), token.longValue());
+		case Tokens.FLOAT:
+			return new FloatPattern(token.raw(), token.floatValue());
+		case Tokens.DOUBLE:
+			return new DoublePattern(token.raw(), token.doubleValue());
 		}
 		return null;
 	}

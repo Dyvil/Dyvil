@@ -63,4 +63,17 @@ public class TokenIterator implements Iterator<IToken>
 		{
 		}
 	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder buf = new StringBuilder();
+		IToken token = this.first;
+		while (token != null)
+		{
+			buf.append(token).append('\n');
+			token = token.getNext();
+		}
+		return buf.toString();
+	}
 }

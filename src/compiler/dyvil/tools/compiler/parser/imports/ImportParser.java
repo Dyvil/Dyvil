@@ -74,7 +74,7 @@ public class ImportParser extends Parser
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				SimpleImport si = new SimpleImport(token.raw(), this.parent, token.value());
+				SimpleImport si = new SimpleImport(token.raw(), this.parent, token.text());
 				this.container.addImport(si);
 				this.parent = si;
 				this.container = si;
@@ -95,9 +95,9 @@ public class ImportParser extends Parser
 			if (type == Tokens.ARROW_OPERATOR)
 			{
 				IToken next = token.next();
-				if (next.type() == Tokens.TYPE_IDENTIFIER)
+				if (next.type() == Tokens.IDENTIFIER)
 				{
-					((SimpleImport) this.parent).setAlias(next.value());
+					((SimpleImport) this.parent).setAlias(next.text());
 					pm.skip();
 					return;
 				}

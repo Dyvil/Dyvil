@@ -47,7 +47,7 @@ public class PropertyParser extends Parser implements IValued
 		
 		if (this.mode == 0)
 		{
-			String value = token.value();
+			String value = token.text();
 			if ("get".equals(value))
 			{
 				this.mode = GET;

@@ -43,7 +43,7 @@ public final class ExpressionListParser extends Parser implements IValued
 		{
 			if (token.next().type() == Tokens.COLON)
 			{
-				this.label = token.value();
+				this.label = token.text();
 				pm.skip();
 				return;
 			}

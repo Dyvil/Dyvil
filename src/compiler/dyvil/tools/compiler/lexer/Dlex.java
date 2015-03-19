@@ -1,10 +1,9 @@
 package dyvil.tools.compiler.lexer;
 
 import static dyvil.tools.compiler.util.ParserUtil.*;
-import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.Token;
-import dyvil.tools.compiler.util.ParserUtil;
-import dyvil.tools.compiler.util.Tokens;
+import static dyvil.tools.compiler.util.Tokens.*;
+import dyvil.tools.compiler.lexer.token.*;
+import dyvil.tools.compiler.util.Keywords;
 
 public class Dlex
 {
@@ -22,11 +21,10 @@ public class Dlex
 		int len = code.length();
 		
 		StringBuilder buf = new StringBuilder(20);
-		Token first = new Token(-1, "", (byte) 0, null, 0, -1, -1);
-		Token prev = first;
+		IToken first = new InferredSemicolon(0, 0);
+		IToken prev = first;
 		int start = 0;
 		int lineNumber = 1;
-		int i;
 		
 		char l = 0;
 		char c = 0;
@@ -35,7 +33,7 @@ public class Dlex
 		boolean addToken = false;
 		boolean reparse = true;
 		boolean string = false;
-		for (i = 0; i < len; ++i, l = c)
+		for (int i = 0; i < len; ++i, l = c)
 		{
 			c = code.charAt(i);
 			
@@ -53,15 +51,15 @@ public class Dlex
 					continue;
 				}
 				
-				int m = string && l == '}' ? Tokens.TYPE_STRING_2 : getMode(c, code, i);
+				int m = string && l == '}' ? STRING_2 : getMode(c, code, i);
 				type = m & 0xFFFF;
 				subtype = m & 0xFFFF0000;
 			}
 			
 			switch (type)
 			{
-			case Tokens.TYPE_IDENTIFIER:
-				if (subtype == Tokens.MOD_DOTS)
+			case IDENTIFIER:
+				if (subtype == MOD_DOTS)
 				{
 					if (c == '.')
 					{
@@ -75,18 +73,18 @@ public class Dlex
 				}
 				else if (c == '_' || c == '$' || c == '@')
 				{
-					subtype = Tokens.MOD_SYMBOL | Tokens.MOD_LETTER;
+					subtype = MOD_SYMBOL | MOD_LETTER;
 					buf.append(c);
 				}
 				else
 				{
-					boolean letter = (subtype & Tokens.MOD_LETTER) != 0;
-					boolean symbol = (subtype & Tokens.MOD_SYMBOL) != 0;
+					boolean letter = (subtype & MOD_LETTER) != 0;
+					boolean symbol = (subtype & MOD_SYMBOL) != 0;
 					if (letter)
 					{
 						if (isIdentifierPart(c))
 						{
-							subtype = Tokens.MOD_LETTER;
+							subtype = MOD_LETTER;
 							buf.append(c);
 							continue;
 						}
@@ -95,7 +93,7 @@ public class Dlex
 					{
 						if (isIdentifierSymbol(c))
 						{
-							subtype = Tokens.MOD_SYMBOL;
+							subtype = MOD_SYMBOL;
 							buf.append(c);
 							continue;
 						}
@@ -103,18 +101,18 @@ public class Dlex
 					addToken = true;
 				}
 				break;
-			case Tokens.TYPE_SYMBOL:
+			case SYMBOL:
 				buf.append(c);
 				addToken = true;
 				reparse = false;
 				break;
-			case Tokens.TYPE_BRACKET:
+			case BRACKET:
 				buf.append(c);
 				addToken = true;
 				reparse = false;
 				break;
-			case Tokens.TYPE_COMMENT:
-				if (subtype == Tokens.MOD_LINE)
+			case COMMENT:
+				if (subtype == MOD_LINE)
 				{
 					if (c == '\n')
 					{
@@ -122,7 +120,7 @@ public class Dlex
 						continue;
 					}
 				}
-				else if (subtype == Tokens.MOD_BLOCK)
+				else if (subtype == MOD_BLOCK)
 				{
 					if (l == '*' && c == '/')
 					{
@@ -131,20 +129,20 @@ public class Dlex
 					}
 				}
 				break;
-			case Tokens.TYPE_INT:
-			case Tokens.TYPE_LONG:
+			case INT:
+			case LONG:
 				if (c == '.')
 				{
-					type = Tokens.TYPE_FLOAT;
+					type = FLOAT;
 					buf.append('.');
 				}
 				else if (c == 'l' || c == 'L')
 				{
-					type = Tokens.TYPE_LONG;
+					type = LONG;
 					addToken = true;
 					reparse = false;
 				}
-				else if (subtype == Tokens.MOD_DEC)
+				else if (subtype == MOD_DEC)
 				{
 					if (isDigit(c))
 					{
@@ -152,13 +150,13 @@ public class Dlex
 					}
 					else if (c == 'f' || c == 'F')
 					{
-						type = Tokens.TYPE_FLOAT;
+						type = FLOAT;
 						addToken = true;
 						reparse = false;
 					}
 					else if (c == 'd' || c == 'D')
 					{
-						type = Tokens.TYPE_DOUBLE;
+						type = DOUBLE;
 						addToken = true;
 						reparse = false;
 					}
@@ -167,7 +165,7 @@ public class Dlex
 						addToken = true;
 					}
 				}
-				else if (subtype == Tokens.MOD_BIN)
+				else if (subtype == MOD_BIN)
 				{
 					if (c == 'b' || isBinDigit(c))
 					{
@@ -178,7 +176,7 @@ public class Dlex
 						addToken = true;
 					}
 				}
-				else if (subtype == Tokens.MOD_OCT)
+				else if (subtype == MOD_OCT)
 				{
 					if (isOctDigit(c))
 					{
@@ -189,7 +187,7 @@ public class Dlex
 						addToken = true;
 					}
 				}
-				else if (subtype == Tokens.MOD_HEX)
+				else if (subtype == MOD_HEX)
 				{
 					if (c == 'x' || isHexDigit(c))
 					{
@@ -201,11 +199,11 @@ public class Dlex
 					}
 				}
 				break;
-			case Tokens.TYPE_FLOAT:
-			case Tokens.TYPE_DOUBLE:
+			case FLOAT:
+			case DOUBLE:
 				if (c == 'x')
 				{
-					subtype = Tokens.MOD_HEX;
+					subtype = MOD_HEX;
 					buf.append(c);
 				}
 				else if (c == 'f' || c == 'F')
@@ -215,7 +213,7 @@ public class Dlex
 				}
 				else if (c == 'd' || c == 'D')
 				{
-					type = Tokens.TYPE_DOUBLE;
+					type = DOUBLE;
 					addToken = true;
 					reparse = false;
 				}
@@ -228,7 +226,7 @@ public class Dlex
 					addToken = true;
 				}
 				break;
-			case Tokens.TYPE_STRING:
+			case STRING:
 				if (c == '"' && buf.length() > 0)
 				{
 					buf.append('"');
@@ -245,7 +243,7 @@ public class Dlex
 					buf.append(c);
 				}
 				break;
-			case Tokens.TYPE_STRING_2:
+			case STRING_2:
 				if (c == '"' && (buf.length() > 1 || string))
 				{
 					buf.append('"');
@@ -271,7 +269,7 @@ public class Dlex
 					buf.append(c);
 				}
 				break;
-			case Tokens.TYPE_CHAR:
+			case CHAR:
 				if (c == '\'' && buf.length() > 0)
 				{
 					buf.append('\'');
@@ -320,81 +318,81 @@ public class Dlex
 		switch (c)
 		{
 		case '"':
-			return Tokens.TYPE_STRING;
+			return STRING;
 		case '\'':
-			return Tokens.TYPE_CHAR;
+			return CHAR;
 		case '/':
 			char n = code.charAt(i + 1);
 			if (n == '*')
 			{
-				return Tokens.BLOCK_COMMENT;
+				return BLOCK_COMMENT;
 			}
 			else if (n == '/')
 			{
-				return Tokens.LINE_COMMENT;
+				return LINE_COMMENT;
 			}
 			else
 			{
-				return Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL;
+				return IDENTIFIER | MOD_SYMBOL;
 			}
 		case '@':
 			n = code.charAt(i + 1);
 			// @"string"
 			if (n == '"')
 			{
-				return Tokens.TYPE_STRING_2;
+				return STRING_2;
 			}
-			return Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL;
+			return IDENTIFIER | MOD_SYMBOL;
 		case '0':
 			n = code.charAt(i + 1);
 			if (n == 'b')
 			{
-				return Tokens.TYPE_INT | Tokens.MOD_BIN;
+				return INT | MOD_BIN;
 			}
 			else if (n == 'x')
 			{
-				return Tokens.TYPE_INT | Tokens.MOD_HEX;
+				return INT | MOD_HEX;
 			}
 			else if (isDigit(n))
 			{
-				return Tokens.TYPE_INT | Tokens.MOD_OCT;
+				return INT | MOD_OCT;
 			}
-			return Tokens.TYPE_INT;
+			return INT;
 		case '(':
-			return Tokens.OPEN_PARENTHESIS;
+			return OPEN_PARENTHESIS;
 		case ')':
-			return Tokens.CLOSE_PARENTHESIS;
+			return CLOSE_PARENTHESIS;
 		case '[':
-			return Tokens.OPEN_SQUARE_BRACKET;
+			return OPEN_SQUARE_BRACKET;
 		case ']':
-			return Tokens.CLOSE_SQUARE_BRACKET;
+			return CLOSE_SQUARE_BRACKET;
 		case '{':
-			return Tokens.OPEN_CURLY_BRACKET;
+			return OPEN_CURLY_BRACKET;
 		case '}':
-			return Tokens.CLOSE_CURLY_BRACKET;
+			return CLOSE_CURLY_BRACKET;
 		case '.':
 			n = code.charAt(i + 1);
 			if (n == '.')
 			{
-				return Tokens.TYPE_IDENTIFIER | Tokens.MOD_DOTS;
+				return IDENTIFIER | MOD_DOTS;
 			}
-			return Tokens.DOT;
+			return DOT;
 		case ';':
-			return Tokens.SEMICOLON;
+			return SEMICOLON;
 		case ',':
-			return Tokens.COMMA;
+			return COMMA;
 		}
 		if (isDigit(c))
 		{
-			return Tokens.TYPE_INT;
+			return INT;
 		}
 		else if (isIdentifierSymbol(c))
 		{
-			return Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL;
+			return IDENTIFIER | MOD_SYMBOL;
 		}
 		else if (isIdentifierPart(c))
 		{
-			return Tokens.TYPE_IDENTIFIER | Tokens.MOD_LETTER;
+			return IDENTIFIER | MOD_LETTER;
 		}
 		return 0;
 	}
@@ -430,81 +428,88 @@ public class Dlex
 		return false;
 	}
 	
-	private static Token addToken(Token prev, String s, int type, int line, int start, int len)
+	private static IToken addToken(IToken prev, String s, int type, int line, int start, int len)
 	{
-		Token t;
-		if ((type & Tokens.TYPE_IDENTIFIER) != 0)
+		switch (type)
 		{
-			type = ParserUtil.getKeywordType(s, type);
-			t = new Token(0, s, type, s, line, start, start + len);
-		}
-		else
+		case IDENTIFIER:
+		case LETTER_IDENTIFIER:
 		{
-			t = new Token(0, s, type, parse(type, s), line, start, start + len);
+			int i = Keywords.getKeywordType(s);
+			if (i == 0)
+			{
+				return new IdentifierToken(prev, s, type, line, start, start + len);
+			}
+			return new KeywordToken(prev, i, line, start, start + len);
 		}
-		
-		prev.setNext(t);
-		return t;
+		case LETTER_IDENTIFIER | SYMBOL_IDENTIFIER:
+		case SYMBOL_IDENTIFIER:
+		{
+			int i = Keywords.getSymbolType(s);
+			if (i == 0)
+			{
+				return new IdentifierToken(prev, s, type, line, start, start + len);
+			}
+			return new SymbolToken(prev, i, line, start);
+		}
+		case SYMBOL:
+		case DOT:
+		case COLON:
+		case SEMICOLON:
+		case COMMA:
+		case EQUALS:
+		case HASH:
+		case WILDCARD:
+		case ARROW_OPERATOR:
+			/* Brackets */
+		case OPEN_BRACKET:
+		case CLOSE_BRACKET:
+		case OPEN_PARENTHESIS:
+		case CLOSE_PARENTHESIS:
+		case OPEN_SQUARE_BRACKET:
+		case CLOSE_SQUARE_BRACKET:
+		case OPEN_CURLY_BRACKET:
+		case CLOSE_CURLY_BRACKET:
+			return new SymbolToken(prev, type, line, start);
+		case INT:
+			return new IntToken(prev, Integer.parseInt(s, 10), line, start, start + len);
+		case INT | MOD_BIN:
+			return new IntToken(prev, Integer.parseInt(s.substring(2), 2), line, start, start + len);
+		case INT | MOD_OCT:
+			return new IntToken(prev, Integer.parseInt(s.substring(1), 8), line, start, start + len);
+		case INT | MOD_HEX:
+			return new IntToken(prev, Integer.parseInt(s.substring(2), 16), line, start, start + len);
+		case LONG:
+			return new LongToken(prev, Long.parseLong(s, 10), line, start, start + len);
+		case LONG | MOD_BIN:
+			return new LongToken(prev, Long.parseLong(s.substring(2), 2), line, start, start + len);
+		case LONG | MOD_OCT:
+			return new LongToken(prev, Long.parseLong(s.substring(1), 8), line, start, start + len);
+		case LONG | MOD_HEX:
+			return new LongToken(prev, Long.parseLong(s.substring(2), 16), line, start, start + len);
+		case FLOAT:
+			return new FloatToken(prev, Float.parseFloat(s), line, start, start + len);
+		case FLOAT | MOD_HEX:
+			return new FloatToken(prev, Float.parseFloat(s.substring(2)), line, start, start + len);
+		case DOUBLE:
+			return new DoubleToken(prev, Double.parseDouble(s), line, start, start + len);
+		case DOUBLE | MOD_HEX:
+			return new DoubleToken(prev, Double.parseDouble(s.substring(2)), line, start, start + len);
+		case STRING:
+			return new StringToken(prev, s.substring(1, len - 1), line, start, start + len);
+		case STRING_2:
+			return null;
+		case CHAR:
+			return new CharToken(prev, s.charAt(1), line, start);
+		}
+		return null;
 	}
 	
-	private static Token addToken(Token prev, StringBuilder buf, int type, int line, int start)
+	private static IToken addToken(IToken prev, StringBuilder buf, int type, int line, int start)
 	{
 		String s = buf.toString();
 		int len = buf.length();
 		buf.delete(0, len);
 		return addToken(prev, s, type, line, start, len);
-	}
-	
-	public static Object parse(int type, String value)
-	{
-		switch (type)
-		{
-		case Tokens.TYPE_INT:
-			return Integer.valueOf(value);
-		case Tokens.TYPE_INT | Tokens.MOD_BIN:
-			return Integer.valueOf(value.substring(2), 2);
-		case Tokens.TYPE_INT | Tokens.MOD_OCT:
-			return Integer.valueOf(value, 8);
-		case Tokens.TYPE_INT | Tokens.MOD_HEX:
-			return Integer.valueOf(value.substring(2), 16);
-			
-		case Tokens.TYPE_LONG:
-			return Long.valueOf(value);
-		case Tokens.TYPE_LONG | Tokens.MOD_BIN:
-			return Long.valueOf(value.substring(2), 2);
-		case Tokens.TYPE_LONG | Tokens.MOD_OCT:
-			return Long.valueOf(value, 8);
-		case Tokens.TYPE_LONG | Tokens.MOD_HEX:
-			return Long.valueOf(value.substring(2), 16);
-			
-		case Tokens.TYPE_FLOAT:
-			return Float.valueOf(value);
-		case Tokens.TYPE_FLOAT | Tokens.MOD_HEX:
-			return Float.valueOf(value.substring(2));
-			
-		case Tokens.TYPE_DOUBLE:
-			return Double.valueOf(value);
-		case Tokens.TYPE_DOUBLE | Tokens.MOD_HEX:
-			return Double.valueOf(value.substring(2));
-			
-		case Tokens.TYPE_STRING:
-			return value.substring(1, value.length() - 1);
-		case Tokens.TYPE_STRING_2:
-			int len = value.length();
-			int start = 0;
-			int end = len;
-			if (len > 2 && value.charAt(0) == '@' && value.charAt(1) == '"')
-			{
-				start = 2;
-			}
-			if (len > 0 && value.charAt(len - 1) == '"')
-			{
-				end = len - 1;
-			}
-			return value.substring(start, end);
-		case Tokens.TYPE_CHAR:
-			return Character.valueOf(value.charAt(1));
-		}
-		return value;
 	}
 }

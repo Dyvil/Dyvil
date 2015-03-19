@@ -80,12 +80,12 @@ public final class TypeParser extends Parser implements ITyped
 			{
 				if (token.next().type() == Tokens.OPEN_SQUARE_BRACKET)
 				{
-					this.type = new GenericType(token, token.value());
+					this.type = new GenericType(token, token.text());
 					this.mode = GENERICS;
 					return;
 				}
 				
-				this.type = new Type(token, token.value());
+				this.type = new Type(token, token.text());
 				this.mode = ARRAY_END;
 				return;
 			}
@@ -95,7 +95,7 @@ public final class TypeParser extends Parser implements ITyped
 				this.mode = WILDCARD_TYPE;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type - Invalid Token '" + token.value() + "'");
+			throw new SyntaxError(token, "Invalid Type - Invalid Token '" + token.text() + "'");
 		}
 		if (this.isInMode(TUPLE_END))
 		{
@@ -192,7 +192,7 @@ public final class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(WILDCARD_TYPE))
 		{
-			String value = token.value();
+			String value = token.text();
 			if (this.boundMode == 0)
 			{
 				if ("<=".equals(value))

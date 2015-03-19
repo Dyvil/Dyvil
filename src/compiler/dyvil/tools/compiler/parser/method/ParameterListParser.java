@@ -60,7 +60,7 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 		if (this.mode == TYPE)
 		{
 			int i = 0;
-			String value = token.value();
+			String value = token.text();
 			if ((i = ModifierTypes.PARAMETER.parse(value)) != -1)
 			{
 				this.modifiers |= i;
@@ -93,7 +93,7 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.parameter = new Parameter(0, token.value(), this.type);
+				this.parameter = new Parameter(0, token.text(), this.type);
 				this.parameter.modifiers = this.modifiers;
 				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.paramList.addParameter(this.parameter);

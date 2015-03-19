@@ -38,9 +38,9 @@ public class PackageParser extends Parser
 		}
 		if (ParserUtil.isIdentifier(type) || type == Tokens.DOT)
 		{
-			this.buffer.append(token.value());
+			this.buffer.append(token.text());
 			return;
 		}
-		throw new SyntaxError(token, "Invalid Package Declaration - Invalid Token '" + token.value() + "'");
+		throw new SyntaxError(token, "Invalid Package Declaration - Invalid Token '" + token.text() + "'");
 	}
 }

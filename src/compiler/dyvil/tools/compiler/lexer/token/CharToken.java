@@ -5,42 +5,56 @@ import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Tokens;
 
-public class InferredSemicolon implements IToken
+public final class CharToken implements IToken
 {
-	public IToken		prev;
-	public IToken		next;
+	private IToken		prev;
+	private IToken		next;
 	
-	public final int	lineNumber;
-	public final int	start;
+	private final int	lineNumber;
+	private final int	start;
 	
-	public InferredSemicolon(int lineNumber, int start)
+	private char			value;
+	
+	public CharToken(IToken prev, char value, int lineNumber, int start)
 	{
+		this.prev = prev;
+		prev.setNext(this);
+		this.value = value;
+		
+		this.lineNumber = lineNumber;
+		this.start = start;
+	}
+	
+	public CharToken(char value, int lineNumber, int start)
+	{
+		this.value = value;
+		
 		this.lineNumber = lineNumber;
 		this.start = start;
 	}
 	
 	@Override
-	public boolean isInferred()
-	{
-		return true;
-	}
-	
-	@Override
 	public String text()
 	{
-		return ";";
+		return null;
 	}
 	
 	@Override
 	public int type()
 	{
-		return Tokens.SEMICOLON;
+		return Tokens.CHAR;
 	}
 	
 	@Override
 	public boolean equals(String value)
 	{
-		return ";".equals(value);
+		return false;
+	}
+	
+	@Override
+	public char charValue()
+	{
+		return this.value;
 	}
 	
 	@Override
@@ -52,7 +66,7 @@ public class InferredSemicolon implements IToken
 	@Override
 	public int endIndex()
 	{
-		return this.start + 1;
+		return this.start + 3;
 	}
 	
 	@Override
@@ -126,7 +140,7 @@ public class InferredSemicolon implements IToken
 	@Override
 	public ICodePosition raw()
 	{
-		return new CodePosition(this.lineNumber, this.start, this.start + 1);
+		return new CodePosition(this.lineNumber, this.start, this.endIndex());
 	}
 	
 	@Override
@@ -138,6 +152,6 @@ public class InferredSemicolon implements IToken
 	@Override
 	public String toString()
 	{
-		return "Inferred Semicolon (line " + this.lineNumber + ")";
+		return "Char '" + this.value + "' (line " + this.lineNumber + ")";
 	}
 }

@@ -119,7 +119,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				return;
 			}
-			if ((type & Tokens.TYPE_SYMBOL_ID) == Tokens.TYPE_SYMBOL_ID)
+			if ((type & Tokens.SYMBOL_IDENTIFIER) == Tokens.SYMBOL_IDENTIFIER)
 			{
 				if (token.equals("@") && token.next().type() == Tokens.OPEN_CURLY_BRACKET)
 				{
@@ -132,7 +132,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				
 				this.prefix = true;
-				this.getAccess(pm, token.value(), token, type);
+				this.getAccess(pm, token.text(), token, type);
 				return;
 			}
 			if (type == Tokens.ARROW_OPERATOR)
@@ -262,7 +262,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser();
 			if (ParserUtil.isIdentifier(type))
 			{
-				FunctionValue fl = new FunctionValue(token.raw(), token.value());
+				FunctionValue fl = new FunctionValue(token.raw(), token.text());
 				fl.instance = this.value;
 				this.field.setValue(fl);
 				return;
@@ -336,7 +336,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 					throw new SyntaxError(token, "Invalid Assignment");
 				}
 				
-				String name = token.value();
+				String name = token.text();
 				FieldInitializer access = new FieldInitializer(pos, name, itype);
 				this.value = access;
 				
@@ -384,7 +384,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				int prevType = prev.type();
 				if (ParserUtil.isIdentifier(prevType))
 				{
-					MethodCall mc = new MethodCall(prev, null, prev.value());
+					MethodCall mc = new MethodCall(prev, null, prev.text());
 					mc.arguments = args;
 					this.value = mc;
 				}
@@ -417,7 +417,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.prefix = false;
-				String name = token.value();
+				String name = token.text();
 				if (this.precedence != 0 && this.dotless)
 				{
 					int p = Operators.index(name);
@@ -444,7 +444,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				this.value = null;
 				pm.reparse();
-				this.getAccess(pm, prev.value(), prev, type);
+				this.getAccess(pm, prev.text(), prev, type);
 				return;
 			}
 			
@@ -482,7 +482,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser(true);
 			return;
 		}
-		throw new SyntaxError(token, "Invalid Expression - Invalid Token '" + token.value() + "'");
+		throw new SyntaxError(token, "Invalid Expression - Invalid Token '" + token.text() + "'");
 	}
 	
 	private IArguments getArguments(IParserManager pm, IToken next) throws SyntaxError
@@ -524,7 +524,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = GENERICS;
 			return;
 		}
-		if (type == Tokens.TYPE_SYMBOL_ID || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
+		if (type == Tokens.SYMBOL_IDENTIFIER || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
 		{
 			MethodCall call = new MethodCall(token, this.value, value);
 			SingleArgument sa = new SingleArgument();
@@ -678,23 +678,23 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	{
 		switch (type)
 		{
-		case Tokens.TYPE_STRING:
-			this.value = new StringValue(token.raw(), (String) token.object());
+		case Tokens.STRING:
+			this.value = new StringValue(token.raw(), token.stringValue());
 			return true;
-		case Tokens.TYPE_CHAR:
-			this.value = new CharValue(token.raw(), (Character) token.object());
+		case Tokens.CHAR:
+			this.value = new CharValue(token.raw(), token.charValue());
 			return true;
-		case Tokens.TYPE_INT:
-			this.value = new IntValue(token.raw(), (Integer) token.object());
+		case Tokens.INT:
+			this.value = new IntValue(token.raw(), token.intValue());
 			return true;
-		case Tokens.TYPE_LONG:
-			this.value = new LongValue(token.raw(), (Long) token.object());
+		case Tokens.LONG:
+			this.value = new LongValue(token.raw(), token.longValue());
 			return true;
-		case Tokens.TYPE_FLOAT:
-			this.value = new FloatValue(token.raw(), (Float) token.object());
+		case Tokens.FLOAT:
+			this.value = new FloatValue(token.raw(), token.floatValue());
 			return true;
-		case Tokens.TYPE_DOUBLE:
-			this.value = new DoubleValue(token.raw(), (Double) token.object());
+		case Tokens.DOUBLE:
+			this.value = new DoubleValue(token.raw(), token.doubleValue());
 			return true;
 		}
 		return false;
@@ -790,7 +790,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			IToken next = token.next();
 			if (ParserUtil.isIdentifier(next.type()))
 			{
-				statement.setName(next.value());
+				statement.setName(next.text());
 				pm.skip();
 			}
 			this.mode = 0;
@@ -803,7 +803,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			IToken next = token.next();
 			if (ParserUtil.isIdentifier(next.type()))
 			{
-				statement.setName(next.value());
+				statement.setName(next.text());
 				pm.skip();
 			}
 			this.mode = 0;
@@ -816,7 +816,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			IToken next = token.next();
 			if (ParserUtil.isIdentifier(next.type()))
 			{
-				statement.setName(next.value());
+				statement.setName(next.text());
 				pm.skip();
 			}
 			this.mode = 0;

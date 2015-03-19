@@ -84,7 +84,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				return;
 			}
 		}
-		String value = token.value();
+		String value = token.text();
 		if (this.isInMode(TYPE))
 		{
 			if (type == Tokens.SEMICOLON)

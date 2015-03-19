@@ -35,7 +35,7 @@ public class CompilationUnitParser extends Parser
 	@Override
 	public void parse(IParserManager jcp, IToken token) throws SyntaxError
 	{
-		String value = token.value();
+		String value = token.text();
 		if (this.isInMode(PACKAGE))
 		{
 			if ("package".equals(value))

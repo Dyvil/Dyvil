@@ -5,22 +5,46 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IToken extends ICodePosition
 {
-	public String value();
-	
-	public Object object();
-	
 	public int type();
 	
+	public String text();
+	
 	public boolean equals(String value);
+	
+	public default String stringValue()
+	{
+		return null;
+	}
+	
+	public default char charValue()
+	{
+		return 0;
+	}
+	
+	public default int intValue()
+	{
+		return 0;
+	}
+	
+	public default long longValue()
+	{
+		return 0L;
+	}
+	
+	public default float floatValue()
+	{
+		return 0F;
+	}
+	
+	public default double doubleValue()
+	{
+		return 0D;
+	}
 	
 	public default boolean isInferred()
 	{
 		return false;
 	}
-	
-	public void setIndex(int index);
-	
-	public int index();
 	
 	public IToken prev() throws SyntaxError;
 	

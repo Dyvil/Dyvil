@@ -87,7 +87,7 @@ public class TryStatementParser extends Parser implements IValued
 			this.mode = CATCH_CLOSE;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.catchBlock.varName = token.value();
+				this.catchBlock.varName = token.text();
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Catch Expression - Name expected", true);

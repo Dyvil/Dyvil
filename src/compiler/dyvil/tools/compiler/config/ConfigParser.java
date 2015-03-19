@@ -42,7 +42,7 @@ public class ConfigParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.mode = EQUALS;
-				this.key = token.value();
+				this.key = token.text();
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Property - Name expected");
@@ -64,7 +64,7 @@ public class ConfigParser extends Parser
 				return;
 			}
 			
-			this.setProperty(this.key, token.object());
+			this.setProperty(this.key, token);
 			this.mode = KEY;
 			this.key = null;
 			return;
@@ -78,43 +78,43 @@ public class ConfigParser extends Parser
 				return;
 			}
 			
-			this.setProperty(this.key, token.object());
+			this.setProperty(this.key, token);
 			return;
 		}
 	}
 	
-	private void setProperty(String name, Object property)
+	private void setProperty(String name, IToken token)
 	{
 		switch (name)
 		{
 		case "jar_name":
-			this.config.jarName = (String) property;
+			this.config.jarName = token.stringValue();
 			return;
 		case "jar_vendor":
-			this.config.jarVendor = (String) property;
+			this.config.jarVendor = token.stringValue();
 			return;
 		case "jar_version":
-			this.config.jarVersion = (String) property;
+			this.config.jarVersion = token.stringValue();
 			return;
 		case "jar_format":
-			this.config.jarNameFormat = (String) property;
+			this.config.jarNameFormat = token.stringValue();
 		case "source_dir":
-			this.config.sourceDir = new File((String) property);
+			this.config.sourceDir = new File(token.stringValue());
 			return;
 		case "output_dir":
-			this.config.outputDir = new File((String) property);
+			this.config.outputDir = new File(token.stringValue());
 			return;
 		case "main_type":
-			this.config.mainType = (String) property;
+			this.config.mainType = token.stringValue();
 			return;
 		case "main_args":
-			this.config.mainArgs.add((String) property);
+			this.config.mainArgs.add(token.stringValue());
 			return;
 		case "include":
-			this.config.includeFile((String) property);
+			this.config.includeFile(token.stringValue());
 			return;
 		case "exclude":
-			this.config.excludeFile((String) property);
+			this.config.excludeFile(token.stringValue());
 			return;
 		}
 	}

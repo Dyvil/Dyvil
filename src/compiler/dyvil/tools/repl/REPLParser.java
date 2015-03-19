@@ -23,14 +23,11 @@ public class REPLParser implements IParserManager
 		this.reparse = false;
 		
 		IToken token = null, prev = null;
-		int index = 0;
 		tokens.reset();
 		while (tokens.hasNext())
 		{
 			token = tokens.next();
-			token.setIndex(index);
 			token.setPrev(prev);
-			index++;
 			prev = token;
 		}
 		
@@ -40,9 +37,9 @@ public class REPLParser implements IParserManager
 		}
 		
 		int type = prev.type();
-		if (!ParserUtil.isSeperator(type) && type != (Tokens.TYPE_IDENTIFIER | Tokens.MOD_SYMBOL))
+		if (!ParserUtil.isSeperator(type) && type != (Tokens.IDENTIFIER | Tokens.MOD_SYMBOL))
 		{
-			IToken semicolon = new InferredSemicolon(prev.index() + 1, prev.endLine(), prev.endIndex());
+			IToken semicolon = new InferredSemicolon(prev.endLine(), prev.endIndex());
 			semicolon.setPrev(prev);
 			prev.setNext(semicolon);
 		}

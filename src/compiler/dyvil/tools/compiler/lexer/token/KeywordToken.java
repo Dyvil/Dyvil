@@ -1,46 +1,59 @@
 package dyvil.tools.compiler.lexer.token;
 
+import java.util.Objects;
+
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Tokens;
+import dyvil.tools.compiler.util.Keywords;
 
-public class InferredSemicolon implements IToken
+public final class KeywordToken implements IToken
 {
-	public IToken		prev;
-	public IToken		next;
+	private IToken		prev;
+	private IToken		next;
 	
-	public final int	lineNumber;
-	public final int	start;
+	private final int	type;
 	
-	public InferredSemicolon(int lineNumber, int start)
+	private final int	lineNumber;
+	private final int	start;
+	private final int	end;
+	
+	public KeywordToken(IToken prev, int type, int lineNumber, int start, int end)
 	{
+		this.prev = prev;
+		prev.setNext(this);
+		this.type = type;
+		
 		this.lineNumber = lineNumber;
 		this.start = start;
+		this.end = end;
 	}
 	
-	@Override
-	public boolean isInferred()
+	public KeywordToken(String value, int type, int lineNumber, int start, int end)
 	{
-		return true;
+		this.type = type;
+		
+		this.lineNumber = lineNumber;
+		this.start = start;
+		this.end = end;
 	}
 	
 	@Override
 	public String text()
 	{
-		return ";";
+		return Keywords.keywordToString(this.type);
 	}
 	
 	@Override
 	public int type()
 	{
-		return Tokens.SEMICOLON;
+		return this.type;
 	}
 	
 	@Override
 	public boolean equals(String value)
 	{
-		return ";".equals(value);
+		return Objects.equals(Keywords.keywordToString(this.type), value);
 	}
 	
 	@Override
@@ -52,7 +65,7 @@ public class InferredSemicolon implements IToken
 	@Override
 	public int endIndex()
 	{
-		return this.start + 1;
+		return this.end;
 	}
 	
 	@Override
@@ -126,7 +139,7 @@ public class InferredSemicolon implements IToken
 	@Override
 	public ICodePosition raw()
 	{
-		return new CodePosition(this.lineNumber, this.start, this.start + 1);
+		return new CodePosition(this.lineNumber, this.start, this.end);
 	}
 	
 	@Override
@@ -138,6 +151,6 @@ public class InferredSemicolon implements IToken
 	@Override
 	public String toString()
 	{
-		return "Inferred Semicolon (line " + this.lineNumber + ")";
+		return "Keyword '" + Keywords.keywordToString(this.type) + "' (line " + this.lineNumber + ")";
 	}
 }

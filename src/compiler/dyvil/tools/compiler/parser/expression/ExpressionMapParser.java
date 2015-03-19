@@ -48,7 +48,7 @@ public class ExpressionMapParser extends Parser implements IValued
 			this.mode = VALUE;
 			if (token.next().type() == Tokens.COLON)
 			{
-				this.key = token.value();
+				this.key = token.text();
 				pm.skip();
 				return;
 			}

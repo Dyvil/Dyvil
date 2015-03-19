@@ -42,14 +42,14 @@ public class DWTValueParser extends Parser
 			{
 				if (token.next().type() == Tokens.OPEN_CURLY_BRACKET)
 				{
-					DWTNode node = new DWTNode(token.raw(), token.value());
+					DWTNode node = new DWTNode(token.raw(), token.text());
 					this.valued.setValue(node);
 					pm.popParser();
 					pm.pushParser(new DWTParser(node), true);
 					return;
 				}
 				
-				this.valued.setValue(new DWTReference(token.raw(), token.value()));
+				this.valued.setValue(new DWTReference(token.raw(), token.text()));
 				pm.popParser();
 				return;
 			}
