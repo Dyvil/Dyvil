@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -51,13 +50,13 @@ public final class ThisValue extends ASTNode implements IConstantValue
 	@Override
 	public IValue withType(IType type)
 	{
-		return Type.isSuperType(type, this.type) ? this : null;
+		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return Type.isSuperType(type, this.type);
+		return type.isSuperTypeOf(this.type);
 	}
 	
 	@Override

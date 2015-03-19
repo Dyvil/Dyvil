@@ -406,7 +406,8 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				else
 				{
-					ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value);
+					ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition());
+					amc.instance = this.value;
 					amc.arguments = args;
 					this.value = amc;
 				}
@@ -450,7 +451,8 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				return;
 			}
 			
-			ApplyMethodCall call = new ApplyMethodCall(token.raw(), this.value);
+			ApplyMethodCall call = new ApplyMethodCall(token.raw());
+			call.instance = this.value;
 			SingleArgument sa = new SingleArgument();
 			call.arguments = sa;
 			this.value = call;

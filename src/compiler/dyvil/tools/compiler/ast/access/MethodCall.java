@@ -107,7 +107,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		{
 			return false;
 		}
-		return Type.isSuperType(type, this.getType());
+		return type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
@@ -123,7 +123,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		{
 			return 3;
 		}
-		else if (Type.isSuperType(type, type1))
+		else if (type.isSuperTypeOf(type1))
 		{
 			return 2;
 		}
@@ -256,6 +256,16 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	{
 		this.arguments.resolve(markers, context);
 		
+		if (this.arguments.size() == 1 && "match".equals(this.name))
+		{
+			MatchExpression me = Operators.getMatchExpression(this.instance, this.arguments.getFirstValue());
+			if (me != null)
+			{
+				me.position = this.position;
+				return me.resolve(markers, context);
+			}
+		}
+		
 		IValue op = this.resolveOperator(markers, this.instance == null ? null : this.instance.getType());
 		if (op != null)
 		{
@@ -377,16 +387,6 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		
 		if (this.instance != null)
 		{
-			if ("match".equals(this.name))
-			{
-				MatchExpression me = Operators.getMatchExpression(this.instance, argument);
-				if (me != null)
-				{
-					me.position = this.position;
-					return me;
-				}
-			}
-			
 			operator = Operators.get(this.instance, this.name, argument);
 		}
 		else
@@ -430,7 +430,6 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 				call.arguments = this.arguments;
 				call.name = this.name.substring(0, this.name.length() - 1);
 				call.qualifiedName = s;
-				call.dotless = this.dotless;
 				this.replacement = call;
 			}
 		}
@@ -546,12 +545,11 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		marker.addInfo("Qualified Name: " + this.qualifiedName);
 		if (this.instance != null)
 		{
-			IType vtype = this.instance.getType();
-			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
+			marker.addInfo("Instance Type: " + this.instance.getType());
 		}
-		StringBuilder builder = new StringBuilder("Argument Types: [");
+		StringBuilder builder = new StringBuilder("Argument Types: {");
 		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.append(']').toString());
+		marker.addInfo(builder.append('}').toString());
 	}
 	
 	@Override
@@ -562,7 +560,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		if (this.type != null)
 		{
 			IType methodType = this.method.getType();
-			if (this.type != methodType && !Type.isSuperType(this.type, methodType))
+			if (this.type != methodType && !this.type.isSuperTypeOf(methodType))
 			{
 				writer.writeTypeInsn(Opcodes.CHECKCAST, this.type);
 			}

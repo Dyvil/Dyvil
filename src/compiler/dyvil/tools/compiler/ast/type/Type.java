@@ -184,24 +184,15 @@ public class Type extends ASTNode implements IType
 		{
 			return OBJECT;
 		}
-		if (isSuperType(type1, type2))
+		if (type1.isSuperTypeOf(type2))
 		{
 			return type1;
 		}
-		if (isSuperType(type2, type1))
+		if (type2.isSuperTypeOf(type1))
 		{
 			return type2;
 		}
 		return null;
-	}
-	
-	public static boolean isSuperType(IType superType, IType subType)
-	{
-		if (subType == NONE && !(superType instanceof PrimitiveType))
-		{
-			return true;
-		}
-		return superType.isSuperTypeOf(subType);
 	}
 	
 	@Override

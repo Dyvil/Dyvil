@@ -61,13 +61,13 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 	@Override
 	public IValue withType(IType type)
 	{
-		return Type.isSuperType(type, this.type) ? this : null;
+		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return Type.isSuperType(type, this.type);
+		return type.isSuperTypeOf(this.type);
 	}
 	
 	@Override

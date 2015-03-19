@@ -300,7 +300,24 @@ public class WildcardType extends TypeVariable implements IType
 		{
 			return false;
 		}
-		return super.isSuperTypeOf(type);
+		if (this.upperBoundCount > 0)
+		{
+			for (int i = 0; i < this.upperBoundCount; i++)
+			{
+				if (!this.upperBounds[i].isSuperTypeOf(type))
+				{
+					return false;
+				}
+			}
+		}
+		if (this.lowerBound != null)
+		{
+			if (!type.isSuperTypeOf(this.lowerBound))
+			{
+				return false;
+			}
+		}
+		return !type.isPrimitive();
 	}
 	
 	@Override

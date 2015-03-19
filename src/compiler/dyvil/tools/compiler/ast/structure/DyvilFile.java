@@ -180,7 +180,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 			DyvilCompiler.logger.info(buf.toString());
 			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
 			
-			if (DyvilCompiler.states.contains(ICompilerPhase.PRINT))
+			if (DyvilCompiler.phases.contains(ICompilerPhase.PRINT))
 			{
 				DyvilCompiler.logger.info("Code:\n" + this.toString());
 			}

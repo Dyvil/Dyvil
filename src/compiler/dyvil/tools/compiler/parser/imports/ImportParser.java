@@ -96,7 +96,7 @@ public class ImportParser extends Parser
 			if (type == Tokens.ARROW_OPERATOR)
 			{
 				IToken next = token.next();
-				if (next.type() == Tokens.IDENTIFIER)
+				if (ParserUtil.isIdentifier(next.type()))
 				{
 					((SimpleImport) this.parent).setAlias(next.text());
 					pm.skip();

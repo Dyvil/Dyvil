@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -58,13 +57,13 @@ public class ClassAccess extends ASTNode implements IValue
 	@Override
 	public IValue withType(IType type)
 	{
-		return Type.isSuperType(type, this.type) ? this : null;
+		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return Type.isSuperType(type, this.type);
+		return type.isSuperTypeOf(this.type);
 	}
 	
 	@Override

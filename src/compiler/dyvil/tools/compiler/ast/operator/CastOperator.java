@@ -42,15 +42,9 @@ public final class CastOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
-	{
-		return Type.isSuperType(type, this.type) ? this : null;
-	}
-	
-	@Override
 	public boolean isType(IType type)
 	{
-		return Type.isSuperType(type, this.type);
+		return type.isSuperTypeOf(this.type);
 	}
 	
 	@Override

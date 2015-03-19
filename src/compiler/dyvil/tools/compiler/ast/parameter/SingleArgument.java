@@ -37,7 +37,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public boolean isEmpty()
 	{
-		return this.value != null;
+		return this.value == null;
 	}
 	
 	// 'Variations'

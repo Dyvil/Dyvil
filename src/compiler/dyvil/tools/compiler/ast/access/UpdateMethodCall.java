@@ -1,15 +1,13 @@
 package dyvil.tools.compiler.ast.access;
 
-import java.util.Iterator;
-
 import org.objectweb.asm.Label;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -30,16 +28,11 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
 	public IMethod		method;
+	private IType		type;
 	
 	public UpdateMethodCall(ICodePosition position)
 	{
 		this.position = position;
-	}
-	
-	public UpdateMethodCall(ICodePosition position, IValue instance)
-	{
-		this.position = position;
-		this.instance = instance;
 	}
 	
 	@Override
@@ -51,23 +44,45 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.method.isIntrinsic() || this.getType().isPrimitive();
+		return this.method != null && (this.method.isIntrinsic() || this.getType().isPrimitive());
 	}
 	
 	@Override
 	public IType getType()
 	{
-		return this.method == null ? Type.NONE : this.method.getType();
+		if (this.method == null)
+		{
+			return Type.NONE;
+		}
+		if (this.type == null)
+		{
+			if (this.method.hasTypeVariables())
+			{
+				return this.type = this.method.getType(this);
+			}
+			return this.type = this.method.getType();
+		}
+		return this.type;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.VOID ? this : IValue.super.withType(type);
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Type.NONE || type == Type.VOID)
+		if (type == Type.VOID)
 		{
 			return true;
 		}
-		return this.method == null ? false : Type.isSuperType(type, this.method.getType());
+		if (this.method == null)
+		{
+			return false;
+		}
+		return type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
@@ -93,13 +108,13 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	@Override
 	public void setValue(IValue value)
 	{
-		this.instance = value;
+		this.arguments = this.arguments.addLastValue("update", value);
 	}
 	
 	@Override
 	public IValue getValue()
 	{
-		return this.instance;
+		return null;
 	}
 	
 	@Override
@@ -136,15 +151,10 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		}
 		
 		Marker marker = markers.create(this.position, "resolve.method", "update");
-		
-		if (this.instance != null)
-		{
-			IType vtype = this.instance.getType();
-			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
-		}
-		StringBuilder builder = new StringBuilder("Argument Types: [");
+		marker.addInfo("Instance Type: " + this.instance.getType());
+		StringBuilder builder = new StringBuilder("Argument Types: {");
 		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.append(']').toString());
+		marker.addInfo(builder.append('}').toString());
 		
 		return this;
 	}
@@ -246,24 +256,24 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			this.instance.toString(prefix, buffer);
 		}
 		
-		buffer.append(Formatting.Method.parametersStart);
-		Iterator<? extends IASTNode> iterator = this.arguments.iterator();
-		while (true)
+		if (this.arguments instanceof ArgumentList)
 		{
-			IASTNode value = iterator.next();
-			if (iterator.hasNext())
+			buffer.append(Formatting.Method.parametersStart);
+			int len = this.arguments.size() - 1;
+			
+			this.arguments.getValue(0, null).toString(prefix, buffer);
+			for (int i = 1; i < len; i++)
 			{
-				value.toString("", buffer);
 				buffer.append(Formatting.Method.parameterSeperator);
+				this.arguments.getValue(i, null).toString(prefix, buffer);
 			}
-			else
-			{
-				int len = buffer.length();
-				buffer.delete(len - 2, len);
-				buffer.append(Formatting.Method.parametersEnd).append(Formatting.Field.keyValueSeperator).append(' ');
-				value.toString("", buffer);
-				break;
-			}
+			buffer.append(Formatting.Method.parametersEnd);
+			buffer.append(Formatting.Field.keyValueSeperator);
+			Formatting.appendValue(this.arguments.getValue(len, null), prefix, buffer);
+		}
+		else
+		{
+			this.arguments.toString(prefix, buffer);
 		}
 	}
 }

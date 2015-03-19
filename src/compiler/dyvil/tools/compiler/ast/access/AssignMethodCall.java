@@ -33,10 +33,9 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	public IValue		instance;
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
-	public boolean		dotless;
-	
 	public IMethod		method;
 	public IMethod		updateMethod;
+	private IType		type;
 	
 	public AssignMethodCall(ICodePosition position)
 	{
@@ -60,13 +59,25 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.method.isIntrinsic() || this.getType().isPrimitive();
+		return this.method != null && (this.method.isIntrinsic() || this.getType().isPrimitive());
 	}
 	
 	@Override
 	public IType getType()
 	{
-		return this.method == null ? Type.NONE : this.method.getType();
+		if (this.method == null)
+		{
+			return Type.NONE;
+		}
+		if (this.type == null)
+		{
+			if (this.method.hasTypeVariables())
+			{
+				return this.type = this.method.getType(this);
+			}
+			return this.type = this.method.getType();
+		}
+		return this.type;
 	}
 	
 	@Override
@@ -82,7 +93,11 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		{
 			return true;
 		}
-		return this.method == null ? false : Type.isSuperType(type, this.method.getType());
+		if (this.method == null)
+		{
+			return false;
+		}
+		return type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
@@ -145,13 +160,13 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	@Override
 	public void setValue(IValue value)
 	{
-		this.instance = value;
+		this.arguments = this.arguments.addLastValue("update", value);
 	}
 	
 	@Override
 	public IValue getValue()
 	{
-		return this.instance;
+		return null;
 	}
 	
 	@Override
@@ -174,6 +189,11 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		if (this.instance != null)
+		{
+			this.instance.resolve(markers, context);
+		}
+		
 		this.arguments.resolve(markers, context);
 		
 		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, this.arguments);
@@ -186,9 +206,9 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		Marker marker = markers.create(this.position, "resolve.method", this.name);
 		marker.addInfo("Qualified Name: " + this.qualifiedName);
 		marker.addInfo("Instance Type: " + this.instance.getType());
-		StringBuilder builder = new StringBuilder("Argument Types: [");
+		StringBuilder builder = new StringBuilder("Argument Types: {");
 		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.append(']').toString());
+		marker.addInfo(builder.append('}').toString());
 		
 		return this;
 	}
@@ -235,13 +255,11 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			this.instance.check(markers, context);
 		}
 		
-		this.arguments.check(markers, context);
-		
 		if (this.method != null)
 		{
 			IType type1 = this.instance.getType();
-			IType type2 = this.method.getType();
-			if (!Type.isSuperType(type1, type2))
+			IType type2 = this.getType();
+			if (!type1.isSuperTypeOf(type2))
 			{
 				Marker marker = markers.create(this.position, "access.assign_call.type", this.name, this.instance.toString());
 				marker.addInfo("Field Type: " + type1);
@@ -267,6 +285,8 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 				markers.add(this.position, "access.method.invisible", this.name);
 			}
 		}
+		
+		this.arguments.check(markers, context);
 	}
 	
 	@Override
@@ -396,14 +416,6 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		if (this.instance != null)
 		{
 			this.instance.toString(prefix, buffer);
-			if (this.dotless && !Formatting.Method.useJavaFormat)
-			{
-				buffer.append(Formatting.Method.dotlessSeperator);
-			}
-			else
-			{
-				buffer.append('.');
-			}
 		}
 		
 		if (Formatting.Method.convertQualifiedNames)

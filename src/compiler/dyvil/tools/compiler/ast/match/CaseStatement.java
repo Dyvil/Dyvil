@@ -179,7 +179,6 @@ public final class CaseStatement extends ASTNode implements IValue, ICase, ICont
 		{
 			this.condition = this.condition.resolve(markers, this);
 		}
-		
 		if (this.value != null)
 		{
 			this.value = this.value.resolve(markers, this);
@@ -191,33 +190,31 @@ public final class CaseStatement extends ASTNode implements IValue, ICase, ICont
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		this.context = context;
 		if (this.condition != null)
 		{
-			this.condition.checkTypes(markers, context);
+			this.condition.checkTypes(markers, this);
 		}
-		
 		if (this.value != null)
 		{
-			this.value.checkTypes(markers, context);
+			this.value.checkTypes(markers, this);
 		}
+		this.context = null;
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.context = context;
 		if (this.condition != null)
 		{
-			this.condition.check(markers, context);
+			this.condition.check(markers, this);
 		}
-		
 		if (this.value != null)
 		{
-			this.value.check(markers, context);
+			this.value.check(markers, this);
 		}
-		else
-		{
-			markers.add(this.position, "case.invalid");
-		}
+		this.context = null;
 	}
 	
 	@Override

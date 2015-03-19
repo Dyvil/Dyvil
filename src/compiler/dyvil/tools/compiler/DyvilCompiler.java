@@ -46,7 +46,7 @@ public final class DyvilCompiler
 	public static DateFormat				format				= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public static CompilerConfig			config				= new CompilerConfig();
-	public static Set<ICompilerPhase>		states				= new TreeSet();
+	public static Set<ICompilerPhase>		phases				= new TreeSet();
 	
 	public static List<File>				files				= new ArrayList();
 	public static List<ICompilationUnit>	units				= new ArrayList();
@@ -68,9 +68,13 @@ public final class DyvilCompiler
 		loadConfig(args[0]);
 		
 		File sourceDir = config.sourceDir;
+		if (!sourceDir.exists())
+		{
+			logger.severe("The specified source path '" + sourceDir + "' does not exist. Skipping Compilation.");
+		}
+		
 		File outputDir = config.outputDir;
-		Package root = Package.rootPackage;
-		int states = DyvilCompiler.states.size();
+		int phases = DyvilCompiler.phases.size();
 		int libs = config.libraries.size();
 		
 		logger.info("Dyvil Compiler " + VERSION + " for Dyvil " + DYVIL_VERSION);
@@ -81,7 +85,7 @@ public final class DyvilCompiler
 			logger.fine("Startup Time: " + (System.nanoTime() - now) / 1000000L + " ms");
 		}
 		
-		if (DyvilCompiler.states.contains(ICompilerPhase.RESOLVE_TYPES))
+		if (DyvilCompiler.phases.contains(ICompilerPhase.RESOLVE_TYPES))
 		{
 			now = System.nanoTime();
 			
@@ -101,20 +105,13 @@ public final class DyvilCompiler
 		
 		now = System.nanoTime();
 		logger.info("Compiling '" + sourceDir + "' to '" + outputDir + "'");
-		if (debug)
-		{
-			logger.info("Applying " + states + (states == 1 ? " State: " : " States: ") + DyvilCompiler.states);
-		}
 		
 		// Scan for Packages and Compilation Units
-		for (String s : sourceDir.list())
-		{
-			findUnits(new CodeFile(sourceDir, s), new File(outputDir, s), Package.rootPackage);
-		}
+		findUnits(sourceDir, outputDir, null);
 		
 		int fileCount = files.size();
 		int unitCount = units.size();
-		int packages = root.subPackages.size();
+		int packages = Package.rootPackage.subPackages.size();
 		logger.info("Compiling " + packages + (packages == 1 ? " Package, " : " Packages, ") + fileCount + (fileCount == 1 ? " File (" : " Files (")
 				+ unitCount + (unitCount == 1 ? " Compilation Unit)" : " Compilation Units)"));
 		logger.info("");
@@ -122,20 +119,21 @@ public final class DyvilCompiler
 		// Apply states
 		if (debug)
 		{
-			for (ICompilerPhase state : DyvilCompiler.states)
+			logger.info("Applying " + phases + (phases == 1 ? " Phase: " : " Phases: ") + DyvilCompiler.phases);
+			for (ICompilerPhase phase : DyvilCompiler.phases)
 			{
-				logger.info("Applying " + state.getName());
 				long now1 = System.nanoTime();
-				state.apply(units);
+				logger.info("Applying " + phase.getName());
+				phase.apply(units);
 				now1 = System.nanoTime() - now1;
-				logger.info("Completed " + state.getName() + " (" + Util.toTime(now1) + ")");
+				logger.info("Completed " + phase.getName() + " (" + Util.toTime(now1) + ")");
 			}
 		}
 		else
 		{
-			for (ICompilerPhase state : DyvilCompiler.states)
+			for (ICompilerPhase phase : DyvilCompiler.phases)
 			{
-				state.apply(units);
+				phase.apply(units);
 			}
 		}
 		
@@ -209,38 +207,38 @@ public final class DyvilCompiler
 		switch (s)
 		{
 		case "compile":
-			states.add(ICompilerPhase.TOKENIZE);
-			states.add(ICompilerPhase.PARSE);
-			states.add(ICompilerPhase.RESOLVE_TYPES);
-			states.add(ICompilerPhase.RESOLVE);
-			states.add(ICompilerPhase.CHECK_TYPES);
-			states.add(ICompilerPhase.CHECK);
-			states.add(ICompilerPhase.COMPILE);
+			phases.add(ICompilerPhase.TOKENIZE);
+			phases.add(ICompilerPhase.PARSE);
+			phases.add(ICompilerPhase.RESOLVE_TYPES);
+			phases.add(ICompilerPhase.RESOLVE);
+			phases.add(ICompilerPhase.CHECK_TYPES);
+			phases.add(ICompilerPhase.CHECK);
+			phases.add(ICompilerPhase.COMPILE);
 			return;
 			// case "obfuscate":
 			// case "doc":
 			// case "decompile":
 		case "optimize":
-			states.add(ICompilerPhase.FOLD_CONSTANTS);
+			phases.add(ICompilerPhase.FOLD_CONSTANTS);
 			constantFolding = 1;
 			return;
 		case "jar":
-			states.add(ICompilerPhase.JAR);
+			phases.add(ICompilerPhase.JAR);
 			return;
 		case "format":
-			states.add(ICompilerPhase.TOKENIZE);
-			states.add(ICompilerPhase.PARSE);
-			states.add(ICompilerPhase.FORMAT);
+			phases.add(ICompilerPhase.TOKENIZE);
+			phases.add(ICompilerPhase.PARSE);
+			phases.add(ICompilerPhase.FORMAT);
 			return;
 		case "print":
-			states.add(ICompilerPhase.PRINT);
+			phases.add(ICompilerPhase.PRINT);
 			return;
 		case "test":
-			states.add(ICompilerPhase.TEST);
+			phases.add(ICompilerPhase.TEST);
 			return;
 		case "--debug":
-			states.add(ICompilerPhase.PRINT);
-			states.add(ICompilerPhase.TEST);
+			phases.add(ICompilerPhase.PRINT);
+			phases.add(ICompilerPhase.TEST);
 			debug = true;
 			return;
 		case "--pstack":
@@ -255,7 +253,7 @@ public final class DyvilCompiler
 		{
 			try
 			{
-				states.add(ICompilerPhase.FOLD_CONSTANTS);
+				phases.add(ICompilerPhase.FOLD_CONSTANTS);
 				constantFolding = Integer.parseInt(s.substring(2));
 				return;
 			}
@@ -264,7 +262,7 @@ public final class DyvilCompiler
 			}
 		}
 		
-		System.out.println("Invalid Argument '" + s + "'. Ignoring.");
+		System.err.println("Invalid Argument '" + s + "'. Ignoring.");
 	}
 	
 	private static void findUnits(File source, File output, Package pack)
@@ -274,7 +272,7 @@ public final class DyvilCompiler
 			String name = source.getName();
 			for (String s : source.list())
 			{
-				findUnits(new CodeFile(source, s), new File(output, s), pack.createSubPackage(name));
+				findUnits(new CodeFile(source, s), new File(output, s), pack == null ? Package.rootPackage : pack.createSubPackage(name));
 			}
 			return;
 		}

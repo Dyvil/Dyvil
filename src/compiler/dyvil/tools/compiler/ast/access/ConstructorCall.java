@@ -62,13 +62,13 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 	@Override
 	public IValue withType(IType type)
 	{
-		return Type.isSuperType(type, this.type) ? this : null;
+		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return Type.isSuperType(type, this.type);
+		return type.isSuperTypeOf(this.type);
 	}
 	
 	@Override
@@ -134,7 +134,12 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 				return this;
 			}
 			
-			// TODO Handle this cast
+			if (!(this.arguments instanceof ArgumentList))
+			{
+				markers.add(markers.create(this.position, "access.constructor.array"));
+				return this;
+			}
+			
 			ArgumentList paramList = (ArgumentList) this.arguments;
 			
 			for (int i = 0; i < len; i++)
@@ -145,7 +150,6 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 				{
 					Marker marker = markers.create(v.getPosition(), "access.constructor.arraylength_type");
 					marker.addInfo("Value Type: " + t);
-					
 				}
 			}
 			
@@ -156,9 +160,9 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 		if (match == null)
 		{
 			Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());
-			StringBuilder builder = new StringBuilder("Argument Types: [");
+			StringBuilder builder = new StringBuilder("Argument Types: {");
 			Util.typesToString("", this.arguments, ", ", builder);
-			marker.addInfo(builder.append(']').toString());
+			marker.addInfo(builder.append('}').toString());
 			
 			return this;
 		}
@@ -243,7 +247,6 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 				return;
 			}
 			
-			// TODO Handle this cast
 			ArgumentList paramList = (ArgumentList) this.arguments;
 			
 			for (int i = 0; i < len; i++)

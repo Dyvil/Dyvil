@@ -105,7 +105,7 @@ public class IfStatement extends ASTNode implements IStatement
 		
 		if (this.commonType != null)
 		{
-			return Type.isSuperType(type, this.commonType);
+			return type.isSuperTypeOf(this.commonType);
 		}
 		
 		if (this.then != null)

@@ -481,7 +481,7 @@ public class Method extends Member implements IMethod
 	@Override
 	public IType resolveType(String name, IValue instance, IArguments arguments, ITypeList generics)
 	{
-		if (this.genericCount > 0)
+		if (this.genericCount > 0 && generics != null)
 		{
 			int len = Math.min(this.genericCount, generics.typeCount());
 			for (int i = 0; i < len; i++)
@@ -691,7 +691,7 @@ public class Method extends Member implements IMethod
 				else
 				{
 					IType type = this.overrideMethod.getType();
-					if (!Type.isSuperType(type, this.type))
+					if (type.isSuperTypeOf(this.type))
 					{
 						Marker marker = markers.create(this.position, "method.override.type", this.name);
 						marker.addInfo("Return Type: " + this.type);

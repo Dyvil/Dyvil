@@ -307,6 +307,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				this.variable.value.checkTypes(markers, context);
 			}
 		}
+		this.context = context;
 		if (this.update != null)
 		{
 			this.update.checkTypes(markers, this);
@@ -330,6 +331,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 		{
 			this.then.checkTypes(markers, this);
 		}
+		this.context = null;
 	}
 	
 	@Override

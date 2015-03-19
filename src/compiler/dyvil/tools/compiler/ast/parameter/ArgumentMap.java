@@ -92,19 +92,37 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public boolean isEmpty()
 	{
-		return this.size > 0;
+		return this.size == 0;
 	}
 	
 	@Override
 	public IArguments dropFirstValue()
 	{
-		return null;
+		return this;
 	}
 	
 	@Override
 	public IArguments addLastValue(IValue value)
 	{
-		return null;
+		return this;
+	}
+	
+	@Override
+	public IArguments addLastValue(String name, IValue value)
+	{
+		int size = this.size;
+		int index = size++;
+		String[] k = new String[size];
+		IValue[] v = new IValue[size];
+		System.arraycopy(this.keys, 0, k, 0, size);
+		System.arraycopy(this.values, 0, v, 0, size);
+		k[index] = name;
+		v[index] = value;
+		ArgumentMap map = new ArgumentMap();
+		map.keys = k;
+		map.values = v;
+		map.size = size;
+		return map;
 	}
 	
 	@Override

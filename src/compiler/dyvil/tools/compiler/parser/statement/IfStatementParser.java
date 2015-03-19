@@ -62,22 +62,30 @@ public class IfStatementParser extends Parser implements IValued
 			}
 			throw new SyntaxError(token, "Invalid if statement - ')' expected", true);
 		}
-		if (ParserUtil.isTerminator(type))
-		{
-			if (!token.isInferred())
-			{
-				pm.popParser(true);
-			}
-			return;
-		}
 		if (this.mode == THEN)
 		{
+			if (ParserUtil.isTerminator(type))
+			{
+				pm.popParser(true);
+				return;
+			}
+			
 			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = ELSE;
 			return;
 		}
 		if (this.mode == ELSE)
 		{
+			if (ParserUtil.isTerminator(type))
+			{
+				if (token.isInferred() && token.next().type() == Keywords.ELSE)
+				{
+					return;
+				}
+				pm.popParser(true);
+				return;
+			}
+			
 			if (type == Keywords.ELSE)
 			{
 				pm.pushParser(new ExpressionParser(this));

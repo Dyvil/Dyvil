@@ -81,13 +81,17 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public IValue withType(IType type)
 	{
-		this.type = type;
-		return IValue.super.withType(type);
+		return type == Type.VOID ? this : IValue.super.withType(type);
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
+		if (type == Type.VOID)
+		{
+			return true;
+		}
+		
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			if (!this.cases[i].getValue().isType(type))
@@ -124,17 +128,10 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		IType type = this.value.getType();
-		
 		this.value = this.value.resolve(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i] = this.cases[i].resolve(markers, context);
-		}
-		
-		if (type == Type.BOOLEAN && this.caseCount >= 2)
-		{
-			this.exhaustive = true;
 		}
 		return this;
 	}
@@ -142,6 +139,8 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		IType type = this.type = this.value.getType();
+		
 		this.value.checkTypes(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
 		{
@@ -167,6 +166,11 @@ public final class MatchExpression extends ASTNode implements IValue
 			}
 			
 			this.cases[i].checkTypes(markers, context);
+		}
+
+		if (type == Type.BOOLEAN && this.caseCount >= 2)
+		{
+			this.exhaustive = true;
 		}
 	}
 	
@@ -278,7 +282,7 @@ public final class MatchExpression extends ASTNode implements IValue
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			buffer.append(prefix1);
-			this.cases[i].toString(prefix, buffer);
+			this.cases[i].toString(prefix1, buffer);
 			buffer.append('\n');
 		}
 		buffer.append(prefix).append('}');

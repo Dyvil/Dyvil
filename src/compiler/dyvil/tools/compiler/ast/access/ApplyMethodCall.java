@@ -25,16 +25,11 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	public IArguments	arguments;
 	
 	public IMethod		method;
+	private IType		type;
 	
 	public ApplyMethodCall(ICodePosition position)
 	{
 		this.position = position;
-	}
-	
-	public ApplyMethodCall(ICodePosition position, IValue instance)
-	{
-		this.position = position;
-		this.instance = instance;
 	}
 	
 	@Override
@@ -52,17 +47,39 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	@Override
 	public IType getType()
 	{
-		return this.method == null ? Type.NONE : this.method.getType();
+		if (this.method == null)
+		{
+			return Type.NONE;
+		}
+		if (this.type == null)
+		{
+			if (this.method.hasTypeVariables())
+			{
+				return this.type = this.method.getType(this);
+			}
+			return this.type = this.method.getType();
+		}
+		return this.type;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return type == Type.VOID ? this : IValue.super.withType(type);
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Type.NONE || type == Type.VOID)
+		if (type == Type.VOID)
 		{
 			return true;
 		}
-		return this.method == null ? false : Type.isSuperType(type, this.method.getType());
+		if (this.method == null)
+		{
+			return false;
+		}
+		return type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
@@ -142,15 +159,10 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 		}
 		
 		Marker marker = markers.create(this.position, "resolve.method", "apply");
-		
-		if (this.instance != null)
-		{
-			IType vtype = this.instance.getType();
-			marker.addInfo("Instance Type: " + (vtype == null ? "unknown" : vtype));
-		}
-		StringBuilder builder = new StringBuilder("Argument Types: [");
+		marker.addInfo("Instance Type: " + this.instance.getType());
+		StringBuilder builder = new StringBuilder("Argument Types: {");
 		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.append(']').toString());
+		marker.addInfo(builder.append('}').toString());
 		
 		return this;
 	}
@@ -178,8 +190,6 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 			this.instance.check(markers, context);
 		}
 		
-		this.arguments.check(markers, context);
-		
 		if (this.method != null)
 		{
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
@@ -201,6 +211,8 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 				markers.add(this.position, "access.method.invisible", "apply");
 			}
 		}
+		
+		this.arguments.check(markers, context);
 	}
 	
 	@Override
@@ -210,6 +222,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 		{
 			this.instance = this.instance.foldConstants();
 		}
+		this.arguments.foldConstants();
 		
 		return this;
 	}

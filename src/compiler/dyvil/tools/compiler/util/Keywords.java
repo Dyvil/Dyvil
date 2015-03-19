@@ -2,81 +2,125 @@ package dyvil.tools.compiler.util;
 
 public interface Keywords
 {
-	int	NULL					= Tokens.KEYWORD | 0x00010000;
-	int	TRUE					= Tokens.KEYWORD | 0x00020000;
-	int	FALSE					= Tokens.KEYWORD | 0x00030000;
-	int	THIS					= Tokens.KEYWORD | 0x00040000;
-	int	SUPER					= Tokens.KEYWORD | 0x00050000;
-	int	NEW						= Tokens.KEYWORD | 0x00060000;
-	int	RETURN					= Tokens.KEYWORD | 0x00070000;
-	int	IF						= Tokens.KEYWORD | 0x00080000;
-	int	ELSE					= Tokens.KEYWORD | 0x00090000;
-	int	WHILE					= Tokens.KEYWORD | 0x000A0000;
-	int	DO						= Tokens.KEYWORD | 0x000B0000;
-	int	FOR						= Tokens.KEYWORD | 0x000C0000;
-	int	BREAK					= Tokens.KEYWORD | 0x000D0000;
-	int	CONTINUE				= Tokens.KEYWORD | 0x000E0000;
-	int	GOTO					= Tokens.KEYWORD | 0x000F0000;
-	int	CASE					= Tokens.KEYWORD | 0x00100000;
-	int	TRY						= Tokens.KEYWORD | 0x00110000;
-	int	CATCH					= Tokens.KEYWORD | 0x00120000;
-	int	FINALLY					= Tokens.KEYWORD | 0x00130000;
-	int	THROW					= Tokens.KEYWORD | 0x00140000;
-	int	SYNCHRONIZED			= Tokens.KEYWORD | 0x00150000;
-
+	int	NULL			= Tokens.KEYWORD | 0x00010000;
+	int	TRUE			= Tokens.KEYWORD | 0x00020000;
+	int	FALSE			= Tokens.KEYWORD | 0x00030000;
+	int	THIS			= Tokens.KEYWORD | 0x00040000;
+	int	SUPER			= Tokens.KEYWORD | 0x00050000;
+	int	NEW				= Tokens.KEYWORD | 0x00060000;
+	int	RETURN			= Tokens.KEYWORD | 0x00070000;
+	int	IF				= Tokens.KEYWORD | 0x00080000;
+	int	ELSE			= Tokens.KEYWORD | 0x00090000;
+	int	WHILE			= Tokens.KEYWORD | 0x000A0000;
+	int	DO				= Tokens.KEYWORD | 0x000B0000;
+	int	FOR				= Tokens.KEYWORD | 0x000C0000;
+	int	BREAK			= Tokens.KEYWORD | 0x000D0000;
+	int	CONTINUE		= Tokens.KEYWORD | 0x000E0000;
+	int	GOTO			= Tokens.KEYWORD | 0x000F0000;
+	int	CASE			= Tokens.KEYWORD | 0x00100000;
+	int	TRY				= Tokens.KEYWORD | 0x00110000;
+	int	CATCH			= Tokens.KEYWORD | 0x00120000;
+	int	FINALLY			= Tokens.KEYWORD | 0x00130000;
+	int	THROW			= Tokens.KEYWORD | 0x00140000;
+	int	SYNCHRONIZED	= Tokens.KEYWORD | 0x00150000;
+	
 	public static int getKeywordType(String s)
 	{
 		switch (s)
 		{
 		case "null":
-			return Keywords.NULL;
+			return NULL;
 		case "true":
-			return Keywords.TRUE;
+			return TRUE;
 		case "false":
-			return Keywords.FALSE;
+			return FALSE;
 		case "this":
-			return Keywords.THIS;
+			return THIS;
 		case "super":
-			return Keywords.SUPER;
+			return SUPER;
 		case "new":
-			return Keywords.NEW;
+			return NEW;
 		case "return":
-			return Keywords.RETURN;
+			return RETURN;
 		case "if":
-			return Keywords.IF;
+			return IF;
 		case "else":
-			return Keywords.ELSE;
+			return ELSE;
 		case "while":
-			return Keywords.WHILE;
+			return WHILE;
 		case "do":
-			return Keywords.DO;
+			return DO;
 		case "for":
-			return Keywords.FOR;
+			return FOR;
 		case "break":
-			return Keywords.BREAK;
+			return BREAK;
 		case "continue":
-			return Keywords.CONTINUE;
+			return CONTINUE;
 		case "goto":
-			return Keywords.GOTO;
+			return GOTO;
 		case "case":
-			return Keywords.CASE;
+			return CASE;
 		case "try":
-			return Keywords.TRY;
+			return TRY;
 		case "catch":
-			return Keywords.CATCH;
+			return CATCH;
 		case "finally":
-			return Keywords.FINALLY;
+			return FINALLY;
 		case "synchronized":
-			return Keywords.SYNCHRONIZED;
+			return SYNCHRONIZED;
 		case "throw":
-			return Keywords.THROW;
+			return THROW;
 		}
 		return 0;
 	}
 	
 	public static String keywordToString(int type)
 	{
-		// FIXME
+		switch (type)
+		{
+		case NULL:
+			return "null";
+		case TRUE:
+			return "true";
+		case FALSE:
+			return "false";
+		case THIS:
+			return "this";
+		case SUPER:
+			return "super";
+		case NEW:
+			return "new";
+		case RETURN:
+			return "return";
+		case IF:
+			return "if";
+		case ELSE:
+			return "else";
+		case WHILE:
+			return "while";
+		case DO:
+			return "do";
+		case FOR:
+			return "for";
+		case BREAK:
+			return "break";
+		case CONTINUE:
+			return "continue";
+		case GOTO:
+			return "goto";
+		case CASE:
+			return "case";
+		case TRY:
+			return "try";
+		case CATCH:
+			return "catch";
+		case FINALLY:
+			return "finally";
+		case SYNCHRONIZED:
+			return "synchronized";
+		case THROW:
+			return "throw";
+		}
 		return "";
 	}
 }

@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TupleType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -149,18 +148,14 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 			return this.values[0].getTypeMatch(type);
 		}
 		
-		IType t = this.getType();
-		if (type.equals(t))
+		IType type1 = this.getType();
+		if (type.equals(type1))
 		{
 			return 3;
 		}
-		else if (Type.isSuperType(type, t))
+		else if (type.isSuperTypeOf(type1))
 		{
 			return 2;
-		}
-		else if (type.classEquals(Type.OBJECT))
-		{
-			return 1;
 		}
 		return 0;
 	}

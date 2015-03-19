@@ -89,7 +89,10 @@ public final class EmptyArguments implements IArguments
 	@Override
 	public void writeValue(int index, String name, IValue defaultValue, MethodWriter writer)
 	{
-		defaultValue.writeExpression(writer);
+		if (defaultValue != null)
+		{
+			defaultValue.writeExpression(writer);
+		}
 	}
 	
 	@Override

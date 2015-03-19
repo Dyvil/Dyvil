@@ -61,7 +61,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.field == null ? false : Type.isSuperType(type, this.field.getType());
+		return this.field == null ? false : type.isSuperTypeOf(this.field.getType());
 	}
 	
 	@Override
@@ -77,7 +77,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 		{
 			return 3;
 		}
-		else if (Type.isSuperType(type, type1))
+		else if (type.isSuperTypeOf(type1))
 		{
 			return 2;
 		}

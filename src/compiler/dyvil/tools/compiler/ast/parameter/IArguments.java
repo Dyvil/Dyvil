@@ -20,6 +20,11 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public IArguments addLastValue(IValue value);
 	
+	public default IArguments addLastValue(String name, IValue value)
+	{
+		return this.addLastValue(value);
+	}
+	
 	// First Values
 	
 	public IValue getFirstValue();
