@@ -718,11 +718,26 @@ public final class MethodWriterImpl implements MethodWriter
 		case Opcodes.LCONST_M1:
 			this.mv.visitLdcInsn(LONG_MINUS_ONE);
 			return;
-		case Opcodes.IBIN:
+		case Opcodes.BINV:
+		{
+			this.pop();
+			Label label1 = new Label();
+			Label label2 = new Label();
+			this.mv.visitJumpInsn(Opcodes.IFEQ, label1);
+			this.mv.visitInsn(Opcodes.ICONST_0);
+			this.mv.visitJumpInsn(Opcodes.GOTO, label2);
+			this.mv.visitLabel(label1);
+			this.writeFrame();
+			this.mv.visitInsn(Opcodes.ICONST_1);
+			this.push(INT);
+			this.writeFrame();
+			this.mv.visitLabel(label2);
+		}
+		case Opcodes.IINV:
 			this.mv.visitInsn(Opcodes.ICONST_M1);
 			this.mv.visitInsn(Opcodes.IXOR);
 			return;
-		case Opcodes.LBIN:
+		case Opcodes.LINV:
 			this.mv.visitLdcInsn(LONG_MINUS_ONE);
 			this.mv.visitInsn(Opcodes.IXOR);
 			return;
@@ -771,6 +786,24 @@ public final class MethodWriterImpl implements MethodWriter
 			this.mv.visitInsn(Opcodes.I2C);
 			this.set(INT);
 			return;
+		}
+		if (opcode >= ICMPEQ && opcode <= ICMPLE)
+		{
+			opcode -= ICMPEQ;
+			
+			this.pop();
+			this.pop();
+			Label label1 = new Label();
+			Label label2 = new Label();
+			this.mv.visitJumpInsn(Opcodes.IF_ICMPEQ + opcode, label1);
+			this.mv.visitInsn(Opcodes.ICONST_0);
+			this.mv.visitJumpInsn(Opcodes.GOTO, label2);
+			this.mv.visitLabel(label1);
+			this.writeFrame();
+			this.mv.visitInsn(Opcodes.ICONST_1);
+			this.push(INT);
+			this.writeFrame();
+			this.mv.visitLabel(label2);
 		}
 	}
 	

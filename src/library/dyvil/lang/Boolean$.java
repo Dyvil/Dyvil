@@ -17,4 +17,8 @@ public @sealed interface Boolean$
 	public Boolean$ $bar(boolean v);
 	
 	public Boolean$ $up(boolean v);
+	
+	public Boolean$ $eq$eq$greater(boolean v);
+	
+	public Boolean$ $less$eq$greater(boolean v);
 }

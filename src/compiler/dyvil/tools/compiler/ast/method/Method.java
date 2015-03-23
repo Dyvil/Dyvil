@@ -1007,21 +1007,22 @@ public class Method extends Member implements IMethod
 		
 		if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
 		{
-			if (this.type == Type.BOOLEAN)
+			if (this.type.getTheClass() == Type.BOOLEAN_CLASS)
 			{
 				Label ifEnd = new Label();
 				Label elseEnd = new Label();
 				this.writeIntrinsic(writer, ifEnd, instance, arguments);
 				
 				// If Block
-				writer.writeLDC(1);
+				writer.writeLDC(0);
 				writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
 				writer.writeFrameLabel(ifEnd);
 				// Else Block
-				writer.writeLDC(0);
+				writer.writeLDC(1);
 				writer.writeFrameLabel(elseEnd);
 				return;
 			}
+			
 			this.writeIntrinsic(writer, instance, arguments);
 			return;
 		}

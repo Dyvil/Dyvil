@@ -29,45 +29,59 @@ public class Boolean implements Boolean$
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IBIN })
+	@Intrinsic({ INSTANCE, ARGUMENTS, BINV })
 	public @prefix Boolean $bang()
 	{
 		return create(!this.value);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
 	public boolean $eq$eq(boolean v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
 	public boolean $bang$eq(boolean v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IAND })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IAND, IFNE })
 	public Boolean $amp(boolean v)
 	{
-		return create(this.value && v);
+		return create(v && this.value);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IOR })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IOR, IFNE })
 	public Boolean $bar(boolean v)
 	{
-		return create(this.value || v);
+		return create(v || this.value);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IXOR })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IXOR, IFNE })
 	public Boolean $up(boolean v)
 	{
-		return create(this.value ^ v);
+		return create(v != this.value);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, BINV, ARGUMENTS, IOR, IFEQ })
+	public Boolean $eq$eq$greater(boolean v)
+	{
+		return create(v || !this.value);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
+	public Boolean $less$eq$greater(boolean v)
+	{
+		return create(v == this.value);
 	}
 	
 	// Object methods

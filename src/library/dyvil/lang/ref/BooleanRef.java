@@ -78,6 +78,20 @@ public class BooleanRef implements Boolean$
 	}
 	
 	@Override
+	public Boolean$ $eq$eq$greater(boolean v)
+	{
+		this.value = v || !this.value;
+		return this;
+	}
+	
+	@Override
+	public Boolean$ $less$eq$greater(boolean v)
+	{
+		this.value = this.value == v;
+		return this;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return this.value ? "true" : "false";

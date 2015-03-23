@@ -856,16 +856,22 @@ public interface Opcodes
 	public static final int	LCONST_M1		= 264;
 	
 	/**
-	 * Removes an {@code int} value from the, bitwise-inverts it and pushes the
+	 * Removes a {@code boolean} value from the stack, inverts it and pushes the
 	 * result back onto the stack.
 	 */
-	public static final int	IBIN			= 270;
+	public static final int	BINV			= 270;
 	
 	/**
-	 * Removes a {@code long} value from the, bitwise-inverts it and pushes the
-	 * result back onto the stack.
+	 * Removes an {@code int} value from the stack, bitwise-inverts it and
+	 * pushes the result back onto the stack.
 	 */
-	public static final int	LBIN			= 271;
+	public static final int	IINV			= 271;
+	
+	/**
+	 * Removes a {@code long} value from the stack, bitwise-inverts it and
+	 * pushes the result back onto the stack.
+	 */
+	public static final int	LINV			= 272;
 	
 	public static final int	L2B				= 280;
 	public static final int	L2S				= 281;
@@ -876,6 +882,13 @@ public interface Opcodes
 	public static final int	D2B				= 286;
 	public static final int	D2S				= 287;
 	public static final int	D2C				= 289;
+	
+	public static final int	ICMPEQ			= 290;
+	public static final int	ICMPNE			= 291;
+	public static final int	ICMPLT			= 292;
+	public static final int	ICMPGE			= 293;
+	public static final int	ICMPGT			= 294;
+	public static final int	ICMPLE			= 295;
 	
 	public static final int	IF_LCMPEQ		= 300;
 	public static final int	IF_LCMPNE		= 301;
