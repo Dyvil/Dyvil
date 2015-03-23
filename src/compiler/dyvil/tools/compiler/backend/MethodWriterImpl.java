@@ -642,6 +642,9 @@ public final class MethodWriterImpl implements MethodWriter
 		case ISHL:
 		case ISHR:
 		case IUSHR:
+		case IAND:
+		case IOR:
+		case IXOR:
 			this.pop();
 			this.pop();
 			this.push(INT);
@@ -654,6 +657,9 @@ public final class MethodWriterImpl implements MethodWriter
 		case LSHL:
 		case LSHR:
 		case LUSHR:
+		case LAND:
+		case LOR:
+		case LXOR:
 			this.pop();
 			this.pop();
 			this.push(LONG);

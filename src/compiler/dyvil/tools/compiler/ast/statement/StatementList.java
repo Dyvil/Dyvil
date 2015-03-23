@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -25,7 +26,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class StatementList extends ValueList implements IStatement, IContext
+public final class StatementList extends ValueList implements IStatement, IContext
 {
 	private IContext				context;
 	private IStatement				parent;
@@ -271,7 +272,6 @@ public class StatementList extends ValueList implements IStatement, IContext
 		{
 			this.values[i].check(markers, context);
 		}
-		this.context = null;
 	}
 	
 	@Override
@@ -463,7 +463,10 @@ public class StatementList extends ValueList implements IStatement, IContext
 			}
 		}
 		
-		writer.resetLocals(count);
+		if (!(this.context instanceof IMethod))
+		{
+			writer.resetLocals(count);
+		}
 		writer.writeLabel(end);
 		
 		for (Entry<String, Variable> entry : this.variables.entrySet())

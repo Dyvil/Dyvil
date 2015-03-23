@@ -215,9 +215,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	public default Object getFrameType()
 	{
-		StringBuilder buffer = new StringBuilder();
-		this.appendExtendedName(buffer);
-		return buffer.toString();
+		return this.getInternalName();
 	}
 	
 	// Compilation

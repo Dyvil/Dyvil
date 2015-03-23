@@ -550,6 +550,12 @@ public class Type extends ASTNode implements IType
 	@Override
 	public String getInternalName()
 	{
+		if (this.arrayDimensions > 0)
+		{
+			StringBuilder buf = new StringBuilder();
+			this.appendExtendedName(buf);
+			return buf.toString();
+		}
 		return this.theClass == null ? ClassFormat.packageToInternal(this.qualifiedName) : this.theClass.getInternalName();
 	}
 	
@@ -560,7 +566,7 @@ public class Type extends ASTNode implements IType
 		{
 			buffer.append('[');
 		}
-		buffer.append('L').append(this.getInternalName()).append(';');
+		buffer.append('L').append(this.theClass == null ? ClassFormat.packageToInternal(this.qualifiedName) : this.theClass.getInternalName()).append(';');
 	}
 	
 	@Override

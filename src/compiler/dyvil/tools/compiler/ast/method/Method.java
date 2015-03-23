@@ -646,19 +646,35 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
-			IValue value1 = this.value.withType(this.type);
-			if (value1 == null)
+			if (this.isConstructor)
 			{
-				Marker marker = markers.create(this.position, "method.type", this.name);
-				marker.addInfo("Return Type: " + this.type);
-				marker.addInfo("Value Type: " + this.value.getType());
-				
+				IValue value1 = this.value.withType(Type.VOID);
+				if (value1 == null)
+				{
+					Marker marker = markers.create(this.position, "constructor.return");
+					marker.addInfo("Expression Type: " + this.value.getType());
+				}
+				else
+				{
+					this.value = value1;
+				}
 			}
 			else
 			{
-				this.value = value1;
+				IValue value1 = this.value.withType(this.type);
+				if (value1 == null)
+				{
+					Marker marker = markers.create(this.position, "method.type", this.name);
+					marker.addInfo("Return Type: " + this.type);
+					marker.addInfo("Value Type: " + this.value.getType());
+				}
+				else
+				{
+					this.value = value1;
+				}
 			}
-			this.value.checkTypes(markers, context);
+			
+			this.value.checkTypes(markers, this);
 		}
 		else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
 		{
@@ -710,15 +726,7 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
-			if (this.isConstructor)
-			{
-				if (!this.value.isType(Type.VOID))
-				{
-					Marker marker = markers.create(this.position, "constructor.return");
-					marker.addInfo("Expression Type: " + this.value.getType());
-				}
-			}
-			this.value.check(markers, context);
+			this.value.check(markers, this);
 		}
 		// If the method does not have an implementation and is static
 		else if (this.isStatic())
@@ -972,7 +980,7 @@ public class Method extends Member implements IMethod
 		{
 			mw.begin();
 			mw.writeLabel(start);
-			this.value.writeExpression(mw);
+			this.value.writeStatement(mw);
 			mw.writeLabel(end);
 			mw.end(this.isConstructor ? Type.VOID : this.type);
 		}
