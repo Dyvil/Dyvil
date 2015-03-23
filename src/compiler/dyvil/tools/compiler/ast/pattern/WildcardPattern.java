@@ -29,19 +29,25 @@ public final class WildcardPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public IPattern withType(IType type)
+	{
+		return this;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		return true;
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeInsn(Opcodes.POP);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 	}
 	

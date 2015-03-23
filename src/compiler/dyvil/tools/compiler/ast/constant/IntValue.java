@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.BoxedValue;
+import dyvil.tools.compiler.ast.value.BoxValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -54,7 +54,7 @@ public class IntValue extends ASTNode implements INumericValue
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Type.INT) ? new BoxedValue(this, Type.INT.boxMethod) : null;
+		return type.isSuperTypeOf(Type.INT) ? new BoxValue(this, Type.INT.boxMethod) : null;
 	}
 	
 	@Override

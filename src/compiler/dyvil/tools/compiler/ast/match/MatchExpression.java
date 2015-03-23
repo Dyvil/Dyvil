@@ -16,14 +16,14 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class MatchExpression extends ASTNode implements IValue
 {
-	private IValue	value;
-	private ICase[]	cases;
-	private int		caseCount;
-	private boolean	exhaustive;
+	private IValue			value;
+	private CaseStatement[]	cases;
+	private int				caseCount;
+	private boolean			exhaustive;
 	
-	private IType	type;
+	private IType			type;
 	
-	public MatchExpression(IValue value, ICase[] cases)
+	public MatchExpression(IValue value, CaseStatement[] cases)
 	{
 		this.value = value;
 		this.cases = cases;
@@ -41,7 +41,8 @@ public final class MatchExpression extends ASTNode implements IValue
 	{
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			if (this.cases[i].getValue().isPrimitive())
+			IValue v = this.cases[i];
+			if (v != null && v.isPrimitive())
 			{
 				return true;
 			}
@@ -64,10 +65,21 @@ public final class MatchExpression extends ASTNode implements IValue
 			return this.type;
 		}
 		
-		IType t = this.cases[0].getValue().getType();
-		for (int i = 1; i < len; i++)
+		IType t = null;
+		for (int i = 0; i < len; i++)
 		{
-			IType t1 = this.cases[i].getValue().getType();
+			IValue v = this.cases[i].value;
+			if (v == null)
+			{
+				continue;
+			}
+			IType t1 = this.cases[i].value.getType();
+			if (t == null)
+			{
+				t = t1;
+				continue;
+			}
+			
 			t = Type.findCommonSuperType(t, t1);
 			if (t == null)
 			{
@@ -75,6 +87,10 @@ public final class MatchExpression extends ASTNode implements IValue
 			}
 		}
 		
+		if (t == null)
+		{
+			return this.type = Type.VOID;
+		}
 		return this.type = t;
 	}
 	
@@ -94,7 +110,8 @@ public final class MatchExpression extends ASTNode implements IValue
 		
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			if (!this.cases[i].getValue().isType(type))
+			IValue v = this.cases[i].value;
+			if (v != null && !v.isType(type))
 			{
 				return false;
 			}
@@ -107,7 +124,8 @@ public final class MatchExpression extends ASTNode implements IValue
 	{
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			if (!this.cases[i].getValue().isType(type))
+			IValue v = this.cases[i].value;
+			if (v != null && !v.isType(type))
 			{
 				return 0;
 			}
@@ -129,9 +147,45 @@ public final class MatchExpression extends ASTNode implements IValue
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.value = this.value.resolve(markers, context);
+		
+		IType type = this.type = this.value.getType();
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			this.cases[i] = this.cases[i].resolve(markers, context);
+			CaseStatement c = this.cases[i];
+			if (this.exhaustive)
+			{
+				markers.add(c.getPosition(), "pattern.dead");
+			}
+			
+			IPattern pattern = c.pattern;
+			if (pattern.getPatternType() == IPattern.WILDCARD)
+			{
+				if (c.condition == null)
+				{
+					this.exhaustive = true;
+				}
+			}
+			else
+			{
+				IPattern pattern1 = pattern.withType(type);
+				if (pattern1 == null)
+				{
+					Marker marker = markers.create(pattern.getPosition(), "pattern.type");
+					marker.addInfo("Pattern Type: " + pattern.getType());
+					marker.addInfo("Value Type: " + type);
+				}
+				else
+				{
+					c.pattern = pattern1;
+				}
+			}
+			
+			this.cases[i].resolve(markers, context);
+		}
+		
+		if (type == Type.BOOLEAN && this.caseCount >= 2)
+		{
+			this.exhaustive = true;
 		}
 		return this;
 	}
@@ -139,38 +193,10 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IType type = this.type = this.value.getType();
-		
 		this.value.checkTypes(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			ICase c = this.cases[i];
-			if (this.exhaustive)
-			{
-				markers.add(c.getPosition(), "pattern.dead");
-			}
-			
-			IPattern pattern = c.getPattern();
-			if (pattern.getPatternType() == IPattern.WILDCARD)
-			{
-				if (c.getCondition() == null)
-				{
-					this.exhaustive = true;
-				}
-			}
-			else if (!pattern.isType(this.type))
-			{
-				Marker marker = markers.create(pattern.getPosition(), "pattern.type");
-				marker.addInfo("Pattern Type: " + pattern.getType());
-				marker.addInfo("Value Type: " + this.type);
-			}
-			
 			this.cases[i].checkTypes(markers, context);
-		}
-
-		if (type == Type.BOOLEAN && this.caseCount >= 2)
-		{
-			this.exhaustive = true;
 		}
 	}
 	
@@ -198,34 +224,16 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		int varIndex = writer.localCount();
-		
-		IType type = this.value.getType();
-		this.value.writeExpression(writer);
-		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
-		
-		Label elseLabel = new Label();
-		Label endLabel = new Label();
-		for (int i = 0; i < this.caseCount;)
-		{
-			this.cases[i].writeExpression(writer, varIndex, elseLabel);
-			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
-			writer.writeFrameLabel(elseLabel);
-			
-			if (++i < this.caseCount)
-			{
-				elseLabel = new Label();
-			}
-		}
-		
-		writer.writeFrameLabel(elseLabel);
-		this.writeError(writer, type, type.getLoadOpcode(), varIndex);
-		writer.resetLocals(varIndex);
-		writer.writeFrameLabel(endLabel);
+		this.write(writer, true);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
+	{
+		this.write(writer, false);
+	}
+	
+	private void write(MethodWriter writer, boolean expr)
 	{
 		int varIndex = writer.localCount();
 		
@@ -233,11 +241,62 @@ public final class MatchExpression extends ASTNode implements IValue
 		this.value.writeExpression(writer);
 		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
 		
+		int localCount = writer.localCount();
+		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
+		Label destLabel = null;
 		for (int i = 0; i < this.caseCount;)
 		{
-			this.cases[i].writeStatement(writer, varIndex, elseLabel);
+			CaseStatement c = this.cases[i];
+			IPattern pattern = c.pattern;
+			IValue condition = c.condition;
+			IValue value = c.value;
+			
+			if (value == null)
+			{
+				if (destLabel == null)
+				{
+					destLabel = new Label();
+				}
+				
+				if (condition != null)
+				{
+					pattern.writeInvJump(writer, varIndex, elseLabel);
+					condition.writeJump(writer, destLabel);
+				}
+				else
+				{
+					pattern.writeJump(writer, varIndex, destLabel);
+				}
+				
+				writer.resetLocals(localCount);
+				++i;
+				continue;
+			}
+			
+			pattern.writeInvJump(writer, varIndex, elseLabel);
+			if (condition != null)
+			{
+				condition.writeInvJump(writer, elseLabel);
+			}
+			
+			if (destLabel != null)
+			{
+				writer.writeFrameLabel(destLabel);
+				destLabel = null;
+			}
+			
+			if (expr)
+			{
+				value.writeExpression(writer);
+			}
+			else
+			{
+				value.writeStatement(writer);
+			}
+			
+			writer.resetLocals(localCount);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 			writer.writeFrameLabel(elseLabel);
 			if (++i < this.caseCount)
@@ -248,22 +307,16 @@ public final class MatchExpression extends ASTNode implements IValue
 		
 		// MatchError
 		writer.writeFrameLabel(elseLabel);
-		this.writeError(writer, type, type.getLoadOpcode(), varIndex);
-		writer.resetLocals(varIndex);
-		writer.writeFrameLabel(endLabel);
-	}
-	
-	private void writeError(MethodWriter writer, IType type, int loadOpcode, int var)
-	{
-		if (this.exhaustive)
+		if (!this.exhaustive)
 		{
-			return;
+			writer.writeTypeInsn(Opcodes.NEW, "dyvil/lang/MatchError");
+			writer.writeInsn(Opcodes.DUP);
+			writer.writeVarInsn(type.getLoadOpcode(), varIndex);
+			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", "(" + type.getExtendedName() + ")V", 2, null);
+			writer.writeInsn(Opcodes.ATHROW);
+			writer.resetLocals(varIndex);
 		}
-		writer.writeTypeInsn(Opcodes.NEW, "dyvil/lang/MatchError");
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeVarInsn(loadOpcode, var);
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", "(" + type.getExtendedName() + ")V", 2, null);
-		writer.writeInsn(Opcodes.ATHROW);
+		writer.writeFrameLabel(endLabel);
 	}
 	
 	@Override

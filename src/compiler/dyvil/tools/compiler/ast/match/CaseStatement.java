@@ -2,8 +2,6 @@ package dyvil.tools.compiler.ast.match;
 
 import java.util.List;
 
-import org.objectweb.asm.Label;
-
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -12,20 +10,22 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.pattern.IPattern;
+import dyvil.tools.compiler.ast.pattern.IPatterned;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class CaseStatement extends ASTNode implements IValue, ICase, IContext
+public final class CaseStatement extends ASTNode implements IValue, IValued, IPatterned, IContext
 {
-	private IPattern			pattern;
-	private IValue				condition;
-	private IValue				value;
+	protected IPattern			pattern;
+	protected IValue			condition;
+	protected IValue			value;
 	
 	private transient IContext	context;
 	
@@ -49,7 +49,7 @@ public final class CaseStatement extends ASTNode implements IValue, ICase, ICont
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.VOID || type == Type.NONE;
+		return type == Type.VOID;
 	}
 	
 	@Override
@@ -70,6 +70,16 @@ public final class CaseStatement extends ASTNode implements IValue, ICase, ICont
 		return this.value;
 	}
 	
+	public void setCondition(IValue condition)
+	{
+		this.condition = condition;
+	}
+	
+	public IValue getCondition()
+	{
+		return this.condition;
+	}
+	
 	@Override
 	public void setPattern(IPattern pattern)
 	{
@@ -80,18 +90,6 @@ public final class CaseStatement extends ASTNode implements IValue, ICase, ICont
 	public IPattern getPattern()
 	{
 		return this.pattern;
-	}
-	
-	@Override
-	public void setCondition(IValue condition)
-	{
-		this.condition = condition;
-	}
-	
-	@Override
-	public IValue getCondition()
-	{
-		return this.condition;
 	}
 	
 	// IContext
@@ -239,30 +237,6 @@ public final class CaseStatement extends ASTNode implements IValue, ICase, ICont
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer, int varIndex, Label elseLabel)
-	{
-		this.pattern.writeJump(writer, varIndex, elseLabel);
-		if (this.condition != null)
-		{
-			this.condition.writeInvJump(writer, elseLabel);
-		}
-		this.value.writeExpression(writer);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer, int varIndex, Label elseLabel)
-	{
-		int locals = writer.localCount();
-		this.pattern.writeJump(writer, varIndex, elseLabel);
-		if (this.condition != null)
-		{
-			this.condition.writeInvJump(writer, elseLabel);
-		}
-		this.value.writeStatement(writer);
-		writer.resetLocals(locals);
 	}
 	
 	@Override

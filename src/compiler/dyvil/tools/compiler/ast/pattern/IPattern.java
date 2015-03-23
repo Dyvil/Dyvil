@@ -26,15 +26,23 @@ public interface IPattern extends IASTNode, ITyped
 	public static int	LIST		= 18;
 	
 	public static int	BINDING		= 32;
-	
-	public static int	WILDCARD	= 64;
+	public static int	WILDCARD	= 33;
+	public static int	BOXED		= 34;
 	
 	public int getPatternType();
 	
 	@Override
+	public IType getType();
+	
+	@Override
 	public default void setType(IType type)
 	{
-	}
+	};
+	
+	public IPattern withType(IType type);
+	
+	@Override
+	public boolean isType(IType type);
 	
 	public default IField resolveField(String name)
 	{
@@ -46,7 +54,7 @@ public interface IPattern extends IASTNode, ITyped
 		return 0;
 	}
 	
-	public void writeJump(MethodWriter writer, Label elseLabel);
-	
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel);
+	
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel);
 }

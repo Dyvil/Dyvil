@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.value.BoxedValue;
+import dyvil.tools.compiler.ast.value.BoxValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -61,13 +61,13 @@ public final class PrimitiveType extends Type
 	@Override
 	public IValue box(IValue value)
 	{
-		return new BoxedValue(value, this.boxMethod);
+		return new BoxValue(value, this.boxMethod);
 	}
 	
 	@Override
 	public IValue unbox(IValue value)
 	{
-		return new BoxedValue(value, this.unboxMethod);
+		return new BoxValue(value, this.unboxMethod);
 	}
 	
 	@Override

@@ -150,7 +150,7 @@ public class ParserManager implements IParserManager
 		}
 		
 		int type = token.type();
-		if (!ParserUtil.isIdentifier(type) && (type & Tokens.KEYWORD) == 0)
+		if ((type & (Tokens.SYMBOL | Tokens.KEYWORD | Tokens.IDENTIFIER)) == 0)
 		{
 			return true;
 		}

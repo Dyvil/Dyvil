@@ -157,7 +157,7 @@ public final class UnknownType extends ASTNode implements IType
 	@Override
 	public IType getSuperType()
 	{
-		return this;
+		return null;
 	}
 	
 	@Override

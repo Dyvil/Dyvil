@@ -172,11 +172,14 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(PATTERN_END))
 		{
-			this.field.setValue(this.value);
-			pm.popParser();
-			pm.pushParser(new ExpressionParser((IValued) this.value));
 			if (type == Tokens.COLON)
 			{
+				this.field.setValue(this.value);
+				pm.popParser();
+				if (token.next().type() != Keywords.CASE)
+				{
+					pm.pushParser(new ExpressionParser((IValued) this.value));
+				}
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Pattern - ':' expected");

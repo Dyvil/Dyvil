@@ -32,21 +32,28 @@ public final class StringPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public IPattern withType(IType type)
+	{
+		return type == Type.STRING || type.isSuperTypeOf(Type.STRING) ? this : null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		return type == Type.STRING || type.isSuperTypeOf(Type.STRING);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeLDC(this.value);
+		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 2, MethodWriter.INT);
-		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
+		writer.writeJumpInsn(Opcodes.IFNE, elseLabel);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeLDC(this.value);
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);

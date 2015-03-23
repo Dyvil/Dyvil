@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.pattern;
 
 import org.objectweb.asm.Label;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
@@ -41,18 +40,27 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	}
 	
 	@Override
-	public boolean isType(IType type)
+	public IPattern withType(IType type)
 	{
 		if (this.pattern == null)
 		{
-			return true;
+			return this;
 		}
-		if (this.pattern.isType(type))
+		IPattern pattern1 = this.pattern.withType(type);
+		if (pattern1 == null)
 		{
-			this.type = type;
-			return true;
+			return null;
 		}
-		return false;
+		
+		this.pattern = pattern1;
+		this.type = type;
+		return this;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return this.pattern == null || this.pattern.isType(type);
 	}
 	
 	@Override
@@ -88,40 +96,42 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
-	{
-		if (this.variable != null)
-		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
-		}
-		
-		if (this.pattern != null)
-		{
-			this.pattern.writeJump(writer, elseLabel);
-		}
-	}
-	
-	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		if (this.variable != null)
 		{
-			this.variable.type = this.type;
-			if (writer.getLocal(varIndex) == this.type.getFrameType())
-			{
-				this.variable.index = varIndex;
-			}
-			else
-			{
-				writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
-				writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
-			}
+			this.writeVar(writer, varIndex);
 		}
-		
 		if (this.pattern != null)
 		{
 			this.pattern.writeJump(writer, varIndex, elseLabel);
+		}
+	}
+	
+	@Override
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
+	{
+		if (this.variable != null)
+		{
+			this.writeVar(writer, varIndex);
+		}
+		if (this.pattern != null)
+		{
+			this.pattern.writeInvJump(writer, varIndex, elseLabel);
+		}
+	}
+	
+	private void writeVar(MethodWriter writer, int varIndex)
+	{
+		this.variable.type = this.type;
+		if (writer.getLocal(varIndex) == this.type.getFrameType())
+		{
+			this.variable.index = varIndex;
+		}
+		else
+		{
+			writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
+			writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
 		}
 	}
 	

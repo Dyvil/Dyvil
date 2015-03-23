@@ -29,19 +29,26 @@ public final class NullPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public IPattern withType(IType type)
+	{
+		return type.isPrimitive() ? null : this;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		return !type.isPrimitive();
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
-		writer.writeJumpInsn(Opcodes.IFNONNULL, elseLabel);
+		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+		writer.writeJumpInsn(Opcodes.IFNULL, elseLabel);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 		writer.writeJumpInsn(Opcodes.IFNONNULL, elseLabel);

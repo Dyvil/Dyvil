@@ -32,20 +32,31 @@ public final class LongPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public IPattern withType(IType type)
+	{
+		if (type == Type.LONG)
+		{
+			return this;
+		}
+		return type.isSuperTypeOf(Type.LONG) ? new BoxPattern(this, Type.LONG.unboxMethod) : null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		return type == Type.LONG || type.isSuperTypeOf(Type.LONG);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
+		writer.writeVarInsn(Opcodes.LLOAD, varIndex);
 		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_LCMPNE, elseLabel);
+		writer.writeJumpInsn(Opcodes.IF_LCMPEQ, elseLabel);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.LLOAD, varIndex);
 		writer.writeLDC(this.value);

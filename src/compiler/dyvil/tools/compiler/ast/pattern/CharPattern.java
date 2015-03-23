@@ -32,6 +32,16 @@ public final class CharPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public IPattern withType(IType type)
+	{
+		if (type == Type.CHAR)
+		{
+			return this;
+		}
+		return type.isSuperTypeOf(Type.CHAR) ? new BoxPattern(this, Type.CHAR.unboxMethod) : null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		return type == Type.CHAR || type.isSuperTypeOf(Type.CHAR);
@@ -44,14 +54,15 @@ public final class CharPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
+		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
 		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+		writer.writeJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
 		writer.writeLDC(this.value);

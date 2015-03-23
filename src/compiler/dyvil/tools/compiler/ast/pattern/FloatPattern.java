@@ -32,20 +32,31 @@ public final class FloatPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public IPattern withType(IType type)
+	{
+		if (type == Type.FLOAT)
+		{
+			return this;
+		}
+		return type.isSuperTypeOf(Type.FLOAT) ? new BoxPattern(this, Type.FLOAT.unboxMethod) : null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		return type == Type.FLOAT || type.isSuperTypeOf(Type.FLOAT);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
+		writer.writeVarInsn(Opcodes.FLOAD, varIndex);
 		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
+		writer.writeJumpInsn(Opcodes.IF_FCMPEQ, elseLabel);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.FLOAD, varIndex);
 		writer.writeLDC(this.value);

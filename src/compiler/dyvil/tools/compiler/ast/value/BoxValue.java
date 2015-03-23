@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.value;
 
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -8,12 +7,12 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class BoxedValue extends ASTNode implements IValue
+public final class BoxValue implements IValue
 {
 	public IValue	boxed;
 	public IMethod	boxingMethod;
 	
-	public BoxedValue(IValue boxed, IMethod boxingMethod)
+	public BoxValue(IValue boxed, IMethod boxingMethod)
 	{
 		this.boxed = boxed;
 		this.boxingMethod = boxingMethod;

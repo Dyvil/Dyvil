@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.BoxedValue;
+import dyvil.tools.compiler.ast.value.BoxValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -47,7 +47,7 @@ public final class BooleanNot extends ASTNode implements IValue
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Type.BOOLEAN) ? new BoxedValue(this, Type.BOOLEAN.boxMethod) : null;
+		return type.isSuperTypeOf(Type.BOOLEAN) ? new BoxValue(this, Type.BOOLEAN.boxMethod) : null;
 	}
 	
 	@Override

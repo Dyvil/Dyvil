@@ -254,8 +254,6 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.arguments.resolve(markers, context);
-		
 		if (this.arguments.size() == 1 && "match".equals(this.name))
 		{
 			MatchExpression me = Operators.getMatchExpression(this.instance, this.arguments.getFirstValue());
@@ -265,6 +263,8 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 				return me.resolve(markers, context);
 			}
 		}
+		
+		this.arguments.resolve(markers, context);
 		
 		IValue op = this.resolveOperator(markers, this.instance == null ? null : this.instance.getType());
 		if (op != null)

@@ -2,12 +2,10 @@ package dyvil.tools.compiler.ast.pattern;
 
 import org.objectweb.asm.Label;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TupleType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -44,6 +42,17 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			t.addType(this.patterns[i].getType());
 		}
 		return this.tupleType = t;
+	}
+	
+	@Override
+	public IPattern withType(IType type)
+	{
+		if (TupleType.isSuperType(type, this.patterns, this.patternCount))
+		{
+			this.getType();
+			return this;
+		}
+		return null;
 	}
 	
 	@Override
@@ -103,24 +112,16 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 		return null;
 	}
 	
-	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
-	{
-		// TODO Nested Tuple Patterns
-	}
+	// TODO Re-implement Tuple Pattern Compilation
 	
 	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
-		String owner = "dyvil/lang/tuple/Tuple" + this.patternCount;
-		
-		for (int i = 0; i < this.patternCount; i++)
-		{
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeGetField(owner, "_" + (i + 1), "Ljava/lang/Object;", Type.OBJECT);
-			writer.writeTypeInsn(Opcodes.CHECKCAST, this.tupleType.getType(i));
-			this.patterns[i].writeJump(writer, elseLabel);
-		}
+	}
+	
+	@Override
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
+	{
 	}
 	
 	@Override

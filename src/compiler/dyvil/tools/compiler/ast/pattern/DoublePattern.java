@@ -32,20 +32,31 @@ public final class DoublePattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public IPattern withType(IType type)
+	{
+		if (type == Type.DOUBLE)
+		{
+			return this;
+		}
+		return type.isSuperTypeOf(Type.DOUBLE) ? new BoxPattern(this, Type.DOUBLE.unboxMethod) : null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		return type == Type.DOUBLE || type.isSuperTypeOf(Type.DOUBLE);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
+		writer.writeVarInsn(Opcodes.DLOAD, varIndex);
 		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
+		writer.writeJumpInsn(Opcodes.IF_DCMPEQ, elseLabel);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.DLOAD, varIndex);
 		writer.writeLDC(this.value);

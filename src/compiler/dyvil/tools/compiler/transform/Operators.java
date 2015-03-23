@@ -3,7 +3,6 @@ package dyvil.tools.compiler.transform;
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.match.CaseStatement;
-import dyvil.tools.compiler.ast.match.ICase;
 import dyvil.tools.compiler.ast.match.MatchExpression;
 import dyvil.tools.compiler.ast.operator.*;
 import dyvil.tools.compiler.ast.type.Type;
@@ -128,7 +127,7 @@ public class Operators
 		{
 			IValueList list = (IValueList) arg2;
 			int len = list.valueCount();
-			ICase[] cases = new ICase[len];
+			CaseStatement[] cases = new CaseStatement[len];
 			for (int i = 0; i < len; i++)
 			{
 				IValue v = list.getValue(i);
@@ -145,7 +144,7 @@ public class Operators
 		}
 		if (arg2.getValueType() == IValue.CASE_STATEMENT)
 		{
-			return new MatchExpression(arg1, new ICase[] { (ICase) arg2 });
+			return new MatchExpression(arg1, new CaseStatement[] { (CaseStatement) arg2 });
 		}
 		return null;
 	}

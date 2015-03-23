@@ -38,20 +38,31 @@ public final class IntPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public IPattern withType(IType type)
+	{
+		if (type == Type.INT)
+		{
+			return this;
+		}
+		return type.isSuperTypeOf(Type.INT) ? new BoxPattern(this, Type.INT.unboxMethod) : null;
+	}
+	
+	@Override
 	public int intValue()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
+		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
 		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+		writer.writeJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
 		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
 		writer.writeLDC(this.value);

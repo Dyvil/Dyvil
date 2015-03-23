@@ -6,12 +6,12 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.BoxedValue;
+import dyvil.tools.compiler.ast.value.BoxValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class BooleanValue extends ASTNode implements IConstantValue
+public final class BooleanValue extends ASTNode implements IConstantValue
 {
 	public static final BooleanValue	TRUE	= new BooleanValue(true);
 	public static final BooleanValue	FALSE	= new BooleanValue(false);
@@ -54,7 +54,7 @@ public class BooleanValue extends ASTNode implements IConstantValue
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Type.BOOLEAN) ? new BoxedValue(this, Type.BOOLEAN.boxMethod) : null;
+		return type.isSuperTypeOf(Type.BOOLEAN) ? new BoxValue(this, Type.BOOLEAN.boxMethod) : null;
 	}
 	
 	@Override
