@@ -980,7 +980,7 @@ public class Method extends Member implements IMethod
 		{
 			mw.begin();
 			mw.writeLabel(start);
-			this.value.writeStatement(mw);
+			this.value.writeExpression(mw);
 			mw.writeLabel(end);
 			mw.end(this.isConstructor ? Type.VOID : this.type);
 		}
@@ -1045,7 +1045,7 @@ public class Method extends Member implements IMethod
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
-		writer.writeJumpInsn(IFNE, dest);
+		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
 	@Override
@@ -1063,7 +1063,7 @@ public class Method extends Member implements IMethod
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
-		writer.writeJumpInsn(IFEQ, dest);
+		writer.writeJumpInsn(IFNE, dest);
 	}
 	
 	private int writeArguments(MethodWriter writer, IArguments arguments)

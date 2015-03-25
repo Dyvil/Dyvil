@@ -17,14 +17,24 @@ public final class Predef
 	
 	// Object Operators
 	
+	public static @infix @inline boolean $eq$eq(Object o1, Object o2)
+	{
+		return o1 == o2 || o1 != null && o1.equals(o2);
+	}
+	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPEQ })
-	public static @inline boolean $eq$eq(Object o1, Object o2)
+	public static @infix @inline boolean $eq$eq$eq(Object o1, Object o2)
 	{
 		return o1 == o2;
 	}
 	
+	public static @infix @inline boolean $bang$eq(Object o1, Object o2)
+	{
+		return o1 != o2 && (o1 == null || !o1.equals(o2));
+	}
+	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPNE })
-	public static @inline boolean $bang$eq(Object o1, Object o2)
+	public static @infix @inline boolean $bang$eq$eq(Object o1, Object o2)
 	{
 		return o1 != o2;
 	}
@@ -201,40 +211,6 @@ public final class Predef
 		return new Tuple2(b, a);
 	}
 	
-	// Casts
-	
-	/**
-	 * Returns true if the given {@code T t} is an instance of the given
-	 * {@link Class} {@code c}.
-	 * 
-	 * @dyvil <:
-	 * @param t
-	 *            the object
-	 * @param c
-	 *            the class
-	 * @return true, if t is an instance of c
-	 */
-	public static @infix <T> boolean $less$colon(T t, Class<?> c)
-	{
-		return t == null ? false : c.isInstance(t);
-	}
-	
-	/**
-	 * Casts the given {@code T t} to the given {@link Class} {@code c} of type
-	 * {@code U}.
-	 * 
-	 * @dyvil :>
-	 * @param t
-	 *            the object
-	 * @param c
-	 *            the class
-	 * @return t as an instance of c
-	 */
-	public static @infix <T, U> U $colon$greater(T t, Class<U> c)
-	{
-		return t == null ? (U) null : c.cast(t);
-	}
-	
 	// Miscellaneous
 	
 	public static @inline List<?> List()
@@ -377,8 +353,8 @@ public final class Predef
 		throw new UnsupportedOperationException();
 	}
 	
-	@Intrinsic({ NOP })
-	public static void $dot$dot$dot()
+	@Intrinsic({})
+	public static @inline void $dot$dot$dot()
 	{
 	}
 }

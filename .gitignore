@@ -9,3 +9,5 @@ dbin/
 src/test/dyvil/test/JavaTest.java
 
 src/test/dyvil/test/*
+
+config.txt

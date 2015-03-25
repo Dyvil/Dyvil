@@ -165,6 +165,7 @@ public final class Bytecode extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		this.writeStatement(writer);
 	}
 	
 	@Override

@@ -25,11 +25,13 @@ public class MethodInstruction implements IInstruction
 		this.desc = desc;
 		this.isInterface = isInterface;
 		
-		if (opcode != Opcodes.INVOKESTATIC)
+		int args = org.objectweb.asm.Type.getArgumentsAndReturnSizes(desc) >> 2;
+		if (opcode == Opcodes.INVOKESTATIC)
 		{
-			this.args++;
+			args--;
 		}
-		this.args = org.objectweb.asm.Type.getArgumentsAndReturnSizes(desc);
+		
+		this.args = args;
 		this.type = ClassFormat.internalToType(desc.substring(desc.lastIndexOf(')') + 1));
 	}
 	

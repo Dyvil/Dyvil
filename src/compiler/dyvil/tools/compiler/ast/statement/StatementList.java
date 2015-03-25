@@ -423,7 +423,10 @@ public final class StatementList extends ValueList implements IStatement, IConte
 			this.values[len].writeExpression(writer);
 		}
 		
-		writer.resetLocals(count);
+		if (!(this.context instanceof IMethod))
+		{
+			writer.resetLocals(count);
+		}
 		writer.writeLabel(end);
 		
 		for (Entry<String, Variable> entry : this.variables.entrySet())

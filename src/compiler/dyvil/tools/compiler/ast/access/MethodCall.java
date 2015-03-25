@@ -40,6 +40,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	public int			genericCount;
 	
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
+	private boolean		argumentsResolved;
 	
 	public boolean		dotless;
 	
@@ -265,6 +266,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		}
 		
 		this.arguments.resolve(markers, context);
+		this.argumentsResolved = true;
 		
 		IValue op = this.resolveOperator(markers, this.instance == null ? null : this.instance.getType());
 		if (op != null)
@@ -404,6 +406,12 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	@Override
 	public boolean resolve(IContext context, MarkerList markers)
 	{
+		if (!this.argumentsResolved)
+		{
+			this.arguments.resolve(markers, context);
+			this.argumentsResolved = true;
+		}
+		
 		IValue op = this.resolveOperator(markers, context);
 		if (op != null)
 		{
