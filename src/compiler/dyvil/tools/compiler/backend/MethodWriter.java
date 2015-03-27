@@ -49,6 +49,8 @@ public interface MethodWriter
 	
 	// Stack
 	
+	public int stackCount();
+	
 	public void set(Object type);
 	
 	public void set(IType type);
@@ -148,6 +150,12 @@ public interface MethodWriter
 	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs);
 	
 	public void writeInvokeDynamic(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs);
+	
+	// Inlining
+	
+	public void startInline(int varOffset, int stackOffset, Label end);
+	
+	public void endInline(int varOffset, int stackOffset, Label end);
 	
 	// Blocks
 	

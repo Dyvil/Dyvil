@@ -29,6 +29,12 @@ public final class MethodWriterImpl implements MethodWriter
 	private int					maxStack;
 	private Object[]			stack			= new Object[3];
 	
+	// Inlining
+	
+	private int					varOffset;
+	private int					stackOffset;
+	private Label				inlineEnd;
+	
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
 	{
 		this.cw = cw;
@@ -91,6 +97,12 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.stackCount = count;
 		}
+	}
+	
+	@Override
+	public int stackCount()
+	{
+		return this.stackCount;
 	}
 	
 	@Override
@@ -305,6 +317,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(int value)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -335,18 +348,15 @@ public final class MethodWriterImpl implements MethodWriter
 			this.mv.visitInsn(ICONST_5);
 			return;
 		}
-		if (value > 0)
+		if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE)
 		{
-			if (value <= Byte.MAX_VALUE)
-			{
-				this.mv.visitIntInsn(Opcodes.BIPUSH, value);
-				return;
-			}
-			if (value <= Short.MAX_VALUE)
-			{
-				this.mv.visitIntInsn(Opcodes.SIPUSH, value);
-				return;
-			}
+			this.mv.visitIntInsn(Opcodes.BIPUSH, value);
+			return;
+		}
+		if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE)
+		{
+			this.mv.visitIntInsn(Opcodes.SIPUSH, value);
+			return;
 		}
 		this.mv.visitLdcInsn(Integer.valueOf(value));
 	}
@@ -354,6 +364,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(long value)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -376,6 +387,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(float value)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -403,6 +415,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(double value)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -425,6 +438,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(String value)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -437,6 +451,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(Type type)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -475,6 +490,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInsn(int opcode)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -491,10 +507,18 @@ public final class MethodWriterImpl implements MethodWriter
 			this.pop();
 			this.pop();
 		}
-		else if (opcode >= IRETURN && opcode <= ARETURN)
+		else if (opcode >= IRETURN && opcode <= RETURN)
 		{
-			this.clear();
 			this.hasReturn = true;
+			if (this.inlineEnd != null)
+			{
+				this.stackIndex = this.stackOffset;
+				this.stackCount = this.stackOffset;
+				this.mv.visitJumpInsn(GOTO, this.inlineEnd);
+				this.visitFrame = true;
+				return;
+			}
+			this.clear();
 		}
 		else
 		{
@@ -597,10 +621,6 @@ public final class MethodWriterImpl implements MethodWriter
 			return;
 		case ARRAYLENGTH:
 			this.set(INT);
-			return;
-		case RETURN:
-			this.clear();
-			this.hasReturn = true;
 			return;
 		case ATHROW:
 			this.clear();
@@ -812,6 +832,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeJumpInsn(int opcode, Label label)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -934,6 +955,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeTypeInsn(int opcode, String type)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -957,6 +979,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeTypeInsn(int opcode, IType type)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -985,6 +1008,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeNewArray(String type, int dims)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -997,6 +1021,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeNewArray(IType type, int dims)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1009,6 +1034,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeIINC(int var, int value)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1020,10 +1046,13 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeVarInsn(int opcode, int index)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
 		}
+		
+		index += this.varOffset;
 		
 		if (opcode >= ILOAD && opcode <= ALOAD)
 		{
@@ -1041,6 +1070,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeGetStatic(String owner, String name, String desc, IType type)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1056,6 +1086,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writePutStatic(String owner, String name, String desc)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1068,6 +1099,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeGetField(String owner, String name, String desc, IType type)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1081,6 +1113,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writePutField(String owner, String name, String desc)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1094,6 +1127,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, Object returnType)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1109,6 +1143,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, IType returnType)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1125,6 +1160,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, Object returnType)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1141,6 +1177,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, IType returnType)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1157,6 +1194,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1173,6 +1211,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInvokeDynamic(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs)
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.writeFrame();
@@ -1184,6 +1223,23 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.push(returnType);
 		}
+	}
+	
+	@Override
+	public void startInline(int varOffset, int stackOffset, Label end)
+	{
+		this.varOffset += varOffset;
+		this.stackOffset += stackOffset;
+		this.inlineEnd = end;
+	}
+	
+	@Override
+	public void endInline(int varOffset, int stackOffset, Label end)
+	{
+		this.varOffset -= varOffset;
+		this.stackOffset -= stackOffset;
+		this.mv.visitLabel(end);
+		this.visitFrame = true;
 	}
 	
 	@Override

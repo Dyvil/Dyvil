@@ -23,8 +23,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
+import dyvil.tools.compiler.backend.visitor.BytecodeVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
-import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.transform.Symbols;
 
@@ -427,7 +427,7 @@ public class BytecodeClass extends CodeClass
 			this.body.addMethod(method);
 		}
 		
-		return new SimpleMethodVisitor(method);
+		return new BytecodeVisitor(method);
 	}
 	
 	public void visitOuterClass(String owner, String name, String desc)

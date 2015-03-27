@@ -1027,6 +1027,12 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
+		if (false && (this.modifiers & Modifiers.INLINE) != 0)
+		{
+			this.writeInline(writer, instance, arguments);
+			return;
+		}
+		
 		this.writeInvoke(writer, instance, arguments);
 	}
 	
@@ -1227,6 +1233,87 @@ public class Method extends Member implements IMethod
 		String desc = this.getDescriptor();
 		IType type = this.type;
 		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);
+	}
+	
+	private void writeInline(MethodWriter writer, IValue instance, IArguments arguments)
+	{
+		int varOffset = writer.localCount();
+		int stackOffset = writer.stackCount();
+		Label inlineEnd = new Label();
+		
+		writer.startInline(varOffset, stackOffset, inlineEnd);
+		
+		if (instance != null)
+		{
+			instance.writeExpression(writer);
+			writer.writeVarInsn(instance.getType().getStoreOpcode(), 0);
+		}
+		
+		this.writeInlineArguments(writer, arguments);
+		
+		this.value.writeExpression(writer);
+		
+		writer.endInline(varOffset, stackOffset, inlineEnd);
+	}
+	
+	private void writeInlineArguments(MethodWriter writer, IArguments arguments)
+	{
+		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		{
+			int len = this.parameterCount;
+			if ((this.modifiers & Modifiers.VARARGS) != 0)
+			{
+				len--;
+				Parameter param;
+				for (int i = 1, j = 0; i < len; i++, j++)
+				{
+					param = this.parameters[i];
+					arguments.writeValue(j, param.qualifiedName, param.defaultValue, writer);
+					writer.writeVarInsn(param.type.getStoreOpcode(), i);
+				}
+				param = this.parameters[len];
+				arguments.writeVarargsValue(len - 1, param.qualifiedName, param.type, writer);
+				writer.writeVarInsn(param.type.getStoreOpcode(), len);
+				return;
+			}
+			
+			for (int i = 1, j = 0; i < this.parameterCount; i++, j++)
+			{
+				Parameter param = this.parameters[i];
+				arguments.writeValue(j, param.qualifiedName, param.defaultValue, writer);
+				writer.writeVarInsn(param.type.getStoreOpcode(), i);
+			}
+			return;
+		}
+		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		{
+			arguments.writeValue(0, "this", null, writer);
+			writer.writeVarInsn(this.getThisType().getStoreOpcode(), 0);
+			return;
+		}
+		
+		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		{
+			int len = this.parameterCount - 1;
+			Parameter param;
+			for (int i = 0; i < len; i++)
+			{
+				param = this.parameters[i];
+				arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
+				writer.writeVarInsn(param.type.getStoreOpcode(), len);
+			}
+			param = this.parameters[len];
+			arguments.writeVarargsValue(len, param.qualifiedName, param.type, writer);
+			writer.writeVarInsn(param.type.getStoreOpcode(), len);
+			return;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			Parameter param = this.parameters[i];
+			arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
+			writer.writeVarInsn(param.type.getStoreOpcode(), i);
+		}
 	}
 	
 	@Override
