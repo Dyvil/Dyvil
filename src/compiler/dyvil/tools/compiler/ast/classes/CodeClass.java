@@ -486,9 +486,9 @@ public class CodeClass extends ASTNode implements IClass
 	public void addInterface(IType type)
 	{
 		int index = this.interfaceCount++;
-		if (index > this.interfaces.length)
+		if (index >= this.interfaces.length)
 		{
-			IType[] temp = new IType[this.interfaces.length + 1];
+			IType[] temp = new IType[this.interfaceCount];
 			System.arraycopy(this.interfaces, 0, temp, 0, this.interfaces.length);
 			this.interfaces = temp;
 		}
@@ -561,7 +561,7 @@ public class CodeClass extends ASTNode implements IClass
 			return this.constructor;
 		}
 		
-		Method constructor = new Method(this, "new", Type.VOID);
+		Method constructor = new Method(this, "new", this.type);
 		constructor.modifiers = Modifiers.PUBLIC | Modifiers.SYNTHETIC;
 		return this.constructor = constructor;
 	}
@@ -804,6 +804,10 @@ public class CodeClass extends ASTNode implements IClass
 			return clazz;
 		}
 		
+		if (this.outerClass != null)
+		{
+			return this.outerClass.resolveClass(name);
+		}
 		return this.unit.resolveClass(name);
 	}
 	

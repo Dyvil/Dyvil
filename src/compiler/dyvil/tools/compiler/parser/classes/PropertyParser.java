@@ -42,7 +42,7 @@ public class PropertyParser extends Parser implements IValued
 		}
 		if (type == Symbols.CLOSE_CURLY_BRACKET)
 		{
-			pm.popParser(true);
+			pm.popParser();
 			return;
 		}
 		

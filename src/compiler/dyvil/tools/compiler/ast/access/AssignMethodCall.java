@@ -323,7 +323,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			}
 			
 			f.writeGet(writer, null);
-			this.method.writeCall(writer, null, this.arguments);
+			this.method.writeCall(writer, null, this.arguments, null);
 			writer.writeInsn(Opcodes.DUP);
 			f.writeSet(writer, null, null);
 		}
@@ -340,10 +340,10 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			
 			writer.writeInsn(Opcodes.DUP2);
 			
-			call.method.writeCall(writer, null, EmptyArguments.INSTANCE);
-			this.method.writeCall(writer, null, this.arguments);
+			call.method.writeCall(writer, null, EmptyArguments.INSTANCE, null);
+			this.method.writeCall(writer, null, this.arguments, null);
 			writer.writeInsn(Opcodes.DUP_X2);
-			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE);
+			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null);
 		}
 	}
 	
@@ -369,7 +369,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			}
 			
 			f.writeGet(writer, null);
-			this.method.writeCall(writer, null, this.arguments);
+			this.method.writeCall(writer, null, this.arguments, null);
 			f.writeSet(writer, null, null);
 		}
 		else if (i == APPLY_METHOD_CALL)
@@ -385,9 +385,9 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			
 			writer.writeInsn(Opcodes.DUP2);
 			
-			call.method.writeCall(writer, null, EmptyArguments.INSTANCE);
-			this.method.writeCall(writer, null, this.arguments);
-			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE);
+			call.method.writeCall(writer, null, EmptyArguments.INSTANCE, null);
+			this.method.writeCall(writer, null, this.arguments, null);
+			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null);
 		}
 	}
 	

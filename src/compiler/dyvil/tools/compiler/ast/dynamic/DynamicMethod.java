@@ -414,7 +414,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type)
 	{
 		int len = arguments.size();
 		StringBuilder desc = new StringBuilder();

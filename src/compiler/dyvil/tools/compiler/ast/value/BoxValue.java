@@ -9,13 +9,13 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class BoxValue implements IValue
 {
-	public IValue	boxed;
-	public IMethod	boxingMethod;
+	private IValue	boxed;
+	private IMethod	method;
 	
 	public BoxValue(IValue boxed, IMethod boxingMethod)
 	{
 		this.boxed = boxed;
-		this.boxingMethod = boxingMethod;
+		this.method = boxingMethod;
 	}
 	
 	@Override
@@ -33,25 +33,25 @@ public final class BoxValue implements IValue
 	@Override
 	public IType getType()
 	{
-		return this.boxed.getType();
+		return this.method.getType();
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
-		return this.boxed.withType(type);
+		return this;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.boxed.isType(type);
+		return type.isSuperTypeOf(this.method.getType());
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		return this.boxed.getTypeMatch(type);
+		return type.isSuperTypeOf(this.method.getType()) ? 3 : 0;
 	}
 	
 	@Override
@@ -76,7 +76,7 @@ public final class BoxValue implements IValue
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.boxed.checkTypes(markers, context);
+		this.boxed.check(markers, context);
 	}
 	
 	@Override
@@ -89,7 +89,7 @@ public final class BoxValue implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		this.boxingMethod.writeCall(writer, this.boxed, EmptyArguments.INSTANCE);
+		this.method.writeCall(writer, this.boxed, EmptyArguments.INSTANCE, null);
 	}
 	
 	@Override

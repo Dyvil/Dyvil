@@ -36,7 +36,6 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 {
 	public static final int	TYPE			= 1;
 	public static final int	NAME			= 2;
-	public static final int	PROPERTY_END	= 8;
 	public static final int	GENERICS_END	= 16;
 	public static final int	PARAMETERS		= 32;
 	public static final int	PARAMETERS_END	= 64;
@@ -78,14 +77,12 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	{
 		int type = token.type();
 		
-		if (this.isInMode(BODY_END))
+		if (type == Symbols.CLOSE_CURLY_BRACKET)
 		{
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
-			{
-				pm.popParser(true);
-				return;
-			}
+			pm.popParser(true);
+			return;
 		}
+		
 		String value = token.text();
 		if (this.isInMode(TYPE))
 		{
@@ -115,11 +112,12 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				CodeClass codeClass = new CodeClass(null, this.theClass.getUnit(), this.modifiers);
 				codeClass.setAnnotations(this.getAnnotations(), this.annotationCount);
 				codeClass.setOuterClass(this.theClass);
+				codeClass.setModifiers(this.modifiers);
 				this.theClass.getBody().addClass(codeClass);
 				
 				ClassDeclParser parser = new ClassDeclParser(codeClass);
-				pm.pushParser(parser);
-				this.modifiers = 0;
+				pm.pushParser(parser, true);
+				this.reset();
 				return;
 			}
 			if (value.charAt(0) == '@')
@@ -170,7 +168,6 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 			}
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
-				this.mode = PROPERTY_END;
 				Property p = new Property(this.theClass, value, this.type);
 				p.position = token.raw();
 				p.modifiers = this.modifiers;
@@ -179,6 +176,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				
 				pm.skip();
 				pm.pushParser(new PropertyParser(this.theClass, p));
+				this.reset();
 				return;
 			}
 			if (type == Tokens.EQUALS)
@@ -209,15 +207,6 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				return;
 			}
 			return;
-		}
-		if (this.isInMode(PROPERTY_END))
-		{
-			this.reset();
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
-			{
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Property Declaration - '}' expected", true);
 		}
 		if (this.isInMode(GENERICS_END))
 		{

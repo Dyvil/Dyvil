@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -258,35 +257,7 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 			return;
 		}
 		
-		writer.writeTypeInsn(Opcodes.NEW, this.type);
-		writer.writeInsn(Opcodes.DUP);
-		
-		int args = this.method.parameterCount();
-		if (this.method.isVarargs())
-		{
-			int len = args - 1;
-			Parameter param;
-			for (int i = 0; i < len; i++)
-			{
-				param = this.method.getParameter(i);
-				this.arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
-			}
-			param = this.method.getParameter(len);
-			this.arguments.writeVarargsValue(len, param.qualifiedName, param.type, writer);
-		}
-		else
-		{
-			for (int i = 0; i < args; i++)
-			{
-				Parameter param = this.method.getParameter(i);
-				this.arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
-			}
-		}
-		
-		String owner = this.type.getInternalName();
-		String name = "<init>";
-		String desc = this.method.getDescriptor();
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false, 1 + args, (String) null);
+		this.method.writeCall(writer, null, arguments, null);
 	}
 	
 	@Override

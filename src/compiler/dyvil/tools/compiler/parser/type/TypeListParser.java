@@ -7,13 +7,13 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.util.Tokens;
 
 public final class TypeListParser extends Parser implements ITyped
 {
 	protected ITypeList	typeList;
-	
-	private IType		type;
 	
 	public TypeListParser(ITypeList typeList)
 	{
@@ -24,13 +24,23 @@ public final class TypeListParser extends Parser implements ITyped
 	public void reset()
 	{
 		this.mode = 0;
-		this.type = null;
 	}
 	
 	@Override
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
+		if (type == Symbols.OPEN_CURLY_BRACKET)
+		{
+			pm.popParser(true);
+			return;
+		}
+		if (type == Tokens.SEMICOLON && token.isInferred())
+		{
+			pm.popParser(true);
+			return;
+		}
+		
 		if (this.mode == 0)
 		{
 			this.mode = 1;
@@ -41,14 +51,12 @@ public final class TypeListParser extends Parser implements ITyped
 		{
 			if (ParserUtil.isCloseBracket(type))
 			{
-				this.typeList.addType(this.type);
 				pm.popParser(true);
 				return;
 			}
 			this.mode = 0;
 			if (ParserUtil.isSeperator(type))
 			{
-				this.typeList.addType(this.type);
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Type List - ',' expected");
@@ -58,12 +66,12 @@ public final class TypeListParser extends Parser implements ITyped
 	@Override
 	public void setType(IType type)
 	{
-		this.type = type;
+		this.typeList.addType(type);
 	}
 	
 	@Override
 	public IType getType()
 	{
-		return this.type;
+		return null;
 	}
 }

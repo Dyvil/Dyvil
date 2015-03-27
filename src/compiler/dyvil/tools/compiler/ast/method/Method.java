@@ -707,7 +707,7 @@ public class Method extends Member implements IMethod
 				else
 				{
 					IType type = this.overrideMethod.getType();
-					if (type.isSuperTypeOf(this.type))
+					if (!type.isSuperTypeOf(this.type))
 					{
 						Marker marker = markers.create(this.position, "method.override.type", this.name);
 						marker.addInfo("Return Type: " + this.type);
@@ -998,8 +998,25 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type)
 	{
+		if (this.isConstructor)
+		{
+			writer.writeTypeInsn(Opcodes.NEW, this.type);
+			if (type != Type.VOID)
+			{
+				writer.writeInsn(Opcodes.DUP);
+			}
+			
+			int args = 1 + this.writeArguments(writer, arguments);
+			
+			String owner = this.type.getInternalName();
+			String name = "<init>";
+			String desc = this.getDescriptor();
+			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false, args, (String) null);
+			return;
+		}
+		
 		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
 		{
 			instance = null;
@@ -1028,6 +1045,23 @@ public class Method extends Member implements IMethod
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
+		
+		if (type == Type.VOID)
+		{
+			if (this.type != Type.VOID)
+			{
+				writer.writeInsn(Opcodes.POP);
+			}
+			return;
+		}
+		
+		if (type != null)
+		{
+			if (type != this.type && !type.isSuperTypeOf(this.type))
+			{
+				writer.writeTypeInsn(Opcodes.CHECKCAST, this.type);
+			}
+		}
 	}
 	
 	@Override

@@ -91,5 +91,6 @@ public final class ClassParameterSetter implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		this.writeStatement(writer);
 	}
 }

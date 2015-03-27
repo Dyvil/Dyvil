@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.access;
 import org.objectweb.asm.Label;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -230,18 +229,13 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		this.method.writeCall(writer, this.instance, this.arguments);
+		this.method.writeCall(writer, this.instance, this.arguments, this.type);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.method.writeCall(writer, this.instance, this.arguments);
-		
-		if (this.method.getType() != Type.VOID)
-		{
-			writer.writeInsn(Opcodes.POP);
-		}
+		this.method.writeCall(writer, this.instance, this.arguments, Type.VOID);
 	}
 	
 	@Override

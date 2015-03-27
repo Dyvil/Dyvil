@@ -50,7 +50,7 @@ public interface IMethod extends IASTNode, IMember, IBaseMethod, IValued, IConte
 	
 	public String[] getExceptions();
 	
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments);
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type);
 	
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments);
 	

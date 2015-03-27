@@ -68,14 +68,17 @@ public class CaseClasses
 			writeEquals(writer, theClass.getParameter(i));
 		}
 		
-		len = body.fieldCount();
-		for (int i = 0; i < len; i++)
+		if (body != null)
 		{
-			IField f = body.getField(i);
-			
-			if (!f.hasModifier(Modifiers.STATIC))
+			len = body.fieldCount();
+			for (int i = 0; i < len; i++)
 			{
-				writeEquals(writer, f);
+				IField f = body.getField(i);
+				
+				if (!f.hasModifier(Modifiers.STATIC))
+				{
+					writeEquals(writer, f);
+				}
 			}
 		}
 		
@@ -163,19 +166,20 @@ public class CaseClasses
 			writer.writeInsn(IMUL);
 		}
 		
-		len = body.fieldCount();
-		for (int i = 0; i < len; i++)
+		if (body != null)
 		{
-			IField f = body.getField(i);
-			
-			if (!f.hasModifier(Modifiers.STATIC))
+			len = body.fieldCount();
+			for (int i = 0; i < len; i++)
 			{
-				// Write the hashing strategy for the field
+				IField f = body.getField(i);
+				
+				if (f.hasModifier(Modifiers.STATIC))
+				{
+					continue;
+				}
 				writeHashCode(writer, f);
-				// Add the hash to the previous result
 				writer.writeInsn(IADD);
 				writer.writeLDC(31);
-				// Multiply the result by 31
 				writer.writeInsn(IMUL);
 			}
 		}
@@ -275,7 +279,7 @@ public class CaseClasses
 		
 		// ----- Fields -----
 		int params = theClass.parameterCount();
-		int fields = body.fieldCount();
+		int fields = body == null ? 0 : body.fieldCount();
 		for (int i = 0; i < params; i++)
 		{
 			writeToString(writer, theClass.getParameter(i));
