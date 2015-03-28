@@ -492,8 +492,6 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	@Override
 	public void write(ClassWriter writer)
 	{
-		// TODO Exceptions
-		
 		boolean instance = this.thisType != null;
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.getName(), this.getLambdaDescriptor(), null, null));

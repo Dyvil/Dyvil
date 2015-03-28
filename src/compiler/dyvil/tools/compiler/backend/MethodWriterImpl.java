@@ -1184,6 +1184,20 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
+	public void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers)
+	{
+		this.pop();
+		this.mv.visitTableSwitchInsn(start, end, defaultHandler, handlers);
+	}
+	
+	@Override
+	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers)
+	{
+		this.pop();
+		this.mv.visitLookupSwitchInsn(defaultHandler, keys, handlers);
+	}
+	
+	@Override
 	public void writeFinallyBlock(Label start, Label end, Label handler)
 	{
 		this.mv.visitTryCatchBlock(start, end, handler, null);

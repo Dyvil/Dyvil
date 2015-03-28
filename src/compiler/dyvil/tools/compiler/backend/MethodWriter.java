@@ -149,6 +149,12 @@ public interface MethodWriter
 	
 	public void writeInvokeDynamic(String name, String desc, int args, IType returnType, Handle bsm, Object... bsmArgs);
 	
+	// Switch Instructions
+	
+	public void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers);
+	
+	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers);
+	
 	// Blocks
 	
 	public void writeFinallyBlock(Label start, Label end, Label handler);

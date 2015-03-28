@@ -389,6 +389,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		if (this.instance != null)
 		{
 			this.instance.toString(prefix, buffer);
+			buffer.append(' ');
 		}
 		
 		if (Formatting.Method.convertQualifiedNames)

@@ -28,7 +28,13 @@ public class TableSwitchInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		// TODO
+		int len = this.handlers.length;
+		org.objectweb.asm.Label[] labels = new org.objectweb.asm.Label[len];
+		for (int i = 0; i < len; i++)
+		{
+			labels[i] = this.handlers[i].target;
+		}
+		writer.writeTableSwitch(this.defaultHandler.target, this.start, this.end, labels);
 	}
 	
 	@Override
