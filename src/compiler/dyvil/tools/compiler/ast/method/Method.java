@@ -86,15 +86,15 @@ public class Method extends Member implements IMethod
 	@Override
 	public void setName(String name)
 	{
-			this.name = name;
-			this.qualifiedName = Symbols.qualify(name);
+		this.name = name;
+		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override
 	public void setQualifiedName(String name)
 	{
 		this.name = Symbols.unqualify(name);
-			this.qualifiedName = name;
+		this.qualifiedName = name;
 	}
 	
 	@Override
@@ -448,17 +448,17 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
-				IValue value1 = this.value.withType(this.type);
-				if (value1 == null)
-				{
-					Marker marker = markers.create(this.position, "method.type", this.name);
-					marker.addInfo("Return Type: " + this.type);
-					marker.addInfo("Value Type: " + this.value.getType());
-				}
-				else
-				{
-					this.value = value1;
-				}
+			IValue value1 = this.value.withType(this.type);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(this.position, "method.type", this.name);
+				marker.addInfo("Return Type: " + this.type);
+				marker.addInfo("Value Type: " + this.value.getType());
+			}
+			else
+			{
+				this.value = value1;
+			}
 			
 			this.value.checkTypes(markers, this);
 		}
@@ -710,7 +710,7 @@ public class Method extends Member implements IMethod
 		
 		return match;
 	}
-
+	
 	@Override
 	public void checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
@@ -778,13 +778,13 @@ public class Method extends Member implements IMethod
 			arguments.checkValue(i, this.parameters[i], markers, typeContext);
 		}
 	}
-
+	
 	@Override
 	public boolean hasTypeVariables()
 	{
 		return this.generics != null || this.theClass.isGeneric();
 	}
-
+	
 	@Override
 	public boolean isIntrinsic()
 	{
@@ -801,7 +801,7 @@ public class Method extends Member implements IMethod
 			this.parameters[i].type.appendExtendedName(buffer);
 		}
 		buffer.append(')');
-			this.type.appendExtendedName(buffer);
+		this.type.appendExtendedName(buffer);
 		return buffer.toString();
 	}
 	
@@ -863,7 +863,7 @@ public class Method extends Member implements IMethod
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.setInstance(this.type);
+			mw.setInstance(this.theClass.getType());
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)
@@ -904,7 +904,14 @@ public class Method extends Member implements IMethod
 		{
 			mw.begin();
 			mw.writeLabel(start);
-			this.value.writeExpression(mw);
+			if (this.type == Type.VOID)
+			{
+				this.value.writeStatement(mw);
+			}
+			else
+			{
+				this.value.writeExpression(mw);
+			}
 			mw.writeLabel(end);
 			mw.end(this.type);
 		}

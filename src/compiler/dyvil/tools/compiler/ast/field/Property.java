@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
@@ -22,6 +21,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -299,22 +299,65 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public void write(ClassWriter writer)
 	{
+		String extended = this.type.getExtendedName();
+		String signature = this.type.getSignature();
 		if (this.get != null)
 		{
-			Method getter = new Method(this.theClass, "get$" + this.qualifiedName, this.type);
-			getter.modifiers = this.modifiers | Modifiers.SYNTHETIC;
-			getter.setAnnotations(this.annotations, this.annotationCount);
-			getter.value = this.get;
-			getter.write(writer);
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers | Modifiers.SYNTHETIC, "get$" + this.qualifiedName, "()"
+					+ extended, signature == null ? null : "()" + signature, null));
+			
+			if ((this.modifiers & Modifiers.STATIC) == 0)
+			{
+				mw.setInstance(this.theClass.getThisType());
+			}
+			
+			for (int i = 0; i < this.annotationCount; i++)
+			{
+				this.annotations[i].write(writer);
+			}
+			
+			if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
+			{
+				mw.addAnnotation("Ljava/lang/Deprecated;", true);
+			}
+			if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
+			{
+				mw.addAnnotation("Ldyvil/lang/annotation/sealed;", false);
+			}
+			
+			mw.begin();
+			this.get.writeExpression(mw);
+			mw.end(this.type);
 		}
 		if (this.set != null)
 		{
-			Method setter = new Method(this.theClass, "set$" + this.qualifiedName, Type.VOID);
-			setter.modifiers = this.modifiers | Modifiers.SYNTHETIC;
-			setter.addParameter(this.setterParameter);
-			setter.setAnnotations(this.annotations, this.annotationCount);
-			setter.value = this.set;
-			setter.write(writer);
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers | Modifiers.SYNTHETIC, "set$" + this.qualifiedName, "(" + extended
+					+ ")V", signature == null ? null : "(" + signature + ")V", null));
+			
+			if ((this.modifiers & Modifiers.STATIC) == 0)
+			{
+				mw.setInstance(this.theClass.getThisType());
+			}
+			
+			for (int i = 0; i < this.annotationCount; i++)
+			{
+				this.annotations[i].write(writer);
+			}
+			
+			if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
+			{
+				mw.addAnnotation("Ljava/lang/Deprecated;", true);
+			}
+			if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
+			{
+				mw.addAnnotation("Ldyvil/lang/annotation/sealed;", false);
+			}
+			
+			this.setterParameter.write(mw);
+			
+			mw.begin();
+			this.set.writeStatement(mw);
+			mw.end(Type.VOID);
 		}
 	}
 	

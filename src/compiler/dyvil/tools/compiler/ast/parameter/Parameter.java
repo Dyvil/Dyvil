@@ -222,7 +222,7 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		if (this.parameterized.isClass())
+		if (this.parameterized != null && this.parameterized.isClass())
 		{
 			if (instance != null)
 			{
@@ -239,14 +239,17 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
-		if (this.parameterized.isClass())
+		if (this.parameterized != null && this.parameterized.isClass())
 		{
 			if (instance != null)
 			{
 				instance.writeExpression(writer);
 			}
 			
-			value.writeExpression(writer);
+			if (value != null)
+			{
+				value.writeExpression(writer);
+			}
 			
 			writer.writePutField(((IClass) this.parameterized).getInternalName(), this.qualifiedName, this.getDescription());
 			return;
