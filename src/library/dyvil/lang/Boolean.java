@@ -16,9 +16,15 @@ public class Boolean implements Boolean$
 		this.value = value;
 	}
 	
-	public static Boolean create(boolean value)
+	public static Boolean apply(boolean value)
 	{
 		return value ? TRUE : FALSE;
+	}
+	
+	@Intrinsic({ INSTANCE })
+	public boolean unapply()
+	{
+		return this.value;
 	}
 	
 	@Override
@@ -32,7 +38,7 @@ public class Boolean implements Boolean$
 	@Intrinsic({ INSTANCE, ARGUMENTS, BINV })
 	public @prefix Boolean $bang()
 	{
-		return create(!this.value);
+		return apply(!this.value);
 	}
 	
 	@Override
@@ -53,35 +59,35 @@ public class Boolean implements Boolean$
 	@Intrinsic({ INSTANCE, ARGUMENTS, IAND, IFNE })
 	public Boolean $amp(boolean v)
 	{
-		return create(v && this.value);
+		return apply(v && this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IOR, IFNE })
 	public Boolean $bar(boolean v)
 	{
-		return create(v || this.value);
+		return apply(v || this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IXOR, IFNE })
 	public Boolean $up(boolean v)
 	{
-		return create(v != this.value);
+		return apply(v != this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, BINV, ARGUMENTS, IOR, IFEQ })
 	public Boolean $eq$eq$greater(boolean v)
 	{
-		return create(v || !this.value);
+		return apply(v || !this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
 	public Boolean $less$eq$greater(boolean v)
 	{
-		return create(v == this.value);
+		return apply(v == this.value);
 	}
 	
 	// Object methods

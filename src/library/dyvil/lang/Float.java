@@ -13,7 +13,7 @@ public class Float implements Number
 		this.value = value;
 	}
 	
-	public static Float create(float v)
+	public static Float apply(float v)
 	{
 		int i = (int) v;
 		if (i >= 0 && v == i && i < ConstPool.tableSize)
@@ -21,6 +21,12 @@ public class Float implements Number
 			return ConstPool.FLOATS[i];
 		}
 		return new Float(v);
+	}
+	
+	@Intrinsic({ INSTANCE })
+	public float unapply()
+	{
+		return this.value;
 	}
 	
 	@Override
@@ -85,21 +91,21 @@ public class Float implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, FNEG })
 	public @prefix Float $minus()
 	{
-		return Float.create(-this.value);
+		return Float.apply(-this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, DUP, FMUL })
 	public Float sqr()
 	{
-		return Float.create(this.value * this.value);
+		return Float.apply(this.value * this.value);
 	}
 	
 	@Override
 	@Intrinsic({ FCONST_1, INSTANCE, FDIV })
 	public Float rec()
 	{
-		return Float.create(1 / this.value);
+		return Float.apply(1 / this.value);
 	}
 	
 	// byte operators
@@ -150,35 +156,35 @@ public class Float implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FADD })
 	public Float $plus(byte v)
 	{
-		return Float.create(this.value + v);
+		return Float.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FSUB })
 	public Float $minus(byte v)
 	{
-		return Float.create(this.value - v);
+		return Float.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FMUL })
 	public Float $times(byte v)
 	{
-		return Float.create(this.value * v);
+		return Float.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FDIV })
 	public Float $div(byte v)
 	{
-		return Float.create(this.value / v);
+		return Float.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FREM })
 	public Float $percent(byte v)
 	{
-		return Float.create(this.value % v);
+		return Float.apply(this.value % v);
 	}
 	
 	// short operators
@@ -229,35 +235,35 @@ public class Float implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FADD })
 	public Float $plus(short v)
 	{
-		return Float.create(this.value + v);
+		return Float.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FSUB })
 	public Float $minus(short v)
 	{
-		return Float.create(this.value - v);
+		return Float.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FMUL })
 	public Float $times(short v)
 	{
-		return Float.create(this.value * v);
+		return Float.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FDIV })
 	public Float $div(short v)
 	{
-		return Float.create(this.value / v);
+		return Float.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FREM })
 	public Float $percent(short v)
 	{
-		return Float.create(this.value % v);
+		return Float.apply(this.value % v);
 	}
 	
 	// char operators
@@ -308,35 +314,35 @@ public class Float implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FADD })
 	public Float $plus(char v)
 	{
-		return Float.create(this.value + v);
+		return Float.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FSUB })
 	public Float $minus(char v)
 	{
-		return Float.create(this.value - v);
+		return Float.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FMUL })
 	public Float $times(char v)
 	{
-		return Float.create(this.value * v);
+		return Float.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FDIV })
 	public Float $div(char v)
 	{
-		return Float.create(this.value / v);
+		return Float.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FREM })
 	public Float $percent(char v)
 	{
-		return Float.create(this.value % v);
+		return Float.apply(this.value % v);
 	}
 	
 	// int operators
@@ -387,35 +393,35 @@ public class Float implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FADD })
 	public Float $plus(int v)
 	{
-		return Float.create(this.value + v);
+		return Float.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FSUB })
 	public Float $minus(int v)
 	{
-		return Float.create(this.value - v);
+		return Float.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FMUL })
 	public Float $times(int v)
 	{
-		return Float.create(this.value * v);
+		return Float.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FDIV })
 	public Float $div(int v)
 	{
-		return Float.create(this.value / v);
+		return Float.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FREM })
 	public Float $percent(int v)
 	{
-		return Float.create(this.value % v);
+		return Float.apply(this.value % v);
 	}
 	
 	// long operators
@@ -466,35 +472,35 @@ public class Float implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, FADD })
 	public Float $plus(long v)
 	{
-		return Float.create(this.value + v);
+		return Float.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, FSUB })
 	public Float $minus(long v)
 	{
-		return Float.create(this.value - v);
+		return Float.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, FMUL })
 	public Float $times(long v)
 	{
-		return Float.create(this.value * v);
+		return Float.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, FDIV })
 	public Float $div(long v)
 	{
-		return Float.create(this.value / v);
+		return Float.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, FREM })
 	public Float $percent(long v)
 	{
-		return Float.create(this.value % v);
+		return Float.apply(this.value % v);
 	}
 	
 	// float operators
@@ -545,35 +551,35 @@ public class Float implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, FADD })
 	public Float $plus(float v)
 	{
-		return Float.create(this.value + v);
+		return Float.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, FSUB })
 	public Float $minus(float v)
 	{
-		return Float.create(this.value - v);
+		return Float.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, FMUL })
 	public Float $times(float v)
 	{
-		return Float.create(this.value * v);
+		return Float.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, FDIV })
 	public Float $div(float v)
 	{
-		return Float.create(this.value / v);
+		return Float.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, FREM })
 	public Float $percent(float v)
 	{
-		return Float.create(this.value % v);
+		return Float.apply(this.value % v);
 	}
 	
 	// double operators
@@ -624,35 +630,35 @@ public class Float implements Number
 	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, DADD })
 	public Double $plus(double v)
 	{
-		return Double.create(this.value + v);
+		return Double.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, DSUB })
 	public Double $minus(double v)
 	{
-		return Double.create(this.value - v);
+		return Double.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, DMUL })
 	public Double $times(double v)
 	{
-		return Double.create(this.value * v);
+		return Double.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, DDIV })
 	public Double $div(double v)
 	{
-		return Double.create(this.value / v);
+		return Double.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, DREM })
 	public Double $percent(double v)
 	{
-		return Double.create(this.value % v);
+		return Double.apply(this.value % v);
 	}
 	
 	// generic operators
@@ -696,31 +702,31 @@ public class Float implements Number
 	@Override
 	public Float $plus(Number v)
 	{
-		return Float.create(this.value + v.floatValue());
+		return Float.apply(this.value + v.floatValue());
 	}
 	
 	@Override
 	public Float $minus(Number v)
 	{
-		return Float.create(this.value - v.floatValue());
+		return Float.apply(this.value - v.floatValue());
 	}
 	
 	@Override
 	public Float $times(Number v)
 	{
-		return Float.create(this.value * v.floatValue());
+		return Float.apply(this.value * v.floatValue());
 	}
 	
 	@Override
 	public Float $div(Number v)
 	{
-		return Float.create(this.value / v.floatValue());
+		return Float.apply(this.value / v.floatValue());
 	}
 	
 	@Override
 	public Float $percent(Number v)
 	{
-		return Float.create(this.value % v.floatValue());
+		return Float.apply(this.value % v.floatValue());
 	}
 	
 	// Object methods

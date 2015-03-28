@@ -26,7 +26,7 @@ public class BooleanRef implements Boolean$
 	@Override
 	public Boolean $bang()
 	{
-		return Boolean.create(!this.value);
+		return Boolean.apply(!this.value);
 	}
 	
 	@Override
@@ -44,19 +44,19 @@ public class BooleanRef implements Boolean$
 	@Override
 	public Boolean $amp(boolean v)
 	{
-		return Boolean.create(this.value && v);
+		return Boolean.apply(this.value && v);
 	}
 	
 	@Override
 	public Boolean $bar(boolean v)
 	{
-		return Boolean.create(this.value || v);
+		return Boolean.apply(this.value || v);
 	}
 	
 	@Override
 	public Boolean $up(boolean v)
 	{
-		return Boolean.create(this.value ^ v);
+		return Boolean.apply(this.value ^ v);
 	}
 	
 	public BooleanRef $amp$eq(boolean v)

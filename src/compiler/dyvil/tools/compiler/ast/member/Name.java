@@ -10,9 +10,6 @@ public final class Name
 {
 	private static final Map<String, Name>	map						= new HashMap();
 	
-	public final String						qualified;
-	public final String						unqualified;
-	
 	public static final Name				instance				= new Name("instance");
 	public static final Name				apply					= new Name("apply");
 	public static final Name				unapply					= new Name("unapply");
@@ -65,6 +62,9 @@ public final class Name
 	
 	public static final Name				colonGreater			= new Name(":>", "$colon$greater");
 	public static final Name				lessColon				= new Name("<:", "$less$colon");
+
+	public final String						qualified;
+	public final String						unqualified;
 	
 	protected Name(String name)
 	{

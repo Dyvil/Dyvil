@@ -13,13 +13,19 @@ public class Short implements Integer
 		this.value = value;
 	}
 	
-	public static Short create(short v)
+	public static Short apply(short v)
 	{
 		if (v >= 0 && v < ConstPool.tableSize)
 		{
 			return ConstPool.SHORTS[v];
 		}
 		return new Short(v);
+	}
+	
+	@Intrinsic({ INSTANCE })
+	public short unapply()
+	{
+		return this.value;
 	}
 	
 	@Override
@@ -77,35 +83,35 @@ public class Short implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS })
 	public @prefix Int $plus()
 	{
-		return Int.create(this.value);
+		return Int.apply(this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, INEG })
 	public @prefix Int $minus()
 	{
-		return Int.create((byte) -this.value);
+		return Int.apply((byte) -this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ICONST_M1, IXOR })
 	public @prefix Int $tilde()
 	{
-		return Int.create((byte) ~this.value);
+		return Int.apply((byte) ~this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, DUP, IMUL })
 	public Int sqr()
 	{
-		return Int.create(this.value * this.value);
+		return Int.apply(this.value * this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ICONST_1, IDIV })
 	public Int rec()
 	{
-		return Int.create((byte) (1 / this.value));
+		return Int.apply((byte) (1 / this.value));
 	}
 	
 	// byte operators
@@ -156,77 +162,77 @@ public class Short implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, IADD })
 	public Int $plus(byte v)
 	{
-		return Int.create(this.value + v);
+		return Int.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISUB })
 	public Int $minus(byte v)
 	{
-		return Int.create(this.value - v);
+		return Int.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IMUL })
 	public Int $times(byte v)
 	{
-		return Int.create(this.value * v);
+		return Int.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
 	public Int $div(byte v)
 	{
-		return Int.create(this.value / v);
+		return Int.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IREM })
 	public Int $percent(byte v)
 	{
-		return Int.create(this.value % v);
+		return Int.apply(this.value % v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IAND })
 	public Int $amp(byte v)
 	{
-		return Int.create(this.value & v);
+		return Int.apply(this.value & v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IOR })
 	public Int $bar(byte v)
 	{
-		return Int.create(this.value | v);
+		return Int.apply(this.value | v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IXOR })
 	public Int $up(byte v)
 	{
-		return Int.create(this.value ^ v);
+		return Int.apply(this.value ^ v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISHL })
 	public Int $less$less(byte v)
 	{
-		return Int.create(this.value << v);
+		return Int.apply(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISHR })
 	public Int $greater$greater(byte v)
 	{
-		return Int.create(this.value >> v);
+		return Int.apply(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IUSHR })
 	public Int $greater$greater$greater(byte v)
 	{
-		return Int.create(this.value >>> v);
+		return Int.apply(this.value >>> v);
 	}
 	
 	// short operators
@@ -277,77 +283,77 @@ public class Short implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, IADD })
 	public Int $plus(short v)
 	{
-		return Int.create(this.value + v);
+		return Int.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISUB })
 	public Int $minus(short v)
 	{
-		return Int.create(this.value - v);
+		return Int.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IMUL })
 	public Int $times(short v)
 	{
-		return Int.create(this.value * v);
+		return Int.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
 	public Int $div(short v)
 	{
-		return Int.create(this.value / v);
+		return Int.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IREM })
 	public Int $percent(short v)
 	{
-		return Int.create(this.value % v);
+		return Int.apply(this.value % v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IAND })
 	public Int $amp(short v)
 	{
-		return Int.create(this.value & v);
+		return Int.apply(this.value & v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IOR })
 	public Int $bar(short v)
 	{
-		return Int.create(this.value | v);
+		return Int.apply(this.value | v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IXOR })
 	public Int $up(short v)
 	{
-		return Int.create(this.value ^ v);
+		return Int.apply(this.value ^ v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISHL })
 	public Int $less$less(short v)
 	{
-		return Int.create(this.value << v);
+		return Int.apply(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISHR })
 	public Int $greater$greater(short v)
 	{
-		return Int.create(this.value >> v);
+		return Int.apply(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IUSHR })
 	public Int $greater$greater$greater(short v)
 	{
-		return Int.create(this.value >>> v);
+		return Int.apply(this.value >>> v);
 	}
 	
 	// char operators
@@ -398,77 +404,77 @@ public class Short implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, IADD })
 	public Int $plus(char v)
 	{
-		return Int.create(this.value + v);
+		return Int.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISUB })
 	public Int $minus(char v)
 	{
-		return Int.create(this.value - v);
+		return Int.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IMUL })
 	public Int $times(char v)
 	{
-		return Int.create(this.value * v);
+		return Int.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
 	public Int $div(char v)
 	{
-		return Int.create(this.value / v);
+		return Int.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IREM })
 	public Int $percent(char v)
 	{
-		return Int.create(this.value % v);
+		return Int.apply(this.value % v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IAND })
 	public Int $amp(char v)
 	{
-		return Int.create(this.value & v);
+		return Int.apply(this.value & v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IOR })
 	public Int $bar(char v)
 	{
-		return Int.create(this.value | v);
+		return Int.apply(this.value | v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IXOR })
 	public Int $up(char v)
 	{
-		return Int.create(this.value ^ v);
+		return Int.apply(this.value ^ v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISHL })
 	public Int $less$less(char v)
 	{
-		return Int.create(this.value << v);
+		return Int.apply(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISHR })
 	public Int $greater$greater(char v)
 	{
-		return Int.create(this.value >> v);
+		return Int.apply(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IUSHR })
 	public Int $greater$greater$greater(char v)
 	{
-		return Int.create(this.value >>> v);
+		return Int.apply(this.value >>> v);
 	}
 	
 	// int operators
@@ -519,77 +525,77 @@ public class Short implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, IADD })
 	public Int $plus(int v)
 	{
-		return Int.create(this.value + v);
+		return Int.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISUB })
 	public Int $minus(int v)
 	{
-		return Int.create(this.value - v);
+		return Int.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IMUL })
 	public Int $times(int v)
 	{
-		return Int.create(this.value * v);
+		return Int.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
 	public Int $div(int v)
 	{
-		return Int.create(this.value / v);
+		return Int.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IREM })
 	public Int $percent(int v)
 	{
-		return Int.create(this.value % v);
+		return Int.apply(this.value % v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IAND })
 	public Int $amp(int v)
 	{
-		return Int.create(this.value & v);
+		return Int.apply(this.value & v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IOR })
 	public Int $bar(int v)
 	{
-		return Int.create(this.value | v);
+		return Int.apply(this.value | v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IXOR })
 	public Int $up(int v)
 	{
-		return Int.create(this.value ^ v);
+		return Int.apply(this.value ^ v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISHL })
 	public Int $less$less(int v)
 	{
-		return Int.create(this.value << v);
+		return Int.apply(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, ISHR })
 	public Int $greater$greater(int v)
 	{
-		return Int.create(this.value >> v);
+		return Int.apply(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IUSHR })
 	public Int $greater$greater$greater(int v)
 	{
-		return Int.create(this.value >>> v);
+		return Int.apply(this.value >>> v);
 	}
 	
 	// long operators
@@ -696,21 +702,21 @@ public class Short implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2I, ISHL })
 	public Int $less$less(long v)
 	{
-		return Int.create(this.value << v);
+		return Int.apply(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2I, ISHR })
 	public Int $greater$greater(long v)
 	{
-		return Int.create(this.value >> v);
+		return Int.apply(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2I, IUSHR })
 	public Int $greater$greater$greater(long v)
 	{
-		return Int.create(this.value >>> v);
+		return Int.apply(this.value >>> v);
 	}
 	
 	// float operators
@@ -761,35 +767,35 @@ public class Short implements Integer
 	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, FADD })
 	public Float $plus(float v)
 	{
-		return Float.create(this.value + v);
+		return Float.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, FSUB })
 	public Float $minus(float v)
 	{
-		return Float.create(this.value - v);
+		return Float.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, FMUL })
 	public Float $times(float v)
 	{
-		return Float.create(this.value * v);
+		return Float.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, FDIV })
 	public Float $div(float v)
 	{
-		return Float.create(this.value / v);
+		return Float.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, FREM })
 	public Float $percent(float v)
 	{
-		return Float.create(this.value % v);
+		return Float.apply(this.value % v);
 	}
 	
 	// double operators
@@ -840,35 +846,35 @@ public class Short implements Integer
 	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, DADD })
 	public Double $plus(double v)
 	{
-		return Double.create(this.value + v);
+		return Double.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, DSUB })
 	public Double $minus(double v)
 	{
-		return Double.create(this.value - v);
+		return Double.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, DMUL })
 	public Double $times(double v)
 	{
-		return Double.create(this.value * v);
+		return Double.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, DDIV })
 	public Double $div(double v)
 	{
-		return Double.create(this.value / v);
+		return Double.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, DREM })
 	public Double $percent(double v)
 	{
-		return Double.create(this.value % v);
+		return Double.apply(this.value % v);
 	}
 	
 	// generic operators
@@ -912,67 +918,67 @@ public class Short implements Integer
 	@Override
 	public Int $plus(Number v)
 	{
-		return Int.create(this.value + v.intValue());
+		return Int.apply(this.value + v.intValue());
 	}
 	
 	@Override
 	public Int $minus(Number v)
 	{
-		return Int.create(this.value - v.intValue());
+		return Int.apply(this.value - v.intValue());
 	}
 	
 	@Override
 	public Int $times(Number v)
 	{
-		return Int.create(this.value * v.intValue());
+		return Int.apply(this.value * v.intValue());
 	}
 	
 	@Override
 	public Int $div(Number v)
 	{
-		return Int.create(this.value / v.intValue());
+		return Int.apply(this.value / v.intValue());
 	}
 	
 	@Override
 	public Int $percent(Number v)
 	{
-		return Int.create(this.value % v.intValue());
+		return Int.apply(this.value % v.intValue());
 	}
 	
 	@Override
 	public Int $bar(Integer v)
 	{
-		return Int.create(this.value | v.intValue());
+		return Int.apply(this.value | v.intValue());
 	}
 	
 	@Override
 	public Int $amp(Integer v)
 	{
-		return Int.create(this.value & v.intValue());
+		return Int.apply(this.value & v.intValue());
 	}
 	
 	@Override
 	public Int $up(Integer v)
 	{
-		return Int.create(this.value ^ v.intValue());
+		return Int.apply(this.value ^ v.intValue());
 	}
 	
 	@Override
 	public Int $less$less(Integer v)
 	{
-		return Int.create(this.value << v.intValue());
+		return Int.apply(this.value << v.intValue());
 	}
 	
 	@Override
 	public Int $greater$greater(Integer v)
 	{
-		return Int.create(this.value >> v.intValue());
+		return Int.apply(this.value >> v.intValue());
 	}
 	
 	@Override
 	public Int $greater$greater$greater(Integer v)
 	{
-		return Int.create(this.value >>> v.intValue());
+		return Int.apply(this.value >>> v.intValue());
 	}
 	
 	// Object methods

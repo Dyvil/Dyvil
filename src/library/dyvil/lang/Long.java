@@ -22,6 +22,12 @@ public class Long implements Integer
 		return new Long(value);
 	}
 	
+	@Intrinsic({ INSTANCE })
+	public long unapply()
+	{
+		return this.value;
+	}
+	
 	@Override
 	@Intrinsic({ INSTANCE, L2B })
 	public byte byteValue()
@@ -761,35 +767,35 @@ public class Long implements Integer
 	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, FADD })
 	public Float $plus(float v)
 	{
-		return Float.create(this.value + v);
+		return Float.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, FSUB })
 	public Float $minus(float v)
 	{
-		return Float.create(this.value - v);
+		return Float.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, FMUL })
 	public Float $times(float v)
 	{
-		return Float.create(this.value * v);
+		return Float.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, FDIV })
 	public Float $div(float v)
 	{
-		return Float.create(this.value / v);
+		return Float.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, FREM })
 	public Float $percent(float v)
 	{
-		return Float.create(this.value % v);
+		return Float.apply(this.value % v);
 	}
 	
 	// double operators
@@ -840,35 +846,35 @@ public class Long implements Integer
 	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, DADD })
 	public Double $plus(double v)
 	{
-		return Double.create(this.value + v);
+		return Double.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, DSUB })
 	public Double $minus(double v)
 	{
-		return Double.create(this.value - v);
+		return Double.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, DMUL })
 	public Double $times(double v)
 	{
-		return Double.create(this.value * v);
+		return Double.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, DDIV })
 	public Double $div(double v)
 	{
-		return Double.create(this.value / v);
+		return Double.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, DREM })
 	public Double $percent(double v)
 	{
-		return Double.create(this.value % v);
+		return Double.apply(this.value % v);
 	}
 	
 	// generic operators

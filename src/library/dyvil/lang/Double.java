@@ -13,7 +13,7 @@ public class Double implements Number
 		this.value = value;
 	}
 	
-	public static Double create(double v)
+	public static Double apply(double v)
 	{
 		int i = (int) v;
 		if (i >= 0 && v == i && i < ConstPool.tableSize)
@@ -21,6 +21,12 @@ public class Double implements Number
 			return ConstPool.DOUBLES[i];
 		}
 		return new Double(v);
+	}
+	
+	@Intrinsic({ INSTANCE })
+	public double unapply()
+	{
+		return this.value;
 	}
 	
 	@Override
@@ -85,21 +91,21 @@ public class Double implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, DNEG })
 	public @prefix Double $minus()
 	{
-		return Double.create(-this.value);
+		return Double.apply(-this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, DUP2, DMUL })
 	public Double sqr()
 	{
-		return Double.create(this.value * this.value);
+		return Double.apply(this.value * this.value);
 	}
 	
 	@Override
 	@Intrinsic({ DCONST_1, INSTANCE, DDIV })
 	public Double rec()
 	{
-		return Double.create(1 / this.value);
+		return Double.apply(1 / this.value);
 	}
 	
 	// byte operators
@@ -150,35 +156,35 @@ public class Double implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DADD })
 	public Double $plus(byte v)
 	{
-		return Double.create(this.value + v);
+		return Double.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DSUB })
 	public Double $minus(byte v)
 	{
-		return Double.create(this.value - v);
+		return Double.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DMUL })
 	public Double $times(byte v)
 	{
-		return Double.create(this.value * v);
+		return Double.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DDIV })
 	public Double $div(byte v)
 	{
-		return Double.create(this.value / v);
+		return Double.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DREM })
 	public Double $percent(byte v)
 	{
-		return Double.create(this.value % v);
+		return Double.apply(this.value % v);
 	}
 	
 	// short operators
@@ -229,35 +235,35 @@ public class Double implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DADD })
 	public Double $plus(short v)
 	{
-		return Double.create(this.value + v);
+		return Double.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DSUB })
 	public Double $minus(short v)
 	{
-		return Double.create(this.value - v);
+		return Double.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DMUL })
 	public Double $times(short v)
 	{
-		return Double.create(this.value * v);
+		return Double.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DDIV })
 	public Double $div(short v)
 	{
-		return Double.create(this.value / v);
+		return Double.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DREM })
 	public Double $percent(short v)
 	{
-		return Double.create(this.value % v);
+		return Double.apply(this.value % v);
 	}
 	
 	// char operators
@@ -308,35 +314,35 @@ public class Double implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DADD })
 	public Double $plus(char v)
 	{
-		return Double.create(this.value + v);
+		return Double.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DSUB })
 	public Double $minus(char v)
 	{
-		return Double.create(this.value - v);
+		return Double.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DMUL })
 	public Double $times(char v)
 	{
-		return Double.create(this.value * v);
+		return Double.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DDIV })
 	public Double $div(char v)
 	{
-		return Double.create(this.value / v);
+		return Double.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DREM })
 	public Double $percent(char v)
 	{
-		return Double.create(this.value % v);
+		return Double.apply(this.value % v);
 	}
 	
 	// int operators
@@ -387,35 +393,35 @@ public class Double implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DADD })
 	public Double $plus(int v)
 	{
-		return Double.create(this.value + v);
+		return Double.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DSUB })
 	public Double $minus(int v)
 	{
-		return Double.create(this.value - v);
+		return Double.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DMUL })
 	public Double $times(int v)
 	{
-		return Double.create(this.value * v);
+		return Double.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DDIV })
 	public Double $div(int v)
 	{
-		return Double.create(this.value / v);
+		return Double.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2D, DREM })
 	public Double $percent(int v)
 	{
-		return Double.create(this.value % v);
+		return Double.apply(this.value % v);
 	}
 	
 	// long operators
@@ -466,35 +472,35 @@ public class Double implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, DADD })
 	public Double $plus(long v)
 	{
-		return Double.create(this.value + v);
+		return Double.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, DSUB })
 	public Double $minus(long v)
 	{
-		return Double.create(this.value - v);
+		return Double.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, DMUL })
 	public Double $times(long v)
 	{
-		return Double.create(this.value * v);
+		return Double.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, DDIV })
 	public Double $div(long v)
 	{
-		return Double.create(this.value / v);
+		return Double.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, L2D, DREM })
 	public Double $percent(long v)
 	{
-		return Double.create(this.value % v);
+		return Double.apply(this.value % v);
 	}
 	
 	// float operators
@@ -545,35 +551,35 @@ public class Double implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, DADD })
 	public Double $plus(float v)
 	{
-		return Double.create(this.value + v);
+		return Double.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, DSUB })
 	public Double $minus(float v)
 	{
-		return Double.create(this.value - v);
+		return Double.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, DMUL })
 	public Double $times(float v)
 	{
-		return Double.create(this.value * v);
+		return Double.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, DDIV })
 	public Double $div(float v)
 	{
-		return Double.create(this.value / v);
+		return Double.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, F2D, DREM })
 	public Double $percent(float v)
 	{
-		return Double.create(this.value % v);
+		return Double.apply(this.value % v);
 	}
 	
 	// double operators
@@ -624,35 +630,35 @@ public class Double implements Number
 	@Intrinsic({ INSTANCE, ARGUMENTS, DADD })
 	public Double $plus(double v)
 	{
-		return Double.create(this.value + v);
+		return Double.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, DSUB })
 	public Double $minus(double v)
 	{
-		return Double.create(this.value - v);
+		return Double.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, DMUL })
 	public Double $times(double v)
 	{
-		return Double.create(this.value * v);
+		return Double.apply(this.value * v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, DDIV })
 	public Double $div(double v)
 	{
-		return Double.create(this.value / v);
+		return Double.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, DREM })
 	public Double $percent(double v)
 	{
-		return Double.create(this.value % v);
+		return Double.apply(this.value % v);
 	}
 	
 	// generic operators
@@ -696,31 +702,31 @@ public class Double implements Number
 	@Override
 	public Double $plus(Number v)
 	{
-		return Double.create(this.value + v.doubleValue());
+		return Double.apply(this.value + v.doubleValue());
 	}
 	
 	@Override
 	public Double $minus(Number v)
 	{
-		return Double.create(this.value - v.doubleValue());
+		return Double.apply(this.value - v.doubleValue());
 	}
 	
 	@Override
 	public Double $times(Number v)
 	{
-		return Double.create(this.value * v.doubleValue());
+		return Double.apply(this.value * v.doubleValue());
 	}
 	
 	@Override
 	public Double $div(Number v)
 	{
-		return Double.create(this.value / v.doubleValue());
+		return Double.apply(this.value / v.doubleValue());
 	}
 	
 	@Override
 	public Double $percent(Number v)
 	{
-		return Double.create(this.value % v.doubleValue());
+		return Double.apply(this.value % v.doubleValue());
 	}
 	
 	// Object methods
