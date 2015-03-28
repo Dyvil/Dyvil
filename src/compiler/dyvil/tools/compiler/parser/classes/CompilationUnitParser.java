@@ -10,7 +10,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
-import dyvil.tools.compiler.util.Tokens;
+import dyvil.tools.compiler.transform.Tokens;
 
 public class CompilationUnitParser extends Parser
 {

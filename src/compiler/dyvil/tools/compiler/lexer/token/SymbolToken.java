@@ -6,7 +6,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Tokens;
+import dyvil.tools.compiler.transform.Tokens;
 
 public final class SymbolToken implements IToken
 {

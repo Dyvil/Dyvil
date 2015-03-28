@@ -5,7 +5,7 @@ import java.util.Objects;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Keywords;
+import dyvil.tools.compiler.transform.Keywords;
 
 public final class KeywordToken implements IToken
 {

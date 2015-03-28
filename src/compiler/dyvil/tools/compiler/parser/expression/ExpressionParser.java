@@ -17,11 +17,11 @@ import dyvil.tools.compiler.parser.pattern.PatternParser;
 import dyvil.tools.compiler.parser.statement.*;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Keywords;
+import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
-import dyvil.tools.compiler.util.Tokens;
 
 public final class ExpressionParser extends Parser implements ITyped, IValued
 {

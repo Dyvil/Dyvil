@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.lexer;
 
+import static dyvil.tools.compiler.transform.Tokens.*;
 import static dyvil.tools.compiler.util.ParserUtil.*;
-import static dyvil.tools.compiler.util.Tokens.*;
 import dyvil.tools.compiler.lexer.token.*;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Keywords;
 
 public class Dlex
 {

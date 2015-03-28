@@ -10,8 +10,10 @@ import org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.access.ClassParameterSetter;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAssign;
+import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -40,10 +42,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.ClassParameterSetter;
-import dyvil.tools.compiler.util.InitializerCall;
-import dyvil.tools.compiler.util.ModifierTypes;
-import dyvil.tools.compiler.util.Util;
+import dyvil.tools.compiler.util.*;
 
 public class CodeClass extends ASTNode implements IClass
 {

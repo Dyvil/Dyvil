@@ -25,11 +25,10 @@ import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.Keywords;
-import dyvil.tools.compiler.util.ModifierTypes;
-import dyvil.tools.compiler.util.ParserUtil;
-import dyvil.tools.compiler.util.Tokens;
+import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.util.*;
 
 public final class ClassBodyParser extends Parser implements ITyped, IAnnotationList
 {

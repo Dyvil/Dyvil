@@ -3,8 +3,6 @@ package dyvil.tools.compiler.transform;
 import java.util.HashMap;
 import java.util.Map;
 
-import dyvil.tools.compiler.util.Tokens;
-
 public final class Symbols
 {
 	public static Map<Character, String>	symbolMap		= new HashMap();

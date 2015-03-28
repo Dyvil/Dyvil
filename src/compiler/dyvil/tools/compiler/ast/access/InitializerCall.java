@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.util;
+package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;

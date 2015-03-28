@@ -3,7 +3,7 @@ package dyvil.tools.compiler.lexer.token;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Tokens;
+import dyvil.tools.compiler.transform.Tokens;
 
 public class InferredSemicolon implements IToken
 {
