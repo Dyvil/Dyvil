@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -35,9 +34,7 @@ public class Property extends Member implements IProperty, IContext
 	public IValue		get;
 	public IValue		set;
 	
-	protected IMethod	getterMethod;
 	protected Parameter	setterParameter;
-	protected IMethod	setterMethod;
 	
 	public Property(IClass iclass)
 	{
@@ -60,6 +57,12 @@ public class Property extends Member implements IProperty, IContext
 	public ElementType getAnnotationType()
 	{
 		return ElementType.FIELD;
+	}
+	
+	@Override
+	public boolean isField()
+	{
+		return true;
 	}
 	
 	@Override
@@ -98,20 +101,6 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public void setGetterMethod(IMethod method)
-	{
-		this.get = method.getValue();
-		this.getterMethod = method;
-	}
-	
-	@Override
-	public void setSetterMethod(IMethod method)
-	{
-		this.set = method.getValue();
-		this.setterMethod = method;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
@@ -133,21 +122,11 @@ public class Property extends Member implements IProperty, IContext
 		
 		if (this.get != null)
 		{
-			Method getter = new Method(this.theClass, "get$" + this.qualifiedName, this.type);
-			getter.modifiers = this.modifiers | Modifiers.SYNTHETIC;
-			getter.value = this.get;
-			getter.setAnnotations(this.annotations, this.annotationCount);
-			this.getterMethod = getter;
 			this.get = this.get.resolve(markers, this);
 		}
 		if (this.set != null)
 		{
 			this.setterParameter = new Parameter(0, this.qualifiedName, this.type);
-			Method setter = new Method(this.theClass, "set$" + this.qualifiedName, Type.VOID);
-			setter.modifiers = this.modifiers | Modifiers.SYNTHETIC;
-			setter.value = this.set;
-			setter.addParameter(this.setterParameter);
-			setter.setAnnotations(this.annotations, this.annotationCount);
 			this.set = this.set.resolve(markers, this);
 		}
 	}
@@ -165,16 +144,27 @@ public class Property extends Member implements IProperty, IContext
 				Marker marker = markers.create(this.get.getPosition(), "property.getter.type", this.name);
 				marker.addInfo("Property Type: " + this.type);
 				marker.addInfo("Getter Value Type: " + this.get.getType());
-				
 			}
 			else
 			{
 				this.get = get1;
 			}
+			
+			this.get.checkTypes(markers, context);
 		}
-		if (this.set != null && !this.set.isType(Type.VOID))
+		if (this.set != null)
 		{
-			markers.add(this.set.getPosition(), "property.setter.type", this.name);
+			IValue set1 = this.set.withType(Type.VOID);
+			if (set1 == null)
+			{
+				markers.add(this.set.getPosition(), "property.setter.type", this.name);
+			}
+			else
+			{
+				this.set = set1;
+			}
+			
+			this.set.checkTypes(markers, context);
 		}
 	}
 	
@@ -183,7 +173,16 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.check(markers, context);
 		
-		if (this.get == null && this.set == null)
+		if (this.get != null)
+		{
+			this.get.check(markers, context);
+		}
+		if (this.set != null)
+		{
+			this.set.check(markers, context);
+		}
+		// If both are null
+		else if (this.get == null)
 		{
 			markers.add(this.position, "property.empty", this.name);
 		}
@@ -202,6 +201,12 @@ public class Property extends Member implements IProperty, IContext
 		{
 			this.set = this.set.foldConstants();
 		}
+	}
+	
+	@Override
+	public boolean isStatic()
+	{
+		return (this.modifiers & Modifiers.STATIC) != 0;
 	}
 	
 	@Override
@@ -294,13 +299,22 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public void write(ClassWriter writer)
 	{
-		if (this.getterMethod != null)
+		if (this.get != null)
 		{
-			this.getterMethod.write(writer);
+			Method getter = new Method(this.theClass, "get$" + this.qualifiedName, this.type);
+			getter.modifiers = this.modifiers | Modifiers.SYNTHETIC;
+			getter.setAnnotations(this.annotations, this.annotationCount);
+			getter.value = this.get;
+			getter.write(writer);
 		}
-		if (this.setterMethod != null)
+		if (this.set != null)
 		{
-			this.setterMethod.write(writer);
+			Method setter = new Method(this.theClass, "set$" + this.qualifiedName, Type.VOID);
+			setter.modifiers = this.modifiers | Modifiers.SYNTHETIC;
+			setter.addParameter(this.setterParameter);
+			setter.setAnnotations(this.annotations, this.annotationCount);
+			setter.value = this.set;
+			setter.write(writer);
 		}
 	}
 	
@@ -339,7 +353,10 @@ public class Property extends Member implements IProperty, IContext
 			instance.writeExpression(writer);
 		}
 		
-		value.writeExpression(writer);
+		if (value != null)
+		{
+			value.writeExpression(writer);
+		}
 		
 		int opcode;
 		int args;

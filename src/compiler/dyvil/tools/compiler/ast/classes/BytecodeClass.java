@@ -249,17 +249,15 @@ public class BytecodeClass extends CodeClass
 	
 	public boolean addSpecialMethod(String specialType, String name, IMethod method)
 	{
-		if ("get".equals(specialType))
+		if ("get".equals(specialType) || "set".equals(specialType))
 		{
-			IProperty property = this.getProperty(name, method);
-			property.setGetterMethod(method);
-			return false;
-		}
-		if ("set".equals(specialType))
-		{
-			IProperty property = this.getProperty(name, method);
-			property.setSetterMethod(method);
-			return false;
+			IProperty property = this.body.getProperty(name);
+			if (property == null)
+			{
+				Property prop = new Property(this, name, method.getType());
+				prop.modifiers = method.getModifiers() & ~Modifiers.SYNTHETIC;
+				this.body.addProperty(prop);
+			}
 		}
 		if ("parDefault".equals(specialType))
 		{
@@ -273,19 +271,6 @@ public class BytecodeClass extends CodeClass
 			return false;
 		}
 		return true;
-	}
-	
-	private IProperty getProperty(String name, IMethod method)
-	{
-		IProperty property = this.body.getProperty(name);
-		if (property == null)
-		{
-			Property prop = new Property(this, name, method.getType());
-			prop.modifiers = method.getModifiers() & ~Modifiers.SYNTHETIC;
-			this.body.addProperty(prop);
-			return prop;
-		}
-		return property;
 	}
 	
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)

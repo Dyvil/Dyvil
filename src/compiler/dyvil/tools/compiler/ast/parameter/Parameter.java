@@ -5,7 +5,6 @@ import java.lang.annotation.ElementType;
 import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.IModified;
@@ -38,6 +37,12 @@ public class Parameter extends Member implements IVariable
 	{
 		super(name, type);
 		this.index = index;
+	}
+	
+	@Override
+	public boolean isField()
+	{
+		return this.parameterized != null && this.parameterized.isClass();
 	}
 	
 	@Override
@@ -210,9 +215,9 @@ public class Parameter extends Member implements IVariable
 			writer.addParameterAnnotation(this.index, "Ldyvil/lang/annotation/byref;", true);
 		}
 		
-		for (Annotation a : this.annotations)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
-			a.write(writer, this.index);
+			this.annotations[i].write(writer, this.index);
 		}
 	}
 	

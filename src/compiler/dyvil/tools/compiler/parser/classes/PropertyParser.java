@@ -38,6 +38,7 @@ public class PropertyParser extends Parser implements IValued
 		int type = token.type();
 		if (type == Tokens.SEMICOLON)
 		{
+			this.mode = 0;
 			return;
 		}
 		if (type == Symbols.CLOSE_CURLY_BRACKET)
