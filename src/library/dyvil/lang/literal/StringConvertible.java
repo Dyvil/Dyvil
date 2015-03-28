@@ -2,24 +2,26 @@ package dyvil.lang.literal;
 
 /**
  * Marks a class that can be instantiated with a String literal. The process of
- * doing so will cause the compiler to insert a call to a constructor of that
- * class that takes the String literal as a single argument.
+ * doing so will cause the compiler to insert a call to a method of that class
+ * with the signature {@code static X apply(String)}. Note that such a method is
+ * automatically inserted by the <i>Dyvil Compiler</i> for any
+ * {@code case class} that takes a single {@code String} parameter, as shown in the below example.
  * <p>
  * Example:
+ * 
  * <pre>
- * public class Name implements StringConvertible
+ * case class Name(String value) implements StringConvertible
  * {
- *     private String name;
- *     
- *     public Name new(String value) { name = value }
- *     
- *     public String getFormattedName() = ...
+ *     public String Qualified {
+ *         get: ...
+ *         set: ...
+ *     }
  * }
  * 
- * ----------
+ * // ----------
  * 
  * Name name = "Dyvil"
- * String s = name getFormattedName
+ * String s = name.Qualified
  * </pre>
  * 
  * @author Clashsoft

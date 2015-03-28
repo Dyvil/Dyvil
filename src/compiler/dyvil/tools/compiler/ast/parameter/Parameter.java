@@ -45,6 +45,18 @@ public class Parameter extends Member implements IVariable
 	}
 	
 	@Override
+	public boolean isVariable()
+	{
+		return this.parameterized == null || !this.parameterized.isClass();
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		return (IClass) this.parameterized;
+	}
+	
+	@Override
 	public void setValue(IValue value)
 	{
 		this.defaultValue = value;

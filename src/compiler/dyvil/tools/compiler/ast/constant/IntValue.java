@@ -2,18 +2,22 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.BoxValue;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.value.LiteralValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class IntValue extends ASTNode implements INumericValue
 {
-	private static IntValue	NULL;
+	public static final Type	INT_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("IntConvertible"));
 	
-	public int				value;
+	private static IntValue		NULL;
+	
+	public int					value;
 	
 	public IntValue(int value)
 	{
@@ -54,13 +58,21 @@ public class IntValue extends ASTNode implements INumericValue
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Type.INT) ? new BoxValue(this, Type.INT.boxMethod) : null;
+		if (type.isSuperTypeOf(Type.INT))
+		{
+			return new BoxValue(this, Type.INT.boxMethod);
+		}
+		if (INT_CONVERTIBLE.isSuperTypeOf(type))
+		{
+			return new LiteralValue(type, this);
+		}
+		return null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.INT || type.isSuperTypeOf(Type.INT);
+		return type == Type.INT || type.isSuperTypeOf(Type.INT) || INT_CONVERTIBLE.isSuperTypeOf(type);
 	}
 	
 	@Override
@@ -70,7 +82,7 @@ public class IntValue extends ASTNode implements INumericValue
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Type.INT))
+		if (type.isSuperTypeOf(Type.INT) || INT_CONVERTIBLE.isSuperTypeOf(type))
 		{
 			return 2;
 		}
