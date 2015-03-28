@@ -7,8 +7,6 @@ import org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.member.IModified;
-import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -197,8 +195,8 @@ public class Parameter extends Member implements IVariable
 		}
 		
 		// Copy the access modifiers and add the STATIC modifier
-		int modifiers = ((IModified) this.parameterized).getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
-		String name = "parDefault$" + ((INamed) this.parameterized).getQualifiedName() + "$" + this.index;
+		int modifiers = this.parameterized.getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
+		String name = "parDefault$" + this.parameterized.getQualifiedName() + "$" + this.index;
 		String desc = "()" + this.type.getExtendedName();
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
 		mw.begin();
@@ -226,6 +224,11 @@ public class Parameter extends Member implements IVariable
 	{
 		if (this.parameterized.isClass())
 		{
+			if (instance != null)
+			{
+				instance.writeExpression(writer);
+			}
+			
 			writer.writeGetField(((IClass) this.parameterized).getInternalName(), this.qualifiedName, this.getDescription(), this.type);
 			return;
 		}
@@ -236,14 +239,20 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
-		value.writeExpression(writer);
-		
 		if (this.parameterized.isClass())
 		{
+			if (instance != null)
+			{
+				instance.writeExpression(writer);
+			}
+			
+			value.writeExpression(writer);
+			
 			writer.writePutField(((IClass) this.parameterized).getInternalName(), this.qualifiedName, this.getDescription());
 			return;
 		}
 		
+		value.writeExpression(writer);
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}
 	
