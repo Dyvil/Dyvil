@@ -4,9 +4,7 @@ import static dyvil.reflect.Opcodes.*;
 
 import org.objectweb.asm.Label;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.CodeClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
@@ -15,7 +13,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 
 public class CaseClasses
 {
-	public static void writeEquals(MethodWriter writer, CodeClass theClass, IClassBody body)
+	public static void writeEquals(MethodWriter writer, CodeClass theClass)
 	{
 		Label label;
 		String extended = "L" + theClass.getInternalName() + ";";
@@ -66,20 +64,6 @@ public class CaseClasses
 		for (int i = 0; i < len; i++)
 		{
 			writeEquals(writer, theClass.getParameter(i));
-		}
-		
-		if (body != null)
-		{
-			len = body.fieldCount();
-			for (int i = 0; i < len; i++)
-			{
-				IField f = body.getField(i);
-				
-				if (!f.hasModifier(Modifiers.STATIC))
-				{
-					writeEquals(writer, f);
-				}
-			}
 		}
 		
 		writer.writeLDC(1);
@@ -150,7 +134,7 @@ public class CaseClasses
 		writer.writeFrameLabel(endLabel);
 	}
 	
-	public static void writeHashCode(MethodWriter writer, CodeClass theClass, IClassBody body)
+	public static void writeHashCode(MethodWriter writer, CodeClass theClass)
 	{
 		writer.writeLDC(31);
 		
@@ -164,24 +148,6 @@ public class CaseClasses
 			writer.writeLDC(31);
 			// Multiply the result by 31
 			writer.writeInsn(IMUL);
-		}
-		
-		if (body != null)
-		{
-			len = body.fieldCount();
-			for (int i = 0; i < len; i++)
-			{
-				IField f = body.getField(i);
-				
-				if (f.hasModifier(Modifiers.STATIC))
-				{
-					continue;
-				}
-				writeHashCode(writer, f);
-				writer.writeInsn(IADD);
-				writer.writeLDC(31);
-				writer.writeInsn(IMUL);
-			}
 		}
 		
 		writer.writeInsn(IRETURN);
@@ -267,7 +233,7 @@ public class CaseClasses
 		writer.writeFrameLabel(endLabel);
 	}
 	
-	public static void writeToString(MethodWriter writer, CodeClass theClass, IClassBody body)
+	public static void writeToString(MethodWriter writer, CodeClass theClass)
 	{
 		// ----- StringBuilder Constructor -----
 		writer.writeTypeInsn(NEW, "java/lang/StringBuilder");
@@ -279,30 +245,10 @@ public class CaseClasses
 		
 		// ----- Fields -----
 		int params = theClass.parameterCount();
-		int fields = body == null ? 0 : body.fieldCount();
 		for (int i = 0; i < params; i++)
 		{
 			writeToString(writer, theClass.getParameter(i));
-			if (fields > 0 || i + 1 < params)
-			{
-				// Separator Comma
-				writer.writeLDC(", ");
-				writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
-						"Ljava/lang/StringBuilder;");
-			}
-		}
-		
-		for (int i = 0; i < fields; i++)
-		{
-			IField f = body.getField(i);
-			
-			if (f.hasModifier(Modifiers.STATIC))
-			{
-				continue;
-			}
-			
-			writeToString(writer, f);
-			if (i + 1 < fields)
+			if (i + 1 < params)
 			{
 				// Separator Comma
 				writer.writeLDC(", ");

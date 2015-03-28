@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.value;
 
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class LiteralValue implements IValue
@@ -14,7 +14,7 @@ public final class LiteralValue implements IValue
 	private SingleArgument	argument;
 	private IType			type;
 	
-	private IConstructor	constructor;
+	private IMethod	method;
 	
 	public LiteralValue(IType type, IValue literal)
 	{
@@ -74,17 +74,15 @@ public final class LiteralValue implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		ConstructorMatch match = this.type.resolveConstructor(this.argument);
+		MethodMatch match = this.type.resolveMethod(null, Name.apply, this.argument);
 		if (match == null)
 		{
 			IValue value = this.argument.getFirstValue();
-			Marker marker = markers.create(value.getPosition(), "literal.constructor");
-			marker.addInfo("Literal Type: " + value.getType());
-			marker.addInfo("Target Type: " + this.type);
+			markers.add(value.getPosition(), "literal.method", value.getType().toString(), this.type.toString());
 		}
 		else
 		{
-			this.constructor = match.constructor;
+			this.method = match.method;
 		}
 		
 		this.argument.checkTypes(markers, context);
@@ -106,7 +104,7 @@ public final class LiteralValue implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		this.constructor.writeCall(writer, this.argument, null);
+		this.method.writeCall(writer, null, this.argument, null);
 	}
 	
 	@Override

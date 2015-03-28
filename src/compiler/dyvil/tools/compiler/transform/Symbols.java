@@ -90,6 +90,12 @@ public final class Symbols
 		
 		int len = s.length();
 		StringBuilder builder = new StringBuilder(len);
+		
+		for (int j = 0; j < i; j++)
+		{
+			builder.append(s.charAt(j));
+		}
+		
 		for (; i < len; i++)
 		{
 			char c = s.charAt(i);

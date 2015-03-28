@@ -8,6 +8,7 @@ import java.util.List;
 import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.ClassParameterSetter;
@@ -72,6 +73,7 @@ public class CodeClass extends ASTNode implements IClass
 	
 	protected IClassBody			body;
 	protected IField				instanceField;
+	protected IMethod				applyMethod;
 	protected IClassCompilable[]	compilables;
 	protected int					compilableCount;
 	protected IConstructor			constructor;
@@ -604,11 +606,25 @@ public class CodeClass extends ASTNode implements IClass
 			a.resolve(markers, context);
 		}
 		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
+		if (this.body.getField(Name.instance) == null)
 		{
-			Field f = new Field(this, Name.instance, this.getType());
-			f.modifiers = Modifiers.PUBLIC | Modifiers.CONST | Modifiers.SYNTHETIC;
-			this.instanceField = f;
+			if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
+			{
+				Field f = new Field(this, Name.instance, this.type);
+				f.modifiers = Modifiers.PUBLIC | Modifiers.CONST | Modifiers.SYNTHETIC;
+				this.instanceField = f;
+			}
+		}
+		
+		if (this.body.getMethod(Name.apply, this.parameters, this.parameterCount) == null)
+		{
+			if ((this.modifiers & Modifiers.CASE_CLASS) != 0)
+			{
+				Method m = new Method(this, Name.apply, this.type);
+				m.modifiers = Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC;
+				m.setParameters(this.parameters, this.parameterCount);
+				this.applyMethod = m;
+			}
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -858,6 +874,15 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
+		if (name == Name.apply && this.applyMethod != null)
+		{
+			int match = this.applyMethod.getSignatureMatch(name, instance, arguments);
+			if (match > 0)
+			{
+				list.add(new MethodMatch(this.applyMethod, match));
+			}
+		}
+		
 		if (this.body != null)
 		{
 			this.body.getMethodMatches(list, instance, name, arguments);
@@ -1168,20 +1193,37 @@ public class CodeClass extends ASTNode implements IClass
 			mw.setInstance(this.type);
 			mw.registerParameter("obj", "java/lang/Object");
 			mw.begin();
-			CaseClasses.writeEquals(mw, this, this.body);
+			CaseClasses.writeEquals(mw, this);
 			mw.end();
 			
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I", null, null));
 			mw.setInstance(this.type);
 			mw.begin();
-			CaseClasses.writeHashCode(mw, this, this.body);
+			CaseClasses.writeHashCode(mw, this);
 			mw.end();
 			
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString", "()Ljava/lang/String;", null, null));
 			mw.setInstance(this.type);
 			mw.begin();
-			CaseClasses.writeToString(mw, this, this.body);
+			CaseClasses.writeToString(mw, this);
 			mw.end();
+			
+			if (this.applyMethod != null)
+			{
+				mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers(), "apply", this.applyMethod.getDescriptor(), null, null));
+				mw.begin();
+				mw.writeTypeInsn(Opcodes.NEW, this.type);
+				mw.writeInsn(Opcodes.DUP);
+				for (int i = 0; i < this.parameterCount; i++)
+				{
+					Parameter param = this.parameters[i];
+					param.write(mw);
+					mw.writeVarInsn(param.type.getLoadOpcode(), param.index);
+				}
+				this.constructor.writeInvoke(mw, EmptyArguments.INSTANCE);
+				mw.writeInsn(Opcodes.ARETURN);
+				mw.end(this.type);
+			}
 		}
 		
 		if (instanceField != null)

@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.value.LiteralValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class StringValue extends ASTNode implements IConstantValue
+public final class StringValue extends ASTNode implements IConstantValue
 {
 	public static final Type	STRING_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("StringConvertible"));
 	
