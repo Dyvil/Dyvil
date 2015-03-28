@@ -6,7 +6,8 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
-import dyvil.tools.compiler.ast.method.IBaseMethod;
+import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.method.IMethodSignature;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
@@ -208,7 +209,7 @@ public class ClassFormat
 		}
 	}
 	
-	public static void readMethodType(String internal, IBaseMethod method)
+	public static void readMethodType(String internal, IMethodSignature method)
 	{
 		int index = internal.indexOf(')');
 		int i = 1;
@@ -224,6 +225,11 @@ public class ClassFormat
 		
 		IType t = internalToType(internal.substring(index + 1));
 		method.setType(t);
+	}
+	
+	public static void readConstructorType(String internal, IConstructor constructor)
+	{
+		readTypeList(internal, 1, internal.indexOf(')'), constructor);
 	}
 	
 	protected static void readTypeList(String internal, int start, int end, ITypeList list)

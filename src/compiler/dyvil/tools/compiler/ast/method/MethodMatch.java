@@ -2,12 +2,12 @@ package dyvil.tools.compiler.ast.method;
 
 public class MethodMatch implements Comparable<MethodMatch>
 {
-	public IMethod	theMethod;
+	public IMethod	method;
 	public int		match;
 	
-	public MethodMatch(IMethod theMethod, int match)
+	public MethodMatch(IMethod method, int match)
 	{
-		this.theMethod = theMethod;
+		this.method = method;
 		this.match = match;
 	}
 	
@@ -21,7 +21,7 @@ public class MethodMatch implements Comparable<MethodMatch>
 	public String toString()
 	{
 		StringBuilder buf = new StringBuilder();
-		this.theMethod.toString("", buf);
+		this.method.toString("", buf);
 		return buf.toString();
 	}
 }

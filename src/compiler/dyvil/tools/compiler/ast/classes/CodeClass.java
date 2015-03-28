@@ -12,7 +12,6 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAssign;
-import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -21,9 +20,7 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.Method;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
@@ -35,7 +32,6 @@ import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.SuperValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -45,6 +41,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ClassParameterSetter;
+import dyvil.tools.compiler.util.InitializerCall;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
@@ -78,8 +75,8 @@ public class CodeClass extends ASTNode implements IClass
 	protected IField				instanceField;
 	protected IClassCompilable[]	compilables;
 	protected int					compilableCount;
-	protected IMethod				constructor;
-	protected IMethod				superConstructor;
+	protected IConstructor			constructor;
+	protected IConstructor			superConstructor;
 	
 	public CodeClass()
 	{
@@ -411,7 +408,7 @@ public class CodeClass extends ASTNode implements IClass
 	public void addParameter(Parameter param)
 	{
 		param.parameterized = this;
-		IMethod constructor = this.getConstructor();
+		IConstructor constructor = this.getConstructor();
 		
 		if (this.parameters == null)
 		{
@@ -554,14 +551,14 @@ public class CodeClass extends ASTNode implements IClass
 		return interfaces;
 	}
 	
-	private IMethod getConstructor()
+	private IConstructor getConstructor()
 	{
 		if (this.constructor != null)
 		{
 			return this.constructor;
 		}
 		
-		Method constructor = new Method(this, "new", this.type);
+		Constructor constructor = new Constructor(this);
 		constructor.modifiers = Modifiers.PUBLIC | Modifiers.SYNTHETIC;
 		return this.constructor = constructor;
 	}
@@ -622,10 +619,10 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.superType != null)
 		{
-			MethodMatch match = this.superType.resolveConstructor(EmptyArguments.INSTANCE);
+			ConstructorMatch match = this.superType.resolveConstructor(EmptyArguments.INSTANCE);
 			if (match != null)
 			{
-				this.superConstructor = match.theMethod;
+				this.superConstructor = match.constructor;
 			}
 		}
 	}
@@ -886,9 +883,9 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public MethodMatch resolveConstructor(IArguments arguments)
+	public ConstructorMatch resolveConstructor(IArguments arguments)
 	{
-		List<MethodMatch> list = new ArrayList();
+		List<ConstructorMatch> list = new ArrayList();
 		this.getConstructorMatches(list, arguments);
 		
 		if (!list.isEmpty())
@@ -934,20 +931,20 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		if (this.constructor != null)
 		{
-			int match = this.constructor.getSignatureMatch("<init>", null, arguments);
+			int match = this.constructor.getSignatureMatch(arguments);
 			if (match > 0)
 			{
-				list.add(new MethodMatch(this.constructor, match));
+				list.add(new ConstructorMatch(this.constructor, match));
 			}
 		}
 		
 		if (this.body != null)
 		{
-			this.body.getMethodMatches(list, null, "<init>", arguments);
+			this.body.getConstructorMatches(list, arguments);
 		}
 	}
 	
@@ -1116,12 +1113,14 @@ public class CodeClass extends ASTNode implements IClass
 		// Fields, Methods and Properties
 		
 		int fields = 0;
+		int constructors = 0;
 		int methods = 0;
 		int properties = 0;
 		if (this.body != null)
 		{
 			fields = this.body.fieldCount();
 			methods = this.body.methodCount();
+			constructors = this.body.constructorCount();
 			properties = this.body.propertyCount();
 			
 			int classes = this.body.classCount();
@@ -1167,13 +1166,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.superConstructor != null)
 		{
-			MethodCall call = new MethodCall(null);
-			call.instance = new SuperValue(null, this.superType);
-			call.method = this.superConstructor;
-			call.name = "new";
-			call.qualifiedName = "<init>";
-			call.arguments = EmptyArguments.INSTANCE;
-			instanceFields.addValue(0, call);
+			instanceFields.addValue(0, new InitializerCall(null, this.superConstructor, EmptyArguments.INSTANCE, true));
 		}
 		
 		if (this.constructor != null)
@@ -1188,6 +1181,11 @@ public class CodeClass extends ASTNode implements IClass
 			
 			this.constructor.setValue(instanceFields);
 			this.constructor.write(writer);
+		}
+		
+		for (int i = 0; i < constructors; i++)
+		{
+			this.body.getConstructor(i).write(writer);
 		}
 		
 		for (int i = 0; i < properties; i++)
@@ -1210,7 +1208,7 @@ public class CodeClass extends ASTNode implements IClass
 			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null,
 					null));
 			mw.setInstance(this.type);
-			mw.registerParameter("obj", "Ljava/lang/Object;");
+			mw.registerParameter("obj", "java/lang/Object");
 			mw.begin();
 			CaseClasses.writeEquals(mw, this, this.body);
 			mw.end();
@@ -1236,7 +1234,7 @@ public class CodeClass extends ASTNode implements IClass
 			assign.field = instanceField;
 			ConstructorCall call = new ConstructorCall(null);
 			call.type = this.type;
-			call.method = this.constructor;
+			call.constructor = this.constructor;
 			assign.value = call;
 			staticFields.addValue(assign);
 		}

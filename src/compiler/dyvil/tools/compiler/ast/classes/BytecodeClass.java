@@ -11,9 +11,7 @@ import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.Method;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -239,14 +237,14 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		if (!this.typesResolved)
 		{
 			this.resolveTypes(null, Package.rootPackage);
 		}
 		
-		this.body.getMethodMatches(list, null, "<init>", arguments);
+		this.body.getConstructorMatches(list, arguments);
 	}
 	
 	public boolean addSpecialMethod(String specialType, String name, IMethod method)
@@ -391,9 +389,28 @@ public class BytecodeClass extends CodeClass
 			return new AnnotationClassVisitor(param);
 		}
 		
+		if ("<init>".equals(name))
+		{
+			Constructor constructor = new Constructor(this);
+			constructor.setModifiers(access);
+			
+			ClassFormat.readConstructorType(desc, constructor);
+			
+			if ((access & Modifiers.VARARGS) != 0)
+			{
+				Parameter param = constructor.getParameter(constructor.parameterCount() - 1);
+				param.setVarargs2();
+			}
+			
+			this.body.addConstructor(constructor);
+			
+			return new SimpleMethodVisitor(constructor);
+		}
+		
 		Method method = new Method(this);
-		method.setName(Symbols.unqualify(name), name);
-		method.setModifiers(access);
+		method.name = name; // TODO Maybe use Symbols.unqualify here?
+		method.qualifiedName = name;
+		method.modifiers = access;
 		
 		if (signature != null)
 		{
@@ -405,10 +422,9 @@ public class BytecodeClass extends CodeClass
 			ClassFormat.readMethodType(desc, method);
 		}
 		
-		int parCount = method.parameterCount();
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			Parameter param = method.getParameter(parCount - 1);
+			Parameter param = method.getParameter(method.parameterCount() - 1);
 			param.setVarargs2();
 		}
 		

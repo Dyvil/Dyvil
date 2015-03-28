@@ -191,7 +191,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 					
 					if (m != null)
 					{
-						value.resolve(markers, m.theMethod);
+						value.resolve(markers, m.method);
 						continue;
 					}
 					markers.add(v.getPosition(), "dwt.property.unknown", key, this.type.toString());
@@ -211,7 +211,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				MethodMatch getter = this.theClass.resolveMethod(this, Util.getGetter(key), EmptyArguments.INSTANCE);
 				if (getter != null)
 				{
-					node.getter = getter.theMethod;
+					node.getter = getter.method;
 					continue;
 				}
 				IMethod constructor = iclass.getBody().getMethod("<init>");
@@ -227,7 +227,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				
 				if (m != null)
 				{
-					property.setter = m.theMethod;
+					property.setter = m.method;
 					continue;
 				}
 				markers.add(value.getPosition(), "dwt.property.unknown", key, this.type.toString());

@@ -40,7 +40,7 @@ public interface IValue extends IASTNode, ITyped
 	public static int	APPLY_METHOD_CALL	= 20;
 	public static int	UPDATE_METHOD_CALL	= 21;
 	public static int	CONSTRUCTOR_CALL	= 22;
-	public static int	ARRAY_CONSTRUCTOR	= 23;
+	public static int	INITIALIZER_CALL	= 23;
 	public static int	VARIABLE			= 24;
 	
 	public static int	CAST_OPERATOR		= 32;

@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -266,13 +267,13 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	}
 	
 	@Override
-	public MethodMatch resolveConstructor(IArguments arguments)
+	public ConstructorMatch resolveConstructor(IArguments arguments)
 	{
 		return this.context.resolveConstructor(arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		this.context.getConstructorMatches(list, arguments);
 	}

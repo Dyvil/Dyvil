@@ -8,12 +8,11 @@ import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.Property;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IAnnotationList;
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.Constructor;
+import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -32,7 +31,7 @@ import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Tokens;
 
-public final class ClassBodyParser extends Parser implements ITyped, ITypeList, IAnnotationList
+public final class ClassBodyParser extends Parser implements ITyped, IAnnotationList
 {
 	public static final int	TYPE			= 1;
 	public static final int	NAME			= 2;
@@ -52,7 +51,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	private Annotation[]	annotations		= new Annotation[2];
 	private int				annotationCount;
 	
-	private IMethod			method;
+	private IBaseMethod		method;
 	
 	public ClassBodyParser(IClass theClass)
 	{
@@ -97,6 +96,19 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				return;
 			}
 			
+			if (type == Keywords.NEW)
+			{
+				Constructor c = new Constructor(this.theClass);
+				this.body.addConstructor(c);
+				c.position = token.raw();
+				c.modifiers = this.modifiers;
+				c.setAnnotations(this.annotations, this.annotationCount);
+				this.method = c;
+				
+				this.mode = PARAMETERS;
+				return;
+			}
+			
 			int i = 0;
 			if ((i = ModifierTypes.MEMBER.parse(value)) != -1)
 			{
@@ -134,7 +146,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		}
 		if (this.isInMode(NAME))
 		{
-			if (!ParserUtil.isIdentifier(type) && type != Keywords.NEW)
+			if (!ParserUtil.isIdentifier(type))
 			{
 				this.reset();
 				throw new SyntaxError(token, "Invalid Member Declaration - Name expected");
@@ -163,7 +175,7 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				m.position = token.raw();
 				m.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.method = m;
-				this.body.addMethod(this.method);
+				this.body.addMethod(m);
 				return;
 			}
 			if (type == Symbols.OPEN_CURLY_BRACKET)
@@ -199,11 +211,11 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 				m.position = token.raw();
 				m.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.method = m;
-				this.body.addMethod(this.method);
+				this.body.addMethod(m);
 				
 				this.mode = GENERICS_END;
 				pm.skip();
-				pm.pushParser(new TypeVariableListParser(this.method));
+				pm.pushParser(new TypeVariableListParser(m));
 				return;
 			}
 			return;
@@ -267,12 +279,6 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 		this.type = type;
 	}
 	
-	@Override
-	public void addType(IType type)
-	{
-		this.method.addTypeVariable((ITypeVariable) type);
-	}
-	
 	private Annotation[] getAnnotations()
 	{
 		Annotation[] a = new Annotation[this.annotationCount];
@@ -325,23 +331,6 @@ public final class ClassBodyParser extends Parser implements ITyped, ITypeList, 
 	
 	@Override
 	public Type getType()
-	{
-		return null;
-	}
-	
-	@Override
-	public int typeCount()
-	{
-		return 0;
-	}
-	
-	@Override
-	public void setType(int index, IType type)
-	{
-	}
-	
-	@Override
-	public IType getType(int index)
 	{
 		return null;
 	}

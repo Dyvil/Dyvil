@@ -5,6 +5,7 @@ import java.util.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
@@ -43,9 +44,9 @@ public interface IContext
 	
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments);
 	
-	public MethodMatch resolveConstructor(IArguments arguments);
+	public ConstructorMatch resolveConstructor(IArguments arguments);
 	
-	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments);
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
 	
 	public byte getAccessibility(IMember member);
 }

@@ -61,7 +61,7 @@ public interface IAccess extends IValue, IValued, ICall
 				match = type.resolveMethod(instance, name, arguments);
 				if (match != null)
 				{
-					return match.theMethod;
+					return match.method;
 				}
 			}
 		}
@@ -74,7 +74,7 @@ public interface IAccess extends IValue, IValued, ICall
 				match = type.resolveMethod(instance, name, EmptyArguments.INSTANCE);
 				if (match != null)
 				{
-					return match.theMethod;
+					return match.method;
 				}
 			}
 		}
@@ -82,13 +82,13 @@ public interface IAccess extends IValue, IValued, ICall
 		match = context.resolveMethod(instance, name, arguments);
 		if (match != null)
 		{
-			return match.theMethod;
+			return match.method;
 		}
 		
 		match = Type.PREDEF_CLASS.resolveMethod(instance, name, arguments);
 		if (match != null)
 		{
-			return match.theMethod;
+			return match.method;
 		}
 		return null;
 	}

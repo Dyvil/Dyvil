@@ -54,8 +54,6 @@ public class Method extends Member implements IMethod
 	
 	public IValue				value;
 	
-	protected boolean			isConstructor;
-	
 	protected IMethod			overrideMethod;
 	protected int[]				intrinsicOpcodes;
 	
@@ -67,15 +65,6 @@ public class Method extends Member implements IMethod
 	public Method(IClass iclass, String name)
 	{
 		this.theClass = iclass;
-		
-		if (name.equals("new"))
-		{
-			this.isConstructor = true;
-			this.name = "new";
-			this.qualifiedName = "<init>";
-			return;
-		}
-		
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
 	}
@@ -84,15 +73,6 @@ public class Method extends Member implements IMethod
 	{
 		this.theClass = iclass;
 		this.type = type;
-		
-		if (name.equals("new"))
-		{
-			this.isConstructor = true;
-			this.name = "new";
-			this.qualifiedName = "<init>";
-			return;
-		}
-		
 		this.name = name;
 		this.qualifiedName = Symbols.qualify(name);
 	}
@@ -106,33 +86,15 @@ public class Method extends Member implements IMethod
 	@Override
 	public void setName(String name)
 	{
-		if (name.equals("new"))
-		{
-			this.qualifiedName = "<init>";
-			this.name = "new";
-			this.isConstructor = true;
-		}
-		else
-		{
-			this.qualifiedName = Symbols.qualify(name);
 			this.name = name;
-		}
+			this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override
 	public void setQualifiedName(String name)
 	{
-		if (name.equals("<init>"))
-		{
-			this.qualifiedName = "<init>";
-			this.name = "new";
-			this.isConstructor = true;
-		}
-		else
-		{
+		this.name = Symbols.unqualify(name);
 			this.qualifiedName = name;
-			this.name = Symbols.unqualify(name);
-		}
 	}
 	
 	@Override
@@ -323,162 +285,6 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public int getSignatureMatch(String name, IValue instance, IArguments arguments)
-	{
-		if (name != null && !name.equals(this.qualifiedName))
-		{
-			return 0;
-		}
-		
-		// Only matching the name
-		if (arguments == null)
-		{
-			return 1;
-		}
-		
-		int parIndex = 0;
-		int match = 1;
-		int len = arguments.size();
-		
-		// infix modifier implementation
-		int mods = this.modifiers & Modifiers.INFIX;
-		if (instance != null && mods == Modifiers.INFIX)
-		{
-			IType t2 = this.parameters[0].type;
-			int m = instance.getTypeMatch(t2);
-			if (m == 0)
-			{
-				return 0;
-			}
-			match += m;
-			
-			parIndex = 1;
-		}
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
-		{
-			int parCount = this.parameterCount - 1;
-			if (len <= parCount)
-			{
-				return 0;
-			}
-			
-			int m;
-			Parameter varParam = this.parameters[parCount];
-			for (int i = parIndex; i < parCount; i++)
-			{
-				Parameter par = this.parameters[i + parIndex];
-				m = arguments.getTypeMatch(i, par);
-				if (m == 0)
-				{
-					return 0;
-				}
-				match += m;
-			}
-			for (int i = parCount + parIndex; i < len; i++)
-			{
-				m = arguments.getVarargsTypeMatch(i, varParam);
-				if (m == 0)
-				{
-					return 0;
-				}
-				match += m;
-			}
-			return match;
-		}
-		else if (len > this.parameterCount)
-		{
-			return 0;
-		}
-		
-		for (int i = 0; parIndex < this.parameterCount; parIndex++, i++)
-		{
-			Parameter par = this.parameters[parIndex];
-			int m = arguments.getTypeMatch(i, par);
-			if (m == 0)
-			{
-				return 0;
-			}
-			match += m;
-		}
-		
-		return match;
-	}
-	
-	@Override
-	public void checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
-	{
-		int len = arguments.size();
-		IType parType;
-		
-		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			Parameter par = this.parameters[0];
-			parType = par.getType(typeContext);
-			IValue instance1 = instance.withType(parType);
-			if (instance1 == null)
-			{
-				Marker marker = markers.create(instance.getPosition(), "access.method.infix_type", par.name);
-				marker.addInfo("Required Type: " + parType);
-				marker.addInfo("Value Type: " + instance.getType());
-			}
-			
-			if ((this.modifiers & Modifiers.VARARGS) != 0)
-			{
-				arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1], markers, typeContext);
-				
-				for (int i = 0; i < this.parameterCount - 2; i++)
-				{
-					arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
-				}
-				return;
-			}
-			
-			for (int i = 0; i < this.parameterCount - 1; i++)
-			{
-				arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
-			}
-			return;
-		}
-		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
-		{
-			parType = this.theClass.getType();
-			instance = arguments.getFirstValue();
-			IValue instance1 = instance.withType(parType);
-			if (instance1 == null)
-			{
-				Marker marker = markers.create(instance.getPosition(), "access.method.prefix_type", this.name);
-				marker.addInfo("Required Type: " + parType);
-				marker.addInfo("Value Type: " + instance.getType());
-				
-			}
-			return;
-		}
-		
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
-		{
-			len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], markers, typeContext);
-			
-			for (int i = 0; i < len; i++)
-			{
-				arguments.checkValue(i, this.parameters[i], markers, typeContext);
-			}
-			return;
-		}
-		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			arguments.checkValue(i, this.parameters[i], markers, typeContext);
-		}
-	}
-	
-	@Override
-	public boolean hasTypeVariables()
-	{
-		return this.generics != null || this.theClass.isGeneric();
-	}
-	
-	@Override
 	public IType resolveType(String name, IValue instance, IArguments arguments, ITypeList generics)
 	{
 		if (this.genericCount > 0 && generics != null)
@@ -619,13 +425,9 @@ public class Method extends Member implements IMethod
 		
 		super.resolve(markers, context);
 		
-		int index = this.hasModifier(Modifiers.STATIC) ? 0 : 1;
-		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			Parameter param = this.parameters[i];
-			param.index = index++;
-			param.resolve(markers, context);
+			this.parameters[i].resolve(markers, context);
 		}
 		
 		if (this.value != null)
@@ -646,21 +448,6 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
-			if (this.isConstructor)
-			{
-				IValue value1 = this.value.withType(Type.VOID);
-				if (value1 == null)
-				{
-					Marker marker = markers.create(this.position, "constructor.return");
-					marker.addInfo("Expression Type: " + this.value.getType());
-				}
-				else
-				{
-					this.value = value1;
-				}
-			}
-			else
-			{
 				IValue value1 = this.value.withType(this.type);
 				if (value1 == null)
 				{
@@ -672,7 +459,6 @@ public class Method extends Member implements IMethod
 				{
 					this.value = value1;
 				}
-			}
 			
 			this.value.checkTypes(markers, this);
 		}
@@ -694,7 +480,7 @@ public class Method extends Member implements IMethod
 					markers.add(this.position, "method.override", this.name);
 				}
 			}
-			else if (!this.isConstructor)
+			else
 			{
 				if ((this.modifiers & Modifiers.OVERRIDE) == 0)
 				{
@@ -817,13 +603,13 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public MethodMatch resolveConstructor(IArguments arguments)
+	public ConstructorMatch resolveConstructor(IArguments arguments)
 	{
 		return this.theClass.resolveConstructor(arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		this.theClass.getConstructorMatches(list, arguments);
 	}
@@ -844,6 +630,162 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public int getSignatureMatch(String name, IValue instance, IArguments arguments)
+	{
+		if (name != null && !name.equals(this.qualifiedName))
+		{
+			return 0;
+		}
+		
+		// Only matching the name
+		if (arguments == null)
+		{
+			return 1;
+		}
+		
+		int parIndex = 0;
+		int match = 1;
+		int len = arguments.size();
+		
+		// infix modifier implementation
+		int mods = this.modifiers & Modifiers.INFIX;
+		if (instance != null && mods == Modifiers.INFIX)
+		{
+			IType t2 = this.parameters[0].type;
+			int m = instance.getTypeMatch(t2);
+			if (m == 0)
+			{
+				return 0;
+			}
+			match += m;
+			
+			parIndex = 1;
+		}
+		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		{
+			int parCount = this.parameterCount - 1;
+			if (len <= parCount)
+			{
+				return 0;
+			}
+			
+			int m;
+			Parameter varParam = this.parameters[parCount];
+			for (int i = parIndex; i < parCount; i++)
+			{
+				Parameter par = this.parameters[i + parIndex];
+				m = arguments.getTypeMatch(i, par);
+				if (m == 0)
+				{
+					return 0;
+				}
+				match += m;
+			}
+			for (int i = parCount + parIndex; i < len; i++)
+			{
+				m = arguments.getVarargsTypeMatch(i, varParam);
+				if (m == 0)
+				{
+					return 0;
+				}
+				match += m;
+			}
+			return match;
+		}
+		else if (len > this.parameterCount)
+		{
+			return 0;
+		}
+		
+		for (int i = 0; parIndex < this.parameterCount; parIndex++, i++)
+		{
+			Parameter par = this.parameters[parIndex];
+			int m = arguments.getTypeMatch(i, par);
+			if (m == 0)
+			{
+				return 0;
+			}
+			match += m;
+		}
+		
+		return match;
+	}
+
+	@Override
+	public void checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
+	{
+		int len = arguments.size();
+		IType parType;
+		
+		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		{
+			Parameter par = this.parameters[0];
+			parType = par.getType(typeContext);
+			IValue instance1 = instance.withType(parType);
+			if (instance1 == null)
+			{
+				Marker marker = markers.create(instance.getPosition(), "access.method.infix_type", par.name);
+				marker.addInfo("Required Type: " + parType);
+				marker.addInfo("Value Type: " + instance.getType());
+			}
+			
+			if ((this.modifiers & Modifiers.VARARGS) != 0)
+			{
+				arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1], markers, typeContext);
+				
+				for (int i = 0; i < this.parameterCount - 2; i++)
+				{
+					arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
+				}
+				return;
+			}
+			
+			for (int i = 0; i < this.parameterCount - 1; i++)
+			{
+				arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
+			}
+			return;
+		}
+		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		{
+			parType = this.theClass.getType();
+			instance = arguments.getFirstValue();
+			IValue instance1 = instance.withType(parType);
+			if (instance1 == null)
+			{
+				Marker marker = markers.create(instance.getPosition(), "access.method.prefix_type", this.name);
+				marker.addInfo("Required Type: " + parType);
+				marker.addInfo("Value Type: " + instance.getType());
+				
+			}
+			return;
+		}
+		
+		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		{
+			len = this.parameterCount - 1;
+			arguments.checkVarargsValue(len, this.parameters[len], markers, typeContext);
+			
+			for (int i = 0; i < len; i++)
+			{
+				arguments.checkValue(i, this.parameters[i], markers, typeContext);
+			}
+			return;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			arguments.checkValue(i, this.parameters[i], markers, typeContext);
+		}
+	}
+
+	@Override
+	public boolean hasTypeVariables()
+	{
+		return this.generics != null || this.theClass.isGeneric();
+	}
+
+	@Override
 	public boolean isIntrinsic()
 	{
 		return this.intrinsicOpcodes != null;
@@ -859,14 +801,7 @@ public class Method extends Member implements IMethod
 			this.parameters[i].type.appendExtendedName(buffer);
 		}
 		buffer.append(')');
-		if (this.isConstructor)
-		{
-			buffer.append('V');
-		}
-		else
-		{
 			this.type.appendExtendedName(buffer);
-		}
 		return buffer.toString();
 	}
 	
@@ -895,14 +830,7 @@ public class Method extends Member implements IMethod
 			this.parameters[i].type.appendSignature(buffer);
 		}
 		buffer.append(')');
-		if (this.isConstructor)
-		{
-			buffer.append('V');
-		}
-		else
-		{
-			this.type.appendExtendedName(buffer);
-		}
+		this.type.appendExtendedName(buffer);
 		return buffer.toString();
 	}
 	
@@ -933,10 +861,6 @@ public class Method extends Member implements IMethod
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(),
 				this.getExceptions()));
 		
-		if (this.isConstructor)
-		{
-			mw.setConstructor(this.type);
-		}
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
 			mw.setInstance(this.type);
@@ -982,7 +906,7 @@ public class Method extends Member implements IMethod
 			mw.writeLabel(start);
 			this.value.writeExpression(mw);
 			mw.writeLabel(end);
-			mw.end(this.isConstructor ? Type.VOID : this.type);
+			mw.end(this.type);
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -1000,23 +924,6 @@ public class Method extends Member implements IMethod
 	@Override
 	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type)
 	{
-		if (this.isConstructor)
-		{
-			writer.writeTypeInsn(Opcodes.NEW, this.type);
-			if (type != Type.VOID)
-			{
-				writer.writeInsn(Opcodes.DUP);
-			}
-			
-			int args = 1 + this.writeArguments(writer, arguments);
-			
-			String owner = this.type.getInternalName();
-			String name = "<init>";
-			String desc = this.getDescriptor();
-			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false, args, (String) null);
-			return;
-		}
-		
 		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
 		{
 			instance = null;

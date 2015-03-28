@@ -145,11 +145,11 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 		outer:
 		for (MethodMatch match : this.methods)
 		{
-			if (staticInstance != match.theMethod.isStatic())
+			if (staticInstance != match.method.isStatic())
 			{
 				continue;
 			}
-			if (parCount != match.theMethod.parameterCount())
+			if (parCount != match.method.parameterCount())
 			{
 				continue;
 			}
@@ -157,7 +157,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 			for (int i = 0; i < parCount; i++)
 			{
 				Parameter par1 = method.getParameter(i);
-				Parameter par2 = match.theMethod.getParameter(i);
+				Parameter par2 = match.method.getParameter(i);
 				
 				if (!par1.type.equals(par2.type))
 				{
@@ -167,7 +167,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 			
 			this.type = type;
 			this.functionalMethod = method;
-			this.method = match.theMethod;
+			this.method = match.method;
 			return true;
 		}
 		

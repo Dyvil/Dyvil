@@ -5,6 +5,8 @@ import java.util.List;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -55,6 +57,16 @@ public interface IClassBody extends IASTNode
 	public IProperty getProperty(int index);
 	
 	public IProperty getProperty(String name);
+	
+	// Constructors
+	
+	public int constructorCount();
+	
+	public void addConstructor(IConstructor constructor);
+	
+	public IConstructor getConstructor(int index);
+	
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
 	
 	// Methods
 	

@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -244,13 +245,13 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public MethodMatch resolveConstructor(IArguments arguments)
+	public ConstructorMatch resolveConstructor(IArguments arguments)
 	{
 		return this.theClass.resolveConstructor(arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<MethodMatch> list, IArguments arguments)
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		this.theClass.getConstructorMatches(list, arguments);
 	}

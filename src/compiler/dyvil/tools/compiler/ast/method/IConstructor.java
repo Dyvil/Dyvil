@@ -1,9 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
-import org.objectweb.asm.Label;
-
 import dyvil.tools.compiler.ast.IASTNode;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -11,19 +8,29 @@ import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignature, IContext, IClassCompilable
+public interface IConstructor extends IASTNode, IMember, IBaseMethod, ITypeList, IContext, IClassCompilable
 {
-	public int getSignatureMatch(String name, IValue instance, IArguments arguments);
+	public int getSignatureMatch(IArguments arguments);
 	
-	public void checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext);
+	public void checkArguments(MarkerList markers, IArguments arguments);
 	
 	// Misc
 	
 	public void setParameters(Parameter[] parameters, int parameterCount);
+	
+	@Override
+	public default int typeCount()
+	{
+		return 0;
+	}
+	
+	@Override
+	public default void setType(int index, IType type)
+	{
+	}
 	
 	@Override
 	public default void addType(IType type)
@@ -32,15 +39,13 @@ public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignatur
 		this.addParameter(new Parameter(index, "par" + index, type));
 	}
 	
-	// Generics
-	
-	public boolean hasTypeVariables();
-	
-	public IType resolveType(String name, IValue instance, IArguments arguments, ITypeList generics);
+	@Override
+	public default IType getType(int index)
+	{
+		return null;
+	}
 	
 	// Compilation
-	
-	public boolean isIntrinsic();
 	
 	public String getDescriptor();
 	
@@ -48,9 +53,7 @@ public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignatur
 	
 	public String[] getExceptions();
 	
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type);
+	public void writeCall(MethodWriter writer, IArguments arguments, IType type);
 	
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments);
-	
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments);
+	public void writeInvoke(MethodWriter writer, IArguments arguments);
 }

@@ -106,7 +106,7 @@ public class ClassAccess extends ASTNode implements IValue
 			MethodCall call = new MethodCall(this.position);
 			call.name = this.type.getName();
 			call.qualifiedName = qualifiedName;
-			call.method = m.theMethod;
+			call.method = m.method;
 			call.dotless = true;
 			if (this.type.isGeneric())
 			{

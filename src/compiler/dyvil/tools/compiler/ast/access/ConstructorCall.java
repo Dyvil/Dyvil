@@ -4,16 +4,13 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -22,12 +19,12 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class ConstructorCall extends ASTNode implements IValue, ICall, ITypeContext
+public final class ConstructorCall extends ASTNode implements IValue, ICall
 {
 	public IType		type;
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
-	public IMethod		method;
+	public IConstructor	constructor;
 	
 	public ConstructorCall(ICodePosition position)
 	{
@@ -97,13 +94,6 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 	}
 	
 	@Override
-	public IType resolveType(String name)
-	{
-		ITypeList generics = this.type.isGeneric() ? (GenericType) this.type : null;
-		return this.method.resolveType(name, null, this.arguments, generics);
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context);
@@ -155,7 +145,7 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 			return this;
 		}
 		
-		MethodMatch match = this.type.resolveConstructor(this.arguments);
+		ConstructorMatch match = this.type.resolveConstructor(this.arguments);
 		if (match == null)
 		{
 			Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());
@@ -166,16 +156,16 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 			return this;
 		}
 		
-		this.method = match.theMethod;
+		this.constructor = match.constructor;
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.method != null)
+		if (this.constructor != null)
 		{
-			this.method.checkArguments(markers, null, this.arguments, this);
+			this.constructor.checkArguments(markers, this.arguments);
 		}
 		this.arguments.checkTypes(markers, context);
 	}
@@ -204,14 +194,14 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 			markers.add(this.position, "constructor.abstract", iclass.getName());
 		}
 		
-		if (this.method != null)
+		if (this.constructor != null)
 		{
-			if (this.method.hasModifier(Modifiers.DEPRECATED))
+			if (this.constructor.hasModifier(Modifiers.DEPRECATED))
 			{
 				markers.add(this.position, "access.constructor.deprecated", iclass.getName());
 			}
 			
-			byte access = context.getAccessibility(this.method);
+			byte access = context.getAccessibility(this.constructor);
 			if (access == IContext.SEALED)
 			{
 				markers.add(this.position, "access.constructor.sealed", iclass.getName());
@@ -257,7 +247,7 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall, ITy
 			return;
 		}
 		
-		this.method.writeCall(writer, null, arguments, null);
+		this.constructor.writeCall(writer, arguments, null);
 	}
 	
 	@Override

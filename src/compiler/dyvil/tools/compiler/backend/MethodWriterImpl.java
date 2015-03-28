@@ -38,16 +38,13 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void setConstructor(IType type)
 	{
-		this.locals[0] = UNINITIALIZED_THIS;
-		this.localCount++;
-		this.push(UNINITIALIZED_THIS);
+		this.setLocal(0, UNINITIALIZED_THIS);
 	}
 	
 	@Override
 	public void setInstance(IType type)
 	{
-		this.locals[0] = type.getFrameType();
-		this.localCount++;
+		this.setLocal(0, type.getFrameType());
 	}
 	
 	@Override

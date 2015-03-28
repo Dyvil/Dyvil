@@ -230,7 +230,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 				MethodMatch match = type.resolveMethod(instance1, "update", arguments1);
 				if (match != null)
 				{
-					this.updateMethod = match.theMethod;
+					this.updateMethod = match.method;
 				}
 				else
 				{

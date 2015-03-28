@@ -6,6 +6,8 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -17,19 +19,21 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ClassBody extends ASTNode implements IClassBody
 {
-	public IClass		theClass;
+	public IClass			theClass;
 	
-	public IClass[]		classes;
-	public int			classCount;
+	public IClass[]			classes;
+	public int				classCount;
 	
-	private IField[]	fields		= new IField[3];
-	private int			fieldCount;
-	private IMethod[]	methods		= new IMethod[3];
-	private int			methodCount;
-	private IProperty[]	properties	= new IProperty[3];
-	private int			propertyCount;
+	private IField[]		fields			= new IField[3];
+	private int				fieldCount;
+	private IConstructor[]	constructors	= new IConstructor[1];
+	private int				constructorCount;
+	private IMethod[]		methods			= new IMethod[3];
+	private int				methodCount;
+	private IProperty[]		properties		= new IProperty[3];
+	private int				propertyCount;
 	
-	protected IMethod	functionalMethod;
+	protected IMethod		functionalMethod;
 	
 	public ClassBody(IClass iclass)
 	{
@@ -68,7 +72,7 @@ public class ClassBody extends ASTNode implements IClassBody
 		}
 		
 		int index = this.classCount++;
-		if (this.classCount > this.classes.length)
+		if (index >= this.classes.length)
 		{
 			IClass[] temp = new IClass[this.classCount];
 			System.arraycopy(this.classes, 0, temp, 0, index);
@@ -109,7 +113,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	public void addField(IField field)
 	{
 		int index = this.fieldCount++;
-		if (this.fieldCount > this.fields.length)
+		if (index >= this.fields.length)
 		{
 			IField[] temp = new IField[this.fieldCount];
 			System.arraycopy(this.fields, 0, temp, 0, index);
@@ -150,7 +154,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	public void addProperty(IProperty property)
 	{
 		int index = this.propertyCount++;
-		if (this.propertyCount > this.properties.length)
+		if (index >= this.properties.length)
 		{
 			IProperty[] temp = new IProperty[this.propertyCount];
 			System.arraycopy(this.properties, 0, temp, 0, index);
@@ -179,6 +183,47 @@ public class ClassBody extends ASTNode implements IClassBody
 		return null;
 	}
 	
+	// Constructors
+	
+	@Override
+	public int constructorCount()
+	{
+		return this.constructorCount;
+	}
+	
+	@Override
+	public void addConstructor(IConstructor constructor)
+	{
+		int index = this.constructorCount++;
+		if (index >= this.constructors.length)
+		{
+			IConstructor[] temp = new IConstructor[this.constructorCount];
+			System.arraycopy(this.constructors, 0, temp, 0, index);
+			this.constructors = temp;
+		}
+		this.constructors[index] = constructor;
+	}
+	
+	@Override
+	public IConstructor getConstructor(int index)
+	{
+		return this.constructors[index];
+	}
+	
+	@Override
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	{
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			IConstructor c = this.constructors[i];
+			int m = c.getSignatureMatch(arguments);
+			if (m > 0)
+			{
+				list.add(new ConstructorMatch(c, m));
+			}
+		}
+	}
+	
 	// Methods
 	
 	@Override
@@ -191,7 +236,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	public void addMethod(IMethod method)
 	{
 		int index = this.methodCount++;
-		if (this.methodCount > this.methods.length)
+		if (index >= this.methods.length)
 		{
 			IMethod[] temp = new IMethod[this.methodCount];
 			System.arraycopy(this.methods, 0, temp, 0, index);
@@ -300,6 +345,10 @@ public class ClassBody extends ASTNode implements IClassBody
 		{
 			this.properties[i].resolveTypes(markers, context);
 		}
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].resolveTypes(markers, context);
+		}
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			this.methods[i].resolveTypes(markers, context);
@@ -320,6 +369,10 @@ public class ClassBody extends ASTNode implements IClassBody
 		for (int i = 0; i < this.propertyCount; i++)
 		{
 			this.properties[i].resolve(markers, context);
+		}
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].resolve(markers, context);
 		}
 		for (int i = 0; i < this.methodCount; i++)
 		{
@@ -342,6 +395,10 @@ public class ClassBody extends ASTNode implements IClassBody
 		{
 			this.properties[i].checkTypes(markers, context);
 		}
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].checkTypes(markers, context);
+		}
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			this.methods[i].checkTypes(markers, context);
@@ -363,6 +420,10 @@ public class ClassBody extends ASTNode implements IClassBody
 		{
 			this.properties[i].check(markers, context);
 		}
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].check(markers, context);
+		}
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			this.methods[i].check(markers, context);
@@ -383,6 +444,10 @@ public class ClassBody extends ASTNode implements IClassBody
 		for (int i = 0; i < this.propertyCount; i++)
 		{
 			this.properties[i].foldConstants();
+		}
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].foldConstants();
 		}
 		for (int i = 0; i < this.methodCount; i++)
 		{
@@ -416,6 +481,19 @@ public class ClassBody extends ASTNode implements IClassBody
 			{
 				this.fields[i].toString(prefix1, buffer);
 				buffer.append('\n');
+			}
+			buffer.append('\n');
+		}
+		
+		if (this.constructorCount > 0)
+		{
+			for (int i = 0; i < this.constructorCount; i++)
+			{
+				this.constructors[i].toString(prefix1, buffer);
+				if (i + 1 < this.constructorCount)
+				{
+					buffer.append('\n');
+				}
 			}
 			buffer.append('\n');
 		}

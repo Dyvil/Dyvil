@@ -432,7 +432,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			if (method1 != null)
 			{
 				AssignMethodCall call = new AssignMethodCall(this.position);
-				call.method = method1.theMethod;
+				call.method = method1.method;
 				call.instance = this.instance;
 				call.arguments = this.arguments;
 				call.name = this.name.substring(0, this.name.length() - 1);
@@ -489,7 +489,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 					// No apply method found -> Not an apply method call
 					return null;
 				}
-				method = match.theMethod;
+				method = match.method;
 				instance = new ClassAccess(this.position, type);
 			}
 			else
@@ -507,7 +507,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 					// No apply method found -> Not an apply method call
 					return null;
 				}
-				method = match.theMethod;
+				method = match.method;
 				instance = access;
 			}
 			

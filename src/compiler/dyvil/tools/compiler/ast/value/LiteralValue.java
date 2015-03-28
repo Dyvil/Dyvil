@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.value;
 
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -14,7 +14,7 @@ public final class LiteralValue implements IValue
 	private SingleArgument	argument;
 	private IType			type;
 	
-	private IMethod			constructor;
+	private IConstructor	constructor;
 	
 	public LiteralValue(IType type, IValue literal)
 	{
@@ -74,7 +74,7 @@ public final class LiteralValue implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		MethodMatch match = this.type.resolveConstructor(this.argument);
+		ConstructorMatch match = this.type.resolveConstructor(this.argument);
 		if (match == null)
 		{
 			IValue value = this.argument.getFirstValue();
@@ -84,7 +84,7 @@ public final class LiteralValue implements IValue
 		}
 		else
 		{
-			this.constructor = match.theMethod;
+			this.constructor = match.constructor;
 		}
 		
 		this.argument.checkTypes(markers, context);
@@ -106,7 +106,7 @@ public final class LiteralValue implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		this.constructor.writeCall(writer, null, this.argument, null);
+		this.constructor.writeCall(writer, this.argument, null);
 	}
 	
 	@Override
