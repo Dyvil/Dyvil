@@ -83,7 +83,6 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			return;
 		}
 		
-		String value = token.text();
 		if (this.isInMode(TYPE))
 		{
 			if (type == Tokens.SEMICOLON)
@@ -111,16 +110,12 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			}
 			
 			int i = 0;
-			if ((i = ModifierTypes.MEMBER.parse(value)) != -1)
+			if ((i = ModifierTypes.MEMBER.parse(type)) != -1)
 			{
-				if ((this.modifiers & i) != 0)
-				{
-					throw new SyntaxError(token, "Duplicate Modifier '" + value + "' - Remove this Modifier");
-				}
 				this.modifiers |= i;
 				return;
 			}
-			if ((i = ModifierTypes.CLASS_TYPE.parse(value)) != -1)
+			if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
 			{
 				CodeClass codeClass = new CodeClass(null, this.theClass.getUnit(), this.modifiers);
 				codeClass.setAnnotations(this.getAnnotations(), this.annotationCount);
@@ -133,9 +128,9 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 				this.reset();
 				return;
 			}
-			if (value.charAt(0) == '@')
+			if (token.nameValue() == Name.at)
 			{
-				Annotation annotation = new Annotation(token.raw(), Name.get(value.substring(1)));
+				Annotation annotation = new Annotation(token.raw());
 				this.addAnnotation(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
@@ -157,7 +152,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			type = next.type();
 			if (type == Tokens.SEMICOLON)
 			{
-				Field f = new Field(this.theClass, Name.get(value), this.type);
+				Field f = new Field(this.theClass, token.nameValue(), this.type);
 				f.position = token.raw();
 				f.modifiers = this.modifiers;
 				f.setAnnotations(this.getAnnotations(), this.annotationCount);
@@ -171,7 +166,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			{
 				this.mode = PARAMETERS;
 				
-				Method m = new Method(this.theClass, Name.get(value), this.type);
+				Method m = new Method(this.theClass, token.nameValue(), this.type);
 				m.modifiers = this.modifiers;
 				m.position = token.raw();
 				m.setAnnotations(this.getAnnotations(), this.annotationCount);
@@ -181,7 +176,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			}
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
-				Property p = new Property(this.theClass, Name.get(value), this.type);
+				Property p = new Property(this.theClass, token.nameValue(), this.type);
 				p.position = token.raw();
 				p.modifiers = this.modifiers;
 				p.setAnnotations(this.getAnnotations(), this.annotationCount);
@@ -194,7 +189,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			}
 			if (type == Tokens.EQUALS)
 			{
-				Field f = new Field(this.theClass, Name.get(value), this.type);
+				Field f = new Field(this.theClass, token.nameValue(), this.type);
 				f.position = token.raw();
 				f.modifiers = this.modifiers;
 				f.setAnnotations(this.getAnnotations(), this.annotationCount);
@@ -207,7 +202,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			}
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
-				Method m = new Method(this.theClass, Name.get(value), this.type);
+				Method m = new Method(this.theClass, token.nameValue(), this.type);
 				m.modifiers = this.modifiers;
 				m.position = token.raw();
 				m.setAnnotations(this.getAnnotations(), this.annotationCount);
@@ -266,7 +261,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 				pm.pushParser(new ExpressionParser(this.method));
 				return;
 			}
-			if ("throws".equals(value))
+			if (type == Keywords.THROWS)
 			{
 				pm.pushParser(new ThrowsDeclParser(this.method));
 				return;

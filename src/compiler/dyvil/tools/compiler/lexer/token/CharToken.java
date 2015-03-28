@@ -34,21 +34,9 @@ public final class CharToken implements IToken
 	}
 	
 	@Override
-	public String text()
-	{
-		return null;
-	}
-	
-	@Override
 	public int type()
 	{
 		return Tokens.CHAR;
-	}
-	
-	@Override
-	public boolean equals(String value)
-	{
-		return false;
 	}
 	
 	@Override

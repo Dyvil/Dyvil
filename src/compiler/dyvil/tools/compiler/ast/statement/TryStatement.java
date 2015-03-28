@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -88,7 +89,7 @@ public class TryStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public Label resolveLabel(String name)
+	public Label resolveLabel(Name name)
 	{
 		return this.parent == null ? this.parent.resolveLabel(name) : null;
 	}

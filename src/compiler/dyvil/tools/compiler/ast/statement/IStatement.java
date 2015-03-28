@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -40,7 +41,7 @@ public interface IStatement extends IValue
 	
 	public IStatement getParent();
 	
-	public default Label resolveLabel(String name)
+	public default Label resolveLabel(Name name)
 	{
 		return null;
 	}

@@ -137,7 +137,7 @@ public class BytecodeVisitor extends MethodVisitor
 	{
 		String name = "L" + this.labelCount++;
 		label.info = name;
-		this.bytecode.addLabel(new dyvil.tools.compiler.ast.statement.Label(label, name));
+		this.bytecode.addLabel(new dyvil.tools.compiler.ast.statement.Label(label, Name.getQualified(name)));
 	}
 	
 	@Override

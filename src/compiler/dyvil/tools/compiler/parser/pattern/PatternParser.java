@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser.pattern;
 
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.pattern.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -50,7 +49,7 @@ public class PatternParser extends Parser
 				int nextType = token.next().type();
 				if (nextType == Tokens.EQUALS)
 				{
-					BindingPattern bp = new BindingPattern(token.raw(), Name.get(token.text()));
+					BindingPattern bp = new BindingPattern(token.raw(), token.nameValue());
 					this.patterned.setPattern(bp);
 					this.patterned = bp;
 					pm.skip();

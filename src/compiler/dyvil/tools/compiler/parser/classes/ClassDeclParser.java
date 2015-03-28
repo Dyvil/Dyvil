@@ -16,6 +16,7 @@ import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -50,40 +51,35 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 	@Override
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
-		String value = token.text();
-		
+		int type = token.type();
 		if (this.isInMode(MODIFIERS))
 		{
 			int i = 0;
-			if ((i = ModifierTypes.CLASS.parse(value)) != -1)
+			if ((i = ModifierTypes.CLASS.parse(type)) != -1)
 			{
-				if (this.theClass.addModifier(i))
-				{
-					throw new SyntaxError(token, "Duplicate Modifier '" + value + "' - Remove this Modifier");
-				}
+				this.theClass.addModifier(i);
 				return;
 			}
-			else if ((i = ModifierTypes.CLASS_TYPE.parse(value)) != -1)
+			else if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
 			{
 				this.theClass.addModifier(i);
 				this.mode = NAME;
 				return;
 			}
-			else if (value.charAt(0) == '@')
+			else if (token.nameValue() == Name.at)
 			{
-				Annotation annotation = new Annotation(token.raw(), Name.get(value.substring(1)));
+				Annotation annotation = new Annotation(token.raw());
 				this.theClass.addAnnotation(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}
 		}
-		int type = token.type();
 		if (this.isInMode(NAME))
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.theClass.setPosition(token.raw());
-				this.theClass.setName(Name.get(value));
+				this.theClass.setName(token.nameValue());
 				this.mode = PARAMETERS | GENERICS | EXTENDS | IMPLEMENTS | BODY;
 				return;
 			}
@@ -128,7 +124,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 		}
 		if (this.isInMode(EXTENDS))
 		{
-			if ("extends".equals(value))
+			if (type == Keywords.EXTENDS)
 			{
 				pm.pushParser(new TypeParser(this));
 				this.mode = IMPLEMENTS | BODY;
@@ -137,7 +133,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 		}
 		if (this.isInMode(IMPLEMENTS))
 		{
-			if ("implements".equals(value))
+			if (type == Keywords.IMPLEMENTS)
 			{
 				pm.pushParser(new TypeListParser(this));
 				this.mode = BODY;

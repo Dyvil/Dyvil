@@ -2,6 +2,7 @@ package dyvil.tools.compiler.lexer;
 
 import static dyvil.tools.compiler.transform.Tokens.*;
 import static dyvil.tools.compiler.util.ParserUtil.*;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.lexer.token.*;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
@@ -72,7 +73,7 @@ public class Dlex
 						reparse = true;
 					}
 				}
-				else if (c == '_' || c == '$' || c == '@')
+				else if (c == '_' || c == '$')
 				{
 					subtype = MOD_SYMBOL | MOD_LETTER;
 					buf.append(c);
@@ -439,7 +440,7 @@ public class Dlex
 			int i = Keywords.getKeywordType(s);
 			if (i == 0)
 			{
-				return new IdentifierToken(prev, s, type, line, start, start + len);
+				return new IdentifierToken(prev, Name.get(s), type, line, start, start + len);
 			}
 			return new KeywordToken(prev, i, line, start, start + len);
 		}
@@ -449,7 +450,7 @@ public class Dlex
 			int i = Symbols.getSymbolType(s);
 			if (i == 0)
 			{
-				return new IdentifierToken(prev, s, type, line, start, start + len);
+				return new IdentifierToken(prev, Name.get(s), type, line, start, start + len);
 			}
 			return new SymbolToken(prev, i, line, start);
 		}

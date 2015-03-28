@@ -10,6 +10,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class TypeVariableParser extends Parser implements ITyped
 {
@@ -41,24 +42,34 @@ public class TypeVariableParser extends Parser implements ITyped
 	@Override
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
+		int type = token.type();
 		if (this.mode == NAME)
 		{
-			this.variable = new TypeVariable(token, Name.get(token.text()));
-			this.mode = TYPE_VARIABLE;
-			return;
+			if (ParserUtil.isIdentifier(type))
+			{
+				this.variable = new TypeVariable(token, token.nameValue());
+				this.mode = TYPE_VARIABLE;
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Type Variable - Name expected");
 		}
 		if (this.mode == TYPE_VARIABLE)
 		{
-			String value = token.text();
+			if (!ParserUtil.isIdentifier(type))
+			{
+				throw new SyntaxError(token, "Invalid Type Variable - '>=', '<=' or '&' expected");
+			}
+			
+			Name name = token.nameValue();
 			if (this.boundMode == 0)
 			{
-				if ("<=".equals(value))
+				if (name == Name.lessEq)
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = LOWER;
 					return;
 				}
-				else if (">=".equals(value))
+				if (name == Name.greaterEq)
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = UPPER;
@@ -67,7 +78,7 @@ public class TypeVariableParser extends Parser implements ITyped
 			}
 			else if (this.boundMode == UPPER)
 			{
-				if ("&".equals(value))
+				if (name == Name.amp)
 				{
 					pm.pushParser(new TypeParser(this));
 					return;

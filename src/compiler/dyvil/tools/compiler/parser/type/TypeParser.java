@@ -82,12 +82,12 @@ public final class TypeParser extends Parser implements ITyped
 			{
 				if (token.next().type() == Symbols.OPEN_SQUARE_BRACKET)
 				{
-					this.type = new GenericType(token, Name.get(token.text()));
+					this.type = new GenericType(token, token.nameValue());
 					this.mode = GENERICS;
 					return;
 				}
 				
-				this.type = new Type(token, Name.get(token.text()));
+				this.type = new Type(token, token.nameValue());
 				this.mode = ARRAY_END;
 				return;
 			}
@@ -97,7 +97,7 @@ public final class TypeParser extends Parser implements ITyped
 				this.mode = WILDCARD_TYPE;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type - Invalid Token '" + token.text() + "'");
+			throw new SyntaxError(token, "Invalid Type - Invalid " + token);
 		}
 		if (this.isInMode(TUPLE_END))
 		{
@@ -194,16 +194,16 @@ public final class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(WILDCARD_TYPE))
 		{
-			String value = token.text();
+			Name name = token.nameValue();
 			if (this.boundMode == 0)
 			{
-				if ("<=".equals(value))
+				if (name == Name.lessEq)
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = LOWER;
 					return;
 				}
-				else if (">=".equals(value))
+				if (name == Name.greaterEq)
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = UPPER;
@@ -212,7 +212,7 @@ public final class TypeParser extends Parser implements ITyped
 			}
 			else if (this.boundMode == UPPER)
 			{
-				if ("&".equals(value))
+				if (name == Name.amp)
 				{
 					pm.pushParser(new TypeParser(this));
 					return;

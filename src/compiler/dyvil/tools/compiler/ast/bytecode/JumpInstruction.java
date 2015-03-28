@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -18,7 +19,7 @@ public class JumpInstruction implements IInstruction
 		this.target = target;
 	}
 	
-	public JumpInstruction(ICodePosition position, int opcode, String target)
+	public JumpInstruction(ICodePosition position, int opcode, Name target)
 	{
 		this.position = position;
 		this.opcode = opcode;

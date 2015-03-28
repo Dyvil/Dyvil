@@ -134,7 +134,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				
 				this.prefix = true;
-				this.getAccess(pm, Name.get(token.text()), token, type);
+				this.getAccess(pm, token.nameValue(), token, type);
 				return;
 			}
 			if (type == Tokens.ARROW_OPERATOR)
@@ -267,7 +267,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser();
 			if (ParserUtil.isIdentifier(type))
 			{
-				FunctionValue fl = new FunctionValue(token.raw(), Name.get(token.text()));
+				FunctionValue fl = new FunctionValue(token.raw(), token.nameValue());
 				fl.instance = this.value;
 				this.field.setValue(fl);
 				return;
@@ -341,8 +341,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 					throw new SyntaxError(token, "Invalid Assignment");
 				}
 				
-				String name = token.text();
-				FieldInitializer access = new FieldInitializer(pos, Name.get(name), itype);
+				FieldInitializer access = new FieldInitializer(pos, token.nameValue(), itype);
 				this.value = access;
 				
 				pm.skip();
@@ -389,7 +388,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				int prevType = prev.type();
 				if (ParserUtil.isIdentifier(prevType))
 				{
-					MethodCall mc = new MethodCall(prev, null, Name.get(prev.text()));
+					MethodCall mc = new MethodCall(prev, null, token.nameValue());
 					mc.arguments = args;
 					this.value = mc;
 				}
@@ -423,7 +422,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.prefix = false;
-				Name name = Name.get(token.text());
+				Name name = token.nameValue();
 				if (this.precedence != 0 && this.dotless)
 				{
 					int p = Operators.index(name);
@@ -450,7 +449,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				this.value = null;
 				pm.reparse();
-				this.getAccess(pm, Name.get(prev.text()), prev, type);
+				this.getAccess(pm, token.nameValue(), prev, type);
 				return;
 			}
 			
@@ -489,7 +488,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser(true);
 			return;
 		}
-		throw new SyntaxError(token, "Invalid Expression - Invalid Token '" + token.text() + "'");
+		throw new SyntaxError(token, "Invalid Expression - Invalid " + token);
 	}
 	
 	private IArguments getArguments(IParserManager pm, IToken next) throws SyntaxError
@@ -794,7 +793,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			IToken next = token.next();
 			if (ParserUtil.isIdentifier(next.type()))
 			{
-				statement.setName(next.text());
+				statement.setName(next.nameValue());
 				pm.skip();
 			}
 			this.mode = 0;
@@ -807,7 +806,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			IToken next = token.next();
 			if (ParserUtil.isIdentifier(next.type()))
 			{
-				statement.setName(next.text());
+				statement.setName(next.nameValue());
 				pm.skip();
 			}
 			this.mode = 0;
@@ -820,7 +819,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			IToken next = token.next();
 			if (ParserUtil.isIdentifier(next.type()))
 			{
-				statement.setName(next.text());
+				statement.setName(next.nameValue());
 				pm.skip();
 			}
 			this.mode = 0;

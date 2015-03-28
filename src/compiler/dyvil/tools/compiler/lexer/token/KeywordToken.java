@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.lexer.token;
 
-import java.util.Objects;
-
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -39,21 +37,9 @@ public final class KeywordToken implements IToken
 	}
 	
 	@Override
-	public String text()
-	{
-		return Keywords.keywordToString(this.type);
-	}
-	
-	@Override
 	public int type()
 	{
 		return this.type;
-	}
-	
-	@Override
-	public boolean equals(String value)
-	{
-		return Objects.equals(Keywords.keywordToString(this.type), value);
 	}
 	
 	@Override

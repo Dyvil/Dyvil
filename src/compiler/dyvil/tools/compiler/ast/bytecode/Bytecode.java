@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -108,7 +109,7 @@ public final class Bytecode extends ASTNode implements IValue
 		this.labels[index] = label;
 	}
 	
-	public Label resolveLabel(String name)
+	public Label resolveLabel(Name name)
 	{
 		if (this.labels == null)
 		{
@@ -122,7 +123,7 @@ public final class Bytecode extends ASTNode implements IValue
 				continue;
 			}
 			
-			if (name.equals(label.name))
+			if (name == label.name)
 			{
 				return label;
 			}

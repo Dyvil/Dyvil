@@ -363,13 +363,13 @@ public final class StatementList extends ValueList implements IStatement, IConte
 	}
 	
 	@Override
-	public Label resolveLabel(String name)
+	public Label resolveLabel(Name name)
 	{
 		if (this.labels != null)
 		{
 			for (Label label : this.labels)
 			{
-				if (label != null && name.equals(label.name))
+				if (label != null && name == label.name)
 				{
 					return label;
 				}

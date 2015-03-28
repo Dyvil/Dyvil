@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.bytecode;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -19,7 +20,7 @@ public final class BytecodeParser extends Parser
 	
 	protected Bytecode			bytecode;
 	
-	private String				label;
+	private Name				label;
 	
 	public BytecodeParser(Bytecode bytecode)
 	{
@@ -60,11 +61,11 @@ public final class BytecodeParser extends Parser
 				}
 				
 				pm.skip();
-				insn = new JumpInstruction(Opcodes.GOTO, new Label(next.text()));
+				insn = new JumpInstruction(Opcodes.GOTO, new Label(next.nameValue()));
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				String name = token.text();
+				Name name = token.nameValue();
 				if (token.next().type() == Tokens.COLON)
 				{
 					pm.skip();
@@ -72,7 +73,7 @@ public final class BytecodeParser extends Parser
 					return;
 				}
 				
-				int opcode = Opcodes.parseOpcode(name);
+				int opcode = Opcodes.parseOpcode(name.qualified);
 				if (opcode == -1)
 				{
 					throw new SyntaxError(token, "Invalid Instruction - Unknown Instruction Name '" + name + "'");
@@ -323,7 +324,7 @@ public final class BytecodeParser extends Parser
 			}
 			
 			pm.skip();
-			return new JumpInstruction(opcode, new Label(next.text()));
+			return new JumpInstruction(opcode, new Label(next.nameValue()));
 		}
 		/* TODO TableSwitchInstruction */
 		case Opcodes.TABLESWITCH:

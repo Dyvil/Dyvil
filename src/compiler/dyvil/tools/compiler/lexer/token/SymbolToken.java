@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.lexer.token;
 
-import java.util.Objects;
-
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -37,21 +35,9 @@ public final class SymbolToken implements IToken
 	}
 	
 	@Override
-	public String text()
-	{
-		return Symbols.symbolToString(this.type);
-	}
-	
-	@Override
 	public int type()
 	{
 		return this.type;
-	}
-	
-	@Override
-	public boolean equals(String value)
-	{
-		return Objects.equals(Symbols.symbolToString(this.type), value);
 	}
 	
 	@Override

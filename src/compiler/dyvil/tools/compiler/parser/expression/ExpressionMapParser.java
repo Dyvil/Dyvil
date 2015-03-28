@@ -19,7 +19,7 @@ public class ExpressionMapParser extends Parser implements IValued
 	
 	protected IValueMap		valueMap;
 	
-	private String			key;
+	private Name			key;
 	
 	public ExpressionMapParser(IValueMap valueMap)
 	{
@@ -47,13 +47,13 @@ public class ExpressionMapParser extends Parser implements IValued
 		if (this.mode == NAME)
 		{
 			this.mode = VALUE;
-			if (token.next().type() == Tokens.COLON)
+			if (ParserUtil.isIdentifier(type) && token.next().type() == Tokens.COLON)
 			{
-				this.key = token.text();
+				this.key = token.nameValue();
 				pm.skip();
 				return;
 			}
-			this.key = "value";
+			this.key = Name.update;
 			return;
 		}
 		if (this.mode == VALUE)
@@ -76,7 +76,7 @@ public class ExpressionMapParser extends Parser implements IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		this.valueMap.addValue(Name.get(this.key), value);
+		this.valueMap.addValue(this.key, value);
 		this.key = null;
 	}
 	

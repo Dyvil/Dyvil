@@ -6,12 +6,14 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public class ImportParser extends Parser
 {
+	public static final Name	annotation	= Name.getQualified("annotation");
 	public static final int		IMPORT		= 1;
 	public static final int		DOT			= 2;
 	public static final int		ALIAS		= 4;
@@ -74,9 +76,18 @@ public class ImportParser extends Parser
 				this.mode = 0;
 				return;
 			}
+			if (type == Keywords.ANNOTATION)
+			{
+				SimpleImport si = new SimpleImport(token.raw(), this.parent, annotation);
+				this.container.addImport(si);
+				this.parent = si;
+				this.container = si;
+				this.mode = DOT | ALIAS;
+				return;
+			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				SimpleImport si = new SimpleImport(token.raw(), this.parent, Name.get(token.text()));
+				SimpleImport si = new SimpleImport(token.raw(), this.parent, token.nameValue());
 				this.container.addImport(si);
 				this.parent = si;
 				this.container = si;
@@ -99,7 +110,7 @@ public class ImportParser extends Parser
 				IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()))
 				{
-					((SimpleImport) this.parent).setAlias(Name.get(next.text()));
+					((SimpleImport) this.parent).setAlias(token.nameValue());
 					pm.skip();
 					return;
 				}

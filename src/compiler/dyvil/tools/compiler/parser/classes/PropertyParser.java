@@ -9,6 +9,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 
@@ -49,13 +50,12 @@ public class PropertyParser extends Parser implements IValued
 		
 		if (this.mode == 0)
 		{
-			String value = token.text();
-			if ("get".equals(value))
+			if (type == Keywords.GET)
 			{
 				this.mode = GET;
 				return;
 			}
-			if ("set".equals(value))
+			if (type == Keywords.SET)
 			{
 				this.mode = SET;
 				return;

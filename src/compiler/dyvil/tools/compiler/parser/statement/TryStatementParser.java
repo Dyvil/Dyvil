@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser.statement;
 
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.CatchBlock;
 import dyvil.tools.compiler.ast.statement.TryStatement;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -89,7 +88,7 @@ public class TryStatementParser extends Parser implements IValued
 			this.mode = CATCH_CLOSE;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.catchBlock.varName = Name.get(token.text());
+				this.catchBlock.varName = token.nameValue();
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Catch Expression - Name expected", true);

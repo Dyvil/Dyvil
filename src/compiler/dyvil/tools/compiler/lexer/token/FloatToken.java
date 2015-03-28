@@ -37,21 +37,9 @@ public final class FloatToken implements IToken
 	}
 	
 	@Override
-	public String text()
-	{
-		return null;
-	}
-	
-	@Override
 	public int type()
 	{
 		return Tokens.FLOAT;
-	}
-	
-	@Override
-	public boolean equals(String value)
-	{
-		return false;
 	}
 	
 	@Override

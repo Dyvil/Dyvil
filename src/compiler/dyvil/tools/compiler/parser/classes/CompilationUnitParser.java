@@ -10,6 +10,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Tokens;
 
 public class CompilationUnitParser extends Parser
@@ -35,10 +36,10 @@ public class CompilationUnitParser extends Parser
 	@Override
 	public void parse(IParserManager jcp, IToken token) throws SyntaxError
 	{
-		String value = token.text();
+		int type = token.type();
 		if (this.isInMode(PACKAGE))
 		{
-			if ("package".equals(value))
+			if (type == Keywords.PACKAGE)
 			{
 				this.mode = IMPORT | CLASS;
 				
@@ -50,7 +51,7 @@ public class CompilationUnitParser extends Parser
 		}
 		if (this.isInMode(IMPORT))
 		{
-			if ("import".equals(value))
+			if (type == Keywords.IMPORT)
 			{
 				this.mode = IMPORT | CLASS;
 				Import i = new Import(token.raw());
@@ -58,7 +59,7 @@ public class CompilationUnitParser extends Parser
 				jcp.pushParser(new ImportParser(null, i));
 				return;
 			}
-			if ("using".equals(value))
+			if (type == Keywords.USING)
 			{
 				this.mode = IMPORT | CLASS;
 				Import i = new Import(token.raw());

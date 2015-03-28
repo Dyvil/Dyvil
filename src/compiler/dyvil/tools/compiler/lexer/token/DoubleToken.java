@@ -37,21 +37,9 @@ public final class DoubleToken implements IToken
 	}
 	
 	@Override
-	public String text()
-	{
-		return null;
-	}
-	
-	@Override
 	public int type()
 	{
 		return Tokens.DOUBLE;
-	}
-	
-	@Override
-	public boolean equals(String value)
-	{
-		return false;
 	}
 	
 	@Override

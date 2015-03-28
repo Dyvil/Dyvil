@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -14,20 +15,23 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class WhileStatement extends ASTNode implements IStatement, ILoop
 {
-	public IValue		condition;
-	public IValue		action;
+	public static final Name	$whileStart	= Name.getQualified("$whileStart");
+	public static final Name	$whileEnd	= Name.getQualified("$whileEnd");
 	
-	private IStatement	parent;
+	public IValue				condition;
+	public IValue				action;
 	
-	public Label		startLabel;
-	public Label		endLabel;
+	private IStatement			parent;
+	
+	public Label				startLabel;
+	public Label				endLabel;
 	
 	public WhileStatement(ICodePosition position)
 	{
 		this.position = position;
 		
-		this.startLabel = new Label("$whileStart");
-		this.endLabel = new Label("$whileEnd");
+		this.startLabel = new Label($whileStart);
+		this.endLabel = new Label($whileEnd);
 	}
 	
 	public void setCondition(IValue condition)
@@ -194,13 +198,13 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public Label resolveLabel(String name)
+	public Label resolveLabel(Name name)
 	{
-		if ("$whileStart".equals(name))
+		if (name == $whileStart)
 		{
 			return this.startLabel;
 		}
-		else if ("$whileEnd".equals(name))
+		if (name == $whileEnd)
 		{
 			return this.endLabel;
 		}

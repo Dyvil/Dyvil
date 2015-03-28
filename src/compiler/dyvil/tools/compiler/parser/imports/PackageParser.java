@@ -36,11 +36,16 @@ public class PackageParser extends Parser
 			pm.popParser();
 			return;
 		}
-		if (ParserUtil.isIdentifier(type) || type == Tokens.DOT)
+		if (type == Tokens.DOT)
 		{
-			this.buffer.append(token.text());
+			this.buffer.append('.');
 			return;
 		}
-		throw new SyntaxError(token, "Invalid Package Declaration - Invalid Token '" + token.text() + "'");
+		if (ParserUtil.isIdentifier(type))
+		{
+			this.buffer.append(token.nameValue().qualified);
+			return;
+		}
+		throw new SyntaxError(token, "Invalid Package Declaration - Invalid " + token);
 	}
 }

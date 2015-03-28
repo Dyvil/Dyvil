@@ -47,7 +47,7 @@ public class DWTParser extends Parser implements IValued
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.node.setPosition(token.raw());
-				this.node.name = Name.get(token.text());
+				this.node.name = token.nameValue();
 				return;
 			}
 			throw new SyntaxError(token, "Invalid DWT File - Name expected");
@@ -71,7 +71,7 @@ public class DWTParser extends Parser implements IValued
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.mode = EQUALS;
-				this.name = token.text();
+				this.name = token.nameValue().qualified;
 				return;
 			}
 			this.mode = PROPERTY_NAME;

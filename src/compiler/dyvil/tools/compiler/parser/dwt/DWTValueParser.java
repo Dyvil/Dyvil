@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.dwt;
 import dyvil.tools.compiler.ast.dwt.DWTList;
 import dyvil.tools.compiler.ast.dwt.DWTNode;
 import dyvil.tools.compiler.ast.dwt.DWTReference;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.ast.value.ValueList;
@@ -43,14 +42,14 @@ public class DWTValueParser extends Parser
 			{
 				if (token.next().type() == Symbols.OPEN_CURLY_BRACKET)
 				{
-					DWTNode node = new DWTNode(token.raw(), Name.get(token.text()));
+					DWTNode node = new DWTNode(token.raw(), token.nameValue());
 					this.valued.setValue(node);
 					pm.popParser();
 					pm.pushParser(new DWTParser(node), true);
 					return;
 				}
 				
-				this.valued.setValue(new DWTReference(token.raw(), token.text()));
+				this.valued.setValue(new DWTReference(token.raw(), token.nameValue()));
 				pm.popParser();
 				return;
 			}

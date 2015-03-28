@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.lexer.token;
 
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -7,9 +8,10 @@ public interface IToken extends ICodePosition
 {
 	public int type();
 	
-	public String text();
-	
-	public boolean equals(String value);
+	public default Name nameValue()
+	{
+		return null;
+	}
 	
 	public default String stringValue()
 	{

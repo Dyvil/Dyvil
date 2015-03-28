@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
@@ -42,9 +43,9 @@ public final class ExpressionListParser extends Parser implements IValued
 		
 		if (this.mode == 0)
 		{
-			if (token.next().type() == Tokens.COLON)
+			if (ParserUtil.isIdentifier(type) && token.next().type() == Tokens.COLON)
 			{
-				this.label = token.text();
+				this.label = token.nameValue().qualified;
 				pm.skip();
 				return;
 			}
@@ -80,7 +81,7 @@ public final class ExpressionListParser extends Parser implements IValued
 	{
 		if (this.label != null)
 		{
-			this.valueList.addValue(value, new Label(this.label, value));
+			this.valueList.addValue(value, new Label(Name.get(this.label), value));
 			this.label = null;
 		}
 		else

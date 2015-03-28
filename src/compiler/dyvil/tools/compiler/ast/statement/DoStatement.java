@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -14,12 +15,14 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class DoStatement extends ASTNode implements IStatement, ILoop
 {
+	public static final Name	$doCondition	= Name.getQualified("$doCondition");
+	public static final Name	$doEnd	= Name.getQualified("$doEnd");
+	
 	public IValue		action;
 	public IValue		condition;
 	
 	private IStatement	parent;
 	
-	public Label		startLabel;
 	public Label		conditionLabel;
 	public Label		endLabel;
 	
@@ -27,9 +30,8 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	{
 		this.position = position;
 		
-		this.startLabel = new Label("$doStart");
-		this.conditionLabel = new Label("$doCondition");
-		this.endLabel = new Label("$doEnd");
+		this.conditionLabel = new Label($doCondition);
+		this.endLabel = new Label($doEnd);
 	}
 	
 	public void setCondition(IValue condition)
@@ -191,13 +193,13 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public Label resolveLabel(String name)
+	public Label resolveLabel(Name name)
 	{
-		if ("$doCondition".equals(name))
+		if (name == $doCondition)
 		{
 			return this.conditionLabel;
 		}
-		else if ("$doEnd".equals(name))
+		if (name == $doEnd)
 		{
 			return this.endLabel;
 		}
@@ -220,12 +222,15 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 			this.condition.writeStatement(writer);
 		}
 		
+		org.objectweb.asm.Label startLabel = new org.objectweb.asm.Label();
+		
 		// Do Block
-		writer.writeFrameLabel(this.startLabel.target);
+		
+		writer.writeFrameLabel(startLabel);
 		this.action.writeStatement(writer);
 		// Condition
 		writer.writeFrameLabel(this.conditionLabel.target);
-		this.condition.writeJump(writer, this.startLabel.target);
+		this.condition.writeJump(writer, startLabel);
 		
 		writer.writeFrameLabel(this.endLabel.target);
 	}

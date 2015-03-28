@@ -21,7 +21,7 @@ import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class ParameterListParser extends Parser implements IAnnotationList, ITyped
+public final class ParameterListParser extends Parser implements IAnnotationList, ITyped
 {
 	public static final int		TYPE		= 1;
 	public static final int		NAME		= 2;
@@ -61,15 +61,14 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 		if (this.mode == TYPE)
 		{
 			int i = 0;
-			String value = token.text();
-			if ((i = ModifierTypes.PARAMETER.parse(value)) != -1)
+			if ((i = ModifierTypes.PARAMETER.parse(type)) != -1)
 			{
 				this.modifiers |= i;
 				return;
 			}
-			if (value.charAt(0) == '@')
+			if (token.nameValue() == Name.at)
 			{
-				Annotation annotation = new Annotation(token.raw(), Name.get(value.substring(1)));
+				Annotation annotation = new Annotation(token.raw());
 				this.addAnnotation(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
@@ -94,7 +93,7 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.parameter = new Parameter(0, Name.get(token.text()), this.type);
+				this.parameter = new Parameter(0, token.nameValue(), this.type);
 				this.parameter.modifiers = this.modifiers;
 				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.paramList.addParameter(this.parameter);

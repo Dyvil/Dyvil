@@ -26,21 +26,9 @@ public class InferredSemicolon implements IToken
 	}
 	
 	@Override
-	public String text()
-	{
-		return ";";
-	}
-	
-	@Override
 	public int type()
 	{
 		return Tokens.SEMICOLON;
-	}
-	
-	@Override
-	public boolean equals(String value)
-	{
-		return ";".equals(value);
 	}
 	
 	@Override

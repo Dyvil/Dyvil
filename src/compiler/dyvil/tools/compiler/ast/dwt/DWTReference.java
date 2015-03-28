@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.dwt;
 
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -10,9 +11,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class DWTReference extends ASTNode implements IValue
 {
-	public String	name;
+	public Name	name;
 	
-	public DWTReference(ICodePosition position, String name)
+	public DWTReference(ICodePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;

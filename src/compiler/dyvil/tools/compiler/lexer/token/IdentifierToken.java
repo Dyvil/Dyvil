@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.lexer.token;
 
-import java.util.Objects;
-
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -12,17 +11,17 @@ public class IdentifierToken implements IToken
 	public IToken		next;
 	
 	public final int	type;
-	public final String	value;
+	public final Name	name;
 	
 	public final int	lineNumber;
 	public final int	start;
 	public final int	end;
 	
-	public IdentifierToken(IToken prev, String value, int type, int lineNumber, int start, int end)
+	public IdentifierToken(IToken prev, Name name, int type, int lineNumber, int start, int end)
 	{
 		this.prev = prev;
 		prev.setNext(this);
-		this.value = value;
+		this.name = name;
 		this.type = type;
 		
 		this.lineNumber = lineNumber;
@@ -30,20 +29,14 @@ public class IdentifierToken implements IToken
 		this.end = end;
 	}
 	
-	public IdentifierToken(String value, int type, int lineNumber, int start, int end)
+	public IdentifierToken(Name name, int type, int lineNumber, int start, int end)
 	{
-		this.value = value;
+		this.name = name;
 		this.type = type;
 		
 		this.lineNumber = lineNumber;
 		this.start = start;
 		this.end = end;
-	}
-	
-	@Override
-	public String text()
-	{
-		return this.value;
 	}
 	
 	@Override
@@ -53,9 +46,9 @@ public class IdentifierToken implements IToken
 	}
 	
 	@Override
-	public boolean equals(String value)
+	public Name nameValue()
 	{
-		return Objects.equals(this.value, value);
+		return this.name;
 	}
 	
 	@Override
@@ -153,6 +146,6 @@ public class IdentifierToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Identifier '" + this.value + "' (line " + this.lineNumber + ")";
+		return "Identifier '" + this.name + "' (line " + this.lineNumber + ")";
 	}
 }

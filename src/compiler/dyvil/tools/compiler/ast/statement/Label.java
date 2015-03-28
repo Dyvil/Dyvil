@@ -1,20 +1,21 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.value.IValue;
 
 public class Label
 {
-	public String					name;
+	public Name					name;
 	public IValue					value;
 	
 	public org.objectweb.asm.Label	target	= new org.objectweb.asm.Label();
 	
-	public Label(String name)
+	public Label(Name name)
 	{
 		this.name = name;
 	}
 	
-	public Label(String name, IValue value)
+	public Label(Name name, IValue value)
 	{
 		this.name = name;
 		this.value = value;
@@ -25,7 +26,7 @@ public class Label
 		this.target = target;
 	}
 	
-	public Label(org.objectweb.asm.Label target, String name)
+	public Label(org.objectweb.asm.Label target, Name name)
 	{
 		this.target = target;
 		this.name = name;
@@ -34,6 +35,6 @@ public class Label
 	@Override
 	public String toString()
 	{
-		return this.name != null ? this.name : this.target.info.toString();
+		return this.name != null ? this.name.qualified : this.target.info.toString();
 	}
 }

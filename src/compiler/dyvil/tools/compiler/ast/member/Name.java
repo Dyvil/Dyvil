@@ -39,6 +39,7 @@ public final class Name
 	public static final Name				amp						= new Name("&", "$amp");
 	public static final Name				bar						= new Name("|", "$bar");
 	public static final Name				up						= new Name("^", "$up");
+	public static final Name				at						= new Name("@", "$at");
 	public static final Name				lessLess				= new Name("<<", "$less$less");
 	public static final Name				greaterGreater			= new Name(">>", "$greater$greater");
 	public static final Name				greaterGreaterGreater	= new Name(">>>", "$greater$greater$greater");
@@ -62,7 +63,7 @@ public final class Name
 	
 	public static final Name				colonGreater			= new Name(":>", "$colon$greater");
 	public static final Name				lessColon				= new Name("<:", "$less$colon");
-
+	
 	public final String						qualified;
 	public final String						unqualified;
 	

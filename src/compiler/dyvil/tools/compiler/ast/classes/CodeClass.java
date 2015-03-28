@@ -606,7 +606,7 @@ public class CodeClass extends ASTNode implements IClass
 			a.resolve(markers, context);
 		}
 		
-		if (this.body.getField(Name.instance) == null)
+		if (this.body == null || this.body.getField(Name.instance) == null)
 		{
 			if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
 			{
@@ -616,7 +616,7 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.body.getMethod(Name.apply, this.parameters, this.parameterCount) == null)
+		if (this.body == null || this.body.getMethod(Name.apply, this.parameters, this.parameterCount) == null)
 		{
 			if ((this.modifiers & Modifiers.CASE_CLASS) != 0)
 			{

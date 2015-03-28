@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.util;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.transform.Keywords;
 
 public enum ModifierTypes
 {
@@ -40,7 +41,7 @@ public enum ModifierTypes
 		return sb.toString();
 	}
 	
-	public int parse(String mod)
+	public int parse(int mod)
 	{
 		int m = 0;
 		switch (this)
@@ -282,121 +283,121 @@ public enum ModifierTypes
 		}
 	}
 	
-	private static int readAccessModifier(String mod)
+	private static int readAccessModifier(int mod)
 	{
 		switch (mod)
 		{
-		case "package":
+		case Keywords.PACKAGE:
 			return Modifiers.PACKAGE;
-		case "public":
+		case Keywords.PUBLIC:
 			return Modifiers.PUBLIC;
-		case "private":
+		case Keywords.PRIVATE:
 			return Modifiers.PRIVATE;
-		case "protected":
+		case Keywords.PROTECTED:
 			return Modifiers.PROTECTED;
-		case "derived":
+		case Keywords.DERIVED:
 			return Modifiers.DERIVED;
-		case "sealed":
+		case Keywords.SEALED:
 			return Modifiers.SEALED;
-		case "deprecated":
+		case Keywords.DEPRECATED:
 			return Modifiers.DEPRECATED;
 		}
 		return -1;
 	}
 	
-	private static int readClassTypeModifier(String mod)
+	private static int readClassTypeModifier(int mod)
 	{
 		switch (mod)
 		{
-		case "class":
+		case Keywords.CLASS:
 			return 0;
-		case "interface":
+		case Keywords.INTERFACE:
 			return Modifiers.INTERFACE_CLASS;
-		case "annotation":
+		case Keywords.ANNOTATION:
 			return Modifiers.ANNOTATION;
-		case "enum":
+		case Keywords.ENUM:
 			return Modifiers.ENUM;
-		case "object":
+		case Keywords.OBJECT:
 			return Modifiers.OBJECT_CLASS;
 		}
 		return -1;
 	}
 	
-	private static int readClassModifier(String mod)
+	private static int readClassModifier(int mod)
 	{
 		switch (mod)
 		{
-		case "static":
+		case Keywords.STATIC:
 			return Modifiers.STATIC;
-		case "abstract":
+		case Keywords.ABSTRACT:
 			return Modifiers.ABSTRACT;
-		case "final":
+		case Keywords.FINAL:
 			return Modifiers.FINAL;
-		case "strictfp":
+		case Keywords.STRICTFP:
 			return Modifiers.STRICT;
-		case "functional":
+		case Keywords.FUNCTIONAL:
 			return Modifiers.FUNCTIONAL;
-		case "case":
+		case Keywords.CASE:
 			return Modifiers.CASE_CLASS;
 		}
 		return -1;
 	}
 	
-	private static int readFieldModifier(String mod)
+	private static int readFieldModifier(int mod)
 	{
 		switch (mod)
 		{
-		case "static":
+		case Keywords.STATIC:
 			return Modifiers.STATIC;
-		case "final":
+		case Keywords.FINAL:
 			return Modifiers.FINAL;
-		case "const":
+		case Keywords.CONST:
 			return Modifiers.CONST;
-		case "transient":
+		case Keywords.TRANSIENT:
 			return Modifiers.TRANSIENT;
-		case "volatile":
+		case Keywords.VOLATILE:
 			return Modifiers.VOLATILE;
-		case "lazy":
+		case Keywords.LAZY:
 			return Modifiers.LAZY;
 		}
 		return -1;
 	}
 	
-	private static int readMethodModifier(String mod)
+	private static int readMethodModifier(int mod)
 	{
 		switch (mod)
 		{
-		case "static":
+		case Keywords.STATIC:
 			return Modifiers.STATIC;
-		case "final":
+		case Keywords.FINAL:
 			return Modifiers.FINAL;
-		case "const":
+		case Keywords.CONST:
 			return Modifiers.CONST;
-		case "synchronized":
+		case Keywords.SYNCHRONIZED:
 			return Modifiers.SYNCHRONIZED;
-		case "native":
+		case Keywords.NATIVE:
 			return Modifiers.NATIVE;
-		case "abstract":
+		case Keywords.ABSTRACT:
 			return Modifiers.ABSTRACT;
-		case "strictfp":
+		case Keywords.STRICTFP:
 			return Modifiers.STRICT;
-		case "inline":
+		case Keywords.INLINE:
 			return Modifiers.INLINE;
-		case "infix":
+		case Keywords.INFIX:
 			return Modifiers.INFIX;
-		case "override":
+		case Keywords.OVERRIDE:
 			return Modifiers.OVERRIDE;
 		}
 		return -1;
 	}
 	
-	private static int readParameterModifier(String mod)
+	private static int readParameterModifier(int mod)
 	{
 		switch (mod)
 		{
-		case "final":
+		case Keywords.FINAL:
 			return Modifiers.FINAL;
-		case "var":
+		case Keywords.VAR:
 			return Modifiers.VAR;
 		}
 		return -1;

@@ -28,6 +28,9 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	public static final Name	$index		= Name.getQualified("$index");
 	public static final Name	$length		= Name.getQualified("$length");
 	public static final Name	$array		= Name.getQualified("$array");
+	public static final Name	$forStart	= Name.getQualified("$forStart");
+	public static final Name	$forUpdate	= Name.getQualified("$forCondition");
+	public static final Name	$forEnd		= Name.getQualified("$forEnd");
 	
 	public static final int		DEFAULT		= 0;
 	public static final int		ITERATOR	= 1;
@@ -57,9 +60,9 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	{
 		this.position = position;
 		
-		this.startLabel = new Label("$forStart");
-		this.updateLabel = new Label("$forUpdate");
-		this.endLabel = new Label("$forEnd");
+		this.startLabel = new Label($forStart);
+		this.updateLabel = new Label($forUpdate);
+		this.endLabel = new Label($forEnd);
 	}
 	
 	@Override
@@ -181,17 +184,17 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public Label resolveLabel(String name)
+	public Label resolveLabel(Name name)
 	{
-		if ("$forStart".equals(name))
+		if (name == $forStart)
 		{
 			return this.startLabel;
 		}
-		else if ("$forUpdate".equals(name))
+		if (name == $forUpdate)
 		{
 			return this.updateLabel;
 		}
-		else if ("$forEnd".equals(name))
+		if (name == $forEnd)
 		{
 			return this.endLabel;
 		}

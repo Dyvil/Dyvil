@@ -1,9 +1,11 @@
 package dyvil.tools.compiler.parser.annotation;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
+import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -26,7 +28,7 @@ public class AnnotationParser extends Parser
 	public AnnotationParser(Annotation annotation)
 	{
 		this.annotation = annotation;
-		this.mode = PARAMETERS_START;
+		this.mode = NAME;
 	}
 	
 	@Override
@@ -44,6 +46,10 @@ public class AnnotationParser extends Parser
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
+				Name name = token.nameValue();
+				this.annotation.name = name;
+				this.annotation.type = new AnnotationType(token, name);
+				
 				this.mode = PARAMETERS_START;
 				return;
 			}

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser.statement;
 
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
@@ -72,7 +71,7 @@ public class ForStatementParser extends Parser implements IValued
 			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.forStatement.variable.setName(Name.get(token.text()));
+				this.forStatement.variable.setName(token.nameValue());
 				return;
 			}
 			

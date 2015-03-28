@@ -2,6 +2,7 @@ package dyvil.tools.compiler.config;
 
 import java.io.File;
 
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -19,7 +20,7 @@ public class ConfigParser extends Parser
 	
 	protected CompilerConfig	config;
 	
-	private String				key;
+	private Name				key;
 	
 	public ConfigParser(CompilerConfig config)
 	{
@@ -43,7 +44,7 @@ public class ConfigParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.mode = EQUALS;
-				this.key = token.text();
+				this.key = token.nameValue();
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Property - Name expected");
@@ -84,9 +85,9 @@ public class ConfigParser extends Parser
 		}
 	}
 	
-	private void setProperty(String name, IToken token)
+	private void setProperty(Name name, IToken token)
 	{
-		switch (name)
+		switch (name.qualified)
 		{
 		case "jar_name":
 			this.config.jarName = token.stringValue();
