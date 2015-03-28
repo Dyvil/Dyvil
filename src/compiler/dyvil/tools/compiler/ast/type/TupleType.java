@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.type;
 
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
@@ -23,12 +24,6 @@ public final class TupleType extends Type implements ITypeList
 	public TupleType(int size)
 	{
 		this.types = new IType[size];
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return false;
 	}
 	
 	// ITypeList Overrides
@@ -81,7 +76,7 @@ public final class TupleType extends Type implements ITypeList
 			return iclass;
 		}
 		
-		iclass = Package.dyvilLangTuple.resolveClass("Tuple" + this.typeCount);
+		iclass = Package.dyvilLangTuple.resolveClass(Name.getQualified("Tuple" + this.typeCount));
 		tupleClasses[this.typeCount] = iclass;
 		this.theClass = iclass;
 		return iclass;

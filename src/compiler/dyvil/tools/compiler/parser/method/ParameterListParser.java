@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.member.IAnnotationList;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.type.IType;
@@ -68,7 +69,7 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 			}
 			if (value.charAt(0) == '@')
 			{
-				Annotation annotation = new Annotation(token.raw(), value.substring(1));
+				Annotation annotation = new Annotation(token.raw(), Name.get(value.substring(1)));
 				this.addAnnotation(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
@@ -93,7 +94,7 @@ public class ParameterListParser extends Parser implements IAnnotationList, ITyp
 			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.parameter = new Parameter(0, token.text(), this.type);
+				this.parameter = new Parameter(0, Name.get(token.text()), this.type);
 				this.parameter.modifiers = this.modifiers;
 				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.paramList.addParameter(this.parameter);

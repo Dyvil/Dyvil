@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.parser.dwt;
 
 import dyvil.tools.compiler.ast.dwt.DWTNode;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -46,7 +47,7 @@ public class DWTParser extends Parser implements IValued
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.node.setPosition(token.raw());
-				this.node.name = this.node.fullName = token.text();
+				this.node.name = Name.get(token.text());
 				return;
 			}
 			throw new SyntaxError(token, "Invalid DWT File - Name expected");
@@ -98,7 +99,7 @@ public class DWTParser extends Parser implements IValued
 	public void setValue(IValue value)
 	{
 		this.mode = PROPERTY_NAME;
-		this.node.addValue(this.name, value);
+		this.node.addValue(Name.get(this.name), value);
 		this.name = null;
 	}
 	

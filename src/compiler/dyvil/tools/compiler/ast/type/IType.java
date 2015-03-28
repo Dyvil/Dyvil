@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -67,12 +68,12 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	public IType getConcreteType(ITypeContext context);
 	
 	@Override
-	public default IType resolveType(String name)
+	public default IType resolveType(Name name)
 	{
 		return null;
 	}
 	
-	public default IType resolveType(String name, IType concrete)
+	public default IType resolveType(Name name, IType concrete)
 	{
 		return null;
 	}

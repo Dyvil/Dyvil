@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -42,7 +43,7 @@ public class TypeVariableParser extends Parser implements ITyped
 	{
 		if (this.mode == NAME)
 		{
-			this.variable = new TypeVariable(token, token.text());
+			this.variable = new TypeVariable(token, Name.get(token.text()));
 			this.mode = TYPE_VARIABLE;
 			return;
 		}

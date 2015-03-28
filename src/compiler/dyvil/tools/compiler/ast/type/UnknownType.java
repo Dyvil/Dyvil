@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -20,64 +21,44 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 public final class UnknownType extends ASTNode implements IType
 {
 	@Override
-	public void setName(String name, String qualifiedName)
+	public void setName(Name name)
 	{
 	}
 	
 	@Override
-	public void setName(String name)
+	public Name getName()
 	{
+		return Name.getQualified("unknown");
 	}
 	
-	@Override
-	public String getName()
-	{
-		return "unknown";
-	}
+	// IContext
 	
 	@Override
-	public void setQualifiedName(String name)
-	{
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return "unknown";
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return false;
-	}
-	
-	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		return null;
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 	}
 	

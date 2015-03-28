@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -24,6 +25,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 {
+	public static final Name	$index		= Name.getQualified("$index");
+	public static final Name	$length		= Name.getQualified("$length");
+	public static final Name	$array		= Name.getQualified("$array");
+	
 	public static final int		DEFAULT		= 0;
 	public static final int		ITERATOR	= 1;
 	public static final int		ARRAY		= 2;
@@ -107,36 +112,36 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return this.context.resolvePackage(name);
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		return this.context.resolveClass(name);
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
-		if (this.variable != null && this.variable.isName(name))
+		if (this.variable != null && this.variable.getName() == name)
 		{
 			return new FieldMatch(this.variable, 1);
 		}
 		
 		if (this.type == ARRAY)
 		{
-			if ("$index".equals(name))
+			if (name == $index)
 			{
 				return new FieldMatch(this.var1, 1);
 			}
-			else if ("$length".equals(name))
+			if (name == $length)
 			{
 				return new FieldMatch(this.var2, 1);
 			}
-			else if ("$array".equals(name))
+			if (name == $array)
 			{
 				return new FieldMatch(this.var3, 1);
 			}
@@ -146,13 +151,13 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		return this.context.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.context.getMethodMatches(list, instance, name, arguments);
 	}
@@ -251,20 +256,17 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				{
 					Variable var = new Variable(null);
 					var.type = Type.INT;
-					var.name = "$index";
-					var.qualifiedName = "$index";
+					var.name = $index;
 					this.var1 = var;
 					
 					var = new Variable(null);
 					var.type = Type.INT;
-					var.name = "$length";
-					var.qualifiedName = "$length";
+					var.name = $length;
 					this.var2 = var;
 					
 					var = new Variable(null);
 					var.type = valueType;
-					var.name = "$array";
-					var.qualifiedName = "$array";
+					var.name = $array;
 					this.var3 = var;
 				}
 			}
@@ -426,7 +428,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Variable
 			if (var != null)
 			{
-				writer.writeLocal(var.qualifiedName, var.type, startLabel, endLabel, var.index);
+				writer.writeLocal(var.name.qualified, var.type, startLabel, endLabel, var.index);
 			}
 			return;
 		}
@@ -486,7 +488,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			writer.resetLocals(locals);
 			writer.writeFrameLabel(endLabel);
 			
-			writer.writeLocal(var.qualifiedName, var.type, scopeLabel, endLabel, var.index);
+			writer.writeLocal(var.name.qualified, var.type, scopeLabel, endLabel, var.index);
 			writer.writeLocal("$index", "I", null, scopeLabel, endLabel, indexVar.index);
 			writer.writeLocal("$length", "I", null, scopeLabel, endLabel, lengthVar.index);
 			writer.writeLocal("$array", arrayVar.type, scopeLabel, endLabel, arrayVar.index);

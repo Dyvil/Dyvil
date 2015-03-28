@@ -11,6 +11,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -28,7 +29,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class Annotation extends ASTNode implements ITyped
 {
-	public String			name;
+	public Name			name;
 	public AnnotationType	type;
 	public IArguments		arguments;
 	public ElementType		target;
@@ -51,7 +52,7 @@ public class Annotation extends ASTNode implements ITyped
 		this.type = type;
 	}
 	
-	public Annotation(ICodePosition position, String name)
+	public Annotation(ICodePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;
@@ -100,7 +101,7 @@ public class Annotation extends ASTNode implements ITyped
 			
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "annotation.type", param.qualifiedName);
+				Marker marker = markers.create(value.getPosition(), "annotation.type", param.name.qualified);
 				marker.addInfo("Required Type: " + type);
 				marker.addInfo("Value Type: " + value.getType());
 				continue;
@@ -181,7 +182,7 @@ public class Annotation extends ASTNode implements ITyped
 		for (int i = 0; i < count; i++)
 		{
 			Parameter param = iclass.getParameter(i);
-			visitValue(visitor, param.qualifiedName, this.arguments.getValue(i, param));
+			visitValue(visitor, param.name.qualified, this.arguments.getValue(i, param));
 		}
 	}
 	
@@ -199,7 +200,7 @@ public class Annotation extends ASTNode implements ITyped
 		else if (valueType == IValue.ENUM)
 		{
 			EnumValue enumValue = (EnumValue) value;
-			visitor.visitEnum(key, enumValue.type.getExtendedName(), enumValue.name);
+			visitor.visitEnum(key, enumValue.type.getExtendedName(), enumValue.name.qualified);
 		}
 		else if (value.isConstant())
 		{

@@ -8,6 +8,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -31,7 +32,7 @@ public class Parameter extends Member implements IVariable
 	{
 	}
 	
-	public Parameter(int index, String name, IType type)
+	public Parameter(int index, Name name, IType type)
 	{
 		super(name, type);
 		this.index = index;
@@ -196,7 +197,7 @@ public class Parameter extends Member implements IVariable
 		
 		// Copy the access modifiers and add the STATIC modifier
 		int modifiers = this.parameterized.getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
-		String name = "parDefault$" + this.parameterized.getQualifiedName() + "$" + this.index;
+		String name = "parDefault$" + this.parameterized.getName().qualified + "$" + this.index;
 		String desc = "()" + this.type.getExtendedName();
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
 		mw.begin();
@@ -206,7 +207,7 @@ public class Parameter extends Member implements IVariable
 	
 	public void write(MethodWriter writer)
 	{
-		this.index = writer.registerParameter(this.name, this.type);
+		this.index = writer.registerParameter(this.name.qualified, this.type);
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{
@@ -229,7 +230,7 @@ public class Parameter extends Member implements IVariable
 				instance.writeExpression(writer);
 			}
 			
-			writer.writeGetField(((IClass) this.parameterized).getInternalName(), this.qualifiedName, this.getDescription(), this.type);
+			writer.writeGetField(((IClass) this.parameterized).getInternalName(), this.name.qualified, this.getDescription(), this.type);
 			return;
 		}
 		
@@ -251,7 +252,7 @@ public class Parameter extends Member implements IVariable
 				value.writeExpression(writer);
 			}
 			
-			writer.writePutField(((IClass) this.parameterized).getInternalName(), this.qualifiedName, this.getDescription());
+			writer.writePutField(((IClass) this.parameterized).getInternalName(), this.name.qualified, this.getDescription());
 			return;
 		}
 		

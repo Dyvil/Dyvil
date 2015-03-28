@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -21,7 +22,7 @@ public class AnnotationType extends Type
 	
 	static
 	{
-		VALUE.name = VALUE.qualifiedName = "value";
+		VALUE.name = Name.getQualified("value");
 	}
 	
 	public RetentionPolicy			retention;
@@ -35,10 +36,10 @@ public class AnnotationType extends Type
 	{
 		int index = packageName.lastIndexOf('.');
 		this.fullName = packageName;
-		this.name = this.qualifiedName = packageName.substring(index + 1);
+		this.name = Name.getQualified(packageName.substring(index + 1));
 	}
 	
-	public AnnotationType(ICodePosition position, String name)
+	public AnnotationType(ICodePosition position, Name name)
 	{
 		super(position, name);
 	}
@@ -53,15 +54,7 @@ public class AnnotationType extends Type
 	{
 		if (this.theClass == null)
 		{
-			IClass iclass;
-			if (this.fullName != null)
-			{
-				iclass = context.resolveClass(this.fullName);
-			}
-			else
-			{
-				iclass = context.resolveClass(this.name);
-			}
+			IClass iclass = context.resolveClass(this.name);
 			
 			if (iclass != null)
 			{
@@ -88,7 +81,7 @@ public class AnnotationType extends Type
 			if (retention != null)
 			{
 				EnumValue value = (EnumValue) retention.arguments.getValue(0, null);
-				this.retention = RetentionPolicy.valueOf(value.name);
+				this.retention = RetentionPolicy.valueOf(value.name.qualified);
 			}
 		}
 		if (this.targets != null)
@@ -112,7 +105,7 @@ public class AnnotationType extends Type
 		for (IValue v : values)
 		{
 			EnumValue value = (EnumValue) v;
-			this.targets.add(ElementType.valueOf(value.name));
+			this.targets.add(ElementType.valueOf(value.name.qualified));
 		}
 	}
 	

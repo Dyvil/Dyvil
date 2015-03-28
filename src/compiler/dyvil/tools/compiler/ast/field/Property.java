@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -41,13 +42,13 @@ public class Property extends Member implements IProperty, IContext
 		this.theClass = iclass;
 	}
 	
-	public Property(IClass iclass, String name)
+	public Property(IClass iclass, Name name)
 	{
 		super(name);
 		this.theClass = iclass;
 	}
 	
-	public Property(IClass iclass, String name, IType type)
+	public Property(IClass iclass, Name name, IType type)
 	{
 		super(name, type);
 		this.theClass = iclass;
@@ -126,7 +127,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.set != null)
 		{
-			this.setterParameter = new Parameter(0, this.qualifiedName, this.type);
+			this.setterParameter = new Parameter(0, this.name, this.type);
 			this.set = this.set.resolve(markers, this);
 		}
 	}
@@ -216,19 +217,19 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return this.theClass.resolvePackage(name);
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		return this.theClass.resolveClass(name);
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		if (name.equals(this.name))
 		{
@@ -238,13 +239,13 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		return this.theClass.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
@@ -303,7 +304,7 @@ public class Property extends Member implements IProperty, IContext
 		String signature = this.type.getSignature();
 		if (this.get != null)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers | Modifiers.SYNTHETIC, "get$" + this.qualifiedName, "()"
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers | Modifiers.SYNTHETIC, "get$" + this.name.qualified, "()"
 					+ extended, signature == null ? null : "()" + signature, null));
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -331,7 +332,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.set != null)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers | Modifiers.SYNTHETIC, "set$" + this.qualifiedName, "(" + extended
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers | Modifiers.SYNTHETIC, "set$" + this.name.qualified, "(" + extended
 					+ ")V", signature == null ? null : "(" + signature + ")V", null));
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -383,7 +384,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		
 		String owner = this.theClass.getInternalName();
-		String name = "get$" + this.qualifiedName;
+		String name = "get$" + this.name.qualified;
 		String desc = "()" + this.type.getExtendedName();
 		writer.writeInvokeInsn(opcode, owner, name, desc, false, args, this.type);
 	}
@@ -415,7 +416,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		
 		String owner = this.theClass.getInternalName();
-		String name = "set$" + this.qualifiedName;
+		String name = "set$" + this.name.qualified;
 		String desc = "(" + this.type.getExtendedName() + ")V";
 		writer.writeInvokeInsn(opcode, owner, name, desc, false, args, (String) null);
 	}
@@ -434,15 +435,7 @@ public class Property extends Member implements IProperty, IContext
 		buffer.append(ModifierTypes.FIELD.toString(this.modifiers));
 		this.type.toString("", buffer);
 		buffer.append(' ');
-		
-		if (Formatting.Field.convertQualifiedNames)
-		{
-			buffer.append(this.qualifiedName);
-		}
-		else
-		{
-			buffer.append(this.name);
-		}
+		buffer.append(this.name);
 		
 		buffer.append('\n').append(prefix).append('{');
 		if (this.get != null)

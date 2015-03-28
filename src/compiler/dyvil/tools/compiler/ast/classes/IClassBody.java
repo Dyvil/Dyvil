@@ -5,6 +5,7 @@ import java.util.List;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -31,7 +32,7 @@ public interface IClassBody extends IASTNode
 	
 	public IClass getClass(int index);
 	
-	public IClass getClass(String name);
+	public IClass getClass(Name name);
 	
 	// Fields
 	
@@ -41,7 +42,7 @@ public interface IClassBody extends IASTNode
 	
 	public IField getField(int index);
 	
-	public IField getField(String name);
+	public IField getField(Name name);
 	
 	public default IField getInstanceField()
 	{
@@ -56,7 +57,7 @@ public interface IClassBody extends IASTNode
 	
 	public IProperty getProperty(int index);
 	
-	public IProperty getProperty(String name);
+	public IProperty getProperty(Name name);
 	
 	// Constructors
 	
@@ -76,11 +77,11 @@ public interface IClassBody extends IASTNode
 	
 	public IMethod getMethod(int index);
 	
-	public IMethod getMethod(String name);
+	public IMethod getMethod(Name name);
 	
-	public IMethod getMethod(String name, Parameter[] parameters, int parameterCount);
+	public IMethod getMethod(Name name, Parameter[] parameters, int parameterCount);
 	
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments);
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
 	
 	public default IMethod getFunctionalMethod()
 	{

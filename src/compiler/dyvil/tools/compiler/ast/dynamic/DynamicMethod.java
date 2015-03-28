@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -34,9 +35,9 @@ public class DynamicMethod extends ASTNode implements IMethod
 	public static final Handle	BOOTSTRAP	= new Handle(MethodWriter.H_INVOKESTATIC, "dyvil/dyn/DynamicLinker", "linkMethod",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
 	
-	public String				name;
+	public Name					name;
 	
-	public DynamicMethod(String name)
+	public DynamicMethod(Name name)
 	{
 		this.name = name;
 	}
@@ -125,31 +126,31 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		return null;
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 	}
 	
@@ -229,40 +230,21 @@ public class DynamicMethod extends ASTNode implements IMethod
 	{
 	}
 	
-	@Override
-	public void setName(String name, String qualifiedName)
-	{
-		this.name = qualifiedName;
-	}
+	// Name
 	
 	@Override
-	public void setName(String name)
-	{
-	}
-	
-	@Override
-	public String getName()
-	{
-		return this.name;
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public Name getName()
 	{
 		return this.name;
 	}
 	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.name.equals(name);
-	}
+	// Modifiers
 	
 	@Override
 	public void setModifiers(int modifiers)
@@ -368,7 +350,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public int getSignatureMatch(String name, IValue instance, IArguments arguments)
+	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		return 0;
 	}
@@ -385,7 +367,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public IType resolveType(String name, IValue instance, IArguments arguments, ITypeList generics)
+	public IType resolveType(Name name, IValue instance, IArguments arguments, ITypeList generics)
 	{
 		return Type.DYNAMIC;
 	}
@@ -438,7 +420,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 		
 		writer.push((Object) null);
 		writer.pop();
-		writer.writeInvokeDynamic(this.name, desc.toString(), len, Type.DYNAMIC, BOOTSTRAP, ArrayUtils.EMPTY_OBJECT_ARRAY);
+		writer.writeInvokeDynamic(this.name.qualified, desc.toString(), len, Type.DYNAMIC, BOOTSTRAP, ArrayUtils.EMPTY_OBJECT_ARRAY);
 	}
 	
 	@Override

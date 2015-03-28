@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.member.IAnnotationList;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.method.Method;
@@ -28,7 +29,8 @@ import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
-import dyvil.tools.compiler.util.*;
+import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ClassBodyParser extends Parser implements ITyped, IAnnotationList
 {
@@ -133,7 +135,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			}
 			if (value.charAt(0) == '@')
 			{
-				Annotation annotation = new Annotation(token.raw(), value.substring(1));
+				Annotation annotation = new Annotation(token.raw(), Name.get(value.substring(1)));
 				this.addAnnotation(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
@@ -155,7 +157,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			type = next.type();
 			if (type == Tokens.SEMICOLON)
 			{
-				Field f = new Field(this.theClass, value, this.type);
+				Field f = new Field(this.theClass, Name.get(value), this.type);
 				f.position = token.raw();
 				f.modifiers = this.modifiers;
 				f.setAnnotations(this.getAnnotations(), this.annotationCount);
@@ -169,7 +171,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			{
 				this.mode = PARAMETERS;
 				
-				Method m = new Method(this.theClass, value, this.type);
+				Method m = new Method(this.theClass, Name.get(value), this.type);
 				m.modifiers = this.modifiers;
 				m.position = token.raw();
 				m.setAnnotations(this.getAnnotations(), this.annotationCount);
@@ -179,7 +181,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			}
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
-				Property p = new Property(this.theClass, value, this.type);
+				Property p = new Property(this.theClass, Name.get(value), this.type);
 				p.position = token.raw();
 				p.modifiers = this.modifiers;
 				p.setAnnotations(this.getAnnotations(), this.annotationCount);
@@ -192,7 +194,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			}
 			if (type == Tokens.EQUALS)
 			{
-				Field f = new Field(this.theClass, value, this.type);
+				Field f = new Field(this.theClass, Name.get(value), this.type);
 				f.position = token.raw();
 				f.modifiers = this.modifiers;
 				f.setAnnotations(this.getAnnotations(), this.annotationCount);
@@ -205,7 +207,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			}
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
-				Method m = new Method(this.theClass, value, this.type);
+				Method m = new Method(this.theClass, Name.get(value), this.type);
 				m.modifiers = this.modifiers;
 				m.position = token.raw();
 				m.setAnnotations(this.getAnnotations(), this.annotationCount);

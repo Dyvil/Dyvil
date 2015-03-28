@@ -7,6 +7,7 @@ import org.objectweb.asm.MethodVisitor;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -24,7 +25,7 @@ public final class SimpleMethodVisitor extends MethodVisitor
 	@Override
 	public void visitParameter(String name, int index)
 	{
-		this.method.getParameter(index).setName(name);
+		this.method.getParameter(index).setName(Name.getQualified(name));
 	}
 	
 	@Override
@@ -34,14 +35,14 @@ public final class SimpleMethodVisitor extends MethodVisitor
 		{
 			if (index != 0 && index <= this.method.parameterCount())
 			{
-				this.method.getParameter(index - 1).setName(name);
+				this.method.getParameter(index - 1).setName(Name.getQualified(name));
 			}
 			return;
 		}
 		
 		if (index < this.method.parameterCount())
 		{
-			this.method.getParameter(index).setName(name);
+			this.method.getParameter(index).setName(Name.getQualified(name));
 		}
 	}
 	

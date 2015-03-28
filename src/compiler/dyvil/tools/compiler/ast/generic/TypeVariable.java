@@ -4,6 +4,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -13,7 +14,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class TypeVariable extends ASTNode implements ITypeVariable
 {
-	public String			name;
+	public Name			name;
 	
 	protected IType[]		upperBounds	= new IType[1];
 	protected int			upperBoundCount;
@@ -25,7 +26,7 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	{
 	}
 	
-	public TypeVariable(String name)
+	public TypeVariable(Name name)
 	{
 		this.name = name;
 	}
@@ -35,46 +36,22 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 		this.position = position;
 	}
 	
-	public TypeVariable(ICodePosition position, String name)
+	public TypeVariable(ICodePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;
 	}
 	
 	@Override
-	public void setName(String name, String qualifiedName)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-	
-	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
-	{
-		this.name = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.name;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.name.equals(name);
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -16,28 +17,26 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.Symbols;
 
 public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 {
-	public String	name;
-	public String	qualifiedName;
+	public Name		name;
 	
 	public IValue	instance;
-	public IField	field;
 	public IValue	value;
+	
+	public IField	field;
 	
 	public FieldAssign(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public FieldAssign(ICodePosition position, String name, IValue instance)
+	public FieldAssign(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
 		this.instance = instance;
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override
@@ -88,40 +87,15 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public void setName(String name, String qualifiedName)
-	{
-		this.name = name;
-		this.qualifiedName = qualifiedName;
-	}
-	
-	@Override
-	public void setName(String name)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
-	{
-		this.qualifiedName = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.qualifiedName;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.qualifiedName.equals(name);
 	}
 	
 	@Override
@@ -165,12 +139,12 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 			this.instance = this.instance.resolve(markers, context);
 		}
 		
-		this.field = IAccess.resolveField(context, this.instance, this.qualifiedName);
+		this.field = IAccess.resolveField(context, this.instance, this.name);
 		
 		if (this.field == null)
 		{
-			Marker marker = markers.create(this.position, "resolve.field", this.name);
-			marker.addInfo("Qualified Name: " + this.qualifiedName);
+			Marker marker = markers.create(this.position, "resolve.field", this.name.unqualified);
+			marker.addInfo("Qualified Name: " + this.name.qualified);
 			if (this.instance != null)
 			{
 				marker.addInfo("Instance Type: " + this.instance.getType());

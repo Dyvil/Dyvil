@@ -8,7 +8,6 @@ public final class RootPackage extends Package
 {
 	public RootPackage()
 	{
-		super(null, null);
 	}
 	
 	@Override

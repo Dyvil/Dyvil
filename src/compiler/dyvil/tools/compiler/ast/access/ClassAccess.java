@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -89,23 +90,21 @@ public class ClassAccess extends ASTNode implements IValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		String qualifiedName = this.type.getQualifiedName();
-		FieldMatch f = context.resolveField(qualifiedName);
+		Name name = this.type.getName();
+		FieldMatch f = context.resolveField(name);
 		if (f != null)
 		{
 			FieldAccess access = new FieldAccess(this.position);
-			access.name = this.type.getName();
-			access.qualifiedName = qualifiedName;
+			access.name = name;
 			access.field = f.theField;
 			return access;
 		}
 		
-		MethodMatch m = context.resolveMethod(null, qualifiedName, EmptyArguments.INSTANCE);
+		MethodMatch m = context.resolveMethod(null, name, EmptyArguments.INSTANCE);
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position);
-			call.name = this.type.getName();
-			call.qualifiedName = qualifiedName;
+			call.name = name;
 			call.method = m.method;
 			call.dotless = true;
 			if (this.type.isGeneric())
@@ -131,7 +130,6 @@ public class ClassAccess extends ASTNode implements IValue
 	{
 		MethodCall call = new MethodCall(this.position);
 		call.name = this.type.getName();
-		call.qualifiedName = this.type.getQualifiedName();
 		call.dotless = true;
 		if (this.type.isGeneric())
 		{

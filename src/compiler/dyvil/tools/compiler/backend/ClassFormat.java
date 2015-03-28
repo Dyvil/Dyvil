@@ -6,13 +6,13 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethodSignature;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.transform.Symbols;
 
 public class ClassFormat
 {
@@ -174,7 +174,7 @@ public class ClassFormat
 			{
 				internal = internal.substring(i + 1, l);
 			}
-			type.setName(Symbols.unqualify(internal), internal);
+			type.setName(Name.getQualified(internal));
 		}
 		else if (len - i == 1)
 		{
@@ -198,13 +198,12 @@ public class ClassFormat
 		int index = internal.lastIndexOf('/');
 		if (index == -1)
 		{
-			type.setName(Symbols.unqualify(internal), internal);
+			type.setName(Name.getQualified(internal));
 			type.setFullName(internal);
 		}
 		else
 		{
-			String name = internal.substring(index + 1);
-			type.setName(Symbols.unqualify(name), name);
+			type.setName(Name.getQualified(internal.substring(index + 1)));
 			type.setFullName(internal.replace('/', '.'));
 		}
 	}
@@ -255,7 +254,7 @@ public class ClassFormat
 			else if (c == 'T')
 			{
 				int end1 = internal.indexOf(';', i);
-				IType type = new Type(null, internal.substring(i + 1, end1));
+				IType type = new Type(Name.getQualified(internal.substring(i + 1, end1)));
 				
 				type.setArrayDimensions(array);
 				array = 0;
@@ -313,7 +312,7 @@ public class ClassFormat
 				
 				int index = signature.indexOf(':', i);
 				String name = signature.substring(i, index);
-				var = new TypeVariable(name);
+				var = new TypeVariable(Name.getQualified(name));
 				generic.addTypeVariable(var);
 				mode = 1;
 			}
@@ -344,7 +343,7 @@ public class ClassFormat
 					else if (c1 == 'T')
 					{
 						int end1 = signature.indexOf(';', i);
-						IType type = new Type(null, signature.substring(i + 2, end1));
+						IType type = new Type(Name.getQualified(signature.substring(i + 2, end1)));
 						
 						type.setArrayDimensions(array);
 						var.addUpperBound(type);
@@ -387,7 +386,7 @@ public class ClassFormat
 					else if (c1 == 'T')
 					{
 						int end1 = signature.indexOf(';', i + 1);
-						IType type = new Type(null, signature.substring(i + 2, end1));
+						IType type = new Type(Name.getQualified(signature.substring(i + 2, end1)));
 						
 						type.setArrayDimensions(array);
 						var.addUpperBound(type);

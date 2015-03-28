@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -26,14 +27,12 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.compiler.transform.Operators;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Util;
 
 public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeList, ITypeContext
 {
 	public IValue		instance;
-	public String		name;
-	public String		qualifiedName;
+	public Name name;
 	
 	public IType[]		generics;
 	public int			genericCount;
@@ -52,12 +51,11 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		this.position = position;
 	}
 	
-	public MethodCall(ICodePosition position, IValue instance, String name)
+	public MethodCall(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
 		this.instance = instance;
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override
@@ -131,40 +129,15 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	}
 	
 	@Override
-	public void setName(String name, String qualifiedName)
-	{
-		this.name = name;
-		this.qualifiedName = qualifiedName;
-	}
-	
-	@Override
-	public void setName(String name)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
-	{
-		this.qualifiedName = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.qualifiedName;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.qualifiedName.equals(name);
 	}
 	
 	@Override
@@ -231,7 +204,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	}
 	
 	@Override
-	public IType resolveType(String name)
+	public IType resolveType(Name name)
 	{
 		return this.method.resolveType(name, this.instance, this.arguments, this);
 	}
@@ -338,7 +311,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 				{
 					if (this.instance.isConstant())
 					{
-						IValue v1 = ConstantFolder.apply(this.instance, this.qualifiedName, argument);
+						IValue v1 = ConstantFolder.apply(this.instance, this.name, argument);
 						return v1 == null ? this : v1;
 					}
 					
@@ -346,7 +319,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 					return this;
 				}
 				
-				IValue v1 = ConstantFolder.apply(this.qualifiedName, argument);
+				IValue v1 = ConstantFolder.apply(this.name, argument);
 				if (v1 != null)
 				{
 					return v1;
@@ -418,28 +391,28 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			return false;
 		}
 		
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, this.arguments);
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
 			return true;
 		}
 		
-		if (this.arguments.size() == 1 && this.instance != null && this.qualifiedName.endsWith("$eq"))
+		if (this.arguments.size() == 1 && this.instance != null) { String qualified = this.name.qualified; if (qualified.endsWith("$eq"))
 		{
-			String s = this.qualifiedName.substring(0, this.qualifiedName.length() - 3);
-			MethodMatch method1 = this.instance.getType().resolveMethod(null, s, this.arguments);
+			String unqualified = this.name.unqualified;
+			Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
+			MethodMatch method1 = this.instance.getType().resolveMethod(null, name, this.arguments);
 			if (method1 != null)
 			{
 				AssignMethodCall call = new AssignMethodCall(this.position);
 				call.method = method1.method;
 				call.instance = this.instance;
 				call.arguments = this.arguments;
-				call.name = this.name.substring(0, this.name.length() - 1);
-				call.qualifiedName = s;
+				call.name = name;
 				this.replacement = call;
 			}
-		}
+		}}
 		return false;
 	}
 	
@@ -453,14 +426,13 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		
 		if (this.arguments.isEmpty())
 		{
-			IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
+			IField field = IAccess.resolveField(context, this.instance, this.name);
 			if (field != null)
 			{
 				FieldAccess access = new FieldAccess(this.position);
 				access.field = field;
 				access.instance = this.instance;
 				access.name = this.name;
-				access.qualifiedName = this.qualifiedName;
 				access.dotless = this.dotless;
 				return access;
 			}
@@ -472,18 +444,18 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			IType type = null;
 			IMethod method = null;
 			
-			FieldMatch field = context.resolveField(this.qualifiedName);
+			FieldMatch field = context.resolveField(this.name);
 			if (field == null)
 			{
 				// Find a type
-				type = new Type(this.position, this.qualifiedName).resolve(null, context);
+				type = new Type(this.position, this.name).resolve(null, context);
 				if (!type.isResolved())
 				{
 					// No type found -> Not an apply method call
 					return null;
 				}
 				// Find the apply method of the type
-				MethodMatch match = type.resolveMethod(null, "apply", this.arguments);
+				MethodMatch match = type.resolveMethod(null, Name.apply, this.arguments);
 				if (match == null)
 				{
 					// No apply method found -> Not an apply method call
@@ -497,11 +469,10 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 				FieldAccess access = new FieldAccess(this.position);
 				access.field = field.theField;
 				access.name = this.name;
-				access.qualifiedName = this.qualifiedName;
 				access.dotless = this.dotless;
 				
 				// Find the apply method of the field type
-				MethodMatch match = field.theField.getType().resolveMethod(access, "apply", this.arguments);
+				MethodMatch match = field.theField.getType().resolveMethod(access, Name.apply, this.arguments);
 				if (match == null)
 				{
 					// No apply method found -> Not an apply method call
@@ -526,7 +497,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	public IAccess resolve3(IContext context, IAccess next)
 	{
 		IArguments list = this.arguments.addLastValue(next);
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, list);
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.name, list);
 		if (method != null)
 		{
 			this.arguments = list;
@@ -542,14 +513,14 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		Marker marker;
 		if (this.arguments.isEmpty())
 		{
-			marker = markers.create(this.position, "resolve.method_field", this.name);
+			marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);
 		}
 		else
 		{
-			marker = markers.create(this.position, "resolve.method", this.name);
+			marker = markers.create(this.position, "resolve.method", this.name.unqualified);
 		}
 		
-		marker.addInfo("Qualified Name: " + this.qualifiedName);
+		marker.addInfo("Qualified Name: " + this.name.qualified);
 		if (this.instance != null)
 		{
 			marker.addInfo("Instance Type: " + this.instance.getType());
@@ -599,14 +570,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			}
 		}
 		
-		if (Formatting.Method.convertQualifiedNames)
-		{
-			buffer.append(this.qualifiedName);
-		}
-		else
-		{
-			buffer.append(this.name);
-		}
+		buffer.append(this.name);
 		
 		if (this.generics != null)
 		{

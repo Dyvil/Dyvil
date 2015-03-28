@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -21,22 +22,21 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.Symbols;
 
 public class Type extends ASTNode implements IType
 {
 	public static final UnknownType		NONE		= new UnknownType();
 	public static final DynamicType		DYNAMIC		= new DynamicType();
 	
-	public static final PrimitiveType	VOID		= new PrimitiveType("void", "Void", 0);
-	public static final PrimitiveType	BOOLEAN		= new PrimitiveType("boolean", "Boolean", MethodWriter.T_BOOLEAN);
-	public static final PrimitiveType	BYTE		= new PrimitiveType("byte", "Byte", MethodWriter.T_BOOLEAN);
-	public static final PrimitiveType	SHORT		= new PrimitiveType("short", "Short", MethodWriter.T_SHORT);
-	public static final PrimitiveType	CHAR		= new PrimitiveType("char", "Char", MethodWriter.T_CHAR);
-	public static final PrimitiveType	INT			= new PrimitiveType("int", "Int", MethodWriter.T_INT);
-	public static final PrimitiveType	LONG		= new PrimitiveType("long", "Long", MethodWriter.T_LONG);
-	public static final PrimitiveType	FLOAT		= new PrimitiveType("float", "Float", MethodWriter.T_FLOAT);
-	public static final PrimitiveType	DOUBLE		= new PrimitiveType("double", "Double", MethodWriter.T_DOUBLE);
+	public static final PrimitiveType	VOID		= new PrimitiveType(Name._void, 0);
+	public static final PrimitiveType	BOOLEAN		= new PrimitiveType(Name._boolean, MethodWriter.T_BOOLEAN);
+	public static final PrimitiveType	BYTE		= new PrimitiveType(Name._byte, MethodWriter.T_BOOLEAN);
+	public static final PrimitiveType	SHORT		= new PrimitiveType(Name._short, MethodWriter.T_SHORT);
+	public static final PrimitiveType	CHAR		= new PrimitiveType(Name._char, MethodWriter.T_CHAR);
+	public static final PrimitiveType	INT			= new PrimitiveType(Name._int, MethodWriter.T_INT);
+	public static final PrimitiveType	LONG		= new PrimitiveType(Name._long, MethodWriter.T_LONG);
+	public static final PrimitiveType	FLOAT		= new PrimitiveType(Name._float, MethodWriter.T_FLOAT);
+	public static final PrimitiveType	DOUBLE		= new PrimitiveType(Name._double, MethodWriter.T_DOUBLE);
 	
 	public static final Type			ANY			= new Type("Any");
 	public static final Type			OBJECT		= new Type("Object");
@@ -65,8 +65,7 @@ public class Type extends ASTNode implements IType
 	public static IClass				ARRAY_CLASS;
 	public static IClass				CLASS_CLASS;
 	
-	public String						name;
-	public String						qualifiedName;
+	public Name							name;
 	public String						fullName;
 	public IClass						theClass;
 	public int							arrayDimensions;
@@ -76,23 +75,25 @@ public class Type extends ASTNode implements IType
 		super();
 	}
 	
-	public Type(String name)
+	private Type(String name)
 	{
-		this.name = name;
-		this.qualifiedName = name;
+		this.name = Name.getQualified(name);
 	}
 	
-	public Type(ICodePosition position, String name)
+	public Type(Name name)
+	{
+		this.name = name;
+	}
+	
+	public Type(ICodePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	public Type(IClass iclass)
 	{
 		this.name = iclass.getName();
-		this.qualifiedName = iclass.getQualifiedName();
 		this.fullName = iclass.getFullName();
 		this.theClass = iclass;
 	}
@@ -100,29 +101,29 @@ public class Type extends ASTNode implements IType
 	public static void init()
 	{
 		BOOLEAN.theClass = BOOLEAN_CLASS = Package.dyvilLang.resolveClass("Boolean");
-		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod("create");
-		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod("booleanValue");
+		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.apply);
+		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.unapply);
 		BYTE.theClass = BYTE_CLASS = Package.dyvilLang.resolveClass("Byte");
-		BYTE.boxMethod = BYTE_CLASS.getBody().getMethod("create");
-		BYTE.unboxMethod = BYTE_CLASS.getBody().getMethod("byteValue");
+		BYTE.boxMethod = BYTE_CLASS.getBody().getMethod(Name.apply);
+		BYTE.unboxMethod = BYTE_CLASS.getBody().getMethod(Name.unapply);
 		SHORT.theClass = SHORT_CLASS = Package.dyvilLang.resolveClass("Short");
-		SHORT.boxMethod = SHORT_CLASS.getBody().getMethod("create");
-		SHORT.unboxMethod = SHORT_CLASS.getBody().getMethod("shortValue");
+		SHORT.boxMethod = SHORT_CLASS.getBody().getMethod(Name.apply);
+		SHORT.unboxMethod = SHORT_CLASS.getBody().getMethod(Name.unapply);
 		CHAR.theClass = CHAR_CLASS = Package.dyvilLang.resolveClass("Char");
-		CHAR.boxMethod = CHAR_CLASS.getBody().getMethod("create");
-		CHAR.unboxMethod = CHAR_CLASS.getBody().getMethod("charValue");
+		CHAR.boxMethod = CHAR_CLASS.getBody().getMethod(Name.apply);
+		CHAR.unboxMethod = CHAR_CLASS.getBody().getMethod(Name.unapply);
 		INT.theClass = INT_CLASS = Package.dyvilLang.resolveClass("Int");
-		INT.boxMethod = INT_CLASS.getBody().getMethod("create");
-		INT.unboxMethod = INT_CLASS.getBody().getMethod("intValue");
+		INT.boxMethod = INT_CLASS.getBody().getMethod(Name.apply);
+		INT.unboxMethod = INT_CLASS.getBody().getMethod(Name.unapply);
 		LONG.theClass = LONG_CLASS = Package.dyvilLang.resolveClass("Long");
-		LONG.boxMethod = LONG_CLASS.getBody().getMethod("create");
-		LONG.unboxMethod = LONG_CLASS.getBody().getMethod("longValue");
+		LONG.boxMethod = LONG_CLASS.getBody().getMethod(Name.apply);
+		LONG.unboxMethod = LONG_CLASS.getBody().getMethod(Name.unapply);
 		FLOAT.theClass = FLOAT_CLASS = Package.dyvilLang.resolveClass("Float");
-		FLOAT.boxMethod = FLOAT_CLASS.getBody().getMethod("create");
-		FLOAT.unboxMethod = FLOAT_CLASS.getBody().getMethod("floatValue");
+		FLOAT.boxMethod = FLOAT_CLASS.getBody().getMethod(Name.apply);
+		FLOAT.unboxMethod = FLOAT_CLASS.getBody().getMethod(Name.unapply);
 		DOUBLE.theClass = DOUBLE_CLASS = Package.dyvilLang.resolveClass("Double");
-		DOUBLE.boxMethod = DOUBLE_CLASS.getBody().getMethod("create");
-		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod("doubleValue");
+		DOUBLE.boxMethod = DOUBLE_CLASS.getBody().getMethod(Name.apply);
+		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod(Name.unapply);
 		
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		OBJECT.fullName = "java.lang.Object";
@@ -196,41 +197,18 @@ public class Type extends ASTNode implements IType
 		return null;
 	}
 	
-	@Override
-	public void setName(String name, String qualifiedName)
-	{
-		this.name = name;
-		this.qualifiedName = qualifiedName;
-	}
+	// Names
 	
 	@Override
-	public void setName(String name)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
-	{
-		this.qualifiedName = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.qualifiedName;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.qualifiedName.equals(name);
 	}
 	
 	@Override
@@ -387,7 +365,7 @@ public class Type extends ASTNode implements IType
 		
 		IClass iclass;
 		// Try to resolve the name of this Type as a primitive type
-		IType t = resolvePrimitive(this.qualifiedName);
+		IType t = resolvePrimitive(this.name);
 		if (t != null)
 		{
 			// If the array dimensions of this type are 0, we can assume
@@ -408,7 +386,7 @@ public class Type extends ASTNode implements IType
 		{
 			// This type is probably not a primitive one, so resolve using
 			// the context.
-			iclass = context.resolveClass(this.qualifiedName);
+			iclass = context.resolveClass(this.name);
 		}
 		
 		if (iclass != null)
@@ -429,36 +407,50 @@ public class Type extends ASTNode implements IType
 		return this;
 	}
 	
-	protected static IType resolvePrimitive(String name)
+	protected static IType resolvePrimitive(Name name)
 	{
-		switch (name)
+		if (name == Name._void)
 		{
-		case "void":
 			return VOID;
-		case "boolean":
+		}
+		if (name == Name._boolean)
+		{
 			return BOOLEAN;
-		case "char":
-			return CHAR;
-		case "byte":
+		}
+		if (name == Name._byte)
+		{
 			return BYTE;
-		case "short":
+		}
+		if (name == Name._short)
+		{
 			return SHORT;
-		case "int":
+		}
+		if (name == Name._char)
+		{
+			return CHAR;
+		}
+		if (name == Name._int)
+		{
 			return INT;
-		case "long":
+		}
+		if (name == Name._long)
+		{
 			return LONG;
-		case "float":
+		}
+		if (name == Name._float)
+		{
 			return FLOAT;
-		case "double":
+		}
+		if (name == Name._double)
+		{
 			return DOUBLE;
-		case "string":
-		case "String":
-			// Both lower- and uppercase "string" resolve to java.lang.String.
-			return STRING;
-		case "any":
-		case "Any":
+		}
+		if (name == Name.any)
+		{
 			return ANY;
-		case "dynamic":
+		}
+		if (name == Name.dynamic)
+		{
 			return DYNAMIC;
 		}
 		return null;
@@ -473,19 +465,19 @@ public class Type extends ASTNode implements IType
 	// IContext
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return this.theClass == null ? null : this.theClass.resolvePackage(name);
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		return this.theClass == null ? null : this.theClass.resolveClass(name);
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -496,7 +488,7 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -507,7 +499,7 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -557,7 +549,7 @@ public class Type extends ASTNode implements IType
 			this.appendExtendedName(buf);
 			return buf.toString();
 		}
-		return this.theClass == null ? ClassFormat.packageToInternal(this.qualifiedName) : this.theClass.getInternalName();
+		return this.theClass == null ? ClassFormat.packageToInternal(this.fullName) : this.theClass.getInternalName();
 	}
 	
 	@Override
@@ -567,7 +559,7 @@ public class Type extends ASTNode implements IType
 		{
 			buffer.append('[');
 		}
-		buffer.append('L').append(this.theClass == null ? ClassFormat.packageToInternal(this.qualifiedName) : this.theClass.getInternalName()).append(';');
+		buffer.append('L').append(this.theClass == null ? ClassFormat.packageToInternal(this.fullName) : this.theClass.getInternalName()).append(';');
 	}
 	
 	@Override
@@ -638,7 +630,6 @@ public class Type extends ASTNode implements IType
 		Type t = new Type();
 		t.theClass = this.theClass;
 		t.name = this.name;
-		t.qualifiedName = this.qualifiedName;
 		t.fullName = this.fullName;
 		t.arrayDimensions = this.arrayDimensions;
 		return t;

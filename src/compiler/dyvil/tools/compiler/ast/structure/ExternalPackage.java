@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassReader;
 import dyvil.tools.compiler.library.Library;
 
@@ -11,7 +12,7 @@ public class ExternalPackage extends Package
 {
 	public Library	library;
 	
-	public ExternalPackage(Package parent, String name, Library library)
+	public ExternalPackage(Package parent, Name name, Library library)
 	{
 		super(parent, name);
 		this.library = library;
@@ -26,7 +27,7 @@ public class ExternalPackage extends Package
 			return pack;
 		}
 		
-		pack = new ExternalPackage(this, name, this.library);
+		pack = new ExternalPackage(this, Name.getQualified(name), this.library);
 		this.subPackages.put(name, pack);
 		return pack;
 	}
@@ -62,8 +63,8 @@ public class ExternalPackage extends Package
 				InputStream is = this.library.getInputStream(this.internalName + name + ".class");
 				if (is != null)
 				{
-					BytecodeClass bclass = new BytecodeClass(name);
-					this.classes.put(name, bclass);
+					BytecodeClass bclass = new BytecodeClass(Name.getQualified(name));
+					this.classes.add(bclass);
 					iclass = ClassReader.loadClass(bclass, is, false);
 				}
 			}

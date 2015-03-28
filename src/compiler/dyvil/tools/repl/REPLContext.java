@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -27,11 +28,11 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class REPLContext implements IValued, IDyvilUnit
 {
-	private int						resultIndex;
+	private int					resultIndex;
 	
-	private Map<String, Variable>	variables	= new HashMap();
+	private Map<Name, Variable>	variables	= new HashMap();
 	
-	private IValue					value;
+	private IValue				value;
 	
 	public void processValue()
 	{
@@ -41,13 +42,13 @@ public class REPLContext implements IValued, IDyvilUnit
 		}
 		
 		MarkerList markers = new MarkerList();
-		String name;
+		Name name;
 		Variable var;
 		
 		if (this.value.getValueType() == IValue.VARIABLE)
 		{
 			var = ((FieldInitializer) this.value).variable;
-			name = var.qualifiedName;
+			name = var.name;
 			this.value = var.value;
 			
 			if (var.value == null)
@@ -62,7 +63,7 @@ public class REPLContext implements IValued, IDyvilUnit
 		}
 		else
 		{
-			name = "res" + this.resultIndex++;
+			name = Name.getQualified("res" + this.resultIndex++);
 			var = new Variable(null, name, null);
 			this.value.resolveTypes(markers, this);
 			this.value = this.value.resolve(markers, this);
@@ -159,13 +160,13 @@ public class REPLContext implements IValued, IDyvilUnit
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		// Standart Dyvil Classes
 		IClass iclass = Package.dyvilLang.resolveClass(name);
@@ -179,7 +180,7 @@ public class REPLContext implements IValued, IDyvilUnit
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		IField f = this.variables.get(name);
 		if (f != null)
@@ -190,13 +191,13 @@ public class REPLContext implements IValued, IDyvilUnit
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		return null;
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 	}
 	

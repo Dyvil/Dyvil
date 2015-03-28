@@ -5,8 +5,8 @@ import java.util.Map;
 
 public final class Symbols
 {
-	public static Map<Character, String>	symbolMap		= new HashMap();
-	public static Map<String, Character>	replacementMap	= new HashMap();
+	public static Map<Character, String>	symbolMap				= new HashMap();
+	public static Map<String, Character>	replacementMap			= new HashMap();
 	
 	static
 	{
@@ -30,20 +30,20 @@ public final class Symbols
 		addReplacement(':', "colon");
 		addReplacement('.', "dot");
 	}
-
-	public static final int	PARENTHESIS				= Tokens.BRACKET | 0x00010000;
-	public static final int	SQUARE					= Tokens.BRACKET | 0x00020000;
-	public static final int	CURLY					= Tokens.BRACKET | 0x00040000;
-	public static final int	OPEN					= 0x00000000;
-	public static final int	CLOSE					= 0x00100000;
-	public static final int	OPEN_BRACKET			= Tokens.BRACKET | OPEN;
-	public static final int	CLOSE_BRACKET			= Tokens.BRACKET | CLOSE;
-	public static final int	OPEN_PARENTHESIS		= PARENTHESIS | OPEN;
-	public static final int	CLOSE_PARENTHESIS		= PARENTHESIS | CLOSE;
-	public static final int	OPEN_SQUARE_BRACKET		= SQUARE | OPEN;
-	public static final int	CLOSE_SQUARE_BRACKET	= SQUARE | CLOSE;
-	public static final int	OPEN_CURLY_BRACKET		= CURLY | OPEN;
-	public static final int	CLOSE_CURLY_BRACKET		= CURLY | CLOSE;
+	
+	public static final int					PARENTHESIS				= Tokens.BRACKET | 0x00010000;
+	public static final int					SQUARE					= Tokens.BRACKET | 0x00020000;
+	public static final int					CURLY					= Tokens.BRACKET | 0x00040000;
+	public static final int					OPEN					= 0x00000000;
+	public static final int					CLOSE					= 0x00100000;
+	public static final int					OPEN_BRACKET			= Tokens.BRACKET | OPEN;
+	public static final int					CLOSE_BRACKET			= Tokens.BRACKET | CLOSE;
+	public static final int					OPEN_PARENTHESIS		= PARENTHESIS | OPEN;
+	public static final int					CLOSE_PARENTHESIS		= PARENTHESIS | CLOSE;
+	public static final int					OPEN_SQUARE_BRACKET		= SQUARE | OPEN;
+	public static final int					CLOSE_SQUARE_BRACKET	= SQUARE | CLOSE;
+	public static final int					OPEN_CURLY_BRACKET		= CURLY | OPEN;
+	public static final int					CLOSE_CURLY_BRACKET		= CURLY | CLOSE;
 	
 	private static void addReplacement(char symbol, String replacement)
 	{
@@ -82,9 +82,15 @@ public final class Symbols
 	
 	public static String unqualify(String s)
 	{
+		int i = s.indexOf('$');
+		if (i == -1)
+		{
+			return s;
+		}
+		
 		int len = s.length();
 		StringBuilder builder = new StringBuilder(len);
-		for (int i = 0; i < len; i++)
+		for (; i < len; i++)
 		{
 			char c = s.charAt(i);
 			if (c == '$')
@@ -123,7 +129,7 @@ public final class Symbols
 		}
 		return end;
 	}
-
+	
 	public static int getSymbolType(String s)
 	{
 		switch (s)
@@ -141,7 +147,7 @@ public final class Symbols
 		}
 		return 0;
 	}
-
+	
 	public static String symbolToString(int type)
 	{
 		switch (type)

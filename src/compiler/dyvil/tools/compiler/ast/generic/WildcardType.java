@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -49,19 +50,19 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return this.captureClass.resolvePackage(name);
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		return this.captureClass.resolveClass(name);
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -72,7 +73,7 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -83,7 +84,7 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -125,13 +126,13 @@ public class WildcardType extends TypeVariable implements IType
 	@Override
 	public void setFullName(String name)
 	{
-		this.name = name;
+		this.name = Name.getQualified(name);
 	}
 	
 	@Override
 	public String getFullName()
 	{
-		return this.name;
+		return this.name.qualified;
 	}
 	
 	@Override
@@ -159,11 +160,11 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
-	public IType resolveType(String name)
+	public IType resolveType(Name name)
 	{
 		if (this.name != null)
 		{
-			if (this.name.equals(name))
+			if (this.name == name)
 			{
 				return this;
 			}
@@ -183,11 +184,11 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
-	public IType resolveType(String name, IType concrete)
+	public IType resolveType(Name name, IType concrete)
 	{
 		if (this.name != null)
 		{
-			if (this.name.equals(name) && this.isSuperTypeOf(concrete))
+			if (this.name == name && this.isSuperTypeOf(concrete))
 			{
 				return concrete;
 			}
@@ -373,7 +374,7 @@ public class WildcardType extends TypeVariable implements IType
 			{
 				buffer.append('[');
 			}
-			buffer.append('T').append(this.name).append(';');
+			buffer.append('T').append(this.name.qualified).append(';');
 		}
 		else if (this.lowerBound != null)
 		{

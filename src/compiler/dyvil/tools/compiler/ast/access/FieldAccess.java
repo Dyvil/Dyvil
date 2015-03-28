@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -21,13 +22,11 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
-import dyvil.tools.compiler.transform.Symbols;
 
 public class FieldAccess extends ASTNode implements IAccess, INamed
 {
 	public IValue	instance;
-	public String	name;
-	public String	qualifiedName;
+	public Name name;
 	
 	public boolean	dotless;
 	
@@ -38,12 +37,11 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 		this.position = position;
 	}
 	
-	public FieldAccess(ICodePosition position, IValue instance, String name)
+	public FieldAccess(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
 		this.instance = instance;
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override
@@ -85,40 +83,15 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	}
 	
 	@Override
-	public void setName(String name, String qualifiedName)
-	{
-		this.name = name;
-		this.qualifiedName = qualifiedName;
-	}
-	
-	@Override
-	public void setName(String name)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public void setQualifiedName(String name)
-	{
-		this.qualifiedName = name;
-	}
-	
-	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.qualifiedName;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.qualifiedName.equals(name);
 	}
 	
 	@Override
@@ -248,7 +221,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	{
 		if (this.instance != null && this.instance.getValueType() == CLASS_ACCESS)
 		{
-			if (this.qualifiedName.equals("class"))
+			if (this.name == Name._class)
 			{
 				ClassOperator co = new ClassOperator(((ClassAccess) this.instance).type);
 				co.position = this.position;
@@ -258,14 +231,13 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 			}
 		}
 		
-		IField field = IAccess.resolveField(context, this.instance, this.qualifiedName);
+		IField field = IAccess.resolveField(context, this.instance, this.name);
 		if (field != null)
 		{
 			if (field.isEnumConstant())
 			{
 				EnumValue enumValue = new EnumValue(this.position);
 				enumValue.name = this.name;
-				enumValue.qualifiedName = this.qualifiedName;
 				enumValue.type = field.getType();
 				this.replacement = enumValue;
 				return false;
@@ -290,7 +262,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 			return this.replacement;
 		}
 		
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, EmptyArguments.INSTANCE);
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
 		if (method != null)
 		{
 			return this.toMethodCall(method);
@@ -304,7 +276,6 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 		MethodCall call = new MethodCall(this.position);
 		call.instance = this.instance;
 		call.name = this.name;
-		call.qualifiedName = this.qualifiedName;
 		call.method = method;
 		call.dotless = this.dotless;
 		call.arguments = EmptyArguments.INSTANCE;
@@ -315,13 +286,12 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	public IAccess resolve3(IContext context, IAccess next)
 	{
 		IArguments arguments = new SingleArgument(next);
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, arguments);
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.name, arguments);
 		if (method != null)
 		{
 			MethodCall call = new MethodCall(this.position);
 			call.instance = this.instance;
 			call.name = this.name;
-			call.qualifiedName = this.qualifiedName;
 			call.method = method;
 			call.dotless = this.dotless;
 			call.arguments = arguments;
@@ -334,8 +304,8 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	@Override
 	public void addResolveError(MarkerList markers)
 	{
-		Marker marker = markers.create(this.position, "resolve.method_field", this.name);
-		marker.addInfo("Qualified Name: " + this.qualifiedName);
+		Marker marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);
+		marker.addInfo("Qualified Name: " + this.name.qualified);
 		if (this.instance != null)
 		{
 			marker.addInfo("Instance Type: " + this.instance.getType());
@@ -371,13 +341,6 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 			}
 		}
 		
-		if (Formatting.Method.convertQualifiedNames)
-		{
-			buffer.append(this.qualifiedName);
-		}
-		else
-		{
-			buffer.append(this.name);
-		}
+		buffer.append(this.name);
 	}
 }

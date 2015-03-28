@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -20,7 +21,7 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public IArguments addLastValue(IValue value);
 	
-	public default IArguments addLastValue(String name, IValue value)
+	public default IArguments addLastValue(Name name, IValue value)
 	{
 		return this.addLastValue(value);
 	}
@@ -47,9 +48,9 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public void checkVarargsValue(int index, Parameter param, MarkerList markers, ITypeContext context);
 	
-	public void writeValue(int index, String name, IValue defaultValue, MethodWriter writer);
+	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer);
 	
-	public void writeVarargsValue(int index, String name, IType type, MethodWriter writer);
+	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer);
 	
 	// Phase Methdos
 	

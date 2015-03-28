@@ -4,6 +4,7 @@ import org.objectweb.asm.Label;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -98,7 +99,7 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 	}
 	
 	@Override
-	public IField resolveField(String name)
+	public IField resolveField(Name name)
 	{
 		for (int i = 0; i < this.patternCount; i++)
 		{

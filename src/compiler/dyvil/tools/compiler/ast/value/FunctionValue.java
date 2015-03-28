@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.Parameter;
@@ -19,14 +20,12 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.Symbols;
 
 public final class FunctionValue extends ASTNode implements IValue, IValued, INamed
 {
 	public IValue				instance;
 	
-	public String				name;
-	public String				qualifiedName;
+	public Name name;
 	
 	/**
 	 * The type this function pointer represents
@@ -45,50 +44,24 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 	
 	private List<MethodMatch>	methods;
 	
-	public FunctionValue(ICodePosition position, String name)
+	public FunctionValue(ICodePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	// Names
 	
 	@Override
-	public void setName(String name, String qualifiedName)
-	{
-		this.name = name;
-		this.qualifiedName = name;
-	}
-	
-	@Override
-	public void setName(String name)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
-	{
-		this.qualifiedName = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.qualifiedName;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.qualifiedName.equals(name);
 	}
 	
 	// Instance
@@ -116,7 +89,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 	@Override
 	public IType getType()
 	{
-		return this.type == null ? new Type("Unknown Function Pointer Type") : this.type;
+		return this.type == null ? new Type(Name.getQualified("Unknown Function Pointer Type")) : this.type;
 	}
 	
 	@Override
@@ -209,7 +182,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 		}
 		
 		List<MethodMatch> matches = new ArrayList();
-		this.instance.getType().getMethodMatches(matches, this.instance, this.qualifiedName, null);
+		this.instance.getType().getMethodMatches(matches, this.instance, this.name, null);
 		this.methods = matches;
 		
 		return this;
@@ -262,12 +235,12 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 		descBuf.append(")");
 		this.type.appendExtendedName(descBuf);
 		
-		String name = this.method.getQualifiedName();
+		String name = this.method.getName().qualified;
 		String desc = descBuf.toString();
 		String methodDesc = this.method.getDescriptor();
 		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.functionalMethod.getDescriptor());
 		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(methodDesc);
-		Handle handle = new Handle(handleType, this.method.getTheClass().getInternalName(), this.method.getQualifiedName(), methodDesc);
+		Handle handle = new Handle(handleType, this.method.getTheClass().getInternalName(), name, methodDesc);
 		writer.writeInvokeDynamic(name, desc, len, this.type, LambdaValue.BOOTSTRAP, type1, handle, type2);
 	}
 	
@@ -284,13 +257,6 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 			this.instance.toString(prefix, buffer);
 		}
 		buffer.append(Formatting.Method.pointerSeperator);
-		if (Formatting.Method.convertQualifiedNames)
-		{
-			buffer.append(this.qualifiedName);
-		}
-		else
-		{
-			buffer.append(this.name);
-		}
+		buffer.append(this.name);
 	}
 }

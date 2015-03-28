@@ -6,6 +6,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -88,12 +89,12 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public IClass getClass(String name)
+	public IClass getClass(Name name)
 	{
 		for (int i = 0; i < this.classCount; i++)
 		{
 			IClass c = this.classes[i];
-			if (c.isName(name))
+			if (c.getName() == name)
 			{
 				return c;
 			}
@@ -129,12 +130,12 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public IField getField(String name)
+	public IField getField(Name name)
 	{
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			IField f = this.fields[i];
-			if (f.isName(name))
+			if (f.getName() == name)
 			{
 				return f;
 			}
@@ -170,12 +171,12 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public IProperty getProperty(String name)
+	public IProperty getProperty(Name name)
 	{
 		for (int i = 0; i < this.propertyCount; i++)
 		{
 			IProperty p = this.properties[i];
-			if (p.isName(name))
+			if (p.getName() == name)
 			{
 				return p;
 			}
@@ -252,12 +253,12 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public IMethod getMethod(String name)
+	public IMethod getMethod(Name name)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			IMethod m = this.methods[i];
-			if (m.isName(name))
+			if (m.getName() == name)
 			{
 				return m;
 			}
@@ -266,13 +267,13 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public IMethod getMethod(String name, Parameter[] parameters, int parameterCount)
+	public IMethod getMethod(Name name, Parameter[] parameters, int parameterCount)
 	{
 		outer:
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			IMethod m = this.methods[i];
-			if (!m.isName(name))
+			if (m.getName() != name)
 			{
 				continue;
 			}
@@ -297,7 +298,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{

@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.transform.Symbols;
 
 public abstract class Member extends ASTNode implements IMember
 {
@@ -17,17 +16,15 @@ public abstract class Member extends ASTNode implements IMember
 	public int				modifiers;
 	
 	public IType			type;
-	public String			name;
-	public String			qualifiedName;
+	public Name				name;
 	
 	protected Member()
 	{
 	}
 	
-	protected Member(String name)
+	protected Member(Name name)
 	{
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	public Member(IType type)
@@ -35,17 +32,15 @@ public abstract class Member extends ASTNode implements IMember
 		this.type = type;
 	}
 	
-	public Member(String name, IType type)
+	public Member(Name name, IType type)
 	{
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 		this.type = type;
 	}
 	
-	public Member(String name, IType type, int modifiers)
+	public Member(Name name, IType type, int modifiers)
 	{
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 		this.type = type;
 		this.modifiers = modifiers;
 	}
@@ -181,41 +176,15 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
-	public void setName(String name, String qualifiedName)
+	public void setName(Name name)
 	{
 		this.name = name;
-		this.qualifiedName = qualifiedName;
 	}
 	
 	@Override
-	public void setName(String name)
-	{
-		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
-	}
-	
-	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
-	{
-		this.qualifiedName = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.qualifiedName;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.qualifiedName.equals(name);
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -12,12 +13,12 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class BindingPattern extends ASTNode implements IPattern, IPatterned
 {
-	private String		name;
+	private Name		name;
 	private IPattern	pattern;
 	private Variable	variable;
 	private IType		type;
 	
-	public BindingPattern(ICodePosition position, String name)
+	public BindingPattern(ICodePosition position, Name name)
 	{
 		this.name = name;
 		this.position = position;
@@ -76,9 +77,9 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	}
 	
 	@Override
-	public IField resolveField(String name)
+	public IField resolveField(Name name)
 	{
-		if (!name.equals(this.name))
+		if (name != this.name)
 		{
 			return null;
 		}
@@ -90,7 +91,6 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 		
 		this.variable = new Variable(this.position);
 		this.variable.name = this.name;
-		this.variable.qualifiedName = this.name;
 		this.variable.type = this.type;
 		return this.variable;
 	}

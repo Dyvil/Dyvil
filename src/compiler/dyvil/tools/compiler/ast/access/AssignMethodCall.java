@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -22,13 +23,11 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.Util;
 
 public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeContext, INamed
 {
-	public String		name;
-	public String		qualifiedName;
+	public Name			name;
 	
 	public IValue		instance;
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
@@ -42,12 +41,11 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		this.position = position;
 	}
 	
-	public AssignMethodCall(ICodePosition position, IValue instance, String name)
+	public AssignMethodCall(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
 		this.instance = instance;
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override
@@ -121,46 +119,21 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
-	public void setName(String name, String qualifiedName)
-	{
-		this.name = name;
-		this.qualifiedName = qualifiedName;
-	}
-	
-	@Override
-	public void setName(String name)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
 	}
 	
 	@Override
-	public void setQualifiedName(String name)
-	{
-		this.qualifiedName = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.qualifiedName;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.qualifiedName.equals(name);
-	}
-	
-	@Override
 	public void setValue(IValue value)
 	{
-		this.arguments = this.arguments.addLastValue("update", value);
+		this.arguments = this.arguments.addLastValue(Name.update, value);
 	}
 	
 	@Override
@@ -170,7 +143,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
-	public IType resolveType(String name)
+	public IType resolveType(Name name)
 	{
 		return this.method.resolveType(name, this.instance, this.arguments, null);
 	}
@@ -196,15 +169,15 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		
 		this.arguments.resolve(markers, context);
 		
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.qualifiedName, this.arguments);
+		IMethod method = IAccess.resolveMethod(context, this.instance, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
 			return this;
 		}
 		
-		Marker marker = markers.create(this.position, "resolve.method", this.name);
-		marker.addInfo("Qualified Name: " + this.qualifiedName);
+		Marker marker = markers.create(this.position, "resolve.method", this.name.unqualified);
+		marker.addInfo("Qualified Name: " + this.name.unqualified);
 		marker.addInfo("Instance Type: " + this.instance.getType());
 		StringBuilder builder = new StringBuilder("Argument Types: {");
 		Util.typesToString("", this.arguments, ", ", builder);
@@ -227,7 +200,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 				IArguments arguments1 = call.arguments.addLastValue(call);
 				
 				IType type = instance1.getType();
-				MethodMatch match = type.resolveMethod(instance1, "update", arguments1);
+				MethodMatch match = type.resolveMethod(instance1, Name.update, arguments1);
 				if (match != null)
 				{
 					this.updateMethod = match.method;
@@ -396,7 +369,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		if (this.arguments.size() == 1 && f.getType() == Type.INT && f.isVariable())
 		{
 			boolean minus = false;
-			if ("$plus".equals(this.qualifiedName) || (minus = "$minus".equals(this.qualifiedName)))
+			if (this.name == Name.plus || (minus = this.name == Name.minus))
 			{
 				IValue value1 = this.arguments.getFirstValue();
 				if (IValue.isNumeric(value1.getValueType()))
@@ -420,11 +393,11 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		
 		if (Formatting.Method.convertQualifiedNames)
 		{
-			buffer.append(this.qualifiedName).append("$eq");
+			buffer.append(this.name.qualified).append("$eq");
 		}
 		else
 		{
-			buffer.append(this.name).append('=');
+			buffer.append(this.name.unqualified).append('=');
 		}
 		
 		this.arguments.toString(prefix, buffer);

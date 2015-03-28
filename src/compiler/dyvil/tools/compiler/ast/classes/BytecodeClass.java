@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
@@ -24,7 +25,6 @@ import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.transform.Symbols;
 
 public class BytecodeClass extends CodeClass
 {
@@ -34,10 +34,9 @@ public class BytecodeClass extends CodeClass
 	private IType		outerType;
 	private List<IType>	innerTypes;
 	
-	public BytecodeClass(String name)
+	public BytecodeClass(Name name)
 	{
 		this.name = name;
-		this.qualifiedName = name;
 	}
 	
 	@Override
@@ -91,14 +90,7 @@ public class BytecodeClass extends CodeClass
 		
 		if (this.superType != null)
 		{
-			if (this.superType.isName("void"))
-			{
-				this.superType = null;
-			}
-			else
-			{
-				this.superType = this.superType.resolve(markers, context);
-			}
+			this.superType = this.superType.resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
@@ -145,7 +137,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		if (!this.typesResolved)
 		{
@@ -155,7 +147,7 @@ public class BytecodeClass extends CodeClass
 		for (int i = 0; i < this.genericCount; i++)
 		{
 			ITypeVariable var = this.generics[i];
-			if (var.isName(name))
+			if (var.getName() == name)
 			{
 				return var.getCaptureClass();
 			}
@@ -171,7 +163,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		if (!this.typesResolved)
 		{
@@ -212,7 +204,7 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		if (!this.typesResolved)
 		{
@@ -251,10 +243,11 @@ public class BytecodeClass extends CodeClass
 	{
 		if ("get".equals(specialType) || "set".equals(specialType))
 		{
-			IProperty property = this.body.getProperty(name);
+			Name name1 = Name.getQualified(name);
+			IProperty property = this.body.getProperty(name1);
 			if (property == null)
 			{
-				Property prop = new Property(this, name, method.getType());
+				Property prop = new Property(this, name1, method.getType());
 				prop.modifiers = method.getModifiers() & ~Modifiers.SYNTHETIC;
 				this.body.addProperty(prop);
 			}
@@ -262,11 +255,13 @@ public class BytecodeClass extends CodeClass
 		if ("parDefault".equals(specialType))
 		{
 			int i = name.indexOf('$');
-			IMethod method1 = this.body.getMethod(name.substring(0, i));
+			Name name1 = Name.getQualified(name.substring(0, i));
+			IMethod method1 = this.body.getMethod(name1);
 			int parIndex = Integer.parseInt(name.substring(i + 1));
 			
 			MethodCall call = new MethodCall(null);
 			call.method = method;
+			call.name = name1;
 			method1.getParameter(parIndex).defaultValue = call;
 			return false;
 		}
@@ -291,17 +286,15 @@ public class BytecodeClass extends CodeClass
 		}
 		if (index == -1)
 		{
-			this.name = name;
-			this.qualifiedName = Symbols.qualify(name);
+			this.name = Name.getQualified(name);
 			this.thePackage = Package.rootPackage;
 			this.fullName = name;
 		}
 		else
 		{
-			this.name = name.substring(index + 1);
-			this.qualifiedName = Symbols.qualify(this.name);
+			this.name = Name.getQualified(name.substring(index + 1));
 			this.fullName = name.replace('/', '.');
-			this.thePackage = Package.rootPackage.resolvePackage(this.fullName.substring(0, index));
+			this.thePackage = Package.rootPackage.resolvePackage(Name.getQualified(this.fullName.substring(0, index)));
 		}
 		
 		if (signature != null)
@@ -337,7 +330,7 @@ public class BytecodeClass extends CodeClass
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
 		Field field = new Field(this);
-		field.setName(Symbols.unqualify(name), name);
+		field.setName(Name.get(name));
 		field.setModifiers(access);
 		field.setType(ClassFormat.internalToType(desc));
 		
@@ -363,12 +356,13 @@ public class BytecodeClass extends CodeClass
 	
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
+		Name name1 = Name.get(name);
+		
 		if ((this.modifiers & Modifiers.ANNOTATION) != 0)
 		{
 			Parameter param = new Parameter();
 			param.modifiers = access;
-			param.name = Symbols.unqualify(name);
-			param.qualifiedName = name;
+			param.name = name1;
 			param.type = ClassFormat.internalToType(desc.substring(desc.lastIndexOf(')') + 1));
 			this.addParameter(param);
 			return new AnnotationClassVisitor(param);
@@ -393,8 +387,7 @@ public class BytecodeClass extends CodeClass
 		}
 		
 		Method method = new Method(this);
-		method.name = name; // TODO Maybe use Symbols.unqualify here?
-		method.qualifiedName = name;
+		method.name = name1;
 		method.modifiers = access;
 		
 		if (signature != null)

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.dwt;
 
 import dyvil.strings.CharUtils;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.value.IValue;
 
@@ -8,13 +9,13 @@ public class DWTProperty
 {
 	public DWTNode	node;
 	public String	fullName;
-	public String	key;
+	public Name		key;
 	public IValue	value;
 	public IMethod	setter;
 	
-	public DWTProperty(DWTNode node, String key, IValue value)
+	public DWTProperty(DWTNode node, Name key, IValue value)
 	{
-		this.fullName = getFullName(node.fullName, key);
+		this.fullName = getFullName(node.fullName, key.qualified);
 		this.key = key;
 		this.value = value;
 	}

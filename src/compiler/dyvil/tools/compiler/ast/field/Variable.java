@@ -6,6 +6,7 @@ import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -14,7 +15,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.Symbols;
 
 public class Variable extends Member implements IVariable
 {
@@ -32,10 +32,9 @@ public class Variable extends Member implements IVariable
 		this.type = type;
 	}
 	
-	public Variable(ICodePosition position, String name, IType type)
+	public Variable(ICodePosition position, Name name, IType type)
 	{
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 		this.type = type;
 		this.position = position;
 	}

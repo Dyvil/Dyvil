@@ -2,18 +2,17 @@ package dyvil.tools.compiler.transform;
 
 import static dyvil.tools.compiler.ast.value.IValue.*;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.value.IValue;
 
 public class ConstantFolder
 {
-	public static IValue apply(String op, IValue v1)
+	public static IValue apply(Name op, IValue v1)
 	{
 		switch (v1.getValueType())
 		{
 		case BOOLEAN:
 			return applyBoolean((BooleanValue) v1, op);
-		case CHAR:
-			return applyChar((CharValue) v1, op);
 		case INT:
 			return applyInt((IntValue) v1, op);
 		case LONG:
@@ -26,7 +25,7 @@ public class ConstantFolder
 		return null;
 	}
 	
-	public static IValue apply(IValue v1, String op, IValue v2)
+	public static IValue apply(IValue v1, Name op, IValue v2)
 	{
 		int t1 = v1.getValueType();
 		int t2 = v2.getValueType();
@@ -46,182 +45,213 @@ public class ConstantFolder
 				return applyDouble((INumericValue) v1, op, (INumericValue) v2);
 			}
 		}
-		else if (t1 == STRING && t2 == STRING && "$plus".equals(op))
+		if (t1 == STRING && t2 == STRING && Name.plus.equals(op))
 		{
 			return new StringValue(((StringValue) v1).value + ((StringValue) v2).value);
 		}
 		return null;
 	}
 	
-	private static IValue applyBoolean(BooleanValue v, String op)
+	private static IValue applyBoolean(BooleanValue v, Name op)
 	{
-		if ("$bang".equals(op))
+		if (op == Name.bang)
 		{
 			return new BooleanValue(!v.value);
 		}
 		return null;
 	}
 	
-	private static IValue applyChar(CharValue v, String op)
+	private static IValue applyInt(IntValue v, Name op)
 	{
-		if ("$tilde".equals(op))
-		{
-			return new CharValue((char) ~v.value);
-		}
-		else if ("$minus".equals(op))
-		{
-			return new CharValue((char) -v.value);
-		}
-		return null;
-	}
-	
-	private static IValue applyInt(IntValue v, String op)
-	{
-		if ("$tilde".equals(op))
+		if (op == Name.tilde)
 		{
 			return new IntValue(~v.value);
 		}
-		else if ("$minus".equals(op))
+		if (op == Name.minus)
 		{
 			return new IntValue(-v.value);
 		}
 		return null;
 	}
 	
-	private static IValue applyLong(LongValue v, String op)
+	private static IValue applyLong(LongValue v, Name op)
 	{
-		if ("$tilde".equals(op))
+		if (op == Name.tilde)
 		{
 			return new LongValue(~v.value);
 		}
-		else if ("$minus".equals(op))
+		if (op == Name.minus)
 		{
 			return new LongValue(-v.value);
 		}
 		return null;
 	}
 	
-	private static IValue applyFloat(FloatValue v, String op)
+	private static IValue applyFloat(FloatValue v, Name op)
 	{
-		if ("$minus".equals(op))
+		if (op == Name.minus)
 		{
 			return new FloatValue(-v.value);
 		}
 		return null;
 	}
 	
-	private static IValue applyDouble(DoubleValue v, String op)
+	private static IValue applyDouble(DoubleValue v, Name op)
 	{
-		if ("$minus".equals(op))
+		if (op == Name.minus)
 		{
 			return new DoubleValue(-v.value);
 		}
 		return null;
 	}
 	
-	private static IValue applyInt(INumericValue v1, String op, INumericValue v2)
+	private static IValue applyInt(INumericValue v1, Name op, INumericValue v2)
 	{
-		switch (op)
+		if (op == Name.plus)
 		{
-		case "$plus":
 			return new IntValue(v1.intValue() + v2.intValue());
-		case "$minus":
+		}
+		if (op == Name.minus)
+		{
 			return new IntValue(v1.intValue() - v2.intValue());
-		case "$times":
+		}
+		if (op == Name.times)
+		{
 			return new IntValue(v1.intValue() * v2.intValue());
-		case "$div":
+		}
+		if (op == Name.div)
 		{
 			int i2 = v2.intValue();
 			return i2 == 0 ? null : new IntValue(v1.intValue() / i2);
 		}
-		case "$percent":
+		if (op == Name.percent)
 		{
 			int i2 = v2.intValue();
 			return i2 == 0 ? null : new IntValue(v1.intValue() % i2);
 		}
-		case "$amp":
+		if (op == Name.amp)
+		{
 			return new IntValue(v1.intValue() & v2.intValue());
-		case "$bar":
+		}
+		if (op == Name.bar)
+		{
 			return new IntValue(v1.intValue() | v2.intValue());
-		case "$up":
+		}
+		if (op == Name.up)
+		{
 			return new IntValue(v1.intValue() ^ v2.intValue());
-		case "$less$less":
+		}
+		if (op == Name.lessLess)
+		{
 			return new IntValue(v1.intValue() << v2.intValue());
-		case "$greater$greater":
+		}
+		if (op == Name.greaterGreater)
+		{
 			return new IntValue(v1.intValue() >> v2.intValue());
-		case "$greater$greater$greater":
+		}
+		if (op == Name.greaterGreaterGreater)
+		{
 			return new IntValue(v1.intValue() >>> v2.intValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyLong(INumericValue v1, String op, INumericValue v2)
+	private static IValue applyLong(INumericValue v1, Name op, INumericValue v2)
 	{
-		switch (op)
+		if (op == Name.plus)
 		{
-		case "$plus":
 			return new LongValue(v1.longValue() + v2.longValue());
-		case "$minus":
+		}
+		if (op == Name.minus)
+		{
 			return new LongValue(v1.longValue() - v2.longValue());
-		case "$times":
+		}
+		if (op == Name.times)
+		{
 			return new LongValue(v1.longValue() * v2.longValue());
-		case "$div":
+		}
+		if (op == Name.div)
 		{
 			long l2 = v2.longValue();
 			return l2 == 0L ? null : new LongValue(v1.longValue() / l2);
 		}
-		case "$percent":
+		if (op == Name.percent)
 		{
 			long l2 = v2.longValue();
 			return l2 == 0L ? null : new LongValue(v1.longValue() % l2);
 		}
-		case "$amp":
+		if (op == Name.amp)
+		{
 			return new LongValue(v1.longValue() & v2.longValue());
-		case "$bar":
+		}
+		if (op == Name.bar)
+		{
 			return new LongValue(v1.longValue() | v2.longValue());
-		case "$up":
+		}
+		if (op == Name.up)
+		{
 			return new LongValue(v1.longValue() ^ v2.longValue());
-		case "$less$less":
+		}
+		if (op == Name.lessLess)
+		{
 			return new LongValue(v1.longValue() << v2.longValue());
-		case "$greater$greater":
+		}
+		if (op == Name.greaterGreater)
+		{
 			return new LongValue(v1.longValue() >> v2.longValue());
-		case "$greater$greater$greater":
+		}
+		if (op == Name.greaterGreaterGreater)
+		{
 			return new LongValue(v1.longValue() >>> v2.longValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyFloat(INumericValue v1, String op, INumericValue v2)
+	private static IValue applyFloat(INumericValue v1, Name op, INumericValue v2)
 	{
-		switch (op)
+		if (op == Name.plus)
 		{
-		case "$plus":
 			return new FloatValue(v1.floatValue() + v2.floatValue());
-		case "$minus":
+		}
+		if (op == Name.minus)
+		{
 			return new FloatValue(v1.floatValue() - v2.floatValue());
-		case "$times":
+		}
+		if (op == Name.times)
+		{
 			return new FloatValue(v1.floatValue() * v2.floatValue());
-		case "$div":
+		}
+		if (op == Name.div)
+		{
 			return new FloatValue(v1.floatValue() / v2.floatValue());
-		case "$percent":
+		}
+		if (op == Name.percent)
+		{
 			return new FloatValue(v1.floatValue() % v2.floatValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyDouble(INumericValue v1, String op, INumericValue v2)
+	private static IValue applyDouble(INumericValue v1, Name op, INumericValue v2)
 	{
-		switch (op)
+		if (op == Name.plus)
 		{
-		case "$plus":
 			return new DoubleValue(v1.doubleValue() + v2.doubleValue());
-		case "$minus":
+		}
+		if (op == Name.minus)
+		{
 			return new DoubleValue(v1.doubleValue() - v2.doubleValue());
-		case "$times":
+		}
+		if (op == Name.times)
+		{
 			return new DoubleValue(v1.doubleValue() * v2.doubleValue());
-		case "$div":
+		}
+		if (op == Name.div)
+		{
 			return new DoubleValue(v1.doubleValue() / v2.doubleValue());
-		case "$percent":
+		}
+		if (op == Name.percent)
+		{
 			return new DoubleValue(v1.doubleValue() % v2.doubleValue());
 		}
 		return null;

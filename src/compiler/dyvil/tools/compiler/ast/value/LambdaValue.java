@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -195,24 +196,24 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return this.context.resolvePackage(name);
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		return this.context.resolveClass(name);
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			LambdaParameter param = this.parameters[i];
-			if (param.isName(name))
+			if (param.name == name)
 			{
 				return new FieldMatch(param, 1);
 			}
@@ -255,13 +256,13 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		return this.context.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.context.getMethodMatches(list, instance, name, arguments);
 	}
@@ -413,7 +414,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		
 		String name = this.getName();
 		String desc = this.getLambdaDescriptor();
-		String invokedName = this.method.getQualifiedName();
+		String invokedName = this.method.getName().qualified;
 		String invokedType = this.getInvokeDescriptor();
 		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
 		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(this.getSpecialDescriptor());
@@ -513,14 +514,14 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 			{
 				IVariable var = this.capturedFields[i];
 				prevIndex[i] = var.getIndex();
-				var.setIndex(mw.registerParameter(var.getQualifiedName(), var.getType()));
+				var.setIndex(mw.registerParameter(var.getName().qualified, var.getType()));
 			}
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			LambdaParameter param = this.parameters[i];
-			param.index = mw.registerParameter(param.qualifiedName, param.type);
+			param.index = mw.registerParameter(param.name.qualified, param.type);
 		}
 		
 		// Write the Value

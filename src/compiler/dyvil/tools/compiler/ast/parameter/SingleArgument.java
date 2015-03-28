@@ -6,6 +6,7 @@ import java.util.Iterator;
 import dyvil.collections.SingletonIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -162,7 +163,7 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void writeValue(int index, String name, IValue defaultValue, MethodWriter writer)
+	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer)
 	{
 		if (index == 0)
 		{
@@ -174,7 +175,7 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, String name, IType type, MethodWriter writer)
+	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer)
 	{
 		if (index != 0)
 		{

@@ -5,6 +5,7 @@ import org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -266,7 +267,7 @@ public interface IValue extends IASTNode, ITyped
 		else if (c == org.objectweb.asm.Type.class)
 		{
 			org.objectweb.asm.Type type = (org.objectweb.asm.Type) o;
-			IType itype = new Type(type.getClassName());
+			IType itype = new Type(Name.getQualified(type.getClassName()));
 			return new ClassOperator(itype);
 		}
 		return null;

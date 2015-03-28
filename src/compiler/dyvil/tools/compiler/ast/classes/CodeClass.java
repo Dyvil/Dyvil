@@ -22,6 +22,7 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -41,8 +42,8 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.CaseClasses;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.*;
+import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
 {
@@ -53,8 +54,7 @@ public class CodeClass extends ASTNode implements IClass
 	protected int					annotationCount;
 	protected int					modifiers;
 	
-	protected String				name;
-	protected String				qualifiedName;
+	protected Name					name;
 	protected String				fullName;
 	protected String				internalName;
 	
@@ -283,45 +283,20 @@ public class CodeClass extends ASTNode implements IClass
 		return IContext.READ_ACCESS;
 	}
 	
+	// Names
+	
 	@Override
-	public void setName(String name, String qualifiedName)
+	public void setName(Name name)
 	{
 		this.name = name;
-		this.qualifiedName = qualifiedName;
+		this.internalName = this.unit.getInternalName(name.qualified);
+		this.fullName = this.unit.getFullName(name.qualified);
 	}
 	
 	@Override
-	public void setName(String name)
-	{
-		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
-		this.internalName = this.unit.getInternalName(this.qualifiedName);
-		this.fullName = this.unit.getFullName(this.qualifiedName);
-	}
-	
-	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
-	{
-		this.name = name;
-		this.qualifiedName = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.qualifiedName;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.name.equals(name);
 	}
 	
 	@Override
@@ -586,14 +561,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.superType != null)
 		{
-			if (this.superType.isName("void"))
-			{
-				this.superType = null;
-			}
-			else
-			{
-				this.superType = this.superType.resolve(markers, context);
-			}
+			this.superType = this.superType.resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
@@ -609,11 +577,6 @@ public class CodeClass extends ASTNode implements IClass
 		if (this.body != null)
 		{
 			this.body.resolveTypes(markers, this);
-			
-			if (this.body.getMethod("<init>") != null)
-			{
-				return;
-			}
 		}
 		
 		if (this.superType != null)
@@ -643,7 +606,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
 		{
-			Field f = new Field(this, "$instance", this.getType());
+			Field f = new Field(this, Name.instance, this.getType());
 			f.modifiers = Modifiers.PUBLIC | Modifiers.CONST | Modifiers.SYNTHETIC;
 			this.instanceField = f;
 		}
@@ -702,13 +665,9 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
+		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0 && this.body.constructorCount() > 0)
 		{
-			IMethod m = this.body.getMethod("<init>");
-			if (m != null)
-			{
-				markers.add(m.getPosition(), "class.object.constructor", this.name);
-			}
+			markers.add(this.position, "class.object.constructor", this.name);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -777,18 +736,18 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		for (int i = 0; i < this.genericCount; i++)
 		{
 			ITypeVariable var = this.generics[i];
-			if (var.isName(name))
+			if (var.getName() == name)
 			{
 				return var.getCaptureClass();
 			}
@@ -808,12 +767,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			Parameter param = this.parameters[i];
-			if (name.equals(param.qualifiedName))
+			if (param.name == name)
 			{
 				return new FieldMatch(param, 1);
 			}
@@ -836,7 +795,7 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.instanceField != null && "instance".equals(name))
+		if (this.instanceField != null && name == Name.instance)
 		{
 			return new FieldMatch(this.instanceField, 1);
 		}
@@ -867,7 +826,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		List<MethodMatch> list = new ArrayList();
 		this.getMethodMatches(list, instance, name, arguments);
@@ -897,7 +856,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.body != null)
 		{
@@ -1147,7 +1106,7 @@ public class CodeClass extends ASTNode implements IClass
 			if (f.hasModifier(Modifiers.STATIC))
 			{
 				FieldAssign assign = new FieldAssign(null);
-				assign.qualifiedName = f.getQualifiedName();
+				assign.name = f.getName();
 				assign.value = f.getValue();
 				assign.field = f;
 				staticFields.addValue(assign);
@@ -1155,7 +1114,7 @@ public class CodeClass extends ASTNode implements IClass
 			else
 			{
 				FieldAssign assign = new FieldAssign(null);
-				assign.qualifiedName = f.getQualifiedName();
+				assign.name = f.getName();
 				assign.instance = thisValue;
 				assign.value = f.getValue();
 				assign.field = f;
@@ -1174,7 +1133,7 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				Parameter param = this.parameters[i];
 				String desc = param.getDescription();
-				writer.visitField(param.modifiers & 0xFFFF, param.qualifiedName, desc, param.getSignature(), null);
+				writer.visitField(param.modifiers & 0xFFFF, param.name.qualified, desc, param.getSignature(), null);
 				instanceFields.addValue(new ClassParameterSetter(param, this.internalName, desc));
 			}
 			
@@ -1229,7 +1188,7 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			instanceField.write(writer);
 			FieldAssign assign = new FieldAssign(null);
-			assign.name = assign.qualifiedName = "instance";
+			assign.name = Name.instance;
 			assign.field = instanceField;
 			ConstructorCall call = new ConstructorCall(null);
 			call.type = this.type;
@@ -1240,12 +1199,10 @@ public class CodeClass extends ASTNode implements IClass
 		if (!staticFields.isEmpty())
 		{
 			// Create the classinit method
-			Method m = new Method(this);
-			m.setQualifiedName("<clinit>");
-			m.setType(Type.VOID);
-			m.setModifiers(Modifiers.STATIC | Modifiers.MANDATED);
-			m.setValue(staticFields);
-			m.write(writer);
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
+			mw.begin();
+			staticFields.writeStatement(mw);
+			mw.end(Type.VOID);
 		}
 	}
 	
@@ -1254,7 +1211,7 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		if (this.outerClass != null)
 		{
-			writer.visitInnerClass(this.internalName, this.outerClass.getInternalName(), this.qualifiedName, this.modifiers | Modifiers.STATIC);
+			writer.visitInnerClass(this.internalName, this.outerClass.getInternalName(), this.name.qualified, this.modifiers | Modifiers.STATIC);
 		}
 	}
 	

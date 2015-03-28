@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -22,8 +23,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public class SimpleImport extends ASTNode implements IImport, IImportContainer
 {
 	public IImport				parent;
-	public String				name;
-	public String				alias;
+	public Name					name;
+	public Name					alias;
 	public IImport				child;
 	
 	private IClass				theClass;
@@ -37,7 +38,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 		this.position = position;
 	}
 	
-	public SimpleImport(ICodePosition position, IImport parent, String name)
+	public SimpleImport(ICodePosition position, IImport parent, Name name)
 	{
 		this.position = position;
 		this.parent = parent;
@@ -50,12 +51,12 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 		this.child = iimport;
 	}
 	
-	public void setAlias(String alias)
+	public void setAlias(Name alias)
 	{
 		this.alias = alias;
 	}
 	
-	public String getAlias()
+	public Name getAlias()
 	{
 		return this.alias;
 	}
@@ -128,7 +129,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		if (this.name.equals(name))
 		{
@@ -142,7 +143,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		if (this.child != null)
 		{
@@ -160,7 +161,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		if (this.child != null)
 		{
@@ -178,7 +179,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		if (this.child != null)
 		{
@@ -199,7 +200,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.child != null)
 		{

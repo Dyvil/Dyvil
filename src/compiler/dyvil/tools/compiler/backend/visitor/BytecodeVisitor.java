@@ -6,6 +6,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.bytecode.*;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -26,7 +27,7 @@ public class BytecodeVisitor extends MethodVisitor
 	@Override
 	public void visitParameter(String name, int index)
 	{
-		this.method.getParameter(index).setName(name);
+		this.method.getParameter(index).setName(Name.getQualified(name));
 	}
 	
 	@Override
@@ -207,12 +208,12 @@ public class BytecodeVisitor extends MethodVisitor
 		{
 			if (index != 0 && index <= this.method.parameterCount())
 			{
-				this.method.getParameter(index - 1).setName(name);
+				this.method.getParameter(index - 1).setName(Name.getQualified(name));
 			}
 		}
 		else if (index < this.method.parameterCount())
 		{
-			this.method.getParameter(index).setName(name);
+			this.method.getParameter(index).setName(Name.getQualified(name));
 		}
 	}
 	

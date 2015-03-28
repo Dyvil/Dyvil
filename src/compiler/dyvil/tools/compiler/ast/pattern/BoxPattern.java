@@ -47,7 +47,7 @@ public class BoxPattern implements IPattern
 	{
 		IType type = this.boxingMethod.getType();
 		writer.writeTypeInsn(Opcodes.CHECKCAST, type);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, this.boxingMethod.getTheClass().getInternalName(), this.boxingMethod.getQualifiedName(),
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, this.boxingMethod.getTheClass().getInternalName(), this.boxingMethod.getName().qualified,
 				this.boxingMethod.getDescriptor(), 1, type);
 		this.pattern.writeJump(writer, varIndex, elseLabel);
 	}
@@ -57,7 +57,7 @@ public class BoxPattern implements IPattern
 	{
 		IType type = this.boxingMethod.getType();
 		writer.writeTypeInsn(Opcodes.CHECKCAST, type);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, this.boxingMethod.getTheClass().getInternalName(), this.boxingMethod.getQualifiedName(),
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, this.boxingMethod.getTheClass().getInternalName(), this.boxingMethod.getName().qualified,
 				this.boxingMethod.getDescriptor(), 1, type);
 		this.pattern.writeInvJump(writer, varIndex, elseLabel);
 	}

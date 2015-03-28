@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
@@ -23,12 +24,12 @@ public final class GenericType extends Type implements ITypeList
 		super();
 	}
 	
-	public GenericType(String name)
+	public GenericType(Name name)
 	{
 		super(name);
 	}
 	
-	public GenericType(ICodePosition position, String name)
+	public GenericType(ICodePosition position, Name name)
 	{
 		super(position, name);
 	}
@@ -80,12 +81,12 @@ public final class GenericType extends Type implements ITypeList
 	}
 	
 	@Override
-	public IType resolveType(String name)
+	public IType resolveType(Name name)
 	{
 		int len = Math.min(this.theClass.genericCount(), this.genericCount);
 		for (int i = 0; i < len; i++)
 		{
-			if (this.theClass.getTypeVariable(i).isName(name))
+			if (this.theClass.getTypeVariable(i).getName() == name)
 			{
 				return this.generics[i];
 			}
@@ -94,7 +95,7 @@ public final class GenericType extends Type implements ITypeList
 	}
 	
 	@Override
-	public IType resolveType(String name, IType concrete)
+	public IType resolveType(Name name, IType concrete)
 	{
 		if (!concrete.isGeneric())
 		{
@@ -143,7 +144,7 @@ public final class GenericType extends Type implements ITypeList
 		}
 		else
 		{
-			iclass = context.resolveClass(this.qualifiedName);
+			iclass = context.resolveClass(this.name);
 		}
 		
 		if (iclass != null)
@@ -166,7 +167,7 @@ public final class GenericType extends Type implements ITypeList
 			{
 				if (this.genericCount != 0 && markers != null)
 				{
-					markers.add(this.position, "generic.not_generic", this.qualifiedName);
+					markers.add(this.position, "generic.not_generic", this.name.qualified);
 				}
 				return this;
 			}
@@ -193,7 +194,7 @@ public final class GenericType extends Type implements ITypeList
 				ITypeVariable var = this.theClass.getTypeVariable(i);
 				if (!var.isSuperTypeOf(t2))
 				{
-					Marker marker = markers.create(t2.getPosition(), "generic.type", var.getQualifiedName());
+					Marker marker = markers.create(t2.getPosition(), "generic.type", var.getName().qualified);
 					marker.addInfo("Generic Type: " + t2);
 					marker.addInfo("Type Variable: " + var);
 				}
@@ -266,7 +267,6 @@ public final class GenericType extends Type implements ITypeList
 		GenericType t = new GenericType();
 		t.theClass = this.theClass;
 		t.name = this.name;
-		t.qualifiedName = this.qualifiedName;
 		t.fullName = this.fullName;
 		t.arrayDimensions = this.arrayDimensions;
 		if (this.generics != null)

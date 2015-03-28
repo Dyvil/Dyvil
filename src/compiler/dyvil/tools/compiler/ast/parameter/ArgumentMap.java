@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import dyvil.collections.ArrayIterator;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -16,7 +17,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ArgumentMap implements IArguments, IValueMap
 {
-	private String[]	keys	= new String[3];
+	private Name[]		keys	= new Name[3];
 	private IValue[]	values	= new IValue[3];
 	private int			size;
 	
@@ -52,12 +53,12 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void addValue(String key, IValue value)
+	public void addValue(Name key, IValue value)
 	{
 		int index = this.size++;
-		if (this.size > this.values.length)
+		if (index >= this.values.length)
 		{
-			String[] k = new String[this.size];
+			Name[] k = new Name[this.size];
 			IValue[] v = new IValue[this.size];
 			System.arraycopy(this.keys, 0, k, 0, index);
 			System.arraycopy(this.values, 0, v, 0, index);
@@ -69,13 +70,11 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public IValue getValue(String key)
+	public IValue getValue(Name key)
 	{
-		int hash = key.hashCode();
 		for (int i = 0; i < this.size; i++)
 		{
-			String s = this.keys[i];
-			if (s.hashCode() == hash && s.equals(key))
+			if (this.keys[i] == key)
 			{
 				return this.values[i];
 			}
@@ -108,11 +107,11 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public IArguments addLastValue(String name, IValue value)
+	public IArguments addLastValue(Name name, IValue value)
 	{
 		int size = this.size;
 		int index = size++;
-		String[] k = new String[size];
+		Name[] k = new Name[size];
 		IValue[] v = new IValue[size];
 		System.arraycopy(this.keys, 0, k, 0, size);
 		System.arraycopy(this.values, 0, v, 0, size);
@@ -140,12 +139,10 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public void setValue(int index, Parameter param, IValue value)
 	{
-		String key = param.qualifiedName;
-		int hash = key.hashCode();
+		Name key = param.name;
 		for (int i = 0; i < this.size; i++)
 		{
-			String s = this.keys[i];
-			if (s.hashCode() == hash && s.equals(key))
+			if (this.keys[i] == key)
 			{
 				this.values[i] = value;
 				return;
@@ -156,24 +153,22 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public IValue getValue(int index, Parameter param)
 	{
-		return this.getValue(param.qualifiedName);
+		return this.getValue(param.name);
 	}
 	
 	@Override
 	public IType getType(int index, Parameter param)
 	{
-		return this.getValue(param.qualifiedName).getType();
+		return this.getValue(param.name).getType();
 	}
 	
 	@Override
 	public int getTypeMatch(int index, Parameter param)
 	{
-		String key = param.qualifiedName;
-		int hash = key.hashCode();
+		Name key = param.name;
 		for (int i = 0; i < this.size; i++)
 		{
-			String s = this.keys[i];
-			if (s.hashCode() == hash && s.equals(key))
+			if (this.keys[i] == key)
 			{
 				return this.values[i].getTypeMatch(param.type);
 			}
@@ -190,12 +185,10 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context)
 	{
-		String key = param.qualifiedName;
-		int hash = key.hashCode();
+		Name key = param.name;
 		for (int i = 0; i < this.size; i++)
 		{
-			String s = this.keys[i];
-			if (s.hashCode() == hash && s.equals(key))
+			if (this.keys[i] == key)
 			{
 				IType type = param.getType(context);
 				IValue value = this.values[i];
@@ -222,13 +215,11 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void writeValue(int index, String name, IValue defaultValue, MethodWriter writer)
+	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer)
 	{
-		int hash = name.hashCode();
 		for (int i = 0; i < this.size; i++)
 		{
-			String s = this.keys[i];
-			if (s.hashCode() == hash && s.equals(name))
+			if (this.keys[i] == name)
 			{
 				this.values[i].writeExpression(writer);
 				return;
@@ -239,7 +230,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, String name, IType type, MethodWriter writer)
+	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer)
 	{
 		this.writeValue(index, name, null, writer);
 	}
@@ -304,7 +295,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 		int len = this.size;
 		for (int i = 0; i < len; i++)
 		{
-			String key = this.keys[i];
+			Name key = this.keys[i];
 			IValue v = this.values[i];
 			buffer.append(key).append(Formatting.Method.keyValueSeperator);
 			

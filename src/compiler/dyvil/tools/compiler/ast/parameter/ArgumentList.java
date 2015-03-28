@@ -5,6 +5,7 @@ import java.util.Iterator;
 import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -237,7 +238,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void writeValue(int index, String name, IValue defaultValue, MethodWriter writer)
+	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer)
 	{
 		if (index < this.size)
 		{
@@ -248,7 +249,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, String name, IType type, MethodWriter writer)
+	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer)
 	{
 		if (this.varargs)
 		{

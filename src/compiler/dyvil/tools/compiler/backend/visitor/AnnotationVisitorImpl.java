@@ -6,6 +6,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.member.IAnnotationList;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -30,14 +31,14 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 	@Override
 	public void visit(String key, Object value)
 	{
-		this.arguments.addValue(key, IValue.fromObject(value));
+		this.arguments.addValue(Name.getQualified(key), IValue.fromObject(value));
 	}
 	
 	static IValue getEnumValue(String enumClass, String name)
 	{
 		IType t = ClassFormat.internalToType(enumClass);
 		t.resolve(null, Package.rootPackage);
-		return new EnumValue(t, name);
+		return new EnumValue(t, Name.getQualified(name));
 	}
 	
 	@Override
@@ -46,7 +47,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 		IValue enumValue = getEnumValue(enumClass, name);
 		if (enumValue != null)
 		{
-			this.arguments.addValue(key, enumValue);
+			this.arguments.addValue(Name.getQualified(key), enumValue);
 		}
 	}
 	
@@ -54,7 +55,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 	public AnnotationVisitor visitArray(String key)
 	{
 		ValueList valueList = new ValueList(null, true);
-		this.arguments.addValue(key, valueList);
+		this.arguments.addValue(Name.getQualified(key), valueList);
 		return new ArrayAnnotationVisitor(this.api, valueList);
 	}
 	

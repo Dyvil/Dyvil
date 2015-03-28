@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
@@ -270,7 +271,7 @@ public final class Constructor extends Member implements IConstructor
 		ConstructorMatch match = iclass.resolveConstructor(arguments);
 		if (match == null)
 		{
-			Marker marker = markers.create(this.position, "resolve.constructor", iclass.getQualifiedName());
+			Marker marker = markers.create(this.position, "resolve.constructor", iclass.getName().qualified);
 			StringBuilder builder = new StringBuilder("Argument Types: {");
 			Util.typesToString("", arguments, ", ", builder);
 			marker.addInfo(builder.append('}').toString());
@@ -369,24 +370,24 @@ public final class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return this.theClass.resolvePackage(name);
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		return this.theClass.resolveClass(name);
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			Parameter param = this.parameters[i];
-			if (param.isName(name))
+			if (param.name == name)
 			{
 				return new FieldMatch(param, 1);
 			}
@@ -396,13 +397,13 @@ public final class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		return this.theClass.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
@@ -427,7 +428,7 @@ public final class Constructor extends Member implements IConstructor
 		{
 			return READ_WRITE_ACCESS;
 		}
-		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC) && !member.isName("<init>"))
+		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC) && !(member instanceof Constructor))
 		{
 			return STATIC;
 		}
@@ -604,7 +605,7 @@ public final class Constructor extends Member implements IConstructor
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			Parameter param = this.parameters[i];
-			mw.writeLocal(param.qualifiedName, param.type, start, end, param.index);
+			mw.writeLocal(param.name.qualified, param.type, start, end, param.index);
 		}
 	}
 	
@@ -640,17 +641,17 @@ public final class Constructor extends Member implements IConstructor
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i];
-				arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
+				arguments.writeValue(i, param.name, param.defaultValue, writer);
 			}
 			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param.qualifiedName, param.type, writer);
+			arguments.writeVarargsValue(len, param.name, param.type, writer);
 			return this.parameterCount;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			Parameter param = this.parameters[i];
-			arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
+			arguments.writeValue(i, param.name, param.defaultValue, writer);
 		}
 		return this.parameterCount;
 	}

@@ -4,6 +4,7 @@ import org.objectweb.asm.Label;
 
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -44,7 +45,7 @@ public interface IPattern extends IASTNode, ITyped
 	@Override
 	public boolean isType(IType type);
 	
-	public default IField resolveField(String name)
+	public default IField resolveField(Name name)
 	{
 		return null;
 	}

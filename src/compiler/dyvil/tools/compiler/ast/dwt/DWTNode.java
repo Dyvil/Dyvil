@@ -11,6 +11,8 @@ import dyvil.strings.StringUtils;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -35,8 +37,8 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	
 	public DWTNode				parent;
 	
-	public String				name;
-	public String				fullName;
+	public Name				name;
+	public String fullName;
 	public IType				type;
 	public List<DWTProperty>	properties	= new ArrayList();
 	
@@ -54,11 +56,11 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		this.position = position;
 	}
 	
-	public DWTNode(ICodePosition position, String name)
+	public DWTNode(ICodePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;
-		this.fullName = name;
+		this.fullName = name.qualified;
 	}
 	
 	public void setParent(DWTNode parent)
@@ -92,44 +94,19 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	}
 	
 	@Override
-	public void setName(String name, String qualifiedName)
-	{
-		this.name = name;
-		this.fullName = qualifiedName;
-	}
-	
-	@Override
-	public void setName(String name)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
 	}
 	
 	@Override
-	public void setQualifiedName(String name)
-	{
-		this.fullName = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.fullName;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.fullName.equals(name);
-	}
-	
-	@Override
-	public void addValue(String key, IValue value)
+	public void addValue(Name key, IValue value)
 	{
 		if (value.getValueType() == NODE)
 		{
@@ -139,7 +116,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	}
 	
 	@Override
-	public IValue getValue(String key)
+	public IValue getValue(Name key)
 	{
 		return null;
 	}
@@ -157,8 +134,8 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		String s = "J" + StringUtils.toTitleCase(this.name);
-		this.theClass = DWTFile.javaxSwing.resolveClass(s);
+		String s = "J" + StringUtils.toTitleCase(this.name.qualified);
+		this.theClass = DWTFile.javaxSwing.resolveClass(Name.getQualified(s));
 		
 		if (this.theClass == null)
 		{
@@ -179,7 +156,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	{
 		for (DWTProperty property : this.properties)
 		{
-			String key = property.key;
+			String key = property.key.qualified;
 			IValue value = property.value;
 			int type = value.getValueType();
 			if (type == LIST)
@@ -187,7 +164,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				for (IValue v : (IValueList) value)
 				{
 					String s1 = Util.getAdder(key);
-					MethodMatch m = this.theClass.resolveMethod(this, s1, new SingleArgument(value));
+					MethodMatch m = this.theClass.resolveMethod(this, Name.getQualified(s1), new SingleArgument(value));
 					
 					if (m != null)
 					{
@@ -208,14 +185,15 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 					continue;
 				}
 				
-				MethodMatch getter = this.theClass.resolveMethod(this, Util.getGetter(key), EmptyArguments.INSTANCE);
+				MethodMatch getter = this.theClass.resolveMethod(this, Name.getQualified(Util.getGetter(key)), EmptyArguments.INSTANCE);
 				if (getter != null)
 				{
 					node.getter = getter.method;
 					continue;
 				}
-				IMethod constructor = iclass.getBody().getMethod("<init>");
-				if (constructor == null)
+				
+				ConstructorMatch match = this.theClass.resolveConstructor(EmptyArguments.INSTANCE);
+				if (match == null)
 				{
 					markers.add(value.getPosition(), "dwt.component.constructor");
 				}
@@ -223,7 +201,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 			else
 			{
 				String s1 = Util.getSetter(key);
-				MethodMatch m = this.theClass.resolveMethod(this, s1, new SingleArgument(value));
+				MethodMatch m = this.theClass.resolveMethod(this, Name.getQualified(s1), new SingleArgument(value));
 				
 				if (m != null)
 				{
@@ -308,7 +286,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		}
 		
 		writer.writeLabel(end);
-		writer.writeLocal(this.name, extended, null, start, end, index);
+		writer.writeLocal(this.name.qualified, extended, null, start, end, index);
 	}
 	
 	@Override

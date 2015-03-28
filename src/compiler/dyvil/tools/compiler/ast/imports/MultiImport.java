@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -58,7 +59,7 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		for (IImport i : this.children)
 		{
@@ -72,7 +73,7 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		for (IImport i : this.children)
 		{
@@ -86,7 +87,7 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		for (IImport i : this.children)
 		{
@@ -100,7 +101,7 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		for (IImport i : this.children)
 		{
@@ -114,7 +115,7 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		for (IImport i : this.children)
 		{

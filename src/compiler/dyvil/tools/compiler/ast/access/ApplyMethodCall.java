@@ -5,6 +5,7 @@ import org.objectweb.asm.Label;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -124,7 +125,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	}
 	
 	@Override
-	public IType resolveType(String name)
+	public IType resolveType(Name name)
 	{
 		return this.method.resolveType(name, this.instance, this.arguments, null);
 	}
@@ -150,7 +151,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 		
 		this.arguments.resolve(markers, context);
 		
-		IMethod method = IAccess.resolveMethod(context, this.instance, "apply", this.arguments);
+		IMethod method = IAccess.resolveMethod(context, this.instance, Name.apply, this.arguments);
 		if (method != null)
 		{
 			this.method = method;

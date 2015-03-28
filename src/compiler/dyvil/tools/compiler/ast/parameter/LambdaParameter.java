@@ -7,6 +7,7 @@ import org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -22,7 +23,7 @@ public class LambdaParameter extends Member implements IVariable
 	{
 	}
 	
-	public LambdaParameter(int index, String name, IType type)
+	public LambdaParameter(int index, Name name, IType type)
 	{
 		super(name, type);
 		this.index = index;
@@ -108,7 +109,7 @@ public class LambdaParameter extends Member implements IVariable
 	
 	public void write(MethodWriter writer)
 	{
-		this.index = writer.registerParameter(this.name, this.type);
+		this.index = writer.registerParameter(this.name.qualified, this.type);
 	}
 	
 	@Override

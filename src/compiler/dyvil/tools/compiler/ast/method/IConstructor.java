@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.method;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -36,7 +37,7 @@ public interface IConstructor extends IASTNode, IMember, IBaseMethod, ITypeList,
 	public default void addType(IType type)
 	{
 		int index = this.parameterCount();
-		this.addParameter(new Parameter(index, "par" + index, type));
+		this.addParameter(new Parameter(index, Name.getQualified("par" + index), type));
 	}
 	
 	@Override

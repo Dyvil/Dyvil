@@ -5,6 +5,7 @@ import org.objectweb.asm.Label;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -107,7 +108,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	@Override
 	public void setValue(IValue value)
 	{
-		this.arguments = this.arguments.addLastValue("update", value);
+		this.arguments = this.arguments.addLastValue(Name.update, value);
 	}
 	
 	@Override
@@ -117,7 +118,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
-	public IType resolveType(String name)
+	public IType resolveType(Name name)
 	{
 		return this.method.resolveType(name, this.instance, this.arguments, null);
 	}
@@ -142,7 +143,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		}
 		this.arguments.resolve(markers, context);
 		
-		IMethod method = IAccess.resolveMethod(context, this.instance, "update", this.arguments);
+		IMethod method = IAccess.resolveMethod(context, this.instance, Name.update, this.arguments);
 		if (method != null)
 		{
 			this.method = method;

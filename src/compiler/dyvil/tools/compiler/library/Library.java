@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.ExternalPackage;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -81,7 +82,7 @@ public abstract class Library
 		}
 		if (this.isSubPackage(name))
 		{
-			pack = new ExternalPackage(Package.rootPackage, name, this);
+			pack = new ExternalPackage(Package.rootPackage, Name.getQualified(name), this);
 			Package.rootPackage.addSubPackage(pack);
 			this.packages.put(name, pack);
 			return pack;
@@ -98,7 +99,7 @@ public abstract class Library
 		}
 		if (this.isSubPackage(name))
 		{
-			pack = new ExternalPackage(Package.rootPackage, name, this);
+			pack = new ExternalPackage(Package.rootPackage, Name.getQualified(name), this);
 			Package.rootPackage.addSubPackage(pack);
 			this.packages.put(name, pack);
 			return pack;

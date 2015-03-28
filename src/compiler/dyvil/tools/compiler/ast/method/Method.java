@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -36,7 +37,6 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
@@ -62,39 +62,23 @@ public class Method extends Member implements IMethod
 		this.theClass = iclass;
 	}
 	
-	public Method(IClass iclass, String name)
+	public Method(IClass iclass, Name name)
 	{
 		this.theClass = iclass;
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 	}
 	
-	public Method(IClass iclass, String name, IType type)
+	public Method(IClass iclass, Name name, IType type)
 	{
 		this.theClass = iclass;
 		this.type = type;
 		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
 	}
 	
 	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;
-	}
-	
-	@Override
-	public void setName(String name)
-	{
-		this.name = name;
-		this.qualifiedName = Symbols.qualify(name);
-	}
-	
-	@Override
-	public void setQualifiedName(String name)
-	{
-		this.name = Symbols.unqualify(name);
-		this.qualifiedName = name;
 	}
 	
 	@Override
@@ -285,7 +269,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IType resolveType(String name, IValue instance, IArguments arguments, ITypeList generics)
+	public IType resolveType(Name name, IValue instance, IArguments arguments, ITypeList generics)
 	{
 		if (this.genericCount > 0 && generics != null)
 		{
@@ -293,7 +277,7 @@ public class Method extends Member implements IMethod
 			for (int i = 0; i < len; i++)
 			{
 				ITypeVariable var = this.generics[i];
-				if (var.isName(name))
+				if (var.getName() == name)
 				{
 					return generics.getType(i);
 				}
@@ -555,18 +539,18 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return this.theClass.resolvePackage(name);
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		for (int i = 0; i < this.genericCount; i++)
 		{
 			ITypeVariable var = this.generics[i];
-			if (var.isName(name))
+			if (var.getName() == name)
 			{
 				return var.getCaptureClass();
 			}
@@ -576,12 +560,12 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			Parameter param = this.parameters[i];
-			if (param.isName(name))
+			if (param.getName() == name)
 			{
 				return new FieldMatch(param, 1);
 			}
@@ -591,13 +575,13 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		return this.theClass.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
@@ -622,7 +606,7 @@ public class Method extends Member implements IMethod
 		{
 			return READ_WRITE_ACCESS;
 		}
-		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC) && !member.isName("<init>"))
+		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC) && !(member instanceof IConstructor))
 		{
 			return STATIC;
 		}
@@ -630,9 +614,9 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public int getSignatureMatch(String name, IValue instance, IArguments arguments)
+	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
-		if (name != null && !name.equals(this.qualifiedName))
+		if (name != null && name != this.name)
 		{
 			return 0;
 		}
@@ -858,7 +842,7 @@ public class Method extends Member implements IMethod
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.qualifiedName, this.getDescriptor(), this.getSignature(),
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(),
 				this.getExceptions()));
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -924,7 +908,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			Parameter param = this.parameters[i];
-			mw.writeLocal(param.qualifiedName, param.type, start, end, param.index);
+			mw.writeLocal(param.name.qualified, param.type, start, end, param.index);
 		}
 	}
 	
@@ -1026,23 +1010,23 @@ public class Method extends Member implements IMethod
 				for (int i = 1, j = 0; i < len; i++, j++)
 				{
 					param = this.parameters[i];
-					arguments.writeValue(j, param.qualifiedName, param.defaultValue, writer);
+					arguments.writeValue(j, param.name, param.defaultValue, writer);
 				}
 				param = this.parameters[len];
-				arguments.writeVarargsValue(len - 1, param.qualifiedName, param.type, writer);
+				arguments.writeVarargsValue(len - 1, param.name, param.type, writer);
 				return this.parameterCount;
 			}
 			
 			for (int i = 1, j = 0; i < this.parameterCount; i++, j++)
 			{
 				Parameter param = this.parameters[i];
-				arguments.writeValue(j, param.qualifiedName, param.defaultValue, writer);
+				arguments.writeValue(j, param.name, param.defaultValue, writer);
 			}
 			return this.parameterCount - 1;
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			arguments.writeValue(0, "this", null, writer);
+			arguments.writeValue(0, Name._this, null, writer);
 			return 1;
 		}
 		
@@ -1053,17 +1037,17 @@ public class Method extends Member implements IMethod
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i];
-				arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
+				arguments.writeValue(i, param.name, param.defaultValue, writer);
 			}
 			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param.qualifiedName, param.type, writer);
+			arguments.writeVarargsValue(len, param.name, param.type, writer);
 			return this.parameterCount;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			Parameter param = this.parameters[i];
-			arguments.writeValue(i, param.qualifiedName, param.defaultValue, writer);
+			arguments.writeValue(i, param.name, param.defaultValue, writer);
 		}
 		return this.parameterCount;
 	}
@@ -1171,7 +1155,7 @@ public class Method extends Member implements IMethod
 		}
 		
 		String owner = this.theClass.getInternalName();
-		String name = this.qualifiedName;
+		String name = this.name.qualified;
 		String desc = this.getDescriptor();
 		IType type = this.type;
 		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);
@@ -1188,15 +1172,7 @@ public class Method extends Member implements IMethod
 			this.type.toString("", buffer);
 			buffer.append(' ');
 		}
-		
-		if (Formatting.Method.convertQualifiedNames)
-		{
-			buffer.append(this.qualifiedName);
-		}
-		else
-		{
-			buffer.append(this.name);
-		}
+		buffer.append(this.name);
 		
 		if (this.genericCount > 0)
 		{

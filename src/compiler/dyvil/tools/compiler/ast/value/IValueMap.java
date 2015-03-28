@@ -1,17 +1,19 @@
 package dyvil.tools.compiler.ast.value;
 
+import dyvil.tools.compiler.ast.member.Name;
+
 public interface IValueMap
 {
-	public void addValue(String key, IValue value);
+	public void addValue(Name key, IValue value);
 	
-	public IValue getValue(String key);
+	public IValue getValue(Name key);
 	
 	public static class KeyValuePair
 	{
-		public String	key;
+		public Name		key;
 		public IValue	value;
 		
-		public KeyValuePair(String key, IValue value)
+		public KeyValuePair(Name key, IValue value)
 		{
 			this.key = key;
 			this.value = value;

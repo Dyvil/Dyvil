@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.*;
@@ -133,7 +134,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				
 				this.prefix = true;
-				this.getAccess(pm, token.text(), token, type);
+				this.getAccess(pm, Name.get(token.text()), token, type);
 				return;
 			}
 			if (type == Tokens.ARROW_OPERATOR)
@@ -266,7 +267,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser();
 			if (ParserUtil.isIdentifier(type))
 			{
-				FunctionValue fl = new FunctionValue(token.raw(), token.text());
+				FunctionValue fl = new FunctionValue(token.raw(), Name.get(token.text()));
 				fl.instance = this.value;
 				this.field.setValue(fl);
 				return;
@@ -341,7 +342,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				
 				String name = token.text();
-				FieldInitializer access = new FieldInitializer(pos, name, itype);
+				FieldInitializer access = new FieldInitializer(pos, Name.get(name), itype);
 				this.value = access;
 				
 				pm.skip();
@@ -388,7 +389,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				int prevType = prev.type();
 				if (ParserUtil.isIdentifier(prevType))
 				{
-					MethodCall mc = new MethodCall(prev, null, prev.text());
+					MethodCall mc = new MethodCall(prev, null, Name.get(prev.text()));
 					mc.arguments = args;
 					this.value = mc;
 				}
@@ -422,7 +423,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.prefix = false;
-				String name = token.text();
+				Name name = Name.get(token.text());
 				if (this.precedence != 0 && this.dotless)
 				{
 					int p = Operators.index(name);
@@ -449,7 +450,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				this.value = null;
 				pm.reparse();
-				this.getAccess(pm, prev.text(), prev, type);
+				this.getAccess(pm, Name.get(prev.text()), prev, type);
 				return;
 			}
 			
@@ -510,13 +511,13 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		return list;
 	}
 	
-	private void getAccess(IParserManager pm, String value, IToken token, int type) throws SyntaxError
+	private void getAccess(IParserManager pm, Name name, IToken token, int type) throws SyntaxError
 	{
 		IToken next = token.next();
 		int type1 = next.type();
 		if (type1 == Symbols.OPEN_PARENTHESIS)
 		{
-			MethodCall call = new MethodCall(token, this.value, value);
+			MethodCall call = new MethodCall(token, this.value, name);
 			call.dotless = this.dotless;
 			this.value = call;
 			this.mode = PARAMETERS;
@@ -524,7 +525,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (type1 == Symbols.OPEN_SQUARE_BRACKET)
 		{
-			MethodCall call = new MethodCall(token, this.value, value);
+			MethodCall call = new MethodCall(token, this.value, name);
 			call.dotless = this.dotless;
 			this.value = call;
 			this.mode = GENERICS;
@@ -532,7 +533,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (type == Tokens.SYMBOL_IDENTIFIER || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
 		{
-			MethodCall call = new MethodCall(token, this.value, value);
+			MethodCall call = new MethodCall(token, this.value, name);
 			SingleArgument sa = new SingleArgument();
 			call.arguments = sa;
 			call.dotless = this.dotless;
@@ -540,12 +541,12 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = ACCESS;
 			
 			ExpressionParser parser = new ExpressionParser(sa);
-			parser.precedence = this.prefix ? Operators.PREFIX : Operators.index(value);
+			parser.precedence = this.prefix ? Operators.PREFIX : Operators.index(name);
 			pm.pushParser(parser);
 			return;
 		}
 		
-		FieldAccess access = new FieldAccess(token, this.value, value);
+		FieldAccess access = new FieldAccess(token, this.value, name);
 		access.dotless = this.dotless;
 		this.value = access;
 		this.mode = ACCESS;
@@ -561,7 +562,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			ClassAccess ca = (ClassAccess) this.value;
 			FieldAssign assign = new FieldAssign(position);
 			assign.name = ca.type.getName();
-			assign.qualifiedName = ca.type.getQualifiedName();
 			
 			this.value = assign;
 			pm.pushParser(new ExpressionParser(assign));
@@ -573,7 +573,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			FieldAssign assign = new FieldAssign(position);
 			assign.instance = fa.instance;
 			assign.name = fa.name;
-			assign.qualifiedName = fa.qualifiedName;
 			
 			this.value = assign;
 			pm.pushParser(new ExpressionParser(assign));
@@ -597,7 +596,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			FieldAccess fa = new FieldAccess(position);
 			fa.instance = call.instance;
 			fa.name = call.name;
-			fa.qualifiedName = call.qualifiedName;
 			
 			UpdateMethodCall updateCall = new UpdateMethodCall(position);
 			updateCall.arguments = call.arguments;
@@ -629,7 +627,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			ClassAccess ca = (ClassAccess) value;
 			LambdaParameter param = new LambdaParameter();
-			param.setName(ca.type.getName(), ca.type.getQualifiedName());
+			param.name = ca.type.getName();
 			return new LambdaValue(ca.getPosition(), param);
 		}
 		
@@ -660,8 +658,8 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				
 				LambdaParameter param = new LambdaParameter();
-				param.setName(fa.name, fa.qualifiedName);
-				param.setType(((ClassAccess) fa.instance).type);
+				param.name = fa.name;
+				param.type = ((ClassAccess) fa.instance).type;
 				params[i] = param;
 				continue;
 			}

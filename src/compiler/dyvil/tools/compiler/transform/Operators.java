@@ -2,6 +2,7 @@ package dyvil.tools.compiler.transform;
 
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.*;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.CaseStatement;
@@ -9,61 +10,72 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.MatchExpression;
 
+import static dyvil.tools.compiler.ast.member.Name.*;
+
 public class Operators
 {
 	public static final int	PREFIX	= 1000;
 	
-	public static int index(String name)
+	public static int index(Name name)
 	{
-		switch (name)
+		if (name == barBar)
 		{
-		case "||":
 			return 10;
-		case "&&":
+		}
+		if (name == ampAmp)
+		{
 			return 20;
-		case "|":
+		}
+		if (name == bar)
+		{
 			return 30;
-		case "^":
+		}
+		if (name == up)
+		{
 			return 40;
-		case "&":
+		}
+		if (name == amp)
+		{
 			return 50;
-		case "==":
-		case "!=":
-		case ":=:":
+		}
+		if (name == eqEq || name == bangEq || name == colonEqColon)
+		{
 			return 60;
-		case "<":
-		case ">":
-		case "<=":
-		case ">=":
+		}
+		if (name == less || name == greater || name == lessEq || name == greaterEq)
+		{
 			return 70;
-		case "<<":
-		case ">>":
-		case ">>>":
+		}
+		if (name == lessLess || name == greaterGreater || name == greaterGreaterGreater)
+		{
 			return 80;
-		case "+":
-		case "-":
+		}
+		if (name == plus || name == minus)
+		{
 			return 90;
-		case "*":
-		case "/":
-		case "%":
+		}
+		if (name == times || name == div || name == bslash || name == percent)
+		{
 			return 100;
-		case "->":
-		case "<-":
+		}
+		if (name == minusGreater || name == lessMinus)
+		{
 			return 110;
-		case "<:":
-		case ":>":
+		}
+		if (name == colonGreater || name == lessColon)
+		{
 			return 200;
 		}
-		if (name.charAt(name.length() - 1) == '=')
+		if (name.qualified.endsWith("$eq"))
 		{
 			return 5;
 		}
 		return 0;
 	}
 	
-	public static IValue get(String name, IValue arg1)
+	public static IValue get(Name name, IValue arg1)
 	{
-		if ("!".equals(name))
+		if (name == bang)
 		{
 			if (arg1.isType(Type.BOOLEAN))
 			{
@@ -73,10 +85,10 @@ public class Operators
 		return null;
 	}
 	
-	public static IValue get(IValue arg1, String name, IValue arg2)
+	public static IValue get(IValue arg1, Name name, IValue arg2)
 	{
 		// Swap Operator
-		if (":=:".equals(name))
+		if (name == colonEqColon)
 		{
 			if (arg1.getValueType() == IValue.FIELD_ACCESS && arg2.getValueType() == IValue.FIELD_ACCESS)
 			{
@@ -85,7 +97,7 @@ public class Operators
 			return null;
 		}
 		// Cast Operator
-		if (":>".equals(name))
+		if (name == colonGreater)
 		{
 			if (arg2.getValueType() == IValue.CLASS_ACCESS)
 			{
@@ -94,7 +106,7 @@ public class Operators
 			return null;
 		}
 		// Instanceof Operator
-		if ("<:".equals(name))
+		if (name == lessColon)
 		{
 			if (arg2.getValueType() == IValue.CLASS_ACCESS)
 			{
@@ -102,7 +114,7 @@ public class Operators
 			}
 			return null;
 		}
-		if ("&&".equals(name))
+		if (name == ampAmp)
 		{
 			if (arg1.isType(Type.BOOLEAN) && arg2.isType(Type.BOOLEAN))
 			{
@@ -110,7 +122,7 @@ public class Operators
 			}
 			return null;
 		}
-		if ("||".equals(name))
+		if (name == barBar)
 		{
 			if (arg1.isType(Type.BOOLEAN) && arg2.isType(Type.BOOLEAN))
 			{

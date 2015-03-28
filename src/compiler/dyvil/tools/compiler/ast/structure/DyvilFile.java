@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -272,7 +273,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 		
 		for (IClass iclass : this.classes)
 		{
-			String name = iclass.getQualifiedName();
+			String name = iclass.getName().qualified;
 			if (!name.equals(this.name))
 			{
 				name = this.name + "$" + name;
@@ -287,7 +288,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 				for (int i = 0; i < len; i++)
 				{
 					IClass iclass1 = body.getClass(i);
-					name = this.name + "$" + iclass1.getQualifiedName() + ".class";
+					name = this.name + "$" + iclass1.getName().qualified + ".class";
 					file = new File(this.outputDirectory, name);
 					ClassWriter.saveClass(file, iclass1);
 				}
@@ -308,20 +309,20 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		// Own classes
-		for (IClass aclass : this.classes)
+		for (IClass c : this.classes)
 		{
-			if (aclass.isName(name))
+			if (c.getName() == name)
 			{
-				return aclass;
+				return c;
 			}
 		}
 		
@@ -356,7 +357,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		for (Import i : this.staticImports)
 		{
@@ -370,7 +371,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		for (Import i : this.staticImports)
 		{
@@ -384,7 +385,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		for (Import i : this.staticImports)
 		{

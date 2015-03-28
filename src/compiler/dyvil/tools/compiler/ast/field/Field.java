@@ -8,6 +8,7 @@ import org.objectweb.asm.FieldVisitor;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -28,13 +29,13 @@ public class Field extends Member implements IField
 		this.theClass = iclass;
 	}
 	
-	public Field(IClass iclass, String name)
+	public Field(IClass iclass, Name name)
 	{
 		super(name);
 		this.theClass = iclass;
 	}
 	
-	public Field(IClass iclass, String name, IType type)
+	public Field(IClass iclass, Name name, IType type)
 	{
 		super(name, type);
 		this.theClass = iclass;
@@ -182,7 +183,7 @@ public class Field extends Member implements IField
 			{
 				signature = "()" + signature;
 			}
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name, desc, signature, null));
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name.qualified, desc, signature, null));
 			
 			for (int i = 0; i < this.annotationCount; i++)
 			{
@@ -198,7 +199,7 @@ public class Field extends Member implements IField
 			return;
 		}
 		
-		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name, this.getDescription(), this.type.getSignature(), null);
+		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, this.getDescription(), this.type.getSignature(), null);
 		if ((this.modifiers & Modifiers.SEALED) != 0)
 		{
 			fv.visitAnnotation("Ldyvil/lang/annotation/sealed", false);
@@ -223,7 +224,7 @@ public class Field extends Member implements IField
 		}
 		
 		String owner = this.theClass.getInternalName();
-		String name = this.name;
+		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
 		{
@@ -246,7 +247,7 @@ public class Field extends Member implements IField
 		value.writeExpression(writer);
 		
 		String owner = this.theClass.getInternalName();
-		String name = this.name;
+		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
 		{
@@ -266,15 +267,7 @@ public class Field extends Member implements IField
 		buffer.append(ModifierTypes.FIELD.toString(this.modifiers));
 		this.type.toString("", buffer);
 		buffer.append(' ');
-		
-		if (Formatting.Field.convertQualifiedNames)
-		{
-			buffer.append(this.qualifiedName);
-		}
-		else
-		{
-			buffer.append(this.name);
-		}
+		buffer.append(this.name);
 		
 		IValue value = this.value;
 		if (value != null)

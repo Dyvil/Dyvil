@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -36,31 +37,32 @@ public class Package implements INamed, IContext
 	public static Package		javaLangAnnotation;
 	
 	public Package				parent;
-	public String				name;
+	public Name					name;
 	public String				fullName;
 	public String				internalName;
 	
 	public List<DyvilFile>		units		= new ArrayList();
-	public Map<String, IClass>	classes		= new HashMap();
+	public List<IClass>			classes		= new ArrayList();
 	public Map<String, Package>	subPackages	= new HashMap();
 	
-	public Package(Package parent, String name)
+	protected Package()
+	{
+	}
+	
+	public Package(Package parent, Name name)
 	{
 		this.name = name;
 		this.parent = parent;
 		
 		if (parent == null || parent.name == null)
 		{
-			if (name != null)
-			{
-				this.fullName = name;
-				this.internalName = ClassFormat.packageToInternal(name) + "/";
-			}
+			this.fullName = name.qualified;
+			this.internalName = ClassFormat.packageToInternal(name.qualified) + "/";
 		}
 		else
 		{
-			this.fullName = parent.fullName + "." + name;
-			this.internalName = parent.internalName + name + "/";
+			this.fullName = parent.fullName + "." + name.qualified;
+			this.internalName = parent.internalName + name.qualified + "/";
 		}
 	}
 	
@@ -77,41 +79,21 @@ public class Package implements INamed, IContext
 		javaLangAnnotation = javaLang.resolvePackage("annotation");
 	}
 	
+	// Name
+	
 	@Override
-	public void setName(String name, String qualifiedName)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-	
-	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
 	}
 	
-	@Override
-	public void setQualifiedName(String name)
-	{
-		this.name = name;
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return this.name;
-	}
-	
-	@Override
-	public boolean isName(String name)
-	{
-		return this.name.equals(name);
-	}
+	// Units
 	
 	public void addCompilationUnit(DyvilFile unit)
 	{
@@ -120,12 +102,12 @@ public class Package implements INamed, IContext
 	
 	public void addClass(IClass iclass)
 	{
-		this.classes.put(iclass.getQualifiedName(), iclass);
+		this.classes.add(iclass);
 	}
 	
 	public void addSubPackage(Package pack)
 	{
-		this.subPackages.put(pack.name, pack);
+		this.subPackages.put(pack.name.qualified, pack);
 	}
 	
 	public Package createSubPackage(String name)
@@ -136,7 +118,7 @@ public class Package implements INamed, IContext
 			return pack;
 		}
 		
-		pack = new Package(this, name);
+		pack = new Package(this, Name.getQualified(name));
 		this.subPackages.put(name, pack);
 		return pack;
 	}
@@ -177,36 +159,49 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
+	public final Package resolvePackage(Name name)
+	{
+		return this.resolvePackage(name.qualified);
+	}
+	
 	public Package resolvePackage(String name)
 	{
 		return this.subPackages.get(name);
 	}
 	
-	public final Package resolvePackage2(String name)
+	@Override
+	public final IClass resolveClass(Name name)
 	{
-		return this.subPackages.get(name);
+		return this.resolveClass(name.qualified);
 	}
 	
-	@Override
 	public IClass resolveClass(String name)
 	{
-		return this.classes.get(name);
+		for (IClass c : this.classes)
+		{
+			if (c.getName().equals(name))
+			{
+				return c;
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		throw new UnsupportedOperationException();
 	}

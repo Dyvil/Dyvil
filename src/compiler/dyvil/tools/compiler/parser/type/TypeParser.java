@@ -2,6 +2,7 @@ package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -81,12 +82,12 @@ public final class TypeParser extends Parser implements ITyped
 			{
 				if (token.next().type() == Symbols.OPEN_SQUARE_BRACKET)
 				{
-					this.type = new GenericType(token, token.text());
+					this.type = new GenericType(token, Name.get(token.text()));
 					this.mode = GENERICS;
 					return;
 				}
 				
-				this.type = new Type(token, token.text());
+				this.type = new Type(token, Name.get(token.text()));
 				this.mode = ARRAY_END;
 				return;
 			}

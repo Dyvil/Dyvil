@@ -5,6 +5,7 @@ import java.util.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -20,10 +21,9 @@ public final class PrimitiveType extends Type
 	public IMethod	boxMethod;
 	public IMethod	unboxMethod;
 	
-	public PrimitiveType(String name, String wrapper, int typecode)
+	public PrimitiveType(Name name, int typecode)
 	{
 		super(name);
-		this.qualifiedName = wrapper;
 		this.typecode = typecode;
 	}
 	
@@ -78,7 +78,7 @@ public final class PrimitiveType extends Type
 		{
 			return fromTypecode(this.typecode);
 		}
-		PrimitiveType t = new PrimitiveType(this.name, this.qualifiedName, this.typecode);
+		PrimitiveType t = new PrimitiveType(this.name, this.typecode);
 		t.theClass = this.theClass;
 		t.arrayDimensions = newDims;
 		return t;
@@ -362,7 +362,7 @@ public final class PrimitiveType extends Type
 		{
 			return true;
 		}
-		if (type.isName(this.qualifiedName))
+		if (type.getName() == this.name)
 		{
 			return true;
 		}
@@ -370,7 +370,7 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -380,7 +380,7 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -395,7 +395,7 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
 		{
@@ -412,7 +412,7 @@ public final class PrimitiveType extends Type
 	@Override
 	public PrimitiveType clone()
 	{
-		PrimitiveType t = new PrimitiveType(this.name, this.qualifiedName, this.typecode);
+		PrimitiveType t = new PrimitiveType(this.name, this.typecode);
 		t.theClass = this.theClass;
 		t.arrayDimensions = this.arrayDimensions;
 		return t;

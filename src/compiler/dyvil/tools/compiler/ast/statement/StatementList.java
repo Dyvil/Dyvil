@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -32,7 +33,7 @@ public final class StatementList extends ValueList implements IStatement, IConte
 	private IContext				context;
 	private IStatement				parent;
 	
-	public Map<String, Variable>	variables	= new HashMap();
+	public Map<Name, Variable>	variables	= new HashMap();
 	
 	public Label[]					labels;
 	
@@ -205,7 +206,7 @@ public final class StatementList extends ValueList implements IStatement, IConte
 			{
 				FieldInitializer fi = (FieldInitializer) v2;
 				Variable var = fi.variable;
-				this.variables.put(var.qualifiedName, var);
+				this.variables.put(var.name, var);
 			}
 		}
 		this.context = null;
@@ -308,19 +309,19 @@ public final class StatementList extends ValueList implements IStatement, IConte
 	}
 	
 	@Override
-	public Package resolvePackage(String name)
+	public Package resolvePackage(Name name)
 	{
 		return this.context.resolvePackage(name);
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
 		return this.context.resolveClass(name);
 	}
 	
 	@Override
-	public FieldMatch resolveField(String name)
+	public FieldMatch resolveField(Name name)
 	{
 		IField field = this.variables.get(name);
 		if (field != null)
@@ -332,13 +333,13 @@ public final class StatementList extends ValueList implements IStatement, IConte
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, String name, IArguments arguments)
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		return this.context.resolveMethod(instance, name, arguments);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, String name, IArguments arguments)
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.context.getMethodMatches(list, instance, name, arguments);
 	}
@@ -430,10 +431,10 @@ public final class StatementList extends ValueList implements IStatement, IConte
 		}
 		writer.writeLabel(end);
 		
-		for (Entry<String, Variable> entry : this.variables.entrySet())
+		for (Entry<Name, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			writer.writeLocal(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), start, end, var.index);
+			writer.writeLocal(var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end, var.index);
 		}
 	}
 	
@@ -473,10 +474,10 @@ public final class StatementList extends ValueList implements IStatement, IConte
 		}
 		writer.writeLabel(end);
 		
-		for (Entry<String, Variable> entry : this.variables.entrySet())
+		for (Entry<Name, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			writer.writeLocal(var.qualifiedName, var.type.getExtendedName(), var.type.getSignature(), start, end, var.index);
+			writer.writeLocal(var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end, var.index);
 		}
 	}
 	

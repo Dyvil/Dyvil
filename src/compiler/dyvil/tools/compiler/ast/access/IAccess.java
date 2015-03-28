@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -26,7 +27,7 @@ public interface IAccess extends IValue, IValued, ICall
 	
 	public void addResolveError(MarkerList markers);
 	
-	public static IField resolveField(IContext context, ITyped instance, String name)
+	public static IField resolveField(IContext context, ITyped instance, Name name)
 	{
 		FieldMatch match;
 		if (instance != null)
@@ -50,7 +51,7 @@ public interface IAccess extends IValue, IValued, ICall
 		return null;
 	}
 	
-	public static IMethod resolveMethod(IContext context, IValue instance, String name, IArguments arguments)
+	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
 	{
 		MethodMatch match;
 		if (instance != null)

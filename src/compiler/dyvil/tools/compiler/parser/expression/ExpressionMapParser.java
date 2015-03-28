@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueMap;
 import dyvil.tools.compiler.ast.value.IValued;
@@ -75,7 +76,7 @@ public class ExpressionMapParser extends Parser implements IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		this.valueMap.addValue(this.key, value);
+		this.valueMap.addValue(Name.get(this.key), value);
 		this.key = null;
 	}
 	

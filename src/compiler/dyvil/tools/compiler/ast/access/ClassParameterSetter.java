@@ -26,7 +26,7 @@ public final class ClassParameterSetter implements IValue
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		writer.writeVarInsn(this.parameter.type.getLoadOpcode(), this.parameter.index);
-		writer.writePutField(this.owner, this.parameter.qualifiedName, this.desc);
+		writer.writePutField(this.owner, this.parameter.name.qualified, this.desc);
 	}
 	
 	@Override

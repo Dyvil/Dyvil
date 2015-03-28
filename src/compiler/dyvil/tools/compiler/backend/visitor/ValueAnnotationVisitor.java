@@ -4,6 +4,7 @@ import org.objectweb.asm.AnnotationVisitor;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.constant.EnumValue;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -31,7 +32,7 @@ public class ValueAnnotationVisitor extends AnnotationVisitor
 	{
 		IType t = ClassFormat.internalToType(enumClass);
 		t.resolve(null, Package.rootPackage);
-		return new EnumValue(t, name);
+		return new EnumValue(t, Name.getQualified(name));
 	}
 	
 	@Override

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.access;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -16,7 +17,7 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 {
 	public Variable	variable;
 	
-	public FieldInitializer(ICodePosition position, String name, IType type)
+	public FieldInitializer(ICodePosition position, Name name, IType type)
 	{
 		this.position = position;
 		this.variable = new Variable(this.position, name, type);

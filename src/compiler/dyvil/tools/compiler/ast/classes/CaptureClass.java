@@ -5,8 +5,6 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public class CaptureClass extends CodeClass
 {
-	private static int		captureID;
-	
 	public ITypeVariable	var;
 	public IType[]			upperBounds;
 	public int				upperBoundCount;
@@ -25,11 +23,6 @@ public class CaptureClass extends CodeClass
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.name == null)
-		{
-			this.name = "capture-#" + captureID++;
-		}
-		
-		buffer.append(this.name);
+		buffer.append("CaptureClass");
 	}
 }
