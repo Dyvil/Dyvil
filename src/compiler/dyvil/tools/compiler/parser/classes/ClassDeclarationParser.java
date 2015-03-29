@@ -21,7 +21,7 @@ import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class ClassDeclParser extends Parser implements ITyped, ITypeList
+public final class ClassDeclarationParser extends Parser implements ITyped, ITypeList
 {
 	private static final int	MODIFIERS		= 0;
 	private static final int	NAME			= 1;
@@ -36,7 +36,7 @@ public final class ClassDeclParser extends Parser implements ITyped, ITypeList
 	
 	protected CodeClass			theClass;
 	
-	public ClassDeclParser(CodeClass theClass)
+	public ClassDeclarationParser(CodeClass theClass)
 	{
 		this.theClass = theClass;
 		this.mode = MODIFIERS;

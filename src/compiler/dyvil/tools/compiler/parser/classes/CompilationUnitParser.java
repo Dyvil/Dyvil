@@ -78,7 +78,7 @@ public class CompilationUnitParser extends Parser
 			
 			CodeClass c = new CodeClass(null, this.unit);
 			this.unit.addClass(c);
-			jcp.pushParser(new ClassDeclParser(c), true);
+			jcp.pushParser(new ClassDeclarationParser(c), true);
 			return;
 		}
 		throw new SyntaxError(token, "Invalid Token - Delete this token");

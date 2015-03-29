@@ -15,19 +15,23 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ExpressionListParser extends Parser implements IValued
 {
-	protected IValueList	valueList;
+	private static final int	EXPRESSION	= 1;
+	private static final int	SEPARATOR	= 2;
 	
-	private String			label;
+	protected IValueList		valueList;
+	
+	private Name				label;
 	
 	public ExpressionListParser(IValueList valueList)
 	{
 		this.valueList = valueList;
+		this.mode = EXPRESSION;
 	}
 	
 	@Override
 	public void reset()
 	{
-		this.mode = 0;
+		this.mode = EXPRESSION;
 		this.label = null;
 	}
 	
@@ -41,11 +45,11 @@ public final class ExpressionListParser extends Parser implements IValued
 			return;
 		}
 		
-		if (this.mode == 0)
+		if (this.mode == EXPRESSION)
 		{
 			if (ParserUtil.isIdentifier(type) && token.next().type() == Tokens.COLON)
 			{
-				this.label = token.nameValue().qualified;
+				this.label = token.nameValue();
 				pm.skip();
 				return;
 			}
@@ -54,7 +58,7 @@ public final class ExpressionListParser extends Parser implements IValued
 			pm.pushParser(new ExpressionParser(this), true);
 			return;
 		}
-		if (this.mode == 1)
+		if (this.mode == SEPARATOR)
 		{
 			if (type == Tokens.COMMA)
 			{
@@ -81,7 +85,7 @@ public final class ExpressionListParser extends Parser implements IValued
 	{
 		if (this.label != null)
 		{
-			this.valueList.addValue(value, new Label(Name.get(this.label), value));
+			this.valueList.addValue(value, new Label(this.label, value));
 			this.label = null;
 		}
 		else

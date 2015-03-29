@@ -11,14 +11,14 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class ThrowsDeclParser extends Parser implements ITyped
+public class ExceptionListParser extends Parser implements ITyped
 {
 	private static final int	TYPE		= 0;
 	private static final int	SEPERATOR	= 1;
 	
 	protected IExceptionList	exceptionList;
 	
-	public ThrowsDeclParser(IExceptionList list)
+	public ExceptionListParser(IExceptionList list)
 	{
 		this.exceptionList = list;
 	}

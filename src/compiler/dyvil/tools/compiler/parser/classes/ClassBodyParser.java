@@ -23,7 +23,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
-import dyvil.tools.compiler.parser.method.ThrowsDeclParser;
+import dyvil.tools.compiler.parser.method.ExceptionListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.transform.Keywords;
@@ -123,7 +123,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 				codeClass.setModifiers(this.modifiers);
 				this.theClass.getBody().addClass(codeClass);
 				
-				ClassDeclParser parser = new ClassDeclParser(codeClass);
+				ClassDeclarationParser parser = new ClassDeclarationParser(codeClass);
 				pm.pushParser(parser, true);
 				this.reset();
 				return;
@@ -263,7 +263,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			}
 			if (type == Keywords.THROWS)
 			{
-				pm.pushParser(new ThrowsDeclParser(this.method));
+				pm.pushParser(new ExceptionListParser(this.method));
 				return;
 			}
 		}
