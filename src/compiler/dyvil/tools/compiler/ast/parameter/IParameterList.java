@@ -4,11 +4,11 @@ public interface IParameterList
 {
 	public int parameterCount();
 	
-	public void setParameter(int index, Parameter param);
+	public void setParameter(int index, IParameter param);
 	
-	public void addParameter(Parameter param);
+	public void addParameter(IParameter param);
 	
-	public Parameter getParameter(int index);
+	public IParameter getParameter(int index);
 	
 	public default void setVarargs()
 	{

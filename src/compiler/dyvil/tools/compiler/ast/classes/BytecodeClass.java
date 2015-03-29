@@ -13,8 +13,8 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.*;
+import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
@@ -262,7 +262,7 @@ public class BytecodeClass extends CodeClass
 			MethodCall call = new MethodCall(null);
 			call.method = method;
 			call.name = name1;
-			method1.getParameter(parIndex).defaultValue = call;
+			method1.getParameter(parIndex).setValue(call);
 			return false;
 		}
 		return true;
@@ -360,7 +360,7 @@ public class BytecodeClass extends CodeClass
 		
 		if ((this.modifiers & Modifiers.ANNOTATION) != 0)
 		{
-			Parameter param = new Parameter();
+			ClassParameter param = new ClassParameter();
 			param.modifiers = access;
 			param.name = name1;
 			param.type = ClassFormat.internalToType(desc.substring(desc.lastIndexOf(')') + 1));
@@ -377,8 +377,7 @@ public class BytecodeClass extends CodeClass
 			
 			if ((access & Modifiers.VARARGS) != 0)
 			{
-				Parameter param = constructor.getParameter(constructor.parameterCount() - 1);
-				param.setVarargs2();
+				constructor.getParameter(constructor.parameterCount() - 1).setVarargs(true);
 			}
 			
 			this.body.addConstructor(constructor);
@@ -402,8 +401,7 @@ public class BytecodeClass extends CodeClass
 		
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			Parameter param = method.getParameter(method.parameterCount() - 1);
-			param.setVarargs2();
+			method.getParameter(method.parameterCount() - 1).setVarargs(true);
 		}
 		
 		boolean flag = true;

@@ -25,9 +25,10 @@ import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.*;
+import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.IDyvilUnit;
@@ -62,7 +63,7 @@ public class CodeClass extends ASTNode implements IClass
 	protected ITypeVariable[]		generics;
 	protected int					genericCount;
 	
-	protected Parameter[]			parameters;
+	protected IParameter[]			parameters;
 	protected int					parameterCount;
 	
 	protected IType					superType	= Type.OBJECT;
@@ -375,20 +376,21 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void setParameter(int index, Parameter param)
+	public void setParameter(int index, IParameter param)
 	{
+		param.setTheClass(this);
 		this.parameters[index] = param;
 	}
 	
 	@Override
-	public void addParameter(Parameter param)
+	public void addParameter(IParameter param)
 	{
-		param.parameterized = this;
+		param.setTheClass(this);
 		IConstructor constructor = this.getConstructor();
 		
 		if (this.parameters == null)
 		{
-			this.parameters = new Parameter[2];
+			this.parameters = new ClassParameter[2];
 			this.parameters[0] = param;
 			this.parameterCount = 1;
 			constructor.setParameters(this.parameters, 1);
@@ -398,7 +400,7 @@ public class CodeClass extends ASTNode implements IClass
 		int index = this.parameterCount++;
 		if (this.parameterCount > this.parameters.length)
 		{
-			Parameter[] temp = new Parameter[this.parameterCount];
+			ClassParameter[] temp = new ClassParameter[this.parameterCount];
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
@@ -407,7 +409,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public Parameter getParameter(int index)
+	public IParameter getParameter(int index)
 	{
 		return this.parameters[index];
 	}
@@ -787,8 +789,8 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			Parameter param = this.parameters[i];
-			if (param.name == name)
+			IParameter param = this.parameters[i];
+			if (param.getName() == name)
 			{
 				return new FieldMatch(param, 1);
 			}
@@ -1156,9 +1158,9 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			for (int i = 0; i < this.parameterCount; i++)
 			{
-				Parameter param = this.parameters[i];
+				IParameter param = this.parameters[i];
 				String desc = param.getDescription();
-				writer.visitField(param.modifiers & 0xFFFF, param.name.qualified, desc, param.getSignature(), null);
+				writer.visitField(param.getModifiers() & 0xFFFF, param.getName().qualified, desc, param.getSignature(), null);
 				instanceFields.addValue(new ClassParameterSetter(param, this.internalName, desc));
 			}
 			
@@ -1216,9 +1218,9 @@ public class CodeClass extends ASTNode implements IClass
 				mw.writeInsn(Opcodes.DUP);
 				for (int i = 0; i < this.parameterCount; i++)
 				{
-					Parameter param = this.parameters[i];
+					IParameter param = this.parameters[i];
 					param.write(mw);
-					mw.writeVarInsn(param.type.getLoadOpcode(), param.index);
+					mw.writeVarInsn(param.getType().getLoadOpcode(), i);
 				}
 				this.constructor.writeInvoke(mw, EmptyArguments.INSTANCE);
 				mw.writeInsn(Opcodes.ARETURN);

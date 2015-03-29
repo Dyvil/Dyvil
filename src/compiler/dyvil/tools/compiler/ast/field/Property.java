@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -35,7 +35,7 @@ public class Property extends Member implements IProperty, IContext
 	public IValue		get;
 	public IValue		set;
 	
-	protected Parameter	setterParameter;
+	protected MethodParameter	setterParameter;
 	
 	public Property(IClass iclass)
 	{
@@ -127,7 +127,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.set != null)
 		{
-			this.setterParameter = new Parameter(0, this.name, this.type);
+			this.setterParameter = new MethodParameter(this.name, this.type);
 			this.set = this.set.resolve(markers, this);
 		}
 	}

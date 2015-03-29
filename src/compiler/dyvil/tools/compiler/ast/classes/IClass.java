@@ -15,12 +15,6 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public interface IClass extends IASTNode, IMember, IGeneric, IContext, IParameterized
 {
-	@Override
-	public default boolean isClass()
-	{
-		return true;
-	}
-	
 	public IDyvilUnit getUnit();
 	
 	public void setOuterClass(IClass iclass);

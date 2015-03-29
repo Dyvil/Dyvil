@@ -20,7 +20,8 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -309,22 +310,22 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void setParameters(Parameter[] parameters, int parameterCount)
+	public void setParameters(IParameter[] parameters, int parameterCount)
 	{
 	}
 	
 	@Override
-	public void setParameter(int index, Parameter param)
+	public void setParameter(int index, IParameter param)
 	{
 	}
 	
 	@Override
-	public void addParameter(Parameter param)
+	public void addParameter(IParameter param)
 	{
 	}
 	
 	@Override
-	public Parameter getParameter(int index)
+	public MethodParameter getParameter(int index)
 	{
 		return null;
 	}

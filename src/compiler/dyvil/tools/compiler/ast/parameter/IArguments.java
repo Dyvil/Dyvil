@@ -34,19 +34,19 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	// Used by Methods
 	
-	public void setValue(int index, Parameter param, IValue value);
+	public void setValue(int index, IParameter param, IValue value);
 	
-	public IValue getValue(int index, Parameter param);
+	public IValue getValue(int index, IParameter param);
 	
-	public IType getType(int index, Parameter param);
+	public IType getType(int index, IParameter param);
 	
-	public int getTypeMatch(int index, Parameter param);
+	public int getTypeMatch(int index, IParameter param);
 	
-	public int getVarargsTypeMatch(int index, Parameter param);
+	public int getVarargsTypeMatch(int index, IParameter param);
 	
-	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context);
+	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context);
 	
-	public void checkVarargsValue(int index, Parameter param, MarkerList markers, ITypeContext context);
+	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context);
 	
 	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer);
 	

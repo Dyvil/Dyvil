@@ -87,7 +87,7 @@ public final class SingleArgument implements IArguments, IValued
 	// Used by Methods
 	
 	@Override
-	public void setValue(int index, Parameter param, IValue value)
+	public void setValue(int index, IParameter param, IValue value)
 	{
 		if (index == 0)
 		{
@@ -96,62 +96,62 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public IValue getValue(int index, Parameter param)
+	public IValue getValue(int index, IParameter param)
 	{
 		return index == 0 ? this.value : null;
 	}
 	
 	@Override
-	public IType getType(int index, Parameter param)
+	public IType getType(int index, IParameter param)
 	{
 		return index == 0 ? this.value.getType() : Type.NONE;
 	}
 	
 	@Override
-	public int getTypeMatch(int index, Parameter param)
+	public int getTypeMatch(int index, IParameter param)
 	{
 		if (index == 0)
 		{
-			return this.value.getTypeMatch(param.type);
+			return this.value.getTypeMatch(param.getType());
 		}
-		return param.defaultValue != null ? 3 : 0;
+		return param.getValue() != null ? 3 : 0;
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, Parameter param)
+	public int getVarargsTypeMatch(int index, IParameter param)
 	{
 		if (index != 0)
 		{
 			return 3;
 		}
 		
-		int m = this.value.getTypeMatch(param.type);
+		int m = this.value.getTypeMatch(param.getType());
 		if (m != 0)
 		{
 			return m;
 		}
-		return this.value.getTypeMatch(param.type.getElementType());
+		return this.value.getTypeMatch(param.getType().getElementType());
 	}
 	
 	@Override
-	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context)
+	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
 	{
 		if (index != 0)
 		{
 			return;
 		}
-		this.value = this.value.withType(param.type.getConcreteType(context));
+		this.value = this.value.withType(param.getType(context));
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, Parameter param, MarkerList markers, ITypeContext context)
+	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
 	{
 		if (index != 0)
 		{
 			return;
 		}
 		
-		IType type = param.type.getConcreteType(context);
+		IType type = param.getType(context);
 		IValue value1 = this.value.withType(type);
 		if (value1 != null)
 		{

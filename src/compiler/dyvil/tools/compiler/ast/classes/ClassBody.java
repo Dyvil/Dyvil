@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
@@ -267,7 +267,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public IMethod getMethod(Name name, Parameter[] parameters, int parameterCount)
+	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount)
 	{
 		outer:
 		for (int i = 0; i < this.methodCount; i++)
@@ -285,8 +285,8 @@ public class ClassBody extends ASTNode implements IClassBody
 			
 			for (int p = 0; p < parameterCount; p++)
 			{
-				Parameter par1 = parameters[p];
-				Parameter par2 = m.getParameter(p);
+				IParameter par1 = parameters[p];
+				IParameter par2 = m.getParameter(p);
 				if (!par1.getType().equals(par2.getType()))
 				{
 					continue outer;

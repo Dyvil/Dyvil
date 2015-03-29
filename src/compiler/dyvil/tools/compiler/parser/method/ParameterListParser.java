@@ -3,10 +3,13 @@ package dyvil.tools.compiler.parser.method;
 import java.lang.annotation.ElementType;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IAnnotationList;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.parameter.ClassParameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
@@ -34,7 +37,7 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 	private int					annotationCount;
 	
 	private IType				type;
-	private Parameter			parameter;
+	private IParameter			parameter;
 	private boolean				varargs;
 	
 	public ParameterListParser(IParameterList paramList)
@@ -93,17 +96,18 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.parameter = new Parameter(0, token.nameValue(), this.type);
-				this.parameter.modifiers = this.modifiers;
+				if (this.varargs)
+				{
+					this.paramList.setVarargs();
+					this.varargs = false;
+					this.type = this.type.getArrayType();
+				}
+				
+				this.parameter = this.paramList instanceof IClass ? new ClassParameter(token.nameValue(), this.type) : new MethodParameter(token.nameValue(), this.type);
+				this.parameter.setModifiers(this.modifiers);
 				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.paramList.addParameter(this.parameter);
 				
-				if (this.varargs)
-				{
-					this.parameter.setVarargs();
-					this.paramList.setVarargs();
-					this.varargs = false;
-				}
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Parameter Declaration - Name expected");
@@ -123,11 +127,6 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 			this.reset();
 			if (type == Tokens.COMMA)
 			{
-				return;
-			}
-			if (type == Tokens.SEMICOLON)
-			{
-				this.parameter.seperator = ';';
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Parameter Declaration - ',' expected");

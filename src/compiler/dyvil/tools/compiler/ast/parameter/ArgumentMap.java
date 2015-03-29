@@ -137,9 +137,9 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void setValue(int index, Parameter param, IValue value)
+	public void setValue(int index, IParameter param, IValue value)
 	{
-		Name key = param.name;
+		Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
 			if (this.keys[i] == key)
@@ -151,51 +151,51 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public IValue getValue(int index, Parameter param)
+	public IValue getValue(int index, IParameter param)
 	{
-		return this.getValue(param.name);
+		return this.getValue(param.getName());
 	}
 	
 	@Override
-	public IType getType(int index, Parameter param)
+	public IType getType(int index, IParameter param)
 	{
-		return this.getValue(param.name).getType();
+		return this.getValue(param.getName()).getType();
 	}
 	
 	@Override
-	public int getTypeMatch(int index, Parameter param)
+	public int getTypeMatch(int index, IParameter param)
 	{
-		Name key = param.name;
+		Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
 			if (this.keys[i] == key)
 			{
-				return this.values[i].getTypeMatch(param.type);
+				return this.values[i].getTypeMatch(param.getType());
 			}
 		}
-		return param.defaultValue != null ? 3 : 0;
+		return param.getValue() != null ? 3 : 0;
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, Parameter param)
+	public int getVarargsTypeMatch(int index, IParameter param)
 	{
 		return this.getTypeMatch(index, param);
 	}
 	
 	@Override
-	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context)
+	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
 	{
-		Name key = param.name;
+		Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
 			if (this.keys[i] == key)
 			{
-				IType type = param.type.getConcreteType(context);
+				IType type = param.getType(context);
 				IValue value = this.values[i];
 				IValue value1 = value.withType(type);
 				if (value1 == null)
 				{
-					Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.name);
+					Marker marker = markers.create(value.getPosition(), "access.method.argument_type", key);
 					marker.addInfo("Required Type: " + type);
 					marker.addInfo("Value Type: " + value.getType());
 				}
@@ -209,7 +209,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, Parameter param, MarkerList markers, ITypeContext context)
+	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
 	{
 		this.checkValue(index, param, markers, context);
 	}

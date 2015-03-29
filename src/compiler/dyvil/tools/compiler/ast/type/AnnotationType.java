@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
@@ -18,7 +18,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class AnnotationType extends Type
 {
-	public static final Parameter	VALUE	= new Parameter();
+	public static final MethodParameter	VALUE	= new MethodParameter();
 	
 	static
 	{

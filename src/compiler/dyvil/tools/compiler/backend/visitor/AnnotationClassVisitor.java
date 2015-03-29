@@ -5,15 +5,15 @@ import org.objectweb.asm.MethodVisitor;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public class AnnotationClassVisitor extends MethodVisitor
 {
-	private Parameter	parameter;
+	private IParameter	parameter;
 	
-	public AnnotationClassVisitor(Parameter param)
+	public AnnotationClassVisitor(IParameter param)
 	{
 		super(DyvilCompiler.asmVersion);
 		this.parameter = param;

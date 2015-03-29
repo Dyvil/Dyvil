@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -79,7 +79,7 @@ public interface IClassBody extends IASTNode
 	
 	public IMethod getMethod(Name name);
 	
-	public IMethod getMethod(Name name, Parameter[] parameters, int parameterCount);
+	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount);
 	
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
 	

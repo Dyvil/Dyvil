@@ -6,9 +6,9 @@ import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -18,42 +18,29 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class Parameter extends Member implements IVariable
+public class MethodParameter extends Member implements IParameter
 {
-	public IParameterized	parameterized;
+	public IBaseMethod	method;
 	
-	public int				index;
-	public char				seperator;
-	public boolean			varargs;
+	public int			index;
+	public boolean		varargs;
 	
-	public IValue			defaultValue;
+	public IValue		defaultValue;
 	
-	public Parameter()
+	public MethodParameter()
 	{
 	}
 	
-	public Parameter(int index, Name name, IType type)
+	public MethodParameter(Name name, IType type)
 	{
-		super(name, type);
-		this.index = index;
-	}
-	
-	@Override
-	public boolean isField()
-	{
-		return this.parameterized != null && this.parameterized.isClass();
+		this.name = name;
+		this.type = type;
 	}
 	
 	@Override
-	public boolean isVariable()
+	public void setMethod(IBaseMethod method)
 	{
-		return this.parameterized == null || !this.parameterized.isClass();
-	}
-	
-	@Override
-	public IClass getTheClass()
-	{
-		return this.parameterized instanceof IClass ? (IClass) this.parameterized : null;
+		this.method = method;
 	}
 	
 	@Override
@@ -80,28 +67,13 @@ public class Parameter extends Member implements IVariable
 		return this.index;
 	}
 	
-	public void setSeperator(char seperator)
+	@Override
+	public void setVarargs(boolean varargs)
 	{
-		this.seperator = seperator;
+		this.varargs = varargs;
 	}
 	
-	public char getSeperator()
-	{
-		return this.seperator;
-	}
-	
-	public void setVarargs()
-	{
-		this.type = this.type.clone();
-		this.type.addArrayDimension();
-		this.varargs = true;
-	}
-	
-	public void setVarargs2()
-	{
-		this.varargs = true;
-	}
-	
+	@Override
 	public boolean isVarargs()
 	{
 		return this.varargs;
@@ -208,8 +180,8 @@ public class Parameter extends Member implements IVariable
 		}
 		
 		// Copy the access modifiers and add the STATIC modifier
-		int modifiers = this.parameterized.getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
-		String name = "parDefault$" + this.parameterized.getName().qualified + "$" + this.index;
+		int modifiers = this.method.getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
+		String name = "parDefault$" + this.method.getName().qualified + "$" + this.index;
 		String desc = "()" + this.type.getExtendedName();
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
 		mw.begin();
@@ -217,13 +189,14 @@ public class Parameter extends Member implements IVariable
 		mw.end(this.type);
 	}
 	
+	@Override
 	public void write(MethodWriter writer)
 	{
 		this.index = writer.registerParameter(this.name.qualified, this.type);
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{
-			writer.addParameterAnnotation(this.index, "Ldyvil/lang/annotation/byref;", true);
+			writer.addParameterAnnotation(this.index, "Ldyvil/lang/annotation/var;", true);
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)
@@ -235,39 +208,12 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		if (this.parameterized != null && this.parameterized.isClass())
-		{
-			if (instance != null)
-			{
-				instance.writeExpression(writer);
-			}
-			
-			writer.writeGetField(((IClass) this.parameterized).getInternalName(), this.name.qualified, this.getDescription(), this.type);
-			return;
-		}
-		
 		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
-		if (this.parameterized != null && this.parameterized.isClass())
-		{
-			if (instance != null)
-			{
-				instance.writeExpression(writer);
-			}
-			
-			if (value != null)
-			{
-				value.writeExpression(writer);
-			}
-			
-			writer.writePutField(((IClass) this.parameterized).getInternalName(), this.name.qualified, this.getDescription());
-			return;
-		}
-		
 		value.writeExpression(writer);
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}

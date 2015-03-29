@@ -8,7 +8,8 @@ import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
@@ -24,13 +25,13 @@ public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignatur
 	
 	// Misc
 	
-	public void setParameters(Parameter[] parameters, int parameterCount);
+	public void setParameters(IParameter[] parameters, int parameterCount);
 	
 	@Override
 	public default void addType(IType type)
 	{
 		int index = this.parameterCount();
-		this.addParameter(new Parameter(index, Name.getQualified("par" + index), type));
+		this.addParameter(new MethodParameter(Name.getQualified("par" + index), type));
 	}
 	
 	// Generics

@@ -17,7 +17,8 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -37,7 +38,7 @@ public final class Constructor extends Member implements IConstructor
 {
 	protected IClass		theClass;
 	
-	protected Parameter[]	parameters	= new Parameter[3];
+	protected IParameter[]	parameters	= new MethodParameter[3];
 	protected int			parameterCount;
 	protected IType[]		exceptions;
 	protected int			exceptionCount;
@@ -72,7 +73,7 @@ public final class Constructor extends Member implements IConstructor
 	// Parameters
 	
 	@Override
-	public void setParameters(Parameter[] parameters, int parameterCount)
+	public void setParameters(IParameter[] parameters, int parameterCount)
 	{
 		this.parameters = parameters;
 		this.parameterCount = parameterCount;
@@ -85,28 +86,29 @@ public final class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void setParameter(int index, Parameter param)
+	public void setParameter(int index, IParameter param)
 	{
+		param.setMethod(this);
 		this.parameters[index] = param;
-		param.parameterized = this;
 	}
 	
 	@Override
-	public void addParameter(Parameter param)
+	public void addParameter(IParameter param)
 	{
+		param.setMethod(this);
+		
 		int index = this.parameterCount++;
-		if (this.parameterCount > this.parameters.length)
+		if (index >= this.parameters.length)
 		{
-			Parameter[] temp = new Parameter[this.parameterCount];
+			MethodParameter[] temp = new MethodParameter[this.parameterCount];
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
 		this.parameters[index] = param;
-		param.parameterized = this;
 	}
 	
 	@Override
-	public Parameter getParameter(int index)
+	public IParameter getParameter(int index)
 	{
 		return this.parameters[index];
 	}
@@ -386,8 +388,8 @@ public final class Constructor extends Member implements IConstructor
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			Parameter param = this.parameters[i];
-			if (param.name == name)
+			IParameter param = this.parameters[i];
+			if (param.getName() == name)
 			{
 				return new FieldMatch(param, 1);
 			}
@@ -451,10 +453,10 @@ public final class Constructor extends Member implements IConstructor
 			}
 			
 			int m;
-			Parameter varParam = this.parameters[parCount];
+			IParameter varParam = this.parameters[parCount];
 			for (int i = 0; i < parCount; i++)
 			{
-				Parameter par = this.parameters[i];
+				IParameter par = this.parameters[i];
 				m = arguments.getTypeMatch(i, par);
 				if (m == 0)
 				{
@@ -480,7 +482,7 @@ public final class Constructor extends Member implements IConstructor
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			Parameter par = this.parameters[i];
+			IParameter par = this.parameters[i];
 			int m = arguments.getTypeMatch(i, par);
 			if (m == 0)
 			{
@@ -521,7 +523,7 @@ public final class Constructor extends Member implements IConstructor
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].type.appendExtendedName(buffer);
+			this.parameters[i].getType().appendExtendedName(buffer);
 		}
 		buffer.append(")V");
 		return buffer.toString();
@@ -557,8 +559,7 @@ public final class Constructor extends Member implements IConstructor
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(), this.getSignature(),
-				this.getExceptions()));
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(), this.getSignature(), this.getExceptions()));
 		
 		mw.setConstructor(this.type);
 		
@@ -604,8 +605,8 @@ public final class Constructor extends Member implements IConstructor
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			Parameter param = this.parameters[i];
-			mw.writeLocal(param.name.qualified, param.type, start, end, param.index);
+			IParameter param = this.parameters[i];
+			mw.writeLocal(param.getName().qualified, param.getType(), start, end, param.getIndex());
 		}
 	}
 	
@@ -636,21 +637,21 @@ public final class Constructor extends Member implements IConstructor
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			int len = this.parameterCount - 1;
-			Parameter param;
+			IParameter param;
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i];
-				arguments.writeValue(i, param.name, param.defaultValue, writer);
+				arguments.writeValue(i, param.getName(), param.getValue(), writer);
 			}
 			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param.name, param.type, writer);
+			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
 			return this.parameterCount;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			Parameter param = this.parameters[i];
-			arguments.writeValue(i, param.name, param.defaultValue, writer);
+			IParameter param = this.parameters[i];
+			arguments.writeValue(i, param.getName(), param.getValue(), writer);
 		}
 		return this.parameterCount;
 	}

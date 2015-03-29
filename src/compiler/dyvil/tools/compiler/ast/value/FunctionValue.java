@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -130,10 +130,9 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 			
 			for (int i = 0; i < parCount; i++)
 			{
-				Parameter par1 = method.getParameter(i);
-				Parameter par2 = match.method.getParameter(i);
-				
-				if (!par1.type.equals(par2.type))
+				IParameter par1 = method.getParameter(i);
+				IParameter par2 = match.method.getParameter(i);
+				if (!par1.getType().equals(par2.getType()))
 				{
 					continue outer;
 				}

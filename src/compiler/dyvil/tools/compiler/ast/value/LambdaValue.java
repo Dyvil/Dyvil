@@ -18,8 +18,8 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.LambdaParameter;
-import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -161,13 +161,13 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			LambdaParameter lambdaParam = this.parameters[i];
-			Parameter param = method.getParameter(i);
+			IParameter param = method.getParameter(i);
 			if (lambdaParam.type == null)
 			{
-				lambdaParam.type = param.type;
+				lambdaParam.type = param.getType();
 				continue;
 			}
-			if (!param.type.equals(lambdaParam.type))
+			if (!param.getType().equals(lambdaParam.type))
 			{
 				return false;
 			}
@@ -341,7 +341,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 				for (int i = 0; i < this.parameterCount; i++)
 				{
 					LambdaParameter param = this.parameters[i];
-					param.baseType = this.method.getParameter(i).type;
+					param.baseType = this.method.getParameter(i).getType();
 					param.type = param.type.getConcreteType(this.type);
 				}
 				

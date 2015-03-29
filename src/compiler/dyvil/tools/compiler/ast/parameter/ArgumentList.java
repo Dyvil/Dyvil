@@ -87,7 +87,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void setValue(int index, Parameter param, IValue value)
+	public void setValue(int index, IParameter param, IValue value)
 	{
 		this.values[index] = value;
 	}
@@ -142,30 +142,30 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public IValue getValue(int index, Parameter param)
+	public IValue getValue(int index, IParameter param)
 	{
 		return this.values[index];
 	}
 	
 	@Override
-	public IType getType(int index, Parameter param)
+	public IType getType(int index, IParameter param)
 	{
 		return this.values[index].getType();
 	}
 	
 	@Override
-	public int getTypeMatch(int index, Parameter param)
+	public int getTypeMatch(int index, IParameter param)
 	{
 		if (index >= this.size)
 		{
-			return param.defaultValue != null ? 3 : 0;
+			return param.getValue() != null ? 3 : 0;
 		}
 		
-		return this.values[index].getTypeMatch(param.type);
+		return this.values[index].getTypeMatch(param.getType());
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, Parameter param)
+	public int getVarargsTypeMatch(int index, IParameter param)
 	{
 		if (index >= this.size)
 		{
@@ -183,19 +183,19 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context)
+	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
 	{
 		if (index >= this.size)
 		{
 			return;
 		}
 		
-		IType type = param.type.getConcreteType(context);
+		IType type = param.getType(context);
 		IValue value = this.values[index];
 		IValue value1 = value.withType(type);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.name);
+			Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.getName());
 			marker.addInfo("Required Type: " + type);
 			marker.addInfo("Value Type: " + value.getType());
 			
@@ -207,7 +207,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, Parameter param, MarkerList markers, ITypeContext context)
+	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
 	{
 		IType varParamType = param.getType(context);
 		
@@ -228,7 +228,7 @@ public final class ArgumentList implements IArguments, IValueList
 			value1 = value.withType(elementType);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.name);
+				Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.getName());
 				marker.addInfo("Required Type: " + elementType);
 				marker.addInfo("Value Type: " + value.getType());
 				

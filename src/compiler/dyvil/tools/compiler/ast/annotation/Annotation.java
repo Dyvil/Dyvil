@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -94,14 +94,14 @@ public class Annotation extends ASTNode implements ITyped
 		int count = theClass.parameterCount();
 		for (int i = 0; i < count; i++)
 		{
-			Parameter param = theClass.getParameter(i);
+			IParameter param = theClass.getParameter(i);
 			IType type = param.getType();
 			IValue value = this.arguments.getValue(i, param);
 			IValue value1 = value.withType(type);
 			
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "annotation.type", param.name.qualified);
+				Marker marker = markers.create(value.getPosition(), "annotation.type", param.getName().qualified);
 				marker.addInfo("Required Type: " + type);
 				marker.addInfo("Value Type: " + value.getType());
 				continue;
@@ -181,8 +181,8 @@ public class Annotation extends ASTNode implements ITyped
 		int count = iclass.parameterCount();
 		for (int i = 0; i < count; i++)
 		{
-			Parameter param = iclass.getParameter(i);
-			visitValue(visitor, param.name.qualified, this.arguments.getValue(i, param));
+			IParameter param = iclass.getParameter(i);
+			visitValue(visitor, param.getName().qualified, this.arguments.getValue(i, param));
 		}
 	}
 	

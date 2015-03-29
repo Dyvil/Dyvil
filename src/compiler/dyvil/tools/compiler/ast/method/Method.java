@@ -23,7 +23,8 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -31,8 +32,8 @@ import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ArrayValue;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
@@ -48,7 +49,7 @@ public class Method extends Member implements IMethod
 	protected ITypeVariable[]	generics;
 	protected int				genericCount;
 	
-	protected Parameter[]		parameters	= new Parameter[3];
+	protected IParameter[]		parameters	= new MethodParameter[3];
 	protected int				parameterCount;
 	protected IType[]			exceptions;
 	protected int				exceptionCount;
@@ -148,7 +149,7 @@ public class Method extends Member implements IMethod
 	// Parameters
 	
 	@Override
-	public void setParameters(Parameter[] parameters, int parameterCount)
+	public void setParameters(IParameter[] parameters, int parameterCount)
 	{
 		this.parameters = parameters;
 		this.parameterCount = parameterCount;
@@ -161,28 +162,29 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void setParameter(int index, Parameter param)
+	public void setParameter(int index, IParameter param)
 	{
+		param.setMethod(this);
 		this.parameters[index] = param;
-		param.parameterized = this;
 	}
 	
 	@Override
-	public void addParameter(Parameter param)
+	public void addParameter(IParameter param)
 	{
+		param.setMethod(this);
+		
 		int index = this.parameterCount++;
-		if (this.parameterCount > this.parameters.length)
+		if (index >= this.parameters.length)
 		{
-			Parameter[] temp = new Parameter[this.parameterCount];
+			MethodParameter[] temp = new MethodParameter[this.parameterCount];
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
 		this.parameters[index] = param;
-		param.parameterized = this;
 	}
 	
 	@Override
-	public Parameter getParameter(int index)
+	public IParameter getParameter(int index)
 	{
 		return this.parameters[index];
 	}
@@ -287,10 +289,10 @@ public class Method extends Member implements IMethod
 		
 		IType type;
 		int len = arguments.size();
-		Parameter param;
+		IParameter param;
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			type = this.parameters[0].type.resolveType(name, instance.getType());
+			type = this.parameters[0].getType().resolveType(name, instance.getType());
 			if (type != null)
 			{
 				return type;
@@ -299,7 +301,7 @@ public class Method extends Member implements IMethod
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i + 1];
-				type = param.type.resolveType(name, arguments.getType(i, param));
+				type = param.getType().resolveType(name, arguments.getType(i, param));
 				if (type != null)
 				{
 					return type;
@@ -330,7 +332,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < len; i++)
 		{
 			param = this.parameters[i];
-			type = param.type.resolveType(name, arguments.getType(i, param));
+			type = param.getType().resolveType(name, arguments.getType(i, param));
 			if (type != null)
 			{
 				return type;
@@ -565,7 +567,7 @@ public class Method extends Member implements IMethod
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			Parameter param = this.parameters[i];
+			IParameter param = this.parameters[i];
 			if (param.getName() == name)
 			{
 				return new FieldMatch(param, 1);
@@ -636,7 +638,7 @@ public class Method extends Member implements IMethod
 		int mods = this.modifiers & Modifiers.INFIX;
 		if (instance != null && mods == Modifiers.INFIX)
 		{
-			IType t2 = this.parameters[0].type;
+			IType t2 = this.parameters[0].getType();
 			int m = instance.getTypeMatch(t2);
 			if (m == 0)
 			{
@@ -655,10 +657,10 @@ public class Method extends Member implements IMethod
 			}
 			
 			int m;
-			Parameter varParam = this.parameters[parCount];
+			IParameter varParam = this.parameters[parCount];
 			for (int i = parIndex; i < parCount; i++)
 			{
-				Parameter par = this.parameters[i + parIndex];
+				IParameter par = this.parameters[i + parIndex];
 				m = arguments.getTypeMatch(i, par);
 				if (m == 0)
 				{
@@ -684,7 +686,7 @@ public class Method extends Member implements IMethod
 		
 		for (int i = 0; parIndex < this.parameterCount; parIndex++, i++)
 		{
-			Parameter par = this.parameters[parIndex];
+			IParameter par = this.parameters[parIndex];
 			int m = arguments.getTypeMatch(i, par);
 			if (m == 0)
 			{
@@ -704,12 +706,12 @@ public class Method extends Member implements IMethod
 		
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			Parameter par = this.parameters[0];
-			parType = par.type.getConcreteType(typeContext);
+			IParameter par = this.parameters[0];
+			parType = par.getType(typeContext);
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
-				Marker marker = markers.create(instance.getPosition(), "access.method.infix_type", par.name);
+				Marker marker = markers.create(instance.getPosition(), "access.method.infix_type", par.getName());
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
 			}
@@ -789,7 +791,7 @@ public class Method extends Member implements IMethod
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].type.appendExtendedName(buffer);
+			this.parameters[i].getType().appendExtendedName(buffer);
 		}
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
@@ -818,7 +820,7 @@ public class Method extends Member implements IMethod
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].type.appendSignature(buffer);
+			this.parameters[i].getType().appendSignature(buffer);
 		}
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
@@ -919,8 +921,8 @@ public class Method extends Member implements IMethod
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			Parameter param = this.parameters[i];
-			mw.writeLocal(param.name.qualified, param.type, start, end, param.index);
+			IParameter param = this.parameters[i];
+			mw.writeLocal(param.getName().qualified, param.getType(), start, end, param.getIndex());
 		}
 	}
 	
@@ -1018,21 +1020,21 @@ public class Method extends Member implements IMethod
 			if ((this.modifiers & Modifiers.VARARGS) != 0)
 			{
 				len--;
-				Parameter param;
+				IParameter param;
 				for (int i = 1, j = 0; i < len; i++, j++)
 				{
 					param = this.parameters[i];
-					arguments.writeValue(j, param.name, param.defaultValue, writer);
+					arguments.writeValue(j, param.getName(), param.getValue(), writer);
 				}
 				param = this.parameters[len];
-				arguments.writeVarargsValue(len - 1, param.name, param.type, writer);
+				arguments.writeVarargsValue(len - 1, param.getName(), param.getType(), writer);
 				return this.parameterCount;
 			}
 			
 			for (int i = 1, j = 0; i < this.parameterCount; i++, j++)
 			{
-				Parameter param = this.parameters[i];
-				arguments.writeValue(j, param.name, param.defaultValue, writer);
+				IParameter param = this.parameters[i];
+				arguments.writeValue(j, param.getName(), param.getValue(), writer);
 			}
 			return this.parameterCount - 1;
 		}
@@ -1045,21 +1047,21 @@ public class Method extends Member implements IMethod
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			int len = this.parameterCount - 1;
-			Parameter param;
+			IParameter param;
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i];
-				arguments.writeValue(i, param.name, param.defaultValue, writer);
+				arguments.writeValue(i, param.getName(), param.getValue(), writer);
 			}
 			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param.name, param.type, writer);
+			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
 			return this.parameterCount;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			Parameter param = this.parameters[i];
-			arguments.writeValue(i, param.name, param.defaultValue, writer);
+			IParameter param = this.parameters[i];
+			arguments.writeValue(i, param.getName(), param.getValue(), writer);
 		}
 		return this.parameterCount;
 	}

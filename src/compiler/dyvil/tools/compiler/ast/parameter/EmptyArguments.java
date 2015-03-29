@@ -71,18 +71,18 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public void setValue(int index, Parameter param, IValue value)
+	public void setValue(int index, IParameter param, IValue value)
 	{
 	}
 	
 	@Override
-	public IValue getValue(int index, Parameter param)
+	public IValue getValue(int index, IParameter param)
 	{
 		return null;
 	}
 	
 	@Override
-	public IType getType(int index, Parameter param)
+	public IType getType(int index, IParameter param)
 	{
 		return null;
 	}
@@ -104,24 +104,24 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public int getTypeMatch(int index, Parameter param)
+	public int getTypeMatch(int index, IParameter param)
 	{
-		return param.defaultValue != null ? 3 : 0;
+		return param.getValue() != null ? 3 : 0;
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, Parameter param)
+	public int getVarargsTypeMatch(int index, IParameter param)
 	{
 		return 3;
 	}
 	
 	@Override
-	public void checkValue(int index, Parameter param, MarkerList markers, ITypeContext context)
+	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
 	{
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, Parameter param, MarkerList markers, ITypeContext context)
+	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
 	{
 	}
 	

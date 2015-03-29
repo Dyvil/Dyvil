@@ -1,7 +1,8 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
@@ -10,11 +11,11 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ClassParameterSetter implements IValue
 {
-	private Parameter	parameter;
+	private IParameter	parameter;
 	private String		owner;
 	private String		desc;
 	
-	public ClassParameterSetter(Parameter param, String owner, String desc)
+	public ClassParameterSetter(IParameter param, String owner, String desc)
 	{
 		this.parameter = param;
 		this.owner = owner;
@@ -25,14 +26,15 @@ public final class ClassParameterSetter implements IValue
 	public void writeStatement(MethodWriter writer)
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
-		writer.writeVarInsn(this.parameter.type.getLoadOpcode(), this.parameter.index);
-		writer.writePutField(this.owner, this.parameter.name.qualified, this.desc);
+		writer.writeVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getIndex());
+		writer.writePutField(this.owner, this.parameter.getName().qualified, this.desc);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("this.").append(this.parameter.name).append(" = ").append(this.parameter.name);
+		Name name = this.parameter.getName();
+		buffer.append("this.").append(name).append(" = ").append(name);
 	}
 	
 	// ----- Ignore -----
