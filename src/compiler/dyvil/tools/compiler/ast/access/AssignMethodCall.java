@@ -215,7 +215,7 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.instance = this.method.checkArguments(markers, this.instance, this.arguments, this);
 		}
 		this.arguments.checkTypes(markers, context);
 	}

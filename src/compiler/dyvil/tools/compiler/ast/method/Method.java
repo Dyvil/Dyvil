@@ -697,7 +697,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
+	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
 		int len = arguments.size();
 		IType parType;
@@ -705,13 +705,17 @@ public class Method extends Member implements IMethod
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			Parameter par = this.parameters[0];
-			parType = par.getType(typeContext);
+			parType = par.type.getConcreteType(typeContext);
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
 				Marker marker = markers.create(instance.getPosition(), "access.method.infix_type", par.name);
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
+			}
+			else
+			{
+				instance = instance1;
 			}
 			
 			if ((this.modifiers & Modifiers.VARARGS) != 0)
@@ -722,14 +726,14 @@ public class Method extends Member implements IMethod
 				{
 					arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
 				}
-				return;
+				return instance;
 			}
 			
 			for (int i = 0; i < this.parameterCount - 1; i++)
 			{
 				arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
 			}
-			return;
+			return instance;
 		}
 		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
@@ -743,7 +747,7 @@ public class Method extends Member implements IMethod
 				marker.addInfo("Value Type: " + instance.getType());
 				
 			}
-			return;
+			return instance;
 		}
 		
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
@@ -755,13 +759,15 @@ public class Method extends Member implements IMethod
 			{
 				arguments.checkValue(i, this.parameters[i], markers, typeContext);
 			}
-			return;
+			return instance;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			arguments.checkValue(i, this.parameters[i], markers, typeContext);
 		}
+		
+		return instance;
 	}
 	
 	@Override

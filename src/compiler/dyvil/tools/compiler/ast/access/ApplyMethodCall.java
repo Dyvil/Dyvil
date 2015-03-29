@@ -177,7 +177,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.instance = this.method.checkArguments(markers, this.instance, this.arguments, this);
 		}
 		this.arguments.checkTypes(markers, context);
 	}

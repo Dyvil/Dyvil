@@ -32,7 +32,7 @@ import dyvil.tools.compiler.util.Util;
 public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeList, ITypeContext
 {
 	public IValue		instance;
-	public Name name;
+	public Name			name;
 	
 	public IType[]		generics;
 	public int			genericCount;
@@ -55,6 +55,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	{
 		this.position = position;
 		this.instance = instance;
+		
 		this.name = name;
 	}
 	
@@ -259,7 +260,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.instance = this.method.checkArguments(markers, this.instance, this.arguments, this);
 		}
 		this.arguments.checkTypes(markers, context);
 	}
@@ -398,21 +399,25 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			return true;
 		}
 		
-		if (this.arguments.size() == 1 && this.instance != null) { String qualified = this.name.qualified; if (qualified.endsWith("$eq"))
+		if (this.arguments.size() == 1 && this.instance != null)
 		{
-			String unqualified = this.name.unqualified;
-			Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
-			MethodMatch method1 = this.instance.getType().resolveMethod(null, name, this.arguments);
-			if (method1 != null)
+			String qualified = this.name.qualified;
+			if (qualified.endsWith("$eq"))
 			{
-				AssignMethodCall call = new AssignMethodCall(this.position);
-				call.method = method1.method;
-				call.instance = this.instance;
-				call.arguments = this.arguments;
-				call.name = name;
-				this.replacement = call;
+				String unqualified = this.name.unqualified;
+				Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
+				MethodMatch method1 = this.instance.getType().resolveMethod(null, name, this.arguments);
+				if (method1 != null)
+				{
+					AssignMethodCall call = new AssignMethodCall(this.position);
+					call.method = method1.method;
+					call.instance = this.instance;
+					call.arguments = this.arguments;
+					call.name = name;
+					this.replacement = call;
+				}
 			}
-		}}
+		}
 		return false;
 	}
 	
