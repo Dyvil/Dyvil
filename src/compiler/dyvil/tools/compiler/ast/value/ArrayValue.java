@@ -6,6 +6,7 @@ import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -15,19 +16,21 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class ValueList extends ASTNode implements IValue, IValueList
+public class ArrayValue extends ASTNode implements IValue, IValueList
 {
-	protected IValue[]	values	= new IValue[3];
-	protected int		valueCount;
+	public static final IType	ARRAY_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("ArrayConvertible"));
 	
-	protected IType		requiredType;
-	protected IType		elementType;
+	protected IValue[]			values				= new IValue[3];
+	protected int				valueCount;
 	
-	public ValueList()
+	protected IType				requiredType;
+	protected IType				elementType;
+	
+	public ArrayValue()
 	{
 	}
 	
-	public ValueList(ICodePosition position)
+	public ArrayValue(ICodePosition position)
 	{
 		this.position = position;
 	}
@@ -106,6 +109,11 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
+			if (ARRAY_CONVERTIBLE.isSuperTypeOf(type))
+			{
+				return new LiteralValue(type, this);
+			}
+			
 			return null;
 		}
 		
@@ -132,7 +140,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			return false;
+			return ARRAY_CONVERTIBLE.isSuperTypeOf(type);
 		}
 		
 		// Skip getting the element type if this is an empty array
@@ -162,7 +170,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			return 0;
+			return ARRAY_CONVERTIBLE.isSuperTypeOf(type) ? 3 : 0;
 		}
 		
 		// Skip getting the element type if this is an empty array

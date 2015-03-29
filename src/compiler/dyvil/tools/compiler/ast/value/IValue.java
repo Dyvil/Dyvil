@@ -231,7 +231,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == int[].class)
 		{
-			ValueList valueList = new ValueList(null);
+			ArrayValue valueList = new ArrayValue(null);
 			for (int i : (int[]) o)
 			{
 				valueList.addValue(new IntValue(i));
@@ -240,7 +240,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == long[].class)
 		{
-			ValueList valueList = new ValueList();
+			ArrayValue valueList = new ArrayValue();
 			for (long l : (long[]) o)
 			{
 				valueList.addValue(new LongValue(l));
@@ -249,7 +249,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == float[].class)
 		{
-			ValueList valueList = new ValueList();
+			ArrayValue valueList = new ArrayValue();
 			for (float f : (float[]) o)
 			{
 				valueList.addValue(new FloatValue(f));
@@ -258,7 +258,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == double[].class)
 		{
-			ValueList valueList = new ValueList();
+			ArrayValue valueList = new ArrayValue();
 			for (double d : (double[]) o)
 			{
 				valueList.addValue(new DoubleValue(d));

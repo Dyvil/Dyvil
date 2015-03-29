@@ -32,7 +32,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.ValueList;
+import dyvil.tools.compiler.ast.value.ArrayValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
@@ -359,7 +359,7 @@ public class Method extends Member implements IMethod
 			
 			try
 			{
-				ValueList array = (ValueList) annotation.arguments.getValue(0, AnnotationType.VALUE);
+				ArrayValue array = (ArrayValue) annotation.arguments.getValue(0, AnnotationType.VALUE);
 				
 				int len = array.valueCount();
 				int[] opcodes = new int[len];

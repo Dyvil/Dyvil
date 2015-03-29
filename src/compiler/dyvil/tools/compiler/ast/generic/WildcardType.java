@@ -148,12 +148,6 @@ public class WildcardType extends TypeVariable implements IType
 	}
 	
 	@Override
-	public boolean isPrimitive()
-	{
-		return this.arrayDimensions != 0;
-	}
-	
-	@Override
 	public boolean isGeneric()
 	{
 		return true;

@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
-import dyvil.tools.compiler.ast.value.ValueList;
+import dyvil.tools.compiler.ast.value.ArrayValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public class ValueAnnotationVisitor extends AnnotationVisitor
@@ -48,7 +48,7 @@ public class ValueAnnotationVisitor extends AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		ValueList valueList = new ValueList();
+		ArrayValue valueList = new ArrayValue();
 		this.valued.setValue(valueList);
 		return new ArrayAnnotationVisitor(this.api, valueList);
 	}

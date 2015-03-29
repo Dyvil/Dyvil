@@ -56,7 +56,7 @@ public final class PrimitiveType extends Type
 	@Override
 	public boolean isPrimitive()
 	{
-		return true;
+		return this.arrayDimensions == 0;
 	}
 	
 	@Override

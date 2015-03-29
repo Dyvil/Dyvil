@@ -4,7 +4,7 @@ import org.objectweb.asm.AnnotationVisitor;
 
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
-import dyvil.tools.compiler.ast.value.ValueList;
+import dyvil.tools.compiler.ast.value.ArrayValue;
 
 public final class ArrayAnnotationVisitor extends AnnotationVisitor
 {
@@ -35,7 +35,7 @@ public final class ArrayAnnotationVisitor extends AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		ValueList valueList = new ValueList(null);
+		ArrayValue valueList = new ArrayValue(null);
 		this.array.addValue(valueList);
 		return new ArrayAnnotationVisitor(this.api, valueList);
 	}

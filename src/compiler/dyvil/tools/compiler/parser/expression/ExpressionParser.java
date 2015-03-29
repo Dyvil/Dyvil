@@ -108,7 +108,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				this.mode = ARRAY_END;
-				ValueList vl = new ValueList(token);
+				ArrayValue vl = new ArrayValue(token);
 				this.value = vl;
 				
 				int nextType = token.next().type();
