@@ -41,7 +41,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int	PARAMETERS_END		= 0x400;
 	public static final int	GENERICS			= 0x800;
 	public static final int	GENERICS_END		= 0x1000;
-	public static final int	VARIABLE			= 0x2000;
 	
 	public static final int	FUNCTION_POINTER	= 0x4000;
 	
@@ -102,12 +101,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				return;
 			}
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
-			{
-				this.mode = ACCESS | VARIABLE | LAMBDA;
-				pm.pushParser(new TypeParser(this), true);
-				return;
-			}
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				this.mode = ARRAY_END;
@@ -117,7 +110,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				int nextType = token.next().type();
 				if (nextType != Symbols.CLOSE_CURLY_BRACKET)
 				{
-					pm.pushParser(new ExpressionListParser(sl));
+					pm.pushParser(new StatementListParser(sl));
 				}
 				return;
 			}
@@ -137,15 +130,9 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				this.getAccess(pm, token.nameValue(), token, type);
 				return;
 			}
-			if (type == Tokens.ARROW_OPERATOR)
-			{
-				this.mode = ACCESS | VARIABLE;
-				pm.pushParser(new TypeParser(this), true);
-				return;
-			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.mode = ACCESS | VARIABLE | LAMBDA;
+				this.mode = ACCESS | LAMBDA;
 				pm.pushParser(new TypeParser(this), true);
 				return;
 			}
@@ -213,7 +200,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(TUPLE_END))
 		{
-			this.mode = ACCESS | VARIABLE | LAMBDA;
+			this.mode = ACCESS | LAMBDA;
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				this.value.expandPosition(token);
@@ -287,7 +274,10 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (ParserUtil.isCloseBracket(type))
 		{
-			this.field.setValue(this.value);
+			if (this.value != null)
+			{
+				this.field.setValue(this.value);
+			}
 			pm.popParser(true);
 			return;
 		}
@@ -305,49 +295,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 					return;
 				}
 				
-				if (this.value.getValueType() == IValue.TUPLE)
-				{
-					TupleType tt = getTupleType((TupleValue) this.value);
-					if (tt != null)
-					{
-						LambdaType lt = new LambdaType(tt);
-						pm.pushParser(new TypeParser(lt));
-						this.value = new ClassAccess(null, lt);
-						this.mode = VARIABLE;
-						return;
-					}
-				}
-				
 				throw new SyntaxError(token, "Invalid Lambda Expression");
-			}
-		}
-		if (this.isInMode(VARIABLE))
-		{
-			if (ParserUtil.isIdentifier(type) && token.next().type() == Tokens.EQUALS)
-			{
-				ICodePosition pos = token.raw();
-				IType itype;
-				int i = this.value.getValueType();
-				if (i == IValue.CLASS_ACCESS)
-				{
-					itype = ((ClassAccess) this.value).type;
-				}
-				else if (i == IValue.TUPLE)
-				{
-					itype = getTupleType((TupleValue) this.value);
-				}
-				else
-				{
-					throw new SyntaxError(token, "Invalid Assignment");
-				}
-				
-				FieldInitializer access = new FieldInitializer(pos, token.nameValue(), itype);
-				this.value = access;
-				
-				pm.skip();
-				pm.pushParser(new ExpressionParser(access));
-				
-				return;
 			}
 		}
 		if (this.isInMode(ACCESS))
@@ -606,17 +554,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		
 		throw new SyntaxError(token, "Invalid Assignment");
-	}
-	
-	private static TupleType getTupleType(TupleValue value)
-	{
-		TupleType t = new TupleType();
-		for (IValue v : value)
-		{
-			ClassAccess ca = (ClassAccess) v;
-			t.addType(ca.type);
-		}
-		return t;
 	}
 	
 	private static LambdaValue getLambdaValue(IValue value)

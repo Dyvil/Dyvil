@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.parser;
 
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
+import dyvil.tools.compiler.lexer.token.IToken;
 
 public interface IParserManager
 {
@@ -9,6 +10,8 @@ public interface IParserManager
 	public void skip(int n);
 	
 	public void reparse();
+	
+	public void jump(IToken token);
 	
 	public void setParser(Parser parser);
 	

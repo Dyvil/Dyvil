@@ -12,12 +12,14 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class REPLParser implements IParserManager
 {
-	private Parser	parser;
-	private int		skip;
-	private boolean	reparse;
+	private TokenIterator	tokens;
+	private Parser			parser;
+	private int				skip;
+	private boolean			reparse;
 	
 	public boolean parse(TokenIterator tokens, Parser parser)
 	{
+		this.tokens = tokens;
 		this.parser = parser;
 		this.skip = 0;
 		this.reparse = false;
@@ -119,6 +121,12 @@ public class REPLParser implements IParserManager
 	public void reparse()
 	{
 		this.reparse = true;
+	}
+	
+	@Override
+	public void jump(IToken token)
+	{
+		this.tokens.jump(token);
 	}
 	
 	@Override

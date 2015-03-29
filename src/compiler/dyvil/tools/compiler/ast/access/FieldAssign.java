@@ -206,6 +206,11 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 			this.value.check(markers, context);
 		}
 		
+		if (this.field == null)
+		{
+			return;
+		}
+		
 		if (this.field.hasModifier(Modifiers.FINAL))
 		{
 			markers.add(this.position, "access.final.field", this.name);

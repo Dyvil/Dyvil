@@ -6,6 +6,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.InferredSemicolon;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -140,17 +141,11 @@ public class ParserManager implements IParserManager
 	 *            the value of the token
 	 * @param token
 	 *            the token
-	 * @return true, if the token should be parser
+	 * @return true, if the token should be parsed or removed from the token stream
 	 */
 	public boolean retainToken(IToken token, IToken prev)
 	{
 		if (!this.semicolonInference)
-		{
-			return true;
-		}
-		
-		int type = token.type();
-		if ((type & (Tokens.SYMBOL | Tokens.KEYWORD | Tokens.IDENTIFIER)) == 0)
 		{
 			return true;
 		}
@@ -162,6 +157,12 @@ public class ParserManager implements IParserManager
 		
 		int prevLN = prev.endLine();
 		if (prevLN == token.startLine())
+		{
+			return true;
+		}
+		
+		int type = token.type();
+		if (type != Symbols.OPEN_SQUARE_BRACKET && (type & (Tokens.SYMBOL | Tokens.KEYWORD | Tokens.IDENTIFIER)) == 0)
 		{
 			return true;
 		}
@@ -195,6 +196,12 @@ public class ParserManager implements IParserManager
 	public void reparse()
 	{
 		this.reparse = true;
+	}
+	
+	@Override
+	public void jump(IToken token)
+	{
+		this.tokens.jump(token);
 	}
 	
 	@Override

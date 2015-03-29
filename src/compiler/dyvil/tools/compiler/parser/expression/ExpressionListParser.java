@@ -54,7 +54,7 @@ public final class ExpressionListParser extends Parser implements IValued
 				return;
 			}
 			
-			this.mode = 1;
+			this.mode = SEPARATOR;
 			pm.pushParser(new ExpressionParser(this), true);
 			return;
 		}
@@ -63,17 +63,18 @@ public final class ExpressionListParser extends Parser implements IValued
 			if (type == Tokens.COMMA)
 			{
 				this.valueList.setArray(true);
-				this.mode = 0;
+				this.mode = EXPRESSION;
 				return;
 			}
 			if (type == Tokens.SEMICOLON)
 			{
-				this.mode = 0;
+				this.mode = EXPRESSION;
 				return;
 			}
 			if (token.prev().type() == Symbols.CLOSE_CURLY_BRACKET)
 			{
-				pm.pushParser(new ExpressionParser(this), true);
+				this.mode = EXPRESSION;
+				pm.reparse();
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Expression List - ',' or ';' expected");

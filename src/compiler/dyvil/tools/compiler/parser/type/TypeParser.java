@@ -133,20 +133,20 @@ public final class TypeParser extends Parser implements ITyped
 		}
 		if (this.isInMode(ARRAY_END))
 		{
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
-			{
-				this.arrayDimensions2--;
-				if (this.arrayDimensions2 == 0)
-				{
-					this.type.expandPosition(token);
-					this.end();
-					pm.popParser();
-					return;
-				}
-			}
-			
 			if (this.arrayDimensions2 > 0)
 			{
+				if (type == Symbols.CLOSE_SQUARE_BRACKET)
+				{
+					this.arrayDimensions2--;
+					if (this.arrayDimensions2 == 0)
+					{
+						this.type.expandPosition(token);
+						this.end();
+						pm.popParser();
+						return;
+					}
+				}
+				
 				this.type.expandPosition(token.prev());
 				this.end();
 				pm.popParser(true);
@@ -165,18 +165,6 @@ public final class TypeParser extends Parser implements ITyped
 				pm.pushParser(new TypeListParser((GenericType) this.type));
 				this.mode = GENERICS_END;
 				return;
-			}
-			
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
-			{
-				this.arrayDimensions2--;
-				if (this.arrayDimensions2 == 0)
-				{
-					this.type.expandPosition(token);
-					this.end();
-					pm.popParser();
-					return;
-				}
 			}
 			
 			if (this.arrayDimensions2 > 0)
