@@ -53,7 +53,7 @@ public class Parameter extends Member implements IVariable
 	@Override
 	public IClass getTheClass()
 	{
-		return (IClass) this.parameterized;
+		return this.parameterized instanceof IClass ? (IClass) this.parameterized : null;
 	}
 	
 	@Override

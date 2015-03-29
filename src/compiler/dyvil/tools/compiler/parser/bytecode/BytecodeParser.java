@@ -230,6 +230,7 @@ public final class BytecodeParser extends Parser
 		/* IntInstructions */
 		case Opcodes.BIPUSH:
 		case Opcodes.SIPUSH:
+		case Opcodes.NEWARRAY:
 		{
 			IToken next = token.next();
 			if (next.type() != Tokens.INT)
@@ -332,28 +333,36 @@ public final class BytecodeParser extends Parser
 			/* TODO LookupSwitchInstruction */
 		case Opcodes.LOOKUPSWITCH:
 			break;
-		/* TODO FieldInstructions */
 		case Opcodes.GETSTATIC:
 		case Opcodes.PUTSTATIC:
 		case Opcodes.GETFIELD:
 		case Opcodes.PUTFIELD:
-			break;
-		/* TODO MethodInstructions */
+		{
+			FieldInstruction fi = new FieldInstruction(opcode);
+			pm.pushParser(new FieldInstructionParser(fi));
+			return fi;
+		}
 		case Opcodes.INVOKEVIRTUAL:
 		case Opcodes.INVOKESPECIAL:
 		case Opcodes.INVOKESTATIC:
 		case Opcodes.INVOKEINTERFACE:
-			break;
+		{
+			MethodInstruction mi = new MethodInstruction(opcode);
+			pm.pushParser(new MethodInstructionParser(mi));
+			return mi;
+		}
 		/* TODO InvokeDynamicInstruction */
 		case Opcodes.INVOKEDYNAMIC:
 			break;
-		/* TODO TypeInstructions */
 		case Opcodes.NEW:
-		case Opcodes.NEWARRAY:
 		case Opcodes.ANEWARRAY:
 		case Opcodes.CHECKCAST:
 		case Opcodes.INSTANCEOF:
-			break;
+		{
+			TypeInstruction ti = new TypeInstruction(opcode);
+			pm.pushParser(new InternalTypeParser(ti));
+			return ti;
+		}
 		/* TODO MultiArrayInstruction */
 		case Opcodes.MULTIANEWARRAY:
 			break;

@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 
 public class CaseClasses
@@ -42,10 +43,10 @@ public class CaseClasses
 		// Write check 'if (this.getClass() != obj.getClass())'
 		// this.getClass()
 		writer.writeVarInsn(ALOAD, 0);
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 1, "Ljava/lang/Class;");
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 0, "Ljava/lang/Class;");
 		// obj.getClass()
 		writer.writeVarInsn(ALOAD, 1);
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 1, "Ljava/lang/Class;");
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 0, "Ljava/lang/Class;");
 		// if
 		writer.writeJumpInsn(IF_ACMPEQ, label = new Label());
 		// then
@@ -85,20 +86,20 @@ public class CaseClasses
 			Label label = new Label();
 			switch (((PrimitiveType) type).typecode)
 			{
-			case MethodWriter.T_BOOLEAN:
-			case MethodWriter.T_BYTE:
-			case MethodWriter.T_SHORT:
-			case MethodWriter.T_CHAR:
-			case MethodWriter.T_INT:
+			case ClassFormat.T_BOOLEAN:
+			case ClassFormat.T_BYTE:
+			case ClassFormat.T_SHORT:
+			case ClassFormat.T_CHAR:
+			case ClassFormat.T_INT:
 				writer.writeJumpInsn(IF_ICMPEQ, label);
 				break;
-			case MethodWriter.T_LONG:
+			case ClassFormat.T_LONG:
 				writer.writeJumpInsn(IF_LCMPEQ, label);
 				break;
-			case MethodWriter.T_FLOAT:
+			case ClassFormat.T_FLOAT:
 				writer.writeJumpInsn(IF_FCMPEQ, label);
 				break;
-			case MethodWriter.T_DOUBLE:
+			case ClassFormat.T_DOUBLE:
 				writer.writeJumpInsn(IF_FCMPEQ, label);
 				break;
 			}
@@ -127,7 +128,7 @@ public class CaseClasses
 		field.writeGet(writer, null);
 		writer.writeVarInsn(ALOAD, 2);
 		field.writeGet(writer, null);
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 2, MethodWriter.INT);
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 1, ClassFormat.INT);
 		writer.writeJumpInsn(IFNE, endLabel);
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN);
@@ -163,7 +164,7 @@ public class CaseClasses
 		{
 			switch (((PrimitiveType) type).typecode)
 			{
-			case MethodWriter.T_BOOLEAN:
+			case ClassFormat.T_BOOLEAN:
 			{
 				// Write boolean hashing by using 1231 if the value is true and
 				// 1237 if the value is false
@@ -180,15 +181,15 @@ public class CaseClasses
 				writer.writeFrameLabel(endLabel);
 				return;
 			}
-			case MethodWriter.T_BYTE:
+			case ClassFormat.T_BYTE:
 				return;
-			case MethodWriter.T_SHORT:
+			case ClassFormat.T_SHORT:
 				return;
-			case MethodWriter.T_CHAR:
+			case ClassFormat.T_CHAR:
 				return;
-			case MethodWriter.T_INT:
+			case ClassFormat.T_INT:
 				return;
-			case MethodWriter.T_LONG:
+			case ClassFormat.T_LONG:
 				// Write a long hashing snippet by XORing the value by the value
 				// bit-shifted 32 bits to the right, and then converting the
 				// result to an integer. l1 = (int) (l ^ (l >>> 32))
@@ -198,14 +199,14 @@ public class CaseClasses
 				writer.writeInsn(LOR);
 				writer.writeInsn(L2I);
 				return;
-			case MethodWriter.T_FLOAT:
+			case ClassFormat.T_FLOAT:
 				// Write a float hashing snippet using Float.floatToIntBits
-				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Float", "floatToIntBits", "(F)I", false, 1, MethodWriter.FLOAT);
+				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Float", "floatToIntBits", "(F)I", false, 1, ClassFormat.FLOAT);
 				return;
-			case MethodWriter.T_DOUBLE:
+			case ClassFormat.T_DOUBLE:
 				// Write a double hashing snippet using Double.doubleToLongBits
 				// and long hashing
-				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)L", false, 1, MethodWriter.DOUBLE);
+				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)L", false, 1, ClassFormat.DOUBLE);
 				writer.writeInsn(DUP2);
 				writer.writeLDC(32);
 				writer.writeInsn(LUSHR);
@@ -224,7 +225,7 @@ public class CaseClasses
 		writer.writeInsn(DUP);
 		writer.writeJumpInsn(IFNULL, elseLabel);
 		// then
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false, 0, null);
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false, 0, ClassFormat.INT);
 		writer.writeJumpInsn(GOTO, endLabel);
 		// else
 		writer.writeFrameLabel(elseLabel);
@@ -241,7 +242,7 @@ public class CaseClasses
 		// Call the StringBuilder(String) constructor with the "[ClassName]("
 		// argument
 		writer.writeLDC(theClass.getName() + "(");
-		writer.writeInvokeInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false, 2, (String) null);
+		writer.writeInvokeInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false, 1, (String) null);
 		
 		// ----- Fields -----
 		int params = theClass.parameterCount();
@@ -252,7 +253,7 @@ public class CaseClasses
 			{
 				// Separator Comma
 				writer.writeLDC(", ");
-				writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
+				writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 1,
 						"Ljava/lang/StringBuilder;");
 			}
 		}
@@ -260,12 +261,12 @@ public class CaseClasses
 		// ----- Append Closing Parenthesis -----
 		writer.writeLDC(")");
 		// Write the call to the StringBuilder#append(String) method
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 2,
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 1,
 				"Ljava/lang/StringBuilder;");
 		
 		// ----- ToString -----
 		// Write the call to the StringBuilder#toString() method
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false, 1, "Ljava/lang/String;");
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false, 0, "Ljava/lang/String;");
 		// Write the return
 		writer.writeInsn(ARETURN);
 	}
@@ -296,6 +297,6 @@ public class CaseClasses
 		}
 		desc.append(")Ljava/lang/StringBuilder;");
 		
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false, 2, "Ljava/lang/StringBuilder;");
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false, 1, "Ljava/lang/StringBuilder;");
 	}
 }

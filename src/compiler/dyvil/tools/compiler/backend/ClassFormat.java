@@ -2,6 +2,8 @@ package dyvil.tools.compiler.backend;
 
 import java.io.File;
 
+import org.objectweb.asm.Opcodes;
+
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
@@ -14,10 +16,42 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 
-public class ClassFormat
+public final class ClassFormat
 {
 	public static File	javaRTJar;
 	public static File	dyvilRTJar;
+	
+	public static final int		H_GETFIELD			= Opcodes.H_GETFIELD;
+	public static final int		H_GETSTATIC			= Opcodes.H_GETSTATIC;
+	public static final int		H_PUTFIELD			= Opcodes.H_PUTFIELD;
+	public static final int		H_PUTSTATIC			= Opcodes.H_PUTSTATIC;
+	public static final int		H_INVOKEVIRTUAL		= Opcodes.H_INVOKEVIRTUAL;
+	public static final int		H_INVOKESTATIC		= Opcodes.H_INVOKESTATIC;
+	public static final int		H_INVOKESPECIAL		= Opcodes.H_INVOKESPECIAL;
+	public static final int		H_NEWINVOKESPECIAL	= Opcodes.H_NEWINVOKESPECIAL;
+	public static final int		H_INVOKEINTERFACE	= Opcodes.H_INVOKEINTERFACE;
+	
+	public static final int T_BOOLEAN			= 4;
+	public static final int T_CHAR				= 5;
+	public static final int		T_FLOAT				= 6;
+	public static final int		T_DOUBLE			= 7;
+	public static final int		T_BYTE				= 8;
+	public static final int		T_SHORT				= 9;
+	public static final int		T_INT				= 10;
+	public static final int		T_LONG				= 11;
+	
+	public static final Integer	UNINITIALIZED_THIS	= Opcodes.UNINITIALIZED_THIS;
+	public static final Integer	NULL				= Opcodes.NULL;
+	public static final Integer	TOP					= Opcodes.TOP;
+	public static final Integer	BOOLEAN	= new Integer(1);
+	public static final Integer	BYTE	= new Integer(1);
+	public static final Integer	SHORT	= new Integer(1);
+	public static final Integer	CHAR	= new Integer(1);
+	public static final Integer	INT					= Opcodes.INTEGER;
+	public static final Integer	LONG				= Opcodes.LONG;
+	public static final Integer	FLOAT				= Opcodes.FLOAT;
+	public static final Integer	DOUBLE				= Opcodes.DOUBLE;
+	
 	
 	static
 	{
@@ -74,7 +108,32 @@ public class ClassFormat
 		return builder.toString();
 	}
 	
-	public static String userToInternal(String name)
+	public static Object getFrameType(String extended) {
+		switch (extended)
+		{
+		case "V":
+			return NULL;
+		case "Z":
+			return BOOLEAN;
+		case "B":
+			return BYTE;
+		case "S":
+			return SHORT;
+		case "C":
+			return CHAR;
+		case "I":
+			return INT;
+		case "L":
+			return LONG;
+		case "F":
+			return FLOAT;
+		case "D":
+			return DOUBLE;
+		}
+		return extended.substring(1, extended.length() - 1);
+	}
+	
+	public static String userToExtended(String name)
 	{
 		switch (name)
 		{

@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.parameter.Parameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -221,14 +222,14 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 		StringBuilder descBuf = new StringBuilder("(");
 		if (this.instance != null && this.instance.getValueType() != CLASS_ACCESS)
 		{
-			handleType = MethodWriter.H_INVOKEVIRTUAL;
+			handleType = ClassFormat.H_INVOKEVIRTUAL;
 			this.instance.writeExpression(writer);
 			this.instance.getType().appendExtendedName(descBuf);
 			len = 1;
 		}
 		else
 		{
-			handleType = MethodWriter.H_INVOKESTATIC;
+			handleType = ClassFormat.H_INVOKESTATIC;
 			len = 0;
 		}
 		

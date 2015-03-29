@@ -231,7 +231,7 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 		
 		String owner = t.getInternalName();
 		String desc = t.getConstructorDescriptor();
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false, this.valueCount + 1, t);
+		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false, this.valueCount, t);
 	}
 	
 	@Override

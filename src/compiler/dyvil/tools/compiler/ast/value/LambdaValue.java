@@ -25,6 +25,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.LambdaType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
@@ -35,7 +36,7 @@ import dyvil.tools.compiler.util.Util;
 
 public final class LambdaValue extends ASTNode implements IValue, IValued, IClassCompilable, IContext
 {
-	public static final Handle	BOOTSTRAP	= new Handle(MethodWriter.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
+	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
 															+ "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodHandle;"
 															+ "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
@@ -398,12 +399,12 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		if (this.thisType != null)
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, 0);
-			handleType = MethodWriter.H_INVOKESPECIAL;
+			handleType = ClassFormat.H_INVOKESPECIAL;
 			len = 1 + this.capturedFieldCount;
 		}
 		else
 		{
-			handleType = MethodWriter.H_INVOKESTATIC;
+			handleType = ClassFormat.H_INVOKESTATIC;
 			len = this.capturedFieldCount;
 		}
 		

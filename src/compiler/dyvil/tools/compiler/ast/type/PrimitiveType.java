@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.BoxValue;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -31,21 +32,21 @@ public final class PrimitiveType extends Type
 	{
 		switch (typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
+		case ClassFormat.T_BOOLEAN:
 			return BOOLEAN;
-		case MethodWriter.T_BYTE:
+		case ClassFormat.T_BYTE:
 			return BYTE;
-		case MethodWriter.T_SHORT:
+		case ClassFormat.T_SHORT:
 			return SHORT;
-		case MethodWriter.T_CHAR:
+		case ClassFormat.T_CHAR:
 			return CHAR;
-		case MethodWriter.T_INT:
+		case ClassFormat.T_INT:
 			return INT;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			return LONG;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			return FLOAT;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			return DOUBLE;
 		default:
 			return VOID;
@@ -115,21 +116,21 @@ public final class PrimitiveType extends Type
 	{
 		switch (this.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
+		case ClassFormat.T_BOOLEAN:
 			return "Z";
-		case MethodWriter.T_BYTE:
+		case ClassFormat.T_BYTE:
 			return "B";
-		case MethodWriter.T_SHORT:
+		case ClassFormat.T_SHORT:
 			return "S";
-		case MethodWriter.T_CHAR:
+		case ClassFormat.T_CHAR:
 			return "C";
-		case MethodWriter.T_INT:
+		case ClassFormat.T_INT:
 			return "I";
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			return "J";
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			return "F";
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			return "D";
 		default:
 			return "V";
@@ -155,18 +156,22 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
-		case MethodWriter.T_BYTE:
-		case MethodWriter.T_SHORT:
-		case MethodWriter.T_CHAR:
-		case MethodWriter.T_INT:
-			return MethodWriter.INT;
-		case MethodWriter.T_LONG:
-			return MethodWriter.LONG;
-		case MethodWriter.T_FLOAT:
-			return MethodWriter.FLOAT;
-		case MethodWriter.T_DOUBLE:
-			return MethodWriter.DOUBLE;
+		case ClassFormat.T_BOOLEAN:
+			return ClassFormat.BOOLEAN;
+		case ClassFormat.T_BYTE:
+			return ClassFormat.BYTE;
+		case ClassFormat.T_SHORT:
+			return ClassFormat.SHORT;
+		case ClassFormat.T_CHAR:
+			return ClassFormat.CHAR;
+		case ClassFormat.T_INT:
+			return ClassFormat.INT;
+		case ClassFormat.T_LONG:
+			return ClassFormat.LONG;
+		case ClassFormat.T_FLOAT:
+			return ClassFormat.FLOAT;
+		case ClassFormat.T_DOUBLE:
+			return ClassFormat.DOUBLE;
 		default:
 			return null;
 		}
@@ -181,17 +186,17 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
-		case MethodWriter.T_BYTE:
-		case MethodWriter.T_SHORT:
-		case MethodWriter.T_CHAR:
-		case MethodWriter.T_INT:
+		case ClassFormat.T_BOOLEAN:
+		case ClassFormat.T_BYTE:
+		case ClassFormat.T_SHORT:
+		case ClassFormat.T_CHAR:
+		case ClassFormat.T_INT:
 			return Opcodes.ILOAD;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			return Opcodes.LLOAD;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			return Opcodes.FLOAD;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			return Opcodes.DLOAD;
 		default:
 			return 0;
@@ -203,20 +208,20 @@ public final class PrimitiveType extends Type
 	{
 		switch (this.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
-		case MethodWriter.T_BYTE:
+		case ClassFormat.T_BOOLEAN:
+		case ClassFormat.T_BYTE:
 			return Opcodes.BALOAD;
-		case MethodWriter.T_SHORT:
+		case ClassFormat.T_SHORT:
 			return Opcodes.SALOAD;
-		case MethodWriter.T_CHAR:
+		case ClassFormat.T_CHAR:
 			return Opcodes.CALOAD;
-		case MethodWriter.T_INT:
+		case ClassFormat.T_INT:
 			return Opcodes.IALOAD;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			return Opcodes.LALOAD;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			return Opcodes.FALOAD;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			return Opcodes.DALOAD;
 		default:
 			return 0;
@@ -232,17 +237,17 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
-		case MethodWriter.T_BYTE:
-		case MethodWriter.T_SHORT:
-		case MethodWriter.T_CHAR:
-		case MethodWriter.T_INT:
+		case ClassFormat.T_BOOLEAN:
+		case ClassFormat.T_BYTE:
+		case ClassFormat.T_SHORT:
+		case ClassFormat.T_CHAR:
+		case ClassFormat.T_INT:
 			return Opcodes.ISTORE;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			return Opcodes.LSTORE;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			return Opcodes.FSTORE;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			return Opcodes.DSTORE;
 		default:
 			return 0;
@@ -254,20 +259,20 @@ public final class PrimitiveType extends Type
 	{
 		switch (this.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
-		case MethodWriter.T_BYTE:
+		case ClassFormat.T_BOOLEAN:
+		case ClassFormat.T_BYTE:
 			return Opcodes.BASTORE;
-		case MethodWriter.T_SHORT:
+		case ClassFormat.T_SHORT:
 			return Opcodes.SASTORE;
-		case MethodWriter.T_CHAR:
+		case ClassFormat.T_CHAR:
 			return Opcodes.CASTORE;
-		case MethodWriter.T_INT:
+		case ClassFormat.T_INT:
 			return Opcodes.IASTORE;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			return Opcodes.LASTORE;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			return Opcodes.FASTORE;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			return Opcodes.DASTORE;
 		default:
 			return 0;
@@ -283,17 +288,17 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
-		case MethodWriter.T_BYTE:
-		case MethodWriter.T_SHORT:
-		case MethodWriter.T_CHAR:
-		case MethodWriter.T_INT:
+		case ClassFormat.T_BOOLEAN:
+		case ClassFormat.T_BYTE:
+		case ClassFormat.T_SHORT:
+		case ClassFormat.T_CHAR:
+		case ClassFormat.T_INT:
 			return Opcodes.IRETURN;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			return Opcodes.LRETURN;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			return Opcodes.FRETURN;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			return Opcodes.DRETURN;
 		default:
 			return Opcodes.RETURN;
@@ -310,20 +315,20 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
-		case MethodWriter.T_BYTE:
-		case MethodWriter.T_SHORT:
-		case MethodWriter.T_CHAR:
-		case MethodWriter.T_INT:
+		case ClassFormat.T_BOOLEAN:
+		case ClassFormat.T_BYTE:
+		case ClassFormat.T_SHORT:
+		case ClassFormat.T_CHAR:
+		case ClassFormat.T_INT:
 			writer.writeLDC(0);
 			break;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			writer.writeLDC(0L);
 			break;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			writer.writeLDC(0F);
 			break;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			writer.writeLDC(0D);
 			break;
 		}
@@ -338,18 +343,18 @@ public final class PrimitiveType extends Type
 		}
 		switch (this.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
+		case ClassFormat.T_BOOLEAN:
 			return BooleanValue.TRUE;
-		case MethodWriter.T_BYTE:
-		case MethodWriter.T_SHORT:
-		case MethodWriter.T_CHAR:
-		case MethodWriter.T_INT:
+		case ClassFormat.T_BYTE:
+		case ClassFormat.T_SHORT:
+		case ClassFormat.T_CHAR:
+		case ClassFormat.T_INT:
 			return IntValue.getNull();
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			return LongValue.getNull();
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			return FloatValue.getNull();
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			return DoubleValue.getNull();
 		}
 		return null;

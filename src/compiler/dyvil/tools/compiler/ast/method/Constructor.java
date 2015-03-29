@@ -624,8 +624,7 @@ public final class Constructor extends Member implements IConstructor
 	@Override
 	public void writeInvoke(MethodWriter writer, IArguments arguments)
 	{
-		int args = 1 + this.writeArguments(writer, arguments);
-		
+		int args = this.writeArguments(writer, arguments);
 		String owner = this.theClass.getInternalName();
 		String name = "<init>";
 		String desc = this.getDescriptor();

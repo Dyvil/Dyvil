@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -179,19 +180,19 @@ public final class CastOperator extends ASTNode implements IValue
 	{
 		switch (cast.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
-		case MethodWriter.T_BYTE:
-		case MethodWriter.T_SHORT:
-		case MethodWriter.T_CHAR:
-		case MethodWriter.T_INT:
+		case ClassFormat.T_BOOLEAN:
+		case ClassFormat.T_BYTE:
+		case ClassFormat.T_SHORT:
+		case ClassFormat.T_CHAR:
+		case ClassFormat.T_INT:
 			break;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			writer.writeInsn(I2L);
 			break;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			writer.writeInsn(I2F);
 			break;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			writer.writeInsn(I2D);
 			break;
 		}
@@ -201,27 +202,27 @@ public final class CastOperator extends ASTNode implements IValue
 	{
 		switch (cast.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
+		case ClassFormat.T_BOOLEAN:
 			writer.writeInsn(L2I);
 			break;
-		case MethodWriter.T_BYTE:
+		case ClassFormat.T_BYTE:
 			writer.writeInsn(L2B);
 			break;
-		case MethodWriter.T_SHORT:
+		case ClassFormat.T_SHORT:
 			writer.writeInsn(L2S);
 			break;
-		case MethodWriter.T_CHAR:
+		case ClassFormat.T_CHAR:
 			writer.writeInsn(L2C);
 			break;
-		case MethodWriter.T_INT:
+		case ClassFormat.T_INT:
 			writer.writeInsn(L2I);
 			break;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			break;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			writer.writeInsn(L2F);
 			break;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			writer.writeInsn(L2D);
 			break;
 		}
@@ -231,27 +232,27 @@ public final class CastOperator extends ASTNode implements IValue
 	{
 		switch (cast.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
+		case ClassFormat.T_BOOLEAN:
 			writer.writeInsn(F2I);
 			break;
-		case MethodWriter.T_BYTE:
+		case ClassFormat.T_BYTE:
 			writer.writeInsn(F2B);
 			break;
-		case MethodWriter.T_SHORT:
+		case ClassFormat.T_SHORT:
 			writer.writeInsn(F2S);
 			break;
-		case MethodWriter.T_CHAR:
+		case ClassFormat.T_CHAR:
 			writer.writeInsn(F2C);
 			break;
-		case MethodWriter.T_INT:
+		case ClassFormat.T_INT:
 			writer.writeInsn(F2I);
 			break;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			writer.writeInsn(F2L);
 			break;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			break;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			writer.writeInsn(F2D);
 			break;
 		}
@@ -261,28 +262,28 @@ public final class CastOperator extends ASTNode implements IValue
 	{
 		switch (cast.typecode)
 		{
-		case MethodWriter.T_BOOLEAN:
+		case ClassFormat.T_BOOLEAN:
 			writer.writeInsn(D2I);
 			break;
-		case MethodWriter.T_BYTE:
+		case ClassFormat.T_BYTE:
 			writer.writeInsn(D2B);
 			break;
-		case MethodWriter.T_SHORT:
+		case ClassFormat.T_SHORT:
 			writer.writeInsn(D2S);
 			break;
-		case MethodWriter.T_CHAR:
+		case ClassFormat.T_CHAR:
 			writer.writeInsn(D2C);
 			break;
-		case MethodWriter.T_INT:
+		case ClassFormat.T_INT:
 			writer.writeInsn(D2I);
 			break;
-		case MethodWriter.T_LONG:
+		case ClassFormat.T_LONG:
 			writer.writeInsn(D2L);
 			break;
-		case MethodWriter.T_FLOAT:
+		case ClassFormat.T_FLOAT:
 			writer.writeInsn(D2F);
 			break;
-		case MethodWriter.T_DOUBLE:
+		case ClassFormat.T_DOUBLE:
 			break;
 		}
 	}

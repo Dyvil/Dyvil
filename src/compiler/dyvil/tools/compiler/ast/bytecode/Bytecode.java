@@ -38,19 +38,19 @@ public final class Bytecode extends ASTNode implements IValue
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Type.VOID ? this : null;
+		return this;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.VOID;
+		return true;
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		return 0;
+		return 3;
 	}
 	
 	public void addInstruction(IInstruction insn)

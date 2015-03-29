@@ -4,10 +4,15 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class TypeInstruction implements IInstruction
+public class TypeInstruction implements IInstruction, IInternalTyped
 {
 	private int		opcode;
 	private String	type;
+	
+	public TypeInstruction(int opcode)
+	{
+		this.opcode = opcode;
+	}
 	
 	public TypeInstruction(int opcode, String type)
 	{
@@ -18,6 +23,18 @@ public class TypeInstruction implements IInstruction
 	@Override
 	public void resolve(MarkerList markers, Bytecode bytecode)
 	{
+	}
+	
+	@Override
+	public void setInternalType(String desc, Object type)
+	{
+		this.type = desc;
+	}
+	
+	@Override
+	public Object getInternalType()
+	{
+		return this.type;
 	}
 	
 	@Override

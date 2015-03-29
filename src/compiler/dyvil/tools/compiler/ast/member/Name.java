@@ -18,17 +18,17 @@ public final class Name
 	public static final Name				_this					= new Name("this");
 	public static final Name				_class					= new Name("class");
 	
-	public static final Name				_void					= new Name("void", "Void");
-	public static final Name				_boolean				= new Name("boolean", "Boolean");
-	public static final Name				_byte					= new Name("byte", "Byte");
-	public static final Name				_short					= new Name("short", "Short");
-	public static final Name				_char					= new Name("char", "Char");
-	public static final Name				_int					= new Name("int", "Int");
-	public static final Name				_long					= new Name("long", "Long");
-	public static final Name				_float					= new Name("float", "Float");
-	public static final Name				_double					= new Name("double", "Double");
-	public static final Name				dynamic					= new Name("dynamic", "Dynamic");
-	public static final Name				any						= new Name("any", "Any");
+	public static final Name				_void					= new Name("void");
+	public static final Name				_boolean				= new Name("boolean");
+	public static final Name				_byte					= new Name("byte");
+	public static final Name				_short					= new Name("short");
+	public static final Name				_char					= new Name("char");
+	public static final Name				_int					= new Name("int");
+	public static final Name				_long					= new Name("long");
+	public static final Name				_float					= new Name("float");
+	public static final Name				_double					= new Name("double");
+	public static final Name				dynamic					= new Name("dynamic");
+	public static final Name				any						= new Name("any");
 	
 	public static final Name				plus					= new Name("+", "$plus");
 	public static final Name				minus					= new Name("-", "$minus");

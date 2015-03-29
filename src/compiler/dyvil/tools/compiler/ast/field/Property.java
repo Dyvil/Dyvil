@@ -371,22 +371,19 @@ public class Property extends Member implements IProperty, IContext
 		}
 		
 		int opcode;
-		int args;
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
 		{
 			opcode = Opcodes.INVOKESTATIC;
-			args = 0;
 		}
 		else
 		{
 			opcode = Opcodes.INVOKEVIRTUAL;
-			args = 1;
 		}
 		
 		String owner = this.theClass.getInternalName();
 		String name = "get$" + this.name.qualified;
 		String desc = "()" + this.type.getExtendedName();
-		writer.writeInvokeInsn(opcode, owner, name, desc, false, args, this.type);
+		writer.writeInvokeInsn(opcode, owner, name, desc, false, 0, this.type);
 	}
 	
 	@Override
@@ -403,22 +400,19 @@ public class Property extends Member implements IProperty, IContext
 		}
 		
 		int opcode;
-		int args;
 		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
 		{
 			opcode = Opcodes.INVOKESTATIC;
-			args = 1;
 		}
 		else
 		{
 			opcode = Opcodes.INVOKEVIRTUAL;
-			args = 2;
 		}
 		
 		String owner = this.theClass.getInternalName();
 		String name = "set$" + this.name.qualified;
 		String desc = "(" + this.type.getExtendedName() + ")V";
-		writer.writeInvokeInsn(opcode, owner, name, desc, false, args, (String) null);
+		writer.writeInvokeInsn(opcode, owner, name, desc, false, 1, (String) null);
 	}
 	
 	@Override

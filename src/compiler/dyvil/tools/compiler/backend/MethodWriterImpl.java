@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.backend;
 
 import static dyvil.reflect.Opcodes.*;
+import static dyvil.tools.compiler.backend.ClassFormat.*;
 
 import org.objectweb.asm.*;
 import org.objectweb.asm.ClassWriter;
@@ -1036,7 +1037,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeGetStatic(String owner, String name, String desc, IType type)
+	public void writeGetStatic(String owner, String name, String desc, Object type)
 	{
 		if (this.visitFrame)
 		{
@@ -1048,6 +1049,12 @@ public final class MethodWriterImpl implements MethodWriter
 			this.push(type);
 		}
 		this.mv.visitFieldInsn(GETSTATIC, owner, name, desc);
+	}
+	
+	@Override
+	public void writeGetStatic(String owner, String name, String desc, IType type)
+	{
+		this.writeGetStatic(owner, name, desc, type.getFrameType());
 	}
 	
 	@Override
@@ -1063,7 +1070,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeGetField(String owner, String name, String desc, IType type)
+	public void writeGetField(String owner, String name, String desc, Object type)
 	{
 		if (this.visitFrame)
 		{
@@ -1073,6 +1080,12 @@ public final class MethodWriterImpl implements MethodWriter
 		this.pop(); // Instance
 		this.push(type);
 		this.mv.visitFieldInsn(GETFIELD, owner, name, desc);
+	}
+	
+	@Override
+	public void writeGetField(String owner, String name, String desc, IType type)
+	{
+		this.writeGetField(owner, name, desc, type.getFrameType());
 	}
 	
 	@Override
@@ -1091,32 +1104,13 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, Object returnType)
 	{
-		if (this.visitFrame)
-		{
-			this.writeFrame();
-		}
-		this.mv.visitMethodInsn(opcode, owner, name, desc, false);
-		this.pop(args);
-		if (returnType != null)
-		{
-			this.push(returnType);
-		}
+		this.writeInvokeInsn(opcode, owner, name, desc, false, args, returnType);
 	}
 	
 	@Override
 	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, IType returnType)
 	{
-		if (this.visitFrame)
-		{
-			this.writeFrame();
-		}
-		
-		this.mv.visitMethodInsn(opcode, owner, name, desc, false);
-		this.pop(args);
-		if (returnType != null)
-		{
-			this.push(returnType);
-		}
+		this.writeInvokeInsn(opcode, owner, name, desc, false, args, returnType.getFrameType());
 	}
 	
 	@Override
@@ -1138,17 +1132,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface, int args, IType returnType)
 	{
-		if (this.visitFrame)
-		{
-			this.writeFrame();
-		}
-		
-		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
-		this.pop(args);
-		if (returnType != null)
-		{
-			this.push(returnType);
-		}
+		this.writeInvokeInsn(opcode, owner, name, desc, isInterface, args, returnType.getFrameType());
 	}
 	
 	@Override

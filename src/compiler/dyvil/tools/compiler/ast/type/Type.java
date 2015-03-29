@@ -19,7 +19,6 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -29,14 +28,14 @@ public class Type extends ASTNode implements IType
 	public static final DynamicType		DYNAMIC		= new DynamicType();
 	
 	public static final PrimitiveType	VOID		= new PrimitiveType(Name._void, 0);
-	public static final PrimitiveType	BOOLEAN		= new PrimitiveType(Name._boolean, MethodWriter.T_BOOLEAN);
-	public static final PrimitiveType	BYTE		= new PrimitiveType(Name._byte, MethodWriter.T_BOOLEAN);
-	public static final PrimitiveType	SHORT		= new PrimitiveType(Name._short, MethodWriter.T_SHORT);
-	public static final PrimitiveType	CHAR		= new PrimitiveType(Name._char, MethodWriter.T_CHAR);
-	public static final PrimitiveType	INT			= new PrimitiveType(Name._int, MethodWriter.T_INT);
-	public static final PrimitiveType	LONG		= new PrimitiveType(Name._long, MethodWriter.T_LONG);
-	public static final PrimitiveType	FLOAT		= new PrimitiveType(Name._float, MethodWriter.T_FLOAT);
-	public static final PrimitiveType	DOUBLE		= new PrimitiveType(Name._double, MethodWriter.T_DOUBLE);
+	public static final PrimitiveType	BOOLEAN		= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
+	public static final PrimitiveType	BYTE		= new PrimitiveType(Name._byte, ClassFormat.T_BOOLEAN);
+	public static final PrimitiveType	SHORT		= new PrimitiveType(Name._short, ClassFormat.T_SHORT);
+	public static final PrimitiveType	CHAR		= new PrimitiveType(Name._char, ClassFormat.T_CHAR);
+	public static final PrimitiveType	INT			= new PrimitiveType(Name._int, ClassFormat.T_INT);
+	public static final PrimitiveType	LONG		= new PrimitiveType(Name._long, ClassFormat.T_LONG);
+	public static final PrimitiveType	FLOAT		= new PrimitiveType(Name._float, ClassFormat.T_FLOAT);
+	public static final PrimitiveType	DOUBLE		= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
 	
 	public static final Type			ANY			= new Type("Any");
 	public static final Type			OBJECT		= new Type("Object");

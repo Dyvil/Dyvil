@@ -27,12 +27,13 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class DynamicMethod extends ASTNode implements IMethod
 {
-	public static final Handle	BOOTSTRAP	= new Handle(MethodWriter.H_INVOKESTATIC, "dyvil/dyn/DynamicLinker", "linkMethod",
+	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/dyn/DynamicLinker", "linkMethod",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
 	
 	public Name					name;

@@ -116,7 +116,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			if ((type & Tokens.SYMBOL_IDENTIFIER) == Tokens.SYMBOL_IDENTIFIER)
 			{
-				if (token.equals("@") && token.next().type() == Symbols.OPEN_CURLY_BRACKET)
+				if (token.nameValue() == Name.at && token.next().type() == Symbols.OPEN_CURLY_BRACKET)
 				{
 					Bytecode bc = new Bytecode(token);
 					pm.skip();

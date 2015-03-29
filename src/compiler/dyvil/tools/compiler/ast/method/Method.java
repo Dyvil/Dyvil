@@ -1126,7 +1126,6 @@ public class Method extends Member implements IMethod
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
-			args = 1;
 		}
 		
 		args += this.writeArguments(writer, arguments);

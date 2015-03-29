@@ -311,7 +311,7 @@ public final class MatchExpression extends ASTNode implements IValue
 			writer.writeTypeInsn(Opcodes.NEW, "dyvil/lang/MatchError");
 			writer.writeInsn(Opcodes.DUP);
 			writer.writeVarInsn(type.getLoadOpcode(), varIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", "(" + type.getExtendedName() + ")V", 2, null);
+			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", "(" + type.getExtendedName() + ")V", 1, null);
 			writer.writeInsn(Opcodes.ATHROW);
 			writer.resetLocals(varIndex);
 		}

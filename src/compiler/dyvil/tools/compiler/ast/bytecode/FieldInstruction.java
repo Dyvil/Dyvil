@@ -5,7 +5,6 @@ import static dyvil.reflect.Opcodes.GETSTATIC;
 import static dyvil.reflect.Opcodes.PUTFIELD;
 import static dyvil.reflect.Opcodes.PUTSTATIC;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -15,16 +14,43 @@ public class FieldInstruction implements IInstruction
 	private int		opcode;
 	private String	owner;
 	private String	fieldName;
+	
 	private String	desc;
-	private IType	type;
+	private Object	type;
+	
+	public FieldInstruction(int opcode)
+	{
+		this.opcode = opcode;
+	}
 	
 	public FieldInstruction(int opcode, String owner, String name, String desc)
 	{
 		this.opcode = opcode;
 		this.owner = owner;
 		this.fieldName = name;
+		
 		this.desc = desc;
-		this.type = ClassFormat.internalToType(desc);
+		this.type = ClassFormat.getFrameType(desc);
+	}
+	
+	public void setOwner(String owner)
+	{
+		this.owner = owner;
+	}
+	
+	public void setFieldName(String fieldName)
+	{
+		this.fieldName = fieldName;
+	}
+	
+	public void setDesc(String desc)
+	{
+		this.desc = desc;
+	}
+	
+	public void setType(Object type)
+	{
+		this.type = type;
 	}
 	
 	@Override
@@ -35,16 +61,22 @@ public class FieldInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer)
 	{
+		String s = ClassFormat.userToExtended(this.desc);
+		
 		switch (this.opcode)
 		{
 		case GETSTATIC:
-			writer.writeGetStatic(this.owner, this.fieldName, this.desc, this.type);
+			writer.writeGetStatic(this.owner, this.fieldName, s, this.type);
+			return;
 		case PUTSTATIC:
-			writer.writePutStatic(this.owner, this.fieldName, this.desc);
+			writer.writePutStatic(this.owner, this.fieldName, s);
+			return;
 		case GETFIELD:
-			writer.writeGetField(this.owner, this.fieldName, this.desc, this.type);
+			writer.writeGetField(this.owner, this.fieldName, s, this.type);
+			return;
 		case PUTFIELD:
-			writer.writePutField(this.owner, this.fieldName, this.desc);
+			writer.writePutField(this.owner, this.fieldName, s);
+			return;
 		}
 	}
 	
@@ -53,7 +85,7 @@ public class FieldInstruction implements IInstruction
 	{
 		buffer.append(Opcodes.toString(this.opcode)).append(' ');
 		buffer.append(this.owner).append('.');
-		buffer.append(this.fieldName).append(':');
+		buffer.append(this.fieldName).append(" : ");
 		buffer.append(this.desc);
 	}
 }
