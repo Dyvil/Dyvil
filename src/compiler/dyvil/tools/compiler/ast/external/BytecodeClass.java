@@ -1,13 +1,18 @@
-package dyvil.tools.compiler.ast.classes;
+package dyvil.tools.compiler.ast.external;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.classes.ClassBody;
+import dyvil.tools.compiler.ast.classes.CodeClass;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
@@ -26,54 +31,26 @@ import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class BytecodeClass extends CodeClass
+public final class BytecodeClass extends CodeClass
 {
 	public Package		thePackage;
-	public boolean		typesResolved;
 	
 	private IType		outerType;
 	private List<IType>	innerTypes;
+	
+	private boolean		superTypesResolved;
+	private boolean		genericsResolved;
+	private boolean		annotationsResolved;
+	private boolean		innerTypesResolved;
 	
 	public BytecodeClass(Name name)
 	{
 		this.name = name;
 	}
 	
-	@Override
-	public boolean isSubTypeOf(IType type)
+	private void resolveGenerics()
 	{
-		if (!this.typesResolved)
-		{
-			this.resolveTypes(null, Package.rootPackage);
-		}
-		return super.isSubTypeOf(type);
-	}
-	
-	@Override
-	public IClassBody getBody()
-	{
-		if (!this.typesResolved)
-		{
-			this.resolveTypes(null, Package.rootPackage);
-		}
-		return this.body;
-	}
-	
-	@Override
-	public ITypeVariable getTypeVariable(int index)
-	{
-		if (!this.typesResolved)
-		{
-			this.resolveTypes(null, Package.rootPackage);
-		}
-		return super.getTypeVariable(index);
-	}
-	
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		this.typesResolved = true;
-		
+		this.genericsResolved = true;
 		if (this.genericCount > 0)
 		{
 			GenericType type = new GenericType(this);
@@ -81,44 +58,130 @@ public class BytecodeClass extends CodeClass
 			for (int i = 0; i < this.genericCount; i++)
 			{
 				ITypeVariable var = this.generics[i];
-				var.resolveTypes(markers, context);
+				var.resolveTypes(null, Package.rootPackage);
 				type.addType(new WildcardType(null, 0, var.getCaptureClass()));
 			}
 			
 			this.type = type;
 		}
-		
+	}
+	
+	private void resolveSuperTypes()
+	{
+		this.superTypesResolved = true;
 		if (this.superType != null)
 		{
-			this.superType = this.superType.resolve(markers, context);
+			this.superType = this.superType.resolve(null, Package.rootPackage);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i] = this.interfaces[i].resolve(markers, context);
+			this.interfaces[i] = this.interfaces[i].resolve(null, Package.rootPackage);
 		}
-		
+	}
+	
+	private void resolveAnnotations()
+	{
+		this.annotationsResolved = true;
 		for (int i = 0; i < this.annotationCount; i++)
 		{
-			this.annotations[i].resolveTypes(markers, context);
+			this.annotations[i].resolveTypes(null, Package.rootPackage);
 		}
-		
-		this.body.resolveTypes(markers, this);
+	}
+	
+	private void resolveInnerTypes()
+	{
+		this.innerTypesResolved = true;
 		
 		if (this.outerType != null)
 		{
-			this.outerClass = this.outerType.resolve(markers, context).getTheClass();
+			this.outerClass = this.outerType.resolve(null, Package.rootPackage).getTheClass();
+			this.outerType = null;
 		}
 		
 		if (this.innerTypes != null)
 		{
-			for (IType t : this.innerTypes)
+			for (ListIterator<IType> iterator = this.innerTypes.listIterator(); iterator.hasNext();)
 			{
-				IClass iclass = t.resolve(markers, context).getTheClass();
-				this.body.addClass(iclass);
+				IType t = iterator.next();
+				iterator.set(t.resolve(null, Package.rootPackage));
 			}
-			this.innerTypes = null;
 		}
+	}
+	
+	@Override
+	public IType getType()
+	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		return this.type;
+	}
+	
+	@Override
+	public IType getThisType()
+	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		return this.type;
+	}
+	
+	@Override
+	public IType getSuperType()
+	{
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		return this.superType;
+	}
+	
+	@Override
+	public IClass getOuterClass()
+	{
+		if (!this.innerTypesResolved)
+		{
+			this.resolveInnerTypes();
+		}
+		return super.getOuterClass();
+	}
+	
+	@Override
+	public boolean isSubTypeOf(IType type)
+	{
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		return super.isSubTypeOf(type);
+	}
+	
+	@Override
+	public ITypeVariable getTypeVariable(int index)
+	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		return super.getTypeVariable(index);
+	}
+	
+	@Override
+	public Annotation getAnnotation(IType type)
+	{
+		if (!this.annotationsResolved)
+		{
+			this.resolveAnnotations();
+		}
+		return super.getAnnotation(type);
+	}
+	
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
 	}
 	
 	@Override
@@ -132,6 +195,11 @@ public class BytecodeClass extends CodeClass
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void foldConstants()
 	{
 	}
@@ -139,9 +207,9 @@ public class BytecodeClass extends CodeClass
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		if (!this.typesResolved)
+		if (!this.genericsResolved)
 		{
-			this.resolveTypes(null, Package.rootPackage);
+			this.resolveGenerics();
 		}
 		
 		for (int i = 0; i < this.genericCount; i++)
@@ -153,10 +221,12 @@ public class BytecodeClass extends CodeClass
 			}
 		}
 		
-		IClass clazz = this.body.getClass(name);
-		if (clazz != null)
+		for (IType t : this.innerTypes)
 		{
-			return clazz;
+			if (t.getName() == name)
+			{
+				return t.getTheClass();
+			}
 		}
 		
 		return null;
@@ -165,11 +235,6 @@ public class BytecodeClass extends CodeClass
 	@Override
 	public FieldMatch resolveField(Name name)
 	{
-		if (!this.typesResolved)
-		{
-			this.resolveTypes(null, Package.rootPackage);
-		}
-		
 		// Own properties
 		IField field = this.body.getProperty(name);
 		if (field != null)
@@ -182,11 +247,6 @@ public class BytecodeClass extends CodeClass
 		if (field != null)
 		{
 			return new FieldMatch(field, 1);
-		}
-		
-		if (this.instanceField != null && "instance".equals(name))
-		{
-			return new FieldMatch(this.instanceField, 1);
 		}
 		
 		FieldMatch match;
@@ -206,11 +266,6 @@ public class BytecodeClass extends CodeClass
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		if (!this.typesResolved)
-		{
-			this.resolveTypes(null, Package.rootPackage);
-		}
-		
 		this.body.getMethodMatches(list, instance, name, arguments);
 		
 		if (!list.isEmpty())
@@ -231,11 +286,6 @@ public class BytecodeClass extends CodeClass
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
-		if (!this.typesResolved)
-		{
-			this.resolveTypes(null, Package.rootPackage);
-		}
-		
 		this.body.getConstructorMatches(list, arguments);
 	}
 	
@@ -247,7 +297,7 @@ public class BytecodeClass extends CodeClass
 			IProperty property = this.body.getProperty(name1);
 			if (property == null)
 			{
-				Property prop = new Property(this, name1, method.getType());
+				Property prop = new ExternalProperty(this, name1, method.getType());
 				prop.modifiers = method.getModifiers() & ~Modifiers.SYNTHETIC;
 				this.body.addProperty(prop);
 			}
@@ -329,7 +379,7 @@ public class BytecodeClass extends CodeClass
 	
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
-		Field field = new Field(this);
+		Field field = new ExternalField(this);
 		field.setName(Name.get(name));
 		field.setModifiers(access);
 		field.setType(ClassFormat.internalToType(desc));
@@ -370,7 +420,7 @@ public class BytecodeClass extends CodeClass
 		
 		if ("<init>".equals(name))
 		{
-			Constructor constructor = new Constructor(this);
+			Constructor constructor = new ExternalConstructor(this);
 			constructor.setModifiers(access);
 			
 			ClassFormat.readConstructorType(desc, constructor);
@@ -385,7 +435,7 @@ public class BytecodeClass extends CodeClass
 			return new SimpleMethodVisitor(constructor);
 		}
 		
-		Method method = new Method(this);
+		Method method = new ExternalMethod(this);
 		method.name = name1;
 		method.modifiers = access;
 		

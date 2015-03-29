@@ -93,7 +93,7 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
-	public final Annotation getAnnotation(int index)
+	public Annotation getAnnotation(int index)
 	{
 		if (this.annotations == null)
 		{
@@ -103,14 +103,15 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
-	public final Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IType type)
 	{
 		if (this.annotations == null)
 		{
 			return null;
 		}
-		for (Annotation a : this.annotations)
+		for (int i = 0; i < this.annotationCount; i++)
 		{
+			Annotation a = this.annotations[i];
 			if (a.type.equals(type))
 			{
 				return a;

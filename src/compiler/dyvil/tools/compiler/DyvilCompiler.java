@@ -32,7 +32,7 @@ public final class DyvilCompiler
 	public static final String				DYVIL_VERSION		= "1.0.0";
 	
 	public static boolean					parseStack;
-	public static boolean					logFile				= true;
+	public static String					logFile;
 	public static boolean					debug;
 	public static int						constantFolding;
 	
@@ -95,12 +95,16 @@ public final class DyvilCompiler
 				library.loadLibrary();
 			}
 			
+			long now1 = System.nanoTime();
+			now = now1 - now;
+			logger.fine("Loaded " + libs + (libs == 1 ? " Library " : " Libraries ") + "(" + Util.toTime(now) + ")");
+			
 			// Inits primitive data types
 			Package.init();
 			Type.init();
 			
-			now = System.nanoTime() - now;
-			logger.info("Loaded " + libs + (libs == 1 ? " Library " : " Libraries ") + "(" + Util.toTime(now) + ")");
+			now1 = System.nanoTime() - now1;
+			logger.fine("Loaded Base Types (" + Util.toTime(now1) + ")");
 		}
 		
 		now = System.nanoTime();
@@ -181,10 +185,9 @@ public final class DyvilCompiler
 			ch.setLevel(Level.ALL);
 			logger.addHandler(ch);
 			
-			if (logFile)
+			if (logFile != null)
 			{
-				String path = new File("dyvilc.log").getAbsolutePath();
-				FileHandler fh = new FileHandler(path, true);
+				FileHandler fh = new FileHandler(logFile, true);
 				fh.setLevel(Level.ALL);
 				fh.setFormatter(formatter);
 				logger.addHandler(fh);
@@ -244,11 +247,13 @@ public final class DyvilCompiler
 		case "--pstack":
 			parseStack = true;
 			return;
-		case "--nolog":
-			logFile = false;
-			return;
 		}
 		
+		if (s.startsWith("--logFile="))
+		{
+			logFile = s.substring(10);
+			return;
+		}
 		if (s.startsWith("-o"))
 		{
 			try

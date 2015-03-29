@@ -34,7 +34,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
-public final class Constructor extends Member implements IConstructor
+public class Constructor extends Member implements IConstructor
 {
 	protected IClass		theClass;
 	

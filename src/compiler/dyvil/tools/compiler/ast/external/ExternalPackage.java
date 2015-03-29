@@ -1,10 +1,10 @@
-package dyvil.tools.compiler.ast.structure;
+package dyvil.tools.compiler.ast.external;
 
 import java.io.InputStream;
 
-import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassReader;
 import dyvil.tools.compiler.library.Library;
 

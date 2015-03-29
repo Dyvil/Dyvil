@@ -6,8 +6,8 @@ import java.util.Map;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.FieldInitializer;
-import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.external.BytecodeClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;

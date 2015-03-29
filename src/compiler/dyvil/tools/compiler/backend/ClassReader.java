@@ -7,8 +7,8 @@ import org.objectweb.asm.*;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.classes.BytecodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.external.BytecodeClass;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
 
