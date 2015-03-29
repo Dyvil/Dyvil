@@ -189,7 +189,7 @@ public class Annotation extends ASTNode implements ITyped
 	private static void visitValue(AnnotationVisitor visitor, String key, IValue value)
 	{
 		int valueType = value.getValueType();
-		if (valueType == IValue.VALUE_LIST)
+		if (valueType == IValue.ARRAY)
 		{
 			AnnotationVisitor arrayVisitor = visitor.visitArray(key);
 			for (IValue v : (IValueList) value)

@@ -62,11 +62,10 @@ public final class ExpressionListParser extends Parser implements IValued
 		{
 			if (type == Tokens.COMMA)
 			{
-				this.valueList.setArray(true);
 				this.mode = EXPRESSION;
 				return;
 			}
-			if (type == Tokens.SEMICOLON)
+			if (type == Tokens.SEMICOLON && token.isInferred())
 			{
 				this.mode = EXPRESSION;
 				return;
@@ -77,7 +76,7 @@ public final class ExpressionListParser extends Parser implements IValued
 				pm.reparse();
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Expression List - ',' or ';' expected");
+			throw new SyntaxError(token, "Invalid Expression List - ',' expected");
 		}
 	}
 	

@@ -140,7 +140,7 @@ public final class SingleArgument implements IArguments, IValued
 		{
 			return;
 		}
-		this.value = this.value.withType(param.type);
+		this.value = this.value.withType(param.type.getConcreteType(context));
 	}
 	
 	@Override
@@ -151,7 +151,8 @@ public final class SingleArgument implements IArguments, IValued
 			return;
 		}
 		
-		IValue value1 = this.value.withType(param.type);
+		IType type = param.type.getConcreteType(context);
+		IValue value1 = this.value.withType(type);
 		if (value1 != null)
 		{
 			this.value = value1;
@@ -159,7 +160,7 @@ public final class SingleArgument implements IArguments, IValued
 			return;
 		}
 		
-		this.value = this.value.withType(param.type.getElementType());
+		this.value = this.value.withType(type.getElementType());
 	}
 	
 	@Override

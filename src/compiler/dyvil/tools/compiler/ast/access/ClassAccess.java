@@ -126,22 +126,6 @@ public class ClassAccess extends ASTNode implements IValue
 		return this;
 	}
 	
-	public MethodCall toMethodCall()
-	{
-		MethodCall call = new MethodCall(this.position);
-		call.name = this.type.getName();
-		call.dotless = true;
-		if (this.type.isGeneric())
-		{
-			// Copy generic Type arguments
-			GenericType generic = (GenericType) this.type;
-			call.generics = generic.generics;
-			call.genericCount = generic.genericCount;
-		}
-		call.arguments = EmptyArguments.INSTANCE;
-		return call;
-	}
-	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{

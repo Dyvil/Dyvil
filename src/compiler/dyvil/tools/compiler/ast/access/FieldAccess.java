@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -26,7 +27,7 @@ import dyvil.tools.compiler.transform.AccessResolver;
 public class FieldAccess extends ASTNode implements IAccess, INamed
 {
 	public IValue	instance;
-	public Name name;
+	public Name		name;
 	
 	public boolean	dotless;
 	
@@ -129,6 +130,23 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		if (this.instance == null)
+		{
+			if (this.resolve(context, markers))
+			{
+				return this;
+			}
+			
+			IValue v = this.resolve2(context);
+			if (v != null)
+			{
+				return v;
+			}
+			
+			this.addResolveError(markers);
+			return this;
+		}
+		
 		return AccessResolver.resolve(markers, context, this);
 	}
 	
@@ -266,6 +284,15 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 		if (method != null)
 		{
 			return this.toMethodCall(method);
+		}
+		
+		if (this.instance == null)
+		{
+			IClass iclass = context.resolveClass(this.name);
+			if (iclass != null)
+			{
+				return new ClassAccess(this.position, new Type(iclass));
+			}
 		}
 		
 		return null;

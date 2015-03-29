@@ -20,13 +20,4 @@ public interface IValueList extends Iterable<IValue>
 	public void addValue(int index, IValue value);
 	
 	public IValue getValue(int index);
-	
-	public default void setArray(boolean array)
-	{
-	}
-	
-	public default boolean isArray()
-	{
-		return false;
-	}
 }

@@ -48,7 +48,7 @@ public class ValueAnnotationVisitor extends AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		ValueList valueList = new ValueList(null, true);
+		ValueList valueList = new ValueList();
 		this.valued.setValue(valueList);
 		return new ArrayAnnotationVisitor(this.api, valueList);
 	}

@@ -136,12 +136,6 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 		}
 		if (this.mode == SEPARATOR)
 		{
-			if (type == Tokens.COMMA)
-			{
-				this.statementList.setArray(true);
-				this.mode = EXPRESSION;
-				return;
-			}
 			if (type == Tokens.SEMICOLON)
 			{
 				this.mode = EXPRESSION;
@@ -158,7 +152,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 				pm.reparse();
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Expression List - ',' or ';' expected");
+			throw new SyntaxError(token, "Invalid Expression List - ';' expected");
 		}
 	}
 	

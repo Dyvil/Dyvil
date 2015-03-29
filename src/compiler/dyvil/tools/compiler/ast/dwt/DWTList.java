@@ -8,7 +8,7 @@ public class DWTList extends ValueList
 {
 	public DWTList(ICodePosition position)
 	{
-		super(position, true);
+		super(position);
 	}
 	
 	@Override

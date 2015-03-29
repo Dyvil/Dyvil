@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.statement;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
+import dyvil.collections.ArrayIterator;
+import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.FieldInitializer;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
@@ -21,26 +21,36 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.ValueList;
+import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class StatementList extends ValueList implements IStatement, IContext
+public final class StatementList extends ASTNode implements IStatement, IValueList, IContext
 {
-	private IContext			context;
-	private IStatement			parent;
-	
+	protected IValue[]			values		= new IValue[3];
+	protected int				valueCount;
+	public Label[]				labels;
 	public Map<Name, Variable>	variables	= new HashMap();
 	
-	public Label[]				labels;
+	protected IType				requiredType;
+	protected IType				elementType;
+	
+	private IContext			context;
+	private IStatement			parent;
 	public boolean				topLevel;
 	
 	public StatementList(ICodePosition position)
 	{
-		super(position);
+		this.position = position;
+	}
+	
+	@Override
+	public int getValueType()
+	{
+		return STATEMENT_LIST;
 	}
 	
 	@Override
@@ -58,10 +68,6 @@ public final class StatementList extends ValueList implements IStatement, IConte
 	@Override
 	public boolean isPrimitive()
 	{
-		if (this.isArray)
-		{
-			return false;
-		}
 		return this.requiredType.isPrimitive();
 	}
 	
@@ -80,10 +86,6 @@ public final class StatementList extends ValueList implements IStatement, IConte
 			return this;
 		}
 		
-		if (type.isArrayType())
-		{
-			return new ValueList(this.position, this.values, this.valueCount, type, type.getElementType());
-		}
 		return null;
 	}
 	
@@ -100,10 +102,6 @@ public final class StatementList extends ValueList implements IStatement, IConte
 			return true;
 		}
 		
-		if (type.isArrayType())
-		{
-			return super.isType(type);
-		}
 		return false;
 	}
 	
@@ -124,11 +122,44 @@ public final class StatementList extends ValueList implements IStatement, IConte
 			}
 		}
 		
-		if (type.isArrayType())
-		{
-			return super.getTypeMatch(type);
-		}
 		return 0;
+	}
+	
+	@Override
+	public Iterator<IValue> iterator()
+	{
+		return new ArrayIterator(this.values);
+	}
+	
+	@Override
+	public int valueCount()
+	{
+		return this.valueCount;
+	}
+	
+	@Override
+	public boolean isEmpty()
+	{
+		return this.valueCount == 0;
+	}
+	
+	@Override
+	public void setValue(int index, IValue value)
+	{
+		this.values[index] = value;
+	}
+	
+	@Override
+	public void addValue(IValue value)
+	{
+		int index = this.valueCount++;
+		if (index >= this.values.length)
+		{
+			IValue[] temp = new IValue[this.valueCount];
+			System.arraycopy(this.values, 0, temp, 0, index);
+			this.values = temp;
+		}
+		this.values[index] = value;
 	}
 	
 	@Override
@@ -159,17 +190,22 @@ public final class StatementList extends ValueList implements IStatement, IConte
 	}
 	
 	@Override
+	public void addValue(int index, IValue value)
+	{
+		int i = this.valueCount++;
+		System.arraycopy(this.values, index, this.values, index + 1, i - index + 1);
+		this.values[index] = value;
+	}
+	
+	@Override
+	public IValue getValue(int index)
+	{
+		return this.values[index];
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.isArray)
-		{
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				this.values[i].resolveTypes(markers, context);
-			}
-			return;
-		}
-		
 		this.context = context;
 		for (int i = 0; i < this.valueCount; i++)
 		{
@@ -187,12 +223,6 @@ public final class StatementList extends ValueList implements IStatement, IConte
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.isArray)
-		{
-			// Convert this to a simpler ValueList for performance
-			return new ValueList(this.position, this.values, this.valueCount, this.requiredType, this.elementType).resolve(markers, context);
-		}
-		
 		this.context = context;
 		for (int i = 0; i < this.valueCount; i++)
 		{

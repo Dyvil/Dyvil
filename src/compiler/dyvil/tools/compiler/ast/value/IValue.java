@@ -32,7 +32,8 @@ public interface IValue extends IASTNode, ITyped
 	public static int	THIS				= 11;
 	public static int	SUPER				= 12;
 	
-	public static int	VALUE_LIST			= 13;
+	public static int	STATEMENT_LIST		= 13;
+	public static int	ARRAY				= 14;
 	
 	public static int	CLASS_ACCESS		= 16;
 	public static int	FIELD_ACCESS		= 17;
@@ -230,7 +231,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == int[].class)
 		{
-			ValueList valueList = new ValueList(null, true);
+			ValueList valueList = new ValueList(null);
 			for (int i : (int[]) o)
 			{
 				valueList.addValue(new IntValue(i));
@@ -239,7 +240,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == long[].class)
 		{
-			ValueList valueList = new ValueList(null, true);
+			ValueList valueList = new ValueList();
 			for (long l : (long[]) o)
 			{
 				valueList.addValue(new LongValue(l));
@@ -248,7 +249,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == float[].class)
 		{
-			ValueList valueList = new ValueList(null, true);
+			ValueList valueList = new ValueList();
 			for (float f : (float[]) o)
 			{
 				valueList.addValue(new FloatValue(f));
@@ -257,7 +258,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == double[].class)
 		{
-			ValueList valueList = new ValueList(null, true);
+			ValueList valueList = new ValueList();
 			for (double d : (double[]) o)
 			{
 				valueList.addValue(new DoubleValue(d));

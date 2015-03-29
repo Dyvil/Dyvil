@@ -357,8 +357,9 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
+	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
+		return instance;
 	}
 	
 	@Override

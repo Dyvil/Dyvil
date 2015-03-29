@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -18,40 +17,25 @@ import dyvil.tools.compiler.util.Util;
 
 public class ValueList extends ASTNode implements IValue, IValueList
 {
-	protected IValue[]	values;
+	protected IValue[]	values	= new IValue[3];
 	protected int		valueCount;
 	
-	protected boolean	isArray;
 	protected IType		requiredType;
 	protected IType		elementType;
+	
+	public ValueList()
+	{
+	}
 	
 	public ValueList(ICodePosition position)
 	{
 		this.position = position;
-		this.values = new IValue[3];
-	}
-	
-	public ValueList(ICodePosition position, boolean array)
-	{
-		this.position = position;
-		this.isArray = array;
-		this.values = new IValue[3];
-	}
-	
-	public ValueList(ICodePosition position, IValue[] values, int valueCount, IType type, IType elementType)
-	{
-		this.position = position;
-		this.isArray = true;
-		this.values = values;
-		this.valueCount = valueCount;
-		this.requiredType = type;
-		this.elementType = elementType;
 	}
 	
 	@Override
 	public int getValueType()
 	{
-		return VALUE_LIST;
+		return ARRAY;
 	}
 	
 	@Override
@@ -70,7 +54,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.isArray;
+		return false;
 	}
 	
 	private void generateTypes()
@@ -114,7 +98,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 		}
 		
 		this.generateTypes();
-		return this.isArray ? this.requiredType : this.elementType;
+		return this.requiredType;
 	}
 	
 	@Override
@@ -138,7 +122,6 @@ public class ValueList extends ASTNode implements IValue, IValueList
 			}
 		}
 		
-		this.isArray = true;
 		this.elementType = type1;
 		this.requiredType = type;
 		return this;
@@ -236,7 +219,7 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	public void addValue(IValue value)
 	{
 		int index = this.valueCount++;
-		if (this.valueCount > this.values.length)
+		if (index >= this.values.length)
 		{
 			IValue[] temp = new IValue[this.valueCount];
 			System.arraycopy(this.values, 0, temp, 0, index);
@@ -257,18 +240,6 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	public IValue getValue(int index)
 	{
 		return this.values[index];
-	}
-	
-	@Override
-	public void setArray(boolean array)
-	{
-		this.isArray = array;
-	}
-	
-	@Override
-	public boolean isArray()
-	{
-		return this.isArray;
 	}
 	
 	@Override
@@ -347,80 +318,41 @@ public class ValueList extends ASTNode implements IValue, IValueList
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		if (this.isArray)
-		{
-			IType type = this.elementType;
-			int opcode = type.getArrayStoreOpcode();
-			
-			writer.writeLDC(this.valueCount);
-			writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
-			
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				writer.writeInsn(Opcodes.DUP);
-				IValue value = this.values[i];
-				writer.writeLDC(i);
-				value.writeExpression(writer);
-				writer.writeInsn(opcode);
-			}
-			return;
-		}
+		IType type = this.elementType;
+		int opcode = type.getArrayStoreOpcode();
 		
-		DyvilCompiler.logger.warning("ValueList.writeExpression() - Not an Array");
+		writer.writeLDC(this.valueCount);
+		writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
+		
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			writer.writeInsn(Opcodes.DUP);
+			IValue value = this.values[i];
+			writer.writeLDC(i);
+			value.writeExpression(writer);
+			writer.writeInsn(opcode);
+		}
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		if (this.isArray)
-		{
-			this.writeExpression(writer);
-			return;
-		}
-		
-		DyvilCompiler.logger.warning("ValueList.writeStatement() - Not an Array");
+		this.writeExpression(writer);
+		writer.writeInsn(Opcodes.ARETURN);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.isArray)
+		if (this.valueCount == 0)
 		{
-			if (this.valueCount == 0)
-			{
-				buffer.append(Formatting.Expression.emptyArray);
-			}
-			else
-			{
-				buffer.append(Formatting.Expression.arrayStart);
-				Util.astToString(prefix, this.values, this.valueCount, Formatting.Expression.arraySeperator, buffer);
-				buffer.append(Formatting.Expression.arrayEnd);
-			}
+			buffer.append(Formatting.Expression.emptyArray);
 		}
 		else
 		{
-			if (this.valueCount == 0)
-			{
-				buffer.append(Formatting.Expression.emptyExpression);
-			}
-			else if (this.valueCount == 1)
-			{
-				buffer.append(Formatting.Expression.arrayStart);
-				this.values[0].toString("", buffer);
-				buffer.append(Formatting.Expression.arrayEnd);
-			}
-			else
-			{
-				buffer.append('{').append('\n');
-				String prefix1 = prefix + Formatting.Method.indent;
-				for (int i = 0; i < this.valueCount; i++)
-				{
-					buffer.append(prefix1);
-					this.values[i].toString(prefix1, buffer);
-					buffer.append(";\n");
-				}
-				buffer.append(prefix).append('}');
-			}
+			buffer.append(Formatting.Expression.arrayStart);
+			Util.astToString(prefix, this.values, this.valueCount, Formatting.Expression.arraySeperator, buffer);
+			buffer.append(Formatting.Expression.arrayEnd);
 		}
 	}
 }

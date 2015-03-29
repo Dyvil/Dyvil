@@ -97,6 +97,12 @@ public final class TypeParser extends Parser implements ITyped
 				this.mode = WILDCARD_TYPE;
 				return;
 			}
+			
+			if (ParserUtil.isTerminator(type))
+			{
+				pm.popParser(true);
+				return;
+			}
 			throw new SyntaxError(token, "Invalid Type - Invalid " + token);
 		}
 		if (this.isInMode(TUPLE_END))

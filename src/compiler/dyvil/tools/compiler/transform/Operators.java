@@ -135,7 +135,7 @@ public class Operators
 	
 	public static MatchExpression getMatchExpression(IValue arg1, IValue arg2)
 	{
-		if (arg2.getValueType() == IValue.VALUE_LIST)
+		if (arg2.getValueType() == IValue.ARRAY)
 		{
 			IValueList list = (IValueList) arg2;
 			int len = list.valueCount();

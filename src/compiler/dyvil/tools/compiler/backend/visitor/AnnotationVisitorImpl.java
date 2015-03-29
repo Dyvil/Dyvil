@@ -54,7 +54,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		ValueList valueList = new ValueList(null, true);
+		ValueList valueList = new ValueList();
 		this.arguments.addValue(Name.getQualified(key), valueList);
 		return new ArrayAnnotationVisitor(this.api, valueList);
 	}

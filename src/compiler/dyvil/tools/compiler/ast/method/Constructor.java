@@ -228,7 +228,7 @@ public final class Constructor extends Member implements IConstructor
 	
 	private void resolveSuperConstructors(MarkerList markers, IContext context)
 	{
-		if (this.value.getValueType() != IValue.VALUE_LIST)
+		if (this.value.getValueType() != IValue.ARRAY)
 		{
 			markers.add(this.position, "constructor.expression");
 		}
