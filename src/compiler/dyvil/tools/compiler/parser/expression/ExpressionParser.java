@@ -6,7 +6,10 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -806,8 +809,14 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = statement;
 			return true;
 		}
-		case Keywords.SYNCHRONIZED: // TODO Synchronized Blocks
+		case Keywords.SYNCHRONIZED:
+		{
+			SyncStatement statement = new SyncStatement(token.raw());
+			pm.pushParser(new SyncStatementParser(statement));
+			this.mode = 0;
+			this.value = statement;
 			return true;
+		}
 		default:
 			return false;
 		}

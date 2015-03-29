@@ -30,12 +30,13 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class StatementList extends ValueList implements IStatement, IContext
 {
-	private IContext				context;
-	private IStatement				parent;
+	private IContext			context;
+	private IStatement			parent;
 	
 	public Map<Name, Variable>	variables	= new HashMap();
 	
-	public Label[]					labels;
+	public Label[]				labels;
+	public boolean				topLevel;
 	
 	public StatementList(ICodePosition position)
 	{
@@ -468,7 +469,7 @@ public final class StatementList extends ValueList implements IStatement, IConte
 			}
 		}
 		
-		if (!(this.context instanceof IMethod))
+		if (!this.topLevel)
 		{
 			writer.resetLocals(count);
 		}

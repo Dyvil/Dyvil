@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser.statement;
 
-import dyvil.tools.compiler.ast.statement.WhileStatement;
+import dyvil.tools.compiler.ast.statement.SyncStatement;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -11,24 +11,24 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class WhileStatementParser extends Parser implements IValued
+public class SyncStatementParser extends Parser implements IValued
 {
-	public static final int		CONDITION		= 1;
-	public static final int		CONDITION_END	= 2;
-	public static final int		BLOCK			= 4;
+	public static final int		LOCK		= 1;
+	public static final int		LOCK_END	= 2;
+	public static final int		THEN			= 4;
 	
-	protected WhileStatement	statement;
+	protected SyncStatement	statement;
 	
-	public WhileStatementParser(WhileStatement statement)
+	public SyncStatementParser(SyncStatement statement)
 	{
 		this.statement = statement;
-		this.mode = CONDITION;
+		this.mode = LOCK;
 	}
 	
 	@Override
 	public void reset()
 	{
-		this.mode = CONDITION;
+		this.mode = LOCK;
 	}
 	
 	@Override
@@ -41,26 +41,26 @@ public final class WhileStatementParser extends Parser implements IValued
 		}
 		
 		int type = token.type();
-		if (this.mode == CONDITION)
+		if (this.mode == LOCK)
 		{
-			this.mode = CONDITION_END;
+			this.mode = LOCK_END;
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ExpressionParser(this));
 				return;
 			}
-			throw new SyntaxError(token, "Invalid While Statement - '(' expected", true);
+			throw new SyntaxError(token, "Invalid Synchronized Block - '(' expected", true);
 		}
-		if (this.mode == CONDITION_END)
+		if (this.mode == LOCK_END)
 		{
-			this.mode = BLOCK;
+			this.mode = THEN;
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid While Statement - ')' expected", true);
+			throw new SyntaxError(token, "Invalid Synchronized Block - ')' expected", true);
 		}
-		if (this.mode == BLOCK)
+		if (this.mode == THEN)
 		{
 			if (ParserUtil.isTerminator(type) && !token.isInferred())
 			{
@@ -77,13 +77,13 @@ public final class WhileStatementParser extends Parser implements IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == CONDITION_END)
+		if (this.mode == LOCK_END)
 		{
-			this.statement.condition = value;
+			this.statement.lock = value;
 		}
 		else if (this.mode == -1)
 		{
-			this.statement.action = value;
+			this.statement.block = value;
 		}
 	}
 	

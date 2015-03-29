@@ -568,6 +568,13 @@ public final class MethodWriterImpl implements MethodWriter
 			this.pop();
 			return;
 		}
+		case MONITORENTER:
+		case MONITOREXIT:
+		{
+			this.pop();
+			this.visitFrame = true;
+			return;
+		}
 		case ICONST_0:
 		case ICONST_1:
 		case ICONST_2:
@@ -597,11 +604,11 @@ public final class MethodWriterImpl implements MethodWriter
 			this.set(INT);
 			return;
 		case RETURN:
-			this.clear();
+			this.pop();
 			this.hasReturn = true;
 			return;
 		case ATHROW:
-			this.clear();
+			this.pop();
 			this.visitFrame = true;
 			return;
 		case BALOAD:
@@ -1122,6 +1129,10 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		
 		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
+		if (opcode != INVOKESTATIC)
+		{
+			this.pop();
+		}
 		this.pop(args);
 		if (returnType != null)
 		{

@@ -24,6 +24,7 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.Parameter;
+import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
@@ -886,6 +887,11 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
+			if (this.value instanceof StatementList)
+			{
+				((StatementList) this.value).topLevel = true;
+			}
+			
 			mw.begin();
 			mw.writeLabel(start);
 			if (this.type == Type.VOID)

@@ -82,6 +82,9 @@ public class Formatting
 		public static String	whileStart			= "while (";
 		public static String	whileEnd			= ")";
 		
+		public static String	syncStart			= "synchronized (";
+		public static String	syncEnd				= ")";
+		
 		public static String	doStart				= "do";
 		public static String	doWhile				= "while (";
 		public static String	doEnd				= ")";
