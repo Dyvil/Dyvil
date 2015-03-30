@@ -80,7 +80,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (this.mode == 0 || type == Tokens.SEMICOLON || type == Tokens.COMMA)
+		if (this.mode == 0 || type == Symbols.SEMICOLON || type == Symbols.COMMA)
 		{
 			if (this.value != null)
 			{
@@ -175,7 +175,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.mode == PATTERN_END)
 		{
-			if (type == Tokens.COLON)
+			if (type == Symbols.COLON)
 			{
 				this.field.setValue(this.value);
 				pm.popParser();
@@ -187,7 +187,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			throw new SyntaxError(token, "Invalid Pattern - ':' expected");
 		}
-		if (type == Tokens.COLON)
+		if (type == Symbols.COLON)
 		{
 			if (this.value != null)
 			{
@@ -202,7 +202,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value.expandPosition(token);
 			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
-				if (token.next().type() == Tokens.DOT)
+				if (token.next().type() == Symbols.DOT)
 				{
 					this.mode = ACCESS_2;
 					this.dotless = false;
@@ -221,7 +221,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value.expandPosition(token);
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
-				if (token.next().type() == Tokens.DOT)
+				if (token.next().type() == Symbols.DOT)
 				{
 					this.mode = ACCESS_2;
 					this.dotless = false;
@@ -319,7 +319,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(LAMBDA))
 		{
-			if (type == Tokens.ARROW_OPERATOR)
+			if (type == Symbols.ARROW_OPERATOR)
 			{
 				LambdaValue lv = getLambdaValue(this.value);
 				if (lv != null)
@@ -336,13 +336,13 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.isInMode(ACCESS))
 		{
-			if (type == Tokens.DOT)
+			if (type == Symbols.DOT)
 			{
 				this.mode = ACCESS_2;
 				this.dotless = false;
 				return;
 			}
-			if (type == Tokens.HASH)
+			if (type == Symbols.HASH)
 			{
 				this.mode = FUNCTION_POINTER;
 				return;
@@ -357,7 +357,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				pm.popParser(true);
 				return;
 			}
-			if (type == Tokens.EQUALS)
+			if (type == Symbols.EQUALS)
 			{
 				this.getAssign(pm, token);
 				return;
@@ -482,7 +482,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			return EmptyArguments.VISIBLE;
 		}
-		if (ParserUtil.isIdentifier(type) && next.next().type() == Tokens.COLON)
+		if (ParserUtil.isIdentifier(type) && next.next().type() == Symbols.COLON)
 		{
 			ArgumentMap map = new ArgumentMap();
 			pm.pushParser(new ExpressionMapParser(map));
@@ -675,7 +675,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	{
 		switch (type)
 		{
-		case Tokens.WILDCARD:
+		case Symbols.WILDCARD:
 			return true;
 		case Keywords.NULL:
 			this.value = new NullValue(token.raw());

@@ -264,14 +264,14 @@ public class BytecodeVisitor extends MethodVisitor
 	{
 		if (this.method.hasModifier(Modifiers.STATIC))
 		{
-			if (index != 0 && index <= this.method.parameterCount())
+			if (index < this.method.parameterCount())
 			{
-				this.method.getParameter(index - 1).setName(Name.getQualified(name));
+				this.method.getParameter(index).setName(Name.getQualified(name));
 			}
 		}
-		else if (index < this.method.parameterCount())
+		else if (index != 0 && index <= this.method.parameterCount())
 		{
-			this.method.getParameter(index).setName(Name.getQualified(name));
+			this.method.getParameter(index - 1).setName(Name.getQualified(name));
 		}
 	}
 	

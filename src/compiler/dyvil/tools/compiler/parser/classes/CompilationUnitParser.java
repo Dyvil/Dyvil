@@ -11,7 +11,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
 import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.Symbols;
 
 public class CompilationUnitParser extends Parser
 {
@@ -71,7 +71,7 @@ public class CompilationUnitParser extends Parser
 		}
 		if (this.isInMode(CLASS))
 		{
-			if (token.type() == Tokens.SEMICOLON)
+			if (token.type() == Symbols.SEMICOLON)
 			{
 				return;
 			}

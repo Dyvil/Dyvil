@@ -83,18 +83,18 @@ public class ParserUtil
 	
 	public static boolean isTerminator(int type)
 	{
-		return type == Tokens.COMMA || type == Tokens.SEMICOLON || (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET;
+		return type == Symbols.COMMA || type == Symbols.SEMICOLON || (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET;
 	}
 	
 	public static boolean isTerminator2(int type)
 	{
-		return type == Tokens.DOT || type == Tokens.COMMA || type == Tokens.SEMICOLON || type == Tokens.EQUALS
+		return type == Symbols.DOT || type == Symbols.COMMA || type == Symbols.SEMICOLON || type == Symbols.EQUALS
 				|| (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET;
 	}
 	
 	public static boolean isSeperator(int type)
 	{
-		return type == Tokens.COMMA || type == Tokens.SEMICOLON;
+		return type == Symbols.COMMA || type == Symbols.SEMICOLON;
 	}
 	
 	public static IValue parsePrimitive(IToken token, int type) throws SyntaxError

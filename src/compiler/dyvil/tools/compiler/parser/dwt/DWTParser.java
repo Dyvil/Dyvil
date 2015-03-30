@@ -9,7 +9,6 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public class DWTParser extends Parser implements IValued
@@ -79,7 +78,7 @@ public class DWTParser extends Parser implements IValued
 		}
 		if (this.mode == EQUALS)
 		{
-			if (type == Tokens.EQUALS || type == Tokens.COLON)
+			if (type == Symbols.EQUALS || type == Symbols.COLON)
 			{
 				pm.pushParser(new DWTValueParser(this));
 				return;

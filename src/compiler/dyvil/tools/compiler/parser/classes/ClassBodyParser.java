@@ -28,7 +28,6 @@ import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -85,7 +84,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 		
 		if (this.isInMode(TYPE))
 		{
-			if (type == Tokens.SEMICOLON)
+			if (type == Symbols.SEMICOLON)
 			{
 				if (token.isInferred())
 				{
@@ -150,7 +149,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			
 			IToken next = token.next();
 			type = next.type();
-			if (type == Tokens.SEMICOLON)
+			if (type == Symbols.SEMICOLON)
 			{
 				Field f = new Field(this.theClass, token.nameValue(), this.type);
 				f.position = token.raw();
@@ -187,7 +186,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 				this.reset();
 				return;
 			}
-			if (type == Tokens.EQUALS)
+			if (type == Symbols.EQUALS)
 			{
 				Field f = new Field(this.theClass, token.nameValue(), this.type);
 				f.position = token.raw();
@@ -246,7 +245,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 		}
 		if (this.isInMode(METHOD_END))
 		{
-			if (type == Tokens.SEMICOLON)
+			if (type == Symbols.SEMICOLON)
 			{
 				this.reset();
 				return;
@@ -256,7 +255,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 				pm.pushParser(new ExpressionParser(this.method), true);
 				return;
 			}
-			if (type == Tokens.EQUALS)
+			if (type == Symbols.EQUALS)
 			{
 				pm.pushParser(new ExpressionParser(this.method));
 				return;

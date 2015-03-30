@@ -8,7 +8,6 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public class ImportParser extends Parser
@@ -39,12 +38,12 @@ public class ImportParser extends Parser
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (type == Tokens.SEMICOLON)
+		if (type == Symbols.SEMICOLON)
 		{
 			pm.popParser();
 			return;
 		}
-		if (type == Tokens.COMMA)
+		if (type == Symbols.COMMA)
 		{
 			pm.popParser(true);
 			return;
@@ -69,7 +68,7 @@ public class ImportParser extends Parser
 				pm.skip();
 				return;
 			}
-			if (type == Tokens.WILDCARD)
+			if (type == Symbols.WILDCARD)
 			{
 				PackageImport pi = new PackageImport(token.raw(), this.parent);
 				this.container.addImport(pi);
@@ -97,7 +96,7 @@ public class ImportParser extends Parser
 		}
 		if (this.isInMode(DOT))
 		{
-			if (type == Tokens.DOT)
+			if (type == Symbols.DOT)
 			{
 				this.mode = IMPORT;
 				return;
@@ -105,7 +104,7 @@ public class ImportParser extends Parser
 		}
 		if (this.isInMode(ALIAS))
 		{
-			if (type == Tokens.ARROW_OPERATOR)
+			if (type == Symbols.ARROW_OPERATOR)
 			{
 				IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()))

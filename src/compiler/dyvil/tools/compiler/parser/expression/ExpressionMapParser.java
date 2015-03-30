@@ -8,7 +8,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public class ExpressionMapParser extends Parser implements IValued
@@ -47,7 +47,7 @@ public class ExpressionMapParser extends Parser implements IValued
 		if (this.mode == NAME)
 		{
 			this.mode = VALUE;
-			if (ParserUtil.isIdentifier(type) && token.next().type() == Tokens.COLON)
+			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.COLON)
 			{
 				this.key = token.nameValue();
 				pm.skip();
@@ -64,7 +64,7 @@ public class ExpressionMapParser extends Parser implements IValued
 		}
 		if (this.mode == SEPERATOR)
 		{
-			if (type == Tokens.COMMA)
+			if (type == Symbols.COMMA)
 			{
 				this.mode = NAME;
 				return;

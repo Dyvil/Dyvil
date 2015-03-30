@@ -8,7 +8,6 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public class ConfigParser extends Parser
@@ -51,7 +50,7 @@ public class ConfigParser extends Parser
 		}
 		if (this.mode == EQUALS)
 		{
-			if (type == Tokens.EQUALS)
+			if (type == Symbols.EQUALS)
 			{
 				this.mode = VALUE;
 				return;

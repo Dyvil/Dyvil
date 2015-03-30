@@ -45,6 +45,15 @@ public final class Symbols
 	public static final int					OPEN_CURLY_BRACKET		= CURLY | OPEN;
 	public static final int					CLOSE_CURLY_BRACKET		= CURLY | CLOSE;
 	
+	public static final int					DOT						= Tokens.SYMBOL | 0x00010000;
+	public static final int					COLON					= Tokens.SYMBOL | 0x00020000;
+	public static final int					SEMICOLON				= Tokens.SYMBOL | 0x00030000;
+	public static final int					COMMA					= Tokens.SYMBOL | 0x00040000;
+	public static final int					EQUALS					= Tokens.SYMBOL | 0x00050000;
+	public static final int					HASH					= Tokens.SYMBOL | 0x00060000;
+	public static final int					WILDCARD				= Tokens.SYMBOL | 0x00070000;
+	public static final int					ARROW_OPERATOR			= Tokens.SYMBOL | 0x00080000;
+	
 	private static void addReplacement(char symbol, String replacement)
 	{
 		Character c = symbol;
@@ -141,15 +150,15 @@ public final class Symbols
 		switch (s)
 		{
 		case "_":
-			return Tokens.WILDCARD;
+			return Symbols.WILDCARD;
 		case ":":
-			return Tokens.COLON;
+			return Symbols.COLON;
 		case "=":
-			return Tokens.EQUALS;
+			return Symbols.EQUALS;
 		case "#":
-			return Tokens.HASH;
+			return Symbols.HASH;
 		case "=>":
-			return Tokens.ARROW_OPERATOR;
+			return Symbols.ARROW_OPERATOR;
 		}
 		return 0;
 	}
@@ -158,21 +167,21 @@ public final class Symbols
 	{
 		switch (type)
 		{
-		case Tokens.DOT:
+		case Symbols.DOT:
 			return ".";
-		case Tokens.COLON:
+		case Symbols.COLON:
 			return ":";
-		case Tokens.SEMICOLON:
+		case Symbols.SEMICOLON:
 			return ";";
-		case Tokens.COMMA:
+		case Symbols.COMMA:
 			return ",";
-		case Tokens.WILDCARD:
+		case Symbols.WILDCARD:
 			return "_";
-		case Tokens.EQUALS:
+		case Symbols.EQUALS:
 			return "=";
-		case Tokens.HASH:
+		case Symbols.HASH:
 			return "#";
-		case Tokens.ARROW_OPERATOR:
+		case Symbols.ARROW_OPERATOR:
 			return "=>";
 		case Symbols.OPEN_PARENTHESIS:
 			return "(";

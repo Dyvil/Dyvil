@@ -4,7 +4,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 
 public final class SymbolToken implements IToken
 {
@@ -49,7 +48,7 @@ public final class SymbolToken implements IToken
 	@Override
 	public int endIndex()
 	{
-		return this.type == Tokens.ARROW_OPERATOR ? this.start + 2 : this.start + 1;
+		return this.type == Symbols.ARROW_OPERATOR ? this.start + 2 : this.start + 1;
 	}
 	
 	@Override

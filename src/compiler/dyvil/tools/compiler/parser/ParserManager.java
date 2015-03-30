@@ -10,7 +10,7 @@ import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class ParserManager implements IParserManager
+public final class ParserManager implements IParserManager
 {
 	protected Parser		parser;
 	
@@ -163,7 +163,12 @@ public class ParserManager implements IParserManager
 		}
 		
 		int type = token.type();
-		if (type != Symbols.OPEN_SQUARE_BRACKET && (type & (Tokens.SYMBOL | Tokens.KEYWORD | Tokens.IDENTIFIER)) == 0)
+		if ((type & (Tokens.SYMBOL | Tokens.KEYWORD | Tokens.IDENTIFIER | Tokens.BRACKET)) == 0)
+		{
+			return true;
+		}
+		
+		if (type == Symbols.OPEN_CURLY_BRACKET)
 		{
 			return true;
 		}

@@ -8,7 +8,6 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class TypeListParser extends Parser implements ITyped
@@ -35,7 +34,7 @@ public final class TypeListParser extends Parser implements ITyped
 			pm.popParser(true);
 			return;
 		}
-		if (type == Tokens.SEMICOLON && token.isInferred())
+		if (type == Symbols.SEMICOLON && token.isInferred())
 		{
 			pm.popParser(true);
 			return;

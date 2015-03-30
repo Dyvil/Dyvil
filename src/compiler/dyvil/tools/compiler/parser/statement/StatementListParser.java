@@ -16,7 +16,6 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class StatementListParser extends Parser implements IValued, ITyped, IParserManager
@@ -67,7 +66,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 		
 		if (this.mode == EXPRESSION)
 		{
-			if (ParserUtil.isIdentifier(type) && token.next().type() == Tokens.COLON)
+			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.COLON)
 			{
 				this.label = token.nameValue();
 				pm.skip();
@@ -81,7 +80,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 		}
 		if (this.mode == TYPE)
 		{
-			if (ParserUtil.isIdentifier(type) && token.next().type() == Tokens.EQUALS)
+			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.EQUALS)
 			{
 				if (this.type == null)
 				{
@@ -115,7 +114,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 				return;
 			}
 			
-			if (type == Tokens.SEMICOLON && token.isInferred())
+			if (type == Symbols.SEMICOLON && token.isInferred())
 			{
 				return;
 			}
@@ -136,7 +135,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 		}
 		if (this.mode == SEPARATOR)
 		{
-			if (type == Tokens.SEMICOLON)
+			if (type == Symbols.SEMICOLON)
 			{
 				this.mode = EXPRESSION;
 				return;

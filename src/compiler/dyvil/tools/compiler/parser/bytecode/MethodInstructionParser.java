@@ -8,7 +8,6 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class MethodInstructionParser extends Parser implements IInternalTyped
@@ -37,7 +36,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (type == Tokens.SEMICOLON)
+		if (type == Symbols.SEMICOLON)
 		{
 			pm.popParser(true);
 			return;
@@ -56,7 +55,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		}
 		if (this.mode == DOT)
 		{
-			if (type != Tokens.DOT)
+			if (type != Symbols.DOT)
 			{
 				throw new SyntaxError(token, "Invalid Field Instruction - '.' expected");
 			}
@@ -83,7 +82,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		}
 		if (this.mode == PARAMETERS_END)
 		{
-			if (type == Tokens.COMMA)
+			if (type == Symbols.COMMA)
 			{
 				pm.pushParser(new InternalTypeParser(this));
 				return;
@@ -97,7 +96,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		}
 		if (this.mode == COLON)
 		{
-			if (type != Tokens.COLON)
+			if (type != Symbols.COLON)
 			{
 				throw new SyntaxError(token, "Invalid Field Instruction - ':' expected");
 			}

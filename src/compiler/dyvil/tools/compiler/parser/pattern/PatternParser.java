@@ -36,7 +36,7 @@ public class PatternParser extends Parser
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (this.mode == 0 || type == Tokens.COLON)
+		if (this.mode == 0 || type == Symbols.COLON)
 		{
 			pm.popParser(true);
 			return;
@@ -47,7 +47,7 @@ public class PatternParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				int nextType = token.next().type();
-				if (nextType == Tokens.EQUALS)
+				if (nextType == Symbols.EQUALS)
 				{
 					BindingPattern bp = new BindingPattern(token.raw(), token.nameValue());
 					this.patterned.setPattern(bp);
@@ -117,7 +117,7 @@ public class PatternParser extends Parser
 			return new BooleanPattern(token.raw(), true);
 		case Keywords.FALSE:
 			return new BooleanPattern(token.raw(), false);
-		case Tokens.WILDCARD:
+		case Symbols.WILDCARD:
 			return new WildcardPattern(token.raw());
 		case Keywords.NULL:
 			return new NullPattern(token.raw());

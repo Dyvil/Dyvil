@@ -378,11 +378,11 @@ public class Dlex
 			{
 				return IDENTIFIER | MOD_DOTS;
 			}
-			return DOT;
+			return Symbols.DOT;
 		case ';':
-			return SEMICOLON;
+			return Symbols.SEMICOLON;
 		case ',':
-			return COMMA;
+			return Symbols.COMMA;
 		}
 		if (isDigit(c))
 		{
@@ -455,14 +455,14 @@ public class Dlex
 			return new SymbolToken(prev, i, line, start);
 		}
 		case SYMBOL:
-		case DOT:
-		case COLON:
-		case SEMICOLON:
-		case COMMA:
-		case EQUALS:
-		case HASH:
-		case WILDCARD:
-		case ARROW_OPERATOR:
+		case Symbols.DOT:
+		case Symbols.COLON:
+		case Symbols.SEMICOLON:
+		case Symbols.COMMA:
+		case Symbols.EQUALS:
+		case Symbols.HASH:
+		case Symbols.WILDCARD:
+		case Symbols.ARROW_OPERATOR:
 			/* Brackets */
 		case Symbols.OPEN_BRACKET:
 		case Symbols.CLOSE_BRACKET:

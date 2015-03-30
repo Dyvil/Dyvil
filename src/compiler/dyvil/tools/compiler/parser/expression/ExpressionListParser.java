@@ -10,7 +10,6 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ExpressionListParser extends Parser implements IValued
@@ -47,7 +46,7 @@ public final class ExpressionListParser extends Parser implements IValued
 		
 		if (this.mode == EXPRESSION)
 		{
-			if (ParserUtil.isIdentifier(type) && token.next().type() == Tokens.COLON)
+			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.COLON)
 			{
 				this.label = token.nameValue();
 				pm.skip();
@@ -60,12 +59,12 @@ public final class ExpressionListParser extends Parser implements IValued
 		}
 		if (this.mode == SEPARATOR)
 		{
-			if (type == Tokens.COMMA)
+			if (type == Symbols.COMMA)
 			{
 				this.mode = EXPRESSION;
 				return;
 			}
-			if (type == Tokens.SEMICOLON && token.isInferred())
+			if (type == Symbols.SEMICOLON && token.isInferred())
 			{
 				this.mode = EXPRESSION;
 				return;

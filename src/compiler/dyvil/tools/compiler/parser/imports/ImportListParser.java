@@ -7,7 +7,6 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 
 public class ImportListParser extends Parser
 {
@@ -30,7 +29,7 @@ public class ImportListParser extends Parser
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (type == Symbols.CLOSE_CURLY_BRACKET || type == Tokens.SEMICOLON)
+		if (type == Symbols.CLOSE_CURLY_BRACKET || type == Symbols.SEMICOLON)
 		{
 			pm.popParser(true);
 			return;
@@ -45,7 +44,7 @@ public class ImportListParser extends Parser
 		if (this.mode == 1)
 		{
 			this.mode = 0;
-			if (type == Tokens.COMMA)
+			if (type == Symbols.COMMA)
 			{
 				return;
 			}

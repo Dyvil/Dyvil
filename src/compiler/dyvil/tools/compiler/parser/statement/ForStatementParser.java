@@ -10,7 +10,6 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public class ForStatementParser extends Parser implements IValued
@@ -54,7 +53,7 @@ public class ForStatementParser extends Parser implements IValued
 		}
 		if (this.mode == TYPE)
 		{
-			if (type == Tokens.SEMICOLON)
+			if (type == Symbols.SEMICOLON)
 			{
 				// Condition
 				pm.pushParser(new ExpressionParser(this));
@@ -79,7 +78,7 @@ public class ForStatementParser extends Parser implements IValued
 		}
 		if (this.mode == SEPERATOR)
 		{
-			if (type == Tokens.COLON)
+			if (type == Symbols.COLON)
 			{
 				this.mode = FOR_END;
 				this.forStatement.type = 3;
@@ -87,7 +86,7 @@ public class ForStatementParser extends Parser implements IValued
 				return;
 			}
 			this.mode = VARIABLE_END;
-			if (type == Tokens.EQUALS)
+			if (type == Symbols.EQUALS)
 			{
 				pm.pushParser(new ExpressionParser(this));
 				return;
@@ -97,9 +96,9 @@ public class ForStatementParser extends Parser implements IValued
 		if (this.mode == VARIABLE_END)
 		{
 			this.mode = CONDITION_END;
-			if (type == Tokens.SEMICOLON)
+			if (type == Symbols.SEMICOLON)
 			{
-				if (token.next().type() == Tokens.SEMICOLON)
+				if (token.next().type() == Symbols.SEMICOLON)
 				{
 					return;
 				}
@@ -112,9 +111,9 @@ public class ForStatementParser extends Parser implements IValued
 		if (this.mode == CONDITION_END)
 		{
 			this.mode = FOR_END;
-			if (type == Tokens.SEMICOLON)
+			if (type == Symbols.SEMICOLON)
 			{
-				if (token.next().type() == Tokens.SEMICOLON)
+				if (token.next().type() == Symbols.SEMICOLON)
 				{
 					return;
 				}

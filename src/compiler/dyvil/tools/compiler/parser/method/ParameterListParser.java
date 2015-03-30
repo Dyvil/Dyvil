@@ -20,7 +20,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -120,13 +120,13 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 				pm.popParser(true);
 				return;
 			}
-			if (type == Tokens.EQUALS)
+			if (type == Symbols.EQUALS)
 			{
 				pm.pushParser(new ExpressionParser(this.parameter));
 				return;
 			}
 			this.reset();
-			if (type == Tokens.COMMA)
+			if (type == Symbols.COMMA)
 			{
 				return;
 			}

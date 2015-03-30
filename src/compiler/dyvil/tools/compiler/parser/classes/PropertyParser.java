@@ -11,7 +11,6 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 
 public class PropertyParser extends Parser implements IValued
 {
@@ -37,7 +36,7 @@ public class PropertyParser extends Parser implements IValued
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (type == Tokens.SEMICOLON)
+		if (type == Symbols.SEMICOLON)
 		{
 			this.mode = 0;
 			return;
@@ -64,7 +63,7 @@ public class PropertyParser extends Parser implements IValued
 		}
 		if (this.mode > 0) // SET or GET
 		{
-			if (type == Tokens.COLON)
+			if (type == Symbols.COLON)
 			{
 				pm.pushParser(new ExpressionParser(this));
 				return;

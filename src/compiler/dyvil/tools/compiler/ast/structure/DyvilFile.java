@@ -204,7 +204,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 		
 		for (IClass i : this.classes)
 		{
-			i.resolveTypes(this.markers, Package.rootPackage);
+			i.resolveTypes(this.markers, this);
 		}
 	}
 	

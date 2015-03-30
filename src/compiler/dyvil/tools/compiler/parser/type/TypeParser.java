@@ -9,7 +9,6 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class TypeParser extends Parser implements ITyped
@@ -70,7 +69,7 @@ public final class TypeParser extends Parser implements ITyped
 				this.arrayDimensions2++;
 				return;
 			}
-			if (type == Tokens.ARROW_OPERATOR)
+			if (type == Symbols.ARROW_OPERATOR)
 			{
 				LambdaType lt = new LambdaType();
 				this.type = lt;
@@ -91,7 +90,7 @@ public final class TypeParser extends Parser implements ITyped
 				this.mode = ARRAY_END;
 				return;
 			}
-			if (type == Tokens.WILDCARD)
+			if (type == Symbols.WILDCARD)
 			{
 				this.type = new WildcardType(token.raw());
 				this.mode = WILDCARD_TYPE;
@@ -111,7 +110,7 @@ public final class TypeParser extends Parser implements ITyped
 			pm.popParser();
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
-				if (token.next().type() == Tokens.ARROW_OPERATOR)
+				if (token.next().type() == Symbols.ARROW_OPERATOR)
 				{
 					TupleType tupleType = (TupleType) this.type;
 					this.type = new LambdaType(tupleType);

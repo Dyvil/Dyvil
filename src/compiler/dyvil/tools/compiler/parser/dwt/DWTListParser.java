@@ -8,7 +8,6 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 
 public class DWTListParser extends Parser implements IValued
 {
@@ -42,7 +41,7 @@ public class DWTListParser extends Parser implements IValued
 		}
 		if (this.mode == 1)
 		{
-			if (type == Tokens.COMMA)
+			if (type == Symbols.COMMA)
 			{
 				this.mode = 0;
 				return;

@@ -38,7 +38,7 @@ public final class BytecodeParser extends Parser
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (type == Tokens.SEMICOLON)
+		if (type == Symbols.SEMICOLON)
 		{
 			return;
 		}
@@ -66,7 +66,7 @@ public final class BytecodeParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				if (token.next().type() == Tokens.COLON)
+				if (token.next().type() == Symbols.COLON)
 				{
 					pm.skip();
 					this.label = name;

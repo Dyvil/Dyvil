@@ -5,7 +5,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public class PackageParser extends Parser
@@ -29,14 +29,14 @@ public class PackageParser extends Parser
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (type == Tokens.SEMICOLON)
+		if (type == Symbols.SEMICOLON)
 		{
 			this.packageDeclaration.setPackage(this.buffer.toString());
 			
 			pm.popParser();
 			return;
 		}
-		if (type == Tokens.DOT)
+		if (type == Symbols.DOT)
 		{
 			this.buffer.append('.');
 			return;

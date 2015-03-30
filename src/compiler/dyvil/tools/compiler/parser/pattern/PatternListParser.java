@@ -7,7 +7,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class PatternListParser extends Parser implements IPatterned
@@ -47,7 +47,7 @@ public final class PatternListParser extends Parser implements IPatterned
 				return;
 			}
 			this.mode = 0;
-			if (type == Tokens.COMMA)
+			if (type == Symbols.COMMA)
 			{
 				this.patternList.addPattern(this.pattern);
 				return;
