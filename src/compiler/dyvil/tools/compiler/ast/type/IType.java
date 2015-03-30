@@ -134,7 +134,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		{
 			if (arrayDimensions > 0)
 			{
-				return arrayDimensions > this.getArrayDimensions();
+				return arrayDimensions >= this.getArrayDimensions();
 			}
 			return true;
 		}

@@ -10,6 +10,7 @@ import org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 
 public final class MethodWriterImpl implements MethodWriter
 {
@@ -484,6 +485,12 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		this.hasReturn = false;
 		
+		if (dims == 1)
+		{
+			this.writeTypeInsn(Opcodes.ANEWARRAY, type);
+			return;
+		}
+		
 		this.mv.visitMultiANewArrayInsn(type, dims);
 	}
 	
@@ -495,6 +502,18 @@ public final class MethodWriterImpl implements MethodWriter
 			this.writeInlineReturn();
 		}
 		this.hasReturn = false;
+		
+		if (dims == 1)
+		{
+			if (type instanceof PrimitiveType)
+			{
+				this.mv.visitIntInsn(Opcodes.NEWARRAY, ((PrimitiveType) type).typecode);
+				return;
+			}
+			
+			this.mv.visitTypeInsn(Opcodes.ANEWARRAY, type.getInternalName());
+			return;
+		}
 		
 		this.mv.visitMultiANewArrayInsn(type.getExtendedName(), dims);
 	}
