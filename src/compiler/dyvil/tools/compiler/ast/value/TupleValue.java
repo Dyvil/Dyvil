@@ -118,7 +118,11 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 	{
 		if (this.valueCount == 1)
 		{
-			return this.values[0].withType(type);
+			IValue value1 = this.values[0].withType(type);
+			if (value1 != null)
+			{
+				return new EncapsulatedValue(value1);
+			}
 		}
 		
 		if (TupleType.isSuperType(type, this.values, this.valueCount))
@@ -179,7 +183,7 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 	{
 		if (this.valueCount == 1)
 		{
-			return this.values[0].resolve(markers, context);
+			return new EncapsulatedValue(this.values[0].resolve(markers, context));
 		}
 		
 		for (int i = 0; i < this.valueCount; i++)

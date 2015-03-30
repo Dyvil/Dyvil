@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.external;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
@@ -10,7 +11,9 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.value.ArrayValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -32,7 +35,30 @@ public class ExternalMethod extends Method
 		this.annotationsResolved = true;
 		for (int i = 0; i < this.annotationCount; i++)
 		{
-			this.annotations[i].resolveTypes(null, Package.rootPackage);
+			Annotation annotation = this.annotations[i];
+			annotation.resolveTypes(null, Package.rootPackage);
+			
+			if (!"dyvil.lang.annotation.Intrinsic".equals(annotation.type.fullName))
+			{
+				continue;
+			}
+			
+			try
+			{
+				ArrayValue array = (ArrayValue) annotation.arguments.getValue(0, AnnotationType.VALUE);
+				
+				int len = array.valueCount();
+				int[] opcodes = new int[len];
+				for (int j = 0; j < len; j++)
+				{
+					IntValue v = (IntValue) array.getValue(j);
+					opcodes[j] = v.value;
+				}
+				this.intrinsicOpcodes = opcodes;
+			}
+			catch (NullPointerException | ClassCastException ex)
+			{
+			}
 		}
 	}
 	
@@ -170,6 +196,16 @@ public class ExternalMethod extends Method
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public boolean isIntrinsic()
+	{
+		if (!this.annotationsResolved)
+		{
+			this.resolveAnnotations();
+		}
+		return this.intrinsicOpcodes != null;
 	}
 	
 	@Override

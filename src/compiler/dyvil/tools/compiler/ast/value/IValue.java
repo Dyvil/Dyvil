@@ -34,6 +34,7 @@ public interface IValue extends IASTNode, ITyped
 	
 	public static int	STATEMENT_LIST		= 13;
 	public static int	ARRAY				= 14;
+	public static int	CAPSULATED			= 15;
 	
 	public static int	CLASS_ACCESS		= 16;
 	public static int	FIELD_ACCESS		= 17;
