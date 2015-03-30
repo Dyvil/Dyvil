@@ -77,7 +77,7 @@ public class AnnotationType extends Type
 		}
 		if (this.retention == null)
 		{
-			Annotation retention = this.theClass.getAnnotation(Type.ARetention);
+			Annotation retention = this.theClass.getAnnotation(Types.ARetention);
 			if (retention != null)
 			{
 				EnumValue value = (EnumValue) retention.arguments.getValue(0, null);
@@ -90,7 +90,7 @@ public class AnnotationType extends Type
 		}
 		this.targets = new TreeSet();
 		
-		Annotation target = this.theClass.getAnnotation(Type.ATarget);
+		Annotation target = this.theClass.getAnnotation(Types.ATarget);
 		if (target == null)
 		{
 			return;

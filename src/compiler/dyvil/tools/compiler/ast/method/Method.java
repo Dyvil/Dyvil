@@ -31,7 +31,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.ArrayValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -550,16 +550,13 @@ public class Method extends Member implements IMethod
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			ITypeVariable var = this.generics[i];
-			if (var.getName() == name)
-			{
-				return var.getCaptureClass();
-			}
-		}
-		
 		return this.theClass.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.theClass.resolveTypeVariable(name);
 	}
 	
 	@Override
@@ -902,7 +899,7 @@ public class Method extends Member implements IMethod
 			
 			mw.begin();
 			mw.writeLabel(start);
-			if (this.type == Type.VOID)
+			if (this.type == Types.VOID)
 			{
 				this.value.writeStatement(mw);
 			}
@@ -936,7 +933,7 @@ public class Method extends Member implements IMethod
 		
 		if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
 		{
-			if (this.type.getTheClass() == Type.BOOLEAN_CLASS)
+			if (this.type.getTheClass() == Types.BOOLEAN_CLASS)
 			{
 				Label ifEnd = new Label();
 				Label elseEnd = new Label();
@@ -964,9 +961,9 @@ public class Method extends Member implements IMethod
 		
 		this.writeInvoke(writer, instance, arguments);
 		
-		if (type == Type.VOID)
+		if (type == Types.VOID)
 		{
-			if (this.type != Type.VOID)
+			if (this.type != Types.VOID)
 			{
 				writer.writeInsn(Opcodes.POP);
 			}

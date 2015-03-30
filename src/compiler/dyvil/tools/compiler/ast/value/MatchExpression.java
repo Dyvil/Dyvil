@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -60,7 +61,7 @@ public final class MatchExpression extends ASTNode implements IValue
 		int len = this.caseCount;
 		if (len == 0)
 		{
-			this.type = Type.VOID;
+			this.type = Types.VOID;
 			return this.type;
 		}
 		
@@ -82,13 +83,13 @@ public final class MatchExpression extends ASTNode implements IValue
 			t = Type.findCommonSuperType(t, t1);
 			if (t == null)
 			{
-				return this.type = Type.VOID;
+				return this.type = Types.VOID;
 			}
 		}
 		
 		if (t == null)
 		{
-			return this.type = Type.VOID;
+			return this.type = Types.VOID;
 		}
 		return this.type = t;
 	}
@@ -96,13 +97,13 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Type.VOID ? this : IValue.super.withType(type);
+		return type == Types.VOID ? this : IValue.super.withType(type);
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Type.VOID)
+		if (type == Types.VOID)
 		{
 			return true;
 		}
@@ -182,7 +183,7 @@ public final class MatchExpression extends ASTNode implements IValue
 			this.cases[i].resolve(markers, context);
 		}
 		
-		if (type == Type.BOOLEAN && this.caseCount >= 2)
+		if (type == Types.BOOLEAN && this.caseCount >= 2)
 		{
 			this.exhaustive = true;
 		}

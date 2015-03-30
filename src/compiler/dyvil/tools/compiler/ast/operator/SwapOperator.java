@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -45,19 +45,19 @@ public class SwapOperator extends ASTNode implements IValue
 	@Override
 	public IType getType()
 	{
-		return Type.NONE;
+		return Types.UNKNOWN;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.VOID || type == Type.NONE;
+		return type == Types.VOID || type == Types.UNKNOWN;
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Type.VOID || type == Type.NONE ? this : null;
+		return type == Types.VOID || type == Types.UNKNOWN ? this : null;
 	}
 	
 	@Override

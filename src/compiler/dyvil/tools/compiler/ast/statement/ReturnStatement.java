@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -48,7 +48,7 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	@Override
 	public IType getType()
 	{
-		return this.value == null ? Type.VOID : this.value.getType();
+		return this.value == null ? Types.VOID : this.value.getType();
 	}
 	
 	@Override
@@ -56,7 +56,7 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	{
 		if (this.value == null)
 		{
-			return type == Type.NONE || type == Type.VOID ? this : null;
+			return type == Types.UNKNOWN || type == Types.VOID ? this : null;
 		}
 		IValue value1 = this.value.withType(type);
 		if (value1 == null)
@@ -70,7 +70,7 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.value == null ? type == Type.NONE || type == Type.VOID : this.value.isType(type);
+		return this.value == null ? type == Types.UNKNOWN || type == Types.VOID : this.value.isType(type);
 	}
 	
 	@Override

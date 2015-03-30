@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -54,13 +54,13 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public IType getType()
 	{
-		return this.field == null ? Type.NONE : this.field.getType();
+		return this.field == null ? Types.UNKNOWN : this.field.getType();
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
-		if (type == Type.NONE || type == Type.VOID)
+		if (type == Types.UNKNOWN || type == Types.VOID)
 		{
 			return this;
 		}
@@ -77,7 +77,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.value == null ? type == Type.NONE || type == Type.VOID : this.value.isType(type);
+		return this.value == null ? type == Types.UNKNOWN || type == Types.VOID : this.value.isType(type);
 	}
 	
 	@Override

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -185,6 +186,12 @@ public class Package implements INamed, IContext
 			}
 		}
 		
+		return null;
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
 		return null;
 	}
 	

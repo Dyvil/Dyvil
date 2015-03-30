@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -135,7 +135,7 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall
 			{
 				IValue v = paramList.getValue(i);
 				IType t = v.getType();
-				if (t != Type.INT)
+				if (t != Types.INT)
 				{
 					Marker marker = markers.create(v.getPosition(), "access.constructor.arraylength_type");
 					marker.addInfo("Value Type: " + t);

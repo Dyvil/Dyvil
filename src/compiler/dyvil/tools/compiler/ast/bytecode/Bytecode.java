@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -32,7 +33,7 @@ public final class Bytecode extends ASTNode implements IValue
 	@Override
 	public Type getType()
 	{
-		return Type.VOID;
+		return Types.VOID;
 	}
 	
 	@Override

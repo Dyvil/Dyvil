@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.dwt.DWTFile;
 import dyvil.tools.compiler.ast.structure.DyvilFile;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
@@ -98,7 +98,7 @@ public final class DyvilCompiler
 			
 			// Inits primitive data types
 			Package.init();
-			Type.init();
+			Types.init();
 			
 			now1 = System.nanoTime() - now1;
 			logger.fine("Loaded Base Types (" + Util.toTime(now1) + ")");

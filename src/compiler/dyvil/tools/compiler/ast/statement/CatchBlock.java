@@ -5,6 +5,7 @@ import java.util.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -59,6 +60,12 @@ public class CatchBlock implements IValued, ITyped, IContext
 	}
 	
 	@Override
+	public boolean isStatic()
+	{
+		return this.context.isStatic();
+	}
+	
+	@Override
 	public IType getThisType()
 	{
 		return this.context.getThisType();
@@ -74,6 +81,12 @@ public class CatchBlock implements IValued, ITyped, IContext
 	public IClass resolveClass(Name name)
 	{
 		return this.context.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.context.resolveTypeVariable(name);
 	}
 	
 	@Override

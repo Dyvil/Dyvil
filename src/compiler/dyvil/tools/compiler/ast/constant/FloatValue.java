@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.BoxValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.LiteralValue;
@@ -48,19 +49,19 @@ public class FloatValue extends ASTNode implements INumericValue
 	@Override
 	public Type getType()
 	{
-		return Type.FLOAT;
+		return Types.FLOAT;
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
-		if (type == Type.FLOAT)
+		if (type == Types.FLOAT)
 		{
 			return this;
 		}
-		if (type.isSuperTypeOf(Type.FLOAT))
+		if (type.isSuperTypeOf(Types.FLOAT))
 		{
-			return new BoxValue(this, Type.FLOAT.boxMethod);
+			return new BoxValue(this, Types.FLOAT.boxMethod);
 		}
 		if (FLOAT_CONVERTIBLE.isSuperTypeOf(type))
 		{
@@ -72,17 +73,17 @@ public class FloatValue extends ASTNode implements INumericValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.FLOAT || type.isSuperTypeOf(Type.FLOAT) || FLOAT_CONVERTIBLE.isSuperTypeOf(type);
+		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT) || FLOAT_CONVERTIBLE.isSuperTypeOf(type);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Type.FLOAT)
+		if (type == Types.FLOAT)
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Type.FLOAT) || FLOAT_CONVERTIBLE.isSuperTypeOf(type))
+		if (type.isSuperTypeOf(Types.FLOAT) || FLOAT_CONVERTIBLE.isSuperTypeOf(type))
 		{
 			return 2;
 		}

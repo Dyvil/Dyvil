@@ -6,6 +6,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.BoxValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -44,33 +45,33 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	@Override
 	public Type getType()
 	{
-		return Type.BOOLEAN;
+		return Types.BOOLEAN;
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
-		if (type == Type.BOOLEAN)
+		if (type == Types.BOOLEAN)
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Type.BOOLEAN) ? new BoxValue(this, Type.BOOLEAN.boxMethod) : null;
+		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxValue(this, Types.BOOLEAN.boxMethod) : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.BOOLEAN || type.isSuperTypeOf(Type.BOOLEAN);
+		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Type.BOOLEAN)
+		if (type == Types.BOOLEAN)
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Type.BOOLEAN))
+		if (type.isSuperTypeOf(Types.BOOLEAN))
 		{
 			return 2;
 		}

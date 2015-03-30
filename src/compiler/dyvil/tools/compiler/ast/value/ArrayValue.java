@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -65,8 +66,8 @@ public class ArrayValue extends ASTNode implements IValue, IValueList
 		int len = this.valueCount;
 		if (len == 0)
 		{
-			this.elementType = Type.VOID;
-			this.requiredType = Type.VOID;
+			this.elementType = Types.VOID;
+			this.requiredType = Types.VOID;
 			return;
 		}
 		
@@ -77,8 +78,8 @@ public class ArrayValue extends ASTNode implements IValue, IValueList
 			t = Type.findCommonSuperType(t, t1);
 			if (t == null)
 			{
-				this.elementType = Type.VOID;
-				this.requiredType = Type.VOID;
+				this.elementType = Types.VOID;
+				this.requiredType = Types.VOID;
 				return;
 			}
 		}
@@ -92,7 +93,7 @@ public class ArrayValue extends ASTNode implements IValue, IValueList
 	{
 		if (this.valueCount == 0)
 		{
-			return Type.VOID;
+			return Types.VOID;
 		}
 		
 		if (this.requiredType != null)

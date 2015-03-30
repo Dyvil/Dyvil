@@ -1,14 +1,22 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.util.List;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
+import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -16,6 +24,11 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 public interface IType extends IASTNode, INamed, IContext, ITypeContext
 {
 	public default boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	public default boolean isGenericType()
 	{
 		return false;
 	}
@@ -32,7 +45,14 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	// Full Name
 	
-	public void setFullName(String name);
+	@Override
+	public void setName(Name name);
+	
+	@Override
+	public Name getName();
+
+	
+	public void setFullName(String nae);
 	
 	public String getFullName();
 	
@@ -41,42 +61,6 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	public void setClass(IClass theClass);
 	
 	public IClass getTheClass();
-	
-	// Generics
-	
-	/**
-	 * Returns true if this is an instance of {@link GenericType}.
-	 * 
-	 * @return
-	 */
-	public boolean isGeneric();
-	
-	/**
-	 * Returns true if this is or contains any type variables.
-	 * 
-	 * @return
-	 */
-	public boolean hasTypeVariables();
-	
-	/**
-	 * Returns a copy of this type with all type variables replaced.
-	 * 
-	 * @param typeVariables
-	 *            the type variables
-	 * @return
-	 */
-	public IType getConcreteType(ITypeContext context);
-	
-	@Override
-	public default IType resolveType(Name name)
-	{
-		return null;
-	}
-	
-	public default IType resolveType(Name name, IType concrete)
-	{
-		return null;
-	}
 	
 	// Arrays
 	
@@ -130,7 +114,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		IClass thisClass = this.getTheClass();
 		IClass thatClass = type.getTheClass();
 		int arrayDimensions = type.getArrayDimensions();
-		if (thisClass == Type.OBJECT_CLASS)
+		if (thisClass == Types.OBJECT_CLASS)
 		{
 			if (arrayDimensions > 0)
 			{
@@ -174,13 +158,46 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return this.getTheClass() == type.getTheClass();
 	}
 	
-	// Resolve
+	/**
+	 * Returns true if this is or contains any type variables.
+	 * 
+	 * @return
+	 */
+	public boolean hasTypeVariables();
 	
-	public IType resolve(MarkerList markers, IContext context);
+	/**
+	 * Returns a copy of this type with all type variables replaced.
+	 * 
+	 * @param typeVariables
+	 *            the type variables
+	 * @return
+	 */
+	public IType getConcreteType(ITypeContext context);
+	
+	@Override
+	public default IType resolveType(Name name)
+	{
+		return null;
+	}
+	
+	public default IType resolveType(Name name, IType concrete)
+	{
+		return null;
+	}
+	
+	// Resolve
 	
 	public boolean isResolved();
 	
+	public IType resolve(MarkerList markers, IContext context);
+	
 	// IContext
+	
+	@Override
+	public default boolean isStatic()
+	{
+		return true;
+	}
 	
 	@Override
 	public default IType getThisType()
@@ -189,10 +206,28 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	}
 	
 	@Override
-	public default boolean isStatic()
-	{
-		return false;
-	}
+	public Package resolvePackage(Name name);
+	
+	@Override
+	public IClass resolveClass(Name name);
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name);
+	
+	@Override
+	public FieldMatch resolveField(Name name);
+	
+	@Override
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments);
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
+	
+	@Override
+	public ConstructorMatch resolveConstructor(IArguments arguments);
+	
+	@Override
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
 	
 	// Compilation
 	

@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -50,13 +50,13 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Type.VOID ? this : null;
+		return type == Types.VOID ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.VOID;
+		return type == Types.VOID;
 	}
 	
 	@Override

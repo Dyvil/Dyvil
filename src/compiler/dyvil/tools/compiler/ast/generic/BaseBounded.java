@@ -1,63 +1,53 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.CaptureClass;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class TypeVariable extends ASTNode implements ITypeVariable
+public abstract class BaseBounded implements IASTNode, IBounded
 {
-	public Name				name;
+	protected ICodePosition	position;
 	
 	protected IType[]		upperBounds	= new IType[1];
 	protected int			upperBoundCount;
 	protected IType			lowerBound;
 	
-	protected CaptureClass	captureClass;
-	
-	public TypeVariable()
+	public BaseBounded()
 	{
 	}
 	
-	public TypeVariable(Name name)
-	{
-		this.name = name;
-	}
-	
-	public TypeVariable(ICodePosition position)
+	public BaseBounded(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public TypeVariable(ICodePosition position, Name name)
+	@Override
+	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
-		this.name = name;
 	}
 	
 	@Override
-	public void setName(Name name)
+	public ICodePosition getPosition()
 	{
-		this.name = name;
+		return this.position;
 	}
 	
 	@Override
-	public Name getName()
+	public int upperBoundCount()
 	{
-		return this.name;
+		return this.upperBoundCount;
 	}
 	
 	@Override
-	public CaptureClass getCaptureClass()
+	public void setUpperBound(int index, IType bound)
 	{
-		return this.captureClass;
+		this.upperBounds[index] = bound;
 	}
 	
 	@Override
@@ -74,6 +64,18 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	}
 	
 	@Override
+	public IType getUpperBound(int index)
+	{
+		return this.upperBounds[index];
+	}
+	
+	@Override
+	public IType[] getUpperBounds()
+	{
+		return this.upperBounds;
+	}
+	
+	@Override
 	public void setLowerBound(IType bound)
 	{
 		this.lowerBound = bound;
@@ -85,7 +87,6 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 		return this.lowerBound;
 	}
 	
-	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
 		if (this.upperBoundCount > 0)
@@ -110,7 +111,6 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 	
 	// Misc
 	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.lowerBound != null)
@@ -133,21 +133,21 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 					if (++this.upperBoundCount > this.upperBounds.length)
 					{
 						IType[] temp = new IType[this.upperBoundCount];
-						temp[0] = Type.OBJECT;
+						temp[0] = Types.OBJECT;
 						System.arraycopy(this.upperBounds, 0, temp, 1, this.upperBoundCount - 1);
 						this.upperBounds = temp;
 					}
 					else
 					{
 						System.arraycopy(this.upperBounds, 0, this.upperBounds, 1, this.upperBoundCount - 1);
-						this.upperBounds[0] = Type.OBJECT;
+						this.upperBounds[0] = Types.OBJECT;
 					}
 				}
 			}
 			
 			// Check if the remaining upper bounds are interfaces, and remove if
 			// not.
-			for (int i = 1; i < this.upperBoundCount; i++)
+			for (int i = 0; i < this.upperBoundCount; i++)
 			{
 				type = this.upperBounds[i] = this.upperBounds[i].resolve(markers, context);
 				iclass = type.getTheClass();
@@ -159,54 +159,13 @@ public class TypeVariable extends ASTNode implements ITypeVariable
 				}
 			}
 		}
-		this.captureClass = new CaptureClass(this, this.upperBounds, this.upperBoundCount, this.lowerBound);
 	}
 	
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public String toString()
 	{
-		buffer.append(this.name).append(':');
-		if (this.upperBoundCount > 0)
-		{
-			if (this.upperBounds[0] != Type.OBJECT)
-			{
-				this.upperBounds[0].appendSignature(buffer);
-			}
-			
-			for (int i = 1; i < this.upperBoundCount; i++)
-			{
-				buffer.append(':');
-				this.upperBounds[i].appendSignature(buffer);
-			}
-		}
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		if (this.name == null)
-		{
-			buffer.append('_');
-		}
-		else
-		{
-			buffer.append(this.name);
-		}
-		
-		if (this.lowerBound != null)
-		{
-			buffer.append(Formatting.Type.genericLowerBound);
-			this.lowerBound.toString(prefix, buffer);
-		}
-		if (this.upperBoundCount > 0)
-		{
-			buffer.append(Formatting.Type.genericUpperBound);
-			this.upperBounds[0].toString(prefix, buffer);
-			for (int i = 1; i < this.upperBoundCount; i++)
-			{
-				buffer.append(Formatting.Type.genericBoundSeperator);
-				this.upperBounds[i].toString(prefix, buffer);
-			}
-		}
+		StringBuilder builder = new StringBuilder();
+		this.toString("", builder);
+		return builder.toString();
 	}
 }

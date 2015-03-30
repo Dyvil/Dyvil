@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 
@@ -285,7 +285,7 @@ public class CaseClasses
 		{
 			type.appendExtendedName(desc);
 		}
-		else if (type == Type.STRING)
+		else if (type == Types.STRING)
 		{
 			desc.append("Ljava/lang/String;");
 		}

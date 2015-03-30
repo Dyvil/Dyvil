@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.MatchExpression;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -76,7 +77,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	{
 		if (this.method == null)
 		{
-			return Type.NONE;
+			return Types.UNKNOWN;
 		}
 		if (this.type == null)
 		{
@@ -92,13 +93,13 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Type.VOID ? this : IAccess.super.withType(type);
+		return type == Types.VOID ? this : IAccess.super.withType(type);
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Type.VOID)
+		if (type == Types.VOID)
 		{
 			return true;
 		}
@@ -544,7 +545,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.method.writeCall(writer, this.instance, this.arguments, Type.VOID);
+		this.method.writeCall(writer, this.instance, this.arguments, Types.VOID);
 	}
 	
 	@Override

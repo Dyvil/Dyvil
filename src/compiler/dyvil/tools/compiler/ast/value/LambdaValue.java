@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -24,7 +25,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.LambdaType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -125,7 +126,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 			for (int i = 0; i < this.parameterCount; i++)
 			{
 				IType t = this.parameters[i].type;
-				lt.addType(t == null ? Type.NONE : t);
+				lt.addType(t == null ? Types.UNKNOWN : t);
 			}
 			lt.returnType = this.value.getType();
 			this.type = lt;
@@ -206,6 +207,12 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	public IClass resolveClass(Name name)
 	{
 		return this.context.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.context.resolveTypeVariable(name);
 	}
 	
 	@Override

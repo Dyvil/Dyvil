@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.external.BytecodeClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -154,6 +155,12 @@ public class REPLContext implements IValued, IDyvilUnit
 	}
 	
 	@Override
+	public boolean isStatic()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getThisType()
 	{
 		return null;
@@ -177,6 +184,12 @@ public class REPLContext implements IValued, IDyvilUnit
 		
 		// Standart Java Classes
 		return Package.javaLang.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return null;
 	}
 	
 	@Override

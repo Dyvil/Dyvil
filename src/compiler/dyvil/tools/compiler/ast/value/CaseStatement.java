@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -16,7 +17,7 @@ import dyvil.tools.compiler.ast.pattern.IPatterned;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -43,13 +44,13 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	@Override
 	public IType getType()
 	{
-		return Type.NONE;
+		return Types.UNKNOWN;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.VOID;
+		return type == Types.VOID;
 	}
 	
 	@Override
@@ -95,6 +96,12 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	// IContext
 	
 	@Override
+	public boolean isStatic()
+	{
+		return this.context.isStatic();
+	}
+	
+	@Override
 	public IType getThisType()
 	{
 		return this.context.getThisType();
@@ -110,6 +117,12 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	public IClass resolveClass(Name name)
 	{
 		return this.context.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.context.resolveTypeVariable(name);
 	}
 	
 	@Override

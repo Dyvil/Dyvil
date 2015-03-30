@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -93,13 +94,13 @@ public class IfStatement extends ASTNode implements IStatement
 			}
 			return this.commonType = this.then.getType();
 		}
-		return this.commonType = Type.VOID;
+		return this.commonType = Types.VOID;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Type.VOID || type == Type.NONE)
+		if (type == Types.VOID || type == Types.UNKNOWN)
 		{
 			return true;
 		}
@@ -185,7 +186,7 @@ public class IfStatement extends ASTNode implements IStatement
 	{
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Type.BOOLEAN);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN);
 			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "if.condition.type");

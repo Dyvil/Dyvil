@@ -159,7 +159,7 @@ public class ClassParameter extends Member implements IParameter
 			IValue value1 = this.defaultValue.withType(this.type);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.defaultValue.getPosition(), "parameter.type", this.name);
+				Marker marker = markers.create(this.defaultValue.getPosition(), "parameter.type");
 				marker.addInfo("Parameter Type: " + this.type);
 				marker.addInfo("Value Type: " + this.defaultValue.getType());
 				

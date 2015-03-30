@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.BoxValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.LiteralValue;
@@ -48,19 +49,19 @@ public class DoubleValue extends ASTNode implements INumericValue
 	@Override
 	public Type getType()
 	{
-		return Type.DOUBLE;
+		return Types.DOUBLE;
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
-		if (type == Type.DOUBLE)
+		if (type == Types.DOUBLE)
 		{
 			return this;
 		}
-		if (type.isSuperTypeOf(Type.DOUBLE))
+		if (type.isSuperTypeOf(Types.DOUBLE))
 		{
-			return new BoxValue(this, Type.DOUBLE.boxMethod);
+			return new BoxValue(this, Types.DOUBLE.boxMethod);
 		}
 		if (DOUBLE_CONVERTIBLE.isSuperTypeOf(type))
 		{
@@ -72,17 +73,17 @@ public class DoubleValue extends ASTNode implements INumericValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.DOUBLE || type.isSuperTypeOf(Type.DOUBLE) || DOUBLE_CONVERTIBLE.isSuperTypeOf(type);
+		return type == Types.DOUBLE || type.isSuperTypeOf(Types.DOUBLE) || DOUBLE_CONVERTIBLE.isSuperTypeOf(type);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Type.DOUBLE)
+		if (type == Types.DOUBLE)
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Type.DOUBLE) || DOUBLE_CONVERTIBLE.isSuperTypeOf(type))
+		if (type.isSuperTypeOf(Types.DOUBLE) || DOUBLE_CONVERTIBLE.isSuperTypeOf(type))
 		{
 			return 2;
 		}

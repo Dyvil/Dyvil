@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.BoxValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -33,33 +34,33 @@ public class CharValue extends ASTNode implements INumericValue
 	@Override
 	public Type getType()
 	{
-		return Type.CHAR;
+		return Types.CHAR;
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
-		if (type == Type.CHAR)
+		if (type == Types.CHAR)
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Type.CHAR) ? new BoxValue(this, Type.CHAR.boxMethod) : null;
+		return type.isSuperTypeOf(Types.CHAR) ? new BoxValue(this, Types.CHAR.boxMethod) : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.CHAR || type.isSuperTypeOf(Type.CHAR);
+		return type == Types.CHAR || type.isSuperTypeOf(Types.CHAR);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Type.CHAR)
+		if (type == Types.CHAR)
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Type.CHAR))
+		if (type.isSuperTypeOf(Types.CHAR))
 		{
 			return 2;
 		}

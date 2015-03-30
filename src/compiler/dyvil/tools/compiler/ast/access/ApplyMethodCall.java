@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -49,7 +49,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	{
 		if (this.method == null)
 		{
-			return Type.NONE;
+			return Types.UNKNOWN;
 		}
 		if (this.type == null)
 		{
@@ -65,13 +65,13 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Type.VOID ? this : IValue.super.withType(type);
+		return type == Types.VOID ? this : IValue.super.withType(type);
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Type.VOID)
+		if (type == Types.VOID)
 		{
 			return true;
 		}
@@ -236,7 +236,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.method.writeCall(writer, this.instance, this.arguments, Type.VOID);
+		this.method.writeCall(writer, this.instance, this.arguments, Types.VOID);
 	}
 	
 	@Override

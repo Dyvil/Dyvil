@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -86,7 +86,7 @@ public interface IAccess extends IValue, IValued, ICall
 			return match.method;
 		}
 		
-		match = Type.PREDEF_CLASS.resolveMethod(instance, name, arguments);
+		match = Types.PREDEF_CLASS.resolveMethod(instance, name, arguments);
 		if (match != null)
 		{
 			return match.method;

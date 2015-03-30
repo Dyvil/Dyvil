@@ -7,20 +7,17 @@ import java.util.List;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class SimpleImport extends ASTNode implements IImport, IImportContainer
+public final class SimpleImport extends ASTNode implements IImport, IImportContainer
 {
 	public IImport				parent;
 	public Name					name;
@@ -117,25 +114,13 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return false;
-	}
-	
-	@Override
-	public IType getThisType()
-	{
-		return this.theClass.getThisType();
-	}
-	
-	@Override
 	public Package resolvePackage(Name name)
 	{
-		if (this.name.equals(name))
+		if (this.name == name)
 		{
 			return this.thePackage;
 		}
-		if (this.alias != null && this.alias.equals(name))
+		if (this.alias == name)
 		{
 			return this.thePackage;
 		}
@@ -149,11 +134,11 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 		{
 			return this.child.resolveClass(name);
 		}
-		if (this.name.equals(name))
+		if (this.name == name)
 		{
 			return this.theClass;
 		}
-		if (this.alias != null && this.alias.equals(name))
+		if (this.alias == name)
 		{
 			return this.theClass;
 		}
@@ -167,11 +152,11 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 		{
 			return this.child.resolveField(name);
 		}
-		if (this.name.equals(name))
+		if (this.name == name)
 		{
 			return this.field;
 		}
-		if (this.alias != null && this.alias.equals(name))
+		if (this.alias == name)
 		{
 			return this.field;
 		}
@@ -191,7 +176,7 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 			{
 				return this.methods.get(0);
 			}
-			if (this.alias != null && this.alias.equals(name))
+			if (this.alias == name)
 			{
 				return this.methods.get(0);
 			}
@@ -206,31 +191,14 @@ public class SimpleImport extends ASTNode implements IImport, IImportContainer
 		{
 			this.child.getMethodMatches(list, instance, name, arguments);
 		}
-		if (this.name.equals(name))
+		if (this.name == name)
 		{
 			list.addAll(this.methods);
 		}
-		if (this.alias != null && this.alias.equals(name))
+		if (this.alias == name)
 		{
 			list.addAll(this.methods);
 		}
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public byte getAccessibility(IMember member)
-	{
-		throw new UnsupportedOperationException();
 	}
 	
 	@Override

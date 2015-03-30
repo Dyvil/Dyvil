@@ -19,7 +19,7 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.IValueMap;
@@ -253,7 +253,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		if (this.getter != null)
 		{
 			// Getter
-			this.getter.writeCall(writer, this.parent, EmptyArguments.INSTANCE, Type.VOID);
+			this.getter.writeCall(writer, this.parent, EmptyArguments.INSTANCE, Types.VOID);
 		}
 		else
 		{
@@ -277,7 +277,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				value.writeExpression(writer);
 				writer.writeInsn(Opcodes.DUP);
 				writer.writeFieldInsn(Opcodes.PUTSTATIC, owner, property.fullName, value.getType().getExtendedName());
-				setter.writeCall(writer, null, EmptyArguments.INSTANCE, Type.VOID);
+				setter.writeCall(writer, null, EmptyArguments.INSTANCE, Types.VOID);
 			}
 			else if (value.getValueType() == NODE)
 			{

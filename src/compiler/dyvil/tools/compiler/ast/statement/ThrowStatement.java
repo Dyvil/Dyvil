@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -42,7 +42,7 @@ public class ThrowStatement extends ASTNode implements IValue, IValued
 	@Override
 	public IType getType()
 	{
-		return Type.NONE;
+		return Types.UNKNOWN;
 	}
 	
 	@Override
@@ -54,7 +54,7 @@ public class ThrowStatement extends ASTNode implements IValue, IValued
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.VOID;
+		return type == Types.VOID;
 	}
 	
 	@Override

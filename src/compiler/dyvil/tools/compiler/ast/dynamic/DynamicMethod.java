@@ -26,7 +26,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -52,7 +52,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	@Override
 	public IType getType()
 	{
-		return Type.DYNAMIC;
+		return Types.DYNAMIC;
 	}
 	
 	@Override
@@ -122,6 +122,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public boolean isStatic()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getThisType()
 	{
 		return null;
@@ -135,6 +141,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	
 	@Override
 	public IClass resolveClass(Name name)
+	{
+		return null;
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return null;
 	}
@@ -372,7 +384,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	@Override
 	public IType resolveType(Name name, IValue instance, IArguments arguments, ITypeList generics)
 	{
-		return Type.DYNAMIC;
+		return Types.DYNAMIC;
 	}
 	
 	@Override

@@ -107,7 +107,7 @@ public class ClassAccess extends ASTNode implements IValue
 			call.name = name;
 			call.method = m.method;
 			call.dotless = true;
-			if (this.type.isGeneric())
+			if (this.type.isGenericType())
 			{
 				// Copy generic Type arguments
 				GenericType generic = (GenericType) this.type;

@@ -122,7 +122,7 @@ public class Variable extends Member implements IVariable
 		IValue value1 = this.value.withType(this.type);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.value.getPosition(), "variable.type", this.name);
+			Marker marker = markers.create(this.position, "variable.type");
 			marker.addInfo("Variable Type: " + this.type);
 			marker.addInfo("Value Type: " + this.value.getType());
 		}

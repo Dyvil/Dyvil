@@ -9,6 +9,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
@@ -19,7 +20,7 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -155,7 +156,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.set != null)
 		{
-			IValue set1 = this.set.withType(Type.VOID);
+			IValue set1 = this.set.withType(Types.VOID);
 			if (set1 == null)
 			{
 				markers.add(this.set.getPosition(), "property.setter.type", this.name);
@@ -231,11 +232,17 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public FieldMatch resolveField(Name name)
 	{
-		if (name.equals(this.name))
+		if (name == this.name)
 		{
 			return new FieldMatch(this.setterParameter, 1);
 		}
 		return this.theClass.resolveField(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.theClass.resolveTypeVariable(name);
 	}
 	
 	@Override
@@ -358,7 +365,7 @@ public class Property extends Member implements IProperty, IContext
 			
 			mw.begin();
 			this.set.writeStatement(mw);
-			mw.end(Type.VOID);
+			mw.end(Types.VOID);
 		}
 	}
 	

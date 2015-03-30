@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -54,7 +55,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	@Override
 	public IType getType()
 	{
-		return this.field == null ? Type.NONE : this.field.getType();
+		return this.field == null ? Types.UNKNOWN : this.field.getType();
 	}
 	
 	@Override

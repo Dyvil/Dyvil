@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -41,6 +42,12 @@ public final class UnknownType extends ASTNode implements IType
 	
 	@Override
 	public IClass resolveClass(Name name)
+	{
+		return null;
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return null;
 	}
@@ -102,7 +109,7 @@ public final class UnknownType extends ASTNode implements IType
 	}
 	
 	@Override
-	public boolean isGeneric()
+	public boolean isGenericType()
 	{
 		return false;
 	}

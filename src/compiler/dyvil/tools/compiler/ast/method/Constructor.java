@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.access.ApplyMethodCall;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
@@ -23,7 +24,7 @@ import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -303,7 +304,7 @@ public class Constructor extends Member implements IConstructor
 			return;
 		}
 		
-		IValue value1 = this.value.withType(Type.VOID);
+		IValue value1 = this.value.withType(Types.VOID);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.position, "constructor.return");
@@ -381,6 +382,12 @@ public class Constructor extends Member implements IConstructor
 	public IClass resolveClass(Name name)
 	{
 		return this.theClass.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.theClass.resolveTypeVariable(name);
 	}
 	
 	@Override
@@ -595,7 +602,7 @@ public class Constructor extends Member implements IConstructor
 			mw.writeLabel(start);
 			this.value.writeStatement(mw);
 			mw.writeLabel(end);
-			mw.end(Type.VOID);
+			mw.end(Types.VOID);
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -614,7 +621,7 @@ public class Constructor extends Member implements IConstructor
 	public void writeCall(MethodWriter writer, IArguments arguments, IType type)
 	{
 		writer.writeTypeInsn(Opcodes.NEW, this.theClass.getInternalName());
-		if (type != Type.VOID)
+		if (type != Types.VOID)
 		{
 			writer.writeInsn(Opcodes.DUP);
 		}

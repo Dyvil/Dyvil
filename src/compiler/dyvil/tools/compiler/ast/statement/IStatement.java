@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 
 public interface IStatement extends IValue
@@ -16,7 +16,7 @@ public interface IStatement extends IValue
 	@Override
 	public default IType getType()
 	{
-		return Type.NONE;
+		return Types.UNKNOWN;
 	}
 	
 	@Override
@@ -28,7 +28,7 @@ public interface IStatement extends IValue
 	@Override
 	public default boolean isType(IType type)
 	{
-		return type == Type.NONE || type == Type.VOID;
+		return type == Types.UNKNOWN || type == Types.VOID;
 	}
 	
 	@Override

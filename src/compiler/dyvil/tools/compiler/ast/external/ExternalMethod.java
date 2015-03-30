@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.value.ArrayValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ExternalMethod extends Method
+public final class ExternalMethod extends Method
 {
 	private boolean	annotationsResolved;
 	private boolean	returnTypeResolved;
@@ -211,20 +211,6 @@ public class ExternalMethod extends Method
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		if (!this.genericsResolved)
-		{
-			this.resolveGenerics();
-		}
-		
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			ITypeVariable var = this.generics[i];
-			if (var.getName() == name)
-			{
-				return var.getCaptureClass();
-			}
-		}
-		
 		return Package.rootPackage.resolveClass(name);
 	}
 	

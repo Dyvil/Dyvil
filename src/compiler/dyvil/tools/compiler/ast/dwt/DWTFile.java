@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -213,7 +213,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		
 		mw.begin();
 		this.rootNode.write(this.internalName, mw);
-		mw.end(Type.VOID);
+		mw.end(Types.VOID);
 		
 		// Write public static void main(String[] args)
 		
@@ -222,7 +222,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 		mw.registerParameter("args", "[Ljava/lang/String;");
 		mw.begin();
 		mw.writeInvokeInsn(Opcodes.INVOKESTATIC, this.internalName, "init", "()V", false);
-		mw.end(Type.VOID);
+		mw.end(Types.VOID);
 	}
 	
 	@Override

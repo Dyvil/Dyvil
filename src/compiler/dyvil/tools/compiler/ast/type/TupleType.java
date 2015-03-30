@@ -90,7 +90,7 @@ public final class TupleType extends Type implements ITypeList
 			return false;
 		}
 		
-		if (type.isGeneric())
+		if (type.isGenericType())
 		{
 			if (this.theClass != type.getTheClass())
 			{
@@ -130,12 +130,12 @@ public final class TupleType extends Type implements ITypeList
 			}
 			return true;
 		}
-		return OBJECT.classEquals(type);
+		return Types.OBJECT.classEquals(type);
 	}
 	
 	public static boolean isSuperType(IType type, ITyped[] typedArray, int count)
 	{
-		if (type.isGeneric())
+		if (type.isGenericType())
 		{
 			if (type.getTheClass().getInternalName().equals("dyvil/lang/tuple/Tuple" + count))
 			{
@@ -175,13 +175,13 @@ public final class TupleType extends Type implements ITypeList
 			}
 			return true;
 		}
-		return type.classEquals(Type.OBJECT) || type.classEquals(Type.ANY);
+		return type.classEquals(Types.OBJECT) || type.classEquals(Types.ANY);
 	}
 	
 	@Override
 	public IType getSuperType()
 	{
-		return Type.OBJECT;
+		return Types.OBJECT;
 	}
 	
 	@Override

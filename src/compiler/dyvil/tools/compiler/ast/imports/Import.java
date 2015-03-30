@@ -5,6 +5,7 @@ import java.util.List;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -16,7 +17,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class Import extends ASTNode implements IImportContainer
+public final class Import extends ASTNode implements IImportContainer
 {
 	public IImport	theImport;
 	public IImport	last;
@@ -54,7 +55,7 @@ public class Import extends ASTNode implements IImportContainer
 	@Override
 	public boolean isStatic()
 	{
-		return this.isStatic;
+		return false;
 	}
 	
 	@Override
@@ -82,6 +83,12 @@ public class Import extends ASTNode implements IImportContainer
 	}
 	
 	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return null;
+	}
+	
+	@Override
 	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
 		return this.last.resolveMethod(instance, name, arguments);
@@ -96,19 +103,18 @@ public class Import extends ASTNode implements IImportContainer
 	@Override
 	public ConstructorMatch resolveConstructor(IArguments arguments)
 	{
-		return this.last.resolveConstructor(arguments);
+		return null;
 	}
 	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
-		this.last.getConstructorMatches(list, arguments);
 	}
 	
 	@Override
 	public byte getAccessibility(IMember member)
 	{
-		return READ_WRITE_ACCESS;
+		return 0;
 	}
 	
 	@Override

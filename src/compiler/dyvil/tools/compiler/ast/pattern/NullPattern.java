@@ -5,7 +5,7 @@ import org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -25,7 +25,7 @@ public final class NullPattern extends ASTNode implements IPattern
 	@Override
 	public IType getType()
 	{
-		return Type.NONE;
+		return Types.UNKNOWN;
 	}
 	
 	@Override

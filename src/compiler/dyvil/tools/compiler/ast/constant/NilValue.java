@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -52,7 +53,7 @@ public final class NilValue implements IConstantValue
 	@Override
 	public IType getType()
 	{
-		return this.requiredType == null ? Type.NONE : this.requiredType;
+		return this.requiredType == null ? Types.UNKNOWN : this.requiredType;
 	}
 	
 	@Override

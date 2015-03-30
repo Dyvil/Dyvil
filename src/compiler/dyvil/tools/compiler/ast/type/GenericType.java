@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.ast.type;
 
-import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -75,7 +73,7 @@ public final class GenericType extends Type implements ITypeList
 	// IType Overrides
 	
 	@Override
-	public boolean isGeneric()
+	public boolean isGenericType()
 	{
 		return this.theClass == null || this.theClass.isGeneric();
 	}
@@ -97,7 +95,7 @@ public final class GenericType extends Type implements ITypeList
 	@Override
 	public IType resolveType(Name name, IType concrete)
 	{
-		if (!concrete.isGeneric())
+		if (!concrete.isGenericType())
 		{
 			return null;
 		}
@@ -151,11 +149,6 @@ public final class GenericType extends Type implements ITypeList
 		{
 			this.theClass = iclass;
 			this.fullName = iclass.getFullName();
-			
-			if (iclass instanceof CaptureClass)
-			{
-				return new WildcardType(this.position, this.arrayDimensions, (CaptureClass) iclass);
-			}
 			
 			if (this.generics == null)
 			{

@@ -6,14 +6,11 @@ import java.util.List;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -44,18 +41,6 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 		{
 			i.resolveTypes(markers, context, isStatic);
 		}
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return false;
-	}
-	
-	@Override
-	public IType getThisType()
-	{
-		return null;
 	}
 	
 	@Override
@@ -121,23 +106,6 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 		{
 			i.getMethodMatches(list, instance, name, arguments);
 		}
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public byte getAccessibility(IMember member)
-	{
-		return 0;
 	}
 	
 	@Override

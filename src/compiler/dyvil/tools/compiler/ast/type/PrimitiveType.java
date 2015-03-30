@@ -33,23 +33,23 @@ public final class PrimitiveType extends Type
 		switch (typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
-			return BOOLEAN;
+			return Types.BOOLEAN;
 		case ClassFormat.T_BYTE:
-			return BYTE;
+			return Types.BYTE;
 		case ClassFormat.T_SHORT:
-			return SHORT;
+			return Types.SHORT;
 		case ClassFormat.T_CHAR:
-			return CHAR;
+			return Types.CHAR;
 		case ClassFormat.T_INT:
-			return INT;
+			return Types.INT;
 		case ClassFormat.T_LONG:
-			return LONG;
+			return Types.LONG;
 		case ClassFormat.T_FLOAT:
-			return FLOAT;
+			return Types.FLOAT;
 		case ClassFormat.T_DOUBLE:
-			return DOUBLE;
+			return Types.DOUBLE;
 		default:
-			return VOID;
+			return Types.VOID;
 		}
 	}
 	
@@ -379,7 +379,7 @@ public final class PrimitiveType extends Type
 	{
 		if (this.arrayDimensions > 0)
 		{
-			return ARRAY.resolveField(name);
+			return Types.ARRAY.resolveField(name);
 		}
 		return null;
 	}
@@ -389,7 +389,7 @@ public final class PrimitiveType extends Type
 	{
 		if (this.arrayDimensions > 0)
 		{
-			MethodMatch match = ARRAY.resolveMethod(instance, name, arguments);
+			MethodMatch match = Types.ARRAY.resolveMethod(instance, name, arguments);
 			if (match != null)
 			{
 				return match;
@@ -404,7 +404,7 @@ public final class PrimitiveType extends Type
 	{
 		if (this.arrayDimensions > 0)
 		{
-			ARRAY.getMethodMatches(list, instance, name, arguments);
+			Types.ARRAY.getMethodMatches(list, instance, name, arguments);
 			return;
 		}
 		

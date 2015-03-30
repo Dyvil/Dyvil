@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.library.Library;
@@ -25,7 +25,7 @@ public class DyvilREPL
 		Library.javaLibrary.loadLibrary();
 		Library.dyvilLibrary.loadLibrary();
 		Package.init();
-		Type.init();
+		Types.init();
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String line = null;

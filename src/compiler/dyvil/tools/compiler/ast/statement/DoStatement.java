@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -63,13 +63,13 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public IType getType()
 	{
-		return Type.VOID;
+		return Types.VOID;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.classEquals(Type.VOID);
+		return type.classEquals(Types.VOID);
 	}
 	
 	@Override
@@ -146,7 +146,7 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 		}
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Type.BOOLEAN);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN);
 			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "do.condition.type");

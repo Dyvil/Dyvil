@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -299,7 +300,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	@Override
 	public boolean isStatic()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -354,6 +355,12 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 		
 		// Standart Java Classes
 		return Package.javaLang.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return null;
 	}
 	
 	@Override

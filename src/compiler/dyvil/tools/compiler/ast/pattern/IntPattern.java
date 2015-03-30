@@ -5,7 +5,7 @@ import org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -28,23 +28,23 @@ public final class IntPattern extends ASTNode implements IPattern
 	@Override
 	public IType getType()
 	{
-		return Type.INT;
+		return Types.INT;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.INT || type.isSuperTypeOf(Type.INT);
+		return type == Types.INT || type.isSuperTypeOf(Types.INT);
 	}
 	
 	@Override
 	public IPattern withType(IType type)
 	{
-		if (type == Type.INT)
+		if (type == Types.INT)
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Type.INT) ? new BoxPattern(this, Type.INT.unboxMethod) : null;
+		return type.isSuperTypeOf(Types.INT) ? new BoxPattern(this, Types.INT.unboxMethod) : null;
 	}
 	
 	@Override

@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -19,7 +20,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -74,9 +75,9 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public IValue withType(IType type)
 	{
-		if (type == Type.VOID || type == Type.NONE)
+		if (type == Types.VOID || type == Types.UNKNOWN)
 		{
-			this.elementType = this.requiredType = Type.VOID;
+			this.elementType = this.requiredType = Types.VOID;
 			return this;
 		}
 		
@@ -92,7 +93,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Type.VOID || type == Type.NONE)
+		if (type == Types.VOID || type == Types.UNKNOWN)
 		{
 			return true;
 		}
@@ -108,7 +109,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Type.VOID || type == Type.NONE)
+		if (type == Types.VOID || type == Types.UNKNOWN)
 		{
 			return 3;
 		}
@@ -247,8 +248,6 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		// this.isArray has already been checked in resolve
-		
 		if (this.valueCount == 0)
 		{
 			return;
@@ -256,7 +255,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		
 		if (this.requiredType == null)
 		{
-			this.elementType = this.requiredType = Type.VOID;
+			this.elementType = this.requiredType = Types.VOID;
 		}
 		
 		this.context = context;
@@ -264,7 +263,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		for (int i = 0; i < len; i++)
 		{
 			IValue v = this.values[i];
-			IValue v1 = v.withType(Type.VOID);
+			IValue v1 = v.withType(Types.VOID);
 			if (v1 == null)
 			{
 				Marker marker = markers.create(v.getPosition(), "statement.type");
@@ -298,8 +297,6 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		// this.isArray has already been checked in resolve
-		
 		this.context = context;
 		for (int i = 0; i < this.valueCount; i++)
 		{
@@ -349,6 +346,12 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	public IClass resolveClass(Name name)
 	{
 		return this.context.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.context.resolveTypeVariable(name);
 	}
 	
 	@Override
@@ -413,7 +416,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		if (this.requiredType == Type.VOID)
+		if (this.requiredType == Types.VOID)
 		{
 			this.writeStatement(writer);
 			return;

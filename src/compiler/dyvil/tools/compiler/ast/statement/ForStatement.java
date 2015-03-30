@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -15,7 +16,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -124,6 +125,12 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 	public IClass resolveClass(Name name)
 	{
 		return this.context.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.context.resolveTypeVariable(name);
 	}
 	
 	@Override
@@ -258,12 +265,12 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				else
 				{
 					Variable var = new Variable(null);
-					var.type = Type.INT;
+					var.type = Types.INT;
 					var.name = $index;
 					this.var1 = var;
 					
 					var = new Variable(null);
-					var.type = Type.INT;
+					var.type = Types.INT;
 					var.name = $length;
 					this.var2 = var;
 					
@@ -320,7 +327,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 		}
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Type.BOOLEAN);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN);
 			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "for.condition.type");

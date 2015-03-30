@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -35,7 +35,7 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	{
 		if (this.pattern == null)
 		{
-			return Type.ANY;
+			return Types.ANY;
 		}
 		return this.pattern.getType();
 	}

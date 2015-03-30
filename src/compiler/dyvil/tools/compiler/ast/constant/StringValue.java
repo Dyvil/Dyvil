@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.LiteralValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -42,13 +43,13 @@ public final class StringValue extends ASTNode implements IConstantValue
 	@Override
 	public Type getType()
 	{
-		return Type.STRING;
+		return Types.STRING;
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
-		if (type.isSuperTypeOf(Type.STRING))
+		if (type.isSuperTypeOf(Types.STRING))
 		{
 			return this;
 		}
@@ -62,17 +63,17 @@ public final class StringValue extends ASTNode implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isSuperTypeOf(Type.STRING) || STRING_CONVERTIBLE.isSuperTypeOf(type);
+		return type.isSuperTypeOf(Types.STRING) || STRING_CONVERTIBLE.isSuperTypeOf(type);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Type.STRING)
+		if (type == Types.STRING)
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Type.STRING) || STRING_CONVERTIBLE.isSuperTypeOf(type))
+		if (type.isSuperTypeOf(Types.STRING) || STRING_CONVERTIBLE.isSuperTypeOf(type))
 		{
 			return 2;
 		}

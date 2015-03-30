@@ -5,7 +5,7 @@ import org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -28,23 +28,23 @@ public final class FloatPattern extends ASTNode implements IPattern
 	@Override
 	public IType getType()
 	{
-		return Type.FLOAT;
+		return Types.FLOAT;
 	}
 	
 	@Override
 	public IPattern withType(IType type)
 	{
-		if (type == Type.FLOAT)
+		if (type == Types.FLOAT)
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Type.FLOAT) ? new BoxPattern(this, Type.FLOAT.unboxMethod) : null;
+		return type.isSuperTypeOf(Types.FLOAT) ? new BoxPattern(this, Types.FLOAT.unboxMethod) : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.FLOAT || type.isSuperTypeOf(Type.FLOAT);
+		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT);
 	}
 	
 	@Override

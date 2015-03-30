@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -92,7 +92,7 @@ public final class CastOperator extends ASTNode implements IValue
 	{
 		this.value.check(markers, context);
 		
-		if (this.type == Type.VOID)
+		if (this.type == Types.VOID)
 		{
 			markers.add(this.position, "cast.void");
 		}
@@ -154,22 +154,22 @@ public final class CastOperator extends ASTNode implements IValue
 	public static void writePrimitiveCast(IType value, PrimitiveType cast, MethodWriter writer)
 	{
 		IClass iclass = value.getTheClass();
-		if (iclass == Type.BYTE_CLASS || iclass == Type.SHORT_CLASS || iclass == Type.CHAR_CLASS || iclass == Type.INT_CLASS)
+		if (iclass == Types.BYTE_CLASS || iclass == Types.SHORT_CLASS || iclass == Types.CHAR_CLASS || iclass == Types.INT_CLASS)
 		{
 			writeIntCast(cast, writer);
 			return;
 		}
-		if (iclass == Type.LONG_CLASS)
+		if (iclass == Types.LONG_CLASS)
 		{
 			writeLongCast(cast, writer);
 			return;
 		}
-		if (iclass == Type.FLOAT_CLASS)
+		if (iclass == Types.FLOAT_CLASS)
 		{
 			writeFloatCast(cast, writer);
 			return;
 		}
-		if (iclass == Type.DOUBLE_CLASS)
+		if (iclass == Types.DOUBLE_CLASS)
 		{
 			writeDoubleCast(cast, writer);
 			return;

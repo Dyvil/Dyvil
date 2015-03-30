@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -48,13 +49,13 @@ public class TryStatement extends ASTNode implements IStatement
 	@Override
 	public IType getType()
 	{
-		return Type.NONE;
+		return Types.UNKNOWN;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Type.VOID || type == Type.NONE;
+		return type == Types.VOID || type == Types.UNKNOWN;
 	}
 	
 	@Override

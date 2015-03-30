@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.*;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.CaseStatement;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
@@ -76,7 +76,7 @@ public class Operators
 	{
 		if (name == bang)
 		{
-			if (arg1.isType(Type.BOOLEAN))
+			if (arg1.isType(Types.BOOLEAN))
 			{
 				return new BooleanNot(arg1);
 			}
@@ -115,7 +115,7 @@ public class Operators
 		}
 		if (name == ampAmp)
 		{
-			if (arg1.isType(Type.BOOLEAN) && arg2.isType(Type.BOOLEAN))
+			if (arg1.isType(Types.BOOLEAN) && arg2.isType(Types.BOOLEAN))
 			{
 				return new BooleanAnd(arg1, arg2);
 			}
@@ -123,7 +123,7 @@ public class Operators
 		}
 		if (name == barBar)
 		{
-			if (arg1.isType(Type.BOOLEAN) && arg2.isType(Type.BOOLEAN))
+			if (arg1.isType(Types.BOOLEAN) && arg2.isType(Types.BOOLEAN))
 			{
 				return new BooleanOr(arg1, arg2);
 			}

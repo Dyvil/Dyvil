@@ -21,7 +21,7 @@ import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.generic.TypeVariableType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -37,6 +37,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ThisValue;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -67,7 +68,7 @@ public class CodeClass extends ASTNode implements IClass
 	protected IParameter[]			parameters;
 	protected int					parameterCount;
 	
-	protected IType					superType	= Type.OBJECT;
+	protected IType					superType	= Types.OBJECT;
 	protected IType[]				interfaces;
 	protected int					interfaceCount;
 	
@@ -553,7 +554,7 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				ITypeVariable var = this.generics[i];
 				var.resolveTypes(markers, context);
-				type.addType(new WildcardType(null, 0, var.getCaptureClass()));
+				type.addType(new TypeVariableType(var));
 			}
 			
 			this.type = type;
@@ -768,15 +769,6 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			ITypeVariable var = this.generics[i];
-			if (var.getName() == name)
-			{
-				return var.getCaptureClass();
-			}
-		}
-		
 		IClass clazz = this.body.getClass(name);
 		if (clazz != null)
 		{
@@ -788,6 +780,22 @@ public class CodeClass extends ASTNode implements IClass
 			return this.outerClass.resolveClass(name);
 		}
 		return this.unit.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		ITypeVariable var;
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			var = this.generics[i];
+			if (var.getName() == name)
+			{
+				return var;
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override
@@ -852,6 +860,7 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
 	{
+		// Note that a copy of this code is used in WildcardType
 		List<MethodMatch> list = new ArrayList();
 		this.getMethodMatches(list, instance, name, arguments);
 		
@@ -905,6 +914,12 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			this.superType.getMethodMatches(list, instance, name, arguments);
 		}
+		
+		if (!list.isEmpty())
+		{
+			return;
+		}
+		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			this.interfaces[i].getMethodMatches(list, instance, name, arguments);
@@ -1252,7 +1267,7 @@ public class CodeClass extends ASTNode implements IClass
 			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
 			mw.begin();
 			staticFields.writeStatement(mw);
-			mw.end(Type.VOID);
+			mw.end(Types.VOID);
 		}
 	}
 	
@@ -1296,7 +1311,7 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			buffer.append(" extends void");
 		}
-		else if (this.superType != Type.OBJECT)
+		else if (this.superType != Types.OBJECT)
 		{
 			buffer.append(" extends ");
 			this.superType.toString("", buffer);

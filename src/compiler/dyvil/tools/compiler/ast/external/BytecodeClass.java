@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.generic.TypeVariableType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
@@ -60,7 +60,7 @@ public final class BytecodeClass extends CodeClass
 			{
 				ITypeVariable var = this.generics[i];
 				var.resolveTypes(null, Package.rootPackage);
-				type.addType(new WildcardType(null, 0, var.getCaptureClass()));
+				type.addType(new TypeVariableType(var));
 			}
 			
 			this.type = type;
@@ -208,20 +208,6 @@ public final class BytecodeClass extends CodeClass
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		if (!this.genericsResolved)
-		{
-			this.resolveGenerics();
-		}
-		
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			ITypeVariable var = this.generics[i];
-			if (var.getName() == name)
-			{
-				return var.getCaptureClass();
-			}
-		}
-		
 		for (IType t : this.innerTypes)
 		{
 			if (t.getName() == name)
@@ -252,6 +238,11 @@ public final class BytecodeClass extends CodeClass
 		
 		FieldMatch match;
 		
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		
 		// Inherited Fields
 		if (this.superType != null)
 		{
@@ -274,10 +265,21 @@ public final class BytecodeClass extends CodeClass
 			return;
 		}
 		
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		
 		if (this.superType != null)
 		{
 			this.superType.getMethodMatches(list, instance, name, arguments);
 		}
+		
+		if (!list.isEmpty())
+		{
+			return;
+		}
+		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			this.interfaces[i].getMethodMatches(list, instance, name, arguments);
@@ -287,6 +289,11 @@ public final class BytecodeClass extends CodeClass
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		
 		this.body.getConstructorMatches(list, arguments);
 	}
 	

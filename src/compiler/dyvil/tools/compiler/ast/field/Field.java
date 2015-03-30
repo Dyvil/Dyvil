@@ -137,7 +137,7 @@ public class Field extends Member implements IField
 			IValue value1 = this.value.withType(this.type);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.value.getPosition(), "field.type", this.name);
+				Marker marker = markers.create(this.value.getPosition(), "field.type");
 				marker.addInfo("Field Type: " + this.type);
 				marker.addInfo("Value Type: " + this.value.getType());
 				

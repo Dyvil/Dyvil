@@ -4,12 +4,11 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.CaptureClass;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.TypeVariableType;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -24,57 +23,17 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Type extends ASTNode implements IType
 {
-	public static final UnknownType		NONE		= new UnknownType();
-	public static final DynamicType		DYNAMIC		= new DynamicType();
-	
-	public static final PrimitiveType	VOID		= new PrimitiveType(Name._void, 0);
-	public static final PrimitiveType	BOOLEAN		= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
-	public static final PrimitiveType	BYTE		= new PrimitiveType(Name._byte, ClassFormat.T_BOOLEAN);
-	public static final PrimitiveType	SHORT		= new PrimitiveType(Name._short, ClassFormat.T_SHORT);
-	public static final PrimitiveType	CHAR		= new PrimitiveType(Name._char, ClassFormat.T_CHAR);
-	public static final PrimitiveType	INT			= new PrimitiveType(Name._int, ClassFormat.T_INT);
-	public static final PrimitiveType	LONG		= new PrimitiveType(Name._long, ClassFormat.T_LONG);
-	public static final PrimitiveType	FLOAT		= new PrimitiveType(Name._float, ClassFormat.T_FLOAT);
-	public static final PrimitiveType	DOUBLE		= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
-	
-	public static final Type			ANY			= new Type("Any");
-	public static final Type			OBJECT		= new Type("Object");
-	public static final Type			PREDEF		= new Type("Predef");
-	public static final Type			ARRAY		= new Type("Array");
-	public static final Type			STRING		= new Type("String");
-	public static final Type			CLASS		= new Type("Class");
-	
-	public static final AnnotationType	AIntrinsic	= new AnnotationType("Intrinsic");
-	public static final AnnotationType	AOverride	= new AnnotationType("Override");
-	public static final AnnotationType	ARetention	= new AnnotationType("Retention");
-	public static final AnnotationType	ATarget		= new AnnotationType("Target");
-	
-	public static IClass				BOOLEAN_CLASS;
-	public static IClass				BYTE_CLASS;
-	public static IClass				SHORT_CLASS;
-	public static IClass				CHAR_CLASS;
-	public static IClass				INT_CLASS;
-	public static IClass				LONG_CLASS;
-	public static IClass				FLOAT_CLASS;
-	public static IClass				DOUBLE_CLASS;
-	
-	public static IClass				OBJECT_CLASS;
-	public static IClass				STRING_CLASS;
-	public static IClass				PREDEF_CLASS;
-	public static IClass				ARRAY_CLASS;
-	public static IClass				CLASS_CLASS;
-	
-	public Name							name;
-	public String						fullName;
-	public IClass						theClass;
-	public int							arrayDimensions;
+	public Name		name;
+	public String	fullName;
+	public IClass	theClass;
+	public int		arrayDimensions;
 	
 	public Type()
 	{
 		super();
 	}
 	
-	private Type(String name)
+	Type(String name)
 	{
 		this.name = Name.getQualified(name);
 	}
@@ -95,52 +54,6 @@ public class Type extends ASTNode implements IType
 		this.name = iclass.getName();
 		this.fullName = iclass.getFullName();
 		this.theClass = iclass;
-	}
-	
-	public static void init()
-	{
-		BOOLEAN.theClass = BOOLEAN_CLASS = Package.dyvilLang.resolveClass("Boolean");
-		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.apply);
-		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.unapply);
-		BYTE.theClass = BYTE_CLASS = Package.dyvilLang.resolveClass("Byte");
-		BYTE.boxMethod = BYTE_CLASS.getBody().getMethod(Name.apply);
-		BYTE.unboxMethod = BYTE_CLASS.getBody().getMethod(Name.unapply);
-		SHORT.theClass = SHORT_CLASS = Package.dyvilLang.resolveClass("Short");
-		SHORT.boxMethod = SHORT_CLASS.getBody().getMethod(Name.apply);
-		SHORT.unboxMethod = SHORT_CLASS.getBody().getMethod(Name.unapply);
-		CHAR.theClass = CHAR_CLASS = Package.dyvilLang.resolveClass("Char");
-		CHAR.boxMethod = CHAR_CLASS.getBody().getMethod(Name.apply);
-		CHAR.unboxMethod = CHAR_CLASS.getBody().getMethod(Name.unapply);
-		INT.theClass = INT_CLASS = Package.dyvilLang.resolveClass("Int");
-		INT.boxMethod = INT_CLASS.getBody().getMethod(Name.apply);
-		INT.unboxMethod = INT_CLASS.getBody().getMethod(Name.unapply);
-		LONG.theClass = LONG_CLASS = Package.dyvilLang.resolveClass("Long");
-		LONG.boxMethod = LONG_CLASS.getBody().getMethod(Name.apply);
-		LONG.unboxMethod = LONG_CLASS.getBody().getMethod(Name.unapply);
-		FLOAT.theClass = FLOAT_CLASS = Package.dyvilLang.resolveClass("Float");
-		FLOAT.boxMethod = FLOAT_CLASS.getBody().getMethod(Name.apply);
-		FLOAT.unboxMethod = FLOAT_CLASS.getBody().getMethod(Name.unapply);
-		DOUBLE.theClass = DOUBLE_CLASS = Package.dyvilLang.resolveClass("Double");
-		DOUBLE.boxMethod = DOUBLE_CLASS.getBody().getMethod(Name.apply);
-		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod(Name.unapply);
-		
-		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
-		OBJECT.fullName = "java.lang.Object";
-		ANY.theClass = OBJECT_CLASS;
-		ANY.fullName = "dyvil.lang.Any";
-		PREDEF.theClass = PREDEF_CLASS = Package.dyvilLang.resolveClass("Predef");
-		PREDEF.fullName = "dyvil.lang.Predef";
-		ARRAY.theClass = ARRAY_CLASS = Package.dyvilLang.resolveClass("Array");
-		ARRAY.fullName = "dyvil.lang.Array";
-		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
-		STRING.fullName = "java.lang.String";
-		CLASS.theClass = CLASS_CLASS = Package.javaLang.resolveClass("Class");
-		CLASS.fullName = "java.lang.Class";
-		
-		AIntrinsic.theClass = Package.dyvilLangAnnotation.resolveClass("Intrinsic");
-		AOverride.theClass = Package.javaLang.resolveClass("Override");
-		ARetention.theClass = Package.javaLangAnnotation.resolveClass("Retention");
-		ATarget.theClass = Package.javaLangAnnotation.resolveClass("Target");
 	}
 	
 	public static IType findCommonSuperType(IType type1, IType type2)
@@ -176,14 +89,14 @@ public class Type extends ASTNode implements IType
 				}
 			}
 		}
-		return ANY;
+		return Types.ANY;
 	}
 	
 	private static IType superType(IType type1, IType type2)
 	{
 		if (type1.getArrayDimensions() != type2.getArrayDimensions())
 		{
-			return OBJECT;
+			return Types.OBJECT;
 		}
 		if (type1.isSuperTypeOf(type2))
 		{
@@ -232,30 +145,6 @@ public class Type extends ASTNode implements IType
 	public IClass getTheClass()
 	{
 		return this.theClass;
-	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return this.arrayDimensions != 0;
-	}
-	
-	@Override
-	public boolean isGeneric()
-	{
-		return false;
-	}
-	
-	@Override
-	public boolean hasTypeVariables()
-	{
-		return false;
-	}
-	
-	@Override
-	public IType getConcreteType(ITypeContext context)
-	{
-		return this;
 	}
 	
 	@Override
@@ -355,6 +244,24 @@ public class Type extends ASTNode implements IType
 	// Resolve
 	
 	@Override
+	public boolean hasTypeVariables()
+	{
+		return false;
+	}
+	
+	@Override
+	public IType getConcreteType(ITypeContext context)
+	{
+		return this;
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return this.theClass != null;
+	}
+	
+	@Override
 	public IType resolve(MarkerList markers, IContext context)
 	{
 		if (this.theClass != null)
@@ -383,6 +290,12 @@ public class Type extends ASTNode implements IType
 		}
 		else
 		{
+			ITypeVariable typeVar = context.resolveTypeVariable(this.name);
+			if (typeVar != null)
+			{
+				return new TypeVariableType(typeVar);
+			}
+			
 			// This type is probably not a primitive one, so resolve using
 			// the context.
 			iclass = context.resolveClass(this.name);
@@ -390,11 +303,6 @@ public class Type extends ASTNode implements IType
 		
 		if (iclass != null)
 		{
-			if (iclass instanceof CaptureClass)
-			{
-				return new WildcardType(this.position, this.arrayDimensions, (CaptureClass) iclass);
-			}
-			
 			this.theClass = iclass;
 			this.fullName = iclass.getFullName();
 			return this;
@@ -410,55 +318,49 @@ public class Type extends ASTNode implements IType
 	{
 		if (name == Name._void)
 		{
-			return VOID;
+			return Types.VOID;
 		}
 		if (name == Name._boolean)
 		{
-			return BOOLEAN;
+			return Types.BOOLEAN;
 		}
 		if (name == Name._byte)
 		{
-			return BYTE;
+			return Types.BYTE;
 		}
 		if (name == Name._short)
 		{
-			return SHORT;
+			return Types.SHORT;
 		}
 		if (name == Name._char)
 		{
-			return CHAR;
+			return Types.CHAR;
 		}
 		if (name == Name._int)
 		{
-			return INT;
+			return Types.INT;
 		}
 		if (name == Name._long)
 		{
-			return LONG;
+			return Types.LONG;
 		}
 		if (name == Name._float)
 		{
-			return FLOAT;
+			return Types.FLOAT;
 		}
 		if (name == Name._double)
 		{
-			return DOUBLE;
+			return Types.DOUBLE;
 		}
 		if (name == Name.any)
 		{
-			return ANY;
+			return Types.ANY;
 		}
 		if (name == Name.dynamic)
 		{
-			return DYNAMIC;
+			return Types.DYNAMIC;
 		}
 		return null;
-	}
-	
-	@Override
-	public boolean isResolved()
-	{
-		return this.theClass != null;
 	}
 	
 	// IContext
@@ -473,6 +375,12 @@ public class Type extends ASTNode implements IType
 	public IClass resolveClass(Name name)
 	{
 		return this.theClass == null ? null : this.theClass.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.theClass == null ? null : this.theClass.resolveTypeVariable(name);
 	}
 	
 	@Override
@@ -491,7 +399,7 @@ public class Type extends ASTNode implements IType
 	{
 		if (this.arrayDimensions > 0)
 		{
-			return ARRAY_CLASS.resolveMethod(instance, name, arguments);
+			return Types.ARRAY_CLASS.resolveMethod(instance, name, arguments);
 		}
 		
 		return this.theClass == null ? null : this.theClass.resolveMethod(instance, name, arguments);
@@ -502,7 +410,7 @@ public class Type extends ASTNode implements IType
 	{
 		if (this.arrayDimensions > 0)
 		{
-			ARRAY_CLASS.getMethodMatches(list, instance, name, arguments);
+			Types.ARRAY_CLASS.getMethodMatches(list, instance, name, arguments);
 			return;
 		}
 		

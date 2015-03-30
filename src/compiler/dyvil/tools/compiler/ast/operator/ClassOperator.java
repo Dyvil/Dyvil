@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -26,7 +26,7 @@ public final class ClassOperator extends ASTNode implements IValue
 	public void setType(IType type)
 	{
 		this.type = type;
-		GenericType generic = new GenericType(Type.CLASS_CLASS);
+		GenericType generic = new GenericType(Types.CLASS_CLASS);
 		generic.addType(type);
 		this.genericType = generic;
 	}

@@ -11,10 +11,7 @@ import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethodSignature;
-import dyvil.tools.compiler.ast.type.GenericType;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.*;
 
 public final class ClassFormat
 {
@@ -168,23 +165,23 @@ public final class ClassFormat
 		switch (c)
 		{
 		case 'V':
-			return Type.VOID;
+			return Types.VOID;
 		case 'Z':
-			return Type.BOOLEAN;
+			return Types.BOOLEAN;
 		case 'B':
-			return Type.BYTE;
+			return Types.BYTE;
 		case 'S':
-			return Type.SHORT;
+			return Types.SHORT;
 		case 'C':
-			return Type.CHAR;
+			return Types.CHAR;
 		case 'I':
-			return Type.INT;
+			return Types.INT;
 		case 'J':
-			return Type.LONG;
+			return Types.LONG;
 		case 'F':
-			return Type.FLOAT;
+			return Types.FLOAT;
 		case 'D':
-			return Type.DOUBLE;
+			return Types.DOUBLE;
 		}
 		return null;
 	}

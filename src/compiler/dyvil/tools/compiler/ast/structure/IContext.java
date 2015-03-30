@@ -4,6 +4,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -21,23 +22,15 @@ public interface IContext
 	public static final byte	STATIC				= 4;
 	public static final byte	SEALED				= 5;
 	
-	public default boolean isStatic()
-	{
-		return true;
-	}
+	public boolean isStatic();
 	
-	/**
-	 * Returns the type of this context. {@code null} in case of a package or
-	 * compilation unit, this in case of a Class and the class this is contained
-	 * in in case of a method.
-	 * 
-	 * @return the type of this context
-	 */
 	public IType getThisType();
 	
 	public Package resolvePackage(Name name);
 	
 	public IClass resolveClass(Name name);
+	
+	public ITypeVariable resolveTypeVariable(Name name);
 	
 	public FieldMatch resolveField(Name name);
 	
