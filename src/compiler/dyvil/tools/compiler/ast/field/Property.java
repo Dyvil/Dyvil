@@ -30,10 +30,10 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 public class Property extends Member implements IProperty, IContext
 {
-	private IClass		theClass;
+	private IClass				theClass;
 	
-	public IValue		get;
-	public IValue		set;
+	public IValue				get;
+	public IValue				set;
 	
 	protected MethodParameter	setterParameter;
 	
@@ -332,8 +332,8 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.set != null)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers | Modifiers.SYNTHETIC, "set$" + this.name.qualified, "(" + extended
-					+ ")V", signature == null ? null : "(" + signature + ")V", null));
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers | Modifiers.SYNTHETIC, "set$" + this.name.qualified, "("
+					+ extended + ")V", signature == null ? null : "(" + signature + ")V", null));
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{

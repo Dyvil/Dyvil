@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.transform;
 
+import static dyvil.tools.compiler.ast.member.Name.*;
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.member.Name;
@@ -9,8 +10,6 @@ import dyvil.tools.compiler.ast.value.CaseStatement;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.ast.value.MatchExpression;
-
-import static dyvil.tools.compiler.ast.member.Name.*;
 
 public class Operators
 {

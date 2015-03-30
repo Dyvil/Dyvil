@@ -60,7 +60,6 @@ public class ExternalProperty extends Property
 		return this.type.getConcreteType(context);
 	}
 	
-	
 	@Override
 	public Annotation getAnnotation(int index)
 	{

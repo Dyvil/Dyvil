@@ -37,8 +37,8 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	
 	public DWTNode				parent;
 	
-	public Name				name;
-	public String fullName;
+	public Name					name;
+	public String				fullName;
 	public IType				type;
 	public List<DWTProperty>	properties	= new ArrayList();
 	

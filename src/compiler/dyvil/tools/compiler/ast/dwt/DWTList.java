@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.dwt;
 
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ArrayValue;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class DWTList extends ArrayValue

@@ -20,7 +20,8 @@ import dyvil.tools.compiler.util.TestThread;
 public interface ICompilerPhase extends Comparable<ICompilerPhase>
 {
 	/**
-	 * Splits the input file into {@link IdentifierToken Tokens} using {@link Dlex}.
+	 * Splits the input file into {@link IdentifierToken Tokens} using
+	 * {@link Dlex}.
 	 */
 	ICompilerPhase	TOKENIZE		= new ParallelCompilerPhase(10, "TOKENIZE", ICompilationUnit::tokenize);
 	

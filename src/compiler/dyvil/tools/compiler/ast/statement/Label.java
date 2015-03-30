@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.value.IValue;
 
 public class Label
 {
-	public Name					name;
+	public Name						name;
 	public IValue					value;
 	
 	public org.objectweb.asm.Label	target	= new org.objectweb.asm.Label();

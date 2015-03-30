@@ -14,7 +14,7 @@ public final class FloatToken implements IToken
 	private final int	start;
 	private final int	end;
 	
-	private float			value;
+	private float		value;
 	
 	public FloatToken(IToken prev, float value, int lineNumber, int start, int end)
 	{

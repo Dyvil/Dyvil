@@ -1,7 +1,8 @@
 package dyvil.tools.compiler.backend;
 
 import static dyvil.reflect.Opcodes.*;
-import static dyvil.tools.compiler.backend.ClassFormat.*;
+import static dyvil.tools.compiler.backend.ClassFormat.DOUBLE;
+import static dyvil.tools.compiler.backend.ClassFormat.LONG;
 
 import org.objectweb.asm.*;
 import org.objectweb.asm.ClassWriter;
@@ -71,10 +72,12 @@ public final class MethodWriterImpl implements MethodWriter
 		int index = this.localCount;
 		this.mv.visitParameter(name, index);
 		
-		if (type == LONG || type == DOUBLE) {
+		if (type == LONG || type == DOUBLE)
+		{
 			this.localCount += 2;
 		}
-		else {
+		else
+		{
 			this.localCount += 1;
 		}
 		return index;

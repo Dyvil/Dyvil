@@ -14,7 +14,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class TypeVariable extends ASTNode implements ITypeVariable
 {
-	public Name			name;
+	public Name				name;
 	
 	protected IType[]		upperBounds	= new IType[1];
 	protected int			upperBoundCount;

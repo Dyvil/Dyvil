@@ -72,7 +72,7 @@ public class MethodInstruction implements IInstruction
 		if (index >= this.args.length)
 		{
 			String[] temp = new String[this.argsCount];
-			System.arraycopy(args, 0, temp, 0, args.length);
+			System.arraycopy(this.args, 0, temp, 0, this.args.length);
 			this.args = temp;
 		}
 		this.args[index] = desc;

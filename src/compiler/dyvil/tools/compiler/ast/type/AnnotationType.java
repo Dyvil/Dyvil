@@ -25,8 +25,8 @@ public class AnnotationType extends Type
 		VALUE.name = Name.getQualified("value");
 	}
 	
-	public RetentionPolicy			retention;
-	public Set<ElementType>			targets;
+	public RetentionPolicy				retention;
+	public Set<ElementType>				targets;
 	
 	public AnnotationType()
 	{

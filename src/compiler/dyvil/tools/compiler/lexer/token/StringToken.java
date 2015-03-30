@@ -14,7 +14,7 @@ public final class StringToken implements IToken
 	private final int	start;
 	private final int	end;
 	
-	private String			value;
+	private String		value;
 	
 	public StringToken(IToken prev, String value, int lineNumber, int start, int end)
 	{

@@ -1,6 +1,9 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.*;
+import static dyvil.reflect.Opcodes.ARGUMENTS;
+import static dyvil.reflect.Opcodes.IF_ACMPEQ;
+import static dyvil.reflect.Opcodes.IF_ACMPNE;
+import static dyvil.reflect.Opcodes.INSTANCE;
 
 import java.util.*;
 

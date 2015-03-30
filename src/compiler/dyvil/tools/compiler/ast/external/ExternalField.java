@@ -54,7 +54,6 @@ public class ExternalField extends Field
 		return this.type.getConcreteType(context);
 	}
 	
-	
 	@Override
 	public Annotation getAnnotation(int index)
 	{

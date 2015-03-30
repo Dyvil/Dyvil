@@ -10,8 +10,8 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.ArrayValue;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public class AnnotationVisitorImpl extends AnnotationVisitor

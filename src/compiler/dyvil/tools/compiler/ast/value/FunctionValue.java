@@ -26,7 +26,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 {
 	public IValue				instance;
 	
-	public Name name;
+	public Name					name;
 	
 	/**
 	 * The type this function pointer represents

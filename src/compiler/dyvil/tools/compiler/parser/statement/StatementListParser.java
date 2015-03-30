@@ -224,7 +224,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 	{
 		parser.setParent(this.parser);
 		this.parser = parser;
-		pm.reparse();
+		this.pm.reparse();
 	}
 	
 	@Override

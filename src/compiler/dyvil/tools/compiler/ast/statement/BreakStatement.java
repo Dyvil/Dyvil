@@ -12,7 +12,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public class BreakStatement extends ASTNode implements IStatement
 {
 	public Label		label;
-	public Name		name;
+	public Name			name;
 	
 	private IStatement	parent;
 	

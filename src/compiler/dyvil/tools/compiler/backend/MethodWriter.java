@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.backend;
 
-import org.objectweb.asm.*;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Type;
 
 import dyvil.tools.compiler.ast.type.IType;
 

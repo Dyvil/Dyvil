@@ -247,7 +247,7 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall
 			return;
 		}
 		
-		this.constructor.writeCall(writer, arguments, null);
+		this.constructor.writeCall(writer, this.arguments, null);
 	}
 	
 	@Override

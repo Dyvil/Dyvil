@@ -80,7 +80,7 @@ public final class InternalTypeParser extends Parser
 	
 	private static boolean isPrimitiveName(Name name)
 	{
-		return (name == Name._void) || (name == Name._boolean) || (name == Name._byte) || (name == Name._short) || (name == Name._char) || (name == Name._int)
-				|| (name == Name._long) || (name == Name._float) || (name == Name._double);
+		return name == Name._void || name == Name._boolean || name == Name._byte || name == Name._short || name == Name._char || name == Name._int
+				|| name == Name._long || name == Name._float || name == Name._double;
 	}
 }

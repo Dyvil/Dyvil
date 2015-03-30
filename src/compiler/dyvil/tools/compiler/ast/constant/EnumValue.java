@@ -13,7 +13,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public class EnumValue extends ASTNode implements IConstantValue, INamed
 {
 	public IType	type;
-	public Name name;
+	public Name		name;
 	
 	public EnumValue(ICodePosition position)
 	{

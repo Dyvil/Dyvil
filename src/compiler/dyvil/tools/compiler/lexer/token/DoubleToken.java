@@ -14,7 +14,7 @@ public final class DoubleToken implements IToken
 	private final int	start;
 	private final int	end;
 	
-	private double			value;
+	private double		value;
 	
 	public DoubleToken(IToken prev, double value, int lineNumber, int start, int end)
 	{

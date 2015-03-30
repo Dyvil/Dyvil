@@ -103,7 +103,8 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 					this.type = this.type.getArrayType();
 				}
 				
-				this.parameter = this.paramList instanceof IClass ? new ClassParameter(token.nameValue(), this.type) : new MethodParameter(token.nameValue(), this.type);
+				this.parameter = this.paramList instanceof IClass ? new ClassParameter(token.nameValue(), this.type) : new MethodParameter(token.nameValue(),
+						this.type);
 				this.parameter.setModifiers(this.modifiers);
 				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.paramList.addParameter(this.parameter);

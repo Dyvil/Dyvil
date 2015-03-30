@@ -14,7 +14,7 @@ public final class LiteralValue implements IValue
 	private SingleArgument	argument;
 	private IType			type;
 	
-	private IMethod	method;
+	private IMethod			method;
 	
 	public LiteralValue(IType type, IValue literal)
 	{

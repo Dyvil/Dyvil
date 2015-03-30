@@ -13,7 +13,7 @@ public final class CharToken implements IToken
 	private final int	lineNumber;
 	private final int	start;
 	
-	private char			value;
+	private char		value;
 	
 	public CharToken(IToken prev, char value, int lineNumber, int start)
 	{

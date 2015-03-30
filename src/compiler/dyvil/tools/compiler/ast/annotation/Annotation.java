@@ -29,7 +29,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class Annotation extends ASTNode implements ITyped
 {
-	public Name			name;
+	public Name				name;
 	public AnnotationType	type;
 	public IArguments		arguments;
 	public ElementType		target;

@@ -141,7 +141,8 @@ public class ParserManager implements IParserManager
 	 *            the value of the token
 	 * @param token
 	 *            the token
-	 * @return true, if the token should be parsed or removed from the token stream
+	 * @return true, if the token should be parsed or removed from the token
+	 *         stream
 	 */
 	public boolean retainToken(IToken token, IToken prev)
 	{

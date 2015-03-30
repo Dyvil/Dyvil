@@ -13,9 +13,9 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class SyncStatementParser extends Parser implements IValued
 {
-	public static final int		LOCK		= 1;
-	public static final int		LOCK_END	= 2;
-	public static final int		THEN			= 4;
+	public static final int	LOCK		= 1;
+	public static final int	LOCK_END	= 2;
+	public static final int	THEN		= 4;
 	
 	protected SyncStatement	statement;
 	

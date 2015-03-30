@@ -14,7 +14,7 @@ public final class LongToken implements IToken
 	private final int	start;
 	private final int	end;
 	
-	private long			value;
+	private long		value;
 	
 	public LongToken(IToken prev, long value, int lineNumber, int start, int end)
 	{

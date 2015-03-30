@@ -16,15 +16,15 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public class DoStatement extends ASTNode implements IStatement, ILoop
 {
 	public static final Name	$doCondition	= Name.getQualified("$doCondition");
-	public static final Name	$doEnd	= Name.getQualified("$doEnd");
+	public static final Name	$doEnd			= Name.getQualified("$doEnd");
 	
-	public IValue		action;
-	public IValue		condition;
+	public IValue				action;
+	public IValue				condition;
 	
-	private IStatement	parent;
+	private IStatement			parent;
 	
-	public Label		conditionLabel;
-	public Label		endLabel;
+	public Label				conditionLabel;
+	public Label				endLabel;
 	
 	public DoStatement(ICodePosition position)
 	{
