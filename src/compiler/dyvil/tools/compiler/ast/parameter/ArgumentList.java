@@ -26,7 +26,7 @@ public final class ArgumentList implements IArguments, IValueList
 		this.values = new IValue[3];
 	}
 	
-	protected ArgumentList(IValue[] values, int size)
+	public ArgumentList(IValue[] values, int size)
 	{
 		this.values = values;
 		this.size = size;

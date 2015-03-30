@@ -234,13 +234,13 @@ public final class MatchExpression extends ASTNode implements IValue
 	
 	private void write(MethodWriter writer, boolean expr)
 	{
-		int varIndex = writer.localCount();
+		int varIndex = writer.registerLocal();
 		
 		IType type = this.value.getType();
 		this.value.writeExpression(writer);
 		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
 		
-		int localCount = writer.localCount();
+		int localCount = writer.registerLocal();
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();

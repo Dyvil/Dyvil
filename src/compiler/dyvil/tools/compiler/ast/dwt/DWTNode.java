@@ -248,7 +248,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		Label start = new Label();
 		Label end = new Label();
 		
-		int index = this.varIndex = writer.localCount();
+		int index = this.varIndex = writer.registerLocal();
 		writer.writeLabel(start);
 		if (this.getter != null)
 		{

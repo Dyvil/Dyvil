@@ -125,7 +125,7 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	{
 		this.variable.type = this.type;
 		writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.registerLocal());
 	}
 	
 	@Override

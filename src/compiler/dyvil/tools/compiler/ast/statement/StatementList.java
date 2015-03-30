@@ -423,7 +423,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
 		
 		writer.writeLabel(start);
-		int count = writer.localCount();
+		int count = writer.registerLocal();
 		int len = this.valueCount - 1;
 		
 		if (this.labels == null)
@@ -476,7 +476,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
 		
 		writer.writeLabel(start);
-		int count = writer.localCount();
+		int count = writer.registerLocal();
 		
 		if (this.labels == null)
 		{

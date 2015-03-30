@@ -19,11 +19,7 @@ public final class MethodWriterImpl implements MethodWriter
 	protected MethodVisitor		mv;
 	
 	private boolean				hasReturn;
-	
-	private int					localCount;
-	
-	// Inlining
-	
+	private int					localIndex;
 	private Label				inlineEnd;
 	
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
@@ -35,7 +31,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void setInstanceMethod()
 	{
-		this.localCount = 1;
+		this.localIndex = 1;
 	}
 	
 	@Override
@@ -69,16 +65,16 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public int registerParameter(String name, Object type)
 	{
-		int index = this.localCount;
+		int index = this.localIndex;
 		this.mv.visitParameter(name, index);
 		
 		if (type == LONG || type == DOUBLE)
 		{
-			this.localCount += 2;
+			this.localIndex += 2;
 		}
 		else
 		{
-			this.localCount += 1;
+			this.localIndex += 1;
 		}
 		return index;
 	}
@@ -86,15 +82,15 @@ public final class MethodWriterImpl implements MethodWriter
 	// Locals
 	
 	@Override
-	public int localCount()
+	public int registerLocal()
 	{
-		return this.localCount;
+		return this.localIndex;
 	}
 	
 	@Override
 	public void resetLocals(int count)
 	{
-		this.localCount = count;
+		this.localIndex = count;
 	}
 	
 	@Override
@@ -524,9 +520,16 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		this.hasReturn = false;
 		
-		if (opcode >= ISTORE && opcode <= ASTORE)
+		if (index >= this.localIndex)
 		{
-			this.localCount = index;
+			if (opcode == ISTORE || opcode == FSTORE || opcode == ASTORE)
+			{
+				this.localIndex = index + 1;
+			}
+			else if (opcode == LSTORE || opcode == DSTORE)
+			{
+				this.localIndex = index + 2;
+			}
 		}
 		this.mv.visitVarInsn(opcode, index);
 	}

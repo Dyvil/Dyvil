@@ -100,7 +100,7 @@ public final class SyncStatement extends ASTNode implements IValue
 	
 	private void write(MethodWriter writer, boolean expression)
 	{
-		int localCount = writer.localCount();
+		int localCount = writer.registerLocal();
 		this.lock.writeExpression(writer);
 		writer.writeInsn(Opcodes.DUP);
 		writer.writeVarInsn(Opcodes.ASTORE, localCount);

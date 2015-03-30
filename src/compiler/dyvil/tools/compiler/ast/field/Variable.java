@@ -171,7 +171,7 @@ public class Variable extends Member implements IVariable
 		
 		if (this.index == -1)
 		{
-			writer.writeVarInsn(this.type.getStoreOpcode(), this.index = writer.localCount());
+			writer.writeVarInsn(this.type.getStoreOpcode(), this.index = writer.registerLocal());
 		}
 		else
 		{

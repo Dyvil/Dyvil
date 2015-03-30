@@ -243,7 +243,7 @@ public class TryStatement extends ASTNode implements IStatement
 			{
 				// If yes register a new local variable for the exception and
 				// store it.
-				int localCount = writer.localCount();
+				int localCount = writer.registerLocal();
 				
 				writer.writeLabel(handlerLabel);
 				writer.writeVarInsn(Opcodes.ASTORE, localCount);

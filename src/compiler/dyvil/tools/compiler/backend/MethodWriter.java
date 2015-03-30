@@ -27,7 +27,7 @@ public interface MethodWriter
 	
 	// Local Variables
 	
-	public int localCount();
+	public int registerLocal();
 	
 	public void resetLocals(int count);
 	
