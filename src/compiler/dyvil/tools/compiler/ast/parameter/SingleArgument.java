@@ -192,7 +192,7 @@ public final class SingleArgument implements IArguments, IValued
 		// Write an array with one element
 		type = type.getElementType();
 		writer.writeLDC(1);
-		writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
+		writer.writeNewArray(type, 1);
 		writer.writeInsn(Opcodes.DUP);
 		writer.writeLDC(0);
 		this.value.writeExpression(writer);

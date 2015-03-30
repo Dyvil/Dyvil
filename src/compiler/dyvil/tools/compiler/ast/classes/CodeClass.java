@@ -1193,20 +1193,20 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null,
 					null));
-			mw.setInstance(this.type);
+			mw.setInstanceMethod();
 			mw.registerParameter("obj", "java/lang/Object");
 			mw.begin();
 			CaseClasses.writeEquals(mw, this);
 			mw.end();
 			
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I", null, null));
-			mw.setInstance(this.type);
+			mw.setInstanceMethod();
 			mw.begin();
 			CaseClasses.writeHashCode(mw, this);
 			mw.end();
 			
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString", "()Ljava/lang/String;", null, null));
-			mw.setInstance(this.type);
+			mw.setInstanceMethod();
 			mw.begin();
 			CaseClasses.writeToString(mw, this);
 			mw.end();
@@ -1215,7 +1215,7 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers(), "apply", this.applyMethod.getDescriptor(), null, null));
 				mw.begin();
-				mw.writeTypeInsn(Opcodes.NEW, this.type);
+				mw.writeTypeInsn(Opcodes.NEW, this.type.getInternalName());
 				mw.writeInsn(Opcodes.DUP);
 				for (int i = 0; i < this.parameterCount; i++)
 				{

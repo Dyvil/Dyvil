@@ -238,7 +238,6 @@ public class TryStatement extends ASTNode implements IStatement
 			CatchBlock block = this.catchBlocks[i];
 			org.objectweb.asm.Label handlerLabel = new org.objectweb.asm.Label();
 			
-			writer.push(block.type);
 			// Check if the block's variable is actually used
 			if (block.variable != null)
 			{
@@ -247,7 +246,6 @@ public class TryStatement extends ASTNode implements IStatement
 				int localCount = writer.localCount();
 				
 				writer.writeLabel(handlerLabel);
-				writer.writeFrame();
 				writer.writeVarInsn(Opcodes.ASTORE, localCount);
 				block.variable.index = localCount;
 				block.action.writeStatement(writer);
@@ -256,12 +254,12 @@ public class TryStatement extends ASTNode implements IStatement
 			// Otherwise pop the exception from the stack
 			else
 			{
-				writer.writeFrameLabel(handlerLabel);
+				writer.writeLabel(handlerLabel);
 				writer.writeInsn(Opcodes.POP);
 				block.action.writeStatement(writer);
 			}
 			
-			writer.writeTryCatchBlock(tryStart, tryEnd, handlerLabel, block.type);
+			writer.writeTryCatchBlock(tryStart, tryEnd, handlerLabel, block.type.getInternalName());
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		
@@ -269,16 +267,15 @@ public class TryStatement extends ASTNode implements IStatement
 		{
 			org.objectweb.asm.Label finallyLabel = new org.objectweb.asm.Label();
 			
-			writer.push("java/lang/Throwable");
 			writer.writeLabel(finallyLabel);
 			writer.writeInsn(Opcodes.POP);
-			writer.writeFrameLabel(endLabel);
+			writer.writeLabel(endLabel);
 			this.finallyBlock.writeExpression(writer);
 			writer.writeFinallyBlock(tryStart, tryEnd, finallyLabel);
 		}
 		else
 		{
-			writer.writeFrameLabel(endLabel);
+			writer.writeLabel(endLabel);
 		}
 	}
 	

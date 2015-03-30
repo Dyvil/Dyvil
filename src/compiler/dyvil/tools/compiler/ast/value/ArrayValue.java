@@ -330,7 +330,7 @@ public class ArrayValue extends ASTNode implements IValue, IValueList
 		int opcode = type.getArrayStoreOpcode();
 		
 		writer.writeLDC(this.valueCount);
-		writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
+		writer.writeNewArray(type, 1);
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{

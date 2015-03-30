@@ -127,8 +127,7 @@ public final class SyncStatement extends ASTNode implements IValue
 		
 		writer.writeJumpInsn(Opcodes.GOTO, handlerEnd);
 		
-		writer.writeFrameLabel(handlerStart);
-		writer.push("java/lang/Throwable");
+		writer.writeLabel(handlerStart);
 		writer.writeVarInsn(Opcodes.ALOAD, localCount);
 		writer.writeInsn(Opcodes.MONITOREXIT);
 		writer.writeLabel(throwLabel);
@@ -139,7 +138,7 @@ public final class SyncStatement extends ASTNode implements IValue
 		}
 		
 		writer.resetLocals(localCount);
-		writer.writeFrameLabel(handlerEnd);
+		writer.writeLabel(handlerEnd);
 		
 		writer.writeFinallyBlock(start, end, handlerStart);
 		writer.writeFinallyBlock(handlerStart, throwLabel, handlerStart);

@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import org.objectweb.asm.Handle;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.util.Printer;
 
 import dyvil.tools.compiler.ast.value.IValue;
@@ -15,18 +14,12 @@ public class InvokeDynamicInstruction implements IInstruction
 	private Handle		bsm;
 	private Object[]	bsmArguments;
 	
-	private String		returnType;
-	private int			args;
-	
 	public InvokeDynamicInstruction(String name, String type, Handle bsm, Object[] bsmArguments)
 	{
 		this.name = name;
 		this.type = type;
 		this.bsm = bsm;
 		this.bsmArguments = bsmArguments;
-		
-		this.type = type.substring(type.lastIndexOf(')') + 1);
-		this.args = Type.getArgumentsAndReturnSizes(type) >> 2;
 	}
 	
 	@Override
@@ -37,7 +30,7 @@ public class InvokeDynamicInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.writeInvokeDynamic(this.name, this.type, this.args, this.returnType, this.bsm, this.bsmArguments);
+		writer.writeInvokeDynamic(this.name, this.type, this.bsm, this.bsmArguments);
 	}
 	
 	@Override

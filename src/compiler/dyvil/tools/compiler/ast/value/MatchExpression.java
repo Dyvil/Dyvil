@@ -282,7 +282,7 @@ public final class MatchExpression extends ASTNode implements IValue
 			
 			if (destLabel != null)
 			{
-				writer.writeFrameLabel(destLabel);
+				writer.writeLabel(destLabel);
 				destLabel = null;
 			}
 			
@@ -297,7 +297,7 @@ public final class MatchExpression extends ASTNode implements IValue
 			
 			writer.resetLocals(localCount);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
-			writer.writeFrameLabel(elseLabel);
+			writer.writeLabel(elseLabel);
 			if (++i < this.caseCount)
 			{
 				elseLabel = new Label();
@@ -305,17 +305,17 @@ public final class MatchExpression extends ASTNode implements IValue
 		}
 		
 		// MatchError
-		writer.writeFrameLabel(elseLabel);
+		writer.writeLabel(elseLabel);
 		if (!this.exhaustive)
 		{
 			writer.writeTypeInsn(Opcodes.NEW, "dyvil/lang/MatchError");
 			writer.writeInsn(Opcodes.DUP);
 			writer.writeVarInsn(type.getLoadOpcode(), varIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", "(" + type.getExtendedName() + ")V", 1, null);
+			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", "(" + type.getExtendedName() + ")V", false);
 			writer.writeInsn(Opcodes.ATHROW);
 			writer.resetLocals(varIndex);
 		}
-		writer.writeFrameLabel(endLabel);
+		writer.writeLabel(endLabel);
 	}
 	
 	@Override

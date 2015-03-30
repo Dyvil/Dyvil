@@ -309,7 +309,7 @@ public class Property extends Member implements IProperty, IContext
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
-				mw.setInstance(this.theClass.getThisType());
+				mw.setInstanceMethod();
 			}
 			
 			for (int i = 0; i < this.annotationCount; i++)
@@ -337,7 +337,7 @@ public class Property extends Member implements IProperty, IContext
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
-				mw.setInstance(this.theClass.getThisType());
+				mw.setInstanceMethod();
 			}
 			
 			for (int i = 0; i < this.annotationCount; i++)
@@ -383,7 +383,7 @@ public class Property extends Member implements IProperty, IContext
 		String owner = this.theClass.getInternalName();
 		String name = "get$" + this.name.qualified;
 		String desc = "()" + this.type.getExtendedName();
-		writer.writeInvokeInsn(opcode, owner, name, desc, false, 0, this.type);
+		writer.writeInvokeInsn(opcode, owner, name, desc, false);
 	}
 	
 	@Override
@@ -412,7 +412,7 @@ public class Property extends Member implements IProperty, IContext
 		String owner = this.theClass.getInternalName();
 		String name = "set$" + this.name.qualified;
 		String desc = "(" + this.type.getExtendedName() + ")V";
-		writer.writeInvokeInsn(opcode, owner, name, desc, false, 1, (String) null);
+		writer.writeInvokeInsn(opcode, owner, name, desc, false);
 	}
 	
 	@Override

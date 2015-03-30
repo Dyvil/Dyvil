@@ -561,7 +561,7 @@ public class Constructor extends Member implements IConstructor
 		}
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(), this.getSignature(), this.getExceptions()));
 		
-		mw.setConstructor(this.type);
+		mw.setInstanceMethod();
 		
 		for (int i = 0; i < this.annotationCount; i++)
 		{
@@ -625,14 +625,15 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void writeInvoke(MethodWriter writer, IArguments arguments)
 	{
-		int args = this.writeArguments(writer, arguments);
+		this.writeArguments(writer, arguments);
+		
 		String owner = this.theClass.getInternalName();
 		String name = "<init>";
 		String desc = this.getDescriptor();
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false, args, (String) null);
+		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false);
 	}
 	
-	private int writeArguments(MethodWriter writer, IArguments arguments)
+	private void writeArguments(MethodWriter writer, IArguments arguments)
 	{
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
@@ -645,7 +646,7 @@ public class Constructor extends Member implements IConstructor
 			}
 			param = this.parameters[len];
 			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
-			return this.parameterCount;
+			return;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -653,7 +654,6 @@ public class Constructor extends Member implements IConstructor
 			IParameter param = this.parameters[i];
 			arguments.writeValue(i, param.getName(), param.getValue(), writer);
 		}
-		return this.parameterCount;
 	}
 	
 	@Override

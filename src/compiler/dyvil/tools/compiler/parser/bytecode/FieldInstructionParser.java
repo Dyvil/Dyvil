@@ -75,7 +75,7 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 	}
 	
 	@Override
-	public void setInternalType(String desc, Object type)
+	public void setInternalType(String desc)
 	{
 		if (this.mode == DOT)
 		{
@@ -85,14 +85,12 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 		if (this.mode == COLON)
 		{
 			this.fieldInstruction.setDesc(desc);
-			this.fieldInstruction.setType(type);
 		}
 	}
 	
 	@Override
-	public Object getInternalType()
+	public String getInternalType()
 	{
 		return null;
 	}
-	
 }

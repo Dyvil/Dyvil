@@ -108,7 +108,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 	}
 	
 	@Override
-	public void setInternalType(String desc, Object type)
+	public void setInternalType(String desc)
 	{
 		if (this.mode == DOT)
 		{
@@ -118,7 +118,6 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		if (this.mode == COLON)
 		{
 			this.methodInstruction.setReturnDesc(desc);
-			this.methodInstruction.setReturnType(type);
 			return;
 		}
 		
@@ -126,9 +125,8 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 	}
 	
 	@Override
-	public Object getInternalType()
+	public String getInternalType()
 	{
 		return null;
 	}
-	
 }

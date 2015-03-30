@@ -26,13 +26,13 @@ public class TypeInstruction implements IInstruction, IInternalTyped
 	}
 	
 	@Override
-	public void setInternalType(String desc, Object type)
+	public void setInternalType(String desc)
 	{
 		this.type = desc;
 	}
 	
 	@Override
-	public Object getInternalType()
+	public String getInternalType()
 	{
 		return this.type;
 	}

@@ -2,7 +2,6 @@ package dyvil.tools.compiler.parser.bytecode;
 
 import dyvil.tools.compiler.ast.bytecode.IInternalTyped;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -39,10 +38,9 @@ public final class InternalTypeParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				Object o = parsePrimitive(name);
-				if (o != null)
+				if (isPrimitiveName(name))
 				{
-					this.typed.setInternalType(name.qualified, o);
+					this.typed.setInternalType(name.qualified);
 					pm.popParser();
 					return;
 				}
@@ -74,50 +72,15 @@ public final class InternalTypeParser extends Parser
 			}
 			
 			String s = this.builder.toString();
-			this.typed.setInternalType(s, s);
+			this.typed.setInternalType(s);
 			pm.popParser(true);
 			return;
 		}
 	}
 	
-	private Object parsePrimitive(Name name)
+	private static boolean isPrimitiveName(Name name)
 	{
-		if (name == Name._void)
-		{
-			return ClassFormat.NULL;
-		}
-		if (name == Name._boolean)
-		{
-			return ClassFormat.BOOLEAN;
-		}
-		if (name == Name._byte)
-		{
-			return ClassFormat.BYTE;
-		}
-		if (name == Name._short)
-		{
-			return ClassFormat.SHORT;
-		}
-		if (name == Name._char)
-		{
-			return ClassFormat.CHAR;
-		}
-		if (name == Name._int)
-		{
-			return ClassFormat.INT;
-		}
-		if (name == Name._long)
-		{
-			return ClassFormat.LONG;
-		}
-		if (name == Name._float)
-		{
-			return ClassFormat.FLOAT;
-		}
-		if (name == Name._double)
-		{
-			return ClassFormat.DOUBLE;
-		}
-		return null;
+		return (name == Name._void) || (name == Name._boolean) || (name == Name._byte) || (name == Name._short) || (name == Name._char) || (name == Name._int)
+				|| (name == Name._long) || (name == Name._float) || (name == Name._double);
 	}
 }

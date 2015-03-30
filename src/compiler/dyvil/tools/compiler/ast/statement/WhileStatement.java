@@ -228,13 +228,13 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 		}
 		
 		// Condition
-		writer.writeFrameLabel(this.startLabel.target);
+		writer.writeLabel(this.startLabel.target);
 		this.condition.writeInvJump(writer, this.endLabel.target);
 		// While Block
 		this.action.writeStatement(writer);
 		writer.writeJumpInsn(Opcodes.GOTO, this.startLabel.target);
 		
-		writer.writeFrameLabel(this.endLabel.target);
+		writer.writeLabel(this.endLabel.target);
 	}
 	
 	@Override

@@ -28,7 +28,7 @@ public class CaseClasses
 		writer.writeLDC(1);
 		writer.writeInsn(IRETURN); // return true
 		// else
-		writer.writeFrameLabel(label);
+		writer.writeLabel(label);
 		
 		// Write check 'if (obj == null)'
 		writer.writeVarInsn(ALOAD, 1);
@@ -38,22 +38,22 @@ public class CaseClasses
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN); // return false
 		// else
-		writer.writeFrameLabel(label);
+		writer.writeLabel(label);
 		
 		// Write check 'if (this.getClass() != obj.getClass())'
 		// this.getClass()
 		writer.writeVarInsn(ALOAD, 0);
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 0, "Ljava/lang/Class;");
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
 		// obj.getClass()
 		writer.writeVarInsn(ALOAD, 1);
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false, 0, "Ljava/lang/Class;");
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
 		// if
 		writer.writeJumpInsn(IF_ACMPEQ, label = new Label());
 		// then
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN);
 		// else
-		writer.writeFrameLabel(label);
+		writer.writeLabel(label);
 		
 		// var = (ClassName) obj
 		writer.writeVarInsn(ALOAD, 1);
@@ -105,7 +105,7 @@ public class CaseClasses
 			}
 			writer.writeLDC(0);
 			writer.writeInsn(IRETURN);
-			writer.writeFrameLabel(label);
+			writer.writeLabel(label);
 			return;
 		}
 		
@@ -123,16 +123,16 @@ public class CaseClasses
 		writer.writeJumpInsn(IFNULL, endLabel);
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN);
-		writer.writeFrameLabel(elseLabel);
+		writer.writeLabel(elseLabel);
 		writer.writeVarInsn(ALOAD, 0);
 		field.writeGet(writer, null);
 		writer.writeVarInsn(ALOAD, 2);
 		field.writeGet(writer, null);
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 1, ClassFormat.INT);
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
 		writer.writeJumpInsn(IFNE, endLabel);
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN);
-		writer.writeFrameLabel(endLabel);
+		writer.writeLabel(endLabel);
 	}
 	
 	public static void writeHashCode(MethodWriter writer, CodeClass theClass)
@@ -176,9 +176,9 @@ public class CaseClasses
 				writer.writeLDC(1231);
 				writer.writeJumpInsn(GOTO, endLabel);
 				// else
-				writer.writeFrameLabel(elseLabel);
+				writer.writeLabel(elseLabel);
 				writer.writeLDC(1237);
-				writer.writeFrameLabel(endLabel);
+				writer.writeLabel(endLabel);
 				return;
 			}
 			case ClassFormat.T_BYTE:
@@ -201,12 +201,12 @@ public class CaseClasses
 				return;
 			case ClassFormat.T_FLOAT:
 				// Write a float hashing snippet using Float.floatToIntBits
-				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Float", "floatToIntBits", "(F)I", false, 1, ClassFormat.FLOAT);
+				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Float", "floatToIntBits", "(F)I", false);
 				return;
 			case ClassFormat.T_DOUBLE:
 				// Write a double hashing snippet using Double.doubleToLongBits
 				// and long hashing
-				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)L", false, 1, ClassFormat.DOUBLE);
+				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)L", false);
 				writer.writeInsn(DUP2);
 				writer.writeLDC(32);
 				writer.writeInsn(LUSHR);
@@ -225,13 +225,13 @@ public class CaseClasses
 		writer.writeInsn(DUP);
 		writer.writeJumpInsn(IFNULL, elseLabel);
 		// then
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false, 0, ClassFormat.INT);
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
 		writer.writeJumpInsn(GOTO, endLabel);
 		// else
-		writer.writeFrameLabel(elseLabel);
+		writer.writeLabel(elseLabel);
 		writer.writeInsn(POP);
 		writer.writeLDC(0);
-		writer.writeFrameLabel(endLabel);
+		writer.writeLabel(endLabel);
 	}
 	
 	public static void writeToString(MethodWriter writer, CodeClass theClass)
@@ -242,7 +242,7 @@ public class CaseClasses
 		// Call the StringBuilder(String) constructor with the "[ClassName]("
 		// argument
 		writer.writeLDC(theClass.getName() + "(");
-		writer.writeInvokeInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false, 1, (String) null);
+		writer.writeInvokeInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
 		
 		// ----- Fields -----
 		int params = theClass.parameterCount();
@@ -253,20 +253,18 @@ public class CaseClasses
 			{
 				// Separator Comma
 				writer.writeLDC(", ");
-				writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 1,
-						"Ljava/lang/StringBuilder;");
+				writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
 			}
 		}
 		
 		// ----- Append Closing Parenthesis -----
 		writer.writeLDC(")");
 		// Write the call to the StringBuilder#append(String) method
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false, 1,
-				"Ljava/lang/StringBuilder;");
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
 		
 		// ----- ToString -----
 		// Write the call to the StringBuilder#toString() method
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false, 0, "Ljava/lang/String;");
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
 		// Write the return
 		writer.writeInsn(ARETURN);
 	}
@@ -297,6 +295,6 @@ public class CaseClasses
 		}
 		desc.append(")Ljava/lang/StringBuilder;");
 		
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false, 1, "Ljava/lang/StringBuilder;");
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false);
 	}
 }

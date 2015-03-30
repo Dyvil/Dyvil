@@ -221,7 +221,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 				new String[] { "java/lang/Exception" }));
 		mw.registerParameter("args", "[Ljava/lang/String;");
 		mw.begin();
-		mw.writeInvokeInsn(Opcodes.INVOKESTATIC, this.internalName, "init", "()V", 0, Type.VOID);
+		mw.writeInvokeInsn(Opcodes.INVOKESTATIC, this.internalName, "init", "()V", false);
 		mw.end(Type.VOID);
 	}
 	

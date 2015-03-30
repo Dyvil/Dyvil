@@ -262,14 +262,14 @@ public final class ArgumentList implements IArguments, IValueList
 		if (len < 0)
 		{
 			writer.writeLDC(0);
-			writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
+			writer.writeNewArray(type, 1);
 			return;
 		}
 		
 		int opcode = type.getArrayStoreOpcode();
 		
 		writer.writeLDC(len);
-		writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
+		writer.writeNewArray(type, 1);
 		
 		for (int i = 0; i < len; i++)
 		{

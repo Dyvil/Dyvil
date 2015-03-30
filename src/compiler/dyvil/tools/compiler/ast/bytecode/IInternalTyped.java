@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.bytecode;
 
 public interface IInternalTyped
 {
-	public void setInternalType(String desc, Object type);
+	public void setInternalType(String desc);
 	
-	public Object getInternalType();
+	public String getInternalType();
 }

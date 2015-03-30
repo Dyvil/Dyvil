@@ -116,9 +116,9 @@ public final class BooleanNot extends ASTNode implements IValue
 		this.value.writeInvJump(writer, label);
 		writer.writeLDC(0);
 		writer.writeJumpInsn(Opcodes.GOTO, label2);
-		writer.writeFrameLabel(label);
+		writer.writeLabel(label);
 		writer.writeLDC(1);
-		writer.writeFrameLabel(label2);
+		writer.writeLabel(label2);
 	}
 	
 	@Override

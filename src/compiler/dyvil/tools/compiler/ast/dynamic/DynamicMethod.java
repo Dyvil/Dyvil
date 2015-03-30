@@ -402,7 +402,6 @@ public class DynamicMethod extends ASTNode implements IMethod
 	@Override
 	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type)
 	{
-		int len = arguments.size();
 		StringBuilder desc = new StringBuilder();
 		desc.append('(');
 		
@@ -410,7 +409,6 @@ public class DynamicMethod extends ASTNode implements IMethod
 		{
 			instance.writeExpression(writer);
 			instance.getType().appendExtendedName(desc);
-			len++;
 		}
 		
 		for (IValue v : arguments)
@@ -421,9 +419,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 		desc.append(')');
 		desc.append("Ljava/lang/Object;");
 		
-		writer.push((Object) null);
-		writer.pop();
-		writer.writeInvokeDynamic(this.name.qualified, desc.toString(), len, Type.DYNAMIC, BOOTSTRAP, ArrayUtils.EMPTY_OBJECT_ARRAY);
+		writer.writeInvokeDynamic(this.name.qualified, desc.toString(), BOOTSTRAP, ArrayUtils.EMPTY_OBJECT_ARRAY);
 	}
 	
 	@Override

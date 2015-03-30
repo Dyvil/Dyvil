@@ -107,7 +107,7 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 		String owner = this.type.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
-		writer.writeGetStatic(owner, name, desc, this.type);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
 	}
 	
 	@Override

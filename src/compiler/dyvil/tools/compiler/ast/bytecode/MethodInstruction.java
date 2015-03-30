@@ -18,7 +18,6 @@ public class MethodInstruction implements IInstruction
 	private int			argsCount;
 	private String[]	args;
 	private String		returnDesc;
-	private Object		returnType;
 	
 	public MethodInstruction(int opcode)
 	{
@@ -32,9 +31,6 @@ public class MethodInstruction implements IInstruction
 		this.name = name;
 		this.desc = desc;
 		this.isInterface = isInterface;
-		
-		this.argsCount = (org.objectweb.asm.Type.getArgumentsAndReturnSizes(desc) >> 2) - 1;
-		this.returnType = ClassFormat.getFrameType(desc.substring(desc.lastIndexOf(')') + 1));
 	}
 	
 	@Override
@@ -55,11 +51,6 @@ public class MethodInstruction implements IInstruction
 	public void setReturnDesc(String returnDesc)
 	{
 		this.returnDesc = returnDesc;
-	}
-	
-	public void setReturnType(Object returnType)
-	{
-		this.returnType = returnType;
 	}
 	
 	public void setInterface(boolean isInterface)
@@ -91,7 +82,7 @@ public class MethodInstruction implements IInstruction
 	public void write(MethodWriter writer)
 	{
 		this.getDesc();
-		writer.writeInvokeInsn(this.opcode, this.owner, this.name, this.desc, this.isInterface, this.argsCount, this.returnType);
+		writer.writeInvokeInsn(this.opcode, this.owner, this.name, this.desc, this.isInterface);
 	}
 	
 	private void getDesc()

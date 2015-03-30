@@ -6,6 +6,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
@@ -226,13 +227,13 @@ public class Field extends Member implements IField
 		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
-		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
+		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			writer.writeGetStatic(owner, name, desc, this.type);
+			writer.writeFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
 		}
 		else
 		{
-			writer.writeGetField(owner, name, desc, this.type);
+			writer.writeFieldInsn(Opcodes.GETFIELD, owner, name, desc);
 		}
 	}
 	
@@ -249,13 +250,13 @@ public class Field extends Member implements IField
 		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
-		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
+		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			writer.writePutStatic(owner, name, desc);
+			writer.writeFieldInsn(Opcodes.PUTSTATIC, owner, name, desc);
 		}
 		else
 		{
-			writer.writePutField(owner, name, desc);
+			writer.writeFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
 		}
 	}
 	

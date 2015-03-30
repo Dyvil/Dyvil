@@ -216,7 +216,6 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		int len;
 		int handleType;
 		StringBuilder descBuf = new StringBuilder("(");
 		if (this.instance != null && this.instance.getValueType() != CLASS_ACCESS)
@@ -224,12 +223,10 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 			handleType = ClassFormat.H_INVOKEVIRTUAL;
 			this.instance.writeExpression(writer);
 			this.instance.getType().appendExtendedName(descBuf);
-			len = 1;
 		}
 		else
 		{
 			handleType = ClassFormat.H_INVOKESTATIC;
-			len = 0;
 		}
 		
 		descBuf.append(")");
@@ -241,7 +238,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.functionalMethod.getDescriptor());
 		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(methodDesc);
 		Handle handle = new Handle(handleType, this.method.getTheClass().getInternalName(), name, methodDesc);
-		writer.writeInvokeDynamic(name, desc, len, this.type, LambdaValue.BOOTSTRAP, type1, handle, type2);
+		writer.writeInvokeDynamic(name, desc, LambdaValue.BOOTSTRAP, type1, handle, type2);
 	}
 	
 	@Override

@@ -271,7 +271,7 @@ public class IfStatement extends ASTNode implements IStatement
 		// If Block
 		this.then.writeExpression(writer);
 		writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-		writer.writeFrameLabel(elseStart);
+		writer.writeLabel(elseStart);
 		// Else Block
 		if (this.elseThen == null)
 		{
@@ -281,7 +281,7 @@ public class IfStatement extends ASTNode implements IStatement
 		{
 			this.elseThen.writeExpression(writer);
 		}
-		writer.writeFrameLabel(elseEnd);
+		writer.writeLabel(elseEnd);
 	}
 	
 	@Override
@@ -297,10 +297,10 @@ public class IfStatement extends ASTNode implements IStatement
 			// If Block
 			this.then.writeStatement(writer);
 			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.writeFrameLabel(elseStart);
+			writer.writeLabel(elseStart);
 			// Else Block
 			this.elseThen.writeStatement(writer);
-			writer.writeFrameLabel(elseEnd);
+			writer.writeLabel(elseEnd);
 		}
 		else
 		{
@@ -308,7 +308,7 @@ public class IfStatement extends ASTNode implements IStatement
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.writeFrameLabel(elseStart);
+			writer.writeLabel(elseStart);
 		}
 	}
 	

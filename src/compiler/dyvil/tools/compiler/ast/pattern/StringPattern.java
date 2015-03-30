@@ -6,7 +6,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -49,7 +48,7 @@ public final class StringPattern extends ASTNode implements IPattern
 	{
 		writer.writeLDC(this.value);
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 1, ClassFormat.INT);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
 		writer.writeJumpInsn(Opcodes.IFNE, elseLabel);
 	}
 	
@@ -58,7 +57,7 @@ public final class StringPattern extends ASTNode implements IPattern
 	{
 		writer.writeLDC(this.value);
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false, 1, ClassFormat.INT);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
 		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
 	}
 	

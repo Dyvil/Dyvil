@@ -261,8 +261,8 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 			writer.writeTypeInsn(Opcodes.NEW, internal);
 			writer.writeInsn(Opcodes.DUP);
 			writer.writeInsn(Opcodes.DUP);
-			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, internal, "<init>", "()V", 0, Type.VOID);
-			writer.writePutStatic(owner, this.fullName, extended);
+			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, internal, "<init>", "()V", false);
+			writer.writeFieldInsn(Opcodes.PUTSTATIC, owner, this.fullName, extended);
 		}
 		
 		writer.writeVarInsn(Opcodes.ASTORE, index);
@@ -276,7 +276,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				writer.writeVarInsn(Opcodes.ALOAD, index);
 				value.writeExpression(writer);
 				writer.writeInsn(Opcodes.DUP);
-				writer.writePutStatic(owner, property.fullName, value.getType().getExtendedName());
+				writer.writeFieldInsn(Opcodes.PUTSTATIC, owner, property.fullName, value.getType().getExtendedName());
 				setter.writeCall(writer, null, EmptyArguments.INSTANCE, Type.VOID);
 			}
 			else if (value.getValueType() == NODE)

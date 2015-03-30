@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.parameter;
 import java.util.Collections;
 import java.util.Iterator;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -100,7 +99,7 @@ public final class EmptyArguments implements IArguments
 	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer)
 	{
 		writer.writeLDC(0);
-		writer.writeTypeInsn(Opcodes.ANEWARRAY, type);
+		writer.writeNewArray(type, 1);
 	}
 	
 	@Override

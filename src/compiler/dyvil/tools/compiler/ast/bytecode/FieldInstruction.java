@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import static dyvil.reflect.Opcodes.GETFIELD;
-import static dyvil.reflect.Opcodes.GETSTATIC;
-import static dyvil.reflect.Opcodes.PUTFIELD;
-import static dyvil.reflect.Opcodes.PUTSTATIC;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -16,7 +12,6 @@ public class FieldInstruction implements IInstruction
 	private String	fieldName;
 	
 	private String	desc;
-	private Object	type;
 	
 	public FieldInstruction(int opcode)
 	{
@@ -28,9 +23,7 @@ public class FieldInstruction implements IInstruction
 		this.opcode = opcode;
 		this.owner = owner;
 		this.fieldName = name;
-		
 		this.desc = desc;
-		this.type = ClassFormat.getFrameType(desc);
 	}
 	
 	public void setOwner(String owner)
@@ -48,11 +41,6 @@ public class FieldInstruction implements IInstruction
 		this.desc = desc;
 	}
 	
-	public void setType(Object type)
-	{
-		this.type = type;
-	}
-	
 	@Override
 	public void resolve(MarkerList markers, Bytecode bytecode)
 	{
@@ -62,22 +50,7 @@ public class FieldInstruction implements IInstruction
 	public void write(MethodWriter writer)
 	{
 		String s = ClassFormat.userToExtended(this.desc);
-		
-		switch (this.opcode)
-		{
-		case GETSTATIC:
-			writer.writeGetStatic(this.owner, this.fieldName, s, this.type);
-			return;
-		case PUTSTATIC:
-			writer.writePutStatic(this.owner, this.fieldName, s);
-			return;
-		case GETFIELD:
-			writer.writeGetField(this.owner, this.fieldName, s, this.type);
-			return;
-		case PUTFIELD:
-			writer.writePutField(this.owner, this.fieldName, s);
-			return;
-		}
+		writer.writeFieldInsn(this.opcode, this.owner, this.fieldName, s);
 	}
 	
 	@Override

@@ -226,13 +226,13 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 		
 		// Do Block
 		
-		writer.writeFrameLabel(startLabel);
+		writer.writeLabel(startLabel);
 		this.action.writeStatement(writer);
 		// Condition
-		writer.writeFrameLabel(this.conditionLabel.target);
+		writer.writeLabel(this.conditionLabel.target);
 		this.condition.writeJump(writer, startLabel);
 		
-		writer.writeFrameLabel(this.endLabel.target);
+		writer.writeLabel(this.endLabel.target);
 	}
 	
 	@Override

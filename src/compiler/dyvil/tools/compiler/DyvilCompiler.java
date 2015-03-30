@@ -80,10 +80,7 @@ public final class DyvilCompiler
 		logger.info("Dyvil Compiler " + VERSION + " for Dyvil " + DYVIL_VERSION);
 		logger.info("");
 		
-		if (debug)
-		{
-			logger.fine("Startup Time: " + (System.nanoTime() - now) / 1000000L + " ms");
-		}
+		logger.fine("Loaded Config (" + Util.toTime(System.nanoTime() - now) + ")");
 		
 		if (DyvilCompiler.phases.contains(ICompilerPhase.RESOLVE_TYPES))
 		{
@@ -97,7 +94,7 @@ public final class DyvilCompiler
 			
 			long now1 = System.nanoTime();
 			now = now1 - now;
-			logger.fine("Loaded " + libs + (libs == 1 ? " Library " : " Libraries ") + "(" + Util.toTime(now) + ")");
+			logger.fine("Loaded " + libs + (libs == 1 ? " Library (" : " Libraries (") + Util.toTime(now) + ")");
 			
 			// Inits primitive data types
 			Package.init();

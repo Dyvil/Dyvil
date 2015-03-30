@@ -119,7 +119,7 @@ public class LambdaParameter extends Member implements IVariable
 		
 		if (this.baseType != this.type)
 		{
-			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type);
+			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
 		}
 	}
 	

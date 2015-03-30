@@ -394,18 +394,15 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		this.name = "lambda$" + this.index;
 		this.lambdaDesc = this.getLambdaDescriptor();
 		
-		int len;
 		int handleType;
 		if (this.thisType != null)
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, 0);
 			handleType = ClassFormat.H_INVOKESPECIAL;
-			len = 1 + this.capturedFieldCount;
 		}
 		else
 		{
 			handleType = ClassFormat.H_INVOKESTATIC;
-			len = this.capturedFieldCount;
 		}
 		
 		for (int i = 0; i < this.capturedFieldCount; i++)
@@ -420,7 +417,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
 		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(this.getSpecialDescriptor());
 		Handle handle = new Handle(handleType, this.owner, name, desc);
-		writer.writeInvokeDynamic(invokedName, invokedType, len, this.type, BOOTSTRAP, type1, handle, type2);
+		writer.writeInvokeDynamic(invokedName, invokedType, BOOTSTRAP, type1, handle, type2);
 	}
 	
 	@Override
@@ -503,7 +500,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		
 		if (instance)
 		{
-			mw.setInstance(this.thisType);
+			mw.setInstanceMethod();
 		}
 		
 		if (this.capturedFieldCount > 0)

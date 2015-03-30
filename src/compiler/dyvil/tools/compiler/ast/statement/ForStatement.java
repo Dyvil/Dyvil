@@ -405,7 +405,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 				writer.writeVarInsn(var.type.getStoreOpcode(), var.index);
 			}
 			
-			writer.writeFrameLabel(startLabel);
+			writer.writeLabel(startLabel);
 			// Condition
 			if (this.condition != null)
 			{
@@ -426,7 +426,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			writer.writeJumpInsn(Opcodes.GOTO, startLabel);
 			
 			writer.resetLocals(locals);
-			writer.writeFrameLabel(endLabel);
+			writer.writeLabel(endLabel);
 			
 			// Variable
 			if (var != null)
@@ -465,7 +465,7 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			
 			// Jump to boundary check
 			writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
-			writer.writeFrameLabel(startLabel);
+			writer.writeLabel(startLabel);
 			
 			// Load the element
 			arrayVar.writeGet(writer, null);
@@ -482,14 +482,14 @@ public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 			// Increase index
 			writer.writeIINC(indexVar.index, 1);
 			// Boundary Check
-			writer.writeFrameLabel(updateLabel);
+			writer.writeLabel(updateLabel);
 			indexVar.writeGet(writer, null);
 			lengthVar.writeGet(writer, null);
 			writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 			
 			// Local Variables
 			writer.resetLocals(locals);
-			writer.writeFrameLabel(endLabel);
+			writer.writeLabel(endLabel);
 			
 			writer.writeLocal(var.name.qualified, var.type, scopeLabel, endLabel, var.index);
 			writer.writeLocal("$index", "I", null, scopeLabel, endLabel, indexVar.index);

@@ -114,7 +114,7 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	public void writeExpression(MethodWriter writer)
 	{
 		this.value.writeExpression(writer);
-		writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type);
+		writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
 	}
 	
 	@Override

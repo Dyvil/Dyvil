@@ -132,7 +132,7 @@ public final class CastOperator extends ASTNode implements IValue
 		}
 		else
 		{
-			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type);
+			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
 		}
 	}
 	

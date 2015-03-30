@@ -179,7 +179,7 @@ public final class Bytecode extends ASTNode implements IValue
 				Label l = this.labels[i];
 				if (l != null)
 				{
-					writer.writeFrameLabel(l.target);
+					writer.writeLabel(l.target);
 				}
 			}
 			

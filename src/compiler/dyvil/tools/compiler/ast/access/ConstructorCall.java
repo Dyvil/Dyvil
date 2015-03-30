@@ -231,7 +231,7 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall
 			{
 				this.arguments.getFirstValue().writeExpression(writer);
 				this.type.setArrayDimensions(0);
-				writer.writeTypeInsn(Opcodes.ANEWARRAY, this.type);
+				writer.writeTypeInsn(Opcodes.ANEWARRAY, this.type.getInternalName());
 				this.type.setArrayDimensions(1);
 				return;
 			}

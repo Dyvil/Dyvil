@@ -39,7 +39,7 @@ public class ClassWriter
 		
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 		{
-			org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(DyvilCompiler.asmVersion);
+			org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(DyvilCompiler.asmVersion | org.objectweb.asm.ClassWriter.COMPUTE_FRAMES);
 			iclass.write(writer);
 			writer.visitEnd();
 			byte[] bytes = writer.toByteArray();

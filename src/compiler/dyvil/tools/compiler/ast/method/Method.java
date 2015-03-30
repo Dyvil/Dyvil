@@ -856,7 +856,7 @@ public class Method extends Member implements IMethod
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.setInstance(this.theClass.getType());
+			mw.setInstanceMethod();
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)
@@ -945,10 +945,10 @@ public class Method extends Member implements IMethod
 				// If Block
 				writer.writeLDC(0);
 				writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-				writer.writeFrameLabel(ifEnd);
+				writer.writeLabel(ifEnd);
 				// Else Block
 				writer.writeLDC(1);
-				writer.writeFrameLabel(elseEnd);
+				writer.writeLabel(elseEnd);
 				return;
 			}
 			
@@ -977,7 +977,7 @@ public class Method extends Member implements IMethod
 		{
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
-				writer.writeTypeInsn(Opcodes.CHECKCAST, this.type);
+				writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
 			}
 		}
 	}
@@ -1018,7 +1018,7 @@ public class Method extends Member implements IMethod
 		writer.writeJumpInsn(IFNE, dest);
 	}
 	
-	private int writeArguments(MethodWriter writer, IArguments arguments)
+	private void writeArguments(MethodWriter writer, IArguments arguments)
 	{
 		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
@@ -1034,7 +1034,7 @@ public class Method extends Member implements IMethod
 				}
 				param = this.parameters[len];
 				arguments.writeVarargsValue(len - 1, param.getName(), param.getType(), writer);
-				return this.parameterCount;
+				return;
 			}
 			
 			for (int i = 1, j = 0; i < this.parameterCount; i++, j++)
@@ -1042,12 +1042,12 @@ public class Method extends Member implements IMethod
 				IParameter param = this.parameters[i];
 				arguments.writeValue(j, param.getName(), param.getValue(), writer);
 			}
-			return this.parameterCount - 1;
+			return;
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			arguments.writeValue(0, Name._this, null, writer);
-			return 1;
+			return;
 		}
 		
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
@@ -1061,7 +1061,7 @@ public class Method extends Member implements IMethod
 			}
 			param = this.parameters[len];
 			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
-			return this.parameterCount;
+			return;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -1069,7 +1069,6 @@ public class Method extends Member implements IMethod
 			IParameter param = this.parameters[i];
 			arguments.writeValue(i, param.getName(), param.getValue(), writer);
 		}
-		return this.parameterCount;
 	}
 	
 	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments)
@@ -1142,13 +1141,12 @@ public class Method extends Member implements IMethod
 	
 	private void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments)
 	{
-		int args = 0;
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
 		}
 		
-		args += this.writeArguments(writer, arguments);
+		this.writeArguments(writer, arguments);
 		
 		int opcode;
 		int modifiers = this.modifiers;
@@ -1176,17 +1174,14 @@ public class Method extends Member implements IMethod
 		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
-		IType type = this.type;
-		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS), args, type);
+		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS));
 	}
 	
 	private void writeInline(MethodWriter writer, IValue instance, IArguments arguments)
 	{
-		int varOffset = writer.localCount();
-		int stackOffset = writer.stackCount();
 		Label inlineEnd = new Label();
 		
-		writer.startInline(varOffset, stackOffset, inlineEnd);
+		writer.startInline(inlineEnd);
 		
 		if (instance != null)
 		{
@@ -1198,7 +1193,7 @@ public class Method extends Member implements IMethod
 		
 		this.value.writeExpression(writer);
 		
-		writer.endInline(varOffset, stackOffset, inlineEnd);
+		writer.endInline(inlineEnd);
 	}
 	
 	private void writeInlineArguments(MethodWriter writer, IArguments arguments)

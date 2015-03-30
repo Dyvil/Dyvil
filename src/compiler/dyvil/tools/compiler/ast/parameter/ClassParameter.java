@@ -5,6 +5,7 @@ import java.lang.annotation.ElementType;
 import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
@@ -224,7 +225,7 @@ public class ClassParameter extends Member implements IParameter
 			instance.writeExpression(writer);
 		}
 		
-		writer.writeGetField(this.theClass.getInternalName(), this.name.qualified, this.getDescription(), this.type);
+		writer.writeFieldInsn(Opcodes.GETFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
 	}
 	
 	@Override
@@ -240,7 +241,7 @@ public class ClassParameter extends Member implements IParameter
 			value.writeExpression(writer);
 		}
 		
-		writer.writePutField(this.theClass.getInternalName(), this.name.qualified, this.getDescription());
+		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
 	}
 	
 	@Override

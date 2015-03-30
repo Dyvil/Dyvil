@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -31,25 +30,8 @@ public class IntInstruction implements IInstruction
 			writer.writeLDC(this.operand);
 			return;
 		case Opcodes.NEWARRAY:
-			switch (this.operand)
-			{
-			case org.objectweb.asm.Opcodes.T_BOOLEAN:
-			case org.objectweb.asm.Opcodes.T_BYTE:
-			case org.objectweb.asm.Opcodes.T_SHORT:
-			case org.objectweb.asm.Opcodes.T_CHAR:
-			case org.objectweb.asm.Opcodes.T_INT:
-				writer.writeTypeInsn(Opcodes.NEWARRAY, Type.INT);
-				return;
-			case org.objectweb.asm.Opcodes.T_LONG:
-				writer.writeTypeInsn(Opcodes.NEWARRAY, Type.LONG);
-				return;
-			case org.objectweb.asm.Opcodes.T_FLOAT:
-				writer.writeTypeInsn(Opcodes.NEWARRAY, Type.FLOAT);
-				return;
-			case org.objectweb.asm.Opcodes.T_DOUBLE:
-				writer.writeTypeInsn(Opcodes.NEWARRAY, Type.DOUBLE);
-				return;
-			}
+			writer.writeIntInsn(this.opcode, this.operand);
+			return;
 		}
 	}
 	

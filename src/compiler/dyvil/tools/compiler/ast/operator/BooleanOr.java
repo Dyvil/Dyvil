@@ -138,9 +138,9 @@ public final class BooleanOr extends ASTNode implements IValue
 		this.right.writeJump(writer, label);
 		writer.writeLDC(0);
 		writer.writeJumpInsn(Opcodes.GOTO, label2);
-		writer.writeFrameLabel(label);
+		writer.writeLabel(label);
 		writer.writeLDC(1);
-		writer.writeFrameLabel(label2);
+		writer.writeLabel(label2);
 	}
 	
 	@Override
@@ -156,7 +156,7 @@ public final class BooleanOr extends ASTNode implements IValue
 		Label label = new Label();
 		this.left.writeInvJump(writer, label);
 		this.right.writeJump(writer, dest);
-		writer.writeFrameLabel(label);
+		writer.writeLabel(label);
 	}
 	
 	@Override
@@ -165,7 +165,7 @@ public final class BooleanOr extends ASTNode implements IValue
 		Label label = new Label();
 		this.left.writeJump(writer, label);
 		this.right.writeInvJump(writer, dest);
-		writer.writeFrameLabel(label);
+		writer.writeLabel(label);
 	}
 	
 	@Override

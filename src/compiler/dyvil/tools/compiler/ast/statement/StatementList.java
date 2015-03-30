@@ -441,7 +441,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 				Label l = this.labels[i];
 				if (l != null)
 				{
-					writer.writeFrameLabel(l.target);
+					writer.writeLabel(l.target);
 				}
 				
 				this.values[i].writeStatement(writer);
@@ -450,7 +450,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			Label l = this.labels[len];
 			if (l != null)
 			{
-				writer.writeFrameLabel(l.target);
+				writer.writeLabel(l.target);
 			}
 			
 			this.values[len].writeExpression(writer);
@@ -492,7 +492,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 				Label l = this.labels[i];
 				if (l != null)
 				{
-					writer.writeFrameLabel(l.target);
+					writer.writeLabel(l.target);
 				}
 				
 				this.values[i].writeStatement(writer);

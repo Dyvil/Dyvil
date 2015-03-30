@@ -124,15 +124,8 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	private void writeVar(MethodWriter writer, int varIndex)
 	{
 		this.variable.type = this.type;
-		if (writer.getLocal(varIndex) == this.type.getFrameType())
-		{
-			this.variable.index = varIndex;
-		}
-		else
-		{
-			writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
-			writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
-		}
+		writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
 	}
 	
 	@Override
