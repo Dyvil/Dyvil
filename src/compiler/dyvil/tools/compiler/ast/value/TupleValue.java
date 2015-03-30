@@ -5,9 +5,16 @@ import java.util.Iterator;
 import dyvil.collections.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TupleType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -16,10 +23,14 @@ import dyvil.tools.compiler.util.Util;
 
 public final class TupleValue extends ASTNode implements IValue, IValueList
 {
-	private IValue[]	values;
-	private int			valueCount;
+	public static final IType	TUPLE_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("TupleConvertible"));
 	
-	private TupleType	tupleType;
+	private IValue[]			values;
+	private int					valueCount;
+	
+	private IType				tupleType;
+	private IMethod				method;
+	private IArguments			arguments;
 	
 	public TupleValue(ICodePosition position)
 	{
@@ -98,7 +109,7 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public TupleType getType()
+	public IType getType()
 	{
 		if (this.tupleType != null)
 		{
@@ -130,6 +141,12 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 			this.getType();
 			return this;
 		}
+		
+		if (TUPLE_CONVERTIBLE.isSuperTypeOf(type))
+		{
+			this.tupleType = type;
+			return this;
+		}
 		return null;
 	}
 	
@@ -141,7 +158,7 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 			return this.values[0].isType(type);
 		}
 		
-		return TupleType.isSuperType(type, this.values, this.valueCount);
+		return TupleType.isSuperType(type, this.values, this.valueCount) || TUPLE_CONVERTIBLE.isSuperTypeOf(type);
 	}
 	
 	@Override
@@ -157,7 +174,7 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 		{
 			return 3;
 		}
-		else if (type.isSuperTypeOf(type1))
+		if (type.isSuperTypeOf(type1) || TUPLE_CONVERTIBLE.isSuperTypeOf(type1))
 		{
 			return 2;
 		}
@@ -190,6 +207,7 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 		{
 			this.values[i] = this.values[i].resolve(markers, context);
 		}
+		
 		return this;
 	}
 	
@@ -199,6 +217,34 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			this.values[i].checkTypes(markers, context);
+		}
+		
+		if (this.tupleType instanceof TupleType)
+		{
+			return;
+		}
+		
+		MethodMatch m = this.getType().resolveMethod(null, Name.apply, this.arguments = new ArgumentList(this.values, this.valueCount));
+		if (m == null)
+		{
+			StringBuilder builder = new StringBuilder();
+			if (this.valueCount > 0)
+			{
+				this.values[0].getType().toString("", builder);
+				for (int i = 1; i < this.valueCount; i++)
+				{
+					builder.append(", ");
+					this.values[i].getType().toString("", builder);
+				}
+			}
+			
+			markers.add(this.position, "tuple.method", builder.toString(), this.tupleType.toString());
+		}
+		else
+		{
+			this.method = m.method;
+			
+			m.method.checkArguments(markers, null, this.arguments, null);
 		}
 	}
 	
@@ -224,6 +270,13 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		if (this.method != null)
+		{
+			this.method.writeCall(writer, null, this.arguments, this.tupleType);
+			return;
+		}
+		
+		TupleType tt = (TupleType) this.tupleType;
 		writer.writeTypeInsn(Opcodes.NEW, this.tupleType.getInternalName());
 		writer.writeInsn(Opcodes.DUP);
 		
@@ -232,8 +285,8 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 			this.values[i].writeExpression(writer);
 		}
 		
-		String owner = this.tupleType.getInternalName();
-		String desc = this.tupleType.getConstructorDescriptor();
+		String owner = tt.getInternalName();
+		String desc = tt.getConstructorDescriptor();
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false);
 	}
 	
