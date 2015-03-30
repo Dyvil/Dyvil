@@ -15,24 +15,6 @@ public final class MarkerList implements Iterable<Marker>
 		static Map<String, MarkerType>	map	= new HashMap();
 	}
 	
-	public static class MarkerComparator implements Comparator<Marker>
-	{
-		public static final MarkerComparator	instance	= new MarkerComparator();
-		
-		private MarkerComparator()
-		{
-		}
-		
-		@Override
-		public int compare(Marker o1, Marker o2)
-		{
-			int start1 = o1.position.startIndex();
-			int start2 = o2.position.startIndex();
-			
-			return start1 == start2 ? 0 : start1 < start2 ? -1 : 0;
-		}
-	}
-	
 	private Marker[]	markers;
 	private int			markerCount;
 	
@@ -91,7 +73,7 @@ public final class MarkerList implements Iterable<Marker>
 	
 	public void sort()
 	{
-		Arrays.sort(this.markers, MarkerComparator.instance);
+		Arrays.sort(this.markers);
 	}
 	
 	public void add(Marker marker)

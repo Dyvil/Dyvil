@@ -52,7 +52,7 @@ public final class NilValue implements IConstantValue
 	@Override
 	public IType getType()
 	{
-		return Type.NONE;
+		return this.requiredType == null ? Type.NONE : this.requiredType;
 	}
 	
 	@Override
@@ -87,6 +87,12 @@ public final class NilValue implements IConstantValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (this.requiredType == null)
+		{
+			markers.add(this.position, "nil.type");
+			return;
+		}
+		
 		if (this.requiredType.isArrayType())
 		{
 			return;
@@ -95,7 +101,7 @@ public final class NilValue implements IConstantValue
 		MethodMatch match = this.requiredType.resolveMethod(null, Name.apply, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
-			markers.add(this.position, "nil.method");
+			markers.add(this.position, "nil.method", this.requiredType.toString());
 		}
 		else
 		{

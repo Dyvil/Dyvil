@@ -65,7 +65,7 @@ public class ExternalMethod extends Method
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.type.resolve(null, Package.rootPackage);
+		this.type = this.type.resolve(null, this);
 	}
 	
 	private void resolveGenerics()
@@ -82,7 +82,7 @@ public class ExternalMethod extends Method
 		this.parametersResolved = true;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(null, Package.rootPackage);
+			this.parameters[i].resolveTypes(null, this);
 		}
 	}
 	
@@ -91,7 +91,7 @@ public class ExternalMethod extends Method
 		this.exceptionsResolved = true;
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolve(null, Package.rootPackage);
+			this.exceptions[i] = this.exceptions[i].resolve(null, this);
 		}
 	}
 	
@@ -206,6 +206,26 @@ public class ExternalMethod extends Method
 			this.resolveAnnotations();
 		}
 		return this.intrinsicOpcodes != null;
+	}
+	
+	@Override
+	public IClass resolveClass(Name name)
+	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			ITypeVariable var = this.generics[i];
+			if (var.getName() == name)
+			{
+				return var.getCaptureClass();
+			}
+		}
+		
+		return Package.rootPackage.resolveClass(name);
 	}
 	
 	@Override

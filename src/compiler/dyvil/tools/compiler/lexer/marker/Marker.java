@@ -5,7 +5,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public abstract class Marker extends Exception
+public abstract class Marker extends Throwable implements Comparable<Marker>
 {
 	private static final long	serialVersionUID	= 8313691845679541217L;
 	
@@ -59,6 +59,14 @@ public abstract class Marker extends Exception
 	public abstract boolean isError();
 	
 	public abstract boolean isWarning();
+	
+	@Override
+	public int compareTo(Marker o)
+	{
+		int start1 = this.position.startIndex();
+		int start2 = o.position.startIndex();
+		return start1 == start2 ? 0 : start1 < start2 ? -1 : 0;
+	}
 	
 	public void log(String code, StringBuilder buf)
 	{

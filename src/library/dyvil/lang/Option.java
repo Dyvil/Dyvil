@@ -5,7 +5,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public interface Option<T>
+import dyvil.lang.literal.NilConvertible;
+
+public interface Option<T> extends NilConvertible
 {
 	public static <T> Option<T> of(T t)
 	{
@@ -20,6 +22,11 @@ public interface Option<T>
 	public static <T> Option<T> apply(T t)
 	{
 		return new Some(t);
+	}
+	
+	public static <T> Option<T> apply()
+	{
+		return None.instance;
 	}
 	
 	public static <T> Option<T> none()
