@@ -16,6 +16,7 @@ public class BytecodeVisitor extends MethodVisitor
 	private int			labelCount;
 	private IMethod		method;
 	
+	private boolean		inline;
 	private Bytecode	bytecode;
 	
 	public BytecodeVisitor(IMethod method)
@@ -39,7 +40,13 @@ public class BytecodeVisitor extends MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		String packName = ClassFormat.internalToPackage(type);
+		String packName = ClassFormat.internalToPackage2(type);
+		if (packName.equals("dyvil.lang.annotation.inline"))
+		{
+			this.method.addModifier(Modifiers.INLINE);
+			this.inline = true;
+		}
+		
 		if (this.method.addRawAnnotation(packName))
 		{
 			AnnotationType atype = new AnnotationType(packName);
@@ -69,7 +76,10 @@ public class BytecodeVisitor extends MethodVisitor
 	@Override
 	public void visitCode()
 	{
-		this.bytecode = new Bytecode(null);
+		if (this.inline)
+		{
+			this.bytecode = new Bytecode(null);
+		}
 	}
 	
 	@Override
@@ -81,105 +91,150 @@ public class BytecodeVisitor extends MethodVisitor
 	@Override
 	public void visitInsn(int opcode)
 	{
-		this.bytecode.addInstruction(new Instruction(opcode));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new Instruction(opcode));
+		}
 	}
 	
 	@Override
 	public void visitIntInsn(int opcode, int operand)
 	{
-		this.bytecode.addInstruction(new IntInstruction(opcode, operand));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new IntInstruction(opcode, operand));
+		}
 	}
 	
 	@Override
 	public void visitVarInsn(int opcode, int index)
 	{
-		this.bytecode.addInstruction(new VarInstruction(opcode, index));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new VarInstruction(opcode, index));
+		}
 	}
 	
 	@Override
 	public void visitTypeInsn(int opcode, String type)
 	{
-		this.bytecode.addInstruction(new TypeInstruction(opcode, type));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new TypeInstruction(opcode, type));
+		}
 	}
 	
 	@Override
 	public void visitFieldInsn(int opcode, String owner, String name, String desc)
 	{
-		this.bytecode.addInstruction(new FieldInstruction(opcode, owner, name, desc));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new FieldInstruction(opcode, owner, name, desc));
+		}
 	}
 	
 	@Override
 	public void visitMethodInsn(int opcode, String owner, String name, String desc)
 	{
-		this.bytecode.addInstruction(new MethodInstruction(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new MethodInstruction(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE));
+		}
 	}
 	
 	@Override
 	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface)
 	{
-		this.bytecode.addInstruction(new MethodInstruction(opcode, owner, name, desc, isInterface));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new MethodInstruction(opcode, owner, name, desc, isInterface));
+		}
 	}
 	
 	@Override
 	public void visitInvokeDynamicInsn(String name, String type, Handle bsm, Object... bsmArgs)
 	{
-		this.bytecode.addInstruction(new InvokeDynamicInstruction(name, type, bsm, bsmArgs));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new InvokeDynamicInstruction(name, type, bsm, bsmArgs));
+		}
 	}
 	
 	@Override
 	public void visitJumpInsn(int opcode, Label target)
 	{
-		this.bytecode.addInstruction(new JumpInstruction(opcode, new dyvil.tools.compiler.ast.statement.Label(target)));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new JumpInstruction(opcode, new dyvil.tools.compiler.ast.statement.Label(target)));
+		}
 	}
 	
 	@Override
 	public void visitLabel(Label label)
 	{
-		String name = "L" + this.labelCount++;
-		label.info = name;
-		this.bytecode.addLabel(new dyvil.tools.compiler.ast.statement.Label(label, Name.getQualified(name)));
+		if (this.inline)
+		{
+			String name = "L" + this.labelCount++;
+			label.info = name;
+			this.bytecode.addLabel(new dyvil.tools.compiler.ast.statement.Label(label, Name.getQualified(name)));
+		}
 	}
 	
 	@Override
 	public void visitLdcInsn(Object constant)
 	{
-		this.bytecode.addInstruction(new LDCInstruction(constant));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new LDCInstruction(constant));
+		}
 	}
 	
 	@Override
 	public void visitIincInsn(int index, int value)
 	{
-		this.bytecode.addInstruction(new IIncInstruction(index, value));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new IIncInstruction(index, value));
+		}
 	}
 	
 	@Override
 	public void visitTableSwitchInsn(int start, int end, Label defaultHandler, Label... handlers)
 	{
-		int len = handlers.length;
-		dyvil.tools.compiler.ast.statement.Label[] labels = new dyvil.tools.compiler.ast.statement.Label[len];
-		for (int i = 0; i < len; i++)
+		if (this.inline)
 		{
-			labels[i] = new dyvil.tools.compiler.ast.statement.Label(handlers[i]);
+			int len = handlers.length;
+			dyvil.tools.compiler.ast.statement.Label[] labels = new dyvil.tools.compiler.ast.statement.Label[len];
+			for (int i = 0; i < len; i++)
+			{
+				labels[i] = new dyvil.tools.compiler.ast.statement.Label(handlers[i]);
+			}
+			this.bytecode.addInstruction(new TableSwitchInstruction(start, end, new dyvil.tools.compiler.ast.statement.Label(defaultHandler), labels));
 		}
-		this.bytecode.addInstruction(new TableSwitchInstruction(start, end, new dyvil.tools.compiler.ast.statement.Label(defaultHandler), labels));
 	}
 	
 	@Override
 	public void visitLookupSwitchInsn(Label defaultHandler, int[] keys, Label[] handlers)
 	{
-		int len = handlers.length;
-		dyvil.tools.compiler.ast.statement.Label[] labels = new dyvil.tools.compiler.ast.statement.Label[len];
-		for (int i = 0; i < len; i++)
+		if (this.inline)
 		{
-			labels[i] = new dyvil.tools.compiler.ast.statement.Label(handlers[i]);
+			int len = handlers.length;
+			dyvil.tools.compiler.ast.statement.Label[] labels = new dyvil.tools.compiler.ast.statement.Label[len];
+			for (int i = 0; i < len; i++)
+			{
+				labels[i] = new dyvil.tools.compiler.ast.statement.Label(handlers[i]);
+			}
+			this.bytecode.addInstruction(new LookupSwitchInstruction(new dyvil.tools.compiler.ast.statement.Label(defaultHandler), keys, labels));
 		}
-		this.bytecode.addInstruction(new LookupSwitchInstruction(new dyvil.tools.compiler.ast.statement.Label(defaultHandler), keys, labels));
 	}
 	
 	@Override
 	public void visitMultiANewArrayInsn(String type, int dims)
 	{
-		this.bytecode.addInstruction(new MultiArrayInstruction(type, dims));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new MultiArrayInstruction(type, dims));
+		}
 	}
 	
 	@Override
@@ -191,8 +246,11 @@ public class BytecodeVisitor extends MethodVisitor
 	@Override
 	public void visitTryCatchBlock(Label start, Label end, Label handler, String type)
 	{
-		this.bytecode.addInstruction(new TryCatchInstruction(new dyvil.tools.compiler.ast.statement.Label(start), new dyvil.tools.compiler.ast.statement.Label(
-				end), new dyvil.tools.compiler.ast.statement.Label(handler), type));
+		if (this.inline)
+		{
+			this.bytecode.addInstruction(new TryCatchInstruction(new dyvil.tools.compiler.ast.statement.Label(start),
+					new dyvil.tools.compiler.ast.statement.Label(end), new dyvil.tools.compiler.ast.statement.Label(handler), type));
+		}
 	}
 	
 	@Override
@@ -236,7 +294,9 @@ public class BytecodeVisitor extends MethodVisitor
 	@Override
 	public void visitEnd()
 	{
-		this.method.setValue(this.bytecode);
-		System.out.println(this.method);
+		if (this.inline)
+		{
+			this.method.setValue(this.bytecode);
+		}
 	}
 }

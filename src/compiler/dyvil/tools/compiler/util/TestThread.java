@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.util;
 
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -31,14 +32,27 @@ public final class TestThread extends Thread
 			
 			DyvilCompiler.logger.log(Level.INFO, "Test completed (" + Util.toTime(now) + ")");
 		}
+		catch (VerifyError ve)
+		{
+			System.setOut(out);
+			System.setErr(err);
+			
+			StringBuilder builder = new StringBuilder("BYTECODE VERIFICATION FAILED\n\n");
+			builder.append("Main Type: ").append(mainType).append('\n');
+			builder.append("Main Args: ").append(Arrays.toString(args));
+			builder.append("\n\n----- ERROR -----\n");
+			DyvilCompiler.logger.log(Level.SEVERE, builder.toString(), ve);
+		}
+		catch (InvocationTargetException ex)
+		{
+			System.setOut(out);
+			System.setErr(err);
+			
+			DyvilCompiler.logger.log(Level.SEVERE, "TEST EXCEPTION", ex.getCause());
+			return;
+		}
 		catch (Throwable ex)
 		{
-			Throwable cause = ex.getCause();
-			if (cause == null)
-			{
-				cause = ex;
-			}
-			
 			System.setOut(out);
 			System.setErr(err);
 			
@@ -46,7 +60,7 @@ public final class TestThread extends Thread
 			builder.append("Main Type: ").append(mainType).append('\n');
 			builder.append("Main Args: ").append(Arrays.toString(args));
 			builder.append("\n\n----- ERROR -----\n");
-			DyvilCompiler.logger.log(Level.SEVERE, builder.toString(), cause);
+			DyvilCompiler.logger.log(Level.SEVERE, builder.toString(), ex);
 			
 			return;
 		}

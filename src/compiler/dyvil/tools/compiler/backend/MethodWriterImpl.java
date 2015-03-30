@@ -30,6 +30,10 @@ public final class MethodWriterImpl implements MethodWriter
 	private int					maxStack;
 	private Object[]			stack			= new Object[3];
 	
+	// Inlining
+	
+	private Label				inlineEnd;
+	
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
 	{
 		this.cw = cw;
@@ -92,15 +96,15 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void set(Object type)
+	public int stackCount()
 	{
-		this.stack[this.stackIndex - 1] = type;
+		return this.stackCount;
 	}
 	
 	@Override
-	public void set(IType type)
+	public void set(Object type)
 	{
-		this.stack[this.stackIndex - 1] = type.getFrameType();
+		this.stack[this.stackIndex - 1] = type;
 	}
 	
 	@Override
@@ -113,18 +117,9 @@ public final class MethodWriterImpl implements MethodWriter
 				this.maxStack = this.stackIndex + 3;
 			}
 		}
+		
 		this.ensureStack(this.stackIndex + 1);
 		this.stack[this.stackIndex++] = type;
-	}
-	
-	@Override
-	public void push(IType type)
-	{
-		Object frameType = type.getFrameType();
-		if (frameType != null)
-		{
-			this.push(frameType);
-		}
 	}
 	
 	@Override
@@ -157,6 +152,11 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeFrame()
 	{
+		if (this.hasReturn && this.inlineEnd != null)
+		{
+			this.mv.visitJumpInsn(Opcodes.GOTO, this.inlineEnd);
+		}
+		
 		this.mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, this.localCount, this.locals, this.stackCount, this.stack);
 		this.visitFrame = false;
 	}
@@ -240,12 +240,11 @@ public final class MethodWriterImpl implements MethodWriter
 			this.ensureLocals(index + 2);
 			this.locals[index] = type;
 			this.locals[index + 1] = TOP;
+			return;
 		}
-		else
-		{
-			this.ensureLocals(index + 1);
-			this.locals[index] = type;
-		}
+		
+		this.ensureLocals(index + 1);
+		this.locals[index] = type;
 	}
 	
 	@Override
@@ -307,6 +306,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.push(INT);
 		switch (value)
@@ -333,18 +333,15 @@ public final class MethodWriterImpl implements MethodWriter
 			this.mv.visitInsn(ICONST_5);
 			return;
 		}
-		if (value > 0)
+		if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE)
 		{
-			if (value <= Byte.MAX_VALUE)
-			{
-				this.mv.visitIntInsn(Opcodes.BIPUSH, value);
-				return;
-			}
-			if (value <= Short.MAX_VALUE)
-			{
-				this.mv.visitIntInsn(Opcodes.SIPUSH, value);
-				return;
-			}
+			this.mv.visitIntInsn(Opcodes.BIPUSH, value);
+			return;
+		}
+		if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE)
+		{
+			this.mv.visitIntInsn(Opcodes.SIPUSH, value);
+			return;
 		}
 		this.mv.visitLdcInsn(Integer.valueOf(value));
 	}
@@ -356,6 +353,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.push(LONG);
 		if (value == 0L)
@@ -378,6 +376,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.push(FLOAT);
 		if (value == 0F)
@@ -405,6 +404,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.push(DOUBLE);
 		if (value == 0D)
@@ -427,8 +427,9 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
-		this.push("Ljava/lang/String;");
+		this.push("java/lang/String");
 		this.mv.visitLdcInsn(value);
 	}
 	
@@ -439,8 +440,9 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
-		this.push("Ljava/lang/Class;");
+		this.push("java/lang/Class");
 		this.mv.visitLdcInsn(type);
 	}
 	
@@ -477,6 +479,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		if (opcode > 255)
 		{
@@ -489,10 +492,15 @@ public final class MethodWriterImpl implements MethodWriter
 			this.pop();
 			this.pop();
 		}
-		else if (opcode >= IRETURN && opcode <= ARETURN)
+		else if (opcode >= IRETURN && opcode <= RETURN)
 		{
-			this.clear();
 			this.hasReturn = true;
+			if (this.inlineEnd != null)
+			{
+				this.visitFrame = true;
+				return;
+			}
+			this.pop();
 		}
 		else
 		{
@@ -602,10 +610,6 @@ public final class MethodWriterImpl implements MethodWriter
 			return;
 		case ARRAYLENGTH:
 			this.set(INT);
-			return;
-		case RETURN:
-			this.pop();
-			this.hasReturn = true;
 			return;
 		case ATHROW:
 			this.pop();
@@ -821,6 +825,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		if (opcode > 255)
 		{
@@ -943,6 +948,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		if (opcode == ANEWARRAY || opcode == NEWARRAY)
 		{
@@ -966,6 +972,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		if (opcode == ANEWARRAY || opcode == NEWARRAY)
 		{
@@ -994,6 +1001,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.push(type);
 		this.mv.visitMultiANewArrayInsn(type, dims);
@@ -1006,6 +1014,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.push(type);
 		this.mv.visitMultiANewArrayInsn(type.getExtendedName(), dims);
@@ -1018,6 +1027,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.mv.visitIincInsn(var, value);
 	}
@@ -1029,6 +1039,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		if (opcode >= ILOAD && opcode <= ALOAD)
 		{
@@ -1050,6 +1061,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		if (type != null)
 		{
@@ -1071,6 +1083,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.pop(); // Value
 		this.mv.visitFieldInsn(PUTSTATIC, owner, name, desc);
@@ -1083,6 +1096,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.pop(); // Instance
 		this.push(type);
@@ -1102,6 +1116,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.pop(); // Instance
 		this.pop(); // Value
@@ -1127,6 +1142,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
 		if (opcode != INVOKESTATIC)
@@ -1153,6 +1169,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
 		this.pop(args);
@@ -1169,6 +1186,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.writeFrame();
 		}
+		this.hasReturn = false;
 		
 		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
 		this.pop(args);
@@ -1177,6 +1195,8 @@ public final class MethodWriterImpl implements MethodWriter
 			this.push(returnType);
 		}
 	}
+	
+	// Switch Instructions
 	
 	@Override
 	public void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers)
@@ -1190,6 +1210,22 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.pop();
 		this.mv.visitLookupSwitchInsn(defaultHandler, keys, handlers);
+	}
+	
+	// Inlining
+	
+	@Override
+	public void startInline(int varOffset, int stackOffset, Label end)
+	{
+		this.inlineEnd = end;
+	}
+	
+	@Override
+	public void endInline(int varOffset, int stackOffset, Label end)
+	{
+		this.mv.visitLabel(end);
+		this.hasReturn = false;
+		this.visitFrame = true;
 	}
 	
 	@Override

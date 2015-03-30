@@ -22,13 +22,11 @@ public interface MethodWriter
 	
 	// Stack
 	
+	public int stackCount();
+	
 	public void set(Object type);
 	
-	public void set(IType type);
-	
 	public void push(Object type);
-	
-	public void push(IType type);
 	
 	public void pop();
 	
@@ -131,6 +129,12 @@ public interface MethodWriter
 	public void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers);
 	
 	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers);
+	
+	// Inlining
+	
+	public void startInline(int varOffset, int stackOffset, Label end);
+	
+	public void endInline(int varOffset, int stackOffset, Label end);
 	
 	// Blocks
 	
