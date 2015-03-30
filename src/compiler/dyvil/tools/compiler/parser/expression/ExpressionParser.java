@@ -681,6 +681,10 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = new NullValue(token.raw());
 			this.mode = ACCESS;
 			return true;
+		case Keywords.NIL:
+			this.value = new NilValue(token.raw());
+			this.mode = ACCESS;
+			return true;
 		case Keywords.TRUE:
 			this.value = new BooleanValue(token.raw(), true);
 			this.mode = ACCESS;

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class EncapsulatedValue implements IValue, IValued
 {
@@ -33,6 +34,12 @@ public final class EncapsulatedValue implements IValue, IValued
 	public IValue getValue()
 	{
 		return this.value;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.value.getPosition();
 	}
 	
 	@Override

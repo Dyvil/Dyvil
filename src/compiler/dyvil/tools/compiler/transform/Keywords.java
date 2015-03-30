@@ -34,30 +34,31 @@ public interface Keywords
 	int	LAZY			= Tokens.KEYWORD | 0x001E0000;
 	int	NATIVE			= Tokens.KEYWORD | 0x001F0000;
 	int	NEW				= Tokens.KEYWORD | 0x00200000;
-	int	NULL			= Tokens.KEYWORD | 0x00210000;
-	int	OBJECT			= Tokens.KEYWORD | 0x00220000;
-	int	OVERRIDE		= Tokens.KEYWORD | 0x00230000;
-	int	PACKAGE			= Tokens.KEYWORD | 0x00240000;
-	int	PRIVATE			= Tokens.KEYWORD | 0x00250000;
-	int	PROTECTED		= Tokens.KEYWORD | 0x00260000;
-	int	PUBLIC			= Tokens.KEYWORD | 0x00270000;
-	int	RETURN			= Tokens.KEYWORD | 0x00280000;
-	int	SEALED			= Tokens.KEYWORD | 0x00290000;
-	int	SET				= Tokens.KEYWORD | 0x002A0000;
-	int	STATIC			= Tokens.KEYWORD | 0x002B0000;
-	int	STRICTFP		= Tokens.KEYWORD | 0x002C0000;
-	int	SUPER			= Tokens.KEYWORD | 0x002D0000;
-	int	SYNCHRONIZED	= Tokens.KEYWORD | 0x002E0000;
-	int	THIS			= Tokens.KEYWORD | 0x002F0000;
-	int	THROW			= Tokens.KEYWORD | 0x00300000;
-	int	THROWS			= Tokens.KEYWORD | 0x00310000;
-	int	TRANSIENT		= Tokens.KEYWORD | 0x00320000;
-	int	TRUE			= Tokens.KEYWORD | 0x00330000;
-	int	TRY				= Tokens.KEYWORD | 0x00340000;
-	int	USING			= Tokens.KEYWORD | 0x00350000;
-	int	VAR				= Tokens.KEYWORD | 0x00360000;
-	int	VOLATILE		= Tokens.KEYWORD | 0x00370000;
-	int	WHILE			= Tokens.KEYWORD | 0x00380000;
+	int	NIL				= Tokens.KEYWORD | 0x00210000;
+	int	NULL			= Tokens.KEYWORD | 0x00220000;
+	int	OBJECT			= Tokens.KEYWORD | 0x00230000;
+	int	OVERRIDE		= Tokens.KEYWORD | 0x00240000;
+	int	PACKAGE			= Tokens.KEYWORD | 0x00250000;
+	int	PRIVATE			= Tokens.KEYWORD | 0x00260000;
+	int	PROTECTED		= Tokens.KEYWORD | 0x00270000;
+	int	PUBLIC			= Tokens.KEYWORD | 0x00280000;
+	int	RETURN			= Tokens.KEYWORD | 0x00290000;
+	int	SEALED			= Tokens.KEYWORD | 0x002A0000;
+	int	SET				= Tokens.KEYWORD | 0x002B0000;
+	int	STATIC			= Tokens.KEYWORD | 0x002C0000;
+	int	STRICTFP		= Tokens.KEYWORD | 0x002D0000;
+	int	SUPER			= Tokens.KEYWORD | 0x002E0000;
+	int	SYNCHRONIZED	= Tokens.KEYWORD | 0x002F0000;
+	int	THIS			= Tokens.KEYWORD | 0x00300000;
+	int	THROW			= Tokens.KEYWORD | 0x00310000;
+	int	THROWS			= Tokens.KEYWORD | 0x00320000;
+	int	TRANSIENT		= Tokens.KEYWORD | 0x00330000;
+	int	TRUE			= Tokens.KEYWORD | 0x00340000;
+	int	TRY				= Tokens.KEYWORD | 0x00350000;
+	int	USING			= Tokens.KEYWORD | 0x00360000;
+	int	VAR				= Tokens.KEYWORD | 0x00370000;
+	int	VOLATILE		= Tokens.KEYWORD | 0x00380000;
+	int	WHILE			= Tokens.KEYWORD | 0x00390000;
 	
 	public static int getKeywordType(String s)
 	{
@@ -127,6 +128,8 @@ public interface Keywords
 			return NATIVE;
 		case "new":
 			return NEW;
+		case "nil":
+			return NIL;
 		case "null":
 			return NULL;
 		case "object":
@@ -247,6 +250,8 @@ public interface Keywords
 			return "native";
 		case NEW:
 			return "new";
+		case NIL:
+			return "nil";
 		case NULL:
 			return "null";
 		case OBJECT:

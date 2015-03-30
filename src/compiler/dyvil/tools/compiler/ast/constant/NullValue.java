@@ -1,16 +1,17 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class NullValue extends ASTNode implements IConstantValue
+public final class NullValue implements IConstantValue
 {
 	private static NullValue	NULL;
+	
+	private ICodePosition		position;
 	
 	public NullValue()
 	{
@@ -34,6 +35,12 @@ public class NullValue extends ASTNode implements IConstantValue
 	public int getValueType()
 	{
 		return IValue.NULL;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
@@ -83,6 +90,12 @@ public class NullValue extends ASTNode implements IConstantValue
 	{
 		writer.writeInsn(Opcodes.ACONST_NULL);
 		writer.writeInsn(Opcodes.RETURN);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "null";
 	}
 	
 	@Override

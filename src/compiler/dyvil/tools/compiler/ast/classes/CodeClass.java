@@ -658,6 +658,11 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			this.body.checkTypes(markers, this);
 		}
+		
+		if ((this.modifiers & Modifiers.CASE_CLASS) != 0)
+		{
+			this.getConstructor();
+		}
 	}
 	
 	@Override
