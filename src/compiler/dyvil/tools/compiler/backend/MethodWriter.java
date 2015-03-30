@@ -53,11 +53,7 @@ public interface MethodWriter
 	
 	public void set(Object type);
 	
-	public void set(IType type);
-	
 	public void push(Object type);
-	
-	public void push(IType type);
 	
 	public void pop();
 	

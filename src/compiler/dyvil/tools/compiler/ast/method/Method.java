@@ -1027,7 +1027,7 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		if (false && (this.modifiers & Modifiers.INLINE) != 0)
+		if ((this.modifiers & Modifiers.INLINE) != 0)
 		{
 			this.writeInline(writer, instance, arguments);
 			return;

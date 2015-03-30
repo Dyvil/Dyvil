@@ -556,7 +556,7 @@ public class Type extends ASTNode implements IType
 			this.appendExtendedName(buf);
 			return buf.toString();
 		}
-		return this.theClass == null ? ClassFormat.packageToInternal(this.qualifiedName) : this.theClass.getInternalName();
+		return this.theClass == null ? ClassFormat.packageToInternal(this.fullName) : this.theClass.getInternalName();
 	}
 	
 	@Override
@@ -566,7 +566,7 @@ public class Type extends ASTNode implements IType
 		{
 			buffer.append('[');
 		}
-		buffer.append('L').append(this.theClass == null ? ClassFormat.packageToInternal(this.qualifiedName) : this.theClass.getInternalName()).append(';');
+		buffer.append('L').append(this.theClass == null ? ClassFormat.packageToInternal(this.fullName) : this.theClass.getInternalName()).append(';');
 	}
 	
 	@Override
