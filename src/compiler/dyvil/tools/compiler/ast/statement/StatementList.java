@@ -31,17 +31,20 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class StatementList extends ASTNode implements IStatement, IValueList, IContext
 {
-	protected IValue[]			values		= new IValue[3];
+	protected IValue[]			values	= new IValue[3];
 	protected int				valueCount;
 	public Label[]				labels;
-	public Map<Name, Variable>	variables	= new HashMap();
+	public Map<Name, Variable>	variables;
 	
 	protected IType				requiredType;
-	protected IType				elementType;
 	
 	private IContext			context;
 	private IStatement			parent;
 	public boolean				topLevel;
+	
+	public StatementList()
+	{
+	}
 	
 	public StatementList(ICodePosition position)
 	{
@@ -77,13 +80,13 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	{
 		if (type == Types.VOID || type == Types.UNKNOWN)
 		{
-			this.elementType = this.requiredType = Types.VOID;
+			this.requiredType = Types.VOID;
 			return this;
 		}
 		
 		if (this.valueCount > 0 && this.values[this.valueCount - 1].isType(type))
 		{
-			this.elementType = this.requiredType = type;
+			this.requiredType = type;
 			return this;
 		}
 		
@@ -236,6 +239,11 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			
 			if (v2.getValueType() == IValue.VARIABLE)
 			{
+				if (this.variables == null)
+				{
+					this.variables = new HashMap();
+				}
+				
 				FieldInitializer fi = (FieldInitializer) v2;
 				Variable var = fi.variable;
 				this.variables.put(var.name, var);
@@ -255,7 +263,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		
 		if (this.requiredType == null)
 		{
-			this.elementType = this.requiredType = Types.VOID;
+			this.requiredType = Types.VOID;
 		}
 		
 		this.context = context;
@@ -357,10 +365,13 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public FieldMatch resolveField(Name name)
 	{
-		IField field = this.variables.get(name);
-		if (field != null)
+		if (this.variables != null)
 		{
-			return new FieldMatch(field, 1);
+			IField field = this.variables.get(name);
+			if (field != null)
+			{
+				return new FieldMatch(field, 1);
+			}
 		}
 		
 		return this.context.resolveField(name);
@@ -465,6 +476,11 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		}
 		writer.writeLabel(end);
 		
+		if (this.variables == null)
+		{
+			return;
+		}
+		
 		for (Entry<Name, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
@@ -507,6 +523,11 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			writer.resetLocals(count);
 		}
 		writer.writeLabel(end);
+		
+		if (this.variables == null)
+		{
+			return;
+		}
 		
 		for (Entry<Name, Variable> entry : this.variables.entrySet())
 		{

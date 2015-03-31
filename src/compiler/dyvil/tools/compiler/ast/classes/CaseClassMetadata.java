@@ -18,34 +18,20 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.transform.CaseClasses;
 
-public class CaseClassMetadata implements IClassMetadata
+public final class CaseClassMetadata extends ClassMetadata
 {
-	protected final IClass	theClass;
-	
-	protected IConstructor	constructor;
 	protected IMethod		applyMethod;
 	
 	public CaseClassMetadata(IClass iclass)
 	{
-		this.theClass = iclass;
-	}
-	
-	@Override
-	public IConstructor getConstructor()
-	{
-		if (this.constructor != null)
-		{
-			return this.constructor;
-		}
-		
-		Constructor constructor = new Constructor(this.theClass);
-		constructor.modifiers = Modifiers.PUBLIC | Modifiers.SYNTHETIC;
-		return this.constructor = constructor;
+		super(iclass);
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
+		super.resolve(markers, context);
+
 		Method m = new Method(this.theClass, Name.apply, this.theClass.getType());
 		m.modifiers = Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC;
 		m.setParameters(this.theClass.getParameters(), this.theClass.parameterCount());
@@ -66,25 +52,9 @@ public class CaseClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void write(ClassWriter writer, IValue instanceFields)
 	{
-		if (this.constructor != null)
-		{
-			int match = this.constructor.getSignatureMatch(arguments);
-			if (match > 0)
-			{
-				list.add(new ConstructorMatch(this.constructor, match));
-			}
-		}
-	}
-	
-	@Override
-	public void write(ClassWriter writer)
-	{
-		if (this.constructor != null)
-		{
-			// TODO
-		}
+		super.write(writer, instanceFields);
 		
 		MethodWriter mw = new MethodWriterImpl(writer,
 				writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));

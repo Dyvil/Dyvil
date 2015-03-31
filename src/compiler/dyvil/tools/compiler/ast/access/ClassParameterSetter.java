@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -11,15 +12,13 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ClassParameterSetter implements IValue
 {
+	private IClass theClass;
 	private IParameter	parameter;
-	private String		owner;
-	private String		desc;
 	
-	public ClassParameterSetter(IParameter param, String owner, String desc)
+	public ClassParameterSetter(IClass theClass, IParameter param)
 	{
+		this.theClass = theClass;
 		this.parameter = param;
-		this.owner = owner;
-		this.desc = desc;
 	}
 	
 	@Override
@@ -27,7 +26,7 @@ public final class ClassParameterSetter implements IValue
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		writer.writeVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getIndex());
-		writer.writeFieldInsn(Opcodes.PUTFIELD, this.owner, this.parameter.getName().qualified, this.desc);
+		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified, this.parameter.getDescription());
 	}
 	
 	@Override

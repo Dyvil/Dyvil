@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.ast.value.IValueList;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -90,7 +91,12 @@ public final class AnnotationMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void write(ClassWriter writer, IValue instanceFields)
 	{
 	}
 }

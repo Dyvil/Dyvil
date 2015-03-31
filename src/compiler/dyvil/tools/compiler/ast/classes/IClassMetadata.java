@@ -55,6 +55,8 @@ public interface IClassMetadata
 	
 	public void resolve(MarkerList markers, IContext context);
 	
+	public void checkTypes(MarkerList markers, IContext context);
+	
 	public default FieldMatch resolveField(Name name)
 	{
 		return null;
@@ -70,5 +72,5 @@ public interface IClassMetadata
 	
 	// Compilation
 	
-	public void write(ClassWriter writer);
+	public void write(ClassWriter writer, IValue instanceFields);
 }

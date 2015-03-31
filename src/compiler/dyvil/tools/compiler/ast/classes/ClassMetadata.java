@@ -5,11 +5,18 @@ import java.util.List;
 import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.access.ClassParameterSetter;
+import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
@@ -17,49 +24,80 @@ public class ClassMetadata implements IClassMetadata
 	protected final IClass	theClass;
 	
 	protected IConstructor	constructor;
+	protected IConstructor	superConstructor;
 	
 	public ClassMetadata(IClass iclass)
 	{
 		this.theClass = iclass;
+		
+		Constructor constructor = new Constructor(this.theClass);
+		constructor.modifiers = Modifiers.PUBLIC | Modifiers.SYNTHETIC;
+		this.constructor = constructor;
 	}
 	
 	@Override
 	public IConstructor getConstructor()
 	{
-		if (this.constructor != null)
-		{
-			return this.constructor;
-		}
-		
-		Constructor constructor = new Constructor(this.theClass);
-		constructor.modifiers = Modifiers.PUBLIC | Modifiers.SYNTHETIC;
-		return this.constructor = constructor;
+		return this.constructor;
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
+		this.constructor.setParameters(this.theClass.getParameters(), this.theClass.parameterCount());
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		IType superType = this.theClass.getSuperType();
+		if (superType == null)
+		{
+			return;
+		}
+		
+		ConstructorMatch match = superType.resolveConstructor(EmptyArguments.INSTANCE);
+		if (match != null)
+		{
+			this.superConstructor = match.constructor;
+			return;
+		}
+		
+		markers.add(this.theClass.getPosition(), "constructor.super", superType.toString());
 	}
 	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
-		if (this.constructor != null)
+		int match = this.constructor.getSignatureMatch(arguments);
+		if (match > 0)
 		{
-			int match = this.constructor.getSignatureMatch(arguments);
-			if (match > 0)
-			{
-				list.add(new ConstructorMatch(this.constructor, match));
-			}
+			list.add(new ConstructorMatch(this.constructor, match));
 		}
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer, IValue instanceFields)
 	{
-		if (this.constructor != null)
+		StatementList list = new StatementList();
+		if (instanceFields != null)
 		{
-			// TODO
+			list.addValue(instanceFields);
 		}
+		if (superConstructor != null)
+		{
+			list.addValue(new InitializerCall(null, this.superConstructor, EmptyArguments.INSTANCE, true));
+		}
+		int count = this.theClass.parameterCount();
+		for (int i = 0; i < count; i++)
+		{
+			IParameter param = this.theClass.getParameter(i);
+			param.write(writer);
+			
+			list.addValue(new ClassParameterSetter(this.theClass, param));
+		}
+		
+		this.constructor.setValue(list);
+		this.constructor.write(writer);
 	}
 }

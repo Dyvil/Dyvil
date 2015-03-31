@@ -567,6 +567,12 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void write(ClassWriter writer)
 	{
+		this.write(writer, null);
+	}
+	
+	@Override
+	public void write(ClassWriter writer, IValue instanceFields)
+	{
 		int modifiers = this.modifiers & 0xFFFF;
 		if (this.value == null)
 		{
@@ -606,6 +612,12 @@ public class Constructor extends Member implements IConstructor
 		{
 			mw.begin();
 			mw.writeLabel(start);
+			
+			if (instanceFields != null)
+			{
+				instanceFields.writeStatement(mw);
+			}
+			
 			this.value.writeStatement(mw);
 			mw.writeLabel(end);
 			mw.end(Types.VOID);

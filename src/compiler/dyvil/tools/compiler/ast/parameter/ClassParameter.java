@@ -162,7 +162,6 @@ public class ClassParameter extends Member implements IParameter
 				Marker marker = markers.create(this.defaultValue.getPosition(), "parameter.type");
 				marker.addInfo("Parameter Type: " + this.type);
 				marker.addInfo("Value Type: " + this.defaultValue.getType());
-				
 			}
 			else
 			{
@@ -186,6 +185,9 @@ public class ClassParameter extends Member implements IParameter
 	@Override
 	public void write(ClassWriter writer)
 	{
+		String desc = this.getDescription();
+		writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
+		
 		if (this.defaultValue == null)
 		{
 			return;
@@ -194,8 +196,7 @@ public class ClassParameter extends Member implements IParameter
 		// Copy the access modifiers and add the STATIC modifier
 		int modifiers = this.theClass.getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
 		String name = "parDefault$class$" + this.index;
-		String desc = "()" + this.type.getExtendedName();
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, "()" + desc, null, null));
 		mw.begin();
 		this.defaultValue.writeExpression(mw);
 		mw.end(this.type);

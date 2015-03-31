@@ -638,14 +638,16 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].checkTypes(markers, this);
-		}
+		this.metadata.checkTypes(markers, context);
 		
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			this.annotations[i].checkTypes(markers, context);
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].checkTypes(markers, this);
 		}
 		
 		if (this.body != null)
@@ -1109,9 +1111,9 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		ThisValue thisValue = new ThisValue(null, this.type);
-		StatementList instanceFields = new StatementList(null);
-		StatementList staticFields = new StatementList(null);
+		ThisValue thisValue = new ThisValue(this.type);
+		StatementList instanceFields = new StatementList();
+		StatementList staticFields = new StatementList();
 		
 		for (int i = 0; i < fields; i++)
 		{
@@ -1142,11 +1144,11 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		this.metadata.write(writer);
+		this.metadata.write(writer, instanceFields);
 		
 		for (int i = 0; i < constructors; i++)
 		{
-			this.body.getConstructor(i).write(writer);
+			this.body.getConstructor(i).write(writer, instanceFields);
 		}
 		
 		for (int i = 0; i < properties; i++)
@@ -1176,14 +1178,16 @@ public class CodeClass extends ASTNode implements IClass
 			assign.value = call;
 			staticFields.addValue(assign);
 		}
-		if (!staticFields.isEmpty())
+		else if (staticFields.isEmpty())
 		{
-			// Create the classinit method
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
-			mw.begin();
-			staticFields.writeStatement(mw);
-			mw.end(Types.VOID);
+			return;
 		}
+		
+		// Create the classinit method
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
+		mw.begin();
+		staticFields.writeStatement(mw);
+		mw.end(Types.VOID);
 	}
 	
 	@Override

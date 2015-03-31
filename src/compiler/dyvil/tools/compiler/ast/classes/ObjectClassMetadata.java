@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ObjectClassMetadata implements IClassMetadata
@@ -49,7 +50,12 @@ public final class ObjectClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void write(ClassWriter writer, IValue instanceFields)
 	{
 	}
 }
