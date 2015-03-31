@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.generic.TypeVariableType;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -33,9 +34,25 @@ public class Type extends ASTNode implements IType
 		super();
 	}
 	
-	Type(String name)
+	public Type(String fullName)
 	{
-		this.name = Name.getQualified(name);
+		this.fullName = fullName;
+		
+		int index = fullName.lastIndexOf('.');
+		if (index == -1)
+		{
+			this.name = Name.getQualified(fullName);
+		}
+		else
+		{
+			this.name = Name.getQualified(fullName.substring(index + 1));
+		}
+	}
+	
+	public Type(String fullName, Name name)
+	{
+		this.fullName = fullName;
+		this.name = name;
 	}
 	
 	public Type(Name name)
@@ -244,18 +261,6 @@ public class Type extends ASTNode implements IType
 	// Resolve
 	
 	@Override
-	public boolean hasTypeVariables()
-	{
-		return false;
-	}
-	
-	@Override
-	public IType getConcreteType(ITypeContext context)
-	{
-		return this;
-	}
-	
-	@Override
 	public boolean isResolved()
 	{
 		return this.theClass != null;
@@ -363,6 +368,18 @@ public class Type extends ASTNode implements IType
 		return null;
 	}
 	
+	@Override
+	public boolean hasTypeVariables()
+	{
+		return false;
+	}
+	
+	@Override
+	public IType getConcreteType(ITypeContext context)
+	{
+		return this;
+	}
+	
 	// IContext
 	
 	@Override
@@ -443,6 +460,12 @@ public class Type extends ASTNode implements IType
 	public byte getAccessibility(IMember member)
 	{
 		return this.theClass == null ? 0 : this.theClass.getAccessibility(member);
+	}
+	
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		return this.theClass == null ? null : this.theClass.getFunctionalMethod();
 	}
 	
 	// Compilation

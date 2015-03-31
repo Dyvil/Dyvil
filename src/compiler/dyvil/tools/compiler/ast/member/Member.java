@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.member;
 
+import java.lang.annotation.ElementType;
+
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -61,8 +63,6 @@ public abstract class Member extends ASTNode implements IMember
 	@Override
 	public final void addAnnotation(Annotation annotation)
 	{
-		annotation.target = this.getAnnotationType();
-		
 		if (this.annotations == null)
 		{
 			this.annotations = new Annotation[3];
@@ -211,7 +211,7 @@ public abstract class Member extends ASTNode implements IMember
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			String fullName = a.type.fullName;
+			String fullName = a.type.getFullName();
 			if (fullName != null && !this.addRawAnnotation(fullName))
 			{
 				this.removeAnnotation(i--);
@@ -223,20 +223,21 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].check(markers, context);
-		}
-	}
-	
-	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			this.annotations[i].checkTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		ElementType target = this.getAnnotationType();
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			this.annotations[i].check(markers, context, target);
 		}
 	}
 	

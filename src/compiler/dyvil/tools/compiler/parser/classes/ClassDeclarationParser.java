@@ -2,6 +2,7 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.CodeClass;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
@@ -60,13 +61,14 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 				this.theClass.addModifier(i);
 				return;
 			}
-			else if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
+			if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
 			{
+				this.theClass.setMetadata(IClass.getClassMetadata(this.theClass, this.theClass.getModifiers()));
 				this.theClass.addModifier(i);
 				this.mode = NAME;
 				return;
 			}
-			else if (token.nameValue() == Name.at)
+			if (token.nameValue() == Name.at)
 			{
 				Annotation annotation = new Annotation(token.raw());
 				this.theClass.addAnnotation(annotation);

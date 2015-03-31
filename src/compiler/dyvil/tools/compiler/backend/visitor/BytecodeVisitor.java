@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public class BytecodeVisitor extends MethodVisitor
@@ -40,7 +39,7 @@ public class BytecodeVisitor extends MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		String packName = ClassFormat.internalToPackage2(type);
+		String packName = ClassFormat.extendedToPackage(type);
 		if (packName.equals("dyvil.lang.annotation.inline"))
 		{
 			this.method.addModifier(Modifiers.INLINE);
@@ -49,8 +48,7 @@ public class BytecodeVisitor extends MethodVisitor
 		
 		if (this.method.addRawAnnotation(packName))
 		{
-			AnnotationType atype = new AnnotationType(packName);
-			Annotation annotation = new Annotation(atype);
+			Annotation annotation = new Annotation(new dyvil.tools.compiler.ast.type.Type(packName));
 			return new AnnotationVisitorImpl(this.method, annotation);
 		}
 		return null;

@@ -20,17 +20,17 @@ public interface Types
 	PrimitiveType	DOUBLE			= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
 	
 	DynamicType		DYNAMIC			= new DynamicType();
-	Type			ANY				= new Type("Any");
-	Type			OBJECT			= new Type("Object");
-	Type			PREDEF			= new Type("Predef");
-	Type			ARRAY			= new Type("Array");
-	Type			STRING			= new Type("String");
-	Type			CLASS			= new Type("Class");
+	Type			ANY				= new Type("dyvil.lang.Any", Name.any);
+	Type			OBJECT			= new Type("java.lang.Object", Name.getQualified("Object"));
+	Type			STRING			= new Type("java.lang.String", Name.getQualified("String"));
+	Type			CLASS			= new Type("java.lang.Class", Name.getQualified("Class"));
+	Type			PREDEF			= new Type("dyvil.lang.Predef", Name.getQualified("Predef"));
+	Type			ARRAY			= new Type("dyvil.lang.Array", Name.getQualified("Array"));
 	
-	AnnotationType	AIntrinsic		= new AnnotationType("Intrinsic");
-	AnnotationType	AOverride		= new AnnotationType("Override");
-	AnnotationType	ARetention		= new AnnotationType("Retention");
-	AnnotationType	ATarget			= new AnnotationType("Target");
+	Type			AIntrinsic		= new Type("Intrinsic");
+	Type			AOverride		= new Type("Override");
+	Type			ARetention		= new Type("Retention");
+	Type			ATarget			= new Type("Target");
 	
 	IClass			BOOLEAN_CLASS	= Package.dyvilLang.resolveClass("Boolean");
 	IClass			BYTE_CLASS		= Package.dyvilLang.resolveClass("Byte");
@@ -49,47 +49,42 @@ public interface Types
 	
 	public static void init()
 	{
-		Types.BOOLEAN.theClass = Types.BOOLEAN_CLASS;
-		Types.BOOLEAN.boxMethod = Types.BOOLEAN_CLASS.getBody().getMethod(Name.apply);
-		Types.BOOLEAN.unboxMethod = Types.BOOLEAN_CLASS.getBody().getMethod(Name.unapply);
-		Types.BYTE.theClass = Types.BYTE_CLASS;
-		Types.BYTE.boxMethod = Types.BYTE_CLASS.getBody().getMethod(Name.apply);
-		Types.BYTE.unboxMethod = Types.BYTE_CLASS.getBody().getMethod(Name.unapply);
-		Types.SHORT.theClass = Types.SHORT_CLASS;
-		Types.SHORT.boxMethod = Types.SHORT_CLASS.getBody().getMethod(Name.apply);
-		Types.SHORT.unboxMethod = Types.SHORT_CLASS.getBody().getMethod(Name.unapply);
-		Types.CHAR.theClass = Types.CHAR_CLASS;
-		Types.CHAR.boxMethod = Types.CHAR_CLASS.getBody().getMethod(Name.apply);
-		Types.CHAR.unboxMethod = Types.CHAR_CLASS.getBody().getMethod(Name.unapply);
-		Types.INT.theClass = Types.INT_CLASS;
-		Types.INT.boxMethod = Types.INT_CLASS.getBody().getMethod(Name.apply);
-		Types.INT.unboxMethod = Types.INT_CLASS.getBody().getMethod(Name.unapply);
-		Types.LONG.theClass = Types.LONG_CLASS;
-		Types.LONG.boxMethod = Types.LONG_CLASS.getBody().getMethod(Name.apply);
-		Types.LONG.unboxMethod = Types.LONG_CLASS.getBody().getMethod(Name.unapply);
-		Types.FLOAT.theClass = Types.FLOAT_CLASS;
-		Types.FLOAT.boxMethod = Types.FLOAT_CLASS.getBody().getMethod(Name.apply);
-		Types.FLOAT.unboxMethod = Types.FLOAT_CLASS.getBody().getMethod(Name.unapply);
-		Types.DOUBLE.theClass = Types.DOUBLE_CLASS;
-		Types.DOUBLE.boxMethod = Types.DOUBLE_CLASS.getBody().getMethod(Name.apply);
-		Types.DOUBLE.unboxMethod = Types.DOUBLE_CLASS.getBody().getMethod(Name.unapply);
+		BOOLEAN.theClass = BOOLEAN_CLASS;
+		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.apply);
+		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.unapply);
+		BYTE.theClass = BYTE_CLASS;
+		BYTE.boxMethod = BYTE_CLASS.getBody().getMethod(Name.apply);
+		BYTE.unboxMethod = BYTE_CLASS.getBody().getMethod(Name.unapply);
+		SHORT.theClass = SHORT_CLASS;
+		SHORT.boxMethod = SHORT_CLASS.getBody().getMethod(Name.apply);
+		SHORT.unboxMethod = SHORT_CLASS.getBody().getMethod(Name.unapply);
+		CHAR.theClass = CHAR_CLASS;
+		CHAR.boxMethod = CHAR_CLASS.getBody().getMethod(Name.apply);
+		CHAR.unboxMethod = CHAR_CLASS.getBody().getMethod(Name.unapply);
+		INT.theClass = INT_CLASS;
+		INT.boxMethod = INT_CLASS.getBody().getMethod(Name.apply);
+		INT.unboxMethod = INT_CLASS.getBody().getMethod(Name.unapply);
+		LONG.theClass = LONG_CLASS;
+		LONG.boxMethod = LONG_CLASS.getBody().getMethod(Name.apply);
+		LONG.unboxMethod = LONG_CLASS.getBody().getMethod(Name.unapply);
+		FLOAT.theClass = FLOAT_CLASS;
+		FLOAT.boxMethod = FLOAT_CLASS.getBody().getMethod(Name.apply);
+		FLOAT.unboxMethod = FLOAT_CLASS.getBody().getMethod(Name.unapply);
+		DOUBLE.theClass = DOUBLE_CLASS;
+		DOUBLE.boxMethod = DOUBLE_CLASS.getBody().getMethod(Name.apply);
+		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod(Name.unapply);
 		
-		Types.ANY.theClass = Types.OBJECT_CLASS;
-		Types.ANY.fullName = "dyvil.lang.Any";
-		Types.OBJECT.theClass = Types.OBJECT_CLASS;
-		Types.OBJECT.fullName = "java.lang.Object";
-		Types.STRING.theClass = Types.STRING_CLASS;
-		Types.STRING.fullName = "java.lang.String";
-		Types.CLASS.theClass = Types.CLASS_CLASS;
-		Types.CLASS.fullName = "java.lang.Class";
-		Types.ARRAY.theClass = Types.ARRAY_CLASS;
-		Types.ARRAY.fullName = "dyvil.lang.Array";
-		Types.PREDEF.theClass = Types.PREDEF_CLASS;
-		Types.PREDEF.fullName = "dyvil.lang.Predef";
+		ANY.theClass = OBJECT_CLASS;
+		OBJECT.theClass = OBJECT_CLASS;
+		STRING.theClass = STRING_CLASS;
+		CLASS.theClass = CLASS_CLASS;
+		ARRAY.theClass = ARRAY_CLASS;
+		PREDEF.theClass = PREDEF_CLASS;
+		ARRAY.theClass = ARRAY_CLASS;
 		
-		Types.AIntrinsic.theClass = Package.dyvilLangAnnotation.resolveClass("Intrinsic");
-		Types.AOverride.theClass = Package.javaLang.resolveClass("Override");
-		Types.ARetention.theClass = Package.javaLangAnnotation.resolveClass("Retention");
-		Types.ATarget.theClass = Package.javaLangAnnotation.resolveClass("Target");
+		ATarget.theClass = Package.javaLangAnnotation.resolveClass("Target");
+		ARetention.theClass = Package.javaLangAnnotation.resolveClass("Retention");
+		AOverride.theClass = Package.javaLang.resolveClass("Override");
+		AIntrinsic.theClass = Package.dyvilLangAnnotation.resolveClass("Intrinsic");
 	}
 }

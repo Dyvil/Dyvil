@@ -87,7 +87,7 @@ public final class ClassFormat
 		return name.replace('/', '.');
 	}
 	
-	public static String internalToPackage2(String name)
+	public static String extendedToPackage(String name)
 	{
 		int len = name.length() - 1;
 		StringBuilder builder = new StringBuilder(len - 1);

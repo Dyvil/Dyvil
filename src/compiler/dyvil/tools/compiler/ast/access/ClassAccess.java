@@ -161,7 +161,7 @@ public class ClassAccess extends ASTNode implements IValue
 		IClass iclass = this.type.getTheClass();
 		if (iclass != null)
 		{
-			IField field = iclass.getInstanceField();
+			IField field = iclass.getMetadata().getInstanceField();
 			if (field != null)
 			{
 				field.writeGet(writer, null);

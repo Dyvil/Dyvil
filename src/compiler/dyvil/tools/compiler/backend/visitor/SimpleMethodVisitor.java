@@ -9,7 +9,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IBaseMethod;
-import dyvil.tools.compiler.ast.type.AnnotationType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class SimpleMethodVisitor extends MethodVisitor
@@ -49,11 +49,10 @@ public final class SimpleMethodVisitor extends MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		String packName = ClassFormat.internalToPackage2(type);
+		String packName = ClassFormat.extendedToPackage(type);
 		if (this.method.addRawAnnotation(packName))
 		{
-			AnnotationType atype = new AnnotationType(packName);
-			Annotation annotation = new Annotation(atype);
+			Annotation annotation = new Annotation(new Type(packName));
 			return new AnnotationVisitorImpl(this.method, annotation);
 		}
 		return null;

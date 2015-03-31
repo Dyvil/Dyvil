@@ -10,9 +10,11 @@ import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -158,13 +160,22 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return this.getTheClass() == type.getTheClass();
 	}
 	
+	// Resolve
+	
+	public boolean isResolved();
+	
+	public IType resolve(MarkerList markers, IContext context);
+	
+	// Generics
+	
+	
 	/**
 	 * Returns true if this is or contains any type variables.
 	 * 
 	 * @return
 	 */
 	public boolean hasTypeVariables();
-	
+
 	/**
 	 * Returns a copy of this type with all type variables replaced.
 	 * 
@@ -184,12 +195,6 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	{
 		return null;
 	}
-	
-	// Resolve
-	
-	public boolean isResolved();
-	
-	public IType resolve(MarkerList markers, IContext context);
 	
 	// IContext
 	
@@ -228,6 +233,11 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
+	
+	@Override
+	public byte getAccessibility(IMember member);
+	
+	public IMethod getFunctionalMethod();
 	
 	// Compilation
 	

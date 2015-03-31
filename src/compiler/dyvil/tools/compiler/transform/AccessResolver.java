@@ -119,6 +119,7 @@ public class AccessResolver
 				}
 				else
 				{
+					next.setValue(curr);
 					curr.addResolveError(markers);
 				}
 			}

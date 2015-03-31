@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -34,58 +35,6 @@ public final class DynamicType extends ASTNode implements IType
 	}
 	
 	// IContext
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public FieldMatch resolveField(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		return new MethodMatch(new DynamicMethod(name), 1);
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public byte getAccessibility(IMember member)
-	{
-		return IContext.READ_WRITE_ACCESS;
-	}
 	
 	@Override
 	public void setFullName(String name)
@@ -163,17 +112,77 @@ public final class DynamicType extends ASTNode implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
-	{
-		return this;
-	}
-	
-	@Override
 	public boolean isResolved()
 	{
 		return true;
 	}
 	
+	// IContext
+	
+	@Override
+	public IType resolve(MarkerList markers, IContext context)
+	{
+		return this;
+	}
+
+	@Override
+	public Package resolvePackage(Name name)
+	{
+		return null;
+	}
+
+	@Override
+	public IClass resolveClass(Name name)
+	{
+		return null;
+	}
+
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return null;
+	}
+
+	@Override
+	public FieldMatch resolveField(Name name)
+	{
+		return null;
+	}
+
+	@Override
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
+	{
+		return new MethodMatch(new DynamicMethod(name), 1);
+	}
+
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	{
+	}
+
+	@Override
+	public ConstructorMatch resolveConstructor(IArguments arguments)
+	{
+		return null;
+	}
+
+	@Override
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	{
+	}
+
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		return IContext.READ_WRITE_ACCESS;
+	}
+	
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		return null;
+	}
+
 	@Override
 	public String getInternalName()
 	{

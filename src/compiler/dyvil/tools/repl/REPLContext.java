@@ -7,7 +7,7 @@ import java.util.Map;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.FieldInitializer;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.external.BytecodeClass;
+import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
@@ -237,7 +237,7 @@ public class REPLContext implements IValued, IDyvilUnit
 		int level = member.getAccessLevel();
 		if ((level & Modifiers.SEALED) != 0)
 		{
-			if (iclass instanceof BytecodeClass)
+			if (iclass instanceof ExternalClass)
 			{
 				return SEALED;
 			}

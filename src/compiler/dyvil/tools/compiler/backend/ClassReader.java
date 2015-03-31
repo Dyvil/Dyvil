@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.backend;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.objectweb.asm.*;
@@ -8,31 +7,30 @@ import org.objectweb.asm.*;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.external.BytecodeClass;
-import dyvil.tools.compiler.ast.type.AnnotationType;
+import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
 
 public class ClassReader extends ClassVisitor
 {
-	protected BytecodeClass	theClass;
+	protected ExternalClass	theClass;
 	
-	public ClassReader(BytecodeClass theClass)
+	public ClassReader(ExternalClass theClass)
 	{
 		super(DyvilCompiler.asmVersion);
 		this.theClass = theClass;
 	}
 	
-	public static IClass loadClass(BytecodeClass bclass, InputStream is, boolean decompile)
+	public static IClass loadClass(ExternalClass bclass, InputStream is, boolean decompile)
 	{
 		try
 		{
 			org.objectweb.asm.ClassReader reader = new org.objectweb.asm.ClassReader(is);
 			ClassReader visitor = new ClassReader(bclass);
-			reader.accept(visitor, 0);
+			reader.accept(visitor, org.objectweb.asm.ClassReader.SKIP_DEBUG | org.objectweb.asm.ClassReader.SKIP_FRAMES);
 			
 			return bclass;
 		}
-		catch (IOException ex)
+		catch (Throwable ex)
 		{
 			DyvilCompiler.logger.throwing("ClassReader", "loadClass", ex);
 		}
@@ -60,9 +58,7 @@ public class ClassReader extends ClassVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String name, boolean visible)
 	{
-		AnnotationType type = new AnnotationType();
-		ClassFormat.internalToType(name, type);
-		Annotation annotation = new Annotation(null, type);
+		Annotation annotation = new Annotation(null, ClassFormat.internalToType(name));
 		return new AnnotationVisitorImpl(this.theClass, annotation);
 	}
 	

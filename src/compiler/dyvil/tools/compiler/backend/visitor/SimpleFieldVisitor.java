@@ -6,7 +6,7 @@ import org.objectweb.asm.FieldVisitor;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.type.AnnotationType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public class SimpleFieldVisitor extends FieldVisitor
@@ -22,11 +22,10 @@ public class SimpleFieldVisitor extends FieldVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		String packName = ClassFormat.internalToPackage2(type);
+		String packName = ClassFormat.extendedToPackage(type);
 		if (this.field.addRawAnnotation(packName))
 		{
-			AnnotationType atype = new AnnotationType(packName);
-			Annotation annotation = new Annotation(atype);
+			Annotation annotation = new Annotation(new Type(packName));
 			return new AnnotationVisitorImpl(this.field, annotation);
 		}
 		return null;

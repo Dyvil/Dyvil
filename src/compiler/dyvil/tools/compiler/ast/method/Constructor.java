@@ -115,6 +115,12 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
+	public IParameter[] getParameters()
+	{
+		return this.parameters;
+	}
+	
+	@Override
 	public boolean addRawAnnotation(String type)
 	{
 		switch (type)

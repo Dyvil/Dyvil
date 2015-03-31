@@ -11,8 +11,8 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.ArrayValue;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -38,14 +38,14 @@ public final class ExternalMethod extends Method
 			Annotation annotation = this.annotations[i];
 			annotation.resolveTypes(null, Package.rootPackage);
 			
-			if (!"dyvil.lang.annotation.Intrinsic".equals(annotation.type.fullName))
+			if (annotation.type.getTheClass() != Types.AIntrinsic.theClass)
 			{
 				continue;
 			}
 			
 			try
 			{
-				ArrayValue array = (ArrayValue) annotation.arguments.getValue(0, AnnotationType.VALUE);
+				ArrayValue array = (ArrayValue) annotation.arguments.getValue(0, Annotation.VALUE);
 				
 				int len = array.valueCount();
 				int[] opcodes = new int[len];

@@ -6,7 +6,7 @@ import org.objectweb.asm.MethodVisitor;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.type.AnnotationType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public class AnnotationClassVisitor extends MethodVisitor
@@ -28,11 +28,10 @@ public class AnnotationClassVisitor extends MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		String packName = ClassFormat.internalToPackage2(type);
+		String packName = ClassFormat.extendedToPackage(type);
 		if (this.parameter.addRawAnnotation(packName))
 		{
-			AnnotationType atype = new AnnotationType(packName);
-			Annotation annotation = new Annotation(atype);
+			Annotation annotation = new Annotation(new Type(packName));
 			return new AnnotationVisitorImpl(this.parameter, annotation);
 		}
 		return null;

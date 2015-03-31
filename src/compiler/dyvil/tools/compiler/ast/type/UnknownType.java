@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -33,58 +34,6 @@ public final class UnknownType extends ASTNode implements IType
 	}
 	
 	// IContext
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public FieldMatch resolveField(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public byte getAccessibility(IMember member)
-	{
-		return 0;
-	}
 	
 	@Override
 	public void setFullName(String name)
@@ -150,17 +99,81 @@ public final class UnknownType extends ASTNode implements IType
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+
+	@Override
 	public IType resolve(MarkerList markers, IContext context)
 	{
 		return this;
 	}
 	
+	
+	
+	// IContext
+	
 	@Override
-	public boolean isResolved()
+	public Package resolvePackage(Name name)
 	{
-		return true;
+		return null;
+	}
+
+	@Override
+	public IClass resolveClass(Name name)
+	{
+		return null;
+	}
+
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return null;
+	}
+
+	@Override
+	public FieldMatch resolveField(Name name)
+	{
+		return null;
+	}
+
+	@Override
+	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
+	{
+		return null;
+	}
+
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	{
+	}
+
+	@Override
+	public ConstructorMatch resolveConstructor(IArguments arguments)
+	{
+		return null;
+	}
+
+	@Override
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	{
+	}
+
+	@Override
+	public byte getAccessibility(IMember member)
+	{
+		return 0;
 	}
 	
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		return null;
+	}
+	
+	// Compilation
+
 	@Override
 	public String getInternalName()
 	{

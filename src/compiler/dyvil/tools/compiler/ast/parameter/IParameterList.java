@@ -10,6 +10,8 @@ public interface IParameterList
 	
 	public IParameter getParameter(int index);
 	
+	public IParameter[] getParameters();
+	
 	public default void setVarargs()
 	{
 	}

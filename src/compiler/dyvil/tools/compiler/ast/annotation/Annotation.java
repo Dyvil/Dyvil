@@ -10,12 +10,13 @@ import org.objectweb.asm.FieldVisitor;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
@@ -29,15 +30,21 @@ import dyvil.tools.compiler.util.Util;
 
 public class Annotation extends ASTNode implements ITyped
 {
-	public Name				name;
-	public AnnotationType	type;
-	public IArguments		arguments;
-	public ElementType		target;
+	public static final MethodParameter	VALUE	= new MethodParameter();
 	
-	public Annotation(AnnotationType type)
+	static
+	{
+		VALUE.name = Name.getQualified("value");
+	}
+	
+	public Name							name;
+	public IType						type;
+	public IArguments					arguments;
+	
+	public Annotation(IType type)
 	{
 		this.type = type;
-		this.name = type.name;
+		this.name = type.getName();
 	}
 	
 	public Annotation(ICodePosition position)
@@ -45,10 +52,10 @@ public class Annotation extends ASTNode implements ITyped
 		this.position = position;
 	}
 	
-	public Annotation(ICodePosition position, AnnotationType type)
+	public Annotation(ICodePosition position, IType type)
 	{
 		this.position = position;
-		this.name = type.name;
+		this.name = type.getName();
 		this.type = type;
 	}
 	
@@ -56,17 +63,17 @@ public class Annotation extends ASTNode implements ITyped
 	{
 		this.position = position;
 		this.name = name;
-		this.type = new AnnotationType(position, name);
+		this.type = new Type(position, name);
 	}
 	
 	@Override
 	public void setType(IType type)
 	{
-		this.type = (AnnotationType) type;
+		this.type = type;
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return this.type;
 	}
@@ -79,13 +86,12 @@ public class Annotation extends ASTNode implements ITyped
 	
 	public void resolve(MarkerList markers, IContext context)
 	{
-		this.type.readMetaAnnotations();
 		this.arguments.resolve(markers, context);
 	}
 	
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IClass theClass = this.type.theClass;
+		IClass theClass = this.type.getTheClass();
 		if (theClass == null)
 		{
 			return;
@@ -115,9 +121,9 @@ public class Annotation extends ASTNode implements ITyped
 		}
 	}
 	
-	public void check(MarkerList markers, IContext context)
+	public void check(MarkerList markers, IContext context, ElementType target)
 	{
-		IClass theClass = this.type.theClass;
+		IClass theClass = this.type.getTheClass();
 		if (theClass == null)
 		{
 			return;
@@ -129,11 +135,12 @@ public class Annotation extends ASTNode implements ITyped
 			return;
 		}
 		
-		if (!this.type.isTarget(this.target))
+		IClassMetadata metadata = theClass.getMetadata();
+		if (!metadata.isTarget(target))
 		{
 			Marker error = markers.create(this.position, "annotation.target", this.name);
-			error.addInfo("Element Target: " + this.target);
-			error.addInfo("Allowed Targets: " + this.type.getTargets());
+			error.addInfo("Element Target: " + target);
+			error.addInfo("Allowed Targets: " + metadata.getTargets());
 			markers.add(error);
 		}
 	}
@@ -143,35 +150,44 @@ public class Annotation extends ASTNode implements ITyped
 		this.arguments.foldConstants();
 	}
 	
+	private RetentionPolicy getRetention()
+	{
+		return this.type.getTheClass().getMetadata().getRetention();
+	}
+	
 	public void write(ClassWriter writer)
 	{
-		if (this.type.retention != RetentionPolicy.SOURCE)
+		RetentionPolicy retention = this.getRetention();
+		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.visitAnnotation(this.type.getExtendedName(), this.type.retention == RetentionPolicy.RUNTIME));
+			this.write(writer.visitAnnotation(this.type.getExtendedName(), retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	
 	public void write(MethodWriter writer)
 	{
-		if (this.type.retention != RetentionPolicy.SOURCE)
+		RetentionPolicy retention = this.getRetention();
+		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.addAnnotation(this.type.getExtendedName(), this.type.retention == RetentionPolicy.RUNTIME));
+			this.write(writer.addAnnotation(this.type.getExtendedName(), retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	
 	public void write(FieldVisitor writer)
 	{
-		if (this.type.retention != RetentionPolicy.SOURCE)
+		RetentionPolicy retention = this.getRetention();
+		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.visitAnnotation(this.type.getExtendedName(), this.type.retention == RetentionPolicy.RUNTIME));
+			this.write(writer.visitAnnotation(this.type.getExtendedName(), retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	
 	public void write(MethodWriter writer, int index)
 	{
-		if (this.type.retention != RetentionPolicy.SOURCE)
+		RetentionPolicy retention = this.getRetention();
+		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.addParameterAnnotation(index, this.type.getExtendedName(), this.type.retention == RetentionPolicy.RUNTIME));
+			this.write(writer.addParameterAnnotation(index, this.type.getExtendedName(), retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	

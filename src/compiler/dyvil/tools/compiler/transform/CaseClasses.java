@@ -4,7 +4,7 @@ import static dyvil.reflect.Opcodes.*;
 
 import org.objectweb.asm.Label;
 
-import dyvil.tools.compiler.ast.classes.CodeClass;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
@@ -14,7 +14,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 
 public class CaseClasses
 {
-	public static void writeEquals(MethodWriter writer, CodeClass theClass)
+	public static void writeEquals(MethodWriter writer, IClass theClass)
 	{
 		Label label;
 		String extended = "L" + theClass.getInternalName() + ";";
@@ -71,7 +71,7 @@ public class CaseClasses
 		writer.writeInsn(IRETURN);
 	}
 	
-	private static void writeEquals(MethodWriter writer, IField field)
+	public static void writeEquals(MethodWriter writer, IField field)
 	{
 		IType type = field.getType();
 		if (type.isPrimitive())
@@ -135,7 +135,7 @@ public class CaseClasses
 		writer.writeLabel(endLabel);
 	}
 	
-	public static void writeHashCode(MethodWriter writer, CodeClass theClass)
+	public static void writeHashCode(MethodWriter writer, IClass theClass)
 	{
 		writer.writeLDC(31);
 		
@@ -154,7 +154,7 @@ public class CaseClasses
 		writer.writeInsn(IRETURN);
 	}
 	
-	private static void writeHashCode(MethodWriter writer, IField field)
+	public static void writeHashCode(MethodWriter writer, IField field)
 	{
 		writer.writeVarInsn(ALOAD, 0);
 		field.writeGet(writer, null);
@@ -234,7 +234,7 @@ public class CaseClasses
 		writer.writeLabel(endLabel);
 	}
 	
-	public static void writeToString(MethodWriter writer, CodeClass theClass)
+	public static void writeToString(MethodWriter writer, IClass theClass)
 	{
 		// ----- StringBuilder Constructor -----
 		writer.writeTypeInsn(NEW, "java/lang/StringBuilder");
@@ -269,7 +269,7 @@ public class CaseClasses
 		writer.writeInsn(ARETURN);
 	}
 	
-	private static void writeToString(MethodWriter writer, IField field)
+	public static void writeToString(MethodWriter writer, IField field)
 	{
 		IType type = field.getType();
 		

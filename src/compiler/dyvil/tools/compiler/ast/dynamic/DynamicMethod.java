@@ -343,6 +343,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public IParameter[] getParameters()
+	{
+		return null;
+	}
+	
+	@Override
 	public void exceptionCount()
 	{
 	}

@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
@@ -32,21 +33,29 @@ import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class BytecodeClass extends CodeClass
+public final class ExternalClass extends CodeClass
 {
 	public Package		thePackage;
 	
 	private IType		outerType;
 	private List<IType>	innerTypes;
 	
+	private boolean		metadataResolved;
 	private boolean		superTypesResolved;
 	private boolean		genericsResolved;
 	private boolean		annotationsResolved;
 	private boolean		innerTypesResolved;
 	
-	public BytecodeClass(Name name)
+	public ExternalClass(Name name)
 	{
 		this.name = name;
+	}
+	
+	private void resolveMetadata()
+	{
+		this.metadataResolved = true;
+		this.metadata = IClass.getClassMetadata(this, this.modifiers);
+		this.metadata.resolve(null, Package.rootPackage);
 	}
 	
 	private void resolveGenerics()
@@ -178,6 +187,17 @@ public final class BytecodeClass extends CodeClass
 			this.resolveAnnotations();
 		}
 		return super.getAnnotation(type);
+	}
+	
+	@Override
+	public void addParameter(IParameter param)
+	{
+		if (!this.metadataResolved)
+		{
+			this.resolveMetadata();
+		}
+		
+		super.addParameter(param);
 	}
 	
 	@Override
@@ -405,7 +425,7 @@ public final class BytecodeClass extends CodeClass
 		{
 			// This is the instance field of a singleton object class, ignore
 			// annotations as it shouldn't have any
-			this.instanceField = field;
+			this.metadata.setInstanceField(field);
 			return null;
 		}
 		

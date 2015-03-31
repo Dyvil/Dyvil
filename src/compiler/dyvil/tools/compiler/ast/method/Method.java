@@ -28,7 +28,6 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.AnnotationType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Types;
@@ -187,6 +186,12 @@ public class Method extends Member implements IMethod
 	public IParameter getParameter(int index)
 	{
 		return this.parameters[index];
+	}
+	
+	@Override
+	public IParameter[] getParameters()
+	{
+		return this.parameters;
 	}
 	
 	@Override
@@ -354,14 +359,14 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation annotation = this.annotations[i];
-			if (!"dyvil.lang.annotation.Intrinsic".equals(annotation.type.fullName))
+			if (annotation.type.getTheClass() != Types.AIntrinsic.theClass)
 			{
 				continue;
 			}
 			
 			try
 			{
-				ArrayValue array = (ArrayValue) annotation.arguments.getValue(0, AnnotationType.VALUE);
+				ArrayValue array = (ArrayValue) annotation.arguments.getValue(0, Annotation.VALUE);
 				
 				int len = array.valueCount();
 				int[] opcodes = new int[len];

@@ -63,7 +63,7 @@ public class ExternalPackage extends Package
 				InputStream is = this.library.getInputStream(this.internalName + name + ".class");
 				if (is != null)
 				{
-					BytecodeClass bclass = new BytecodeClass(Name.getQualified(name));
+					ExternalClass bclass = new ExternalClass(Name.getQualified(name));
 					this.classes.add(bclass);
 					iclass = ClassReader.loadClass(bclass, is, false);
 				}

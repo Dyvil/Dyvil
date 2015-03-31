@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -229,6 +230,12 @@ public final class TypeVariableType extends ASTNode implements IType
 	public byte getAccessibility(IMember member)
 	{
 		return 0;
+	}
+	
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		return null;
 	}
 	
 	@Override

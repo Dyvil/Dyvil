@@ -15,7 +15,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class FieldAssign extends ASTNode implements IValue, INamed, IValued
@@ -197,14 +196,7 @@ public class FieldAssign extends ASTNode implements IValue, INamed, IValued
 			this.instance.check(markers, context);
 		}
 		
-		if (this.value.getValueType() == IValue.THIS)
-		{
-			markers.add(new SyntaxError(this.position, "access.this.assign"));
-		}
-		else
-		{
-			this.value.check(markers, context);
-		}
+		this.value.check(markers, context);
 		
 		if (this.field == null)
 		{
