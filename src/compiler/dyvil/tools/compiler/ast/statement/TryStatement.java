@@ -15,7 +15,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class TryStatement extends ASTNode implements IStatement
+public final class TryStatement extends ASTNode implements IStatement
 {
 	private static IType	THROWABLE;
 	

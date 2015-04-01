@@ -89,7 +89,9 @@ public interface MethodWriter
 	
 	// Inlining
 	
-	public void startInline(Label end);
+	public int inlineOffset();
+	
+	public int startInline(Label end);
 	
 	public void endInline(Label end);
 	

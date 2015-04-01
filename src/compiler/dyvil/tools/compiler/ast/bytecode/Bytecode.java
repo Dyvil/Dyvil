@@ -173,9 +173,27 @@ public final class Bytecode extends ASTNode implements IValue
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		if (this.labels == null)
+		{
+			for (int i = 0; i < this.instructionCount; i++)
+			{
+				this.instructions[i].write(writer);
+			}
+			return;
+		}
+		
+		for (int i = 0; i < this.labels.length; i++)
+		{
+			Label l = this.labels[i];
+			if (l != null)
+			{
+				l.target = new org.objectweb.asm.Label();
+			}
+		}
+		
 		for (int i = 0; i < this.instructionCount; i++)
 		{
-			if (this.labels != null && i < this.labels.length)
+			if (i < this.labels.length)
 			{
 				Label l = this.labels[i];
 				if (l != null)

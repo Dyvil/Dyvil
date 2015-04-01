@@ -13,8 +13,9 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class DoStatement extends ASTNode implements IStatement, ILoop
+public final class DoStatement extends ASTNode implements IStatement, ILoop
 {
+	public static final Name	$doStart		= Name.getQualified("$doStart");
 	public static final Name	$doCondition	= Name.getQualified("$doCondition");
 	public static final Name	$doEnd			= Name.getQualified("$doEnd");
 	
@@ -23,6 +24,7 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	
 	private IStatement			parent;
 	
+	public Label startLabel;
 	public Label				conditionLabel;
 	public Label				endLabel;
 	
@@ -30,6 +32,7 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 	{
 		this.position = position;
 		
+		this.startLabel = new Label($doStart);
 		this.conditionLabel = new Label($doCondition);
 		this.endLabel = new Label($doEnd);
 	}
@@ -222,17 +225,19 @@ public class DoStatement extends ASTNode implements IStatement, ILoop
 			this.condition.writeStatement(writer);
 		}
 		
-		org.objectweb.asm.Label startLabel = new org.objectweb.asm.Label();
+		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
+		org.objectweb.asm.Label conditionLabel = this.conditionLabel.target = new org.objectweb.asm.Label();
+		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
 		
 		// Do Block
 		
 		writer.writeLabel(startLabel);
 		this.action.writeStatement(writer);
 		// Condition
-		writer.writeLabel(this.conditionLabel.target);
+		writer.writeLabel(conditionLabel);
 		this.condition.writeJump(writer, startLabel);
 		
-		writer.writeLabel(this.endLabel.target);
+		writer.writeLabel(endLabel);
 	}
 	
 	@Override

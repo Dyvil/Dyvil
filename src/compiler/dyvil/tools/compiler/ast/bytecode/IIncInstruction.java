@@ -22,7 +22,7 @@ public class IIncInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.writeIINC(this.index, this.value);
+		writer.writeIINC(this.index + writer.inlineOffset(), this.value);
 	}
 	
 	@Override

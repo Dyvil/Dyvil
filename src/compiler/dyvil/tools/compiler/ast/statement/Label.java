@@ -8,7 +8,7 @@ public class Label
 	public Name						name;
 	public IValue					value;
 	
-	public org.objectweb.asm.Label	target	= new org.objectweb.asm.Label();
+	public org.objectweb.asm.Label	target;
 	
 	public Label(Name name)
 	{
@@ -19,17 +19,6 @@ public class Label
 	{
 		this.name = name;
 		this.value = value;
-	}
-	
-	public Label(org.objectweb.asm.Label target)
-	{
-		this.target = target;
-	}
-	
-	public Label(org.objectweb.asm.Label target, Name name)
-	{
-		this.target = target;
-		this.name = name;
 	}
 	
 	@Override

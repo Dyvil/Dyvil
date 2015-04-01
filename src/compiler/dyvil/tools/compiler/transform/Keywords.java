@@ -4,7 +4,6 @@ public interface Keywords
 {
 	int	ABSTRACT		= Tokens.KEYWORD | 0x00010000;
 	int	ANNOTATION		= Tokens.KEYWORD | 0x00020000;
-	int	BOOLEAN			= Tokens.KEYWORD | 0x00030000;
 	int	BREAK			= Tokens.KEYWORD | 0x00040000;
 	int	BYTE			= Tokens.KEYWORD | 0x00050000;
 	int	CASE			= Tokens.KEYWORD | 0x00060000;
@@ -68,8 +67,6 @@ public interface Keywords
 			return ABSTRACT;
 		case "annotation":
 			return ANNOTATION;
-		case "boolean":
-			return BOOLEAN;
 		case "break":
 			return BREAK;
 		case "byte":
@@ -190,8 +187,6 @@ public interface Keywords
 			return "abstract";
 		case ANNOTATION:
 			return "annotation";
-		case BOOLEAN:
-			return "boolean";
 		case BREAK:
 			return "break";
 		case BYTE:

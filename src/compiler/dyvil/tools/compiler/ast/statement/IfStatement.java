@@ -15,7 +15,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class IfStatement extends ASTNode implements IStatement
+public final class IfStatement extends ASTNode implements IStatement
 {
 	public IValue		condition;
 	public IValue		then;

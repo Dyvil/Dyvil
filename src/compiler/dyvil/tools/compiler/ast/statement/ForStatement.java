@@ -395,9 +395,9 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		org.objectweb.asm.Label startLabel = this.startLabel.target;
-		org.objectweb.asm.Label updateLabel = this.updateLabel.target;
-		org.objectweb.asm.Label endLabel = this.endLabel.target;
+		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
+		org.objectweb.asm.Label updateLabel = this.updateLabel.target = new org.objectweb.asm.Label();
+		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
 		
 		Variable var = this.variable;
 		if (this.type == DEFAULT)

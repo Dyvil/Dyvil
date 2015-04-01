@@ -23,7 +23,7 @@ public class VarInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.writeVarInsn(this.opcode, this.index);
+		writer.writeVarInsn(this.opcode, this.index + writer.inlineOffset());
 	}
 	
 	@Override

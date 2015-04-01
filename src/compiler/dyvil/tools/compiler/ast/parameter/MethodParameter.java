@@ -214,7 +214,10 @@ public class MethodParameter extends Member implements IParameter
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
-		value.writeExpression(writer);
+		if (value != null)
+		{
+			value.writeExpression(writer);
+		}
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}
 	

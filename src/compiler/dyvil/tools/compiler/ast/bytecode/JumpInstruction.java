@@ -7,7 +7,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class JumpInstruction implements IInstruction
+public final class JumpInstruction implements IInstruction
 {
 	private ICodePosition	position;
 	private int				opcode;

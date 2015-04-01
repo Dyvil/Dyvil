@@ -26,7 +26,7 @@ public final class Predef
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPEQ })
-	public static @infix @inline boolean $eq$eq$eq(Object o1, Object o2)
+	public static @infix boolean $eq$eq$eq(Object o1, Object o2)
 	{
 		return o1 == o2;
 	}
@@ -37,7 +37,7 @@ public final class Predef
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPNE })
-	public static @infix @inline boolean $bang$eq$eq(Object o1, Object o2)
+	public static @infix boolean $bang$eq$eq(Object o1, Object o2)
 	{
 		return o1 != o2;
 	}
@@ -153,39 +153,40 @@ public final class Predef
 		return result;
 	}
 	
-	public static @infix int $hash$hash(Object o)
+	public static @inline @infix int $hash$hash(Object o)
 	{
 		return o == null ? 0 : o.hashCode();
 	}
 	
+	@Intrinsic({ INSTANCE, ARGUMENTS })
 	public static @infix int $hash$hash(int i)
 	{
 		return i;
 	}
 	
-	public static @infix int $hash$hash(long l)
+	public static @inline @infix int $hash$hash(long l)
 	{
 		return (int) (l ^ l >>> 32);
 	}
 	
-	public static @infix int $hash$hash(float f)
+	public static @inline @infix int $hash$hash(float f)
 	{
 		return java.lang.Float.hashCode(f);
 	}
 	
-	public static @infix int $hash$hash(double d)
+	public static @inline @infix int $hash$hash(double d)
 	{
 		return java.lang.Double.hashCode(d);
 	}
 	
 	// Print
 	
-	public static void println()
+	public static @inline void println()
 	{
 		System.out.println();
 	}
 	
-	public static void println(String s)
+	public static @inline void println(String s)
 	{
 		System.out.println(s);
 	}
@@ -198,7 +199,7 @@ public final class Predef
 	 * @param b
 	 * @return
 	 */
-	public static @infix <A, B> Tuple2<A, B> $minus$greater(A a, B b)
+	public static @inline @infix <A, B> Tuple2<A, B> $minus$greater(A a, B b)
 	{
 		return new Tuple2(a, b);
 	}
@@ -209,7 +210,7 @@ public final class Predef
 	 * @param b
 	 * @return
 	 */
-	public static @infix <A, B> Tuple2<B, A> $less$minus(A a, B b)
+	public static @inline @infix <A, B> Tuple2<B, A> $less$minus(A a, B b)
 	{
 		return new Tuple2(b, a);
 	}
@@ -256,7 +257,7 @@ public final class Predef
 		return list;
 	}
 	
-	public @inline static Set<?> Set()
+	public static @inline Set<?> Set()
 	{
 		return new HashSet();
 	}
@@ -296,7 +297,7 @@ public final class Predef
 		return set;
 	}
 	
-	public static Map<?, ?> Map()
+	public static @inline Map<?, ?> Map()
 	{
 		return new HashMap();
 	}

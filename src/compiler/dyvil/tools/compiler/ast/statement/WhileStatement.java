@@ -13,7 +13,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class WhileStatement extends ASTNode implements IStatement, ILoop
+public final class WhileStatement extends ASTNode implements IStatement, ILoop
 {
 	public static final Name	$whileStart	= Name.getQualified("$whileStart");
 	public static final Name	$whileEnd	= Name.getQualified("$whileEnd");
@@ -227,14 +227,17 @@ public class WhileStatement extends ASTNode implements IStatement, ILoop
 			this.condition.writeStatement(writer);
 		}
 		
+		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
+		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
+		
 		// Condition
-		writer.writeLabel(this.startLabel.target);
-		this.condition.writeInvJump(writer, this.endLabel.target);
+		writer.writeLabel(startLabel);
+		this.condition.writeInvJump(writer, endLabel);
 		// While Block
 		this.action.writeStatement(writer);
-		writer.writeJumpInsn(Opcodes.GOTO, this.startLabel.target);
+		writer.writeJumpInsn(Opcodes.GOTO, startLabel);
 		
-		writer.writeLabel(this.endLabel.target);
+		writer.writeLabel(endLabel);
 	}
 	
 	@Override

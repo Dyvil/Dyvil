@@ -21,6 +21,7 @@ public final class MethodWriterImpl implements MethodWriter
 	
 	private boolean				hasReturn;
 	private int					localIndex;
+	private int					inlineOffset;
 	private Label				inlineEnd;
 	
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
@@ -254,6 +255,12 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLabel(Label label)
 	{
+		if (this.hasReturn && this.inlineEnd != null)
+		{
+			this.writeInlineReturn();
+		}
+		this.hasReturn = false;
+		
 		this.mv.visitLabel(label);
 	}
 	
@@ -614,9 +621,17 @@ public final class MethodWriterImpl implements MethodWriter
 	// Inlining
 	
 	@Override
-	public void startInline(Label end)
+	public int inlineOffset()
+	{
+		return this.inlineOffset;
+	}
+	
+	@Override
+	public int startInline(Label end)
 	{
 		this.inlineEnd = end;
+		this.inlineOffset += this.localIndex;
+		return this.localIndex;
 	}
 	
 	@Override
@@ -624,6 +639,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.mv.visitLabel(end);
 		this.inlineEnd = null;
+		this.inlineOffset = this.localIndex;
 		this.hasReturn = false;
 	}
 	

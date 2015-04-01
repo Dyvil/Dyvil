@@ -1171,8 +1171,7 @@ public class Method extends Member implements IMethod
 	{
 		Label inlineEnd = new Label();
 		
-		int localCount = writer.registerLocal();
-		writer.startInline(inlineEnd);
+		int localCount = writer.startInline(inlineEnd);
 		
 		if (instance != null)
 		{
@@ -1185,7 +1184,6 @@ public class Method extends Member implements IMethod
 		this.value.writeExpression(writer);
 		
 		writer.endInline(inlineEnd);
-		writer.resetLocals(localCount);
 	}
 	
 	private void writeInlineArguments(MethodWriter writer, IArguments arguments, int localCount)
@@ -1201,11 +1199,15 @@ public class Method extends Member implements IMethod
 				{
 					param = this.parameters[i];
 					arguments.writeValue(j, param.getName(), param.getValue(), writer);
-					writer.writeVarInsn(param.getType().getStoreOpcode(), i + localCount);
+					
+					param.setIndex(writer.registerLocal());
+					param.writeSet(writer, null, null);
 				}
 				param = this.parameters[len];
 				arguments.writeVarargsValue(len - 1, param.getName(), param.getType(), writer);
-				writer.writeVarInsn(param.getType().getStoreOpcode(), len + localCount);
+				
+				param.setIndex(writer.registerLocal());
+				param.writeSet(writer, null, null);
 				return;
 			}
 			
@@ -1213,14 +1215,16 @@ public class Method extends Member implements IMethod
 			{
 				IParameter param = this.parameters[i];
 				arguments.writeValue(j, param.getName(), param.getValue(), writer);
-				writer.writeVarInsn(param.getType().getStoreOpcode(), i + localCount);
+				
+				param.setIndex(writer.registerLocal());
+				param.writeSet(writer, null, null);
 			}
 			return;
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			arguments.writeValue(0, Name._this, null, writer);
-			writer.writeVarInsn(this.getThisType().getStoreOpcode(), localCount);
+			// FIXME
 			return;
 		}
 		
@@ -1232,11 +1236,13 @@ public class Method extends Member implements IMethod
 			{
 				param = this.parameters[i];
 				arguments.writeValue(i, param.getName(), param.getValue(), writer);
-				writer.writeVarInsn(param.getType().getStoreOpcode(), len + localCount);
+				param.setIndex(writer.registerLocal());
+				param.writeSet(writer, null, null);
 			}
 			param = this.parameters[len];
 			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
-			writer.writeVarInsn(param.getType().getStoreOpcode(), len + localCount);
+			param.setIndex(writer.registerLocal());
+			param.writeSet(writer, null, null);
 			return;
 		}
 		
@@ -1244,7 +1250,8 @@ public class Method extends Member implements IMethod
 		{
 			IParameter param = this.parameters[i];
 			arguments.writeValue(i, param.getName(), param.getValue(), writer);
-			writer.writeVarInsn(param.getType().getStoreOpcode(), i + localCount);
+			param.setIndex(writer.registerLocal());
+			param.writeSet(writer, null, null);
 		}
 	}
 	
