@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.external;
 
+import org.objectweb.asm.Label;
+
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IntValue;
@@ -15,6 +17,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.value.ArrayValue;
 import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ExternalMethod extends Method
@@ -151,6 +154,16 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
+	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
+	{
+		if (!this.annotationsResolved)
+		{
+			this.resolveAnnotations();
+		}
+		return super.checkArguments(markers, instance, arguments, typeContext);
+	}
+	
+	@Override
 	public IType getException(int index)
 	{
 		if (!this.exceptionsResolved)
@@ -199,16 +212,6 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public boolean isIntrinsic()
-	{
-		if (!this.annotationsResolved)
-		{
-			this.resolveAnnotations();
-		}
-		return this.intrinsicOpcodes != null;
-	}
-	
-	@Override
 	public IClass resolveClass(Name name)
 	{
 		return Package.rootPackage.resolveClass(name);
@@ -237,5 +240,35 @@ public final class ExternalMethod extends Method
 	@Override
 	public void foldConstants()
 	{
+	}
+	
+	@Override
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type)
+	{
+		if (!this.annotationsResolved)
+		{
+			this.resolveAnnotations();
+		}
+		super.writeCall(writer, instance, arguments, type);
+	}
+	
+	@Override
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
+	{
+		if (!this.annotationsResolved)
+		{
+			this.resolveAnnotations();
+		}
+		super.writeJump(writer, dest, instance, arguments);
+	}
+	
+	@Override
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
+	{
+		if (!this.annotationsResolved)
+		{
+			this.resolveAnnotations();
+		}
+		super.writeInvJump(writer, dest, instance, arguments);
 	}
 }

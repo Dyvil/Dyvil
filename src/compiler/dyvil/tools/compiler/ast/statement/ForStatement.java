@@ -24,7 +24,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ForStatement extends ASTNode implements IStatement, IContext, ILoop
+public final class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 {
 	public static final Name	$index		= Name.getQualified("$index");
 	public static final Name	$length		= Name.getQualified("$length");

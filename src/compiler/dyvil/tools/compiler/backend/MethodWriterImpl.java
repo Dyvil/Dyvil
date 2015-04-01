@@ -273,6 +273,14 @@ public final class MethodWriterImpl implements MethodWriter
 			this.visitSpecialInsn(opcode);
 			return;
 		}
+		if (opcode >= IRETURN && opcode <= RETURN)
+		{
+			this.hasReturn = true;
+			if (this.inlineEnd != null)
+			{
+				return;
+			}
+		}
 		this.mv.visitInsn(opcode);
 	}
 	

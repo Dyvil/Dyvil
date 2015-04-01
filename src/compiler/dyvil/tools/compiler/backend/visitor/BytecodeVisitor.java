@@ -40,7 +40,7 @@ public class BytecodeVisitor extends MethodVisitor
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
 		String packName = ClassFormat.extendedToPackage(type);
-		if (packName.equals("dyvil.lang.annotation.inline"))
+		if ("dyvil.lang.annotation.inline".equals(packName))
 		{
 			this.method.addModifier(Modifiers.INLINE);
 			this.inline = true;

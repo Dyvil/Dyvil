@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
@@ -112,15 +111,13 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		this.variable.value.writeExpression(writer);
-		writer.writeInsn(Opcodes.DUP);
-		this.variable.writeSet(writer, null, null);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
 		this.variable.value.writeExpression(writer);
+		this.variable.index = writer.registerLocal();
 		this.variable.writeSet(writer, null, null);
 	}
 	

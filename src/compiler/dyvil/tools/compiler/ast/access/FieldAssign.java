@@ -17,7 +17,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class FieldAssign extends ASTNode implements IValue, INamed, IValued
+public final class FieldAssign extends ASTNode implements IValue, INamed, IValued
 {
 	public Name		name;
 	

@@ -25,7 +25,6 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
-import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -853,6 +852,7 @@ public class Method extends Member implements IMethod
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
+		
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(),
 				this.getExceptions()));
 		
@@ -897,21 +897,9 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
-			if (this.value instanceof StatementList)
-			{
-				((StatementList) this.value).topLevel = true;
-			}
-			
 			mw.begin();
 			mw.writeLabel(start);
-			if (this.type == Types.VOID)
-			{
-				this.value.writeStatement(mw);
-			}
-			else
-			{
-				this.value.writeExpression(mw);
-			}
+			this.value.writeExpression(mw);
 			mw.writeLabel(end);
 			mw.end(this.type);
 		}
@@ -1183,22 +1171,24 @@ public class Method extends Member implements IMethod
 	{
 		Label inlineEnd = new Label();
 		
+		int localCount = writer.registerLocal();
 		writer.startInline(inlineEnd);
 		
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
-			writer.writeVarInsn(instance.getType().getStoreOpcode(), 0);
+			writer.writeVarInsn(instance.getType().getStoreOpcode(), localCount);
 		}
 		
-		this.writeInlineArguments(writer, arguments);
+		this.writeInlineArguments(writer, arguments, localCount);
 		
 		this.value.writeExpression(writer);
 		
 		writer.endInline(inlineEnd);
+		writer.resetLocals(localCount);
 	}
 	
-	private void writeInlineArguments(MethodWriter writer, IArguments arguments)
+	private void writeInlineArguments(MethodWriter writer, IArguments arguments, int localCount)
 	{
 		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
@@ -1211,11 +1201,11 @@ public class Method extends Member implements IMethod
 				{
 					param = this.parameters[i];
 					arguments.writeValue(j, param.getName(), param.getValue(), writer);
-					writer.writeVarInsn(param.getType().getStoreOpcode(), i);
+					writer.writeVarInsn(param.getType().getStoreOpcode(), i + localCount);
 				}
 				param = this.parameters[len];
 				arguments.writeVarargsValue(len - 1, param.getName(), param.getType(), writer);
-				writer.writeVarInsn(param.getType().getStoreOpcode(), len);
+				writer.writeVarInsn(param.getType().getStoreOpcode(), len + localCount);
 				return;
 			}
 			
@@ -1223,14 +1213,14 @@ public class Method extends Member implements IMethod
 			{
 				IParameter param = this.parameters[i];
 				arguments.writeValue(j, param.getName(), param.getValue(), writer);
-				writer.writeVarInsn(param.getType().getStoreOpcode(), i);
+				writer.writeVarInsn(param.getType().getStoreOpcode(), i + localCount);
 			}
 			return;
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			arguments.writeValue(0, Name._this, null, writer);
-			writer.writeVarInsn(this.getThisType().getStoreOpcode(), 0);
+			writer.writeVarInsn(this.getThisType().getStoreOpcode(), localCount);
 			return;
 		}
 		
@@ -1242,11 +1232,11 @@ public class Method extends Member implements IMethod
 			{
 				param = this.parameters[i];
 				arguments.writeValue(i, param.getName(), param.getValue(), writer);
-				writer.writeVarInsn(param.getType().getStoreOpcode(), len);
+				writer.writeVarInsn(param.getType().getStoreOpcode(), len + localCount);
 			}
 			param = this.parameters[len];
 			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
-			writer.writeVarInsn(param.getType().getStoreOpcode(), len);
+			writer.writeVarInsn(param.getType().getStoreOpcode(), len + localCount);
 			return;
 		}
 		
@@ -1254,7 +1244,7 @@ public class Method extends Member implements IMethod
 		{
 			IParameter param = this.parameters[i];
 			arguments.writeValue(i, param.getName(), param.getValue(), writer);
-			writer.writeVarInsn(param.getType().getStoreOpcode(), i);
+			writer.writeVarInsn(param.getType().getStoreOpcode(), i + localCount);
 		}
 	}
 	

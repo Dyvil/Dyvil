@@ -25,7 +25,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeContext, INamed
+public final class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeContext, INamed
 {
 	public Name			name;
 	
@@ -179,9 +179,9 @@ public class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		Marker marker = markers.create(this.position, "resolve.method", this.name.unqualified);
 		marker.addInfo("Qualified Name: " + this.name.unqualified);
 		marker.addInfo("Instance Type: " + this.instance.getType());
-		StringBuilder builder = new StringBuilder("Argument Types: {");
+		StringBuilder builder = new StringBuilder("Argument Types: ");
 		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.append('}').toString());
+		marker.addInfo(builder.toString());
 		
 		return this;
 	}

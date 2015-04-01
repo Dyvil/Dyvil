@@ -114,11 +114,6 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 				return;
 			}
 			
-			if (type == Symbols.SEMICOLON && token.isInferred())
-			{
-				return;
-			}
-			
 			try
 			{
 				this.parser.parse(this, token);

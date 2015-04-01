@@ -39,13 +39,14 @@ public class ClassWriter
 		
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 		{
-			org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(DyvilCompiler.asmVersion | org.objectweb.asm.ClassWriter.COMPUTE_FRAMES);
+			int ver = DyvilCompiler.asmVersion | org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
+			org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(ver);
 			iclass.write(writer);
 			writer.visitEnd();
 			byte[] bytes = writer.toByteArray();
 			os.write(bytes, 0, bytes.length);
 		}
-		catch (Exception ex)
+		catch (Throwable ex)
 		{
 			DyvilCompiler.logger.throwing("ClassWriter", "saveClass", ex);
 		}

@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -40,7 +39,6 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	
 	private IContext			context;
 	private IStatement			parent;
-	public boolean				topLevel;
 	
 	public StatementList()
 	{
@@ -470,10 +468,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			this.values[len].writeExpression(writer);
 		}
 		
-		if (!(this.context instanceof IMethod))
-		{
-			writer.resetLocals(count);
-		}
+		writer.resetLocals(count);
 		writer.writeLabel(end);
 		
 		if (this.variables == null)
@@ -518,10 +513,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			}
 		}
 		
-		if (!this.topLevel)
-		{
-			writer.resetLocals(count);
-		}
+		writer.resetLocals(count);
 		writer.writeLabel(end);
 		
 		if (this.variables == null)
