@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -169,7 +168,7 @@ public final class AssignMethodCall extends ASTNode implements IValue, IValued, 
 		
 		this.arguments.resolve(markers, context);
 		
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.name, this.arguments);
+		IMethod method = IAccess.resolveMethod(markers, context, this.instance, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
@@ -200,10 +199,10 @@ public final class AssignMethodCall extends ASTNode implements IValue, IValued, 
 				IArguments arguments1 = call.arguments.addLastValue(call);
 				
 				IType type = instance1.getType();
-				MethodMatch match = type.resolveMethod(instance1, Name.update, arguments1);
+				IMethod match = IContext.resolveMethod(markers, type, instance1, Name.update, arguments1);
 				if (match != null)
 				{
-					this.updateMethod = match.method;
+					this.updateMethod = match;
 				}
 				else
 				{

@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -51,18 +50,18 @@ public interface IAccess extends IValue, IValued, ICall
 		return null;
 	}
 	
-	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
+	public static IMethod resolveMethod(MarkerList markers, IContext context, IValue instance, Name name, IArguments arguments)
 	{
-		MethodMatch match;
+		IMethod match;
 		if (instance != null)
 		{
 			IType type = instance.getType();
 			if (type != null)
 			{
-				match = type.resolveMethod(instance, name, arguments);
+				match = IContext.resolveMethod(markers, type, instance, name, arguments);
 				if (match != null)
 				{
-					return match.method;
+					return match;
 				}
 			}
 		}
@@ -72,24 +71,24 @@ public interface IAccess extends IValue, IValued, ICall
 			IType type = v.getType();
 			if (type != null)
 			{
-				match = type.resolveMethod(instance, name, EmptyArguments.INSTANCE);
+				match = IContext.resolveMethod(markers, type, instance, name, EmptyArguments.INSTANCE);
 				if (match != null)
 				{
-					return match.method;
+					return match;
 				}
 			}
 		}
 		
-		match = context.resolveMethod(instance, name, arguments);
+		match = IContext.resolveMethod(markers, context, instance, name, arguments);
 		if (match != null)
 		{
-			return match.method;
+			return match;
 		}
 		
-		match = Types.PREDEF_CLASS.resolveMethod(instance, name, arguments);
+		match = IContext.resolveMethod(markers, Types.PREDEF_CLASS, instance, name, arguments);
 		if (match != null)
 		{
-			return match.method;
+			return match;
 		}
 		return null;
 	}

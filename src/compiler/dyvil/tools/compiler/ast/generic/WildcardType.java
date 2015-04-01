@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.generic;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import dyvil.reflect.Opcodes;
@@ -281,26 +279,6 @@ public final class WildcardType extends BaseBounded implements IType
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		if (this.arrayDimensions > 0)
-		{
-			return Types.ARRAY_CLASS.resolveMethod(instance, name, arguments);
-		}
-		
-		List<MethodMatch> list = new ArrayList();
-		this.getMethodMatches(list, instance, name, arguments);
-		
-		if (!list.isEmpty())
-		{
-			Collections.sort(list);
-			return list.get(0);
-		}
-		
-		return null;
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
@@ -319,12 +297,6 @@ public final class WildcardType extends BaseBounded implements IType
 		{
 			this.upperBounds[i].getMethodMatches(list, instance, name, arguments);
 		}
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return null;
 	}
 	
 	@Override

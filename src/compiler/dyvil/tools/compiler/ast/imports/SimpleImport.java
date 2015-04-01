@@ -164,27 +164,6 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		if (this.child != null)
-		{
-			return this.child.resolveMethod(instance, name, arguments);
-		}
-		if (!this.methods.isEmpty())
-		{
-			if (this.name.equals(name))
-			{
-				return this.methods.get(0);
-			}
-			if (this.alias == name)
-			{
-				return this.methods.get(0);
-			}
-		}
-		return null;
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.child != null)

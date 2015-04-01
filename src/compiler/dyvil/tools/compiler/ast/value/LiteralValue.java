@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.value;
 
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -74,7 +73,7 @@ public final class LiteralValue implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		MethodMatch match = this.type.resolveMethod(null, Name.apply, this.argument);
+		IMethod match = IContext.resolveMethod(markers, this.type, null, Name.apply, this.argument);
 		if (match == null)
 		{
 			IValue value = this.argument.getFirstValue();
@@ -82,7 +81,7 @@ public final class LiteralValue implements IValue
 		}
 		else
 		{
-			this.method = match.method;
+			this.method = match;
 		}
 		
 		this.argument.checkTypes(markers, context);

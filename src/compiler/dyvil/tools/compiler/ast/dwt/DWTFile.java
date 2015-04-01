@@ -13,9 +13,10 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -120,7 +121,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	@Override
 	public void resolve()
 	{
-		ConstructorMatch match = this.rootNode.theClass.resolveConstructor(EmptyArguments.INSTANCE);
+		IConstructor match = IContext.resolveConstructor(this.markers, this.rootNode.theClass, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			this.markers.add(this.position, "dwt.component.constructor");

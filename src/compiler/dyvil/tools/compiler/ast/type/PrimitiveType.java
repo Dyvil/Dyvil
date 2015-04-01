@@ -385,21 +385,6 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		if (this.arrayDimensions > 0)
-		{
-			MethodMatch match = Types.ARRAY.resolveMethod(instance, name, arguments);
-			if (match != null)
-			{
-				return match;
-			}
-		}
-		
-		return this.theClass == null ? null : this.theClass.resolveMethod(instance, name, arguments);
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)

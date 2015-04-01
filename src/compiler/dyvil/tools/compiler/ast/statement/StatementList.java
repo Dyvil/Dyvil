@@ -376,21 +376,9 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		return this.context.resolveMethod(instance, name, arguments);
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return this.context.resolveConstructor(arguments);
 	}
 	
 	@Override

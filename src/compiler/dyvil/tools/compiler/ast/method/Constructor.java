@@ -237,7 +237,7 @@ public class Constructor extends Member implements IConstructor
 	
 	private void resolveSuperConstructors(MarkerList markers, IContext context)
 	{
-		if (this.value.getValueType() != IValue.ARRAY)
+		if (this.value.getValueType() != IValue.STATEMENT_LIST)
 		{
 			markers.add(this.position, "constructor.expression");
 		}
@@ -265,29 +265,29 @@ public class Constructor extends Member implements IConstructor
 		}
 		
 		// Implicit Super Constructor
-		ConstructorMatch match = this.theClass.getSuperType().resolveConstructor(EmptyArguments.INSTANCE);
+		IConstructor match = IContext.resolveConstructor(markers, this.theClass.getSuperType(), EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			markers.add(this.position, "constructor.super");
 			return;
 		}
 		
-		sl.addValue(0, new InitializerCall(this.position, match.constructor, EmptyArguments.INSTANCE));
+		sl.addValue(0, new InitializerCall(this.position, match, EmptyArguments.INSTANCE));
 	}
 	
 	private IValue initializer(ICodePosition position, MarkerList markers, IClass iclass, IArguments arguments, boolean isSuper)
 	{
-		ConstructorMatch match = iclass.resolveConstructor(arguments);
+		IConstructor match = IContext.resolveConstructor(markers, iclass, arguments);
 		if (match == null)
 		{
 			Marker marker = markers.create(this.position, "resolve.constructor", iclass.getName().qualified);
-			StringBuilder builder = new StringBuilder("Argument Types: {");
+			StringBuilder builder = new StringBuilder("Argument Types: ");
 			Util.typesToString("", arguments, ", ", builder);
-			marker.addInfo(builder.append('}').toString());
+			marker.addInfo(builder.toString());
 			return new InitializerCall(position, null, arguments, isSuper);
 		}
 		
-		return new InitializerCall(position, match.constructor, arguments, isSuper);
+		return new InitializerCall(position, match, arguments, isSuper);
 	}
 	
 	@Override
@@ -412,21 +412,9 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		return this.theClass.resolveMethod(instance, name, arguments);
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return this.theClass.resolveConstructor(arguments);
 	}
 	
 	@Override

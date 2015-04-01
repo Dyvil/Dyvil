@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -393,7 +392,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			return false;
 		}
 		
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.name, this.arguments);
+		IMethod method = IAccess.resolveMethod(markers, context, this.instance, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
@@ -407,11 +406,11 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			{
 				String unqualified = this.name.unqualified;
 				Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
-				MethodMatch method1 = this.instance.getType().resolveMethod(null, name, this.arguments);
+				IMethod method1 = IContext.resolveMethod(markers, this.instance.getType(), null, name, this.arguments);
 				if (method1 != null)
 				{
 					AssignMethodCall call = new AssignMethodCall(this.position);
-					call.method = method1.method;
+					call.method = method1;
 					call.instance = this.instance;
 					call.arguments = this.arguments;
 					call.name = name;
@@ -461,13 +460,13 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 					return null;
 				}
 				// Find the apply method of the type
-				MethodMatch match = type.resolveMethod(null, Name.apply, this.arguments);
+				IMethod match = IContext.resolveMethod(null, type, null, Name.apply, this.arguments);
 				if (match == null)
 				{
 					// No apply method found -> Not an apply method call
 					return null;
 				}
-				method = match.method;
+				method = match;
 				instance = new ClassAccess(this.position, type);
 			}
 			else
@@ -478,13 +477,13 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 				access.dotless = this.dotless;
 				
 				// Find the apply method of the field type
-				MethodMatch match = field.theField.getType().resolveMethod(access, Name.apply, this.arguments);
+				IMethod match = IContext.resolveMethod(null, field.theField.getType(), access, Name.apply, this.arguments);
 				if (match == null)
 				{
 					// No apply method found -> Not an apply method call
 					return null;
 				}
-				method = match.method;
+				method = match;
 				instance = access;
 			}
 			
@@ -503,7 +502,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	public IAccess resolve3(IContext context, IAccess next)
 	{
 		IArguments list = this.arguments.addLastValue(next);
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.name, list);
+		IMethod method = IAccess.resolveMethod(null, context, this.instance, this.name, list);
 		if (method != null)
 		{
 			this.arguments = list;

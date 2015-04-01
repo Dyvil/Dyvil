@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.constant;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -99,14 +98,14 @@ public final class NilValue implements IConstantValue
 			return;
 		}
 		
-		MethodMatch match = this.requiredType.resolveMethod(null, Name.apply, EmptyArguments.INSTANCE);
+		IMethod match = IContext.resolveMethod(markers, this.requiredType, null, Name.apply, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			markers.add(this.position, "nil.method", this.requiredType.toString());
 		}
 		else
 		{
-			this.method = match.method;
+			this.method = match;
 		}
 	}
 	

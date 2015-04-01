@@ -65,12 +65,6 @@ public final class PackageImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		return this.theClass.resolveMethod(instance, name, arguments);
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);

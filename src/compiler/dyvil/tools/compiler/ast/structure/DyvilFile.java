@@ -378,32 +378,12 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		for (Import i : this.staticImports)
-		{
-			MethodMatch method = i.resolveMethod(instance, name, arguments);
-			if (method != null)
-			{
-				return method;
-			}
-		}
-		return null;
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		for (Import i : this.staticImports)
 		{
 			i.getMethodMatches(list, instance, name, arguments);
 		}
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return null;
 	}
 	
 	@Override

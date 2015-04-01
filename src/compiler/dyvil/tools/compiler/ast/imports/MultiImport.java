@@ -86,20 +86,6 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		for (IImport i : this.children)
-		{
-			MethodMatch match = i.resolveMethod(instance, name, arguments);
-			if (match != null)
-			{
-				return match;
-			}
-		}
-		return null;
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		for (IImport i : this.children)

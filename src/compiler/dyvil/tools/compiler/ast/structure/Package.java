@@ -202,19 +202,7 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
 	{
 		throw new UnsupportedOperationException();
 	}

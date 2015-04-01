@@ -35,12 +35,6 @@ public interface IImport extends IASTNode, IContext
 	}
 	
 	@Override
-	public default ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return null;
-	}
-	
-	@Override
 	public default void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 	}

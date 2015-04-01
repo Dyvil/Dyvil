@@ -139,20 +139,8 @@ public final class UnknownType extends ASTNode implements IType
 	}
 
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		return null;
-	}
-
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-	}
-
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return null;
 	}
 
 	@Override

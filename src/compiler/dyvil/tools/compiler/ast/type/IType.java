@@ -223,13 +223,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	public FieldMatch resolveField(Name name);
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments);
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments);
 	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);

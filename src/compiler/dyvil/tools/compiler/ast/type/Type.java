@@ -412,17 +412,6 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		if (this.arrayDimensions > 0)
-		{
-			return Types.ARRAY_CLASS.resolveMethod(instance, name, arguments);
-		}
-		
-		return this.theClass == null ? null : this.theClass.resolveMethod(instance, name, arguments);
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.arrayDimensions > 0)
@@ -435,16 +424,6 @@ public class Type extends ASTNode implements IType
 		{
 			this.theClass.getMethodMatches(list, instance, name, arguments);
 		}
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		if (this.arrayDimensions > 0)
-		{
-			return null;
-		}
-		return this.theClass == null ? null : this.theClass.resolveConstructor(arguments);
 	}
 	
 	@Override

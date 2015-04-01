@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.GenericType;
@@ -100,12 +100,12 @@ public class ClassAccess extends ASTNode implements IValue
 			return access;
 		}
 		
-		MethodMatch m = context.resolveMethod(null, name, EmptyArguments.INSTANCE);
+		IMethod m = IContext.resolveMethod(markers, context, null, name, EmptyArguments.INSTANCE);
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position);
 			call.name = name;
-			call.method = m.method;
+			call.method = m;
 			call.dotless = true;
 			if (this.type.isGenericType())
 			{

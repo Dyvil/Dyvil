@@ -281,7 +281,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 			return this.replacement;
 		}
 		
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
+		IMethod method = IAccess.resolveMethod(null, context, this.instance, this.name, EmptyArguments.INSTANCE);
 		if (method != null)
 		{
 			return this.toMethodCall(method);
@@ -314,7 +314,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	public IAccess resolve3(IContext context, IAccess next)
 	{
 		IArguments arguments = new SingleArgument(next);
-		IMethod method = IAccess.resolveMethod(context, this.instance, this.name, arguments);
+		IMethod method = IAccess.resolveMethod(null, context, this.instance, this.name, arguments);
 		if (method != null)
 		{
 			MethodCall call = new MethodCall(this.position);

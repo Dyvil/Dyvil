@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
 import java.lang.annotation.ElementType;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.objectweb.asm.ClassWriter;
@@ -841,37 +839,6 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				return match;
 			}
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		// Note that a copy of this code is used in WildcardType
-		List<MethodMatch> list = new ArrayList();
-		this.getMethodMatches(list, instance, name, arguments);
-		
-		if (!list.isEmpty())
-		{
-			Collections.sort(list);
-			return list.get(0);
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		List<ConstructorMatch> list = new ArrayList();
-		this.getConstructorMatches(list, arguments);
-		
-		if (!list.isEmpty())
-		{
-			Collections.sort(list);
-			return list.get(0);
 		}
 		
 		return null;

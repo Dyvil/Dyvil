@@ -89,21 +89,9 @@ public final class Import extends ASTNode implements IImportContainer
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		return this.last.resolveMethod(instance, name, arguments);
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.last.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return null;
 	}
 	
 	@Override

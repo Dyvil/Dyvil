@@ -4,7 +4,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -145,18 +144,18 @@ public final class ConstructorCall extends ASTNode implements IValue, ICall
 			return this;
 		}
 		
-		ConstructorMatch match = this.type.resolveConstructor(this.arguments);
+		IConstructor match = IContext.resolveConstructor(markers, this.type, this.arguments);
 		if (match == null)
 		{
 			Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());
-			StringBuilder builder = new StringBuilder("Argument Types: {");
+			StringBuilder builder = new StringBuilder("Argument Types: ");
 			Util.typesToString("", this.arguments, ", ", builder);
-			marker.addInfo(builder.append('}').toString());
+			marker.addInfo(builder.toString());
 			
 			return this;
 		}
 		
-		this.constructor = match.constructor;
+		this.constructor = match;
 		return this;
 	}
 	

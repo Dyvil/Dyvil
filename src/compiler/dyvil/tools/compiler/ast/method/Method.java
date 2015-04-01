@@ -579,21 +579,9 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public MethodMatch resolveMethod(IValue instance, Name name, IArguments arguments)
-	{
-		return this.theClass.resolveMethod(instance, name, arguments);
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public ConstructorMatch resolveConstructor(IArguments arguments)
-	{
-		return this.theClass.resolveConstructor(arguments);
 	}
 	
 	@Override

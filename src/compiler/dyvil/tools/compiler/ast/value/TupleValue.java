@@ -7,7 +7,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -224,7 +223,7 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 			return;
 		}
 		
-		MethodMatch m = this.getType().resolveMethod(null, Name.apply, this.arguments = new ArgumentList(this.values, this.valueCount));
+		IMethod m = IContext.resolveMethod(markers, this.getType(), null, Name.apply, this.arguments = new ArgumentList(this.values, this.valueCount));
 		if (m == null)
 		{
 			StringBuilder builder = new StringBuilder();
@@ -242,9 +241,8 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 		}
 		else
 		{
-			this.method = m.method;
-			
-			m.method.checkArguments(markers, null, this.arguments, null);
+			this.method = m;
+			m.checkArguments(markers, null, this.arguments, null);
 		}
 	}
 	

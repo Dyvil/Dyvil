@@ -12,9 +12,8 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -164,11 +163,10 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				for (IValue v : (IValueList) value)
 				{
 					String s1 = Util.getAdder(key);
-					MethodMatch m = this.theClass.resolveMethod(this, Name.getQualified(s1), new SingleArgument(value));
-					
+					IMethod m = IContext.resolveMethod(markers, this.theClass, this, Name.getQualified(s1), new SingleArgument(value));
 					if (m != null)
 					{
-						value.resolve(markers, m.method);
+						value.resolve(markers, m);
 						continue;
 					}
 					markers.add(v.getPosition(), "dwt.property.unknown", key, this.type.toString());
@@ -185,14 +183,14 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 					continue;
 				}
 				
-				MethodMatch getter = this.theClass.resolveMethod(this, Name.getQualified(Util.getGetter(key)), EmptyArguments.INSTANCE);
+				IMethod getter = IContext.resolveMethod(markers, this.theClass, this, Name.getQualified(Util.getGetter(key)), EmptyArguments.INSTANCE);
 				if (getter != null)
 				{
-					node.getter = getter.method;
+					node.getter = getter;
 					continue;
 				}
 				
-				ConstructorMatch match = this.theClass.resolveConstructor(EmptyArguments.INSTANCE);
+				IConstructor match = IContext.resolveConstructor(markers, this.theClass, EmptyArguments.INSTANCE);
 				if (match == null)
 				{
 					markers.add(value.getPosition(), "dwt.component.constructor");
@@ -201,11 +199,10 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 			else
 			{
 				String s1 = Util.getSetter(key);
-				MethodMatch m = this.theClass.resolveMethod(this, Name.getQualified(s1), new SingleArgument(value));
-				
+				IMethod m = IContext.resolveMethod(markers, this.theClass, this, Name.getQualified(s1), new SingleArgument(value));
 				if (m != null)
 				{
-					property.setter = m.method;
+					property.setter = m;
 					continue;
 				}
 				markers.add(value.getPosition(), "dwt.property.unknown", key, this.type.toString());
