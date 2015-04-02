@@ -3,13 +3,13 @@ package dyvil.tools.compiler.transform;
 import static dyvil.tools.compiler.ast.member.Name.*;
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.expression.CaseStatement;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.*;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.ast.value.CaseStatement;
-import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValueList;
-import dyvil.tools.compiler.ast.value.MatchExpression;
 
 public class Operators
 {
@@ -78,7 +78,7 @@ public class Operators
 		{
 			if (arg1.isType(Types.BOOLEAN))
 			{
-				return new BooleanNot(arg1);
+				return new NotOperator(arg1);
 			}
 		}
 		return null;
@@ -117,7 +117,7 @@ public class Operators
 		{
 			if (arg1.isType(Types.BOOLEAN) && arg2.isType(Types.BOOLEAN))
 			{
-				return new BooleanAnd(arg1, arg2);
+				return new AndOperator(arg1, arg2);
 			}
 			return null;
 		}
@@ -125,7 +125,7 @@ public class Operators
 		{
 			if (arg1.isType(Types.BOOLEAN) && arg2.isType(Types.BOOLEAN))
 			{
-				return new BooleanOr(arg1, arg2);
+				return new OrOperator(arg1, arg2);
 			}
 			return null;
 		}

@@ -1,21 +1,24 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class BoxValue implements IValue
+public final class LiteralExpression implements IValue
 {
-	private IValue	boxed;
-	private IMethod	method;
+	private SingleArgument	argument;
+	private IType			type;
 	
-	public BoxValue(IValue boxed, IMethod boxingMethod)
+	private IMethod			method;
+	
+	public LiteralExpression(IType type, IValue literal)
 	{
-		this.boxed = boxed;
-		this.method = boxingMethod;
+		this.argument = new SingleArgument(literal);
+		this.type = type;
 	}
 	
 	@Override
@@ -33,7 +36,7 @@ public final class BoxValue implements IValue
 	@Override
 	public IType getType()
 	{
-		return this.method.getType();
+		return this.type;
 	}
 	
 	@Override
@@ -45,62 +48,73 @@ public final class BoxValue implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isSuperTypeOf(this.method.getType());
+		return type.isSuperTypeOf(this.type);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		return type.isSuperTypeOf(this.method.getType()) ? 3 : 0;
+		return type.isSuperTypeOf(this.type) ? 3 : 0;
 	}
 	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.boxed.resolveTypes(markers, context);
+		this.argument.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.boxed = this.boxed.resolve(markers, context);
+		this.argument.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.boxed.checkTypes(markers, context);
+		IMethod match = IContext.resolveMethod(markers, this.type, null, Name.apply, this.argument);
+		if (match == null)
+		{
+			IValue value = this.argument.getFirstValue();
+			markers.add(value.getPosition(), "literal.method", value.getType().toString(), this.type.toString());
+		}
+		else
+		{
+			this.method = match;
+		}
+		
+		this.argument.checkTypes(markers, context);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.boxed.check(markers, context);
+		this.argument.check(markers, context);
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
-		this.boxed = this.boxed.foldConstants();
+		this.argument.foldConstants();
 		return this;
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		this.method.writeCall(writer, this.boxed, EmptyArguments.INSTANCE, null);
+		this.method.writeCall(writer, null, this.argument, null);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.boxed.writeStatement(writer);
+		this.argument.getFirstValue().writeStatement(writer);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.boxed.toString(prefix, buffer);
+		this.argument.getFirstValue().toString(prefix, buffer);
 	}
 }

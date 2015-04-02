@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.expression;
 
 import java.util.Iterator;
 
@@ -17,7 +17,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class ArrayValue extends ASTNode implements IValue, IValueList
+public final class Array extends ASTNode implements IValue, IValueList
 {
 	public static final IType	ARRAY_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("ArrayConvertible"));
 	
@@ -27,11 +27,11 @@ public final class ArrayValue extends ASTNode implements IValue, IValueList
 	protected IType				requiredType;
 	protected IType				elementType;
 	
-	public ArrayValue()
+	public Array()
 	{
 	}
 	
-	public ArrayValue(ICodePosition position)
+	public Array(ICodePosition position)
 	{
 		this.position = position;
 	}
@@ -112,7 +112,7 @@ public final class ArrayValue extends ASTNode implements IValue, IValueList
 		{
 			if (ARRAY_CONVERTIBLE.isSuperTypeOf(type))
 			{
-				return new LiteralValue(type, this);
+				return new LiteralExpression(type, this);
 			}
 			
 			return null;

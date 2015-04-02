@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import dyvil.tools.compiler.ast.access.IAccess;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface AccessResolver

@@ -2,13 +2,13 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.expression.BoxedValue;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.ast.value.BoxValue;
-import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.LiteralValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -61,11 +61,11 @@ public class DoubleValue extends ASTNode implements INumericValue
 		}
 		if (type.isSuperTypeOf(Types.DOUBLE))
 		{
-			return new BoxValue(this, Types.DOUBLE.boxMethod);
+			return new BoxedValue(this, Types.DOUBLE.boxMethod);
 		}
 		if (DOUBLE_CONVERTIBLE.isSuperTypeOf(type))
 		{
-			return new LiteralValue(type, this);
+			return new LiteralExpression(type, this);
 		}
 		return null;
 	}

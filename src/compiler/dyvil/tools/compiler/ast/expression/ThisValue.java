@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -6,20 +6,24 @@ import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class SuperValue extends ASTNode implements IConstantValue
+public final class ThisValue extends ASTNode implements IConstantValue
 {
 	public IType	type;
 	
-	public SuperValue(ICodePosition position)
+	public ThisValue(IType type)
+	{
+		this.type = type;
+	}
+	
+	public ThisValue(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public SuperValue(ICodePosition position, IType type)
+	public ThisValue(ICodePosition position, IType type)
 	{
 		this.position = position;
 		this.type = type;
@@ -28,13 +32,7 @@ public final class SuperValue extends ASTNode implements IConstantValue
 	@Override
 	public int getValueType()
 	{
-		return SUPER;
-	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return false;
+		return THIS;
 	}
 	
 	@Override
@@ -88,18 +86,11 @@ public final class SuperValue extends ASTNode implements IConstantValue
 		{
 			if (context.isStatic())
 			{
-				markers.add(this.position, "access.super.static");
+				markers.add(this.position, "access.this.static");
 			}
 			else
 			{
-				IType thisType = context.getThisType();
-				this.type = thisType.getSuperType();
-				if (this.type == null)
-				{
-					Marker marker = markers.create(this.position, "access.super.type");
-					marker.addInfo("Enclosing Type: " + thisType);
-					
-				}
+				this.type = context.getThisType();
 			}
 		}
 	}
@@ -107,7 +98,7 @@ public final class SuperValue extends ASTNode implements IConstantValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("super");
+		buffer.append("this");
 	}
 	
 	@Override

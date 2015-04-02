@@ -7,6 +7,7 @@ import org.objectweb.asm.ClassWriter;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.ClassParameterSetter;
 import dyvil.tools.compiler.ast.access.InitializerCall;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -16,7 +17,6 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata

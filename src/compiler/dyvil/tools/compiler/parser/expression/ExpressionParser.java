@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
@@ -10,7 +11,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.value.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -95,7 +95,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				this.mode = TUPLE_END;
-				TupleValue tv = new TupleValue(token);
+				Tuple tv = new Tuple(token);
 				this.value = tv;
 				
 				int nextType = token.next().type();
@@ -108,7 +108,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				this.mode = ARRAY_END;
-				ArrayValue vl = new ArrayValue(token);
+				Array vl = new Array(token);
 				this.value = vl;
 				
 				int nextType = token.next().type();
@@ -290,7 +290,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser();
 			if (ParserUtil.isIdentifier(type))
 			{
-				FunctionValue fl = new FunctionValue(token.raw(), token.nameValue());
+				FunctionPointer fl = new FunctionPointer(token.raw(), token.nameValue());
 				fl.instance = this.value;
 				this.field.setValue(fl);
 				return;
@@ -321,7 +321,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (type == Symbols.ARROW_OPERATOR)
 			{
-				LambdaValue lv = getLambdaValue(this.value);
+				LambdaExpression lv = getLambdaValue(this.value);
 				if (lv != null)
 				{
 					lv.expandPosition(token);
@@ -516,7 +516,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (type1 == Symbols.ARROW_OPERATOR)
 		{
-			LambdaValue lv = new LambdaValue(next.raw(), name);
+			LambdaExpression lv = new LambdaExpression(next.raw(), name);
 			this.mode = VALUE;
 			this.field.setValue(lv);
 			this.field = lv;
@@ -591,7 +591,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		throw new SyntaxError(token, "Invalid Assignment");
 	}
 	
-	private static LambdaValue getLambdaValue(IValue value)
+	private static LambdaExpression getLambdaValue(IValue value)
 	{
 		int type = value.getValueType();
 		if (type != IValue.TUPLE)
@@ -599,7 +599,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			return null;
 		}
 		
-		TupleValue tv = (TupleValue) value;
+		Tuple tv = (Tuple) value;
 		int len = tv.valueCount();
 		MethodParameter[] params = new MethodParameter[len];
 		
@@ -630,7 +630,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			return null;
 		}
 		
-		return new LambdaValue(tv.position, params);
+		return new LambdaExpression(tv.position, params);
 	}
 	
 	public void end()

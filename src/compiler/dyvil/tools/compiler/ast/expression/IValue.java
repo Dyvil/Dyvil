@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.expression;
 
 import org.objectweb.asm.Label;
 
@@ -232,7 +232,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == int[].class)
 		{
-			ArrayValue valueList = new ArrayValue(null);
+			Array valueList = new Array(null);
 			for (int i : (int[]) o)
 			{
 				valueList.addValue(new IntValue(i));
@@ -241,7 +241,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == long[].class)
 		{
-			ArrayValue valueList = new ArrayValue();
+			Array valueList = new Array();
 			for (long l : (long[]) o)
 			{
 				valueList.addValue(new LongValue(l));
@@ -250,7 +250,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == float[].class)
 		{
-			ArrayValue valueList = new ArrayValue();
+			Array valueList = new Array();
 			for (float f : (float[]) o)
 			{
 				valueList.addValue(new FloatValue(f));
@@ -259,7 +259,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == double[].class)
 		{
-			ArrayValue valueList = new ArrayValue();
+			Array valueList = new Array();
 			for (double d : (double[]) o)
 			{
 				valueList.addValue(new DoubleValue(d));

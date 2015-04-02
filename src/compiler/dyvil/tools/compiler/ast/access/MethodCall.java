@@ -4,6 +4,8 @@ import org.objectweb.asm.Label;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -16,8 +18,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.MatchExpression;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -408,7 +408,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 				IMethod method1 = IContext.resolveMethod(markers, this.instance.getType(), null, name, this.arguments);
 				if (method1 != null)
 				{
-					AssignMethodCall call = new AssignMethodCall(this.position);
+					CompoundCall call = new CompoundCall(this.position);
 					call.method = method1;
 					call.instance = this.instance;
 					call.arguments = this.arguments;

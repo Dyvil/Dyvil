@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.expression;
 
 public interface IValued
 {

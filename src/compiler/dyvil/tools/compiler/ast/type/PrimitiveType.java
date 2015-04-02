@@ -4,14 +4,14 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.expression.BoxedValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.value.BoxValue;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -62,13 +62,13 @@ public final class PrimitiveType extends Type
 	@Override
 	public IValue box(IValue value)
 	{
-		return new BoxValue(value, this.boxMethod);
+		return new BoxedValue(value, this.boxMethod);
 	}
 	
 	@Override
 	public IValue unbox(IValue value)
 	{
-		return new BoxValue(value, this.unboxMethod);
+		return new BoxedValue(value, this.unboxMethod);
 	}
 	
 	@Override

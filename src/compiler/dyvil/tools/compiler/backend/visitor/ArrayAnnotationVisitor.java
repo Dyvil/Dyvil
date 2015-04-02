@@ -2,9 +2,9 @@ package dyvil.tools.compiler.backend.visitor;
 
 import org.objectweb.asm.AnnotationVisitor;
 
-import dyvil.tools.compiler.ast.value.ArrayValue;
-import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValueList;
+import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValueList;
 
 public final class ArrayAnnotationVisitor extends AnnotationVisitor
 {
@@ -35,7 +35,7 @@ public final class ArrayAnnotationVisitor extends AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		ArrayValue valueList = new ArrayValue(null);
+		Array valueList = new Array(null);
 		this.array.addValue(valueList);
 		return new ArrayAnnotationVisitor(this.api, valueList);
 	}

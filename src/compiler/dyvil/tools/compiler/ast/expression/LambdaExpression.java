@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
@@ -17,7 +18,6 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.CaptureVariable;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -35,7 +35,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class LambdaValue extends ASTNode implements IValue, IValued, IClassCompilable, IContext
+public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IContext
 {
 	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
@@ -66,13 +66,13 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	private int					capturedFieldCount;
 	private IType				thisType;
 	
-	public LambdaValue(ICodePosition position)
+	public LambdaExpression(ICodePosition position)
 	{
 		this.position = position;
 		this.parameters = new IParameter[2];
 	}
 	
-	public LambdaValue(ICodePosition position, Name name)
+	public LambdaExpression(ICodePosition position, Name name)
 	{
 		this.position = position;
 		this.parameters = new IParameter[1];
@@ -80,7 +80,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		this.parameterCount = 1;
 	}
 	
-	public LambdaValue(ICodePosition position, IParameter[] params)
+	public LambdaExpression(ICodePosition position, IParameter[] params)
 	{
 		this.position = position;
 		this.parameters = params;

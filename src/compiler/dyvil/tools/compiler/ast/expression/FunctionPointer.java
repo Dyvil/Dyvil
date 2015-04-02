@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.expression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class FunctionValue extends ASTNode implements IValue, IValued, INamed
+public final class FunctionPointer extends ASTNode implements IValue, IValued, INamed
 {
 	public IValue				instance;
 	
@@ -45,7 +45,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 	
 	private List<MethodMatch>	methods;
 	
-	public FunctionValue(ICodePosition position, Name name)
+	public FunctionPointer(ICodePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;
@@ -238,7 +238,7 @@ public final class FunctionValue extends ASTNode implements IValue, IValued, INa
 		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.functionalMethod.getDescriptor());
 		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(methodDesc);
 		Handle handle = new Handle(handleType, this.method.getTheClass().getInternalName(), name, methodDesc);
-		writer.writeInvokeDynamic(name, desc, LambdaValue.BOOTSTRAP, type1, handle, type2);
+		writer.writeInvokeDynamic(name, desc, LambdaExpression.BOOTSTRAP, type1, handle, type2);
 	}
 	
 	@Override

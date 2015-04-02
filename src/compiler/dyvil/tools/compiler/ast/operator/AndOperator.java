@@ -5,27 +5,27 @@ import org.objectweb.asm.Label;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
+import dyvil.tools.compiler.ast.expression.BoxedValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.ast.value.BoxValue;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class BooleanOr extends ASTNode implements IValue
+public final class AndOperator extends ASTNode implements IValue
 {
 	public IValue	left;
 	public IValue	right;
 	
-	public BooleanOr(IValue left, IValue right)
+	public AndOperator(IValue left, IValue right)
 	{
 		this.left = left;
 		this.right = right;
 	}
 	
-	public BooleanOr(ICodePosition position, IValue left, IValue right)
+	public AndOperator(ICodePosition position, IValue left, IValue right)
 	{
 		this.position = position;
 		this.left = left;
@@ -57,7 +57,7 @@ public final class BooleanOr extends ASTNode implements IValue
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxValue(this, Types.BOOLEAN.boxMethod) : null;
+		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxedValue(this, Types.BOOLEAN.boxMethod) : null;
 	}
 	
 	@Override
@@ -114,13 +114,13 @@ public final class BooleanOr extends ASTNode implements IValue
 	{
 		int t1 = this.left.getValueType();
 		int t2 = this.right.getValueType();
-		if (t1 == BOOLEAN && ((BooleanValue) this.left).value)
+		if (t1 == BOOLEAN && !((BooleanValue) this.left).value)
 		{
-			return BooleanValue.TRUE;
+			return BooleanValue.FALSE;
 		}
-		if (t2 == BOOLEAN && ((BooleanValue) this.left).value)
+		if (t2 == BOOLEAN && !((BooleanValue) this.left).value)
 		{
-			return BooleanValue.TRUE;
+			return BooleanValue.FALSE;
 		}
 		
 		this.left.foldConstants();
@@ -134,12 +134,12 @@ public final class BooleanOr extends ASTNode implements IValue
 	{
 		Label label = new Label();
 		Label label2 = new Label();
-		this.left.writeJump(writer, label);
-		this.right.writeJump(writer, label);
-		writer.writeLDC(0);
+		this.left.writeInvJump(writer, label);
+		this.right.writeInvJump(writer, label);
+		writer.writeLDC(1);
 		writer.writeJumpInsn(Opcodes.GOTO, label2);
 		writer.writeLabel(label);
-		writer.writeLDC(1);
+		writer.writeLDC(0);
 		writer.writeLabel(label2);
 	}
 	
@@ -153,26 +153,22 @@ public final class BooleanOr extends ASTNode implements IValue
 	@Override
 	public void writeJump(MethodWriter writer, Label dest)
 	{
-		Label label = new Label();
-		this.left.writeInvJump(writer, label);
+		this.left.writeJump(writer, dest);
 		this.right.writeJump(writer, dest);
-		writer.writeLabel(label);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest)
 	{
-		Label label = new Label();
-		this.left.writeJump(writer, label);
+		this.left.writeInvJump(writer, dest);
 		this.right.writeInvJump(writer, dest);
-		writer.writeLabel(label);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.left.toString(prefix, buffer);
-		buffer.append(" || ");
+		buffer.append(" && ");
 		this.right.toString(prefix, buffer);
 	}
 }

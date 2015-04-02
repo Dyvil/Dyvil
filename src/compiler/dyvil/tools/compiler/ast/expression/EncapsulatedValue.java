@@ -1,73 +1,81 @@
-package dyvil.tools.compiler.ast.operator;
+package dyvil.tools.compiler.ast.expression;
 
 import org.objectweb.asm.Label;
 
-import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.ast.value.BoxValue;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class BooleanNot extends ASTNode implements IValue
+public final class EncapsulatedValue implements IValue, IValued
 {
-	public IValue	value;
+	private IValue	value;
 	
-	public BooleanNot(IValue right)
+	public EncapsulatedValue(IValue value)
 	{
-		this.value = right;
+		this.value = value;
 	}
 	
 	@Override
 	public int getValueType()
 	{
-		return BOOLEAN_NOT;
+		return CAPSULATED;
+	}
+	
+	@Override
+	public void setValue(IValue value)
+	{
+		this.value = value;
+	}
+	
+	@Override
+	public IValue getValue()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.value.getPosition();
 	}
 	
 	@Override
 	public boolean isPrimitive()
 	{
-		return true;
+		return this.value.isPrimitive();
 	}
 	
 	@Override
 	public IType getType()
 	{
-		return Types.BOOLEAN;
+		return this.value.getType();
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
-		if (type == Types.BOOLEAN)
+		IValue value1 = this.value.withType(type);
+		if (value1 == null)
 		{
-			return this;
+			return null;
 		}
-		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxValue(this, Types.BOOLEAN.boxMethod) : null;
+		this.value = value1;
+		return this;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN);
+		return this.value.isType(type);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Types.BOOLEAN)
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(Types.BOOLEAN))
-		{
-			return 2;
-		}
-		return 0;
+		return this.value.getTypeMatch(type);
 	}
 	
 	@Override
@@ -98,52 +106,46 @@ public final class BooleanNot extends ASTNode implements IValue
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.value.getValueType() == BOOLEAN)
-		{
-			BooleanValue b = (BooleanValue) this.value;
-			b.value = !b.value;
-			return b;
-		}
-		this.value = this.value.foldConstants();
-		return this;
+		return this.value.foldConstants();
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		Label label = new Label();
-		Label label2 = new Label();
-		this.value.writeInvJump(writer, label);
-		writer.writeLDC(0);
-		writer.writeJumpInsn(Opcodes.GOTO, label2);
-		writer.writeLabel(label);
-		writer.writeLDC(1);
-		writer.writeLabel(label2);
+		this.value.writeExpression(writer);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.IRETURN);
+		this.value.writeStatement(writer);
 	}
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label dest)
 	{
-		this.value.writeInvJump(writer, dest);
+		this.value.writeJump(writer, dest);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest)
 	{
-		this.value.writeJump(writer, dest);
+		this.value.writeInvJump(writer, dest);
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		this.toString("", builder);
+		return builder.toString();
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('!');
+		buffer.append(Formatting.Expression.tupleStart);
 		this.value.toString(prefix, buffer);
+		buffer.append(Formatting.Expression.tupleEnd);
 	}
 }

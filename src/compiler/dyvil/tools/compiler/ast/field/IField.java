@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 
 public interface IField extends IASTNode, IMember, IClassCompilable, IValued

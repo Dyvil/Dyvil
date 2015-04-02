@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.dwt;
 
 import dyvil.strings.CharUtils;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.value.IValue;
 
 public class DWTProperty
 {

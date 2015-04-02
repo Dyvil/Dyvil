@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.value;
+package dyvil.tools.compiler.ast.expression;
 
 import java.util.Iterator;
 
@@ -20,7 +20,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class TupleValue extends ASTNode implements IValue, IValueList
+public final class Tuple extends ASTNode implements IValue, IValueList
 {
 	public static final IType	TUPLE_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("TupleConvertible"));
 	
@@ -31,13 +31,13 @@ public final class TupleValue extends ASTNode implements IValue, IValueList
 	private IMethod				method;
 	private IArguments			arguments;
 	
-	public TupleValue(ICodePosition position)
+	public Tuple(ICodePosition position)
 	{
 		this.position = position;
 		this.values = new IValue[3];
 	}
 	
-	public TupleValue(ICodePosition position, IValue[] values)
+	public Tuple(ICodePosition position, IValue[] values)
 	{
 		this.position = position;
 		this.values = values;

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.method;
 import org.objectweb.asm.ClassWriter;
 
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -12,7 +13,6 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 

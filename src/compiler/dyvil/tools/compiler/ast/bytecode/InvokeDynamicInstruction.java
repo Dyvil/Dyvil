@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.bytecode;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.util.Printer;
 
-import dyvil.tools.compiler.ast.value.IValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 

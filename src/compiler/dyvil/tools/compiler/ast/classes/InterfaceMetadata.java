@@ -2,8 +2,8 @@ package dyvil.tools.compiler.ast.classes;
 
 import org.objectweb.asm.ClassWriter;
 
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class InterfaceMetadata implements IClassMetadata

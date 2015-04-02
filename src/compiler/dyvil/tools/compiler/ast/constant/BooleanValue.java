@@ -4,11 +4,11 @@ import org.objectweb.asm.Label;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.expression.BoxedValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.ast.value.BoxValue;
-import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -55,7 +55,7 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxValue(this, Types.BOOLEAN.boxMethod) : null;
+		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxedValue(this, Types.BOOLEAN.boxMethod) : null;
 	}
 	
 	@Override

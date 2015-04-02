@@ -4,6 +4,8 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.INumericValue;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -15,8 +17,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.ast.value.IValue;
-import dyvil.tools.compiler.ast.value.IValued;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -24,7 +24,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class AssignMethodCall extends ASTNode implements IValue, IValued, ITypeContext, INamed
+public final class CompoundCall extends ASTNode implements IValue, IValued, ITypeContext, INamed
 {
 	public Name			name;
 	
@@ -35,12 +35,12 @@ public final class AssignMethodCall extends ASTNode implements IValue, IValued, 
 	public IMethod		updateMethod;
 	private IType		type;
 	
-	public AssignMethodCall(ICodePosition position)
+	public CompoundCall(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public AssignMethodCall(ICodePosition position, IValue instance, Name name)
+	public CompoundCall(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
 		this.instance = instance;
