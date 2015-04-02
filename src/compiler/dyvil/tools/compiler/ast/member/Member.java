@@ -197,7 +197,10 @@ public abstract class Member extends ASTNode implements IMember
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
+		if (this.type != null)
+		{
+			this.type = this.type.resolve(markers, context);
+		}
 		
 		for (int i = 0; i < this.annotationCount; i++)
 		{

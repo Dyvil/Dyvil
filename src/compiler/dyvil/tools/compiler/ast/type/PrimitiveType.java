@@ -4,7 +4,7 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -375,7 +375,7 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		if (this.arrayDimensions > 0)
 		{

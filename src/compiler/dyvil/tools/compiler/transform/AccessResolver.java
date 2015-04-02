@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.value.IValue;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class AccessResolver
+public interface AccessResolver
 {
 	public static IValue resolve(MarkerList markers, IContext context, IAccess access)
 	{

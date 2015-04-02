@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -196,7 +196,7 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		throw new UnsupportedOperationException();
 	}

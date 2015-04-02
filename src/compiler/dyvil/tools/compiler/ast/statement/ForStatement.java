@@ -5,7 +5,7 @@ import java.util.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -134,26 +134,26 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		if (this.variable != null && this.variable.getName() == name)
 		{
-			return new FieldMatch(this.variable, 1);
+			return this.variable;
 		}
 		
 		if (this.type == ARRAY)
 		{
 			if (name == $index)
 			{
-				return new FieldMatch(this.var1, 1);
+				return this.var1;
 			}
 			if (name == $length)
 			{
-				return new FieldMatch(this.var2, 1);
+				return this.var2;
 			}
 			if (name == $array)
 			{
-				return new FieldMatch(this.var3, 1);
+				return this.var3;
 			}
 		}
 		

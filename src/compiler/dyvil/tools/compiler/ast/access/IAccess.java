@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -28,7 +27,7 @@ public interface IAccess extends IValue, IValued, ICall
 	
 	public static IField resolveField(IContext context, ITyped instance, Name name)
 	{
-		FieldMatch match;
+		IField match;
 		if (instance != null)
 		{
 			IType type = instance.getType();
@@ -37,7 +36,7 @@ public interface IAccess extends IValue, IValued, ICall
 				match = type.resolveField(name);
 				if (match != null)
 				{
-					return match.theField;
+					return match;
 				}
 			}
 		}
@@ -45,7 +44,7 @@ public interface IAccess extends IValue, IValued, ICall
 		match = context.resolveField(name);
 		if (match != null)
 		{
-			return match.theField;
+			return match;
 		}
 		return null;
 	}

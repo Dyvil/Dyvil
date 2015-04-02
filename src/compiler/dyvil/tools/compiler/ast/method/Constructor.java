@@ -11,7 +11,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.access.ApplyMethodCall;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Member;
@@ -397,14 +397,14 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
 			if (param.getName() == name)
 			{
-				return new FieldMatch(param, 1);
+				return param;
 			}
 		}
 		

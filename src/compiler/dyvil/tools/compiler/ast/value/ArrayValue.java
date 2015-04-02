@@ -17,7 +17,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class ArrayValue extends ASTNode implements IValue, IValueList
+public final class ArrayValue extends ASTNode implements IValue, IValueList
 {
 	public static final IType	ARRAY_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("ArrayConvertible"));
 	

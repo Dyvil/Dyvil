@@ -4,7 +4,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -199,7 +199,7 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		return null;
 	}

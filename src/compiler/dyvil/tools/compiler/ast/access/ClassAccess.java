@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.access;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -91,12 +90,12 @@ public class ClassAccess extends ASTNode implements IValue
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		Name name = this.type.getName();
-		FieldMatch f = context.resolveField(name);
+		IField f = context.resolveField(name);
 		if (f != null)
 		{
 			FieldAccess access = new FieldAccess(this.position);
 			access.name = name;
-			access.field = f.theField;
+			access.field = f;
 			return access;
 		}
 		

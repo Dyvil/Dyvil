@@ -230,11 +230,11 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		if (name == this.name)
 		{
-			return new FieldMatch(this.setterParameter, 1);
+			return this.setterParameter;
 		}
 		return this.theClass.resolveField(name);
 	}

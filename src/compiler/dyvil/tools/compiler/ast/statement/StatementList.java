@@ -7,7 +7,6 @@ import dyvil.collections.ArrayIterator;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.FieldInitializer;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -346,14 +345,14 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		if (this.variables != null)
 		{
 			IField field = this.variables.get(name);
 			if (field != null)
 			{
-				return new FieldMatch(field, 1);
+				return field;
 			}
 		}
 		

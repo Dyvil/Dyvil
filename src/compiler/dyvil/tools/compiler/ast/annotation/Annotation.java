@@ -28,7 +28,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class Annotation extends ASTNode implements ITyped
+public final class Annotation extends ASTNode implements ITyped
 {
 	public static final MethodParameter	VALUE	= new MethodParameter();
 	

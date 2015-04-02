@@ -9,8 +9,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
-import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -18,9 +17,10 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.CaptureVariable;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.LambdaParameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -41,7 +41,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
 															+ "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodHandle;"
 															+ "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
-	public LambdaParameter[]	parameters;
+	public IParameter[]			parameters;
 	public int					parameterCount;
 	public IValue				value;
 	
@@ -62,25 +62,25 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	private String				name;
 	private String				lambdaDesc;
 	private IType				returnType;
-	private IVariable[]			capturedFields;
+	private CaptureVariable[]	capturedFields;
 	private int					capturedFieldCount;
 	private IType				thisType;
 	
 	public LambdaValue(ICodePosition position)
 	{
 		this.position = position;
-		this.parameters = new LambdaParameter[2];
+		this.parameters = new IParameter[2];
 	}
 	
-	public LambdaValue(ICodePosition position, LambdaParameter param)
+	public LambdaValue(ICodePosition position, Name name)
 	{
 		this.position = position;
-		this.parameters = new LambdaParameter[1];
-		this.parameters[0] = param;
+		this.parameters = new IParameter[1];
+		this.parameters[0] = new MethodParameter(name);
 		this.parameterCount = 1;
 	}
 	
-	public LambdaValue(ICodePosition position, LambdaParameter[] params)
+	public LambdaValue(ICodePosition position, IParameter[] params)
 	{
 		this.position = position;
 		this.parameters = params;
@@ -125,7 +125,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 			LambdaType lt = new LambdaType();
 			for (int i = 0; i < this.parameterCount; i++)
 			{
-				IType t = this.parameters[i].type;
+				IType t = this.parameters[i].getType();
 				lt.addType(t == null ? Types.UNKNOWN : t);
 			}
 			lt.returnType = this.value.getType();
@@ -161,14 +161,15 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		}
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			LambdaParameter lambdaParam = this.parameters[i];
+			IParameter lambdaParam = this.parameters[i];
 			IParameter param = method.getParameter(i);
-			if (lambdaParam.type == null)
+			IType paramType = lambdaParam.getType();
+			if (paramType == null)
 			{
-				lambdaParam.type = param.getType();
+				lambdaParam.setType(param.getType());
 				continue;
 			}
-			if (!param.getType().equals(lambdaParam.type))
+			if (!param.getType().equals(paramType))
 			{
 				return false;
 			}
@@ -216,33 +217,31 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			LambdaParameter param = this.parameters[i];
-			if (param.name == name)
+			IParameter param = this.parameters[i];
+			if (param.getName() == name)
 			{
-				return new FieldMatch(param, 1);
+				return param;
 			}
 		}
 		
-		FieldMatch match = this.context.resolveField(name);
-		if (match != null && match.theField instanceof IVariable)
+		IField match = this.context.resolveField(name);
+		if (match != null && match.isVariable())
 		{
-			IVariable var = (IVariable) match.theField;
 			if (this.capturedFields == null)
 			{
-				this.capturedFields = new IVariable[2];
-				this.capturedFields[0] = var;
+				this.capturedFields = new CaptureVariable[2];
 				this.capturedFieldCount = 1;
-				return match;
+				return this.capturedFields[0] = new CaptureVariable(match);
 			}
 			
 			// Check if the variable is already in the array
 			for (int i = 0; i < this.capturedFieldCount; i++)
 			{
-				if (this.capturedFields[i] == var)
+				if (this.capturedFields[i].variable == match)
 				{
 					// If yes, return the match and skip adding the variable
 					// again.
@@ -253,11 +252,11 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 			int index = this.capturedFieldCount++;
 			if (this.capturedFieldCount > this.capturedFields.length)
 			{
-				IVariable[] temp = new IVariable[this.capturedFieldCount];
+				CaptureVariable[] temp = new CaptureVariable[this.capturedFieldCount];
 				System.arraycopy(this.capturedFields, 0, temp, 0, index);
 				this.capturedFields = temp;
 			}
-			this.capturedFields[index] = var;
+			return this.capturedFields[index] = new CaptureVariable(match);
 		}
 		
 		return match;
@@ -286,11 +285,8 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			LambdaParameter param = this.parameters[i];
-			if (param.type != null)
-			{
-				param.type = param.type.resolve(markers, context);
-			}
+			IParameter param = this.parameters[i];
+			param.resolveTypes(markers, context);
 		}
 		
 		this.context = context;
@@ -327,17 +323,14 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	{
 		this.context = context;
 		
-		this.value = this.value.resolve(markers, this);
-		
 		if (this.method != null)
 		{
 			if (this.method.hasTypeVariables())
 			{
 				for (int i = 0; i < this.parameterCount; i++)
 				{
-					LambdaParameter param = this.parameters[i];
-					param.baseType = this.method.getParameter(i).getType();
-					param.type = param.type.getConcreteType(this.type);
+					IParameter param = this.parameters[i];
+					param.setType(param.getType().getConcreteType(this.type));
 				}
 				
 				this.returnType = this.method.getType(this.type);
@@ -347,6 +340,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 				this.returnType = this.method.getType();
 			}
 			
+			this.value = this.value.resolve(markers, this);
 			IValue value1 = this.value.withType(this.returnType);
 			if (value1 == null)
 			{
@@ -372,7 +366,6 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		
 		this.value.check(markers, context);
 	}
 	
@@ -402,7 +395,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].writeGet(writer, null);
+			this.capturedFields[i].variable.writeGet(writer, null);
 		}
 		
 		String name = this.getName();
@@ -453,7 +446,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].type.appendExtendedName(buffer);
+			this.parameters[i].getType().appendExtendedName(buffer);
 		}
 		buffer.append(')');
 		this.returnType.appendExtendedName(buffer);
@@ -475,7 +468,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		}
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].type.appendExtendedName(buffer);
+			this.parameters[i].getType().appendExtendedName(buffer);
 		}
 		buffer.append(')');
 		this.returnType.appendExtendedName(buffer);
@@ -489,45 +482,27 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.getName(), this.getLambdaDescriptor(), null, null));
 		
-		// Updated Captured Field Indexes
-		
-		int[] prevIndex = null;
-		
 		if (instance)
 		{
 			mw.setInstanceMethod();
 		}
 		
-		if (this.capturedFieldCount > 0)
+		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			prevIndex = new int[this.capturedFieldCount];
-			for (int i = 0; i < this.capturedFieldCount; i++)
-			{
-				IVariable var = this.capturedFields[i];
-				prevIndex[i] = var.getIndex();
-				var.setIndex(mw.registerParameter(var.getName().qualified, var.getType()));
-			}
+			this.capturedFields[i].write(mw);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			LambdaParameter param = this.parameters[i];
-			param.index = mw.registerParameter(param.name.qualified, param.type);
+			IParameter param = this.parameters[i];
+			param.setIndex(mw.registerParameter(param.getName().qualified, param.getType()));
 		}
 		
 		// Write the Value
 		
 		mw.begin();
 		this.value.writeExpression(mw);
-		mw.end(this.method.getType());
-		
-		// Reset Captured Field Indexes
-		
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			IVariable var = this.capturedFields[i];
-			var.setIndex(prevIndex[i]);
-		}
+		mw.end(this.returnType);
 	}
 	
 	@Override
@@ -539,8 +514,8 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 		}
 		else if (this.parameterCount == 1)
 		{
-			LambdaParameter param = this.parameters[0];
-			if (param.type != null)
+			IParameter param = this.parameters[0];
+			if (param.getType() != null)
 			{
 				buffer.append('(');
 				param.toString(prefix, buffer);
@@ -548,7 +523,7 @@ public final class LambdaValue extends ASTNode implements IValue, IValued, IClas
 			}
 			else
 			{
-				buffer.append(param.name);
+				buffer.append(param.getName());
 			}
 		}
 		else

@@ -433,7 +433,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				this.value = null;
 				pm.reparse();
-				this.getAccess(pm, token.nameValue(), prev, type);
+				this.getAccess(pm, prev.nameValue(), prev, type);
 				return;
 			}
 			
@@ -514,6 +514,15 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = GENERICS;
 			return;
 		}
+		if (type1 == Symbols.ARROW_OPERATOR)
+		{
+			LambdaValue lv = new LambdaValue(next.raw(), name);
+			this.mode = VALUE;
+			this.field.setValue(lv);
+			this.field = lv;
+			pm.skip();
+			return;
+		}
 		if (type == Tokens.SYMBOL_IDENTIFIER || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
 		{
 			MethodCall call = new MethodCall(token, this.value, name);
@@ -585,19 +594,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	private static LambdaValue getLambdaValue(IValue value)
 	{
 		int type = value.getValueType();
-		if (type == IValue.FIELD_ACCESS)
-		{
-			FieldAccess fa = (FieldAccess) value;
-			if (fa.instance != null)
-			{
-				return null;
-			}
-			
-			LambdaParameter param = new LambdaParameter();
-			param.name = fa.getName();
-			return new LambdaValue(fa.getPosition(), param);
-		}
-		
 		if (type != IValue.TUPLE)
 		{
 			return null;
@@ -605,7 +601,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		
 		TupleValue tv = (TupleValue) value;
 		int len = tv.valueCount();
-		LambdaParameter[] params = new LambdaParameter[len];
+		MethodParameter[] params = new MethodParameter[len];
 		
 		for (int i = 0; i < len; i++)
 		{
@@ -624,7 +620,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 					return null;
 				}
 				
-				LambdaParameter param = new LambdaParameter();
+				MethodParameter param = new MethodParameter();
 				param.name = fa.name;
 				param.type = ((ClassAccess) fa.instance).type;
 				params[i] = param;

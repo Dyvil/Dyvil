@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
-import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -220,7 +220,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	public ITypeVariable resolveTypeVariable(Name name);
 	
 	@Override
-	public FieldMatch resolveField(Name name);
+	public IField resolveField(Name name);
 	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);

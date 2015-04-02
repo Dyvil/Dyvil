@@ -6,7 +6,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -27,7 +27,7 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 	private IClass				theClass;
 	private Package				thePackage;
 	
-	private FieldMatch			field;
+	private IField				field;
 	private List<MethodMatch>	methods;
 	
 	public SimpleImport(ICodePosition position)
@@ -69,7 +69,7 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 				return;
 			}
 			
-			FieldMatch field = context.resolveField(this.name);
+			IField field = context.resolveField(this.name);
 			if (field != null)
 			{
 				this.field = field;
@@ -146,7 +146,7 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		if (this.child != null)
 		{

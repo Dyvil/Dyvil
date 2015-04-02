@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.objectweb.asm.ClassWriter;
 
-import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -57,7 +56,7 @@ public interface IClassMetadata
 	
 	public void checkTypes(MarkerList markers, IContext context);
 	
-	public default FieldMatch resolveField(Name name)
+	public default IField resolveField(Name name)
 	{
 		return null;
 	}

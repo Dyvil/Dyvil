@@ -4,7 +4,7 @@ import java.util.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -259,7 +259,7 @@ public final class WildcardType extends BaseBounded implements IType
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		if (this.arrayDimensions > 0 || this.upperBoundCount == 0)
 		{
@@ -268,7 +268,7 @@ public final class WildcardType extends BaseBounded implements IType
 		
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
-			FieldMatch f = this.upperBounds[i].resolveField(name);
+			IField f = this.upperBounds[i].resolveField(name);
 			if (f != null)
 			{
 				return f;

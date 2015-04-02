@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -90,7 +90,7 @@ public class CatchBlock implements IValued, ITyped, IContext
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		if (this.varName == name)
 		{
@@ -100,7 +100,7 @@ public class CatchBlock implements IValued, ITyped, IContext
 				this.variable.name = this.varName;
 				this.variable.type = this.type;
 			}
-			return new FieldMatch(this.variable, 1);
+			return this.variable;
 		}
 		
 		return this.context.resolveField(name);

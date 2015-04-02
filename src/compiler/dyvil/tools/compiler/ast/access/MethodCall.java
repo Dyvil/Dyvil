@@ -4,7 +4,6 @@ import org.objectweb.asm.Label;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -449,7 +448,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			IType type = null;
 			IMethod method = null;
 			
-			FieldMatch field = context.resolveField(this.name);
+			IField field = context.resolveField(this.name);
 			if (field == null)
 			{
 				// Find a type
@@ -472,12 +471,12 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			else
 			{
 				FieldAccess access = new FieldAccess(this.position);
-				access.field = field.theField;
+				access.field = field;
 				access.name = this.name;
 				access.dotless = this.dotless;
 				
 				// Find the apply method of the field type
-				IMethod match = IContext.resolveMethod(null, field.theField.getType(), access, Name.apply, this.arguments);
+				IMethod match = IContext.resolveMethod(null, field.getType(), access, Name.apply, this.arguments);
 				if (match == null)
 				{
 					// No apply method found -> Not an apply method call

@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class VarInstruction implements IInstruction
+public final class VarInstruction implements IInstruction
 {
 	private int	opcode;
 	private int	index;

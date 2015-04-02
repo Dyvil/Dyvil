@@ -31,6 +31,11 @@ public class MethodParameter extends Member implements IParameter
 	{
 	}
 	
+	public MethodParameter(Name name)
+	{
+		this.name = name;
+	}
+	
 	public MethodParameter(Name name, IType type)
 	{
 		this.name = name;

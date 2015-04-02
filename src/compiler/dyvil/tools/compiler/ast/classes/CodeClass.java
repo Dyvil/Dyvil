@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAssign;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.external.ExternalClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.TypeVariableType;
@@ -787,14 +786,14 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
 			if (param.getName() == name)
 			{
-				return new FieldMatch(param, 1);
+				return param;
 			}
 		}
 		
@@ -804,18 +803,18 @@ public class CodeClass extends ASTNode implements IClass
 			IField field = this.body.getProperty(name);
 			if (field != null)
 			{
-				return new FieldMatch(field, 1);
+				return field;
 			}
 			
 			// Own fields
 			field = this.body.getField(name);
 			if (field != null)
 			{
-				return new FieldMatch(field, 1);
+				return field;
 			}
 		}
 		
-		FieldMatch match = this.metadata.resolveField(name);
+		IField match = this.metadata.resolveField(name);
 		if (match != null)
 		{
 			return match;

@@ -240,23 +240,21 @@ public final class ExternalClass extends CodeClass
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		// Own properties
 		IField field = this.body.getProperty(name);
 		if (field != null)
 		{
-			return new FieldMatch(field, 1);
+			return field;
 		}
 		
 		// Own fields
 		field = this.body.getField(name);
 		if (field != null)
 		{
-			return new FieldMatch(field, 1);
+			return field;
 		}
-		
-		FieldMatch match;
 		
 		if (!this.superTypesResolved)
 		{
@@ -266,7 +264,7 @@ public final class ExternalClass extends CodeClass
 		// Inherited Fields
 		if (this.superType != null)
 		{
-			match = this.superType.resolveField(name);
+			IField match = this.superType.resolveField(name);
 			if (match != null)
 			{
 				return match;

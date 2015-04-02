@@ -8,7 +8,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.FieldInitializer;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.external.ExternalClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -193,12 +192,12 @@ public class REPLContext implements IValued, IDyvilUnit
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		IField f = this.variables.get(name);
 		if (f != null)
 		{
-			return new FieldMatch(f, 1);
+			return f;
 		}
 		return null;
 	}

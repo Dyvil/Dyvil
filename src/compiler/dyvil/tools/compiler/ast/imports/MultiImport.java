@@ -5,7 +5,7 @@ import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.FieldMatch;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -72,11 +72,11 @@ public class MultiImport extends ASTNode implements IImport, IImportContainer
 	}
 	
 	@Override
-	public FieldMatch resolveField(Name name)
+	public IField resolveField(Name name)
 	{
 		for (IImport i : this.children)
 		{
-			FieldMatch match = i.resolveField(name);
+			IField match = i.resolveField(name);
 			if (match != null)
 			{
 				return match;
