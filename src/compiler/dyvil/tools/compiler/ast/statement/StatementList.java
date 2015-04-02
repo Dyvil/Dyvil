@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 
 import dyvil.collections.ArrayIterator;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.access.FieldInitializer;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;

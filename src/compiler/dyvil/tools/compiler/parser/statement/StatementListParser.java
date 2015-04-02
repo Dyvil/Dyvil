@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.access.FieldAssign;
-import dyvil.tools.compiler.ast.access.FieldInitializer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -20,9 +20,9 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class StatementListParser extends Parser implements IValued, ITyped, IParserManager
 {
-	private static final int	EXPRESSION	= 1;
-	private static final int	TYPE		= 2;
-	private static final int	SEPARATOR	= 4;
+	private static final int	EXPRESSION		= 1;
+	private static final int	TYPE			= 2;
+	private static final int	SEPARATOR		= 4;
 	
 	protected IValueList		statementList;
 	

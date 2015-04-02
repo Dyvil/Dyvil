@@ -42,7 +42,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
-	private static final int INLINABLE = (Modifiers.STATIC | Modifiers.PRIVATE | Modifiers.INLINE);
+	private static final int	INLINABLE	= (Modifiers.STATIC | Modifiers.PRIVATE | Modifiers.INLINE);
 	
 	protected IClass			theClass;
 	
@@ -562,6 +562,15 @@ public class Method extends Member implements IMethod
 	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			ITypeVariable var = this.generics[i];
+			if (var.getName() == name)
+			{
+				return var;
+			}
+		}
+		
 		return this.theClass.resolveTypeVariable(name);
 	}
 	

@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.access;
+package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;

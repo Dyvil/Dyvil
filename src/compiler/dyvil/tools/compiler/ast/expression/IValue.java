@@ -45,6 +45,7 @@ public interface IValue extends IASTNode, ITyped
 	public static int	CONSTRUCTOR_CALL	= 22;
 	public static int	INITIALIZER_CALL	= 23;
 	public static int	VARIABLE			= 24;
+	public static int	NESTED_METHOD		= 25;
 	
 	public static int	CAST_OPERATOR		= 32;
 	public static int	ISOF_OPERATOR		= 33;
