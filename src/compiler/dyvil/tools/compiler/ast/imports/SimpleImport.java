@@ -1,14 +1,15 @@
 package dyvil.tools.compiler.ast.imports;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -17,28 +18,26 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class SimpleImport extends ASTNode implements IImport, IImportContainer
+public final class SimpleImport extends ASTNode implements IImport
 {
-	public IImport				parent;
-	public Name					name;
-	public Name					alias;
-	public IImport				child;
+	public Name				name;
+	public Name				alias;
+	public IImport			child;
 	
-	private IClass				theClass;
-	private Package				thePackage;
+	private IClass			theClass;
+	private Package			thePackage;
 	
-	private IField				field;
-	private List<MethodMatch>	methods;
+	private IField			field;
+	private List<IMethod>	methods;
 	
 	public SimpleImport(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public SimpleImport(ICodePosition position, IImport parent, Name name)
+	public SimpleImport(ICodePosition position, Name name)
 	{
 		this.position = position;
-		this.parent = parent;
 		this.name = name;
 	}
 	
@@ -48,6 +47,13 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 		this.child = iimport;
 	}
 	
+	@Override
+	public IImport getChild()
+	{
+		return this.child;
+	}
+	
+	@Override
 	public void setAlias(Name alias)
 	{
 		this.alias = alias;
@@ -69,7 +75,9 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 				return;
 			}
 			
-			IField field = context.resolveField(this.name);
+			IClassBody body = ((IClass) context).getBody();
+			
+			IField field = body.getField(this.name);
 			if (field != null)
 			{
 				this.field = field;
@@ -77,10 +85,17 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 			}
 			
 			this.methods = new ArrayList();
-			context.getMethodMatches(this.methods, null, this.name, null);
+			int len = body.methodCount();
+			for (int i = 0; i < len; i++)
+			{
+				IMethod m = body.getMethod(i);
+				if (m.getName() == this.name)
+				{
+					this.methods.add(m);
+				}
+			}
 			if (!this.methods.isEmpty())
 			{
-				Collections.sort(this.methods);
 				return;
 			}
 			
@@ -116,11 +131,11 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 	@Override
 	public Package resolvePackage(Name name)
 	{
-		if (this.name == name)
+		if (this.child != null)
 		{
-			return this.thePackage;
+			return this.child.resolvePackage(name);
 		}
-		if (this.alias == name)
+		if (name == this.name || name == this.alias)
 		{
 			return this.thePackage;
 		}
@@ -134,11 +149,7 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 		{
 			return this.child.resolveClass(name);
 		}
-		if (this.name == name)
-		{
-			return this.theClass;
-		}
-		if (this.alias == name)
+		if (name == this.name || name == this.alias)
 		{
 			return this.theClass;
 		}
@@ -152,11 +163,7 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 		{
 			return this.child.resolveField(name);
 		}
-		if (this.name == name)
-		{
-			return this.field;
-		}
-		if (this.alias == name)
+		if (name == this.name || name == this.alias)
 		{
 			return this.field;
 		}
@@ -170,13 +177,18 @@ public final class SimpleImport extends ASTNode implements IImport, IImportConta
 		{
 			this.child.getMethodMatches(list, instance, name, arguments);
 		}
-		if (this.name == name)
+		if (name != this.name && name != this.alias)
 		{
-			list.addAll(this.methods);
+			return;
 		}
-		if (this.alias == name)
+		
+		for (IMethod m : this.methods)
 		{
-			list.addAll(this.methods);
+			int match = m.getSignatureMatch(name, instance, arguments);
+			if (match > 0)
+			{
+				list.add(new MethodMatch(m, match));
+			}
 		}
 	}
 	

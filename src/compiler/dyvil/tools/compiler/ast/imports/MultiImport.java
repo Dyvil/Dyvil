@@ -17,15 +17,13 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class MultiImport extends ASTNode implements IImport, IImportContainer
+public class MultiImport extends ASTNode implements IImport
 {
-	public IImport			parent;
 	public List<IImport>	children	= new ArrayList();
 	
-	public MultiImport(ICodePosition position, IImport parent)
+	public MultiImport(ICodePosition position)
 	{
 		this.position = position;
-		this.parent = parent;
 	}
 	
 	@Override

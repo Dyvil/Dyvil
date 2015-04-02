@@ -12,12 +12,13 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class Import extends ASTNode implements IImportContainer
+public final class Import extends ASTNode implements IImport
 {
 	public IImport	theImport;
 	public IImport	last;
@@ -28,20 +29,27 @@ public final class Import extends ASTNode implements IImportContainer
 		this.position = position;
 	}
 	
+	public Import(ICodePosition position, boolean isStatic)
+	{
+		this.position = position;
+		this.isStatic = isStatic;
+	}
+	
 	@Override
 	public void addImport(IImport iimport)
 	{
 		this.theImport = iimport;
 	}
 	
-	public void resolveTypes(MarkerList markers)
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic)
 	{
 		this.theImport.resolveTypes(markers, Package.rootPackage, this.isStatic);
 		
-		IImport iimport = this.theImport;
-		while (iimport instanceof SimpleImport)
+		IImport iimport = this.theImport.getChild();
+		while (true)
 		{
-			IImport child = ((SimpleImport) iimport).child;
+			IImport child = iimport.getChild();
 			if (child == null)
 			{
 				break;
@@ -55,7 +63,7 @@ public final class Import extends ASTNode implements IImportContainer
 	@Override
 	public boolean isStatic()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override

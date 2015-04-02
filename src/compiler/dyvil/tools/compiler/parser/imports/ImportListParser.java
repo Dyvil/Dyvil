@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.parser.imports;
 
 import dyvil.tools.compiler.ast.imports.IImport;
-import dyvil.tools.compiler.ast.imports.IImportContainer;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -10,13 +9,11 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public class ImportListParser extends Parser
 {
-	protected IImport			parent;
-	protected IImportContainer	container;
+	protected IImport	theImport;
 	
-	public ImportListParser(IImport parent, IImportContainer container)
+	public ImportListParser(IImport parent)
 	{
-		this.parent = parent;
-		this.container = container;
+		this.theImport = parent;
 	}
 	
 	@Override
@@ -37,7 +34,7 @@ public class ImportListParser extends Parser
 		
 		if (this.mode == 0)
 		{
-			pm.pushParser(new ImportParser(this.parent, this.container), true);
+			pm.pushParser(new ImportParser(this.theImport), true);
 			this.mode = 1;
 			return;
 		}

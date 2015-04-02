@@ -56,16 +56,15 @@ public class CompilationUnitParser extends Parser
 				this.mode = IMPORT | CLASS;
 				Import i = new Import(token.raw());
 				this.unit.addImport(i);
-				jcp.pushParser(new ImportParser(null, i));
+				jcp.pushParser(new ImportParser(i));
 				return;
 			}
 			if (type == Keywords.USING)
 			{
 				this.mode = IMPORT | CLASS;
-				Import i = new Import(token.raw());
-				i.isStatic = true;
+				Import i = new Import(token.raw(), true);
 				this.unit.addStaticImport(i);
-				jcp.pushParser(new ImportParser(null, i));
+				jcp.pushParser(new ImportParser(i));
 				return;
 			}
 		}

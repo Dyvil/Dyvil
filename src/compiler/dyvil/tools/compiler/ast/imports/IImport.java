@@ -16,6 +16,15 @@ public interface IImport extends IASTNode, IContext
 {
 	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic);
 	
+	public void addImport(IImport iimport);
+	
+	public default IImport getChild()
+	{
+		return null;
+	}
+	
+	public default void setAlias(Name alias) {}
+	
 	@Override
 	public default boolean isStatic()
 	{

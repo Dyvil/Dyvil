@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.parser.imports;
 
-import dyvil.tools.compiler.ast.imports.*;
+import dyvil.tools.compiler.ast.imports.IImport;
+import dyvil.tools.compiler.ast.imports.MultiImport;
+import dyvil.tools.compiler.ast.imports.PackageImport;
+import dyvil.tools.compiler.ast.imports.SimpleImport;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -10,7 +13,7 @@ import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class ImportParser extends Parser
+public final class ImportParser extends Parser
 {
 	public static final Name	annotation	= Name.getQualified("annotation");
 	public static final int		IMPORT		= 1;
@@ -18,13 +21,11 @@ public class ImportParser extends Parser
 	public static final int		ALIAS		= 4;
 	public static final int		MULTIIMPORT	= 8;
 	
-	protected IImport			parent;
-	protected IImportContainer	container;
+	protected IImport	theImport;
 	
-	public ImportParser(IImport parent, IImportContainer container)
+	public ImportParser(IImport container)
 	{
-		this.parent = parent;
-		this.container = container;
+		this.theImport = container;
 		this.mode = IMPORT;
 	}
 	
@@ -53,14 +54,13 @@ public class ImportParser extends Parser
 		{
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
-				MultiImport mi = new MultiImport(token, this.parent);
-				this.container.addImport(mi);
-				this.parent = mi;
-				this.container = mi;
+				MultiImport mi = new MultiImport(token);
+				this.theImport.addImport(mi);
+				this.theImport = mi;
 				
 				if (token.next().type() != Symbols.CLOSE_CURLY_BRACKET)
 				{
-					pm.pushParser(new ImportListParser(mi, mi));
+					pm.pushParser(new ImportListParser(mi));
 					this.mode = MULTIIMPORT;
 					return;
 				}
@@ -70,26 +70,24 @@ public class ImportParser extends Parser
 			}
 			if (type == Symbols.WILDCARD)
 			{
-				PackageImport pi = new PackageImport(token.raw(), this.parent);
-				this.container.addImport(pi);
+				PackageImport pi = new PackageImport(token.raw());
+				this.theImport.addImport(pi);
 				this.mode = 0;
 				return;
 			}
 			if (type == Keywords.ANNOTATION)
 			{
-				SimpleImport si = new SimpleImport(token.raw(), this.parent, annotation);
-				this.container.addImport(si);
-				this.parent = si;
-				this.container = si;
+				SimpleImport si = new SimpleImport(token.raw(), annotation);
+				this.theImport.addImport(si);
+				this.theImport = si;
 				this.mode = DOT | ALIAS;
 				return;
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				SimpleImport si = new SimpleImport(token.raw(), this.parent, token.nameValue());
-				this.container.addImport(si);
-				this.parent = si;
-				this.container = si;
+				SimpleImport si = new SimpleImport(token.raw(), token.nameValue());
+				this.theImport.addImport(si);
+				this.theImport = si;
 				this.mode = DOT | ALIAS;
 				return;
 			}
@@ -109,7 +107,7 @@ public class ImportParser extends Parser
 				IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()))
 				{
-					((SimpleImport) this.parent).setAlias(token.nameValue());
+					this.theImport.setAlias(token.nameValue());
 					pm.skip();
 					return;
 				}
@@ -122,7 +120,7 @@ public class ImportParser extends Parser
 		{
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
-				this.container.expandPosition(token);
+				this.theImport.expandPosition(token);
 				this.mode = 0;
 				return;
 			}
