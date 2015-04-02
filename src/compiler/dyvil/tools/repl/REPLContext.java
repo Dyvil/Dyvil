@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.structure.IDyvilUnit;
@@ -134,6 +135,11 @@ public class REPLContext implements IValued, IDyvilUnit
 	public boolean hasStaticImports()
 	{
 		return false;
+	}
+	
+	@Override
+	public void addOperator(Operator op)
+	{
 	}
 	
 	@Override

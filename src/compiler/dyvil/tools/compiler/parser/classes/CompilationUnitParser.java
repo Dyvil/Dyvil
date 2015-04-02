@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.IDyvilUnit;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -34,7 +35,7 @@ public class CompilationUnitParser extends Parser
 	}
 	
 	@Override
-	public void parse(IParserManager jcp, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
 		if (this.isInMode(PACKAGE))
@@ -45,7 +46,7 @@ public class CompilationUnitParser extends Parser
 				
 				PackageDecl pack = new PackageDecl(token.raw());
 				this.unit.setPackageDeclaration(pack);
-				jcp.pushParser(new PackageParser(pack));
+				pm.pushParser(new PackageParser(pack));
 				return;
 			}
 		}
@@ -56,7 +57,7 @@ public class CompilationUnitParser extends Parser
 				this.mode = IMPORT | CLASS;
 				Import i = new Import(token.raw());
 				this.unit.addImport(i);
-				jcp.pushParser(new ImportParser(i));
+				pm.pushParser(new ImportParser(i));
 				return;
 			}
 			if (type == Keywords.USING)
@@ -64,7 +65,16 @@ public class CompilationUnitParser extends Parser
 				this.mode = IMPORT | CLASS;
 				Import i = new Import(token.raw(), true);
 				this.unit.addStaticImport(i);
-				jcp.pushParser(new ImportParser(i));
+				pm.pushParser(new ImportParser(i));
+				return;
+			}
+			if (type == Keywords.OPERATOR)
+			{
+				this.mode = IMPORT | CLASS;
+				Operator operator = new Operator(token.next().nameValue());
+				this.unit.addOperator(operator);
+				pm.skip();
+				pm.pushParser(new OperatorParser(operator));
 				return;
 			}
 		}
@@ -77,7 +87,7 @@ public class CompilationUnitParser extends Parser
 			
 			CodeClass c = new CodeClass(null, this.unit);
 			this.unit.addClass(c);
-			jcp.pushParser(new ClassDeclarationParser(c), true);
+			pm.pushParser(new ClassDeclarationParser(c), true);
 			return;
 		}
 		throw new SyntaxError(token, "Invalid Token - Delete this token");

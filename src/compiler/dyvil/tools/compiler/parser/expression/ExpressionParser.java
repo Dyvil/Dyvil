@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.IType;
@@ -22,7 +23,6 @@ import dyvil.tools.compiler.parser.statement.*;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -54,11 +54,11 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int		PATTERN_END			= 0x20000;
 	
 	protected IValued			field;
-	protected int				precedence;
 	
 	private IValue				value;
 	
 	private boolean				dotless;
+	private Operator			operator;
 	private boolean				prefix;
 	
 	public ExpressionParser(IValued field)
@@ -73,7 +73,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		this.mode = VALUE;
 		this.value = null;
 		this.dotless = false;
-		this.prefix = false;
+		this.operator = null;
 	}
 	
 	@Override
@@ -131,7 +131,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				}
 				return;
 			}
-			if ((type & Tokens.SYMBOL_IDENTIFIER) == Tokens.SYMBOL_IDENTIFIER)
+			if (type == Tokens.SYMBOL_IDENTIFIER)
 			{
 				if (token.nameValue() == Name.at && token.next().type() == Symbols.OPEN_CURLY_BRACKET)
 				{
@@ -143,11 +143,10 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 					return;
 				}
 				
-				this.prefix = true;
 				this.getAccess(pm, token.nameValue(), token, type);
 				return;
 			}
-			if (ParserUtil.isIdentifier(type))
+			if ((type & Tokens.IDENTIFIER) != 0)
 			{
 				this.getAccess(pm, token.nameValue(), token, type);
 				return;
@@ -405,16 +404,35 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.prefix = false;
 				Name name = token.nameValue();
-				if (this.precedence != 0 && this.dotless)
+				if (this.prefix)
 				{
-					int p = Operators.index(name);
-					if (this.precedence >= p)
+					this.field.setValue(this.value);
+					pm.popParser(true);
+					return;
+				}
+				if (this.dotless && this.operator != null)
+				{
+					Operator operator = pm.getOperator(name);
+					int p = this.operator.precedence;
+					if (p > operator.precedence)
 					{
 						this.field.setValue(this.value);
 						pm.popParser(true);
 						return;
+					}
+					if (p == operator.precedence)
+					{
+						switch (operator.type)
+						{
+						case Operator.INFIX_LEFT:
+							this.field.setValue(this.value);
+							pm.popParser(true);
+							break;
+						case Operator.INFIX_NONE:
+							throw new SyntaxError(token, "Invalid Operator " + name + " - Operator without associativity is not allowed at this location");
+						case Operator.INFIX_RIGHT:
+						}
 					}
 				}
 				
@@ -523,18 +541,37 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.skip();
 			return;
 		}
-		if (type == Tokens.SYMBOL_IDENTIFIER || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
+		Operator op = pm.getOperator(name);
+		if (op != null || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
 		{
+			if (this.value == null || op.type == Operator.PREFIX)
+			{
+				MethodCall call = new MethodCall(token, null, name);
+				SingleArgument sa = new SingleArgument();
+				call.arguments = sa;
+				call.dotless = this.dotless;
+				this.value = call;
+				this.mode = ACCESS;
+				
+				ExpressionParser parser = new ExpressionParser(sa);
+				parser.operator = op;
+				parser.prefix = true;
+				pm.pushParser(parser);
+				return;
+			}
 			MethodCall call = new MethodCall(token, this.value, name);
-			SingleArgument sa = new SingleArgument();
-			call.arguments = sa;
-			call.dotless = this.dotless;
 			this.value = call;
 			this.mode = ACCESS;
-			
-			ExpressionParser parser = new ExpressionParser(sa);
-			parser.precedence = this.prefix ? Operators.PREFIX : Operators.index(name);
-			pm.pushParser(parser);
+			call.dotless = this.dotless;
+			if (op.type != Operator.POSTFIX)
+			{
+				SingleArgument sa = new SingleArgument();
+				call.arguments = sa;
+				
+				ExpressionParser parser = new ExpressionParser(sa);
+				parser.operator = op;
+				pm.pushParser(parser);
+			}
 			return;
 		}
 		

@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.structure;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -28,24 +29,24 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
-import dyvil.tools.compiler.phase.ICompilerPhase;
 
 public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 {
-	public final CodeFile	inputFile;
-	public final File		outputDirectory;
-	public final File		outputFile;
+	public final CodeFile			inputFile;
+	public final File				outputDirectory;
+	public final File				outputFile;
 	
-	public final String		name;
-	public Package			pack;
+	public final String				name;
+	public Package					pack;
 	
-	protected TokenIterator	tokens;
-	protected MarkerList	markers			= new MarkerList();
+	protected TokenIterator			tokens;
+	protected MarkerList			markers			= new MarkerList();
 	
-	protected PackageDecl	packageDeclaration;
-	protected List<Import>	imports			= new ArrayList();
-	protected List<Import>	staticImports	= new ArrayList();
-	protected List<IClass>	classes			= new ArrayList();
+	protected PackageDecl			packageDeclaration;
+	protected List<Import>			imports			= new ArrayList();
+	protected List<Import>			staticImports	= new ArrayList();
+	protected List<IClass>			classes			= new ArrayList();
+	protected Map<Name, Operator>	operators		= new IdentityHashMap();
 	
 	public DyvilFile(Package pack, CodeFile input, File output)
 	{
@@ -123,6 +124,12 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 		return !this.staticImports.isEmpty();
 	}
 	
+	@Override
+	public void addOperator(Operator op)
+	{
+		this.operators.put(op.name, op);
+	}
+	
 	public List<IClass> getClasses()
 	{
 		return this.classes;
@@ -166,28 +173,9 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	{
 		ParserManager manager = new ParserManager(new CompilationUnitParser(this));
 		manager.semicolonInference = true;
+		manager.operators = this.operators;
 		manager.parse(this.markers, this.tokens);
 		this.tokens = null;
-		
-		int size = this.markers.size();
-		if (size > 0)
-		{
-			StringBuilder buf = new StringBuilder("Syntax Errors in Compilation Unit '");
-			String code = this.inputFile.getCode();
-			buf.append(this.inputFile).append(": ").append(size).append("\n\n");
-			
-			for (Marker marker : this.markers)
-			{
-				marker.log(code, buf);
-			}
-			DyvilCompiler.logger.info(buf.toString());
-			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
-			
-			if (DyvilCompiler.phases.contains(ICompilerPhase.PRINT))
-			{
-				DyvilCompiler.logger.info("Code:\n" + this.toString());
-			}
-		}
 	}
 	
 	@Override
@@ -431,6 +419,20 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 			{
 				buffer.append(prefix);
 				iimport.toString(prefix, buffer);
+				buffer.append(";\n");
+			}
+			if (Formatting.Import.newLine)
+			{
+				buffer.append('\n');
+			}
+		}
+		
+		if (!this.operators.isEmpty())
+		{
+			for (Entry<Name, Operator> entry : this.operators.entrySet())
+			{
+				buffer.append(prefix);
+				entry.getValue().toString(buffer);
 				buffer.append(";\n");
 			}
 			if (Formatting.Import.newLine)

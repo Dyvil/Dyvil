@@ -42,7 +42,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
-	private static final int	INLINABLE	= (Modifiers.STATIC | Modifiers.PRIVATE | Modifiers.INLINE);
+	private static final int	INLINABLE	= Modifiers.INLINE;
 	
 	protected IClass			theClass;
 	
@@ -749,7 +749,7 @@ public class Method extends Member implements IMethod
 				marker.addInfo("Value Type: " + instance.getType());
 				
 			}
-			return instance;
+			return null;
 		}
 		
 		if ((this.modifiers & Modifiers.VARARGS) != 0)

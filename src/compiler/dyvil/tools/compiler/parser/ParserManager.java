@@ -1,6 +1,11 @@
 package dyvil.tools.compiler.parser;
 
+import java.util.Map;
+
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -12,13 +17,14 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ParserManager implements IParserManager
 {
-	protected Parser		parser;
+	protected Parser			parser;
 	
-	public boolean			semicolonInference;
+	public boolean				semicolonInference;
+	public Map<Name, Operator>	operators;
 	
-	protected TokenIterator	tokens;
-	protected int			skip;
-	protected boolean		reparse;
+	protected TokenIterator		tokens;
+	protected int				skip;
+	protected boolean			reparse;
 	
 	public ParserManager()
 	{
@@ -184,6 +190,17 @@ public final class ParserManager implements IParserManager
 		semicolon.setNext(token);
 		prev.setNext(semicolon);
 		return true;
+	}
+	
+	@Override
+	public Operator getOperator(Name name)
+	{
+		Operator op = this.operators.get(name);
+		if (op != null)
+		{
+			return op;
+		}
+		return Operators.map.get(name);
 	}
 	
 	@Override

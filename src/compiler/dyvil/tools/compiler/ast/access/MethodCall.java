@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -25,7 +26,6 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.ConstantFolder;
-import dyvil.tools.compiler.transform.Operators;
 import dyvil.tools.compiler.util.Util;
 
 public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeList, ITypeContext

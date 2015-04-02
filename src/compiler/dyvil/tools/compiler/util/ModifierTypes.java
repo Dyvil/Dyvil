@@ -333,8 +333,6 @@ public enum ModifierTypes
 			return Modifiers.ABSTRACT;
 		case Keywords.FINAL:
 			return Modifiers.FINAL;
-		case Keywords.STRICTFP:
-			return Modifiers.STRICT;
 		case Keywords.FUNCTIONAL:
 			return Modifiers.FUNCTIONAL;
 		case Keywords.CASE:
@@ -353,10 +351,6 @@ public enum ModifierTypes
 			return Modifiers.FINAL;
 		case Keywords.CONST:
 			return Modifiers.CONST;
-		case Keywords.TRANSIENT:
-			return Modifiers.TRANSIENT;
-		case Keywords.VOLATILE:
-			return Modifiers.VOLATILE;
 		case Keywords.LAZY:
 			return Modifiers.LAZY;
 		}
@@ -375,12 +369,8 @@ public enum ModifierTypes
 			return Modifiers.CONST;
 		case Keywords.SYNCHRONIZED:
 			return Modifiers.SYNCHRONIZED;
-		case Keywords.NATIVE:
-			return Modifiers.NATIVE;
 		case Keywords.ABSTRACT:
 			return Modifiers.ABSTRACT;
-		case Keywords.STRICTFP:
-			return Modifiers.STRICT;
 		case Keywords.INLINE:
 			return Modifiers.INLINE;
 		case Keywords.INFIX:

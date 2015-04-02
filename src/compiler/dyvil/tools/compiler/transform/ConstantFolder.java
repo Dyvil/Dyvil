@@ -141,15 +141,15 @@ public class ConstantFolder
 		{
 			return new IntValue(v1.intValue() ^ v2.intValue());
 		}
-		if (op == Name.lessLess)
+		if (op == Name.ltlt)
 		{
 			return new IntValue(v1.intValue() << v2.intValue());
 		}
-		if (op == Name.greaterGreater)
+		if (op == Name.gtgt)
 		{
 			return new IntValue(v1.intValue() >> v2.intValue());
 		}
-		if (op == Name.greaterGreaterGreater)
+		if (op == Name.gtgtgt)
 		{
 			return new IntValue(v1.intValue() >>> v2.intValue());
 		}
@@ -192,15 +192,15 @@ public class ConstantFolder
 		{
 			return new LongValue(v1.longValue() ^ v2.longValue());
 		}
-		if (op == Name.lessLess)
+		if (op == Name.ltlt)
 		{
 			return new LongValue(v1.longValue() << v2.longValue());
 		}
-		if (op == Name.greaterGreater)
+		if (op == Name.gtgt)
 		{
 			return new LongValue(v1.longValue() >> v2.longValue());
 		}
-		if (op == Name.greaterGreaterGreater)
+		if (op == Name.gtgtgt)
 		{
 			return new LongValue(v1.longValue() >>> v2.longValue());
 		}

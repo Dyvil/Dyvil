@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.structure;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.imports.Import;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.operator.Operator;
 
 public interface IDyvilUnit extends IContext
 {
@@ -25,6 +26,8 @@ public interface IDyvilUnit extends IContext
 	public void addStaticImport(Import i);
 	
 	public boolean hasStaticImports();
+	
+	public void addOperator(Operator op);
 	
 	// Classes
 	
