@@ -81,18 +81,21 @@ public class Field extends Member implements IField
 	@Override
 	public boolean addRawAnnotation(String type)
 	{
-		if ("dyvil.lang.annotation.lazy".equals(type))
+		switch (type)
 		{
+		case "dyvil.lang.annotation.lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
-		}
-		if ("dyvil.lang.annotation.sealed".equals(type))
-		{
+		case "dyvil.lang.annotation.sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
-		}
-		if ("java.lang.Deprecated".equals(type))
-		{
+		case "dyvil.lang.annotation.Transient":
+			this.modifiers |= Modifiers.TRANSIENT;
+			return false;
+		case "dyvil.lang.annotation.Volatile":
+			this.modifiers |= Modifiers.VOLATILE;
+			return false;
+		case "java.lang.Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
 			return false;
 		}

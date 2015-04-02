@@ -179,18 +179,18 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean addRawAnnotation(String type)
 	{
-		if ("dyvil.lang.annotation.sealed".equals(type))
+		switch (type)
 		{
+		case "dyvil.lang.annotation.sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
-		}
-		if ("java.lang.Deprecated".equals(type))
-		{
+		case "dyvil.lang.annotation.Strict":
+			this.modifiers |= Modifiers.STRICT;
+			return false;
+		case "java.lang.Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
 			return false;
-		}
-		if ("java.lang.FunctionalInterface".equals(type))
-		{
+		case "java.lang.FunctionalInterface":
 			this.modifiers |= Modifiers.FUNCTIONAL;
 			return false;
 		}

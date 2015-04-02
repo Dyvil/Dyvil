@@ -212,6 +212,12 @@ public class Method extends Member implements IMethod
 		case "dyvil.lang.annotation.sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
+		case "dyvil.lang.annotation.Native":
+			this.modifiers |= Modifiers.NATIVE;
+			return false;
+		case "dyvil.lang.annotation.Strict":
+			this.modifiers |= Modifiers.STRICT;
+			return false;
 		case "java.lang.Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
 			return false;

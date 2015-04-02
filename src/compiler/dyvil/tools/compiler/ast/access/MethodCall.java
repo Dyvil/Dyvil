@@ -529,9 +529,9 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		{
 			marker.addInfo("Instance Type: " + this.instance.getType());
 		}
-		StringBuilder builder = new StringBuilder("Argument Types: {");
+		StringBuilder builder = new StringBuilder("Argument Types: ");
 		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.append('}').toString());
+		marker.addInfo(builder.toString());
 	}
 	
 	@Override

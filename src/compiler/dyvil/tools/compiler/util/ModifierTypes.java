@@ -178,7 +178,7 @@ public enum ModifierTypes
 		}
 		if ((mod & Modifiers.STRICT) == Modifiers.STRICT)
 		{
-			sb.append("strictfp ");
+			sb.append("@Strict ");
 		}
 		if ((mod & Modifiers.FUNCTIONAL) == Modifiers.FUNCTIONAL)
 		{
@@ -214,11 +214,11 @@ public enum ModifierTypes
 		
 		if ((mod & Modifiers.TRANSIENT) == Modifiers.TRANSIENT)
 		{
-			sb.append("transient ");
+			sb.append("@Transient ");
 		}
 		if ((mod & Modifiers.VOLATILE) == Modifiers.VOLATILE)
 		{
-			sb.append("volatile ");
+			sb.append("@Volatile ");
 		}
 	}
 	
@@ -247,7 +247,7 @@ public enum ModifierTypes
 		}
 		if ((mod & Modifiers.NATIVE) == Modifiers.NATIVE)
 		{
-			sb.append("native ");
+			sb.append("@Native ");
 		}
 		if ((mod & Modifiers.ABSTRACT) == Modifiers.ABSTRACT)
 		{
@@ -255,7 +255,7 @@ public enum ModifierTypes
 		}
 		if ((mod & Modifiers.STRICT) == Modifiers.STRICT)
 		{
-			sb.append("strictfp ");
+			sb.append("@Strict ");
 		}
 		if ((mod & Modifiers.INLINE) == Modifiers.INLINE)
 		{

@@ -293,7 +293,7 @@ public final class DyvilCompiler
 			units.add(dwt);
 			return;
 		}
-		if (fileName.endsWith(".dyvil"))
+		if (fileName.endsWith(".dyvil") || fileName.endsWith(".dyv"))
 		{
 			DyvilUnit unit = new DyvilUnit(pack, (CodeFile) source, output);
 			pack.addCompilationUnit(unit);

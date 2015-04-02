@@ -114,13 +114,13 @@ public interface AccessResolver
 					else
 					{
 						next.setValue(curr);
-						curr.addResolveError(markers);
+						next.addResolveError(markers);
 					}
 				}
 				else
 				{
 					next.setValue(curr);
-					curr.addResolveError(markers);
+					next.addResolveError(markers);
 				}
 			}
 			next = curr;
