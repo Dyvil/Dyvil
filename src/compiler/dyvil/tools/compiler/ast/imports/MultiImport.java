@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
@@ -17,9 +16,10 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class MultiImport extends ASTNode implements IImport
+public final class MultiImport extends ASTNode implements IImport
 {
-	public List<IImport>	children	= new ArrayList();
+	private IImport[]	children	= new IImport[2];
+	private int			childrenCount;
 	
 	public MultiImport(ICodePosition position)
 	{
@@ -29,24 +29,31 @@ public class MultiImport extends ASTNode implements IImport
 	@Override
 	public void addImport(IImport iimport)
 	{
-		this.children.add(iimport);
+		int index = this.childrenCount++;
+		if (index >= this.children.length)
+		{
+			IImport[] temp = new IImport[index];
+			System.arraycopy(children, 0, temp, 0, children.length);
+			this.children = temp;
+		}
+		this.children[index] = iimport;
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic)
+	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
-		for (IImport i : this.children)
+		for (int i = 0; i < this.childrenCount; i++)
 		{
-			i.resolveTypes(markers, context, isStatic);
+			this.children[i].resolveTypes(markers, context, using);
 		}
 	}
 	
 	@Override
 	public Package resolvePackage(Name name)
 	{
-		for (IImport i : this.children)
+		for (int i = 0; i < this.childrenCount; i++)
 		{
-			Package pack = i.resolvePackage(name);
+			Package pack = this.children[i].resolvePackage(name);
 			if (pack != null)
 			{
 				return pack;
@@ -58,9 +65,9 @@ public class MultiImport extends ASTNode implements IImport
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		for (IImport i : this.children)
+		for (int i = 0; i < this.childrenCount; i++)
 		{
-			IClass iclass = i.resolveClass(name);
+			IClass iclass = this.children[i].resolveClass(name);
 			if (iclass != null)
 			{
 				return iclass;
@@ -72,9 +79,9 @@ public class MultiImport extends ASTNode implements IImport
 	@Override
 	public IField resolveField(Name name)
 	{
-		for (IImport i : this.children)
+		for (int i = 0; i < this.childrenCount; i++)
 		{
-			IField match = i.resolveField(name);
+			IField match = this.children[i].resolveField(name);
 			if (match != null)
 			{
 				return match;
@@ -86,9 +93,9 @@ public class MultiImport extends ASTNode implements IImport
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		for (IImport i : this.children)
+		for (int i = 0; i < this.childrenCount; i++)
 		{
-			i.getMethodMatches(list, instance, name, arguments);
+			this.children[i].getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	
@@ -96,7 +103,7 @@ public class MultiImport extends ASTNode implements IImport
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Import.multiImportStart);
-		Util.astToString(prefix, this.children, Formatting.Import.multiImportSeperator, buffer);
+		Util.astToString(prefix, this.children, this.childrenCount, Formatting.Import.multiImportSeperator, buffer);
 		buffer.append(Formatting.Import.multiImportEnd);
 	}
 }

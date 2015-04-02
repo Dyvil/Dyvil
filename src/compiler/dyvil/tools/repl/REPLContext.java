@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.imports.Import;
+import dyvil.tools.compiler.ast.imports.HeaderComponent;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -21,13 +21,13 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
-import dyvil.tools.compiler.ast.structure.IDyvilUnit;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class REPLContext implements IValued, IDyvilUnit
+public class REPLContext implements IValued, IDyvilHeader
 {
 	private int					resultIndex;
 	
@@ -97,6 +97,12 @@ public class REPLContext implements IValued, IDyvilUnit
 	}
 	
 	@Override
+	public String getName()
+	{
+		return "REPL";
+	}
+	
+	@Override
 	public void setPackage(Package pack)
 	{
 		// unsupported
@@ -122,12 +128,12 @@ public class REPLContext implements IValued, IDyvilUnit
 	}
 	
 	@Override
-	public void addImport(Import i)
+	public void addImport(HeaderComponent i)
 	{
 	}
 	
 	@Override
-	public void addStaticImport(Import i)
+	public void addStaticImport(HeaderComponent i)
 	{
 	}
 	
@@ -140,6 +146,12 @@ public class REPLContext implements IValued, IDyvilUnit
 	@Override
 	public void addOperator(Operator op)
 	{
+	}
+	
+	@Override
+	public Operator getOperator(Name name)
+	{
+		return null;
 	}
 	
 	@Override

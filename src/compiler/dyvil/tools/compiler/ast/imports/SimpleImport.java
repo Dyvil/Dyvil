@@ -65,9 +65,9 @@ public final class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic)
+	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
-		if (isStatic && this.child == null)
+		if (using && this.child == null)
 		{
 			if (!(context instanceof IClass))
 			{
@@ -99,7 +99,7 @@ public final class SimpleImport extends ASTNode implements IImport
 				return;
 			}
 			
-			markers.add(this.position, "resolve.method_field", this.name);
+			markers.add(this.position, "resolve.method_field", this.name.qualified);
 			return;
 		}
 		
@@ -109,7 +109,7 @@ public final class SimpleImport extends ASTNode implements IImport
 			this.thePackage = pack;
 			if (this.child != null)
 			{
-				this.child.resolveTypes(markers, pack, isStatic);
+				this.child.resolveTypes(markers, pack, using);
 			}
 			return;
 		}
@@ -120,12 +120,12 @@ public final class SimpleImport extends ASTNode implements IImport
 			this.theClass = iclass;
 			if (this.child != null)
 			{
-				this.child.resolveTypes(markers, iclass, isStatic);
+				this.child.resolveTypes(markers, iclass, using);
 			}
 			return;
 		}
 		
-		markers.add(this.position, "resolve.package", this.name);
+		markers.add(this.position, "resolve.package", this.name.qualified);
 	}
 	
 	@Override

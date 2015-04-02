@@ -12,7 +12,8 @@ import org.objectweb.asm.Opcodes;
 import dyvil.io.AppendableOutputStream;
 import dyvil.io.LoggerOutputStream;
 import dyvil.tools.compiler.ast.dwt.DWTFile;
-import dyvil.tools.compiler.ast.structure.DyvilFile;
+import dyvil.tools.compiler.ast.structure.DyvilUnit;
+import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
@@ -285,19 +286,26 @@ public final class DyvilCompiler
 		{
 			return;
 		}
-		else if (fileName.endsWith(".dwt"))
+		files.add(output);
+		if (fileName.endsWith(".dwt"))
 		{
 			DWTFile dwt = new DWTFile(pack, (CodeFile) source, output);
-			output = dwt.outputFile;
 			units.add(dwt);
+			return;
 		}
-		else if (fileName.endsWith(".dyvil"))
+		if (fileName.endsWith(".dyvil"))
 		{
-			DyvilFile unit = new DyvilFile(pack, (CodeFile) source, output);
-			output = unit.outputFile;
+			DyvilUnit unit = new DyvilUnit(pack, (CodeFile) source, output);
 			pack.addCompilationUnit(unit);
 			units.add(unit);
+			return;
 		}
-		files.add(output);
+		if (fileName.endsWith(".dyh"))
+		{
+			DyvilHeader header = new DyvilHeader(pack, (CodeFile) source, output);
+			pack.addCompilationUnit(header);
+			units.add(0, header);
+			return;
+		}
 	}
 }

@@ -134,7 +134,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		String s = "J" + StringUtils.toTitleCase(this.name.qualified);
-		this.theClass = DWTFile.javaxSwing.resolveClass(Name.getQualified(s));
+		this.theClass = DWTFile.javaxSwing.resolveClass(s);
 		
 		if (this.theClass == null)
 		{

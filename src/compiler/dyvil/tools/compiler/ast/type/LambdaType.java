@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
@@ -94,7 +93,7 @@ public final class LambdaType extends Type implements ITyped, ITypeList
 			return iclass;
 		}
 		
-		iclass = Package.dyvilLangFunction.resolveClass(Name.getQualified("Function" + this.parameterCount));
+		iclass = Package.dyvilLangFunction.resolveClass("Function" + this.parameterCount);
 		functionClasses[this.parameterCount] = iclass;
 		this.theClass = iclass;
 		return iclass;

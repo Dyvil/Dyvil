@@ -29,7 +29,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.IDyvilUnit;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -45,7 +45,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
 {
-	protected IDyvilUnit			unit;
+	protected IDyvilHeader			unit;
 	protected IClass				outerClass;
 	
 	protected Annotation[]			annotations;
@@ -79,7 +79,7 @@ public class CodeClass extends ASTNode implements IClass
 		this.type = new Type(this);
 	}
 	
-	public CodeClass(ICodePosition position, IDyvilUnit unit)
+	public CodeClass(ICodePosition position, IDyvilHeader unit)
 	{
 		this.position = position;
 		this.unit = unit;
@@ -87,7 +87,7 @@ public class CodeClass extends ASTNode implements IClass
 		this.interfaces = new IType[1];
 	}
 	
-	public CodeClass(ICodePosition position, IDyvilUnit unit, int modifiers)
+	public CodeClass(ICodePosition position, IDyvilHeader unit, int modifiers)
 	{
 		this.position = position;
 		this.unit = unit;
@@ -97,7 +97,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public IDyvilUnit getUnit()
+	public IDyvilHeader getUnit()
 	{
 		return this.unit;
 	}

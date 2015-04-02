@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -25,7 +25,7 @@ import dyvil.tools.compiler.library.Library;
 
 public class Package implements INamed, IContext
 {
-	public static Package		rootPackage	= new RootPackage();
+	public static RootPackage	rootPackage	= new RootPackage();
 	
 	public static Package		dyvil;
 	public static Package		dyvilLang;
@@ -42,7 +42,7 @@ public class Package implements INamed, IContext
 	public String				fullName;
 	public String				internalName;
 	
-	public List<DyvilFile>		units		= new ArrayList();
+	public List<IDyvilHeader>		units		= new ArrayList();
 	public List<IClass>			classes		= new ArrayList();
 	public Map<String, Package>	subPackages	= new HashMap();
 	
@@ -96,7 +96,7 @@ public class Package implements INamed, IContext
 	
 	// Units
 	
-	public void addCompilationUnit(DyvilFile unit)
+	public void addCompilationUnit(IDyvilHeader unit)
 	{
 		this.units.add(unit);
 	}
@@ -154,13 +154,13 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
-	public Type getThisType()
+	public IType getThisType()
 	{
 		return null;
 	}
 	
 	@Override
-	public final Package resolvePackage(Name name)
+	public Package resolvePackage(Name name)
 	{
 		return this.resolvePackage(name.qualified);
 	}
@@ -170,8 +170,20 @@ public class Package implements INamed, IContext
 		return this.subPackages.get(name);
 	}
 	
+	public IDyvilHeader resolveHeader(String name)
+	{
+		for (IDyvilHeader unit : this.units)
+		{
+			if (unit.getName().equals(name))
+			{
+				return unit;
+			}
+		}
+		return null;
+	}
+	
 	@Override
-	public final IClass resolveClass(Name name)
+	public IClass resolveClass(Name name)
 	{
 		return this.resolveClass(name.qualified);
 	}
@@ -190,33 +202,31 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
+	public IField resolveField(Name name)
+	{
+		return null;
+	}
+	
+	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public IField resolveField(Name name)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		throw new UnsupportedOperationException();
 	}
 	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
-		throw new UnsupportedOperationException();
 	}
 	
 	@Override
 	public byte getAccessibility(IMember member)
 	{
-		throw new UnsupportedOperationException();
+		return 0;
 	}
 	
 	@Override

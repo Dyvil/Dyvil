@@ -31,9 +31,9 @@ public final class PackageImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic)
+	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
-		if (isStatic)
+		if (using)
 		{
 			if (!(context instanceof IClass))
 			{
@@ -51,13 +51,13 @@ public final class PackageImport extends ASTNode implements IImport
 	@Override
 	public Package resolvePackage(Name name)
 	{
-		return this.thePackage.resolvePackage(name);
+		return this.thePackage.resolvePackage(name.qualified);
 	}
 	
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.thePackage.resolveClass(name);
+		return this.thePackage.resolveClass(name.qualified);
 	}
 	
 	@Override

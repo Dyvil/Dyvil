@@ -1,17 +1,16 @@
 package dyvil.tools.compiler.ast.structure;
 
 import java.io.File;
-import java.util.*;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.imports.Import;
+import dyvil.tools.compiler.ast.imports.HeaderComponent;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -20,17 +19,15 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.parser.classes.CompilationUnitParser;
+import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 
-public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
+public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
 	public final CodeFile			inputFile;
 	public final File				outputDirectory;
@@ -43,12 +40,17 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	protected MarkerList			markers			= new MarkerList();
 	
 	protected PackageDecl			packageDeclaration;
-	protected List<Import>			imports			= new ArrayList();
-	protected List<Import>			staticImports	= new ArrayList();
-	protected List<IClass>			classes			= new ArrayList();
+	
+	protected HeaderComponent[]				imports			= new HeaderComponent[5];
+	protected int					importCount;
+	protected HeaderComponent[]				staticImports	= new HeaderComponent[1];
+	protected int					staticImportCount;
+	protected HeaderComponent[]				includes		= new HeaderComponent[2];
+	protected int					includeCount;
+	
 	protected Map<Name, Operator>	operators		= new IdentityHashMap();
 	
-	public DyvilFile(Package pack, CodeFile input, File output)
+	public DyvilHeader(Package pack, CodeFile input, File output)
 	{
 		this.pack = pack;
 		this.inputFile = input;
@@ -63,6 +65,12 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 		end = name.lastIndexOf('.');
 		this.outputDirectory = new File(name.substring(0, start));
 		this.outputFile = new File(name.substring(0, end) + ".class");
+	}
+	
+	@Override
+	public String getName()
+	{
+		return this.name;
 	}
 	
 	@Override
@@ -101,27 +109,36 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 		return this.packageDeclaration;
 	}
 	
-	public List<Import> getImports()
+	@Override
+	public void addImport(HeaderComponent component)
 	{
-		return this.imports;
+		int index = this.importCount++;
+		if (index >= this.imports.length)
+		{
+			HeaderComponent[] temp = new HeaderComponent[index];
+			System.arraycopy(imports, 0, temp, 0, imports.length);
+			this.imports = temp;
+		}
+		this.imports[index] = component;
 	}
 	
 	@Override
-	public void addImport(Import iimport)
+	public void addStaticImport(HeaderComponent component)
 	{
-		this.imports.add(iimport);
-	}
-	
-	@Override
-	public void addStaticImport(Import iimport)
-	{
-		this.staticImports.add(iimport);
+		int index = this.staticImportCount++;
+		if (index >= this.staticImports.length)
+		{
+			HeaderComponent[] temp = new HeaderComponent[index];
+			System.arraycopy(staticImports, 0, temp, 0, staticImports.length);
+			this.staticImports = temp;
+		}
+		this.staticImports[index] = component;
 	}
 	
 	@Override
 	public boolean hasStaticImports()
 	{
-		return !this.staticImports.isEmpty();
+		return this.staticImportCount > 0;
 	}
 	
 	@Override
@@ -130,36 +147,15 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 		this.operators.put(op.name, op);
 	}
 	
-	public List<IClass> getClasses()
+	@Override
+	public Operator getOperator(Name name)
 	{
-		return this.classes;
+		return this.operators.get(name);
 	}
 	
 	@Override
 	public void addClass(IClass iclass)
 	{
-		this.classes.add(iclass);
-		this.pack.addClass(iclass);
-	}
-	
-	@Override
-	public String getFullName(String name)
-	{
-		if (!name.equals(this.name))
-		{
-			name = this.name + '.' + name;
-		}
-		return this.pack.fullName + '.' + name;
-	}
-	
-	@Override
-	public String getInternalName(String name)
-	{
-		if (!name.equals(this.name))
-		{
-			name = this.name + '$' + name;
-		}
-		return this.pack.internalName + name;
 	}
 	
 	@Override
@@ -171,7 +167,7 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	@Override
 	public void parse()
 	{
-		ParserManager manager = new ParserManager(new CompilationUnitParser(this));
+		ParserManager manager = new ParserManager(new DyvilHeaderParser(this));
 		manager.semicolonInference = true;
 		manager.operators = this.operators;
 		manager.parse(this.markers, this.tokens);
@@ -181,108 +177,41 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	@Override
 	public void resolveTypes()
 	{
-		for (Import i : this.imports)
+		for (int i = 0; i < this.importCount; i++)
 		{
-			i.resolveTypes(this.markers, this, false);
+			this.imports[i].resolveTypes(this.markers, this, false);
 		}
 		
-		for (Import i : this.staticImports)
+		for (int i = 0; i < this.staticImportCount; i++)
 		{
-			i.resolveTypes(this.markers, this, true);
-		}
-		
-		for (IClass i : this.classes)
-		{
-			i.resolveTypes(this.markers, this);
+			this.staticImports[i].resolveTypes(this.markers, this, true);
 		}
 	}
 	
 	@Override
 	public void resolve()
 	{
-		for (IClass i : this.classes)
-		{
-			i.resolve(this.markers, this);
-		}
 	}
 	
 	@Override
 	public void checkTypes()
 	{
-		for (IClass i : this.classes)
-		{
-			i.checkTypes(this.markers, this);
-		}
 	}
 	
 	@Override
 	public void check()
 	{
 		this.pack.check(this.packageDeclaration, this.inputFile, this.markers);
-		
-		for (IClass i : this.classes)
-		{
-			i.check(this.markers, this);
-		}
 	}
 	
 	@Override
 	public void foldConstants()
 	{
-		for (IClass i : this.classes)
-		{
-			i.foldConstants();
-		}
 	}
 	
 	@Override
 	public void compile()
 	{
-		int size = this.markers.size();
-		if (size > 0)
-		{
-			StringBuilder buf = new StringBuilder("Problems in Dyvil File ").append(this.inputFile).append(":\n\n");
-			String code = this.inputFile.getCode();
-			
-			int warnings = this.markers.getWarnings();
-			int errors = this.markers.getErrors();
-			this.markers.sort();
-			for (Marker marker : this.markers)
-			{
-				marker.log(code, buf);
-			}
-			buf.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
-			DyvilCompiler.logger.info(buf.toString());
-			if (errors > 0)
-			{
-				DyvilCompiler.logger.warning(this.name + " was not compiled due to errors in the Compilation Unit\n");
-				return;
-			}
-		}
-		
-		for (IClass iclass : this.classes)
-		{
-			String name = iclass.getName().qualified;
-			if (!name.equals(this.name))
-			{
-				name = this.name + "$" + name;
-			}
-			File file = new File(this.outputDirectory, name + ".class");
-			ClassWriter.saveClass(file, iclass);
-			
-			IClassBody body = iclass.getBody();
-			if (body != null)
-			{
-				int len = body.classCount();
-				for (int i = 0; i < len; i++)
-				{
-					IClass iclass1 = body.getClass(i);
-					name = this.name + "$" + iclass1.getName().qualified + ".class";
-					file = new File(this.outputDirectory, name);
-					ClassWriter.saveClass(file, iclass1);
-				}
-			}
-		}
 	}
 	
 	@Override
@@ -306,43 +235,35 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		// Own classes
-		for (IClass c : this.classes)
-		{
-			if (c.getName() == name)
-			{
-				return c;
-			}
-		}
-		
 		IClass iclass;
-		
 		// Imported Classes
-		for (Import i : this.imports)
+		for (int i = 0; i < this.importCount; i++)
 		{
-			iclass = i.resolveClass(name);
+			iclass = this.imports[i].resolveClass(name);
 			if (iclass != null)
 			{
 				return iclass;
 			}
 		}
 		
+		String qualified = name.qualified;
+		
 		// Package Classes
-		iclass = this.pack.resolveClass(name);
+		iclass = this.pack.resolveClass(qualified);
 		if (iclass != null)
 		{
 			return iclass;
 		}
 		
 		// Standart Dyvil Classes
-		iclass = Package.dyvilLang.resolveClass(name);
+		iclass = Package.dyvilLang.resolveClass(qualified);
 		if (iclass != null)
 		{
 			return iclass;
 		}
 		
 		// Standart Java Classes
-		return Package.javaLang.resolveClass(name);
+		return Package.javaLang.resolveClass(qualified);
 	}
 	
 	@Override
@@ -354,9 +275,9 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	@Override
 	public IField resolveField(Name name)
 	{
-		for (Import i : this.staticImports)
+		for (int i = 0; i < this.staticImportCount; i++)
 		{
-			IField field = i.resolveField(name);
+			IField field = this.staticImports[i].resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -368,9 +289,9 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		for (Import i : this.staticImports)
+		for (int i = 0; i < this.staticImportCount; i++)
 		{
-			i.getMethodMatches(list, instance, name, arguments);
+			this.staticImports[i].getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	
@@ -383,6 +304,34 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 	public byte getAccessibility(IMember member)
 	{
 		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public String getFullName(String name)
+	{
+		if (!name.equals(this.name))
+		{
+			name = this.name + '.' + name;
+		}
+		return this.pack.fullName + '.' + name;
+	}
+	
+	@Override
+	public String getInternalName(String name)
+	{
+		if (!name.equals(this.name))
+		{
+			name = this.name + '$' + name;
+		}
+		return this.pack.internalName + name;
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder buf = new StringBuilder();
+		this.toString("", buf);
+		return buf.toString();
 	}
 	
 	@Override
@@ -399,12 +348,12 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 			}
 		}
 		
-		if (!this.imports.isEmpty())
+		if (this.importCount > 0)
 		{
-			for (Import iimport : this.imports)
+			for (int i = 0; i < this.importCount; i++)
 			{
 				buffer.append(prefix);
-				iimport.toString(prefix, buffer);
+				this.imports[i].toString(prefix, buffer);
 				buffer.append(";\n");
 			}
 			if (Formatting.Import.newLine)
@@ -413,12 +362,12 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 			}
 		}
 		
-		if (!this.staticImports.isEmpty())
+		if (this.staticImportCount > 0)
 		{
-			for (Import iimport : this.staticImports)
+			for (int i = 0; i < this.staticImportCount; i++)
 			{
 				buffer.append(prefix);
-				iimport.toString(prefix, buffer);
+				this.staticImports[i].toString(prefix, buffer);
 				buffer.append(";\n");
 			}
 			if (Formatting.Import.newLine)
@@ -436,16 +385,6 @@ public class DyvilFile extends ASTNode implements ICompilationUnit, IDyvilUnit
 				buffer.append(";\n");
 			}
 			if (Formatting.Import.newLine)
-			{
-				buffer.append('\n');
-			}
-		}
-		
-		for (IClass iclass : this.classes)
-		{
-			iclass.toString(prefix, buffer);
-			
-			if (Formatting.Class.newLine)
 			{
 				buffer.append('\n');
 			}

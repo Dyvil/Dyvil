@@ -3,18 +3,19 @@ package dyvil.tools.compiler.ast.imports;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.IASTNode;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public interface IImport extends IASTNode, IContext
+public interface IImport extends IASTNode
 {
-	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic);
+	public void resolveTypes(MarkerList markers, IContext context, boolean using);
 	
 	public void addImport(IImport iimport);
 	
@@ -25,32 +26,11 @@ public interface IImport extends IASTNode, IContext
 	
 	public default void setAlias(Name alias) {}
 	
-	@Override
-	public default boolean isStatic()
-	{
-		return false;
-	}
+	public Package resolvePackage(Name name);
 	
-	@Override
-	public default IType getThisType()
-	{
-		return null;
-	}
+	public IClass resolveClass(Name name);
 	
-	@Override
-	public default ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
+	public IField resolveField(Name name);
 	
-	@Override
-	public default void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public default byte getAccessibility(IMember member)
-	{
-		return READ_WRITE_ACCESS;
-	}
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
 }

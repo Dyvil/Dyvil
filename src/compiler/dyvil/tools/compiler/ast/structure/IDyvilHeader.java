@@ -1,12 +1,15 @@
 package dyvil.tools.compiler.ast.structure;
 
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.imports.Import;
+import dyvil.tools.compiler.ast.imports.HeaderComponent;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 
-public interface IDyvilUnit extends IContext
+public interface IDyvilHeader extends IContext
 {
+	public String getName();
+	
 	// Package
 	
 	public void setPackage(Package pack);
@@ -19,15 +22,19 @@ public interface IDyvilUnit extends IContext
 	
 	public PackageDecl getPackageDeclaration();
 	
-	// Imports
+	// Include
 	
-	public void addImport(Import i);
+	public void addImport(HeaderComponent i);
 	
-	public void addStaticImport(Import i);
+	public void addStaticImport(HeaderComponent i);
 	
 	public boolean hasStaticImports();
 	
+	// Operators
+	
 	public void addOperator(Operator op);
+	
+	public Operator getOperator(Name name);
 	
 	// Classes
 	

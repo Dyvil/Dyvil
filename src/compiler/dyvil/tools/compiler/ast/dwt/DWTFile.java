@@ -114,7 +114,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 	@Override
 	public void resolveTypes()
 	{
-		this.rootNode.resolveTypes(this.markers, javaxSwing);
+		this.rootNode.resolveTypes(this.markers, Package.rootPackage);
 		this.rootNode.addFields(this.fields);
 	}
 	
@@ -127,7 +127,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 			this.markers.add(this.position, "dwt.component.constructor");
 		}
 		
-		this.rootNode.resolve(this.markers, javaxSwing);
+		this.rootNode.resolve(this.markers, Package.rootPackage);
 	}
 	
 	@Override

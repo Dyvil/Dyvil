@@ -6,33 +6,31 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class Import extends ASTNode implements IImport
+public final class HeaderComponent extends ASTNode implements IImport
 {
-	public IImport	theImport;
-	public IImport	last;
-	public boolean	isStatic;
+	public static final int	IMPORT	= 0;
+	public static final int	USING	= 1;
 	
-	public Import(ICodePosition position)
+	public IImport			theImport;
+	public IImport			last;
+	public boolean			isStatic;
+	
+	public HeaderComponent(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public Import(ICodePosition position, boolean isStatic)
+	public HeaderComponent(ICodePosition position, boolean isStatic)
 	{
 		this.position = position;
-		this.isStatic = isStatic;
 	}
 	
 	@Override
@@ -61,18 +59,6 @@ public final class Import extends ASTNode implements IImport
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
-	public IType getThisType()
-	{
-		return null;
-	}
-	
-	@Override
 	public Package resolvePackage(Name name)
 	{
 		return this.last.resolvePackage(name);
@@ -91,26 +77,9 @@ public final class Import extends ASTNode implements IImport
 	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		this.last.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public byte getAccessibility(IMember member)
-	{
-		return 0;
 	}
 	
 	@Override
@@ -124,7 +93,6 @@ public final class Import extends ASTNode implements IImport
 		{
 			buffer.append("import ");
 		}
-		
 		this.theImport.toString(prefix, buffer);
 	}
 }
