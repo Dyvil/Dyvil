@@ -98,35 +98,50 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		if (this.then == null)
+		{
+			return null;
+		}
+		
+		IValue then1 = this.then.withType(type);
+		if (then1 == null)
+		{
+			return null;
+		}
+		this.then = then1;
+		
+		if (this.elseThen != null)
+		{
+			then1 = this.elseThen.withType(type);
+			if (then1 == null)
+			{
+				return null;
+			}
+			this.elseThen = then1;
+		}
+		
+		this.commonType = type;
+		return this;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID || type == Types.UNKNOWN)
+		if (type == Types.VOID)
 		{
 			return true;
 		}
-		
-		if (this.commonType != null)
+		if (this.then != null && !this.then.isType(type))
 		{
-			return type.isSuperTypeOf(this.commonType);
+			return false;
 		}
-		
-		if (this.then != null)
+		if (this.elseThen != null && !this.elseThen.isType(type))
 		{
-			if (this.elseThen != null)
-			{
-				if (this.then.isType(type) && this.elseThen.isType(type))
-				{
-					this.commonType = type;
-					return true;
-				}
-			}
-			else
-			{
-				return this.then.isType(type);
-			}
+			return false;
 		}
-		
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -325,7 +340,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		
 		if (this.then != null)
 		{
-			Formatting.appendValue(this.then, prefix, buffer);
+			this.then.toString(prefix, buffer);
 			
 			if (this.elseThen != null)
 			{
@@ -339,7 +354,7 @@ public final class IfStatement extends ASTNode implements IStatement
 				}
 				
 				buffer.append(Formatting.Statements.ifElse);
-				Formatting.appendValue(this.elseThen, prefix, buffer);
+				this.elseThen.toString(prefix, buffer);
 			}
 		}
 	}

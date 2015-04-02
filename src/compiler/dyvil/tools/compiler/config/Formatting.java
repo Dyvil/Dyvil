@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.config;
 
-import dyvil.tools.compiler.ast.value.IValue;
-
-public class Formatting
+public interface Formatting
 {
 	public static class Package
 	{
@@ -42,7 +40,7 @@ public class Formatting
 	
 	public static class Field
 	{
-		public static String	keyValueSeperator		= " =";
+		public static String	keyValueSeperator		= " = ";
 		
 		public static boolean	convertQualifiedNames	= false;
 		public static boolean	useJavaFormat			= false;
@@ -69,32 +67,34 @@ public class Formatting
 		
 		public static String	throwsSeperator				= ", ";
 		public static String	signatureThrowsSeperator	= " throws ";
-		public static String	signatureBodySeperator		= " =";
+		public static String	signatureBodySeperator		= " = ";
 		public static String	indent						= "\t";
 	}
 	
 	public static class Statements
 	{
 		public static String	ifStart				= "if (";
-		public static String	ifEnd				= ")";
+		public static String	ifEnd				= ") ";
 		public static String	ifElse				= "else";
 		
 		public static String	whileStart			= "while (";
-		public static String	whileEnd			= ")";
+		public static String	whileEnd			= ") ";
 		
 		public static String	syncStart			= "synchronized (";
-		public static String	syncEnd				= ")";
+		public static String	syncEnd				= ") ";
 		
-		public static String	doStart				= "do";
+		public static String	doStart				= "do ";
 		public static String	doWhile				= "while (";
 		public static String	doEnd				= ")";
 		
 		public static String	forStart			= "for (";
 		public static String	forEachSeperator	= " : ";
-		public static String	forEnd				= ")";
+		public static String	forEnd				= ") ";
 		
+		public static String	tryStart			= "try ";
+		public static String	tryFinally			= "finally ";
 		public static String	catchStart			= "catch (";
-		public static String	catchEnd			= ")";
+		public static String	catchEnd			= ") ";
 	}
 	
 	public static class Expression
@@ -114,19 +114,5 @@ public class Formatting
 		public static String	arraySeperator	= ", ";
 		
 		public static String	lambdaSeperator	= " => ";
-	}
-	
-	public static void appendValue(IValue value, String prefix, StringBuilder buffer)
-	{
-		if (value.isStatement())
-		{
-			buffer.append('\n').append(prefix);
-			value.toString(prefix, buffer);
-		}
-		else
-		{
-			buffer.append(' ');
-			value.toString(prefix, buffer);
-		}
 	}
 }

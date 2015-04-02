@@ -249,6 +249,9 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 			this.condition.toString(prefix, buffer);
 		}
 		buffer.append(Formatting.Statements.whileEnd);
-		Formatting.appendValue(this.action, prefix, buffer);
+		if (this.action != null)
+		{
+			this.action.toString(prefix, buffer);
+		}
 	}
 }

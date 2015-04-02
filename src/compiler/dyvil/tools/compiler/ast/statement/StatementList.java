@@ -30,12 +30,12 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class StatementList extends ASTNode implements IStatement, IValueList, IContext
 {
-	protected IValue[]			values	= new IValue[3];
-	protected int				valueCount;
-	public Label[]				labels;
-	public Map<Name, Variable>	variables;
+	private IValue[]			values	= new IValue[3];
+	private int					valueCount;
 	
-	protected IType				requiredType;
+	private Label[]				labels;
+	private Map<Name, Variable>	variables;
+	private IType				requiredType;
 	
 	private IContext			context;
 	private IStatement			parent;
@@ -99,38 +99,23 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			return true;
 		}
 		
-		if (this.valueCount > 0 && this.values[this.valueCount - 1].isType(type))
-		{
-			return true;
-		}
-		
-		return false;
+		return this.valueCount > 0 && this.values[this.valueCount - 1].isType(type);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Types.VOID || type == Types.UNKNOWN)
-		{
-			return 3;
-		}
-		
 		if (this.valueCount > 0)
 		{
-			int m = this.values[this.valueCount - 1].getTypeMatch(type);
-			if (m > 0)
-			{
-				return m;
-			}
+			return this.values[this.valueCount - 1].getTypeMatch(type);
 		}
-		
 		return 0;
 	}
 	
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator(this.values);
+		return new ArrayIterator(this.values, this.valueCount);
 	}
 	
 	@Override
@@ -239,7 +224,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			{
 				if (this.variables == null)
 				{
-					this.variables = new HashMap();
+					this.variables = new IdentityHashMap();
 				}
 				
 				FieldInitializer fi = (FieldInitializer) v2;
@@ -525,7 +510,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		}
 		else
 		{
-			buffer.append('{').append('\n');
+			buffer.append('\n').append(prefix).append('{').append('\n');
 			String prefix1 = prefix + Formatting.Method.indent;
 			IValue prev = null;
 			
@@ -537,7 +522,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 				if (prev != null)
 				{
 					ICodePosition pos = value.getPosition();
-					if (pos != null && pos.endLine() - prev.getPosition().startLine() > 1)
+					if (pos != null && pos.endLine() - prev.getPosition().startLine() > 0)
 					{
 						buffer.append('\n').append(prefix1);
 					}

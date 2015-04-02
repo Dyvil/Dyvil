@@ -153,6 +153,6 @@ public final class SyncStatement extends ASTNode implements IValue
 			this.lock.toString(prefix, buffer);
 		}
 		buffer.append(Formatting.Statements.syncEnd);
-		Formatting.appendValue(this.block, prefix, buffer);
+		this.block.toString(prefix, buffer);
 	}
 }

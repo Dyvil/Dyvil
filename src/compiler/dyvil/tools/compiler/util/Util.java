@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import dyvil.strings.CharUtils;
@@ -23,61 +22,6 @@ public class Util
 	public static final List<ITyped>	EMPTY_TYPES	= Collections.EMPTY_LIST;
 	
 	public static final Predicate<?>	ISNULL		= a -> a == null;
-	
-	public static IType[] getTypes(List<IValue> values)
-	{
-		int len = values.size();
-		IType[] types = new IType[len];
-		for (int i = 0; i < len; i++)
-		{
-			types[i] = values.get(i).getType();
-		}
-		return types;
-	}
-	
-	public static <T> void toString(Collection<T> list, Function<T, String> function, String seperator, StringBuilder buffer)
-	{
-		if (!list.isEmpty())
-		{
-			Iterator<T> iterator = list.iterator();
-			while (true)
-			{
-				T o = iterator.next();
-				buffer.append(function.apply(o));
-				
-				if (iterator.hasNext())
-				{
-					buffer.append(seperator);
-				}
-				else
-				{
-					break;
-				}
-			}
-		}
-	}
-	
-	public static void listToString(Collection<String> list, String seperator, StringBuilder buffer)
-	{
-		if (!list.isEmpty())
-		{
-			Iterator<String> iterator = list.iterator();
-			while (true)
-			{
-				String o = iterator.next();
-				buffer.append(o);
-				
-				if (iterator.hasNext())
-				{
-					buffer.append(seperator);
-				}
-				else
-				{
-					break;
-				}
-			}
-		}
-	}
 	
 	public static void astToString(String prefix, Collection list, String seperator, StringBuilder buffer)
 	{

@@ -271,11 +271,10 @@ public class Field extends Member implements IField
 		buffer.append(' ');
 		buffer.append(this.name);
 		
-		IValue value = this.value;
-		if (value != null)
+		if (this.value != null)
 		{
 			buffer.append(Formatting.Field.keyValueSeperator);
-			Formatting.appendValue(value, prefix, buffer);
+			this.value.toString(prefix, buffer);
 		}
 		buffer.append(';');
 	}

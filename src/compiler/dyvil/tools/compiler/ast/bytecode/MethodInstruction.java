@@ -7,7 +7,7 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class MethodInstruction implements IInstruction
+public final class MethodInstruction implements IInstruction
 {
 	private int			opcode;
 	private String		owner;

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser.dwt;
 
-import dyvil.tools.compiler.ast.dwt.DWTList;
 import dyvil.tools.compiler.ast.dwt.DWTNode;
 import dyvil.tools.compiler.ast.dwt.DWTReference;
 import dyvil.tools.compiler.ast.value.ArrayValue;
@@ -10,6 +9,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.expression.ExpressionListParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -55,10 +55,10 @@ public class DWTValueParser extends Parser
 			}
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
-				ArrayValue list = new DWTList(token);
+				ArrayValue list = new ArrayValue(token);
 				this.mode = LIST_END;
 				this.valued.setValue(list);
-				pm.pushParser(new DWTListParser(list));
+				pm.pushParser(new ExpressionListParser(list));
 				return;
 			}
 			

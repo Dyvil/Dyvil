@@ -283,10 +283,14 @@ public final class TryStatement extends ASTNode implements IStatement
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("try");
+		buffer.append(Formatting.Statements.tryStart);
 		if (this.action != null)
 		{
-			Formatting.appendValue(this.action, prefix, buffer);
+			this.action.toString(prefix, buffer);
+			if (this.action.isStatement())
+			{
+				buffer.append('\n').append(prefix);
+			}
 		}
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
@@ -295,12 +299,12 @@ public final class TryStatement extends ASTNode implements IStatement
 			buffer.append('\n').append(prefix).append(Formatting.Statements.catchStart);
 			block.type.toString(prefix, buffer);
 			buffer.append(' ').append(block.varName).append(Formatting.Statements.catchEnd);
-			Formatting.appendValue(block.action, prefix, buffer);
+			block.action.toString(prefix, buffer);
 		}
 		if (this.finallyBlock != null)
 		{
-			buffer.append('\n').append(prefix).append("finally");
-			Formatting.appendValue(this.finallyBlock, prefix, buffer);
+			buffer.append('\n').append(prefix).append(Formatting.Statements.tryFinally);
+			this.finallyBlock.toString(prefix, buffer);
 		}
 	}
 }

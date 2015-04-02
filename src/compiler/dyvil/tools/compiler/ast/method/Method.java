@@ -42,6 +42,8 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
+	private static final int INLINABLE = (Modifiers.STATIC | Modifiers.PRIVATE | Modifiers.INLINE);
+	
 	protected IClass			theClass;
 	
 	protected ITypeVariable[]	generics;
@@ -934,9 +936,12 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		if ((this.modifiers & Modifiers.INLINE) != 0)
+		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() == 0)
 		{
-			this.writeInline(writer, instance, arguments);
+			Label inlineEnd = new Label();
+			this.writeInlineArguments(writer, instance, arguments, writer.startInline(inlineEnd));
+			this.value.writeExpression(writer);
+			writer.endInline(inlineEnd);
 			return;
 		}
 		
@@ -974,6 +979,15 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
+		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() == 0)
+		{
+			Label inlineEnd = new Label();
+			this.writeInlineArguments(writer, instance, arguments, writer.startInline(inlineEnd));
+			this.value.writeJump(writer, dest);
+			writer.endInline(inlineEnd);
+			return;
+		}
+		
 		this.writeInvoke(writer, instance, arguments);
 		writer.writeJumpInsn(IFEQ, dest);
 	}
@@ -989,6 +1003,15 @@ public class Method extends Member implements IMethod
 		if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
 		{
 			this.writeInvIntrinsic(writer, dest, instance, arguments);
+			return;
+		}
+		
+		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() == 0)
+		{
+			Label inlineEnd = new Label();
+			this.writeInlineArguments(writer, instance, arguments, writer.startInline(inlineEnd));
+			this.value.writeInvJump(writer, dest);
+			writer.endInline(inlineEnd);
 			return;
 		}
 		
@@ -1155,27 +1178,14 @@ public class Method extends Member implements IMethod
 		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS));
 	}
 	
-	private void writeInline(MethodWriter writer, IValue instance, IArguments arguments)
+	private void writeInlineArguments(MethodWriter writer, IValue instance, IArguments arguments, int localCount)
 	{
-		Label inlineEnd = new Label();
-		
-		int localCount = writer.startInline(inlineEnd);
-		
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
 			writer.writeVarInsn(instance.getType().getStoreOpcode(), localCount);
 		}
 		
-		this.writeInlineArguments(writer, arguments, localCount);
-		
-		this.value.writeExpression(writer);
-		
-		writer.endInline(inlineEnd);
-	}
-	
-	private void writeInlineArguments(MethodWriter writer, IArguments arguments, int localCount)
-	{
 		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			int len = this.parameterCount;
@@ -1212,7 +1222,7 @@ public class Method extends Member implements IMethod
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			arguments.writeValue(0, Name._this, null, writer);
-			// FIXME
+			writer.writeVarInsn(Opcodes.ASTORE, localCount);
 			return;
 		}
 		
@@ -1273,11 +1283,10 @@ public class Method extends Member implements IMethod
 			Util.astToString(prefix, this.exceptions, this.exceptionCount, Formatting.Method.throwsSeperator, buffer);
 		}
 		
-		IValue value = this.getValue();
-		if (value != null)
+		if (this.value != null)
 		{
 			buffer.append(Formatting.Method.signatureBodySeperator);
-			Formatting.appendValue(value, prefix, buffer);
+			this.value.toString(prefix, buffer);
 		}
 		buffer.append(';');
 	}

@@ -264,7 +264,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 			}
 			buffer.append(Formatting.Method.parametersEnd);
 			buffer.append(Formatting.Field.keyValueSeperator);
-			Formatting.appendValue(this.arguments.getValue(len, null), prefix, buffer);
+			this.arguments.getValue(len, null).toString(prefix, buffer);
 		}
 		else
 		{

@@ -630,7 +630,7 @@ public final class MethodWriterImpl implements MethodWriter
 	public int startInline(Label end)
 	{
 		this.inlineEnd = end;
-		this.inlineOffset += this.localIndex;
+		this.inlineOffset = this.localIndex;
 		return this.localIndex;
 	}
 	
@@ -639,7 +639,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.mv.visitLabel(end);
 		this.inlineEnd = null;
-		this.inlineOffset = this.localIndex;
+		this.inlineOffset = 0;
 		this.hasReturn = false;
 	}
 	

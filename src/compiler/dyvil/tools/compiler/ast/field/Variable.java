@@ -181,7 +181,7 @@ public final class Variable extends Member implements IVariable
 		if (this.value != null)
 		{
 			buffer.append(Formatting.Field.keyValueSeperator);
-			Formatting.appendValue(this.value, prefix, buffer);
+			this.value.toString(prefix, buffer);
 		}
 	}
 }

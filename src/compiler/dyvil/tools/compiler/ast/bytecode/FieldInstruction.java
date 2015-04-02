@@ -5,7 +5,7 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class FieldInstruction implements IInstruction
+public final class FieldInstruction implements IInstruction
 {
 	private int		opcode;
 	private String	owner;
@@ -38,7 +38,7 @@ public class FieldInstruction implements IInstruction
 	
 	public void setDesc(String desc)
 	{
-		this.desc = desc;
+		this.desc = ClassFormat.userToExtended(desc);
 	}
 	
 	@Override
@@ -49,8 +49,7 @@ public class FieldInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer)
 	{
-		String s = ClassFormat.userToExtended(this.desc);
-		writer.writeFieldInsn(this.opcode, this.owner, this.fieldName, s);
+		writer.writeFieldInsn(this.opcode, this.owner, this.fieldName, this.desc);
 	}
 	
 	@Override

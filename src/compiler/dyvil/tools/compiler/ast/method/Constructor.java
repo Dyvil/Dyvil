@@ -687,11 +687,10 @@ public class Constructor extends Member implements IConstructor
 			Util.astToString(prefix, this.exceptions, this.exceptionCount, Formatting.Method.throwsSeperator, buffer);
 		}
 		
-		IValue value = this.getValue();
-		if (value != null)
+		if (this.value != null)
 		{
 			buffer.append(Formatting.Method.signatureBodySeperator);
-			Formatting.appendValue(value, prefix, buffer);
+			this.value.toString(prefix, buffer);
 		}
 		buffer.append(';');
 	}
