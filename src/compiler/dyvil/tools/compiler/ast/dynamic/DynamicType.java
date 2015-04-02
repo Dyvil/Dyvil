@@ -124,41 +124,41 @@ public final class DynamicType extends ASTNode implements IType
 	{
 		return this;
 	}
-
+	
 	@Override
 	public Package resolvePackage(Name name)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public IClass resolveClass(Name name)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public IField resolveField(Name name)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 	}
-
+	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 	}
-
+	
 	@Override
 	public byte getAccessibility(IMember member)
 	{
@@ -170,7 +170,7 @@ public final class DynamicType extends ASTNode implements IType
 	{
 		return null;
 	}
-
+	
 	@Override
 	public String getInternalName()
 	{

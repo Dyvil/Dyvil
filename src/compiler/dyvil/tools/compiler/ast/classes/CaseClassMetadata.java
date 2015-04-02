@@ -8,7 +8,9 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.*;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -20,7 +22,7 @@ import dyvil.tools.compiler.transform.CaseClasses;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
-	protected IMethod		applyMethod;
+	protected IMethod	applyMethod;
 	
 	public CaseClassMetadata(IClass iclass)
 	{
@@ -31,7 +33,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
-
+		
 		Method m = new Method(this.theClass, Name.apply, this.theClass.getType());
 		m.modifiers = Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC;
 		m.setParameters(this.theClass.getParameters(), this.theClass.parameterCount());

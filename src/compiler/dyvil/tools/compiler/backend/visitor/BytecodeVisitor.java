@@ -180,7 +180,7 @@ public final class BytecodeVisitor extends MethodVisitor
 	{
 		if (this.inline)
 		{
-			this.bytecode.addInstruction(new JumpInstruction(opcode, getLabel(target)));
+			this.bytecode.addInstruction(new JumpInstruction(opcode, this.getLabel(target)));
 		}
 	}
 	
@@ -189,7 +189,7 @@ public final class BytecodeVisitor extends MethodVisitor
 	{
 		if (this.inline)
 		{
-			this.bytecode.addLabel(getLabel(label));
+			this.bytecode.addLabel(this.getLabel(label));
 		}
 	}
 	
@@ -220,9 +220,9 @@ public final class BytecodeVisitor extends MethodVisitor
 			dyvil.tools.compiler.ast.statement.Label[] labels = new dyvil.tools.compiler.ast.statement.Label[len];
 			for (int i = 0; i < len; i++)
 			{
-				labels[i] = getLabel(handlers[i]);
+				labels[i] = this.getLabel(handlers[i]);
 			}
-			this.bytecode.addInstruction(new TableSwitchInstruction(start, end, getLabel(defaultHandler), labels));
+			this.bytecode.addInstruction(new TableSwitchInstruction(start, end, this.getLabel(defaultHandler), labels));
 		}
 	}
 	
@@ -235,9 +235,9 @@ public final class BytecodeVisitor extends MethodVisitor
 			dyvil.tools.compiler.ast.statement.Label[] labels = new dyvil.tools.compiler.ast.statement.Label[len];
 			for (int i = 0; i < len; i++)
 			{
-				labels[i] = getLabel(handlers[i]);
+				labels[i] = this.getLabel(handlers[i]);
 			}
-			this.bytecode.addInstruction(new LookupSwitchInstruction(getLabel(defaultHandler), keys, labels));
+			this.bytecode.addInstruction(new LookupSwitchInstruction(this.getLabel(defaultHandler), keys, labels));
 		}
 	}
 	
@@ -261,7 +261,7 @@ public final class BytecodeVisitor extends MethodVisitor
 	{
 		if (this.inline)
 		{
-			this.bytecode.addInstruction(new TryCatchInstruction(getLabel(start), getLabel(end), getLabel(handler), type));
+			this.bytecode.addInstruction(new TryCatchInstruction(this.getLabel(start), this.getLabel(end), this.getLabel(handler), type));
 		}
 	}
 	

@@ -21,7 +21,7 @@ public final class ImportParser extends Parser
 	public static final int		ALIAS		= 4;
 	public static final int		MULTIIMPORT	= 8;
 	
-	protected IImport	theImport;
+	protected IImport			theImport;
 	
 	public ImportParser(IImport container)
 	{

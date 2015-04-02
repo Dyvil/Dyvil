@@ -24,7 +24,7 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 	
 	private IStatement			parent;
 	
-	public Label startLabel;
+	public Label				startLabel;
 	public Label				conditionLabel;
 	public Label				endLabel;
 	

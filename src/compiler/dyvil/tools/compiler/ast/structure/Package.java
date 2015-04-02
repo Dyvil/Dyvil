@@ -42,7 +42,7 @@ public class Package implements INamed, IContext
 	public String				fullName;
 	public String				internalName;
 	
-	public List<IDyvilHeader>		units		= new ArrayList();
+	public List<IDyvilHeader>	units		= new ArrayList();
 	public List<IClass>			classes		= new ArrayList();
 	public Map<String, Package>	subPackages	= new HashMap();
 	

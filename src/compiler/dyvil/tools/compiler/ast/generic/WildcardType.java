@@ -156,7 +156,7 @@ public final class WildcardType extends BaseBounded implements IType
 	{
 		return true;
 	}
-
+	
 	@Override
 	public IType resolve(MarkerList markers, IContext context)
 	{
@@ -178,7 +178,7 @@ public final class WildcardType extends BaseBounded implements IType
 		}
 		return null;
 	}
-
+	
 	@Override
 	public IType resolveType(Name name, IType concrete)
 	{
@@ -193,13 +193,13 @@ public final class WildcardType extends BaseBounded implements IType
 		}
 		return null;
 	}
-
+	
 	@Override
 	public boolean hasTypeVariables()
 	{
 		return false;
 	}
-
+	
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
@@ -218,7 +218,7 @@ public final class WildcardType extends BaseBounded implements IType
 		}
 		return type;
 	}
-
+	
 	@Override
 	public boolean isStatic()
 	{

@@ -84,7 +84,7 @@ public class ClassMetadata implements IClassMetadata
 		{
 			list.addValue(instanceFields);
 		}
-		if (superConstructor != null)
+		if (this.superConstructor != null)
 		{
 			list.addValue(new InitializerCall(null, this.superConstructor, EmptyArguments.INSTANCE, true));
 		}

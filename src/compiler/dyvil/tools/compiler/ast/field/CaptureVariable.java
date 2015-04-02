@@ -14,9 +14,9 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class CaptureVariable implements IVariable
 {
-	public int			index;
+	public int		index;
 	public IField	variable;
-	private IType		type;
+	private IType	type;
 	
 	public CaptureVariable()
 	{

@@ -33,7 +33,7 @@ public final class MultiImport extends ASTNode implements IImport
 		if (index >= this.children.length)
 		{
 			IImport[] temp = new IImport[index];
-			System.arraycopy(children, 0, temp, 0, children.length);
+			System.arraycopy(this.children, 0, temp, 0, this.children.length);
 			this.children = temp;
 		}
 		this.children[index] = iimport;

@@ -24,7 +24,9 @@ public interface IImport extends IASTNode
 		return null;
 	}
 	
-	public default void setAlias(Name alias) {}
+	public default void setAlias(Name alias)
+	{
+	}
 	
 	public Package resolvePackage(Name name);
 	

@@ -103,14 +103,12 @@ public final class UnknownType extends ASTNode implements IType
 	{
 		return true;
 	}
-
+	
 	@Override
 	public IType resolve(MarkerList markers, IContext context)
 	{
 		return this;
 	}
-	
-	
 	
 	// IContext
 	
@@ -119,35 +117,35 @@ public final class UnknownType extends ASTNode implements IType
 	{
 		return null;
 	}
-
+	
 	@Override
 	public IClass resolveClass(Name name)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public IField resolveField(Name name)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 	}
-
+	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 	}
-
+	
 	@Override
 	public byte getAccessibility(IMember member)
 	{
@@ -161,7 +159,7 @@ public final class UnknownType extends ASTNode implements IType
 	}
 	
 	// Compilation
-
+	
 	@Override
 	public String getInternalName()
 	{

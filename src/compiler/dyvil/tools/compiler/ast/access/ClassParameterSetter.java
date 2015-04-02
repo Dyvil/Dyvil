@@ -12,7 +12,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ClassParameterSetter implements IValue
 {
-	private IClass theClass;
+	private IClass		theClass;
 	private IParameter	parameter;
 	
 	public ClassParameterSetter(IClass theClass, IParameter param)

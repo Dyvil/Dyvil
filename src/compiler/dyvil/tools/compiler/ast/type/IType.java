@@ -52,7 +52,6 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	@Override
 	public Name getName();
-
 	
 	public void setFullName(String nae);
 	
@@ -168,14 +167,13 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	// Generics
 	
-	
 	/**
 	 * Returns true if this is or contains any type variables.
 	 * 
 	 * @return
 	 */
 	public boolean hasTypeVariables();
-
+	
 	/**
 	 * Returns a copy of this type with all type variables replaced.
 	 * 

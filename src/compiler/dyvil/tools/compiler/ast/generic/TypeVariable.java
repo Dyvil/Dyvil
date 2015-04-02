@@ -7,7 +7,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class TypeVariable extends BaseBounded implements ITypeVariable
 {
-	public Name				name;
+	public Name	name;
 	
 	public TypeVariable()
 	{

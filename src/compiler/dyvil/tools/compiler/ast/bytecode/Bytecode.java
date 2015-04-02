@@ -182,12 +182,11 @@ public final class Bytecode extends ASTNode implements IValue
 			return;
 		}
 		
-		for (int i = 0; i < this.labels.length; i++)
+		for (Label label : this.labels)
 		{
-			Label l = this.labels[i];
-			if (l != null)
+			if (label != null)
 			{
-				l.target = new org.objectweb.asm.Label();
+				label.target = new org.objectweb.asm.Label();
 			}
 		}
 		

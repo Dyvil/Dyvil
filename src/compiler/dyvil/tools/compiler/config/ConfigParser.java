@@ -24,20 +24,32 @@ public class ConfigParser
 			case KEY:
 			{
 				for (; CharUtils.isWhitespace(source.charAt(i));)
+				{
 					if (++i >= len)
+					{
 						return;
+					}
+				}
 				int l = i;
 				for (char c; CharUtils.isLetter(c = source.charAt(i)) || c == '_';)
+				{
 					if (++i >= len)
+					{
 						return;
+					}
+				}
 				key = source.substring(l, i);
 				mode = EQUALS;
 				continue;
 			}
 			case EQUALS:
 				for (char c; CharUtils.isWhitespace(c = source.charAt(i)) || c == '=';)
+				{
 					if (++i >= len)
+					{
 						return;
+					}
+				}
 				mode = VALUE;
 				continue;
 			case VALUE:
@@ -50,8 +62,12 @@ public class ConfigParser
 				}
 				int l = i;
 				for (; !CharUtils.isWhitespace(source.charAt(i));)
+				{
 					if (++i >= len)
+					{
 						return;
+					}
+				}
 				if (source.charAt(l) == ']')
 				{
 					mode = KEY;
@@ -63,8 +79,12 @@ public class ConfigParser
 			}
 			case ARRAY:
 				for (char c; CharUtils.isWhitespace(c = source.charAt(i)) || c == ',' || c == '[';)
+				{
 					if (++i >= len)
+					{
 						return;
+					}
+				}
 				if (source.charAt(i) == ']')
 				{
 					mode = KEY;
@@ -72,8 +92,12 @@ public class ConfigParser
 				}
 				int l = i;
 				for (char c; !CharUtils.isWhitespace(c = source.charAt(i)) && c != ',' && c != ']';)
+				{
 					if (++i >= len)
+					{
 						return;
+					}
+				}
 				setProperty(config, key, source.substring(l, i));
 			}
 		}

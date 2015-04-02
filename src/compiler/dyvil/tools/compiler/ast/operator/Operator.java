@@ -4,11 +4,11 @@ import dyvil.tools.compiler.ast.member.Name;
 
 public final class Operator
 {
-	public static final int	PREFIX	= 0;
+	public static final int	PREFIX		= 0;
 	public static final int	INFIX_LEFT	= 1;
 	public static final int	INFIX_NONE	= 2;
 	public static final int	INFIX_RIGHT	= 3;
-	public static final int	POSTFIX	= 4;
+	public static final int	POSTFIX		= 4;
 	
 	public final Name		name;
 	public int				precedence;

@@ -41,11 +41,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	
 	protected PackageDecl			packageDeclaration;
 	
-	protected HeaderComponent[]				imports			= new HeaderComponent[5];
+	protected HeaderComponent[]		imports			= new HeaderComponent[5];
 	protected int					importCount;
-	protected HeaderComponent[]				staticImports	= new HeaderComponent[1];
+	protected HeaderComponent[]		staticImports	= new HeaderComponent[1];
 	protected int					staticImportCount;
-	protected HeaderComponent[]				includes		= new HeaderComponent[2];
+	protected HeaderComponent[]		includes		= new HeaderComponent[2];
 	protected int					includeCount;
 	
 	protected Map<Name, Operator>	operators		= new IdentityHashMap();
@@ -116,7 +116,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		if (index >= this.imports.length)
 		{
 			HeaderComponent[] temp = new HeaderComponent[index];
-			System.arraycopy(imports, 0, temp, 0, imports.length);
+			System.arraycopy(this.imports, 0, temp, 0, this.imports.length);
 			this.imports = temp;
 		}
 		this.imports[index] = component;
@@ -129,7 +129,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		if (index >= this.staticImports.length)
 		{
 			HeaderComponent[] temp = new HeaderComponent[index];
-			System.arraycopy(staticImports, 0, temp, 0, staticImports.length);
+			System.arraycopy(this.staticImports, 0, temp, 0, this.staticImports.length);
 			this.staticImports = temp;
 		}
 		this.staticImports[index] = component;

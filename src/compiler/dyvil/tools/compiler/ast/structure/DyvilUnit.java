@@ -31,7 +31,7 @@ public final class DyvilUnit extends DyvilHeader
 		if (index >= this.classes.length)
 		{
 			IClass[] temp = new IClass[index];
-			System.arraycopy(classes, 0, temp, 0, classes.length);
+			System.arraycopy(this.classes, 0, temp, 0, this.classes.length);
 			this.classes = temp;
 		}
 		this.classes[index] = iclass;

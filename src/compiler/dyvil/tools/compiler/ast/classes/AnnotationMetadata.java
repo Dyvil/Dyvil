@@ -17,9 +17,9 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class AnnotationMetadata implements IClassMetadata
 {
-	private IClass theClass;
-	public RetentionPolicy				retention;
-	public Set<ElementType>				targets;
+	private IClass			theClass;
+	public RetentionPolicy	retention;
+	public Set<ElementType>	targets;
 	
 	public AnnotationMetadata(IClass iclass)
 	{

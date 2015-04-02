@@ -11,7 +11,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class MethodStatement extends ASTNode implements IValue
 {
-	private NestedMethod method;
+	private NestedMethod	method;
 	
 	@Override
 	public int getValueType()

@@ -55,23 +55,23 @@ public final class OperatorParser extends Parser
 			switch (name.qualified)
 			{
 			case "prefix":
-				this.operator.type = (Operator.PREFIX);
+				this.operator.type = Operator.PREFIX;
 				this.mode = CLOSE_BRACKET;
 				return;
 			case "postfix":
-				this.operator.type = (Operator.POSTFIX);
+				this.operator.type = Operator.POSTFIX;
 				this.mode = CLOSE_BRACKET;
 				return;
 			case "none":
-				this.operator.type = (Operator.INFIX_NONE);
+				this.operator.type = Operator.INFIX_NONE;
 				this.mode = COMMA;
 				return;
 			case "left":
-				this.operator.type = (Operator.INFIX_LEFT);
+				this.operator.type = Operator.INFIX_LEFT;
 				this.mode = COMMA;
 				return;
 			case "right":
-				this.operator.type = (Operator.INFIX_RIGHT);
+				this.operator.type = Operator.INFIX_RIGHT;
 				this.mode = COMMA;
 				return;
 			}

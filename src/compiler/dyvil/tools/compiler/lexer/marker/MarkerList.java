@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.lexer.marker;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import dyvil.collections.ArrayIterator;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
