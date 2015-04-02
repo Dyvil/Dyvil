@@ -11,8 +11,8 @@ public final class Symbols
 	static
 	{
 		addReplacement('=', "eq");
-		addReplacement('>', "greater");
-		addReplacement('<', "less");
+		addReplacement('>', "gt");
+		addReplacement('<', "lt");
 		addReplacement('+', "plus");
 		addReplacement('-', "minus");
 		addReplacement('*', "times");

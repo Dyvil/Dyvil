@@ -12,11 +12,11 @@ public interface IntegerRef extends Integer, NumberRef
 	
 	public IntegerRef $up$eq(byte v);
 	
-	public IntegerRef $less$less$eq(byte v);
+	public IntegerRef $lt$lt$eq(byte v);
 	
-	public IntegerRef $greater$greater$eq(byte v);
+	public IntegerRef $gt$gt$eq(byte v);
 	
-	public IntegerRef $greater$greater$greater$eq(byte v);
+	public IntegerRef $gt$gt$gt$eq(byte v);
 	
 	// short operations
 	
@@ -26,11 +26,11 @@ public interface IntegerRef extends Integer, NumberRef
 	
 	public IntegerRef $up$eq(short v);
 	
-	public IntegerRef $less$less$eq(short v);
+	public IntegerRef $lt$lt$eq(short v);
 	
-	public IntegerRef $greater$greater$eq(short v);
+	public IntegerRef $gt$gt$eq(short v);
 	
-	public IntegerRef $greater$greater$greater$eq(short v);
+	public IntegerRef $gt$gt$gt$eq(short v);
 	
 	// char operations
 	
@@ -40,11 +40,11 @@ public interface IntegerRef extends Integer, NumberRef
 	
 	public IntegerRef $up$eq(char v);
 	
-	public IntegerRef $less$less$eq(char v);
+	public IntegerRef $lt$lt$eq(char v);
 	
-	public IntegerRef $greater$greater$eq(char v);
+	public IntegerRef $gt$gt$eq(char v);
 	
-	public IntegerRef $greater$greater$greater$eq(char v);
+	public IntegerRef $gt$gt$gt$eq(char v);
 	
 	// int operations
 	
@@ -54,11 +54,11 @@ public interface IntegerRef extends Integer, NumberRef
 	
 	public IntegerRef $up$eq(int v);
 	
-	public IntegerRef $less$less$eq(int v);
+	public IntegerRef $lt$lt$eq(int v);
 	
-	public IntegerRef $greater$greater$eq(int v);
+	public IntegerRef $gt$gt$eq(int v);
 	
-	public IntegerRef $greater$greater$greater$eq(int v);
+	public IntegerRef $gt$gt$gt$eq(int v);
 	
 	// long operations
 	
@@ -68,9 +68,9 @@ public interface IntegerRef extends Integer, NumberRef
 	
 	public IntegerRef $up$eq(long v);
 	
-	public IntegerRef $less$less$eq(long v);
+	public IntegerRef $lt$lt$eq(long v);
 	
-	public IntegerRef $greater$greater$eq(long v);
+	public IntegerRef $gt$gt$eq(long v);
 	
-	public IntegerRef $greater$greater$greater$eq(long v);
+	public IntegerRef $gt$gt$gt$eq(long v);
 }

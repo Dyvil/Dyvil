@@ -34,13 +34,13 @@ public interface Number extends Ordered<Number>
 	
 	public boolean $bang$eq(byte v);
 	
-	public boolean $less(byte v);
+	public boolean $lt(byte v);
 	
-	public boolean $less$eq(byte v);
+	public boolean $lt$eq(byte v);
 	
-	public boolean $greater(byte v);
+	public boolean $gt(byte v);
 	
-	public boolean $greater$eq(byte v);
+	public boolean $gt$eq(byte v);
 	
 	public Number $plus(byte v);
 	
@@ -58,13 +58,13 @@ public interface Number extends Ordered<Number>
 	
 	public boolean $bang$eq(short v);
 	
-	public boolean $less(short v);
+	public boolean $lt(short v);
 	
-	public boolean $less$eq(short v);
+	public boolean $lt$eq(short v);
 	
-	public boolean $greater(short v);
+	public boolean $gt(short v);
 	
-	public boolean $greater$eq(short v);
+	public boolean $gt$eq(short v);
 	
 	public Number $plus(short v);
 	
@@ -82,13 +82,13 @@ public interface Number extends Ordered<Number>
 	
 	public boolean $bang$eq(char v);
 	
-	public boolean $less(char v);
+	public boolean $lt(char v);
 	
-	public boolean $less$eq(char v);
+	public boolean $lt$eq(char v);
 	
-	public boolean $greater(char v);
+	public boolean $gt(char v);
 	
-	public boolean $greater$eq(char v);
+	public boolean $gt$eq(char v);
 	
 	public Number $plus(char v);
 	
@@ -106,13 +106,13 @@ public interface Number extends Ordered<Number>
 	
 	public boolean $bang$eq(int v);
 	
-	public boolean $less(int v);
+	public boolean $lt(int v);
 	
-	public boolean $less$eq(int v);
+	public boolean $lt$eq(int v);
 	
-	public boolean $greater(int v);
+	public boolean $gt(int v);
 	
-	public boolean $greater$eq(int v);
+	public boolean $gt$eq(int v);
 	
 	public Number $plus(int v);
 	
@@ -130,13 +130,13 @@ public interface Number extends Ordered<Number>
 	
 	public boolean $bang$eq(long v);
 	
-	public boolean $less(long v);
+	public boolean $lt(long v);
 	
-	public boolean $less$eq(long v);
+	public boolean $lt$eq(long v);
 	
-	public boolean $greater(long v);
+	public boolean $gt(long v);
 	
-	public boolean $greater$eq(long v);
+	public boolean $gt$eq(long v);
 	
 	public Number $plus(long v);
 	
@@ -154,13 +154,13 @@ public interface Number extends Ordered<Number>
 	
 	public boolean $bang$eq(float v);
 	
-	public boolean $less(float v);
+	public boolean $lt(float v);
 	
-	public boolean $less$eq(float v);
+	public boolean $lt$eq(float v);
 	
-	public boolean $greater(float v);
+	public boolean $gt(float v);
 	
-	public boolean $greater$eq(float v);
+	public boolean $gt$eq(float v);
 	
 	public Number $plus(float v);
 	
@@ -178,13 +178,13 @@ public interface Number extends Ordered<Number>
 	
 	public boolean $bang$eq(double v);
 	
-	public boolean $less(double v);
+	public boolean $lt(double v);
 	
-	public boolean $less$eq(double v);
+	public boolean $lt$eq(double v);
 	
-	public boolean $greater(double v);
+	public boolean $gt(double v);
 	
-	public boolean $greater$eq(double v);
+	public boolean $gt$eq(double v);
 	
 	public Number $plus(double v);
 	
@@ -205,16 +205,16 @@ public interface Number extends Ordered<Number>
 	public boolean $bang$eq(Number v);
 	
 	@Override
-	public boolean $less(Number v);
+	public boolean $lt(Number v);
 	
 	@Override
-	public boolean $less$eq(Number v);
+	public boolean $lt$eq(Number v);
 	
 	@Override
-	public boolean $greater(Number v);
+	public boolean $gt(Number v);
 	
 	@Override
-	public boolean $greater$eq(Number v);
+	public boolean $gt$eq(Number v);
 	
 	public Number $plus(Number v);
 	

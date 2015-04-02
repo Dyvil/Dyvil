@@ -199,7 +199,7 @@ public final class Predef
 	 * @param b
 	 * @return
 	 */
-	public static @inline @infix <A, B> Tuple2<A, B> $minus$greater(A a, B b)
+	public static @inline @infix <A, B> Tuple2<A, B> $minus$gt(A a, B b)
 	{
 		return new Tuple2(a, b);
 	}
@@ -210,7 +210,7 @@ public final class Predef
 	 * @param b
 	 * @return
 	 */
-	public static @inline @infix <A, B> Tuple2<B, A> $less$minus(A a, B b)
+	public static @inline @infix <A, B> Tuple2<B, A> $lt$minus(A a, B b)
 	{
 		return new Tuple2(b, a);
 	}

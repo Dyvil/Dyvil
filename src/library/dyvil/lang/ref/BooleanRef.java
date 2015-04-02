@@ -78,14 +78,14 @@ public class BooleanRef implements Boolean$
 	}
 	
 	@Override
-	public Boolean$ $eq$eq$greater(boolean v)
+	public Boolean$ $eq$eq$gt(boolean v)
 	{
 		this.value = v || !this.value;
 		return this;
 	}
 	
 	@Override
-	public Boolean$ $less$eq$greater(boolean v)
+	public Boolean$ $lt$eq$gt(boolean v)
 	{
 		this.value = this.value == v;
 		return this;

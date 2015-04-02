@@ -132,28 +132,28 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLT })
-	public boolean $less(byte v)
+	public boolean $lt(byte v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLE })
-	public boolean $less$eq(byte v)
+	public boolean $lt$eq(byte v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGT })
-	public boolean $greater(byte v)
+	public boolean $gt(byte v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGE })
-	public boolean $greater$eq(byte v)
+	public boolean $gt$eq(byte v)
 	{
 		return this.value >= v;
 	}
@@ -216,21 +216,21 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
-	public Long $less$less(byte v)
+	public Long $lt$lt(byte v)
 	{
 		return Long.create(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
-	public Long $greater$greater(byte v)
+	public Long $gt$gt(byte v)
 	{
 		return Long.create(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
-	public Long $greater$greater$greater(byte v)
+	public Long $gt$gt$gt(byte v)
 	{
 		return Long.create(this.value >>> v);
 	}
@@ -253,28 +253,28 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLT })
-	public boolean $less(short v)
+	public boolean $lt(short v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLE })
-	public boolean $less$eq(short v)
+	public boolean $lt$eq(short v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGT })
-	public boolean $greater(short v)
+	public boolean $gt(short v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGE })
-	public boolean $greater$eq(short v)
+	public boolean $gt$eq(short v)
 	{
 		return this.value >= v;
 	}
@@ -337,21 +337,21 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
-	public Long $less$less(short v)
+	public Long $lt$lt(short v)
 	{
 		return Long.create(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
-	public Long $greater$greater(short v)
+	public Long $gt$gt(short v)
 	{
 		return Long.create(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
-	public Long $greater$greater$greater(short v)
+	public Long $gt$gt$gt(short v)
 	{
 		return Long.create(this.value >>> v);
 	}
@@ -374,28 +374,28 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLT })
-	public boolean $less(char v)
+	public boolean $lt(char v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLE })
-	public boolean $less$eq(char v)
+	public boolean $lt$eq(char v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGT })
-	public boolean $greater(char v)
+	public boolean $gt(char v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGE })
-	public boolean $greater$eq(char v)
+	public boolean $gt$eq(char v)
 	{
 		return this.value >= v;
 	}
@@ -458,21 +458,21 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
-	public Long $less$less(char v)
+	public Long $lt$lt(char v)
 	{
 		return Long.create(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
-	public Long $greater$greater(char v)
+	public Long $gt$gt(char v)
 	{
 		return Long.create(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
-	public Long $greater$greater$greater(char v)
+	public Long $gt$gt$gt(char v)
 	{
 		return Long.create(this.value >>> v);
 	}
@@ -495,28 +495,28 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLT })
-	public boolean $less(int v)
+	public boolean $lt(int v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLE })
-	public boolean $less$eq(int v)
+	public boolean $lt$eq(int v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGT })
-	public boolean $greater(int v)
+	public boolean $gt(int v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGE })
-	public boolean $greater$eq(int v)
+	public boolean $gt$eq(int v)
 	{
 		return this.value >= v;
 	}
@@ -579,21 +579,21 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
-	public Long $less$less(int v)
+	public Long $lt$lt(int v)
 	{
 		return Long.create(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
-	public Long $greater$greater(int v)
+	public Long $gt$gt(int v)
 	{
 		return Long.create(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
-	public Long $greater$greater$greater(int v)
+	public Long $gt$gt$gt(int v)
 	{
 		return Long.create(this.value >>> v);
 	}
@@ -616,28 +616,28 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_LCMPLT })
-	public boolean $less(long v)
+	public boolean $lt(long v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_LCMPLE })
-	public boolean $less$eq(long v)
+	public boolean $lt$eq(long v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_LCMPGT })
-	public boolean $greater(long v)
+	public boolean $gt(long v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_LCMPGE })
-	public boolean $greater$eq(long v)
+	public boolean $gt$eq(long v)
 	{
 		return this.value >= v;
 	}
@@ -700,21 +700,21 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LSHL })
-	public Long $less$less(long v)
+	public Long $lt$lt(long v)
 	{
 		return Long.create(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LSHR })
-	public Long $greater$greater(long v)
+	public Long $gt$gt(long v)
 	{
 		return Long.create(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LUSHR })
-	public Long $greater$greater$greater(long v)
+	public Long $gt$gt$gt(long v)
 	{
 		return Long.create(this.value >>> v);
 	}
@@ -737,28 +737,28 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, IF_FCMPLT })
-	public boolean $less(float v)
+	public boolean $lt(float v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, IF_FCMPLE })
-	public boolean $less$eq(float v)
+	public boolean $lt$eq(float v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, IF_FCMPGT })
-	public boolean $greater(float v)
+	public boolean $gt(float v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, IF_FCMPGE })
-	public boolean $greater$eq(float v)
+	public boolean $gt$eq(float v)
 	{
 		return this.value >= v;
 	}
@@ -816,28 +816,28 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, IF_DCMPLT })
-	public boolean $less(double v)
+	public boolean $lt(double v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, IF_DCMPLE })
-	public boolean $less$eq(double v)
+	public boolean $lt$eq(double v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, IF_DCMPGT })
-	public boolean $greater(double v)
+	public boolean $gt(double v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, IF_DCMPGE })
-	public boolean $greater$eq(double v)
+	public boolean $gt$eq(double v)
 	{
 		return this.value >= v;
 	}
@@ -892,25 +892,25 @@ public class Long implements Integer
 	}
 	
 	@Override
-	public boolean $less(Number v)
+	public boolean $lt(Number v)
 	{
 		return this.value < v.longValue();
 	}
 	
 	@Override
-	public boolean $less$eq(Number v)
+	public boolean $lt$eq(Number v)
 	{
 		return this.value <= v.longValue();
 	}
 	
 	@Override
-	public boolean $greater(Number v)
+	public boolean $gt(Number v)
 	{
 		return this.value > v.longValue();
 	}
 	
 	@Override
-	public boolean $greater$eq(Number v)
+	public boolean $gt$eq(Number v)
 	{
 		return this.value >= v.longValue();
 	}
@@ -964,19 +964,19 @@ public class Long implements Integer
 	}
 	
 	@Override
-	public Long $less$less(Integer v)
+	public Long $lt$lt(Integer v)
 	{
 		return Long.create(this.value << v.longValue());
 	}
 	
 	@Override
-	public Long $greater$greater(Integer v)
+	public Long $gt$gt(Integer v)
 	{
 		return Long.create(this.value >> v.longValue());
 	}
 	
 	@Override
-	public Long $greater$greater$greater(Integer v)
+	public Long $gt$gt$gt(Integer v)
 	{
 		return Long.create(this.value >>> v.longValue());
 	}

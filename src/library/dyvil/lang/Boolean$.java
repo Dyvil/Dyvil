@@ -18,7 +18,7 @@ public @sealed interface Boolean$
 	
 	public Boolean$ $up(boolean v);
 	
-	public Boolean$ $eq$eq$greater(boolean v);
+	public Boolean$ $eq$eq$gt(boolean v);
 	
-	public Boolean$ $less$eq$greater(boolean v);
+	public Boolean$ $lt$eq$gt(boolean v);
 }

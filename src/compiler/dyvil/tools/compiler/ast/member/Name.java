@@ -40,9 +40,9 @@ public final class Name
 	public static final Name				bar				= new Name("|", "$bar");
 	public static final Name				up				= new Name("^", "$up");
 	public static final Name				at				= new Name("@", "$at");
-	public static final Name				ltlt			= new Name("<<", "$less$less");
-	public static final Name				gtgt			= new Name(">>", "$greater$greater");
-	public static final Name				gtgtgt			= new Name(">>>", "$greater$greater$greater");
+	public static final Name				ltlt			= new Name("<<", "$lt$lt");
+	public static final Name				gtgt			= new Name(">>", "$gt$gt");
+	public static final Name				gtgtgt			= new Name(">>>", "$gt$gt$gt");
 	public static final Name				ampamp			= new Name("&&", "$amp$amp");
 	public static final Name				barbar			= new Name("||", "$bar$bar");
 	
@@ -50,19 +50,19 @@ public final class Name
 	public static final Name				bangeq			= new Name("!=", "$bang$eq");
 	public static final Name				coloneqcolon	= new Name(":=:", "$colon$eq$colon");
 	
-	public static final Name				less			= new Name("<", "$less");
-	public static final Name				lessEq			= new Name("<=", "$less$eq");
-	public static final Name				greater			= new Name(">", "$greater");
-	public static final Name				greaterEq		= new Name(">=", "$greater$eq");
+	public static final Name				lt				= new Name("<", "$lt");
+	public static final Name				lteq			= new Name("<=", "$lt$eq");
+	public static final Name				gt				= new Name(">", "$gt");
+	public static final Name				gteq			= new Name(">=", "$gt$eq");
 	
 	public static final Name				bang			= new Name("!", "$bang");
 	public static final Name				tilde			= new Name("~", "$tilde");
 	
-	public static final Name				minusgt			= new Name("->", "$minus$greater");
-	public static final Name				ltminus			= new Name("<-", "$less$minus");
+	public static final Name				minusgt			= new Name("->", "$minus$gt");
+	public static final Name				ltminus			= new Name("<-", "$lt$minus");
 	
-	public static final Name				colongt			= new Name(":>", "$colon$greater");
-	public static final Name				ltcolon			= new Name("<:", "$less$colon");
+	public static final Name				colongt			= new Name(":>", "$colon$gt");
+	public static final Name				ltcolon			= new Name("<:", "$lt$colon");
 	
 	public final String						qualified;
 	public final String						unqualified;

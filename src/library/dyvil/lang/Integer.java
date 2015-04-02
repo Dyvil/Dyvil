@@ -16,11 +16,11 @@ public interface Integer extends Number
 	
 	public Integer $up(byte v);
 	
-	public Integer $less$less(byte v);
+	public Integer $lt$lt(byte v);
 	
-	public Integer $greater$greater(byte v);
+	public Integer $gt$gt(byte v);
 	
-	public Integer $greater$greater$greater(byte v);
+	public Integer $gt$gt$gt(byte v);
 	
 	// short operators
 	
@@ -30,11 +30,11 @@ public interface Integer extends Number
 	
 	public Integer $up(short v);
 	
-	public Integer $less$less(short v);
+	public Integer $lt$lt(short v);
 	
-	public Integer $greater$greater(short v);
+	public Integer $gt$gt(short v);
 	
-	public Integer $greater$greater$greater(short v);
+	public Integer $gt$gt$gt(short v);
 	
 	// char operators
 	
@@ -44,11 +44,11 @@ public interface Integer extends Number
 	
 	public Integer $up(char v);
 	
-	public Integer $less$less(char v);
+	public Integer $lt$lt(char v);
 	
-	public Integer $greater$greater(char v);
+	public Integer $gt$gt(char v);
 	
-	public Integer $greater$greater$greater(char v);
+	public Integer $gt$gt$gt(char v);
 	
 	// int operators
 	
@@ -58,11 +58,11 @@ public interface Integer extends Number
 	
 	public Integer $up(int v);
 	
-	public Integer $less$less(int v);
+	public Integer $lt$lt(int v);
 	
-	public Integer $greater$greater(int v);
+	public Integer $gt$gt(int v);
 	
-	public Integer $greater$greater$greater(int v);
+	public Integer $gt$gt$gt(int v);
 	
 	// long operators
 	
@@ -72,11 +72,11 @@ public interface Integer extends Number
 	
 	public Integer $up(long v);
 	
-	public Integer $less$less(long v);
+	public Integer $lt$lt(long v);
 	
-	public Integer $greater$greater(long v);
+	public Integer $gt$gt(long v);
 	
-	public Integer $greater$greater$greater(long v);
+	public Integer $gt$gt$gt(long v);
 	
 	// Integer operators
 	
@@ -86,11 +86,11 @@ public interface Integer extends Number
 	
 	public Integer $up(Integer v);
 	
-	public Integer $less$less(Integer v);
+	public Integer $lt$lt(Integer v);
 	
-	public Integer $greater$greater(Integer v);
+	public Integer $gt$gt(Integer v);
 	
-	public Integer $greater$greater$greater(Integer v);
+	public Integer $gt$gt$gt(Integer v);
 	
 	// String representations
 	

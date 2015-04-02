@@ -190,13 +190,13 @@ public final class TypeParser extends Parser implements ITyped
 			Name name = token.nameValue();
 			if (this.boundMode == 0)
 			{
-				if (name == Name.lessEq)
+				if (name == Name.lteq)
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = LOWER;
 					return;
 				}
-				if (name == Name.greaterEq)
+				if (name == Name.gteq)
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = UPPER;

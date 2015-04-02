@@ -78,14 +78,14 @@ public class Boolean implements Boolean$
 	
 	@Override
 	@Intrinsic({ INSTANCE, BINV, ARGUMENTS, IOR, IFEQ })
-	public Boolean $eq$eq$greater(boolean v)
+	public Boolean $eq$eq$gt(boolean v)
 	{
 		return apply(v || !this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
-	public Boolean $less$eq$greater(boolean v)
+	public Boolean $lt$eq$gt(boolean v)
 	{
 		return apply(v == this.value);
 	}

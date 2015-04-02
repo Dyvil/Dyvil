@@ -9,20 +9,20 @@ public interface Ordered<T>
 		return !$eq$eq(t);
 	}
 	
-	public boolean $less(T t);
+	public boolean $lt(T t);
 	
-	public default boolean $less$eq(T t)
+	public default boolean $lt$eq(T t)
 	{
-		return $less(t) || $eq$eq(t);
+		return $lt(t) || $eq$eq(t);
 	}
 	
-	public default boolean $greater(T t)
+	public default boolean $gt(T t)
 	{
-		return !$less$eq(t);
+		return !$lt$eq(t);
 	}
 	
-	public default boolean $greater$eq(T t)
+	public default boolean $gt$eq(T t)
 	{
-		return !$less(t);
+		return !$lt(t);
 	}
 }

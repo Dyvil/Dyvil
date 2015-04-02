@@ -119,25 +119,25 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public boolean $less(byte v)
+	public boolean $lt(byte v)
 	{
 		return this.imag == 0D && this.real < v;
 	}
 	
 	@Override
-	public boolean $less$eq(byte v)
+	public boolean $lt$eq(byte v)
 	{
 		return this.imag == 0D && this.real <= v;
 	}
 	
 	@Override
-	public boolean $greater(byte v)
+	public boolean $gt(byte v)
 	{
 		return this.imag == 0D && this.real > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(byte v)
+	public boolean $gt$eq(byte v)
 	{
 		return this.imag == 0D && this.real >= v;
 	}
@@ -187,25 +187,25 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public boolean $less(short v)
+	public boolean $lt(short v)
 	{
 		return this.imag == 0D && this.real < v;
 	}
 	
 	@Override
-	public boolean $less$eq(short v)
+	public boolean $lt$eq(short v)
 	{
 		return this.imag == 0D && this.real <= v;
 	}
 	
 	@Override
-	public boolean $greater(short v)
+	public boolean $gt(short v)
 	{
 		return this.imag == 0D && this.real > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(short v)
+	public boolean $gt$eq(short v)
 	{
 		return this.imag == 0D && this.real >= v;
 	}
@@ -255,25 +255,25 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public boolean $less(char v)
+	public boolean $lt(char v)
 	{
 		return this.imag == 0D && this.real < v;
 	}
 	
 	@Override
-	public boolean $less$eq(char v)
+	public boolean $lt$eq(char v)
 	{
 		return this.imag == 0D && this.real <= v;
 	}
 	
 	@Override
-	public boolean $greater(char v)
+	public boolean $gt(char v)
 	{
 		return this.imag == 0D && this.real > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(char v)
+	public boolean $gt$eq(char v)
 	{
 		return this.imag == 0D && this.real >= v;
 	}
@@ -323,25 +323,25 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public boolean $less(int v)
+	public boolean $lt(int v)
 	{
 		return this.imag == 0D && this.real < v;
 	}
 	
 	@Override
-	public boolean $less$eq(int v)
+	public boolean $lt$eq(int v)
 	{
 		return this.imag == 0D && this.real <= v;
 	}
 	
 	@Override
-	public boolean $greater(int v)
+	public boolean $gt(int v)
 	{
 		return this.imag == 0D && this.real > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(int v)
+	public boolean $gt$eq(int v)
 	{
 		return this.imag == 0D && this.real >= v;
 	}
@@ -391,25 +391,25 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public boolean $less(long v)
+	public boolean $lt(long v)
 	{
 		return this.imag == 0D && this.real < v;
 	}
 	
 	@Override
-	public boolean $less$eq(long v)
+	public boolean $lt$eq(long v)
 	{
 		return this.imag == 0D && this.real <= v;
 	}
 	
 	@Override
-	public boolean $greater(long v)
+	public boolean $gt(long v)
 	{
 		return this.imag == 0D && this.real > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(long v)
+	public boolean $gt$eq(long v)
 	{
 		return this.imag == 0D && this.real >= v;
 	}
@@ -459,25 +459,25 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public boolean $less(float v)
+	public boolean $lt(float v)
 	{
 		return this.imag == 0D && this.real < v;
 	}
 	
 	@Override
-	public boolean $less$eq(float v)
+	public boolean $lt$eq(float v)
 	{
 		return this.imag == 0D && this.real <= v;
 	}
 	
 	@Override
-	public boolean $greater(float v)
+	public boolean $gt(float v)
 	{
 		return this.imag == 0D && this.real > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(float v)
+	public boolean $gt$eq(float v)
 	{
 		return this.imag == 0D && this.real >= v;
 	}
@@ -527,25 +527,25 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public boolean $less(double v)
+	public boolean $lt(double v)
 	{
 		return this.imag == 0D && this.real < v;
 	}
 	
 	@Override
-	public boolean $less$eq(double v)
+	public boolean $lt$eq(double v)
 	{
 		return this.imag == 0D && this.real <= v;
 	}
 	
 	@Override
-	public boolean $greater(double v)
+	public boolean $gt(double v)
 	{
 		return this.imag == 0D && this.real > v;
 	}
 	
 	@Override
-	public boolean $greater$eq(double v)
+	public boolean $gt$eq(double v)
 	{
 		return this.imag == 0D && this.real >= v;
 	}
@@ -592,22 +592,22 @@ public class Complex implements Number
 		return this.real != v.real || this.imag != v.imag;
 	}
 	
-	public boolean $less(Complex v)
+	public boolean $lt(Complex v)
 	{
 		return false;
 	}
 	
-	public boolean $less$eq(Complex v)
+	public boolean $lt$eq(Complex v)
 	{
 		return false;
 	}
 	
-	public boolean $greater(Complex v)
+	public boolean $gt(Complex v)
 	{
 		return false;
 	}
 	
-	public boolean $greater$eq(Complex v)
+	public boolean $gt$eq(Complex v)
 	{
 		return false;
 	}
@@ -648,25 +648,25 @@ public class Complex implements Number
 	}
 	
 	@Override
-	public boolean $less(Number v)
+	public boolean $lt(Number v)
 	{
 		return false;
 	}
 	
 	@Override
-	public boolean $less$eq(Number v)
+	public boolean $lt$eq(Number v)
 	{
 		return false;
 	}
 	
 	@Override
-	public boolean $greater(Number v)
+	public boolean $gt(Number v)
 	{
 		return false;
 	}
 	
 	@Override
-	public boolean $greater$eq(Number v)
+	public boolean $gt$eq(Number v)
 	{
 		return false;
 	}

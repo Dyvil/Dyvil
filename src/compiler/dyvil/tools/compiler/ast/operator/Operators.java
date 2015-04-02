@@ -35,10 +35,10 @@ public interface Operators
 	public static final Operator			NE				= new Operator(Name.bangeq, 60, INFIX_LEFT);
 	public static final Operator			SWAP			= new Operator(Name.coloneqcolon, 60, INFIX_LEFT);
 	
-	public static final Operator			LESS			= new Operator(Name.less, 70, INFIX_LEFT);
-	public static final Operator			LESSEQ			= new Operator(Name.lessEq, 70, INFIX_LEFT);
-	public static final Operator			GREATER			= new Operator(Name.greater, 70, INFIX_LEFT);
-	public static final Operator			GREATEREQ		= new Operator(Name.greaterEq, 70, INFIX_LEFT);
+	public static final Operator			LESS			= new Operator(Name.lt, 70, INFIX_LEFT);
+	public static final Operator			LESSEQ			= new Operator(Name.lteq, 70, INFIX_LEFT);
+	public static final Operator			GREATER			= new Operator(Name.gt, 70, INFIX_LEFT);
+	public static final Operator			GREATEREQ		= new Operator(Name.gteq, 70, INFIX_LEFT);
 	
 	public static final Operator			LSHIFT			= new Operator(Name.ltlt, 100, INFIX_LEFT);
 	public static final Operator			RSHIFT			= new Operator(Name.gtgt, 100, INFIX_LEFT);
