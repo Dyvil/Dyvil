@@ -19,10 +19,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
-import dyvil.tools.compiler.lexer.Dlex;
-import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.library.Library;
-import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.util.Util;
 
@@ -198,8 +195,7 @@ public final class DyvilCompiler
 	private static void loadConfig(String source)
 	{
 		CodeFile file = new CodeFile(source);
-		TokenIterator tokens = Dlex.tokenIterator(file.getCode());
-		new ParserManager(new ConfigParser(config)).parse(null, tokens);
+		ConfigParser.parse(file.getCode(), config);
 	}
 	
 	private static void addStates(String s)

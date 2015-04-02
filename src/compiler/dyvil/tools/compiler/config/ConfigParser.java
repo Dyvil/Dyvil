@@ -2,120 +2,115 @@ package dyvil.tools.compiler.config;
 
 import java.io.File;
 
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.strings.CharUtils;
 
-public class ConfigParser extends Parser
+public class ConfigParser
 {
-	public static final int		KEY		= 1;
-	public static final int		EQUALS	= 2;
-	public static final int		VALUE	= 4;
-	public static final int		ARRAY	= 8;
+	public static final int	KEY		= 1;
+	public static final int	EQUALS	= 2;
+	public static final int	VALUE	= 4;
+	public static final int	ARRAY	= 8;
 	
-	protected CompilerConfig	config;
-	
-	private Name				key;
-	
-	public ConfigParser(CompilerConfig config)
+	public static void parse(String source, CompilerConfig config)
 	{
-		this.config = config;
-		this.mode = KEY;
+		int len = source.length();
+		int mode = KEY;
+		int i = 0;
+		String key = null;
+		while (i < len)
+		{
+			switch (mode)
+			{
+			case KEY:
+			{
+				for (; CharUtils.isWhitespace(source.charAt(i));)
+					if (++i >= len)
+						return;
+				int l = i;
+				for (char c; CharUtils.isLetter(c = source.charAt(i)) || c == '_';)
+					if (++i >= len)
+						return;
+				key = source.substring(l, i);
+				mode = EQUALS;
+				continue;
+			}
+			case EQUALS:
+				for (char c; CharUtils.isWhitespace(c = source.charAt(i)) || c == '=';)
+					if (++i >= len)
+						return;
+				mode = VALUE;
+				continue;
+			case VALUE:
+			{
+				if (source.charAt(i) == '[')
+				{
+					mode = ARRAY;
+					i++;
+					continue;
+				}
+				int l = i;
+				for (; !CharUtils.isWhitespace(source.charAt(i));)
+					if (++i >= len)
+						return;
+				if (source.charAt(l) == ']')
+				{
+					mode = KEY;
+					continue;
+				}
+				setProperty(config, key, source.substring(l, i));
+				mode = KEY;
+				continue;
+			}
+			case ARRAY:
+				for (char c; CharUtils.isWhitespace(c = source.charAt(i)) || c == ',' || c == '[';)
+					if (++i >= len)
+						return;
+				if (source.charAt(i) == ']')
+				{
+					mode = KEY;
+					continue;
+				}
+				int l = i;
+				for (char c; !CharUtils.isWhitespace(c = source.charAt(i)) && c != ',' && c != ']';)
+					if (++i >= len)
+						return;
+				setProperty(config, key, source.substring(l, i));
+			}
+		}
 	}
 	
-	@Override
-	public void reset()
+	private static void setProperty(CompilerConfig config, String name, String value)
 	{
-		this.mode = KEY;
-		this.key = null;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
-	{
-		int type = token.type();
-		if (this.mode == KEY)
-		{
-			if (ParserUtil.isIdentifier(type))
-			{
-				this.mode = EQUALS;
-				this.key = token.nameValue();
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Property - Name expected");
-		}
-		if (this.mode == EQUALS)
-		{
-			if (type == Symbols.EQUALS)
-			{
-				this.mode = VALUE;
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Property - '=' expected");
-		}
-		else if (this.mode == VALUE)
-		{
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
-			{
-				this.mode = ARRAY;
-				return;
-			}
-			
-			this.setProperty(this.key, token);
-			this.mode = KEY;
-			this.key = null;
-			return;
-		}
-		else if (this.mode == ARRAY)
-		{
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
-			{
-				this.mode = KEY;
-				this.key = null;
-				return;
-			}
-			
-			this.setProperty(this.key, token);
-			return;
-		}
-	}
-	
-	private void setProperty(Name name, IToken token)
-	{
-		switch (name.qualified)
+		switch (name)
 		{
 		case "jar_name":
-			this.config.jarName = token.stringValue();
+			config.jarName = value;
 			return;
 		case "jar_vendor":
-			this.config.jarVendor = token.stringValue();
+			config.jarVendor = value;
 			return;
 		case "jar_version":
-			this.config.jarVersion = token.stringValue();
+			config.jarVersion = value;
 			return;
 		case "jar_format":
-			this.config.jarNameFormat = token.stringValue();
+			config.jarNameFormat = value;
 		case "source_dir":
-			this.config.sourceDir = new File(token.stringValue());
+			config.sourceDir = new File(value);
 			return;
 		case "output_dir":
-			this.config.outputDir = new File(token.stringValue());
+			config.outputDir = new File(value);
 			return;
 		case "main_type":
-			this.config.mainType = token.stringValue();
+			config.mainType = value;
 			return;
 		case "main_args":
-			this.config.mainArgs.add(token.stringValue());
+			config.mainArgs.add(value);
 			return;
 		case "include":
-			this.config.includeFile(token.stringValue());
+			config.includeFile(value);
 			return;
 		case "exclude":
-			this.config.excludeFile(token.stringValue());
+			config.excludeFile(value);
 			return;
 		}
 	}
