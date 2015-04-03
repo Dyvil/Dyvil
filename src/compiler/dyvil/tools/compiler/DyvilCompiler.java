@@ -127,11 +127,11 @@ public final class DyvilCompiler
 				{
 					phase.apply(units);
 					now1 = System.nanoTime() - now1;
-					logger.info(phase.getName() + "completed (" + Util.toTime(now1) + ")");
+					logger.info(phase.getName() + " completed (" + Util.toTime(now1) + ")");
 				}
 				catch (Throwable t)
 				{
-					logger.info(phase.getName() + "failed!");
+					logger.info(phase.getName() + " failed!");
 					logger.throwing(phase.getName(), "apply", t);
 					logger.info("");
 					logger.info("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");

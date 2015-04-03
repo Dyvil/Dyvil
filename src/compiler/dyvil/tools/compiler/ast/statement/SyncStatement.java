@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -10,7 +11,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class SyncStatement extends ASTNode implements IValue
+public final class SyncStatement extends ASTNode implements IStatement
 {
 	public IValue	lock;
 	public IValue	block;
@@ -24,6 +25,17 @@ public final class SyncStatement extends ASTNode implements IValue
 	public int getValueType()
 	{
 		return SYNCHRONIZED;
+	}
+	
+	@Override
+	public void setParent(IStatement parent)
+	{
+	}
+	
+	@Override
+	public IStatement getParent()
+	{
+		return null;
 	}
 	
 	@Override
@@ -55,6 +67,12 @@ public final class SyncStatement extends ASTNode implements IValue
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.lock.resolveTypes(markers, context);
+		
+		if (this.block.isStatement())
+		{
+			((IStatement) this.block).setParent(this);
+		}
+		
 		this.block.resolveTypes(markers, context);
 	}
 	
@@ -87,6 +105,12 @@ public final class SyncStatement extends ASTNode implements IValue
 	}
 	
 	@Override
+	public Label resolveLabel(Name name)
+	{
+		return null;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 		this.write(writer, true);
@@ -100,17 +124,18 @@ public final class SyncStatement extends ASTNode implements IValue
 	
 	private void write(MethodWriter writer, boolean expression)
 	{
-		int localCount = writer.registerLocal();
-		this.lock.writeExpression(writer);
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeVarInsn(Opcodes.ASTORE, localCount);
-		writer.writeInsn(Opcodes.MONITORENTER);
-		
 		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label handlerStart = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label throwLabel = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label handlerEnd = new org.objectweb.asm.Label();
+		
+		this.lock.writeExpression(writer);
+		writer.writeInsn(Opcodes.DUP);
+		
+		int varIndex = writer.startSync();
+		writer.writeVarInsn(Opcodes.ASTORE, varIndex);
+		writer.writeInsn(Opcodes.MONITORENTER);
 		
 		writer.writeLabel(start);
 		if (expression)
@@ -121,14 +146,16 @@ public final class SyncStatement extends ASTNode implements IValue
 		{
 			this.block.writeStatement(writer);
 		}
-		writer.writeVarInsn(Opcodes.ALOAD, localCount);
+		writer.endSync();
+		
+		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 		writer.writeInsn(Opcodes.MONITOREXIT);
 		writer.writeLabel(end);
 		
 		writer.writeJumpInsn(Opcodes.GOTO, handlerEnd);
 		
 		writer.writeLabel(handlerStart);
-		writer.writeVarInsn(Opcodes.ALOAD, localCount);
+		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 		writer.writeInsn(Opcodes.MONITOREXIT);
 		writer.writeLabel(throwLabel);
 		writer.writeInsn(Opcodes.ATHROW);
@@ -137,7 +164,7 @@ public final class SyncStatement extends ASTNode implements IValue
 			this.block.getType().writeDefaultValue(writer);
 		}
 		
-		writer.resetLocals(localCount);
+		writer.resetLocals(varIndex);
 		writer.writeLabel(handlerEnd);
 		
 		writer.writeFinallyBlock(start, end, handlerStart);

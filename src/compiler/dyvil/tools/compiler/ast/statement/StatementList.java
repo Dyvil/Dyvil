@@ -520,7 +520,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 				if (prev != null)
 				{
 					ICodePosition pos = value.getPosition();
-					if (pos != null && pos.endLine() - prev.getPosition().startLine() > 0)
+					if (pos != null && pos.endLine() - prev.getPosition().startLine() > 1)
 					{
 						buffer.append('\n').append(prefix1);
 					}

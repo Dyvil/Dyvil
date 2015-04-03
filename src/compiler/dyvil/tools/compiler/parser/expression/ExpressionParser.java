@@ -578,7 +578,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			return;
 		}
-		if (!ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
+		if (name.qualified.endsWith("$eq") || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
 		{
 			MethodCall call = new MethodCall(token, this.value, name);
 			this.value = call;

@@ -527,16 +527,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 		
 		if (this.then != null)
 		{
-			if (this.then.isStatement())
-			{
-				buffer.append('\n').append(prefix);
-				this.then.toString(prefix, buffer);
-			}
-			else
-			{
-				buffer.append(' ');
-				this.then.toString(prefix, buffer);
-			}
+			this.then.toString(prefix, buffer);
 		}
 	}
 }

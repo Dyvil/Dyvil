@@ -97,6 +97,10 @@ public interface MethodWriter
 	
 	// Blocks
 	
+	public int startSync();
+	
+	public void endSync();
+	
 	public void writeFinallyBlock(Label start, Label end, Label handler);
 	
 	public void writeTryCatchBlock(Label start, Label end, Label handler, String type);

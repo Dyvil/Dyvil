@@ -24,6 +24,9 @@ public final class MethodWriterImpl implements MethodWriter
 	private int					inlineOffset;
 	private Label				inlineEnd;
 	
+	private int[]				syncLocals;
+	private int					syncCount;
+	
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
 	{
 		this.cw = cw;
@@ -56,10 +59,13 @@ public final class MethodWriterImpl implements MethodWriter
 	
 	// Stack
 	
-	public void writeInlineReturn()
+	public void insnCallback()
 	{
-		this.mv.visitJumpInsn(Opcodes.GOTO, this.inlineEnd);
-		this.hasReturn = false;
+		if (this.hasReturn && this.inlineEnd != null)
+		{
+			this.mv.visitJumpInsn(Opcodes.GOTO, this.inlineEnd);
+			this.hasReturn = false;
+		}
 	}
 	
 	// Parameters
@@ -112,11 +118,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(int value)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		switch (value)
 		{
@@ -158,11 +160,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(long value)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		if (value == 0L)
 		{
@@ -180,11 +178,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(float value)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		if (value == 0F)
 		{
@@ -207,11 +201,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(double value)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		if (value == 0D)
 		{
@@ -229,11 +219,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(String value)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		this.mv.visitLdcInsn(value);
 	}
@@ -241,11 +227,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLDC(Type type)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		this.mv.visitLdcInsn(type);
 	}
@@ -255,11 +237,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLabel(Label label)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		this.mv.visitLabel(label);
 	}
@@ -269,11 +247,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInsn(int opcode)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		if (opcode > 255)
 		{
@@ -282,6 +256,14 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		if (opcode >= IRETURN && opcode <= RETURN)
 		{
+			if (this.syncCount > 0)
+			{
+				for (int i = 0; i < this.syncCount; i++)
+				{
+					this.mv.visitVarInsn(Opcodes.ALOAD, this.syncLocals[i]);
+					this.mv.visitInsn(Opcodes.MONITOREXIT);
+				}
+			}
 			this.hasReturn = true;
 			if (this.inlineEnd != null)
 			{
@@ -372,11 +354,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeIntInsn(int opcode, int operand)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		this.mv.visitIntInsn(opcode, operand);
 	}
@@ -386,11 +364,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeJumpInsn(int opcode, Label label)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		if (opcode > 255)
 		{
@@ -482,11 +456,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeTypeInsn(int opcode, String type)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		this.mv.visitTypeInsn(opcode, type);
 	}
@@ -494,11 +464,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeNewArray(String type, int dims)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		if (dims == 1)
 		{
@@ -512,11 +478,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeNewArray(IType type, int dims)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		if (dims == 1)
 		{
@@ -536,11 +498,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeIINC(int var, int value)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		this.mv.visitIincInsn(var, value);
 	}
@@ -548,11 +506,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeVarInsn(int opcode, int index)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		if (index >= this.localIndex)
 		{
@@ -571,11 +525,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeFieldInsn(int opcode, String owner, String name, String desc)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		this.mv.visitFieldInsn(opcode, owner, name, desc);
 	}
@@ -583,11 +533,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
 	}
@@ -595,11 +541,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInvokeDynamic(String name, String desc, Handle bsm, Object... bsmArgs)
 	{
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.writeInlineReturn();
-		}
-		this.hasReturn = false;
+		this.insnCallback();
 		
 		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
 	}
@@ -609,12 +551,16 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers)
 	{
+		this.insnCallback();
+		
 		this.mv.visitTableSwitchInsn(start, end, defaultHandler, handlers);
 	}
 	
 	@Override
 	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers)
 	{
+		this.insnCallback();
+		
 		this.mv.visitLookupSwitchInsn(defaultHandler, keys, handlers);
 	}
 	
@@ -641,6 +587,32 @@ public final class MethodWriterImpl implements MethodWriter
 		this.inlineEnd = null;
 		this.inlineOffset = 0;
 		this.hasReturn = false;
+	}
+	
+	@Override
+	public int startSync()
+	{
+		if (this.syncLocals == null)
+		{
+			this.syncLocals = new int[1];
+			this.syncCount = 1;
+			return this.syncLocals[0] = this.localIndex;
+		}
+		
+		int index = this.syncCount++;
+		if (index >= this.syncLocals.length)
+		{
+			int[] temp = new int[this.syncCount];
+			System.arraycopy(syncLocals, 0, temp, 0, syncLocals.length);
+			this.syncLocals = temp;
+		}
+		return this.syncLocals[index] = this.localIndex;
+	}
+	
+	@Override
+	public void endSync()
+	{
+		this.syncCount--;
 	}
 	
 	@Override
