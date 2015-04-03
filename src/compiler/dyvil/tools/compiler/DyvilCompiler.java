@@ -123,22 +123,42 @@ public final class DyvilCompiler
 			{
 				long now1 = System.nanoTime();
 				logger.info("Applying " + phase.getName());
-				phase.apply(units);
-				now1 = System.nanoTime() - now1;
-				logger.info("Completed " + phase.getName() + " (" + Util.toTime(now1) + ")");
+				try
+				{
+					phase.apply(units);
+					now1 = System.nanoTime() - now1;
+					logger.info(phase.getName() + "completed (" + Util.toTime(now1) + ")");
+				}
+				catch (Throwable t)
+				{
+					logger.info(phase.getName() + "failed!");
+					logger.throwing(phase.getName(), "apply", t);
+					logger.info("");
+					logger.info("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");
+					return;
+				}
 			}
 		}
 		else
 		{
 			for (ICompilerPhase phase : DyvilCompiler.phases)
 			{
-				phase.apply(units);
+				try
+				{
+					phase.apply(units);
+				}
+				catch (Throwable t)
+				{
+					logger.throwing(phase.getName(), "apply", t);
+					logger.info("");
+					logger.info("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");
+					return;
+				}
 			}
 		}
 		
-		now = System.nanoTime() - now;
 		logger.info("");
-		logger.info("Compilation finished (" + Util.toTime(now) + ")");
+		logger.info("Compilation finished (" + Util.toTime(System.nanoTime() - now) + ")");
 	}
 	
 	private static void initLogger()

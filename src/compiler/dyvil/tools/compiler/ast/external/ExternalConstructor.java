@@ -21,6 +21,7 @@ public class ExternalConstructor extends Constructor
 	public ExternalConstructor(IClass iclass)
 	{
 		super(iclass);
+		this.type = iclass.getType();
 	}
 	
 	private void resolveAnnotations()
@@ -35,7 +36,7 @@ public class ExternalConstructor extends Constructor
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.type.resolve(null, Package.rootPackage);
+		this.type = this.theClass.getThisType();
 	}
 	
 	private void resolveParameters()
@@ -167,5 +168,18 @@ public class ExternalConstructor extends Constructor
 	@Override
 	public void foldConstants()
 	{
+	}
+	
+	@Override
+	public void checkArguments(MarkerList markers, IArguments arguments)
+	{
+		if (!this.returnTypeResolved)
+		{
+			this.resolveReturnType();
+		}
+		if (!this.parametersResolved) {
+			this.resolveParameters();
+		}
+		super.checkArguments(markers, arguments);
 	}
 }

@@ -154,8 +154,26 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
+	public int classCount()
+	{
+		return 0;
+	}
+	
+	@Override
 	public void addClass(IClass iclass)
 	{
+	}
+	
+	@Override
+	public IClass getClass(int index)
+	{
+		return null;
+	}
+	
+	@Override
+	public IClass getClass(Name name)
+	{
+		return null;
 	}
 	
 	@Override
@@ -246,24 +264,22 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			}
 		}
 		
-		String qualified = name.qualified;
-		
 		// Package Classes
-		iclass = this.pack.resolveClass(qualified);
+		iclass = this.pack.resolveClass(name);
 		if (iclass != null)
 		{
 			return iclass;
 		}
 		
 		// Standart Dyvil Classes
-		iclass = Package.dyvilLang.resolveClass(qualified);
+		iclass = Package.dyvilLang.resolveClass(name);
 		if (iclass != null)
 		{
 			return iclass;
 		}
 		
 		// Standart Java Classes
-		return Package.javaLang.resolveClass(qualified);
+		return Package.javaLang.resolveClass(name);
 	}
 	
 	@Override

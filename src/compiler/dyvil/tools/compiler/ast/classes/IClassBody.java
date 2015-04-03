@@ -16,23 +16,13 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public interface IClassBody extends IASTNode
+public interface IClassBody extends IASTNode, IClassList
 {
 	// Associated Class
 	
 	public void setTheClass(IClass iclass);
 	
 	public IClass getTheClass();
-	
-	// Nested Classes
-	
-	public int classCount();
-	
-	public void addClass(IClass iclass);
-	
-	public IClass getClass(int index);
-	
-	public IClass getClass(Name name);
 	
 	// Fields
 	

@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser.type;
 
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.IBounded;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.*;
@@ -241,11 +241,11 @@ public final class TypeParser extends Parser implements ITyped
 	{
 		if (this.boundMode == UPPER)
 		{
-			((ITypeVariable) this.type).addUpperBound(type);
+			((IBounded) this.type).addUpperBound(type);
 		}
 		else if (this.boundMode == LOWER)
 		{
-			((ITypeVariable) this.type).setLowerBound(type);
+			((IBounded) this.type).setLowerBound(type);
 		}
 		else
 		{

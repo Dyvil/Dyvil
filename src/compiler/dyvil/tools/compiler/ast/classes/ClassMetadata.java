@@ -23,7 +23,7 @@ public class ClassMetadata implements IClassMetadata
 {
 	protected final IClass	theClass;
 	
-	protected IConstructor	constructor;
+	protected Constructor	constructor;
 	protected IConstructor	superConstructor;
 	
 	public ClassMetadata(IClass iclass)
@@ -44,6 +44,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
+		this.constructor.type = this.theClass.getType();
 		this.constructor.setParameters(this.theClass.getParameters(), this.theClass.parameterCount());
 	}
 	

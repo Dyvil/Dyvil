@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -282,6 +283,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
 		
+		
 		// Condition
 		this.condition.writeInvJump(writer, elseStart);
 		// If Block
@@ -291,10 +293,12 @@ public final class IfStatement extends ASTNode implements IStatement
 		// Else Block
 		if (this.elseThen == null)
 		{
+			ClassWriter.addCommonType(this.then.getType(), this.commonType, this.commonType);
 			this.commonType.writeDefaultValue(writer);
 		}
 		else
 		{
+			ClassWriter.addCommonType(this.then.getType(), this.elseThen.getType(), this.commonType);
 			this.elseThen.writeExpression(writer);
 		}
 		writer.writeLabel(elseEnd);

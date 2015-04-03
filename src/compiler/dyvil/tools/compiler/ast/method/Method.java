@@ -56,7 +56,6 @@ public class Method extends Member implements IMethod
 	
 	public IValue				value;
 	
-	protected IMethod			overrideMethod;
 	protected int[]				intrinsicOpcodes;
 	
 	public Method(IClass iclass)
@@ -409,19 +408,6 @@ public class Method extends Member implements IMethod
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if ((this.modifiers & Modifiers.STATIC) == 0)
-		{
-			IType t = this.theClass.getSuperType();
-			if (t != null)
-			{
-				IClass iclass = t.getTheClass();
-				if (iclass != null)
-				{
-					this.overrideMethod = iclass.getBody().getMethod(this.name, this.parameters, this.parameterCount);
-				}
-			}
-		}
-		
 		super.resolve(markers, context);
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -472,34 +458,7 @@ public class Method extends Member implements IMethod
 	{
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			if (this.overrideMethod == null)
-			{
-				if ((this.modifiers & Modifiers.OVERRIDE) != 0)
-				{
-					markers.add(this.position, "method.override", this.name);
-				}
-			}
-			else
-			{
-				if ((this.modifiers & Modifiers.OVERRIDE) == 0)
-				{
-					markers.add(this.position, "method.overrides", this.name);
-				}
-				else if (this.overrideMethod.hasModifier(Modifiers.FINAL))
-				{
-					markers.add(this.position, "method.override.final", this.name);
-				}
-				else
-				{
-					IType type = this.overrideMethod.getType();
-					if (!type.isSuperTypeOf(this.type))
-					{
-						Marker marker = markers.create(this.position, "method.override.type", this.name);
-						marker.addInfo("Return Type: " + this.type);
-						marker.addInfo("Overriden Return Type: " + type);
-					}
-				}
-			}
+			this.checkOverride(markers, context);
 		}
 		
 		super.check(markers, context);
@@ -522,6 +481,38 @@ public class Method extends Member implements IMethod
 		else if ((this.modifiers & Modifiers.ABSTRACT) == 0 && !this.theClass.isAbstract())
 		{
 			markers.add(this.position, "method.unimplemented", this.name);
+		}
+	}
+	
+	private void checkOverride(MarkerList markers, IContext context)
+	{
+		IMethod overrideMethod = this.theClass.getSuperMethod(this.name, this.parameters, this.parameterCount);
+		if (overrideMethod == null)
+		{
+			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
+			{
+				markers.add(this.position, "method.override", this.name);
+			}
+			return;
+		}
+		
+		if ((this.modifiers & Modifiers.OVERRIDE) == 0)
+		{
+			markers.add(this.position, "method.overrides", this.name);
+		}
+		else if (overrideMethod.hasModifier(Modifiers.FINAL))
+		{
+			markers.add(this.position, "method.override.final", this.name);
+		}
+		else
+		{
+			IType type = overrideMethod.getType();
+			if (!type.isSuperTypeOf(this.type))
+			{
+				Marker marker = markers.create(this.position, "method.override.type", this.name);
+				marker.addInfo("Return Type: " + this.type);
+				marker.addInfo("Overriden Return Type: " + type);
+			}
 		}
 	}
 	
@@ -807,7 +798,7 @@ public class Method extends Member implements IMethod
 	@Override
 	public String getSignature()
 	{
-		if (this.generics == null && !this.theClass.isGeneric())
+		if (this.genericCount == 0 && !this.theClass.isGeneric())
 		{
 			return null;
 		}

@@ -455,14 +455,18 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				return;
 			}
 			
-			ApplyMethodCall call = new ApplyMethodCall(token.raw());
-			call.instance = this.value;
-			SingleArgument sa = new SingleArgument();
-			call.arguments = sa;
-			this.value = call;
-			this.mode = 0;
-			pm.pushParser(new ExpressionParser(sa), true);
-			return;
+			if (this.value != null)
+			{
+				ApplyMethodCall call = new ApplyMethodCall(token.raw());
+				call.instance = this.value;
+				SingleArgument sa = new SingleArgument();
+				call.arguments = sa;
+				this.value = call;
+				this.mode = 0;
+				pm.pushParser(new ExpressionParser(sa), true);
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Access - Invalid " + token);
 		}
 		if (this.isInMode(CONSTRUCTOR))
 		{
@@ -542,7 +546,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			return;
 		}
 		Operator op = pm.getOperator(name);
-		if (op != null || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
+		if (op != null)
 		{
 			if (this.value == null || op.type == Operator.PREFIX)
 			{
@@ -572,6 +576,21 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				parser.operator = op;
 				pm.pushParser(parser);
 			}
+			return;
+		}
+		if (!ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
+		{
+			MethodCall call = new MethodCall(token, this.value, name);
+			this.value = call;
+			this.mode = ACCESS;
+			call.dotless = this.dotless;
+			
+			SingleArgument sa = new SingleArgument();
+			call.arguments = sa;
+			
+			ExpressionParser parser = new ExpressionParser(sa);
+			parser.operator = op;
+			pm.pushParser(parser);
 			return;
 		}
 		

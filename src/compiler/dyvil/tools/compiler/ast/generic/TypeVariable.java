@@ -7,26 +7,37 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class TypeVariable extends BaseBounded implements ITypeVariable
 {
-	public Name	name;
+	private IGeneric	generic;
+	public Name			name;
 	
-	public TypeVariable()
+	public TypeVariable(IGeneric generic)
 	{
+		this.generic = generic;
 	}
 	
-	public TypeVariable(Name name)
+	public TypeVariable(IGeneric generic, Name name)
 	{
 		this.name = name;
+		this.generic = generic;
 	}
 	
-	public TypeVariable(ICodePosition position)
+	public TypeVariable(ICodePosition position, IGeneric generic)
 	{
 		this.position = position;
+		this.generic = generic;
 	}
 	
-	public TypeVariable(ICodePosition position, Name name)
+	public TypeVariable(ICodePosition position, IGeneric generic, Name name)
 	{
 		this.position = position;
 		this.name = name;
+		this.generic = generic;
+	}
+	
+	@Override
+	public IGeneric getGeneric()
+	{
+		return this.generic;
 	}
 	
 	@Override
@@ -47,7 +58,7 @@ public final class TypeVariable extends BaseBounded implements ITypeVariable
 		buffer.append(this.name).append(':');
 		if (this.upperBoundCount > 0)
 		{
-			if (this.upperBounds[0] != Types.OBJECT)
+			if (this.upperBounds[0] != Types.OBJECT || this.upperBoundCount == 1)
 			{
 				this.upperBounds[0].appendSignature(buffer);
 			}
@@ -57,6 +68,10 @@ public final class TypeVariable extends BaseBounded implements ITypeVariable
 				buffer.append(':');
 				this.upperBounds[i].appendSignature(buffer);
 			}
+		}
+		else
+		{
+			buffer.append("Ljava/lang/Object;");
 		}
 	}
 	

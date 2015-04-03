@@ -8,6 +8,8 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface ITypeVariable extends IASTNode, INamed, IBounded
 {
+	public IGeneric getGeneric();
+	
 	// Super Types
 	
 	public boolean isSuperTypeOf(IType type);

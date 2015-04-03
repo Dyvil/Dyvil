@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.type;
 
 import java.util.List;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -485,36 +484,6 @@ public class Type extends ASTNode implements IType
 			buffer.append('[');
 		}
 		buffer.append('L').append(this.getInternalName()).append(';');
-	}
-	
-	@Override
-	public int getLoadOpcode()
-	{
-		return Opcodes.ALOAD;
-	}
-	
-	@Override
-	public int getArrayLoadOpcode()
-	{
-		return Opcodes.AALOAD;
-	}
-	
-	@Override
-	public int getStoreOpcode()
-	{
-		return Opcodes.ASTORE;
-	}
-	
-	@Override
-	public int getArrayStoreOpcode()
-	{
-		return Opcodes.AASTORE;
-	}
-	
-	@Override
-	public int getReturnOpcode()
-	{
-		return Opcodes.ARETURN;
 	}
 	
 	// Misc

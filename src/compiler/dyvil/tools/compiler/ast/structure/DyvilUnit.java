@@ -26,15 +26,34 @@ public final class DyvilUnit extends DyvilHeader
 	@Override
 	public void addClass(IClass iclass)
 	{
-		this.pack.addClass(iclass);
 		int index = this.classCount++;
 		if (index >= this.classes.length)
 		{
-			IClass[] temp = new IClass[index];
+			IClass[] temp = new IClass[this.classCount];
 			System.arraycopy(this.classes, 0, temp, 0, this.classes.length);
 			this.classes = temp;
 		}
 		this.classes[index] = iclass;
+	}
+	
+	@Override
+	public IClass getClass(int index)
+	{
+		return this.classes[index];
+	}
+	
+	@Override
+	public IClass getClass(Name name)
+	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			IClass c = this.classes[i];
+			if (c.getName() == name)
+			{
+				return c;
+			}
+		}
+		return null;
 	}
 	
 	@Override
@@ -50,8 +69,17 @@ public final class DyvilUnit extends DyvilHeader
 	@Override
 	public void resolveTypes()
 	{
+		super.resolveTypes();
+		
 		for (int i = 0; i < this.classCount; i++)
 		{
+			IClass iclass = this.classes[i];
+			if (iclass.getName() == null)
+			{
+				this.classes[i] = null;
+				this.classCount = i;
+				return;
+			}
 			this.classes[i].resolveTypes(this.markers, this);
 		}
 	}

@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.external;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Name;
@@ -10,7 +12,8 @@ import dyvil.tools.compiler.library.Library;
 
 public class ExternalPackage extends Package
 {
-	public Library	library;
+	public Library			library;
+	private List<IClass>	classes	= new ArrayList();
 	
 	public ExternalPackage(Package parent, Name name, Library library)
 	{
@@ -53,22 +56,49 @@ public class ExternalPackage extends Package
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public IClass resolveClass(Name name)
 	{
-		IClass iclass = super.resolveClass(name);
-		if (iclass == null)
+		for (IClass iclass : this.classes)
 		{
-			synchronized (this)
+			if (iclass.getName() == name)
 			{
-				InputStream is = this.library.getInputStream(this.internalName + name + ".class");
-				if (is != null)
-				{
-					ExternalClass bclass = new ExternalClass(Name.getQualified(name));
-					this.classes.add(bclass);
-					iclass = ClassReader.loadClass(bclass, is, false);
-				}
+				return iclass;
 			}
 		}
-		return iclass;
+		IClass iclass = super.resolveClass(name);
+		if (iclass != null)
+		{
+			return iclass;
+		}
+		return this.loadClass(name.qualified);
+	}
+	
+	@Override
+	public IClass resolveClass(String name)
+	{
+		for (IClass iclass : this.classes)
+		{
+			if (name.equals(iclass.getName().qualified))
+			{
+				return iclass;
+			}
+		}
+		
+		return this.loadClass(name);
+	}
+	
+	private IClass loadClass(String name)
+	{
+		synchronized (this)
+		{
+			InputStream is = this.library.getInputStream(this.internalName + name + ".class");
+			if (is != null)
+			{
+				ExternalClass bclass = new ExternalClass(Name.getQualified(name));
+				this.classes.add(bclass);
+				return ClassReader.loadClass(bclass, is, false);
+			}
+		}
+		return null;
 	}
 }

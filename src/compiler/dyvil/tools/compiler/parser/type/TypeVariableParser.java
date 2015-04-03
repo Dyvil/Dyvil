@@ -12,7 +12,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class TypeVariableParser extends Parser implements ITyped
+public final class TypeVariableParser extends Parser implements ITyped
 {
 	public static final int	NAME			= 1;
 	public static final int	TYPE_VARIABLE	= 16;
@@ -20,14 +20,14 @@ public class TypeVariableParser extends Parser implements ITyped
 	public static final int	UPPER			= 1;
 	public static final int	LOWER			= 2;
 	
-	protected IGeneric		typed;
+	protected IGeneric		generic;
 	
 	private byte			boundMode;
 	private ITypeVariable	variable;
 	
 	public TypeVariableParser(IGeneric typed)
 	{
-		this.typed = typed;
+		this.generic = typed;
 		this.mode = NAME;
 	}
 	
@@ -47,7 +47,7 @@ public class TypeVariableParser extends Parser implements ITyped
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.variable = new TypeVariable(token, token.nameValue());
+				this.variable = new TypeVariable(token, this.generic, token.nameValue());
 				this.mode = TYPE_VARIABLE;
 				return;
 			}
@@ -55,8 +55,23 @@ public class TypeVariableParser extends Parser implements ITyped
 		}
 		if (this.mode == TYPE_VARIABLE)
 		{
+			if (ParserUtil.isTerminator(type))
+			{
+				if (this.variable != null)
+				{
+					this.generic.addTypeVariable(this.variable);
+				}
+				pm.popParser(true);
+				return;
+			}
+			
 			if (!ParserUtil.isIdentifier(type))
 			{
+				if (this.variable != null)
+				{
+					this.generic.addTypeVariable(this.variable);
+				}
+				pm.popParser(true);
 				throw new SyntaxError(token, "Invalid Type Variable - '>=', '<=' or '&' expected");
 			}
 			
@@ -84,7 +99,7 @@ public class TypeVariableParser extends Parser implements ITyped
 					return;
 				}
 			}
-			this.typed.addTypeVariable(this.variable);
+			this.generic.addTypeVariable(this.variable);
 			pm.popParser(true);
 			return;
 		}

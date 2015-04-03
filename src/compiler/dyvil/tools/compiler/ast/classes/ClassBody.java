@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -285,9 +286,9 @@ public class ClassBody extends ASTNode implements IClassBody
 			
 			for (int p = 0; p < parameterCount; p++)
 			{
-				IParameter par1 = parameters[p];
-				IParameter par2 = m.getParameter(p);
-				if (!par1.getType().equals(par2.getType()))
+				IType t1 = parameters[p].getType();
+				IType t2 = m.getParameter(p).getType();
+				if (!t1.classEquals(t2) && t1.getArrayDimensions() != t2.getArrayDimensions())
 				{
 					continue outer;
 				}

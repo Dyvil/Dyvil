@@ -8,11 +8,9 @@ import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -67,6 +65,10 @@ public final class ExternalMethod extends Method
 	
 	private void resolveReturnType()
 	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
 		this.returnTypeResolved = true;
 		this.type = this.type.resolve(null, this);
 	}
@@ -82,6 +84,11 @@ public final class ExternalMethod extends Method
 	
 	private void resolveParameters()
 	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		
 		this.parametersResolved = true;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -119,26 +126,6 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public ITypeVariable getTypeVariable(int index)
-	{
-		if (!this.genericsResolved)
-		{
-			this.resolveGenerics();
-		}
-		return this.generics[index];
-	}
-	
-	@Override
-	public IParameter getParameter(int index)
-	{
-		if (!this.parametersResolved)
-		{
-			this.resolveParameters();
-		}
-		return this.parameters[index];
-	}
-	
-	@Override
 	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		if (name != this.name)
@@ -159,6 +146,10 @@ public final class ExternalMethod extends Method
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
+		}
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
 		}
 		return super.checkArguments(markers, instance, arguments, typeContext);
 	}

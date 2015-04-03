@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -153,7 +154,7 @@ public final class TypeVariableType extends ASTNode implements IType
 			}
 			return t;
 		}
-		return null;
+		return this;
 	}
 	
 	@Override
@@ -257,39 +258,22 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
-	public int getLoadOpcode()
-	{
-		return 0;
-	}
-	
-	@Override
-	public int getArrayLoadOpcode()
-	{
-		return 0;
-	}
-	
-	@Override
-	public int getStoreOpcode()
-	{
-		return 0;
-	}
-	
-	@Override
-	public int getArrayStoreOpcode()
-	{
-		return 0;
-	}
-	
-	@Override
-	public int getReturnOpcode()
-	{
-		return 0;
-	}
-	
-	@Override
 	public IType clone()
 	{
 		return new TypeVariableType(this.typeVar);
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder buf = new StringBuilder();
+		IGeneric generic = this.typeVar.getGeneric();
+		buf.append(this.typeVar.getName());
+		if (generic instanceof INamed)
+		{
+			buf.append(" (of type ").append(((INamed) generic).getName()).append(")");
+		}
+		return buf.toString();
 	}
 	
 	@Override

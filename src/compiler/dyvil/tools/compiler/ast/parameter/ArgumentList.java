@@ -198,7 +198,6 @@ public final class ArgumentList implements IArguments, IValueList
 			Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.getName());
 			marker.addInfo("Required Type: " + type);
 			marker.addInfo("Value Type: " + value.getType());
-			
 		}
 		else
 		{

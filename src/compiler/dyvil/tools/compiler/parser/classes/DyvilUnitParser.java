@@ -86,8 +86,7 @@ public final class DyvilUnitParser extends Parser
 			}
 			
 			CodeClass c = new CodeClass(null, this.unit);
-			this.unit.addClass(c);
-			pm.pushParser(new ClassDeclarationParser(c), true);
+			pm.pushParser(new ClassDeclarationParser(this.unit, c), true);
 			return;
 		}
 		throw new SyntaxError(token, "Invalid Token - Delete this token");

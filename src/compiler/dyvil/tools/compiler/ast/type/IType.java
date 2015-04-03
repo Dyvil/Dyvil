@@ -258,15 +258,30 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	// Compilation
 	
-	public int getLoadOpcode();
+	public default int getLoadOpcode()
+	{
+		return Opcodes.ALOAD;
+	}
 	
-	public int getArrayLoadOpcode();
+	public default int getArrayLoadOpcode()
+	{
+		return Opcodes.AALOAD;
+	}
 	
-	public int getStoreOpcode();
+	public default int getStoreOpcode()
+	{
+		return Opcodes.ASTORE;
+	}
 	
-	public int getArrayStoreOpcode();
+	public default int getArrayStoreOpcode()
+	{
+		return Opcodes.ASTORE;
+	}
 	
-	public int getReturnOpcode();
+	public default int getReturnOpcode()
+	{
+		return Opcodes.ARETURN;
+	}
 	
 	public default void writeDefaultValue(MethodWriter writer)
 	{

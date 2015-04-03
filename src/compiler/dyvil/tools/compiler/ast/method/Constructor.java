@@ -215,6 +215,8 @@ public class Constructor extends Member implements IConstructor
 		{
 			this.value.resolveTypes(markers, this);
 		}
+		
+		this.type = this.theClass.getType();
 	}
 	
 	@Override
@@ -347,7 +349,6 @@ public class Constructor extends Member implements IConstructor
 		{
 			markers.add(this.position, "constructor.static", this.name);
 		}
-		
 	}
 	
 	@Override
@@ -502,18 +503,18 @@ public class Constructor extends Member implements IConstructor
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], markers, null);
+			arguments.checkVarargsValue(len, this.parameters[len], markers, this.type);
 			
 			for (int i = 0; i < len; i++)
 			{
-				arguments.checkValue(i, this.parameters[i], markers, null);
+				arguments.checkValue(i, this.parameters[i], markers, this.type);
 			}
 			return;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			arguments.checkValue(i, this.parameters[i], markers, null);
+			arguments.checkValue(i, this.parameters[i], markers, this.type);
 		}
 	}
 	

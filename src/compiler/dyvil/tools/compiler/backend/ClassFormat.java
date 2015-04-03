@@ -368,7 +368,7 @@ public final class ClassFormat
 				
 				int index = signature.indexOf(':', i);
 				String name = signature.substring(i, index);
-				var = new TypeVariable(Name.getQualified(name));
+				var = new TypeVariable(generic, Name.getQualified(name));
 				generic.addTypeVariable(var);
 				mode = 1;
 			}

@@ -43,7 +43,6 @@ public class Package implements INamed, IContext
 	public String				internalName;
 	
 	public List<IDyvilHeader>	units		= new ArrayList();
-	public List<IClass>			classes		= new ArrayList();
 	public Map<String, Package>	subPackages	= new HashMap();
 	
 	protected Package()
@@ -99,11 +98,6 @@ public class Package implements INamed, IContext
 	public void addCompilationUnit(IDyvilHeader unit)
 	{
 		this.units.add(unit);
-	}
-	
-	public void addClass(IClass iclass)
-	{
-		this.classes.add(iclass);
 	}
 	
 	public void addSubPackage(Package pack)
@@ -182,19 +176,19 @@ public class Package implements INamed, IContext
 		return null;
 	}
 	
+	public IClass resolveClass(String name)
+	{
+		return this.resolveClass(Name.getQualified(name));
+	}
+	
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.resolveClass(name.qualified);
-	}
-	
-	public IClass resolveClass(String name)
-	{
-		for (IClass c : this.classes)
+		for (IDyvilHeader c : this.units)
 		{
-			if (c.getName().equals(name))
+			if (c.getName().equals(name.qualified))
 			{
-				return c;
+				return c.getClass(name);
 			}
 		}
 		

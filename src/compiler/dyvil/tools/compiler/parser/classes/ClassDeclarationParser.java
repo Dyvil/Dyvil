@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassList;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
@@ -35,10 +36,12 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 	private static final int	BODY			= 128;
 	private static final int	BODY_END		= 256;
 	
+	protected IClassList		classList;
 	protected CodeClass			theClass;
 	
-	public ClassDeclarationParser(CodeClass theClass)
+	public ClassDeclarationParser(IClassList classList, CodeClass theClass)
 	{
+		this.classList = classList;
 		this.theClass = theClass;
 		this.mode = MODIFIERS;
 	}
@@ -63,8 +66,8 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 			}
 			if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
 			{
-				this.theClass.setMetadata(IClass.getClassMetadata(this.theClass, this.theClass.getModifiers()));
 				this.theClass.addModifier(i);
+				this.theClass.setMetadata(IClass.getClassMetadata(this.theClass, this.theClass.getModifiers()));
 				this.mode = NAME;
 				return;
 			}
@@ -82,6 +85,7 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 			{
 				this.theClass.setPosition(token.raw());
 				this.theClass.setName(token.nameValue());
+				this.classList.addClass(this.theClass);
 				this.mode = PARAMETERS | GENERICS | EXTENDS | IMPLEMENTS | BODY;
 				return;
 			}
@@ -117,7 +121,7 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 		}
 		if (this.isInMode(GENERICS_END))
 		{
-			this.mode = EXTENDS | IMPLEMENTS | BODY;
+			this.mode = PARAMETERS | EXTENDS | IMPLEMENTS | BODY;
 			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
@@ -150,9 +154,9 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 				this.mode = BODY_END;
 				return;
 			}
-			pm.popParser();
 			if (ParserUtil.isTerminator(type))
 			{
+				pm.popParser();
 				this.theClass.expandPosition(token);
 				return;
 			}
@@ -160,9 +164,9 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 		}
 		if (this.isInMode(BODY_END))
 		{
-			pm.popParser();
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
+				pm.popParser();
 				this.theClass.expandPosition(token);
 				return;
 			}

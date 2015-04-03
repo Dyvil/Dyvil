@@ -120,9 +120,8 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 				codeClass.setAnnotations(this.getAnnotations(), this.annotationCount);
 				codeClass.setOuterClass(this.theClass);
 				codeClass.setModifiers(this.modifiers);
-				this.theClass.getBody().addClass(codeClass);
 				
-				ClassDeclarationParser parser = new ClassDeclarationParser(codeClass);
+				ClassDeclarationParser parser = new ClassDeclarationParser(this.theClass.getBody(), codeClass);
 				pm.pushParser(parser, true);
 				this.reset();
 				return;
@@ -144,7 +143,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 			if (!ParserUtil.isIdentifier(type))
 			{
 				this.reset();
-				throw new SyntaxError(token, "Invalid Member Declaration - Name expected");
+				throw new SyntaxError(token, "Invalid Member Declaration - Name expected", true);
 			}
 			
 			IToken next = token.next();

@@ -32,6 +32,7 @@ public interface Types
 	Type			ARetention		= new Type("Retention");
 	Type			ATarget			= new Type("Target");
 	
+	IClass			VOID_CLASS		= Package.dyvilLang.resolveClass("Void");
 	IClass			BOOLEAN_CLASS	= Package.dyvilLang.resolveClass("Boolean");
 	IClass			BYTE_CLASS		= Package.dyvilLang.resolveClass("Byte");
 	IClass			SHORT_CLASS		= Package.dyvilLang.resolveClass("Short");
@@ -49,6 +50,7 @@ public interface Types
 	
 	public static void init()
 	{
+		VOID.theClass = VOID_CLASS;
 		BOOLEAN.theClass = BOOLEAN_CLASS;
 		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.apply);
 		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.unapply);

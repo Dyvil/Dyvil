@@ -26,7 +26,7 @@ public final class Predef
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPEQ })
-	public static @infix boolean $eq$eq$eq(Object o1, Object o2)
+	public static @infix @inline boolean $eq$eq$eq(Object o1, Object o2)
 	{
 		return o1 == o2;
 	}
@@ -37,7 +37,7 @@ public final class Predef
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPNE })
-	public static @infix boolean $bang$eq$eq(Object o1, Object o2)
+	public static @infix @inline boolean $bang$eq$eq(Object o1, Object o2)
 	{
 		return o1 != o2;
 	}
@@ -336,20 +336,6 @@ public final class Predef
 			map.put(entry._1, entry._2);
 		}
 		return map;
-	}
-	
-	public static @infix Object match(Object o, Pattern[] patterns)
-	{
-		Option res;
-		for (Pattern p : patterns)
-		{
-			res = p.match(o);
-			if (res.isDefined())
-			{
-				return res.get();
-			}
-		}
-		throw new MatchError(o);
 	}
 	
 	public static @inline void $qmark$qmark$qmark()

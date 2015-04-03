@@ -76,14 +76,12 @@ public class CodeClass extends ASTNode implements IClass
 	
 	public CodeClass()
 	{
-		this.type = new Type(this);
 	}
 	
 	public CodeClass(ICodePosition position, IDyvilHeader unit)
 	{
 		this.position = position;
 		this.unit = unit;
-		this.type = new Type(this);
 		this.interfaces = new IType[1];
 	}
 	
@@ -92,7 +90,6 @@ public class CodeClass extends ASTNode implements IClass
 		this.position = position;
 		this.unit = unit;
 		this.modifiers = modifiers;
-		this.type = new Type(this);
 		this.interfaces = new IType[1];
 	}
 	
@@ -344,7 +341,7 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		
 		int index = this.genericCount++;
-		if (this.genericCount > this.generics.length)
+		if (index >= this.generics.length)
 		{
 			ITypeVariable[] temp = new ITypeVariable[this.genericCount];
 			System.arraycopy(this.generics, 0, temp, 0, index);
@@ -547,7 +544,24 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public String getSignature()
 	{
-		return null;
+		StringBuilder buffer = new StringBuilder();
+		
+		buffer.append('<');
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].appendSignature(buffer);
+		}
+		buffer.append('>');
+		
+		if (this.superType != null)
+		{
+			this.superType.appendSignature(buffer);
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].appendSignature(buffer);
+		}
+		return buffer.toString();
 	}
 	
 	@Override
@@ -577,6 +591,15 @@ public class CodeClass extends ASTNode implements IClass
 			
 			this.type = type;
 		}
+		else
+		{
+			this.type = new Type(this);
+		}
+		
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			this.annotations[i].resolveTypes(markers, context);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -585,17 +608,12 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.superType != null)
 		{
-			this.superType = this.superType.resolve(markers, context);
+			this.superType = this.superType.resolve(markers, this);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i] = this.interfaces[i].resolve(markers, context);
-		}
-		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].resolveTypes(markers, context);
+			this.interfaces[i] = this.interfaces[i].resolve(markers, this);
 		}
 		
 		if (this.body != null)
@@ -610,7 +628,8 @@ public class CodeClass extends ASTNode implements IClass
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			if (this.addRawAnnotation(a.type.getFullName()))
+			String fullName = a.type.getFullName();
+			if (fullName != null && this.addRawAnnotation(fullName))
 			{
 				this.removeAnnotation(i--);
 				continue;
@@ -675,11 +694,6 @@ public class CodeClass extends ASTNode implements IClass
 					markers.add(this.superType.getPosition(), "class.extend.deprecated", superClass.getName());
 				}
 			}
-		}
-		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0 && this.body.constructorCount() > 0)
-		{
-			markers.add(this.position, "class.object.constructor", this.name);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -893,6 +907,50 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		
 		this.metadata.getConstructorMatches(list, arguments);
+	}
+	
+	@Override
+	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount)
+	{
+		if (this.body != null)
+		{
+			IMethod m = this.body.getMethod(name, parameters, parameterCount);
+			if (m != null)
+			{
+				return m;
+			}
+		}
+		return this.getSuperMethod(name, parameters, parameterCount);
+	}
+	
+	@Override
+	public IMethod getSuperMethod(Name name, IParameter[] parameters, int parameterCount)
+	{
+		if (this.superType != null)
+		{
+			IClass iclass = this.superType.getTheClass();
+			if (iclass != null)
+			{
+				IMethod m = iclass.getMethod(name, parameters, parameterCount);
+				if (m != null)
+				{
+					return m;
+				}
+			}
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			IClass iclass = this.interfaces[i].getTheClass();
+			if (iclass != null)
+			{
+				IMethod m = iclass.getMethod(name, parameters, parameterCount);
+				if (m != null)
+				{
+					return m;
+				}
+			}
+		}
+		return null;
 	}
 	
 	@Override

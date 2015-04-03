@@ -22,7 +22,6 @@ public interface Keywords
 	int	FINALLY			= Tokens.KEYWORD | 0x00120000;
 	int	FOR				= Tokens.KEYWORD | 0x00130000;
 	int	FUNCTIONAL		= Tokens.KEYWORD | 0x00140000;
-	int	GET				= Tokens.KEYWORD | 0x00150000;
 	int	GOTO			= Tokens.KEYWORD | 0x00160000;
 	int	IF				= Tokens.KEYWORD | 0x00170000;
 	int	IMPLEMENTS		= Tokens.KEYWORD | 0x00180000;
@@ -45,7 +44,6 @@ public interface Keywords
 	int	PUBLIC			= Tokens.KEYWORD | 0x00290000;
 	int	RETURN			= Tokens.KEYWORD | 0x002A0000;
 	int	SEALED			= Tokens.KEYWORD | 0x002B0000;
-	int	SET				= Tokens.KEYWORD | 0x002C0000;
 	int	STATIC			= Tokens.KEYWORD | 0x002D0000;
 	int	SUPER			= Tokens.KEYWORD | 0x002E0000;
 	int	SYNCHRONIZED	= Tokens.KEYWORD | 0x002F0000;
@@ -102,8 +100,6 @@ public interface Keywords
 			return FOR;
 		case "functional":
 			return FUNCTIONAL;
-		case "get":
-			return GET;
 		case "goto":
 			return GOTO;
 		case "if":
@@ -148,8 +144,6 @@ public interface Keywords
 			return RETURN;
 		case "sealed":
 			return SEALED;
-		case "set":
-			return SET;
 		case "static":
 			return STATIC;
 		case "super":
@@ -220,8 +214,6 @@ public interface Keywords
 			return "for";
 		case FUNCTIONAL:
 			return "functional";
-		case GET:
-			return "get";
 		case GOTO:
 			return "goto";
 		case IF:
@@ -266,8 +258,6 @@ public interface Keywords
 			return "return";
 		case SEALED:
 			return "sealed";
-		case SET:
-			return "set";
 		case STATIC:
 			return "static";
 		case SUPER:

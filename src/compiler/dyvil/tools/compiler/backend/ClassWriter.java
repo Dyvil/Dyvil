@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.backend;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -9,10 +11,18 @@ import java.util.jar.Manifest;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.CompilerConfig;
 
-public class ClassWriter
+public class ClassWriter extends org.objectweb.asm.ClassWriter
 {
+	private static Map<String, String>	commonTypes	= new HashMap();
+
+	public ClassWriter()
+	{
+		super(DyvilCompiler.asmVersion | org.objectweb.asm.ClassWriter.COMPUTE_FRAMES);
+	}
+	
 	public static void createFile(File file)
 	{
 		try
@@ -39,12 +49,13 @@ public class ClassWriter
 		
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 		{
-			int ver = DyvilCompiler.asmVersion | org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
-			org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(ver);
+			ClassWriter writer = new ClassWriter();
 			iclass.write(writer);
 			writer.visitEnd();
 			byte[] bytes = writer.toByteArray();
 			os.write(bytes, 0, bytes.length);
+			
+			commonTypes.clear();
 		}
 		catch (Throwable ex)
 		{
@@ -52,6 +63,21 @@ public class ClassWriter
 		}
 	}
 	
+	public static void addCommonType(IType type1, IType type2, IType common)
+	{
+		StringBuilder buf = new StringBuilder();
+		buf.append(type1.getInternalName()).append(type2.getInternalName());
+		commonTypes.put(buf.toString(), common.getInternalName());
+	}
+	
+	@Override
+	protected String getCommonSuperClass(String type1, String type2)
+	{
+		StringBuilder buf = new StringBuilder();
+		buf.append(type1).append(type2);
+		return commonTypes.get(buf.toString());
+	}
+
 	public static void generateJAR(List<File> files)
 	{
 		CompilerConfig config = DyvilCompiler.config;
@@ -70,7 +96,7 @@ public class ClassWriter
 		attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
 		jar(files, output, manifest);
 	}
-	
+
 	public static void jar(List<File> files, File output, Manifest manifest)
 	{
 		String outputDir = DyvilCompiler.config.outputDir.getAbsolutePath();
@@ -98,7 +124,7 @@ public class ClassWriter
 			DyvilCompiler.logger.throwing("ClassWriter", "jar", ex);
 		}
 	}
-	
+
 	public static void createEntry(File input, JarOutputStream jos, String name)
 	{
 		try (FileInputStream fis = new FileInputStream(input))

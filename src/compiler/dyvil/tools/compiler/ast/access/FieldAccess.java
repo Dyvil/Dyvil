@@ -77,7 +77,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 		{
 			return 3;
 		}
-		else if (type.isSuperTypeOf(type1))
+		if (type.isSuperTypeOf(type1))
 		{
 			return 2;
 		}
@@ -165,7 +165,7 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 				return;
 			}
 		}
-		else if (this.field != null && this.field.isField())
+		else if (this.field != null && this.field.isField() && !this.field.hasModifier(Modifiers.STATIC))
 		{
 			markers.add(this.position, "access.field.unqualified", this.name);
 			this.instance = new ThisValue(this.position, this.field.getTheClass().getType());

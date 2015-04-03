@@ -1,8 +1,0 @@
-package dyvil.lang;
-
-public abstract class Any extends void
-{
-	protected Any new() = { };
-	
-	public abstract Class getClass();
-}

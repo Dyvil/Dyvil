@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -30,7 +31,7 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Annotation extends ASTNode implements ITyped
 {
-	public static final MethodParameter	VALUE	= new MethodParameter();
+	public static final MethodParameter	VALUE		= new MethodParameter();
 	
 	static
 	{
@@ -39,7 +40,7 @@ public final class Annotation extends ASTNode implements ITyped
 	
 	public Name							name;
 	public IType						type;
-	public IArguments					arguments;
+	public IArguments					arguments	= EmptyArguments.INSTANCE;
 	
 	public Annotation(IType type)
 	{

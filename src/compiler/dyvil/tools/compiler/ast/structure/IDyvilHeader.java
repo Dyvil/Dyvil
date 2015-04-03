@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.structure;
 
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassList;
 import dyvil.tools.compiler.ast.imports.HeaderComponent;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 
-public interface IDyvilHeader extends IContext
+public interface IDyvilHeader extends IContext, IClassList
 {
 	public String getName();
 	
@@ -35,10 +35,6 @@ public interface IDyvilHeader extends IContext
 	public void addOperator(Operator op);
 	
 	public Operator getOperator(Name name);
-	
-	// Classes
-	
-	public void addClass(IClass iclass);
 	
 	// Compilation
 	

@@ -155,8 +155,26 @@ public class REPLContext implements IValued, IDyvilHeader
 	}
 	
 	@Override
+	public int classCount()
+	{
+		return 0;
+	}
+	
+	@Override
 	public void addClass(IClass iclass)
 	{
+	}
+	
+	@Override
+	public IClass getClass(int index)
+	{
+		return null;
+	}
+	
+	@Override
+	public IClass getClass(Name name)
+	{
+		return null;
 	}
 	
 	@Override

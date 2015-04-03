@@ -7,7 +7,9 @@ import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterized;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -60,6 +62,10 @@ public interface IClass extends IASTNode, IMember, IGeneric, IContext, IParamete
 	public IClassMetadata getMetadata();
 	
 	public IMethod getFunctionalMethod();
+	
+	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount);
+	
+	public IMethod getSuperMethod(Name name, IParameter[] parameters, int parameterCount);
 	
 	public boolean isMember(IMember member);
 	
