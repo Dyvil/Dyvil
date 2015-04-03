@@ -58,7 +58,7 @@ public class ClassReader extends ClassVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String name, boolean visible)
 	{
-		Annotation annotation = new Annotation(null, ClassFormat.internalToType(name));
+		Annotation annotation = new Annotation(null, ClassFormat.extendedToType(name));
 		return new AnnotationVisitorImpl(this.theClass, annotation);
 	}
 	

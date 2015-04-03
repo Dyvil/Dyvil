@@ -449,6 +449,30 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public int typeCount()
+	{
+		return this.interfaceCount;
+	}
+	
+	@Override
+	public void setType(int index, IType type)
+	{
+		this.interfaces[index] = type;
+	}
+	
+	@Override
+	public void addType(IType type)
+	{
+		this.addInterface(type);
+	}
+	
+	@Override
+	public IType getType(int index)
+	{
+		return this.interfaces[index];
+	}
+	
+	@Override
 	public int interfaceCount()
 	{
 		return this.interfaceCount;
@@ -546,12 +570,15 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		StringBuilder buffer = new StringBuilder();
 		
-		buffer.append('<');
-		for (int i = 0; i < this.genericCount; i++)
+		if (this.genericCount > 0)
 		{
-			this.generics[i].appendSignature(buffer);
+			buffer.append('<');
+			for (int i = 0; i < this.genericCount; i++)
+			{
+				this.generics[i].appendSignature(buffer);
+			}
+			buffer.append('>');
 		}
-		buffer.append('>');
 		
 		if (this.superType != null)
 		{

@@ -104,32 +104,6 @@ public final class ClassFormat
 		return builder.toString();
 	}
 	
-	public static Object getFrameType(String extended)
-	{
-		switch (extended)
-		{
-		case "V":
-			return NULL;
-		case "Z":
-			return BOOLEAN;
-		case "B":
-			return BYTE;
-		case "S":
-			return SHORT;
-		case "C":
-			return CHAR;
-		case "I":
-			return INT;
-		case "L":
-			return LONG;
-		case "F":
-			return FLOAT;
-		case "D":
-			return DOUBLE;
-		}
-		return extended.substring(1, extended.length() - 1);
-	}
-	
 	public static String userToExtended(String name)
 	{
 		switch (name)
@@ -160,357 +134,326 @@ public final class ClassFormat
 		return name;
 	}
 	
-	private static IType parseBaseType(char c)
+	public static IType internalToType(String internal)
 	{
-		switch (c)
+		Type type = new Type();
+		setInternalName(type, internal, 0, internal.length());
+		return type;
+	}
+	
+	public static IType extendedToType(String extended)
+	{
+		return readType(extended, 0, extended.length());
+	}
+	
+	public static IType readReturnType(String desc) {
+		return readType(desc, desc.lastIndexOf(')') + 1, desc.length());
+	}
+	
+	public static void readClassSignature(String desc, IClass iclass)
+	{
+		int i = 0;
+		if (desc.charAt(0) == '<')
+		{
+			i++;
+			while (desc.charAt(i) != '>')
+			{
+				i = readGeneric(desc, i, iclass);
+			}
+			i++;
+		}
+		
+		int len = desc.length();
+		i = readTyped(desc, i, iclass);
+		while (i < len)
+		{
+			i = readTypeList(desc, i, iclass);
+		}
+	}
+
+	public static void readMethodType(String desc, IMethodSignature method)
+	{
+		int i = 1;
+		if (desc.charAt(0) == '<')
+		{
+			while (desc.charAt(i) != '>')
+			{
+				i = readGeneric(desc, i, method);
+			}
+			i += 2;
+		}
+		while (desc.charAt(i) != ')')
+		{
+			i = readTypeList(desc, i, method);
+		}
+		i++;
+		readTyped(desc, i, method);
+	}
+
+	public static void readConstructorType(String desc, IConstructor constructor)
+	{
+		int i = 1;
+		while (desc.charAt(i) != ')')
+		{
+			i = readTypeList(desc, i, constructor);
+		}
+	}
+
+	private static void setInternalName(IType type, String desc, int start, int end)
+	{
+		int index = desc.lastIndexOf('/', end);
+		if (index < start)
+		{
+			// No slash in type name, skip internal -> package name conversion
+			type.setName(Name.getQualified(desc.substring(start, end)));
+			type.setFullName(desc.substring(start, end));
+			return;
+		}
+		
+		type.setName(Name.getQualified(desc.substring(index + 1, end)));
+		StringBuilder buf = new StringBuilder(end - index + 1);
+		for (; start < end; start++)
+		{
+			char c = desc.charAt(start);
+			if (c == '/')
+			{
+				buf.append('.');
+				continue;
+			}
+			buf.append(c);
+		}
+		type.setFullName(buf.toString());
+	}
+
+	private static IType readType(String desc, int start, int end)
+	{
+		int array = 0;
+		while (desc.charAt(start) == '[')
+		{
+			array++;
+			start++;
+		}
+		
+		switch (desc.charAt(start))
 		{
 		case 'V':
-			return Types.VOID;
+			return Types.VOID.getArrayType(array);
 		case 'Z':
-			return Types.BOOLEAN;
+			return Types.BOOLEAN.getArrayType(array);
 		case 'B':
-			return Types.BYTE;
+			return Types.BYTE.getArrayType(array);
 		case 'S':
-			return Types.SHORT;
+			return Types.SHORT.getArrayType(array);
 		case 'C':
-			return Types.CHAR;
+			return Types.CHAR.getArrayType(array);
 		case 'I':
-			return Types.INT;
+			return Types.INT.getArrayType(array);
 		case 'J':
-			return Types.LONG;
+			return Types.LONG.getArrayType(array);
 		case 'F':
-			return Types.FLOAT;
+			return Types.FLOAT.getArrayType(array);
 		case 'D':
-			return Types.DOUBLE;
+			return Types.DOUBLE.getArrayType(array);
+		case 'L':
+			return readReferenceType(desc, start + 1, end - 1);
 		}
 		return null;
 	}
 	
-	public static IType internalToType(String internal)
+	private static IType readReferenceType(String desc, int start, int end)
 	{
-		int i = internal.indexOf('<');
-		if (i != -1)
+		int index = desc.indexOf('<', start);
+		if (index != -1 && index < end)
 		{
 			GenericType type = new GenericType();
-			setInternalName(type, internal.substring(1, i));
-			int index = getMatchingBracket(internal, i, internal.length());
-			readTypeList(internal, i + 1, index, type);
-			return type;
-		}
-		
-		return internalToType(internal, new Type());
-	}
-	
-	public static IType internalToType(String internal, IType type)
-	{
-		int len = internal.length();
-		int arrayDimensions = 0;
-		int i = 0;
-		while (i < len && internal.charAt(i) == '[')
-		{
-			arrayDimensions++;
-			i++;
-		}
-		
-		char c = internal.charAt(i);
-		
-		if (c == 'L')
-		{
-			int l = len - 1;
-			if (internal.charAt(l) == ';')
+			setInternalName(type, desc, start, index);
+			index++;
+			
+			while (desc.charAt(index) != '>')
 			{
-				internal = internal.substring(i + 1, l);
+				index = readTypeList(desc, index, type);
 			}
-			setInternalName(type, internal);
-		}
-		else if (c == 'T')
-		{
-			int l = len - 1;
-			if (internal.charAt(l) == ';')
-			{
-				internal = internal.substring(i + 1, l);
-			}
-			type.setName(Name.getQualified(internal));
-		}
-		else if (len - i == 1)
-		{
-			type = parseBaseType(c);
-			if (arrayDimensions > 0)
-			{
-				type = type.clone();
-			}
-		}
-		else
-		{
-			setInternalName(type, internal);
-		}
-		
-		type.setArrayDimensions(arrayDimensions);
-		return type;
-	}
-	
-	protected static void setInternalName(IType type, String internal)
-	{
-		int index = internal.lastIndexOf('/');
-		if (index == -1)
-		{
-			type.setName(Name.getQualified(internal));
-			type.setFullName(internal);
-		}
-		else
-		{
-			type.setName(Name.getQualified(internal.substring(index + 1)));
-			type.setFullName(internal.replace('/', '.'));
-		}
-	}
-	
-	public static void readMethodType(String internal, IMethodSignature method)
-	{
-		int index = internal.indexOf(')');
-		int i = 1;
-		
-		if (internal.charAt(0) == '<')
-		{
-			int j = getMatchingBracket(internal, 0, index);
-			readTypeArguments(internal, 1, j, method);
-			i = j + 2;
-		}
-		
-		readTypeList(internal, i, index, method);
-		
-		IType t = internalToType(internal.substring(index + 1));
-		method.setType(t);
-	}
-	
-	public static void readConstructorType(String internal, IConstructor constructor)
-	{
-		readTypeList(internal, 1, internal.indexOf(')'), constructor);
-	}
-	
-	protected static void readTypeList(String internal, int start, int end, ITypeList list)
-	{
-		int array = 0;
-		for (int i = start; i < end; i++)
-		{
-			char c = internal.charAt(i);
-			if (c == '[')
-			{
-				array++;
-			}
-			else if (c == 'L')
-			{
-				int end1 = getMatchingSemicolon(internal, i, end);
-				IType type = internalToType2(internal.substring(i + 1, end1));
-				
-				type.setArrayDimensions(array);
-				array = 0;
-				list.addType(type);
-				i = end1;
-			}
-			else if (c == 'T')
-			{
-				int end1 = internal.indexOf(';', i);
-				IType type = new Type(Name.getQualified(internal.substring(i + 1, end1)));
-				
-				type.setArrayDimensions(array);
-				array = 0;
-				list.addType(type);
-				i = end1;
-			}
-			else if (c == '*')
-			{
-				list.addType(new WildcardType());
-			}
-			else if (c == '+' || c == '-')
-			{
-				int end1 = getMatchingSemicolon(internal, i, end);
-				String name = internal.substring(i + 1, end1 + 1);
-				IType type = internalToType(name);
-				WildcardType var = new WildcardType();
-				if (c == '-')
-				{
-					var.setLowerBound(type);
-				}
-				else
-				{
-					var.addUpperBound(type);
-				}
-				list.addType(var);
-				i = end1;
-			}
-			else if (array == 0)
-			{
-				list.addType(parseBaseType(c));
-			}
-			else
-			{
-				IType type = parseBaseType(c).clone();
-				type.setArrayDimensions(array);
-				array = 0;
-				list.addType(type);
-			}
-		}
-	}
-	
-	protected static void readTypeArguments(String signature, int start, int end, IGeneric generic)
-	{
-		int array = 0;
-		int mode = 0;
-		TypeVariable var = null;
-		for (int i = start; i < end; i++)
-		{
-			if (mode == 0)
-			{
-				if (signature.charAt(i) == '>')
-				{
-					return;
-				}
-				
-				int index = signature.indexOf(':', i);
-				String name = signature.substring(i, index);
-				var = new TypeVariable(generic, Name.getQualified(name));
-				generic.addTypeVariable(var);
-				mode = 1;
-			}
-			else if (mode == 1)
-			{
-				char c = signature.charAt(i);
-				if (c == ':')
-				{
-					char c1 = signature.charAt(i + 1);
-					if (c1 == '[')
-					{
-						i++;
-						array++;
-						continue;
-					}
-					
-					if (c1 == 'L')
-					{
-						int end1 = getMatchingSemicolon(signature, i + 1, end);
-						IType type = internalToType2(signature.substring(i + 2, end1));
-						
-						type.setArrayDimensions(array);
-						var.addUpperBound(type);
-						array = 0;
-						mode = 2;
-						i = end1;
-					}
-					else if (c1 == 'T')
-					{
-						int end1 = signature.indexOf(';', i);
-						IType type = new Type(Name.getQualified(signature.substring(i + 2, end1)));
-						
-						type.setArrayDimensions(array);
-						var.addUpperBound(type);
-						array = 0;
-						mode = 2;
-						i = end1;
-					}
-					
-					mode = 2;
-					continue;
-				}
-				
-				mode = 0;
-				i--;
-			}
-			else if (mode == 2)
-			{
-				char c = signature.charAt(i);
-				if (c == ':')
-				{
-					char c1 = signature.charAt(i + 1);
-					if (c1 == '[')
-					{
-						i++;
-						array++;
-						continue;
-					}
-					
-					if (c1 == 'L')
-					{
-						int end1 = getMatchingSemicolon(signature, i + 1, end);
-						IType type = internalToType2(signature.substring(i + 2, end1));
-						
-						type.setArrayDimensions(array);
-						var.addUpperBound(type);
-						array = 0;
-						mode = 0;
-						i = end1;
-					}
-					else if (c1 == 'T')
-					{
-						int end1 = signature.indexOf(';', i + 1);
-						IType type = new Type(Name.getQualified(signature.substring(i + 2, end1)));
-						
-						type.setArrayDimensions(array);
-						var.addUpperBound(type);
-						array = 0;
-						mode = 2;
-						i = end1;
-					}
-					
-					continue;
-				}
-				
-				mode = 0;
-				i--;
-			}
-		}
-	}
-	
-	protected static IType internalToType2(String internal)
-	{
-		int i = internal.indexOf('<');
-		if (i != -1)
-		{
-			GenericType type = new GenericType();
-			setInternalName(type, internal.substring(0, i));
-			int index = getMatchingBracket(internal, i, internal.length());
-			readTypeList(internal, i + 1, index, type);
 			return type;
 		}
 		
 		IType type = new Type();
-		setInternalName(type, internal);
+		setInternalName(type, desc, start, end);
 		return type;
 	}
 	
-	public static void readClassSignature(String signature, IClass iclass)
+	private static int readTyped(String desc, int start, ITyped typed)
 	{
-		int i = 0;
-		int len = signature.length();
-		
-		if (signature.charAt(0) == '<')
+		int array = 0;
+		char c;
+		while ((c = desc.charAt(start)) == '[')
 		{
-			int index = getMatchingBracket(signature, 0, len);
-			readTypeArguments(signature, 1, index, iclass);
-			i = index + 1;
+			array++;
+			start++;
 		}
 		
-		boolean superClass = true;
-		for (; i < len; i++)
+		switch (c)
 		{
-			char c = signature.charAt(i);
-			if (c == 'L')
-			{
-				int end1 = getMatchingSemicolon(signature, i, len);
-				String name = signature.substring(i + 1, end1);
-				IType type = internalToType2(name);
-				i = end1;
-				
-				if (superClass)
-				{
-					iclass.setSuperType(type);
-					superClass = false;
-				}
-				else
-				{
-					iclass.addInterface(type);
-				}
-			}
+		case 'V':
+			typed.setType(Types.VOID.getArrayType(array));
+			return start + 1;
+		case 'Z':
+			typed.setType(Types.BOOLEAN.getArrayType(array));
+			return start + 1;
+		case 'B':
+			typed.setType(Types.BYTE.getArrayType(array));
+			return start + 1;
+		case 'S':
+			typed.setType(Types.SHORT.getArrayType(array));
+			return start + 1;
+		case 'C':
+			typed.setType(Types.CHAR.getArrayType(array));
+			return start + 1;
+		case 'I':
+			typed.setType(Types.INT.getArrayType(array));
+			return start + 1;
+		case 'J':
+			typed.setType(Types.LONG.getArrayType(array));
+			return start + 1;
+		case 'F':
+			typed.setType(Types.FLOAT.getArrayType(array));
+			return start + 1;
+		case 'D':
+			typed.setType(Types.DOUBLE.getArrayType(array));
+			return start + 1;
+		case 'L':
+		{
+			int end1 = getMatchingSemicolon(desc, start, desc.length());
+			IType type = readReferenceType(desc, start + 1, end1);
+			type.setArrayDimensions(array);
+			typed.setType(type);
+			return end1 + 1;
 		}
+		case 'T':
+		{
+			int end1 = desc.indexOf(';', start);
+			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
+			
+			type.setArrayDimensions(array);
+			typed.setType(type);
+			return end1 + 1;
+		}
+		case '*':
+			typed.setType(new WildcardType());
+			return start + 1;
+		case '+':
+		{
+			int end1 = getMatchingSemicolon(desc, start, desc.length());
+			WildcardType var = new WildcardType();
+			var.addUpperBound(readType(desc, start + 1, end1));
+			typed.setType(var);
+			return end1 + 1;
+		}
+		case '-':
+		{
+			int end1 = getMatchingSemicolon(desc, start, desc.length());
+			WildcardType var = new WildcardType();
+			var.setLowerBound(readType(desc, start + 1, end1));
+			typed.setType(var);
+			return end1 + 1;
+		}
+		}
+		return start;
+	}
+	
+	private static int readTypeList(String desc, int start, ITypeList list)
+	{
+		int array = 0;
+		char c;
+		while ((c = desc.charAt(start)) == '[')
+		{
+			array++;
+			start++;
+		}
+		
+		switch (c)
+		{
+		case 'V':
+			list.addType(Types.VOID.getArrayType(array));
+			return start + 1;
+		case 'Z':
+			list.addType(Types.BOOLEAN.getArrayType(array));
+			return start + 1;
+		case 'B':
+			list.addType(Types.BYTE.getArrayType(array));
+			return start + 1;
+		case 'C':
+			list.addType(Types.CHAR.getArrayType(array));
+			return start + 1;
+		case 'S':
+			list.addType(Types.SHORT.getArrayType(array));
+			return start + 1;
+		case 'I':
+			list.addType(Types.INT.getArrayType(array));
+			return start + 1;
+		case 'J':
+			list.addType(Types.LONG.getArrayType(array));
+			return start + 1;
+		case 'F':
+			list.addType(Types.FLOAT.getArrayType(array));
+			return start + 1;
+		case 'D':
+			list.addType(Types.DOUBLE.getArrayType(array));
+			return start + 1;
+		case 'L':
+		{
+			int end1 = getMatchingSemicolon(desc, start, desc.length());
+			IType type = readReferenceType(desc, start + 1, end1);
+			type.setArrayDimensions(array);
+			list.addType(type);
+			return end1 + 1;
+		}
+		case 'T':
+		{
+			int end1 = desc.indexOf(';', start);
+			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
+			type.setArrayDimensions(array);
+			list.addType(type);
+			return end1 + 1;
+		}
+		case '*':
+			list.addType(new WildcardType());
+			return start + 1;
+		case '+':
+		{
+			int end1 = getMatchingSemicolon(desc, start, desc.length());
+			WildcardType var = new WildcardType();
+			var.addUpperBound(readType(desc, start + 1, end1));
+			list.addType(var);
+			return end1 + 1;
+		}
+		case '-':
+		{
+			int end1 = getMatchingSemicolon(desc, start, desc.length());
+			WildcardType var = new WildcardType();
+			var.setLowerBound(readType(desc, start + 1, end1));
+			list.addType(var);
+			return end1 + 1;
+		}
+		}
+		return start;
+	}
+	
+	private static int readGeneric(String desc, int start, IGeneric generic)
+	{
+		TypeVariable typeVar = new TypeVariable(generic);
+		int index = desc.indexOf(':', start);
+		typeVar.name = Name.getQualified(desc.substring(start, index));
+		if (desc.charAt(index + 1) == ':')
+		{
+			index++;
+			typeVar.addUpperBound(Types.OBJECT);
+		}
+		while (desc.charAt(index) == ':')
+		{
+			index = readTypeList(desc, index + 1, typeVar);
+		}
+		generic.addTypeVariable(typeVar);
+		return index;
 	}
 	
 	private static int getMatchingSemicolon(String s, int start, int end)
@@ -530,28 +473,6 @@ public final class ClassFormat
 			else if (c == ';' && depth == 0)
 			{
 				return i;
-			}
-		}
-		return -1;
-	}
-	
-	private static int getMatchingBracket(String s, int start, int end)
-	{
-		int depth = 0;
-		for (int i = start; i < end; i++)
-		{
-			char c = s.charAt(i);
-			if (c == '<')
-			{
-				depth++;
-			}
-			else if (c == '>')
-			{
-				depth--;
-				if (depth == 0)
-				{
-					return i;
-				}
 			}
 		}
 		return -1;

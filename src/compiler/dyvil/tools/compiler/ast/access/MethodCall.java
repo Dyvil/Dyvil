@@ -121,7 +121,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		{
 			return 3;
 		}
-		else if (type.isSuperTypeOf(type1))
+		if (type.isSuperTypeOf(type1))
 		{
 			return 2;
 		}

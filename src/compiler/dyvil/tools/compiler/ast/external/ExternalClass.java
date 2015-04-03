@@ -43,7 +43,6 @@ public final class ExternalClass extends CodeClass
 	private IType		outerType;
 	private List<IType>	innerTypes;
 	
-	private boolean		metadataResolved;
 	private boolean		superTypesResolved;
 	private boolean		genericsResolved;
 	private boolean		annotationsResolved;
@@ -52,13 +51,6 @@ public final class ExternalClass extends CodeClass
 	public ExternalClass(Name name)
 	{
 		this.name = name;
-	}
-	
-	private void resolveMetadata()
-	{
-		this.metadataResolved = true;
-		this.metadata = IClass.getClassMetadata(this, this.modifiers);
-		this.metadata.resolve(null, Package.rootPackage);
 	}
 	
 	private void resolveGenerics()
@@ -91,6 +83,12 @@ public final class ExternalClass extends CodeClass
 		{
 			this.interfaces[i] = this.interfaces[i].resolve(null, Package.rootPackage);
 		}
+		
+		if (this.metadata == null)
+		{
+			this.metadata = IClass.getClassMetadata(this, this.modifiers);
+		}
+		this.metadata.resolve(null, Package.rootPackage);
 	}
 	
 	private void resolveAnnotations()
@@ -195,11 +193,10 @@ public final class ExternalClass extends CodeClass
 	@Override
 	public void addParameter(IParameter param)
 	{
-		if (!this.metadataResolved)
+		if (this.metadata == null)
 		{
-			this.resolveMetadata();
+			this.metadata = IClass.getClassMetadata(this, this.modifiers);
 		}
-		
 		super.addParameter(param);
 	}
 	
@@ -411,7 +408,7 @@ public final class ExternalClass extends CodeClass
 		Field field = new ExternalField(this);
 		field.setName(Name.get(name));
 		field.setModifiers(access);
-		field.setType(ClassFormat.internalToType(desc));
+		field.setType(ClassFormat.extendedToType(desc));
 		
 		if (value != null)
 		{
@@ -442,7 +439,7 @@ public final class ExternalClass extends CodeClass
 			ClassParameter param = new ClassParameter();
 			param.modifiers = access;
 			param.name = name1;
-			param.type = ClassFormat.internalToType(desc.substring(desc.lastIndexOf(')') + 1));
+			param.type = ClassFormat.readReturnType(desc);
 			this.addParameter(param);
 			return new AnnotationClassVisitor(param);
 		}

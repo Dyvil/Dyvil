@@ -5,11 +5,12 @@ import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public abstract class BaseBounded implements IASTNode, IBounded
+public abstract class BaseBounded implements IASTNode, IBounded, ITypeList
 {
 	protected ICodePosition	position;
 	
@@ -36,6 +37,37 @@ public abstract class BaseBounded implements IASTNode, IBounded
 	public ICodePosition getPosition()
 	{
 		return this.position;
+	}
+	
+	@Override
+	public int typeCount()
+	{
+		return this.upperBoundCount;
+	}
+	
+	@Override
+	public void setType(int index, IType type)
+	{
+		this.upperBounds[index] = type;
+	}
+	
+	@Override
+	public void addType(IType type)
+	{
+		int index = this.upperBoundCount++;
+		if (index >= this.upperBounds.length)
+		{
+			IType[] temp = new IType[this.upperBoundCount];
+			System.arraycopy(this.upperBounds, 0, temp, 0, this.upperBounds.length);
+			this.upperBounds = temp;
+		}
+		this.upperBounds[index] = type;
+	}
+	
+	@Override
+	public IType getType(int index)
+	{
+		return this.upperBounds[index];
 	}
 	
 	@Override

@@ -14,8 +14,9 @@ import dyvil.tools.compiler.ast.parameter.IParameterized;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
 
-public interface IClass extends IASTNode, IMember, IGeneric, IContext, IParameterized
+public interface IClass extends IASTNode, IMember, IGeneric, IContext, IParameterized, ITypeList
 {
 	public IDyvilHeader getUnit();
 	

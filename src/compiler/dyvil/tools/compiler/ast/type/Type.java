@@ -194,6 +194,11 @@ public class Type extends ASTNode implements IType
 	@Override
 	public IType getArrayType(int dimensions)
 	{
+		if (dimensions == this.arrayDimensions)
+		{
+			return this;
+		}
+		
 		Type t = this.clone();
 		t.arrayDimensions = dimensions;
 		return t;
@@ -473,7 +478,7 @@ public class Type extends ASTNode implements IType
 	@Override
 	public String getSignature()
 	{
-		return this.theClass.getSignature();
+		return null;
 	}
 	
 	@Override

@@ -204,7 +204,7 @@ public class Field extends Member implements IField
 			return;
 		}
 		
-		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, this.getDescription(), this.type.getSignature(), null);
+		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(), this.type.getSignature(), null);
 		if ((this.modifiers & Modifiers.SEALED) != 0)
 		{
 			fv.visitAnnotation("Ldyvil/lang/annotation/sealed", false);

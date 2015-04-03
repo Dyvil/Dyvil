@@ -7,23 +7,16 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.Constructor;
-import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class ObjectClassMetadata implements IClassMetadata
+public final class ObjectClassMetadata extends ClassMetadata
 {
-	protected final IClass	theClass;
-	
-	private Constructor		constructor;
-	protected IField		instanceField;
+	protected IField	instanceField;
 	
 	public ObjectClassMetadata(IClass iclass)
 	{
-		this.theClass = iclass;
-		
-		this.constructor = new Constructor(iclass);
+		super(iclass);
 	}
 	
 	@Override
@@ -33,15 +26,9 @@ public final class ObjectClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public IConstructor getConstructor()
-	{
-		return this.constructor;
-	}
-	
-	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		this.constructor.type = this.theClass.getType();
+		super.resolve(markers, context);
 		
 		IClassBody body = this.theClass.getBody();
 		if (body != null)
@@ -54,7 +41,6 @@ public final class ObjectClassMetadata implements IClassMetadata
 			IField f = body.getField(Name.instance);
 			if (f != null)
 			{
-				this.instanceField = f;
 				return;
 			}
 		}
@@ -72,7 +58,7 @@ public final class ObjectClassMetadata implements IClassMetadata
 	@Override
 	public IField resolveField(Name name)
 	{
-		if (name == Name.instance)
+		if (this.instanceField != null && name == Name.instance)
 		{
 			return this.instanceField;
 		}
@@ -82,5 +68,11 @@ public final class ObjectClassMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer, IValue instanceFields)
 	{
+		if (this.instanceField != null)
+		{
+			this.instanceField.write(writer);
+		}
+		
+		super.write(writer, instanceFields);
 	}
 }

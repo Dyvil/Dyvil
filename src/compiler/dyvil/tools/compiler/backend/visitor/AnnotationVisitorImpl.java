@@ -36,7 +36,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 	
 	static IValue getEnumValue(String enumClass, String name)
 	{
-		IType t = ClassFormat.internalToType(enumClass);
+		IType t = ClassFormat.extendedToType(enumClass);
 		t.resolve(null, Package.rootPackage);
 		return new EnumValue(t, Name.getQualified(name));
 	}
