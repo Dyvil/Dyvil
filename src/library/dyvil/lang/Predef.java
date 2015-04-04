@@ -192,23 +192,11 @@ public final class Predef
 	
 	// Tuples
 	
-	/**
-	 * @dyvil ->
-	 * @param a
-	 * @param b
-	 * @return
-	 */
 	public static @inline @infix <A, B> Tuple2<A, B> $minus$gt(A a, B b)
 	{
 		return new Tuple2(a, b);
 	}
 	
-	/**
-	 * @dyvil <-
-	 * @param a
-	 * @param b
-	 * @return
-	 */
 	public static @inline @infix <A, B> Tuple2<B, A> $lt$minus(A a, B b)
 	{
 		return new Tuple2(b, a);
@@ -216,9 +204,9 @@ public final class Predef
 	
 	// Miscellaneous
 	
-	public static @inline List<?> List()
+	public static @inline <T> List<T> List()
 	{
-		return new ArrayList();
+		return new ArrayList<T>();
 	}
 	
 	public static <T> List<T> List(T e1)
@@ -256,9 +244,9 @@ public final class Predef
 		return list;
 	}
 	
-	public static @inline Set<?> Set()
+	public static @inline <T> Set<T> Set()
 	{
-		return new HashSet();
+		return new HashSet<T>();
 	}
 	
 	public static <T> Set<T> Set(T e1)
@@ -296,9 +284,9 @@ public final class Predef
 		return set;
 	}
 	
-	public static @inline Map<?, ?> Map()
+	public static @inline <K, V> Map<K, V> Map()
 	{
-		return new HashMap();
+		return new HashMap<K, V>();
 	}
 	
 	public static <K, V> Map<K, V> Map(Tuple2<K, V> e1)
@@ -339,11 +327,6 @@ public final class Predef
 	
 	public static @inline void $qmark$qmark$qmark()
 	{
-		throw new UnsupportedOperationException();
-	}
-	
-	@Intrinsic({})
-	public static @inline void $dot$dot$dot()
-	{
+		throw new UnsupportedOperationException("Not Implemented!");
 	}
 }
