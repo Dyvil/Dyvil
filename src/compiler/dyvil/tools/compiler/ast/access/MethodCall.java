@@ -339,8 +339,6 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		return this;
 	}
 	
-	private IValue	replacement;
-	
 	@Override
 	public boolean isResolved()
 	{
@@ -383,18 +381,23 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			this.argumentsResolved = true;
 		}
 		
-		IValue op = this.resolveOperator(markers, context);
-		if (op != null)
-		{
-			this.replacement = op;
-			return false;
-		}
-		
 		IMethod method = IAccess.resolveMethod(markers, context, this.instance, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
 			return true;
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public IValue resolve2(IContext context)
+	{
+		IValue op = this.resolveOperator(null, context);
+		if (op != null)
+		{
+			return op;
 		}
 		
 		if (this.arguments.size() == 1 && this.instance != null)
@@ -404,7 +407,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 			{
 				String unqualified = this.name.unqualified;
 				Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
-				IMethod method1 = IContext.resolveMethod(markers, this.instance.getType(), null, name, this.arguments);
+				IMethod method1 = IContext.resolveMethod(null, this.instance.getType(), null, name, this.arguments);
 				if (method1 != null)
 				{
 					CompoundCall call = new CompoundCall(this.position);
@@ -412,19 +415,9 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 					call.instance = this.instance;
 					call.arguments = this.arguments;
 					call.name = name;
-					this.replacement = call;
+					return call;
 				}
 			}
-		}
-		return false;
-	}
-	
-	@Override
-	public IValue resolve2(IContext context)
-	{
-		if (this.replacement != null)
-		{
-			return this.replacement;
 		}
 		
 		if (this.arguments.isEmpty())

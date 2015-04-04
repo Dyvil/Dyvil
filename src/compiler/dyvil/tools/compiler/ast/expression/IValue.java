@@ -56,6 +56,7 @@ public interface IValue extends IASTNode, ITyped
 	public static int	BOOLEAN_OR			= 36;
 	public static int	BOOLEAN_NOT			= 37;
 	public static int	CLASS_OPERATOR		= 38;
+	public static int	NULLCHECK			= 39;
 	
 	public static int	TUPLE				= 48;
 	public static int	CASE_STATEMENT		= 49;
@@ -196,6 +197,9 @@ public interface IValue extends IASTNode, ITyped
 		this.writeExpression(writer);
 		writer.writeJumpInsn(Opcodes.IFEQ, dest);
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer);
 	
 	public default Object toObject()
 	{

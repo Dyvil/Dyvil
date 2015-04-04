@@ -33,6 +33,8 @@ public interface Operators
 	
 	public static final Operator			EQ				= new Operator(Name.eqeq, 60, INFIX_LEFT);
 	public static final Operator			NE				= new Operator(Name.bangeq, 60, INFIX_LEFT);
+	public static final Operator			IS				= new Operator(Name.eqeqeq, 60, INFIX_LEFT);
+	public static final Operator			ISNOT			= new Operator(Name.bangeqeq, 60, INFIX_LEFT);
 	public static final Operator			SWAP			= new Operator(Name.coloneqcolon, 60, INFIX_LEFT);
 	
 	public static final Operator			LESS			= new Operator(Name.lt, 70, INFIX_LEFT);
@@ -75,6 +77,31 @@ public interface Operators
 	
 	public static IValue get(IValue arg1, Name name, IValue arg2)
 	{
+		// Null check
+		if (name == eqeq || name == eqeqeq)
+		{
+			if (arg2.getValueType() == IValue.NULL)
+			{
+				return new NullCheckOperator(arg1, true);
+			}
+			if (arg1.getValueType() == IValue.NULL)
+			{
+				return new NullCheckOperator(arg2, true);
+			}
+			return null;
+		}
+		if (name == bangeq || name == bangeqeq)
+		{
+			if (arg2.getValueType() == IValue.NULL)
+			{
+				return new NullCheckOperator(arg1, false);
+			}
+			if (arg1.getValueType() == IValue.NULL)
+			{
+				return new NullCheckOperator(arg2, false);
+			}
+			return null;
+		}
 		// Swap Operator
 		if (name == coloneqcolon)
 		{
