@@ -222,7 +222,7 @@ public final class ClassParameter extends Member implements IParameter
 	@Override
 	public void write(MethodWriter writer)
 	{
-		this.index = writer.registerParameter(this.name.qualified, this.type);
+		writer.registerParameter(this.index, this.name.qualified, this.type);
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{

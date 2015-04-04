@@ -190,14 +190,20 @@ public class NestedMethod extends Method
 			mw.addAnnotation("Ljava/lang/Deprecated;", true);
 		}
 		
+		int index = 0;
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].write(mw);
+			CaptureVariable capture = this.capturedFields[i];
+			capture.index = index;
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.variable.getType());
 		}
 		
+		index = 0;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].write(mw);
+			IParameter param = this.parameters[i];
+			index = mw.registerParameter(index, param.getName().qualified, param.getType());
+			param.setIndex(index);
 		}
 		
 		Label start = new Label();
@@ -214,13 +220,13 @@ public class NestedMethod extends Method
 		
 		if (this.thisType != null)
 		{
-			mw.writeLocal("this", this.theClass.getType(), start, end, 0);
+			mw.writeLocal(0, "this", this.theClass.getType(), start, end);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getName().qualified, param.getType(), start, end, param.getIndex());
+			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getType(), start, end);
 		}
 	}
 	

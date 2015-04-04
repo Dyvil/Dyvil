@@ -460,7 +460,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		for (Entry<Name, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			writer.writeLocal(var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end, var.index);
+			writer.writeLocal(var.index, var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end);
 		}
 	}
 	
@@ -505,7 +505,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		for (Entry<Name, Variable> entry : this.variables.entrySet())
 		{
 			Variable var = entry.getValue();
-			writer.writeLocal(var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end, var.index);
+			writer.writeLocal(var.index, var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end);
 		}
 	}
 	

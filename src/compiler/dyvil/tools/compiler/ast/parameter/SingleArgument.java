@@ -259,6 +259,14 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
+	public String toString()
+	{
+		StringBuilder buf = new StringBuilder();
+		this.toString("", buf);
+		return buf.toString();
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.value == null)

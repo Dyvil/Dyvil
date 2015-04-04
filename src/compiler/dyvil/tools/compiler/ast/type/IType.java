@@ -251,11 +251,6 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	public void appendSignature(StringBuilder buffer);
 	
-	public default Object getFrameType()
-	{
-		return this.getInternalName();
-	}
-	
 	// Compilation
 	
 	public default int getLoadOpcode()

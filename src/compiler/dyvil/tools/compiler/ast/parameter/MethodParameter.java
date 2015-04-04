@@ -212,7 +212,7 @@ public final class MethodParameter extends Member implements IParameter
 	@Override
 	public void write(MethodWriter writer)
 	{
-		this.index = writer.registerParameter(this.name.qualified, this.type);
+		writer.registerParameter(this.index, this.name.qualified, this.type);
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{
@@ -228,7 +228,7 @@ public final class MethodParameter extends Member implements IParameter
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.index + writer.inlineOffset());
 	}
 	
 	@Override
@@ -238,7 +238,7 @@ public final class MethodParameter extends Member implements IParameter
 		{
 			value.writeExpression(writer);
 		}
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.index + writer.inlineOffset());
 	}
 	
 	@Override

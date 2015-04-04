@@ -23,7 +23,7 @@ public interface MethodWriter
 	
 	// Parameters
 	
-	public int registerParameter(String name, Object type);
+	public int registerParameter(int index, String name, IType type);
 	
 	// Local Variables
 	
@@ -31,9 +31,9 @@ public interface MethodWriter
 	
 	public void resetLocals(int count);
 	
-	public void writeLocal(String name, String desc, String signature, Label start, Label end, int index);
+	public void writeLocal(int index, String name, String desc, String signature, Label start, Label end);
 	
-	public void writeLocal(String name, IType type, Label start, Label end, int index);
+	public void writeLocal(int index, String name, IType type, Label start, Label end);
 	
 	// Constants
 	
@@ -91,9 +91,9 @@ public interface MethodWriter
 	
 	public int inlineOffset();
 	
-	public int startInline(Label end);
+	public void startInline(Label end, int localCount);
 	
-	public void endInline(Label end);
+	public void endInline(Label end, int localCount);
 	
 	// Blocks
 	

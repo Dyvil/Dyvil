@@ -43,6 +43,7 @@ import dyvil.tools.compiler.util.Util;
 public class Method extends Member implements IMethod
 {
 	private static final int	INLINABLE	= Modifiers.INLINE;
+	private static final int INLINE_TRESHOLD = 10;
 	
 	protected IClass			theClass;
 	
@@ -394,9 +395,22 @@ public class Method extends Member implements IMethod
 			this.exceptions[i] = this.exceptions[i].resolve(markers, this);
 		}
 		
+		int index = 0;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(markers, this);
+			IParameter param = this.parameters[i];
+			param.resolveTypes(markers, this);
+			param.setIndex(index);
+			
+			IType type = param.getType();
+			if (type == Types.LONG || type == Types.DOUBLE)
+			{
+				index += 2;
+			}
+			else
+			{
+				index++;
+			}
 		}
 		
 		if (this.value != null)
@@ -917,13 +931,13 @@ public class Method extends Member implements IMethod
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.writeLocal("this", this.theClass.getType(), start, end, 0);
+			mw.writeLocal(0, "this", this.theClass.getType(), start, end);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getName().qualified, param.getType(), start, end, param.getIndex());
+			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getType(), start, end);
 		}
 	}
 	
@@ -950,13 +964,9 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() == 0)
+		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() < INLINE_TRESHOLD)
 		{
-			Label inlineEnd = new Label();
-			this.writeInlineArguments(writer, instance, arguments, writer.startInline(inlineEnd));
-			this.value.writeExpression(writer);
-			writer.endInline(inlineEnd);
-			return;
+			// FIXME
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
@@ -1002,13 +1012,9 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() == 0)
+		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() < INLINE_TRESHOLD)
 		{
-			Label inlineEnd = new Label();
-			this.writeInlineArguments(writer, instance, arguments, writer.startInline(inlineEnd));
-			this.value.writeJump(writer, dest);
-			writer.endInline(inlineEnd);
-			return;
+			// FIXME
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
@@ -1038,13 +1044,9 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() == 0)
+		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() < INLINE_TRESHOLD)
 		{
-			Label inlineEnd = new Label();
-			this.writeInlineArguments(writer, instance, arguments, writer.startInline(inlineEnd));
-			this.value.writeInvJump(writer, dest);
-			writer.endInline(inlineEnd);
-			return;
+			// FIXME
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
@@ -1251,34 +1253,29 @@ public class Method extends Member implements IMethod
 		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS));
 	}
 	
-	private void writeInlineArguments(MethodWriter writer, IValue instance, IArguments arguments, int localCount)
+	private void writeInlineArguments(MethodWriter writer, IValue instance, IArguments arguments)
 	{
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
-			writer.writeVarInsn(instance.getType().getStoreOpcode(), localCount);
+			writer.writeVarInsn(instance.getType().getStoreOpcode(), writer.registerLocal());
 		}
 		
 		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			int len = this.parameterCount;
 			if ((this.modifiers & Modifiers.VARARGS) != 0)
 			{
-				len--;
+				int len = this.parameterCount - 1;
 				IParameter param;
 				for (int i = 1, j = 0; i < len; i++, j++)
 				{
 					param = this.parameters[i];
 					arguments.writeValue(j, param.getName(), param.getValue(), writer);
-					
-					param.setIndex(writer.registerLocal());
-					param.writeSet(writer, null, null);
+					writer.writeVarInsn(param.getType().getStoreOpcode(), writer.registerLocal());
 				}
 				param = this.parameters[len];
 				arguments.writeVarargsValue(len - 1, param.getName(), param.getType(), writer);
-				
-				param.setIndex(writer.registerLocal());
-				param.writeSet(writer, null, null);
+				writer.writeVarInsn(Opcodes.ASTORE, writer.registerLocal());
 				return;
 			}
 			
@@ -1286,16 +1283,14 @@ public class Method extends Member implements IMethod
 			{
 				IParameter param = this.parameters[i];
 				arguments.writeValue(j, param.getName(), param.getValue(), writer);
-				
-				param.setIndex(writer.registerLocal());
-				param.writeSet(writer, null, null);
+				writer.writeVarInsn(param.getType().getStoreOpcode(), writer.registerLocal());
 			}
 			return;
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			arguments.writeValue(0, Name._this, null, writer);
-			writer.writeVarInsn(Opcodes.ASTORE, localCount);
+			writer.writeVarInsn(Opcodes.ASTORE, writer.registerLocal());
 			return;
 		}
 		
@@ -1307,13 +1302,11 @@ public class Method extends Member implements IMethod
 			{
 				param = this.parameters[i];
 				arguments.writeValue(i, param.getName(), param.getValue(), writer);
-				param.setIndex(writer.registerLocal());
-				param.writeSet(writer, null, null);
+				writer.writeVarInsn(param.getType().getStoreOpcode(), writer.registerLocal());
 			}
 			param = this.parameters[len];
 			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
-			param.setIndex(writer.registerLocal());
-			param.writeSet(writer, null, null);
+			writer.writeVarInsn(Opcodes.ASTORE, writer.registerLocal());
 			return;
 		}
 		
@@ -1321,8 +1314,7 @@ public class Method extends Member implements IMethod
 		{
 			IParameter param = this.parameters[i];
 			arguments.writeValue(i, param.getName(), param.getValue(), writer);
-			param.setIndex(writer.registerLocal());
-			param.writeSet(writer, null, null);
+			writer.writeVarInsn(param.getType().getStoreOpcode(), writer.registerLocal());
 		}
 	}
 	

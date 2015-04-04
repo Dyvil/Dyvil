@@ -487,15 +487,20 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			mw.setInstanceMethod();
 		}
 		
+		int index = 0;
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].write(mw);
+			CaptureVariable capture = this.capturedFields[i];
+			capture.index = index;
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.variable.getType());
 		}
 		
+		index = 0;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			param.setIndex(mw.registerParameter(param.getName().qualified, param.getType()));
+			index = mw.registerParameter(index, param.getName().qualified, param.getType());
+			param.setIndex(index);
 		}
 		
 		// Write the Value

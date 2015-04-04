@@ -423,7 +423,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 						case Operator.INFIX_LEFT:
 							this.field.setValue(this.value);
 							pm.popParser(true);
-							break;
+							return;
 						case Operator.INFIX_NONE:
 							throw new SyntaxError(token, "Invalid Operator " + name + " - Operator without associativity is not allowed at this location");
 						case Operator.INFIX_RIGHT:

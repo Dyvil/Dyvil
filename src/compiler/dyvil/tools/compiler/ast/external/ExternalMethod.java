@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -88,11 +89,23 @@ public final class ExternalMethod extends Method
 		{
 			this.resolveGenerics();
 		}
-		
 		this.parametersResolved = true;
+		int index = 0;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(null, this);
+			IParameter param = this.parameters[i];
+			param.resolveTypes(null, this);
+			param.setIndex(index);
+			
+			IType type = param.getType();
+			if (type == Types.LONG || type == Types.DOUBLE)
+			{
+				index += 2;
+			}
+			else
+			{
+				index++;
+			}
 		}
 	}
 	

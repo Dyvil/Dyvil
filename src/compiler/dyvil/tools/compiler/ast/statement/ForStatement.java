@@ -426,7 +426,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			// Variable
 			if (var != null)
 			{
-				writer.writeLocal(var.name.qualified, var.type, startLabel, endLabel, var.index);
+				writer.writeLocal(var.index, var.name.qualified, var.type, startLabel, endLabel);
 			}
 			return;
 		}
@@ -486,10 +486,10 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			writer.resetLocals(locals);
 			writer.writeLabel(endLabel);
 			
-			writer.writeLocal(var.name.qualified, var.type, scopeLabel, endLabel, var.index);
-			writer.writeLocal("$index", "I", null, scopeLabel, endLabel, indexVar.index);
-			writer.writeLocal("$length", "I", null, scopeLabel, endLabel, lengthVar.index);
-			writer.writeLocal("$array", arrayVar.type, scopeLabel, endLabel, arrayVar.index);
+			writer.writeLocal(var.index, var.name.qualified, var.type, scopeLabel, endLabel);
+			writer.writeLocal(indexVar.index, "$index", "I", null, scopeLabel, endLabel);
+			writer.writeLocal(lengthVar.index, "$length", "I", null, scopeLabel, endLabel);
+			writer.writeLocal(arrayVar.index, "$array", arrayVar.type, scopeLabel, endLabel);
 			return;
 		}
 	}

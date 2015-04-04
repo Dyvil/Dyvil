@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -61,7 +62,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		MethodWriter mw = new MethodWriterImpl(writer,
 				writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));
 		mw.setInstanceMethod();
-		mw.registerParameter("obj", "java/lang/Object");
+		mw.registerParameter(0, "obj", Types.OBJECT);
 		mw.begin();
 		CaseClasses.writeEquals(mw, this.theClass);
 		mw.end();

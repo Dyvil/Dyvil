@@ -614,13 +614,13 @@ public class Constructor extends Member implements IConstructor
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.writeLocal("this", this.theClass.getType(), start, end, 0);
+			mw.writeLocal(0, "this", this.theClass.getType(), start, end);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getName().qualified, param.getType(), start, end, param.getIndex());
+			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getType(), start, end);
 		}
 	}
 	

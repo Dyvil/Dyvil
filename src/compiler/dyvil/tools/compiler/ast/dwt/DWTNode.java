@@ -283,7 +283,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		}
 		
 		writer.writeLabel(end);
-		writer.writeLocal(this.name.qualified, extended, null, start, end, index);
+		writer.writeLocal(index, this.name.qualified, extended, null, start, end);
 	}
 	
 	@Override

@@ -209,11 +209,6 @@ public class CaptureVariable implements IVariable
 	{
 	}
 	
-	public void write(MethodWriter writer)
-	{
-		this.index = writer.registerParameter(this.variable.getName().qualified, this.type);
-	}
-	
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{

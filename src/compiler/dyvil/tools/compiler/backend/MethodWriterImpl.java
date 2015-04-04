@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.backend;
 
 import static dyvil.reflect.Opcodes.*;
-import static dyvil.tools.compiler.backend.ClassFormat.DOUBLE;
-import static dyvil.tools.compiler.backend.ClassFormat.LONG;
 
 import org.objectweb.asm.*;
 import org.objectweb.asm.ClassWriter;
@@ -11,6 +9,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
+import dyvil.tools.compiler.ast.type.Types;
 
 public final class MethodWriterImpl implements MethodWriter
 {
@@ -71,20 +70,16 @@ public final class MethodWriterImpl implements MethodWriter
 	// Parameters
 	
 	@Override
-	public int registerParameter(String name, Object type)
+	public int registerParameter(int index, String name, IType type)
 	{
-		int index = this.localIndex;
 		this.mv.visitParameter(name, index);
 		
-		if (type == LONG || type == DOUBLE)
+		if (type == Types.LONG || type == Types.DOUBLE)
 		{
-			this.localIndex += 2;
+			return this.localIndex = index + 2;
 		}
-		else
-		{
-			this.localIndex += 1;
-		}
-		return index;
+		
+		return this.localIndex = index + 1;
 	}
 	
 	// Locals
@@ -102,13 +97,13 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeLocal(String name, String desc, String signature, Label start, Label end, int index)
+	public void writeLocal(int index, String name, String desc, String signature, Label start, Label end)
 	{
 		this.mv.visitLocalVariable(name, desc, signature, start, end, index);
 	}
 	
 	@Override
-	public void writeLocal(String name, IType type, Label start, Label end, int index)
+	public void writeLocal(int index, String name, IType type, Label start, Label end)
 	{
 		this.mv.visitLocalVariable(name, type.getExtendedName(), type.getSignature(), start, end, index);
 	}
@@ -565,15 +560,14 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public int startInline(Label end)
+	public void startInline(Label end, int localCount)
 	{
 		this.inlineEnd = end;
-		this.inlineOffset = this.localIndex;
-		return this.localIndex;
+		this.inlineOffset = localCount;
 	}
 	
 	@Override
-	public void endInline(Label end)
+	public void endInline(Label end, int localCount)
 	{
 		this.mv.visitLabel(end);
 		this.inlineEnd = null;
