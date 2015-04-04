@@ -48,7 +48,15 @@ public final class SymbolToken implements IToken
 	@Override
 	public int endIndex()
 	{
-		return this.type == Symbols.ARROW_OPERATOR ? this.start + 2 : this.start + 1;
+		if (this.type == Symbols.ARROW_OPERATOR)
+		{
+			return this.start + 2;
+		}
+		if (this.type == Symbols.ELLIPSIS)
+		{
+			return this.start + 3;
+		}
+		return this.start + 1;
 	}
 	
 	@Override

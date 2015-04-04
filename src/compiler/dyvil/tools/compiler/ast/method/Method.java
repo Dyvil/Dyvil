@@ -418,6 +418,33 @@ public class Method extends Member implements IMethod
 		if (this.value != null)
 		{
 			this.value = this.value.resolve(markers, this);
+			
+			if (this.type == Types.UNKNOWN)
+			{
+				this.type = this.value.getType();
+				if (this.type == Types.UNKNOWN)
+				{
+					markers.add(this.position, "method.type.infer", this.name.unqualified);
+				}
+				return;
+			}
+			
+			IValue value1 = this.value.withType(this.type);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(this.position, "method.type", this.name.unqualified);
+				marker.addInfo("Return Type: " + this.type);
+				marker.addInfo("Value Type: " + this.value.getType());
+			}
+			else
+			{
+				this.value = value1;
+			}
+			return;
+		}
+		if (this.type == Types.UNKNOWN)
+		{
+			markers.add(this.position, "method.type.abstract", this.name.unqualified);
 		}
 	}
 	
@@ -433,19 +460,7 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
-			IValue value1 = this.value.withType(this.type);
-			if (value1 == null)
-			{
-				Marker marker = markers.create(this.position, "method.type", this.name);
-				marker.addInfo("Return Type: " + this.type);
-				marker.addInfo("Value Type: " + this.value.getType());
-			}
-			else
-			{
-				this.value = value1;
-			}
-			
-			this.value.checkTypes(markers, this);
+			this.value.checkTypes(markers, context);
 		}
 		else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
 		{

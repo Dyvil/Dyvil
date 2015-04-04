@@ -30,7 +30,7 @@ public final class UnknownType extends ASTNode implements IType
 	@Override
 	public Name getName()
 	{
-		return Name.getQualified("unknown");
+		return Name.getQualified("var");
 	}
 	
 	// IContext
@@ -216,12 +216,12 @@ public final class UnknownType extends ASTNode implements IType
 	@Override
 	public String toString()
 	{
-		return "unknown";
+		return "var";
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("Object");
+		buffer.append("var");
 	}
 }

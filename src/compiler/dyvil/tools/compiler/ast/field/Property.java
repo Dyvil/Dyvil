@@ -122,14 +122,42 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.resolve(markers, context);
 		
-		if (this.get != null)
-		{
-			this.get = this.get.resolve(markers, this);
-		}
 		if (this.set != null)
 		{
 			this.setterParameter = new MethodParameter(this.name, this.type);
 			this.set = this.set.resolve(markers, this);
+		}
+		if (this.get != null)
+		{
+			this.get = this.get.resolve(markers, this);
+			
+			if (this.type == Types.UNKNOWN)
+			{
+				this.type = this.get.getType();
+				if (this.type == Types.UNKNOWN)
+				{
+					markers.add(this.position, "property.type.infer", this.name.unqualified);
+				}
+				return;
+			}
+			
+			IValue get1 = this.get.withType(this.type);
+			if (get1 == null)
+			{
+				Marker marker = markers.create(this.get.getPosition(), "property.getter.type", this.name.unqualified);
+				marker.addInfo("Property Type: " + this.type);
+				marker.addInfo("Getter Value Type: " + this.get.getType());
+			}
+			else
+			{
+				this.get = get1;
+			}
+			
+			return;
+		}
+		if (this.type == Types.UNKNOWN)
+		{
+			markers.add(this.position, "property.type.infer.nogetter", this.name.unqualified);
 		}
 	}
 	
@@ -140,18 +168,6 @@ public class Property extends Member implements IProperty, IContext
 		
 		if (this.get != null)
 		{
-			IValue get1 = this.get.withType(this.type);
-			if (get1 == null)
-			{
-				Marker marker = markers.create(this.get.getPosition(), "property.getter.type", this.name);
-				marker.addInfo("Property Type: " + this.type);
-				marker.addInfo("Getter Value Type: " + this.get.getType());
-			}
-			else
-			{
-				this.get = get1;
-			}
-			
 			this.get.checkTypes(markers, context);
 		}
 		if (this.set != null)

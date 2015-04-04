@@ -34,7 +34,7 @@ public final class NilValue implements IConstantValue
 	@Override
 	public int getValueType()
 	{
-		return IValue.NULL;
+		return NIL;
 	}
 	
 	@Override

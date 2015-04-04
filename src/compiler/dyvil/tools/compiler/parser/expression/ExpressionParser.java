@@ -151,11 +151,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				this.getAccess(pm, token.nameValue(), token, type);
 				return;
 			}
-			if (this.parsePrimitive(token, type))
-			{
-				this.mode = ACCESS;
-				return;
-			}
 			if (this.parseKeyword(pm, token, type))
 			{
 				return;
@@ -697,36 +692,38 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 	}
 	
-	public boolean parsePrimitive(IToken token, int type) throws SyntaxError
+	public boolean parseKeyword(IParserManager pm, IToken token, int type) throws SyntaxError
 	{
 		switch (type)
 		{
 		case Tokens.STRING:
 			this.value = new StringValue(token.raw(), token.stringValue());
+			this.mode = ACCESS;
 			return true;
 		case Tokens.CHAR:
 			this.value = new CharValue(token.raw(), token.charValue());
+			this.mode = ACCESS;
 			return true;
 		case Tokens.INT:
 			this.value = new IntValue(token.raw(), token.intValue());
+			this.mode = ACCESS;
 			return true;
 		case Tokens.LONG:
 			this.value = new LongValue(token.raw(), token.longValue());
+			this.mode = ACCESS;
 			return true;
 		case Tokens.FLOAT:
 			this.value = new FloatValue(token.raw(), token.floatValue());
+			this.mode = ACCESS;
 			return true;
 		case Tokens.DOUBLE:
 			this.value = new DoubleValue(token.raw(), token.doubleValue());
+			this.mode = ACCESS;
 			return true;
-		}
-		return false;
-	}
-	
-	public boolean parseKeyword(IParserManager pm, IToken token, int type) throws SyntaxError
-	{
-		switch (type)
-		{
+		case Symbols.ELLIPSIS:
+			this.value = new WildcardValue(token.raw());
+			this.mode = ACCESS;
+			return true;
 		case Symbols.WILDCARD:
 			return true;
 		case Keywords.NULL:

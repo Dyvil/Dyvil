@@ -8,6 +8,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -75,6 +76,12 @@ public final class TypeParser extends Parser implements ITyped
 				this.type = lt;
 				pm.pushParser(new TypeParser(lt));
 				this.mode = LAMBDA_END;
+				return;
+			}
+			if (type == Keywords.VAR)
+			{
+				this.type = Types.UNKNOWN;
+				this.mode = ARRAY_END;
 				return;
 			}
 			if (ParserUtil.isIdentifier(type))

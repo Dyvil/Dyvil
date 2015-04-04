@@ -17,35 +17,37 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 public interface IValue extends IASTNode, ITyped
 {
 	public static int	NULL				= 0;
-	public static int	BOOLEAN				= 1;
-	public static int	BYTE				= 2;
-	public static int	SHORT				= 3;
-	public static int	CHAR				= 4;
-	public static int	INT					= 5;
-	public static int	LONG				= 6;
-	public static int	FLOAT				= 7;
-	public static int	DOUBLE				= 8;
-	public static int	STRING				= 9;
-	public static int	ENUM				= 10;
-	public static int	BOXED				= 11;
+	public static int	NIL					= 1;
+	public static int	WILDCARD			= 2;
+	public static int	BOOLEAN				= 3;
+	public static int	BYTE				= 4;
+	public static int	SHORT				= 5;
+	public static int	CHAR				= 6;
+	public static int	INT					= 7;
+	public static int	LONG				= 8;
+	public static int	FLOAT				= 9;
+	public static int	DOUBLE				= 10;
+	public static int	STRING				= 11;
 	
-	public static int	THIS				= 11;
-	public static int	SUPER				= 12;
+	public static int	THIS				= 12;
+	public static int	SUPER				= 13;
 	
-	public static int	STATEMENT_LIST		= 13;
-	public static int	ARRAY				= 14;
-	public static int	CAPSULATED			= 15;
+	public static int	STATEMENT_LIST		= 14;
+	public static int	ARRAY				= 15;
+	public static int	CAPSULATED			= 16;
+	public static int	BOXED				= 17;
 	
-	public static int	CLASS_ACCESS		= 16;
-	public static int	FIELD_ACCESS		= 17;
-	public static int	FIELD_ASSIGN		= 18;
-	public static int	METHOD_CALL			= 19;
-	public static int	APPLY_METHOD_CALL	= 20;
-	public static int	UPDATE_METHOD_CALL	= 21;
-	public static int	CONSTRUCTOR_CALL	= 22;
-	public static int	INITIALIZER_CALL	= 23;
-	public static int	VARIABLE			= 24;
-	public static int	NESTED_METHOD		= 25;
+	public static int	CLASS_ACCESS		= 18;
+	public static int	ENUM				= 19;
+	public static int	FIELD_ACCESS		= 20;
+	public static int	FIELD_ASSIGN		= 21;
+	public static int	METHOD_CALL			= 22;
+	public static int	APPLY_METHOD_CALL	= 23;
+	public static int	UPDATE_METHOD_CALL	= 24;
+	public static int	CONSTRUCTOR_CALL	= 25;
+	public static int	INITIALIZER_CALL	= 26;
+	public static int	VARIABLE			= 27;
+	public static int	NESTED_METHOD		= 28;
 	
 	public static int	CAST_OPERATOR		= 32;
 	public static int	ISOF_OPERATOR		= 33;

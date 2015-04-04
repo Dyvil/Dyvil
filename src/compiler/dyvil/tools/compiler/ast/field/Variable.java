@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -112,17 +113,21 @@ public final class Variable extends Member implements IVariable
 		{
 			this.value = this.value.resolve(markers, context);
 		}
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		super.checkTypes(markers, context);
+		
+		if (this.type == Types.UNKNOWN)
+		{
+			this.type = this.value.getType();
+			if (this.type == Types.UNKNOWN)
+			{
+				markers.add(this.position, "variable.type.infer", this.name.unqualified);
+			}
+			return;
+		}
 		
 		IValue value1 = this.value.withType(this.type);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.position, "variable.type");
+			Marker marker = markers.create(this.position, "variable.type", this.name.unqualified);
 			marker.addInfo("Variable Type: " + this.type);
 			marker.addInfo("Value Type: " + this.value.getType());
 		}
@@ -130,6 +135,12 @@ public final class Variable extends Member implements IVariable
 		{
 			this.value = value1;
 		}
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		super.checkTypes(markers, context);
 		
 		this.value.checkTypes(markers, context);
 	}

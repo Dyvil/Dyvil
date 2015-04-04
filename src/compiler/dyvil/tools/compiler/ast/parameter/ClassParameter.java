@@ -12,13 +12,14 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ClassParameter extends Member implements IParameter
+public final class ClassParameter extends Member implements IParameter
 {
 	public IClass	theClass;
 	
@@ -143,9 +144,36 @@ public class ClassParameter extends Member implements IParameter
 		
 		if (this.defaultValue != null)
 		{
-			IClass iclass = context.getThisType().getTheClass();
+			context.getThisType().getTheClass().addCompilable(this);
+			
 			this.defaultValue = this.defaultValue.resolve(markers, context);
-			iclass.addCompilable(this);
+			
+			if (this.type == Types.UNKNOWN)
+			{
+				this.type = this.defaultValue.getType();
+				if (this.type == Types.UNKNOWN)
+				{
+					markers.add(this.position, "classparameter.type.infer", this.name.unqualified);
+				}
+				return;
+			}
+			
+			IValue value1 = this.defaultValue.withType(this.type);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(this.defaultValue.getPosition(), "classparameter.type", this.name.unqualified);
+				marker.addInfo("Parameter Type: " + this.type);
+				marker.addInfo("Value Type: " + this.defaultValue.getType());
+			}
+			else
+			{
+				this.defaultValue = value1;
+			}
+			return;
+		}
+		if (this.type == Types.UNKNOWN)
+		{
+			markers.add(this.position, "classparameter.type.nodefault", this.name.unqualified);
 		}
 	}
 	
@@ -156,17 +184,6 @@ public class ClassParameter extends Member implements IParameter
 		
 		if (this.defaultValue != null)
 		{
-			IValue value1 = this.defaultValue.withType(this.type);
-			if (value1 == null)
-			{
-				Marker marker = markers.create(this.defaultValue.getPosition(), "parameter.type");
-				marker.addInfo("Parameter Type: " + this.type);
-				marker.addInfo("Value Type: " + this.defaultValue.getType());
-			}
-			else
-			{
-				this.defaultValue = value1;
-			}
 			this.defaultValue.checkTypes(markers, context);
 		}
 	}

@@ -61,33 +61,6 @@ public final class Array extends ASTNode implements IValue, IValueList
 		return false;
 	}
 	
-	private void generateTypes()
-	{
-		int len = this.valueCount;
-		if (len == 0)
-		{
-			this.elementType = Types.VOID;
-			this.requiredType = Types.VOID;
-			return;
-		}
-		
-		IType t = this.values[0].getType();
-		for (int i = 1; i < len; i++)
-		{
-			IType t1 = this.values[i].getType();
-			t = Type.findCommonSuperType(t, t1);
-			if (t == null)
-			{
-				this.elementType = Types.VOID;
-				this.requiredType = Types.VOID;
-				return;
-			}
-		}
-		
-		this.elementType = t;
-		this.requiredType = t.getArrayType();
-	}
-	
 	@Override
 	public IType getType()
 	{
@@ -101,8 +74,27 @@ public final class Array extends ASTNode implements IValue, IValueList
 			return this.requiredType;
 		}
 		
-		this.generateTypes();
-		return this.requiredType;
+		int len = this.valueCount;
+		if (len == 0)
+		{
+			this.elementType = Types.UNKNOWN;
+			return this.requiredType = Types.UNKNOWN;
+		}
+		
+		IType t = this.values[0].getType();
+		for (int i = 1; i < len; i++)
+		{
+			IType t1 = this.values[i].getType();
+			t = Type.findCommonSuperType(t, t1);
+			if (t == null)
+			{
+				this.elementType = Types.ANY;
+				return this.requiredType = Types.ANY.getArrayType(1);
+			}
+		}
+		
+		this.elementType = t;
+		return this.requiredType = t.getArrayType();
 	}
 	
 	@Override

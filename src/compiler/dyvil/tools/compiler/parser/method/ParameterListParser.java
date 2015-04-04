@@ -88,7 +88,7 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 		}
 		if (this.mode == NAME)
 		{
-			if (token.equals("..."))
+			if (type == Symbols.ELLIPSIS)
 			{
 				this.varargs = true;
 				return;

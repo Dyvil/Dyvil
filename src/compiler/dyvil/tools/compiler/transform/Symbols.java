@@ -53,6 +53,7 @@ public final class Symbols
 	public static final int					HASH					= Tokens.SYMBOL | 0x00060000;
 	public static final int					WILDCARD				= Tokens.SYMBOL | 0x00070000;
 	public static final int					ARROW_OPERATOR			= Tokens.SYMBOL | 0x00080000;
+	public static final int					ELLIPSIS				= Tokens.SYMBOL | 0x00090000;
 	
 	private static void addReplacement(char symbol, String replacement)
 	{
@@ -159,6 +160,8 @@ public final class Symbols
 			return Symbols.HASH;
 		case "=>":
 			return Symbols.ARROW_OPERATOR;
+		case "...":
+			return Symbols.ELLIPSIS;
 		}
 		return 0;
 	}
@@ -183,6 +186,8 @@ public final class Symbols
 			return "#";
 		case Symbols.ARROW_OPERATOR:
 			return "=>";
+		case Symbols.ELLIPSIS:
+			return "...";
 		case Symbols.OPEN_PARENTHESIS:
 			return "(";
 		case Symbols.CLOSE_PARENTHESIS:

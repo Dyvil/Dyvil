@@ -72,6 +72,16 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
+	public IType getType()
+	{
+		if (this.requiredType != null)
+		{
+			return this.requiredType;
+		}
+		return this.requiredType = this.values[this.valueCount - 1].getType();
+	}
+	
+	@Override
 	public IValue withType(IType type)
 	{
 		if (type == Types.VOID || type == Types.UNKNOWN)

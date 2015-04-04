@@ -444,7 +444,7 @@ public class Dlex
 			}
 			return new KeywordToken(prev, i, line, start, start + len);
 		}
-		case LETTER_IDENTIFIER | SYMBOL_IDENTIFIER:
+		case DOT_IDENTIFIER:
 		case SYMBOL_IDENTIFIER:
 		{
 			int i = Symbols.getSymbolType(s);
