@@ -930,29 +930,22 @@ public class Method extends Member implements IMethod
 	@Override
 	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type)
 	{
-		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
+		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			instance = null;
-		}
-		
-		if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
-		{
-			if (this.type.getTheClass() == Types.BOOLEAN_CLASS)
+			if (instance != null && instance.getValueType() == IValue.CLASS_ACCESS)
 			{
-				Label ifEnd = new Label();
-				Label elseEnd = new Label();
-				this.writeIntrinsic(writer, ifEnd, instance, arguments);
-				
-				// If Block
-				writer.writeLDC(0);
-				writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-				writer.writeLabel(ifEnd);
-				// Else Block
-				writer.writeLDC(1);
-				writer.writeLabel(elseEnd);
+				instance = null;
+			}
+			// Intrinsic Case 1: Static (infix) Method, Instance not null
+			if (this.intrinsicOpcodes != null)
+			{
+				this.writeIntrinsic(writer, instance, arguments);
 				return;
 			}
-			
+		}
+		// Intrinsic Case 2: Member Method, Instance is Primitive
+		else if (this.intrinsicOpcodes != null && instance.isPrimitive())
+		{
 			this.writeIntrinsic(writer, instance, arguments);
 			return;
 		}
@@ -989,12 +982,21 @@ public class Method extends Member implements IMethod
 	@Override
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
 	{
-		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
+		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			instance = null;
+			if (instance != null && instance.getValueType() == IValue.CLASS_ACCESS)
+			{
+				instance = null;
+			}
+			// Intrinsic Case 1: Static (infix) Method, Instance not null
+			if (this.intrinsicOpcodes != null)
+			{
+				this.writeIntrinsic(writer, dest, instance, arguments);
+				return;
+			}
 		}
-		
-		if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
+		// Intrinsic Case 2: Member Method, Instance is Primitive
+		else if (this.intrinsicOpcodes != null && instance.isPrimitive())
 		{
 			this.writeIntrinsic(writer, dest, instance, arguments);
 			return;
@@ -1016,12 +1018,21 @@ public class Method extends Member implements IMethod
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
 	{
-		if (instance != null && (this.modifiers & Modifiers.STATIC) != 0 && instance.getValueType() == IValue.CLASS_ACCESS)
+		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			instance = null;
+			if (instance != null && instance.getValueType() == IValue.CLASS_ACCESS)
+			{
+				instance = null;
+			}
+			// Intrinsic Case 1: Static (infix) Method, Instance not null
+			if (this.intrinsicOpcodes != null)
+			{
+				this.writeInvIntrinsic(writer, dest, instance, arguments);
+				return;
+			}
 		}
-		
-		if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
+		// Intrinsic Case 2: Member Method, Instance is Primitive
+		else if (this.intrinsicOpcodes != null && instance.isPrimitive())
 		{
 			this.writeInvIntrinsic(writer, dest, instance, arguments);
 			return;
@@ -1095,6 +1106,47 @@ public class Method extends Member implements IMethod
 	
 	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments)
 	{
+		if (this.type.getTheClass() == Types.BOOLEAN_CLASS)
+		{
+			int len = this.intrinsicOpcodes.length - 1;
+			if (this.intrinsicOpcodes[len] == IFNE)
+			{
+				for (int i = 0; i < len; i++)
+				{
+					int insn = this.intrinsicOpcodes[i];
+					if (insn == INSTANCE)
+					{
+						if (instance != null)
+						{
+							instance.writeExpression(writer);
+						}
+					}
+					else if (insn == ARGUMENTS)
+					{
+						this.writeArguments(writer, arguments);
+					}
+					else
+					{
+						writer.writeInsn(insn);
+					}
+				}
+				return;
+			}
+			
+			Label ifEnd = new Label();
+			Label elseEnd = new Label();
+			this.writeIntrinsic(writer, ifEnd, instance, arguments);
+			
+			// If Block
+			writer.writeLDC(0);
+			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
+			writer.writeLabel(ifEnd);
+			// Else Block
+			writer.writeLDC(1);
+			writer.writeLabel(elseEnd);
+			return;
+		}
+		
 		for (int i : this.intrinsicOpcodes)
 		{
 			if (i == INSTANCE)

@@ -251,7 +251,83 @@ public final class MethodWriterImpl implements MethodWriter
 		
 		if (opcode > 255)
 		{
-			this.visitSpecialInsn(opcode);
+			switch (opcode)
+			{
+			case Opcodes.LCONST_M1:
+				this.mv.visitLdcInsn(LONG_MINUS_ONE);
+				return;
+			case Opcodes.BINV:
+			{
+				Label label1 = new Label();
+				Label label2 = new Label();
+				this.mv.visitJumpInsn(Opcodes.IFEQ, label1);
+				this.mv.visitInsn(Opcodes.ICONST_0);
+				this.mv.visitJumpInsn(Opcodes.GOTO, label2);
+				this.mv.visitLabel(label1);
+				this.mv.visitInsn(Opcodes.ICONST_1);
+				this.mv.visitLabel(label2);
+			}
+			case Opcodes.IINV:
+				this.mv.visitInsn(Opcodes.ICONST_M1);
+				this.mv.visitInsn(Opcodes.IXOR);
+				return;
+			case Opcodes.LINV:
+				this.mv.visitLdcInsn(LONG_MINUS_ONE);
+				this.mv.visitInsn(Opcodes.IXOR);
+				return;
+			case Opcodes.L2B:
+				this.mv.visitInsn(Opcodes.L2I);
+				this.mv.visitInsn(Opcodes.I2B);
+				return;
+			case Opcodes.L2S:
+				this.mv.visitInsn(Opcodes.L2I);
+				this.mv.visitInsn(Opcodes.I2S);
+				return;
+			case Opcodes.L2C:
+				this.mv.visitInsn(Opcodes.L2I);
+				this.mv.visitInsn(Opcodes.I2C);
+				return;
+			case Opcodes.F2B:
+				this.mv.visitInsn(Opcodes.F2I);
+				this.mv.visitInsn(Opcodes.I2B);
+				return;
+			case Opcodes.F2S:
+				this.mv.visitInsn(Opcodes.F2I);
+				this.mv.visitInsn(Opcodes.I2S);
+				return;
+			case Opcodes.F2C:
+				this.mv.visitInsn(Opcodes.F2I);
+				this.mv.visitInsn(Opcodes.I2C);
+				return;
+			case Opcodes.D2B:
+				this.mv.visitInsn(Opcodes.D2I);
+				this.mv.visitInsn(Opcodes.I2B);
+				return;
+			case Opcodes.D2S:
+				this.mv.visitInsn(Opcodes.D2I);
+				this.mv.visitInsn(Opcodes.I2S);
+				return;
+			case Opcodes.D2C:
+				this.mv.visitInsn(Opcodes.D2I);
+				this.mv.visitInsn(Opcodes.I2C);
+				return;
+			case Opcodes.OBJECT_EQUALS:
+				this.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
+				return;
+			}
+			if (opcode >= ICMPEQ && opcode <= ICMPLE)
+			{
+				opcode -= ICMPEQ;
+				
+				Label label1 = new Label();
+				Label label2 = new Label();
+				this.mv.visitJumpInsn(Opcodes.IF_ICMPEQ + opcode, label1);
+				this.mv.visitInsn(Opcodes.ICONST_0);
+				this.mv.visitJumpInsn(Opcodes.GOTO, label2);
+				this.mv.visitLabel(label1);
+				this.mv.visitInsn(Opcodes.ICONST_1);
+				this.mv.visitLabel(label2);
+			}
 			return;
 		}
 		if (opcode >= IRETURN && opcode <= RETURN)
@@ -273,84 +349,6 @@ public final class MethodWriterImpl implements MethodWriter
 		this.mv.visitInsn(opcode);
 	}
 	
-	private void visitSpecialInsn(int opcode)
-	{
-		switch (opcode)
-		{
-		case Opcodes.LCONST_M1:
-			this.mv.visitLdcInsn(LONG_MINUS_ONE);
-			return;
-		case Opcodes.BINV:
-		{
-			Label label1 = new Label();
-			Label label2 = new Label();
-			this.mv.visitJumpInsn(Opcodes.IFEQ, label1);
-			this.mv.visitInsn(Opcodes.ICONST_0);
-			this.mv.visitJumpInsn(Opcodes.GOTO, label2);
-			this.mv.visitLabel(label1);
-			this.mv.visitInsn(Opcodes.ICONST_1);
-			this.mv.visitLabel(label2);
-		}
-		case Opcodes.IINV:
-			this.mv.visitInsn(Opcodes.ICONST_M1);
-			this.mv.visitInsn(Opcodes.IXOR);
-			return;
-		case Opcodes.LINV:
-			this.mv.visitLdcInsn(LONG_MINUS_ONE);
-			this.mv.visitInsn(Opcodes.IXOR);
-			return;
-		case Opcodes.L2B:
-			this.mv.visitInsn(Opcodes.L2I);
-			this.mv.visitInsn(Opcodes.I2B);
-			return;
-		case Opcodes.L2S:
-			this.mv.visitInsn(Opcodes.L2I);
-			this.mv.visitInsn(Opcodes.I2S);
-			return;
-		case Opcodes.L2C:
-			this.mv.visitInsn(Opcodes.L2I);
-			this.mv.visitInsn(Opcodes.I2C);
-			return;
-		case Opcodes.F2B:
-			this.mv.visitInsn(Opcodes.F2I);
-			this.mv.visitInsn(Opcodes.I2B);
-			return;
-		case Opcodes.F2S:
-			this.mv.visitInsn(Opcodes.F2I);
-			this.mv.visitInsn(Opcodes.I2S);
-			return;
-		case Opcodes.F2C:
-			this.mv.visitInsn(Opcodes.F2I);
-			this.mv.visitInsn(Opcodes.I2C);
-			return;
-		case Opcodes.D2B:
-			this.mv.visitInsn(Opcodes.D2I);
-			this.mv.visitInsn(Opcodes.I2B);
-			return;
-		case Opcodes.D2S:
-			this.mv.visitInsn(Opcodes.D2I);
-			this.mv.visitInsn(Opcodes.I2S);
-			return;
-		case Opcodes.D2C:
-			this.mv.visitInsn(Opcodes.D2I);
-			this.mv.visitInsn(Opcodes.I2C);
-			return;
-		}
-		if (opcode >= ICMPEQ && opcode <= ICMPLE)
-		{
-			opcode -= ICMPEQ;
-			
-			Label label1 = new Label();
-			Label label2 = new Label();
-			this.mv.visitJumpInsn(Opcodes.IF_ICMPEQ + opcode, label1);
-			this.mv.visitInsn(Opcodes.ICONST_0);
-			this.mv.visitJumpInsn(Opcodes.GOTO, label2);
-			this.mv.visitLabel(label1);
-			this.mv.visitInsn(Opcodes.ICONST_1);
-			this.mv.visitLabel(label2);
-		}
-	}
-	
 	@Override
 	public void writeIntInsn(int opcode, int operand)
 	{
@@ -362,95 +360,89 @@ public final class MethodWriterImpl implements MethodWriter
 	// Jump Instructions
 	
 	@Override
-	public void writeJumpInsn(int opcode, Label label)
+	public void writeJumpInsn(int opcode, Label target)
 	{
 		this.insnCallback();
 		
 		if (opcode > 255)
 		{
-			this.visitSpecialJumpInsn(opcode, label);
-			return;
+			switch (opcode)
+			{
+			case Opcodes.IF_LCMPEQ:
+				this.writeInsn(Opcodes.LCMP);
+				this.writeJumpInsn(Opcodes.IFEQ, target);
+				return;
+			case Opcodes.IF_LCMPNE:
+				this.writeInsn(Opcodes.LCMP);
+				this.writeJumpInsn(Opcodes.IFNE, target);
+				return;
+			case Opcodes.IF_LCMPLT:
+				this.writeInsn(Opcodes.LCMP);
+				this.writeJumpInsn(Opcodes.IFLT, target);
+				return;
+			case Opcodes.IF_LCMPGE:
+				this.writeInsn(Opcodes.LCMP);
+				this.writeJumpInsn(Opcodes.IFGE, target);
+				return;
+			case Opcodes.IF_LCMPGT:
+				this.writeInsn(Opcodes.LCMP);
+				this.writeJumpInsn(Opcodes.IFGT, target);
+				return;
+			case Opcodes.IF_LCMPLE:
+				this.writeInsn(Opcodes.LCMP);
+				this.writeJumpInsn(Opcodes.IFLE, target);
+				return;
+			case Opcodes.IF_FCMPEQ:
+				this.writeInsn(Opcodes.FCMPL);
+				this.writeJumpInsn(Opcodes.IFEQ, target);
+				return;
+			case Opcodes.IF_FCMPNE:
+				this.writeInsn(Opcodes.FCMPL);
+				this.writeJumpInsn(Opcodes.IFNE, target);
+				return;
+			case Opcodes.IF_FCMPLT:
+				this.writeInsn(Opcodes.FCMPL);
+				this.writeJumpInsn(Opcodes.IFLT, target);
+				return;
+			case Opcodes.IF_FCMPGE:
+				this.writeInsn(Opcodes.FCMPG);
+				this.writeJumpInsn(Opcodes.IFGE, target);
+				return;
+			case Opcodes.IF_FCMPGT:
+				this.writeInsn(Opcodes.FCMPG);
+				this.writeJumpInsn(Opcodes.IFGT, target);
+				return;
+			case Opcodes.IF_FCMPLE:
+				this.writeInsn(Opcodes.FCMPL);
+				this.writeJumpInsn(Opcodes.IFLE, target);
+				return;
+			case Opcodes.IF_DCMPEQ:
+				this.writeInsn(Opcodes.DCMPL);
+				this.writeJumpInsn(Opcodes.IFEQ, target);
+				return;
+			case Opcodes.IF_DCMPNE:
+				this.writeInsn(Opcodes.DCMPL);
+				this.writeJumpInsn(Opcodes.IFNE, target);
+				return;
+			case Opcodes.IF_DCMPLT:
+				this.writeInsn(Opcodes.DCMPL);
+				this.writeJumpInsn(Opcodes.IFLT, target);
+				return;
+			case Opcodes.IF_DCMPGE:
+				this.writeInsn(Opcodes.DCMPG);
+				this.writeJumpInsn(Opcodes.IFGE, target);
+				return;
+			case Opcodes.IF_DCMPGT:
+				this.writeInsn(Opcodes.DCMPG);
+				this.writeJumpInsn(Opcodes.IFGT, target);
+				return;
+			case Opcodes.IF_DCMPLE:
+				this.writeInsn(Opcodes.DCMPL);
+				this.writeJumpInsn(Opcodes.IFLE, target);
+				return;
+			}
 		}
-		this.mv.visitJumpInsn(opcode, label);
-	}
-	
-	private void visitSpecialJumpInsn(int opcode, Label dest)
-	{
-		switch (opcode)
-		{
-		case Opcodes.IF_LCMPEQ:
-			this.writeInsn(Opcodes.LCMP);
-			this.writeJumpInsn(Opcodes.IFEQ, dest);
-			return;
-		case Opcodes.IF_LCMPNE:
-			this.writeInsn(Opcodes.LCMP);
-			this.writeJumpInsn(Opcodes.IFNE, dest);
-			return;
-		case Opcodes.IF_LCMPLT:
-			this.writeInsn(Opcodes.LCMP);
-			this.writeJumpInsn(Opcodes.IFLT, dest);
-			return;
-		case Opcodes.IF_LCMPGE:
-			this.writeInsn(Opcodes.LCMP);
-			this.writeJumpInsn(Opcodes.IFGE, dest);
-			return;
-		case Opcodes.IF_LCMPGT:
-			this.writeInsn(Opcodes.LCMP);
-			this.writeJumpInsn(Opcodes.IFGT, dest);
-			return;
-		case Opcodes.IF_LCMPLE:
-			this.writeInsn(Opcodes.LCMP);
-			this.writeJumpInsn(Opcodes.IFLE, dest);
-			return;
-		case Opcodes.IF_FCMPEQ:
-			this.writeInsn(Opcodes.FCMPL);
-			this.writeJumpInsn(Opcodes.IFEQ, dest);
-			return;
-		case Opcodes.IF_FCMPNE:
-			this.writeInsn(Opcodes.FCMPL);
-			this.writeJumpInsn(Opcodes.IFNE, dest);
-			return;
-		case Opcodes.IF_FCMPLT:
-			this.writeInsn(Opcodes.FCMPL);
-			this.writeJumpInsn(Opcodes.IFLT, dest);
-			return;
-		case Opcodes.IF_FCMPGE:
-			this.writeInsn(Opcodes.FCMPG);
-			this.writeJumpInsn(Opcodes.IFGE, dest);
-			return;
-		case Opcodes.IF_FCMPGT:
-			this.writeInsn(Opcodes.FCMPG);
-			this.writeJumpInsn(Opcodes.IFGT, dest);
-			return;
-		case Opcodes.IF_FCMPLE:
-			this.writeInsn(Opcodes.FCMPL);
-			this.writeJumpInsn(Opcodes.IFLE, dest);
-			return;
-		case Opcodes.IF_DCMPEQ:
-			this.writeInsn(Opcodes.DCMPL);
-			this.writeJumpInsn(Opcodes.IFEQ, dest);
-			return;
-		case Opcodes.IF_DCMPNE:
-			this.writeInsn(Opcodes.DCMPL);
-			this.writeJumpInsn(Opcodes.IFNE, dest);
-			return;
-		case Opcodes.IF_DCMPLT:
-			this.writeInsn(Opcodes.DCMPL);
-			this.writeJumpInsn(Opcodes.IFLT, dest);
-			return;
-		case Opcodes.IF_DCMPGE:
-			this.writeInsn(Opcodes.DCMPG);
-			this.writeJumpInsn(Opcodes.IFGE, dest);
-			return;
-		case Opcodes.IF_DCMPGT:
-			this.writeInsn(Opcodes.DCMPG);
-			this.writeJumpInsn(Opcodes.IFGT, dest);
-			return;
-		case Opcodes.IF_DCMPLE:
-			this.writeInsn(Opcodes.DCMPL);
-			this.writeJumpInsn(Opcodes.IFLE, dest);
-			return;
-		}
+		this.mv.visitJumpInsn(opcode, target);
 	}
 	
 	@Override

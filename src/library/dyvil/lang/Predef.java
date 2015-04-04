@@ -1,9 +1,6 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.ARGUMENTS;
-import static dyvil.reflect.Opcodes.IF_ACMPEQ;
-import static dyvil.reflect.Opcodes.IF_ACMPNE;
-import static dyvil.reflect.Opcodes.INSTANCE;
+import static dyvil.reflect.Opcodes.*;
 
 import java.util.*;
 
@@ -20,24 +17,26 @@ public final class Predef
 	
 	// Object Operators
 	
-	public static @infix @inline boolean $eq$eq(Object o1, Object o2)
+	@Intrinsic({ INSTANCE, ARGUMENTS, OBJECT_EQUALS, IFNE })
+	public static @infix boolean $eq$eq(Object o1, Object o2)
 	{
-		return o1 == o2 || o1 != null && o1.equals(o2);
+		return o1.equals(o2);
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPEQ })
-	public static @infix @inline boolean $eq$eq$eq(Object o1, Object o2)
+	public static @infix boolean $eq$eq$eq(Object o1, Object o2)
 	{
 		return o1 == o2;
 	}
 	
-	public static @infix @inline boolean $bang$eq(Object o1, Object o2)
+	@Intrinsic({ INSTANCE, ARGUMENTS, OBJECT_EQUALS, IFEQ })
+	public static @infix boolean $bang$eq(Object o1, Object o2)
 	{
-		return o1 != o2 && (o1 == null || !o1.equals(o2));
+		return !o1.equals(o2);
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ACMPNE })
-	public static @infix @inline boolean $bang$eq$eq(Object o1, Object o2)
+	public static @infix boolean $bang$eq$eq(Object o1, Object o2)
 	{
 		return o1 != o2;
 	}

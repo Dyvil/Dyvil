@@ -911,6 +911,8 @@ public interface Opcodes
 	public static final int	IF_DCMPGT		= 316;
 	public static final int	IF_DCMPLE		= 317;
 	
+	public static final int	OBJECT_EQUALS	= 318;
+	
 	public static String toString(int op)
 	{
 		return Printer.OPCODES[op];
