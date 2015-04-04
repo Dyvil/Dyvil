@@ -138,7 +138,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 			this.instance = this.instance.resolve(markers, context);
 		}
 		
-		this.field = IAccess.resolveField(context, this.instance, this.name);
+		this.field = ICall.resolveField(context, this.instance, this.name);
 		
 		if (this.field == null)
 		{

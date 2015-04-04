@@ -573,26 +573,37 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			return;
 		}
-		if (name.qualified.endsWith("$eq") || !ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(type1))
+		if (!name.qualified.endsWith("$eq"))
 		{
-			MethodCall call = new MethodCall(token, this.value, name);
-			this.value = call;
-			this.mode = ACCESS;
-			call.dotless = this.dotless;
-			
-			SingleArgument sa = new SingleArgument();
-			call.arguments = sa;
-			
-			ExpressionParser parser = new ExpressionParser(sa);
-			parser.operator = op;
-			pm.pushParser(parser);
-			return;
+			if (ParserUtil.isTerminator2(type1))
+			{
+				FieldAccess access = new FieldAccess(token, this.value, name);
+				access.dotless = this.dotless;
+				this.value = access;
+				this.mode = ACCESS;
+				return;
+			}
+			if (ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(next.next().type()))
+			{
+				FieldAccess access = new FieldAccess(token, this.value, name);
+				access.dotless = this.dotless;
+				this.value = access;
+				this.mode = ACCESS;
+				return;
+			}
 		}
 		
-		FieldAccess access = new FieldAccess(token, this.value, name);
-		access.dotless = this.dotless;
-		this.value = access;
+		MethodCall call = new MethodCall(token, this.value, name);
+		this.value = call;
 		this.mode = ACCESS;
+		call.dotless = this.dotless;
+		
+		SingleArgument sa = new SingleArgument();
+		call.arguments = sa;
+		
+		ExpressionParser parser = new ExpressionParser(sa);
+		parser.operator = op;
+		pm.pushParser(parser);
 		return;
 	}
 	

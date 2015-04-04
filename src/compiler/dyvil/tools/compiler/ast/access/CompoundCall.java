@@ -168,7 +168,7 @@ public final class CompoundCall extends ASTNode implements IValue, IValued, ITyp
 		
 		this.arguments.resolve(markers, context);
 		
-		IMethod method = IAccess.resolveMethod(markers, context, this.instance, this.name, this.arguments);
+		IMethod method = ICall.resolveMethod(markers, context, this.instance, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;

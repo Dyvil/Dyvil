@@ -5,6 +5,7 @@ import org.objectweb.asm.Label;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -24,25 +25,20 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.AccessResolver;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.compiler.util.Util;
 
-public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeList, ITypeContext
+public final class MethodCall extends ASTNode implements ICall, IValued, INamed, ITypeList, ITypeContext
 {
 	public IValue		instance;
+	public boolean		dotless;
 	public Name			name;
-	
 	public IType[]		generics;
 	public int			genericCount;
 	
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
-	private boolean		argumentsResolved;
-	
-	public boolean		dotless;
 	
 	public IMethod		method;
-	
 	private IType		type;
 	
 	public MethodCall(ICodePosition position)
@@ -91,7 +87,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Types.VOID ? this : IAccess.super.withType(type);
+		return type == Types.VOID ? this : ICall.super.withType(type);
 	}
 	
 	@Override
@@ -227,7 +223,13 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.arguments.size() == 1 && "match".equals(this.name))
+		if (this.instance != null)
+		{
+			this.instance.resolve(markers, context);
+		}
+		
+		int args = this.arguments.size();
+		if (args == 1 && "match".equals(this.name))
 		{
 			MatchExpression me = Operators.getMatchExpression(this.instance, this.arguments.getFirstValue());
 			if (me != null)
@@ -238,15 +240,82 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		}
 		
 		this.arguments.resolve(markers, context);
-		this.argumentsResolved = true;
 		
-		IValue op = this.resolveOperator(markers, this.instance == null ? null : this.instance.getType());
+		IValue op = this.resolveOperator();
 		if (op != null)
 		{
 			return op;
 		}
 		
-		return AccessResolver.resolve(markers, context, this);
+		IMethod method = ICall.resolveMethod(markers, context, this.instance, this.name, this.arguments);
+		if (method != null)
+		{
+			this.method = method;
+			return this;
+		}
+		
+		if (args == 1 && this.instance != null)
+		{
+			String qualified = this.name.qualified;
+			if (qualified.endsWith("$eq"))
+			{
+				String unqualified = this.name.unqualified;
+				Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
+				IMethod method1 = IContext.resolveMethod(markers, this.instance.getType(), null, name, this.arguments);
+				if (method1 != null)
+				{
+					CompoundCall call = new CompoundCall(this.position);
+					call.method = method1;
+					call.instance = this.instance;
+					call.arguments = this.arguments;
+					call.name = name;
+					return call;
+				}
+			}
+		}
+		
+		if (args == 0)
+		{
+			IField field = ICall.resolveField(context, this.instance, this.name);
+			if (field != null)
+			{
+				FieldAccess access = new FieldAccess(this.position);
+				access.field = field;
+				access.instance = this.instance;
+				access.name = this.name;
+				access.dotless = this.dotless;
+				return access;
+			}
+		}
+		// Resolve Apply Method
+		else if (this.instance == null)
+		{
+			IValue apply = this.resolveApply(markers, context);
+			if (apply != null)
+			{
+				return apply;
+			}
+		}
+		
+		Marker marker;
+		if (this.arguments.isEmpty())
+		{
+			marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);
+		}
+		else
+		{
+			marker = markers.create(this.position, "resolve.method", this.name.unqualified);
+		}
+		
+		marker.addInfo("Qualified Name: " + this.name.qualified);
+		if (this.instance != null)
+		{
+			marker.addInfo("Instance Type: " + this.instance.getType());
+		}
+		StringBuilder builder = new StringBuilder("Argument Types: ");
+		Util.typesToString("", this.arguments, ", ", builder);
+		marker.addInfo(builder.toString());
+		return this;
 	}
 	
 	@Override
@@ -339,13 +408,7 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		return this;
 	}
 	
-	@Override
-	public boolean isResolved()
-	{
-		return this.method != null;
-	}
-	
-	private IValue resolveOperator(MarkerList markers, IContext context)
+	private IValue resolveOperator()
 	{
 		int len = this.arguments.size();
 		if (len != 1)
@@ -372,158 +435,56 @@ public final class MethodCall extends ASTNode implements IAccess, INamed, ITypeL
 		return null;
 	}
 	
-	@Override
-	public boolean resolve(IContext context, MarkerList markers)
+	private IValue resolveApply(MarkerList markers, IContext context)
 	{
-		if (!this.argumentsResolved)
-		{
-			this.arguments.resolve(markers, context);
-			this.argumentsResolved = true;
-		}
+		IValue instance;
+		IMethod method;
+		IType type = null;
 		
-		IMethod method = IAccess.resolveMethod(markers, context, this.instance, this.name, this.arguments);
-		if (method != null)
+		IField field = context.resolveField(this.name);
+		if (field == null)
 		{
-			this.method = method;
-			return true;
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public IValue resolve2(IContext context)
-	{
-		IValue op = this.resolveOperator(null, context);
-		if (op != null)
-		{
-			return op;
-		}
-		
-		if (this.arguments.size() == 1 && this.instance != null)
-		{
-			String qualified = this.name.qualified;
-			if (qualified.endsWith("$eq"))
+			// Find a type
+			type = new Type(this.position, this.name).resolve(null, context);
+			if (!type.isResolved())
 			{
-				String unqualified = this.name.unqualified;
-				Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
-				IMethod method1 = IContext.resolveMethod(null, this.instance.getType(), null, name, this.arguments);
-				if (method1 != null)
-				{
-					CompoundCall call = new CompoundCall(this.position);
-					call.method = method1;
-					call.instance = this.instance;
-					call.arguments = this.arguments;
-					call.name = name;
-					return call;
-				}
+				// No type found -> Not an apply method call
+				return null;
 			}
-		}
-		
-		if (this.arguments.isEmpty())
-		{
-			IField field = IAccess.resolveField(context, this.instance, this.name);
-			if (field != null)
+			// Find the apply method of the type
+			IMethod match = IContext.resolveMethod(markers, type, null, Name.apply, this.arguments);
+			if (match == null)
 			{
-				FieldAccess access = new FieldAccess(this.position);
-				access.field = field;
-				access.instance = this.instance;
-				access.name = this.name;
-				access.dotless = this.dotless;
-				return access;
+				// No apply method found -> Not an apply method call
+				return null;
 			}
-		}
-		// Resolve Apply Method
-		else if (this.instance == null)
-		{
-			IValue instance;
-			IType type = null;
-			IMethod method = null;
-			
-			IField field = context.resolveField(this.name);
-			if (field == null)
-			{
-				// Find a type
-				type = new Type(this.position, this.name).resolve(null, context);
-				if (!type.isResolved())
-				{
-					// No type found -> Not an apply method call
-					return null;
-				}
-				// Find the apply method of the type
-				IMethod match = IContext.resolveMethod(null, type, null, Name.apply, this.arguments);
-				if (match == null)
-				{
-					// No apply method found -> Not an apply method call
-					return null;
-				}
-				method = match;
-				instance = new ClassAccess(this.position, type);
-			}
-			else
-			{
-				FieldAccess access = new FieldAccess(this.position);
-				access.field = field;
-				access.name = this.name;
-				access.dotless = this.dotless;
-				
-				// Find the apply method of the field type
-				IMethod match = IContext.resolveMethod(null, field.getType(), access, Name.apply, this.arguments);
-				if (match == null)
-				{
-					// No apply method found -> Not an apply method call
-					return null;
-				}
-				method = match;
-				instance = access;
-			}
-			
-			ApplyMethodCall call = new ApplyMethodCall(this.position);
-			call.method = method;
-			call.instance = instance;
-			call.arguments = this.arguments;
-			
-			return call;
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public IAccess resolve3(IContext context, IAccess next)
-	{
-		IArguments list = this.arguments.addLastValue(next);
-		IMethod method = IAccess.resolveMethod(null, context, this.instance, this.name, list);
-		if (method != null)
-		{
-			this.arguments = list;
-			this.method = method;
-			return this;
-		}
-		return null;
-	}
-	
-	@Override
-	public void addResolveError(MarkerList markers)
-	{
-		Marker marker;
-		if (this.arguments.isEmpty())
-		{
-			marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);
+			method = match;
+			instance = new ClassAccess(this.position, type);
 		}
 		else
 		{
-			marker = markers.create(this.position, "resolve.method", this.name.unqualified);
+			FieldAccess access = new FieldAccess(this.position);
+			access.field = field;
+			access.name = this.name;
+			access.dotless = this.dotless;
+			
+			// Find the apply method of the field type
+			IMethod match = IContext.resolveMethod(markers, field.getType(), access, Name.apply, this.arguments);
+			if (match == null)
+			{
+				// No apply method found -> Not an apply method call
+				return null;
+			}
+			method = match;
+			instance = access;
 		}
 		
-		marker.addInfo("Qualified Name: " + this.name.qualified);
-		if (this.instance != null)
-		{
-			marker.addInfo("Instance Type: " + this.instance.getType());
-		}
-		StringBuilder builder = new StringBuilder("Argument Types: ");
-		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.toString());
+		ApplyMethodCall call = new ApplyMethodCall(this.position);
+		call.method = method;
+		call.instance = instance;
+		call.arguments = this.arguments;
+		
+		return call;
 	}
 	
 	@Override

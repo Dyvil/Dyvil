@@ -143,7 +143,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		}
 		this.arguments.resolve(markers, context);
 		
-		IMethod method = IAccess.resolveMethod(markers, context, this.instance, Name.update, this.arguments);
+		IMethod method = ICall.resolveMethod(markers, context, this.instance, Name.update, this.arguments);
 		if (method != null)
 		{
 			this.method = method;

@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class SingleArgument implements IArguments, IValued
@@ -265,6 +266,13 @@ public final class SingleArgument implements IArguments, IValued
 			return;
 		}
 		
+		if (Formatting.Method.useJavaFormat)
+		{
+			buffer.append('(');
+			this.value.toString(prefix, buffer);
+			buffer.append(')');
+			return;
+		}
 		buffer.append(' ');
 		this.value.toString(prefix, buffer);
 	}

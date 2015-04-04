@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -13,7 +14,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
@@ -23,9 +23,8 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.AccessResolver;
 
-public class FieldAccess extends ASTNode implements IAccess, INamed
+public class FieldAccess extends ASTNode implements ICall, INamed, IValued
 {
 	public IValue	instance;
 	public Name		name;
@@ -131,24 +130,59 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.instance == null)
+		if (this.instance != null)
 		{
-			if (this.resolve(context, markers))
+			this.instance = this.instance.resolve(markers, context);
+		}
+		
+		if (this.instance != null && this.instance.getValueType() == CLASS_ACCESS)
+		{
+			if (this.name == Name._class)
 			{
-				return this;
+				ClassOperator co = new ClassOperator(((ClassAccess) this.instance).type);
+				co.position = this.position;
+				co.dotless = this.dotless;
+				return co;
+			}
+		}
+		
+		IField field = ICall.resolveField(context, this.instance, this.name);
+		if (field != null)
+		{
+			if (field.isEnumConstant())
+			{
+				EnumValue enumValue = new EnumValue(this.position);
+				enumValue.name = this.name;
+				enumValue.type = field.getType();
+				return enumValue;
 			}
 			
-			IValue v = this.resolve2(context);
-			if (v != null)
-			{
-				return v;
-			}
-			
-			this.addResolveError(markers);
+			this.field = field;
 			return this;
 		}
 		
-		return AccessResolver.resolve(markers, context, this);
+		IMethod method = ICall.resolveMethod(null, context, this.instance, this.name, EmptyArguments.INSTANCE);
+		if (method != null)
+		{
+			return this.toMethodCall(method);
+		}
+		
+		if (this.instance == null)
+		{
+			IClass iclass = context.resolveClass(this.name);
+			if (iclass != null)
+			{
+				return new ClassAccess(this.position, new Type(iclass));
+			}
+		}
+		
+		Marker marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);
+		marker.addInfo("Qualified Name: " + this.name.qualified);
+		if (this.instance != null)
+		{
+			marker.addInfo("Instance Type: " + this.instance.getType());
+		}
+		return this;
 	}
 	
 	@Override
@@ -218,87 +252,6 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 		return this;
 	}
 	
-	private transient IValue	replacement;
-	
-	@Override
-	public boolean isResolved()
-	{
-		if (this.field == null)
-		{
-			return false;
-		}
-		
-		if (this.instance != null && !this.field.isField())
-		{
-			return false;
-		}
-		return true;
-	}
-	
-	@Override
-	public boolean resolve(IContext context, MarkerList markers)
-	{
-		if (this.instance != null && this.instance.getValueType() == CLASS_ACCESS)
-		{
-			if (this.name == Name._class)
-			{
-				ClassOperator co = new ClassOperator(((ClassAccess) this.instance).type);
-				co.position = this.position;
-				co.dotless = this.dotless;
-				this.replacement = co;
-				return false;
-			}
-		}
-		
-		IField field = IAccess.resolveField(context, this.instance, this.name);
-		if (field != null)
-		{
-			if (field.isEnumConstant())
-			{
-				EnumValue enumValue = new EnumValue(this.position);
-				enumValue.name = this.name;
-				enumValue.type = field.getType();
-				this.replacement = enumValue;
-				return false;
-			}
-			
-			if (this.instance != null && !field.isField())
-			{
-				return false;
-			}
-			
-			this.field = field;
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public IValue resolve2(IContext context)
-	{
-		if (this.replacement != null)
-		{
-			return this.replacement;
-		}
-		
-		IMethod method = IAccess.resolveMethod(null, context, this.instance, this.name, EmptyArguments.INSTANCE);
-		if (method != null)
-		{
-			return this.toMethodCall(method);
-		}
-		
-		if (this.instance == null)
-		{
-			IClass iclass = context.resolveClass(this.name);
-			if (iclass != null)
-			{
-				return new ClassAccess(this.position, new Type(iclass));
-			}
-		}
-		
-		return null;
-	}
-	
 	public MethodCall toMethodCall(IMethod method)
 	{
 		MethodCall call = new MethodCall(this.position);
@@ -308,36 +261,6 @@ public class FieldAccess extends ASTNode implements IAccess, INamed
 		call.dotless = this.dotless;
 		call.arguments = EmptyArguments.INSTANCE;
 		return call;
-	}
-	
-	@Override
-	public IAccess resolve3(IContext context, IAccess next)
-	{
-		IArguments arguments = new SingleArgument(next);
-		IMethod method = IAccess.resolveMethod(null, context, this.instance, this.name, arguments);
-		if (method != null)
-		{
-			MethodCall call = new MethodCall(this.position);
-			call.instance = this.instance;
-			call.name = this.name;
-			call.method = method;
-			call.dotless = this.dotless;
-			call.arguments = arguments;
-			return call;
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public void addResolveError(MarkerList markers)
-	{
-		Marker marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);
-		marker.addInfo("Qualified Name: " + this.name.qualified);
-		if (this.instance != null)
-		{
-			marker.addInfo("Instance Type: " + this.instance.getType());
-		}
 	}
 	
 	@Override
