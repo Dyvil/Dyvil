@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -17,27 +18,20 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class TryStatement extends ASTNode implements IStatement
 {
-	private static IType	THROWABLE;
+	public static final IType	THROWABLE	= new Type(Package.javaLang.resolveClass("Throwable"));
 	
-	public IValue			action;
-	private CatchBlock[]	catchBlocks	= new CatchBlock[1];
-	private int				catchBlockCount;
-	public IValue			finallyBlock;
+	public IValue				action;
+	private CatchBlock[]		catchBlocks	= new CatchBlock[1];
+	private int					catchBlockCount;
+	public IValue				finallyBlock;
 	
-	private IStatement		parent;
+	private IType				commonType;
+	
+	private IStatement			parent;
 	
 	public TryStatement(ICodePosition position)
 	{
 		this.position = position;
-	}
-	
-	public static IType getThrowable()
-	{
-		if (THROWABLE == null)
-		{
-			THROWABLE = new Type(Package.javaLang.resolveClass("Throwable"));
-		}
-		return THROWABLE;
 	}
 	
 	@Override
@@ -49,19 +43,100 @@ public final class TryStatement extends ASTNode implements IStatement
 	@Override
 	public IType getType()
 	{
-		return Types.UNKNOWN;
+		if (this.commonType != null)
+		{
+			return this.commonType;
+		}
+		
+		if (this.finallyBlock != null)
+		{
+			return this.commonType = this.finallyBlock.getType();
+		}
+		if (this.action == null)
+		{
+			return Types.UNKNOWN;
+		}
+		IType type = this.action.getType();
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			IType t1 = this.catchBlocks[i].action.getType();
+			type = Type.findCommonSuperType(type, t1);
+			if (type == null)
+			{
+				return this.commonType = Types.ANY;
+			}
+		}
+		return this.commonType = type;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		if (this.finallyBlock != null)
+		{
+			IValue value1 = this.finallyBlock.withType(type);
+			if (value1 == null)
+			{
+				return null;
+			}
+			this.finallyBlock = value1;
+			this.commonType = type;
+			return this;
+		}
+		
+		if (this.action != null)
+		{
+			IValue value1 = this.action.withType(type);
+			if (value1 == null)
+			{
+				return null;
+			}
+			this.action = value1;
+		}
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			CatchBlock block = this.catchBlocks[i];
+			IValue value1 = block.action.withType(type);
+			if (value1 == null)
+			{
+				return null;
+			}
+			block.action = value1;
+		}
+		
+		this.commonType = type;
+		return this;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.VOID || type == Types.UNKNOWN;
+		if (type == Types.VOID)
+		{
+			return true;
+		}
+		if (this.finallyBlock != null)
+		{
+			return this.finallyBlock.isType(type);
+		}
+		if (this.action != null && !this.action.isType(type))
+		{
+			return false;
+		}
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			if (!this.catchBlocks[i].action.isType(type))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		return 0;
+		return this.isType(type) ? 3 : 0;
 	}
 	
 	public void addCatchBlock(CatchBlock block)
@@ -169,19 +244,13 @@ public final class TryStatement extends ASTNode implements IStatement
 			this.action.check(markers, context);
 		}
 		
-		IType throwable = getThrowable();
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			IValue action1 = block.action.withType(throwable);
-			if (action1 == null)
+			if (!THROWABLE.isSuperTypeOf(block.type))
 			{
 				Marker marker = markers.create(block.type.getPosition(), "try.catch.type");
 				marker.addInfo("Exception Type: " + block.type);
-			}
-			else
-			{
-				block.action = action1;
 			}
 			
 			block.action.check(markers, context);
@@ -217,19 +286,43 @@ public final class TryStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		if (this.finallyBlock == null)
+		{
+			IType type1 = this.action.getType();
+			for (int i = 0; i < this.catchBlockCount; i++)
+			{
+				ClassWriter.addCommonType(type1, this.catchBlocks[i].action.getType(), this.commonType);
+			}
+		}
+		
+		this.write(writer, true);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
+		this.write(writer, false);
+	}
+	
+	private void write(MethodWriter writer, boolean expression)
+	{
 		org.objectweb.asm.Label tryStart = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label tryEnd = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label endLabel = new org.objectweb.asm.Label();
 		
+		boolean hasFinally = this.finallyBlock != null;
+		
 		writer.writeLabel(tryStart);
 		if (this.action != null)
 		{
-			this.action.writeStatement(writer);
+			if (expression && !hasFinally)
+			{
+				this.action.writeExpression(writer);
+			}
+			else
+			{
+				this.action.writeStatement(writer);
+			}
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		writer.writeLabel(tryEnd);
@@ -249,7 +342,14 @@ public final class TryStatement extends ASTNode implements IStatement
 				writer.writeLabel(handlerLabel);
 				writer.writeVarInsn(Opcodes.ASTORE, localCount);
 				block.variable.index = localCount;
-				block.action.writeStatement(writer);
+				if (expression && !hasFinally)
+				{
+					block.action.writeExpression(writer);
+				}
+				else
+				{
+					block.action.writeStatement(writer);
+				}
 				writer.resetLocals(localCount);
 			}
 			// Otherwise pop the exception from the stack
@@ -257,21 +357,35 @@ public final class TryStatement extends ASTNode implements IStatement
 			{
 				writer.writeLabel(handlerLabel);
 				writer.writeInsn(Opcodes.POP);
-				block.action.writeStatement(writer);
+				if (expression && !hasFinally)
+				{
+					block.action.writeExpression(writer);
+				}
+				else
+				{
+					block.action.writeStatement(writer);
+				}
 			}
 			
 			writer.writeTryCatchBlock(tryStart, tryEnd, handlerLabel, block.type.getInternalName());
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		
-		if (this.finallyBlock != null)
+		if (hasFinally)
 		{
 			org.objectweb.asm.Label finallyLabel = new org.objectweb.asm.Label();
 			
 			writer.writeLabel(finallyLabel);
 			writer.writeInsn(Opcodes.POP);
 			writer.writeLabel(endLabel);
-			this.finallyBlock.writeExpression(writer);
+			if (expression)
+			{
+				this.finallyBlock.writeExpression(writer);
+			}
+			else
+			{
+				this.finallyBlock.writeStatement(writer);
+			}
 			writer.writeFinallyBlock(tryStart, tryEnd, finallyLabel);
 		}
 		else

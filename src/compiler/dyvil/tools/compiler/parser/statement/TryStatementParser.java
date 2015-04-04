@@ -14,7 +14,7 @@ import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class TryStatementParser extends Parser implements IValued
+public final class TryStatementParser extends Parser implements IValued
 {
 	private static final int	ACTION		= 1;
 	private static final int	CATCH		= 2;
@@ -65,7 +65,8 @@ public class TryStatementParser extends Parser implements IValued
 			}
 			if (ParserUtil.isTerminator(type))
 			{
-				if (!token.isInferred())
+				int next = token.next().type();
+				if (next != Keywords.CATCH && next != Keywords.FINALLY)
 				{
 					pm.popParser(true);
 				}

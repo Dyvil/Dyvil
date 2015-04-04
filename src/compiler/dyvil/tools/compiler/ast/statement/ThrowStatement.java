@@ -79,7 +79,7 @@ public class ThrowStatement extends ASTNode implements IValue, IValued
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IValue value1 = this.value.withType(TryStatement.getThrowable());
+		IValue value1 = this.value.withType(TryStatement.THROWABLE);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.value.getPosition(), "throw.type");
