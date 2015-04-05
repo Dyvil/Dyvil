@@ -82,17 +82,16 @@ public final class ThisValue extends ASTNode implements IConstantValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.type == null)
+		if (this.type != null)
+			return;
+		
+		if (context.isStatic())
 		{
-			if (context.isStatic())
-			{
-				markers.add(this.position, "access.this.static");
-			}
-			else
-			{
-				this.type = context.getThisType();
-			}
+			markers.add(this.position, "access.this.static");
+			return;
 		}
+		
+		this.type = context.getThisClass().getType();
 	}
 	
 	@Override

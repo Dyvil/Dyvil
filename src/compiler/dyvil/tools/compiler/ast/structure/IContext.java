@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IContext
@@ -28,7 +27,12 @@ public interface IContext
 	
 	public boolean isStatic();
 	
-	public IType getThisType();
+	public IClass getThisClass();
+	
+	public default IField getEnclosingInstance(IClass iclass)
+	{
+		return null;
+	}
 	
 	public Package resolvePackage(Name name);
 	

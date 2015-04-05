@@ -460,7 +460,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(prefix).append(Formatting.Class.bodyStart);
+		buffer.append(Formatting.Class.bodyStart).append('\n');
 		String prefix1 = prefix + Formatting.Class.bodyIndent;
 		
 		if (this.classCount > 0)

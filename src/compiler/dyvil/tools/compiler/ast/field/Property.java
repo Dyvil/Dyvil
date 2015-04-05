@@ -228,9 +228,9 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
-		return this.theClass.getType();
+		return this.theClass;
 	}
 	
 	@Override

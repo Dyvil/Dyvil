@@ -66,9 +66,9 @@ public class CatchBlock implements IValued, ITyped, IContext
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
-		return this.context.getThisType();
+		return this.context.getThisClass();
 	}
 	
 	@Override

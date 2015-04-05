@@ -136,7 +136,7 @@ public final class MethodParameter extends Member implements IParameter
 		
 		if (this.defaultValue != null)
 		{
-			context.getThisType().getTheClass().addCompilable(this);
+			context.getThisClass().getTheClass().addCompilable(this);
 			
 			this.defaultValue = this.defaultValue.resolve(markers, context);
 			

@@ -324,7 +324,7 @@ public class Method extends Member implements IMethod
 		}
 		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			type = this.theClass.getThisType().resolveType(name, arguments.getFirstValue().getType());
+			type = this.theClass.getType().resolveType(name, arguments.getFirstValue().getType());
 			if (type != null)
 			{
 				return type;
@@ -334,7 +334,7 @@ public class Method extends Member implements IMethod
 		
 		if (instance != null)
 		{
-			type = this.theClass.getThisType().resolveType(name, instance.getType());
+			type = this.theClass.getType().resolveType(name, instance.getType());
 			if (type != null)
 			{
 				return type;
@@ -568,9 +568,9 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
-		return this.theClass.getThisType();
+		return this.theClass;
 	}
 	
 	@Override

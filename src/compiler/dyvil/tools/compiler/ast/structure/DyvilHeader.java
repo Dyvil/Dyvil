@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.NestedClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -18,7 +19,6 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
@@ -160,6 +160,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
+	public IClass getClass(Name name)
+	{
+		return null;
+	}
+	
+	@Override
 	public void addClass(IClass iclass)
 	{
 	}
@@ -171,7 +177,18 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public IClass getClass(Name name)
+	public int innerClassCount()
+	{
+		return 0;
+	}
+	
+	@Override
+	public void addInnerClass(NestedClass iclass)
+	{
+	}
+	
+	@Override
+	public NestedClass getInnerClass(int index)
 	{
 		return null;
 	}
@@ -239,7 +256,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public Type getThisType()
+	public IClass getThisClass()
 	{
 		return null;
 	}

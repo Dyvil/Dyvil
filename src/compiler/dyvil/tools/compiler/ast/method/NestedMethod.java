@@ -23,7 +23,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 
 public class NestedMethod extends Method
 {
-	private IType				thisType;
+	private IClass				thisClass;
 	private CaptureVariable[]	capturedFields;
 	private int					capturedFieldCount;
 	
@@ -51,9 +51,9 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
-		return this.thisType = this.context.getThisType();
+		return this.thisClass = this.context.getThisClass();
 	}
 	
 	@Override
@@ -163,7 +163,7 @@ public class NestedMethod extends Method
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(),
 				this.getExceptions()));
 		
-		if (this.thisType != null)
+		if (this.thisClass != null)
 		{
 			mw.setInstanceMethod();
 		}
@@ -218,7 +218,7 @@ public class NestedMethod extends Method
 			mw.end(this.type);
 		}
 		
-		if (this.thisType != null)
+		if (this.thisClass != null)
 		{
 			mw.writeLocal(0, "this", this.theClass.getType(), start, end);
 		}

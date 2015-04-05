@@ -16,7 +16,6 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -148,7 +147,7 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
 		return null;
 	}

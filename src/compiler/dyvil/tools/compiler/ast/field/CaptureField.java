@@ -4,7 +4,10 @@ import java.lang.annotation.ElementType;
 
 import org.objectweb.asm.ClassWriter;
 
+import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -12,50 +15,73 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class CaptureVariable implements IVariable
+public final class CaptureField implements IVariable
 {
-	public int		index;
-	public IField	variable;
+	public IClass	theClass;
+	public String	name;
+	public IField	field;
 	private IType	type;
 	
-	public CaptureVariable()
+	public CaptureField(IClass iclass)
 	{
+		this.theClass = iclass;
 	}
 	
-	public CaptureVariable(IField variable)
+	public CaptureField(IClass iclass, IField field)
 	{
-		this.variable = variable;
-		this.type = variable.getType();
+		this.theClass = iclass;
+		this.field = field;
+		this.type = field.getType();
+		
+		this.name = "this$" + field.getName().qualified;
+	}
+	
+	@Override
+	public boolean isField()
+	{
+		return this.field.isField();
+	}
+	
+	@Override
+	public boolean isVariable()
+	{
+		return this.field.isVariable();
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		return this.theClass;
 	}
 	
 	@Override
 	public int getAccessLevel()
 	{
-		return this.variable.getAccessLevel();
+		return this.field.getAccessLevel();
 	}
 	
 	@Override
 	public byte getAccessibility()
 	{
-		return this.variable.getAccessibility();
+		return this.field.getAccessibility();
 	}
 	
 	@Override
 	public void setName(Name name)
 	{
-		this.variable.setName(name);
+		this.field.setName(name);
 	}
 	
 	@Override
 	public Name getName()
 	{
-		return this.variable.getName();
+		return this.field.getName();
 	}
 	
 	@Override
 	public void setType(IType type)
 	{
-		this.variable.setType(type);
+		this.field.setType(type);
 		this.type = type;
 	}
 	
@@ -68,103 +94,102 @@ public class CaptureVariable implements IVariable
 	@Override
 	public void setModifiers(int modifiers)
 	{
-		this.variable.setModifiers(modifiers);
+		this.field.setModifiers(modifiers);
 	}
 	
 	@Override
 	public boolean addModifier(int mod)
 	{
-		return this.variable.addModifier(mod);
+		return this.field.addModifier(mod);
 	}
 	
 	@Override
 	public void removeModifier(int mod)
 	{
-		this.variable.removeModifier(mod);
+		this.field.removeModifier(mod);
 	}
 	
 	@Override
 	public int getModifiers()
 	{
-		return this.variable.getModifiers();
+		return this.field.getModifiers();
 	}
 	
 	@Override
 	public boolean hasModifier(int mod)
 	{
-		return this.variable.hasModifier(mod);
+		return this.field.hasModifier(mod);
 	}
 	
 	@Override
 	public void setAnnotations(Annotation[] annotations, int count)
 	{
-		this.variable.setAnnotations(annotations, count);
+		this.field.setAnnotations(annotations, count);
 	}
 	
 	@Override
 	public void setAnnotation(int index, Annotation annotation)
 	{
-		this.variable.setAnnotation(index, annotation);
+		this.field.setAnnotation(index, annotation);
 	}
 	
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		this.variable.addAnnotation(annotation);
+		this.field.addAnnotation(annotation);
 	}
 	
 	@Override
 	public boolean addRawAnnotation(String type)
 	{
-		return this.variable.addRawAnnotation(type);
+		return this.field.addRawAnnotation(type);
 	}
 	
 	@Override
 	public void removeAnnotation(int index)
 	{
-		this.variable.removeAnnotation(index);
+		this.field.removeAnnotation(index);
 	}
 	
 	@Override
 	public Annotation getAnnotation(int index)
 	{
-		return this.variable.getAnnotation(index);
+		return this.field.getAnnotation(index);
 	}
 	
 	@Override
 	public Annotation getAnnotation(IType type)
 	{
-		return this.variable.getAnnotation(type);
+		return this.field.getAnnotation(type);
 	}
 	
 	@Override
 	public ElementType getAnnotationType()
 	{
-		return this.variable.getAnnotationType();
+		return this.field.getAnnotationType();
 	}
 	
 	@Override
 	public void setValue(IValue value)
 	{
-		this.variable.setValue(value);
+		this.field.setValue(value);
 	}
 	
 	@Override
 	public IValue getValue()
 	{
-		return this.variable.getValue();
+		return this.field.getValue();
 	}
 	
 	@Override
 	public void setIndex(int index)
 	{
-		this.index = index;
 	}
 	
 	@Override
 	public int getIndex()
 	{
-		return this.index;
+		return 0;
 	}
 	
 	@Override
@@ -207,28 +232,36 @@ public class CaptureVariable implements IVariable
 	@Override
 	public void write(ClassWriter writer)
 	{
-		
+		writer.visitField(Modifiers.PRIVATE | Modifiers.MANDATED, this.name, this.type.getExtendedName(), this.type.getSignature(), null);
 	}
 	
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
+		writer.writeVarInsn(Opcodes.ALOAD, 0);
+		String owner = this.theClass.getInternalName();
+		String name = this.name;
+		String desc = this.type.getExtendedName();
+		writer.writeFieldInsn(Opcodes.GETFIELD, owner, name, desc);
 	}
 	
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
+		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		if (value != null)
 		{
 			value.writeExpression(writer);
 		}
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		String owner = this.theClass.getInternalName();
+		String name = this.name;
+		String desc = this.type.getExtendedName();
+		writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.variable.toString(prefix, buffer);
+		this.field.toString(prefix, buffer);
 	}
 }

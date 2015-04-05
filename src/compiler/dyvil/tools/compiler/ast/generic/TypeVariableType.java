@@ -176,7 +176,7 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
 		return null;
 	}

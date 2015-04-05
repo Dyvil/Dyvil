@@ -330,9 +330,9 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
-		return this.context.getThisType();
+		return this.context.getThisClass();
 	}
 	
 	@Override

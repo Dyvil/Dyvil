@@ -64,7 +64,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	private IType				returnType;
 	private CaptureVariable[]	capturedFields;
 	private int					capturedFieldCount;
-	private IType				thisType;
+	private IClass				thisClass;
 	
 	public LambdaExpression(ICodePosition position)
 	{
@@ -193,9 +193,9 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
-		return this.thisType = this.context.getThisType();
+		return this.thisClass = this.context.getThisClass();
 	}
 	
 	@Override
@@ -298,14 +298,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		// Value gets resolved in check()
-		
-		IType type = context.getThisType();
-		if (type == null)
-		{
-			return this;
-		}
-		
-		IClass iclass = type.getTheClass();
+		IClass iclass = context.getThisClass();
 		if (iclass == null)
 		{
 			return this;
@@ -383,7 +376,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		this.lambdaDesc = this.getLambdaDescriptor();
 		
 		int handleType;
-		if (this.thisType != null)
+		if (this.thisClass != null)
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, 0);
 			handleType = ClassFormat.H_INVOKESPECIAL;
@@ -427,9 +420,9 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	{
 		StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
-		if (this.thisType != null)
+		if (this.thisClass != null)
 		{
-			this.thisType.appendExtendedName(buffer);
+			buffer.append('L').append(this.thisClass.getInternalName()).append(';');
 		}
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
@@ -478,7 +471,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public void write(ClassWriter writer)
 	{
-		boolean instance = this.thisType != null;
+		boolean instance = this.thisClass != null;
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.getName(), this.getLambdaDescriptor(), null, null));
 		

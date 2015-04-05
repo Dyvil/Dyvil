@@ -36,7 +36,7 @@ public class ExternalConstructor extends Constructor
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.theClass.getThisType();
+		this.type = this.theClass.getType();
 	}
 	
 	private void resolveParameters()

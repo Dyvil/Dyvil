@@ -60,7 +60,9 @@ public interface IConstructor extends IASTNode, IMember, IBaseMethod, ITypeList,
 	
 	public void writeCall(MethodWriter writer, IArguments arguments, IType type);
 	
-	public void writeInvoke(MethodWriter writer, IArguments arguments);
+	public void writeInvoke(MethodWriter writer);
+	
+	public void writeArguments(MethodWriter writer, IArguments arguments);
 	
 	public void write(ClassWriter writer, IValue instanceFields);
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.classes.NestedClass;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -15,12 +16,20 @@ import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 
 public final class DyvilUnit extends DyvilHeader
 {
-	private IClass[]	classes		= new IClass[1];
-	private int			classCount	= 0;
+	private IClass[]		classes			= new IClass[1];
+	private int				classCount;
+	private NestedClass[]	innerClasses	= new NestedClass[1];
+	private int				innerClassCount;
 	
 	public DyvilUnit(Package pack, CodeFile input, File output)
 	{
 		super(pack, input, output);
+	}
+	
+	@Override
+	public int classCount()
+	{
+		return this.classCount;
 	}
 	
 	@Override
@@ -54,6 +63,33 @@ public final class DyvilUnit extends DyvilHeader
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public int innerClassCount()
+	{
+		return this.innerClassCount;
+	}
+	
+	@Override
+	public void addInnerClass(NestedClass iclass)
+	{
+		int index = this.innerClassCount++;
+		if (index >= this.innerClasses.length)
+		{
+			NestedClass[] temp = new NestedClass[this.innerClassCount];
+			System.arraycopy(this.innerClasses, 0, temp, 0, this.innerClasses.length);
+			this.innerClasses = temp;
+		}
+		this.innerClasses[index] = iclass;
+		
+		iclass.setIndex(index);
+	}
+	
+	@Override
+	public NestedClass getInnerClass(int index)
+	{
+		return this.innerClasses[index];
 	}
 	
 	@Override
@@ -153,9 +189,13 @@ public final class DyvilUnit extends DyvilHeader
 			String name = iclass.getName().qualified;
 			if (!name.equals(this.name))
 			{
-				name = this.name + "$" + name;
+				name = this.name + "$" + name + ".class";
 			}
-			File file = new File(this.outputDirectory, name + ".class");
+			else
+			{
+				name += ".class";
+			}
+			File file = new File(this.outputDirectory, name);
 			ClassWriter.saveClass(file, iclass);
 			
 			IClassBody body = iclass.getBody();
@@ -170,6 +210,14 @@ public final class DyvilUnit extends DyvilHeader
 					ClassWriter.saveClass(file, iclass1);
 				}
 			}
+		}
+		
+		for (int i = 0; i < this.innerClassCount; i++)
+		{
+			NestedClass iclass = this.innerClasses[i];
+			String name = iclass.getName().qualified + ".class";
+			File file = new File(this.outputDirectory, name);
+			ClassWriter.saveClass(file, iclass);
 		}
 	}
 	

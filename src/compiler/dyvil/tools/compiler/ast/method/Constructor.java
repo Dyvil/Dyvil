@@ -374,9 +374,9 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
-		return this.theClass.getThisType();
+		return this.theClass.getThisClass();
 	}
 	
 	@Override
@@ -633,21 +633,21 @@ public class Constructor extends Member implements IConstructor
 			writer.writeInsn(Opcodes.DUP);
 		}
 		
-		this.writeInvoke(writer, arguments);
+		this.writeArguments(writer, arguments);
+		this.writeInvoke(writer);
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer, IArguments arguments)
+	public void writeInvoke(MethodWriter writer)
 	{
-		this.writeArguments(writer, arguments);
-		
 		String owner = this.theClass.getInternalName();
 		String name = "<init>";
 		String desc = this.getDescriptor();
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false);
 	}
 	
-	private void writeArguments(MethodWriter writer, IArguments arguments)
+	@Override
+	public void writeArguments(MethodWriter writer, IArguments arguments)
 	{
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{

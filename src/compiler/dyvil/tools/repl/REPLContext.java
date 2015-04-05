@@ -6,6 +6,7 @@ import java.util.Map;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.NestedClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.external.ExternalClass;
@@ -23,7 +24,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -178,6 +178,23 @@ public class REPLContext implements IValued, IDyvilHeader
 	}
 	
 	@Override
+	public int innerClassCount()
+	{
+		return 0;
+	}
+	
+	@Override
+	public void addInnerClass(NestedClass iclass)
+	{
+	}
+	
+	@Override
+	public NestedClass getInnerClass(int index)
+	{
+		return null;
+	}
+	
+	@Override
 	public String getInternalName(String subClass)
 	{
 		return null;
@@ -196,7 +213,7 @@ public class REPLContext implements IValued, IDyvilHeader
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
 		return null;
 	}

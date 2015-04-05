@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -92,7 +91,7 @@ public final class CaseClassMetadata extends ClassMetadata
 				param.write(mw);
 				mw.writeVarInsn(param.getType().getLoadOpcode(), i);
 			}
-			this.constructor.writeInvoke(mw, EmptyArguments.INSTANCE);
+			this.constructor.writeInvoke(mw);
 			mw.writeInsn(Opcodes.ARETURN);
 			mw.end(this.theClass.getType());
 		}

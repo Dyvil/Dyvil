@@ -203,9 +203,9 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	}
 	
 	@Override
-	public default IType getThisType()
+	public default IClass getThisClass()
 	{
-		return this;
+		return this.getTheClass();
 	}
 	
 	@Override

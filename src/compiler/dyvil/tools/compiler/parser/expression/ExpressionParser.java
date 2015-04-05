@@ -18,6 +18,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
+import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
 import dyvil.tools.compiler.parser.statement.*;
 import dyvil.tools.compiler.parser.type.TypeListParser;
@@ -41,17 +42,18 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int		STATEMENT			= 0x80;
 	public static final int		TYPE				= 0x100;
 	public static final int		CONSTRUCTOR			= 0x200;
-	public static final int		PARAMETERS			= 0x400;
-	public static final int		PARAMETERS_END		= 0x800;
-	public static final int		GENERICS			= 0x1000;
-	public static final int		GENERICS_END		= 0x2000;
+	public static final int		CONSTRUCTOR_END		= 0x400;
+	public static final int		PARAMETERS			= 0x800;
+	public static final int		PARAMETERS_END		= 0x1000;
+	public static final int		GENERICS			= 0x2000;
+	public static final int		GENERICS_END		= 0x4000;
 	
-	public static final int		FUNCTION_POINTER	= 0x4000;
+	public static final int		FUNCTION_POINTER	= 0x8000;
 	
-	public static final int		BYTECODE_END		= 0x8000;
+	public static final int		BYTECODE_END		= 0x10000;
 	
-	public static final int		PATTERN_IF			= 0x10000;
-	public static final int		PATTERN_END			= 0x20000;
+	public static final int		PATTERN_IF			= 0x20000;
+	public static final int		PATTERN_END			= 0x40000;
 	
 	protected IValued			field;
 	
@@ -258,6 +260,25 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Argument List - ')' expected", true);
+		}
+		if (this.mode == CONSTRUCTOR_END)
+		{
+			this.mode = ACCESS;
+			if (token.next().type() == Symbols.OPEN_CURLY_BRACKET)
+			{
+				ClassConstructor cc = ((ConstructorCall) this.value).toClassConstructor();
+				pm.skip();
+				pm.pushParser(new ClassBodyParser(cc.getNestedClass()));
+				this.value = cc;
+				this.mode = LIST_END;
+				return;
+			}
+			this.value.expandPosition(token);
+			if (type == Symbols.CLOSE_PARENTHESIS)
+			{
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Constructor Argument List - ')' expected", true);
 		}
 		if (this.mode == GENERICS)
 		{
@@ -466,12 +487,21 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		if (this.isInMode(CONSTRUCTOR))
 		{
 			ConstructorCall cc = (ConstructorCall) this.value;
+			if (type == Symbols.OPEN_CURLY_BRACKET)
+			{
+				ClassConstructor cc2 = cc.toClassConstructor();
+				pm.pushParser(new ClassBodyParser(cc2.getNestedClass()));
+				this.mode = LIST_END;
+				this.value = cc2;
+				return;
+			}
+			
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				ArgumentList list = new ArgumentList();
 				cc.arguments = list;
 				pm.pushParser(new ExpressionListParser(list));
-				this.mode = PARAMETERS_END;
+				this.mode = CONSTRUCTOR_END;
 				return;
 			}
 			

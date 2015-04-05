@@ -131,13 +131,13 @@ public final class ExternalClass extends CodeClass
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
 		if (!this.genericsResolved)
 		{
 			this.resolveGenerics();
 		}
-		return this.type;
+		return this;
 	}
 	
 	@Override

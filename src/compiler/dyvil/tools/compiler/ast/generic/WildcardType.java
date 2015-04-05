@@ -226,9 +226,9 @@ public final class WildcardType extends BaseBounded implements IType
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
-		return this;
+		return null;
 	}
 	
 	@Override

@@ -173,11 +173,11 @@ public final class FunctionPointer extends ASTNode implements IValue, IValued, I
 		{
 			if (context.isStatic())
 			{
-				this.instance = new ThisValue(context.getThisType());
+				this.instance = new ThisValue(context.getThisClass().getType());
 			}
 			else
 			{
-				this.instance = new ClassAccess(context.getThisType());
+				this.instance = new ClassAccess(context.getThisClass().getType());
 			}
 		}
 		

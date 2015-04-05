@@ -94,6 +94,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public void setUnit(IDyvilHeader unit)
+	{
+		this.unit = unit;
+	}
+	
+	@Override
 	public IDyvilHeader getUnit()
 	{
 		return this.unit;
@@ -628,9 +634,21 @@ public class CodeClass extends ASTNode implements IClass
 			this.annotations[i].resolveTypes(markers, context);
 		}
 		
+		int index = 1;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(markers, this);
+			IParameter param = this.parameters[i];
+			IType type = param.getType();
+			param.resolveTypes(markers, this);
+			param.setIndex(index);
+			if (type == Types.LONG || type == Types.DOUBLE)
+			{
+				index += 2;
+			}
+			else
+			{
+				index++;
+			}
 		}
 		
 		if (this.superType != null)
@@ -783,9 +801,9 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public IType getThisType()
+	public IClass getThisClass()
 	{
-		return this.type;
+		return this;
 	}
 	
 	@Override
@@ -797,10 +815,13 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		IClass clazz = this.body.getClass(name);
-		if (clazz != null)
+		if (this.body != null)
 		{
-			return clazz;
+			IClass clazz = this.body.getClass(name);
+			if (clazz != null)
+			{
+				return clazz;
+			}
 		}
 		
 		if (this.outerClass != null)

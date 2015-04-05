@@ -84,23 +84,20 @@ public final class SuperValue extends ASTNode implements IConstantValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		if (this.type != null)
+			return;
+		if (context.isStatic())
+		{
+			markers.add(this.position, "access.super.static");
+			return;
+		}
+		
+		IType thisType = context.getThisClass().getType();
+		this.type = thisType.getSuperType();
 		if (this.type == null)
 		{
-			if (context.isStatic())
-			{
-				markers.add(this.position, "access.super.static");
-			}
-			else
-			{
-				IType thisType = context.getThisType();
-				this.type = thisType.getSuperType();
-				if (this.type == null)
-				{
-					Marker marker = markers.create(this.position, "access.super.type");
-					marker.addInfo("Enclosing Type: " + thisType);
-					
-				}
-			}
+			Marker marker = markers.create(this.position, "access.super.type");
+			marker.addInfo("Enclosing Type: " + thisType);
 		}
 	}
 	

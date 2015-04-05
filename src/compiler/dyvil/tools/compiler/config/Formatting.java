@@ -23,8 +23,8 @@ public interface Formatting
 	public static class Class
 	{
 		public static String	superClassesSeperator	= ", ";
-		public static String	bodyStart				= "{\n";
-		public static String	bodyEnd					= "}\n";
+		public static String	bodyStart				= "{";
+		public static String	bodyEnd					= "}";
 		public static String	bodyIndent				= "\t";
 		
 		public static boolean	newLine					= true;

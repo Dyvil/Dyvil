@@ -18,6 +18,8 @@ import dyvil.tools.compiler.ast.type.ITypeList;
 
 public interface IClass extends IASTNode, IMember, IGeneric, IContext, IParameterized, ITypeList
 {
+	public void setUnit(IDyvilHeader unit);
+	
 	public IDyvilHeader getUnit();
 	
 	public void setOuterClass(IClass iclass);
