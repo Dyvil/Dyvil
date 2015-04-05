@@ -223,13 +223,14 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		int args = this.arguments.size();
+		
 		if (this.instance != null)
 		{
 			this.instance.resolve(markers, context);
 		}
 		
-		int args = this.arguments.size();
-		if (args == 1 && "match".equals(this.name))
+		if (args == 1 && this.name == Name.match)
 		{
 			MatchExpression me = Operators.getMatchExpression(this.instance, this.arguments.getFirstValue());
 			if (me != null)
@@ -241,10 +242,23 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 		
 		this.arguments.resolve(markers, context);
 		
-		IValue op = this.resolveOperator();
-		if (op != null)
+		if (args == 1)
 		{
-			return op;
+			IValue argument = this.arguments.getFirstValue();
+			IValue op;
+			if (this.instance != null)
+			{
+				op = Operators.get(this.instance, this.name, argument);
+			}
+			else
+			{
+				op = Operators.get(this.name, argument);
+			}
+			if (op != null)
+			{
+				op.setPosition(this.position);
+				return op;
+			}
 		}
 		
 		IMethod method = ICall.resolveMethod(markers, context, this.instance, this.name, this.arguments);
@@ -406,33 +420,6 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 			this.instance = this.instance.foldConstants();
 		}
 		return this;
-	}
-	
-	private IValue resolveOperator()
-	{
-		int len = this.arguments.size();
-		if (len != 1)
-		{
-			return null;
-		}
-		
-		IValue argument = this.arguments.getFirstValue();
-		IValue operator;
-		
-		if (this.instance != null)
-		{
-			operator = Operators.get(this.instance, this.name, argument);
-		}
-		else
-		{
-			operator = Operators.get(this.name, argument);
-		}
-		if (operator != null)
-		{
-			operator.setPosition(this.position);
-			return operator;
-		}
-		return null;
 	}
 	
 	private IValue resolveApply(MarkerList markers, IContext context)
