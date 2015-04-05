@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class CharValue extends ASTNode implements INumericValue
+public final class CharValue extends ASTNode implements INumericValue
 {
 	public char	value;
 	
@@ -114,7 +114,7 @@ public class CharValue extends ASTNode implements INumericValue
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.ensureCapacity(buffer.length() + 4);
-		buffer.append('"');
+		buffer.append('\'');
 		switch (this.value)
 		{
 		case '\'':
@@ -141,6 +141,6 @@ public class CharValue extends ASTNode implements INumericValue
 		default:
 			buffer.append(this.value);
 		}
-		buffer.append('"');
+		buffer.append('\'');
 	}
 }

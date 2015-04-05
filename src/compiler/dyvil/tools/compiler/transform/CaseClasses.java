@@ -248,7 +248,14 @@ public class CaseClasses
 		int params = theClass.parameterCount();
 		for (int i = 0; i < params; i++)
 		{
-			writeToString(writer, theClass.getParameter(i));
+			IField field = theClass.getParameter(i);
+			IType type = field.getType();
+			
+			// Get the field
+			writer.writeVarInsn(ALOAD, 0);
+			field.writeGet(writer, null);
+			
+			writeToString(writer, type);
 			if (i + 1 < params)
 			{
 				// Separator Comma
@@ -269,14 +276,8 @@ public class CaseClasses
 		writer.writeInsn(ARETURN);
 	}
 	
-	public static void writeToString(MethodWriter writer, IField field)
+	public static void writeToString(MethodWriter writer, IType type)
 	{
-		IType type = field.getType();
-		
-		// Get the field
-		writer.writeVarInsn(ALOAD, 0);
-		field.writeGet(writer, null);
-		
 		// Write the call to the StringBuilder#append() method that
 		// corresponds to the type of the field
 		StringBuilder desc = new StringBuilder().append('(');
@@ -285,7 +286,39 @@ public class CaseClasses
 		{
 			type.appendExtendedName(desc);
 		}
-		else if (type == Types.STRING)
+		else if (type.equals(Types.BOOLEAN))
+		{
+			desc.append("Z");
+		}
+		else if (type.equals(Types.BYTE))
+		{
+			desc.append("B");
+		}
+		else if (type.equals(Types.SHORT))
+		{
+			desc.append("S");
+		}
+		else if (type.equals(Types.CHAR))
+		{
+			desc.append("C");
+		}
+		else if (type.equals(Types.INT))
+		{
+			desc.append("I");
+		}
+		else if (type.equals(Types.LONG))
+		{
+			desc.append("J");
+		}
+		else if (type.equals(Types.FLOAT))
+		{
+			desc.append("F");
+		}
+		else if (type.equals(Types.DOUBLE))
+		{
+			desc.append("D");
+		}
+		else if (type.equals(Types.STRING))
 		{
 			desc.append("Ljava/lang/String;");
 		}

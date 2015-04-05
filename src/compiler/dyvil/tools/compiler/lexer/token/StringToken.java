@@ -10,27 +10,30 @@ public final class StringToken implements IToken
 	private IToken		prev;
 	private IToken		next;
 	
+	private final int type;
 	private final int	lineNumber;
 	private final int	start;
 	private final int	end;
 	
 	private String		value;
 	
-	public StringToken(IToken prev, String value, int lineNumber, int start, int end)
+	public StringToken(IToken prev, int type, String value, int lineNumber, int start, int end)
 	{
 		this.prev = prev;
 		prev.setNext(this);
 		this.value = value;
 		
+		this.type = type;
 		this.lineNumber = lineNumber;
 		this.start = start;
 		this.end = end;
 	}
 	
-	public StringToken(String value, int lineNumber, int start, int end)
+	public StringToken(String value, int type, int lineNumber, int start, int end)
 	{
 		this.value = value;
 		
+		this.type = type;
 		this.lineNumber = lineNumber;
 		this.start = start;
 		this.end = end;
@@ -39,7 +42,7 @@ public final class StringToken implements IToken
 	@Override
 	public int type()
 	{
-		return Tokens.STRING;
+		return this.type;
 	}
 	
 	@Override
@@ -143,6 +146,13 @@ public final class StringToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "String \"" + this.value + "\" (line " + this.lineNumber + ")";
+		String s = " \"" + this.value + "\" (line " + this.lineNumber + ")";;
+		switch (this.type) {
+		case Tokens.STRING: return "String" + s;
+		case Tokens.STRING_START: return "String {" + s;
+		case Tokens.STRING_PART: return "} String {" + s;
+		case Tokens.STRING_END: return "} String" + s;
+		}
+		return "String" + s;
 	}
 }

@@ -252,11 +252,6 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			return;
 		}
 		
-		if (this.requiredType == null)
-		{
-			this.requiredType = Types.VOID;
-		}
-		
 		this.context = context;
 		int len = this.valueCount - 1;
 		for (int i = 0; i < len; i++)
@@ -277,16 +272,23 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		}
 		
 		IValue lastValue = this.values[len];
-		IValue value1 = lastValue.withType(this.requiredType);
-		if (value1 == null)
+		if (this.requiredType != null)
 		{
-			Marker marker = markers.create(lastValue.getPosition(), "block.type");
-			marker.addInfo("Block Type: " + this.requiredType);
-			marker.addInfo("Returning Type: " + lastValue.getType());
+			IValue value1 = lastValue.withType(this.requiredType);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(lastValue.getPosition(), "block.type");
+				marker.addInfo("Block Type: " + this.requiredType);
+				marker.addInfo("Returning Type: " + lastValue.getType());
+			}
+			else
+			{
+				lastValue = this.values[len] = value1;
+			}
 		}
 		else
 		{
-			lastValue = this.values[len] = value1;
+			this.requiredType = lastValue.getType();
 		}
 		lastValue.checkTypes(markers, this);
 		

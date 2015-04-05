@@ -105,9 +105,14 @@ public final class StringValue extends ASTNode implements IConstantValue
 		int len = this.value.length();
 		buffer.ensureCapacity(buffer.length() + len + 3);
 		buffer.append('"');
+		append(this.value, len, buffer);
+		buffer.append('"');
+	}
+	
+	public static void append(String value, int len, StringBuilder buffer) {
 		for (int i = 0; i < len; i++)
 		{
-			char c = this.value.charAt(i);
+			char c = value.charAt(i);
 			switch (c)
 			{
 			case '"':
@@ -134,6 +139,5 @@ public final class StringValue extends ASTNode implements IConstantValue
 			}
 			buffer.append(c);
 		}
-		buffer.append('"');
 	}
 }

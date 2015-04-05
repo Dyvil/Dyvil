@@ -82,8 +82,21 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (this.mode == 0 || type == Symbols.SEMICOLON || type == Symbols.COMMA)
+		if (this.mode == 0)
 		{
+			if (this.value != null)
+			{
+				this.field.setValue(this.value);
+			}
+			pm.popParser(true);
+			return;
+		}
+		switch (type)
+		{
+		case Symbols.SEMICOLON:
+		case Symbols.COMMA:
+		case Tokens.STRING_PART:
+		case Tokens.STRING_END:
 			if (this.value != null)
 			{
 				this.field.setValue(this.value);
@@ -741,6 +754,20 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = new StringValue(token.raw(), token.stringValue());
 			this.mode = ACCESS;
 			return true;
+		case Tokens.STRING_START:
+		{
+			FormatStringExpression ssv = new FormatStringExpression(token);
+			this.value = ssv;
+			this.mode = ACCESS;
+			pm.pushParser(new FormatStringParser(ssv), true);
+			return true;
+		}
+		case Tokens.STRING_PART:
+		case Tokens.STRING_END:
+		{
+			pm.popParser(true);
+			return true;
+		}
 		case Tokens.CHAR:
 			this.value = new CharValue(token.raw(), token.charValue());
 			this.mode = ACCESS;

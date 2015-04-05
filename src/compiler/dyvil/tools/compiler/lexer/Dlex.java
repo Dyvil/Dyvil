@@ -7,7 +7,7 @@ import dyvil.tools.compiler.lexer.token.*;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 
-public class Dlex
+public final class Dlex
 {
 	private Dlex()
 	{
@@ -53,9 +53,17 @@ public class Dlex
 					continue;
 				}
 				
-				int m = string && l == '}' ? STRING_2 : getMode(c, code, i);
-				type = m & 0xFFFF;
-				subtype = m & 0xFFFF0000;
+				if (string && l == '}')
+				{
+					type = STRING_START;
+					subtype = STRING_PART;
+				}
+				else
+				{
+					int m = getMode(c, code, i);
+					type = m & 0xFFFF;
+					subtype = m & 0xFFFF0000;
+				}
 			}
 			
 			switch (type)
@@ -245,10 +253,11 @@ public class Dlex
 					buf.append(c);
 				}
 				break;
-			case STRING_2:
+			case STRING_START:
 				if (c == '"' && (buf.length() > 1 || string))
 				{
 					buf.append('"');
+					subtype = STRING_END;
 					string = false;
 					addToken = true;
 					reparse = false;
@@ -261,7 +270,7 @@ public class Dlex
 				}
 				else if (c == '$' && code.charAt(i + 1) == '{')
 				{
-					i++;
+					i += 2;
 					buf.append("${");
 					addToken = true;
 					string = true;
@@ -342,7 +351,7 @@ public class Dlex
 			// @"string"
 			if (n == '"')
 			{
-				return STRING_2;
+				return STRING_START;
 			}
 			return IDENTIFIER | MOD_SYMBOL;
 		case '0':
@@ -498,9 +507,13 @@ public class Dlex
 		case DOUBLE | MOD_HEX:
 			return new DoubleToken(prev, Double.parseDouble(s.substring(2)), line, start, start + len);
 		case STRING:
-			return new StringToken(prev, s.substring(1, len - 1), line, start, start + len);
-		case STRING_2:
-			return null;
+			return new StringToken(prev, STRING, s.substring(1, len - 1), line, start, start + len);
+		case STRING_START:
+			return new StringToken(prev, STRING_START, s.substring(2, len - 2), line, start, start + len);
+		case STRING_PART:
+			return new StringToken(prev, STRING_PART, s.substring(1, len - 2), line, start, start + len);
+		case STRING_END:
+			return new StringToken(prev, STRING_END, s.substring(1, len - 1), line, start, start + len);
 		case CHAR:
 			return new CharToken(prev, s.charAt(1), line, start);
 		}

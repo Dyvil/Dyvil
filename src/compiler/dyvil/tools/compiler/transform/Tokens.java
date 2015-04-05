@@ -29,7 +29,9 @@ public interface Tokens
 	
 	// STRINGS
 	int	STRING				= 0x00000100;
-	int	STRING_2			= 0x00000200;
+	int	STRING_START		= 0x00000200;
+	int	STRING_PART			= 0x00010200;
+	int	STRING_END			= 0x00020200;
 	int	CHAR				= 0x00000400;
 	
 	// COMMENTS
