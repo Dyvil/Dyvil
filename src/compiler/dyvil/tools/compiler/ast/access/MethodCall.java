@@ -227,7 +227,7 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 		
 		if (this.instance != null)
 		{
-			this.instance.resolve(markers, context);
+			this.instance = this.instance.resolve(markers, context);
 		}
 		
 		if (args == 1 && this.name == Name.match)
@@ -332,6 +332,58 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 		return this;
 	}
 	
+	private IValue resolveApply(MarkerList markers, IContext context)
+	{
+		IValue instance;
+		IMethod method;
+		IType type = null;
+		
+		IField field = context.resolveField(this.name);
+		if (field == null)
+		{
+			// Find a type
+			type = new Type(this.position, this.name).resolve(null, context);
+			if (!type.isResolved())
+			{
+				// No type found -> Not an apply method call
+				return null;
+			}
+			// Find the apply method of the type
+			IMethod match = IContext.resolveMethod(markers, type, null, Name.apply, this.arguments);
+			if (match == null)
+			{
+				// No apply method found -> Not an apply method call
+				return null;
+			}
+			method = match;
+			instance = new ClassAccess(this.position, type);
+		}
+		else
+		{
+			FieldAccess access = new FieldAccess(this.position);
+			access.field = field;
+			access.name = this.name;
+			access.dotless = this.dotless;
+			
+			// Find the apply method of the field type
+			IMethod match = IContext.resolveMethod(markers, field.getType(), access, Name.apply, this.arguments);
+			if (match == null)
+			{
+				// No apply method found -> Not an apply method call
+				return null;
+			}
+			method = match;
+			instance = access;
+		}
+		
+		ApplyMethodCall call = new ApplyMethodCall(this.position);
+		call.method = method;
+		call.instance = instance;
+		call.arguments = this.arguments;
+		
+		return call;
+	}
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -420,58 +472,6 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 			this.instance = this.instance.foldConstants();
 		}
 		return this;
-	}
-	
-	private IValue resolveApply(MarkerList markers, IContext context)
-	{
-		IValue instance;
-		IMethod method;
-		IType type = null;
-		
-		IField field = context.resolveField(this.name);
-		if (field == null)
-		{
-			// Find a type
-			type = new Type(this.position, this.name).resolve(null, context);
-			if (!type.isResolved())
-			{
-				// No type found -> Not an apply method call
-				return null;
-			}
-			// Find the apply method of the type
-			IMethod match = IContext.resolveMethod(markers, type, null, Name.apply, this.arguments);
-			if (match == null)
-			{
-				// No apply method found -> Not an apply method call
-				return null;
-			}
-			method = match;
-			instance = new ClassAccess(this.position, type);
-		}
-		else
-		{
-			FieldAccess access = new FieldAccess(this.position);
-			access.field = field;
-			access.name = this.name;
-			access.dotless = this.dotless;
-			
-			// Find the apply method of the field type
-			IMethod match = IContext.resolveMethod(markers, field.getType(), access, Name.apply, this.arguments);
-			if (match == null)
-			{
-				// No apply method found -> Not an apply method call
-				return null;
-			}
-			method = match;
-			instance = access;
-		}
-		
-		ApplyMethodCall call = new ApplyMethodCall(this.position);
-		call.method = method;
-		call.instance = instance;
-		call.arguments = this.arguments;
-		
-		return call;
 	}
 	
 	@Override

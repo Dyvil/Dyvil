@@ -53,17 +53,16 @@ public final class Dlex
 					continue;
 				}
 				
-				if (string && l == '}')
+				if (string && c == '}')
 				{
 					type = STRING_START;
 					subtype = STRING_PART;
+					continue;
 				}
-				else
-				{
-					int m = getMode(c, code, i);
-					type = m & 0xFFFF;
-					subtype = m & 0xFFFF0000;
-				}
+				
+				int m = getMode(c, code, i);
+				type = m & 0xFFFF;
+				subtype = m & 0xFFFF0000;
 			}
 			
 			switch (type)
@@ -248,7 +247,7 @@ public final class Dlex
 					i++;
 					continue;
 				}
-				else
+				else if (c != '\t')
 				{
 					buf.append(c);
 				}
@@ -256,7 +255,6 @@ public final class Dlex
 			case STRING_START:
 				if (c == '"' && (buf.length() > 1 || string))
 				{
-					buf.append('"');
 					subtype = STRING_END;
 					string = false;
 					addToken = true;
@@ -271,11 +269,10 @@ public final class Dlex
 				else if (c == '$' && code.charAt(i + 1) == '{')
 				{
 					i += 2;
-					buf.append("${");
 					addToken = true;
 					string = true;
 				}
-				else
+				else if (c != '\t')
 				{
 					buf.append(c);
 				}
@@ -292,7 +289,7 @@ public final class Dlex
 					i++;
 					continue;
 				}
-				else
+				else if (c != '\t')
 				{
 					buf.append(c);
 				}
@@ -509,11 +506,11 @@ public final class Dlex
 		case STRING:
 			return new StringToken(prev, STRING, s.substring(1, len - 1), line, start, start + len);
 		case STRING_START:
-			return new StringToken(prev, STRING_START, s.substring(2, len - 2), line, start, start + len);
+			return new StringToken(prev, STRING_START, s.substring(2), line, start, start + len);
 		case STRING_PART:
-			return new StringToken(prev, STRING_PART, s.substring(1, len - 2), line, start, start + len);
+			return new StringToken(prev, STRING_PART, s, line, start, start + len);
 		case STRING_END:
-			return new StringToken(prev, STRING_END, s.substring(1, len - 1), line, start, start + len);
+			return new StringToken(prev, STRING_END, s, line, start, start + len);
 		case CHAR:
 			return new CharToken(prev, s.charAt(1), line, start);
 		}

@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.expression.FormatStringExpression;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
-import dyvil.tools.compiler.ast.expression.FormatStringExpression;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -32,9 +32,16 @@ public final class FormatStringParser extends Parser implements IValued
 		{
 		case Tokens.STRING_START:
 		case Tokens.STRING_PART:
+		{
+			int nextType = token.next().type();
+			if (nextType == Tokens.STRING_PART || nextType == Tokens.STRING_END)
+			{
+				throw new SyntaxError(token.next(), "Invalid Format String - Expression expected");
+			}
 			this.value.addString(token.stringValue());
 			pm.pushParser(new ExpressionParser(this));
 			return;
+		}
 		case Tokens.STRING_END:
 			this.value.addString(token.stringValue());
 			pm.popParser();

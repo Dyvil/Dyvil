@@ -24,7 +24,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class FieldAccess extends ASTNode implements ICall, INamed, IValued
+public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 {
 	public IValue	instance;
 	public Name		name;
