@@ -42,15 +42,15 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
-	private static final int	INLINABLE	= Modifiers.INLINE;
-	private static final int INLINE_TRESHOLD = 10;
+	private static final int	INLINABLE		= Modifiers.INLINE;
+	private static final int	INLINE_TRESHOLD	= 10;
 	
 	protected IClass			theClass;
 	
 	protected ITypeVariable[]	generics;
 	protected int				genericCount;
 	
-	protected IParameter[]		parameters	= new MethodParameter[3];
+	protected IParameter[]		parameters		= new MethodParameter[3];
 	protected int				parameterCount;
 	protected IType[]			exceptions;
 	protected int				exceptionCount;
@@ -924,7 +924,14 @@ public class Method extends Member implements IMethod
 		{
 			mw.begin();
 			mw.writeLabel(start);
-			this.value.writeExpression(mw);
+			if (this.type == Types.VOID)
+			{
+				this.value.writeStatement(mw);
+			}
+			else
+			{
+				this.value.writeExpression(mw);
+			}
 			mw.writeLabel(end);
 			mw.end(this.type);
 		}

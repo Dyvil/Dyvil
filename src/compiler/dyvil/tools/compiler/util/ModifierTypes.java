@@ -375,6 +375,8 @@ public enum ModifierTypes
 			return Modifiers.INLINE;
 		case Keywords.INFIX:
 			return Modifiers.INFIX;
+		case Keywords.POSTFIX:
+			return Modifiers.INFIX;
 		case Keywords.OVERRIDE:
 			return Modifiers.OVERRIDE;
 		}

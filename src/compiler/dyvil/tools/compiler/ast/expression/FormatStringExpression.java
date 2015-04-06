@@ -115,7 +115,13 @@ public final class FormatStringExpression extends ASTNode implements IValue
 		int len = this.count / 2;
 		for (int i = 0; i < len; i++)
 		{
-			this.values[i].check(markers, context);
+			IValue v = this.values[i];
+			v.check(markers, context);
+			
+			if (v.getType() == Types.VOID)
+			{
+				markers.add(v.getPosition(), "formatstring.void");
+			}
 		}
 	}
 	
