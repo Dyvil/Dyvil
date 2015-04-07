@@ -13,7 +13,7 @@ public class Long implements Integer
 		this.value = value;
 	}
 	
-	public static Long create(long value)
+	public static Long apply(long value)
 	{
 		if (value >= 0 && value < ConstPool.tableSize)
 		{
@@ -90,28 +90,28 @@ public class Long implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, LNEG })
 	public @prefix Long $minus()
 	{
-		return Long.create(-this.value);
+		return Long.apply(-this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LCONST_M1, LXOR })
 	public @prefix Long $tilde()
 	{
-		return Long.create(~this.value);
+		return Long.apply(~this.value);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, DUP2, LMUL })
 	public Long sqr()
 	{
-		return Long.create(this.value * this.value);
+		return Long.apply(this.value * this.value);
 	}
 	
 	@Override
 	@Intrinsic({ LCONST_1, INSTANCE, LDIV })
 	public Long rec()
 	{
-		return Long.create(1L / this.value);
+		return Long.apply(1L / this.value);
 	}
 	
 	// byte operators
@@ -162,77 +162,84 @@ public class Long implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LADD })
 	public Long $plus(byte v)
 	{
-		return Long.create(this.value + v);
+		return Long.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSUB })
 	public Long $minus(byte v)
 	{
-		return Long.create(this.value - v);
+		return Long.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LMUL })
 	public Long $times(byte v)
 	{
-		return Long.create(this.value * v);
+		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
-	public Long $div(byte v)
+	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, I2D, DDIV })
+	public Double $div(byte v)
 	{
-		return Long.create(this.value / v);
+		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LREM })
 	public Long $percent(byte v)
 	{
-		return Long.create(this.value % v);
+		return Long.apply(this.value % v);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
+	public Integer $bslash(byte v)
+	{
+		return null;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LAND })
 	public Long $amp(byte v)
 	{
-		return Long.create(this.value & v);
+		return Long.apply(this.value & v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LOR })
 	public Long $bar(byte v)
 	{
-		return Long.create(this.value | v);
+		return Long.apply(this.value | v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LXOR })
 	public Long $up(byte v)
 	{
-		return Long.create(this.value ^ v);
+		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
 	public Long $lt$lt(byte v)
 	{
-		return Long.create(this.value << v);
+		return Long.apply(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
 	public Long $gt$gt(byte v)
 	{
-		return Long.create(this.value >> v);
+		return Long.apply(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
 	public Long $gt$gt$gt(byte v)
 	{
-		return Long.create(this.value >>> v);
+		return Long.apply(this.value >>> v);
 	}
 	
 	// short operators
@@ -283,77 +290,84 @@ public class Long implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LADD })
 	public Long $plus(short v)
 	{
-		return Long.create(this.value + v);
+		return Long.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSUB })
 	public Long $minus(short v)
 	{
-		return Long.create(this.value - v);
+		return Long.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LMUL })
 	public Long $times(short v)
 	{
-		return Long.create(this.value * v);
+		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
-	public Long $div(short v)
+	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, I2D, DDIV })
+	public Double $div(short v)
 	{
-		return Long.create(this.value / v);
+		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LREM })
 	public Long $percent(short v)
 	{
-		return Long.create(this.value % v);
+		return Long.apply(this.value % v);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
+	public Integer $bslash(short v)
+	{
+		return null;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LAND })
 	public Long $amp(short v)
 	{
-		return Long.create(this.value & v);
+		return Long.apply(this.value & v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LOR })
 	public Long $bar(short v)
 	{
-		return Long.create(this.value | v);
+		return Long.apply(this.value | v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LXOR })
 	public Long $up(short v)
 	{
-		return Long.create(this.value ^ v);
+		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
 	public Long $lt$lt(short v)
 	{
-		return Long.create(this.value << v);
+		return Long.apply(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
 	public Long $gt$gt(short v)
 	{
-		return Long.create(this.value >> v);
+		return Long.apply(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
 	public Long $gt$gt$gt(short v)
 	{
-		return Long.create(this.value >>> v);
+		return Long.apply(this.value >>> v);
 	}
 	
 	// char operators
@@ -404,77 +418,84 @@ public class Long implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LADD })
 	public Long $plus(char v)
 	{
-		return Long.create(this.value + v);
+		return Long.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSUB })
 	public Long $minus(char v)
 	{
-		return Long.create(this.value - v);
+		return Long.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LMUL })
 	public Long $times(char v)
 	{
-		return Long.create(this.value * v);
+		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
-	public Long $div(char v)
+	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, I2D, DDIV })
+	public Double $div(char v)
 	{
-		return Long.create(this.value / v);
+		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LREM })
 	public Long $percent(char v)
 	{
-		return Long.create(this.value % v);
+		return Long.apply(this.value % v);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
+	public Integer $bslash(char v)
+	{
+		return null;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LAND })
 	public Long $amp(char v)
 	{
-		return Long.create(this.value & v);
+		return Long.apply(this.value & v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LOR })
 	public Long $bar(char v)
 	{
-		return Long.create(this.value | v);
+		return Long.apply(this.value | v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LXOR })
 	public Long $up(char v)
 	{
-		return Long.create(this.value ^ v);
+		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
 	public Long $lt$lt(char v)
 	{
-		return Long.create(this.value << v);
+		return Long.apply(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
 	public Long $gt$gt(char v)
 	{
-		return Long.create(this.value >> v);
+		return Long.apply(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
 	public Long $gt$gt$gt(char v)
 	{
-		return Long.create(this.value >>> v);
+		return Long.apply(this.value >>> v);
 	}
 	
 	// int operators
@@ -525,77 +546,84 @@ public class Long implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LADD })
 	public Long $plus(int v)
 	{
-		return Long.create(this.value + v);
+		return Long.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSUB })
 	public Long $minus(int v)
 	{
-		return Long.create(this.value - v);
+		return Long.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LMUL })
 	public Long $times(int v)
 	{
-		return Long.create(this.value * v);
+		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
-	public Long $div(int v)
+	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, I2D, DDIV })
+	public Double $div(int v)
 	{
-		return Long.create(this.value / v);
+		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LREM })
 	public Long $percent(int v)
 	{
-		return Long.create(this.value % v);
+		return Long.apply(this.value % v);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
+	public Integer $bslash(int v)
+	{
+		return null;
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LAND })
 	public Long $amp(int v)
 	{
-		return Long.create(this.value & v);
+		return Long.apply(this.value & v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LOR })
 	public Long $bar(int v)
 	{
-		return Long.create(this.value | v);
+		return Long.apply(this.value | v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LXOR })
 	public Long $up(int v)
 	{
-		return Long.create(this.value ^ v);
+		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
 	public Long $lt$lt(int v)
 	{
-		return Long.create(this.value << v);
+		return Long.apply(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
 	public Long $gt$gt(int v)
 	{
-		return Long.create(this.value >> v);
+		return Long.apply(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
 	public Long $gt$gt$gt(int v)
 	{
-		return Long.create(this.value >>> v);
+		return Long.apply(this.value >>> v);
 	}
 	
 	// long operators
@@ -646,77 +674,84 @@ public class Long implements Integer
 	@Intrinsic({ INSTANCE, ARGUMENTS, LADD })
 	public Long $plus(long v)
 	{
-		return Long.create(this.value + v);
+		return Long.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LSUB })
 	public Long $minus(long v)
 	{
-		return Long.create(this.value - v);
+		return Long.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LMUL })
 	public Long $times(long v)
 	{
-		return Long.create(this.value * v);
+		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LDIV })
-	public Long $div(long v)
+	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, L2D, DDIV })
+	public Double $div(long v)
 	{
-		return Long.create(this.value / v);
+		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LREM })
 	public Long $percent(long v)
 	{
-		return Long.create(this.value % v);
+		return Long.apply(this.value % v);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, ARGUMENTS, LDIV })
+	public Long $bslash(long v)
+	{
+		return Long.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LAND })
 	public Long $amp(long v)
 	{
-		return Long.create(this.value & v);
+		return Long.apply(this.value & v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LOR })
 	public Long $bar(long v)
 	{
-		return Long.create(this.value | v);
+		return Long.apply(this.value | v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LXOR })
 	public Long $up(long v)
 	{
-		return Long.create(this.value ^ v);
+		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LSHL })
 	public Long $lt$lt(long v)
 	{
-		return Long.create(this.value << v);
+		return Long.apply(this.value << v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LSHR })
 	public Long $gt$gt(long v)
 	{
-		return Long.create(this.value >> v);
+		return Long.apply(this.value >> v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, LUSHR })
 	public Long $gt$gt$gt(long v)
 	{
-		return Long.create(this.value >>> v);
+		return Long.apply(this.value >>> v);
 	}
 	
 	// float operators
@@ -918,67 +953,73 @@ public class Long implements Integer
 	@Override
 	public Long $plus(Number v)
 	{
-		return Long.create(this.value + v.longValue());
+		return Long.apply(this.value + v.longValue());
 	}
 	
 	@Override
 	public Long $minus(Number v)
 	{
-		return Long.create(this.value - v.longValue());
+		return Long.apply(this.value - v.longValue());
 	}
 	
 	@Override
 	public Long $times(Number v)
 	{
-		return Long.create(this.value * v.longValue());
+		return Long.apply(this.value * v.longValue());
 	}
 	
 	@Override
-	public Long $div(Number v)
+	public Double $div(Number v)
 	{
-		return Long.create(this.value / v.longValue());
+		return Double.apply(this.value / v.doubleValue());
 	}
 	
 	@Override
 	public Long $percent(Number v)
 	{
-		return Long.create(this.value % v.longValue());
+		return Long.apply(this.value % v.longValue());
+	}
+	
+	@Override
+	public Long $bslash(Integer v)
+	{
+		return Long.apply(this.value / v.longValue());
 	}
 	
 	@Override
 	public Long $bar(Integer v)
 	{
-		return Long.create(this.value | v.longValue());
+		return Long.apply(this.value | v.longValue());
 	}
 	
 	@Override
 	public Long $amp(Integer v)
 	{
-		return Long.create(this.value & v.longValue());
+		return Long.apply(this.value & v.longValue());
 	}
 	
 	@Override
 	public Long $up(Integer v)
 	{
-		return Long.create(this.value ^ v.longValue());
+		return Long.apply(this.value ^ v.longValue());
 	}
 	
 	@Override
 	public Long $lt$lt(Integer v)
 	{
-		return Long.create(this.value << v.longValue());
+		return Long.apply(this.value << v.longValue());
 	}
 	
 	@Override
 	public Long $gt$gt(Integer v)
 	{
-		return Long.create(this.value >> v.longValue());
+		return Long.apply(this.value >> v.longValue());
 	}
 	
 	@Override
 	public Long $gt$gt$gt(Integer v)
 	{
-		return Long.create(this.value >>> v.longValue());
+		return Long.apply(this.value >>> v.longValue());
 	}
 	
 	// Object methods

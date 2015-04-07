@@ -152,7 +152,7 @@ public class Byte implements Integer
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGE })
 	public boolean $gt$eq(byte v)
 	{
 		return this.value >= v;
@@ -180,10 +180,10 @@ public class Byte implements Integer
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
-	public Int $div(byte v)
+	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, I2F, FDIV })
+	public Float $div(byte v)
 	{
-		return Int.apply(this.value / v);
+		return Float.apply((float) this.value / (float) v);
 	}
 	
 	@Override
@@ -191,6 +191,13 @@ public class Byte implements Integer
 	public Int $percent(byte v)
 	{
 		return Int.apply(this.value % v);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
+	public Int $bslash(byte v)
+	{
+		return Int.apply(this.value / v);
 	}
 	
 	@Override
@@ -273,7 +280,7 @@ public class Byte implements Integer
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPLE })
+	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPGE })
 	public boolean $gt$eq(short v)
 	{
 		return this.value >= v;
@@ -301,10 +308,10 @@ public class Byte implements Integer
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
-	public Int $div(short v)
+	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, I2F, FDIV })
+	public Float $div(short v)
 	{
-		return Int.apply(this.value / v);
+		return Float.apply((float) this.value / (float) v);
 	}
 	
 	@Override
@@ -312,6 +319,13 @@ public class Byte implements Integer
 	public Int $percent(short v)
 	{
 		return Int.apply(this.value % v);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
+	public Int $bslash(short v)
+	{
+		return Int.apply(this.value / v);
 	}
 	
 	@Override
@@ -422,10 +436,10 @@ public class Byte implements Integer
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
-	public Int $div(char v)
+	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, I2F, FDIV })
+	public Float $div(char v)
 	{
-		return Int.apply(this.value / v);
+		return Float.apply((float) this.value / (float) v);
 	}
 	
 	@Override
@@ -433,6 +447,13 @@ public class Byte implements Integer
 	public Int $percent(char v)
 	{
 		return Int.apply(this.value % v);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
+	public Int $bslash(char v)
+	{
+		return Int.apply(this.value / v);
 	}
 	
 	@Override
@@ -543,10 +564,10 @@ public class Byte implements Integer
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
-	public Int $div(int v)
+	@Intrinsic({ INSTANCE, I2F, ARGUMENTS, I2F, FDIV })
+	public Float $div(int v)
 	{
-		return Int.apply(this.value / v);
+		return Float.apply((float) this.value / (float) v);
 	}
 	
 	@Override
@@ -554,6 +575,13 @@ public class Byte implements Integer
 	public Int $percent(int v)
 	{
 		return Int.apply(this.value % v);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, ARGUMENTS, IDIV })
+	public Int $bslash(int v)
+	{
+		return Int.apply(this.value / v);
 	}
 	
 	@Override
@@ -646,56 +674,63 @@ public class Byte implements Integer
 	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, LADD })
 	public Long $plus(long v)
 	{
-		return Long.create(this.value + v);
+		return Long.apply(this.value + v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, LSUB })
 	public Long $minus(long v)
 	{
-		return Long.create(this.value - v);
+		return Long.apply(this.value - v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, LMUL })
 	public Long $times(long v)
 	{
-		return Long.create(this.value * v);
+		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, LDIV })
-	public Long $div(long v)
+	@Intrinsic({ INSTANCE, I2D, ARGUMENTS, L2D, DDIV })
+	public Double $div(long v)
 	{
-		return Long.create(this.value / v);
+		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, LREM })
 	public Long $percent(long v)
 	{
-		return Long.create(this.value % v);
+		return Long.apply(this.value % v);
+	}
+	
+	@Override
+	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, LDIV })
+	public Long $bslash(long v)
+	{
+		return Long.apply(this.value / v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, LAND })
 	public Long $amp(long v)
 	{
-		return Long.create(this.value & v);
+		return Long.apply(this.value & v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, LOR })
 	public Long $bar(long v)
 	{
-		return Long.create(this.value | v);
+		return Long.apply(this.value | v);
 	}
 	
 	@Override
 	@Intrinsic({ INSTANCE, I2L, ARGUMENTS, LXOR })
 	public Long $up(long v)
 	{
-		return Long.create(this.value ^ v);
+		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
@@ -934,7 +969,13 @@ public class Byte implements Integer
 	}
 	
 	@Override
-	public Int $div(Number v)
+	public Float $div(Number v)
+	{
+		return Float.apply(this.value / v.floatValue());
+	}
+	
+	@Override
+	public Int $bslash(Integer v)
 	{
 		return Int.apply(this.value / v.intValue());
 	}

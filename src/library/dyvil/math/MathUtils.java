@@ -12,8 +12,8 @@ import dyvil.lang.annotation.infix;
  * <PRE>
  * int abs = -1 abs
  * int floor = 4.5 floor
- * float average = { 1F, 2.3F, 4F } average
- * int[] range = 1 .. 4
+ * float average = [ 1F, 2.3F, 4F ] average
+ * [int] range = 1 .. 4
  * </PRE>
  * 
  * @author Clashsoft
@@ -774,9 +774,14 @@ public final class MathUtils
 		return deBruijnBits[(int) (powerOfTwo(i) * 125613361L >> 27) & 0x1F] - 1;
 	}
 	
-	public static @infix boolean checkBit(int i, byte bit)
+	public static @infix boolean apply(int i, byte bit)
 	{
 		return (i & 1 << bit) != 0;
+	}
+	
+	public static @infix int update(int i, byte bit, boolean set)
+	{
+		return set ? (i | 1 << bit) : i ^ ~(1 << bit);
 	}
 	
 	public static @infix int setBit(int i, byte bit)
@@ -786,13 +791,17 @@ public final class MathUtils
 	
 	public static @infix int clearBit(int i, byte bit)
 	{
-		int bitToSet = 1 << bit;
-		return (i | bitToSet) ^ bitToSet;
+		return i ^ ~(1 << bit);
 	}
 	
-	public static @infix boolean checkBit(long l, byte bit)
+	public static @infix boolean apply(long l, byte bit)
 	{
 		return (l & 1L << bit) != 0;
+	}
+	
+	public static @infix long update(long l, byte bit, boolean set)
+	{
+		return set ? (l | 1L << bit) : l ^ ~(1L << bit);
 	}
 	
 	public static @infix long setBit(long l, byte bit)
@@ -802,7 +811,6 @@ public final class MathUtils
 	
 	public static @infix long clearBit(long l, byte bit)
 	{
-		long bitToSet = 1L << bit;
-		return (l | bitToSet) ^ bitToSet;
+		return l ^ ~(1 << bit);
 	}
 }

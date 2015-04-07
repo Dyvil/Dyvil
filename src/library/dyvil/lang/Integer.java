@@ -10,6 +10,8 @@ public interface Integer extends Number
 	
 	// byte operators
 	
+	public Integer $bslash(byte v);
+	
 	public Integer $amp(byte v);
 	
 	public Integer $bar(byte v);
@@ -23,6 +25,8 @@ public interface Integer extends Number
 	public Integer $gt$gt$gt(byte v);
 	
 	// short operators
+	
+	public Integer $bslash(short v);
 	
 	public Integer $amp(short v);
 	
@@ -38,6 +42,8 @@ public interface Integer extends Number
 	
 	// char operators
 	
+	public Integer $bslash(char v);
+	
 	public Integer $amp(char v);
 	
 	public Integer $bar(char v);
@@ -51,6 +57,8 @@ public interface Integer extends Number
 	public Integer $gt$gt$gt(char v);
 	
 	// int operators
+	
+	public Integer $bslash(int v);
 	
 	public Integer $amp(int v);
 	
@@ -66,6 +74,8 @@ public interface Integer extends Number
 	
 	// long operators
 	
+	public Integer $bslash(long v);
+	
 	public Integer $amp(long v);
 	
 	public Integer $bar(long v);
@@ -79,6 +89,8 @@ public interface Integer extends Number
 	public Integer $gt$gt$gt(long v);
 	
 	// Integer operators
+	
+	public Integer $bslash(Integer v);
 	
 	public Integer $amp(Integer v);
 	
