@@ -94,20 +94,6 @@ public class Double implements Number
 		return Double.apply(-this.value);
 	}
 	
-	@Override
-	@Intrinsic({ INSTANCE, DUP2, DMUL })
-	public Double sqr()
-	{
-		return Double.apply(this.value * this.value);
-	}
-	
-	@Override
-	@Intrinsic({ DCONST_1, INSTANCE, DDIV })
-	public Double rec()
-	{
-		return Double.apply(1 / this.value);
-	}
-	
 	// byte operators
 	
 	@Override

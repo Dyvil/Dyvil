@@ -100,20 +100,6 @@ public class Char implements Integer
 		return Int.apply((byte) ~this.value);
 	}
 	
-	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, DUP, IMUL })
-	public Int sqr()
-	{
-		return Int.apply(this.value * this.value);
-	}
-	
-	@Override
-	@Intrinsic({ ICONST_1, INSTANCE, IDIV })
-	public Int rec()
-	{
-		return Int.apply((byte) (1 / this.value));
-	}
-	
 	// byte operators
 	
 	@Override

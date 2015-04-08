@@ -94,20 +94,6 @@ public class Float implements Number
 		return Float.apply(-this.value);
 	}
 	
-	@Override
-	@Intrinsic({ INSTANCE, DUP, FMUL })
-	public Float sqr()
-	{
-		return Float.apply(this.value * this.value);
-	}
-	
-	@Override
-	@Intrinsic({ FCONST_1, INSTANCE, FDIV })
-	public Float rec()
-	{
-		return Float.apply(1 / this.value);
-	}
-	
 	// byte operators
 	
 	@Override

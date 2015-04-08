@@ -24,10 +24,6 @@ public interface Number extends Ordered<Number>
 	
 	public Number $minus();
 	
-	public Number sqr();
-	
-	public Number rec();
-	
 	// byte operators
 	
 	public boolean $eq$eq(byte v);

@@ -87,7 +87,6 @@ public class Complex implements Number
 		return create(-this.real, this.imag);
 	}
 	
-	@Override
 	public Complex sqr()
 	{
 		double r = this.real;
@@ -95,7 +94,6 @@ public class Complex implements Number
 		return create(r * r - i * i, 2D * r * i);
 	}
 	
-	@Override
 	public Complex rec()
 	{
 		double r = this.real;

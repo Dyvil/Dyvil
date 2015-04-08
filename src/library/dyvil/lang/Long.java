@@ -100,20 +100,6 @@ public class Long implements Integer
 		return Long.apply(~this.value);
 	}
 	
-	@Override
-	@Intrinsic({ INSTANCE, DUP2, LMUL })
-	public Long sqr()
-	{
-		return Long.apply(this.value * this.value);
-	}
-	
-	@Override
-	@Intrinsic({ LCONST_1, INSTANCE, LDIV })
-	public Long rec()
-	{
-		return Long.apply(1L / this.value);
-	}
-	
 	// byte operators
 	
 	@Override
@@ -195,9 +181,9 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
-	public Integer $bslash(byte v)
+	public Long $bslash(byte v)
 	{
-		return null;
+		return Long.apply(this.value / v);
 	}
 	
 	@Override
@@ -323,9 +309,9 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
-	public Integer $bslash(short v)
+	public Long $bslash(short v)
 	{
-		return null;
+		return Long.apply(this.value / v);
 	}
 	
 	@Override
@@ -451,9 +437,9 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
-	public Integer $bslash(char v)
+	public Long $bslash(char v)
 	{
-		return null;
+		return Long.apply(this.value / v);
 	}
 	
 	@Override
@@ -579,9 +565,9 @@ public class Long implements Integer
 	
 	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
-	public Integer $bslash(int v)
+	public Long $bslash(int v)
 	{
-		return null;
+		return Long.apply(this.value / v);
 	}
 	
 	@Override
