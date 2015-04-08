@@ -96,7 +96,6 @@ public final class DyvilUnit extends DyvilHeader
 	public void parse()
 	{
 		ParserManager manager = new ParserManager(new DyvilUnitParser(this));
-		manager.semicolonInference = true;
 		manager.operators = this.operators;
 		manager.parse(this.markers, this.tokens);
 		this.tokens = null;

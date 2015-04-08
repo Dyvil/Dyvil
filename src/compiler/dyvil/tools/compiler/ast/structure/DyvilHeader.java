@@ -197,13 +197,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public void tokenize()
 	{
 		this.tokens = Dlex.tokenIterator(this.inputFile.getCode());
+		this.tokens.inferSemicolons();
 	}
 	
 	@Override
 	public void parse()
 	{
 		ParserManager manager = new ParserManager(new DyvilHeaderParser(this));
-		manager.semicolonInference = true;
 		manager.operators = this.operators;
 		manager.parse(this.markers, this.tokens);
 		this.tokens = null;

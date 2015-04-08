@@ -55,7 +55,7 @@ public final class Dlex
 				
 				if (string && c == '}')
 				{
-					type = STRING_START;
+					type = STRING_2;
 					subtype = STRING_PART;
 					continue;
 				}
@@ -252,10 +252,17 @@ public final class Dlex
 					buf.append(c);
 				}
 				break;
-			case STRING_START:
+			case STRING_2:
 				if (c == '"' && (buf.length() > 1 || string))
 				{
-					subtype = STRING_END;
+					if (!string && buf.charAt(0) == '@')
+					{
+						subtype = STRING_2;
+					}
+					else
+					{
+						subtype = STRING_END;
+					}
 					string = false;
 					addToken = true;
 					reparse = false;
@@ -269,6 +276,14 @@ public final class Dlex
 				else if (c == '$' && code.charAt(i + 1) == '{')
 				{
 					i += 2;
+					if (buf.charAt(0) == '@')
+					{
+						subtype = STRING_START;
+					}
+					else
+					{
+						subtype = STRING_PART;
+					}
 					addToken = true;
 					string = true;
 				}
@@ -348,7 +363,7 @@ public final class Dlex
 			// @"string"
 			if (n == '"')
 			{
-				return STRING_START;
+				return STRING_2;
 			}
 			return IDENTIFIER | MOD_SYMBOL;
 		case '0':
@@ -505,6 +520,8 @@ public final class Dlex
 			return new DoubleToken(prev, Double.parseDouble(s.substring(2)), line, start, start + len);
 		case STRING:
 			return new StringToken(prev, STRING, s.substring(1, len - 1), line, start, start + len);
+		case STRING_2:
+			return new StringToken(prev, STRING, s.substring(2), line, start, start + len);
 		case STRING_START:
 			return new StringToken(prev, STRING_START, s.substring(2), line, start, start + len);
 		case STRING_PART:

@@ -10,16 +10,11 @@ import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.InferredSemicolon;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
-import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ParserManager implements IParserManager
 {
 	protected Parser			parser;
 	
-	public boolean				semicolonInference;
 	public Map<Name, Operator>	operators;
 	
 	protected TokenIterator		tokens;
@@ -47,28 +42,7 @@ public final class ParserManager implements IParserManager
 	public final void parse(MarkerList markers, TokenIterator tokens)
 	{
 		this.tokens = tokens;
-		
 		IToken token = null;
-		IToken prev = null;
-		while (tokens.hasNext())
-		{
-			token = tokens.next();
-			if (!this.retainToken(token, prev))
-			{
-				tokens.remove();
-			}
-			prev = token;
-		}
-		
-		tokens.reset();
-		while (tokens.hasNext())
-		{
-			token = tokens.next();
-			token.setPrev(prev);
-			prev = token;
-		}
-		
-		tokens.reset();
 		while (true)
 		{
 			if (this.reparse)
@@ -137,59 +111,6 @@ public final class ParserManager implements IParserManager
 				System.out.println(token + ":\t\t" + this.parser.name + " @ " + this.parser.mode);
 			}
 		}
-	}
-	
-	/**
-	 * Returns true if the given {@link IToken} {@code token} should be parsed.
-	 * If not, it gets removed from the Token Chain.
-	 * 
-	 * @param value
-	 *            the value of the token
-	 * @param token
-	 *            the token
-	 * @return true, if the token should be parsed or removed from the token
-	 *         stream
-	 */
-	public boolean retainToken(IToken token, IToken prev)
-	{
-		if (!this.semicolonInference)
-		{
-			return true;
-		}
-		
-		if (prev == null)
-		{
-			return true;
-		}
-		
-		int prevLN = prev.endLine();
-		if (prevLN == token.startLine())
-		{
-			return true;
-		}
-		
-		int type = token.type();
-		if ((type & (Tokens.SYMBOL | Tokens.KEYWORD | Tokens.IDENTIFIER | Tokens.BRACKET)) == 0)
-		{
-			return true;
-		}
-		
-		if (type == Symbols.OPEN_CURLY_BRACKET)
-		{
-			return true;
-		}
-		
-		int type1 = prev.type();
-		if (ParserUtil.isSeperator(type1))
-		{
-			return true;
-		}
-		
-		int prevEnd = prev.endIndex();
-		IToken semicolon = new InferredSemicolon(prevLN, prevEnd);
-		semicolon.setNext(token);
-		prev.setNext(semicolon);
-		return true;
 	}
 	
 	@Override
