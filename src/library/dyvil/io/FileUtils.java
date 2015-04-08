@@ -20,6 +20,27 @@ import dyvil.lang.annotation.infix;
 @Utility(File.class)
 public interface FileUtils
 {
+	public static boolean createFile(File file)
+	{
+		try
+		{
+			if (!file.exists())
+			{
+				File parent = file.getParentFile();
+				if (parent != null)
+				{
+					parent.mkdirs();
+				}
+				file.createNewFile();
+			}
+			return true;
+		}
+		catch (IOException ex)
+		{
+			return false;
+		}
+	}
+	
 	/**
 	 * Writes the given {@link String} {@code text} to the given {@link File}
 	 * {@code file}. This operation attempts to override an existing file, and

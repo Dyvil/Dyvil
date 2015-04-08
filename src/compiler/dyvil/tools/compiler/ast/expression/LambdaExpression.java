@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
-import org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 import org.objectweb.asm.Handle;
 
 import dyvil.reflect.Modifiers;
@@ -485,14 +485,14 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		{
 			CaptureVariable capture = this.capturedFields[i];
 			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.variable.getType());
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.variable.getType(), 0);
 		}
 		
 		index = 0;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			index = mw.registerParameter(index, param.getName().qualified, param.getType());
+			index = mw.registerParameter(index, param.getName().qualified, param.getType(), 0);
 			param.setIndex(index);
 		}
 		

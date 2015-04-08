@@ -4,7 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 
 import dyvil.reflect.Modifiers;

@@ -9,6 +9,8 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public interface MethodWriter
 {
+	public ClassWriter getClassWriter();
+	
 	public void setInstanceMethod();
 	
 	// Annotations
@@ -23,7 +25,9 @@ public interface MethodWriter
 	
 	// Parameters
 	
-	public int registerParameter(int index, String name, IType type);
+	public int registerParameter(int index, String name, IType type, int access);
+	
+	public void registerParameter(String name, int access);
 	
 	// Local Variables
 	

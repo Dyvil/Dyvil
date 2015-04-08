@@ -1,9 +1,6 @@
 package dyvil.tools.compiler.ast.dwt;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,6 +10,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
@@ -32,7 +30,7 @@ import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.dwt.DWTParser;
 
-public class DWTFile extends ASTNode implements ICompilationUnit
+public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilable
 {
 	public static final Package		javaxSwing	= Library.javaLibrary.resolvePackage("javax.swing");
 	
@@ -177,24 +175,11 @@ public class DWTFile extends ASTNode implements ICompilationUnit
 			}
 		}
 		
-		ClassWriter.createFile(this.outputFile);
-		
-		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(this.outputFile)))
-		{
-			org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(DyvilCompiler.asmVersion);
-			this.write(writer);
-			writer.visitEnd();
-			byte[] bytes = writer.toByteArray();
-			os.write(bytes, 0, bytes.length);
-		}
-		catch (Exception ex)
-		{
-			DyvilCompiler.logger.throwing("DWTFile", "compile", ex);
-		}
-		
+		ClassWriter.compile(this.outputFile, this);
 	}
 	
-	public void write(org.objectweb.asm.ClassWriter writer)
+	@Override
+	public void write(ClassWriter writer)
 	{
 		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC, this.internalName, null, "java/lang/Object", null);
 		

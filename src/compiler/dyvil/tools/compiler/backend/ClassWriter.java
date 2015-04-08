@@ -9,43 +9,29 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
+import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.CompilerConfig;
 
 public class ClassWriter extends org.objectweb.asm.ClassWriter
 {
-	private static Map<String, String>	commonTypes	= new HashMap();
-
+	private Map<String, String>	commonTypes	= new HashMap();
+	
 	public ClassWriter()
 	{
 		super(DyvilCompiler.asmVersion | org.objectweb.asm.ClassWriter.COMPUTE_FRAMES);
 	}
 	
-	public static void createFile(File file)
+	public ClassWriter(int api)
 	{
-		try
-		{
-			if (!file.exists())
-			{
-				File parent = file.getParentFile();
-				if (parent != null)
-				{
-					parent.mkdirs();
-				}
-				file.createNewFile();
-			}
-		}
-		catch (Exception ex)
-		{
-			DyvilCompiler.logger.throwing("ClassWriter", "createFile", ex);
-		}
+		super(api);
 	}
 	
-	public static void saveClass(File file, IClass iclass)
+	public static void compile(File file, IClassCompilable iclass)
 	{
-		createFile(file);
+		FileUtils.createFile(file);
 		
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 		{
@@ -54,16 +40,14 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 			writer.visitEnd();
 			byte[] bytes = writer.toByteArray();
 			os.write(bytes, 0, bytes.length);
-			
-			commonTypes.clear();
 		}
 		catch (Throwable ex)
 		{
-			DyvilCompiler.logger.throwing("ClassWriter", "saveClass", ex);
+			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
 		}
 	}
 	
-	public static void addCommonType(IType type1, IType type2, IType common)
+	public void addCommonType(IType type1, IType type2, IType common)
 	{
 		StringBuilder buf = new StringBuilder();
 		buf.append(type1.getInternalName()).append(type2.getInternalName());
@@ -77,14 +61,14 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		buf.append(type1).append(type2);
 		return commonTypes.get(buf.toString());
 	}
-
+	
 	public static void generateJAR(List<File> files)
 	{
 		CompilerConfig config = DyvilCompiler.config;
 		String fileName = config.getJarName();
 		
 		File output = new File(fileName);
-		createFile(output);
+		FileUtils.createFile(output);
 		
 		Manifest manifest = new Manifest();
 		Attributes attributes = manifest.getMainAttributes();
@@ -94,11 +78,7 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		attributes.putValue("Created-By", "Dyvil Compiler");
 		attributes.put(Attributes.Name.MAIN_CLASS, config.mainType);
 		attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
-		jar(files, output, manifest);
-	}
-
-	public static void jar(List<File> files, File output, Manifest manifest)
-	{
+		
 		String outputDir = DyvilCompiler.config.outputDir.getAbsolutePath();
 		int len = outputDir.length();
 		if (!outputDir.endsWith("/"))
@@ -124,8 +104,8 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 			DyvilCompiler.logger.throwing("ClassWriter", "jar", ex);
 		}
 	}
-
-	public static void createEntry(File input, JarOutputStream jos, String name)
+	
+	private static void createEntry(File input, JarOutputStream jos, String name)
 	{
 		try (FileInputStream fis = new FileInputStream(input))
 		{

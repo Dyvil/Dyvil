@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.member;
 
-import org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 
 public interface IClassCompilable
 {

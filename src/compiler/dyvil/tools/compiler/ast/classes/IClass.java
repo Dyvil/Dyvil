@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.classes;
 
-import org.objectweb.asm.ClassWriter;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.IGeneric;
@@ -15,8 +13,9 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.backend.ClassWriter;
 
-public interface IClass extends IASTNode, IMember, IGeneric, IContext, IParameterized, ITypeList
+public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, IContext, IParameterized, ITypeList
 {
 	public void setUnit(IDyvilHeader unit);
 	
@@ -88,6 +87,7 @@ public interface IClass extends IASTNode, IMember, IGeneric, IContext, IParamete
 	
 	public String[] getInterfaceArray();
 	
+	@Override
 	public void write(ClassWriter writer);
 	
 	public void writeInnerClassInfo(ClassWriter writer);

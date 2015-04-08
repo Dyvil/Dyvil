@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.classes;
 import java.lang.annotation.ElementType;
 import java.util.List;
 
-import org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;

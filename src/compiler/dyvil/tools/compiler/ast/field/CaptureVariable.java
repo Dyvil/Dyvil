@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
 
-import org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.expression.IValue;

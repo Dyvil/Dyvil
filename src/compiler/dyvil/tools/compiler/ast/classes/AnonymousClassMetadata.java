@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
-import org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -92,7 +92,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 			{
 				CaptureField field = capturedFields[i];
 				field.write(writer);
-				indexes[i] = index = mw.registerParameter(index, field.name, field.getType());
+				indexes[i] = index = mw.registerParameter(index, field.name, field.getType(), 0);
 			}
 		}
 		

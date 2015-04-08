@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -367,6 +368,11 @@ public final class PrimitiveType extends Type
 		{
 			this.theClass.getMethodMatches(list, instance, name, arguments);
 		}
+	}
+	
+	@Override
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	{
 	}
 	
 	@Override

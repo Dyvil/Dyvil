@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
-import org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IContext;

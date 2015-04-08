@@ -3,7 +3,6 @@ package dyvil.tools.compiler.backend;
 import static dyvil.reflect.Opcodes.*;
 
 import org.objectweb.asm.*;
-import org.objectweb.asm.ClassWriter;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -30,6 +29,12 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.cw = cw;
 		this.mv = mv;
+	}
+	
+	@Override
+	public ClassWriter getClassWriter()
+	{
+		return this.cw;
 	}
 	
 	@Override
@@ -70,9 +75,9 @@ public final class MethodWriterImpl implements MethodWriter
 	// Parameters
 	
 	@Override
-	public int registerParameter(int index, String name, IType type)
+	public int registerParameter(int index, String name, IType type, int access)
 	{
-		this.mv.visitParameter(name, index);
+		this.mv.visitParameter(name, access);
 		
 		if (type == Types.LONG || type == Types.DOUBLE)
 		{
@@ -80,6 +85,12 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		
 		return this.localIndex = index + 1;
+	}
+	
+	@Override
+	public void registerParameter(String name, int access)
+	{
+		this.mv.visitParameter(name, access);
 	}
 	
 	// Locals

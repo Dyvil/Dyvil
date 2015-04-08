@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.util.List;
 
-import org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -61,7 +61,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		MethodWriter mw = new MethodWriterImpl(writer,
 				writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));
 		mw.setInstanceMethod();
-		mw.registerParameter(0, "obj", Types.OBJECT);
+		mw.registerParameter(0, "obj", Types.OBJECT, 0);
 		mw.begin();
 		CaseClasses.writeEquals(mw, this.theClass);
 		mw.end();

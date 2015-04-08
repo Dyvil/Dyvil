@@ -2,8 +2,6 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.util.List;
 
-import org.objectweb.asm.ClassWriter;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.ClassParameterSetter;
 import dyvil.tools.compiler.ast.access.InitializerCall;
@@ -17,6 +15,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata

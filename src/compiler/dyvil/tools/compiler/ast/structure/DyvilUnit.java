@@ -196,7 +196,7 @@ public final class DyvilUnit extends DyvilHeader
 				name += ".class";
 			}
 			File file = new File(this.outputDirectory, name);
-			ClassWriter.saveClass(file, iclass);
+			ClassWriter.compile(file, iclass);
 			
 			IClassBody body = iclass.getBody();
 			if (body != null)
@@ -207,7 +207,7 @@ public final class DyvilUnit extends DyvilHeader
 					IClass iclass1 = body.getClass(j);
 					name = this.name + "$" + iclass1.getName().qualified + ".class";
 					file = new File(this.outputDirectory, name);
-					ClassWriter.saveClass(file, iclass1);
+					ClassWriter.compile(file, iclass1);
 				}
 			}
 		}
@@ -217,7 +217,7 @@ public final class DyvilUnit extends DyvilHeader
 			NestedClass iclass = this.innerClasses[i];
 			String name = iclass.getName().qualified + ".class";
 			File file = new File(this.outputDirectory, name);
-			ClassWriter.saveClass(file, iclass);
+			ClassWriter.compile(file, iclass);
 		}
 	}
 	

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import java.lang.annotation.ElementType;
 
-import org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -222,7 +222,7 @@ public final class ClassParameter extends Member implements IParameter
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.registerParameter(this.index, this.name.qualified, this.type);
+		writer.registerParameter(this.index, this.name.qualified, this.type, 0);
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{

@@ -5,7 +5,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.objectweb.asm.ClassWriter;
+import dyvil.tools.compiler.backend.ClassWriter;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.constant.EnumValue;
