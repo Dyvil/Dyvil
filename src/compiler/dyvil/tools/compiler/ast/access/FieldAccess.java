@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -133,17 +132,6 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		if (this.instance != null)
 		{
 			this.instance = this.instance.resolve(markers, context);
-		}
-		
-		if (this.instance != null && this.instance.getValueType() == CLASS_ACCESS)
-		{
-			if (this.name == Name._class)
-			{
-				ClassOperator co = new ClassOperator(((ClassAccess) this.instance).type);
-				co.position = this.position;
-				co.dotless = this.dotless;
-				return co;
-			}
 		}
 		
 		IField field = ICall.resolveField(context, this.instance, this.name);

@@ -190,6 +190,16 @@ public final class Predef
 		System.out.println(s);
 	}
 	
+	public static @inline void println(Object o)
+	{
+		if (o == null)
+		{
+			System.out.println("null");
+			return;
+		}
+		System.out.println(o);
+	}
+	
 	// Tuples
 	
 	public static @inline @infix <A, B> Tuple2<A, B> $minus$gt(A a, B b)

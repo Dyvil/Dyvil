@@ -192,26 +192,26 @@ public final class StringConversions
 		{
 			return "-" + toRomanString(-number);
 		}
-		else if (number < ROMANCACHE.length)
+		else if (number < 20)
 		{
 			return ROMANCACHE[number];
 		}
 		else if (number >= 4000)
 		{
-			throw new NumberFormatException("Exception while converting to Roman: Value outside roman numeral range.");
+			throw new NumberFormatException("Invalid Roman Conversion: Value outside Roman numeral range: " + number + " >= 4000");
 		}
 		
-		StringBuilder roman = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 		
-		for (int i = 0; i < ROMANDIGIT.length; i++)
+		for (int i = 0; i < 13; i++)
 		{
 			while (number >= ROMANNUMBER[i])
 			{
 				number -= ROMANNUMBER[i];
-				roman.append(ROMANDIGIT[i]);
+				builder.append(ROMANDIGIT[i]);
 			}
 		}
-		return roman.toString();
+		return builder.toString();
 	}
 	
 	public static @infix String toRomanString(long number)
@@ -220,25 +220,25 @@ public final class StringConversions
 		{
 			return "-" + toRomanString(-number);
 		}
-		else if (number < ROMANCACHE.length)
+		else if (number < 20L)
 		{
 			return ROMANCACHE[(int) number];
 		}
 		else if (number >= 4000L)
 		{
-			throw new NumberFormatException("Exception while converting to Roman: Value outside roman numeral range.");
+			throw new NumberFormatException("Invalid Roman Conversion: Value outside Roman numeral range: " + number + " >= 4000");
 		}
 		
-		StringBuilder roman = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 		
-		for (int i = 0; i < ROMANDIGIT.length; i++)
+		for (int i = 0; i < 13; i++)
 		{
 			while (number >= ROMANNUMBER[i])
 			{
 				number -= ROMANNUMBER[i];
-				roman.append(ROMANDIGIT[i]);
+				builder.append(ROMANDIGIT[i]);
 			}
 		}
-		return roman.toString();
+		return builder.toString();
 	}
 }

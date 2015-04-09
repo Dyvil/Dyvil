@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
@@ -211,14 +212,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value.expandPosition(token);
 			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
-				if (token.next().type() == Symbols.DOT)
-				{
-					this.mode = ACCESS_2;
-					this.dotless = false;
-					pm.skip();
-					return;
-				}
-				pm.popParser();
+				this.mode = ACCESS;
 				return;
 			}
 			pm.popParser(true);
@@ -818,6 +812,20 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = new SuperValue(token.raw());
 			this.mode = ACCESS;
 			return true;
+		case Keywords.CLASS:
+		{
+			if (token.next().type() != Symbols.OPEN_SQUARE_BRACKET)
+			{
+				return false;
+			}
+			
+			ClassOperator co = new ClassOperator(token);
+			this.value = co;
+			pm.skip();
+			pm.pushParser(new TypeParser(co));
+			this.mode = ARRAY_END;
+			return true;
+		}
 		case Keywords.NEW:
 		{
 			ConstructorCall call = new ConstructorCall(token);

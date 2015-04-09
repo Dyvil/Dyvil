@@ -15,7 +15,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ClassAccess extends ASTNode implements IValue
+public final class ClassAccess extends ASTNode implements IValue
 {
 	public IType	type;
 	
@@ -73,7 +73,7 @@ public class ClassAccess extends ASTNode implements IValue
 		{
 			return 3;
 		}
-		else if (type.isSuperTypeOf(this.type))
+		if (type.isSuperTypeOf(this.type))
 		{
 			return 2;
 		}

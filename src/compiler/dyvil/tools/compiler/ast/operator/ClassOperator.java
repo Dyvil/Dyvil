@@ -8,8 +8,8 @@ import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ClassOperator extends ASTNode implements IValue
 {
@@ -17,18 +17,14 @@ public final class ClassOperator extends ASTNode implements IValue
 	private IType	genericType;
 	public boolean	dotless;
 	
+	public ClassOperator(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
 	public ClassOperator(IType type)
 	{
 		this.setType(type);
-	}
-	
-	@Override
-	public void setType(IType type)
-	{
-		this.type = type;
-		GenericType generic = new GenericType(Types.CLASS_CLASS);
-		generic.addType(type);
-		this.genericType = generic;
 	}
 	
 	@Override
@@ -38,14 +34,32 @@ public final class ClassOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+	
+	@Override
 	public IType getType()
 	{
+		if (this.genericType == null)
+		{
+			GenericType generic = new GenericType(Types.CLASS_CLASS);
+			generic.addType(type);
+			return this.genericType = generic;
+		}
 		return this.genericType;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
+		if (this.genericType == null)
+		{
+			GenericType generic = new GenericType(Types.CLASS_CLASS);
+			generic.addType(type);
+			this.genericType = generic;
+		}
 		return type.isSuperTypeOf(this.genericType);
 	}
 	
@@ -66,7 +80,10 @@ public final class ClassOperator extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.genericType = this.genericType.resolve(markers, context);
+		this.type = this.type.resolve(markers, context);
+		GenericType generic = new GenericType(Types.CLASS_CLASS);
+		generic.addType(type);
+		this.genericType = generic;
 	}
 	
 	@Override
@@ -108,11 +125,8 @@ public final class ClassOperator extends ASTNode implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		buffer.append("class[");
 		this.type.toString(prefix, buffer);
-		if (!this.dotless || !Formatting.Method.useJavaFormat)
-		{
-			buffer.append('.');
-		}
-		buffer.append("class");
+		buffer.append(']');
 	}
 }
