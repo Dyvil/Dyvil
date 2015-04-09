@@ -45,6 +45,11 @@ public final class PackageImport extends ASTNode implements IImport
 			return;
 		}
 		
+		if (!(context instanceof Package))
+		{
+			markers.add(this.position, "import.package.invalid");
+			return;
+		}
 		this.thePackage = (Package) context;
 	}
 	

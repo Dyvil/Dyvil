@@ -31,6 +31,7 @@ public final class HeaderComponent extends ASTNode implements IImport
 	public HeaderComponent(ICodePosition position, boolean isStatic)
 	{
 		this.position = position;
+		this.isStatic = isStatic;
 	}
 	
 	@Override

@@ -285,43 +285,21 @@ public final class TryStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		if (this.finallyBlock == null)
-		{
-			IType type1 = this.action.getType();
-			for (int i = 0; i < this.catchBlockCount; i++)
-			{
-				writer.getClassWriter().addCommonType(type1, this.catchBlocks[i].action.getType(), this.commonType);
-			}
-		}
-		
-		this.write(writer, true);
+		// FIXME
+		this.commonType.writeDefaultValue(writer);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.write(writer, false);
-	}
-	
-	private void write(MethodWriter writer, boolean expression)
-	{
 		org.objectweb.asm.Label tryStart = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label tryEnd = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label endLabel = new org.objectweb.asm.Label();
 		
-		boolean hasFinally = this.finallyBlock != null;
-		
 		writer.writeLabel(tryStart);
 		if (this.action != null)
 		{
-			if (expression && !hasFinally)
-			{
-				this.action.writeExpression(writer);
-			}
-			else
-			{
-				this.action.writeStatement(writer);
-			}
+			this.action.writeStatement(writer);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		writer.writeLabel(tryEnd);
@@ -341,14 +319,7 @@ public final class TryStatement extends ASTNode implements IStatement
 				writer.writeLabel(handlerLabel);
 				writer.writeVarInsn(Opcodes.ASTORE, localCount);
 				block.variable.index = localCount;
-				if (expression && !hasFinally)
-				{
-					block.action.writeExpression(writer);
-				}
-				else
-				{
-					block.action.writeStatement(writer);
-				}
+				block.action.writeStatement(writer);
 				writer.resetLocals(localCount);
 			}
 			// Otherwise pop the exception from the stack
@@ -356,35 +327,21 @@ public final class TryStatement extends ASTNode implements IStatement
 			{
 				writer.writeLabel(handlerLabel);
 				writer.writeInsn(Opcodes.POP);
-				if (expression && !hasFinally)
-				{
-					block.action.writeExpression(writer);
-				}
-				else
-				{
-					block.action.writeStatement(writer);
-				}
+				block.action.writeStatement(writer);
 			}
 			
 			writer.writeTryCatchBlock(tryStart, tryEnd, handlerLabel, block.type.getInternalName());
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		
-		if (hasFinally)
+		if (this.finallyBlock != null)
 		{
 			org.objectweb.asm.Label finallyLabel = new org.objectweb.asm.Label();
 			
 			writer.writeLabel(finallyLabel);
 			writer.writeInsn(Opcodes.POP);
 			writer.writeLabel(endLabel);
-			if (expression)
-			{
-				this.finallyBlock.writeExpression(writer);
-			}
-			else
-			{
 				this.finallyBlock.writeStatement(writer);
-			}
 			writer.writeFinallyBlock(tryStart, tryEnd, finallyLabel);
 		}
 		else

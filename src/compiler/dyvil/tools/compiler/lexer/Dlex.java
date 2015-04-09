@@ -467,6 +467,7 @@ public final class Dlex
 		}
 		case DOT_IDENTIFIER:
 		case SYMBOL_IDENTIFIER:
+		case SYMBOL_IDENTIFIER | LETTER_IDENTIFIER:
 		{
 			int i = Symbols.getSymbolType(s);
 			if (i == 0)
