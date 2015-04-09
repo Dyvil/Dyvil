@@ -32,6 +32,11 @@ public interface IPattern extends IASTNode, ITyped
 	
 	public int getPatternType();
 	
+	public default boolean isExhaustive()
+	{
+		return false;
+	}
+	
 	@Override
 	public IType getType();
 	

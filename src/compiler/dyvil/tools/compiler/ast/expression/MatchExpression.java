@@ -158,26 +158,24 @@ public final class MatchExpression extends ASTNode implements IValue
 			}
 			
 			IPattern pattern = c.pattern;
-			if (pattern.getPatternType() == IPattern.WILDCARD)
+			if (pattern.isExhaustive())
 			{
 				if (c.condition == null)
 				{
 					this.exhaustive = true;
 				}
 			}
+			
+			IPattern pattern1 = pattern.withType(type);
+			if (pattern1 == null)
+			{
+				Marker marker = markers.create(pattern.getPosition(), "pattern.type");
+				marker.addInfo("Pattern Type: " + pattern.getType());
+				marker.addInfo("Value Type: " + type);
+			}
 			else
 			{
-				IPattern pattern1 = pattern.withType(type);
-				if (pattern1 == null)
-				{
-					Marker marker = markers.create(pattern.getPosition(), "pattern.type");
-					marker.addInfo("Pattern Type: " + pattern.getType());
-					marker.addInfo("Value Type: " + type);
-				}
-				else
-				{
-					c.pattern = pattern1;
-				}
+				c.pattern = pattern1;
 			}
 			
 			this.cases[i].resolve(markers, context);
@@ -312,7 +310,8 @@ public final class MatchExpression extends ASTNode implements IValue
 			writer.writeTypeInsn(Opcodes.NEW, "dyvil/lang/MatchError");
 			writer.writeInsn(Opcodes.DUP);
 			writer.writeVarInsn(type.getLoadOpcode(), varIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", "(" + type.getExtendedName() + ")V", false);
+			String desc = "(" + (type.isPrimitive() ? type.getExtendedName() + ")V" : "Ljava/lang/Object;)V");
+			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", desc, false);
 			writer.writeInsn(Opcodes.ATHROW);
 			writer.resetLocals(varIndex);
 		}

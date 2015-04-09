@@ -150,7 +150,7 @@ public interface Operators
 	
 	public static MatchExpression getMatchExpression(IValue arg1, IValue arg2)
 	{
-		if (arg2.getValueType() == IValue.ARRAY)
+		if (arg2.getValueType() == IValue.STATEMENT_LIST)
 		{
 			IValueList list = (IValueList) arg2;
 			int len = list.valueCount();

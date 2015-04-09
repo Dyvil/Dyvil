@@ -23,6 +23,12 @@ public final class WildcardPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
+	public boolean isExhaustive()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Types.ANY;

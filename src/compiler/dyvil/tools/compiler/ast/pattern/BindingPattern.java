@@ -31,6 +31,12 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	}
 	
 	@Override
+	public boolean isExhaustive()
+	{
+		return this.pattern.isExhaustive();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.pattern == null)
