@@ -376,9 +376,9 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public IType resolveType(Name name, IValue instance, IArguments arguments, ITypeList generics)
+	public IType resolveType(ITypeVariable typeVar, IValue instance, IArguments arguments, ITypeList generics)
 	{
-		return Types.DYNAMIC;
+		return null;
 	}
 	
 	@Override

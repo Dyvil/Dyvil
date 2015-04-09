@@ -92,8 +92,6 @@ public class ClassMetadata implements IClassMetadata
 		for (int i = 0; i < count; i++)
 		{
 			IParameter param = this.theClass.getParameter(i);
-			param.write(writer);
-			
 			list.addValue(new ClassParameterSetter(this.theClass, param));
 		}
 		

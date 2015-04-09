@@ -284,7 +284,7 @@ public final class ClassParameter extends Member implements IParameter
 		
 		if (this.defaultValue != null)
 		{
-			buffer.append(Formatting.Field.keyValueSeperator).append(' ');
+			buffer.append(Formatting.Field.keyValueSeperator);
 			this.defaultValue.toString(prefix, buffer);
 		}
 	}

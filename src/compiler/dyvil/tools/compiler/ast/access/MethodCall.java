@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -72,11 +73,7 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 		}
 		if (this.type == null)
 		{
-			if (this.method.hasTypeVariables())
-			{
-				this.type = this.method.getType(this);
-			}
-			this.type = this.method.getType();
+			this.type = this.method.getType(this);
 			
 			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
 			{
@@ -202,9 +199,9 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 	}
 	
 	@Override
-	public IType resolveType(Name name)
+	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.method.resolveType(name, this.instance, this.arguments, this);
+		return this.method.resolveType(typeVar, this.instance, this.arguments, this);
 	}
 	
 	@Override
@@ -304,7 +301,7 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 			}
 		}
 		// Resolve Apply Method
-		else if (this.instance == null)
+		if (this.instance == null)
 		{
 			IValue apply = this.resolveApply(markers, context);
 			if (apply != null)

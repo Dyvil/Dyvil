@@ -5,6 +5,7 @@ import org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -38,7 +39,7 @@ public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignatur
 	
 	public boolean hasTypeVariables();
 	
-	public IType resolveType(Name name, IValue instance, IArguments arguments, ITypeList generics);
+	public IType resolveType(ITypeVariable typeVar, IValue instance, IArguments arguments, ITypeList generics);
 	
 	// Compilation
 	

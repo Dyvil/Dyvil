@@ -106,9 +106,9 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
-	public IType resolveType(Name name)
+	public IType resolveType(ITypeVariable typeVar)
 	{
-		if (this.typeVar.getName() == name)
+		if (this.typeVar == typeVar)
 		{
 			return this;
 		}
@@ -116,9 +116,9 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
-	public IType resolveType(Name name, IType concrete)
+	public IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
-		if (this.typeVar.getName() == name && this.typeVar.isSuperTypeOf(concrete))
+		if (this.typeVar == typeVar)
 		{
 			return concrete;
 		}
@@ -134,7 +134,7 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		IType t = context.resolveType(this.typeVar.getName());
+		IType t = context.resolveType(this.typeVar);
 		if (t != null)
 		{
 			if (this.arrayDimensions > 0)

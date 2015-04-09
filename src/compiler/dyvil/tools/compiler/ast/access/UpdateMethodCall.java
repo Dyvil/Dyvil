@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
@@ -56,11 +57,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		}
 		if (this.type == null)
 		{
-			if (this.method.hasTypeVariables())
-			{
-				return this.type = this.method.getType(this);
-			}
-			return this.type = this.method.getType();
+			return this.type = this.method.getType(this);
 		}
 		return this.type;
 	}
@@ -118,9 +115,9 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
-	public IType resolveType(Name name)
+	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.method.resolveType(name, this.instance, this.arguments, null);
+		return this.method.resolveType(typeVar, this.instance, this.arguments, null);
 	}
 	
 	@Override

@@ -8,7 +8,6 @@ import static dyvil.reflect.Opcodes.INSTANCE;
 import java.lang.annotation.ElementType;
 import java.util.List;
 
-import dyvil.tools.compiler.backend.ClassWriter;
 import org.objectweb.asm.Label;
 
 import dyvil.reflect.Modifiers;
@@ -32,6 +31,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
@@ -284,7 +284,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IType resolveType(Name name, IValue instance, IArguments arguments, ITypeList generics)
+	public IType resolveType(ITypeVariable typeVar, IValue instance, IArguments arguments, ITypeList generics)
 	{
 		if (this.genericCount > 0 && generics != null)
 		{
@@ -292,7 +292,7 @@ public class Method extends Member implements IMethod
 			for (int i = 0; i < len; i++)
 			{
 				ITypeVariable var = this.generics[i];
-				if (var.getName() == name)
+				if (var == typeVar)
 				{
 					return generics.getType(i);
 				}
@@ -304,7 +304,7 @@ public class Method extends Member implements IMethod
 		IParameter param;
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			type = this.parameters[0].getType().resolveType(name, instance.getType());
+			type = this.parameters[0].getType().resolveType(typeVar, instance.getType());
 			if (type != null)
 			{
 				return type;
@@ -313,7 +313,7 @@ public class Method extends Member implements IMethod
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i + 1];
-				type = param.getType().resolveType(name, arguments.getType(i, param));
+				type = param.getType().resolveType(typeVar, arguments.getType(i, param));
 				if (type != null)
 				{
 					return type;
@@ -324,7 +324,7 @@ public class Method extends Member implements IMethod
 		}
 		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			type = this.theClass.getType().resolveType(name, arguments.getFirstValue().getType());
+			type = this.theClass.getType().resolveType(typeVar, arguments.getFirstValue().getType());
 			if (type != null)
 			{
 				return type;
@@ -334,7 +334,7 @@ public class Method extends Member implements IMethod
 		
 		if (instance != null)
 		{
-			type = this.theClass.getType().resolveType(name, instance.getType());
+			type = this.theClass.getType().resolveType(typeVar, instance.getType());
 			if (type != null)
 			{
 				return type;
@@ -344,7 +344,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < len; i++)
 		{
 			param = this.parameters[i];
-			type = param.getType().resolveType(name, arguments.getType(i, param));
+			type = param.getType().resolveType(typeVar, arguments.getType(i, param));
 			if (type != null)
 			{
 				return type;

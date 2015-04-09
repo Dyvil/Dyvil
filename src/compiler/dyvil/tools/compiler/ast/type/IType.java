@@ -180,12 +180,12 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	public IType getConcreteType(ITypeContext context);
 	
 	@Override
-	public default IType resolveType(Name name)
+	public default IType resolveType(ITypeVariable typeVar)
 	{
 		return null;
 	}
 	
-	public default IType resolveType(Name name, IType concrete)
+	public default IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
 		return null;
 	}

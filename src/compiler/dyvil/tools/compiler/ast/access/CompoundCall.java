@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -16,6 +17,7 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -68,11 +70,12 @@ public final class CompoundCall extends ASTNode implements IValue, IValued, ITyp
 		}
 		if (this.type == null)
 		{
-			if (this.method.hasTypeVariables())
+			this.type = this.method.getType(this);
+			
+			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
 			{
-				return this.type = this.method.getType(this);
+				this.type = PrimitiveType.getPrimitiveType(this.type);
 			}
-			return this.type = this.method.getType();
 		}
 		return this.type;
 	}
@@ -110,7 +113,7 @@ public final class CompoundCall extends ASTNode implements IValue, IValued, ITyp
 		{
 			return 3;
 		}
-		else if (type.isSuperTypeOf(type1))
+		if (type.isSuperTypeOf(type1))
 		{
 			return 2;
 		}
@@ -142,9 +145,9 @@ public final class CompoundCall extends ASTNode implements IValue, IValued, ITyp
 	}
 	
 	@Override
-	public IType resolveType(Name name)
+	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.method.resolveType(name, this.instance, this.arguments, null);
+		return this.method.resolveType(typeVar, this.instance, this.arguments, null);
 	}
 	
 	@Override
