@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.type;
 import java.util.List;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -27,6 +28,48 @@ public final class PrimitiveType extends Type
 	{
 		super(name);
 		this.typecode = typecode;
+	}
+	
+	public static IType getPrimitiveType(IType type)
+	{
+		if (type.isArrayType())
+		{
+			return type;
+		}
+		IClass iclass = type.getTheClass();
+		if (iclass == Types.VOID_CLASS)
+		{
+			return Types.VOID;
+		}
+		if (iclass == Types.BYTE_CLASS)
+		{
+			return Types.BYTE;
+		}
+		if (iclass == Types.SHORT_CLASS)
+		{
+			return Types.SHORT;
+		}
+		if (iclass == Types.CHAR_CLASS)
+		{
+			return Types.CHAR;
+		}
+		if (iclass == Types.INT_CLASS)
+		{
+			return Types.INT;
+		}
+		if (iclass == Types.LONG_CLASS)
+		{
+			return Types.LONG;
+		}
+		if (iclass == Types.FLOAT_CLASS)
+		{
+			return Types.FLOAT;
+		}
+		if (iclass == Types.DOUBLE_CLASS)
+		{
+			return Types.DOUBLE;
+		}
+		return type;
 	}
 	
 	public static PrimitiveType fromTypecode(int typecode)

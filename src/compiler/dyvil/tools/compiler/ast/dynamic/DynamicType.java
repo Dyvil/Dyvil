@@ -37,17 +37,6 @@ public final class DynamicType extends ASTNode implements IType
 	// IContext
 	
 	@Override
-	public void setFullName(String name)
-	{
-	}
-	
-	@Override
-	public String getFullName()
-	{
-		return "dynamic";
-	}
-	
-	@Override
 	public void setClass(IClass theClass)
 	{
 	}
@@ -169,6 +158,11 @@ public final class DynamicType extends ASTNode implements IType
 	public IMethod getFunctionalMethod()
 	{
 		return null;
+	}
+
+	@Override
+	public void setInternalName(String name)
+	{
 	}
 	
 	@Override

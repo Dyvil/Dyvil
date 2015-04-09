@@ -56,17 +56,6 @@ public final class WildcardType extends BaseBounded implements IType
 	}
 	
 	@Override
-	public void setFullName(String name)
-	{
-	}
-	
-	@Override
-	public String getFullName()
-	{
-		return "_";
-	}
-	
-	@Override
 	public void setArrayDimensions(int dimensions)
 	{
 		this.arrayDimensions = dimensions;
@@ -314,6 +303,11 @@ public final class WildcardType extends BaseBounded implements IType
 	public IMethod getFunctionalMethod()
 	{
 		return null;
+	}
+	
+	@Override
+	public void setInternalName(String name)
+	{
 	}
 	
 	@Override

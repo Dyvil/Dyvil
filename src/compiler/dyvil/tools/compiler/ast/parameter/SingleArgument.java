@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class SingleArgument implements IArguments, IValued
@@ -141,7 +142,18 @@ public final class SingleArgument implements IArguments, IValued
 		{
 			return;
 		}
-		this.value = this.value.withType(param.getType(context));
+		IType type = param.getType(context);
+		IValue value1 = this.value.withType(type);
+		if (value1 == null)
+		{
+			Marker marker = markers.create(this.value.getPosition(), "access.method.argument_type", param.getName());
+			marker.addInfo("Required Type: " + type);
+			marker.addInfo("Value Type: " + this.value.getType());
+		}
+		else
+		{
+			this.value = value1;
+		}
 	}
 	
 	@Override
@@ -161,7 +173,17 @@ public final class SingleArgument implements IArguments, IValued
 			return;
 		}
 		
-		this.value = this.value.withType(type.getElementType());
+		value1 = this.value.withType(type.getElementType());
+		if (value1 == null)
+		{
+			Marker marker = markers.create(this.value.getPosition(), "access.method.argument_type", param.getName());
+			marker.addInfo("Required Type: " + type);
+			marker.addInfo("Value Type: " + this.value.getType());
+		}
+		else
+		{
+			this.value = value1;
+		}
 	}
 	
 	@Override
@@ -250,12 +272,10 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void foldConstants()
 	{
-		if (this.value == null)
+		if (this.value != null)
 		{
-			return;
+			this.value = this.value.foldConstants();
 		}
-		
-		this.value = this.value.foldConstants();
 	}
 	
 	@Override

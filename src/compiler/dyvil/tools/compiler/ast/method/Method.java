@@ -200,28 +200,28 @@ public class Method extends Member implements IMethod
 	{
 		switch (type)
 		{
-		case "dyvil.lang.annotation.inline":
+		case "dyvil/lang/annotation/inline":
 			this.modifiers |= Modifiers.INLINE;
 			return false;
-		case "dyvil.lang.annotation.infix":
+		case "dyvil/lang/annotation/infix":
 			this.modifiers |= Modifiers.INFIX;
 			return false;
-		case "dyvil.lang.annotation.prefix":
+		case "dyvil/lang/annotation/prefix":
 			this.modifiers |= Modifiers.PREFIX;
 			return false;
-		case "dyvil.lang.annotation.sealed":
+		case "dyvil/lang/annotation/sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
-		case "dyvil.lang.annotation.Native":
+		case "dyvil/lang/annotation/Native":
 			this.modifiers |= Modifiers.NATIVE;
 			return false;
-		case "dyvil.lang.annotation.Strict":
+		case "dyvil/lang/annotation/Strict":
 			this.modifiers |= Modifiers.STRICT;
 			return false;
-		case "java.lang.Deprecated":
+		case "java/lang/Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
 			return false;
-		case "java.lang.Override":
+		case "java/lang/Override":
 			this.modifiers |= Modifiers.OVERRIDE;
 			return false;
 		}

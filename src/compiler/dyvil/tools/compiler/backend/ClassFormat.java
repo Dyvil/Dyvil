@@ -77,23 +77,28 @@ public final class ClassFormat
 		}
 	}
 	
-	public static String packageToInternal(String name)
+	public static String packageToInternal(String pack)
 	{
-		return name.replace('.', '/');
+		return pack.replace('.', '/');
 	}
 	
-	public static String internalToPackage(String name)
+	public static String internalToPackage(String internal)
 	{
-		return name.replace('/', '.');
+		return internal.replace('/', '.');
 	}
 	
-	public static String extendedToPackage(String name)
+	public static String extendedToInternal(String extended)
 	{
-		int len = name.length() - 1;
+		return extended.substring(1, extended.length() - 1);
+	}
+	
+	public static String extendedToPackage(String extended)
+	{
+		int len = extended.length() - 1;
 		StringBuilder builder = new StringBuilder(len - 1);
 		for (int i = 1; i < len; i++)
 		{
-			char c = name.charAt(i);
+			char c = extended.charAt(i);
 			if (c == '/')
 			{
 				builder.append('.');
@@ -146,7 +151,8 @@ public final class ClassFormat
 		return readType(extended, 0, extended.length());
 	}
 	
-	public static IType readReturnType(String desc) {
+	public static IType readReturnType(String desc)
+	{
 		return readType(desc, desc.lastIndexOf(')') + 1, desc.length());
 	}
 	
@@ -170,7 +176,7 @@ public final class ClassFormat
 			i = readTypeList(desc, i, iclass);
 		}
 	}
-
+	
 	public static void readMethodType(String desc, IMethodSignature method)
 	{
 		int i = 1;
@@ -189,7 +195,7 @@ public final class ClassFormat
 		i++;
 		readTyped(desc, i, method);
 	}
-
+	
 	public static void readConstructorType(String desc, IConstructor constructor)
 	{
 		int i = 1;
@@ -198,7 +204,7 @@ public final class ClassFormat
 			i = readTypeList(desc, i, constructor);
 		}
 	}
-
+	
 	private static void setInternalName(IType type, String desc, int start, int end)
 	{
 		int index = desc.lastIndexOf('/', end);
@@ -206,25 +212,14 @@ public final class ClassFormat
 		{
 			// No slash in type name, skip internal -> package name conversion
 			type.setName(Name.getQualified(desc.substring(start, end)));
-			type.setFullName(desc.substring(start, end));
+			type.setInternalName(desc.substring(start, end));
 			return;
 		}
 		
 		type.setName(Name.getQualified(desc.substring(index + 1, end)));
-		StringBuilder buf = new StringBuilder(end - index + 1);
-		for (; start < end; start++)
-		{
-			char c = desc.charAt(start);
-			if (c == '/')
-			{
-				buf.append('.');
-				continue;
-			}
-			buf.append(c);
-		}
-		type.setFullName(buf.toString());
+		type.setInternalName(desc.substring(start, end));
 	}
-
+	
 	private static IType readType(String desc, int start, int end)
 	{
 		int array = 0;

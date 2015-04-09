@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.structure;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.library.Library;
 
 public final class RootPackage extends Package
@@ -19,9 +20,10 @@ public final class RootPackage extends Package
 			return pack;
 		}
 		
+		String internal = ClassFormat.internalToPackage(name);
 		for (Library lib : DyvilCompiler.config.libraries)
 		{
-			pack = lib.resolvePackage(name);
+			pack = lib.resolvePackage(internal);
 			if (pack != null)
 			{
 				return pack;
@@ -34,19 +36,31 @@ public final class RootPackage extends Package
 	@Override
 	public IClass resolveClass(String name)
 	{
-		int index = name.lastIndexOf('.');
+		return this.resolveInternalClass(ClassFormat.packageToInternal(name));
+	}
+	
+	public IClass resolveInternalClass(String internal)
+	{
+		int index = internal.lastIndexOf('/');
 		if (index == -1)
 		{
-			return super.resolveClass(name);
+			return super.resolveClass(internal);
 		}
-		String packageName = name.substring(0, index);
-		String className = name.substring(index + 1);
-		Package pack = this.resolvePackage(packageName);
-		if (pack != null)
+		String packageName = internal.substring(0, index);
+		String className = internal.substring(index + 1);
+		Package pack;
+		for (Library lib : DyvilCompiler.config.libraries)
 		{
-			return pack.resolveClass(className);
+			pack = lib.resolvePackage(packageName);
+			if (pack != null)
+			{
+				IClass iclass = pack.resolveClass(className);
+				if (iclass != null)
+				{
+					return iclass;
+				}
+			}
 		}
-		
 		return null;
 	}
 	

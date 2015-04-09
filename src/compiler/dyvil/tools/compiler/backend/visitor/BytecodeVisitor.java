@@ -41,16 +41,17 @@ public final class BytecodeVisitor extends MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		String packName = ClassFormat.extendedToPackage(type);
-		if ("dyvil.lang.annotation.inline".equals(packName))
+		if ("Ldyvil/lang/annotation/inline;".equals(type))
 		{
 			this.method.addModifier(Modifiers.INLINE);
 			this.inline = true;
+			return null;
 		}
 		
-		if (this.method.addRawAnnotation(packName))
+		String internal = ClassFormat.extendedToInternal(type);
+		if (this.method.addRawAnnotation(internal))
 		{
-			Annotation annotation = new Annotation(new dyvil.tools.compiler.ast.type.Type(packName));
+			Annotation annotation = new Annotation(new dyvil.tools.compiler.ast.type.Type(internal));
 			return new AnnotationVisitorImpl(this.method, annotation);
 		}
 		return null;

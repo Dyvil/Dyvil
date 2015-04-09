@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FileLibrary extends Library
+public final class FileLibrary extends Library
 {
 	public FileLibrary(File file)
 	{

@@ -49,10 +49,10 @@ public final class SimpleMethodVisitor extends MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		String packName = ClassFormat.extendedToPackage(type);
-		if (this.method.addRawAnnotation(packName))
+		String internal = ClassFormat.extendedToInternal(type);
+		if (this.method.addRawAnnotation(internal))
 		{
-			Annotation annotation = new Annotation(new Type(packName));
+			Annotation annotation = new Annotation(new Type(internal));
 			return new AnnotationVisitorImpl(this.method, annotation);
 		}
 		return null;

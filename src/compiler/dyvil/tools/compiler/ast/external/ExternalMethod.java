@@ -139,6 +139,16 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
+	public boolean isIntrinsic()
+	{
+		if (!this.annotationsResolved)
+		{
+			this.resolveAnnotations();
+		}
+		return this.intrinsicOpcodes != null;
+	}
+	
+	@Override
 	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		if (name != this.name)

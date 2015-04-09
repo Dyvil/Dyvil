@@ -22,10 +22,10 @@ public class SimpleFieldVisitor extends FieldVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		String packName = ClassFormat.extendedToPackage(type);
-		if (this.field.addRawAnnotation(packName))
+		String internal = ClassFormat.extendedToInternal(type);
+		if (this.field.addRawAnnotation(internal))
 		{
-			Annotation annotation = new Annotation(new Type(packName));
+			Annotation annotation = new Annotation(new Type(internal));
 			return new AnnotationVisitorImpl(this.field, annotation);
 		}
 		return null;

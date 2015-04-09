@@ -10,7 +10,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-public class JarLibrary extends Library
+public final class JarLibrary extends Library
 {
 	private JarFile		jarFile;
 	private Set<String>	packageNames	= new TreeSet();

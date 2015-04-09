@@ -673,7 +673,7 @@ public class CodeClass extends ASTNode implements IClass
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			String fullName = a.type.getFullName();
+			String fullName = a.type.getInternalName();
 			if (fullName != null && this.addRawAnnotation(fullName))
 			{
 				this.removeAnnotation(i--);

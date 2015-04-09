@@ -125,13 +125,13 @@ public class Constructor extends Member implements IConstructor
 	{
 		switch (type)
 		{
-		case "dyvil.lang.annotation.inline":
+		case "dyvil/lang/annotation/inline":
 			this.modifiers |= Modifiers.INLINE;
 			return false;
-		case "dyvil.lang.annotation.sealed":
+		case "dyvil/lang/annotation/sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
-		case "java.lang.Deprecated":
+		case "java/lang/Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
 			return false;
 		}

@@ -36,17 +36,6 @@ public final class UnknownType extends ASTNode implements IType
 	// IContext
 	
 	@Override
-	public void setFullName(String name)
-	{
-	}
-	
-	@Override
-	public String getFullName()
-	{
-		return "unknown";
-	}
-	
-	@Override
 	public void setClass(IClass theClass)
 	{
 	}
@@ -159,6 +148,11 @@ public final class UnknownType extends ASTNode implements IType
 	}
 	
 	// Compilation
+	
+	@Override
+	public void setInternalName(String name)
+	{
+	}
 	
 	@Override
 	public String getInternalName()

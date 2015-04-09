@@ -28,10 +28,10 @@ public class AnnotationClassVisitor extends MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		String packName = ClassFormat.extendedToPackage(type);
-		if (this.parameter.addRawAnnotation(packName))
+		String internal = ClassFormat.extendedToInternal(type);
+		if (this.parameter.addRawAnnotation(internal))
 		{
-			Annotation annotation = new Annotation(new Type(packName));
+			Annotation annotation = new Annotation(new Type(internal));
 			return new AnnotationVisitorImpl(this.parameter, annotation);
 		}
 		return null;

@@ -67,8 +67,9 @@ public final class Variable extends Member implements IVariable
 	@Override
 	public boolean addRawAnnotation(String type)
 	{
-		if ("dyvil.lang.annotation.lazy".equals(type))
+		switch (type)
 		{
+		case "dyvil/lang/annotation/lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
 		}

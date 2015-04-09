@@ -53,10 +53,6 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	@Override
 	public Name getName();
 	
-	public void setFullName(String nae);
-	
-	public String getFullName();
-	
 	// Container Class
 	
 	public void setClass(IClass theClass);
@@ -232,6 +228,8 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	public IMethod getFunctionalMethod();
 	
 	// Compilation
+	
+	public void setInternalName(String name);
 	
 	public String getInternalName();
 	

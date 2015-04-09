@@ -20,17 +20,17 @@ public interface Types
 	PrimitiveType	DOUBLE			= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
 	
 	DynamicType		DYNAMIC			= new DynamicType();
-	Type			ANY				= new Type("dyvil.lang.Any", Name.any);
-	Type			OBJECT			= new Type("java.lang.Object", Name.getQualified("Object"));
-	Type			STRING			= new Type("java.lang.String", Name.getQualified("String"));
-	Type			CLASS			= new Type("java.lang.Class", Name.getQualified("Class"));
-	Type			PREDEF			= new Type("dyvil.lang.Predef", Name.getQualified("Predef"));
-	Type			ARRAY			= new Type("dyvil.lang.Array", Name.getQualified("Array"));
+	Type			ANY				= new Type("dyvil/lang/Any", Name.any);
+	Type			OBJECT			= new Type("java/lang/Object", Name.getQualified("Object"));
+	Type			STRING			= new Type("java/lang/String", Name.getQualified("String"));
+	Type			CLASS			= new Type("java/lang/Class", Name.getQualified("Class"));
+	Type			PREDEF			= new Type("dyvil/lang/Predef", Name.getQualified("Predef"));
+	Type			ARRAY			= new Type("dyvil/lang/Array", Name.getQualified("Array"));
 	
-	Type			AIntrinsic		= new Type("Intrinsic");
-	Type			AOverride		= new Type("Override");
-	Type			ARetention		= new Type("Retention");
-	Type			ATarget			= new Type("Target");
+	Type			AIntrinsic		= new Type("dyvil/lang/annotation/Intrinsic", Name.getQualified("Intrinsic"));
+	Type			AOverride		= new Type("java/lang/Override", Name.getQualified("Override"));
+	Type			ARetention		= new Type("java/lang/annotation/Retention", Name.getQualified("Retention"));
+	Type			ATarget			= new Type("java/lang/annotation/Target", Name.getQualified("Target"));
 	
 	IClass			VOID_CLASS		= Package.dyvilLang.resolveClass("Void");
 	IClass			BOOLEAN_CLASS	= Package.dyvilLang.resolveClass("Boolean");

@@ -16,10 +16,7 @@ import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
-import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -77,9 +74,14 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 		{
 			if (this.method.hasTypeVariables())
 			{
-				return this.type = this.method.getType(this);
+				this.type = this.method.getType(this);
 			}
-			return this.type = this.method.getType();
+			this.type = this.method.getType();
+			
+			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
+			{
+				this.type = PrimitiveType.getPrimitiveType(this.type);
+			}
 		}
 		return this.type;
 	}
@@ -383,7 +385,7 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 		
 		return call;
 	}
-
+	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{

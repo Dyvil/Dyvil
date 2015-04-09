@@ -40,17 +40,6 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
-	public void setFullName(String name)
-	{
-	}
-	
-	@Override
-	public String getFullName()
-	{
-		return null;
-	}
-	
-	@Override
 	public void setClass(IClass theClass)
 	{
 	}
@@ -225,6 +214,11 @@ public final class TypeVariableType extends ASTNode implements IType
 	public IMethod getFunctionalMethod()
 	{
 		return null;
+	}
+	
+	@Override
+	public void setInternalName(String name)
+	{
 	}
 	
 	@Override

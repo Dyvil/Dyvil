@@ -44,7 +44,7 @@ public class ExternalPackage extends Package
 			return pack;
 		}
 		
-		String name1 = this.fullName + "." + name;
+		String name1 = this.internalName + name;
 		pack = this.library.resolvePackage(name1);
 		if (pack != null)
 		{

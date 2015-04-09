@@ -107,13 +107,12 @@ public final class ClassParameter extends Member implements IParameter
 	@Override
 	public boolean addRawAnnotation(String type)
 	{
-		if ("dyvil.lang.annotation.var".equals(this.name))
+		switch (type)
 		{
+		case "dyvil/lang/annotation/var":
 			this.modifiers |= Modifiers.VAR;
 			return false;
-		}
-		if ("dyvil.lang.annotation.lazy".equals(this.name))
-		{
+		case "dyvil/lang/annotation/lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
 		}

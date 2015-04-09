@@ -84,19 +84,19 @@ public class Field extends Member implements IField
 	{
 		switch (type)
 		{
-		case "dyvil.lang.annotation.lazy":
+		case "dyvil/lang/annotation/lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
-		case "dyvil.lang.annotation.sealed":
+		case "dyvil/lang/annotation/sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
-		case "dyvil.lang.annotation.Transient":
+		case "dyvil/lang/annotation/Transient":
 			this.modifiers |= Modifiers.TRANSIENT;
 			return false;
-		case "dyvil.lang.annotation.Volatile":
+		case "dyvil/lang/annotation/Volatile":
 			this.modifiers |= Modifiers.VOLATILE;
 			return false;
-		case "java.lang.Deprecated":
+		case "java/lang/Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
 			return false;
 		}

@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 
-public class CaseClasses
+public interface CaseClasses
 {
 	public static void writeEquals(MethodWriter writer, IClass theClass)
 	{
@@ -285,38 +285,6 @@ public class CaseClasses
 		if (type.isPrimitive())
 		{
 			type.appendExtendedName(desc);
-		}
-		else if (type.equals(Types.BOOLEAN))
-		{
-			desc.append("Z");
-		}
-		else if (type.equals(Types.BYTE))
-		{
-			desc.append("B");
-		}
-		else if (type.equals(Types.SHORT))
-		{
-			desc.append("S");
-		}
-		else if (type.equals(Types.CHAR))
-		{
-			desc.append("C");
-		}
-		else if (type.equals(Types.INT))
-		{
-			desc.append("I");
-		}
-		else if (type.equals(Types.LONG))
-		{
-			desc.append("J");
-		}
-		else if (type.equals(Types.FLOAT))
-		{
-			desc.append("F");
-		}
-		else if (type.equals(Types.DOUBLE))
-		{
-			desc.append("D");
 		}
 		else if (type.equals(Types.STRING))
 		{

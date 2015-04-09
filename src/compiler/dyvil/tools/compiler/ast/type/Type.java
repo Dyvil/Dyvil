@@ -17,14 +17,13 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Type extends ASTNode implements IType
 {
 	public Name		name;
-	public String	fullName;
+	public String	internalName;
 	public IClass	theClass;
 	public int		arrayDimensions;
 	
@@ -33,24 +32,24 @@ public class Type extends ASTNode implements IType
 		super();
 	}
 	
-	public Type(String fullName)
+	public Type(String internalName)
 	{
-		this.fullName = fullName;
+		this.internalName = internalName;
 		
-		int index = fullName.lastIndexOf('.');
+		int index = internalName.lastIndexOf('/');
 		if (index == -1)
 		{
-			this.name = Name.getQualified(fullName);
+			this.name = Name.getQualified(internalName);
 		}
 		else
 		{
-			this.name = Name.getQualified(fullName.substring(index + 1));
+			this.name = Name.getQualified(internalName.substring(index + 1));
 		}
 	}
 	
-	public Type(String fullName, Name name)
+	public Type(String internalName, Name name)
 	{
-		this.fullName = fullName;
+		this.internalName = internalName;
 		this.name = name;
 	}
 	
@@ -68,7 +67,7 @@ public class Type extends ASTNode implements IType
 	public Type(IClass iclass)
 	{
 		this.name = iclass.getName();
-		this.fullName = iclass.getFullName();
+		this.internalName = iclass.getInternalName();
 		this.theClass = iclass;
 	}
 	
@@ -137,18 +136,6 @@ public class Type extends ASTNode implements IType
 	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public void setFullName(String name)
-	{
-		this.fullName = name;
-	}
-	
-	@Override
-	public String getFullName()
-	{
-		return this.fullName;
 	}
 	
 	@Override
@@ -293,9 +280,9 @@ public class Type extends ASTNode implements IType
 			
 			return t.getArrayType(this.arrayDimensions);
 		}
-		else if (this.fullName != null)
+		else if (this.internalName != null)
 		{
-			iclass = Package.rootPackage.resolveClass(this.fullName);
+			iclass = Package.rootPackage.resolveInternalClass(this.internalName);
 		}
 		else
 		{
@@ -313,7 +300,7 @@ public class Type extends ASTNode implements IType
 		if (iclass != null)
 		{
 			this.theClass = iclass;
-			this.fullName = iclass.getFullName();
+			this.internalName = iclass.getInternalName();
 			return this;
 		}
 		if (markers != null)
@@ -454,6 +441,12 @@ public class Type extends ASTNode implements IType
 	// Compilation
 	
 	@Override
+	public void setInternalName(String name)
+	{
+		this.internalName = name;
+	}
+	
+	@Override
 	public String getInternalName()
 	{
 		if (this.arrayDimensions > 0)
@@ -462,7 +455,7 @@ public class Type extends ASTNode implements IType
 			this.appendExtendedName(buf);
 			return buf.toString();
 		}
-		return this.theClass == null ? ClassFormat.packageToInternal(this.fullName) : this.theClass.getInternalName();
+		return this.internalName;
 	}
 	
 	@Override
@@ -472,7 +465,7 @@ public class Type extends ASTNode implements IType
 		{
 			buffer.append('[');
 		}
-		buffer.append('L').append(this.theClass == null ? ClassFormat.packageToInternal(this.fullName) : this.theClass.getInternalName()).append(';');
+		buffer.append('L').append(this.internalName).append(';');
 	}
 	
 	@Override
@@ -488,7 +481,7 @@ public class Type extends ASTNode implements IType
 		{
 			buffer.append('[');
 		}
-		buffer.append('L').append(this.getInternalName()).append(';');
+		buffer.append('L').append(this.internalName).append(';');
 	}
 	
 	// Misc
@@ -513,7 +506,7 @@ public class Type extends ASTNode implements IType
 		Type t = new Type();
 		t.theClass = this.theClass;
 		t.name = this.name;
-		t.fullName = this.fullName;
+		t.internalName = this.internalName;
 		t.arrayDimensions = this.arrayDimensions;
 		return t;
 	}

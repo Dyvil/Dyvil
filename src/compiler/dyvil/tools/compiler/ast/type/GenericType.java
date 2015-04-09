@@ -136,9 +136,9 @@ public final class GenericType extends Type implements ITypeList
 		}
 		
 		IClass iclass;
-		if (this.fullName != null)
+		if (this.internalName != null)
 		{
-			iclass = Package.rootPackage.resolveClass(this.fullName);
+			iclass = Package.rootPackage.resolveInternalClass(this.internalName);
 		}
 		else
 		{
@@ -148,7 +148,7 @@ public final class GenericType extends Type implements ITypeList
 		if (iclass != null)
 		{
 			this.theClass = iclass;
-			this.fullName = iclass.getFullName();
+			this.internalName = iclass.getInternalName();
 			
 			if (this.generics == null)
 			{
@@ -221,7 +221,7 @@ public final class GenericType extends Type implements ITypeList
 		{
 			buf.append('[');
 		}
-		buf.append('L').append(this.getInternalName());
+		buf.append('L').append(this.internalName);
 		if (this.generics != null)
 		{
 			buf.append('<');
@@ -260,7 +260,7 @@ public final class GenericType extends Type implements ITypeList
 		GenericType t = new GenericType();
 		t.theClass = this.theClass;
 		t.name = this.name;
-		t.fullName = this.fullName;
+		t.internalName = this.internalName;
 		t.arrayDimensions = this.arrayDimensions;
 		if (this.generics != null)
 		{

@@ -38,23 +38,22 @@ public abstract class Library
 	
 	public abstract void loadLibrary();
 	
-	public abstract boolean isSubPackage(String name);
+	public abstract boolean isSubPackage(String internal);
 	
-	public Package resolvePackage(String name)
+	public Package resolvePackage(String internal)
 	{
-		Package pack = this.packages.get(name);
+		Package pack = this.packages.get(internal);
 		if (pack != null)
 		{
 			return pack;
 		}
 		
-		int index = name.indexOf('.');
+		int index = internal.indexOf('/');
 		if (index >= 0)
 		{
-			String internal = name.replace('.', '/');
 			if (this.isSubPackage(internal))
 			{
-				String s = name.substring(0, index);
+				String s = internal.substring(0, index);
 				pack = this.resolvePackage2(s);
 				
 				if (pack == null)
@@ -64,9 +63,9 @@ public abstract class Library
 				
 				do
 				{
-					int index1 = name.indexOf('.', index + 1);
-					int index2 = index1 >= 0 ? index1 : name.length();
-					s = name.substring(index + 1, index2);
+					int index1 = internal.indexOf('/', index + 1);
+					int index2 = index1 >= 0 ? index1 : internal.length();
+					s = internal.substring(index + 1, index2);
 					pack = pack.createSubPackage(s);
 					if (pack == null)
 					{
@@ -80,11 +79,11 @@ public abstract class Library
 			
 			return null;
 		}
-		if (this.isSubPackage(name))
+		if (this.isSubPackage(internal))
 		{
-			pack = new ExternalPackage(Package.rootPackage, Name.getQualified(name), this);
+			pack = new ExternalPackage(Package.rootPackage, Name.getQualified(internal), this);
 			Package.rootPackage.addSubPackage(pack);
-			this.packages.put(name, pack);
+			this.packages.put(internal, pack);
 			return pack;
 		}
 		return null;
