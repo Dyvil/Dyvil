@@ -341,7 +341,7 @@ public final class TryStatement extends ASTNode implements IStatement
 			writer.writeLabel(finallyLabel);
 			writer.writeInsn(Opcodes.POP);
 			writer.writeLabel(endLabel);
-				this.finallyBlock.writeStatement(writer);
+			this.finallyBlock.writeStatement(writer);
 			writer.writeFinallyBlock(tryStart, tryEnd, finallyLabel);
 		}
 		else

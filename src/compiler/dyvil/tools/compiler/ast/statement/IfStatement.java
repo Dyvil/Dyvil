@@ -282,7 +282,6 @@ public final class IfStatement extends ASTNode implements IStatement
 		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
 		
-		
 		// Condition
 		this.condition.writeInvJump(writer, elseStart);
 		// If Block

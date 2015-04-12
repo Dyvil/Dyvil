@@ -10,7 +10,7 @@ public final class StringToken implements IToken
 	private IToken		prev;
 	private IToken		next;
 	
-	private final int type;
+	private final int	type;
 	private final int	lineNumber;
 	private final int	start;
 	private final int	end;
@@ -146,12 +146,18 @@ public final class StringToken implements IToken
 	@Override
 	public String toString()
 	{
-		String s = " \"" + this.value + "\" (line " + this.lineNumber + ")";;
-		switch (this.type) {
-		case Tokens.STRING: return "String" + s;
-		case Tokens.STRING_START: return "String {" + s;
-		case Tokens.STRING_PART: return "} String {" + s;
-		case Tokens.STRING_END: return "} String" + s;
+		String s = " \"" + this.value + "\" (line " + this.lineNumber + ")";
+		
+		switch (this.type)
+		{
+		case Tokens.STRING:
+			return "String" + s;
+		case Tokens.STRING_START:
+			return "String {" + s;
+		case Tokens.STRING_PART:
+			return "} String {" + s;
+		case Tokens.STRING_END:
+			return "} String" + s;
 		}
 		return "String" + s;
 	}

@@ -47,7 +47,7 @@ public final class ClassOperator extends ASTNode implements IValue
 		if (this.genericType == null)
 		{
 			GenericType generic = new GenericType(Types.CLASS_CLASS);
-			generic.addType(type);
+			generic.addType(this.type);
 			return this.genericType = generic;
 		}
 		return this.genericType;
@@ -84,7 +84,7 @@ public final class ClassOperator extends ASTNode implements IValue
 	{
 		this.type = this.type.resolve(markers, context);
 		GenericType generic = new GenericType(Types.CLASS_CLASS);
-		generic.addType(type);
+		generic.addType(this.type);
 		this.genericType = generic;
 	}
 	

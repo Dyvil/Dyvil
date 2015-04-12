@@ -1,13 +1,12 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.tools.compiler.backend.ClassWriter;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ObjectClassMetadata extends ClassMetadata

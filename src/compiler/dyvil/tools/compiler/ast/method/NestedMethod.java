@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.method;
 
 import java.util.List;
 
-import dyvil.tools.compiler.backend.ClassWriter;
 import org.objectweb.asm.Label;
 
 import dyvil.reflect.Modifiers;
@@ -18,6 +17,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 

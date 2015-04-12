@@ -600,7 +600,7 @@ public final class MethodWriterImpl implements MethodWriter
 		if (index >= this.syncLocals.length)
 		{
 			int[] temp = new int[this.syncCount];
-			System.arraycopy(syncLocals, 0, temp, 0, syncLocals.length);
+			System.arraycopy(this.syncLocals, 0, temp, 0, this.syncLocals.length);
 			this.syncLocals = temp;
 		}
 		return this.syncLocals[index] = this.localIndex;

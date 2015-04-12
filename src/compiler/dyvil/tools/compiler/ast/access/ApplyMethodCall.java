@@ -28,7 +28,7 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued, ITypeCon
 	
 	public IMethod		method;
 	private IType		type;
-	private GenericData genericData;
+	private GenericData	genericData;
 	
 	public ApplyMethodCall(ICodePosition position)
 	{
@@ -37,9 +37,9 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued, ITypeCon
 	
 	private GenericData getGenericData()
 	{
-		if (this.method == null || (this.genericData != null && this.genericData.computedGenerics >= 0))
+		if (this.method == null || this.genericData != null && this.genericData.computedGenerics >= 0)
 		{
-			return genericData;
+			return this.genericData;
 		}
 		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
 	}
@@ -132,7 +132,8 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued, ITypeCon
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		if (typeVar.getGeneric().isMethod()) {
+		if (typeVar.getGeneric().isMethod())
+		{
 			return this.genericData.generics[typeVar.getIndex()];
 		}
 		return this.type.resolveType(typeVar);

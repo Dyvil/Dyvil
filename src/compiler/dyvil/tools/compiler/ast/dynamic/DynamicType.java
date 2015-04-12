@@ -159,7 +159,7 @@ public final class DynamicType extends ASTNode implements IType
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setInternalName(String name)
 	{

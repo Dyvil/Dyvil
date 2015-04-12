@@ -4,7 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 import org.objectweb.asm.AnnotationVisitor;
-import dyvil.tools.compiler.backend.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 
 import dyvil.reflect.Modifiers;
@@ -23,6 +22,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;

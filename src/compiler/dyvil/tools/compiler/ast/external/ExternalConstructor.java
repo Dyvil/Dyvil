@@ -166,7 +166,8 @@ public class ExternalConstructor extends Constructor
 		{
 			this.resolveReturnType();
 		}
-		if (!this.parametersResolved) {
+		if (!this.parametersResolved)
+		{
 			this.resolveParameters();
 		}
 		super.checkArguments(markers, arguments);

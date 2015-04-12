@@ -109,7 +109,8 @@ public final class StringValue extends ASTNode implements IConstantValue
 		buffer.append('"');
 	}
 	
-	public static void append(String value, int len, StringBuilder buffer) {
+	public static void append(String value, int len, StringBuilder buffer)
+	{
 		for (int i = 0; i < len; i++)
 		{
 			char c = value.charAt(i);

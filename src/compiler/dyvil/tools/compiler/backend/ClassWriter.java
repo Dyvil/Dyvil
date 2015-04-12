@@ -51,7 +51,7 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 	{
 		StringBuilder buf = new StringBuilder();
 		buf.append(type1.getInternalName()).append(type2.getInternalName());
-		commonTypes.put(buf.toString(), common.getInternalName());
+		this.commonTypes.put(buf.toString(), common.getInternalName());
 	}
 	
 	@Override
@@ -59,7 +59,7 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 	{
 		StringBuilder buf = new StringBuilder();
 		buf.append(type1).append(type2);
-		return commonTypes.get(buf.toString());
+		return this.commonTypes.get(buf.toString());
 	}
 	
 	public static void generateJAR(List<File> files)

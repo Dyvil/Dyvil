@@ -53,9 +53,9 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 	
 	private GenericData getGenericData()
 	{
-		if (this.method == null || (this.genericData != null && this.genericData.computedGenerics >= 0))
+		if (this.method == null || this.genericData != null && this.genericData.computedGenerics >= 0)
 		{
-			return genericData;
+			return this.genericData;
 		}
 		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
 	}

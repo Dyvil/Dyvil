@@ -2,8 +2,6 @@ package dyvil.tools.compiler.ast.parameter;
 
 import java.lang.annotation.ElementType;
 
-import dyvil.tools.compiler.backend.ClassWriter;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
@@ -12,6 +10,7 @@ import dyvil.tools.compiler.ast.method.IBaseMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;

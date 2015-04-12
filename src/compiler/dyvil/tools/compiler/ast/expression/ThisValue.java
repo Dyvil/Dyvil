@@ -83,7 +83,9 @@ public final class ThisValue extends ASTNode implements IConstantValue
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.type != null)
+		{
 			return;
+		}
 		
 		if (context.isStatic())
 		{

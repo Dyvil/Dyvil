@@ -12,8 +12,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassConstructor extends ConstructorCall
 {
-	private NestedClass	nestedClass;
-	private AnonymousClassMetadata metadata;
+	private NestedClass				nestedClass;
+	private AnonymousClassMetadata	metadata;
 	
 	public ClassConstructor(ICodePosition position)
 	{

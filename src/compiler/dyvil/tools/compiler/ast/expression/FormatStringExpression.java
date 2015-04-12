@@ -60,7 +60,7 @@ public final class FormatStringExpression extends ASTNode implements IValue
 		if (index >= this.strings.length)
 		{
 			String[] temp = new String[index + 1];
-			System.arraycopy(strings, 0, temp, 0, strings.length);
+			System.arraycopy(this.strings, 0, temp, 0, this.strings.length);
 			this.strings = temp;
 		}
 		this.strings[index] = s;

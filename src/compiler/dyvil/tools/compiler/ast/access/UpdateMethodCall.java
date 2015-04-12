@@ -40,9 +40,9 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 	
 	private GenericData getGenericData()
 	{
-		if (this.method == null || (this.genericData != null && this.genericData.computedGenerics >= 0))
+		if (this.method == null || this.genericData != null && this.genericData.computedGenerics >= 0)
 		{
-			return genericData;
+			return this.genericData;
 		}
 		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
 	}
