@@ -1,0 +1,6 @@
+package dyvil.lang.tuple
+
+public case class Tuple10[A, B, C, D, E, F, G, H, I, J](public A _1, public B _2, public C _3, public D _4, public E _5, public F _6, public G _7, public H _8, public I _9, public J _10)
+{
+	public override String toString() = @"(${this._1}, ${this._2}, ${this._3}, ${this._4}, ${this._5}, ${this._6}, ${this._7}, ${this._8}, ${this._9}, ${this._10})"
+}
