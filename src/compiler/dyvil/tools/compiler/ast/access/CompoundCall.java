@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -26,7 +27,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class CompoundCall extends ASTNode implements IValue, IValued, ITypeContext, INamed
+public final class CompoundCall extends ASTNode implements ICall, INamed, IValued, ITypeContext
 {
 	public Name			name;
 	
@@ -35,6 +36,7 @@ public final class CompoundCall extends ASTNode implements IValue, IValued, ITyp
 	
 	public IMethod		method;
 	public IMethod		updateMethod;
+	private GenericData	genericData;
 	private IType		type;
 	
 	public CompoundCall(ICodePosition position)
@@ -49,16 +51,19 @@ public final class CompoundCall extends ASTNode implements IValue, IValued, ITyp
 		this.name = name;
 	}
 	
+	private GenericData getGenericData()
+	{
+		if (this.method == null || (this.genericData != null && this.genericData.computedGenerics >= 0))
+		{
+			return genericData;
+		}
+		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
+	}
+	
 	@Override
 	public int getValueType()
 	{
 		return METHOD_CALL;
-	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return this.method != null && (this.method.isIntrinsic() || this.getType().isPrimitive());
 	}
 	
 	@Override
@@ -70,7 +75,8 @@ public final class CompoundCall extends ASTNode implements IValue, IValued, ITyp
 		}
 		if (this.type == null)
 		{
-			this.type = this.method.getType(this);
+			this.getGenericData();
+			this.type = this.method.getType().getConcreteType(this);
 			
 			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
 			{
@@ -83,7 +89,7 @@ public final class CompoundCall extends ASTNode implements IValue, IValued, ITyp
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Types.VOID ? this : IValue.super.withType(type);
+		return type == Types.VOID ? this : ICall.super.withType(type);
 	}
 	
 	@Override
@@ -145,9 +151,25 @@ public final class CompoundCall extends ASTNode implements IValue, IValued, ITyp
 	}
 	
 	@Override
+	public void setArguments(IArguments arguments)
+	{
+		this.arguments = arguments;
+	}
+	
+	@Override
+	public IArguments getArguments()
+	{
+		return this.arguments;
+	}
+	
+	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.method.resolveType(typeVar, this.instance, this.arguments, null);
+		if (typeVar.getGeneric().isMethod())
+		{
+			return this.genericData.generics[typeVar.getIndex()];
+		}
+		return this.type.resolveType(typeVar);
 	}
 	
 	@Override
@@ -217,7 +239,7 @@ public final class CompoundCall extends ASTNode implements IValue, IValued, ITyp
 		
 		if (this.method != null)
 		{
-			this.instance = this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.method.checkArguments(markers, this.instance, this.arguments, this);
 		}
 		this.arguments.checkTypes(markers, context);
 	}

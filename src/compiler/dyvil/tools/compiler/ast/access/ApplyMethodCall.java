@@ -6,6 +6,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
@@ -20,29 +21,33 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeContext
+public class ApplyMethodCall extends ASTNode implements ICall, IValued, ITypeContext
 {
 	public IValue		instance;
 	public IArguments	arguments;
 	
 	public IMethod		method;
 	private IType		type;
+	private GenericData genericData;
 	
 	public ApplyMethodCall(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
+	private GenericData getGenericData()
+	{
+		if (this.method == null || (this.genericData != null && this.genericData.computedGenerics >= 0))
+		{
+			return genericData;
+		}
+		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
+	}
+	
 	@Override
 	public int getValueType()
 	{
 		return APPLY_METHOD_CALL;
-	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return this.method != null && (this.method.isIntrinsic() || this.getType().isPrimitive());
 	}
 	
 	@Override
@@ -54,7 +59,8 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 		}
 		if (this.type == null)
 		{
-			return this.type = this.method.getType(this);
+			this.getGenericData();
+			return this.type = this.method.getType().getConcreteType(this);
 		}
 		return this.type;
 	}
@@ -62,7 +68,7 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Types.VOID ? this : IValue.super.withType(type);
+		return type == Types.VOID ? this : ICall.super.withType(type);
 	}
 	
 	@Override
@@ -111,11 +117,13 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 		return this.instance;
 	}
 	
+	@Override
 	public void setArguments(IArguments arguments)
 	{
 		this.arguments = arguments;
 	}
 	
+	@Override
 	public IArguments getArguments()
 	{
 		return this.arguments;
@@ -124,7 +132,10 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.method.resolveType(typeVar, this.instance, this.arguments, null);
+		if (typeVar.getGeneric().isMethod()) {
+			return this.genericData.generics[typeVar.getIndex()];
+		}
+		return this.type.resolveType(typeVar);
 	}
 	
 	@Override
@@ -157,9 +168,9 @@ public class ApplyMethodCall extends ASTNode implements IValue, IValued, ITypeCo
 		
 		Marker marker = markers.create(this.position, "resolve.method", "apply");
 		marker.addInfo("Instance Type: " + this.instance.getType());
-		StringBuilder builder = new StringBuilder("Argument Types: {");
+		StringBuilder builder = new StringBuilder("Argument Types: ");
 		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.append('}').toString());
+		marker.addInfo(builder.toString());
 		
 		return this;
 	}

@@ -71,6 +71,14 @@ public class Type extends ASTNode implements IType
 		this.theClass = iclass;
 	}
 	
+	public Type(ICodePosition position, IClass iclass)
+	{
+		this.position = position;
+		this.name = iclass.getName();
+		this.internalName = iclass.getInternalName();
+		this.theClass = iclass;
+	}
+	
 	public static IType findCommonSuperType(IType type1, IType type2)
 	{
 		IType t = superType(type1, type2);

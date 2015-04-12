@@ -326,7 +326,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 					param.setType(param.getType().getConcreteType(this.type));
 				}
 				
-				this.returnType = this.method.getType(this.type);
+				this.returnType = this.method.getType().getConcreteType(this.type);
 			}
 			else
 			{

@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.external;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -65,16 +64,6 @@ public class ExternalConstructor extends Constructor
 			this.resolveReturnType();
 		}
 		return this.type;
-	}
-	
-	@Override
-	public IType getType(ITypeContext context)
-	{
-		if (!this.returnTypeResolved)
-		{
-			this.resolveReturnType();
-		}
-		return this.type.getConcreteType(context);
 	}
 	
 	@Override

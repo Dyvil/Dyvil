@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Method;
@@ -129,16 +130,6 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public IType getType(ITypeContext context)
-	{
-		if (!this.returnTypeResolved)
-		{
-			this.resolveReturnType();
-		}
-		return this.type.getConcreteType(context);
-	}
-	
-	@Override
 	public boolean isIntrinsic()
 	{
 		if (!this.annotationsResolved)
@@ -175,6 +166,16 @@ public final class ExternalMethod extends Method
 			this.resolveParameters();
 		}
 		return super.checkArguments(markers, instance, arguments, typeContext);
+	}
+	
+	@Override
+	public GenericData getGenericData(GenericData genericData, IValue instance, IArguments arguments)
+	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		return super.getGenericData(genericData, instance, arguments);
 	}
 	
 	@Override

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class TypeVariable extends BaseBounded implements ITypeVariable
 {
+	private int index;
 	private IGeneric	generic;
 	public Name			name;
 	
@@ -38,6 +39,18 @@ public final class TypeVariable extends BaseBounded implements ITypeVariable
 	public IGeneric getGeneric()
 	{
 		return this.generic;
+	}
+	
+	@Override
+	public void setIndex(int index)
+	{
+		this.index = index;
+	}
+	
+	@Override
+	public int getIndex()
+	{
+		return this.index;
 	}
 	
 	@Override

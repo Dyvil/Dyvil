@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.external;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.Property;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -48,16 +47,6 @@ public class ExternalProperty extends Property
 			this.resolveReturnType();
 		}
 		return this.type;
-	}
-	
-	@Override
-	public IType getType(ITypeContext context)
-	{
-		if (!this.returnTypeResolved)
-		{
-			this.resolveReturnType();
-		}
-		return this.type.getConcreteType(context);
 	}
 	
 	@Override

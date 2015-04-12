@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -29,7 +30,6 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -126,6 +126,8 @@ public class Method extends Member implements IMethod
 			this.generics = temp;
 		}
 		this.generics[index] = var;
+		
+		var.setIndex(index);
 	}
 	
 	@Override
@@ -281,76 +283,6 @@ public class Method extends Member implements IMethod
 	public IValue getValue()
 	{
 		return this.value;
-	}
-	
-	@Override
-	public IType resolveType(ITypeVariable typeVar, IValue instance, IArguments arguments, ITypeList generics)
-	{
-		if (this.genericCount > 0 && generics != null)
-		{
-			int len = Math.min(this.genericCount, generics.typeCount());
-			for (int i = 0; i < len; i++)
-			{
-				ITypeVariable var = this.generics[i];
-				if (var == typeVar)
-				{
-					return generics.getType(i);
-				}
-			}
-		}
-		
-		IType type;
-		int len = arguments.size();
-		IParameter param;
-		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			type = this.parameters[0].getType().resolveType(typeVar, instance.getType());
-			if (type != null)
-			{
-				return type;
-			}
-			
-			for (int i = 0; i < len; i++)
-			{
-				param = this.parameters[i + 1];
-				type = param.getType().resolveType(typeVar, arguments.getType(i, param));
-				if (type != null)
-				{
-					return type;
-				}
-			}
-			
-			return null;
-		}
-		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
-		{
-			type = this.theClass.getType().resolveType(typeVar, arguments.getFirstValue().getType());
-			if (type != null)
-			{
-				return type;
-			}
-			return null;
-		}
-		
-		if (instance != null)
-		{
-			type = this.theClass.getType().resolveType(typeVar, instance.getType());
-			if (type != null)
-			{
-				return type;
-			}
-		}
-		len = Math.min(this.parameterCount, len);
-		for (int i = 0; i < len; i++)
-		{
-			param = this.parameters[i];
-			type = param.getType().resolveType(typeVar, arguments.getType(i, param));
-			if (type != null)
-			{
-				return type;
-			}
-		}
-		return null;
 	}
 	
 	@Override
@@ -725,6 +657,35 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public GenericData getGenericData(GenericData genericData, IValue instance, IArguments arguments)
+	{
+		if (!this.hasTypeVariables())
+		{
+			return genericData;
+		}
+		
+		if (genericData == null)
+		{
+			genericData = new GenericData(this.genericCount);
+			
+			for (int i = 0; i < this.genericCount; i++)
+			{
+				genericData.generics[i] = this.inferType(this.generics[i], instance, arguments);
+			}
+			
+			return genericData;
+		}
+		
+		genericData.setTypeCount(this.genericCount);
+		for (int i = genericData.typeCount(); i < this.genericCount; i++)
+		{
+			genericData.generics[i] = this.inferType(this.generics[i], instance, arguments);
+		}
+		
+		return genericData;
+	}
+	
+	@Override
 	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
 		int len = arguments.size();
@@ -733,7 +694,7 @@ public class Method extends Member implements IMethod
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			IParameter par = this.parameters[0];
-			parType = par.getType(typeContext);
+			parType = par.getType().getConcreteType(typeContext);
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
@@ -798,10 +759,49 @@ public class Method extends Member implements IMethod
 		return instance;
 	}
 	
+	private IType inferType(ITypeVariable typeVar, IValue instance, IArguments arguments)
+	{
+		IType type;
+		int len = arguments.size();
+		IParameter param;
+		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		{
+			type = this.parameters[0].getType().resolveType(typeVar, instance.getType());
+			if (type != null)
+			{
+				return type;
+			}
+			
+			for (int i = 0; i < len; i++)
+			{
+				param = this.parameters[i + 1];
+				type = param.getType().resolveType(typeVar, arguments.getType(i, param));
+				if (type != null)
+				{
+					return type;
+				}
+			}
+			
+			return Types.ANY;
+		}
+		
+		len = Math.min(this.parameterCount, len);
+		for (int i = 0; i < len; i++)
+		{
+			param = this.parameters[i];
+			type = param.getType().resolveType(typeVar, arguments.getType(i, param));
+			if (type != null)
+			{
+				return type;
+			}
+		}
+		return Types.ANY;
+	}
+	
 	@Override
 	public boolean hasTypeVariables()
 	{
-		return this.generics != null || this.theClass.isGeneric();
+		return this.genericCount > 0 || this.theClass.isGeneric();
 	}
 	
 	@Override

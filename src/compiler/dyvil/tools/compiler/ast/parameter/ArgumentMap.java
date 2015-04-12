@@ -190,7 +190,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 		{
 			if (this.keys[i] == key)
 			{
-				IType type = param.getType(context);
+				IType type = param.getType().getConcreteType(context);
 				IValue value = this.values[i];
 				IValue value1 = value.withType(type);
 				if (value1 == null)

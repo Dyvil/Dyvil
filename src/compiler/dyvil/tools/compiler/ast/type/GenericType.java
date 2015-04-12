@@ -81,15 +81,7 @@ public final class GenericType extends Type implements ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		int len = Math.min(this.theClass.genericCount(), this.genericCount);
-		for (int i = 0; i < len; i++)
-		{
-			if (this.theClass.getTypeVariable(i) == typeVar)
-			{
-				return this.generics[i];
-			}
-		}
-		return null;
+		return this.generics[typeVar.getIndex()];
 	}
 	
 	@Override
@@ -101,7 +93,7 @@ public final class GenericType extends Type implements ITypeList
 		}
 		
 		IType type;
-		if (this.isSuperTypeOf(concrete))
+		if (this.equals(concrete))
 		{
 			IType[] generics = ((GenericType) concrete).generics;
 			for (int i = 0; i < this.genericCount; i++)
@@ -182,7 +174,14 @@ public final class GenericType extends Type implements ITypeList
 			for (int i = 0; i < this.genericCount; i++)
 			{
 				IType t1 = this.generics[i];
-				IType t2 = this.generics[i] = t1.resolve(markers, context);
+				IType t2 = t1.resolve(markers, context);
+				
+				if (t2.isPrimitive())
+				{
+					t2 = t2.getReferenceType();
+				}
+				
+				this.generics[i] = t2;
 				
 				ITypeVariable var = this.theClass.getTypeVariable(i);
 				if (!var.isSuperTypeOf(t2))

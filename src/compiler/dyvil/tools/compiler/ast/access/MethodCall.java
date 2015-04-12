@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -17,7 +18,10 @@ import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
+import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -26,14 +30,12 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.compiler.util.Util;
 
-public final class MethodCall extends ASTNode implements ICall, IValued, INamed, ITypeList, ITypeContext
+public final class MethodCall extends ASTNode implements ICall, INamed, IValued, ITypeContext
 {
 	public IValue		instance;
 	public boolean		dotless;
 	public Name			name;
-	public IType[]		generics;
-	public int			genericCount;
-	
+	public GenericData	genericData;
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
 	public IMethod		method;
@@ -52,16 +54,19 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 		this.name = name;
 	}
 	
+	private GenericData getGenericData()
+	{
+		if (this.method == null || (this.genericData != null && this.genericData.computedGenerics >= 0))
+		{
+			return genericData;
+		}
+		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
+	}
+	
 	@Override
 	public int getValueType()
 	{
 		return METHOD_CALL;
-	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return this.method != null && (this.method.isIntrinsic() || this.getType().isPrimitive());
 	}
 	
 	@Override
@@ -73,7 +78,8 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 		}
 		if (this.type == null)
 		{
-			this.type = this.method.getType(this);
+			this.getGenericData();
+			this.type = this.method.getType().getConcreteType(this);
 			
 			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
 			{
@@ -160,56 +166,21 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 	}
 	
 	@Override
-	public int typeCount()
-	{
-		return this.genericCount;
-	}
-	
-	@Override
-	public void setType(int index, IType type)
-	{
-		this.generics[index] = type;
-	}
-	
-	@Override
-	public void addType(IType type)
-	{
-		if (this.generics == null)
-		{
-			this.generics = new IType[3];
-			this.generics[0] = type;
-			this.genericCount = 1;
-			return;
-		}
-		
-		int index = this.genericCount++;
-		if (this.genericCount > this.generics.length)
-		{
-			IType[] temp = new IType[this.genericCount];
-			System.arraycopy(this.generics, 0, temp, 0, index);
-			this.generics = temp;
-		}
-		this.generics[index] = type;
-	}
-	
-	@Override
-	public IType getType(int index)
-	{
-		return this.generics[index];
-	}
-	
-	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.method.resolveType(typeVar, this.instance, this.arguments, this);
+		if (typeVar.getGeneric().isMethod())
+		{
+			return this.genericData.generics[typeVar.getIndex()];
+		}
+		return this.method.getType().resolveType(typeVar);
 	}
 	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.genericCount; i++)
+		if (this.genericData != null)
 		{
-			this.generics[i] = this.generics[i].resolve(markers, context);
+			this.genericData.resolveTypes(markers, context);
 		}
 		
 		if (this.instance != null)
@@ -515,11 +486,9 @@ public final class MethodCall extends ASTNode implements ICall, IValued, INamed,
 		
 		buffer.append(this.name);
 		
-		if (this.generics != null)
+		if (this.genericData != null)
 		{
-			buffer.append('[');
-			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
-			buffer.append(']');
+			this.genericData.toString(prefix, buffer);
 		}
 		
 		this.arguments.toString(prefix, buffer);

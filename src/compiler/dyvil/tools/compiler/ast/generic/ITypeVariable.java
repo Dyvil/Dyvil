@@ -10,6 +10,10 @@ public interface ITypeVariable extends IASTNode, INamed, IBounded
 {
 	public IGeneric getGeneric();
 	
+	public void setIndex(int index);
+	
+	public int getIndex();
+	
 	// Super Types
 	
 	public boolean isSuperTypeOf(IType type);

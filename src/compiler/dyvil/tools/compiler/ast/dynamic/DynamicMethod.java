@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.dynamic;
 import java.lang.annotation.ElementType;
 import java.util.List;
 
-import dyvil.tools.compiler.backend.ClassWriter;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 
@@ -13,6 +12,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -26,9 +26,9 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -376,7 +376,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar, IValue instance, IArguments arguments, ITypeList generics)
+	public GenericData getGenericData(GenericData data, IValue instance, IArguments arguments)
 	{
 		return null;
 	}

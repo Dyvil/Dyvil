@@ -35,6 +35,11 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return false;
 	}
 	
+	public default IType getReferenceType()
+	{
+		return this;
+	}
+	
 	public default IValue box(IValue value)
 	{
 		return null;

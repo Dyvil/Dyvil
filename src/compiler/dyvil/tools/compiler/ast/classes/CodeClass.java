@@ -354,6 +354,8 @@ public class CodeClass extends ASTNode implements IClass
 			this.generics = temp;
 		}
 		this.generics[index] = var;
+		
+		var.setIndex(index);
 	}
 	
 	@Override

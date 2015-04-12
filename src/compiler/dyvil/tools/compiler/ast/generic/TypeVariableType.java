@@ -106,21 +106,11 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		if (this.typeVar == typeVar)
-		{
-			return this;
-		}
-		return null;
-	}
-	
-	@Override
 	public IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
 		if (this.typeVar == typeVar)
 		{
-			return concrete;
+			return concrete.getReferenceType();
 		}
 		return null;
 	}
@@ -140,6 +130,10 @@ public final class TypeVariableType extends ASTNode implements IType
 			if (this.arrayDimensions > 0)
 			{
 				return t.getArrayType(this.arrayDimensions);
+			}
+			if (t.isPrimitive())
+			{
+				return t.getReferenceType();
 			}
 			return t;
 		}

@@ -6,7 +6,9 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -111,6 +113,47 @@ public final class ClassOperator extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		if (this.type.isPrimitive())
+		{
+			String owner;
+			
+			// Cannot use PrimitiveType.getInternalName as it returns the Dyvil
+			// class instead of the Java one.
+			switch (((PrimitiveType) this.type).typecode)
+			{
+			case ClassFormat.T_BOOLEAN:
+				owner = "java/lang/Boolean";
+				break;
+			case ClassFormat.T_BYTE:
+				owner = "java/lang/Byte";
+				break;
+			case ClassFormat.T_SHORT:
+				owner = "java/lang/Short";
+				break;
+			case ClassFormat.T_CHAR:
+				owner = "java/lang/Character";
+				break;
+			case ClassFormat.T_INT:
+				owner = "java/lang/Integer";
+				break;
+			case ClassFormat.T_LONG:
+				owner = "java/lang/Long";
+				break;
+			case ClassFormat.T_FLOAT:
+				owner = "java/lang/Float";
+				break;
+			case ClassFormat.T_DOUBLE:
+				owner = "java/lang/Double";
+				break;
+			default:
+				owner = "java/lang/Void";
+				break;
+			}
+			
+			writer.writeFieldInsn(Opcodes.GETSTATIC, owner, "TYPE", "Ljava/lang/Class;");
+			return;
+		}
+		
 		org.objectweb.asm.Type t = org.objectweb.asm.Type.getType(this.type.getExtendedName());
 		writer.writeLDC(t);
 	}

@@ -4,8 +4,8 @@ import org.objectweb.asm.Label;
 
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -37,9 +36,15 @@ public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignatur
 	
 	// Generics
 	
-	public boolean hasTypeVariables();
+	@Override
+	public default boolean isMethod()
+	{
+		return true;
+	}
 	
-	public IType resolveType(ITypeVariable typeVar, IValue instance, IArguments arguments, ITypeList generics);
+	public GenericData getGenericData(GenericData data, IValue instance, IArguments arguments);
+	
+	public boolean hasTypeVariables();
 	
 	// Compilation
 	

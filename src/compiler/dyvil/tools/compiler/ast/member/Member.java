@@ -5,7 +5,6 @@ import java.lang.annotation.ElementType;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -168,12 +167,6 @@ public abstract class Member extends ASTNode implements IMember
 	public IType getType()
 	{
 		return this.type;
-	}
-	
-	@Override
-	public IType getType(ITypeContext context)
-	{
-		return this.type.getConcreteType(context);
 	}
 	
 	@Override

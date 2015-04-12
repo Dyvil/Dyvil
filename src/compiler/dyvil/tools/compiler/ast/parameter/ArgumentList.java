@@ -190,7 +190,7 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		IType type = param.getType(context);
+		IType type = param.getType().getConcreteType(context);
 		IValue value = this.values[index];
 		IValue value1 = value.withType(type);
 		if (value1 == null)
@@ -208,7 +208,7 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
 	{
-		IType varParamType = param.getType(context);
+		IType varParamType = param.getType().getConcreteType(context);
 		
 		IValue value = this.values[index];
 		IValue value1 = value.withType(varParamType);

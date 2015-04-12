@@ -9,7 +9,6 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -106,13 +105,6 @@ public final class ClassAccess extends ASTNode implements IValue
 			call.name = name;
 			call.method = m;
 			call.dotless = true;
-			if (this.type.isGenericType())
-			{
-				// Copy generic Type arguments
-				GenericType generic = (GenericType) this.type;
-				call.generics = generic.generics;
-				call.genericCount = generic.genericCount;
-			}
 			call.arguments = EmptyArguments.INSTANCE;
 			return call;
 		}

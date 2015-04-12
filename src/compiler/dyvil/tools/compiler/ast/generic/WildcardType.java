@@ -154,21 +154,6 @@ public final class WildcardType extends BaseBounded implements IType
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		IType type;
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			type = this.upperBounds[i].resolveType(typeVar);
-			if (type != null)
-			{
-				return type;
-			}
-		}
-		return null;
-	}
-	
-	@Override
 	public IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
 		IType type;

@@ -142,7 +142,7 @@ public final class SingleArgument implements IArguments, IValued
 		{
 			return;
 		}
-		IType type = param.getType(context);
+		IType type = param.getType().getConcreteType(context);
 		IValue value1 = this.value.withType(type);
 		if (value1 == null)
 		{
@@ -164,7 +164,7 @@ public final class SingleArgument implements IArguments, IValued
 			return;
 		}
 		
-		IType type = param.getType(context);
+		IType type = param.getType().getConcreteType(context);
 		IValue value1 = this.value.withType(type);
 		if (value1 != null)
 		{

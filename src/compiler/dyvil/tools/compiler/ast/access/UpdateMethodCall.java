@@ -6,6 +6,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
@@ -23,17 +24,27 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeContext
+public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeContext
 {
 	public IValue		instance;
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
 	public IMethod		method;
+	private GenericData	genericData;
 	private IType		type;
 	
 	public UpdateMethodCall(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	private GenericData getGenericData()
+	{
+		if (this.method == null || (this.genericData != null && this.genericData.computedGenerics >= 0))
+		{
+			return genericData;
+		}
+		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
 	}
 	
 	@Override
@@ -57,7 +68,8 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		}
 		if (this.type == null)
 		{
-			return this.type = this.method.getType(this);
+			this.getGenericData();
+			return this.type = this.method.getType().getConcreteType(this);
 		}
 		return this.type;
 	}
@@ -65,7 +77,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Types.VOID ? this : IValue.super.withType(type);
+		return type == Types.VOID ? this : ICall.super.withType(type);
 	}
 	
 	@Override
@@ -115,9 +127,24 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 	}
 	
 	@Override
+	public void setArguments(IArguments arguments)
+	{
+	}
+	
+	@Override
+	public IArguments getArguments()
+	{
+		return null;
+	}
+	
+	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.method.resolveType(typeVar, this.instance, this.arguments, null);
+		if (typeVar.getGeneric().isMethod())
+		{
+			return this.genericData.generics[typeVar.getIndex()];
+		}
+		return this.type.resolveType(typeVar);
 	}
 	
 	@Override
@@ -166,7 +193,7 @@ public class UpdateMethodCall extends ASTNode implements IValue, IValued, ITypeC
 		
 		if (this.method != null)
 		{
-			this.instance = this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.method.checkArguments(markers, this.instance, this.arguments, this);
 		}
 		this.arguments.check(markers, context);
 	}
