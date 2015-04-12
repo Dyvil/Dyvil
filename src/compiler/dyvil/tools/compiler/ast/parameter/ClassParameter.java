@@ -17,6 +17,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.ModifierTypes;
 
 public final class ClassParameter extends Member implements IParameter
 {
@@ -268,6 +269,8 @@ public final class ClassParameter extends Member implements IParameter
 			this.annotations[i].toString(prefix, buffer);
 			buffer.append(' ');
 		}
+		
+		buffer.append(ModifierTypes.FIELD.toString(this.modifiers));
 		
 		if (this.varargs)
 		{

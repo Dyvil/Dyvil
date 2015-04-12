@@ -275,7 +275,7 @@ public class Field extends Member implements IField
 		}
 		else
 		{
-			writer.writeFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
+			writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 		}
 	}
 	

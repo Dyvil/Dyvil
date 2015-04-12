@@ -102,6 +102,13 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public void setTypeVariables(ITypeVariable[] typeVars, int count)
+	{
+		this.generics = typeVars;
+		this.genericCount = count;
+	}
+	
+	@Override
 	public void setTypeVariable(int index, ITypeVariable var)
 	{
 		this.generics[index] = var;
@@ -128,6 +135,12 @@ public class Method extends Member implements IMethod
 		this.generics[index] = var;
 		
 		var.setIndex(index);
+	}
+	
+	@Override
+	public ITypeVariable[] getTypeVariables()
+	{
+		return this.generics;
 	}
 	
 	@Override

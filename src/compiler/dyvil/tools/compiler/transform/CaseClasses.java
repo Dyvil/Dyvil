@@ -282,11 +282,13 @@ public interface CaseClasses
 		// corresponds to the type of the field
 		StringBuilder desc = new StringBuilder().append('(');
 		
+		// TODO Handle arrays
+		
 		if (type.isPrimitive())
 		{
 			type.appendExtendedName(desc);
 		}
-		else if (type.equals(Types.STRING))
+		else if (type.classEquals(Types.STRING) && !type.isArrayType())
 		{
 			desc.append("Ljava/lang/String;");
 		}

@@ -102,7 +102,7 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public boolean classEquals(IType type)
 	{
-		return this.typeVar.isSuperTypeOf(type);
+		return false;
 	}
 	
 	@Override
@@ -233,6 +233,14 @@ public final class TypeVariableType extends ASTNode implements IType
 			buffer.append('[');
 		}
 		buffer.append('L').append(this.getInternalName()).append(';');
+	}
+	
+	@Override
+	public String getSignature()
+	{
+		StringBuilder buffer = new StringBuilder();
+		this.appendSignature(buffer);
+		return buffer.toString();
 	}
 	
 	@Override

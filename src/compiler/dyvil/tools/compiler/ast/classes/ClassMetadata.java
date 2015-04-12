@@ -30,7 +30,7 @@ public class ClassMetadata implements IClassMetadata
 		this.theClass = iclass;
 		
 		Constructor constructor = new Constructor(this.theClass);
-		constructor.modifiers = Modifiers.PUBLIC | Modifiers.SYNTHETIC;
+		constructor.modifiers = Modifiers.PUBLIC;
 		this.constructor = constructor;
 	}
 	
@@ -96,6 +96,6 @@ public class ClassMetadata implements IClassMetadata
 		}
 		
 		this.constructor.setValue(list);
-		this.constructor.write(writer);
+		this.constructor.write(writer, instanceFields);
 	}
 }

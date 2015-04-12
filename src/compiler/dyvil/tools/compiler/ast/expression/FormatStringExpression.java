@@ -144,8 +144,16 @@ public final class FormatStringExpression extends ASTNode implements IValue
 		
 		writer.writeTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
 		writer.writeInsn(Opcodes.DUP);
-		writer.writeLDC(s);
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
+		
+		if (s.isEmpty())
+		{
+			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
+		}
+		else
+		{
+			writer.writeLDC(s);
+			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
+		}
 		
 		for (int i = 0; i < len; i++)
 		{
@@ -153,8 +161,12 @@ public final class FormatStringExpression extends ASTNode implements IValue
 			value.writeExpression(writer);
 			CaseClasses.writeToString(writer, value.getType());
 			
-			writer.writeLDC(this.strings[i + 1]);
-			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
+			s = this.strings[i + 1];
+			if (!s.isEmpty())
+			{
+				writer.writeLDC(this.strings[i + 1]);
+				writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
+			}
 		}
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
 	}

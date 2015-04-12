@@ -329,6 +329,13 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public void setTypeVariables(ITypeVariable[] typeVars, int count)
+	{
+		this.generics = typeVars;
+		this.genericCount = count;
+	}
+	
+	@Override
 	public void setTypeVariable(int index, ITypeVariable var)
 	{
 		this.generics[index] = var;
@@ -355,6 +362,12 @@ public class CodeClass extends ASTNode implements IClass
 		this.generics[index] = var;
 		
 		var.setIndex(index);
+	}
+	
+	@Override
+	public ITypeVariable[] getTypeVariables()
+	{
+		return this.generics;
 	}
 	
 	@Override
@@ -1219,6 +1232,11 @@ public class CodeClass extends ASTNode implements IClass
 		
 		this.metadata.write(writer, instanceFields);
 		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].write(writer);
+		}
+		
 		for (int i = 0; i < constructors; i++)
 		{
 			this.body.getConstructor(i).write(writer, instanceFields);
@@ -1285,18 +1303,18 @@ public class CodeClass extends ASTNode implements IClass
 		buffer.append(prefix).append(ModifierTypes.CLASS.toString(this.modifiers));
 		buffer.append(ModifierTypes.CLASS_TYPE.toString(this.modifiers)).append(this.name);
 		
-		if (this.parameterCount > 0)
-		{
-			buffer.append('(');
-			Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
-			buffer.append(')');
-		}
-		
 		if (this.genericCount > 0)
 		{
 			buffer.append('[');
 			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
+		}
+		
+		if (this.parameterCount > 0)
+		{
+			buffer.append('(');
+			Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
+			buffer.append(')');
 		}
 		
 		if (this.superType == null)

@@ -95,6 +95,11 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public void setTypeVariables(ITypeVariable[] typeVars, int count)
+	{
+	}
+	
+	@Override
 	public void setTypeVariable(int index, ITypeVariable var)
 	{
 	}
@@ -102,6 +107,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	@Override
 	public void addTypeVariable(ITypeVariable var)
 	{
+	}
+	
+	@Override
+	public ITypeVariable[] getTypeVariables()
+	{
+		return null;
 	}
 	
 	@Override

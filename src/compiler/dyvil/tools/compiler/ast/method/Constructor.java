@@ -534,7 +534,19 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public String getSignature()
 	{
-		return null;
+		if (!this.theClass.isGeneric())
+		{
+			return null;
+		}
+		
+		StringBuilder buffer = new StringBuilder();
+		buffer.append('(');
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].getType().appendSignature(buffer);
+		}
+		buffer.append(")V");
+		return buffer.toString();
 	}
 	
 	@Override
