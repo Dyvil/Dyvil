@@ -4,7 +4,7 @@ import java.io.File;
 
 import dyvil.strings.CharUtils;
 
-public class ConfigParser
+public final class ConfigParser
 {
 	public static final int	KEY		= 1;
 	public static final int	EQUALS	= 2;
@@ -135,6 +135,9 @@ public class ConfigParser
 			return;
 		case "exclude":
 			config.excludeFile(value);
+			return;
+		case "libraries":
+			config.addLibraryFile(new File(value));
 			return;
 		}
 	}

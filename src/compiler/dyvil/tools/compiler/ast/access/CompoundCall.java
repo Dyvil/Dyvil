@@ -169,7 +169,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		{
 			return this.genericData.generics[typeVar.getIndex()];
 		}
-		return this.type.resolveType(typeVar);
+		return this.instance.getType().resolveType(typeVar);
 	}
 	
 	@Override

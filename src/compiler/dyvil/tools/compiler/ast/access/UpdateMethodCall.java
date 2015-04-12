@@ -144,7 +144,7 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 		{
 			return this.genericData.generics[typeVar.getIndex()];
 		}
-		return this.type.resolveType(typeVar);
+		return this.instance.getType().resolveType(typeVar);
 	}
 	
 	@Override

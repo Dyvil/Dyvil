@@ -172,7 +172,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued,
 		{
 			return this.genericData.generics[typeVar.getIndex()];
 		}
-		return this.method.getType().resolveType(typeVar);
+		return this.instance.getType().resolveType(typeVar);
 	}
 	
 	@Override

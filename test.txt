@@ -10,4 +10,4 @@ main_args = [ ]
 
 exclude = [ src/test/dyvil/tests/BooleanTest.dyvil ]
 
-libraries = [ ]
+libraries = [ dbin ]

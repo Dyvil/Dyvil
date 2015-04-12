@@ -136,7 +136,7 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued, ITypeCon
 		{
 			return this.genericData.generics[typeVar.getIndex()];
 		}
-		return this.type.resolveType(typeVar);
+		return this.instance.getType().resolveType(typeVar);
 	}
 	
 	@Override

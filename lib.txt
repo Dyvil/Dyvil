@@ -5,4 +5,4 @@ jar_version = 1.0.0
 source_dir = src/library
 output_dir = dbin
 
-libraries = [ ]
+libraries = [ dbin ]
