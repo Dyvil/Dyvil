@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import dyvil.collections.CollectionUtils;
 import dyvil.lang.annotation.Utility;
 import dyvil.lang.annotation.infix;
 
@@ -164,12 +163,12 @@ public interface ArrayUtils
 	
 	public static @infix <T> T[] toArray(Collection<? extends T> collection)
 	{
-		return CollectionUtils.toArray(collection);
+		return (T[]) collection.toArray();
 	}
 	
 	public static @infix <T> T[] toArray(Collection<? extends T> collection, Class<T> type)
 	{
-		return CollectionUtils.toArray(collection, type);
+		return collection.toArray((T[]) Array.newInstance(type, collection.size()));
 	}
 	
 	public static @infix int indexOf(int[] array, int v)
