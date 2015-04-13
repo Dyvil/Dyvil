@@ -3,6 +3,7 @@ package dyvil.collections.immutable;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -46,13 +47,19 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public int size();
 	
 	@Override
-	public boolean isEmpty();
+	public default boolean isEmpty()
+	{
+		return this.size() == 0;
+	}
 	
 	@Override
 	public Iterator<E> iterator();
 	
 	@Override
-	public Spliterator<E> spliterator();
+	public default Spliterator<E> spliterator()
+	{
+		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.IMMUTABLE);
+	}
 	
 	@Override
 	public void forEach(Consumer<? super E> action);
@@ -108,37 +115,48 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	{
 		throw new ImmutableException("resize() on Immutable List");
 	}
-
+	
+	@Override
+	public default void ensureCapacity(int minSize)
+	{
+	}
+	
 	@Override
 	public default void update(int index, E element)
 	{
 		throw new ImmutableException("update() on Immutable List");
 	}
-
+	
 	@Override
 	public default E set(int index, E element)
 	{
 		throw new ImmutableException("set() on Immutable List");
 	}
-
+	
 	@Override
-	public default void add(int index, E element)
+	public default void insert(int index, E element)
+	{
+		throw new ImmutableException("insert() on Immutable List");
+	}
+	
+	@Override
+	public default E add(int index, E element)
 	{
 		throw new ImmutableException("add() on Immutable List");
 	}
-
+	
 	@Override
 	public default void remove(E element)
 	{
 		throw new ImmutableException("remove() on Immutable List");
 	}
-
+	
 	@Override
 	public default void removeAt(int index)
 	{
 		throw new ImmutableException("removeAt() on Immutable List");
 	}
-
+	
 	@Override
 	public default void $plus$eq(E element)
 	{

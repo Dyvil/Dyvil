@@ -3,6 +3,7 @@ package dyvil.collections.mutable;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -46,13 +47,19 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>, ArrayConv
 	public int size();
 	
 	@Override
-	public boolean isEmpty();
+	public default boolean isEmpty()
+	{
+		return this.size() == 0;
+	}
 	
 	@Override
 	public Iterator<E> iterator();
 	
 	@Override
-	public Spliterator<E> spliterator();
+	public default Spliterator<E> spliterator()
+	{
+		return Spliterators.spliterator(this.iterator(), this.size(), 0);
+	}
 	
 	@Override
 	public void forEach(Consumer<? super E> action);
@@ -107,13 +114,18 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>, ArrayConv
 	public void resize(int newLength);
 	
 	@Override
+	public default void ensureCapacity(int minSize)
+	{
+	}
+	
+	@Override
 	public void update(int index, E element);
 	
 	@Override
 	public E set(int index, E element);
 	
 	@Override
-	public void add(int index, E element);
+	public void insert(int index, E element);
 	
 	@Override
 	public void remove(E element);

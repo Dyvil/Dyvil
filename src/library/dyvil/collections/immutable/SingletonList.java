@@ -4,7 +4,6 @@ import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -38,12 +37,6 @@ public class SingletonList<E> implements ImmutableList<E>
 	public Iterator<E> iterator()
 	{
 		return new SingletonIterator<E>(this.element);
-	}
-	
-	@Override
-	public Spliterator<E> spliterator()
-	{
-		return null; // FIXME
 	}
 	
 	@Override
@@ -173,20 +166,28 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public E[] toArray()
+	public Object[] toArray()
 	{
-		return (E[]) new Object[] { this.element };
+		return new Object[] { this.element };
 	}
 	
 	@Override
-	public E[] toArray(E[] store)
+	public Object[] toArray(Object[] store)
 	{
 		if (store.length == 0)
 		{
-			store = (E[]) Array.newInstance(store.getClass().getComponentType(), 1);
+			store = (Object[]) Array.newInstance(store.getClass().getComponentType(), 1);
 		}
 		store[0] = this.element;
 		return store;
+	}
+	
+	@Override
+	public E[] toArray(Class<E> type)
+	{
+		E[] array = (E[]) Array.newInstance(type, 1);
+		array[0] = type.cast(this.element);
+		return array;
 	}
 	
 	@Override

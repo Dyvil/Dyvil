@@ -1,9 +1,9 @@
 package dyvil.collections.mutable;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -78,12 +78,6 @@ public class ArrayList<E> implements MutableList<E>
 	public Iterator<E> iterator()
 	{
 		return new ArrayIterator(this.elements, this.size);
-	}
-	
-	@Override
-	public Spliterator<E> spliterator()
-	{
-		return null; // FIXME
 	}
 	
 	@Override
@@ -284,9 +278,31 @@ public class ArrayList<E> implements MutableList<E>
 	@Override
 	public void resize(int newLength)
 	{
+		if (newLength < this.size)
+		{
+			for (int i = newLength; i < this.size; i++)
+			{
+				this.elements[i] = null;
+			}
+			this.size = newLength;
+			return;
+		}
+		
 		if (newLength > this.elements.length)
 		{
 			Object[] temp = new Object[newLength];
+			System.arraycopy(this.elements, 0, temp, 0, this.size);
+			this.elements = temp;
+		}
+		this.size = newLength;
+	}
+	
+	@Override
+	public void ensureCapacity(int minSize)
+	{
+		if (minSize > this.elements.length)
+		{
+			Object[] temp = new Object[minSize];
 			System.arraycopy(this.elements, 0, temp, 0, this.size);
 			this.elements = temp;
 		}
@@ -302,17 +318,22 @@ public class ArrayList<E> implements MutableList<E>
 	@Override
 	public E set(int index, E element)
 	{
-		if (index < 0 || index >= this.size)
+		if (index < 0)
 		{
 			return null;
 		}
+		if (index >= this.size)
+		{
+			this.resize(index + 1);
+		}
+		
 		E e = (E) this.elements[index];
 		this.elements[index] = element;
 		return e;
 	}
 	
 	@Override
-	public void add(int index, E element)
+	public void insert(int index, E element)
 	{
 		if (index == this.size)
 		{
@@ -321,10 +342,31 @@ public class ArrayList<E> implements MutableList<E>
 		}
 		this.rangeCheck(index);
 		
-		this.resize(size + 1);
-		System.arraycopy(this.elements, index, this.elements, index + 1, size - index);
+		this.ensureCapacity(this.size + 1);
+		System.arraycopy(this.elements, index, this.elements, index + 1, this.size - index);
 		this.elements[index] = element;
-		size++;
+		this.size++;
+	}
+	
+	@Override
+	public E add(int index, E element)
+	{
+		if (index > this.size)
+		{
+			return this.set(index, element);
+		}
+		if (index == this.size)
+		{
+			this.$plus$eq(element);
+			return null;
+		}
+		
+		E e = (E) this.elements[index];
+		
+		this.resize(index + 1);
+		System.arraycopy(this.elements, index, this.elements, index + 1, this.size - index);
+		this.elements[index] = element;
+		return e;
 	}
 	
 	@Override
@@ -336,30 +378,30 @@ public class ArrayList<E> implements MutableList<E>
 			return;
 		}
 		
-		int numMoved = size - index - 1;
+		int numMoved = this.size - index - 1;
 		if (numMoved > 0)
 		{
 			System.arraycopy(this.elements, index + 1, this.elements, index, numMoved);
 		}
-		this.elements[--size] = null;
+		this.elements[--this.size] = null;
 	}
 	
 	@Override
 	public void removeAt(int index)
 	{
 		this.rangeCheck(index);
-		int numMoved = size - index - 1;
+		int numMoved = this.size - index - 1;
 		if (numMoved > 0)
 		{
 			System.arraycopy(this.elements, index + 1, this.elements, index, numMoved);
 		}
-		this.elements[--size] = null;
+		this.elements[--this.size] = null;
 	}
 	
 	@Override
 	public void $plus$eq(E element)
 	{
-		this.resize(this.size + 1);
+		this.ensureCapacity(this.size + 1);
 		this.elements[this.size++] = element;
 	}
 	
@@ -367,7 +409,7 @@ public class ArrayList<E> implements MutableList<E>
 	public void $plus$eq(Collection<? extends E> collection)
 	{
 		int len = collection.size();
-		this.resize(this.size + len);
+		this.ensureCapacity(this.size + len);
 		Object[] array = collection.toArray();
 		System.arraycopy(array, 0, this.elements, this.size, len);
 	}
@@ -546,22 +588,33 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public E[] toArray()
+	public Object[] toArray()
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		return (E[]) array;
+		return array;
 	}
 	
 	@Override
-	public E[] toArray(E[] store)
+	public Object[] toArray(Object[] store)
 	{
 		if (store.length < this.size)
 		{
-			return (E[]) Arrays.copyOf(this.elements, this.size, store.getClass());
+			return Arrays.copyOf(this.elements, this.size, store.getClass());
 		}
 		System.arraycopy(this.elements, 0, store, 0, this.size);
 		return store;
+	}
+	
+	@Override
+	public E[] toArray(Class<E> type)
+	{
+		E[] array = (E[]) Array.newInstance(type, this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			array[i] = type.cast(this.elements[i]);
+		}
+		return array;
 	}
 	
 	@Override
