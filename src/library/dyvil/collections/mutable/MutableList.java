@@ -11,23 +11,36 @@ import java.util.function.UnaryOperator;
 import dyvil.collections.immutable.ImmutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
+import dyvil.lang.literal.ArrayConvertible;
 
-public interface MutableList<E> extends MutableCollection<E>, List<E>
+public interface MutableList<E> extends MutableCollection<E>, List<E>, ArrayConvertible
 {
 	public static <E> MutableList<E> apply()
 	{
-		return null; // FIXME
+		return new ArrayList();
 	}
 	
 	public static <E> MutableList<E> apply(E element)
 	{
-		return null; // FIXME
+		return new ArrayList(new Object[] { element }, 1, true);
+	}
+	
+	public static <E> MutableList<E> apply(E e1, E e2)
+	{
+		return new ArrayList(new Object[] { e1, e2 }, 2, true);
+	}
+	
+	public static <E> MutableList<E> apply(E e1, E e2, E e3)
+	{
+		return new ArrayList(new Object[] { e1, e2, e3 }, 3, true);
 	}
 	
 	public static <E> MutableList<E> apply(E[] array)
 	{
-		return null; // FIXME
+		return new ArrayList(array);
 	}
+	
+	// Simple Getters
 	
 	@Override
 	public int size();
@@ -52,6 +65,8 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	
 	@Override
 	public E get(int index);
+	
+	// Non-mutating Operations
 	
 	@Override
 	public MutableList<E> slice(int startIndex, int length);
@@ -86,7 +101,25 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	@Override
 	public MutableList<E> sorted(Comparator<? super E> comparator);
 	
-	// Mutating Functions
+	// Mutating Operations
+	
+	@Override
+	public void resize(int newLength);
+	
+	@Override
+	public void update(int index, E element);
+	
+	@Override
+	public E set(int index, E element);
+	
+	@Override
+	public void add(int index, E element);
+	
+	@Override
+	public void remove(E element);
+	
+	@Override
+	public void removeAt(int index);
 	
 	@Override
 	public void $plus$eq(E element);
@@ -120,24 +153,6 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	
 	@Override
 	public void sort(Comparator<? super E> comparator);
-	
-	@Override
-	public void resize(int newLength);
-	
-	@Override
-	public void update(int index, E element);
-	
-	@Override
-	public E set(int index, E element);
-	
-	@Override
-	public void add(int index, E element);
-	
-	@Override
-	public void remove(E element);
-	
-	@Override
-	public void removeAt(int index);
 	
 	@Override
 	public int indexOf(E element);

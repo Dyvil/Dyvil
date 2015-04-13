@@ -1,5 +1,6 @@
 package dyvil.collections.immutable;
 
+import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
@@ -104,7 +105,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> $plus(Collection<? extends E> collection)
 	{
-		return null; // FIXME
+		return ImmutableList.apply(collection);
 	}
 	
 	@Override
@@ -169,6 +170,23 @@ public class SingletonList<E> implements ImmutableList<E>
 	public ImmutableList<E> sorted(Comparator<? super E> comparator)
 	{
 		return ImmutableList.apply(this.element);
+	}
+	
+	@Override
+	public E[] toArray()
+	{
+		return (E[]) new Object[] { this.element };
+	}
+	
+	@Override
+	public E[] toArray(E[] store)
+	{
+		if (store.length == 0)
+		{
+			store = (E[]) Array.newInstance(store.getClass().getComponentType(), 1);
+		}
+		store[0] = this.element;
+		return store;
 	}
 	
 	@Override

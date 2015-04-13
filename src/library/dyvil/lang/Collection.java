@@ -9,12 +9,17 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import dyvil.collections.immutable.ImmutableCollection;
+import dyvil.collections.immutable.ImmutableList;
 import dyvil.collections.mutable.MutableCollection;
-import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-public interface Collection<E> extends Iterable<E>, ArrayConvertible, NilConvertible
+public interface Collection<E> extends Iterable<E>, NilConvertible
 {
+	public static <E> Collection<E> apply()
+	{
+		return ImmutableList.apply();
+	}
+	
 	/**
 	 * Returns the size of this collection, i.e. the number of elements
 	 * contained in this collection.
@@ -43,7 +48,7 @@ public interface Collection<E> extends Iterable<E>, ArrayConvertible, NilConvert
 	
 	@Override
 	public void forEach(Consumer<? super E> action);
-
+	
 	/**
 	 * Returns true if and if only this collection contains the element
 	 * specified by {@code element}
@@ -118,17 +123,17 @@ public interface Collection<E> extends Iterable<E>, ArrayConvertible, NilConvert
 	 *         are present in the given collection
 	 */
 	public Collection<? extends E> $amp(Collection<? extends E> collection);
-
+	
 	public <R> Collection<R> mapped(Function<? super E, ? extends R> mapper);
-
+	
 	public <R> Collection<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
-
+	
 	public Collection<E> filtered(Predicate<? super E> condition);
-
+	
 	public Collection<E> sorted();
-
+	
 	public Collection<E> sorted(Comparator<? super E> comparator);
-
+	
 	/**
 	 * Adds the element given by {@code element} to this collection. This method
 	 * should throw an {@link ImmutableException} if this is an immutable
@@ -138,7 +143,7 @@ public interface Collection<E> extends Iterable<E>, ArrayConvertible, NilConvert
 	 *            the element to be added
 	 */
 	public void $plus$eq(E element);
-
+	
 	/**
 	 * Adds all elements of the given {@code collection} to this collection.
 	 * This method should throw an {@link ImmutableException} if this is an
@@ -148,7 +153,7 @@ public interface Collection<E> extends Iterable<E>, ArrayConvertible, NilConvert
 	 *            the collection of elements to be added
 	 */
 	public void $plus$eq(Collection<? extends E> collection);
-
+	
 	/**
 	 * Removes the element given by {@code element} from this collection. This
 	 * method should throw an {@link ImmutableException} if this is an immutable
@@ -190,6 +195,10 @@ public interface Collection<E> extends Iterable<E>, ArrayConvertible, NilConvert
 	public void sort();
 	
 	public void sort(Comparator<? super E> comparator);
+	
+	public E[] toArray();
+	
+	public E[] toArray(E[] store);
 	
 	/**
 	 * Creates a copy of this collection. The general contract of this method is

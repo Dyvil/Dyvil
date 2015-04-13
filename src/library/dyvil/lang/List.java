@@ -13,6 +13,8 @@ import dyvil.collections.mutable.MutableList;
 
 public interface List<E> extends Collection<E>
 {
+	// Simple getters
+	
 	@Override
 	public int size();
 	
@@ -34,6 +36,8 @@ public interface List<E> extends Collection<E>
 	public E apply(int index);
 	
 	public E get(int index);
+	
+	// Non-mutating Operations
 	
 	public List<E> slice(int startIndex, int length);
 	
@@ -67,6 +71,20 @@ public interface List<E> extends Collection<E>
 	@Override
 	public List<E> sorted(Comparator<? super E> comparator);
 	
+	// Mutating Operations
+	
+	public void resize(int newLength);
+
+	public void update(int index, E element);
+
+	public E set(int index, E element);
+
+	public void add(int index, E element);
+
+	public void remove(E element);
+
+	public void removeAt(int index);
+
 	@Override
 	public void $plus$eq(E element);
 	
@@ -100,25 +118,13 @@ public interface List<E> extends Collection<E>
 	@Override
 	public void sort(Comparator<? super E> comparator);
 	
-	// Mutating Operations
-	
-	public void resize(int newLength);
-	
-	public void update(int index, E element);
-	
-	public E set(int index, E element);
-	
-	public void add(int index, E element);
-	
-	public void remove(E element);
-	
-	public void removeAt(int index);
-	
 	// Search Operations
 	
 	public int indexOf(E element);
 	
 	public int lastIndexOf(E element);
+	
+	// Copying
 	
 	@Override
 	public List<E> copy();

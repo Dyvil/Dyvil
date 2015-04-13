@@ -149,6 +149,18 @@ public class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	public E[] toArray()
+	{
+		return (E[]) new Object[0];
+	}
+	
+	@Override
+	public E[] toArray(E[] store)
+	{
+		return store;
+	}
+	
+	@Override
 	public ImmutableList<E> copy()
 	{
 		return this;

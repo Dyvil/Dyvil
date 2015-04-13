@@ -40,6 +40,8 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 		return null; // FIXME
 	}
 	
+	// Simple Getters
+	
 	@Override
 	public int size();
 	
@@ -63,6 +65,8 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	public E get(int index);
+	
+	// Non-mutating Operations
 	
 	@Override
 	public ImmutableList<E> slice(int startIndex, int length);
@@ -97,8 +101,44 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	@Override
 	public ImmutableList<E> sorted(Comparator<? super E> comparator);
 	
-	// Mutating Functions
+	// Mutating Operations
 	
+	@Override
+	public default void resize(int newLength)
+	{
+		throw new ImmutableException("resize() on Immutable List");
+	}
+
+	@Override
+	public default void update(int index, E element)
+	{
+		throw new ImmutableException("update() on Immutable List");
+	}
+
+	@Override
+	public default E set(int index, E element)
+	{
+		throw new ImmutableException("set() on Immutable List");
+	}
+
+	@Override
+	public default void add(int index, E element)
+	{
+		throw new ImmutableException("add() on Immutable List");
+	}
+
+	@Override
+	public default void remove(E element)
+	{
+		throw new ImmutableException("remove() on Immutable List");
+	}
+
+	@Override
+	public default void removeAt(int index)
+	{
+		throw new ImmutableException("removeAt() on Immutable List");
+	}
+
 	@Override
 	public default void $plus$eq(E element)
 	{
@@ -165,47 +205,15 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 		throw new ImmutableException("sort() on Immutable List");
 	}
 	
-	@Override
-	public default void resize(int newLength)
-	{
-		throw new ImmutableException("resize() on Immutable List");
-	}
-	
-	@Override
-	public default void update(int index, E element)
-	{
-		throw new ImmutableException("update() on Immutable List");
-	}
-	
-	@Override
-	public default E set(int index, E element)
-	{
-		throw new ImmutableException("set() on Immutable List");
-	}
-	
-	@Override
-	public default void add(int index, E element)
-	{
-		throw new ImmutableException("add() on Immutable List");
-	}
-	
-	@Override
-	public default void remove(E element)
-	{
-		throw new ImmutableException("remove() on Immutable List");
-	}
-	
-	@Override
-	public default void removeAt(int index)
-	{
-		throw new ImmutableException("removeAt() on Immutable List");
-	}
+	// Searching
 	
 	@Override
 	public int indexOf(E element);
 	
 	@Override
 	public int lastIndexOf(E element);
+	
+	// Copying
 	
 	@Override
 	public ImmutableList<E> copy();
