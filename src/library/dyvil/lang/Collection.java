@@ -1,11 +1,19 @@
 package dyvil.lang;
 
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+
 import dyvil.collections.immutable.ImmutableCollection;
 import dyvil.collections.mutable.MutableCollection;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-public interface Collection<E> extends ArrayConvertible, NilConvertible
+public interface Collection<E> extends Iterable<E>, ArrayConvertible, NilConvertible
 {
 	/**
 	 * Returns the size of this collection, i.e. the number of elements
@@ -27,6 +35,15 @@ public interface Collection<E> extends ArrayConvertible, NilConvertible
 		return this.size() == 0;
 	}
 	
+	@Override
+	public Iterator<E> iterator();
+	
+	@Override
+	public Spliterator<E> spliterator();
+	
+	@Override
+	public void forEach(Consumer<? super E> action);
+
 	/**
 	 * Returns true if and if only this collection contains the element
 	 * specified by {@code element}
@@ -35,7 +52,7 @@ public interface Collection<E> extends ArrayConvertible, NilConvertible
 	 *            the element
 	 * @return true, if this collection contains the element
 	 */
-	public boolean $qmark(E element);
+	public boolean $qmark(Object element);
 	
 	/**
 	 * Returns a collection that contains all elements of this collection plus
@@ -64,26 +81,6 @@ public interface Collection<E> extends ArrayConvertible, NilConvertible
 	public Collection<? extends E> $plus(Collection<? extends E> collection);
 	
 	/**
-	 * Adds the element given by {@code element} to this collection. This method
-	 * should throw an {@link ImmutableException} if this is an immutable
-	 * collection.
-	 * 
-	 * @param element
-	 *            the element to be added
-	 */
-	public void $plus$eq(E element);
-	
-	/**
-	 * Adds all elements of the given {@code collection} to this collection.
-	 * This method should throw an {@link ImmutableException} if this is an
-	 * immutable collection.
-	 * 
-	 * @param collection
-	 *            the collection of elements to be added
-	 */
-	public void $plus$eq(Collection<? extends E> collection);
-	
-	/**
 	 * Returns a collection that contains all elements of this collection
 	 * excluding the element given by {@code element}. It the depends on the
 	 * type of this collection if this method returns a new collection or the
@@ -110,6 +107,49 @@ public interface Collection<E> extends ArrayConvertible, NilConvertible
 	public Collection<? extends E> $minus(Collection<? extends E> collection);
 	
 	/**
+	 * Returns a collection that contains all elements of this collection that
+	 * are present in the given collection. It the depends on the type of this
+	 * collection if this method returns a new collection or the elements are
+	 * simply removed from this collection.
+	 * 
+	 * @param collection
+	 *            the collection of elements to be retained
+	 * @return a collection that contains all elements of this collection that
+	 *         are present in the given collection
+	 */
+	public Collection<? extends E> $amp(Collection<? extends E> collection);
+
+	public <R> Collection<R> mapped(Function<? super E, ? extends R> mapper);
+
+	public <R> Collection<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
+
+	public Collection<E> filtered(Predicate<? super E> condition);
+
+	public Collection<E> sorted();
+
+	public Collection<E> sorted(Comparator<? super E> comparator);
+
+	/**
+	 * Adds the element given by {@code element} to this collection. This method
+	 * should throw an {@link ImmutableException} if this is an immutable
+	 * collection.
+	 * 
+	 * @param element
+	 *            the element to be added
+	 */
+	public void $plus$eq(E element);
+
+	/**
+	 * Adds all elements of the given {@code collection} to this collection.
+	 * This method should throw an {@link ImmutableException} if this is an
+	 * immutable collection.
+	 * 
+	 * @param collection
+	 *            the collection of elements to be added
+	 */
+	public void $plus$eq(Collection<? extends E> collection);
+
+	/**
 	 * Removes the element given by {@code element} from this collection. This
 	 * method should throw an {@link ImmutableException} if this is an immutable
 	 * collection.
@@ -130,19 +170,6 @@ public interface Collection<E> extends ArrayConvertible, NilConvertible
 	public void $minus$eq(Collection<? extends E> collection);
 	
 	/**
-	 * Returns a collection that contains all elements of this collection that
-	 * are present in the given collection. It the depends on the type of this
-	 * collection if this method returns a new collection or the elements are
-	 * simply removed from this collection.
-	 * 
-	 * @param collection
-	 *            the collection of elements to be retained
-	 * @return a collection that contains all elements of this collection that
-	 *         are present in the given collection
-	 */
-	public Collection<? extends E> $amp(Collection<? extends E> collection);
-	
-	/**
 	 * Removes all elements of this collection that are not present in the given
 	 * {@code collection}. This method should throw an
 	 * {@link ImmutableException} if this is an immutable collection.
@@ -151,6 +178,18 @@ public interface Collection<E> extends ArrayConvertible, NilConvertible
 	 *            the collection of elements to be retained
 	 */
 	public void $amp$eq(Collection<? extends E> collection);
+	
+	public void clear();
+	
+	public void map(UnaryOperator<E> mapper);
+	
+	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	
+	public void filter(Predicate<? super E> condition);
+	
+	public void sort();
+	
+	public void sort(Comparator<? super E> comparator);
 	
 	/**
 	 * Creates a copy of this collection. The general contract of this method is

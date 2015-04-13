@@ -1,4 +1,4 @@
-package dyvil.collections.mutable;
+package dyvil.lang;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -8,10 +8,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.collections.immutable.ImmutableCollection;
-import dyvil.lang.Collection;
+import dyvil.collections.immutable.ImmutableList;
+import dyvil.collections.mutable.MutableList;
 
-public interface MutableCollection<E> extends Collection<E>
+public interface List<E> extends Collection<E>
 {
 	@Override
 	public int size();
@@ -31,37 +31,41 @@ public interface MutableCollection<E> extends Collection<E>
 	@Override
 	public boolean $qmark(Object element);
 	
-	@Override
-	public MutableCollection<E> $plus(E element);
+	public E apply(int index);
+	
+	public E get(int index);
+	
+	public List<E> slice(int startIndex, int length);
 	
 	@Override
-	public MutableCollection<? extends E> $plus(Collection<? extends E> collection);
+	public List<E> $plus(E element);
 	
 	@Override
-	public MutableCollection<E> $minus(E element);
+	public List<? extends E> $plus(Collection<? extends E> collection);
 	
 	@Override
-	public MutableCollection<? extends E> $minus(Collection<? extends E> collection);
+	public List<E> $minus(E element);
 	
 	@Override
-	public MutableCollection<? extends E> $amp(Collection<? extends E> collection);
+	public List<? extends E> $minus(Collection<? extends E> collection);
 	
 	@Override
-	public <R> MutableCollection<R> mapped(Function<? super E, ? extends R> mapper);
+	public List<? extends E> $amp(Collection<? extends E> collection);
 	
 	@Override
-	public <R> MutableCollection<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
+	public <R> List<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
-	public MutableCollection<E> filtered(Predicate<? super E> condition);
+	public <R> List<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
 	
 	@Override
-	public MutableCollection<E> sorted();
+	public List<E> filtered(Predicate<? super E> condition);
 	
 	@Override
-	public MutableCollection<E> sorted(Comparator<? super E> comparator);
+	public List<E> sorted();
 	
-	// Mutating Functions
+	@Override
+	public List<E> sorted(Comparator<? super E> comparator);
 	
 	@Override
 	public void $plus$eq(E element);
@@ -96,15 +100,32 @@ public interface MutableCollection<E> extends Collection<E>
 	@Override
 	public void sort(Comparator<? super E> comparator);
 	
-	@Override
-	public MutableCollection<E> copy();
+	// Mutating Operations
+	
+	public void resize(int newLength);
+	
+	public void update(int index, E element);
+	
+	public E set(int index, E element);
+	
+	public void add(int index, E element);
+	
+	public void remove(E element);
+	
+	public void removeAt(int index);
+	
+	// Search Operations
+	
+	public int indexOf(E element);
+	
+	public int lastIndexOf(E element);
 	
 	@Override
-	public default MutableCollection<E> mutable()
-	{
-		return this;
-	}
+	public List<E> copy();
 	
 	@Override
-	public ImmutableCollection<E> immutable();
+	public MutableList<E> mutable();
+	
+	@Override
+	public ImmutableList<E> immutable();
 }
