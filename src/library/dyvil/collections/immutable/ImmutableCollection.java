@@ -13,7 +13,7 @@ import dyvil.collections.mutable.MutableCollection;
 import dyvil.lang.Collection;
 import dyvil.lang.ImmutableException;
 
-public interface ImmutableCollection<E> extends Collection<E>
+public interface ImmutableCollection<E> extends Collection<E>, Immutable
 {
 	@Override
 	public int size();

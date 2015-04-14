@@ -13,7 +13,7 @@ import dyvil.lang.ImmutableException;
 import dyvil.lang.Map;
 import dyvil.lang.tuple.Tuple2;
 
-public interface ImmutableMap<K, V> extends Map<K, V>
+public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 {
 	// Simple Getters
 	
