@@ -68,7 +68,8 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	}
 	
 	/**
-	 * Creates an {@link Iterator} over the elements of this collection.
+	 * Creates and returns an {@link Iterator} over the elements of this
+	 * collection.
 	 * 
 	 * @return an iterator over the elements of this collection
 	 */
@@ -76,7 +77,8 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	public Iterator<E> iterator();
 	
 	/**
-	 * Creates a {@link Spliterator} over the elements of this collection.
+	 * Creates and returns a {@link Spliterator} over the elements of this
+	 * collection.
 	 * 
 	 * @return a spliterator over the elements of this collection
 	 */
@@ -121,7 +123,7 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 * @return a collection that contains all elements of this collection plus
 	 *         all elements of the collection
 	 */
-	public Collection<? extends E> $plus(Collection<? extends E> collection);
+	public Collection<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	/**
 	 * Returns a collection that contains all elements of this collection
@@ -143,7 +145,7 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 * @return a collection that contains all elements of this collection
 	 *         excluding all elements of the collection
 	 */
-	public Collection<? extends E> $minus(Collection<? extends E> collection);
+	public Collection<? extends E> $minus$minus(Collection<? extends E> collection);
 	
 	/**
 	 * Returns a collection that contains all elements of this collection that
@@ -216,6 +218,17 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	// Mutating Operations
 	
 	/**
+	 * Adds the element given by {@code element} to this collection and returns
+	 * the old element, if any. This method should throw an
+	 * {@link ImmutableException} if this is an immutable collection.
+	 * 
+	 * @param element
+	 *            the element to be added
+	 * @return the old element
+	 */
+	public E add(E element);
+	
+	/**
 	 * Adds the element given by {@code element} to this collection. This method
 	 * should throw an {@link ImmutableException} if this is an immutable
 	 * collection.
@@ -233,7 +246,20 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 * @param collection
 	 *            the collection of elements to be added
 	 */
-	public void $plus$eq(Collection<? extends E> collection);
+	public void $plus$plus$eq(Collection<? extends E> collection);
+	
+	/**
+	 * Removes the given {@code element} from this collection. If the element is
+	 * not present in this list, it is simply ignored and {@code false} is
+	 * returned. Otherwise, if the element has been successfully removed,
+	 * {@code true} is returned.
+	 * 
+	 * @param element
+	 *            the element to be removed
+	 * @return true, iff the element has been removed successfully, false
+	 *         otherwise
+	 */
+	public boolean remove(E element);
 	
 	/**
 	 * Removes the element given by {@code element} from this collection. This
@@ -253,7 +279,7 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 * @param collection
 	 *            the collection of elements to be removed
 	 */
-	public void $minus$eq(Collection<? extends E> collection);
+	public void $minus$minus$eq(Collection<? extends E> collection);
 	
 	/**
 	 * Removes all elements of this collection that are not present in the given

@@ -147,7 +147,7 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public MutableList<? extends E> $plus(Collection<? extends E> collection)
+	public MutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
 		int len = collection.size();
 		Object[] array = new Object[this.size + len];
@@ -182,7 +182,7 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public MutableList<? extends E> $minus(Collection<? extends E> collection)
+	public MutableList<? extends E> $minus$minus(Collection<? extends E> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];
@@ -333,6 +333,13 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
+	public E add(E element)
+	{
+		this.$plus$eq(element);
+		return null;
+	}
+	
+	@Override
 	public void insert(int index, E element)
 	{
 		if (index == this.size)
@@ -370,32 +377,33 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public void remove(E element)
+	public boolean remove(E element)
 	{
 		int index = this.indexOf(element);
 		if (index < 0)
 		{
-			return;
+			return false;
 		}
 		
-		int numMoved = this.size - index - 1;
+		int numMoved = --this.size - index;
 		if (numMoved > 0)
 		{
 			System.arraycopy(this.elements, index + 1, this.elements, index, numMoved);
 		}
-		this.elements[--this.size] = null;
+		this.elements[this.size] = null;
+		return true;
 	}
 	
 	@Override
 	public void removeAt(int index)
 	{
 		this.rangeCheck(index);
-		int numMoved = this.size - index - 1;
+		int numMoved = --this.size - index;
 		if (numMoved > 0)
 		{
 			System.arraycopy(this.elements, index + 1, this.elements, index, numMoved);
 		}
-		this.elements[--this.size] = null;
+		this.elements[this.size] = null;
 	}
 	
 	@Override
@@ -406,7 +414,7 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public void $plus$eq(Collection<? extends E> collection)
+	public void $plus$plus$eq(Collection<? extends E> collection)
 	{
 		int len = collection.size();
 		this.ensureCapacity(this.size + len);
@@ -432,7 +440,7 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public void $minus$eq(Collection<? extends E> collection)
+	public void $minus$minus$eq(Collection<? extends E> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];

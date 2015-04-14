@@ -40,13 +40,13 @@ public interface ImmutableCollection<E> extends Collection<E>
 	public ImmutableCollection<E> $plus(E element);
 	
 	@Override
-	public ImmutableCollection<? extends E> $plus(Collection<? extends E> collection);
+	public ImmutableCollection<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	@Override
 	public ImmutableCollection<E> $minus(E element);
 	
 	@Override
-	public ImmutableCollection<? extends E> $minus(Collection<? extends E> collection);
+	public ImmutableCollection<? extends E> $minus$minus(Collection<? extends E> collection);
 	
 	@Override
 	public ImmutableCollection<? extends E> $amp(Collection<? extends E> collection);
@@ -67,15 +67,27 @@ public interface ImmutableCollection<E> extends Collection<E>
 	public ImmutableCollection<E> sorted(Comparator<? super E> comparator);
 	
 	@Override
+	public default E add(E element)
+	{
+		throw new ImmutableException("add() on Immutable Collection");
+	}
+	
+	@Override
 	public default void $plus$eq(E entry)
 	{
 		throw new ImmutableException("+= on Immutable Collection");
 	}
 	
 	@Override
-	public default void $plus$eq(Collection<? extends E> collection)
+	public default void $plus$plus$eq(Collection<? extends E> collection)
 	{
-		throw new ImmutableException("+= on Immutable Collection");
+		throw new ImmutableException("++= on Immutable Collection");
+	}
+	
+	@Override
+	public default boolean remove(E element)
+	{
+		throw new ImmutableException("remove() on Immutable Collection");
 	}
 	
 	@Override
@@ -85,9 +97,9 @@ public interface ImmutableCollection<E> extends Collection<E>
 	}
 	
 	@Override
-	public default void $minus$eq(Collection<? extends E> collection)
+	public default void $minus$minus$eq(Collection<? extends E> collection)
 	{
-		throw new ImmutableException("-= on Immutable Collection");
+		throw new ImmutableException("--= on Immutable Collection");
 	}
 	
 	@Override

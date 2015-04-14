@@ -82,13 +82,13 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public ImmutableList<E> $plus(E element);
 	
 	@Override
-	public ImmutableList<? extends E> $plus(Collection<? extends E> collection);
+	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	@Override
 	public ImmutableList<E> $minus(E element);
 	
 	@Override
-	public ImmutableList<? extends E> $minus(Collection<? extends E> collection);
+	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection);
 	
 	@Override
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection);
@@ -140,13 +140,19 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	}
 	
 	@Override
+	public default E add(E element)
+	{
+		throw new ImmutableException("add() on Immutable List");
+	}
+	
+	@Override
 	public default E add(int index, E element)
 	{
 		throw new ImmutableException("add() on Immutable List");
 	}
 	
 	@Override
-	public default void remove(E element)
+	public default boolean remove(E element)
 	{
 		throw new ImmutableException("remove() on Immutable List");
 	}
@@ -164,9 +170,9 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	}
 	
 	@Override
-	public default void $plus$eq(Collection<? extends E> collection)
+	public default void $plus$plus$eq(Collection<? extends E> collection)
 	{
-		throw new ImmutableException("+= on Immutable List");
+		throw new ImmutableException("++= on Immutable List");
 	}
 	
 	@Override
@@ -176,9 +182,9 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	}
 	
 	@Override
-	public default void $minus$eq(Collection<? extends E> collection)
+	public default void $minus$minus$eq(Collection<? extends E> collection)
 	{
-		throw new ImmutableException("-= on Immutable List");
+		throw new ImmutableException("--= on Immutable List");
 	}
 	
 	@Override

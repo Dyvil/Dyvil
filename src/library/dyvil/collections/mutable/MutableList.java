@@ -12,9 +12,8 @@ import java.util.function.UnaryOperator;
 import dyvil.collections.immutable.ImmutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
-import dyvil.lang.literal.ArrayConvertible;
 
-public interface MutableList<E> extends MutableCollection<E>, List<E>, ArrayConvertible
+public interface MutableList<E> extends MutableCollection<E>, List<E>
 {
 	public static <E> MutableList<E> apply()
 	{
@@ -82,13 +81,13 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>, ArrayConv
 	public MutableList<E> $plus(E element);
 	
 	@Override
-	public MutableList<? extends E> $plus(Collection<? extends E> collection);
+	public MutableList<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	@Override
 	public MutableList<E> $minus(E element);
 	
 	@Override
-	public MutableList<? extends E> $minus(Collection<? extends E> collection);
+	public MutableList<? extends E> $minus$minus(Collection<? extends E> collection);
 	
 	@Override
 	public MutableList<? extends E> $amp(Collection<? extends E> collection);
@@ -128,7 +127,7 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>, ArrayConv
 	public void insert(int index, E element);
 	
 	@Override
-	public void remove(E element);
+	public boolean remove(E element);
 	
 	@Override
 	public void removeAt(int index);
@@ -137,13 +136,13 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>, ArrayConv
 	public void $plus$eq(E element);
 	
 	@Override
-	public void $plus$eq(Collection<? extends E> collection);
+	public void $plus$plus$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void $minus$eq(E element);
 	
 	@Override
-	public void $minus$eq(Collection<? extends E> collection);
+	public void $minus$minus$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void $amp$eq(Collection<? extends E> collection);

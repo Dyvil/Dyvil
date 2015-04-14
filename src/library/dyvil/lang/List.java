@@ -9,10 +9,22 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import dyvil.collections.immutable.ImmutableList;
+import dyvil.collections.mutable.ArrayList;
 import dyvil.collections.mutable.MutableList;
+import dyvil.lang.literal.ArrayConvertible;
 
-public interface List<E> extends Collection<E>
+public interface List<E> extends Collection<E>, ArrayConvertible
 {
+	public static <E> List<E> apply()
+	{
+		return new ArrayList();
+	}
+	
+	public static <E> List<E> apply(E[] array)
+	{
+		return new ArrayList(array);
+	}
+	
 	// Simple getters
 	
 	@Override
@@ -66,13 +78,13 @@ public interface List<E> extends Collection<E>
 	public List<E> $plus(E element);
 	
 	@Override
-	public List<? extends E> $plus(Collection<? extends E> collection);
+	public List<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	@Override
 	public List<E> $minus(E element);
 	
 	@Override
-	public List<? extends E> $minus(Collection<? extends E> collection);
+	public List<? extends E> $minus$minus(Collection<? extends E> collection);
 	
 	@Override
 	public List<? extends E> $amp(Collection<? extends E> collection);
@@ -162,6 +174,9 @@ public interface List<E> extends Collection<E>
 	 */
 	public void insert(int index, E element);
 	
+	@Override
+	public E add(E element);
+	
 	/**
 	 * Inserts the element at the given {@code index} of this list. Unlike
 	 * {@link #insert(int, Object)}, this method will not throw any exception if
@@ -176,14 +191,8 @@ public interface List<E> extends Collection<E>
 	 */
 	public E add(int index, E element);
 	
-	/**
-	 * Removes the given {@code element} from this list. If the element is not
-	 * present in this list, it is simply ignored.
-	 * 
-	 * @param element
-	 *            the element to be removed
-	 */
-	public void remove(E element);
+	@Override
+	public boolean remove(E element);
 	
 	/**
 	 * Removes the element at the given {@code index} from this list. This
@@ -200,13 +209,13 @@ public interface List<E> extends Collection<E>
 	public void $plus$eq(E element);
 	
 	@Override
-	public void $plus$eq(Collection<? extends E> collection);
+	public void $plus$plus$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void $minus$eq(E element);
 	
 	@Override
-	public void $minus$eq(Collection<? extends E> collection);
+	public void $minus$minus$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void $amp$eq(Collection<? extends E> collection);

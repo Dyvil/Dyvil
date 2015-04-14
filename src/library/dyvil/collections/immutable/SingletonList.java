@@ -96,7 +96,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $plus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
 		return ImmutableList.apply(collection);
 	}
@@ -112,7 +112,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $minus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection)
 	{
 		if (collection.$qmark(this.element))
 		{
