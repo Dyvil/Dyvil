@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-import dyvil.lang.annotation.sealed;
+import dyvil.annotation.sealed;
 
 public @sealed interface Boolean$
 {

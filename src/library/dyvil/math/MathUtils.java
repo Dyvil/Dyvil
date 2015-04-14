@@ -1,7 +1,7 @@
 package dyvil.math;
 
-import dyvil.lang.annotation.Utility;
-import dyvil.lang.annotation.infix;
+import dyvil.annotation.Utility;
+import dyvil.annotation.infix;
 
 /**
  * The {@linkplain Utility utility class} <b>MathUtils</b> can be used for

@@ -4,7 +4,7 @@ import jdk.internal.org.objectweb.asm.Label;
 
 import org.objectweb.asm.util.Printer;
 
-import dyvil.lang.annotation.Intrinsic;
+import dyvil.annotation.Intrinsic;
 
 /**
  * The <b>Opcodes</b> interface declares all opcodes that can be used in

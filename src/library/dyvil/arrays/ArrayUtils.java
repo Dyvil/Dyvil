@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import dyvil.lang.annotation.Utility;
-import dyvil.lang.annotation.infix;
+import dyvil.annotation.Utility;
+import dyvil.annotation.infix;
 
 /**
  * The {@linkplain Utility utility interface} <b>ArrayUtils</b> can be used for

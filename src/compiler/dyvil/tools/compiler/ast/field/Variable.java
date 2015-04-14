@@ -68,7 +68,7 @@ public final class Variable extends Member implements IVariable
 	{
 		switch (type)
 		{
-		case "dyvil/lang/annotation/lazy":
+		case "dyvil/annotation/lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
 		}

@@ -333,7 +333,7 @@ public class Property extends Member implements IProperty, IContext
 			}
 			if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
 			{
-				mw.addAnnotation("Ldyvil/lang/annotation/sealed;", false);
+				mw.addAnnotation("Ldyvil/annotation/sealed;", false);
 			}
 			
 			mw.begin();
@@ -361,7 +361,7 @@ public class Property extends Member implements IProperty, IContext
 			}
 			if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
 			{
-				mw.addAnnotation("Ldyvil/lang/annotation/sealed;", false);
+				mw.addAnnotation("Ldyvil/annotation/sealed;", false);
 			}
 			
 			this.setterParameter.write(mw);

@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-import dyvil.lang.annotation.infix;
+import dyvil.annotation.infix;
 
 public interface Integer extends Number
 {

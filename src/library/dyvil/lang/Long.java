@@ -1,8 +1,8 @@
 package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
-import dyvil.lang.annotation.Intrinsic;
-import dyvil.lang.annotation.prefix;
+import dyvil.annotation.Intrinsic;
+import dyvil.annotation.prefix;
 
 public class Long implements Integer
 {

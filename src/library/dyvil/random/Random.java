@@ -1,6 +1,6 @@
 package dyvil.random;
 
-import dyvil.lang.annotation.infix;
+import dyvil.annotation.infix;
 
 public interface Random
 {

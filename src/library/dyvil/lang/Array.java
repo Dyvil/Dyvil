@@ -1,9 +1,9 @@
 package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
-import dyvil.lang.annotation.Intrinsic;
-import dyvil.lang.annotation.infix;
-import dyvil.lang.annotation.sealed;
+import dyvil.annotation.Intrinsic;
+import dyvil.annotation.infix;
+import dyvil.annotation.sealed;
 
 public @sealed interface Array
 {

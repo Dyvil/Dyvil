@@ -1,9 +1,9 @@
 package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
-import dyvil.lang.annotation.Intrinsic;
-import dyvil.lang.annotation.infix;
-import dyvil.lang.annotation.inline;
+import dyvil.annotation.Intrinsic;
+import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.lang.tuple.Tuple2;
 
 public final class Predef

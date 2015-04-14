@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dyvil.lang.annotation.Utility;
-import dyvil.lang.annotation.infix;
-import dyvil.lang.annotation.inline;
+import dyvil.annotation.Utility;
+import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.math.MathUtils;
 import dyvil.random.Random;
 

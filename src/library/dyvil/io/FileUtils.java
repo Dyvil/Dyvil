@@ -6,8 +6,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.List;
 
-import dyvil.lang.annotation.Utility;
-import dyvil.lang.annotation.infix;
+import dyvil.annotation.Utility;
+import dyvil.annotation.infix;
 
 /**
  * The {@linkplain Utility utility interface} <b>FileUtils</b> can be used for

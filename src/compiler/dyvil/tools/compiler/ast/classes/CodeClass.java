@@ -1131,11 +1131,11 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
 		{
-			writer.visitAnnotation("Ldyvil/lang/annotation/object;", true);
+			writer.visitAnnotation("Ldyvil/annotation/object;", true);
 		}
 		if ((this.modifiers & Modifiers.SEALED) != 0)
 		{
-			writer.visitAnnotation("Ldyvil/lang/annotation/sealed;", false);
+			writer.visitAnnotation("Ldyvil/annotation/sealed;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
 		{

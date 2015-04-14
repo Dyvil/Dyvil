@@ -9,9 +9,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
+import dyvil.annotation.Utility;
+import dyvil.annotation.infix;
 import dyvil.arrays.ArrayUtils;
-import dyvil.lang.annotation.Utility;
-import dyvil.lang.annotation.infix;
 
 /**
  * The {@linkplain Utility utility interface} <b>WebUtils</b> can be used for

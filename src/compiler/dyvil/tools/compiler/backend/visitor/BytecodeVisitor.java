@@ -41,7 +41,7 @@ public final class BytecodeVisitor extends MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		if ("Ldyvil/lang/annotation/inline;".equals(type))
+		if ("Ldyvil/annotation/inline;".equals(type))
 		{
 			this.method.addModifier(Modifiers.INLINE);
 			this.inline = true;

@@ -84,16 +84,16 @@ public class Field extends Member implements IField
 	{
 		switch (type)
 		{
-		case "dyvil/lang/annotation/lazy":
+		case "dyvil/annotation/lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
-		case "dyvil/lang/annotation/sealed":
+		case "dyvil/annotation/sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
-		case "dyvil/lang/annotation/Transient":
+		case "dyvil/annotation/Transient":
 			this.modifiers |= Modifiers.TRANSIENT;
 			return false;
-		case "dyvil/lang/annotation/Volatile":
+		case "dyvil/annotation/Volatile":
 			this.modifiers |= Modifiers.VOLATILE;
 			return false;
 		case "java/lang/Deprecated":
@@ -210,7 +210,7 @@ public class Field extends Member implements IField
 				this.annotations[i].write(mw);
 			}
 			
-			mw.addAnnotation("Ldyvil/lang/annotation/lazy;", false);
+			mw.addAnnotation("Ldyvil/annotation/lazy;", false);
 			
 			mw.begin();
 			this.value.writeExpression(mw);
@@ -222,7 +222,7 @@ public class Field extends Member implements IField
 		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(), this.type.getSignature(), null);
 		if ((this.modifiers & Modifiers.SEALED) != 0)
 		{
-			fv.visitAnnotation("Ldyvil/lang/annotation/sealed", false);
+			fv.visitAnnotation("Ldyvil/annotation/sealed", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
 		{

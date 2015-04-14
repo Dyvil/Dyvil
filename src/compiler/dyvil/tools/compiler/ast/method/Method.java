@@ -215,22 +215,22 @@ public class Method extends Member implements IMethod
 	{
 		switch (type)
 		{
-		case "dyvil/lang/annotation/inline":
+		case "dyvil/annotation/inline":
 			this.modifiers |= Modifiers.INLINE;
 			return false;
-		case "dyvil/lang/annotation/infix":
+		case "dyvil/annotation/infix":
 			this.modifiers |= Modifiers.INFIX;
 			return false;
-		case "dyvil/lang/annotation/prefix":
+		case "dyvil/annotation/prefix":
 			this.modifiers |= Modifiers.PREFIX;
 			return false;
-		case "dyvil/lang/annotation/sealed":
+		case "dyvil/annotation/sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
-		case "dyvil/lang/annotation/Native":
+		case "dyvil/annotation/Native":
 			this.modifiers |= Modifiers.NATIVE;
 			return false;
-		case "dyvil/lang/annotation/Strict":
+		case "dyvil/annotation/Strict":
 			this.modifiers |= Modifiers.STRICT;
 			return false;
 		case "java/lang/Deprecated":
@@ -906,15 +906,15 @@ public class Method extends Member implements IMethod
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
 		{
-			mw.addAnnotation("Ldyvil/lang/annotation/inline;", false);
+			mw.addAnnotation("Ldyvil/annotation/inline;", false);
 		}
 		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			mw.addAnnotation("Ldyvil/lang/annotation/infix;", false);
+			mw.addAnnotation("Ldyvil/annotation/infix;", false);
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			mw.addAnnotation("Ldyvil/lang/annotation/prefix;", false);
+			mw.addAnnotation("Ldyvil/annotation/prefix;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
 		{
@@ -922,7 +922,7 @@ public class Method extends Member implements IMethod
 		}
 		if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
 		{
-			mw.addAnnotation("Ldyvil/lang/annotation/sealed;", false);
+			mw.addAnnotation("Ldyvil/annotation/sealed;", false);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

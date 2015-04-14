@@ -109,10 +109,10 @@ public final class ClassParameter extends Member implements IParameter
 	{
 		switch (type)
 		{
-		case "dyvil/lang/annotation/var":
+		case "dyvil/annotation/var":
 			this.modifiers |= Modifiers.VAR;
 			return false;
-		case "dyvil/lang/annotation/lazy":
+		case "dyvil/annotation/lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
 		}
@@ -225,7 +225,7 @@ public final class ClassParameter extends Member implements IParameter
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{
-			writer.addParameterAnnotation(this.index, "Ldyvil/lang/annotation/var;", true);
+			writer.addParameterAnnotation(this.index, "Ldyvil/annotation/var;", true);
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)

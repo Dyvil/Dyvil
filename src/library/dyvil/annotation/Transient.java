@@ -1,4 +1,4 @@
-package dyvil.lang.annotation;
+package dyvil.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Volatile
+public @interface Transient
 {
 }

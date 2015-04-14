@@ -27,7 +27,7 @@ public interface Types
 	Type			PREDEF			= new Type("dyvil/lang/Predef", Name.getQualified("Predef"));
 	Type			ARRAY			= new Type("dyvil/lang/Array", Name.getQualified("Array"));
 	
-	Type			AIntrinsic		= new Type("dyvil/lang/annotation/Intrinsic", Name.getQualified("Intrinsic"));
+	Type			AIntrinsic		= new Type("dyvil/annotation/Intrinsic", Name.getQualified("Intrinsic"));
 	Type			AOverride		= new Type("java/lang/Override", Name.getQualified("Override"));
 	Type			ARetention		= new Type("java/lang/annotation/Retention", Name.getQualified("Retention"));
 	Type			ATarget			= new Type("java/lang/annotation/Target", Name.getQualified("Target"));

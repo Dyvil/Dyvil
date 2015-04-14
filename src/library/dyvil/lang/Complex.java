@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-import dyvil.lang.annotation.prefix;
+import dyvil.annotation.prefix;
 
 public class Complex implements Number
 {

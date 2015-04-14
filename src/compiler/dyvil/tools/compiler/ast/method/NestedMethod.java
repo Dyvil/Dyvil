@@ -175,15 +175,15 @@ public class NestedMethod extends Method
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
 		{
-			mw.addAnnotation("Ldyvil/lang/annotation/inline;", false);
+			mw.addAnnotation("Ldyvil/annotation/inline;", false);
 		}
 		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			mw.addAnnotation("Ldyvil/lang/annotation/infix;", false);
+			mw.addAnnotation("Ldyvil/annotation/infix;", false);
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			mw.addAnnotation("Ldyvil/lang/annotation/prefix;", false);
+			mw.addAnnotation("Ldyvil/annotation/prefix;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
 		{

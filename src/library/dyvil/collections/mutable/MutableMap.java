@@ -1,4 +1,4 @@
-package dyvil.maps.mutable;
+package dyvil.collections.mutable;
 
 import dyvil.lang.Map;
 

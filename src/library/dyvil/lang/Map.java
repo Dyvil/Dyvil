@@ -8,9 +8,9 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+import dyvil.collections.immutable.ImmutableMap;
+import dyvil.collections.mutable.MutableMap;
 import dyvil.lang.tuple.Tuple2;
-import dyvil.maps.immutable.ImmutableMap;
-import dyvil.maps.mutable.MutableMap;
 
 public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 {

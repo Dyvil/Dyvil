@@ -1,4 +1,4 @@
-package dyvil.maps.immutable;
+package dyvil.collections.immutable;
 
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -8,10 +8,10 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+import dyvil.collections.mutable.MutableMap;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.Map;
 import dyvil.lang.tuple.Tuple2;
-import dyvil.maps.mutable.MutableMap;
 
 public interface ImmutableMap<K, V> extends Map<K, V>
 {

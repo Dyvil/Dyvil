@@ -2,8 +2,8 @@ package dyvil.strings;
 
 import java.util.Random;
 
-import dyvil.lang.annotation.Utility;
-import dyvil.lang.annotation.infix;
+import dyvil.annotation.Utility;
+import dyvil.annotation.infix;
 
 /**
  * The {@linkplain Utility utility class} <b>CharUtils</b> can be used for
