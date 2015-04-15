@@ -4,6 +4,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Locale;
 
+/**
+ * A {@link PrintStream} implementation that delegates calls to {@code print()}
+ * and {@code println()} methods to an underlying {@link Appendable}.
+ * 
+ * @author Clashsoft
+ * @version 1.0
+ */
 public class AppendableOutputStream extends PrintStream
 {
 	private Appendable	appendable;

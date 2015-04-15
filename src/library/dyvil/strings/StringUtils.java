@@ -1,15 +1,13 @@
 package dyvil.strings;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dyvil.annotation.Utility;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collections.mutable.ArrayList;
+import dyvil.lang.List;
 import dyvil.math.MathUtils;
 import dyvil.random.Random;
 
@@ -42,70 +40,112 @@ public interface StringUtils
 		return String.format(format, args);
 	}
 	
-	public static List<String> getWords(String s, boolean spacesOnly)
+	/**
+	 * Returns a list of words contained in the given {@code string}. A 'word'
+	 * is described as a sequence of letter characters, which are themselves
+	 * described in terms of {@link CharUtils#isLetter(char)}. Every other
+	 * non-etter character is simply ommitted from the list of words.
+	 * 
+	 * @param string
+	 *            the string to split
+	 * @return a list of words in the given string
+	 */
+	public static @infix List<String> getWords(String string)
 	{
 		List<String> words = new ArrayList();
-		StringBuilder temp = new StringBuilder(10);
+		StringBuilder buffer = new StringBuilder(10);
 		
-		for (int i = 0; i < s.length(); i++)
+		for (int i = 0; i < string.length(); i++)
 		{
-			char c = s.charAt(i);
-			temp.append(c);
-			if (CharUtils.isWhitespace(c) || !spacesOnly && !CharUtils.isLetter(c))
+			char c = string.charAt(i);
+			buffer.append(c);
+			if (!CharUtils.isLetter(c))
 			{
-				words.add(temp.toString());
-				temp.delete(0, temp.length());
+				words.add(buffer.toString());
+				buffer.delete(0, buffer.length());
 				continue;
 			}
 		}
 		
-		if (temp.length() > 0)
+		if (buffer.length() > 0)
 		{
-			words.add(temp.toString());
+			words.add(buffer.toString());
 		}
 		
 		return words;
 	}
 	
-	public static List<String> cutString(String s, int maxLength)
+	/**
+	 * Trims the given {@code string} to lines of the maximum length
+	 * {@code maxLength}. This is done by {@link String#split(String) splitting}
+	 * the {@code string} into a list of tokens separated by whitespace
+	 * characters, and adding the words separated by a single whitespace to a
+	 * line buffer. As soon as the line buffer reaches the {@code maxLength},
+	 * the algorithm adds the line to a list collecting the lines and proceeds
+	 * with a new, empty line. This is done until all words have been processed,
+	 * at which point the generated list of lines will be returned.
+	 * 
+	 * @param string
+	 * @param maxLength
+	 * @return
+	 */
+	public static @infix List<String> trimLineLength(String string, int maxLength)
 	{
-		List<String> words = getWords(s, false);
-		StringBuilder temp = new StringBuilder(10);
+		String[] words = string.split("\\s");
+		StringBuilder buffer = new StringBuilder(10);
 		List<String> lines = new ArrayList();
 		
 		for (String word : words)
 		{
-			if (temp.length() + word.length() >= maxLength)
+			if (buffer.length() + word.length() >= maxLength)
 			{
-				lines.add(temp.toString());
-				temp.delete(0, temp.length());
+				lines.add(buffer.toString());
+				buffer.delete(0, buffer.length());
 			}
-			temp.append(word);
+			buffer.append(word).append(' ');
 		}
-		if (temp.length() > 0)
+		if (buffer.length() > 0)
 		{
-			lines.add(temp.toString());
+			lines.add(buffer.toString());
 		}
 		
 		return lines;
 	}
 	
-	public static String[] lines(String s)
+	/**
+	 * Splits the given {@code string} into an array of lines separated by
+	 * newline ({@code \n}) characters using it's {@link String#split(String)
+	 * split(String)} method
+	 * 
+	 * @param string
+	 *            the string to split
+	 * @return an array of lines
+	 */
+	public static @infix String[] lines(String string)
 	{
-		if (s == null)
+		if (string == null)
 		{
 			return dyvil.arrays.ArrayUtils.EMPTY_STRING_ARRAY;
 		}
-		return s.split("\n");
+		return string.split("\n");
 	}
 	
-	public static List<String> lineList(String s)
+	/**
+	 * Splits the given {@code string} into a {@link List} of lines separated by
+	 * newline ({@code \n}) characters using it's {@link String#split(String)
+	 * split(String)} method
+	 * 
+	 * @param string
+	 *            the string to split
+	 * @return a List of lines
+	 */
+	public static List<String> lineList(String string)
 	{
-		if (s == null)
+		if (string == null)
 		{
-			return Collections.EMPTY_LIST;
+			return new ArrayList();
 		}
-		return Arrays.asList(s.split("\n"));
+		return new ArrayList(string.split("\n"), true);
 	}
 	
 	/**
@@ -118,7 +158,7 @@ public interface StringUtils
 	 *            the second string
 	 * @return the Levenshtein distance between the two strings
 	 */
-	public static int distance(String s1, String s2)
+	public static @infix int distanceTo(String s1, String s2)
 	{
 		if (s1.equals(s2))
 		{
@@ -157,22 +197,32 @@ public interface StringUtils
 		return a2[len2];
 	}
 	
-	public static @infix String toIdentifier(String s)
+	/**
+	 * Converts the given {@code string} to a valid lower-case identifier. This
+	 * is done by replacing all whitespace characters in the string with
+	 * underscores ({@code _}) and converting all other characters to
+	 * lower-case.
+	 * 
+	 * @param string
+	 *            the string to convert
+	 * @return the string converted to a valid identifier
+	 */
+	public static @infix String toIdentifier(String string)
 	{
-		int len = s.length();
+		int len = string.length();
 		StringBuilder result = new StringBuilder(len);
 		
 		for (int i = 0; i < len; i++)
 		{
-			char c = s.charAt(i);
+			char c = string.charAt(i);
 			
-			if (Character.isWhitespace(c))
+			if (CharUtils.isWhitespace(c))
 			{
 				c = '_';
 			}
 			else
 			{
-				c = Character.toLowerCase(c);
+				c = CharUtils.toLowerCase(c);
 			}
 			
 			result.append(c);
@@ -182,7 +232,7 @@ public interface StringUtils
 	}
 	
 	/**
-	 * Returns the acronym of the given {@link String} {@code s} by removing all
+	 * Converts the given {@code string} to an acronym by removing all
 	 * characters but those at the beginning of a new word.
 	 * <p>
 	 * Example:<br>
@@ -191,22 +241,27 @@ public interface StringUtils
 	 * 
 	 * @param string
 	 *            the string
-	 * @return the initials
+	 * @return the acronym of the string
 	 */
-	public static @infix String toAcronym(String s)
+	public static @infix String toAcronym(String string)
 	{
-		if (s == null || s.isEmpty())
+		if (string == null)
+		{
+			return null;
+		}
+		
+		int len = string.length();
+		if (len <= 0)
 		{
 			return "";
 		}
 		
-		int len = s.length();
 		StringBuilder builder = new StringBuilder(len >> 2);
 		
 		boolean seperator = true;
 		for (int i = 0; i < len; i++)
 		{
-			char c = s.charAt(i);
+			char c = string.charAt(i);
 			if (!CharUtils.isLetter(c))
 			{
 				if (CharUtils.isDigit(c))
@@ -227,24 +282,42 @@ public interface StringUtils
 		return builder.toString();
 	}
 	
-	public static @infix String removeVowels(String s)
+	/**
+	 * Removes the vowels of the given {@code string} in such a way that it is
+	 * still readable and identifiable. This is done by only removing vowels
+	 * that have a consonant to the left <i>and</i> to the right.
+	 * <p>
+	 * Vowels are defined in terms of {@link CharUtils#isVowel(char)}<br>
+	 * Consonants are defined in terms of {@link CharUtils#isConsonant(char)}
+	 * 
+	 * @param string
+	 *            the string to remove the vowels from
+	 * @return a readable acronym-like version of the string with most vowels
+	 *         removed
+	 */
+	public static @infix String removeVowels(String string)
 	{
-		if (s == null || s.isEmpty())
+		if (string == null)
+		{
+			return null;
+		}
+		
+		int len = string.length();
+		if (len <= 0)
 		{
 			return "";
 		}
 		
-		int len = s.length();
 		StringBuilder builder = new StringBuilder(len);
 		
 		char prev = 0;
 		char curr = 0;
-		char next = s.charAt(0);
+		char next = string.charAt(0);
 		for (int i = 1; i < len; i++)
 		{
 			prev = curr;
 			curr = next;
-			next = s.charAt(i);
+			next = string.charAt(i);
 			
 			if (CharUtils.isVowel(curr) && CharUtils.isConsonant(prev) && CharUtils.isConsonant(next))
 			{
@@ -257,12 +330,17 @@ public interface StringUtils
 	
 	public static @infix String toTitleCase(String s)
 	{
-		if (s == null || s.isEmpty())
+		if (s == null)
+		{
+			return null;
+		}
+		
+		int len = s.length();
+		if (len <= 0)
 		{
 			return "";
 		}
 		
-		int len = s.length();
 		StringBuilder builder = new StringBuilder(len);
 		
 		boolean seperator = true;
@@ -290,12 +368,17 @@ public interface StringUtils
 	
 	public static @infix String toLowerCamelCase(String s)
 	{
-		if (s == null || s.isEmpty())
+		if (s == null)
+		{
+			return null;
+		}
+		
+		int len = s.length();
+		if (len <= 0)
 		{
 			return "";
 		}
 		
-		int len = s.length();
 		StringBuilder builder = new StringBuilder(len);
 		
 		boolean seperator = true;
@@ -323,12 +406,17 @@ public interface StringUtils
 	
 	public static @infix String toUpperCamelCase(String s)
 	{
-		if (s == null || s.isEmpty())
+		if (s == null)
+		{
+			return null;
+		}
+		
+		int len = s.length();
+		if (len <= 0)
 		{
 			return "";
 		}
 		
-		int len = s.length();
 		StringBuilder builder = new StringBuilder(len);
 		
 		boolean seperator = true;
@@ -356,12 +444,17 @@ public interface StringUtils
 	
 	public static @infix String toInvertedCase(String s)
 	{
-		if (s == null || s.isEmpty())
+		if (s == null)
+		{
+			return null;
+		}
+		
+		int len = s.length();
+		if (len <= 0)
 		{
 			return "";
 		}
 		
-		int len = s.length();
 		StringBuilder builder = new StringBuilder(len);
 		
 		for (int i = 0; i < len; i++)

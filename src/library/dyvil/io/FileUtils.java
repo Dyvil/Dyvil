@@ -20,6 +20,21 @@ import dyvil.annotation.infix;
 @Utility(File.class)
 public interface FileUtils
 {
+	/**
+	 * Ensures that the given {@code file} exists. If the file does not exist in
+	 * terms of it's {@link File#exists() exists()} method, the file will be
+	 * created by it's {@link File#createNewFile() createNewFile()} method.
+	 * Before that happens, this method ensures that the parent directory of the
+	 * file exists by using it's {@link File#mkdirs() mkdirs()} method.<br>
+	 * If the file exists or has been created successfully, {@code true} will be
+	 * returned from this method. If any {@link IOException} occurs,
+	 * {@code false} will be returned.
+	 * 
+	 * @param file
+	 *            the file to create
+	 * @return true if the file exists or has been created successfully, false
+	 *         otherwise
+	 */
 	public static boolean createFile(File file)
 	{
 		try

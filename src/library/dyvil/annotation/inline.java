@@ -11,7 +11,7 @@ import dyvil.reflect.Modifiers;
  * Annotation for <b>inline</b> methods. Methods annotated as <i>inline</i> will
  * be inlined by the <i>Dyvil Compiler</i> without checking for normal inline
  * conditions. That means that instead of an {@code INVOKE} instruction, the
- * entire body of the method will be inserted.
+ * entire body of the method will be inserted at the call site.
  * 
  * @see Modifiers#INLINE
  * @author Clashsoft

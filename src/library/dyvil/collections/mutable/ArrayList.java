@@ -44,6 +44,12 @@ public class ArrayList<E> implements MutableList<E>
 		this.size = size;
 	}
 	
+	public ArrayList(Object[] elements, boolean trusted)
+	{
+		this.elements = elements;
+		this.size = elements.length;
+	}
+	
 	public ArrayList(Object[] elements, int size, boolean trusted)
 	{
 		this.elements = elements;

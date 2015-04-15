@@ -5,10 +5,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import dyvil.lang.Predef;
+
 /**
- * Annotation for value class methods using JVM instructions instead of an
- * actual method invocation. Instead of a {@code INVOKE} instruction, the
- * compiler inserts the opcodes specified by {@link #value()}.
+ * Annotation for <b>intrinsic</b> methods using JVM instructions for method
+ * invocation. Instead of a {@code INVOKE} instruction, the compiler inserts the
+ * opcodes specified by {@link #value()}. This annotation is primarily used for
+ * methods that have a very common implementation such that simple inlining
+ * performed by the compiler is not efficient enough, since it has to store all
+ * parameters to the inlined call into local variables first. A typical example
+ * for an intrinsic method is the {@link Predef#$eq$eq(Object, Object) ==}
+ * operator in {@link Predef}.
  * <p>
  * The <b>Intrinsic</b> annotation is also designed to work with {@code if} or
  * {@code while} statements and conditional jumps. Jump instructions that would

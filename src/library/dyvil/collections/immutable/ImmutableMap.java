@@ -9,6 +9,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import dyvil.collections.mutable.MutableMap;
+import dyvil.lang.Immutable;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.Map;
 import dyvil.lang.tuple.Tuple2;

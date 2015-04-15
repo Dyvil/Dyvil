@@ -5,10 +5,34 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * A {@link PrintStream} implementation that delegates calls to {@code print()}
+ * and {@code println()} methods to an underlying {@link Logger} using the
+ * loggers {@link Logger#log(Level, String)} method. It is possible to specify a
+ * custom level with a custom name, which will be used as the logging level of
+ * any log records produced by output stream.
+ * 
+ * @author Clashsoft
+ * @version 1.0
+ */
 public class LoggerOutputStream extends PrintStream
 {
 	private Level	level;
 	private Logger	logger;
+	
+	public LoggerOutputStream(Logger logger)
+	{
+		super(System.out, false);
+		this.logger = logger;
+		this.level = Level.INFO;
+	}
+	
+	public LoggerOutputStream(Logger logger, Level level)
+	{
+		super(System.out, false);
+		this.logger = logger;
+		this.level = level;
+	}
 	
 	public LoggerOutputStream(Logger logger, String name)
 	{
