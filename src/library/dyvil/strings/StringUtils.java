@@ -25,6 +25,8 @@ import dyvil.random.Random;
 @Utility(String.class)
 public interface StringUtils
 {
+	public static final String[]	EMPTY_STRING_ARRAY	= new String[0];
+	
 	/**
 	 * Formats the given {@link String} {@code format} with the given
 	 * {@code Object[] args} using {@link String#format(String, Object...)}.
@@ -123,9 +125,9 @@ public interface StringUtils
 	 */
 	public static @infix String[] lines(String string)
 	{
-		if (string == null)
+		if (string == null || string.isEmpty())
 		{
-			return dyvil.arrays.ArrayUtils.EMPTY_STRING_ARRAY;
+			return EMPTY_STRING_ARRAY;
 		}
 		return string.split("\n");
 	}

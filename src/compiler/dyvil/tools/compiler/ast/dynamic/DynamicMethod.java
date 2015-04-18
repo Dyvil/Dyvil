@@ -6,7 +6,7 @@ import java.util.List;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 
-import dyvil.arrays.ArrayUtils;
+import dyvil.arrays.ObjectArray;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -436,7 +436,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 		desc.append(')');
 		desc.append("Ljava/lang/Object;");
 		
-		writer.writeInvokeDynamic(this.name.qualified, desc.toString(), BOOTSTRAP, ArrayUtils.EMPTY_OBJECT_ARRAY);
+		writer.writeInvokeDynamic(this.name.qualified, desc.toString(), BOOTSTRAP, ObjectArray.EMPTY);
 	}
 	
 	@Override

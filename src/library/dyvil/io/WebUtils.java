@@ -11,7 +11,7 @@ import java.nio.channels.ReadableByteChannel;
 
 import dyvil.annotation.Utility;
 import dyvil.annotation.infix;
-import dyvil.arrays.ArrayUtils;
+import dyvil.arrays.ByteArray;
 
 /**
  * The {@linkplain Utility utility interface} <b>WebUtils</b> can be used for
@@ -88,7 +88,7 @@ public interface WebUtils
 		catch (IOException ex)
 		{
 			ex.printStackTrace();
-			return ArrayUtils.EMPTY_BYTE_ARRAY;
+			return ByteArray.EMPTY;
 		}
 	}
 	

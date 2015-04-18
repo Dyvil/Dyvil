@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.arrays.ArrayUtils;
+import dyvil.arrays.ObjectArray;
 import dyvil.collections.EmptyIterator;
 import dyvil.collections.mutable.MutableList;
 import dyvil.lang.Collection;
@@ -152,7 +152,7 @@ public class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public Object[] toArray()
 	{
-		return ArrayUtils.EMPTY_OBJECT_ARRAY;
+		return ObjectArray.EMPTY;
 	}
 	
 	@Override
@@ -164,7 +164,7 @@ public class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public E[] toArray(Class<E> type)
 	{
-		return (E[]) ArrayUtils.EMPTY_OBJECT_ARRAY;
+		return (E[]) ObjectArray.EMPTY;
 	}
 	
 	@Override
