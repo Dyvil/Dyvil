@@ -201,7 +201,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 				}
 				else
 				{
-					this.values[i] = value;
+					this.values[i] = value1;
 				}
 				return;
 			}

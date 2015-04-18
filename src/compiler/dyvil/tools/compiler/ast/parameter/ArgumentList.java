@@ -201,7 +201,7 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 		else
 		{
-			this.values[index] = value;
+			this.values[index] = value1;
 		}
 	}
 	
@@ -230,9 +230,11 @@ public final class ArgumentList implements IArguments, IValueList
 				Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.getName());
 				marker.addInfo("Required Type: " + elementType);
 				marker.addInfo("Value Type: " + value.getType());
-				
 			}
-			this.values[index] = value;
+			else
+			{
+				this.values[index] = value1;
+			}
 		}
 	}
 	

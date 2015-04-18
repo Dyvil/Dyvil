@@ -257,7 +257,7 @@ public final class WildcardType extends BaseBounded implements IType
 	{
 		if (this.arrayDimensions > 0)
 		{
-			Types.ARRAY_CLASS.getMethodMatches(list, instance, name, arguments);
+			Types.getObjectArray().getMethodMatches(list, instance, name, arguments);
 			return;
 		}
 		

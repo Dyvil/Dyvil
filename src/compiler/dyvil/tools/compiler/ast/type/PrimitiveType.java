@@ -399,10 +399,6 @@ public final class PrimitiveType extends Type
 	@Override
 	public IField resolveField(Name name)
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return Types.ARRAY.resolveField(name);
-		}
 		return null;
 	}
 	
@@ -411,7 +407,13 @@ public final class PrimitiveType extends Type
 	{
 		if (this.arrayDimensions > 0)
 		{
-			Types.ARRAY.getMethodMatches(list, instance, name, arguments);
+			if (this.arrayDimensions == 1)
+			{
+				Types.getPrimitiveArray(this.typecode).getMethodMatches(list, instance, name, arguments);
+				return;
+			}
+			
+			Types.getObjectArray().getMethodMatches(list, instance, name, arguments);
 			return;
 		}
 		

@@ -415,7 +415,7 @@ public class Type extends ASTNode implements IType
 	{
 		if (this.arrayDimensions > 0)
 		{
-			Types.ARRAY_CLASS.getMethodMatches(list, instance, name, arguments);
+			Types.getObjectArray().getMethodMatches(list, instance, name, arguments);
 			return;
 		}
 		

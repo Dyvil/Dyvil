@@ -68,12 +68,20 @@ public final class PackageImport extends ASTNode implements IImport
 	@Override
 	public IField resolveField(Name name)
 	{
+		if (this.theClass == null)
+		{
+			return null;
+		}
 		return this.theClass.resolveField(name);
 	}
 	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
+		if (this.theClass == null)
+		{
+			return;
+		}
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
