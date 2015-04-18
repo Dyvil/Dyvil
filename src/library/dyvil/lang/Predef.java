@@ -182,6 +182,46 @@ public final class Predef
 		System.out.println();
 	}
 	
+	public static @inline void println(boolean v)
+	{
+		System.out.println(v ? "true" : "false");
+	}
+	
+	public static @inline void println(byte v)
+	{
+		System.out.println(v);
+	}
+	
+	public static @inline void println(short v)
+	{
+		System.out.println(v);
+	}
+	
+	public static @inline void println(char v)
+	{
+		System.out.println(v);
+	}
+	
+	public static @inline void println(int v)
+	{
+		System.out.println(v);
+	}
+	
+	public static @inline void println(long v)
+	{
+		System.out.println(v);
+	}
+	
+	public static @inline void println(float v)
+	{
+		System.out.println(v);
+	}
+	
+	public static @inline void println(double v)
+	{
+		System.out.println(v);
+	}
+	
 	public static @inline void println(String s)
 	{
 		System.out.println(s);
@@ -194,7 +234,7 @@ public final class Predef
 			System.out.println("null");
 			return;
 		}
-		System.out.println(o);
+		System.out.println(o.toString());
 	}
 	
 	// Tuples
