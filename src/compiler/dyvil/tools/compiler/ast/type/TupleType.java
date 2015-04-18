@@ -75,7 +75,7 @@ public final class TupleType extends Type implements ITypeList
 			return iclass;
 		}
 		
-		iclass = Package.dyvilLangTuple.resolveClass("Tuple" + this.typeCount);
+		iclass = Package.dyvilTuple.resolveClass("Tuple" + this.typeCount);
 		tupleClasses[this.typeCount] = iclass;
 		this.theClass = iclass;
 		return iclass;
@@ -136,7 +136,7 @@ public final class TupleType extends Type implements ITypeList
 	{
 		if (type.isGenericType())
 		{
-			if (type.getTheClass().getInternalName().equals("dyvil/lang/tuple/Tuple" + count))
+			if (!type.getTheClass().getInternalName().equals("dyvil/tuple/Tuple" + count))
 			{
 				return false;
 			}

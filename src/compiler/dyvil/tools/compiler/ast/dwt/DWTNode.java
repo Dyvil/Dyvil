@@ -7,7 +7,7 @@ import java.util.Map;
 import org.objectweb.asm.Label;
 
 import dyvil.reflect.Opcodes;
-import dyvil.strings.StringUtils;
+import dyvil.string.StringUtils;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;

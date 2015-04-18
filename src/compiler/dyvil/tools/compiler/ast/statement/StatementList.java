@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import java.util.*;
 import java.util.Map.Entry;
 
-import dyvil.collections.ArrayIterator;
+import dyvil.collection.ArrayIterator;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;

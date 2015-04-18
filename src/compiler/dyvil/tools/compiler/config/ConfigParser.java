@@ -2,7 +2,7 @@ package dyvil.tools.compiler.config;
 
 import java.io.File;
 
-import dyvil.strings.CharUtils;
+import dyvil.string.CharUtils;
 
 public final class ConfigParser
 {

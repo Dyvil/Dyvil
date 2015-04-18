@@ -6,9 +6,9 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.*;
 
-import dyvil.collections.immutable.ImmutableCollection;
-import dyvil.collections.immutable.ImmutableList;
-import dyvil.collections.mutable.MutableCollection;
+import dyvil.collection.immutable.ImmutableCollection;
+import dyvil.collection.immutable.ImmutableList;
+import dyvil.collection.mutable.MutableCollection;
 import dyvil.lang.literal.NilConvertible;
 
 /**

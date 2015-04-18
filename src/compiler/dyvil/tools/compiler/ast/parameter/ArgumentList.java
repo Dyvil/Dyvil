@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import java.util.Iterator;
 
-import dyvil.collections.ArrayIterator;
+import dyvil.collection.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;

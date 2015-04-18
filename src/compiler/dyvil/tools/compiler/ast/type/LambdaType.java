@@ -93,7 +93,7 @@ public final class LambdaType extends Type implements ITyped, ITypeList
 			return iclass;
 		}
 		
-		iclass = Package.dyvilLangFunction.resolveClass("Function" + this.parameterCount);
+		iclass = Package.dyvilFunction.resolveClass("Function" + this.parameterCount);
 		functionClasses[this.parameterCount] = iclass;
 		this.theClass = iclass;
 		return iclass;

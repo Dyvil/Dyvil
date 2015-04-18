@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.dwt;
 
-import dyvil.strings.CharUtils;
+import dyvil.string.CharUtils;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;

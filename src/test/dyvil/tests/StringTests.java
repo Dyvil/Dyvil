@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import dyvil.strings.StringUtils;
+import dyvil.string.StringUtils;
 
 public class StringTests
 {

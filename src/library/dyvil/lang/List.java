@@ -8,9 +8,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.collections.immutable.ImmutableList;
-import dyvil.collections.mutable.ArrayList;
-import dyvil.collections.mutable.MutableList;
+import dyvil.collection.immutable.ImmutableList;
+import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.mutable.MutableList;
 import dyvil.lang.literal.ArrayConvertible;
 
 public interface List<E> extends Collection<E>, ArrayConvertible

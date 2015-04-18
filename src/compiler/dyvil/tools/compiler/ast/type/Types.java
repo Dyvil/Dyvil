@@ -87,6 +87,6 @@ public interface Types
 		ATarget.theClass = Package.javaLangAnnotation.resolveClass("Target");
 		ARetention.theClass = Package.javaLangAnnotation.resolveClass("Retention");
 		AOverride.theClass = Package.javaLang.resolveClass("Override");
-		AIntrinsic.theClass = Package.dyvilLangAnnotation.resolveClass("Intrinsic");
+		AIntrinsic.theClass = Package.dyvilAnnotation.resolveClass("Intrinsic");
 	}
 }

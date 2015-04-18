@@ -11,7 +11,7 @@ import java.nio.channels.ReadableByteChannel;
 
 import dyvil.annotation.Utility;
 import dyvil.annotation.infix;
-import dyvil.arrays.ByteArray;
+import dyvil.array.ByteArray;
 
 /**
  * The {@linkplain Utility utility interface} <b>WebUtils</b> can be used for

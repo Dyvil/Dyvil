@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.parameter;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import dyvil.collections.ArrayIterator;
+import dyvil.collection.ArrayIterator;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueMap;
 import dyvil.tools.compiler.ast.generic.ITypeContext;

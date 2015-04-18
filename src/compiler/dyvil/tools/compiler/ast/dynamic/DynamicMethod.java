@@ -6,7 +6,7 @@ import java.util.List;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 
-import dyvil.arrays.ObjectArray;
+import dyvil.array.ObjectArray;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
