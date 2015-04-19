@@ -14,6 +14,36 @@ public interface DoubleArray
 {
 	public static final double[]	EMPTY	= new double[0];
 	
+	public static double[] apply()
+	{
+		return EMPTY;
+	}
+	
+	public static double[] apply(int count)
+	{
+		return new double[count];
+	}
+	
+	public static double[] apply(int count, double repeatedValue)
+	{
+		double[] array = new double[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = repeatedValue;
+		}
+		return array;
+	}
+	
+	public static double[] apply(int count, DoubleUnaryOperator generator)
+	{
+		double[] array = new double[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = generator.applyAsDouble(i);
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

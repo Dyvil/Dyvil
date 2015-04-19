@@ -14,6 +14,36 @@ public interface CharArray
 {
 	public static final char[]	EMPTY	= new char[0];
 	
+	public static char[] apply()
+	{
+		return EMPTY;
+	}
+	
+	public static char[] apply(int count)
+	{
+		return new char[count];
+	}
+	
+	public static char[] apply(int count, char repeatedValue)
+	{
+		char[] array = new char[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = repeatedValue;
+		}
+		return array;
+	}
+	
+	public static char[] apply(int count, IntUnaryOperator generator)
+	{
+		char[] array = new char[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = (char) generator.applyAsInt(i);
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

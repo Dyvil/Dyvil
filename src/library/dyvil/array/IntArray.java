@@ -14,6 +14,36 @@ public interface IntArray
 {
 	public static final int[]	EMPTY	= new int[0];
 	
+	public static int[] apply()
+	{
+		return EMPTY;
+	}
+	
+	public static int[] apply(int count)
+	{
+		return new int[count];
+	}
+	
+	public static int[] apply(int count, int repeatedValue)
+	{
+		int[] array = new int[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = repeatedValue;
+		}
+		return array;
+	}
+	
+	public static int[] apply(int count, IntUnaryOperator generator)
+	{
+		int[] array = new int[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = generator.applyAsInt(i);
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

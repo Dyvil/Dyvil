@@ -6,9 +6,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
@@ -16,6 +14,36 @@ import dyvil.annotation.infix;
 public interface ObjectArray
 {
 	public static final Object[]	EMPTY	= new Object[0];
+	
+	public static <T> T[] apply()
+	{
+		return (T[]) EMPTY;
+	}
+	
+	public static <T> T[] apply(Class<T> type, int count)
+	{
+		return (T[]) Array.newInstance(type, count);
+	}
+	
+	public static <T> T[] apply(Class<T> type, int count, T repeatedValue)
+	{
+		T[] array = (T[]) Array.newInstance(type, count);
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = repeatedValue;
+		}
+		return array;
+	}
+	
+	public static <T> T[] apply(Class<T> type, int count, IntFunction<T> generator)
+	{
+		T[] array = (T[]) Array.newInstance(type, count);
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = generator.apply(i);
+		}
+		return array;
+	}
 	
 	// Basic Array Operations
 	

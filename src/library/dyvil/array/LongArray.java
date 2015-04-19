@@ -14,6 +14,36 @@ public interface LongArray
 {
 	public static final long[]	EMPTY	= new long[0];
 	
+	public static long[] apply()
+	{
+		return EMPTY;
+	}
+	
+	public static long[] apply(int count)
+	{
+		return new long[count];
+	}
+	
+	public static long[] apply(int count, long repeatedValue)
+	{
+		long[] array = new long[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = repeatedValue;
+		}
+		return array;
+	}
+	
+	public static long[] apply(int count, LongUnaryOperator generator)
+	{
+		long[] array = new long[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = generator.applyAsLong(i);
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

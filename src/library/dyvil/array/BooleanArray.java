@@ -4,6 +4,7 @@ import static dyvil.reflect.Opcodes.*;
 
 import java.util.Arrays;
 import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 import dyvil.annotation.Intrinsic;
@@ -13,6 +14,36 @@ import dyvil.lang.Boolean;
 public interface BooleanArray
 {
 	public static final boolean[]	EMPTY	= new boolean[0];
+	
+	public static boolean[] apply()
+	{
+		return EMPTY;
+	}
+	
+	public static boolean[] apply(int count)
+	{
+		return new boolean[count];
+	}
+	
+	public static boolean[] apply(int count, boolean repeatedValue)
+	{
+		boolean[] array = new boolean[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = repeatedValue;
+		}
+		return array;
+	}
+	
+	public static boolean[] apply(int count, IntPredicate generator)
+	{
+		boolean[] array = new boolean[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = generator.test(i);
+		}
+		return array;
+	}
 	
 	// Basic Array Operations
 	

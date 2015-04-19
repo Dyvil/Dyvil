@@ -14,6 +14,36 @@ public interface ByteArray
 {
 	public static final byte[]	EMPTY	= new byte[0];
 	
+	public static byte[] apply()
+	{
+		return EMPTY;
+	}
+	
+	public static byte[] apply(int count)
+	{
+		return new byte[count];
+	}
+	
+	public static byte[] apply(int count, byte repeatedValue)
+	{
+		byte[] array = new byte[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = repeatedValue;
+		}
+		return array;
+	}
+	
+	public static byte[] apply(int count, IntUnaryOperator generator)
+	{
+		byte[] array = new byte[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = (byte) generator.applyAsInt(i);
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

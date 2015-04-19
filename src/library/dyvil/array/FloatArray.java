@@ -14,6 +14,36 @@ public interface FloatArray
 {
 	public static final float[]	EMPTY	= new float[0];
 	
+	public static float[] apply()
+	{
+		return EMPTY;
+	}
+	
+	public static float[] apply(int count)
+	{
+		return new float[count];
+	}
+	
+	public static float[] apply(int count, int repeatedValue)
+	{
+		float[] array = new float[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = repeatedValue;
+		}
+		return array;
+	}
+	
+	public static float[] apply(int count, DoubleUnaryOperator generator)
+	{
+		float[] array = new float[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = (float) generator.applyAsDouble(i);
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

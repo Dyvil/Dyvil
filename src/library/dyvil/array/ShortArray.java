@@ -14,6 +14,36 @@ public interface ShortArray
 {
 	public static final short[]	EMPTY	= new short[0];
 	
+	public static short[] apply()
+	{
+		return EMPTY;
+	}
+	
+	public static short[] apply(int count)
+	{
+		return new short[count];
+	}
+	
+	public static short[] apply(int count, short repeatedValue)
+	{
+		short[] array = new short[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = repeatedValue;
+		}
+		return array;
+	}
+	
+	public static short[] apply(int count, IntUnaryOperator generator)
+	{
+		short[] array = new short[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = (short) generator.applyAsInt(i);
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
