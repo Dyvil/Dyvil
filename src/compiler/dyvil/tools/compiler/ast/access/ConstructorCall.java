@@ -238,9 +238,7 @@ public class ConstructorCall extends ASTNode implements ICall
 			if (len == 1)
 			{
 				this.arguments.getFirstValue().writeExpression(writer);
-				this.type.setArrayDimensions(0);
-				writer.writeTypeInsn(Opcodes.ANEWARRAY, this.type.getInternalName());
-				this.type.setArrayDimensions(1);
+				writer.writeNewArray(this.type, 1);
 				return;
 			}
 			

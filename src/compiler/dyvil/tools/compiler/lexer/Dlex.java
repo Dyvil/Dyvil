@@ -126,12 +126,17 @@ public final class Dlex
 					if (c == '\n')
 					{
 						type = 0;
+						lineNumber++;
 						continue;
 					}
 				}
 				else if (subtype == MOD_BLOCK)
 				{
-					if (l == '*' && c == '/')
+					if (c == '\n')
+					{
+						lineNumber++;
+					}
+					else if (l == '*' && c == '/')
 					{
 						type = 0;
 						continue;
