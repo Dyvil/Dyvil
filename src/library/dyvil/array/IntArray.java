@@ -1,12 +1,18 @@
 package dyvil.array;
 
 import static dyvil.reflect.Opcodes.*;
+
+import java.util.Arrays;
+import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 
 public interface IntArray
 {
-	public static final int[]		EMPTY		= new int[0];
+	public static final int[]	EMPTY	= new int[0];
 	
 	// Basic Array Operations
 	
@@ -28,15 +34,136 @@ public interface IntArray
 		array[i] = v;
 	}
 	
+	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
+	public static @infix boolean isEmpty(int[] array)
+	{
+		return array.length == 0;
+	}
+	
+	public static @infix void forEach(int[] array, IntConsumer action)
+	{
+		int len = array.length;
+		for (int i = 0; i < len; i++)
+		{
+			action.accept(array[i]);
+		}
+	}
+	
 	// Operators
 	
-	public static @infix int[] $plus(int[] a, int[] b)
+	public static @infix int[] $plus(int[] array, int v)
 	{
-		int len1 = a.length;
-		int len2 = b.length;
+		int len = array.length;
+		int[] res = new int[len + 1];
+		System.arraycopy(array, 0, res, 0, len);
+		res[len] = v;
+		return res;
+	}
+	
+	public static @infix int[] $plus$plus(int[] array1, int[] array2)
+	{
+		int len1 = array1.length;
+		int len2 = array2.length;
 		int[] res = new int[len1 + len2];
-		System.arraycopy(a, 0, res, 0, len1);
-		System.arraycopy(b, 0, res, len1, len2);
+		System.arraycopy(array1, 0, res, 0, len1);
+		System.arraycopy(array2, 0, res, len1, len2);
+		return res;
+	}
+	
+	public static @infix int[] $minus(int[] array, int v)
+	{
+		int index = indexOf(array, v, 0);
+		if (index < 0)
+		{
+			return array;
+		}
+		
+		int len = array.length;
+		int[] res = new int[len - 1];
+		if (index > 0)
+		{
+			// copy the first part before the index
+			System.arraycopy(array, 0, res, 0, index);
+		}
+		if (index < len)
+		{
+			// copy the second part after the index
+			System.arraycopy(array, index + 1, res, index, len - index - 1);
+		}
+		return res;
+	}
+	
+	public static @infix int[] $minus$minus(int[] array1, int[] array2)
+	{
+		int index = 0;
+		int len = array1.length;
+		int[] res = new int[len];
+		
+		for (int i = 0; i < len; i++)
+		{
+			int v = array1[i];
+			if (indexOf(array2, v, 0) < 0)
+			{
+				res[index++] = v;
+			}
+		}
+		
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+	
+	public static @infix int[] $amp(int[] array1, int[] array2)
+	{
+		int index = 0;
+		int len = array1.length;
+		int[] res = new int[len];
+		
+		for (int i = 0; i < len; i++)
+		{
+			int v = array1[i];
+			if (indexOf(array2, v, 0) >= 0)
+			{
+				res[index++] = v;
+			}
+		}
+		
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+	
+	public static @infix int[] mapped(int[] array, IntUnaryOperator mapper)
+	{
+		int len = array.length;
+		int[] res = new int[len];
+		for (int i = 0; i < len; i++)
+		{
+			res[i] = mapper.applyAsInt(array[i]);
+		}
+		return res;
+	}
+	
+	public static @infix int[] filtered(int[] array, IntPredicate condition)
+	{
+		int index = 0;
+		int len = array.length;
+		int[] res = new int[len];
+		for (int i = 0; i < len; i++)
+		{
+			int v = array[i];
+			if (condition.test(v))
+			{
+				res[index++] = v;
+			}
+		}
+		
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+	
+	public static @infix int[] sorted(int[] array)
+	{
+		int[] res = array.clone();
+		Arrays.sort(res);
 		return res;
 	}
 	

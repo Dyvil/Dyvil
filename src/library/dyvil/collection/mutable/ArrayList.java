@@ -182,7 +182,7 @@ public class ArrayList<E> implements MutableList<E>
 		if (index < this.size)
 		{
 			// copy the second part after the index
-			System.arraycopy(this.elements, index, array, index - 1, this.size - index);
+			System.arraycopy(this.elements, index + 1, array, index, this.size - index - 1);
 		}
 		return new ArrayList(array, this.size - 1, true);
 	}

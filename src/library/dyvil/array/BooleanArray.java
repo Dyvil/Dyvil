@@ -1,8 +1,14 @@
 package dyvil.array;
 
 import static dyvil.reflect.Opcodes.*;
+
+import java.util.Arrays;
+import java.util.function.IntConsumer;
+import java.util.function.Predicate;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.lang.Boolean;
 
 public interface BooleanArray
 {
@@ -28,15 +34,159 @@ public interface BooleanArray
 		array[i] = v;
 	}
 	
+	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
+	public static @infix boolean isEmpty(int[] array)
+	{
+		return array.length == 0;
+	}
+	
+	public static @infix void forEach(int[] array, IntConsumer action)
+	{
+		int len = array.length;
+		for (int i = 0; i < len; i++)
+		{
+			action.accept(array[i]);
+		}
+	}
+	
 	// Operators
 	
-	public static @infix boolean[] $plus(boolean[] array1, boolean[] array2)
+	public static @infix boolean[] $plus(boolean[] array, boolean v)
+	{
+		int len = array.length;
+		boolean[] res = new boolean[len + 1];
+		System.arraycopy(array, 0, res, 0, len);
+		res[len] = v;
+		return res;
+	}
+	
+	public static @infix boolean[] $plus$plus(boolean[] array1, boolean[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
 		boolean[] res = new boolean[len1 + len2];
 		System.arraycopy(array1, 0, res, 0, len1);
 		System.arraycopy(array2, 0, res, len1, len2);
+		return res;
+	}
+	
+	public static @infix boolean[] $minus(boolean[] array, boolean v)
+	{
+		int index = indexOf(array, v, 0);
+		if (index < 0)
+		{
+			return array;
+		}
+		
+		int len = array.length;
+		boolean[] res = new boolean[len - 1];
+		if (index > 0)
+		{
+			// copy the first part before the index
+			System.arraycopy(array, 0, res, 0, index);
+		}
+		if (index < len)
+		{
+			// copy the second part after the index
+			System.arraycopy(array, index + 1, res, index, len - index - 1);
+		}
+		return res;
+	}
+	
+	public static @infix boolean[] $minus$minus(boolean[] array1, boolean[] array2)
+	{
+		int index = 0;
+		int len = array1.length;
+		boolean[] res = new boolean[len];
+		
+		for (int i = 0; i < len; i++)
+		{
+			boolean v = array1[i];
+			if (indexOf(array2, v, 0) < 0)
+			{
+				res[index++] = v;
+			}
+		}
+		
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+	
+	public static @infix boolean[] $amp(boolean[] array1, boolean[] array2)
+	{
+		int index = 0;
+		int len = array1.length;
+		boolean[] res = new boolean[len];
+		
+		for (int i = 0; i < len; i++)
+		{
+			boolean v = array1[i];
+			if (indexOf(array2, v, 0) >= 0)
+			{
+				res[index++] = v;
+			}
+		}
+		
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+	
+	public static @infix boolean[] mapped(boolean[] array, Predicate<Boolean> mapper)
+	{
+		int len = array.length;
+		boolean[] res = new boolean[len];
+		for (int i = 0; i < len; i++)
+		{
+			res[i] = mapper.test(Boolean.apply(array[i]));
+		}
+		return res;
+	}
+	
+	public static @infix boolean[] filtered(boolean[] array, Predicate<Boolean> condition)
+	{
+		int index = 0;
+		int len = array.length;
+		boolean[] res = new boolean[len];
+		for (int i = 0; i < len; i++)
+		{
+			boolean v = array[i];
+			if (condition.test(Boolean.apply(v)))
+			{
+				res[index++] = v;
+			}
+		}
+		
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+	
+	public static @infix boolean[] sorted(boolean[] array)
+	{
+		int len = array.length;
+		if (len <= 0)
+		{
+			return array;
+		}
+		
+		boolean[] res = new boolean[len];
+		
+		// Count the number of 'false' in the array
+		int f = 0;
+		
+		for (int i = 0; i < len; i++)
+		{
+			if (!array[i])
+			{
+				f++;
+			}
+		}
+		
+		// Make the remaining elements of the result true
+		for (; f < len; f++)
+		{
+			res[f] = true;
+		}
+		
 		return res;
 	}
 	

@@ -1,6 +1,12 @@
 package dyvil.array;
 
 import static dyvil.reflect.Opcodes.*;
+
+import java.util.Arrays;
+import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 
@@ -30,13 +36,136 @@ public interface ByteArray
 	
 	// Operators
 	
-	public static @infix byte[] $plus(byte[] array1, byte[] array2)
+	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
+	public static @infix boolean isEmpty(byte[] array)
+	{
+		return array.length == 0;
+	}
+	
+	public static @infix void forEach(byte[] array, IntConsumer action)
+	{
+		int len = array.length;
+		for (int i = 0; i < len; i++)
+		{
+			action.accept(array[i]);
+		}
+	}
+	
+	// Operators
+	
+	public static @infix byte[] $plus(byte[] array, byte v)
+	{
+		int len = array.length;
+		byte[] res = new byte[len + 1];
+		System.arraycopy(array, 0, res, 0, len);
+		res[len] = v;
+		return res;
+	}
+	
+	public static @infix byte[] $plus$plus(byte[] array1, byte[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
 		byte[] res = new byte[len1 + len2];
 		System.arraycopy(array1, 0, res, 0, len1);
 		System.arraycopy(array2, 0, res, len1, len2);
+		return res;
+	}
+	
+	public static @infix byte[] $minus(byte[] array, byte v)
+	{
+		int index = indexOf(array, v, 0);
+		if (index < 0)
+		{
+			return array;
+		}
+		
+		int len = array.length;
+		byte[] res = new byte[len - 1];
+		if (index > 0)
+		{
+			// copy the first part before the index
+			System.arraycopy(array, 0, res, 0, index);
+		}
+		if (index < len)
+		{
+			// copy the second part after the index
+			System.arraycopy(array, index + 1, res, index, len - index - 1);
+		}
+		return res;
+	}
+	
+	public static @infix byte[] $minus$minus(byte[] array1, byte[] array2)
+	{
+		int index = 0;
+		int len = array1.length;
+		byte[] res = new byte[len];
+		
+		for (int i = 0; i < len; i++)
+		{
+			byte v = array1[i];
+			if (indexOf(array2, v, 0) < 0)
+			{
+				res[index++] = v;
+			}
+		}
+		
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+	
+	public static @infix byte[] $amp(byte[] array1, byte[] array2)
+	{
+		int index = 0;
+		int len = array1.length;
+		byte[] res = new byte[len];
+		
+		for (int i = 0; i < len; i++)
+		{
+			byte v = array1[i];
+			if (indexOf(array2, v, 0) >= 0)
+			{
+				res[index++] = v;
+			}
+		}
+		
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+	
+	public static @infix byte[] mapped(byte[] array, IntUnaryOperator mapper)
+	{
+		int len = array.length;
+		byte[] res = new byte[len];
+		for (int i = 0; i < len; i++)
+		{
+			res[i] = (byte) mapper.applyAsInt(array[i]);
+		}
+		return res;
+	}
+	
+	public static @infix byte[] filtered(byte[] array, IntPredicate condition)
+	{
+		int index = 0;
+		int len = array.length;
+		byte[] res = new byte[len];
+		for (int i = 0; i < len; i++)
+		{
+			byte v = array[i];
+			if (condition.test(v))
+			{
+				res[index++] = v;
+			}
+		}
+		
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+	
+	public static @infix byte[] sorted(byte[] array)
+	{
+		byte[] res = array.clone();
+		Arrays.sort(res);
 		return res;
 	}
 	
