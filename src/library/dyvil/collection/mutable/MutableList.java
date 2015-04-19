@@ -40,6 +40,16 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 		return new ArrayList(array);
 	}
 	
+	public static <E> MutableList<E> apply(Iterable<E> iterable)
+	{
+		ArrayList<E> list = new ArrayList();
+		for (E e : iterable)
+		{
+			list.$plus$eq(e);
+		}
+		return list;
+	}
+	
 	// Simple Getters
 	
 	@Override

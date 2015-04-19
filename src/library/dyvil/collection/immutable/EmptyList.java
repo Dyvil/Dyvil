@@ -3,6 +3,7 @@ package dyvil.collection.immutable;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -41,7 +42,7 @@ public class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public Spliterator<E> spliterator()
 	{
-		return null; // FIXME
+		return Spliterators.emptySpliterator();
 	}
 	
 	@Override

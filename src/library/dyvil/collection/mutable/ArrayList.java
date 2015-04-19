@@ -140,7 +140,15 @@ public class ArrayList<E> implements MutableList<E>
 	@Override
 	public MutableList<E> slice(int startIndex, int length)
 	{
-		return null; // FIXME
+		this.rangeCheck(startIndex);
+		if (startIndex + length >= this.size)
+		{
+			throw new IndexOutOfBoundsException("Array Length out of Bounds: " + length);
+		}
+		
+		Object[] array = new Object[length];
+		System.arraycopy(this.elements, startIndex, array, 0, length);
+		return new ArrayList(array, length, true);
 	}
 	
 	@Override
@@ -640,7 +648,7 @@ public class ArrayList<E> implements MutableList<E>
 	@Override
 	public ImmutableList<E> immutable()
 	{
-		return null; // FIXME
+		return new dyvil.collection.immutable.ArrayList<>(this.elements, this.size);
 	}
 	
 	@Override

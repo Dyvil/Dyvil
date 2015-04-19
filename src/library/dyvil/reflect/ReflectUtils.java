@@ -9,23 +9,37 @@ import java.util.List;
 
 public final class ReflectUtils
 {
-	private static Field	modifiersField;
+	private static Field				modifiersField;
+	public static final sun.misc.Unsafe	unsafe;
 	
 	static
 	{
 		try
 		{
 			modifiersField = Field.class.getDeclaredField("modifiers");
-			// Makes the 'modifiers' field of the class Field accessible
+			// Makes the 'modifiers' field of the java.lang.reflect.Field class
+			// accessible
 			modifiersField.setAccessible(true);
 		}
 		catch (ReflectiveOperationException ignored)
 		{
 		}
+		
+		try
+		{
+			Field field = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+			field.setAccessible(true);
+			unsafe = (sun.misc.Unsafe) field.get(null);
+		}
+		catch (Exception ex)
+		{
+			throw new Error("Cannot find Unsafe.theUnsafe", ex);
+		}
 	}
 	
 	private ReflectUtils()
 	{
+		throw new Error("No instances");
 	}
 	
 	/**

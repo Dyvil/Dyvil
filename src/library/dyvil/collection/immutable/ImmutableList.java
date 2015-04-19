@@ -28,17 +28,22 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	public static <E> ImmutableList<E> apply(E e1, E e2)
 	{
-		return null; // FIXME
+		return new ArrayList(new Object[] { e1, e2 }, 2);
+	}
+	
+	public static <E> ImmutableList<E> apply(E e1, E e2, E e3)
+	{
+		return new ArrayList(new Object[] { e1, e2, e3 }, 3);
 	}
 	
 	public static <E> ImmutableList<E> apply(E[] array)
 	{
-		return null; // FIXME
+		return new ArrayList(array);
 	}
 	
-	public static <E> ImmutableList<E> apply(Iterable<? extends E> iterable)
+	public static <E> ImmutableList<E> apply(Iterable<E> iterable)
 	{
-		return null; // FIXME
+		return MutableList.apply(iterable).immutable();
 	}
 	
 	// Simple Getters
