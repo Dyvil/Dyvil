@@ -1,7 +1,6 @@
 package dyvil.random;
 
-import java.util.Random;
-
+import dyvil.lang.Random;
 import dyvil.math.MathUtils;
 
 /**
@@ -9,7 +8,7 @@ import dyvil.math.MathUtils;
  * 
  * @author Clashsoft
  */
-public class MaxRandom extends Random implements DRandom
+public final class MaxRandom implements Random
 {
 	private static final long		serialVersionUID	= -6067026546099361014L;
 	
@@ -22,16 +21,7 @@ public class MaxRandom extends Random implements DRandom
 	@Override
 	public int next(int bits)
 	{
-		return (1 << bits + 1) - 1;
-	}
-	
-	@Override
-	public void nextBytes(byte[] bytes)
-	{
-		for (int i = 0; i < bytes.length; i++)
-		{
-			bytes[i] = Byte.MAX_VALUE;
-		}
+		return (1 << bits) - 1;
 	}
 	
 	@Override
@@ -44,6 +34,66 @@ public class MaxRandom extends Random implements DRandom
 	public boolean nextBoolean(float f)
 	{
 		return true;
+	}
+	
+	@Override
+	public byte nextByte()
+	{
+		return Byte.MAX_VALUE;
+	}
+	
+	@Override
+	public byte nextByte(byte max)
+	{
+		return (byte) (max - 1);
+	}
+	
+	@Override
+	public byte nextByte(byte min, byte max)
+	{
+		return max;
+	}
+	
+	@Override
+	public short nextShort()
+	{
+		return Short.MAX_VALUE;
+	}
+	
+	@Override
+	public short nextShort(short max)
+	{
+		return (short) (max - 1);
+	}
+	
+	@Override
+	public short nextShort(short min, short max)
+	{
+		return max;
+	}
+	
+	@Override
+	public char nextChar()
+	{
+		return Character.MAX_VALUE;
+	}
+	
+	@Override
+	public char nextChar(char max)
+	{
+		return (char) (max - 1);
+	}
+	
+	@Override
+	public char nextChar(char min, char max)
+	{
+		return max;
+	}
+	
+	@Override
+	public int nextInt()
+	{
+		return Integer.MAX_VALUE;
 	}
 	
 	@Override
@@ -89,6 +139,12 @@ public class MaxRandom extends Random implements DRandom
 	}
 	
 	@Override
+	public float nextFloat(float max)
+	{
+		return max;
+	}
+	
+	@Override
 	public float nextFloat(float min, float max)
 	{
 		return max;
@@ -98,6 +154,12 @@ public class MaxRandom extends Random implements DRandom
 	public double nextDouble()
 	{
 		return 1D;
+	}
+	
+	@Override
+	public double nextDouble(double max)
+	{
+		return max;
 	}
 	
 	@Override

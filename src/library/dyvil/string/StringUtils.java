@@ -9,7 +9,7 @@ import dyvil.annotation.inline;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.List;
 import dyvil.math.MathUtils;
-import dyvil.random.Random;
+import dyvil.random.RandomUtils;
 
 /**
  * The {@linkplain Utility utility interface} <b>StringUtils</b> can be used for
@@ -566,7 +566,7 @@ public interface StringUtils
 	 */
 	public static @infix String nextNoun(java.util.Random random, int minLength, int maxLength)
 	{
-		int len = Random.nextInt(random, minLength, maxLength);
+		int len = RandomUtils.nextInt(random, minLength, maxLength);
 		StringBuilder buf = new StringBuilder(len);
 		
 		char prev = CharUtils.nextUppercaseLetter(random);

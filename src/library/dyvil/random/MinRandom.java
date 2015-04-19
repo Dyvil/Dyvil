@@ -1,13 +1,13 @@
 package dyvil.random;
 
-import java.util.Random;
+import dyvil.lang.Random;
 
 /**
  * A {@link Random} implementation that always returns the minimum value.
  * 
  * @author Clashsoft
  */
-public class MinRandom extends Random implements DRandom
+public final class MinRandom implements Random
 {
 	private static final long		serialVersionUID	= 4703419198212688268L;
 	
@@ -24,15 +24,6 @@ public class MinRandom extends Random implements DRandom
 	}
 	
 	@Override
-	public void nextBytes(byte[] bytes)
-	{
-		for (int i = 0; i < bytes.length; i++)
-		{
-			bytes[i] = Byte.MIN_VALUE;
-		}
-	}
-	
-	@Override
 	public boolean nextBoolean()
 	{
 		return false;
@@ -42,6 +33,66 @@ public class MinRandom extends Random implements DRandom
 	public boolean nextBoolean(float f)
 	{
 		return false;
+	}
+	
+	@Override
+	public byte nextByte()
+	{
+		return 0;
+	}
+	
+	@Override
+	public byte nextByte(byte max)
+	{
+		return 0;
+	}
+	
+	@Override
+	public byte nextByte(byte min, byte max)
+	{
+		return 0;
+	}
+	
+	@Override
+	public short nextShort()
+	{
+		return 0;
+	}
+	
+	@Override
+	public short nextShort(short max)
+	{
+		return 0;
+	}
+	
+	@Override
+	public short nextShort(short min, short max)
+	{
+		return 0;
+	}
+	
+	@Override
+	public char nextChar()
+	{
+		return 0;
+	}
+	
+	@Override
+	public char nextChar(char max)
+	{
+		return 0;
+	}
+	
+	@Override
+	public char nextChar(char min, char max)
+	{
+		return 0;
+	}
+	
+	@Override
+	public int nextInt()
+	{
+		return 0;
 	}
 	
 	@Override
@@ -87,6 +138,12 @@ public class MinRandom extends Random implements DRandom
 	}
 	
 	@Override
+	public float nextFloat(float max)
+	{
+		return 0F;
+	}
+	
+	@Override
 	public float nextFloat(float min, float max)
 	{
 		return min;
@@ -94,6 +151,12 @@ public class MinRandom extends Random implements DRandom
 	
 	@Override
 	public double nextDouble()
+	{
+		return 0D;
+	}
+	
+	@Override
+	public double nextDouble(double max)
 	{
 		return 0D;
 	}

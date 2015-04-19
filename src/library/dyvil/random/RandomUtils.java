@@ -2,7 +2,7 @@ package dyvil.random;
 
 import dyvil.annotation.infix;
 
-public interface Random
+public interface RandomUtils
 {
 	/**
 	 * Returns true with the given chance of {@code chance}. It does that by
