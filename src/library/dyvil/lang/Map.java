@@ -10,10 +10,32 @@ import java.util.function.Consumer;
 
 import dyvil.collection.immutable.ImmutableMap;
 import dyvil.collection.mutable.MutableMap;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.tuple.Tuple2;
 
-public interface Map<K, V> extends Iterable<Tuple2<K, V>>
+public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, NilConvertible
 {
+	public static <K, V> MutableMap<K, V> apply()
+	{
+		return MutableMap.apply();
+	}
+	
+	public static <K, V> ImmutableMap<K, V> apply(K key, V value)
+	{
+		return ImmutableMap.apply(key, value);
+	}
+	
+	public static <K, V> ImmutableMap<K, V> apply(Tuple2<K, V> entry)
+	{
+		return ImmutableMap.apply(entry._1, entry._2);
+	}
+	
+	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
+	{	
+		return ImmutableMap.apply(entries);
+	}
+	
 	// Simple Getters
 	
 	/**
@@ -194,9 +216,9 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 	
 	// Copying
 	
-	public Map<? extends K, ? extends V> copy();
+	public Map<K, V> copy();
 	
-	public MutableMap<? extends K, ? extends V> mutable();
+	public MutableMap<K, V> mutable();
 	
-	public ImmutableMap<? extends K, ? extends V> immutable();
+	public ImmutableMap<K, V> immutable();
 }

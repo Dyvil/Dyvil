@@ -16,6 +16,39 @@ import dyvil.lang.tuple.Tuple2;
 
 public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 {
+	public static <K, V> ImmutableMap<K, V> apply()
+	{
+		return EmptyMap.emptyMap;
+	}
+	
+	public static <K, V> ImmutableMap<K, V> apply(K key, V value)
+	{
+		return new SingletonMap(key, value);
+	}
+	
+	public static <K, V> ImmutableMap<K, V> apply(Tuple2<K, V> entry)
+	{
+		return new SingletonMap(entry._1, entry._2);
+	}
+	
+	public static <K, V> ImmutableMap<K, V> apply(K key1, V value1, K key2, V value2)
+	{
+		return null; // FIXME
+	}
+	
+	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
+	{
+		switch (entries.length)
+		{
+		case 0:
+			return EmptyMap.emptyMap;
+		case 1:
+			Tuple2<? extends K, ? extends V> entry = entries[0];
+			return new SingletonMap(entry._1, entry._2);
+		}
+		return null; // FIXME
+	}
+	
 	// Simple Getters
 	
 	@Override
@@ -172,13 +205,13 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	// Copying
 	
 	@Override
-	public ImmutableMap<? extends K, ? extends V> copy();
+	public ImmutableMap<K, V> copy();
 	
 	@Override
-	public MutableMap<? extends K, ? extends V> mutable();
+	public MutableMap<K, V> mutable();
 	
 	@Override
-	public default ImmutableMap<? extends K, ? extends V> immutable()
+	public default ImmutableMap<K, V> immutable()
 	{
 		return this;
 	}
