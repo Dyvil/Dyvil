@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class TypeVariableType extends ASTNode implements IType
@@ -26,6 +27,12 @@ public final class TypeVariableType extends ASTNode implements IType
 	public TypeVariableType(ITypeVariable typeVar)
 	{
 		this.typeVar = typeVar;
+	}
+	
+	public TypeVariableType(ITypeVariable typeVar, int arrayDimensions)
+	{
+		this.typeVar = typeVar;
+		this.arrayDimensions = arrayDimensions;
 	}
 	
 	@Override
@@ -53,24 +60,25 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public void setArrayDimensions(int dimensions)
 	{
+		this.arrayDimensions = dimensions;
 	}
 	
 	@Override
 	public int getArrayDimensions()
 	{
-		return 0;
+		return this.arrayDimensions;
 	}
 	
 	@Override
 	public boolean isArrayType()
 	{
-		return false;
+		return this.arrayDimensions > 0;
 	}
 	
 	@Override
 	public IType getSuperType()
 	{
-		return null;
+		return this.arrayDimensions > 0 ? Types.OBJECT : null;
 	}
 	
 	@Override
@@ -124,6 +132,11 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
+		if (context == null)
+		{
+			return this;
+		}
+		
 		IType t = context.resolveType(this.typeVar);
 		if (t != null)
 		{
@@ -264,7 +277,7 @@ public final class TypeVariableType extends ASTNode implements IType
 	{
 		StringBuilder buf = new StringBuilder();
 		IGeneric generic = this.typeVar.getGeneric();
-		buf.append(this.typeVar.getName());
+		this.toString("", buf);
 		if (generic instanceof INamed)
 		{
 			buf.append(" (of type ").append(((INamed) generic).getName()).append(")");
@@ -275,6 +288,16 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append('[');
+		}
+		
 		buffer.append(this.typeVar.getName());
+		
+		for (int i = 0; i < this.arrayDimensions; i++)
+		{
+			buffer.append(']');
+		}
 	}
 }

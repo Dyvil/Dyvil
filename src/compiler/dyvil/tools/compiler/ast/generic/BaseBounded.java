@@ -58,7 +58,7 @@ public abstract class BaseBounded implements IASTNode, IBounded, ITypeList
 		if (index >= this.upperBounds.length)
 		{
 			IType[] temp = new IType[this.upperBoundCount];
-			System.arraycopy(this.upperBounds, 0, temp, 0, this.upperBounds.length);
+			System.arraycopy(this.upperBounds, 0, temp, 0, index);
 			this.upperBounds = temp;
 		}
 		this.upperBounds[index] = type;
@@ -89,7 +89,7 @@ public abstract class BaseBounded implements IASTNode, IBounded, ITypeList
 		if (index >= this.upperBounds.length)
 		{
 			IType[] temp = new IType[this.upperBoundCount];
-			System.arraycopy(this.upperBounds, 0, temp, 0, this.upperBounds.length);
+			System.arraycopy(this.upperBounds, 0, temp, 0, index);
 			this.upperBounds = temp;
 		}
 		this.upperBounds[index] = bound;

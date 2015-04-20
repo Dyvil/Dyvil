@@ -84,6 +84,8 @@ public final class LiteralExpression implements IValue
 			this.method = match;
 		}
 		
+		match.checkArguments(markers, null, this.argument, null);
+		
 		this.argument.checkTypes(markers, context);
 	}
 	

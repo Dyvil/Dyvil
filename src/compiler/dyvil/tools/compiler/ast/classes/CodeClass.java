@@ -562,20 +562,6 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		m = this.superType.getFunctionalMethod();
-		if (m != null)
-		{
-			return m;
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			m = this.interfaces[i].getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
 		return null;
 	}
 	

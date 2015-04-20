@@ -273,7 +273,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	public default int getArrayStoreOpcode()
 	{
-		return Opcodes.ASTORE;
+		return Opcodes.AASTORE;
 	}
 	
 	public default int getReturnOpcode()

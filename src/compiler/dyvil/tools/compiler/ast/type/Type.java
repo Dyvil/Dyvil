@@ -297,7 +297,7 @@ public class Type extends ASTNode implements IType
 			ITypeVariable typeVar = context.resolveTypeVariable(this.name);
 			if (typeVar != null)
 			{
-				return new TypeVariableType(typeVar);
+				return new TypeVariableType(typeVar, this.arrayDimensions);
 			}
 			
 			// This type is probably not a primitive one, so resolve using

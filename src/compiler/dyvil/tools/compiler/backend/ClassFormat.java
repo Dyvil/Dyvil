@@ -249,6 +249,11 @@ public final class ClassFormat
 			return Types.FLOAT.getArrayType(array);
 		case 'D':
 			return Types.DOUBLE.getArrayType(array);
+		case 'T':
+		{
+			String s = desc.substring(start + 1, end - 1);
+			return new Type(s, Name.getQualified(s));
+		}
 		case 'L':
 			return readReferenceType(desc, start + 1, end - 1);
 		}
