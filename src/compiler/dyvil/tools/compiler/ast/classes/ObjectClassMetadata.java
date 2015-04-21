@@ -1,17 +1,21 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ObjectClassMetadata extends ClassMetadata
 {
 	protected IField	instanceField;
+	private boolean		hasToString;
 	
 	public ObjectClassMetadata(IClass iclass)
 	{
@@ -47,11 +51,11 @@ public final class ObjectClassMetadata extends ClassMetadata
 		Field f = new Field(this.theClass, Name.instance, this.theClass.getType());
 		f.modifiers = Modifiers.PUBLIC | Modifiers.CONST | Modifiers.SYNTHETIC;
 		this.instanceField = f;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
+		
+		if (this.theClass.getMethod(Name.toString, null, 0) != null)
+		{
+			this.hasToString = true;
+		}
 	}
 	
 	@Override
@@ -73,5 +77,16 @@ public final class ObjectClassMetadata extends ClassMetadata
 		}
 		
 		super.write(writer, instanceFields);
+		
+		if (!this.hasToString)
+		{
+			// Generate a toString() method that simply returns the name of this
+			// object type.
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "toString", "()Ljava/lang/String;", null, null));
+			mw.begin();
+			mw.writeLDC(this.theClass.getName().unqualified);
+			mw.writeInsn(Opcodes.ARETURN);
+			mw.end(Types.STRING);
+		}
 	}
 }

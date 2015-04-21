@@ -16,7 +16,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ClassAccess extends ASTNode implements IValue
 {
-	public IType	type;
+	private static final byte	OBJECT_ACCESS	= 1;
+	private static final byte	APPLY_CALL		= 2;
+	
+	public IType				type;
+	private boolean				access;
 	
 	public ClassAccess(IType type)
 	{
@@ -56,7 +60,12 @@ public final class ClassAccess extends ASTNode implements IValue
 	@Override
 	public IValue withType(IType type)
 	{
-		return type.isSuperTypeOf(this.type) ? this : null;
+		if (type.isSuperTypeOf(this.type))
+		{
+			this.access = true;
+			return this;
+		}
+		return null;
 	}
 	
 	@Override
@@ -120,6 +129,25 @@ public final class ClassAccess extends ASTNode implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (!this.access)
+		{
+			return;
+		}
+		
+		IClass iclass = this.type.getTheClass();
+		if (iclass == null)
+		{
+			// Already reported this in RESOLVE ^
+			return;
+		}
+		
+		if (iclass.hasModifier(Modifiers.OBJECT_CLASS))
+		{
+			// Object type, we can safely use it's instance field.
+			return;
+		}
+		
+		markers.add(this.position, "access.type.invalid", this.type.toString());
 	}
 	
 	@Override
@@ -149,6 +177,11 @@ public final class ClassAccess extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
+		if (!this.access)
+		{
+			return;
+		}
+		
 		IClass iclass = this.type.getTheClass();
 		if (iclass != null)
 		{

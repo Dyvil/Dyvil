@@ -968,7 +968,7 @@ public class CodeClass extends ASTNode implements IClass
 				return m;
 			}
 		}
-		return this.getSuperMethod(name, parameters, parameterCount);
+		return null;
 	}
 	
 	@Override
