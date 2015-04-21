@@ -42,6 +42,18 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
+	public Iterator<K> keyIterator()
+	{
+		return new SingletonIterator(this.key);
+	}
+	
+	@Override
+	public Iterator<V> valueIterator()
+	{
+		return new SingletonIterator(this.value);
+	}
+	
+	@Override
 	public void forEach(Consumer<? super Tuple2<K, V>> action)
 	{
 		action.accept(new Tuple2<>(this.key, this.value));

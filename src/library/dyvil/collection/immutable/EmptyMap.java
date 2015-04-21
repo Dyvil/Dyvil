@@ -38,6 +38,18 @@ public class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
+	public Iterator<K> keyIterator()
+	{
+		return new EmptyIterator();
+	}
+	
+	@Override
+	public Iterator<V> valueIterator()
+	{
+		return new EmptyIterator();
+	}
+	
+	@Override
 	public void forEach(Consumer<? super Tuple2<K, V>> action)
 	{
 	}

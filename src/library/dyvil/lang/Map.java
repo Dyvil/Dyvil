@@ -15,7 +15,7 @@ import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.tuple.Tuple2;
 
 public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, NilConvertible
-{
+{	
 	public static <K, V> MutableMap<K, V> apply()
 	{
 		return MutableMap.apply();
@@ -32,7 +32,7 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 	}
 	
 	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
-	{	
+	{
 		return ImmutableMap.apply(entries);
 	}
 	
@@ -75,6 +75,10 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), 0);
 	}
+	
+	public Iterator<K> keyIterator();
+	
+	public Iterator<V> valueIterator();
 	
 	@Override
 	public void forEach(Consumer<? super Tuple2<K, V>> action);

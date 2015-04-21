@@ -201,4 +201,10 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		return MutableList.apply(this.element);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "[ " + this.element + " ]";
+	}
 }

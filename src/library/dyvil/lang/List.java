@@ -9,20 +9,19 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import dyvil.collection.immutable.ImmutableList;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.MutableList;
 import dyvil.lang.literal.ArrayConvertible;
 
 public interface List<E> extends Collection<E>, ArrayConvertible
 {
-	public static <E> List<E> apply()
+	public static <E> MutableList<E> apply()
 	{
-		return new ArrayList();
+		return new dyvil.collection.mutable.ArrayList();
 	}
 	
-	public static <E> List<E> apply(E[] array)
+	public static <E> ImmutableList<E> apply(E[] array)
 	{
-		return new ArrayList(array);
+		return new dyvil.collection.immutable.ArrayList(array);
 	}
 	
 	// Simple getters

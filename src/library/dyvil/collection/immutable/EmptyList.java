@@ -179,4 +179,10 @@ public class EmptyList<E> implements ImmutableList<E>
 	{
 		return MutableList.apply();
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "[]";
+	}
 }

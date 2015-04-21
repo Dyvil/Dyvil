@@ -52,6 +52,12 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
+	public Iterator<K> keyIterator();
+	
+	@Override
+	public Iterator<V> valueIterator();
+	
+	@Override
 	public void forEach(Consumer<? super Tuple2<K, V>> action);
 	
 	@Override
