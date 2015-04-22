@@ -33,20 +33,22 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	
 	public static <K, V> ImmutableMap<K, V> apply(K key1, V value1, K key2, V value2)
 	{
-		return null; // FIXME
+		return new TupleMap(new Tuple2[] { new Tuple2(key1, value1), new Tuple2(key2, value2) }, 2);
 	}
 	
 	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
 	{
-		switch (entries.length)
+		int len = entries.length;
+		switch (len)
 		{
 		case 0:
 			return EmptyMap.emptyMap;
 		case 1:
 			Tuple2<? extends K, ? extends V> entry = entries[0];
 			return new SingletonMap(entry._1, entry._2);
+		default:
+			return new TupleMap(entries, len);
 		}
-		return null; // FIXME
 	}
 	
 	// Simple Getters
@@ -71,6 +73,9 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	
 	@Override
 	public Iterator<V> valueIterator();
+	
+	@Override
+	public Iterator<Entry<K, V>> entryIterator();
 	
 	@Override
 	public void forEach(Consumer<? super Tuple2<K, V>> action);
@@ -108,7 +113,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(Map<? extends K, ? extends V> map);
+	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
 	@Override
 	public ImmutableMap<K, V> $minus(K key);
@@ -126,7 +131,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public ImmutableMap<K, V> $minus$colon(V value);
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Map<? extends K, ? extends V> map);
+	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map);
 	
 	@Override
 	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
@@ -149,7 +154,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	}
 	
 	@Override
-	public default void $plus$eq(K key, V value)
+	public default V put(K key, V value)
 	{
 		throw new ImmutableException("+= on Immutable Map");
 	}
@@ -161,7 +166,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	}
 	
 	@Override
-	public default void $plus$eq(Map<? extends K, ? extends V> map)
+	public default void $plus$plus$eq(Map<? extends K, ? extends V> map)
 	{
 		throw new ImmutableException("+= on Immutable Map");
 	}
@@ -173,9 +178,15 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	}
 	
 	@Override
-	public default void $minus$eq(K key, V value)
+	public default V remove(K key)
 	{
-		throw new ImmutableException("-= on Immutable Map");
+		throw new ImmutableException("remove() on Immutable Map");
+	}
+	
+	@Override
+	public default boolean remove(K key, V value)
+	{
+		throw new ImmutableException("remove() on Immutable Map");
 	}
 	
 	@Override
@@ -191,7 +202,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	}
 	
 	@Override
-	public default void $minus$eq(Map<? extends K, ? extends V> map)
+	public default void $minus$minus$eq(Map<? extends K, ? extends V> map)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}

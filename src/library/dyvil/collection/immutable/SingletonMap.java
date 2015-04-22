@@ -10,9 +10,10 @@ import java.util.function.Consumer;
 import dyvil.collection.SingletonIterator;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
+import dyvil.lang.Map.Entry;
 import dyvil.lang.tuple.Tuple2;
 
-public class SingletonMap<K, V> implements ImmutableMap<K, V>
+public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 {
 	private K	key;
 	private V	value;
@@ -51,6 +52,24 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>
 	public Iterator<V> valueIterator()
 	{
 		return new SingletonIterator(this.value);
+	}
+	
+	@Override
+	public Iterator<Entry<K, V>> entryIterator()
+	{
+		return new SingletonIterator(this);
+	}
+	
+	@Override
+	public K getKey()
+	{
+		return this.key;
+	}
+	
+	@Override
+	public V getValue()
+	{
+		return this.value;
 	}
 	
 	@Override
@@ -96,7 +115,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
 		// TODO This is not the optimal solution.
 		return ((ImmutableMap<K, V>) map.immutable()).$plus(this.key, this.value);
@@ -121,7 +140,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
 	{
 		return map.$qmark(this.key, this.value) ? EmptyMap.emptyMap : this;
 	}

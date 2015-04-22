@@ -34,19 +34,25 @@ public class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Iterator<Tuple2<K, V>> iterator()
 	{
-		return new EmptyIterator();
+		return EmptyIterator.apply();
 	}
 	
 	@Override
 	public Iterator<K> keyIterator()
 	{
-		return new EmptyIterator();
+		return EmptyIterator.apply();
 	}
 	
 	@Override
 	public Iterator<V> valueIterator()
 	{
-		return new EmptyIterator();
+		return EmptyIterator.apply();
+	}
+	
+	@Override
+	public Iterator<Entry<K, V>> entryIterator()
+	{
+		return EmptyIterator.apply();
 	}
 	
 	@Override
@@ -90,7 +96,7 @@ public class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
 		return (ImmutableMap<K, V>) map.immutable();
 	}
@@ -114,7 +120,7 @@ public class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
 	{
 		return this;
 	}

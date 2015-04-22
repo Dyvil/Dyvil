@@ -15,7 +15,7 @@ import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.tuple.Tuple2;
 
 public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, NilConvertible
-{	
+{
 	public static <K, V> MutableMap<K, V> apply()
 	{
 		return MutableMap.apply();
@@ -34,6 +34,13 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
 	{
 		return ImmutableMap.apply(entries);
+	}
+	
+	public static interface Entry<K, V>
+	{
+		public K getKey();
+		
+		public V getValue();
 	}
 	
 	// Simple Getters
@@ -79,6 +86,8 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 	public Iterator<K> keyIterator();
 	
 	public Iterator<V> valueIterator();
+	
+	public Iterator<Entry<K, V>> entryIterator();
 	
 	@Override
 	public void forEach(Consumer<? super Tuple2<K, V>> action);
@@ -164,7 +173,7 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 		return this.$plus(entry._1, entry._2);
 	}
 	
-	public Map<K, V> $plus(Map<? extends K, ? extends V> map);
+	public Map<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
 	public Map<K, V> $minus(K key);
 	
@@ -177,7 +186,7 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 	
 	public Map<K, V> $minus$colon(V value);
 	
-	public Map<K, V> $minus(Map<? extends K, ? extends V> map);
+	public Map<K, V> $minus$minus(Map<? extends K, ? extends V> map);
 	
 	public <U> Map<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
 	
@@ -189,30 +198,29 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 	
 	public void update(K key, V value);
 	
-	public default void $plus$eq(K key, V value)
-	{
-		this.update(key, value);
-	}
+	public V put(K key, V value);
 	
 	public default void $plus$eq(Tuple2<? extends K, ? extends V> entry)
 	{
 		this.update(entry._1, entry._2);
 	}
 	
-	public void $plus$eq(Map<? extends K, ? extends V> map);
+	public void $plus$plus$eq(Map<? extends K, ? extends V> map);
 	
 	public void $minus$eq(K key);
 	
-	public void $minus$eq(K key, V value);
+	public V remove(K key);
+	
+	public boolean remove(K key, V value);
 	
 	public default void $minus$eq(Tuple2<? extends K, ? extends V> entry)
 	{
-		this.$minus$eq(entry._1, entry._2);
+		this.remove(entry._1, entry._2);
 	}
 	
 	public void $minus$colon$eq(V value);
 	
-	public void $minus$eq(Map<? extends K, ? extends V> map);
+	public void $minus$minus$eq(Map<? extends K, ? extends V> map);
 	
 	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);
 	

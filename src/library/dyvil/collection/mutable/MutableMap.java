@@ -16,12 +16,14 @@ public interface MutableMap<K, V> extends Map<K, V>
 {
 	public static <K, V> MutableMap<K, V> apply()
 	{
-		return null; // FIXME
+		return new HashMap();
 	}
 	
 	public static <K, V> MutableMap<K, V> apply(K key, V value)
 	{
-		return null; // FIXME
+		HashMap<K, V> map = new HashMap();
+		map.put(key, value);
+		return map;
 	}
 	
 	public static <K, V> MutableMap<K, V> apply(Tuple2<K, V> entry)
@@ -31,7 +33,12 @@ public interface MutableMap<K, V> extends Map<K, V>
 	
 	public static <K, V> MutableMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
 	{
-		return null; // FIXME
+		HashMap<K, V> map = new HashMap();
+		for (Tuple2<? extends K, ? extends V> entry : entries)
+		{
+			map.put(entry._1, entry._2);
+		}
+		return map;
 	}
 	
 	// Simple Getters
@@ -56,6 +63,9 @@ public interface MutableMap<K, V> extends Map<K, V>
 	
 	@Override
 	public Iterator<V> valueIterator();
+	
+	@Override
+	public Iterator<Entry<K, V>> entryIterator();
 	
 	@Override
 	public void forEach(Consumer<? super Tuple2<K, V>> action);
@@ -93,7 +103,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	public MutableMap<K, V> $plus(Map<? extends K, ? extends V> map);
+	public MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
 	@Override
 	public MutableMap<K, V> $minus(K key);
@@ -111,7 +121,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public MutableMap<K, V> $minus$colon(V value);
 	
 	@Override
-	public MutableMap<K, V> $minus(Map<? extends K, ? extends V> map);
+	public MutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map);
 	
 	@Override
 	public <U> MutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
@@ -128,28 +138,37 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public void update(K key, V value);
 	
 	@Override
-	public void $plus$eq(K key, V value);
+	public V put(K key, V value);
 	
 	@Override
-	public void $plus$eq(Tuple2<? extends K, ? extends V> entry);
+	public default void $plus$eq(Tuple2<? extends K, ? extends V> entry)
+	{
+		this.update(entry._1, entry._2);
+	}
 	
 	@Override
-	public void $plus$eq(Map<? extends K, ? extends V> map);
+	public void $plus$plus$eq(Map<? extends K, ? extends V> map);
 	
 	@Override
 	public void $minus$eq(K key);
 	
 	@Override
-	public void $minus$eq(K key, V value);
+	public V remove(K key);
 	
 	@Override
-	public void $minus$eq(Tuple2<? extends K, ? extends V> entry);
+	public boolean remove(K key, V value);
+	
+	@Override
+	public default void $minus$eq(Tuple2<? extends K, ? extends V> entry)
+	{
+		this.remove(entry._1, entry._2);
+	}
 	
 	@Override
 	public void $minus$colon$eq(V value);
 	
 	@Override
-	public void $minus$eq(Map<? extends K, ? extends V> map);
+	public void $minus$minus$eq(Map<? extends K, ? extends V> map);
 	
 	@Override
 	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);
@@ -160,7 +179,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	// Copying
 	
 	@Override
-	public ImmutableMap<K, V> copy();
+	public MutableMap<K, V> copy();
 	
 	@Override
 	public default MutableMap<K, V> mutable()
