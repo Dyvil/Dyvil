@@ -36,7 +36,7 @@ public class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return new EmptyIterator<E>();
+		return EmptyIterator.apply();
 	}
 	
 	@Override

@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 public final class SingletonIterator<E> implements Iterator<E>
 {
-	private boolean	hasNext	= true;
+	private boolean	returned;
 	private E		e;
 	
 	public SingletonIterator(E e)
@@ -18,15 +18,15 @@ public final class SingletonIterator<E> implements Iterator<E>
 	@Override
 	public boolean hasNext()
 	{
-		return this.hasNext;
+		return !this.returned;
 	}
 	
 	@Override
 	public E next()
 	{
-		if (this.hasNext)
+		if (!this.returned)
 		{
-			this.hasNext = false;
+			this.returned = true;
 			return this.e;
 		}
 		throw new NoSuchElementException();
@@ -42,10 +42,10 @@ public final class SingletonIterator<E> implements Iterator<E>
 	public void forEachRemaining(Consumer<? super E> action)
 	{
 		Objects.requireNonNull(action);
-		if (this.hasNext)
+		if (!this.returned)
 		{
 			action.accept(this.e);
-			this.hasNext = false;
+			this.returned = true;
 		}
 	}
 }
