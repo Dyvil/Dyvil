@@ -36,7 +36,7 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 		return ImmutableMap.apply(entries);
 	}
 	
-	public static interface Entry<K, V>
+	public interface Entry<K, V>
 	{
 		public K getKey();
 		

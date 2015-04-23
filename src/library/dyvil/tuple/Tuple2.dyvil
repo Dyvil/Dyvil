@@ -1,6 +1,12 @@
-package dyvil.lang.tuple
+package dyvil.tuple
 
-public case class Tuple2[A, B](public A _1, public B _2)
+import dyvil.lang.Map.Entry
+
+public case class Tuple2[A, B](public A _1, public B _2) implements Entry[A, B]
 {
 	public override String toString() = @"${this._1} -> ${this._2}"
+			
+	public override A getKey() = this._1
+	
+	public override B getValue() = this._2
 }

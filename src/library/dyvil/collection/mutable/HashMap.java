@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import dyvil.collection.immutable.ImmutableMap;
 import dyvil.lang.Map;
 import dyvil.lang.tuple.Tuple2;
+import dyvil.math.MathUtils;
 
 public class HashMap<K, V> implements MutableMap<K, V>
 {
@@ -19,6 +20,14 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		V		value;
 		int		hash;
 		Entry	next;
+		
+		Entry(K key, V value, int hash)
+		{
+			super();
+			this.key = key;
+			this.value = value;
+			this.hash = hash;
+		}
 		
 		Entry(K key, V value, int hash, Entry next)
 		{
@@ -97,6 +106,12 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		{
 			return this.key + " -> " + this.value;
 		}
+		
+		@Override
+		public Entry<K, V> clone()
+		{
+			return new Entry(this.key, this.value, this.hash, this.next);
+		}
 	}
 	
 	private abstract class EntryIterator
@@ -152,6 +167,14 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	private float				loadFactor;
 	private int					threshold;
 	private Entry[]				entries;
+	
+	HashMap(int size, float loadFactor, Entry[] entries)
+	{
+		this.size = size;
+		this.loadFactor = loadFactor;
+		this.threshold = (int) ((size << 1) / loadFactor);
+		this.entries = entries;
+	}
 	
 	public HashMap()
 	{
@@ -221,7 +244,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			Entry e = oldMap[i];
 			while (e != null)
 			{
-				int index = (e.hash & 0x7FFFFFFF) % newCapacity;
+				int index = index(e.hash, newCapacity);
 				e.next = newMap[index];
 				newMap[index] = e;
 				e = e.next;
@@ -293,7 +316,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		class EntryIteratorImpl extends EntryIterator implements Iterator<Map.Entry<K, V>>
 		{
 			@Override
-			public Map.Entry<K, V> next()
+			public Entry<K, V> next()
 			{
 				return this.nextEntry();
 			}
@@ -554,7 +577,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		Iterator<?> iterator = map.entryIterator();
 		while (iterator.hasNext())
 		{
-			Map.Entry<? extends K, ? extends V> entry = (dyvil.lang.Map.Entry<? extends K, ? extends V>) iterator.next();
+			Map.Entry<? extends K, ? extends V> entry = (Map.Entry<? extends K, ? extends V>) iterator.next();
 			this.update(entry.getKey(), entry.getValue());
 		}
 	}
@@ -735,7 +758,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		Iterator<?> iterator = map.entryIterator();
 		while (iterator.hasNext())
 		{
-			Map.Entry<? extends K, ? extends V> entry = (dyvil.lang.Map.Entry<? extends K, ? extends V>) iterator.next();
+			Map.Entry<? extends K, ? extends V> entry = (Map.Entry<? extends K, ? extends V>) iterator.next();
 			this.remove(entry.getKey(), entry.getValue());
 		}
 	}
@@ -787,7 +810,25 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public HashMap<K, V> copy()
 	{
-		return null;
+		int len = MathUtils.powerOfTwo(this.size);
+		Entry[] newEntries = new Entry[len];
+		for (Entry<K, V> e : this.entries)
+		{
+			while (e != null)
+			{
+				int index = index(e.hash, len);
+				Entry<K, V> newEntry = new Entry(e.key, e.value, e.hash);
+				if (newEntries[index] != null)
+				{
+					newEntry.next = newEntries[index];
+				}
+				
+				newEntries[index] = newEntry;
+				e = e.next;
+			}
+		}
+		
+		return new HashMap<>(this.size, this.loadFactor, newEntries);
 	}
 	
 	@Override

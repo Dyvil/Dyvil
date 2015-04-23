@@ -207,13 +207,18 @@ public final class ClassFormat
 	
 	private static void setInternalName(IType type, String desc, int start, int end)
 	{
-		int index = desc.lastIndexOf('/', end);
+		int index = desc.lastIndexOf('$', end);
 		if (index < start)
 		{
-			// No slash in type name, skip internal -> package name conversion
-			type.setName(Name.getQualified(desc.substring(start, end)));
-			type.setInternalName(desc.substring(start, end));
-			return;
+			index = desc.lastIndexOf('/', end);
+			if (index < start)
+			{
+				// No slash in type name, skip internal -> package name
+				// conversion
+				type.setName(Name.getQualified(desc.substring(start, end)));
+				type.setInternalName(desc.substring(start, end));
+				return;
+			}
 		}
 		
 		type.setName(Name.getQualified(desc.substring(index + 1, end)));

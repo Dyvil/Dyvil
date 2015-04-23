@@ -40,7 +40,6 @@ public final class ExternalClass extends CodeClass
 {
 	public Package		thePackage;
 	
-	private IType		outerType;
 	private List<IType>	innerTypes;
 	
 	private boolean		superTypesResolved;
@@ -104,18 +103,13 @@ public final class ExternalClass extends CodeClass
 	{
 		this.innerTypesResolved = true;
 		
-		if (this.outerType != null)
-		{
-			this.outerClass = this.outerType.resolve(null, Package.rootPackage).getTheClass();
-			this.outerType = null;
-		}
-		
 		if (this.innerTypes != null)
 		{
 			for (ListIterator<IType> iterator = this.innerTypes.listIterator(); iterator.hasNext();)
 			{
 				IType t = iterator.next();
 				iterator.set(t.resolve(null, Package.rootPackage));
+				t.getTheClass().setOuterClass(this);
 			}
 		}
 	}
@@ -228,6 +222,11 @@ public final class ExternalClass extends CodeClass
 	@Override
 	public IClass resolveClass(Name name)
 	{
+		if (!this.innerTypesResolved)
+		{
+			this.resolveInnerTypes();
+		}
+		
 		for (IType t : this.innerTypes)
 		{
 			if (t.getName() == name)
@@ -496,11 +495,6 @@ public final class ExternalClass extends CodeClass
 		}
 		
 		return new BytecodeVisitor(method);
-	}
-	
-	public void visitOuterClass(String owner, String name, String desc)
-	{
-		this.outerType = ClassFormat.internalToType(owner);
 	}
 	
 	public void visitInnerClass(String name, String outerName, String innerName, int access)

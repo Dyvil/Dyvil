@@ -481,7 +481,7 @@ public class Method extends Member implements IMethod
 		else
 		{
 			IType type = overrideMethod.getType();
-			if (!type.isSuperTypeOf(this.type))
+			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
 				Marker marker = markers.create(this.position, "method.override.type", this.name);
 				marker.addInfo("Return Type: " + this.type);

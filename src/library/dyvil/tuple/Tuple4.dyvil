@@ -1,4 +1,4 @@
-package dyvil.lang.tuple
+package dyvil.tuple
 
 public case class Tuple4[A, B, C, D](public A _1, public B _2, public C _3, public D _4)
 {
