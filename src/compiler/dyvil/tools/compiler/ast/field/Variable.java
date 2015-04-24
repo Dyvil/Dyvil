@@ -21,6 +21,10 @@ public final class Variable extends Member implements IVariable
 	public int		index;
 	public IValue	value;
 	
+	public Variable()
+	{
+	}
+	
 	public Variable(ICodePosition position)
 	{
 		this.position = position;

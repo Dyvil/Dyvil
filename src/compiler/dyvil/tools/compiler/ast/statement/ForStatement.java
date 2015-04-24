@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -26,36 +27,40 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 {
-	public static final Name	$index		= Name.getQualified("$index");
-	public static final Name	$length		= Name.getQualified("$length");
-	public static final Name	$array		= Name.getQualified("$array");
-	public static final Name	$forStart	= Name.getQualified("$forStart");
-	public static final Name	$forUpdate	= Name.getQualified("$forCondition");
-	public static final Name	$forEnd		= Name.getQualified("$forEnd");
+	public static final IType		ITERABLE		= new Type(Package.javaLang.resolveClass("Iterable"));
+	private static ITypeVariable	ITERABLE_TYPE	= ITERABLE.getTheClass().getTypeVariable(0);
 	
-	public static final int		DEFAULT		= 0;
-	public static final int		ITERATOR	= 1;
-	public static final int		ARRAY		= 2;
+	public static final Name		$index			= Name.getQualified("$index");
+	public static final Name		$length			= Name.getQualified("$length");
+	public static final Name		$array			= Name.getQualified("$array");
+	public static final Name		$iterator		= Name.getQualified("$iterator");
+	public static final Name		$forStart		= Name.getQualified("$forStart");
+	public static final Name		$forUpdate		= Name.getQualified("$forCondition");
+	public static final Name		$forEnd			= Name.getQualified("$forEnd");
 	
-	private transient IContext	context;
-	private IStatement			parent;
+	public static final int			DEFAULT			= 0;
+	public static final int			ITERATOR		= 1;
+	public static final int			ARRAY			= 2;
 	
-	public Variable				variable;
+	private transient IContext		context;
+	private IStatement				parent;
 	
-	public IValue				condition;
-	public IValue				update;
+	public Variable					variable;
 	
-	public byte					type;
+	public IValue					condition;
+	public IValue					update;
 	
-	public IValue				then;
+	public byte						type;
 	
-	protected Label				startLabel;
-	protected Label				updateLabel;
-	protected Label				endLabel;
+	public IValue					then;
 	
-	protected Variable			var1;
-	protected Variable			var2;
-	protected Variable			var3;
+	protected Label					startLabel;
+	protected Label					updateLabel;
+	protected Label					endLabel;
+	
+	protected Variable				var1;
+	protected Variable				var2;
+	protected Variable				var3;
 	
 	public ForStatement(ICodePosition position)
 	{
@@ -239,34 +244,63 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			this.variable.value = value.resolve(markers, context);
 			
 			IType valueType = value.getType();
-			int valueTypeDims = valueType.getArrayDimensions();
-			if (valueTypeDims != 0)
+			int arrayDims = valueType.getArrayDimensions();
+			if (arrayDims != 0)
 			{
 				this.type = ARRAY;
-				if (!valueType.classEquals(varType) || varType.getArrayDimensions() != valueTypeDims - 1)
+				if (varType == Types.UNKNOWN)
+				{
+					this.variable.type = varType = valueType.getElementType();
+					if (varType == Types.UNKNOWN)
+					{
+						markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.name.unqualified);
+					}
+				}
+				else if (!valueType.classEquals(varType) || varType.getArrayDimensions() != arrayDims - 1)
 				{
 					Marker marker = markers.create(value.getPosition(), "for.array.type");
 					marker.addInfo("Array Type: " + valueType);
 					marker.addInfo("Variable Type: " + varType);
-					
 				}
-				else
+				
+				Variable var = new Variable();
+				var.type = Types.INT;
+				var.name = $index;
+				this.var1 = var;
+				
+				var = new Variable();
+				var.type = Types.INT;
+				var.name = $length;
+				this.var2 = var;
+				
+				var = new Variable();
+				var.type = valueType;
+				var.name = $array;
+				this.var3 = var;
+			}
+			else if (ITERABLE.isSuperTypeOf(valueType))
+			{
+				this.type = ITERATOR;
+				IType iterableType = valueType.resolveType(ITERABLE_TYPE);
+				if (varType == Types.UNKNOWN)
 				{
-					Variable var = new Variable(null);
-					var.type = Types.INT;
-					var.name = $index;
-					this.var1 = var;
-					
-					var = new Variable(null);
-					var.type = Types.INT;
-					var.name = $length;
-					this.var2 = var;
-					
-					var = new Variable(null);
-					var.type = valueType;
-					var.name = $array;
-					this.var3 = var;
+					this.variable.type = varType = iterableType;
+					if (varType == Types.UNKNOWN)
+					{
+						markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.name.unqualified);
+					}
 				}
+				else if (!varType.isSuperTypeOf(iterableType))
+				{
+					Marker m = markers.create(value.getPosition(), "for.iterable.type");
+					m.addInfo("Iterable Type: " + iterableType);
+					m.addInfo("Variable Type: " + varType);
+				}
+				
+				Variable var = new Variable();
+				var.type = valueType;
+				var.name = $iterator;
+				this.var1 = var;
 			}
 		}
 		else
@@ -388,10 +422,11 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
 		
 		Variable var = this.variable;
-		if (this.type == DEFAULT)
+		switch (this.type)
+		{
+		case DEFAULT:
 		{
 			int locals = writer.registerLocal();
-			
 			// Variable
 			if (var != null)
 			{
@@ -399,7 +434,6 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 				var.index = locals;
 				writer.writeVarInsn(var.type.getStoreOpcode(), var.index);
 			}
-			
 			writer.writeLabel(startLabel);
 			// Condition
 			if (this.condition != null)
@@ -419,10 +453,8 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			}
 			// Go back to Condition
 			writer.writeJumpInsn(Opcodes.GOTO, startLabel);
-			
 			writer.resetLocals(locals);
 			writer.writeLabel(endLabel);
-			
 			// Variable
 			if (var != null)
 			{
@@ -430,10 +462,8 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			}
 			return;
 		}
-		if (this.type == ARRAY)
+		case ARRAY:
 		{
-			int locals = writer.registerLocal();
-			
 			Variable arrayVar = this.var3;
 			Variable indexVar = this.var1;
 			Variable lengthVar = this.var2;
@@ -443,7 +473,9 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			
 			// Load the array
 			var.value.writeExpression(writer);
+			
 			// Local Variables
+			int locals = writer.registerLocal();
 			var.index = locals + 1;
 			indexVar.index = locals + 2;
 			lengthVar.index = locals + 3;
@@ -468,7 +500,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			writer.writeInsn(arrayVar.type.getArrayLoadOpcode());
 			var.writeSet(writer, null, null);
 			
-			// Then
+			// Action
 			if (this.then != null)
 			{
 				this.then.writeStatement(writer);
@@ -491,6 +523,62 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			writer.writeLocal(lengthVar.index, "$length", "I", null, scopeLabel, endLabel);
 			writer.writeLocal(arrayVar.index, "$array", arrayVar.type, scopeLabel, endLabel);
 			return;
+		}
+		case ITERATOR:
+		{
+			
+			Variable iteratorVar = this.var1;
+			
+			org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
+			writer.writeLabel(scopeLabel);
+			
+			// Get the iterator
+			var.value.writeExpression(writer);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/lang/Iterable", "iterator", "()Ljava/util/Iterator;", true);
+			
+			// Local Variables
+			int locals = writer.registerLocal();
+			var.index = locals;
+			iteratorVar.index = locals + 1;
+			// Store Iterator
+			writer.writeVarInsn(Opcodes.ASTORE, iteratorVar.index);
+			
+			// Jump to hasNext check
+			writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
+			writer.writeLabel(startLabel);
+			
+			// Invoke Iterator.next()
+			writer.writeVarInsn(Opcodes.ALOAD, iteratorVar.index);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
+			// Cast to the variable type
+			if (!var.type.equals(Types.OBJECT))
+			{
+				writer.writeTypeInsn(Opcodes.CHECKCAST, var.type.getInternalName());
+			}
+			// Store the next element
+			writer.writeVarInsn(Opcodes.ASTORE, var.index);
+			
+			// Action
+			if (this.then != null)
+			{
+				this.then.writeStatement(writer);
+			}
+			
+			writer.writeLabel(updateLabel);
+			// Load Iterator
+			writer.writeVarInsn(Opcodes.ALOAD, iteratorVar.index);
+			// Check hasNext
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/util/Iterator", "hasNext", "()Z", true);
+			// Go back to start if Iterator.hasNext() returned true
+			writer.writeJumpInsn(Opcodes.IFNE, startLabel);
+			
+			// Local Variables
+			writer.resetLocals(locals);
+			writer.writeLabel(endLabel);
+			
+			writer.writeLocal(var.index, var.name.qualified, var.type, scopeLabel, endLabel);
+			writer.writeLocal(iteratorVar.index, "$iterator", "Ljava/util/Iterator;", null, scopeLabel, endLabel);
+		}
 		}
 	}
 	
