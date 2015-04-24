@@ -138,12 +138,22 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public IValue withType(IType type)
 	{
-		return this.isType(type) ? this : null;
+		if (this.isType(type))
+		{
+			this.type = type;
+			return this;
+		}
+		return null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
+		if (this.type != null && type.isSuperTypeOf(this.type))
+		{
+			return true;
+		}
+		
 		IClass iclass = type.getTheClass();
 		if (iclass == null)
 		{
@@ -166,7 +176,6 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			IType paramType = lambdaParam.getType();
 			if (paramType == null)
 			{
-				lambdaParam.setType(param.getType());
 				continue;
 			}
 			if (!param.getType().equals(paramType))
@@ -323,7 +332,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 				for (int i = 0; i < this.parameterCount; i++)
 				{
 					IParameter param = this.parameters[i];
-					param.setType(param.getType().getConcreteType(this.type));
+					IType type = param.getType();
+					if (type == null)
+					{
+						type = this.method.getParameter(i).getType();
+					}
+					param.setType(type.getConcreteType(this.type));
 				}
 				
 				this.returnType = this.method.getType().getConcreteType(this.type);

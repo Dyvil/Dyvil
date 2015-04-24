@@ -256,11 +256,11 @@ public final class ClassFormat
 			return Types.DOUBLE.getArrayType(array);
 		case 'T':
 		{
-			String s = desc.substring(start + 1, end - 1);
+			String s = desc.substring(start + 1, end);
 			return new Type(s, Name.getQualified(s));
 		}
 		case 'L':
-			return readReferenceType(desc, start + 1, end - 1);
+			return readReferenceType(desc, start + 1, end);
 		}
 		return null;
 	}

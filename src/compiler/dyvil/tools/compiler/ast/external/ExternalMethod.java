@@ -140,6 +140,16 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
+	public IParameter getParameter(int index)
+	{
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
+		}
+		return this.parameters[index];
+	}
+	
+	@Override
 	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		if (name != this.name)

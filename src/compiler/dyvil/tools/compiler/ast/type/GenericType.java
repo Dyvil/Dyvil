@@ -81,6 +81,10 @@ public final class GenericType extends Type implements ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
+		if (typeVar.getGeneric() != this.theClass)
+		{
+			return this.theClass.resolveType(typeVar, this);
+		}
 		return this.generics[typeVar.getIndex()];
 	}
 	

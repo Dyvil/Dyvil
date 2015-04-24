@@ -75,12 +75,12 @@ public final class ExternalClass extends CodeClass
 		this.superTypesResolved = true;
 		if (this.superType != null)
 		{
-			this.superType = this.superType.resolve(null, Package.rootPackage);
+			this.superType = this.superType.resolve(null, this);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i] = this.interfaces[i].resolve(null, Package.rootPackage);
+			this.interfaces[i] = this.interfaces[i].resolve(null, this);
 		}
 		
 		if (this.metadata == null)
@@ -192,6 +192,64 @@ public final class ExternalClass extends CodeClass
 			this.metadata = IClass.getClassMetadata(this, this.modifiers);
 		}
 		super.addParameter(param);
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		return super.resolveType(typeVar, concrete);
+	}
+	
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		if ((this.modifiers & Modifiers.ABSTRACT | Modifiers.INTERFACE_CLASS) == 0)
+		{
+			return null;
+		}
+		
+		IMethod m;
+		if (this.body != null)
+		{
+			m = this.body.getFunctionalMethod();
+			if (m != null)
+			{
+				return m;
+			}
+		}
+		
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		
+		if (this.superType != null)
+		{
+			m = this.superType.getFunctionalMethod();
+			if (m != null)
+			{
+				return m;
+			}
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			m = this.interfaces[i].getFunctionalMethod();
+			if (m != null)
+			{
+				return m;
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override

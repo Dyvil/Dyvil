@@ -281,13 +281,13 @@ public final class Dlex
 				else if (c == '$' && code.charAt(i + 1) == '{')
 				{
 					i += 2;
-					if (buf.charAt(0) == '@')
+					if (buf.length() == 0 || buf.charAt(0) == '}')
 					{
-						subtype = STRING_START;
+						subtype = STRING_PART;
 					}
 					else
 					{
-						subtype = STRING_PART;
+						subtype = STRING_START;
 					}
 					addToken = true;
 					string = true;

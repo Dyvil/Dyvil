@@ -552,10 +552,34 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public IMethod getFunctionalMethod()
 	{
+		// Copy in ExternalClass
+		if ((this.modifiers & Modifiers.ABSTRACT | Modifiers.INTERFACE_CLASS) == 0)
+		{
+			return null;
+		}
+		
 		IMethod m;
 		if (this.body != null)
 		{
 			m = this.body.getFunctionalMethod();
+			if (m != null)
+			{
+				return m;
+			}
+		}
+		
+		if (this.superType != null)
+		{
+			m = this.superType.getFunctionalMethod();
+			if (m != null)
+			{
+				return m;
+			}
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			m = this.interfaces[i].getFunctionalMethod();
 			if (m != null)
 			{
 				return m;
@@ -606,6 +630,28 @@ public class CodeClass extends ASTNode implements IClass
 			interfaces[i] = this.interfaces[i].getInternalName();
 		}
 		return interfaces;
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	{
+		if (this.superType != null)
+		{
+			IType type = this.superType.resolveType(typeVar);
+			if (type != null)
+			{
+				return type.getConcreteType(concrete);
+			}
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			IType type = this.interfaces[i].resolveType(typeVar);
+			if (type != null)
+			{
+				return type.getConcreteType(concrete);
+			}
+		}
+		return null;
 	}
 	
 	@Override

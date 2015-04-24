@@ -208,14 +208,14 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (this.mode == ARRAY_END)
 		{
-			this.field.setValue(this.value);
 			this.value.expandPosition(token);
 			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				this.mode = ACCESS;
 				return;
 			}
-			pm.popParser(true);
+			this.field.setValue(this.value);
+			pm.popParser();
 			throw new SyntaxError(token, "Invalid Array - ']' expected");
 		}
 		if (this.mode == LIST_END)

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.classes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -52,6 +53,10 @@ public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, I
 	public void addInterface(IType type);
 	
 	public IType getInterface(int index);
+	
+	// Generics
+	
+	public IType resolveType(ITypeVariable typeVar, IType concrete);
 	
 	// Body
 	
