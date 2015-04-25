@@ -31,7 +31,7 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return IF;
 	}
@@ -251,7 +251,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		
 		if (this.condition.isConstant())
 		{
-			if (this.condition.getValueType() == BOOLEAN)
+			if (this.condition.valueTag() == BOOLEAN)
 			{
 				return ((BooleanValue) this.condition).value ? this.then : this.elseThen;
 			}

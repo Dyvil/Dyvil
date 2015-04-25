@@ -25,7 +25,7 @@ public class WildcardValue implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return WILDCARD;
 	}

@@ -22,7 +22,7 @@ public final class SyncStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return SYNCHRONIZED;
 	}

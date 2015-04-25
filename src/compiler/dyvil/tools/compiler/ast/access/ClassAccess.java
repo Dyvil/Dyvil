@@ -40,7 +40,7 @@ public final class ClassAccess extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return CLASS_ACCESS;
 	}

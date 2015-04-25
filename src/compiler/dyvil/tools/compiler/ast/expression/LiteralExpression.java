@@ -22,7 +22,7 @@ public final class LiteralExpression implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return BOXED;
 	}

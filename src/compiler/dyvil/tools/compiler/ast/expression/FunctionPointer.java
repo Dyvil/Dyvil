@@ -82,7 +82,7 @@ public final class FunctionPointer extends ASTNode implements IValue, IValued, I
 	// IValue Overrides
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return FUNCTION;
 	}
@@ -114,7 +114,7 @@ public final class FunctionPointer extends ASTNode implements IValue, IValued, I
 		}
 		
 		int parCount = method.parameterCount();
-		boolean staticInstance = this.instance.getValueType() == CLASS_ACCESS;
+		boolean staticInstance = this.instance.valueTag() == CLASS_ACCESS;
 		
 		outer:
 		for (MethodMatch match : this.methods)
@@ -218,7 +218,7 @@ public final class FunctionPointer extends ASTNode implements IValue, IValued, I
 	{
 		int handleType;
 		StringBuilder descBuf = new StringBuilder("(");
-		if (this.instance != null && this.instance.getValueType() != CLASS_ACCESS)
+		if (this.instance != null && this.instance.valueTag() != CLASS_ACCESS)
 		{
 			handleType = ClassFormat.H_INVOKEVIRTUAL;
 			this.instance.writeExpression(writer);

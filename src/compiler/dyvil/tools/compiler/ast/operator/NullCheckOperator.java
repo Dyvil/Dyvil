@@ -22,7 +22,7 @@ public final class NullCheckOperator implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return NULLCHECK;
 	}

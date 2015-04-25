@@ -31,7 +31,7 @@ public class ConstructorCall extends ASTNode implements ICall
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return CONSTRUCTOR_CALL;
 	}

@@ -69,7 +69,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return NODE;
 	}
@@ -107,7 +107,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	@Override
 	public void addValue(Name key, IValue value)
 	{
-		if (value.getValueType() == NODE)
+		if (value.valueTag() == NODE)
 		{
 			((DWTNode) value).setParent(this);
 		}
@@ -157,7 +157,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		{
 			String key = property.key.qualified;
 			IValue value = property.value;
-			int type = value.getValueType();
+			int type = value.valueTag();
 			if (type == LIST)
 			{
 				for (IValue v : (IValueList) value)
@@ -276,7 +276,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				writer.writeFieldInsn(Opcodes.PUTSTATIC, owner, property.fullName, value.getType().getExtendedName());
 				setter.writeCall(writer, null, EmptyArguments.INSTANCE, Types.VOID);
 			}
-			else if (value.getValueType() == NODE)
+			else if (value.valueTag() == NODE)
 			{
 				((DWTNode) value).write(owner, writer);
 			}

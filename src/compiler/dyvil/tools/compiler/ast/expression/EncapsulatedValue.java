@@ -19,7 +19,7 @@ public final class EncapsulatedValue implements IValue, IValued
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return CAPSULATED;
 	}

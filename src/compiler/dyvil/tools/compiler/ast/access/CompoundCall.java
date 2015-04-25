@@ -61,7 +61,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return METHOD_CALL;
 	}
@@ -217,7 +217,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		{
 			this.instance.checkTypes(markers, context);
 			
-			if (this.instance.getValueType() == APPLY_METHOD_CALL)
+			if (this.instance.valueTag() == APPLY_METHOD_CALL)
 			{
 				ApplyMethodCall call = (ApplyMethodCall) this.instance;
 				IValue instance1 = call.instance;
@@ -300,7 +300,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		int i = this.instance.getValueType();
+		int i = this.instance.valueTag();
 		if (i == FIELD_ACCESS)
 		{
 			FieldAccess access = (FieldAccess) this.instance;
@@ -347,7 +347,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		int i = this.instance.getValueType();
+		int i = this.instance.valueTag();
 		if (i == FIELD_ACCESS)
 		{
 			FieldAccess access = (FieldAccess) this.instance;
@@ -396,7 +396,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 			if (this.name == Name.plus || (minus = this.name == Name.minus))
 			{
 				IValue value1 = this.arguments.getFirstValue();
-				if (IValue.isNumeric(value1.getValueType()))
+				if (IValue.isNumeric(value1.valueTag()))
 				{
 					int count = ((INumericValue) value1).intValue();
 					writer.writeIINC(((IVariable) f).getIndex(), minus ? -count : count);

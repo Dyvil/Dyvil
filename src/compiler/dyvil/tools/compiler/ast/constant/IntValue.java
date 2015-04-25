@@ -41,7 +41,7 @@ public class IntValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return INT;
 	}

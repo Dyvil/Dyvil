@@ -24,6 +24,12 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 public final class DynamicType extends ASTNode implements IType
 {
 	@Override
+	public int typeTag()
+	{
+		return DYNAMIC;
+	}
+	
+	@Override
 	public void setName(Name name)
 	{
 	}
@@ -45,12 +51,6 @@ public final class DynamicType extends ASTNode implements IType
 	public IClass getTheClass()
 	{
 		return null;
-	}
-	
-	@Override
-	public boolean isGenericType()
-	{
-		return false;
 	}
 	
 	@Override

@@ -55,7 +55,7 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return WHILE;
 	}

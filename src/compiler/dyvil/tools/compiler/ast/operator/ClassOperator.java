@@ -30,7 +30,7 @@ public final class ClassOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return CLASS_OPERATOR;
 	}

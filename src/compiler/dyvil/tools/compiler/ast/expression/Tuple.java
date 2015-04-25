@@ -45,7 +45,7 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return TUPLE;
 	}

@@ -19,7 +19,7 @@ public final class BoxedValue implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return BOXED;
 	}

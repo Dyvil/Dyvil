@@ -29,7 +29,7 @@ public final class StringValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return STRING;
 	}

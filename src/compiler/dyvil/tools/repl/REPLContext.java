@@ -46,7 +46,7 @@ public class REPLContext implements IValued, IDyvilHeader
 		Name name;
 		Variable var;
 		
-		if (this.value.getValueType() == IValue.VARIABLE)
+		if (this.value.valueTag() == IValue.VARIABLE)
 		{
 			var = ((FieldInitializer) this.value).variable;
 			name = var.name;

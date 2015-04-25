@@ -23,7 +23,7 @@ public final class NotOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return BOOLEAN_NOT;
 	}
@@ -98,7 +98,7 @@ public final class NotOperator extends ASTNode implements IValue
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.value.getValueType() == BOOLEAN)
+		if (this.value.valueTag() == BOOLEAN)
 		{
 			BooleanValue b = (BooleanValue) this.value;
 			b.value = !b.value;

@@ -30,7 +30,7 @@ public final class ThisValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return THIS;
 	}

@@ -23,9 +23,9 @@ public final class FormatStringExpression extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
-		return STRING; // FIXME
+		return FORMAT_STRING;
 	}
 	
 	@Override

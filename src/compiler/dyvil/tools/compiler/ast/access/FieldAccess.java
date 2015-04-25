@@ -45,7 +45,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return FIELD_ACCESS;
 	}
@@ -180,7 +180,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		{
 			this.instance.checkTypes(markers, context);
 			
-			if (this.field != null && this.field.hasModifier(Modifiers.STATIC) && this.instance.getValueType() != CLASS_ACCESS)
+			if (this.field != null && this.field.hasModifier(Modifiers.STATIC) && this.instance.valueTag() != CLASS_ACCESS)
 			{
 				markers.add(this.position, "access.field.static", this.name);
 				this.instance = null;

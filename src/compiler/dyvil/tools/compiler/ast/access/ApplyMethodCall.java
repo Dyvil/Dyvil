@@ -45,7 +45,7 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued, ITypeCon
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return APPLY_METHOD_CALL;
 	}

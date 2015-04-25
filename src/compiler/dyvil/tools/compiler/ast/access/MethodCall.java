@@ -64,7 +64,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued,
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return METHOD_CALL;
 	}

@@ -36,6 +36,12 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
+	public int typeTag()
+	{
+		return TYPE_VAR_TYPE;
+	}
+	
+	@Override
 	public void setName(Name name)
 	{
 	}

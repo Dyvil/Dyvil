@@ -16,74 +16,77 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IValue extends IASTNode, ITyped
 {
-	public static int	NULL				= 0;
-	public static int	NIL					= 1;
-	public static int	WILDCARD			= 2;
-	public static int	BOOLEAN				= 3;
-	public static int	BYTE				= 4;
-	public static int	SHORT				= 5;
-	public static int	CHAR				= 6;
-	public static int	INT					= 7;
-	public static int	LONG				= 8;
-	public static int	FLOAT				= 9;
-	public static int	DOUBLE				= 10;
-	public static int	STRING				= 11;
+	int	NULL				= 0;
+	int	NIL					= 1;
+	int	WILDCARD			= 2;
+	int	BOOLEAN				= 3;
+	int	BYTE				= 4;
+	int	SHORT				= 5;
+	int	CHAR				= 6;
+	int	INT					= 7;
+	int	LONG				= 8;
+	int	FLOAT				= 9;
+	int	DOUBLE				= 10;
+	int	STRING				= 11;
+	int	FORMAT_STRING		= 12;
 	
-	public static int	THIS				= 12;
-	public static int	SUPER				= 13;
+	int	THIS				= 13;
+	int	SUPER				= 14;
 	
-	public static int	STATEMENT_LIST		= 14;
-	public static int	ARRAY				= 15;
-	public static int	CAPSULATED			= 16;
-	public static int	BOXED				= 17;
+	int	STATEMENT_LIST		= 16;
+	int	ARRAY				= 17;
 	
-	public static int	CLASS_ACCESS		= 18;
-	public static int	ENUM				= 19;
-	public static int	FIELD_ACCESS		= 20;
-	public static int	FIELD_ASSIGN		= 21;
-	public static int	METHOD_CALL			= 22;
-	public static int	APPLY_METHOD_CALL	= 23;
-	public static int	UPDATE_METHOD_CALL	= 24;
-	public static int	CONSTRUCTOR_CALL	= 25;
-	public static int	INITIALIZER_CALL	= 26;
-	public static int	VARIABLE			= 27;
-	public static int	NESTED_METHOD		= 28;
+	int	CLASS_ACCESS		= 32;
+	int	ENUM				= 33;
+	int	FIELD_ACCESS		= 34;
+	int	FIELD_ASSIGN		= 35;
+	int	METHOD_CALL			= 36;
+	int	APPLY_METHOD_CALL	= 37;
+	int	UPDATE_METHOD_CALL	= 38;
+	int	CONSTRUCTOR_CALL	= 39;
+	int	INITIALIZER_CALL	= 40;
+	int	VARIABLE			= 41;
+	int	NESTED_METHOD		= 42;
 	
-	public static int	CAST_OPERATOR		= 32;
-	public static int	ISOF_OPERATOR		= 33;
-	public static int	SWAP_OPERATOR		= 34;
-	public static int	BOOLEAN_AND			= 35;
-	public static int	BOOLEAN_OR			= 36;
-	public static int	BOOLEAN_NOT			= 37;
-	public static int	CLASS_OPERATOR		= 38;
-	public static int	NULLCHECK			= 39;
+	int	CAST_OPERATOR		= 48;
+	int	ISOF_OPERATOR		= 49;
+	int	SWAP_OPERATOR		= 50;
+	int	BOOLEAN_AND			= 51;
+	int	BOOLEAN_OR			= 52;
+	int	BOOLEAN_NOT			= 53;
+	int	CLASS_OPERATOR		= 54;
+	int	NULLCHECK			= 55;
 	
-	public static int	TUPLE				= 48;
-	public static int	CASE_STATEMENT		= 49;
-	public static int	MATCH				= 50;
-	public static int	LAMBDA				= 51;
-	public static int	FUNCTION			= 52;
-	public static int	BYTECODE			= 53;
+	int	TUPLE				= 64;
+	int	CASE_STATEMENT		= 65;
+	int	MATCH				= 66;
+	int	LAMBDA				= 67;
+	int	FUNCTION			= 68;
+	int	BYTECODE			= 69;
 	
-	public static int	RETURN				= 64;
-	public static int	IF					= 65;
-	public static int	SWITCH				= 66;
-	public static int	FOR					= 67;
-	public static int	WHILE				= 68;
-	public static int	DO_WHILE			= 69;
-	public static int	TRY					= 70;
-	public static int	THROW				= 71;
-	public static int	SYNCHRONIZED		= 72;
+	int	RETURN				= 70;
+	int	IF					= 71;
+	int	SWITCH				= 72;
+	int	FOR					= 73;
+	int	WHILE				= 74;
+	int	DO_WHILE			= 75;
+	int	TRY					= 76;
+	int	THROW				= 77;
+	int	SYNCHRONIZED		= 78;
 	
-	public static int	BREAK				= 80;
-	public static int	CONTINUE			= 81;
-	public static int	GOTO				= 82;
+	int	BREAK				= 79;
+	int	CONTINUE			= 80;
+	int	GOTO				= 81;
 	
-	public int getValueType();
+	// Special Types only used by the compiler
+	int	CAPSULATED			= 128;
+	int	BOXED				= 129;
 	
-	public static boolean isNumeric(int t1)
+	public int valueTag();
+	
+	public static boolean isNumeric(int tag)
 	{
-		return t1 >= BYTE && t1 <= DOUBLE;
+		return tag >= BYTE && tag <= DOUBLE;
 	}
 	
 	public default boolean isConstant()

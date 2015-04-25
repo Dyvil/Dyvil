@@ -422,7 +422,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 		StringBuilder desc = new StringBuilder();
 		desc.append('(');
 		
-		if (instance != null && instance.getValueType() != IValue.CLASS_ACCESS)
+		if (instance != null && instance.valueTag() != IValue.CLASS_ACCESS)
 		{
 			instance.writeExpression(writer);
 			instance.getType().appendExtendedName(desc);

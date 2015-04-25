@@ -26,7 +26,7 @@ public final class CharValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return CHAR;
 	}

@@ -58,7 +58,7 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return DO_WHILE;
 	}

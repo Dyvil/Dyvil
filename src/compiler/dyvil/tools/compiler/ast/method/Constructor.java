@@ -239,7 +239,7 @@ public class Constructor extends Member implements IConstructor
 	
 	private void resolveSuperConstructors(MarkerList markers, IContext context)
 	{
-		if (this.value.getValueType() != IValue.STATEMENT_LIST)
+		if (this.value.valueTag() != IValue.STATEMENT_LIST)
 		{
 			markers.add(this.position, "constructor.expression");
 		}
@@ -248,10 +248,10 @@ public class Constructor extends Member implements IConstructor
 		if (sl.valueCount() > 0)
 		{
 			IValue first = sl.getValue(0);
-			if (first.getValueType() == IValue.APPLY_METHOD_CALL)
+			if (first.valueTag() == IValue.APPLY_METHOD_CALL)
 			{
 				ApplyMethodCall amc = (ApplyMethodCall) first;
-				int valueType = amc.instance.getValueType();
+				int valueType = amc.instance.valueTag();
 				if (valueType == IValue.SUPER)
 				{
 					IClass iclass = this.theClass.getSuperType().getTheClass();

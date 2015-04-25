@@ -34,6 +34,12 @@ public final class WildcardType extends BaseBounded implements IType
 	}
 	
 	@Override
+	public int typeTag()
+	{
+		return WILDCARD_TYPE;
+	}
+	
+	@Override
 	public void setName(Name name)
 	{
 	}

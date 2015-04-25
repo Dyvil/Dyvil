@@ -34,7 +34,7 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return ENUM;
 	}

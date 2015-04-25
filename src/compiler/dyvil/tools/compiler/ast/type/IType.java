@@ -25,6 +25,21 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IType extends IASTNode, INamed, IContext, ITypeContext
 {
+	int	UNKNOWN			= 0;
+	int	TYPE			= 1;
+	int	PRIMITIVE_TYPE	= 2;
+	int	GENERIC_TYPE	= 3;
+	
+	int	TYPE_VAR_TYPE	= 4;
+	int	WILDCARD_TYPE	= 5;
+	
+	int	TUPLE_TYPE		= 6;
+	int	FUNCTION_TYPE	= 7;
+	
+	int	DYNAMIC			= 8;
+	
+	public int typeTag();
+	
 	public default boolean isPrimitive()
 	{
 		return false;

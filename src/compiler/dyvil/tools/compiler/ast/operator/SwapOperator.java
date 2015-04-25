@@ -31,7 +31,7 @@ public class SwapOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return SWAP_OPERATOR;
 	}

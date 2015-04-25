@@ -88,7 +88,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return LAMBDA;
 	}

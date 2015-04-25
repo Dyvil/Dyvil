@@ -31,7 +31,7 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return BOOLEAN;
 	}

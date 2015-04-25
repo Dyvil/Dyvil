@@ -25,7 +25,7 @@ public final class Bytecode extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return BYTECODE;
 	}

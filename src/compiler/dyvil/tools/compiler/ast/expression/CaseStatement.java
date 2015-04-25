@@ -35,7 +35,7 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return CASE_STATEMENT;
 	}

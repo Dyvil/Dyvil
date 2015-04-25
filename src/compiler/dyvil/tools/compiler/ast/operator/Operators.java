@@ -80,11 +80,11 @@ public interface Operators
 		// Null check
 		if (name == eqeq || name == eqeqeq)
 		{
-			if (arg2.getValueType() == IValue.NULL)
+			if (arg2.valueTag() == IValue.NULL)
 			{
 				return new NullCheckOperator(arg1, true);
 			}
-			if (arg1.getValueType() == IValue.NULL)
+			if (arg1.valueTag() == IValue.NULL)
 			{
 				return new NullCheckOperator(arg2, true);
 			}
@@ -92,11 +92,11 @@ public interface Operators
 		}
 		if (name == bangeq || name == bangeqeq)
 		{
-			if (arg2.getValueType() == IValue.NULL)
+			if (arg2.valueTag() == IValue.NULL)
 			{
 				return new NullCheckOperator(arg1, false);
 			}
-			if (arg1.getValueType() == IValue.NULL)
+			if (arg1.valueTag() == IValue.NULL)
 			{
 				return new NullCheckOperator(arg2, false);
 			}
@@ -105,7 +105,7 @@ public interface Operators
 		// Swap Operator
 		if (name == coloneqcolon)
 		{
-			if (arg1.getValueType() == IValue.FIELD_ACCESS && arg2.getValueType() == IValue.FIELD_ACCESS)
+			if (arg1.valueTag() == IValue.FIELD_ACCESS && arg2.valueTag() == IValue.FIELD_ACCESS)
 			{
 				return new SwapOperator((FieldAccess) arg1, (FieldAccess) arg2);
 			}
@@ -114,7 +114,7 @@ public interface Operators
 		// Cast Operator
 		if (name == colongt)
 		{
-			if (arg2.getValueType() == IValue.CLASS_ACCESS)
+			if (arg2.valueTag() == IValue.CLASS_ACCESS)
 			{
 				return new CastOperator(arg1, ((ClassAccess) arg2).type);
 			}
@@ -123,7 +123,7 @@ public interface Operators
 		// Instanceof Operator
 		if (name == ltcolon)
 		{
-			if (arg2.getValueType() == IValue.CLASS_ACCESS)
+			if (arg2.valueTag() == IValue.CLASS_ACCESS)
 			{
 				return new InstanceOfOperator(arg1, ((ClassAccess) arg2).type);
 			}
@@ -150,7 +150,7 @@ public interface Operators
 	
 	public static MatchExpression getMatchExpression(IValue arg1, IValue arg2)
 	{
-		if (arg2.getValueType() == IValue.STATEMENT_LIST)
+		if (arg2.valueTag() == IValue.STATEMENT_LIST)
 		{
 			IValueList list = (IValueList) arg2;
 			int len = list.valueCount();
@@ -158,7 +158,7 @@ public interface Operators
 			for (int i = 0; i < len; i++)
 			{
 				IValue v = list.getValue(i);
-				if (v.getValueType() != IValue.CASE_STATEMENT)
+				if (v.valueTag() != IValue.CASE_STATEMENT)
 				{
 					// All values have to be patterns.
 					return null;
@@ -169,7 +169,7 @@ public interface Operators
 			
 			return new MatchExpression(arg1, cases);
 		}
-		if (arg2.getValueType() == IValue.CASE_STATEMENT)
+		if (arg2.valueTag() == IValue.CASE_STATEMENT)
 		{
 			return new MatchExpression(arg1, new CaseStatement[] { (CaseStatement) arg2 });
 		}

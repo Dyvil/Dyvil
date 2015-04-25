@@ -966,7 +966,7 @@ public class Method extends Member implements IMethod
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			if (instance != null && instance.getValueType() == IValue.CLASS_ACCESS)
+			if (instance != null && instance.valueTag() == IValue.CLASS_ACCESS)
 			{
 				instance = null;
 			}
@@ -1014,7 +1014,7 @@ public class Method extends Member implements IMethod
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			if (instance != null && instance.getValueType() == IValue.CLASS_ACCESS)
+			if (instance != null && instance.valueTag() == IValue.CLASS_ACCESS)
 			{
 				instance = null;
 			}
@@ -1046,7 +1046,7 @@ public class Method extends Member implements IMethod
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			if (instance != null && instance.getValueType() == IValue.CLASS_ACCESS)
+			if (instance != null && instance.valueTag() == IValue.CLASS_ACCESS)
 			{
 				instance = null;
 			}
@@ -1258,7 +1258,7 @@ public class Method extends Member implements IMethod
 		{
 			opcode = Opcodes.INVOKESPECIAL;
 		}
-		else if (instance != null && instance.getValueType() == IValue.SUPER)
+		else if (instance != null && instance.valueTag() == IValue.SUPER)
 		{
 			opcode = Opcodes.INVOKESPECIAL;
 		}

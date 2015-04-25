@@ -31,7 +31,7 @@ public final class MatchExpression extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return MATCH;
 	}

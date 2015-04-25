@@ -22,7 +22,7 @@ public class GoToStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return GOTO;
 	}

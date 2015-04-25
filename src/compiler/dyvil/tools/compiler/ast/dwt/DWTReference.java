@@ -20,7 +20,7 @@ public class DWTReference extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return DWTNode.REFERENCE;
 	}

@@ -14,7 +14,7 @@ public class MethodStatement extends ASTNode implements IValue
 	private NestedMethod	method;
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return NESTED_METHOD;
 	}

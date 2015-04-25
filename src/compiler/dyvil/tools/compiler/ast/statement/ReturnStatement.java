@@ -22,7 +22,7 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return RETURN;
 	}

@@ -401,7 +401,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				else if (prevType == Symbols.CLOSE_SQUARE_BRACKET)
 				{
 					MethodCall mc;
-					if (this.value.getValueType() == IValue.FIELD_ACCESS)
+					if (this.value.valueTag() == IValue.FIELD_ACCESS)
 					{
 						mc = ((FieldAccess) this.value).toMethodCall(null);
 					}
@@ -647,7 +647,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	private void getAssign(IParserManager pm, IToken token) throws SyntaxError
 	{
 		ICodePosition position = this.value.getPosition();
-		int i = this.value.getValueType();
+		int i = this.value.valueTag();
 		if (i == IValue.FIELD_ACCESS)
 		{
 			FieldAccess fa = (FieldAccess) this.value;
@@ -692,7 +692,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	
 	private static LambdaExpression getLambdaValue(IValue value)
 	{
-		int type = value.getValueType();
+		int type = value.valueTag();
 		if (type != IValue.TUPLE)
 		{
 			return null;
@@ -705,7 +705,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		for (int i = 0; i < len; i++)
 		{
 			IValue v = tv.getValue(i);
-			type = v.getValueType();
+			type = v.valueTag();
 			if (type == IValue.FIELD_ACCESS)
 			{
 				FieldAccess fa = (FieldAccess) v;
@@ -714,7 +714,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 					return null;
 				}
 				
-				if (fa.instance.getValueType() != IValue.CLASS_ACCESS)
+				if (fa.instance.valueTag() != IValue.CLASS_ACCESS)
 				{
 					return null;
 				}

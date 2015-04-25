@@ -39,7 +39,7 @@ public final class ClassParameterSetter implements IValue
 	// ----- Ignore -----
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return 0;
 	}

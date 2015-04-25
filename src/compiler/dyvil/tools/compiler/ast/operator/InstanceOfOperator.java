@@ -22,7 +22,7 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return ISOF_OPERATOR;
 	}

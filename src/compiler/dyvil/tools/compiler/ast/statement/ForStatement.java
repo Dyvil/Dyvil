@@ -72,7 +72,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return FOR;
 	}

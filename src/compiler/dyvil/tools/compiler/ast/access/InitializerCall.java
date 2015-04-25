@@ -36,7 +36,7 @@ public class InitializerCall extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return INITIALIZER_CALL;
 	}

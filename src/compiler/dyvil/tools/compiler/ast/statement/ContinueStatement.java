@@ -22,7 +22,7 @@ public class ContinueStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return CONTINUE;
 	}

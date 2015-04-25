@@ -32,7 +32,7 @@ public final class NullValue implements IConstantValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return IValue.NULL;
 	}

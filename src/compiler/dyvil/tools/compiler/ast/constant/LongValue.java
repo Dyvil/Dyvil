@@ -41,7 +41,7 @@ public class LongValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return LONG;
 	}

@@ -9,7 +9,7 @@ public class ConstantFolder
 {
 	public static IValue apply(Name op, IValue v1)
 	{
-		switch (v1.getValueType())
+		switch (v1.valueTag())
 		{
 		case BOOLEAN:
 			return applyBoolean((BooleanValue) v1, op);
@@ -27,8 +27,8 @@ public class ConstantFolder
 	
 	public static IValue apply(IValue v1, Name op, IValue v2)
 	{
-		int t1 = v1.getValueType();
-		int t2 = v2.getValueType();
+		int t1 = v1.valueTag();
+		int t2 = v2.valueTag();
 		if (isNumeric(t1) && isNumeric(t2))
 		{
 			int type = Math.max(t1, t2);

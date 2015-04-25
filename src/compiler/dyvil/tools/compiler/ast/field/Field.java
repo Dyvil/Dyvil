@@ -238,7 +238,7 @@ public class Field extends Member implements IField
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.getValueType() != IValue.CLASS_ACCESS))
+		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
 		{
 			instance.writeExpression(writer);
 		}
@@ -259,7 +259,7 @@ public class Field extends Member implements IField
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
-		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.getValueType() != IValue.CLASS_ACCESS))
+		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
 		{
 			instance.writeExpression(writer);
 		}

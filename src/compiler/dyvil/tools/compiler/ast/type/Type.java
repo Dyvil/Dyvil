@@ -132,6 +132,12 @@ public class Type extends ASTNode implements IType
 		return null;
 	}
 	
+	@Override
+	public int typeTag()
+	{
+		return TYPE;
+	}
+	
 	// Names
 	
 	@Override

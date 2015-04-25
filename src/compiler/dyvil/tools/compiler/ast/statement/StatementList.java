@@ -48,7 +48,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return STATEMENT_LIST;
 	}
@@ -228,7 +228,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 				this.values[i] = v2;
 			}
 			
-			if (v2.getValueType() == IValue.VARIABLE)
+			if (v2.valueTag() == IValue.VARIABLE)
 			{
 				if (this.variables == null)
 				{

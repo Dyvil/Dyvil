@@ -34,7 +34,7 @@ public final class TryStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return TRY;
 	}

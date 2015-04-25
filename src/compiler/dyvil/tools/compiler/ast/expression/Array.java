@@ -37,7 +37,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return ARRAY;
 	}

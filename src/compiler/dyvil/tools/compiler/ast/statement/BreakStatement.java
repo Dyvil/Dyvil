@@ -22,7 +22,7 @@ public class BreakStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return BREAK;
 	}

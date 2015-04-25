@@ -26,7 +26,7 @@ public final class SuperValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return SUPER;
 	}

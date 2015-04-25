@@ -98,17 +98,23 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public final IType getReferenceType()
+	public int typeTag()
 	{
-		Type type = new Type(this.position, this.theClass);
-		type.name = this.name;
-		return type;
+		return PRIMITIVE_TYPE;
 	}
 	
 	@Override
 	public boolean isPrimitive()
 	{
 		return this.arrayDimensions == 0;
+	}
+	
+	@Override
+	public final IType getReferenceType()
+	{
+		Type type = new Type(this.position, this.theClass);
+		type.name = this.name;
+		return type;
 	}
 	
 	@Override

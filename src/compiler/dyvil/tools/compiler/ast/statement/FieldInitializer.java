@@ -23,7 +23,7 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return VARIABLE;
 	}

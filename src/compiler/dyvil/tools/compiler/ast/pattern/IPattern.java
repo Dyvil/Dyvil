@@ -11,24 +11,24 @@ import dyvil.tools.compiler.backend.MethodWriter;
 
 public interface IPattern extends IASTNode, ITyped
 {
-	public static int	NULL		= 0;
-	public static int	BOOLEAN		= 1;
-	public static int	BYTE		= 2;
-	public static int	SHORT		= 3;
-	public static int	CHAR		= 4;
-	public static int	INT			= 5;
-	public static int	LONG		= 6;
-	public static int	FLOAT		= 7;
-	public static int	DOUBLE		= 8;
-	public static int	STRING		= 9;
+	int	NULL		= 0;
+	int	BOOLEAN		= 1;
+	int	BYTE		= 2;
+	int	SHORT		= 3;
+	int	CHAR		= 4;
+	int	INT			= 5;
+	int	LONG		= 6;
+	int	FLOAT		= 7;
+	int	DOUBLE		= 8;
+	int	STRING		= 9;
 	
-	public static int	ARRAY		= 16;
-	public static int	TUPLE		= 17;
-	public static int	LIST		= 18;
+	int	ARRAY		= 16;
+	int	TUPLE		= 17;
+	int	LIST		= 18;
 	
-	public static int	BINDING		= 32;
-	public static int	WILDCARD	= 33;
-	public static int	BOXED		= 34;
+	int	BINDING		= 32;
+	int	WILDCARD	= 33;
+	int	BOXED		= 34;
 	
 	public int getPatternType();
 	

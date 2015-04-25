@@ -33,7 +33,7 @@ public final class OrOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return BOOLEAN_AND;
 	}
@@ -112,8 +112,8 @@ public final class OrOperator extends ASTNode implements IValue
 	@Override
 	public IValue foldConstants()
 	{
-		int t1 = this.left.getValueType();
-		int t2 = this.right.getValueType();
+		int t1 = this.left.valueTag();
+		int t2 = this.right.valueTag();
 		if (t1 == BOOLEAN && ((BooleanValue) this.left).value)
 		{
 			return BooleanValue.TRUE;

@@ -39,7 +39,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return FIELD_ASSIGN;
 	}

@@ -48,7 +48,7 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 	}
 	
 	@Override
-	public int getValueType()
+	public int valueTag()
 	{
 		return UPDATE_METHOD_CALL;
 	}
