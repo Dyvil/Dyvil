@@ -257,7 +257,7 @@ public final class ClassFormat
 		case 'T':
 		{
 			String s = desc.substring(start + 1, end);
-			return new Type(s, Name.getQualified(s));
+			return new Type(Name.getQualified(s));
 		}
 		case 'L':
 			return readReferenceType(desc, start + 1, end);

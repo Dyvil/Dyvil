@@ -117,8 +117,14 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
-		// TODO This is not the optimal solution.
-		return ((ImmutableMap<K, V>) map.immutable()).$plus(this.key, this.value);
+		int index = 1;
+		Tuple2<? extends K, ? extends V>[] tuples = new Tuple2[1 + map.size()];
+		tuples[0] = new Tuple2(this.key, this.value);
+		for (Tuple2<? extends K, ? extends V> entry : map)
+		{
+			tuples[index++] = entry;
+		}
+		return new TupleMap(tuples, index);
 	}
 	
 	@Override
