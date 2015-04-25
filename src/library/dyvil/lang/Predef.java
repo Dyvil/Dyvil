@@ -38,7 +38,12 @@ public final class Predef
 		return o1 != o2;
 	}
 	
-	// String Concatenation
+	// Strings
+	
+	public static @infix @inline void toString(Object o, StringBuilder builder)
+	{
+		builder.append(o == null ? "null" : o.toString());
+	}
 	
 	public static @infix @inline String $plus(String s, Object o)
 	{

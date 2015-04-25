@@ -225,6 +225,54 @@ public interface CharArray
 		return buf.append(']').toString();
 	}
 	
+	public static @infix void toString(char[] array, StringBuilder builder)
+	{
+		if (array == null)
+		{
+			builder.append("null");
+			return;
+		}
+		
+		int len = array.length;
+		if (len <= 0)
+		{
+			builder.append("[]");
+			return;
+		}
+		
+		builder.append('[').append(array[0]);
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(", ");
+			builder.append(array[i]);
+		}
+		builder.append(']');
+	}
+	
+	public static @infix void toString(char[] array, StringBuffer buffer)
+	{
+		if (array == null)
+		{
+			buffer.append("null");
+			return;
+		}
+		
+		int len = array.length;
+		if (len <= 0)
+		{
+			buffer.append("[]");
+			return;
+		}
+		
+		buffer.append('[').append(array[0]);
+		for (int i = 1; i < len; i++)
+		{
+			buffer.append(", ");
+			buffer.append(array[i]);
+		}
+		buffer.append(']');
+	}
+	
 	// Search Operations
 	
 	public static @infix int indexOf(char[] array, char v)

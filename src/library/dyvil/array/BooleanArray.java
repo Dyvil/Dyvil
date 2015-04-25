@@ -246,6 +246,30 @@ public interface BooleanArray
 	
 	// Search Operations
 	
+	public static @infix void toString(boolean[] array, StringBuilder builder)
+	{
+		if (array == null)
+		{
+			builder.append("null");
+			return;
+		}
+		
+		int len = array.length;
+		if (len <= 0)
+		{
+			builder.append("[]");
+			return;
+		}
+		
+		builder.append('[').append(array[0]);
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(", ");
+			builder.append(array[i]);
+		}
+		builder.append(']');
+	}
+	
 	public static @infix int indexOf(boolean[] array, boolean v)
 	{
 		return indexOf(array, v, 0);

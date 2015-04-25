@@ -71,7 +71,7 @@ public interface ObjectArray
 		return array.length == 0;
 	}
 	
-	public static @infix <T> void forEach(T[] array, Consumer<T> action)
+	public static @infix <T> void forEach(T[] array, Consumer<? super T> action)
 	{
 		int len = array.length;
 		for (int i = 0; i < len; i++)
@@ -262,7 +262,7 @@ public interface ObjectArray
 			return "[]";
 		}
 		
-		StringBuilder buf = new StringBuilder(len * 3 + 4);
+		StringBuilder buf = new StringBuilder(len * 10);
 		buf.append('[').append(array[0]);
 		for (int i = 1; i < len; i++)
 		{
@@ -270,6 +270,141 @@ public interface ObjectArray
 			buf.append(array[i]);
 		}
 		return buf.append(']').toString();
+	}
+	
+	public static @infix void toString(Object[] array, StringBuilder builder)
+	{
+		if (array == null)
+		{
+			builder.append("null");
+			return;
+		}
+		
+		int len = array.length;
+		if (len <= 0)
+		{
+			builder.append("[]");
+			return;
+		}
+		
+		builder.append('[').append(array[0]);
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(", ");
+			builder.append(array[i]);
+		}
+		builder.append(']');
+	}
+	
+	public static @infix String deepToString(Object[] array)
+	{
+		if (array == null)
+		{
+			return "null";
+		}
+		
+		int len = array.length;
+		if (len <= 0)
+		{
+			return "[]";
+		}
+		
+		StringBuilder buf = new StringBuilder(len * 10);
+		buf.append('[');
+		toString(array[0], buf);
+		for (int i = 1; i < len; i++)
+		{
+			buf.append(", ");
+			toString(array[i], buf);
+		}
+		return buf.append(']').toString();
+	}
+	
+	public static @infix void deepToString(Object[] array, StringBuilder builder)
+	{
+		if (array == null)
+		{
+			builder.append("null");
+			return;
+		}
+		
+		int len = array.length;
+		if (len <= 0)
+		{
+			builder.append("[]");
+			return;
+		}
+		
+		builder.append('[');
+		toString(array[0], builder);
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(", ");
+			toString(array[i], builder);
+		}
+		builder.append(']');
+	}
+	
+	public static @infix void toString(Object o, StringBuilder builder)
+	{
+		if (o == null)
+		{
+			builder.append("null");
+			return;
+		}
+		
+		Class c = o.getClass();
+		if (c == String.class)
+		{
+			builder.append((String) o);
+			return;
+		}
+		if (c == boolean[].class)
+		{
+			BooleanArray.toString((boolean[]) o, builder);
+			return;
+		}
+		if (c == byte[].class)
+		{
+			ByteArray.toString((byte[]) o, builder);
+			return;
+		}
+		if (c == short[].class)
+		{
+			ShortArray.toString((short[]) o, builder);
+			return;
+		}
+		if (c == char[].class)
+		{
+			CharArray.toString((char[]) o, builder);
+			return;
+		}
+		if (c == int[].class)
+		{
+			IntArray.toString((int[]) o, builder);
+			return;
+		}
+		if (c == long[].class)
+		{
+			LongArray.toString((long[]) o, builder);
+			return;
+		}
+		if (c == float[].class)
+		{
+			FloatArray.toString((float[]) o, builder);
+			return;
+		}
+		if (c == double[].class)
+		{
+			DoubleArray.toString((double[]) o, builder);
+			return;
+		}
+		if (c.isArray()) {
+			deepToString((Object[]) o, builder);
+			return;
+		}
+		
+		builder.append(o.toString());
 	}
 	
 	// Search Operations

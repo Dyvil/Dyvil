@@ -220,6 +220,30 @@ public interface IntArray
 		return buf.append(']').toString();
 	}
 	
+	public static @infix void toString(int[] array, StringBuilder builder)
+	{
+		if (array == null)
+		{
+			builder.append("null");
+			return;
+		}
+		
+		int len = array.length;
+		if (len <= 0)
+		{
+			builder.append("[]");
+			return;
+		}
+		
+		builder.append('[').append(array[0]);
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(", ");
+			builder.append(array[i]);
+		}
+		builder.append(']');
+	}
+	
 	// Search Operations
 	
 	public static @infix int indexOf(int[] array, int v)
