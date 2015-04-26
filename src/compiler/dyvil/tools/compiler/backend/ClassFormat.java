@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.backend;
 
-import java.io.File;
-
 import org.objectweb.asm.Opcodes;
 
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -15,9 +13,6 @@ import dyvil.tools.compiler.ast.type.*;
 
 public final class ClassFormat
 {
-	public static File			javaRTJar;
-	public static File			dyvilRTJar;
-	
 	public static final int		H_GETFIELD			= Opcodes.H_GETFIELD;
 	public static final int		H_GETSTATIC			= Opcodes.H_GETSTATIC;
 	public static final int		H_PUTFIELD			= Opcodes.H_PUTFIELD;
@@ -48,34 +43,6 @@ public final class ClassFormat
 	public static final Integer	LONG				= Opcodes.LONG;
 	public static final Integer	FLOAT				= Opcodes.FLOAT;
 	public static final Integer	DOUBLE				= Opcodes.DOUBLE;
-	
-	static
-	{
-		String s = System.getProperty("sun.boot.class.path");
-		int index = s.indexOf("rt.jar");
-		if (index != -1)
-		{
-			int index1 = s.lastIndexOf(':', index);
-			int index2 = s.indexOf(':', index + 1);
-			String s1 = s.substring(index1 + 1, index2);
-			javaRTJar = new File(s1);
-		}
-		
-		File bin = new File("bin");
-		if (bin.exists())
-		{
-			dyvilRTJar = bin;
-		}
-		else
-		{
-			s = System.getenv("DYVIL_HOME");
-			if (s == null || s.isEmpty())
-			{
-				throw new UnsatisfiedLinkError("No installed Dyvil Runtime Library found!");
-			}
-			dyvilRTJar = new File(s);
-		}
-	}
 	
 	public static String packageToInternal(String pack)
 	{

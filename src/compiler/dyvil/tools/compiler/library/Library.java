@@ -8,12 +8,45 @@ import java.util.Map;
 import dyvil.tools.compiler.ast.external.ExternalPackage;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.backend.ClassFormat;
 
 public abstract class Library
 {
-	public static Library		dyvilLibrary	= load(ClassFormat.dyvilRTJar);
-	public static Library		javaLibrary		= load(ClassFormat.javaRTJar);
+	public static final File	javaLibraryLocation;
+	public static final File	dyvilLibraryLocation;
+	
+	static
+	{
+		String s = System.getProperty("sun.boot.class.path");
+		int index = s.indexOf("rt.jar");
+		if (index != -1)
+		{
+			int index1 = s.lastIndexOf(':', index);
+			String s1 = s.substring(index1 + 1, index + 6);
+			javaLibraryLocation = new File(s1);
+		}
+		else
+		{
+			javaLibraryLocation = null;
+		}
+		
+		File bin = new File("bin");
+		if (bin.exists())
+		{
+			dyvilLibraryLocation = bin;
+		}
+		else
+		{
+			s = System.getenv("DYVIL_HOME");
+			if (s == null || s.isEmpty())
+			{
+				throw new Error("No installed Dyvil Runtime Library found!");
+			}
+			dyvilLibraryLocation = new File(s);
+		}
+	}
+	
+	public static final Library	dyvilLibrary	= load(dyvilLibraryLocation);
+	public static final Library	javaLibrary		= load(javaLibraryLocation);
 	
 	public File					file;
 	public Map<String, Package>	packages		= new HashMap();
