@@ -96,7 +96,7 @@ public final class MethodWriterImpl implements MethodWriter
 	// Locals
 	
 	@Override
-	public int registerLocal()
+	public int localCount()
 	{
 		return this.localIndex;
 	}
@@ -251,7 +251,7 @@ public final class MethodWriterImpl implements MethodWriter
 	// Other Instructions
 	
 	@Override
-	public void writeInsn(int opcode)
+	public void writeInsn(int opcode) throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -356,7 +356,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeIntInsn(int opcode, int operand)
+	public void writeIntInsn(int opcode, int operand) throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -366,7 +366,7 @@ public final class MethodWriterImpl implements MethodWriter
 	// Jump Instructions
 	
 	@Override
-	public void writeJumpInsn(int opcode, Label target)
+	public void writeJumpInsn(int opcode, Label target) throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -452,7 +452,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeTypeInsn(int opcode, String type)
+	public void writeTypeInsn(int opcode, String type) throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -460,49 +460,50 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeNewArray(String type, int dims)
+	public void writeNewArray(String type, int dims) throws BytecodeException
 	{
-		this.insnCallback();
-		
 		if (dims == 1)
 		{
 			this.writeTypeInsn(Opcodes.ANEWARRAY, type);
 			return;
 		}
 		
+		this.insnCallback();
+		
 		this.mv.visitMultiANewArrayInsn(type, dims);
 	}
 	
 	@Override
-	public void writeNewArray(IType type, int dims)
+	public void writeNewArray(IType type, int dims) throws BytecodeException
 	{
-		this.insnCallback();
-		
 		if (dims == 1)
 		{
-			if (type instanceof PrimitiveType)
+			if (type.typeTag() == IType.PRIMITIVE_TYPE)
 			{
-				this.mv.visitIntInsn(Opcodes.NEWARRAY, ((PrimitiveType) type).typecode);
+				this.writeIntInsn(Opcodes.NEWARRAY, ((PrimitiveType) type).typecode);
 				return;
 			}
 			
-			this.mv.visitTypeInsn(Opcodes.ANEWARRAY, type.getInternalName());
+			this.writeTypeInsn(Opcodes.ANEWARRAY, type.getInternalName());
 			return;
 		}
 		
-		this.mv.visitMultiANewArrayInsn(type.getExtendedName(), dims);
+		this.insnCallback();
+		
+		String extended = type.getExtendedName();
+		this.mv.visitMultiANewArrayInsn(extended, dims);
 	}
 	
 	@Override
-	public void writeIINC(int var, int value)
+	public void writeIINC(int index, int value)
 	{
 		this.insnCallback();
 		
-		this.mv.visitIincInsn(var, value);
+		this.mv.visitIincInsn(index, value);
 	}
 	
 	@Override
-	public void writeVarInsn(int opcode, int index)
+	public void writeVarInsn(int opcode, int index) throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -521,7 +522,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeFieldInsn(int opcode, String owner, String name, String desc)
+	public void writeFieldInsn(int opcode, String owner, String name, String desc, Object fieldType) throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -529,7 +530,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface)
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, Object returnType, boolean isInterface) throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -537,7 +538,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeInvokeDynamic(String name, String desc, Handle bsm, Object... bsmArgs)
+	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs) throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -547,7 +548,7 @@ public final class MethodWriterImpl implements MethodWriter
 	// Switch Instructions
 	
 	@Override
-	public void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers)
+	public void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers) throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -555,7 +556,7 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers)
+	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers) throws BytecodeException
 	{
 		this.insnCallback();
 		

@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -41,7 +42,7 @@ public final class JumpInstruction implements IInstruction
 	}
 	
 	@Override
-	public void write(MethodWriter writer)
+	public void write(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeJumpInsn(this.opcode, this.target.target);
 	}

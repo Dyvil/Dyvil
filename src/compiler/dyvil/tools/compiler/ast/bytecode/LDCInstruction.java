@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class LDCInstruction implements IInstruction
@@ -24,7 +25,7 @@ public class LDCInstruction implements IInstruction
 	}
 	
 	@Override
-	public void write(MethodWriter writer)
+	public void write(MethodWriter writer) throws BytecodeException
 	{
 		this.argument.writeExpression(writer);
 	}

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -24,7 +25,7 @@ public class LookupSwitchInstruction implements IInstruction
 	}
 	
 	@Override
-	public void write(MethodWriter writer)
+	public void write(MethodWriter writer) throws BytecodeException
 	{
 		int len = this.handlers.length;
 		org.objectweb.asm.Label[] labels = new org.objectweb.asm.Label[len];

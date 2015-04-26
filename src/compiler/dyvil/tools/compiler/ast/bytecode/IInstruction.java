@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IInstruction extends IASTNode
@@ -10,5 +11,5 @@ public interface IInstruction extends IASTNode
 	
 	// Compilation
 	
-	public void write(MethodWriter writer);
+	public void write(MethodWriter writer) throws BytecodeException;
 }

@@ -21,7 +21,7 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 	
 	public ClassWriter()
 	{
-		super(DyvilCompiler.asmVersion | org.objectweb.asm.ClassWriter.COMPUTE_FRAMES);
+		super(DyvilCompiler.asmVersion);
 	}
 	
 	public ClassWriter(int api)

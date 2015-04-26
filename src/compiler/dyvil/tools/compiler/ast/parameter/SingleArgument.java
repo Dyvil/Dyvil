@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -187,7 +188,7 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer)
+	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
 	{
 		if (index == 0)
 		{
@@ -199,7 +200,7 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer)
+	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException
 	{
 		if (index != 0)
 		{

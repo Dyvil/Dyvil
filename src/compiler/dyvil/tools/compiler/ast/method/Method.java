@@ -34,6 +34,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -883,7 +884,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		int modifiers = this.modifiers & 0xFFFF;
 		if (this.value == null)
@@ -962,7 +963,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
@@ -1010,7 +1011,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
@@ -1042,7 +1043,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
@@ -1073,7 +1074,7 @@ public class Method extends Member implements IMethod
 		writer.writeJumpInsn(IFNE, dest);
 	}
 	
-	private void writeArguments(MethodWriter writer, IArguments arguments)
+	private void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
@@ -1126,7 +1127,7 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments)
+	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		if (this.type.getTheClass() == Types.BOOLEAN_CLASS)
 		{
@@ -1189,7 +1190,7 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	private void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
+	private void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		for (int i : this.intrinsicOpcodes)
 		{
@@ -1212,7 +1213,7 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	private void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
+	private void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		for (int i : this.intrinsicOpcodes)
 		{
@@ -1235,7 +1236,7 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	private void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments)
+	private void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		if (instance != null)
 		{
@@ -1273,12 +1274,12 @@ public class Method extends Member implements IMethod
 		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS));
 	}
 	
-	private void writeInlineArguments(MethodWriter writer, IValue instance, IArguments arguments)
+	private void writeInlineArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
-			writer.writeVarInsn(instance.getType().getStoreOpcode(), writer.registerLocal());
+			writer.writeVarInsn(instance.getType().getStoreOpcode(), writer.localCount());
 		}
 		
 		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
@@ -1291,11 +1292,11 @@ public class Method extends Member implements IMethod
 				{
 					param = this.parameters[i];
 					arguments.writeValue(j, param.getName(), param.getValue(), writer);
-					writer.writeVarInsn(param.getType().getStoreOpcode(), writer.registerLocal());
+					writer.writeVarInsn(param.getType().getStoreOpcode(), writer.localCount());
 				}
 				param = this.parameters[len];
 				arguments.writeVarargsValue(len - 1, param.getName(), param.getType(), writer);
-				writer.writeVarInsn(Opcodes.ASTORE, writer.registerLocal());
+				writer.writeVarInsn(Opcodes.ASTORE, writer.localCount());
 				return;
 			}
 			
@@ -1303,14 +1304,14 @@ public class Method extends Member implements IMethod
 			{
 				IParameter param = this.parameters[i];
 				arguments.writeValue(j, param.getName(), param.getValue(), writer);
-				writer.writeVarInsn(param.getType().getStoreOpcode(), writer.registerLocal());
+				writer.writeVarInsn(param.getType().getStoreOpcode(), writer.localCount());
 			}
 			return;
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			arguments.writeValue(0, Name._this, null, writer);
-			writer.writeVarInsn(Opcodes.ASTORE, writer.registerLocal());
+			writer.writeVarInsn(Opcodes.ASTORE, writer.localCount());
 			return;
 		}
 		
@@ -1322,11 +1323,11 @@ public class Method extends Member implements IMethod
 			{
 				param = this.parameters[i];
 				arguments.writeValue(i, param.getName(), param.getValue(), writer);
-				writer.writeVarInsn(param.getType().getStoreOpcode(), writer.registerLocal());
+				writer.writeVarInsn(param.getType().getStoreOpcode(), writer.localCount());
 			}
 			param = this.parameters[len];
 			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
-			writer.writeVarInsn(Opcodes.ASTORE, writer.registerLocal());
+			writer.writeVarInsn(Opcodes.ASTORE, writer.localCount());
 			return;
 		}
 		
@@ -1334,7 +1335,7 @@ public class Method extends Member implements IMethod
 		{
 			IParameter param = this.parameters[i];
 			arguments.writeValue(i, param.getName(), param.getValue(), writer);
-			writer.writeVarInsn(param.getType().getStoreOpcode(), writer.registerLocal());
+			writer.writeVarInsn(param.getType().getStoreOpcode(), writer.localCount());
 		}
 	}
 	

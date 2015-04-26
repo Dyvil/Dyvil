@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -408,14 +409,14 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.writeStatement(writer);
 		writer.writeInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label updateLabel = this.updateLabel.target = new org.objectweb.asm.Label();
@@ -426,7 +427,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 		{
 		case DEFAULT:
 		{
-			int locals = writer.registerLocal();
+			int locals = writer.localCount();
 			// Variable
 			if (var != null)
 			{
@@ -475,7 +476,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			var.value.writeExpression(writer);
 			
 			// Local Variables
-			int locals = writer.registerLocal();
+			int locals = writer.localCount();
 			var.index = locals + 1;
 			indexVar.index = locals + 2;
 			lengthVar.index = locals + 3;
@@ -537,7 +538,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/lang/Iterable", "iterator", "()Ljava/util/Iterator;", true);
 			
 			// Local Variables
-			int locals = writer.registerLocal();
+			int locals = writer.localCount();
 			var.index = locals;
 			iteratorVar.index = locals + 1;
 			// Store Iterator

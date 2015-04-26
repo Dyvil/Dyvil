@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IType extends IASTNode, INamed, IContext, ITypeContext
@@ -296,7 +297,12 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return Opcodes.ARETURN;
 	}
 	
-	public default void writeDefaultValue(MethodWriter writer)
+	public default Object getFrameType()
+	{
+		return this.getInternalName();
+	}
+	
+	public default void writeDefaultValue(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeInsn(Opcodes.ACONST_NULL);
 	}

@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
@@ -77,7 +78,7 @@ public class ClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer, IValue instanceFields)
+	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
 	{
 		StatementList list = new StatementList();
 		if (instanceFields != null)

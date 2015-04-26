@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class BooleanValue extends ASTNode implements IConstantValue
@@ -85,7 +86,7 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		if (this.value)
 		{
@@ -98,14 +99,14 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.IRETURN);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest)
+	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		if (this.value)
 		{
@@ -114,7 +115,7 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest)
+	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		if (!this.value)
 		{

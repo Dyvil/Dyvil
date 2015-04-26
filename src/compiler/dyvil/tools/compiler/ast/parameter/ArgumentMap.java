@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -215,7 +216,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer)
+	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -230,7 +231,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer)
+	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException
 	{
 		this.writeValue(index, name, null, writer);
 	}

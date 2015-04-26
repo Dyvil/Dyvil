@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -244,25 +245,25 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.method.writeCall(writer, this.instance, this.arguments, this.type);
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.method.writeCall(writer, this.instance, this.arguments, Types.VOID);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest)
+	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.method.writeJump(writer, dest, this.instance, this.arguments);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest)
+	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.method.writeInvJump(writer, dest, this.instance, this.arguments);
 	}

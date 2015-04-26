@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -277,7 +278,7 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
@@ -303,7 +304,7 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
 		

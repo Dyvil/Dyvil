@@ -5,6 +5,7 @@ import org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -110,25 +111,25 @@ public final class EncapsulatedValue implements IValue, IValued
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.value.writeExpression(writer);
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.value.writeStatement(writer);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest)
+	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.value.writeJump(writer, dest);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest)
+	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.value.writeInvJump(writer, dest);
 	}

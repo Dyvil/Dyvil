@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class NullCheckOperator implements IValue
@@ -78,7 +79,7 @@ public final class NullCheckOperator implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.value.writeExpression(writer);
 		Label label1 = new Label();
@@ -93,21 +94,21 @@ public final class NullCheckOperator implements IValue
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.IRETURN);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest)
+	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.value.writeExpression(writer);
 		writer.writeJumpInsn(this.isNull ? Opcodes.IFNULL : Opcodes.IFNONNULL, dest);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest)
+	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.value.writeExpression(writer);
 		writer.writeJumpInsn(this.isNull ? Opcodes.IFNONNULL : Opcodes.IFNULL, dest);

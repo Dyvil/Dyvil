@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class BindingPattern extends ASTNode implements IPattern, IPatterned
@@ -102,7 +103,7 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (this.variable != null)
 		{
@@ -115,7 +116,7 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (this.variable != null)
 		{
@@ -127,11 +128,11 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 		}
 	}
 	
-	private void writeVar(MethodWriter writer, int varIndex)
+	private void writeVar(MethodWriter writer, int varIndex) throws BytecodeException
 	{
 		this.variable.type = this.type;
 		writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.registerLocal());
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
 	}
 	
 	@Override

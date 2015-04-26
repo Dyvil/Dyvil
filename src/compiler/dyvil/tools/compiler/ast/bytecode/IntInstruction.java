@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class IntInstruction implements IInstruction
@@ -21,7 +22,7 @@ public class IntInstruction implements IInstruction
 	}
 	
 	@Override
-	public void write(MethodWriter writer)
+	public void write(MethodWriter writer) throws BytecodeException
 	{
 		switch (this.opcode)
 		{

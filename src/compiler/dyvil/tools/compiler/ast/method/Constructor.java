@@ -28,6 +28,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -566,13 +567,13 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		this.write(writer, null);
 	}
 	
 	@Override
-	public void write(ClassWriter writer, IValue instanceFields)
+	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
 	{
 		int modifiers = this.modifiers & 0xFFFF;
 		if (this.value == null)
@@ -637,7 +638,7 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IArguments arguments, IType type)
+	public void writeCall(MethodWriter writer, IArguments arguments, IType type) throws BytecodeException
 	{
 		writer.writeTypeInsn(Opcodes.NEW, this.theClass.getInternalName());
 		if (type != Types.VOID)
@@ -650,7 +651,7 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer)
+	public void writeInvoke(MethodWriter writer) throws BytecodeException
 	{
 		String owner = this.theClass.getInternalName();
 		String name = "<init>";
@@ -659,7 +660,7 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void writeArguments(MethodWriter writer, IArguments arguments)
+	public void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{

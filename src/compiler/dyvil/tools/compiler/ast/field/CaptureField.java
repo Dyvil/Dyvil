@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class CaptureField implements IVariable
@@ -229,13 +230,13 @@ public final class CaptureField implements IVariable
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		writer.visitField(Modifiers.PRIVATE | Modifiers.MANDATED, this.name, this.type.getExtendedName(), this.type.getSignature(), null);
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance)
+	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		String owner = this.theClass.getInternalName();
@@ -245,7 +246,7 @@ public final class CaptureField implements IVariable
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value)
+	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		if (value != null)

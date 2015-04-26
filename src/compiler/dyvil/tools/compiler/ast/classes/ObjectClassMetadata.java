@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ObjectClassMetadata extends ClassMetadata
@@ -69,7 +70,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer, IValue instanceFields)
+	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
 	{
 		if (this.instanceField != null)
 		{

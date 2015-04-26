@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public class NestedMethod extends Method
 {
@@ -152,7 +153,7 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		int modifiers = this.modifiers & 0xFFFF;
 		if (this.value == null)
@@ -231,7 +232,7 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
 	{
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
@@ -242,7 +243,7 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
@@ -253,7 +254,7 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{

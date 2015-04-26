@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class EnumValue extends ASTNode implements IConstantValue, INamed
@@ -102,7 +103,7 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		String owner = this.type.getInternalName();
 		String name = this.name.qualified;
@@ -111,7 +112,7 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.ARETURN);

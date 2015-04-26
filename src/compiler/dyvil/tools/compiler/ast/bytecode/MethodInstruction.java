@@ -5,6 +5,7 @@ import org.objectweb.asm.Type;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class MethodInstruction implements IInstruction
@@ -79,7 +80,7 @@ public final class MethodInstruction implements IInstruction
 	}
 	
 	@Override
-	public void write(MethodWriter writer)
+	public void write(MethodWriter writer) throws BytecodeException
 	{
 		this.getDesc();
 		writer.writeInvokeInsn(this.opcode, this.owner, this.name, this.desc, this.isInterface);
