@@ -8,7 +8,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public final class MethodWriterImpl implements MethodWriter
 {
@@ -17,8 +17,12 @@ public final class MethodWriterImpl implements MethodWriter
 	public ClassWriter			cw;
 	protected MethodVisitor		mv;
 	
+	private Frame				frame			= new Frame();
+	private boolean				visitFrame;
+	private int					maxLocals;
+	private int					maxStack;
+	
 	private boolean				hasReturn;
-	private int					localIndex;
 	private int					inlineOffset;
 	private Label				inlineEnd;
 	
@@ -38,9 +42,15 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void setInstanceMethod()
+	public Frame getFrame()
 	{
-		this.localIndex = 1;
+		return this.frame;
+	}
+	
+	@Override
+	public void setInstanceMethod(String type)
+	{
+		this.frame.setInstance(type);
 	}
 	
 	@Override
@@ -65,9 +75,15 @@ public final class MethodWriterImpl implements MethodWriter
 	
 	public void insnCallback()
 	{
+		if (this.visitFrame)
+		{
+			this.mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, this.frame.localCount, this.frame.locals, this.frame.stackCount, this.frame.stack);
+		}
+		
 		if (this.hasReturn && this.inlineEnd != null)
 		{
 			this.mv.visitJumpInsn(Opcodes.GOTO, this.inlineEnd);
+			this.visitFrame = true;
 			this.hasReturn = false;
 		}
 	}
@@ -79,12 +95,8 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.mv.visitParameter(name, access);
 		
-		if (type == Types.LONG || type == Types.DOUBLE)
-		{
-			return this.localIndex = index + 2;
-		}
-		
-		return this.localIndex = index + 1;
+		this.frame.setLocal(index, type.getFrameType());
+		return this.frame.localCount;
 	}
 	
 	@Override
@@ -98,13 +110,13 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public int localCount()
 	{
-		return this.localIndex;
+		return this.frame.localCount;
 	}
 	
 	@Override
 	public void resetLocals(int count)
 	{
-		this.localIndex = count;
+		this.frame.localCount = count;
 	}
 	
 	@Override
@@ -125,6 +137,8 @@ public final class MethodWriterImpl implements MethodWriter
 	public void writeLDC(int value)
 	{
 		this.insnCallback();
+		
+		this.frame.push(ClassFormat.INT);
 		
 		switch (value)
 		{
@@ -168,6 +182,8 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
+		this.frame.push(ClassFormat.LONG);
+		
 		if (value == 0L)
 		{
 			this.mv.visitInsn(LCONST_0);
@@ -185,6 +201,8 @@ public final class MethodWriterImpl implements MethodWriter
 	public void writeLDC(float value)
 	{
 		this.insnCallback();
+		
+		this.frame.push(ClassFormat.FLOAT);
 		
 		if (value == 0F)
 		{
@@ -209,6 +227,8 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
+		this.frame.push(ClassFormat.DOUBLE);
+		
 		if (value == 0D)
 		{
 			this.mv.visitInsn(DCONST_0);
@@ -227,6 +247,8 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
+		this.frame.push("java/lang/String");
+		
 		this.mv.visitLdcInsn(value);
 	}
 	
@@ -234,6 +256,8 @@ public final class MethodWriterImpl implements MethodWriter
 	public void writeLDC(Type type)
 	{
 		this.insnCallback();
+		
+		this.frame.push(type.getInternalName());
 		
 		this.mv.visitLdcInsn(type);
 	}
@@ -245,6 +269,13 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
+		if (label.info != null)
+		{
+			this.frame = (Frame) label.info;
+			this.visitFrame = true;
+			label.info = null;
+		}
+		
 		this.mv.visitLabel(label);
 	}
 	
@@ -254,6 +285,8 @@ public final class MethodWriterImpl implements MethodWriter
 	public void writeInsn(int opcode) throws BytecodeException
 	{
 		this.insnCallback();
+		
+		this.frame.visitInsn(opcode);
 		
 		if (opcode > 255)
 		{
@@ -360,6 +393,8 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
+		this.frame.visitIntInsn(opcode, operand);
+		
 		this.mv.visitIntInsn(opcode, operand);
 	}
 	
@@ -448,6 +483,13 @@ public final class MethodWriterImpl implements MethodWriter
 				return;
 			}
 		}
+		
+		this.visitFrame = true;
+		
+		target.info = this.frame;
+		this.frame = this.frame.copy();
+		
+		this.frame.visitJumpInsn(opcode);
 		this.mv.visitJumpInsn(opcode, target);
 	}
 	
@@ -455,6 +497,8 @@ public final class MethodWriterImpl implements MethodWriter
 	public void writeTypeInsn(int opcode, String type) throws BytecodeException
 	{
 		this.insnCallback();
+		
+		this.frame.visitTypeInsn(opcode, type);
 		
 		this.mv.visitTypeInsn(opcode, type);
 	}
@@ -469,6 +513,8 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		
 		this.insnCallback();
+		
+		this.frame.visitNewArray(type, dims);
 		
 		this.mv.visitMultiANewArrayInsn(type, dims);
 	}
@@ -491,11 +537,13 @@ public final class MethodWriterImpl implements MethodWriter
 		this.insnCallback();
 		
 		String extended = type.getExtendedName();
+		this.frame.visitNewArray(extended, dims);
+		
 		this.mv.visitMultiANewArrayInsn(extended, dims);
 	}
 	
 	@Override
-	public void writeIINC(int index, int value)
+	public void writeIINC(int index, int value) throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -507,17 +555,8 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
-		if (index >= this.localIndex)
-		{
-			if (opcode == ISTORE || opcode == FSTORE || opcode == ASTORE)
-			{
-				this.localIndex = index + 1;
-			}
-			else if (opcode == LSTORE || opcode == DSTORE)
-			{
-				this.localIndex = index + 2;
-			}
-		}
+		this.frame.visitVarInsn(opcode, index);
+		
 		this.mv.visitVarInsn(opcode, index);
 	}
 	
@@ -525,6 +564,8 @@ public final class MethodWriterImpl implements MethodWriter
 	public void writeFieldInsn(int opcode, String owner, String name, String desc, Object fieldType) throws BytecodeException
 	{
 		this.insnCallback();
+		
+		this.frame.visitFieldInsn(opcode, fieldType);
 		
 		this.mv.visitFieldInsn(opcode, owner, name, desc);
 	}
@@ -534,6 +575,8 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
+		this.frame.visitInvokeInsn(args, returnType);
+		
 		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
 	}
 	
@@ -541,6 +584,8 @@ public final class MethodWriterImpl implements MethodWriter
 	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs) throws BytecodeException
 	{
 		this.insnCallback();
+		
+		this.frame.visitInvokeInsn(args, returnType);
 		
 		this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
 	}
@@ -552,6 +597,8 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
+		this.frame.visitInsn(Opcodes.TABLESWITCH);
+		
 		this.mv.visitTableSwitchInsn(start, end, defaultHandler, handlers);
 	}
 	
@@ -559,6 +606,8 @@ public final class MethodWriterImpl implements MethodWriter
 	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers) throws BytecodeException
 	{
 		this.insnCallback();
+		
+		this.frame.visitInsn(Opcodes.LOOKUPSWITCH);
 		
 		this.mv.visitLookupSwitchInsn(defaultHandler, keys, handlers);
 	}
@@ -581,7 +630,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void endInline(Label end, int localCount)
 	{
-		this.mv.visitLabel(end);
+		this.writeLabel(end);
 		this.inlineEnd = null;
 		this.inlineOffset = 0;
 		this.hasReturn = false;
@@ -594,7 +643,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.syncLocals = new int[1];
 			this.syncCount = 1;
-			return this.syncLocals[0] = this.localIndex;
+			return this.syncLocals[0] = this.frame.localCount;
 		}
 		
 		int index = this.syncCount++;
@@ -604,7 +653,7 @@ public final class MethodWriterImpl implements MethodWriter
 			System.arraycopy(this.syncLocals, 0, temp, 0, this.syncLocals.length);
 			this.syncLocals = temp;
 		}
-		return this.syncLocals[index] = this.localIndex;
+		return this.syncLocals[index] = this.frame.localCount;
 	}
 	
 	@Override
@@ -628,7 +677,7 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void end()
 	{
-		this.mv.visitMaxs(0, 0);
+		this.mv.visitMaxs(this.frame.maxStack, this.frame.maxLocals);
 		this.mv.visitEnd();
 	}
 	
@@ -645,7 +694,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.mv.visitInsn(type.getReturnOpcode());
 		}
-		this.mv.visitMaxs(0, 0);
+		this.mv.visitMaxs(this.frame.maxStack, this.frame.maxLocals);
 		this.mv.visitEnd();
 	}
 	

@@ -166,7 +166,7 @@ public class NestedMethod extends Method
 		
 		if (this.thisClass != null)
 		{
-			mw.setInstanceMethod();
+			mw.setInstanceMethod(this.theClass.getInternalName());
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)

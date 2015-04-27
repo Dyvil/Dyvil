@@ -897,7 +897,7 @@ public class Method extends Member implements IMethod
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.setInstanceMethod();
+			mw.setInstanceMethod(this.theClass.getInternalName());
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)

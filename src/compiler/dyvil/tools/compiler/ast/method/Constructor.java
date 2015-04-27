@@ -582,7 +582,7 @@ public class Constructor extends Member implements IConstructor
 		}
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(), this.getSignature(), this.getExceptions()));
 		
-		mw.setInstanceMethod();
+		mw.setInstanceMethod(this.theClass.getInternalName());
 		
 		for (int i = 0; i < this.annotationCount; i++)
 		{

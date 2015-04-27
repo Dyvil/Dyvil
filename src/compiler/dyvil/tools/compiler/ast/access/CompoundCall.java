@@ -389,7 +389,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		}
 	}
 	
-	private boolean writeIINC(MethodWriter writer, IField f)
+	private boolean writeIINC(MethodWriter writer, IField f) throws BytecodeException
 	{
 		if (this.arguments.size() == 1 && f.getType() == Types.INT && f.isVariable())
 		{

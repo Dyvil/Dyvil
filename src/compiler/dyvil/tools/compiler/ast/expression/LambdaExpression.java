@@ -492,7 +492,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		
 		if (instance)
 		{
-			mw.setInstanceMethod();
+			mw.setInstanceMethod(this.thisClass.getInternalName());
 		}
 		
 		int index = 0;

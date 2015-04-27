@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.backend.exception;
 
+import dyvil.reflect.Opcodes;
+
+
 public class InvalidTypeException extends BytecodeException
 {
 	private static final long	serialVersionUID	= -3066382947566741703L;
@@ -19,8 +22,8 @@ public class InvalidTypeException extends BytecodeException
 		super(cause);
 	}
 	
-	public InvalidTypeException(String opcode, String expected, String actual)
+	public InvalidTypeException(int opcode, String location, String expected, String actual)
 	{
-		super("Invalid Type on " + opcode + " Instruction: Expected: " + expected + ", Actual: " + actual);
+		super("Invalid Type on " + Opcodes.toString(opcode) + " Instruction at " + location + ": Expected: " + expected + ", Actual: " + actual);
 	}
 }
