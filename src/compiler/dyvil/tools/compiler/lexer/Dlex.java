@@ -281,7 +281,7 @@ public final class Dlex
 				else if (c == '$' && code.charAt(i + 1) == '{')
 				{
 					i += 2;
-					if (buf.length() == 0 || buf.charAt(0) == '}')
+					if (buf.length() == 0 || buf.charAt(0) != '@')
 					{
 						subtype = STRING_PART;
 					}

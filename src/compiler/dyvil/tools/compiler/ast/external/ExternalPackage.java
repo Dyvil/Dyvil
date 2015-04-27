@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -52,11 +53,25 @@ public class ExternalPackage extends Package
 			return pack;
 		}
 		
+		for (Library lib : DyvilCompiler.config.libraries)
+		{
+			if (lib == this.library)
+			{
+				continue;
+			}
+			
+			pack = lib.resolvePackage(name1);
+			if (pack != null)
+			{
+				this.addSubPackage(pack);
+			}
+		}
+		
 		return null;
 	}
 	
 	@Override
-	public IClass resolveClass(Name name)
+	public synchronized IClass resolveClass(Name name)
 	{
 		for (IClass iclass : this.classes)
 		{
@@ -65,6 +80,7 @@ public class ExternalPackage extends Package
 				return iclass;
 			}
 		}
+		
 		IClass iclass = super.resolveClass(name);
 		if (iclass != null)
 		{
@@ -74,7 +90,7 @@ public class ExternalPackage extends Package
 	}
 	
 	@Override
-	public IClass resolveClass(String name)
+	public synchronized IClass resolveClass(String name)
 	{
 		for (IClass iclass : this.classes)
 		{
@@ -89,15 +105,37 @@ public class ExternalPackage extends Package
 	
 	private IClass loadClass(String name)
 	{
-		synchronized (this)
+		IClass iclass = this.loadClass(name, this.library);
+		if (iclass != null)
 		{
-			InputStream is = this.library.getInputStream(this.internalName + name + ".class");
-			if (is != null)
+			return iclass;
+		}
+		
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			if (library == this.library)
 			{
-				ExternalClass bclass = new ExternalClass(Name.getQualified(name));
-				this.classes.add(bclass);
-				return ClassReader.loadClass(bclass, is, false);
+				continue;
 			}
+			
+			iclass = this.loadClass(name, library);
+			if (iclass != null)
+			{
+				return iclass;
+			}
+		}
+		
+		return null;
+	}
+	
+	private IClass loadClass(String name, Library library)
+	{
+		InputStream is = library.getInputStream(this.internalName + name + ".class");
+		if (is != null)
+		{
+			ExternalClass bclass = new ExternalClass(Name.getQualified(name));
+			this.classes.add(bclass);
+			return ClassReader.loadClass(bclass, is, false);
 		}
 		return null;
 	}

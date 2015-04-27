@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -183,15 +184,23 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		TupleType type = new TupleType();
+		TupleType tupleType = new TupleType();
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue v = this.values[i];
 			v.resolveTypes(markers, context);
-			type.addType(v.getType());
+			
+			IType t = v.getType();
+			if (t.isPrimitive())
+			{
+				tupleType.addType(t.getReferenceType());
+			}
+			else
+			{
+				tupleType.addType(t);
+			}
 		}
-		type.getTheClass();
-		this.tupleType = type;
+		this.tupleType = tupleType;
 	}
 	
 	@Override
@@ -213,13 +222,24 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i].checkTypes(markers, context);
-		}
-		
 		if (this.tupleType instanceof TupleType)
 		{
+			ITypeList typeList = (ITypeList) this.tupleType;
+			for (int i = 0; i < this.valueCount; i++)
+			{
+				IValue v1 = this.values[i].withType(typeList.getType(i));
+				if (v1 != null)
+				{
+					this.values[i] = v1;
+				}
+				else
+				{
+					// TODO Handle error?
+				}
+				
+				this.values[i].checkTypes(markers, context);
+			}
+			
 			return;
 		}
 		
@@ -274,8 +294,8 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return;
 		}
 		
-		TupleType tt = (TupleType) this.tupleType;
-		writer.writeTypeInsn(Opcodes.NEW, this.tupleType.getInternalName());
+		String internal = this.tupleType.getInternalName();
+		writer.writeTypeInsn(Opcodes.NEW, internal);
 		writer.writeInsn(Opcodes.DUP);
 		
 		for (int i = 0; i < this.valueCount; i++)
@@ -283,8 +303,8 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			this.values[i].writeExpression(writer);
 		}
 		
-		String owner = tt.getInternalName();
-		String desc = tt.getConstructorDescriptor();
+		String owner = internal;
+		String desc = TupleType.getConstructorDescriptor(this.valueCount);
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false);
 	}
 	
