@@ -220,10 +220,6 @@ public final class GenericType extends Type implements ITypeList
 	@Override
 	public void appendSignature(StringBuilder buf)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buf.append('[');
-		}
 		buf.append('L').append(this.internalName);
 		if (this.generics != null)
 		{
@@ -240,19 +236,11 @@ public final class GenericType extends Type implements ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
 		buffer.append(this.name);
 		if (this.generics != null)
 		{
 			buffer.append('[');
 			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
-			buffer.append(']');
-		}
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
 			buffer.append(']');
 		}
 	}
@@ -264,7 +252,6 @@ public final class GenericType extends Type implements ITypeList
 		t.theClass = this.theClass;
 		t.name = this.name;
 		t.internalName = this.internalName;
-		t.arrayDimensions = this.arrayDimensions;
 		if (this.generics != null)
 		{
 			t.genericCount = this.genericCount;

@@ -1,13 +1,13 @@
-package dyvil.tools.compiler.ast.generic;
+package dyvil.tools.compiler.ast.type;
 
 import java.util.List;
 
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -15,33 +15,52 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class TypeVariableType extends ASTNode implements IType
+public class ArrayType implements IType
 {
-	public ITypeVariable	typeVar;
+	private IType	type;
 	
-	public TypeVariableType(ITypeVariable typeVar)
+	public ArrayType(IType type)
 	{
-		this.typeVar = typeVar;
+		this.type = type;
+	}
+	
+	public static IType getArrayType(IType type, int dims)
+	{
+		switch (dims)
+		{
+		case 0:
+			return type;
+		case 1:
+			return new ArrayType(type);
+		case 2:
+			return new ArrayType(new ArrayType(type));
+		default:
+			for (; dims > 0; dims--)
+			{
+				type = new ArrayType(type);
+			}
+			return type;
+		}
 	}
 	
 	@Override
 	public int typeTag()
 	{
-		return TYPE_VAR_TYPE;
+		return ARRAY_TYPE;
 	}
 	
 	@Override
 	public void setName(Name name)
 	{
+		this.type.setName(name);
 	}
 	
 	@Override
 	public Name getName()
 	{
-		return null;
+		return this.type.getName();
 	}
 	
 	@Override
@@ -52,97 +71,89 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public IClass getTheClass()
 	{
-		return null;
+		return this.type.getArrayClass();
+	}
+	
+	@Override
+	public boolean isArrayType()
+	{
+		return true;
+	}
+	
+	@Override
+	public int getArrayDimensions()
+	{
+		return 1 + this.type.getArrayDimensions();
+	}
+	
+	@Override
+	public IType getElementType()
+	{
+		return this.type;
 	}
 	
 	@Override
 	public IType getSuperType()
 	{
-		return null;
+		return Types.OBJECT;
 	}
 	
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return this.typeVar.isSuperTypeOf(type);
-	}
-	
-	@Override
-	public boolean isSuperTypeOf2(IType type)
-	{
-		return this.typeVar.isSuperTypeOf(type);
-	}
-	
-	@Override
-	public boolean equals(IType type)
-	{
-		return this.typeVar.isSuperTypeOf(type);
-	}
-	
-	@Override
-	public boolean classEquals(IType type)
-	{
-		return false;
-	}
-	
-	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
-	{
-		if (this.typeVar == typeVar)
-		{
-			return concrete.getReferenceType();
+		int arrayDims = type.getArrayDimensions();
+		if (arrayDims == 0) {
+			return false;
 		}
-		return null;
-	}
-	
-	@Override
-	public boolean hasTypeVariables()
-	{
-		return true;
-	}
-	
-	@Override
-	public IType getConcreteType(ITypeContext context)
-	{
-		if (context == null)
+		int thisDims = this.getArrayDimensions();
+		if (arrayDims > thisDims)
 		{
-			return this;
+			return this.type.getTheClass() == Types.OBJECT_CLASS;
 		}
-		
-		IType t = context.resolveType(this.typeVar);
-		if (t != null)
-		{
-			if (t.isPrimitive())
-			{
-				return t.getReferenceType();
-			}
-			return t;
-		}
-		return this;
+		return this.type.isSuperTypeOf(type);
 	}
 	
 	@Override
 	public boolean isResolved()
 	{
-		return true;
+		return this.type.isResolved();
 	}
 	
 	@Override
 	public IType resolve(MarkerList markers, IContext context)
 	{
+		this.type = this.type.resolve(markers, context);
 		return this;
+	}
+	
+	@Override
+	public boolean hasTypeVariables()
+	{
+		return this.type.hasTypeVariables();
+	}
+	
+	@Override
+	public IType getConcreteType(ITypeContext context)
+	{
+		return new ArrayType(this.type.getConcreteType(context));
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar)
+	{
+		return this.type.resolveType(typeVar);
 	}
 	
 	@Override
 	public boolean isStatic()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override
 	public IClass getThisClass()
 	{
-		return null;
+		return this.type.getArrayClass();
 	}
 	
 	@Override
@@ -172,6 +183,7 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
+		this.type.getArrayClass().getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
@@ -182,7 +194,7 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public byte getAccessibility(IMember member)
 	{
-		return 0;
+		return this.type.getArrayClass().getAccessibility(member);
 	}
 	
 	@Override
@@ -199,55 +211,45 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public String getInternalName()
 	{
-		if (this.typeVar.upperBoundCount() > 0)
-		{
-			return this.typeVar.getUpperBound(0).getInternalName();
-		}
-		return "java/lang/Object";
+		return this.getExtendedName();
 	}
 	
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
-		buffer.append('L').append(this.getInternalName()).append(';');
+		buffer.append('[');
+		this.type.appendExtendedName(buffer);
 	}
 	
 	@Override
 	public String getSignature()
 	{
-		StringBuilder buffer = new StringBuilder();
-		this.appendSignature(buffer);
-		return buffer.toString();
+		String s = this.type.getSignature();
+		if (s != null)
+		{
+			return '[' + s;
+		}
+		return null;
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		buffer.append('T').append(this.typeVar.getName().qualified).append(';');
+		buffer.append('[');
+		this.type.appendSignature(buffer);
 	}
 	
 	@Override
 	public IType clone()
 	{
-		return new TypeVariableType(this.typeVar);
-	}
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder buf = new StringBuilder();
-		IGeneric generic = this.typeVar.getGeneric();
-		this.toString("", buf);
-		if (generic instanceof INamed)
-		{
-			buf.append(" (of type ").append(((INamed) generic).getName()).append(")");
-		}
-		return buf.toString();
+		return new ArrayType(this.type);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.typeVar.getName());
+		buffer.append('[');
+		this.type.toString(prefix, buffer);
+		buffer.append(']');
 	}
 }

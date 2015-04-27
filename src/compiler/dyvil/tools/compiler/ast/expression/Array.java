@@ -7,6 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
@@ -88,13 +89,13 @@ public final class Array extends ASTNode implements IValue, IValueList
 			t = Type.findCommonSuperType(t, t1);
 			if (t == null)
 			{
-				this.elementType = Types.ANY;
-				return this.requiredType = Types.ANY.getArrayType(1);
+				t = Types.ANY;
+				break;
 			}
 		}
 		
 		this.elementType = t;
-		return this.requiredType = t.getArrayType();
+		return this.requiredType = new ArrayType(t);
 	}
 	
 	@Override

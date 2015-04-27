@@ -236,9 +236,9 @@ public final class TypeParser extends Parser implements ITyped
 	
 	public void end()
 	{
-		if (this.type != null)
+		if (this.type != null && this.arrayDimensions > 0)
 		{
-			this.type.setArrayDimensions(this.arrayDimensions);
+			this.type = ArrayType.getArrayType(this.type, this.arrayDimensions);
 		}
 		this.typed.setType(this.type);
 	}

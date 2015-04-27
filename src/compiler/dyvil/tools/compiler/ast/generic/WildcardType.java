@@ -22,8 +22,6 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class WildcardType extends BaseBounded implements IType
 {
-	public int	arrayDimensions;
-	
 	public WildcardType()
 	{
 	}
@@ -62,48 +60,6 @@ public final class WildcardType extends BaseBounded implements IType
 	}
 	
 	@Override
-	public void setArrayDimensions(int dimensions)
-	{
-		this.arrayDimensions = dimensions;
-	}
-	
-	@Override
-	public int getArrayDimensions()
-	{
-		return this.arrayDimensions;
-	}
-	
-	@Override
-	public IType getElementType()
-	{
-		WildcardType t = this.clone();
-		t.arrayDimensions--;
-		return t;
-	}
-	
-	@Override
-	public IType getArrayType()
-	{
-		WildcardType t = this.clone();
-		t.arrayDimensions++;
-		return t;
-	}
-	
-	@Override
-	public IType getArrayType(int dimensions)
-	{
-		WildcardType t = this.clone();
-		t.arrayDimensions = dimensions;
-		return t;
-	}
-	
-	@Override
-	public boolean isArrayType()
-	{
-		return this.arrayDimensions > 0;
-	}
-	
-	@Override
 	public IType getSuperType()
 	{
 		return this.upperBoundCount == 0 ? Types.UNKNOWN : this.upperBounds[0];
@@ -112,10 +68,6 @@ public final class WildcardType extends BaseBounded implements IType
 	@Override
 	public boolean equals(IType type)
 	{
-		if (this.arrayDimensions != type.getArrayDimensions())
-		{
-			return false;
-		}
 		if (this.upperBoundCount > 0)
 		{
 			for (int i = 0; i < this.upperBoundCount; i++)
@@ -139,10 +91,6 @@ public final class WildcardType extends BaseBounded implements IType
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (this.arrayDimensions != type.getArrayDimensions())
-		{
-			return false;
-		}
 		return super.isSuperTypeOf(type);
 	}
 	
@@ -204,7 +152,6 @@ public final class WildcardType extends BaseBounded implements IType
 		}
 		
 		WildcardType type = new WildcardType(this.position);
-		type.arrayDimensions = this.arrayDimensions;
 		type.upperBounds = new IType[this.upperBoundCount];
 		type.upperBoundCount = this.upperBoundCount;
 		for (int i = 0; i < this.upperBoundCount; i++)
@@ -256,11 +203,6 @@ public final class WildcardType extends BaseBounded implements IType
 	@Override
 	public IField resolveField(Name name)
 	{
-		if (this.arrayDimensions > 0 || this.upperBoundCount == 0)
-		{
-			return null;
-		}
-		
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
 			IField f = this.upperBounds[i].resolveField(name);
@@ -276,12 +218,6 @@ public final class WildcardType extends BaseBounded implements IType
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		if (this.arrayDimensions > 0)
-		{
-			Types.getObjectArray().getMethodMatches(list, instance, name, arguments);
-			return;
-		}
-		
 		if (this.upperBoundCount == 0)
 		{
 			Types.OBJECT_CLASS.getMethodMatches(list, instance, name, arguments);
@@ -329,10 +265,6 @@ public final class WildcardType extends BaseBounded implements IType
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
 		buffer.append('L').append(this.getInternalName()).append(';');
 	}
 	
@@ -385,7 +317,6 @@ public final class WildcardType extends BaseBounded implements IType
 	public WildcardType clone()
 	{
 		WildcardType clone = new WildcardType(this.position);
-		clone.arrayDimensions = this.arrayDimensions;
 		clone.lowerBound = this.lowerBound;
 		clone.upperBoundCount = this.upperBoundCount;
 		clone.upperBounds = this.upperBounds;
@@ -395,11 +326,6 @@ public final class WildcardType extends BaseBounded implements IType
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
-		
 		buffer.append('_');
 		if (this.lowerBound != null)
 		{
@@ -415,11 +341,6 @@ public final class WildcardType extends BaseBounded implements IType
 				buffer.append(Formatting.Type.genericBoundSeperator);
 				this.upperBounds[i].toString(prefix, buffer);
 			}
-		}
-		
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append(']');
 		}
 	}
 }

@@ -33,10 +33,12 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	int	TYPE_VAR_TYPE	= 4;
 	int	WILDCARD_TYPE	= 5;
 	
-	int	TUPLE_TYPE		= 6;
-	int	FUNCTION_TYPE	= 7;
+	int	ARRAY_TYPE		= 6;
+	int	MULTI_ARRAY		= 7;
+	int	TUPLE_TYPE		= 8;
+	int	FUNCTION_TYPE	= 9;
 	
-	int	DYNAMIC			= 8;
+	int	DYNAMIC			= 10;
 	
 	public int typeTag();
 	
@@ -81,40 +83,25 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	// Arrays
 	
-	public void setArrayDimensions(int dimensions);
+	public default boolean isArrayType()
+	{
+		return false;
+	}
 	
-	public int getArrayDimensions();
+	public default int getArrayDimensions()
+	{
+		return 0;
+	}
 	
 	public default IType getElementType()
 	{
-		IType type1 = this.clone();
-		type1.removeArrayDimension();
-		return type1;
+		return this;
 	}
 	
-	public default IType getArrayType()
+	public default IClass getArrayClass()
 	{
-		IType type1 = this.clone();
-		type1.addArrayDimension();
-		return type1;
+		return Types.getObjectArray();
 	}
-	
-	public default IType getArrayType(int dimensions)
-	{
-		IType type1 = this.clone();
-		type1.setArrayDimensions(dimensions);
-		return type1;
-	}
-	
-	public default void addArrayDimension()
-	{
-	}
-	
-	public default void removeArrayDimension()
-	{
-	}
-	
-	public boolean isArrayType();
 	
 	// Super Type
 	
@@ -130,18 +117,9 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	{
 		IClass thisClass = this.getTheClass();
 		IClass thatClass = type.getTheClass();
-		int arrayDimensions = type.getArrayDimensions();
-		if (thisClass == Types.OBJECT_CLASS)
+		if (type.isArrayType())
 		{
-			if (arrayDimensions > 0)
-			{
-				return arrayDimensions >= this.getArrayDimensions();
-			}
-			return true;
-		}
-		if (arrayDimensions != this.getArrayDimensions())
-		{
-			return false;
+			return thisClass == Types.OBJECT_CLASS;
 		}
 		if (thatClass != null)
 		{
@@ -163,10 +141,6 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	public default boolean equals(IType type)
 	{
-		if (this.getArrayDimensions() != type.getArrayDimensions())
-		{
-			return false;
-		}
 		return this.getTheClass() == type.getTheClass();
 	}
 	

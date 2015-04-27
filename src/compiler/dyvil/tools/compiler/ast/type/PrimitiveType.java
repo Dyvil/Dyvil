@@ -106,7 +106,7 @@ public final class PrimitiveType extends Type
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.arrayDimensions == 0;
+		return true;
 	}
 	
 	@Override
@@ -130,29 +130,21 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public IType getElementType()
+	public IClass getArrayClass()
 	{
-		int newDims = this.arrayDimensions - 1;
-		if (newDims == 0)
-		{
-			return fromTypecode(this.typecode);
-		}
-		PrimitiveType t = new PrimitiveType(this.name, this.typecode);
-		t.theClass = this.theClass;
-		t.arrayDimensions = newDims;
-		return t;
-	}
-	
-	@Override
-	public boolean isResolved()
-	{
-		return true;
+		return Types.getPrimitiveArray(this.typecode);
 	}
 	
 	@Override
 	public boolean isSuperTypeOf2(IType that)
 	{
 		return this.theClass == that.getTheClass();
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return true;
 	}
 	
 	@Override
@@ -198,20 +190,12 @@ public final class PrimitiveType extends Type
 	@Override
 	public void appendExtendedName(StringBuilder buf)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buf.append('[');
-		}
 		buf.append(this.getInternalName());
 	}
 	
 	@Override
 	public int getLoadOpcode()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return Opcodes.ALOAD;
-		}
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
@@ -259,10 +243,6 @@ public final class PrimitiveType extends Type
 	@Override
 	public int getStoreOpcode()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return Opcodes.ASTORE;
-		}
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
@@ -310,10 +290,6 @@ public final class PrimitiveType extends Type
 	@Override
 	public int getReturnOpcode()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return Opcodes.ARETURN;
-		}
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
@@ -336,11 +312,6 @@ public final class PrimitiveType extends Type
 	@Override
 	public void writeDefaultValue(MethodWriter writer)
 	{
-		if (this.arrayDimensions > 0)
-		{
-			writer.writeInsn(Opcodes.ACONST_NULL);
-			return;
-		}
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
@@ -365,10 +336,6 @@ public final class PrimitiveType extends Type
 	@Override
 	public IConstantValue getDefaultValue()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return NullValue.getNull();
-		}
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
@@ -411,18 +378,6 @@ public final class PrimitiveType extends Type
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		if (this.arrayDimensions > 0)
-		{
-			if (this.arrayDimensions == 1)
-			{
-				Types.getPrimitiveArray(this.typecode).getMethodMatches(list, instance, name, arguments);
-				return;
-			}
-			
-			Types.getObjectArray().getMethodMatches(list, instance, name, arguments);
-			return;
-		}
-		
 		if (this.theClass != null)
 		{
 			this.theClass.getMethodMatches(list, instance, name, arguments);
@@ -439,7 +394,6 @@ public final class PrimitiveType extends Type
 	{
 		PrimitiveType t = new PrimitiveType(this.name, this.typecode);
 		t.theClass = this.theClass;
-		t.arrayDimensions = this.arrayDimensions;
 		return t;
 	}
 }

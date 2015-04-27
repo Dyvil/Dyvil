@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
@@ -100,7 +101,7 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 				{
 					this.paramList.setVarargs();
 					this.varargs = false;
-					this.type = this.type.getArrayType();
+					this.type = new ArrayType(this.type);
 				}
 				
 				this.parameter = this.paramList instanceof IClass ? new ClassParameter(token.nameValue(), this.type) : new MethodParameter(token.nameValue(),

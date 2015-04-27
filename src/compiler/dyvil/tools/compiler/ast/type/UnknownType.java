@@ -65,23 +65,6 @@ public final class UnknownType extends ASTNode implements IType
 	}
 	
 	@Override
-	public void setArrayDimensions(int dimensions)
-	{
-	}
-	
-	@Override
-	public int getArrayDimensions()
-	{
-		return 0;
-	}
-	
-	@Override
-	public boolean isArrayType()
-	{
-		return false;
-	}
-	
-	@Override
 	public IType getSuperType()
 	{
 		return null;

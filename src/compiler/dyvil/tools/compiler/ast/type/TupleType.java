@@ -24,8 +24,6 @@ public final class TupleType implements IType, ITypeList
 	public static final IClass[]	tupleClasses	= new IClass[22];
 	public static final String[]	descriptors		= new String[22];
 	
-	private int						arrayDimensions;
-	
 	protected IType[]				types;
 	protected int					typeCount;
 	
@@ -150,24 +148,6 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public void setArrayDimensions(int dimensions)
-	{
-		this.arrayDimensions = dimensions;
-	}
-	
-	@Override
-	public int getArrayDimensions()
-	{
-		return this.arrayDimensions;
-	}
-	
-	@Override
-	public boolean isArrayType()
-	{
-		return this.arrayDimensions > 0;
-	}
-	
-	@Override
 	public int typeCount()
 	{
 		return this.typeCount;
@@ -203,11 +183,6 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (this.arrayDimensions != type.getArrayDimensions())
-		{
-			return false;
-		}
-		
 		if (type.isGenericType())
 		{
 			if (this.getTheClass() != type.getTheClass())
@@ -385,10 +360,6 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
 		buffer.append('L').append(this.getInternalName()).append(';');
 	}
 	
@@ -403,10 +374,6 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public void appendSignature(StringBuilder buf)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buf.append('[');
-		}
 		buf.append('L').append(this.getInternalName());
 		buf.append('<');
 		for (IType t : this.types)
@@ -419,17 +386,9 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
 		buffer.append(Formatting.Expression.tupleStart);
 		Util.astToString(prefix, this.types, this.typeCount, Formatting.Expression.tupleSeperator, buffer);
 		buffer.append(Formatting.Expression.tupleEnd);
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append(']');
-		}
 	}
 	
 	@Override
