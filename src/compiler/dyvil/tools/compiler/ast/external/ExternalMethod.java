@@ -41,7 +41,7 @@ public final class ExternalMethod extends Method
 			Annotation annotation = this.annotations[i];
 			annotation.resolveTypes(null, Package.rootPackage);
 			
-			if (annotation.type.getTheClass() != Types.AIntrinsic.theClass)
+			if (annotation.type.getTheClass() != Types.INTRINSIC_CLASS)
 			{
 				continue;
 			}
@@ -214,7 +214,7 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{
@@ -225,15 +225,7 @@ public final class ExternalMethod extends Method
 		{
 			this.resolveAnnotations();
 		}
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			Annotation a = this.annotations[i];
-			if (a.type.equals(type))
-			{
-				return a;
-			}
-		}
-		return null;
+		return super.getAnnotation(type);
 	}
 	
 	@Override

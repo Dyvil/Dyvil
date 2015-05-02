@@ -5,6 +5,7 @@ import java.lang.annotation.ElementType;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -102,7 +103,7 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{
@@ -111,7 +112,7 @@ public abstract class Member extends ASTNode implements IMember
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			if (a.type.equals(type))
+			if (a.type.getTheClass() == type)
 			{
 				return a;
 			}

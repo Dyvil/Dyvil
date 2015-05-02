@@ -175,7 +175,7 @@ public final class ExternalClass extends CodeClass
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		if (!this.annotationsResolved)
 		{

@@ -212,7 +212,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{
@@ -222,7 +222,7 @@ public class CodeClass extends ASTNode implements IClass
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			if (a.type.classEquals(type))
+			if (a.type.getTheClass() == type)
 			{
 				return a;
 			}

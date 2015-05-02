@@ -311,7 +311,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation annotation = this.annotations[i];
-			if (annotation.type.getTheClass() != Types.AIntrinsic.theClass)
+			if (annotation.type.getTheClass() != Types.INTRINSIC_CLASS)
 			{
 				continue;
 			}

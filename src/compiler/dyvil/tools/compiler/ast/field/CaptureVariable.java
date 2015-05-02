@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.field;
 import java.lang.annotation.ElementType;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -131,7 +132,7 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		return this.variable.getAnnotation(type);
 	}

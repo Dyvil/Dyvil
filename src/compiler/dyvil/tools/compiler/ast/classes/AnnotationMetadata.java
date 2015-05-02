@@ -56,7 +56,7 @@ public final class AnnotationMetadata implements IClassMetadata
 		}
 		if (this.retention == null)
 		{
-			Annotation retention = this.theClass.getAnnotation(Types.ARetention);
+			Annotation retention = this.theClass.getAnnotation(Types.RETENTION_CLASS);
 			if (retention != null)
 			{
 				EnumValue value = (EnumValue) retention.arguments.getValue(0, Annotation.VALUE);
@@ -68,7 +68,7 @@ public final class AnnotationMetadata implements IClassMetadata
 			return;
 		}
 		
-		Annotation target = this.theClass.getAnnotation(Types.ATarget);
+		Annotation target = this.theClass.getAnnotation(Types.TARGET_CLASS);
 		if (target == null)
 		{
 			return;

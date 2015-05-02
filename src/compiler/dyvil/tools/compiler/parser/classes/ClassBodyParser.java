@@ -312,7 +312,7 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		return null;
 	}

@@ -59,7 +59,7 @@ public class ExternalField extends Field
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{
@@ -70,15 +70,7 @@ public class ExternalField extends Field
 		{
 			this.resolveAnnotations();
 		}
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			Annotation a = this.annotations[i];
-			if (a.type.equals(type))
-			{
-				return a;
-			}
-		}
-		return null;
+		return super.getAnnotation(type);
 	}
 	
 	@Override

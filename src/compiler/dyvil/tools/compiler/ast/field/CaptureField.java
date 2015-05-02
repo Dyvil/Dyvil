@@ -157,7 +157,7 @@ public final class CaptureField implements IVariable
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		return this.field.getAnnotation(type);
 	}
