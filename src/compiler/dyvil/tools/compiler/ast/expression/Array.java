@@ -7,10 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.ArrayType;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -20,7 +17,7 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Array extends ASTNode implements IValue, IValueList
 {
-	public static final IType	ARRAY_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("ArrayConvertible"));
+	public static final Type	ARRAY_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("ArrayConvertible"));
 	
 	protected IValue[]			values				= new IValue[3];
 	protected int				valueCount;
@@ -95,6 +92,26 @@ public final class Array extends ASTNode implements IValue, IValueList
 		}
 		
 		this.elementType = t;
+		
+		if (t.getTheClass() == Types.TUPLE2_CLASS)
+		{
+			GenericType type = new GenericType(Types.MAP_CLASS);
+			type.genericCount = 2;
+			
+			switch (t.typeTag())
+			{
+			case IType.GENERIC_TYPE:
+			case IType.TUPLE_TYPE:
+				ITypeList t1 = (ITypeList) t;
+				type.generics[0] = t1.getType(0);
+				type.generics[1] = t1.getType(1);
+				break;
+			default:
+				type.generics[0] = type.generics[1] = Types.ANY;
+			}
+			
+			return this.requiredType = type;
+		}
 		return this.requiredType = new ArrayType(t);
 	}
 	
@@ -333,6 +350,11 @@ public final class Array extends ASTNode implements IValue, IValueList
 			writer.writeLDC(i);
 			value.writeExpression(writer);
 			writer.writeInsn(opcode);
+		}
+		
+		if (this.requiredType.getTheClass() == Types.MAP_CLASS)
+		{
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Map", "apply", "([Ldyvil/tuple/Tuple2;)Ldyvil/collection/immutable/ImmutableMap;", true);
 		}
 	}
 	
