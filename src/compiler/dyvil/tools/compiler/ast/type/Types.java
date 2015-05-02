@@ -26,7 +26,6 @@ public final class Types
 	public static final Type			CLASS				= new Type("java/lang/Class", Name.getQualified("Class"));
 	public static final Type			PREDEF				= new Type("dyvil/lang/Predef", Name.getQualified("Predef"));
 	
-	public static final Type			ARRAY_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("ArrayConvertible"));
 	public static final Type			MAP					= new Type("dyvil/lang/Map", Name.getQualified("Map"));
 	
 	public static final Type			AIntrinsic			= new Type("dyvil/annotation/Intrinsic", Name.getQualified("Intrinsic"));

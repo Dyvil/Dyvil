@@ -115,7 +115,7 @@ public final class ClassFormat
 	
 	public static IType extendedToType(String extended)
 	{
-		return readType(extended, 0, extended.length());
+		return readType(extended, 0, extended.length() - 1);
 	}
 	
 	public static IType readReturnType(String desc)
