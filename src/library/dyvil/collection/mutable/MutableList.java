@@ -182,6 +182,15 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	public int lastIndexOf(E element);
 	
 	@Override
+	public Object[] toArray();
+	
+	@Override
+	public E[] toArray(Class<E> type);
+	
+	@Override
+	public Object[] toArray(Object[] store);
+	
+	@Override
 	public MutableList<E> copy();
 	
 	@Override

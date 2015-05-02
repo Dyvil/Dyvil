@@ -7,6 +7,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.ImmutableMap;
 import dyvil.lang.Map;
 import dyvil.math.MathUtils;
@@ -207,6 +208,16 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		this.threshold = (int) Math.min(size * loadFactor, MAX_ARRAY_SIZE + 1);
 	}
 	
+	public HashMap(Map<K, V> map)
+	{
+		this(map.size(), DEFAULT_LOAD_FACTOR);
+		for (Iterator<Map.Entry<K, V>> iterator = map.entryIterator(); iterator.hasNext();)
+		{
+			Map.Entry<K, V> entry = iterator.next();
+			this.update(entry.getKey(), entry.getValue());
+		}
+	}
+	
 	static int hash(int h)
 	{
 		h ^= h >>> 20 ^ h >>> 12;
@@ -380,24 +391,19 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		return false;
 	}
 	
-	private V applyNull()
-	{
-		for (Entry<K, V> e = this.entries[0]; e != null; e = e.next)
-		{
-			if (e.key == null)
-			{
-				return e.value;
-			}
-		}
-		return null;
-	}
-	
 	@Override
 	public V apply(K key)
 	{
 		if (key == null)
 		{
-			return this.applyNull();
+			for (Entry<K, V> e = this.entries[0]; e != null; e = e.next)
+			{
+				if (e.key == null)
+				{
+					return e.value;
+				}
+			}
+			return null;
 		}
 		
 		int hash = hash(key.hashCode());
@@ -834,7 +840,8 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return null; // FIXME
+		// TODO immutable.HashMap
+		return new ArrayMap(this);
 	}
 	
 	@Override

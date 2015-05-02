@@ -16,6 +16,12 @@ import dyvil.lang.ImmutableException;
 
 public interface ImmutableCollection<E> extends Collection<E>, Immutable
 {
+	// NilConvertible
+	public static <E> ImmutableCollection<E> apply()
+	{
+		return ImmutableList.apply();
+	}
+	
 	@Override
 	public int size();
 	

@@ -56,6 +56,18 @@ public class ArrayList<E> implements MutableList<E>
 		this.size = size;
 	}
 	
+	public ArrayList(Collection<E> collection)
+	{
+		this.size = collection.size();
+		this.elements = new Object[this.size];
+		
+		int index = 0;
+		for (E element : collection)
+		{
+			this.elements[index++] = element;
+		}
+	}
+	
 	private void rangeCheck(int index)
 	{
 		if (index < 0)

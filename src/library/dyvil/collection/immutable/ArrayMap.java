@@ -13,6 +13,28 @@ import dyvil.tuple.Tuple2;
 
 public class ArrayMap<K, V> implements ImmutableMap<K, V>
 {
+	protected class Entry implements Map.Entry<K, V>
+	{
+		private int	index;
+		
+		private Entry(int index)
+		{
+			this.index = index;
+		}
+		
+		@Override
+		public K getKey()
+		{
+			return ArrayMap.this.keys[this.index];
+		}
+		
+		@Override
+		public V getValue()
+		{
+			return ArrayMap.this.values[this.index];
+		}
+	}
+	
 	private int	size;
 	private K[]	keys;
 	private V[]	values;
@@ -43,25 +65,19 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		this.size = size;
 	}
 	
-	private class Entry implements Map.Entry<K, V>
+	public ArrayMap(Map<K, V> map)
 	{
-		private int	index;
+		this.size = map.size();
+		this.keys = (K[]) new Object[this.size];
+		this.values = (V[]) new Object[this.size];
 		
-		private Entry(int index)
+		int index = 0;
+		for (Iterator<Map.Entry<K, V>> iterator = map.entryIterator(); iterator.hasNext();)
 		{
-			this.index = index;
-		}
-		
-		@Override
-		public K getKey()
-		{
-			return ArrayMap.this.keys[this.index];
-		}
-		
-		@Override
-		public V getValue()
-		{
-			return ArrayMap.this.values[this.index];
+			Map.Entry<K, V> entry = iterator.next();
+			this.keys[index] = entry.getKey();
+			this.values[index] = entry.getValue();
+			index++;
 		}
 	}
 	

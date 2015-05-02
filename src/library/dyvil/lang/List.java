@@ -271,6 +271,17 @@ public interface List<E> extends Collection<E>, ArrayConvertible
 	 */
 	public int lastIndexOf(E element);
 	
+	// toArray
+	
+	@Override
+	public Object[] toArray();
+	
+	@Override
+	public E[] toArray(Class<E> type);
+	
+	@Override
+	public Object[] toArray(Object[] store);
+	
 	// Copying
 	
 	@Override

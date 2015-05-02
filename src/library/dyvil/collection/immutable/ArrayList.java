@@ -29,6 +29,18 @@ public class ArrayList<E> implements ImmutableList<E>
 		this.size = size;
 	}
 	
+	public ArrayList(Collection<E> elements)
+	{
+		this.size = elements.size();
+		this.elements = new Object[this.size];
+		
+		int index = 0;
+		for (E element : elements)
+		{
+			this.elements[index++] = element;
+		}
+	}
+	
 	private void rangeCheck(int index)
 	{
 		if (index < 0)

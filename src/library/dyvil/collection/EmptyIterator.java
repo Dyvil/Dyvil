@@ -13,8 +13,7 @@ public class EmptyIterator<E> implements Iterator<E>
 		return instance;
 	}
 	
-	@Deprecated
-	public EmptyIterator()
+	private EmptyIterator()
 	{
 	}
 	

@@ -1,7 +1,6 @@
 package dyvil.collection;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 public final class ArrayIterator<E> implements Iterator<E>
 {
@@ -31,10 +30,6 @@ public final class ArrayIterator<E> implements Iterator<E>
 	@Override
 	public E next()
 	{
-		if (this.index >= this.size)
-		{
-			throw new NoSuchElementException("ArrayIterator.next()");
-		}
 		return this.array[this.index++];
 	}
 	
@@ -47,12 +42,6 @@ public final class ArrayIterator<E> implements Iterator<E>
 	@Override
 	public void remove()
 	{
-		int numMoved = this.size - this.index - 1;
-		if (numMoved > 0)
-		{
-			System.arraycopy(this.array, this.index + 1, this.array, this.index, numMoved);
-		}
-		this.array[--this.size] = null;
-		this.index--;
+		throw new UnsupportedOperationException();
 	}
 }

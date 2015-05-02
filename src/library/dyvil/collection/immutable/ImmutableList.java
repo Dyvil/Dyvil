@@ -242,6 +242,17 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	@Override
 	public int lastIndexOf(E element);
 	
+	// toArray
+	
+	@Override
+	public Object[] toArray();
+	
+	@Override
+	public E[] toArray(Class<E> type);
+	
+	@Override
+	public Object[] toArray(Object[] store);
+	
 	// Copying
 	
 	@Override

@@ -14,6 +14,12 @@ import dyvil.lang.Collection;
 
 public interface MutableCollection<E> extends Collection<E>
 {
+	// NilConvertible
+	public static <E> MutableCollection<E> apply()
+	{
+		return MutableList.apply();
+	}
+	
 	@Override
 	public int size();
 	

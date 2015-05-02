@@ -17,7 +17,12 @@ public class EmptyList<E> implements ImmutableList<E>
 {
 	static final EmptyList	emptyList	= new EmptyList();
 	
-	public EmptyList()
+	public static <E> EmptyList<E> apply()
+	{
+		return emptyList;
+	}
+	
+	private EmptyList()
 	{
 	}
 	
@@ -59,7 +64,7 @@ public class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public E apply(int index)
 	{
-		throw new IndexOutOfBoundsException("apply() on Empty List");
+		throw new IndexOutOfBoundsException("Empty List.apply()");
 	}
 	
 	@Override
@@ -73,7 +78,7 @@ public class EmptyList<E> implements ImmutableList<E>
 	{
 		if (startIndex > 0 || length > 0)
 		{
-			throw new IndexOutOfBoundsException("Slice out of range for Empty List");
+			throw new IndexOutOfBoundsException("Empty List Slice out of range");
 		}
 		return this;
 	}

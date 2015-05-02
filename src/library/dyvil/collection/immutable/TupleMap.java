@@ -28,6 +28,19 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		this.entries = entries;
 	}
 	
+	public TupleMap(Map<K, V> map)
+	{
+		this.size = map.size();
+		this.entries = new Tuple2[this.size];
+		
+		int index = 0;
+		for (Iterator<Map.Entry<K, V>> iterator = map.entryIterator(); iterator.hasNext();)
+		{
+			Map.Entry<K, V> entry = iterator.next();
+			this.entries[index++] = new Tuple2(entry.getKey(), entry.getValue());
+		}
+	}
+	
 	@Override
 	public int size()
 	{
@@ -56,13 +69,13 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 			@Override
 			public boolean hasNext()
 			{
-				return index < size;
+				return this.index < TupleMap.this.size;
 			}
 			
 			@Override
 			public K next()
 			{
-				return entries[index++]._1;
+				return TupleMap.this.entries[this.index++]._1;
 			}
 		};
 	}
@@ -77,13 +90,13 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 			@Override
 			public boolean hasNext()
 			{
-				return index < size;
+				return this.index < TupleMap.this.size;
 			}
 			
 			@Override
 			public V next()
 			{
-				return entries[index++]._2;
+				return TupleMap.this.entries[this.index++]._2;
 			}
 		};
 	}
@@ -119,7 +132,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			if (key == entry._1 || (key != null && key.equals(entry._1)))
+			if (key == entry._1 || key != null && key.equals(entry._1))
 			{
 				return true;
 			}
@@ -133,9 +146,9 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			if (key == entry._1 || (key != null && key.equals(entry._1)))
+			if (key == entry._1 || key != null && key.equals(entry._1))
 			{
-				if (value == entry._2 || (value != null && value.equals(entry._2)))
+				if (value == entry._2 || value != null && value.equals(entry._2))
 				{
 					return true;
 				}
@@ -150,7 +163,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			if (value == entry._2 || (value != null && value.equals(entry._2)))
+			if (value == entry._2 || value != null && value.equals(entry._2))
 			{
 				return true;
 			}
@@ -164,7 +177,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			if (key == entry._1 || (key != null && key.equals(entry._1)))
+			if (key == entry._1 || key != null && key.equals(entry._1))
 			{
 				return entry._2;
 			}
