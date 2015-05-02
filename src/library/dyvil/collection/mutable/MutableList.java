@@ -12,7 +12,11 @@ import java.util.function.UnaryOperator;
 import dyvil.collection.immutable.ImmutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
+@ArrayConvertible
 public interface MutableList<E> extends MutableCollection<E>, List<E>
 {
 	public static <E> MutableList<E> apply()

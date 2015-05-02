@@ -4,10 +4,12 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 import dyvil.collection.immutable.ImmutableCollection;
-import dyvil.collection.immutable.ImmutableList;
 import dyvil.collection.mutable.MutableCollection;
 import dyvil.lang.literal.NilConvertible;
 
@@ -18,31 +20,32 @@ import dyvil.lang.literal.NilConvertible;
  * mutable and immutable collections, as there is an (im)mutable counterpart for
  * almost every method in this base class.
  * <p>
- * This interface implements the {@link NilConvertible} interface, meaning that
+ * This interface supports the {@link NilConvertible} annotation, meaning that
  * a declaration like
  * 
  * <pre>
  * Collection[String] c = nil
  * </pre>
  * 
- * Would create an empty, immutable list and assign it to the variable {@code c}.
+ * Would create an empty list and assign it to the variable {@code c}.
  * 
  * @author Clashsoft
  * @param <E>
  *            the element type
  */
-public interface Collection<E> extends Iterable<E>, NilConvertible
+@NilConvertible
+public interface Collection<E> extends Iterable<E>
 {
 	/**
-	 * Creates and returns an empty collection. By default, this method returns
-	 * an {@linkplain ImmutableList immutable}, empty {@link List}. This method
+	 * Returns an empty collection. This method
 	 * is primarily for use with the {@code nil} literal in <i>Dyvil</i>.
 	 * 
+	 * @see List#apply()
 	 * @return an empty collection
 	 */
 	public static <E> Collection<E> apply()
 	{
-		return ImmutableList.apply();
+		return List.apply();
 	}
 	
 	// Non-mutating Operations

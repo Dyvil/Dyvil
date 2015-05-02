@@ -13,7 +13,11 @@ import dyvil.collection.mutable.MutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.List;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
+@ArrayConvertible
 public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 {
 	public static <E> ImmutableList<E> apply()

@@ -10,8 +10,14 @@ import java.util.function.Consumer;
 
 import dyvil.collection.immutable.ImmutableMap;
 import dyvil.lang.Map;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
+@NilConvertible
+@TupleConvertible
+@ArrayConvertible
 public interface MutableMap<K, V> extends Map<K, V>
 {
 	public static <K, V> MutableMap<K, V> apply()

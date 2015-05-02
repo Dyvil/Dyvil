@@ -12,8 +12,14 @@ import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Immutable;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.Map;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
+@NilConvertible
+@TupleConvertible
+@ArrayConvertible
 public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 {
 	public static <K, V> ImmutableMap<K, V> apply()

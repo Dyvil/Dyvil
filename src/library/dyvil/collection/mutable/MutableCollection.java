@@ -11,10 +11,11 @@ import java.util.function.UnaryOperator;
 
 import dyvil.collection.immutable.ImmutableCollection;
 import dyvil.lang.Collection;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
 public interface MutableCollection<E> extends Collection<E>
 {
-	// NilConvertible
 	public static <E> MutableCollection<E> apply()
 	{
 		return MutableList.apply();
