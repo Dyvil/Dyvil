@@ -95,12 +95,6 @@ public interface MutableCollection<E> extends Collection<E>
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	@Override
-	public void sort();
-	
-	@Override
-	public void sort(Comparator<? super E> comparator);
-	
-	@Override
 	public MutableCollection<E> copy();
 	
 	@Override

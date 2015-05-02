@@ -134,18 +134,6 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	}
 	
 	@Override
-	public default void sort()
-	{
-		throw new ImmutableException("sort() on Immutable Collection");
-	}
-	
-	@Override
-	public default void sort(Comparator<? super E> comparator)
-	{
-		throw new ImmutableException("sort() on Immutable Collection");
-	}
-	
-	@Override
 	public ImmutableCollection<E> copy();
 	
 	@Override

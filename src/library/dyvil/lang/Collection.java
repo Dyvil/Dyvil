@@ -45,7 +45,7 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 		return ImmutableList.apply();
 	}
 	
-	// Simple Getters
+	// Non-mutating Operations
 	
 	/**
 	 * Returns the size of this collection, i.e. the number of elements
@@ -101,7 +101,7 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 */
 	public boolean $qmark(Object element);
 	
-	// Non-mutating Operations
+	// Copying Operations
 	
 	/**
 	 * Returns a collection that contains all elements of this collection plus
@@ -334,25 +334,7 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 */
 	public void filter(Predicate<? super E> condition);
 	
-	/**
-	 * Sorts the elements of this collection. The sorting order is given by the
-	 * <i>natural order</i> of the elements of this collection, i.e. the order
-	 * specified by their {@link Comparable#compareTo(Object) compareTo} method.
-	 * Thus, this method will fail if the elements in this collection do not
-	 * implement {@link Comparable} interface.
-	 */
-	public void sort();
-	
-	/**
-	 * Sorts the elements of this collection. The sorting order is specified by
-	 * the given {@code comparator}.
-	 * 
-	 * @param comparator
-	 *            the comparator that defines the order of the elements
-	 */
-	public void sort(Comparator<? super E> comparator);
-	
-	// ToArray
+	// toArray
 	
 	/**
 	 * Creates and returns an array containing the elements of this collection.
