@@ -11,7 +11,7 @@ import dyvil.collection.SingletonIterator;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
 import dyvil.lang.Map.Entry;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.tuple.Tuple2;
 
 public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 {

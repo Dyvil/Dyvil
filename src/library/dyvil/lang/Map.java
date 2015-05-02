@@ -12,7 +12,7 @@ import dyvil.collection.immutable.ImmutableMap;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.tuple.Tuple2;
 
 public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, NilConvertible
 {

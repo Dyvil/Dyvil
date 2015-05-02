@@ -5,7 +5,7 @@ import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.array.*;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.tuple.Tuple2;
 
 public final class Predef
 {

@@ -12,7 +12,7 @@ import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Immutable;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.Map;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.tuple.Tuple2;
 
 public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 {

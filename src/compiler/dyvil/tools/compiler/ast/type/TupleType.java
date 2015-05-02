@@ -111,6 +111,19 @@ public final class TupleType implements IType, ITypeList
 		return s;
 	}
 	
+	public static IClass getTupleClass(int count)
+	{
+		IClass iclass = tupleClasses[count];
+		if (iclass != null)
+		{
+			return iclass;
+		}
+		
+		iclass = Package.dyvilTuple.resolveClass("Tuple" + count);
+		tupleClasses[count] = iclass;
+		return iclass;
+	}
+	
 	@Override
 	public int typeTag()
 	{
@@ -120,15 +133,7 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public IClass getTheClass()
 	{
-		IClass iclass = tupleClasses[this.typeCount];
-		if (iclass != null)
-		{
-			return iclass;
-		}
-		
-		iclass = Package.dyvilTuple.resolveClass("Tuple" + this.typeCount);
-		tupleClasses[this.typeCount] = iclass;
-		return iclass;
+		return getTupleClass(this.typeCount);
 	}
 	
 	@Override

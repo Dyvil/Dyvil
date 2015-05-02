@@ -9,8 +9,8 @@ import java.util.function.Consumer;
 
 import dyvil.collection.immutable.ImmutableMap;
 import dyvil.lang.Map;
-import dyvil.lang.tuple.Tuple2;
 import dyvil.math.MathUtils;
+import dyvil.tuple.Tuple2;
 
 public class HashMap<K, V> implements MutableMap<K, V>
 {

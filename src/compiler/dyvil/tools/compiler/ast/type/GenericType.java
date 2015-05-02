@@ -37,6 +37,12 @@ public final class GenericType extends Type implements ITypeList
 		super(iclass);
 	}
 	
+	@Override
+	public int typeTag()
+	{
+		return GENERIC_TYPE;
+	}
+	
 	// ITypeList Overrides
 	
 	@Override

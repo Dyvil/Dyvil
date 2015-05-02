@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 import dyvil.collection.immutable.ImmutableMap;
 import dyvil.lang.Map;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.tuple.Tuple2;
 
 public interface MutableMap<K, V> extends Map<K, V>
 {

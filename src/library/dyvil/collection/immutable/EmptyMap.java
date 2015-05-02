@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import dyvil.collection.EmptyIterator;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.tuple.Tuple2;
 
 public class EmptyMap<K, V> implements ImmutableMap<K, V>
 {

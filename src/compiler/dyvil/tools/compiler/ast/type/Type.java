@@ -313,6 +313,18 @@ public class Type extends ASTNode implements IType
 		return this;
 	}
 	
+	@Override
+	public IType resolveType(ITypeVariable typeVar)
+	{
+		return Types.ANY;
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	{
+		return concrete.resolveType(typeVar);
+	}
+	
 	// IContext
 	
 	@Override

@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import dyvil.collection.ArrayIterator;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.tuple.Tuple2;
 
 public class TupleMap<K, V> implements ImmutableMap<K, V>
 {
@@ -49,15 +49,16 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Iterator<K> keyIterator()
 	{
-		return new Iterator<K>() {
-			private int index;
+		return new Iterator<K>()
+		{
+			private int	index;
 			
 			@Override
 			public boolean hasNext()
 			{
 				return index < size;
 			}
-
+			
 			@Override
 			public K next()
 			{
@@ -69,15 +70,16 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Iterator<V> valueIterator()
 	{
-		return new Iterator<V>() {
-			private int index;
+		return new Iterator<V>()
+		{
+			private int	index;
 			
 			@Override
 			public boolean hasNext()
 			{
 				return index < size;
 			}
-
+			
 			@Override
 			public V next()
 			{
@@ -133,8 +135,10 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 			Tuple2<K, V> entry = this.entries[i];
 			if (key == entry._1 || (key != null && key.equals(entry._1)))
 			{
-				if (value == entry._2 || (value != null && value.equals(entry._2))) {
-				return true;}
+				if (value == entry._2 || (value != null && value.equals(entry._2)))
+				{
+					return true;
+				}
 			}
 		}
 		return false;
@@ -150,7 +154,8 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 			{
 				return true;
 			}
-		}return false;
+		}
+		return false;
 	}
 	
 	@Override
@@ -225,5 +230,23 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	public MutableMap<K, V> mutable()
 	{
 		return null;
+	}
+	
+	@Override
+	public String toString()
+	{
+		if (this.size <= 0)
+		{
+			return "[]";
+		}
+		
+		StringBuilder builder = new StringBuilder("[ ");
+		builder.append(this.entries[0]);
+		for (int i = 1; i < this.size; i++)
+		{
+			builder.append(", ");
+			builder.append(this.entries[i]);
+		}
+		return builder.append(" ]").toString();
 	}
 }
