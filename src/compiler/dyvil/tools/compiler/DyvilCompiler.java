@@ -23,6 +23,7 @@ import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.phase.ICompilerPhase;
+import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
 
 public final class DyvilCompiler
@@ -332,6 +333,24 @@ public final class DyvilCompiler
 			units.add(0, header);
 			return;
 		}
+	}
+	
+	public static void test()
+	{
+		String mainType = config.mainType;
+		if (mainType == null)
+		{
+			return;
+		}
+		
+		File file = new File(config.outputDir, config.mainType.replace('.', '/') + ".class");
+		if (!file.exists())
+		{
+			DyvilCompiler.logger.info("The Main Type '" + config.mainType + "' does not exist or was not compiled, skipping test.");
+			return;
+		}
+		
+		new TestThread().start();
 	}
 	
 	public static void clean()

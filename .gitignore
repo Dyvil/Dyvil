@@ -2,6 +2,7 @@
 .project
 bin/
 dbin/
+testbin/
 
 *.log*
 *.log

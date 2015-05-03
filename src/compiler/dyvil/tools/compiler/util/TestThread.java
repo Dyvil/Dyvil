@@ -3,6 +3,8 @@ package dyvil.tools.compiler.util;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.logging.Level;
 
@@ -24,7 +26,8 @@ public final class TestThread extends Thread
 		{
 			long now = System.currentTimeMillis();
 			
-			Class c = Class.forName(mainType);
+			URL url = DyvilCompiler.config.outputDir.toURI().toURL();
+			Class c = Class.forName(mainType, false, new URLClassLoader(new URL[] { url }, ClassLoader.getSystemClassLoader()));
 			Method m = c.getMethod("main", String[].class);
 			m.invoke(null, new Object[] { args });
 			

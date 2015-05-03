@@ -3,7 +3,7 @@ jar_vendor = Clashsoft
 jar_version = 1.0.0
 
 source_dir = src/test
-output_dir = dbin
+output_dir = testbin
 
 main_type = dyvil.test.Main
 main_args = [ ]
