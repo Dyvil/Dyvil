@@ -18,12 +18,20 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface mutating
 {
+	public static final String	VALUE_DEFAULT	= "Invalid invocation of mutating method {method} on immutable type {type}";
+	
 	/**
-	 * Returns the error to be reported by the compiler. The strings {@code method}}
-	 * and {@code type}} are automatically replaced with the method name and
-	 * the type name of the callee, respectively.
+	 * Returns the error to be reported by the compiler when a mutating method
+	 * is called on an immutable callee.
+	 * <p>
+	 * The compiler will automatically replace special tokens in the returned
+	 * string. These tokens include:
+	 * <ul>
+	 * <li>{@code method} - The name of the method
+	 * <li>{@code type} - The type of the callee
+	 * </ul>
 	 * 
 	 * @return the error to be reported by the compiler
 	 */
-	public String error() default "Invalid invocation of mutating method {method} on immutable type {type}";
+	public String value() default VALUE_DEFAULT;
 }

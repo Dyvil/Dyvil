@@ -27,6 +27,7 @@ public final class Types
 	public static final Type			PREDEF			= new Type("dyvil/lang/Predef", Name.getQualified("Predef"));
 	
 	public static final Type			MAP				= new Type("dyvil/lang/Map", Name.getQualified("Map"));
+	public static final Type			IMMUTABLE		= new Type(Package.dyvilLang.resolveClass("Immutable"));
 	
 	public static final IClass			VOID_CLASS		= Package.dyvilLang.resolveClass("Void");
 	public static final IClass			BOOLEAN_CLASS	= Package.dyvilLang.resolveClass("Boolean");
@@ -50,6 +51,7 @@ public final class Types
 	public static final IClass			OVERRIDE_CLASS	= Package.javaLang.resolveClass("Override");
 	public static final IClass			RETENTION_CLASS	= Package.javaLangAnnotation.resolveClass("Retention");
 	public static final IClass			TARGET_CLASS	= Package.javaLangAnnotation.resolveClass("Target");
+	public static final IClass			MUTATING_CLASS	= Package.dyvilAnnotation.resolveClass("mutating");
 	
 	private static IClass				OBJECT_ARRAY_CLASS;
 	private static IClass				BOOLEAN_ARRAY_CLASS;

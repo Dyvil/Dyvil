@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import dyvil.annotation.mutating;
 import dyvil.collection.mutable.MutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.ImmutableException;
@@ -120,119 +121,139 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	// Mutating Operations
 	
 	@Override
+	@mutating
 	public default void resize(int newLength)
 	{
 		throw new ImmutableException("resize() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void ensureCapacity(int minSize)
 	{
 	}
 	
 	@Override
+	@mutating
 	public default void update(int index, E element)
 	{
 		throw new ImmutableException("update() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default E set(int index, E element)
 	{
 		throw new ImmutableException("set() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void insert(int index, E element)
 	{
 		throw new ImmutableException("insert() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default E add(E element)
 	{
 		throw new ImmutableException("add() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default E add(int index, E element)
 	{
 		throw new ImmutableException("add() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default boolean remove(E element)
 	{
 		throw new ImmutableException("remove() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void removeAt(int index)
 	{
 		throw new ImmutableException("removeAt() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void $plus$eq(E element)
 	{
 		throw new ImmutableException("+= on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void $plus$plus$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("++= on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void $minus$eq(E element)
 	{
 		throw new ImmutableException("-= on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void $minus$minus$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("--= on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void $amp$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("&= on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void filter(Predicate<? super E> condition)
 	{
 		throw new ImmutableException("filter() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void map(UnaryOperator<E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void sort()
 	{
 		throw new ImmutableException("sort() on Immutable List");
 	}
 	
 	@Override
+	@mutating
 	public default void sort(Comparator<? super E> comparator)
 	{
 		throw new ImmutableException("sort() on Immutable List");

@@ -10,11 +10,13 @@ import java.util.List;
 
 import org.objectweb.asm.Label;
 
+import dyvil.annotation.mutating;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IntValue;
+import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -37,6 +39,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
@@ -698,6 +701,35 @@ public class Method extends Member implements IMethod
 		return genericData;
 	}
 	
+	private void checkMutating(MarkerList markers, IValue instance)
+	{
+		IType type = instance.getType();
+		if (!Types.IMMUTABLE.isSuperTypeOf(type))
+			return;
+		
+		Annotation a = this.getAnnotation(Types.MUTATING_CLASS);
+		if (a == null)
+			return;
+		
+		IValue v = a.arguments.getValue(0, Annotation.VALUE);
+		String s = v != null ? ((StringValue) v).value : mutating.VALUE_DEFAULT;
+		StringBuilder builder = new StringBuilder(s);
+		
+		int index = builder.indexOf("{method}");
+		if (index >= 0)
+		{
+			builder.replace(index, index + 8, this.name.unqualified);
+		}
+		
+		index = builder.indexOf("{type}");
+		if (index >= 0)
+		{
+			builder.replace(index, index + 6, type.toString());
+		}
+		
+		markers.add(new SemanticError(instance.getPosition(), builder.toString()));
+	}
+	
 	@Override
 	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
@@ -719,6 +751,8 @@ public class Method extends Member implements IMethod
 			{
 				instance = instance1;
 			}
+			
+			this.checkMutating(markers, instance);
 			
 			if ((this.modifiers & Modifiers.VARARGS) != 0)
 			{
@@ -747,8 +781,9 @@ public class Method extends Member implements IMethod
 				Marker marker = markers.create(instance.getPosition(), "access.method.prefix_type", this.name);
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
-				
 			}
+			
+			this.checkMutating(markers, instance);
 			return null;
 		}
 		
@@ -761,6 +796,8 @@ public class Method extends Member implements IMethod
 			{
 				arguments.checkValue(i, this.parameters[i], markers, typeContext);
 			}
+			
+			this.checkMutating(markers, instance);
 			return instance;
 		}
 		
@@ -769,6 +806,10 @@ public class Method extends Member implements IMethod
 			arguments.checkValue(i, this.parameters[i], markers, typeContext);
 		}
 		
+		if (instance != null)
+		{
+			this.checkMutating(markers, instance);
+		}
 		return instance;
 	}
 	
