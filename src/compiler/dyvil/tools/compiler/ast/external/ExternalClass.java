@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
@@ -206,6 +207,16 @@ public final class ExternalClass extends CodeClass
 			this.resolveSuperTypes();
 		}
 		return super.resolveType(typeVar, concrete);
+	}
+	
+	@Override
+	public IClassMetadata getMetadata()
+	{
+		if (this.metadata == null)
+		{
+			return this.metadata = IClass.getClassMetadata(this, this.modifiers);
+		}
+		return this.metadata;
 	}
 	
 	@Override

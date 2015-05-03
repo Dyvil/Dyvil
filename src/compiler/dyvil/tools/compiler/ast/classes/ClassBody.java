@@ -467,10 +467,10 @@ public class ClassBody extends ASTNode implements IClassBody
 		{
 			for (int i = 0; i < this.classCount; i++)
 			{
-				IClass c = this.classes[i];
-				if (c != this.theClass)
+				this.classes[i].toString(prefix1, buffer);
+				buffer.append('\n');
+				if (i + 1 < this.classCount)
 				{
-					c.toString(prefix1, buffer);
 					buffer.append('\n');
 				}
 			}

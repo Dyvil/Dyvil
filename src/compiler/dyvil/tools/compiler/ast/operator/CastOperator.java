@@ -55,7 +55,7 @@ public final class CastOperator extends ASTNode implements IValue
 		{
 			return 3;
 		}
-		else if (type.isSuperTypeOf(this.type))
+		if (type.isSuperTypeOf(this.type))
 		{
 			return 2;
 		}
@@ -78,8 +78,13 @@ public final class CastOperator extends ASTNode implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (this.type.isSuperTypeOf(this.value.getType()))
+		{
+			markers.add(this.position, "cast.unnecessary");
+		}
+		
 		IValue value1 = this.value.withType(this.type);
-		if (value1 != null)
+		if (value1 != null && value1 != this.value)
 		{
 			this.value = value1;
 		}
@@ -109,10 +114,6 @@ public final class CastOperator extends ASTNode implements IValue
 		else if (primitiveValue)
 		{
 			markers.add(this.position, "cast.primitive");
-		}
-		else if (this.value.isType(this.type))
-		{
-			markers.add(this.position, "cast.unnecessary");
 		}
 	}
 	

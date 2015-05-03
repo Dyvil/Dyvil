@@ -281,45 +281,39 @@ public interface CaseClasses
 	{
 		// Write the call to the StringBuilder#append() method that
 		// corresponds to the type of the field
-		int dims = type.getArrayDimensions();
 		
-		switch (dims)
+		if (type.isArrayType())
 		{
-		case 0:
-			StringBuilder desc = new StringBuilder().append('(');
-			if (type.isPrimitive())
-			{
-				type.appendExtendedName(desc);
-			}
-			else if (type.classEquals(Types.STRING))
-			{
-				desc.append("Ljava/lang/String;");
-			}
-			else
-			{
-				desc.append("Ljava/lang/Object;");
-			}
-			desc.append(")Ljava/lang/StringBuilder;");
-			
-			writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false);
-			return;
-		case 1:
 			writer.writeInsn(Opcodes.SWAP);
 			writer.writeInsn(Opcodes.DUP_X1);
-			writeArrayToString(writer, type);
+			writeArrayToString(writer, type.getElementType());
 			return;
-		default:
-			writer.writeInsn(Opcodes.SWAP);
-			writer.writeInsn(Opcodes.DUP_X1);
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepToString", "([Ljava/lang/Object;Ljava/lang/StringBuilder;)V", true);
 		}
 		
+		StringBuilder desc = new StringBuilder().append('(');
+		if (type.isPrimitive())
+		{
+			type.appendExtendedName(desc);
+		}
+		else if (type.classEquals(Types.STRING))
+		{
+			desc.append("Ljava/lang/String;");
+		}
+		else
+		{
+			desc.append("Ljava/lang/Object;");
+		}
+		desc.append(")Ljava/lang/StringBuilder;");
+		
+		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false);
+		return;
 	}
 	
 	public static void writeArrayToString(MethodWriter writer, IType type)
 	{
-		if (type.typeTag() == IType.PRIMITIVE_TYPE)
+		switch (type.typeTag())
 		{
+		case IType.PRIMITIVE_TYPE:
 			switch (((PrimitiveType) type).typecode)
 			{
 			case ClassFormat.T_BOOLEAN:
@@ -346,11 +340,15 @@ public interface CaseClasses
 			case ClassFormat.T_DOUBLE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", "toString", "([DLjava/lang/StringBuilder;)V", true);
 				return;
+			default:
+				return;
 			}
-		}
-		else
-		{
+		case IType.ARRAY_TYPE:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepToString", "([Ljava/lang/Object;Ljava/lang/StringBuilder;)V", true);
+			return;
+		default:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "toString", "([Ljava/lang/Object;Ljava/lang/StringBuilder;)V", true);
+			return;
 		}
 	}
 }

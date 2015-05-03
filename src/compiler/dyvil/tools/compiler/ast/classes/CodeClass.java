@@ -720,7 +720,7 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			Annotation a = this.annotations[i];
 			String fullName = a.type.getInternalName();
-			if (fullName != null && this.addRawAnnotation(fullName))
+			if (fullName != null && !this.addRawAnnotation(fullName))
 			{
 				this.removeAnnotation(i--);
 				continue;
@@ -1367,7 +1367,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.body != null)
 		{
-			buffer.append('\n');
+			buffer.append('\n').append(prefix);
 			this.body.toString(prefix, buffer);
 		}
 		else
