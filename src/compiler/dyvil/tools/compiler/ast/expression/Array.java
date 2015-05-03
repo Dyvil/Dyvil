@@ -5,6 +5,7 @@ import java.util.Iterator;
 import dyvil.collection.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.*;
@@ -17,7 +18,7 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Array extends ASTNode implements IValue, IValueList
 {
-	public static final Type	ARRAY_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("ArrayConvertible"));
+	public static final IClass	ARRAY_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
 	
 	protected IValue[]			values				= new IValue[3];
 	protected int				valueCount;
@@ -120,7 +121,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			if (ARRAY_CONVERTIBLE.isSuperTypeOf(type))
+			if (type.getTheClass().getAnnotation(ARRAY_CONVERTIBLE) != null)
 			{
 				return new LiteralExpression(type, this);
 			}
@@ -151,7 +152,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			return ARRAY_CONVERTIBLE.isSuperTypeOf(type);
+			return type.getTheClass().getAnnotation(ARRAY_CONVERTIBLE) != null;
 		}
 		
 		// Skip getting the element type if this is an empty array
@@ -181,7 +182,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			return ARRAY_CONVERTIBLE.isSuperTypeOf(type) ? 3 : 0;
+			return type.getTheClass().getAnnotation(ARRAY_CONVERTIBLE) != null ? 2 : 0;
 		}
 		
 		// Skip getting the element type if this is an empty array

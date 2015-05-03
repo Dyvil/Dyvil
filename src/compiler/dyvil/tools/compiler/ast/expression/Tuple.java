@@ -5,6 +5,7 @@ import java.util.Iterator;
 import dyvil.collection.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
@@ -14,7 +15,6 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.TupleType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -23,7 +23,7 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Tuple extends ASTNode implements IValue, IValueList
 {
-	public static final IType	TUPLE_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("TupleConvertible"));
+	public static final IClass	TUPLE_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("TupleConvertible");
 	
 	private IValue[]			values;
 	private int					valueCount;
@@ -142,7 +142,7 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return this;
 		}
 		
-		if (TUPLE_CONVERTIBLE.isSuperTypeOf(type))
+		if (type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null)
 		{
 			this.tupleType = type;
 			return this;
@@ -158,7 +158,7 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return this.values[0].isType(type);
 		}
 		
-		return TupleType.isSuperType(type, this.values, this.valueCount) || TUPLE_CONVERTIBLE.isSuperTypeOf(type);
+		return TupleType.isSuperType(type, this.values, this.valueCount) || type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null;
 	}
 	
 	@Override
@@ -169,12 +169,17 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return this.values[0].getTypeMatch(type);
 		}
 		
+		if (type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null)
+		{
+			return 2;
+		}
+		
 		IType type1 = this.getType();
 		if (type.equals(type1))
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(type1) || TUPLE_CONVERTIBLE.isSuperTypeOf(type1))
+		if (type.isSuperTypeOf(type1))
 		{
 			return 2;
 		}

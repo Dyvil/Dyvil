@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -8,7 +9,6 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -16,7 +16,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class NilValue implements IConstantValue
 {
-	public static final IType	NIL_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("NilConvertible"));
+	public static final IClass	NIL_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("NilConvertible");
 	
 	private ICodePosition		position;
 	private IType				requiredType;
@@ -69,7 +69,7 @@ public final class NilValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isArrayType() || NIL_CONVERTIBLE.isSuperTypeOf(type);
+		return type.isArrayType() || type.getTheClass().getAnnotation(NIL_CONVERTIBLE) != null;
 	}
 	
 	@Override

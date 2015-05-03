@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -14,7 +15,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class FloatValue extends ASTNode implements INumericValue
 {
-	public static final Type	FLOAT_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("FloatConvertible"));
+	public static final IClass	FLOAT_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("FloatConvertible");
 	
 	private static FloatValue	NULL;
 	
@@ -63,7 +64,7 @@ public class FloatValue extends ASTNode implements INumericValue
 		{
 			return new BoxedValue(this, Types.FLOAT.boxMethod);
 		}
-		if (FLOAT_CONVERTIBLE.isSuperTypeOf(type))
+		if (type.getTheClass().getAnnotation(FLOAT_CONVERTIBLE) != null)
 		{
 			return new LiteralExpression(type, this);
 		}
@@ -73,7 +74,7 @@ public class FloatValue extends ASTNode implements INumericValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT) || FLOAT_CONVERTIBLE.isSuperTypeOf(type);
+		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT) || type.getTheClass().getAnnotation(FLOAT_CONVERTIBLE) != null;
 	}
 	
 	@Override
@@ -83,7 +84,7 @@ public class FloatValue extends ASTNode implements INumericValue
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Types.FLOAT) || FLOAT_CONVERTIBLE.isSuperTypeOf(type))
+		if (type.isSuperTypeOf(Types.FLOAT) || type.getTheClass().getAnnotation(FLOAT_CONVERTIBLE) != null)
 		{
 			return 2;
 		}

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -13,7 +14,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class StringValue extends ASTNode implements IConstantValue
 {
-	public static final Type	STRING_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("StringConvertible"));
+	public static final IClass	STRING_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("StringConvertible");
 	
 	public String				value;
 	
@@ -53,7 +54,7 @@ public final class StringValue extends ASTNode implements IConstantValue
 		{
 			return this;
 		}
-		if (STRING_CONVERTIBLE.isSuperTypeOf(type))
+		if (type.getTheClass().getAnnotation(STRING_CONVERTIBLE) != null)
 		{
 			return new LiteralExpression(type, this);
 		}
@@ -63,7 +64,7 @@ public final class StringValue extends ASTNode implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isSuperTypeOf(Types.STRING) || STRING_CONVERTIBLE.isSuperTypeOf(type);
+		return type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(STRING_CONVERTIBLE) != null;
 	}
 	
 	@Override
@@ -73,7 +74,7 @@ public final class StringValue extends ASTNode implements IConstantValue
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Types.STRING) || STRING_CONVERTIBLE.isSuperTypeOf(type))
+		if (type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(STRING_CONVERTIBLE) != null)
 		{
 			return 2;
 		}
