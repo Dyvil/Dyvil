@@ -118,7 +118,8 @@ public class ArrayType implements IType, ITyped
 	public boolean isSuperTypeOf(IType type)
 	{
 		int arrayDims = type.getArrayDimensions();
-		if (arrayDims == 0) {
+		if (arrayDims == 0)
+		{
 			return false;
 		}
 		int thisDims = this.getArrayDimensions();
@@ -126,7 +127,7 @@ public class ArrayType implements IType, ITyped
 		{
 			return this.type.getTheClass() == Types.OBJECT_CLASS;
 		}
-		return this.type.isSuperTypeOf(type);
+		return this.type.isSuperTypeOf(type.getElementType());
 	}
 	
 	@Override

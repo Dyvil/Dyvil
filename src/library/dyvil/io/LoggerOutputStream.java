@@ -109,6 +109,12 @@ public class LoggerOutputStream extends PrintStream
 	}
 	
 	@Override
+	public void println()
+	{
+		this.logger.log(this.level, "");
+	}
+	
+	@Override
 	public void println(boolean b)
 	{
 		this.write(b ? "true" : "false");

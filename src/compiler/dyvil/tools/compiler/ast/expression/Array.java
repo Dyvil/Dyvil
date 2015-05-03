@@ -121,7 +121,12 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			if (type.getTheClass().getAnnotation(ARRAY_CONVERTIBLE) != null)
+			IClass iclass = type.getTheClass();
+			if (iclass == Types.OBJECT_CLASS)
+			{
+				return this;
+			}
+			if (iclass.getAnnotation(ARRAY_CONVERTIBLE) != null)
 			{
 				return new LiteralExpression(type, this);
 			}
@@ -152,7 +157,8 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			return type.getTheClass().getAnnotation(ARRAY_CONVERTIBLE) != null;
+			IClass iclass = type.getTheClass();
+			return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null;
 		}
 		
 		// Skip getting the element type if this is an empty array
@@ -182,7 +188,8 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			return type.getTheClass().getAnnotation(ARRAY_CONVERTIBLE) != null ? 2 : 0;
+			IClass iclass = type.getTheClass();
+			return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null ? 2 : 0;
 		}
 		
 		// Skip getting the element type if this is an empty array
