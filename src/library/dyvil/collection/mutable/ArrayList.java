@@ -460,6 +460,7 @@ public class ArrayList<E> implements MutableList<E>
 		this.ensureCapacity(this.size + len);
 		Object[] array = collection.toArray();
 		System.arraycopy(array, 0, this.elements, this.size, len);
+		this.size += len;
 	}
 	
 	@Override
@@ -682,17 +683,17 @@ public class ArrayList<E> implements MutableList<E>
 	{
 		if (this.size == 0)
 		{
-			return "[ ]";
+			return "[]";
 		}
 		
-		StringBuilder buf = new StringBuilder("[ ");
+		StringBuilder buf = new StringBuilder(this.size * 10).append('[');
 		buf.append(this.elements[0]);
 		for (int i = 1; i < this.size; i++)
 		{
 			buf.append(", ");
 			buf.append(this.elements[i]);
 		}
-		buf.append(" ]");
+		buf.append(']');
 		return buf.toString();
 	}
 }

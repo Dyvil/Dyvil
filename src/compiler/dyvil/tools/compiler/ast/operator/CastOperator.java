@@ -113,14 +113,17 @@ public final class CastOperator extends ASTNode implements IValue
 			this.typeHint = true;
 		}
 		
-		IValue value1 = this.value.withType(this.type);
-		if (value1 != null && value1 != this.value)
+		if (this.type.isResolved())
 		{
-			this.value = value1;
-			this.typeHint = true;
+			IValue value1 = this.value.withType(this.type);
+			if (value1 != null && value1 != this.value)
+			{
+				this.value = value1;
+				this.typeHint = true;
+			}
+			
+			this.value.checkTypes(markers, context);
 		}
-		
-		this.value.checkTypes(markers, context);
 	}
 	
 	@Override

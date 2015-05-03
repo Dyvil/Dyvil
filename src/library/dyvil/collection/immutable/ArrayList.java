@@ -392,17 +392,17 @@ public class ArrayList<E> implements ImmutableList<E>
 	{
 		if (this.size == 0)
 		{
-			return "[ ]";
+			return "[]";
 		}
 		
-		StringBuilder buf = new StringBuilder("[ ");
+		StringBuilder buf = new StringBuilder(this.size * 10).append('[');
 		buf.append(this.elements[0]);
 		for (int i = 1; i < this.size; i++)
 		{
 			buf.append(", ");
 			buf.append(this.elements[i]);
 		}
-		buf.append(" ]");
+		buf.append(']');
 		return buf.toString();
 	}
 }

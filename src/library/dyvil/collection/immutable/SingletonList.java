@@ -212,6 +212,6 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public String toString()
 	{
-		return "[ " + this.element + " ]";
+		return new StringBuilder('[').append(this.element).append(']').toString();
 	}
 }

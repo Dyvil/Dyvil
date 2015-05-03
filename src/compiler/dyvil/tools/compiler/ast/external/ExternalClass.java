@@ -310,6 +310,11 @@ public final class ExternalClass extends CodeClass
 	@Override
 	public IField resolveField(Name name)
 	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		
 		// Own properties
 		IField field = this.body.getProperty(name);
 		if (field != null)
@@ -344,6 +349,11 @@ public final class ExternalClass extends CodeClass
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		
 		this.body.getMethodMatches(list, instance, name, arguments);
 		
 		if (!list.isEmpty())
