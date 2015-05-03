@@ -1,7 +1,36 @@
 package dyvil.lang;
 
+import dyvil.lang.literal.DoubleConvertible;
+import dyvil.lang.literal.FloatConvertible;
+import dyvil.lang.literal.IntConvertible;
+import dyvil.lang.literal.LongConvertible;
+
+@IntConvertible
+@LongConvertible
+@FloatConvertible
+@DoubleConvertible
 public interface Number extends Ordered<Number>
 {
+	public static Int apply(int v)
+	{
+		return Int.apply(v);
+	}
+	
+	public static Long apply(long v)
+	{
+		return Long.apply(v);
+	}
+	
+	public static Float apply(float v)
+	{
+		return Float.apply(v);
+	}
+	
+	public static Double apply(double v)
+	{
+		return Double.apply(v);
+	}
+	
 	// Primitive value getters
 	
 	public byte byteValue();

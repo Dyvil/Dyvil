@@ -1,9 +1,23 @@
 package dyvil.lang;
 
 import dyvil.annotation.infix;
+import dyvil.lang.literal.IntConvertible;
+import dyvil.lang.literal.LongConvertible;
 
+@IntConvertible
+@LongConvertible
 public interface Integer extends Number
 {
+	public static Int apply(int v)
+	{
+		return Int.apply(v);
+	}
+	
+	public static Long apply(long v)
+	{
+		return Long.apply(v);
+	}
+	
 	// Unary operators
 	
 	public Integer $tilde();

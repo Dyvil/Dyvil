@@ -11,19 +11,40 @@ import java.util.function.Predicate;
 import dyvil.collection.ArrayIterator;
 import dyvil.collection.mutable.MutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.literal.ArrayConvertible;
 
+@ArrayConvertible
 public class ArrayList<E> implements ImmutableList<E>
 {
-	private final Object[]	elements;
-	private final int		size;
+	private final E[]	elements;
+	private final int	size;
 	
-	public ArrayList(Object[] elements)
+	public static <E> ArrayList<E> apply(E[] elements)
+	{
+		return new ArrayList(elements, true);
+	}
+	
+	public ArrayList(E[] elements)
+	{
+		this.elements = (E[]) new Object[elements.length];
+		System.arraycopy(elements, 0, this.elements, 0, elements.length);
+		this.size = elements.length;
+	}
+	
+	public ArrayList(E[] elements, int size)
+	{
+		this.elements = (E[]) new Object[size];
+		System.arraycopy(elements, 0, this.elements, 0, size);
+		this.size = size;
+	}
+	
+	public ArrayList(E[] elements, boolean trusted)
 	{
 		this.elements = elements;
 		this.size = elements.length;
 	}
 	
-	public ArrayList(Object[] elements, int size)
+	public ArrayList(E[] elements, int size, boolean trusted)
 	{
 		this.elements = elements;
 		this.size = size;
@@ -32,7 +53,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	public ArrayList(Collection<E> elements)
 	{
 		this.size = elements.size();
-		this.elements = new Object[this.size];
+		this.elements = (E[]) new Object[this.size];
 		
 		int index = 0;
 		for (E element : elements)
@@ -76,7 +97,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			action.accept((E) this.elements[i]);
+			action.accept(this.elements[i]);
 		}
 	}
 	
@@ -109,7 +130,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	public E apply(int index)
 	{
 		this.rangeCheck(index);
-		return (E) this.elements[index];
+		return this.elements[index];
 	}
 	
 	@Override
@@ -119,7 +140,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		{
 			return null;
 		}
-		return (E) this.elements[index];
+		return this.elements[index];
 	}
 	
 	@Override
@@ -133,7 +154,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		
 		Object[] array = new Object[length];
 		System.arraycopy(this.elements, startIndex, array, 0, length);
-		return new ArrayList(array, length);
+		return new ArrayList(array, length, true);
 	}
 	
 	@Override
@@ -142,7 +163,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		Object[] array = new Object[this.size + 1];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		array[this.size] = element;
-		return new ArrayList(array, this.size + 1);
+		return new ArrayList(array, this.size + 1, true);
 	}
 	
 	@Override
@@ -154,7 +175,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		
 		Object[] array1 = collection.toArray();
 		System.arraycopy(array1, 0, array, this.size, len);
-		return new ArrayList(array, this.size + len);
+		return new ArrayList(array, this.size + len, true);
 	}
 	
 	@Override
@@ -177,7 +198,7 @@ public class ArrayList<E> implements ImmutableList<E>
 			// copy the second part after the index
 			System.arraycopy(this.elements, index + 1, array, index, this.size - index - 1);
 		}
-		return new ArrayList(array, this.size - 1);
+		return new ArrayList(array, this.size - 1, true);
 	}
 	
 	@Override
@@ -194,7 +215,7 @@ public class ArrayList<E> implements ImmutableList<E>
 				array[index++] = e;
 			}
 		}
-		return new ArrayList(array, index);
+		return new ArrayList(array, index, true);
 	}
 	
 	@Override
@@ -211,7 +232,7 @@ public class ArrayList<E> implements ImmutableList<E>
 				array[index++] = e;
 			}
 		}
-		return new ArrayList(array, index);
+		return new ArrayList(array, index, true);
 		
 	}
 	
@@ -221,9 +242,9 @@ public class ArrayList<E> implements ImmutableList<E>
 		Object[] array = new Object[this.size];
 		for (int i = 0; i < this.size; i++)
 		{
-			array[i] = mapper.apply((E) this.elements[i]);
+			array[i] = mapper.apply(this.elements[i]);
 		}
-		return new ArrayList(array, this.size);
+		return new ArrayList(array, this.size, true);
 	}
 	
 	@Override
@@ -232,7 +253,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		dyvil.collection.mutable.ArrayList<R> list = new dyvil.collection.mutable.ArrayList(this.size << 2);
 		for (int i = 0; i < this.size; i++)
 		{
-			for (R r : mapper.apply((E) this.elements[i]))
+			for (R r : mapper.apply(this.elements[i]))
 			{
 				list.$plus$eq(r);
 			}
@@ -253,7 +274,7 @@ public class ArrayList<E> implements ImmutableList<E>
 				array[index++] = e;
 			}
 		}
-		return new ArrayList(array, index);
+		return new ArrayList(array, index, true);
 	}
 	
 	@Override
@@ -262,7 +283,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		Arrays.sort(array, 0, this.size);
-		return new ArrayList(array, this.size);
+		return new ArrayList(array, this.size, true);
 	}
 	
 	@Override
@@ -271,7 +292,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		Arrays.sort((E[]) array, 0, this.size, comparator);
-		return new ArrayList(array, this.size);
+		return new ArrayList(array, this.size, true);
 	}
 	
 	@Override
@@ -363,8 +384,6 @@ public class ArrayList<E> implements ImmutableList<E>
 	@Override
 	public MutableList<E> mutable()
 	{
-		// Since this immutable ArrayList does not copy the backing array, we
-		// have to copy it in the mutable ArrayList constructor.
 		return new dyvil.collection.mutable.ArrayList(this.elements, this.size);
 	}
 	

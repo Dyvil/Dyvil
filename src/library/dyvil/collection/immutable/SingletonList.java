@@ -11,10 +11,17 @@ import java.util.function.Predicate;
 import dyvil.collection.SingletonIterator;
 import dyvil.collection.mutable.MutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.literal.TupleConvertible;
 
+@TupleConvertible
 public class SingletonList<E> implements ImmutableList<E>
 {
 	private E	element;
+	
+	public static <E> SingletonList<E> apply(E element)
+	{
+		return new SingletonList(element);
+	}
 	
 	public SingletonList(E element)
 	{

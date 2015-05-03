@@ -9,12 +9,19 @@ import java.util.function.Consumer;
 import dyvil.collection.ArrayIterator;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
+import dyvil.lang.literal.ArrayConvertible;
 import dyvil.tuple.Tuple2;
 
+@ArrayConvertible
 public class TupleMap<K, V> implements ImmutableMap<K, V>
 {
 	private final int				size;
 	private final Tuple2<K, V>[]	entries;
+	
+	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>[] entries)
+	{
+		return new TupleMap(entries);
+	}
 	
 	public TupleMap(Tuple2<K, V>[] entries)
 	{

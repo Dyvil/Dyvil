@@ -10,9 +10,15 @@ import java.util.function.Consumer;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.ImmutableMap;
 import dyvil.lang.Map;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.literal.TupleConvertible;
 import dyvil.math.MathUtils;
 import dyvil.tuple.Tuple2;
 
+@NilConvertible
+@TupleConvertible
+@ArrayConvertible
 public class HashMap<K, V> implements MutableMap<K, V>
 {
 	private static final class Entry<K, V> implements Map.Entry<K, V>
@@ -168,6 +174,33 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	private float				loadFactor;
 	private int					threshold;
 	private Entry[]				entries;
+	
+	public static <K, V> HashMap<K, V> apply()
+	{
+		return new HashMap();
+	}
+	
+	public static <K, V> HashMap<K, V> apply(K key, V value)
+	{
+		HashMap<K, V> map = new HashMap();
+		map.put(key, value);
+		return map;
+	}
+	
+	public static <K, V> HashMap<K, V> apply(Tuple2<K, V> entry)
+	{
+		return apply(entry._1, entry._2);
+	}
+	
+	public static <K, V> HashMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
+	{
+		HashMap<K, V> map = new HashMap();
+		for (Tuple2<? extends K, ? extends V> entry : entries)
+		{
+			map.put(entry._1, entry._2);
+		}
+		return map;
+	}
 	
 	HashMap(int size, float loadFactor, Entry[] entries)
 	{

@@ -2,11 +2,19 @@ package dyvil.collection;
 
 import java.util.Iterator;
 
+import dyvil.lang.literal.ArrayConvertible;
+
+@ArrayConvertible
 public final class ArrayIterator<E> implements Iterator<E>
 {
 	private int	index;
 	private E[]	array;
 	private int	size;
+	
+	public static <E> ArrayIterator<E> apply(E[] array)
+	{
+		return new ArrayIterator(array);
+	}
 	
 	public ArrayIterator(E[] array)
 	{

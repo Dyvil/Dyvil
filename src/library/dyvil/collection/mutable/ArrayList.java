@@ -12,13 +12,27 @@ import java.util.function.UnaryOperator;
 import dyvil.collection.ArrayIterator;
 import dyvil.collection.immutable.ImmutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
+@ArrayConvertible
 public class ArrayList<E> implements MutableList<E>
 {
 	private static final int	INITIAL_CAPACITY	= 10;
 	
 	private Object[]			elements;
 	private int					size;
+	
+	public static <E> ArrayList<E> apply()
+	{
+		return new ArrayList();
+	}
+	
+	public static <E> ArrayList<E> apply(E[] elements)
+	{
+		return new ArrayList(elements, true);
+	}
 	
 	public ArrayList()
 	{
@@ -660,7 +674,7 @@ public class ArrayList<E> implements MutableList<E>
 	@Override
 	public ImmutableList<E> immutable()
 	{
-		return new dyvil.collection.immutable.ArrayList<>(this.elements, this.size);
+		return new dyvil.collection.immutable.ArrayList(this.elements, this.size);
 	}
 	
 	@Override

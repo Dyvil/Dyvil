@@ -9,8 +9,10 @@ import java.util.function.Consumer;
 import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
+import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
+@TupleConvertible
 public class ArrayMap<K, V> implements ImmutableMap<K, V>
 {
 	protected class Entry implements Map.Entry<K, V>
@@ -38,6 +40,11 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	private int	size;
 	private K[]	keys;
 	private V[]	values;
+	
+	public static <K, V> ArrayMap<K, V> apply(K[] keys, V[] values)
+	{
+		return new ArrayMap(keys, values);
+	}
 	
 	public ArrayMap(K[] keys, V[] values)
 	{

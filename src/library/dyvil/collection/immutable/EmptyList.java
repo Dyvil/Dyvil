@@ -12,7 +12,9 @@ import dyvil.array.ObjectArray;
 import dyvil.collection.EmptyIterator;
 import dyvil.collection.mutable.MutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
 public class EmptyList<E> implements ImmutableList<E>
 {
 	static final EmptyList	emptyList	= new EmptyList();

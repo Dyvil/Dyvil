@@ -3,15 +3,12 @@ package dyvil.lang;
 import static dyvil.reflect.Opcodes.*;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
+import dyvil.lang.literal.CharConvertible;
 
+@CharConvertible
 public class Char implements Integer
 {
 	protected char	value;
-	
-	protected Char(char value)
-	{
-		this.value = value;
-	}
 	
 	public static Char apply(char v)
 	{
@@ -20,6 +17,11 @@ public class Char implements Integer
 			return ConstPool.CHARS[v];
 		}
 		return new Char(v);
+	}
+	
+	protected Char(char value)
+	{
+		this.value = value;
 	}
 	
 	@Intrinsic({ INSTANCE })

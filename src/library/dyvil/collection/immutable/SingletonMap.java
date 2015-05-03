@@ -11,12 +11,19 @@ import dyvil.collection.SingletonIterator;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
 import dyvil.lang.Map.Entry;
+import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
+@TupleConvertible
 public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 {
 	private K	key;
 	private V	value;
+	
+	public static <K, V> SingletonMap<K, V> apply(K key, V value)
+	{
+		return new SingletonMap(key, value);
+	}
 	
 	public SingletonMap(K key, V value)
 	{

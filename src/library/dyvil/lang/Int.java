@@ -3,15 +3,12 @@ package dyvil.lang;
 import static dyvil.reflect.Opcodes.*;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
+import dyvil.lang.literal.IntConvertible;
 
+@IntConvertible
 public class Int implements Integer
 {
 	protected int	value;
-	
-	protected Int(int value)
-	{
-		this.value = value;
-	}
 	
 	public static Int apply(int v)
 	{
@@ -20,6 +17,11 @@ public class Int implements Integer
 			return ConstPool.INTS[v];
 		}
 		return new Int(v);
+	}
+	
+	protected Int(int value)
+	{
+		this.value = value;
 	}
 	
 	@Intrinsic({ INSTANCE })

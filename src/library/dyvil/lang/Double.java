@@ -3,15 +3,12 @@ package dyvil.lang;
 import static dyvil.reflect.Opcodes.*;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
+import dyvil.lang.literal.DoubleConvertible;
 
+@DoubleConvertible
 public class Double implements Number
 {
 	protected double	value;
-	
-	protected Double(double value)
-	{
-		this.value = value;
-	}
 	
 	public static Double apply(double v)
 	{
@@ -21,6 +18,11 @@ public class Double implements Number
 			return ConstPool.DOUBLES[i];
 		}
 		return new Double(v);
+	}
+	
+	protected Double(double value)
+	{
+		this.value = value;
 	}
 	
 	@Intrinsic({ INSTANCE })

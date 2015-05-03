@@ -9,13 +9,20 @@ import java.util.function.Consumer;
 import dyvil.collection.EmptyIterator;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
 
+@NilConvertible
 public class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
 	static final EmptyMap	emptyMap	= new EmptyMap();
 	
-	public EmptyMap()
+	public static <K, V> EmptyMap<K, V> apply()
+	{
+		return emptyMap;
+	}
+	
+	private EmptyMap()
 	{
 	}
 	
