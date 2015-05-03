@@ -9,11 +9,18 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class InstanceOfOperator extends ASTNode implements IValue
+public final class InstanceOfOperator extends ASTNode implements IValue
 {
 	public IValue	value;
 	public IType	type;
+	
+	public InstanceOfOperator(ICodePosition position, IValue value)
+	{
+		this.position = position;
+		this.value = value;
+	}
 	
 	public InstanceOfOperator(IValue value, IType type)
 	{
@@ -37,6 +44,12 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	public IType getType()
 	{
 		return Types.BOOLEAN;
+	}
+	
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 	
 	@Override
@@ -128,7 +141,7 @@ public class InstanceOfOperator extends ASTNode implements IValue
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.value.toString(prefix, buffer);
-		buffer.append(" <: ");
+		buffer.append(" is ");
 		this.type.toString(prefix, buffer);
 	}
 }

@@ -5,7 +5,9 @@ import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.operator.CastOperator;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
+import dyvil.tools.compiler.ast.operator.InstanceOfOperator;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
@@ -382,6 +384,20 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Symbols.EQUALS)
 			{
 				this.getAssign(pm, token);
+				return;
+			}
+			if (type == Keywords.AS)
+			{
+				CastOperator co = new CastOperator(token.raw(), this.value);
+				pm.pushParser(new TypeParser(co));
+				this.value = co;
+				return;
+			}
+			if (type == Keywords.IS)
+			{
+				InstanceOfOperator io = new InstanceOfOperator(token.raw(), this.value);
+				pm.pushParser(new TypeParser(io));
+				this.value = io;
 				return;
 			}
 			if (type == Symbols.OPEN_PARENTHESIS)

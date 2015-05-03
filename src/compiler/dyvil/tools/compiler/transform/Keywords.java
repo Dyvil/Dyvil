@@ -4,6 +4,7 @@ public interface Keywords
 {
 	int	ABSTRACT		= Tokens.KEYWORD | 0x00010000;
 	int	ANNOTATION		= Tokens.KEYWORD | 0x00020000;
+	int	AS				= Tokens.KEYWORD | 0x00380000;
 	int	BREAK			= Tokens.KEYWORD | 0x00030000;
 	int	BYTE			= Tokens.KEYWORD | 0x00040000;
 	int	CASE			= Tokens.KEYWORD | 0x00050000;
@@ -30,6 +31,7 @@ public interface Keywords
 	int	INLINE			= Tokens.KEYWORD | 0x001B0000;
 	int	INFIX			= Tokens.KEYWORD | 0x001C0000;
 	int	INTERFACE		= Tokens.KEYWORD | 0x001D0000;
+	int	IS				= Tokens.KEYWORD | 0x00390000;
 	int	LAZY			= Tokens.KEYWORD | 0x001E0000;
 	int	NEW				= Tokens.KEYWORD | 0x001F0000;
 	int	NIL				= Tokens.KEYWORD | 0x00200000;
@@ -64,6 +66,8 @@ public interface Keywords
 			return ABSTRACT;
 		case "annotation":
 			return ANNOTATION;
+		case "as":
+			return AS;
 		case "break":
 			return BREAK;
 		case "byte":
@@ -116,6 +120,8 @@ public interface Keywords
 			return INFIX;
 		case "interface":
 			return INTERFACE;
+		case "is":
+			return IS;
 		case "lazy":
 			return LAZY;
 		case "new":
@@ -178,6 +184,8 @@ public interface Keywords
 			return "abstract";
 		case ANNOTATION:
 			return "annotation";
+		case AS:
+			return "as";
 		case BREAK:
 			return "break";
 		case BYTE:
@@ -230,6 +238,8 @@ public interface Keywords
 			return "infix";
 		case INTERFACE:
 			return "interface";
+		case IS:
+			return "is";
 		case LAZY:
 			return "lazy";
 		case NEW:
