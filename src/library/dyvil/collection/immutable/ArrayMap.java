@@ -9,10 +9,8 @@ import java.util.function.Consumer;
 import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
-import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
-@TupleConvertible
 public class ArrayMap<K, V> implements ImmutableMap<K, V>
 {
 	protected class Entry implements Map.Entry<K, V>
@@ -37,24 +35,23 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		}
 	}
 	
-	private int	size;
-	private K[]	keys;
-	private V[]	values;
-	
-	public static <K, V> ArrayMap<K, V> apply(K[] keys, V[] values)
-	{
-		return new ArrayMap(keys, values);
-	}
+	private final int	size;
+	private final K[]	keys;
+	private final V[]	values;
 	
 	public ArrayMap(K[] keys, V[] values)
 	{
-		if (keys.length != values.length)
+		int size = keys.length;
+		if (size != values.length)
 		{
 			throw new IllegalArgumentException("keys.length != values.length");
 		}
-		this.keys = keys;
-		this.values = values;
-		this.size = keys.length;
+		
+		this.keys = (K[]) new Object[size];
+		System.arraycopy(keys, 0, this.keys, 0, size);
+		this.values = (V[]) new Object[size];
+		System.arraycopy(values, 0, this.values, 0, size);
+		this.size = size;
 	}
 	
 	public ArrayMap(K[] keys, V[] values, int size)
@@ -67,6 +64,23 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		{
 			throw new IllegalArgumentException("values.length < size");
 		}
+		
+		this.keys = (K[]) new Object[size];
+		System.arraycopy(keys, 0, this.keys, 0, size);
+		this.values = (V[]) new Object[size];
+		System.arraycopy(values, 0, this.values, 0, size);
+		this.size = size;
+	}
+	
+	public ArrayMap(K[] keys, V[] values, boolean trusted)
+	{
+		this.keys = keys;
+		this.values = values;
+		this.size = keys.length;
+	}
+	
+	public ArrayMap(K[] keys, V[] values, int size, boolean trusted)
+	{
 		this.keys = keys;
 		this.values = values;
 		this.size = size;
@@ -309,7 +323,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		Object[] values = new Object[len];
 		System.arraycopy(this.keys, 0, keys, 0, this.size);
 		System.arraycopy(this.values, 0, values, 0, this.size);
-		return new ArrayMap(keys, values);
+		return new ArrayMap(keys, values, len, true);
 	}
 	
 	@Override
@@ -329,7 +343,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 			values[index] = entry.getValue();
 			index++;
 		}
-		return new ArrayMap(keys, values);
+		return new ArrayMap(keys, values, len, true);
 	}
 	
 	@Override
@@ -351,7 +365,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 			values[index] = this.values[i];
 			index++;
 		}
-		return new ArrayMap(keys, values, index);
+		return new ArrayMap(keys, values, index, true);
 	}
 	
 	@Override
@@ -377,7 +391,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 			values[index] = v;
 			index++;
 		}
-		return new ArrayMap(keys, values, index);
+		return new ArrayMap(keys, values, index, true);
 	}
 	
 	@Override
@@ -399,7 +413,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 			values[index] = v;
 			index++;
 		}
-		return new ArrayMap(keys, values, index);
+		return new ArrayMap(keys, values, index, true);
 	}
 	
 	@Override
@@ -421,7 +435,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 			values[index] = this.values[i];
 			index++;
 		}
-		return new ArrayMap(keys, values, index);
+		return new ArrayMap(keys, values, index, true);
 	}
 	
 	@Override
@@ -435,7 +449,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		{
 			values[i] = mapper.apply(this.keys[i], this.values[i]);
 		}
-		return new ArrayMap(keys, values);
+		return new ArrayMap(keys, values, this.size, true);
 	}
 	
 	@Override
@@ -458,17 +472,13 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 			values[index] = this.values[i];
 			index++;
 		}
-		return new ArrayMap(keys, values, index);
+		return new ArrayMap(keys, values, index, true);
 	}
 	
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		Object[] keys = new Object[this.size];
-		Object[] values = new Object[this.size];
-		System.arraycopy(this.keys, 0, keys, 0, this.size);
-		System.arraycopy(this.values, 0, values, 0, this.size);
-		return new ArrayMap(keys, values);
+		return new ArrayMap(this.keys, this.values, this.size);
 	}
 	
 	@Override

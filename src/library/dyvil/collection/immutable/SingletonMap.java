@@ -11,10 +11,8 @@ import dyvil.collection.SingletonIterator;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
 import dyvil.lang.Map.Entry;
-import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
-@TupleConvertible
 public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 {
 	private K	key;
@@ -118,7 +116,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		return ImmutableMap.apply(this.key, this.value, key, value);
+		return new ArrayMap(new Object[] { this.key, key }, new Object[] { this.value, value }, 2, true);
 	}
 	
 	@Override

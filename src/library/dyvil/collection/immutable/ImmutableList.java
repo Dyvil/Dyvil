@@ -33,15 +33,15 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	public static <E> ImmutableList<E> apply(E e1, E e2)
 	{
-		return new ArrayList(new Object[] { e1, e2 }, 2);
+		return new ArrayList(new Object[] { e1, e2 }, 2, true);
 	}
 	
 	public static <E> ImmutableList<E> apply(E e1, E e2, E e3)
 	{
-		return new ArrayList(new Object[] { e1, e2, e3 }, 3);
+		return new ArrayList(new Object[] { e1, e2, e3 }, 3, true);
 	}
 	
-	public static <E> ImmutableList<E> apply(E[] array)
+	public static <E> ImmutableList<E> apply(E... array)
 	{
 		return new ArrayList(array);
 	}

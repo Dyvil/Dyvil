@@ -39,7 +39,7 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 		return new ArrayList(new Object[] { e1, e2, e3 }, 3, true);
 	}
 	
-	public static <E> MutableList<E> apply(E[] array)
+	public static <E> MutableList<E> apply(E... array)
 	{
 		return new ArrayList(array);
 	}

@@ -29,7 +29,7 @@ public class ArrayList<E> implements MutableList<E>
 		return new ArrayList();
 	}
 	
-	public static <E> ArrayList<E> apply(E[] elements)
+	public static <E> ArrayList<E> apply(E... elements)
 	{
 		return new ArrayList(elements, true);
 	}
@@ -44,7 +44,7 @@ public class ArrayList<E> implements MutableList<E>
 		this.elements = new Object[size];
 	}
 	
-	public ArrayList(Object[] elements)
+	public ArrayList(Object... elements)
 	{
 		this.elements = new Object[elements.length];
 		System.arraycopy(elements, 0, this.elements, 0, elements.length);

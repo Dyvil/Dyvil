@@ -174,6 +174,6 @@ public interface JavaMaps
 			values[index] = entry.getValue();
 			index++;
 		}
-		return new ArrayMap(keys, values);
+		return new ArrayMap(keys, values, len, true);
 	}
 }

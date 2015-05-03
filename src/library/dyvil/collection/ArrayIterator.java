@@ -11,7 +11,7 @@ public final class ArrayIterator<E> implements Iterator<E>
 	private E[]	array;
 	private int	size;
 	
-	public static <E> ArrayIterator<E> apply(E[] array)
+	public static <E> ArrayIterator<E> apply(E... array)
 	{
 		return new ArrayIterator(array);
 	}

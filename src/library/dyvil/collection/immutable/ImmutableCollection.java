@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import dyvil.annotation.mutating;
 import dyvil.collection.mutable.MutableCollection;
 import dyvil.lang.Collection;
 import dyvil.lang.Immutable;
@@ -75,66 +76,77 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	public ImmutableCollection<E> sorted(Comparator<? super E> comparator);
 	
 	@Override
+	@mutating
 	public default E add(E element)
 	{
 		throw new ImmutableException("add() on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void $plus$eq(E entry)
 	{
 		throw new ImmutableException("+= on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void $plus$plus$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("++= on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default boolean remove(E element)
 	{
 		throw new ImmutableException("remove() on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void $minus$eq(E entry)
 	{
 		throw new ImmutableException("-= on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void $minus$minus$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("--= on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void $amp$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("&= on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void map(UnaryOperator<E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void filter(Predicate<? super E> condition)
 	{
 		throw new ImmutableException("filter() on Immutable Collection");

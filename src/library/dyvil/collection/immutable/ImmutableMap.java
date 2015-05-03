@@ -8,17 +8,16 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+import dyvil.annotation.mutating;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Immutable;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.Map;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
 @NilConvertible
-@TupleConvertible
 @ArrayConvertible
 public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 {
@@ -37,12 +36,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 		return new SingletonMap(entry._1, entry._2);
 	}
 	
-	public static <K, V> ImmutableMap<K, V> apply(K key1, V value1, K key2, V value2)
-	{
-		return new TupleMap(new Tuple2[] { new Tuple2(key1, value1), new Tuple2(key2, value2) }, 2);
-	}
-	
-	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
+	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
 	{
 		int len = entries.length;
 		switch (len)
@@ -148,78 +142,91 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	// Mutating Operations
 	
 	@Override
+	@mutating
 	public default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default void update(K key, V value)
 	{
 		throw new ImmutableException("() on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default V put(K key, V value)
 	{
 		throw new ImmutableException("+= on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default void $plus$eq(Tuple2<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("+= on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default void $plus$plus$eq(Map<? extends K, ? extends V> map)
 	{
 		throw new ImmutableException("+= on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default void $minus$eq(K key)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default V remove(K key)
 	{
 		throw new ImmutableException("remove() on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default boolean remove(K key, V value)
 	{
 		throw new ImmutableException("remove() on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default void $minus$eq(Tuple2<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default void $minus$colon$eq(V value)
 	{
 		throw new ImmutableException("-:= on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default void $minus$minus$eq(Map<? extends K, ? extends V> map)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default void map(BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		throw new ImmutableException("map() on Immutable Map");
 	}
 	
 	@Override
+	@mutating
 	public default void filter(BiPredicate<? super K, ? super V> condition)
 	{
 		throw new ImmutableException("filter() on Immutable Map");

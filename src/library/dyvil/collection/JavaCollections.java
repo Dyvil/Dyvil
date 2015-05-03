@@ -164,6 +164,6 @@ public interface JavaCollections
 	 */
 	public static @infix @inline <E> ImmutableList<E> immutable(java.util.List<E> list)
 	{
-		return new dyvil.collection.immutable.ArrayList(list.toArray());
+		return new dyvil.collection.immutable.ArrayList(list.toArray(), true);
 	}
 }

@@ -12,11 +12,9 @@ import dyvil.collection.immutable.ImmutableMap;
 import dyvil.lang.Map;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
 @NilConvertible
-@TupleConvertible
 @ArrayConvertible
 public interface MutableMap<K, V> extends Map<K, V>
 {
@@ -27,8 +25,8 @@ public interface MutableMap<K, V> extends Map<K, V>
 	
 	public static <K, V> MutableMap<K, V> apply(K key, V value)
 	{
-		HashMap<K, V> map = new HashMap();
-		map.put(key, value);
+		HashMap<K, V> map = new HashMap(1);
+		map.update(key, value);
 		return map;
 	}
 	
@@ -37,12 +35,12 @@ public interface MutableMap<K, V> extends Map<K, V>
 		return apply(entry._1, entry._2);
 	}
 	
-	public static <K, V> MutableMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
+	public static <K, V> MutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
 	{
-		HashMap<K, V> map = new HashMap();
+		HashMap<K, V> map = new HashMap(entries.length);
 		for (Tuple2<? extends K, ? extends V> entry : entries)
 		{
-			map.put(entry._1, entry._2);
+			map.update(entry._1, entry._2);
 		}
 		return map;
 	}

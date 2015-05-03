@@ -12,11 +12,9 @@ import dyvil.collection.immutable.ImmutableMap;
 import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
 @NilConvertible
-@TupleConvertible
 @ArrayConvertible
 public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 {
@@ -25,17 +23,12 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 		return MutableMap.apply();
 	}
 	
-	public static <K, V> ImmutableMap<K, V> apply(K key, V value)
-	{
-		return ImmutableMap.apply(key, value);
-	}
-	
 	public static <K, V> ImmutableMap<K, V> apply(Tuple2<K, V> entry)
 	{
-		return ImmutableMap.apply(entry._1, entry._2);
+		return ImmutableMap.apply(entry);
 	}
 	
-	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
+	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
 	{
 		return ImmutableMap.apply(entries);
 	}
