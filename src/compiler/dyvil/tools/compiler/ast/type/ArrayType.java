@@ -17,9 +17,13 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ArrayType implements IType
+public class ArrayType implements IType, ITyped
 {
 	private IType	type;
+	
+	public ArrayType()
+	{
+	}
 	
 	public ArrayType(IType type)
 	{
@@ -49,6 +53,18 @@ public class ArrayType implements IType
 	public int typeTag()
 	{
 		return ARRAY_TYPE;
+	}
+	
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+	
+	@Override
+	public IType getType()
+	{
+		return this.type;
 	}
 	
 	@Override
@@ -243,6 +259,14 @@ public class ArrayType implements IType
 	public IType clone()
 	{
 		return new ArrayType(this.type);
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		this.toString("", builder);
+		return builder.toString();
 	}
 	
 	@Override

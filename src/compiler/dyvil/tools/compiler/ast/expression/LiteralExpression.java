@@ -82,9 +82,8 @@ public final class LiteralExpression implements IValue
 		else
 		{
 			this.method = match;
+			match.checkArguments(markers, null, this.argument, null);
 		}
-		
-		match.checkArguments(markers, null, this.argument, null);
 		
 		this.argument.checkTypes(markers, context);
 	}

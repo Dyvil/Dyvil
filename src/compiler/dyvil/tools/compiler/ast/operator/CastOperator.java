@@ -17,6 +17,7 @@ public final class CastOperator extends ASTNode implements IValue
 {
 	public IValue	value;
 	public IType	type;
+	private boolean	typeHint;
 	
 	public CastOperator(IValue value, IType type)
 	{
@@ -81,12 +82,14 @@ public final class CastOperator extends ASTNode implements IValue
 		if (this.type.isSuperTypeOf(this.value.getType()))
 		{
 			markers.add(this.position, "cast.unnecessary");
+			this.typeHint = true;
 		}
 		
 		IValue value1 = this.value.withType(this.type);
 		if (value1 != null && value1 != this.value)
 		{
 			this.value = value1;
+			this.typeHint = true;
 		}
 		
 		this.value.checkTypes(markers, context);
@@ -127,6 +130,11 @@ public final class CastOperator extends ASTNode implements IValue
 	public void writeExpression(MethodWriter writer)
 	{
 		this.value.writeExpression(writer);
+		if (this.typeHint)
+		{
+			return;
+		}
+		
 		if (this.type.isPrimitive())
 		{
 			writePrimitiveCast(this.value.getType(), (PrimitiveType) this.type, writer);
