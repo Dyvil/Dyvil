@@ -10,6 +10,7 @@ import java.util.logging.Formatter;
 import org.objectweb.asm.Opcodes;
 
 import dyvil.io.AppendableOutputStream;
+import dyvil.io.FileUtils;
 import dyvil.io.LoggerOutputStream;
 import dyvil.tools.compiler.ast.dwt.DWTFile;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
@@ -240,12 +241,16 @@ public final class DyvilCompiler
 			constantFolding = 1;
 			return;
 		case "jar":
+			phases.add(ICompilerPhase.CLEAN);
 			phases.add(ICompilerPhase.JAR);
 			return;
 		case "format":
 			phases.add(ICompilerPhase.TOKENIZE);
 			phases.add(ICompilerPhase.PARSE);
 			phases.add(ICompilerPhase.FORMAT);
+			return;
+		case "clean":
+			phases.add(ICompilerPhase.CLEAN);
 			return;
 		case "print":
 			phases.add(ICompilerPhase.PRINT);
@@ -326,6 +331,20 @@ public final class DyvilCompiler
 			pack.addCompilationUnit(header);
 			units.add(0, header);
 			return;
+		}
+	}
+	
+	public static void clean()
+	{
+		File[] files = config.outputDir.listFiles();
+		if (files == null)
+		{
+			return;
+		}
+		
+		for (File s : files)
+		{
+			FileUtils.delete(s);
 		}
 	}
 }

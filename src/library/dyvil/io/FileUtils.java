@@ -189,9 +189,13 @@ public interface FileUtils
 	{
 		if (file.isDirectory())
 		{
-			for (File f : file.listFiles())
+			File[] files = file.listFiles();
+			if (files != null)
 			{
-				delete(f);
+				for (File f : files)
+				{
+					delete(f);
+				}
 			}
 		}
 		file.delete();

@@ -20,6 +20,13 @@ import dyvil.tools.compiler.util.TestThread;
 public interface ICompilerPhase extends Comparable<ICompilerPhase>
 {
 	/**
+	 * Recursively deletes all files in the output directory.
+	 * 
+	 * @see DyvilCompiler#clean()
+	 */
+	ICompilerPhase	CLEAN			= new CompilerPhase(0, "CLEAN", units -> DyvilCompiler.clean());
+	
+	/**
 	 * Splits the input file into {@link IdentifierToken Tokens} using
 	 * {@link Dlex}.
 	 */
