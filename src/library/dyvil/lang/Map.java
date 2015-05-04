@@ -55,7 +55,10 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 	 * 
 	 * @return true, if this map contains no mappings
 	 */
-	public boolean isEmpty();
+	public default boolean isEmpty()
+	{
+		return this.size() == 0;
+	}
 	
 	/**
 	 * Creates and returns an {@link Iterator} over the mappings of this map,

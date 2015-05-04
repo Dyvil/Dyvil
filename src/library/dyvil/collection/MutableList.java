@@ -54,16 +54,10 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 		return list;
 	}
 	
-	// Simple Getters
+	// Accessors
 	
 	@Override
 	public int size();
-	
-	@Override
-	public default boolean isEmpty()
-	{
-		return this.size() == 0;
-	}
 	
 	@Override
 	public Iterator<E> iterator();
@@ -89,7 +83,7 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	// Non-mutating Operations
 	
 	@Override
-	public MutableList<E> slice(int startIndex, int length);
+	public MutableList<E> subList(int startIndex, int length);
 	
 	@Override
 	public MutableList<E> $plus(E element);
@@ -179,20 +173,20 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	@Override
 	public void sort(Comparator<? super E> comparator);
 	
+	// Search Operations
+	
 	@Override
 	public int indexOf(E element);
 	
 	@Override
 	public int lastIndexOf(E element);
 	
-	@Override
-	public Object[] toArray();
+	// toArray
 	
 	@Override
-	public E[] toArray(Class<E> type);
+	public void toArray(Object[] store);
 	
-	@Override
-	public Object[] toArray(Object[] store);
+	// Copying
 	
 	@Override
 	public MutableList<E> copy();

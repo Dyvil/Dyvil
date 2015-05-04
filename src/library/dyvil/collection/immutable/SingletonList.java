@@ -76,7 +76,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> slice(int startIndex, int length)
+	public ImmutableList<E> subList(int startIndex, int length)
 	{
 		if (startIndex > 0 || length > 0)
 		{
@@ -180,22 +180,17 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public Object[] toArray(Object[] store)
-	{
-		if (store.length == 0)
-		{
-			store = (Object[]) Array.newInstance(store.getClass().getComponentType(), 1);
-		}
-		store[0] = this.element;
-		return store;
-	}
-	
-	@Override
 	public E[] toArray(Class<E> type)
 	{
 		E[] array = (E[]) Array.newInstance(type, 1);
 		array[0] = type.cast(this.element);
 		return array;
+	}
+	
+	@Override
+	public void toArray(Object[] store)
+	{
+		store[0] = this.element;
 	}
 	
 	@Override

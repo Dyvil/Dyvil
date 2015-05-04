@@ -77,7 +77,7 @@ public class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> slice(int startIndex, int length)
+	public ImmutableList<E> subList(int startIndex, int length)
 	{
 		if (startIndex > 0 || length > 0)
 		{
@@ -165,15 +165,14 @@ public class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public Object[] toArray(Object[] store)
-	{
-		return store;
-	}
-	
-	@Override
 	public E[] toArray(Class<E> type)
 	{
 		return (E[]) ObjectArray.EMPTY;
+	}
+	
+	@Override
+	public void toArray(Object[] store)
+	{
 	}
 	
 	@Override

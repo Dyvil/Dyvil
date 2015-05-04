@@ -74,7 +74,7 @@ public interface List<E> extends Collection<E>
 	
 	// Non-mutating Operations
 	
-	public List<E> slice(int startIndex, int length);
+	public List<E> subList(int startIndex, int length);
 	
 	@Override
 	public List<E> $plus(E element);
@@ -283,7 +283,7 @@ public interface List<E> extends Collection<E>
 	public E[] toArray(Class<E> type);
 	
 	@Override
-	public Object[] toArray(Object[] store);
+	public void toArray(Object[] store);
 	
 	// Copying
 	

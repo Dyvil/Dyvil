@@ -165,7 +165,7 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public MutableList<E> slice(int startIndex, int length)
+	public MutableList<E> subList(int startIndex, int length)
 	{
 		this.rangeCheck(startIndex);
 		if (startIndex + length >= this.size)
@@ -646,17 +646,6 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public Object[] toArray(Object[] store)
-	{
-		if (store.length < this.size)
-		{
-			return Arrays.copyOf(this.elements, this.size, store.getClass());
-		}
-		System.arraycopy(this.elements, 0, store, 0, this.size);
-		return store;
-	}
-	
-	@Override
 	public E[] toArray(Class<E> type)
 	{
 		E[] array = (E[]) Array.newInstance(type, this.size);
@@ -667,6 +656,12 @@ public class ArrayList<E> implements MutableList<E>
 		return array;
 	}
 	
+	@Override
+	public void toArray(Object[] store)
+	{
+		System.arraycopy(this.elements, 0, store, 0, this.size);
+	}
+
 	@Override
 	public MutableList<E> copy()
 	{

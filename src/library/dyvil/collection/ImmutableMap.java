@@ -59,9 +59,6 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public int size();
 	
 	@Override
-	public boolean isEmpty();
-	
-	@Override
 	public Iterator<Tuple2<K, V>> iterator();
 	
 	@Override

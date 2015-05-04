@@ -1,5 +1,6 @@
 package dyvil.lang;
 
+import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -20,8 +21,8 @@ import dyvil.lang.literal.NilConvertible;
  * mutable and immutable collections, as there is an (im)mutable counterpart for
  * almost every method in this base class.
  * <p>
- * This interface supports the {@link NilConvertible} annotation, meaning that
- * a declaration like
+ * This interface supports the {@link NilConvertible} annotation, meaning that a
+ * declaration like
  * 
  * <pre>
  * Collection[String] c = nil
@@ -37,8 +38,8 @@ import dyvil.lang.literal.NilConvertible;
 public interface Collection<E> extends Iterable<E>
 {
 	/**
-	 * Returns an empty collection. This method
-	 * is primarily for use with the {@code nil} literal in <i>Dyvil</i>.
+	 * Returns an empty collection. This method is primarily for use with the
+	 * {@code nil} literal in <i>Dyvil</i>.
 	 * 
 	 * @see List#apply()
 	 * @return an empty collection
@@ -48,7 +49,7 @@ public interface Collection<E> extends Iterable<E>
 		return List.apply();
 	}
 	
-	// Non-mutating Operations
+	// Accessors
 	
 	/**
 	 * Returns the size of this collection, i.e. the number of elements
@@ -104,7 +105,7 @@ public interface Collection<E> extends Iterable<E>
 	 */
 	public boolean $qmark(Object element);
 	
-	// Copying Operations
+	// Non-mutating Operations
 	
 	/**
 	 * Returns a collection that contains all elements of this collection plus
@@ -344,19 +345,12 @@ public interface Collection<E> extends Iterable<E>
 	 * 
 	 * @return an array of this collection's elements
 	 */
-	public Object[] toArray();
-	
-	/**
-	 * Stores the elements of this collection in the given {@code store} array.
-	 * If the {@code store} array is not large enough to hold all the elements
-	 * of this collection, a copy of it is created, filled with the elements and
-	 * returned.
-	 * 
-	 * @param store
-	 *            the store array
-	 * @return the store array or a resized array
-	 */
-	public Object[] toArray(Object[] store);
+	public default Object[] toArray()
+	{
+		Object[] array = new Object[this.size()];
+		this.toArray(array);
+		return array;
+	}
 	
 	/**
 	 * Creates and returns an array containing the elements of this collection.
@@ -369,10 +363,26 @@ public interface Collection<E> extends Iterable<E>
 	 *            the array type
 	 * @return an array containing this collection's elements
 	 */
-	public E[] toArray(Class<E> type);
+	public default E[] toArray(Class<E> type)
+	{
+		E[] array = (E[]) Array.newInstance(type, this.size());
+		this.toArray(array);
+		return array;
+	}
 	
 	// Copying
 	
+	/**
+	 * Stores the elements of this collection in the given {@code store} array.
+	 * If the {@code store} array is not large enough to hold all the elements
+	 * of this collection, a copy of it is created, filled with the elements and
+	 * returned.
+	 * 
+	 * @param store
+	 *            the store array
+	 */
+	public void toArray(Object[] store);
+
 	/**
 	 * Creates a copy of this collection. The general contract of this method is
 	 * that the type of the returned collection is the same as this collection's

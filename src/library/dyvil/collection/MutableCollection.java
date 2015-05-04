@@ -20,11 +20,10 @@ public interface MutableCollection<E> extends Collection<E>
 		return MutableList.apply();
 	}
 	
-	@Override
-	public int size();
+	// Accessors
 	
 	@Override
-	public boolean isEmpty();
+	public int size();
 	
 	@Override
 	public Iterator<E> iterator();
@@ -40,6 +39,8 @@ public interface MutableCollection<E> extends Collection<E>
 	
 	@Override
 	public boolean $qmark(Object element);
+	
+	// Non-mutating Operations
 	
 	@Override
 	public MutableCollection<E> $plus(E element);
@@ -71,7 +72,7 @@ public interface MutableCollection<E> extends Collection<E>
 	@Override
 	public MutableCollection<E> sorted(Comparator<? super E> comparator);
 	
-	// Mutating Functions
+	// Mutating Operations
 	
 	@Override
 	public void $plus$eq(E element);
@@ -99,6 +100,13 @@ public interface MutableCollection<E> extends Collection<E>
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	
+	// toArray
+	
+	@Override
+	public void toArray(Object[] store);
+	
+	// Copying
 	
 	@Override
 	public MutableCollection<E> copy();

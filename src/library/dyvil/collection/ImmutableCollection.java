@@ -23,11 +23,10 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 		return ImmutableList.apply();
 	}
 	
-	@Override
-	public int size();
+	// Accessors
 	
 	@Override
-	public boolean isEmpty();
+	public int size();
 	
 	@Override
 	public Iterator<E> iterator();
@@ -43,6 +42,8 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	
 	@Override
 	public boolean $qmark(Object element);
+	
+	// Non-mutating Operations
 	
 	@Override
 	public ImmutableCollection<E> $plus(E element);
@@ -73,6 +74,8 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	
 	@Override
 	public ImmutableCollection<E> sorted(Comparator<? super E> comparator);
+	
+	// Mutating Operations
 	
 	@Override
 	@mutating
@@ -150,6 +153,13 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	{
 		throw new ImmutableException("filter() on Immutable Collection");
 	}
+	
+	// toArray
+	
+	@Override
+	public void toArray(Object[] store);
+	
+	// Copying
 	
 	@Override
 	public ImmutableCollection<E> copy();

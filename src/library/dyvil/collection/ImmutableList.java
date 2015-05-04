@@ -53,16 +53,10 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 		return MutableList.apply(iterable).immutable();
 	}
 	
-	// Simple Getters
+	// Accessors
 	
 	@Override
 	public int size();
-	
-	@Override
-	public default boolean isEmpty()
-	{
-		return this.size() == 0;
-	}
 	
 	@Override
 	public Iterator<E> iterator();
@@ -88,7 +82,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	// Non-mutating Operations
 	
 	@Override
-	public ImmutableList<E> slice(int startIndex, int length);
+	public ImmutableList<E> subList(int startIndex, int length);
 	
 	@Override
 	public ImmutableList<E> $plus(E element);
@@ -273,12 +267,6 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	public Object[] toArray();
-	
-	@Override
-	public E[] toArray(Class<E> type);
-	
-	@Override
-	public Object[] toArray(Object[] store);
 	
 	// Copying
 	
