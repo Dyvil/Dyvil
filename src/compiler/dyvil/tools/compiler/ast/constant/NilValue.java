@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.constant;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -106,6 +107,8 @@ public final class NilValue implements IConstantValue
 		else
 		{
 			this.method = match;
+			GenericData data = match.getGenericData(null, null, EmptyArguments.INSTANCE);
+			this.requiredType = match.getType().getConcreteType(data);
 		}
 	}
 	

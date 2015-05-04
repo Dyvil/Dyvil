@@ -93,19 +93,16 @@ public final class CastOperator extends ASTNode implements IValue
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.value = this.value.resolve(markers, context);
-		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
 		if (this.type == Types.VOID)
 		{
 			markers.add(this.position, "cast.void");
 			
 			this.value.checkTypes(markers, context);
-			return;
+			return this;
 		}
+		
+		if (!this.type.isResolved())
+			return this;
 		
 		if (!this.typeHint && this.type.isSuperTypeOf(this.value.getType()))
 		{
@@ -113,17 +110,23 @@ public final class CastOperator extends ASTNode implements IValue
 			this.typeHint = true;
 		}
 		
-		if (this.type.isResolved())
+		IValue value1 = this.value.withType(this.type);
+		if (value1 != null && value1 != this.value)
 		{
-			IValue value1 = this.value.withType(this.type);
-			if (value1 != null && value1 != this.value)
-			{
-				this.value = value1;
-				this.typeHint = true;
-			}
-			
+			this.value = value1;
+			this.typeHint = true;
 			this.value.checkTypes(markers, context);
+			this.type = value1.getType();
+			return this;
 		}
+		
+		this.value.checkTypes(markers, context);
+		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
 	}
 	
 	@Override

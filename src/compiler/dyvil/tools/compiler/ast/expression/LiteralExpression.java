@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
@@ -82,7 +83,9 @@ public final class LiteralExpression implements IValue
 		else
 		{
 			this.method = match;
-			match.checkArguments(markers, null, this.argument, null);
+			GenericData data = match.getGenericData(null, null, this.argument);
+			match.checkArguments(markers, null, this.argument, data);
+			this.type = match.getType().getConcreteType(data);
 		}
 		
 		this.argument.checkTypes(markers, context);
