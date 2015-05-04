@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -15,6 +16,8 @@ public interface ITypeVariable extends IASTNode, INamed, IBounded
 	public int getIndex();
 	
 	// Super Types
+	
+	public IClass getTheClass();
 	
 	public boolean isSuperTypeOf(IType type);
 	

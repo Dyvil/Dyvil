@@ -52,7 +52,7 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public IClass getTheClass()
 	{
-		return null;
+		return this.typeVar.getTheClass();
 	}
 	
 	@Override

@@ -119,6 +119,15 @@ public abstract class BaseBounded implements IASTNode, IBounded, ITypeList
 		return this.lowerBound;
 	}
 	
+	public IClass getTheClass()
+	{
+		if (this.lowerBound != null || this.upperBoundCount == 0)
+		{
+			return Types.OBJECT_CLASS;
+		}
+		return this.upperBounds[0].getTheClass();
+	}
+	
 	public boolean isSuperTypeOf(IType type)
 	{
 		if (this.upperBoundCount > 0)

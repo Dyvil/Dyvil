@@ -7,8 +7,6 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.GenericData;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
@@ -24,7 +22,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeContext
+public class UpdateMethodCall extends ASTNode implements ICall, IValued
 {
 	public IValue		instance;
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
@@ -68,8 +66,7 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 		}
 		if (this.type == null)
 		{
-			this.getGenericData();
-			return this.type = this.method.getType().getConcreteType(this);
+			return this.type = this.method.getType().getConcreteType(this.getGenericData());
 		}
 		return this.type;
 	}
@@ -138,16 +135,6 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		if (typeVar.getGeneric().isMethod())
-		{
-			return this.genericData.generics[typeVar.getIndex()];
-		}
-		return this.instance.getType().resolveType(typeVar);
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
@@ -193,7 +180,7 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.method.checkArguments(markers, this.instance, this.arguments, this.getGenericData());
 		}
 		this.arguments.check(markers, context);
 	}

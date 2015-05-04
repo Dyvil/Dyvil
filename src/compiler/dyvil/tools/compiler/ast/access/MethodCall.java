@@ -9,8 +9,6 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.GenericData;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -30,7 +28,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.compiler.util.Util;
 
-public final class MethodCall extends ASTNode implements ICall, INamed, IValued, ITypeContext
+public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 {
 	public IValue		instance;
 	public boolean		dotless;
@@ -78,8 +76,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued,
 		}
 		if (this.type == null)
 		{
-			this.getGenericData();
-			this.type = this.method.getType().getConcreteType(this);
+			this.type = this.method.getType().getConcreteType(this.getGenericData());
 			
 			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
 			{
@@ -163,16 +160,6 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued,
 	public IArguments getArguments()
 	{
 		return this.arguments;
-	}
-	
-	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		if (typeVar.getGeneric().isMethod())
-		{
-			return this.genericData.generics[typeVar.getIndex()];
-		}
-		return this.instance.getType().resolveType(typeVar);
 	}
 	
 	@Override
@@ -364,7 +351,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued,
 		
 		if (this.method != null)
 		{
-			this.instance = this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.instance = this.method.checkArguments(markers, this.instance, this.arguments, this.getGenericData());
 		}
 		this.arguments.checkTypes(markers, context);
 	}

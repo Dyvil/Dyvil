@@ -683,6 +683,10 @@ public class Method extends Member implements IMethod
 		if (genericData == null)
 		{
 			genericData = new GenericData(this.genericCount);
+			if (instance != null)
+			{
+				genericData.instanceType = instance.getType();
+			}
 			
 			for (int i = 0; i < this.genericCount; i++)
 			{
@@ -690,6 +694,11 @@ public class Method extends Member implements IMethod
 			}
 			
 			return genericData;
+		}
+		
+		if (instance != null)
+		{
+			genericData.instanceType = instance.getType();
 		}
 		
 		genericData.setTypeCount(this.genericCount);
@@ -797,7 +806,10 @@ public class Method extends Member implements IMethod
 				arguments.checkValue(i, this.parameters[i], markers, typeContext);
 			}
 			
-			this.checkMutating(markers, instance);
+			if (instance != null)
+			{
+				this.checkMutating(markers, instance);
+			}
 			return instance;
 		}
 		

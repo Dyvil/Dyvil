@@ -9,8 +9,6 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -27,7 +25,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class CompoundCall extends ASTNode implements ICall, INamed, IValued, ITypeContext
+public final class CompoundCall extends ASTNode implements ICall, INamed, IValued
 {
 	public Name			name;
 	
@@ -75,8 +73,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		}
 		if (this.type == null)
 		{
-			this.getGenericData();
-			this.type = this.method.getType().getConcreteType(this);
+			this.type = this.method.getType().getConcreteType(this.getGenericData());
 			
 			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
 			{
@@ -163,16 +160,6 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		if (typeVar.getGeneric().isMethod())
-		{
-			return this.genericData.generics[typeVar.getIndex()];
-		}
-		return this.instance.getType().resolveType(typeVar);
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
@@ -239,7 +226,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.method.checkArguments(markers, this.instance, this.arguments, this.getGenericData());
 		}
 		this.arguments.checkTypes(markers, context);
 	}
