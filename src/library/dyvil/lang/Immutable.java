@@ -1,8 +1,8 @@
 package dyvil.lang;
 
 import dyvil.annotation.mutating;
-import dyvil.collection.immutable.ImmutableCollection;
-import dyvil.collection.immutable.ImmutableMap;
+import dyvil.collection.ImmutableCollection;
+import dyvil.collection.ImmutableMap;
 
 /**
  * Marker interface that marks types as <i>immutable</i> to be used in

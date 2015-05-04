@@ -8,8 +8,8 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.collection.immutable.ImmutableMap;
-import dyvil.collection.mutable.MutableMap;
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;

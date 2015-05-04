@@ -7,7 +7,8 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import dyvil.collection.ArrayIterator;
-import dyvil.collection.mutable.MutableMap;
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
 import dyvil.lang.Map;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.tuple.Tuple2;
@@ -18,7 +19,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	private final int				size;
 	private final Tuple2<K, V>[]	entries;
 	
-	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>[] entries)
+	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
 	{
 		return new TupleMap(entries);
 	}
@@ -26,10 +27,24 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	public TupleMap(Tuple2<K, V>[] entries)
 	{
 		this.size = entries.length;
-		this.entries = entries;
+		this.entries = new Tuple2[this.size];
+		System.arraycopy(entries, 0, this.entries, 0, this.size);
 	}
 	
 	public TupleMap(Tuple2<K, V>[] entries, int size)
+	{
+		this.size = size;
+		this.entries = new Tuple2[size];
+		System.arraycopy(entries, 0, this.entries, 0, size);
+	}
+	
+	public TupleMap(Tuple2<K, V>[] entries, boolean trusted)
+	{
+		this.size = entries.length;
+		this.entries = entries;
+	}
+	
+	public TupleMap(Tuple2<K, V>[] entries, int size, boolean trusted)
 	{
 		this.size = size;
 		this.entries = entries;

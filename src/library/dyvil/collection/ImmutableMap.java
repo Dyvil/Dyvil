@@ -1,4 +1,4 @@
-package dyvil.collection.immutable;
+package dyvil.collection;
 
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -9,7 +9,9 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import dyvil.annotation.mutating;
-import dyvil.collection.mutable.MutableMap;
+import dyvil.collection.immutable.EmptyMap;
+import dyvil.collection.immutable.SingletonMap;
+import dyvil.collection.immutable.TupleMap;
 import dyvil.lang.Immutable;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.Map;
@@ -23,7 +25,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 {
 	public static <K, V> ImmutableMap<K, V> apply()
 	{
-		return EmptyMap.emptyMap;
+		return EmptyMap.apply();
 	}
 	
 	public static <K, V> ImmutableMap<K, V> apply(K key, V value)
@@ -42,12 +44,12 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 		switch (len)
 		{
 		case 0:
-			return EmptyMap.emptyMap;
+			return EmptyMap.apply();
 		case 1:
 			Tuple2<? extends K, ? extends V> entry = entries[0];
 			return new SingletonMap(entry._1, entry._2);
 		default:
-			return new TupleMap(entries, len);
+			return new TupleMap(entries, len, true);
 		}
 	}
 	

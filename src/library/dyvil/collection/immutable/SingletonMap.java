@@ -7,8 +7,9 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
 import dyvil.collection.SingletonIterator;
-import dyvil.collection.mutable.MutableMap;
 import dyvil.lang.Map;
 import dyvil.lang.Map.Entry;
 import dyvil.tuple.Tuple2;

@@ -9,11 +9,11 @@ import dyvil.lang.literal.NilConvertible;
 @NilConvertible
 public class EmptyIterator<E> implements Iterator<E>
 {
-	static final EmptyIterator	instance	= new EmptyIterator();
+	static final EmptyIterator	emptyIterator	= new EmptyIterator();
 	
 	public static <E> EmptyIterator<E> apply()
 	{
-		return instance;
+		return emptyIterator;
 	}
 	
 	private EmptyIterator()
@@ -29,7 +29,7 @@ public class EmptyIterator<E> implements Iterator<E>
 	@Override
 	public E next()
 	{
-		throw new NoSuchElementException("Empty Iterator");
+		throw new NoSuchElementException("Empty Iterator has no elements to return");
 	}
 	
 	@Override

@@ -9,7 +9,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import dyvil.collection.ArrayIterator;
-import dyvil.collection.mutable.MutableList;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.literal.ArrayConvertible;
 

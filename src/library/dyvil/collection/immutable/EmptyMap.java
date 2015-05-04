@@ -7,7 +7,8 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import dyvil.collection.EmptyIterator;
-import dyvil.collection.mutable.MutableMap;
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
 import dyvil.lang.Map;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;

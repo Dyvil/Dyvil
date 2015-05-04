@@ -9,9 +9,7 @@ import java.util.function.UnaryOperator;
 
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
-import dyvil.collection.immutable.ImmutableList;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.collection.mutable.MutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
 

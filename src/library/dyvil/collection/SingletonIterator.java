@@ -8,10 +8,10 @@ import java.util.function.Consumer;
 import dyvil.lang.literal.TupleConvertible;
 
 @TupleConvertible
-public final class SingletonIterator<E> implements Iterator<E>
+public class SingletonIterator<E> implements Iterator<E>
 {
 	private boolean	returned;
-	private E		element;
+	private final E	element;
 	
 	public static <E> SingletonIterator<E> apply(E element)
 	{
@@ -37,7 +37,7 @@ public final class SingletonIterator<E> implements Iterator<E>
 			this.returned = true;
 			return this.element;
 		}
-		throw new NoSuchElementException();
+		throw new NoSuchElementException("Singleton Iterator already returned the element");
 	}
 	
 	@Override

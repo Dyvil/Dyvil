@@ -9,8 +9,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.collection.immutable.ImmutableCollection;
-import dyvil.collection.mutable.MutableCollection;
+import dyvil.collection.ImmutableCollection;
+import dyvil.collection.MutableCollection;
 import dyvil.lang.literal.NilConvertible;
 
 /**

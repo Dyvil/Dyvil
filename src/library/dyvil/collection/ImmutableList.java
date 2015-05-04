@@ -1,4 +1,4 @@
-package dyvil.collection.immutable;
+package dyvil.collection;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -10,7 +10,9 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import dyvil.annotation.mutating;
-import dyvil.collection.mutable.MutableList;
+import dyvil.collection.immutable.ArrayList;
+import dyvil.collection.immutable.EmptyList;
+import dyvil.collection.immutable.SingletonList;
 import dyvil.lang.Collection;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.List;
@@ -23,7 +25,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 {
 	public static <E> ImmutableList<E> apply()
 	{
-		return EmptyList.emptyList;
+		return EmptyList.apply();
 	}
 	
 	public static <E> ImmutableList<E> apply(E element)

@@ -5,11 +5,11 @@ import java.util.Iterator;
 import dyvil.lang.literal.ArrayConvertible;
 
 @ArrayConvertible
-public final class ArrayIterator<E> implements Iterator<E>
+public class ArrayIterator<E> implements Iterator<E>
 {
-	private int	index;
-	private E[]	array;
-	private int	size;
+	private int			index;
+	private final E[]	array;
+	private final int	size;
 	
 	public static <E> ArrayIterator<E> apply(E... array)
 	{

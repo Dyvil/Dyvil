@@ -10,7 +10,8 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import dyvil.collection.ArrayIterator;
-import dyvil.collection.immutable.ImmutableList;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;

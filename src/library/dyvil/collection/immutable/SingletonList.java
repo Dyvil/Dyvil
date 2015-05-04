@@ -8,8 +8,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
 import dyvil.collection.SingletonIterator;
-import dyvil.collection.mutable.MutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.literal.TupleConvertible;
 
