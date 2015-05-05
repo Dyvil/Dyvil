@@ -9,6 +9,7 @@ import java.util.function.IntUnaryOperator;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 
 public interface IntArray
 {
@@ -195,6 +196,26 @@ public interface IntArray
 		int[] res = array.clone();
 		Arrays.sort(res);
 		return res;
+	}
+	
+	public static @infix @inline boolean $eq$eq(int[] array1, int[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean $bang$eq(int[] array1, int[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean equals(int[] array1, int[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline int hashCode(int[] array)
+	{
+		return Arrays.hashCode(array);
 	}
 	
 	public static @infix String toString(int[] array)

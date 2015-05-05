@@ -9,6 +9,7 @@ import java.util.function.IntConsumer;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 
 public interface FloatArray
 {
@@ -195,6 +196,26 @@ public interface FloatArray
 		float[] res = array.clone();
 		Arrays.sort(res);
 		return res;
+	}
+	
+	public static @infix @inline boolean $eq$eq(float[] array1, float[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean $bang$eq(float[] array1, float[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean equals(float[] array1, float[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline int hashCode(float[] array)
+	{
+		return Arrays.hashCode(array);
 	}
 	
 	public static @infix String toString(float[] array)

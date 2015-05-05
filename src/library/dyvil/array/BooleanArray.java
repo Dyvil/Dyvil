@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.lang.Boolean;
 
 public interface BooleanArray
@@ -219,6 +220,26 @@ public interface BooleanArray
 		}
 		
 		return res;
+	}
+	
+	public static @infix @inline boolean $eq$eq(boolean[] array1, boolean[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean $bang$eq(boolean[] array1, boolean[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean equals(boolean[] array1, boolean[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline int hashCode(boolean[] array)
+	{
+		return Arrays.hashCode(array);
 	}
 	
 	public static @infix String toString(boolean[] array)

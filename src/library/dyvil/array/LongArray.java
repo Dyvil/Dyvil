@@ -9,6 +9,7 @@ import java.util.function.LongUnaryOperator;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 
 public interface LongArray
 {
@@ -195,6 +196,26 @@ public interface LongArray
 		long[] res = array.clone();
 		Arrays.sort(res);
 		return res;
+	}
+	
+	public static @infix @inline boolean $eq$eq(long[] array1, long[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean $bang$eq(long[] array1, long[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean equals(long[] array1, long[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline int hashCode(long[] array)
+	{
+		return Arrays.hashCode(array);
 	}
 	
 	public static @infix String toString(long[] array)

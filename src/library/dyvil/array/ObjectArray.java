@@ -6,10 +6,14 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 
 public interface ObjectArray
 {
@@ -45,8 +49,6 @@ public interface ObjectArray
 		return array;
 	}
 	
-	// Basic Array Operations
-	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
 	public static @infix <T> int length(T[] array)
 	{
@@ -79,8 +81,6 @@ public interface ObjectArray
 			action.accept(array[i]);
 		}
 	}
-	
-	// Operators
 	
 	public static @infix <T> T[] $plus(T[] array, T v)
 	{
@@ -209,14 +209,10 @@ public interface ObjectArray
 		return res;
 	}
 	
-	// Array Creation
-	
 	public static @infix <T> T[] newArray(Class<T> type, int size)
 	{
 		return (T[]) Array.newInstance(type, size);
 	}
-	
-	// Component Types
 	
 	public static @infix <T> Class<T> getComponentType(T[] array)
 	{
@@ -237,16 +233,34 @@ public interface ObjectArray
 		}
 	}
 	
-	// Operators
-	
-	public static @infix <T> T[] $plus(T[] a, T[] b)
+	public static @infix @inline <T> boolean $eq$eq(T[] array1, T[] array2)
 	{
-		int len1 = a.length;
-		int len2 = b.length;
-		T[] res = (T[]) new Object[len1 + len2];
-		System.arraycopy(a, 0, res, 0, len1);
-		System.arraycopy(b, 0, res, len1, len2);
-		return res;
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline <T> boolean $bang$eq(T[] array1, T[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline <T> boolean equals(T[] array1, T[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline <T> boolean deepEquals(T[] array1, T[] array2)
+	{
+		return Arrays.deepEquals(array1, array2);
+	}
+	
+	public static @infix @inline <T> int hashCode(T[] array)
+	{
+		return Arrays.hashCode(array);
+	}
+	
+	public static @infix @inline <T> int deepHashCode(T[] array)
+	{
+		return Arrays.deepHashCode(array);
 	}
 	
 	public static @infix <T> String toString(T[] array)
@@ -399,7 +413,8 @@ public interface ObjectArray
 			DoubleArray.toString((double[]) o, builder);
 			return;
 		}
-		if (c.isArray()) {
+		if (c.isArray())
+		{
 			deepToString((Object[]) o, builder);
 			return;
 		}
