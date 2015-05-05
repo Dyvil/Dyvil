@@ -11,7 +11,7 @@ public final class Types
 	public static final UnknownType		UNKNOWN			= new UnknownType();
 	public static final PrimitiveType	VOID			= new PrimitiveType(Name._void, 0);
 	public static final PrimitiveType	BOOLEAN			= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
-	public static final PrimitiveType	BYTE			= new PrimitiveType(Name._byte, ClassFormat.T_BOOLEAN);
+	public static final PrimitiveType	BYTE			= new PrimitiveType(Name._byte, ClassFormat.T_BYTE);
 	public static final PrimitiveType	SHORT			= new PrimitiveType(Name._short, ClassFormat.T_SHORT);
 	public static final PrimitiveType	CHAR			= new PrimitiveType(Name._char, ClassFormat.T_CHAR);
 	public static final PrimitiveType	INT				= new PrimitiveType(Name._int, ClassFormat.T_INT);

@@ -18,8 +18,6 @@ public interface CaseClasses
 	public static void writeEquals(MethodWriter writer, IClass theClass)
 	{
 		Label label;
-		String extended = "L" + theClass.getInternalName() + ";";
-		
 		// Write check 'if (this == obj)'
 		writer.writeVarInsn(ALOAD, 0);
 		writer.writeVarInsn(ALOAD, 1);
@@ -58,7 +56,7 @@ public interface CaseClasses
 		
 		// var = (ClassName) obj
 		writer.writeVarInsn(ALOAD, 1);
-		writer.writeTypeInsn(CHECKCAST, extended);
+		writer.writeTypeInsn(CHECKCAST, theClass.getInternalName());
 		// 'var' variable that stores the casted 'obj' parameter
 		writer.writeVarInsn(ASTORE, 2);
 		
@@ -75,6 +73,7 @@ public interface CaseClasses
 	public static void writeEquals(MethodWriter writer, IField field)
 	{
 		IType type = field.getType();
+		
 		if (type.isPrimitive())
 		{
 			// Push 'this'
@@ -129,11 +128,63 @@ public interface CaseClasses
 		field.writeGet(writer, null);
 		writer.writeVarInsn(ALOAD, 2);
 		field.writeGet(writer, null);
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
+		
+		if (type.isArrayType())
+		{
+			writeArrayEquals(writer, type.getElementType());
+		}
+		else
+		{
+			writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
+		}
+		
 		writer.writeJumpInsn(IFNE, endLabel);
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN);
 		writer.writeLabel(endLabel);
+	}
+	
+	public static void writeArrayEquals(MethodWriter writer, IType type)
+	{
+		switch (type.typeTag())
+		{
+		case IType.PRIMITIVE_TYPE:
+			switch (((PrimitiveType) type).typecode)
+			{
+			case ClassFormat.T_BOOLEAN:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "equals", "([Z[Z)Z", true);
+				return;
+			case ClassFormat.T_BYTE:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", "equals", "([B[B)Z", true);
+				return;
+			case ClassFormat.T_SHORT:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", "equals", "([S[S)Z", true);
+				return;
+			case ClassFormat.T_CHAR:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", "equals", "([C[C)Z", true);
+				return;
+			case ClassFormat.T_INT:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", "equals", "([I[I)Z", true);
+				return;
+			case ClassFormat.T_LONG:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", "equals", "([J[J)Z", true);
+				return;
+			case ClassFormat.T_FLOAT:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", "equals", "([F[F)Z", true);
+				return;
+			case ClassFormat.T_DOUBLE:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", "equals", "([D[D)Z", true);
+				return;
+			default:
+				return;
+			}
+		case IType.ARRAY_TYPE:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepEquals", "([Ljava/lang/Object;[Ljava/lang/Object;)Z", true);
+			return;
+		default:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "equals", "([Ljava/lang/Object;[Ljava/lang/Object;)Z", true);
+			return;
+		}
 	}
 	
 	public static void writeHashCode(MethodWriter writer, IClass theClass)
@@ -143,8 +194,12 @@ public interface CaseClasses
 		int len = theClass.parameterCount();
 		for (int i = 0; i < len; i++)
 		{
+			IField field = theClass.getParameter(i);
+			// Load the value of the field
+			writer.writeVarInsn(ALOAD, 0);
+			field.writeGet(writer, null);
 			// Write the hashing strategy for the field
-			writeHashCode(writer, theClass.getParameter(i));
+			writeHashCode(writer, field.getType());
 			// Add the hash to the previous result
 			writer.writeInsn(IADD);
 			writer.writeLDC(31);
@@ -155,12 +210,9 @@ public interface CaseClasses
 		writer.writeInsn(IRETURN);
 	}
 	
-	public static void writeHashCode(MethodWriter writer, IField field)
+	public static void writeHashCode(MethodWriter writer, IType type)
 	{
-		writer.writeVarInsn(ALOAD, 0);
-		field.writeGet(writer, null);
 		
-		IType type = field.getType();
 		if (type.isPrimitive())
 		{
 			switch (((PrimitiveType) type).typecode)
@@ -226,13 +278,63 @@ public interface CaseClasses
 		writer.writeInsn(DUP);
 		writer.writeJumpInsn(IFNULL, elseLabel);
 		// then
-		writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
+		if (type.isArrayType())
+		{
+			writeArrayHashCode(writer, type.getElementType());
+		}
+		else
+		{
+			writer.writeInvokeInsn(INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
+		}
 		writer.writeJumpInsn(GOTO, endLabel);
 		// else
 		writer.writeLabel(elseLabel);
 		writer.writeInsn(POP);
 		writer.writeLDC(0);
 		writer.writeLabel(endLabel);
+	}
+	
+	public static void writeArrayHashCode(MethodWriter writer, IType type)
+	{
+		switch (type.typeTag())
+		{
+		case IType.PRIMITIVE_TYPE:
+			switch (((PrimitiveType) type).typecode)
+			{
+			case ClassFormat.T_BOOLEAN:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "hashCode", "([Z)Z", true);
+				return;
+			case ClassFormat.T_BYTE:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", "hashCode", "([B)I", true);
+				return;
+			case ClassFormat.T_SHORT:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", "hashCode", "([S)I", true);
+				return;
+			case ClassFormat.T_CHAR:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", "hashCode", "([C)I", true);
+				return;
+			case ClassFormat.T_INT:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", "hashCode", "([I)I", true);
+				return;
+			case ClassFormat.T_LONG:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", "hashCode", "([J)I", true);
+				return;
+			case ClassFormat.T_FLOAT:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", "hashCode", "([F)I", true);
+				return;
+			case ClassFormat.T_DOUBLE:
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", "hashCode", "([D)I", true);
+				return;
+			default:
+				return;
+			}
+		case IType.ARRAY_TYPE:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepHashCode", "([Ljava/lang/Object;)I", true);
+			return;
+		default:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "hashCode", "([Ljava/lang/Object;)I", true);
+			return;
+		}
 	}
 	
 	public static void writeToString(MethodWriter writer, IClass theClass)

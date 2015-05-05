@@ -4,9 +4,8 @@ public interface Keywords
 {
 	int	ABSTRACT		= Tokens.KEYWORD | 0x00010000;
 	int	ANNOTATION		= Tokens.KEYWORD | 0x00020000;
-	int	AS				= Tokens.KEYWORD | 0x00380000;
-	int	BREAK			= Tokens.KEYWORD | 0x00030000;
-	int	BYTE			= Tokens.KEYWORD | 0x00040000;
+	int	AS				= Tokens.KEYWORD | 0x00030000;
+	int	BREAK			= Tokens.KEYWORD | 0x00040000;
 	int	CASE			= Tokens.KEYWORD | 0x00050000;
 	int	CATCH			= Tokens.KEYWORD | 0x00060000;
 	int	CLASS			= Tokens.KEYWORD | 0x00070000;
@@ -70,8 +69,6 @@ public interface Keywords
 			return AS;
 		case "break":
 			return BREAK;
-		case "byte":
-			return BYTE;
 		case "case":
 			return CASE;
 		case "catch":
@@ -188,8 +185,6 @@ public interface Keywords
 			return "as";
 		case BREAK:
 			return "break";
-		case BYTE:
-			return "byte";
 		case CASE:
 			return "case";
 		case CATCH:
