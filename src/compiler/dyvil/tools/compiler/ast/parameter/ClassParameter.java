@@ -57,6 +57,12 @@ public final class ClassParameter extends Member implements IParameter
 	}
 	
 	@Override
+	public IClass getTheClass()
+	{
+		return this.theClass;
+	}
+	
+	@Override
 	public void setValue(IValue value)
 	{
 		this.defaultValue = value;

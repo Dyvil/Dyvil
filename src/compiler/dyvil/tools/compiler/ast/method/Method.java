@@ -915,7 +915,7 @@ public class Method extends Member implements IMethod
 			this.parameters[i].getType().appendSignature(buffer);
 		}
 		buffer.append(')');
-		this.type.appendExtendedName(buffer);
+		this.type.appendSignature(buffer);
 		return buffer.toString();
 	}
 	

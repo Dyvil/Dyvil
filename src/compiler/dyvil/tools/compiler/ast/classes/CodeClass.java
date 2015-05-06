@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.classes;
 import java.lang.annotation.ElementType;
 import java.util.List;
 
+import org.objectweb.asm.Opcodes;
+
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -1150,7 +1152,7 @@ public class CodeClass extends ASTNode implements IClass
 			superClass = this.superType.getInternalName();
 		}
 		
-		writer.visit(DyvilCompiler.classVersion, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
+		writer.visit(DyvilCompiler.classVersion, this.modifiers & 0xFFFF | Opcodes.ACC_SUPER, internalName, signature, superClass, interfaces);
 		
 		// Outer Class
 		

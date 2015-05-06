@@ -124,13 +124,13 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	// Search Operations
 	
 	@Override
-	public int rowOf(E element);
+	public int rowOf(Object element);
 	
 	@Override
-	public int columnOf(E element);
+	public int columnOf(Object element);
 	
 	@Override
-	public Tuple2<Int, Int> cellOf(E element);
+	public Tuple2<Int, Int> cellOf(Object element);
 	
 	// toArray
 	

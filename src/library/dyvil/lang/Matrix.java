@@ -71,11 +71,11 @@ public interface Matrix<E>
 	
 	// Search Operations
 	
-	public int rowOf(E element);
+	public int rowOf(Object element);
 	
-	public int columnOf(E element);
+	public int columnOf(Object element);
 	
-	public Tuple2<Int, Int> cellOf(E element);
+	public Tuple2<Int, Int> cellOf(Object element);
 	
 	// toArray
 	
