@@ -16,7 +16,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
 public class ConstructorCall extends ASTNode implements ICall
 {
@@ -157,9 +156,12 @@ public class ConstructorCall extends ASTNode implements ICall
 		if (match == null)
 		{
 			Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			Util.typesToString("", this.arguments, ", ", builder);
-			marker.addInfo(builder.toString());
+			if (!this.arguments.isEmpty())
+			{
+				StringBuilder builder = new StringBuilder("Argument Types: ");
+				this.arguments.typesToString(builder);
+				marker.addInfo(builder.toString());
+			}
 			
 			return this;
 		}

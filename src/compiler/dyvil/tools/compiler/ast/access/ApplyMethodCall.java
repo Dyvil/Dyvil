@@ -17,7 +17,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
 public class ApplyMethodCall extends ASTNode implements ICall, IValued
 {
@@ -155,10 +154,13 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued
 		}
 		
 		Marker marker = markers.create(this.position, "resolve.method", "apply");
-		marker.addInfo("Instance Type: " + this.instance.getType());
-		StringBuilder builder = new StringBuilder("Argument Types: ");
-		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.toString());
+		marker.addInfo("Callee Type: " + this.instance.getType());
+		if (!this.arguments.isEmpty())
+		{
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			this.arguments.typesToString(builder);
+			marker.addInfo(builder.toString());
+		}
 		
 		return this;
 	}

@@ -53,9 +53,17 @@ public final class CaseClassMetadata extends ClassMetadata
 		if ((this.methods & APPLY) == 0)
 		{
 			Method m = new Method(this.theClass, Name.apply, this.theClass.getType());
+			IParameter[] parameters = this.theClass.getParameters();
+			int parameterCount = this.theClass.parameterCount();
+			
 			m.modifiers = Modifiers.PUBLIC | Modifiers.STATIC;
-			m.setParameters(this.theClass.getParameters(), this.theClass.parameterCount());
+			m.setParameters(parameters, parameterCount);
 			m.setTypeVariables(this.theClass.getTypeVariables(), this.theClass.genericCount());
+			
+			if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
+			{
+				m.setVarargs();
+			}
 			this.applyMethod = m;
 		}
 	}
@@ -129,7 +137,8 @@ public final class CaseClassMetadata extends ClassMetadata
 		
 		if ((this.methods & APPLY) == 0)
 		{
-			mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers(), "apply", this.applyMethod.getDescriptor(), this.applyMethod.getSignature(), null));
+			mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers(), "apply", this.applyMethod.getDescriptor(),
+					this.applyMethod.getSignature(), null));
 			mw.begin();
 			mw.writeTypeInsn(Opcodes.NEW, this.theClass.getType().getInternalName());
 			mw.writeInsn(Opcodes.DUP);

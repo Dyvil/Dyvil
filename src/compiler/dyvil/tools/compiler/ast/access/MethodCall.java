@@ -26,7 +26,6 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.ConstantFolder;
-import dyvil.tools.compiler.util.Util;
 
 public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 {
@@ -281,11 +280,14 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 		marker.addInfo("Qualified Name: " + this.name.qualified);
 		if (this.instance != null)
 		{
-			marker.addInfo("Instance Type: " + this.instance.getType());
+			marker.addInfo("Callee Type: " + this.instance.getType());
 		}
-		StringBuilder builder = new StringBuilder("Argument Types: ");
-		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.toString());
+		if (!this.arguments.isEmpty())
+		{
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			this.arguments.typesToString(builder);
+			marker.addInfo(builder.toString());
+		}
 		return this;
 	}
 	

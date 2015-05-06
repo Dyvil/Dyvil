@@ -343,7 +343,7 @@ public class Method extends Member implements IMethod
 			this.exceptions[i] = this.exceptions[i].resolve(markers, this);
 		}
 		
-		int index = 0;
+		int index = (this.modifiers & Modifiers.STATIC) == 0 ? 1 : 0;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];

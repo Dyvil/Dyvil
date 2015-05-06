@@ -1264,8 +1264,6 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		this.metadata.write(writer, instanceFields);
-		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].write(writer);
@@ -1290,6 +1288,8 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			this.compilables[i].write(writer);
 		}
+		
+		this.metadata.write(writer, instanceFields);
 		
 		IField instanceField = this.metadata.getInstanceField();
 		if (instanceField != null)

@@ -304,4 +304,17 @@ public final class SingleArgument implements IArguments, IValued
 		buffer.append(' ');
 		this.value.toString(prefix, buffer);
 	}
+	
+	@Override
+	public void typesToString(StringBuilder buffer)
+	{
+		if (this.value != null)
+		{
+			this.value.getType().toString("", buffer);
+		}
+		else
+		{
+			buffer.append("unknown");
+		}
+	}
 }

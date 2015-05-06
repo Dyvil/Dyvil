@@ -23,7 +23,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
 public final class CompoundCall extends ASTNode implements ICall, INamed, IValued
 {
@@ -189,11 +188,16 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		
 		Marker marker = markers.create(this.position, "resolve.method", this.name.unqualified);
 		marker.addInfo("Qualified Name: " + this.name.unqualified);
-		marker.addInfo("Instance Type: " + this.instance.getType());
-		StringBuilder builder = new StringBuilder("Argument Types: ");
-		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.toString());
-		
+		if (this.instance != null)
+		{
+			marker.addInfo("Callee Type: " + this.instance.getType());
+		}
+		if (!this.arguments.isEmpty())
+		{
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			this.arguments.typesToString(builder);
+			marker.addInfo(builder.toString());
+		}
 		return this;
 	}
 	

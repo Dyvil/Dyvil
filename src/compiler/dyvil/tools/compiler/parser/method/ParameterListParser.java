@@ -100,7 +100,6 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 				if (this.varargs)
 				{
 					this.paramList.setVarargs();
-					this.varargs = false;
 					this.type = new ArrayType(this.type);
 				}
 				
@@ -108,7 +107,10 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 						this.type);
 				this.parameter.setModifiers(this.modifiers);
 				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);
+				this.parameter.setVarargs(this.varargs);
 				this.paramList.addParameter(this.parameter);
+				
+				this.varargs = false;
 				
 				return;
 			}
