@@ -215,7 +215,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 		}
 		
 		// Divide by the count
-		return total / this.valueCount;
+		return 1 + total / this.valueCount;
 	}
 	
 	@Override

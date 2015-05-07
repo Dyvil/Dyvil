@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -24,7 +23,6 @@ import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
 import dyvil.tools.compiler.parser.statement.*;
-import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
@@ -48,8 +46,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int		CONSTRUCTOR_END		= 0x400;
 	public static final int		PARAMETERS			= 0x800;
 	public static final int		PARAMETERS_END		= 0x1000;
-	public static final int		GENERICS			= 0x2000;
-	public static final int		GENERICS_END		= 0x4000;
 	
 	public static final int		FUNCTION_POINTER	= 0x8000;
 	
@@ -288,25 +284,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Constructor Argument List - ')' expected", true);
-		}
-		if (this.mode == GENERICS)
-		{
-			this.mode = GENERICS_END;
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
-			{
-				pm.pushParser(new TypeListParser((ITypeList) this.value));
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Generic Type Arguments - '[' expected");
-		}
-		if (this.mode == GENERICS_END)
-		{
-			this.mode = ACCESS;
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
-			{
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Generic Type Arguments - ']' expected");
 		}
 		if (this.mode == FUNCTION_POINTER)
 		{
@@ -574,14 +551,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			call.dotless = this.dotless;
 			this.value = call;
 			this.mode = PARAMETERS;
-			return;
-		}
-		if (type1 == Symbols.OPEN_SQUARE_BRACKET)
-		{
-			MethodCall call = new MethodCall(token, this.value, name);
-			call.dotless = this.dotless;
-			this.value = call;
-			this.mode = GENERICS;
 			return;
 		}
 		if (type1 == Symbols.ARROW_OPERATOR)

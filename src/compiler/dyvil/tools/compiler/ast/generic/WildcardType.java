@@ -276,10 +276,14 @@ public final class WildcardType extends BaseBounded implements IType
 			buffer.append('-');
 			this.lowerBound.appendSignature(buffer);
 		}
-		else
+		else if (this.upperBoundCount > 0)
 		{
 			buffer.append('+');
 			this.upperBounds[0].appendSignature(buffer);
+		}
+		else
+		{
+			buffer.append("Ljava/lang/Object;");
 		}
 	}
 	

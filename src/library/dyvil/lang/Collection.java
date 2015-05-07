@@ -12,6 +12,7 @@ import java.util.function.UnaryOperator;
 
 import dyvil.collection.ImmutableCollection;
 import dyvil.collection.MutableCollection;
+import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 /**
@@ -35,6 +36,7 @@ import dyvil.lang.literal.NilConvertible;
  *            the element type
  */
 @NilConvertible
+@ArrayConvertible
 public interface Collection<E> extends Iterable<E>
 {
 	/**
@@ -47,6 +49,11 @@ public interface Collection<E> extends Iterable<E>
 	public static <E> Collection<E> apply()
 	{
 		return List.apply();
+	}
+	
+	public static <E> Collection<E> apply(E... elements)
+	{
+		return List.apply(elements);
 	}
 	
 	// Accessors
@@ -382,7 +389,7 @@ public interface Collection<E> extends Iterable<E>
 	 *            the store array
 	 */
 	public void toArray(Object[] store);
-
+	
 	/**
 	 * Creates a copy of this collection. The general contract of this method is
 	 * that the type of the returned collection is the same as this collection's

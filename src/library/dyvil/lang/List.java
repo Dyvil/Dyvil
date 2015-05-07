@@ -22,7 +22,7 @@ public interface List<E> extends Collection<E>
 		return new dyvil.collection.mutable.ArrayList();
 	}
 	
-	public static <E> ImmutableList<E> apply(E[] array)
+	public static <E> ImmutableList<E> apply(E... array)
 	{
 		return new dyvil.collection.immutable.ArrayList(array);
 	}

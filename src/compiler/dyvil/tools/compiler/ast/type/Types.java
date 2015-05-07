@@ -20,7 +20,7 @@ public final class Types
 	public static final PrimitiveType	DOUBLE			= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
 	
 	public static final DynamicType		DYNAMIC			= new DynamicType();
-	public static final Type			ANY				= new Type("dyvil/lang/Any", Name.any);
+	public static final Type			ANY				= new Type("java/lang/Object", Name.any);
 	public static final Type			OBJECT			= new Type("java/lang/Object", Name.getQualified("Object"));
 	public static final Type			STRING			= new Type("java/lang/String", Name.getQualified("String"));
 	public static final Type			CLASS			= new Type("java/lang/Class", Name.getQualified("Class"));
