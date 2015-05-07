@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -11,15 +12,21 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class LiteralExpression implements IValue
 {
-	private SingleArgument	argument;
-	private IType			type;
+	private IArguments	arguments;
+	private IType		type;
 	
-	private IMethod			method;
+	private IMethod		method;
 	
 	public LiteralExpression(IType type, IValue literal)
 	{
-		this.argument = new SingleArgument(literal);
+		this.arguments = new SingleArgument(literal);
 		this.type = type;
+	}
+	
+	public LiteralExpression(IType type, IArguments arguments)
+	{
+		this.type = type;
+		this.arguments = arguments;
 	}
 	
 	@Override
@@ -61,64 +68,64 @@ public final class LiteralExpression implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.argument.resolveTypes(markers, context);
+		this.arguments.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.argument.resolve(markers, context);
+		this.arguments.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IMethod match = IContext.resolveMethod(markers, this.type, null, Name.apply, this.argument);
+		IMethod match = IContext.resolveMethod(markers, this.type, null, Name.apply, this.arguments);
 		if (match == null)
 		{
-			IValue value = this.argument.getFirstValue();
+			IValue value = this.arguments.getFirstValue();
 			markers.add(value.getPosition(), "literal.method", value.getType().toString(), this.type.toString());
 		}
 		else
 		{
 			this.method = match;
-			GenericData data = match.getGenericData(null, null, this.argument);
-			match.checkArguments(markers, null, this.argument, data);
+			GenericData data = match.getGenericData(null, null, this.arguments);
+			match.checkArguments(markers, null, this.arguments, data);
 			this.type = match.getType().getConcreteType(data);
 		}
 		
-		this.argument.checkTypes(markers, context);
+		this.arguments.checkTypes(markers, context);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.argument.check(markers, context);
+		this.arguments.check(markers, context);
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
-		this.argument.foldConstants();
+		this.arguments.foldConstants();
 		return this;
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer)
 	{
-		this.method.writeCall(writer, null, this.argument, null);
+		this.method.writeCall(writer, null, this.arguments, null);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.argument.getFirstValue().writeStatement(writer);
+		this.arguments.getFirstValue().writeStatement(writer);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.argument.getFirstValue().toString(prefix, buffer);
+		this.arguments.getFirstValue().toString(prefix, buffer);
 	}
 }

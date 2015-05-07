@@ -44,7 +44,7 @@ public class CodePosition implements ICodePosition
 	@Override
 	public int endLine()
 	{
-		return 0;
+		return this.endLine;
 	}
 	
 	@Override

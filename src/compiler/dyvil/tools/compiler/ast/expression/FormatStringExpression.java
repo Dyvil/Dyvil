@@ -2,8 +2,11 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.StringValue;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -13,9 +16,11 @@ import dyvil.tools.compiler.transform.CaseClasses;
 
 public final class FormatStringExpression extends ASTNode implements IValue
 {
-	private IValue[]	values	= new IValue[1];
-	private String[]	strings	= new String[2];
-	private int			count;
+	public static final IClass	FORMAT_STRING_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("FormatStringConvertible");
+	
+	private IValue[]			values						= new IValue[1];
+	private String[]			strings						= new String[2];
+	private int					count;
 	
 	public FormatStringExpression(ICodePosition position)
 	{
@@ -35,9 +40,56 @@ public final class FormatStringExpression extends ASTNode implements IValue
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		if (type.isSuperTypeOf(Types.STRING))
+		{
+			return this;
+		}
+		IClass iclass = type.getTheClass();
+		if (iclass.getAnnotation(StringValue.STRING_CONVERTIBLE) != null)
+		{
+			return new LiteralExpression(type, this);
+		}
+		if (iclass.getAnnotation(FORMAT_STRING_CONVERTIBLE) != null)
+		{
+			StringValue string;
+			int len = this.count / 2;
+			if (len > 0)
+			{
+				StringBuilder builder = new StringBuilder();
+				builder.append(this.strings[0]);
+				for (int i = 1; i <= len; i++)
+				{
+					builder.append('\\').append(i);
+					builder.append(this.strings[i]);
+				}
+				string = new StringValue(this.position, builder.toString());
+			}
+			else
+			{
+				string = new StringValue("");
+			}
+			
+			ArgumentList list = new ArgumentList();
+			list.addValue(string);
+			list.addValue(new Array(this.values, len));
+			
+			return new LiteralExpression(type, list);
+		}
+		return null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
-		return type.isSuperTypeOf(Types.STRING);
+		if (type.isSuperTypeOf(Types.STRING))
+		{
+			return true;
+		}
+		
+		IClass theClass = type.getTheClass();
+		return theClass.getAnnotation(StringValue.STRING_CONVERTIBLE) != null || theClass.getAnnotation(FORMAT_STRING_CONVERTIBLE) != null;
 	}
 	
 	@Override
@@ -47,7 +99,7 @@ public final class FormatStringExpression extends ASTNode implements IValue
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Types.STRING))
+		if (this.isType(type))
 		{
 			return 2;
 		}

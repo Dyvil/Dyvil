@@ -1,7 +1,11 @@
 package dyvil.reflect.type;
 
 import dyvil.lang.Type;
+import dyvil.lang.literal.ClassConvertible;
+import dyvil.lang.literal.StringConvertible;
 
+@StringConvertible
+@ClassConvertible
 public class GenericType<T> extends NamedType<T>
 {
 	protected final Type[]	generics;

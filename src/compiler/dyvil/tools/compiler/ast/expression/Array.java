@@ -20,7 +20,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 {
 	public static final IClass	ARRAY_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
 	
-	protected IValue[]			values				= new IValue[3];
+	protected IValue[]			values;
 	protected int				valueCount;
 	
 	protected IType				requiredType;
@@ -28,11 +28,19 @@ public final class Array extends ASTNode implements IValue, IValueList
 	
 	public Array()
 	{
+		this.values = new IValue[3];
 	}
 	
 	public Array(ICodePosition position)
 	{
+		this.values = new IValue[3];
 		this.position = position;
+	}
+	
+	public Array(IValue[] values, int valueCount)
+	{
+		this.values = values;
+		this.valueCount = valueCount;
 	}
 	
 	@Override

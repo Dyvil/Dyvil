@@ -1,9 +1,11 @@
 package dyvil.reflect.type;
 
 import dyvil.lang.Type;
+import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.StringConvertible;
 
 @StringConvertible
+@ClassConvertible
 public class NamedType<T> implements Type<T>
 {
 	protected final String	name;
