@@ -84,6 +84,21 @@ public interface ByteArray
 	
 	// Operators
 	
+	public static @infix @inline boolean $qmark(byte[] array, byte v)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+
+	public static @infix @inline boolean $eq$eq(byte[] array1, byte[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean $bang$eq(byte[] array1, byte[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
+	
 	public static @infix byte[] $plus(byte[] array, byte v)
 	{
 		int len = array.length;
@@ -200,15 +215,60 @@ public interface ByteArray
 		return res;
 	}
 	
-	public static @infix @inline boolean $eq$eq(byte[] array1, byte[] array2)
+	// Search Operations
+	
+	public static @infix int indexOf(byte[] array, byte v)
 	{
-		return Arrays.equals(array1, array2);
+		return indexOf(array, v, 0);
 	}
 	
-	public static @infix @inline boolean $bang$eq(byte[] array1, byte[] array2)
+	public static @infix int indexOf(byte[] array, byte v, int start)
 	{
-		return !Arrays.equals(array1, array2);
+		for (; start < array.length; start++)
+		{
+			if (array[start] == v)
+			{
+				return start;
+			}
+		}
+		return -1;
 	}
+	
+	public static @infix int lastIndexOf(byte[] array, byte v)
+	{
+		return lastIndexOf(array, v, array.length - 1);
+	}
+	
+	public static @infix int lastIndexOf(byte[] array, byte v, int start)
+	{
+		for (; start >= 0; start--)
+		{
+			if (array[start] == v)
+			{
+				return start;
+			}
+		}
+		return -1;
+	}
+	
+	public static @infix @inline boolean contains(byte[] array, byte v)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	public static @infix @inline boolean in(byte v, byte[] array)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	// Copying
+	
+	public static @infix @inline byte[] copy(byte[] array)
+	{
+		return array.clone();
+	}
+	
+	// equals, hashCode and toString
 	
 	public static @infix @inline boolean equals(byte[] array1, byte[] array2)
 	{
@@ -265,46 +325,5 @@ public interface ByteArray
 			builder.append(array[i]);
 		}
 		builder.append(']');
-	}
-	
-	// Search Operations
-	
-	public static @infix int indexOf(byte[] array, byte v)
-	{
-		return indexOf(array, v, 0);
-	}
-	
-	public static @infix int indexOf(byte[] array, byte v, int start)
-	{
-		for (; start < array.length; start++)
-		{
-			if (array[start] == v)
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix int lastIndexOf(byte[] array, byte v)
-	{
-		return lastIndexOf(array, v, array.length - 1);
-	}
-	
-	public static @infix int lastIndexOf(byte[] array, byte v, int start)
-	{
-		for (; start >= 0; start--)
-		{
-			if (array[start] == v)
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix boolean contains(byte[] array, byte v)
-	{
-		return indexOf(array, v, 0) != -1;
 	}
 }

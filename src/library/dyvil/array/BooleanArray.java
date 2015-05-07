@@ -3,7 +3,7 @@ package dyvil.array;
 import static dyvil.reflect.Opcodes.*;
 
 import java.util.Arrays;
-import java.util.function.IntConsumer;
+import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
@@ -72,16 +72,31 @@ public interface BooleanArray
 		return array.length == 0;
 	}
 	
-	public static @infix void forEach(int[] array, IntConsumer action)
+	public static @infix void forEach(boolean[] array, Consumer<Boolean> action)
 	{
 		int len = array.length;
 		for (int i = 0; i < len; i++)
 		{
-			action.accept(array[i]);
+			action.accept(Boolean.apply(array[i]));
 		}
 	}
 	
 	// Operators
+	
+	public static @infix @inline boolean $qmark(boolean[] array, boolean v)
+	{
+		return indexOf(array, v, 0) >= 0;
+	}
+	
+	public static @infix @inline boolean $eq$eq(boolean[] array1, boolean[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean $bang$eq(boolean[] array1, boolean[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
 	
 	public static @infix boolean[] $plus(boolean[] array, boolean v)
 	{
@@ -218,78 +233,10 @@ public interface BooleanArray
 		{
 			res[f] = true;
 		}
-		
 		return res;
 	}
 	
-	public static @infix @inline boolean $eq$eq(boolean[] array1, boolean[] array2)
-	{
-		return Arrays.equals(array1, array2);
-	}
-	
-	public static @infix @inline boolean $bang$eq(boolean[] array1, boolean[] array2)
-	{
-		return !Arrays.equals(array1, array2);
-	}
-	
-	public static @infix @inline boolean equals(boolean[] array1, boolean[] array2)
-	{
-		return Arrays.equals(array1, array2);
-	}
-	
-	public static @infix @inline int hashCode(boolean[] array)
-	{
-		return Arrays.hashCode(array);
-	}
-	
-	public static @infix String toString(boolean[] array)
-	{
-		if (array == null)
-		{
-			return "null";
-		}
-		
-		int len = array.length;
-		if (len <= 0)
-		{
-			return "[]";
-		}
-		
-		StringBuilder buf = new StringBuilder(len * 3 + 4);
-		buf.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
-		{
-			buf.append(", ");
-			buf.append(array[i]);
-		}
-		return buf.append(']').toString();
-	}
-	
 	// Search Operations
-	
-	public static @infix void toString(boolean[] array, StringBuilder builder)
-	{
-		if (array == null)
-		{
-			builder.append("null");
-			return;
-		}
-		
-		int len = array.length;
-		if (len <= 0)
-		{
-			builder.append("[]");
-			return;
-		}
-		
-		builder.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
-		{
-			builder.append(", ");
-			builder.append(array[i]);
-		}
-		builder.append(']');
-	}
 	
 	public static @infix int indexOf(boolean[] array, boolean v)
 	{
@@ -325,8 +272,79 @@ public interface BooleanArray
 		return -1;
 	}
 	
-	public static @infix boolean contains(boolean[] array, boolean v)
+	public static @infix @inline boolean contains(boolean[] array, boolean v)
 	{
-		return indexOf(array, v, 0) != -1;
+		return indexOf(array, v, 0) >= 0;
+	}
+	
+	public static @infix @inline boolean in(boolean v, boolean[] array)
+	{
+		return indexOf(array, v, 0) >= 0;
+	}
+	
+	// Copying
+	
+	public static @infix @inline boolean[] copy(boolean[] array)
+	{
+		return array.clone();
+	}
+	
+	// equals, hashCode and toString
+	
+	public static @infix @inline boolean equals(boolean[] array1, boolean[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline int hashCode(boolean[] array)
+	{
+		return Arrays.hashCode(array);
+	}
+	
+	public static @infix String toString(boolean[] array)
+	{
+		if (array == null)
+		{
+			return "null";
+		}
+		
+		int len = array.length;
+		if (len <= 0)
+		{
+			return "[]";
+		}
+		
+		StringBuilder buf = new StringBuilder(len * 3 + 4);
+		buf.append('[').append(array[0]);
+		for (int i = 1; i < len; i++)
+		{
+			buf.append(", ");
+			buf.append(array[i]);
+		}
+		return buf.append(']').toString();
+	}
+	
+	public static @infix void toString(boolean[] array, StringBuilder builder)
+	{
+		if (array == null)
+		{
+			builder.append("null");
+			return;
+		}
+		
+		int len = array.length;
+		if (len <= 0)
+		{
+			builder.append("[]");
+			return;
+		}
+		
+		builder.append('[').append(array[0]);
+		for (int i = 1; i < len; i++)
+		{
+			builder.append(", ");
+			builder.append(array[i]);
+		}
+		builder.append(']');
 	}
 }

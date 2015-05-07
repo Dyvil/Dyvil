@@ -80,6 +80,21 @@ public interface CharArray
 		}
 	}
 	
+	public static @infix @inline boolean $qmark(char[] array, char v)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	public static @infix @inline boolean $eq$eq(char[] array1, char[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean $bang$eq(char[] array1, char[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
+	
 	// Operators
 	
 	public static @infix char[] $plus(char[] array, char v)
@@ -198,15 +213,60 @@ public interface CharArray
 		return res;
 	}
 	
-	public static @infix @inline boolean $eq$eq(char[] array1, char[] array2)
+	// Search Operations
+	
+	public static @infix int indexOf(char[] array, char v)
 	{
-		return Arrays.equals(array1, array2);
+		return indexOf(array, v, 0);
 	}
 	
-	public static @infix @inline boolean $bang$eq(char[] array1, char[] array2)
+	public static @infix int indexOf(char[] array, char v, int start)
 	{
-		return !Arrays.equals(array1, array2);
+		for (; start < array.length; start++)
+		{
+			if (array[start] == v)
+			{
+				return start;
+			}
+		}
+		return -1;
 	}
+	
+	public static @infix int lastIndexOf(char[] array, char v)
+	{
+		return lastIndexOf(array, v, array.length - 1);
+	}
+	
+	public static @infix int lastIndexOf(char[] array, char v, int start)
+	{
+		for (; start >= 0; start--)
+		{
+			if (array[start] == v)
+			{
+				return start;
+			}
+		}
+		return -1;
+	}
+	
+	public static @infix @inline boolean contains(char[] array, char v)
+	{
+		return Arrays.binarySearch(array, v) != -1;
+	}
+	
+	public static @infix @inline boolean in(char v, char[] array)
+	{
+		return Arrays.binarySearch(array, v) != -1;
+	}
+	
+	// Copying
+	
+	public static @infix @inline char[] copy(char[] array)
+	{
+		return array.clone();
+	}
+	
+	// equals, hashCode and toString
 	
 	public static @infix @inline boolean equals(char[] array1, char[] array2)
 	{
@@ -268,70 +328,5 @@ public interface CharArray
 			builder.append(array[i]);
 		}
 		builder.append(']');
-	}
-	
-	public static @infix void toString(char[] array, StringBuffer buffer)
-	{
-		if (array == null)
-		{
-			buffer.append("null");
-			return;
-		}
-		
-		int len = array.length;
-		if (len <= 0)
-		{
-			buffer.append("[]");
-			return;
-		}
-		
-		buffer.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
-		{
-			buffer.append(", ");
-			buffer.append(array[i]);
-		}
-		buffer.append(']');
-	}
-	
-	// Search Operations
-	
-	public static @infix int indexOf(char[] array, char v)
-	{
-		return indexOf(array, v, 0);
-	}
-	
-	public static @infix int indexOf(char[] array, char v, int start)
-	{
-		for (; start < array.length; start++)
-		{
-			if (array[start] == v)
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix int lastIndexOf(char[] array, char v)
-	{
-		return lastIndexOf(array, v, array.length - 1);
-	}
-	
-	public static @infix int lastIndexOf(char[] array, char v, int start)
-	{
-		for (; start >= 0; start--)
-		{
-			if (array[start] == v)
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix boolean contains(char[] array, char v)
-	{
-		return indexOf(array, v, 0) != -1;
 	}
 }
