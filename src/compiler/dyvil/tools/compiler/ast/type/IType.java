@@ -270,6 +270,8 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return Opcodes.ARETURN;
 	}
 	
+	public void writeTypeExpression(MethodWriter writer);
+	
 	public default void writeDefaultValue(MethodWriter writer)
 	{
 		writer.writeInsn(Opcodes.ACONST_NULL);

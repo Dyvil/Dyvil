@@ -16,6 +16,8 @@ import dyvil.tools.compiler.util.ParserUtil;
 public final class ImportParser extends Parser
 {
 	public static final Name	annotation	= Name.getQualified("annotation");
+	public static final Name	type		= Name.getQualified("type");
+	
 	public static final int		IMPORT		= 1;
 	public static final int		DOT			= 2;
 	public static final int		ALIAS		= 4;
@@ -78,6 +80,14 @@ public final class ImportParser extends Parser
 			if (type == Keywords.ANNOTATION)
 			{
 				SimpleImport si = new SimpleImport(token.raw(), annotation);
+				this.theImport.addImport(si);
+				this.theImport = si;
+				this.mode = DOT | ALIAS;
+				return;
+			}
+			if (type == Keywords.TYPE)
+			{
+				SimpleImport si = new SimpleImport(token.raw(), ImportParser.type);
 				this.theImport.addImport(si);
 				this.theImport = si;
 				this.mode = DOT | ALIAS;

@@ -55,7 +55,8 @@ public interface IValue extends IASTNode, ITyped
 	int	BOOLEAN_OR			= 52;
 	int	BOOLEAN_NOT			= 53;
 	int	CLASS_OPERATOR		= 54;
-	int	NULLCHECK			= 55;
+	int	TYPE_OPERATOR		= 55;
+	int	NULLCHECK			= 56;
 	
 	int	TUPLE				= 64;
 	int	CASE_STATEMENT		= 65;

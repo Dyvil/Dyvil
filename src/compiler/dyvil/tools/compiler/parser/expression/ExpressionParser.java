@@ -5,10 +5,7 @@ import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.operator.CastOperator;
-import dyvil.tools.compiler.ast.operator.ClassOperator;
-import dyvil.tools.compiler.ast.operator.InstanceOfOperator;
-import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.operator.*;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.IType;
@@ -808,6 +805,20 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = co;
 			pm.skip();
 			pm.pushParser(new TypeParser(co));
+			this.mode = ARRAY_END;
+			return true;
+		}
+		case Keywords.TYPE:
+		{
+			if (token.next().type() != Symbols.OPEN_SQUARE_BRACKET)
+			{
+				return false;
+			}
+			
+			TypeOperator to = new TypeOperator(token);
+			this.value = to;
+			pm.skip();
+			pm.pushParser(new TypeParser(to));
 			this.mode = ARRAY_END;
 			return true;
 		}

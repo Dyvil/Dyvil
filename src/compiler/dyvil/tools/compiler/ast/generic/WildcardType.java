@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -315,6 +316,32 @@ public final class WildcardType extends BaseBounded implements IType
 	public int getReturnOpcode()
 	{
 		return Opcodes.ARETURN;
+	}
+	
+	@Override
+	public void writeTypeExpression(MethodWriter writer)
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.writeTypeExpression(writer);
+		}
+		else
+		{
+			writer.writeInsn(Opcodes.ACONST_NULL);
+		}
+		
+		writer.writeLDC(this.upperBoundCount);
+		writer.writeNewArray("dyvil/lang/Type", 1);
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			writer.writeInsn(Opcodes.DUP);
+			writer.writeLDC(i);
+			this.upperBounds[i].writeTypeExpression(writer);
+			writer.writeInsn(Opcodes.AASTORE);
+		}
+		
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/WildcardType", "apply",
+				"(Ldyvil/lang/Type;[Ldyvil/lang/Type;)Ldyvil/reflect/type/WildcardType;", false);
 	}
 	
 	@Override

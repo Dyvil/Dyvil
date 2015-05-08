@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.generic;
 
 import java.util.List;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -16,6 +17,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class TypeVariableType extends ASTNode implements IType
@@ -224,6 +226,13 @@ public final class TypeVariableType extends ASTNode implements IType
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append('T').append(this.typeVar.getName().qualified).append(';');
+	}
+	
+	@Override
+	public void writeTypeExpression(MethodWriter writer)
+	{
+		writer.writeLDC(this.typeVar.getName().qualified);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/TypeArgument", "apply", "(Ljava/lang/String;)Ldyvil/reflect/type/TypeArgument;", false);
 	}
 	
 	@Override

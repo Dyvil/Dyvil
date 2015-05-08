@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import java.util.List;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -15,6 +16,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
@@ -386,6 +388,23 @@ public final class TupleType implements IType, ITypeList
 			t.appendSignature(buf);
 		}
 		buf.append('>').append(';');
+	}
+	
+	@Override
+	public void writeTypeExpression(MethodWriter writer)
+	{
+		writer.writeLDC(this.typeCount);
+		writer.writeNewArray("dyvil/lang/Type", 1);
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			writer.writeInsn(Opcodes.DUP);
+			writer.writeLDC(i);
+			this.types[i].writeTypeExpression(writer);
+			writer.writeInsn(Opcodes.AASTORE);
+		}
+		
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/TupleType", "apply",
+				"([Ldyvil/lang/Type;)Ldyvil/reflect/type/TupleType;", false);
 	}
 	
 	@Override

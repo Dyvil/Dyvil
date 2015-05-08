@@ -4,6 +4,7 @@ import static dyvil.reflect.Opcodes.*;
 
 import java.util.List;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -18,9 +19,10 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class UnknownType extends ASTNode implements IType
+public class UnknownType extends ASTNode implements IType
 {
 	@Override
 	public int typeTag()
@@ -182,6 +184,12 @@ public final class UnknownType extends ASTNode implements IType
 	public int getReturnOpcode()
 	{
 		return ARETURN;
+	}
+	
+	@Override
+	public void writeTypeExpression(MethodWriter writer)
+	{
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/UnkownType", "apply", "()Ldyvil/reflect/type/UnkownType;", false);
 	}
 	
 	@Override

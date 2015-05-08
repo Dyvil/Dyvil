@@ -142,6 +142,20 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
+	public boolean classEquals(IType type)
+	{
+		if (this == type)
+		{
+			return true;
+		}
+		if (type.getName() == this.name)
+		{
+			return true;
+		}
+		return super.classEquals(type);
+	}
+
+	@Override
 	public boolean isResolved()
 	{
 		return true;
@@ -161,6 +175,26 @@ public final class PrimitiveType extends Type
 		return this;
 	}
 	
+	@Override
+	public IField resolveField(Name name)
+	{
+		return null;
+	}
+
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	{
+		if (this.theClass != null)
+		{
+			this.theClass.getMethodMatches(list, instance, name, arguments);
+		}
+	}
+
+	@Override
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	{
+	}
+
 	@Override
 	public String getInternalName()
 	{
@@ -310,6 +344,26 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
+	public void writeTypeExpression(MethodWriter writer)
+	{
+		int i;
+		switch (this.typecode) {
+		case ClassFormat.T_BOOLEAN: i = dyvil.reflect.type.PrimitiveType.BOOLEAN; break;
+		case ClassFormat.T_BYTE: i = dyvil.reflect.type.PrimitiveType.BYTE; break;
+		case ClassFormat.T_SHORT: i = dyvil.reflect.type.PrimitiveType.SHORT; break;
+		case ClassFormat.T_CHAR: i = dyvil.reflect.type.PrimitiveType.CHAR; break;
+		case ClassFormat.T_INT: i = dyvil.reflect.type.PrimitiveType.INT; break;
+		case ClassFormat.T_LONG: i = dyvil.reflect.type.PrimitiveType.LONG; break;
+		case ClassFormat.T_FLOAT: i = dyvil.reflect.type.PrimitiveType.FLOAT; break;
+		case ClassFormat.T_DOUBLE: i = dyvil.reflect.type.PrimitiveType.DOUBLE; break;
+		default: i = 0;
+		}
+		
+		writer.writeLDC(i);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/PrimitiveType", "apply", "(I)Ldyvil/reflect/type/PrimitiveType;", false);
+	}
+	
+	@Override
 	public void writeDefaultValue(MethodWriter writer)
 	{
 		switch (this.typecode)
@@ -353,40 +407,6 @@ public final class PrimitiveType extends Type
 			return DoubleValue.getNull();
 		}
 		return null;
-	}
-	
-	@Override
-	public boolean classEquals(IType type)
-	{
-		if (this == type)
-		{
-			return true;
-		}
-		if (type.getName() == this.name)
-		{
-			return true;
-		}
-		return super.classEquals(type);
-	}
-	
-	@Override
-	public IField resolveField(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		if (this.theClass != null)
-		{
-			this.theClass.getMethodMatches(list, instance, name, arguments);
-		}
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
 	}
 	
 	@Override

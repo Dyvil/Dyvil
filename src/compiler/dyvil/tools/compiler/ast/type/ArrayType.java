@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import java.util.List;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -15,6 +16,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ArrayType implements IType, ITyped
@@ -254,6 +256,13 @@ public class ArrayType implements IType, ITyped
 	{
 		buffer.append('[');
 		this.type.appendSignature(buffer);
+	}
+	
+	@Override
+	public void writeTypeExpression(MethodWriter writer)
+	{
+		this.type.writeTypeExpression(writer);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/ArrayType", "apply", "(Ldyvil/lang/Type;)Ldyvil/reflect/type/ArrayType;", false);
 	}
 	
 	@Override
