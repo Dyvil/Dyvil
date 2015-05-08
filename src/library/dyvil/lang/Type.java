@@ -1,15 +1,23 @@
 package dyvil.lang;
 
 import dyvil.lang.literal.ClassConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.StringConvertible;
 import dyvil.reflect.type.GenericType;
 import dyvil.reflect.type.NamedType;
 import dyvil.reflect.type.PrimitiveType;
+import dyvil.reflect.type.UnknownType;
 
+@NilConvertible
 @StringConvertible
 @ClassConvertible
 public interface Type<T>
 {
+	public static <T> Type<T> apply()
+	{
+		return UnknownType.apply();
+	}
+	
 	public static <T> Type<T> apply(String className)
 	{
 		return new NamedType(className);
@@ -35,7 +43,7 @@ public interface Type<T>
 	}
 	
 	public Class<T> getTheClass();
-
+	
 	public String getName();
 	
 	public String getQualifiedName();

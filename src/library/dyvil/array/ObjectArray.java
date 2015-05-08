@@ -93,12 +93,12 @@ public interface ObjectArray
 	{
 		return Arrays.equals(array1, array2);
 	}
-
+	
 	public static @infix @inline <T> boolean $bang$eq(T[] array1, T[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
-
+	
 	public static @infix <T> T[] $plus(T[] array, T v)
 	{
 		int len = array.length;
@@ -231,7 +231,7 @@ public interface ObjectArray
 		return (T[]) Array.newInstance(type, size);
 	}
 	
-	public static @infix <T> Class<T> getComponentType(T[] array)
+	public static @infix @inline <T> Class<T> getComponentType(T[] array)
 	{
 		return (Class<T>) array.getClass().getComponentType();
 	}
@@ -250,7 +250,10 @@ public interface ObjectArray
 		}
 	}
 	
-	
+	public static @infix <T> Class<T[]> getArrayType(Class<T> componentType)
+	{
+		return (Class<T[]>) Array.newInstance(componentType, 0).getClass();
+	}
 	
 	// Search Operations
 	
@@ -314,27 +317,27 @@ public interface ObjectArray
 	{
 		return java.util.Arrays.<N, T> copyOf(array, newLength, newType);
 	}
-
+	
 	public static @infix @inline <T> boolean equals(T[] array1, T[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
-
+	
 	public static @infix @inline <T> boolean deepEquals(T[] array1, T[] array2)
 	{
 		return Arrays.deepEquals(array1, array2);
 	}
-
+	
 	public static @infix @inline <T> int hashCode(T[] array)
 	{
 		return Arrays.hashCode(array);
 	}
-
+	
 	public static @infix @inline <T> int deepHashCode(T[] array)
 	{
 		return Arrays.deepHashCode(array);
 	}
-
+	
 	public static @infix <T> String toString(T[] array)
 	{
 		if (array == null)
@@ -357,7 +360,7 @@ public interface ObjectArray
 		}
 		return buf.append(']').toString();
 	}
-
+	
 	public static @infix void toString(Object[] array, StringBuilder builder)
 	{
 		if (array == null)
@@ -381,7 +384,7 @@ public interface ObjectArray
 		}
 		builder.append(']');
 	}
-
+	
 	public static @infix String deepToString(Object[] array)
 	{
 		if (array == null)
@@ -405,7 +408,7 @@ public interface ObjectArray
 		}
 		return buf.append(']').toString();
 	}
-
+	
 	public static @infix void deepToString(Object[] array, StringBuilder builder)
 	{
 		if (array == null)
@@ -430,7 +433,7 @@ public interface ObjectArray
 		}
 		builder.append(']');
 	}
-
+	
 	public static @infix void toString(Object o, StringBuilder builder)
 	{
 		if (o == null)

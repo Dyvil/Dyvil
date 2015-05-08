@@ -17,6 +17,12 @@ public class PrimitiveType implements Type
 	private final int		id;
 	private final Class		theClass;
 	
+	public static PrimitiveType apply(int id)
+	{
+		// TODO Lookup Table
+		return new PrimitiveType(id);
+	}
+	
 	public PrimitiveType(int id)
 	{
 		this.id = id;
