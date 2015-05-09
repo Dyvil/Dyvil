@@ -201,21 +201,20 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued
 		{
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.position, "access.method.deprecated", "update");
+				markers.add(this.position, "method.access.deprecated", "update");
 			}
 			
-			byte access = context.getAccessibility(this.method);
-			if (access == IContext.STATIC)
+			switch (context.getVisibility(this.method))
 			{
-				markers.add(this.position, "access.method.instance", "update");
-			}
-			else if (access == IContext.SEALED)
-			{
-				markers.add(this.position, "access.method.sealed", "update");
-			}
-			else if ((access & IContext.READ_ACCESS) == 0)
-			{
-				markers.add(this.position, "access.method.invisible", "update");
+			case IContext.STATIC:
+				markers.add(this.position, "method.access.instance", "update");
+				break;
+			case IContext.SEALED:
+				markers.add(this.position, "method.access.sealed", "update");
+				break;
+			case IContext.INVISIBLE:
+				markers.add(this.position, "method.access.invisible", "update");
+				break;
 			}
 		}
 	}

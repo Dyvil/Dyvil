@@ -123,7 +123,7 @@ public class ConstructorCall extends ASTNode implements ICall
 			int dims = this.type.getArrayDimensions();
 			if (dims != len)
 			{
-				Marker marker = markers.create(this.position, "access.constructor.array_length");
+				Marker marker = markers.create(this.position, "constructor.access.array_length");
 				marker.addInfo("Type Dimensions: " + dims);
 				marker.addInfo("Number of Length Arguments: " + len);
 				
@@ -132,7 +132,7 @@ public class ConstructorCall extends ASTNode implements ICall
 			
 			if (!(this.arguments instanceof ArgumentList))
 			{
-				markers.add(markers.create(this.position, "access.constructor.array"));
+				markers.add(markers.create(this.position, "constructor.access.array"));
 				return this;
 			}
 			
@@ -144,7 +144,7 @@ public class ConstructorCall extends ASTNode implements ICall
 				IType t = v.getType();
 				if (t != Types.INT)
 				{
-					Marker marker = markers.create(v.getPosition(), "access.constructor.arraylength_type");
+					Marker marker = markers.create(v.getPosition(), "constructor.access.arraylength_type");
 					marker.addInfo("Value Type: " + t);
 				}
 			}
@@ -208,17 +208,17 @@ public class ConstructorCall extends ASTNode implements ICall
 		{
 			if (this.constructor.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.position, "access.constructor.deprecated", iclass.getName());
+				markers.add(this.position, "constructor.access.deprecated", iclass.getName());
 			}
 			
-			byte access = context.getAccessibility(this.constructor);
-			if (access == IContext.SEALED)
+			switch (context.getVisibility(this.constructor))
 			{
-				markers.add(this.position, "access.constructor.sealed", iclass.getName());
-			}
-			else if ((access & IContext.READ_ACCESS) == 0)
-			{
-				markers.add(this.position, "access.constructor.invisible", iclass.getName());
+			case IContext.SEALED:
+				markers.add(this.position, "constructor.access.sealed", iclass.getName());
+				break;
+			case IContext.INVISIBLE:
+				markers.add(this.position, "constructor.access.invisible", iclass.getName());
+				break;
 			}
 		}
 	}

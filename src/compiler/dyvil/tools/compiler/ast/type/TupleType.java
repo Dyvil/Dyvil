@@ -342,9 +342,9 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.getTheClass().getAccessibility(member);
+		return this.getTheClass().getVisibility(member);
 	}
 	
 	@Override

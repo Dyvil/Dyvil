@@ -276,12 +276,6 @@ public class CodeClass extends ASTNode implements IClass
 		return this.modifiers & Modifiers.ACCESS_MODIFIERS;
 	}
 	
-	@Override
-	public byte getAccessibility()
-	{
-		return IContext.READ_ACCESS;
-	}
-	
 	// Names
 	
 	@Override
@@ -1056,12 +1050,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		IClass iclass = member.getTheClass();
 		if (iclass == this || iclass == null)
 		{
-			return member.getAccessibility();
+			return VISIBLE;
 		}
 		
 		int level = member.getAccessLevel();
@@ -1076,20 +1070,20 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		if (level == Modifiers.PUBLIC)
 		{
-			return member.getAccessibility();
+			return VISIBLE;
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.DERIVED)
 		{
 			if (this.superType != null && this.superType.getTheClass() == iclass)
 			{
-				return member.getAccessibility();
+				return VISIBLE;
 			}
 			
 			for (int i = 0; i < this.interfaceCount; i++)
 			{
 				if (this.interfaces[i].getTheClass() == iclass)
 				{
-					return member.getAccessibility();
+					return VISIBLE;
 				}
 			}
 		}
@@ -1097,7 +1091,7 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			if (this.unit.getPackage() == iclass.getUnit().getPackage())
 			{
-				return member.getAccessibility();
+				return VISIBLE;
 			}
 		}
 		

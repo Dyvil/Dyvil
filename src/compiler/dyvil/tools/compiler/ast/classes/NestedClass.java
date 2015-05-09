@@ -136,8 +136,8 @@ public class NestedClass extends CodeClass
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.context.getAccessibility(member);
+		return this.context.getVisibility(member);
 	}
 }

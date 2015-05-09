@@ -149,9 +149,9 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.context.getAccessibility(member);
+		return this.context.getVisibility(member);
 	}
 	
 	// Phases

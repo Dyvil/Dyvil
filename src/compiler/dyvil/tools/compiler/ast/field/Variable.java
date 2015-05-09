@@ -86,15 +86,32 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public String getDescription()
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
 	{
-		return this.type.getExtendedName();
+		return instance;
 	}
 	
 	@Override
-	public String getSignature()
+	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
 	{
-		return this.type.getSignature();
+		if ((this.modifiers & Modifiers.FINAL) != 0)
+		{
+			markers.add(position, "variable.assign.final", this.name.unqualified);
+		}
+		
+		IValue value1 = newValue.withType(this.type);
+		if (value1 == null)
+		{
+			Marker marker = markers.create(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
+			marker.addInfo("Variable Type: " + this.type);
+			marker.addInfo("Value Type: " + newValue.getType());
+		}
+		else
+		{
+			newValue = value1;
+		}
+		
+		return newValue;
 	}
 	
 	@Override
@@ -165,6 +182,18 @@ public final class Variable extends Member implements IVariable
 		this.value = this.value.foldConstants();
 	}
 	
+	@Override
+	public String getDescription()
+	{
+		return this.type.getExtendedName();
+	}
+
+	@Override
+	public String getSignature()
+	{
+		return this.type.getSignature();
+	}
+
 	@Override
 	public void write(ClassWriter writer)
 	{

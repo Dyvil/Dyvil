@@ -219,7 +219,7 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		return 0;
 	}

@@ -372,9 +372,9 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.theClass == null ? 0 : this.theClass.getAccessibility(member);
+		return this.theClass == null ? 0 : this.theClass.getVisibility(member);
 	}
 	
 	@Override

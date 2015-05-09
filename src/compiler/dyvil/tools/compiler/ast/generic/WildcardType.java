@@ -237,7 +237,7 @@ public final class WildcardType extends BaseBounded implements IType
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		return 0;
 	}

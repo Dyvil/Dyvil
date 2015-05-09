@@ -89,7 +89,7 @@ public final class ThisValue extends ASTNode implements IConstantValue
 		
 		if (context.isStatic())
 		{
-			markers.add(this.position, "access.this.static");
+			markers.add(this.position, "this.access.static");
 			return;
 		}
 		

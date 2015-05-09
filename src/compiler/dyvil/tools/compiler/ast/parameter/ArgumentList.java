@@ -195,7 +195,7 @@ public final class ArgumentList implements IArguments, IValueList
 		IValue value1 = value.withType(type);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.getName());
+			Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
 			marker.addInfo("Required Type: " + type);
 			marker.addInfo("Value Type: " + value.getType());
 		}
@@ -227,7 +227,7 @@ public final class ArgumentList implements IArguments, IValueList
 			value1 = value.withType(elementType);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.getName());
+				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
 				marker.addInfo("Required Type: " + elementType);
 				marker.addInfo("Value Type: " + value.getType());
 			}

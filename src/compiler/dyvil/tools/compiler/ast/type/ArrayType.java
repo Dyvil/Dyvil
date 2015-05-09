@@ -211,9 +211,9 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.type.getArrayClass().getAccessibility(member);
+		return this.type.getArrayClass().getVisibility(member);
 	}
 	
 	@Override

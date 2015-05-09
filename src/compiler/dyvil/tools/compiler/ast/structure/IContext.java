@@ -18,12 +18,10 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IContext
 {
-	public static final byte	INVISIBLE			= 0;
-	public static final byte	READ_ACCESS			= 1;
-	public static final byte	WRITE_ACCESS		= 2;
-	public static final byte	READ_WRITE_ACCESS	= 3;
-	public static final byte	STATIC				= 4;
-	public static final byte	SEALED				= 5;
+	public static final byte	VISIBLE		= 0;
+	public static final byte	INVISIBLE	= 1;
+	public static final byte	STATIC		= 2;
+	public static final byte	SEALED		= 3;
 	
 	public boolean isStatic();
 	
@@ -46,7 +44,7 @@ public interface IContext
 	
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
 	
-	public byte getAccessibility(IMember member);
+	public byte getVisibility(IMember member);
 	
 	public static IMethod resolveMethod(MarkerList markers, IContext context, IValue instance, Name name, IArguments arguments)
 	{

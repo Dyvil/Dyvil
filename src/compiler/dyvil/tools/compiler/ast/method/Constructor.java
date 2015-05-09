@@ -441,18 +441,9 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		IClass iclass = member.getTheClass();
-		if (iclass == null)
-		{
-			return READ_WRITE_ACCESS;
-		}
-		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC) && !(member instanceof Constructor))
-		{
-			return STATIC;
-		}
-		return this.theClass.getAccessibility(member);
+		return this.theClass.getVisibility(member);
 	}
 	
 	@Override

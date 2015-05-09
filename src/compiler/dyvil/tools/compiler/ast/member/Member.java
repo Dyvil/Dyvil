@@ -153,12 +153,6 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
-	public byte getAccessibility()
-	{
-		return (this.modifiers & Modifiers.FINAL) != 0 ? IContext.READ_ACCESS : IContext.READ_WRITE_ACCESS;
-	}
-	
-	@Override
 	public void setType(IType type)
 	{
 		this.type = type;

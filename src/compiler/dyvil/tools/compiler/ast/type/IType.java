@@ -217,7 +217,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
 	
 	@Override
-	public byte getAccessibility(IMember member);
+	public byte getVisibility(IMember member);
 	
 	public IMethod getFunctionalMethod();
 	

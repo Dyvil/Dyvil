@@ -192,21 +192,20 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued
 		{
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.position, "access.method.deprecated", "apply");
+				markers.add(this.position, "method.access.deprecated", "apply");
 			}
 			
-			byte access = context.getAccessibility(this.method);
-			if (access == IContext.STATIC)
+			switch (context.getVisibility(this.method))
 			{
-				markers.add(this.position, "access.method.instance", "apply");
-			}
-			else if (access == IContext.SEALED)
-			{
-				markers.add(this.position, "access.method.sealed", "apply");
-			}
-			else if ((access & IContext.READ_ACCESS) == 0)
-			{
-				markers.add(this.position, "access.method.invisible", "apply");
+			case IContext.STATIC:
+				markers.add(this.position, "method.access.instance", "apply");
+				break;
+			case IContext.SEALED:
+				markers.add(this.position, "method.access.sealed", "apply");
+				break;
+			case IContext.INVISIBLE:
+				markers.add(this.position, "method.access.invisible", "apply");
+				break;
 			}
 		}
 		

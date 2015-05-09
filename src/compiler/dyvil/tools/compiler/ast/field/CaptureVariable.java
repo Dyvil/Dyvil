@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class CaptureVariable implements IVariable
 {
@@ -32,12 +33,6 @@ public class CaptureVariable implements IVariable
 	public int getAccessLevel()
 	{
 		return this.variable.getAccessLevel();
-	}
-	
-	@Override
-	public byte getAccessibility()
-	{
-		return this.variable.getAccessibility();
 	}
 	
 	@Override
@@ -165,6 +160,19 @@ public class CaptureVariable implements IVariable
 	public int getIndex()
 	{
 		return this.index;
+	}
+	
+	@Override
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
+	{
+		return this.variable.checkAccess(markers, position, instance);
+	}
+	
+	@Override
+	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	{
+		markers.add(position, "variable.assign.capture", this.variable.getName().unqualified);
+		return newValue;
 	}
 	
 	@Override

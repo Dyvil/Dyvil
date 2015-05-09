@@ -90,7 +90,7 @@ public final class SuperValue extends ASTNode implements IConstantValue
 		}
 		if (context.isStatic())
 		{
-			markers.add(this.position, "access.super.static");
+			markers.add(this.position, "super.access.static");
 			return;
 		}
 		
@@ -98,7 +98,7 @@ public final class SuperValue extends ASTNode implements IConstantValue
 		this.type = thisType.getSuperType();
 		if (this.type == null)
 		{
-			Marker marker = markers.create(this.position, "access.super.type");
+			Marker marker = markers.create(this.position, "super.access.type");
 			marker.addInfo("Enclosing Type: " + thisType);
 		}
 	}

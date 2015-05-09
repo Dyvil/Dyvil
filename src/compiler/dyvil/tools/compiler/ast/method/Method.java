@@ -576,18 +576,18 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		IClass iclass = member.getTheClass();
 		if (iclass == null)
 		{
-			return READ_WRITE_ACCESS;
+			return VISIBLE;
 		}
-		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC) && !(member instanceof IConstructor))
+		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC))
 		{
 			return STATIC;
 		}
-		return this.theClass.getAccessibility(member);
+		return this.theClass.getVisibility(member);
 	}
 	
 	@Override
@@ -752,7 +752,7 @@ public class Method extends Member implements IMethod
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
-				Marker marker = markers.create(instance.getPosition(), "access.method.infix_type", par.getName());
+				Marker marker = markers.create(instance.getPosition(), "method.access.infix_type", par.getName());
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
 			}
@@ -787,7 +787,7 @@ public class Method extends Member implements IMethod
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
-				Marker marker = markers.create(instance.getPosition(), "access.method.prefix_type", this.name);
+				Marker marker = markers.create(instance.getPosition(), "method.access.prefix_type", this.name);
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
 			}

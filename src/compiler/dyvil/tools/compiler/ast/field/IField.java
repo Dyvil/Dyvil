@@ -6,9 +6,15 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IField extends IASTNode, IMember, IClassCompilable, IValued
 {
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance);
+	
+	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue);
+	
 	public default boolean isEnumConstant()
 	{
 		return false;

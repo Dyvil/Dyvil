@@ -167,22 +167,10 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 			this.instance.checkTypes(markers, context);
 		}
 		
-		if (this.field == null)
+		if (this.field != null)
 		{
-			return;
-		}
-		
-		IType type = this.field.getType();
-		IValue value1 = this.value.withType(type);
-		if (value1 == null)
-		{
-			Marker marker = markers.create(this.value.getPosition(), "access.assign.type", this.name);
-			marker.addInfo("Field Type: " + type);
-			marker.addInfo("Value Type: " + this.value.getType());
-		}
-		else
-		{
-			this.value = value1;
+			this.instance = this.field.checkAccess(markers, this.position, this.instance);
+			this.value = this.field.checkAssign(markers, position, instance, value);
 		}
 		
 		this.value.checkTypes(markers, context);
@@ -209,21 +197,20 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 		}
 		if (this.field.hasModifier(Modifiers.DEPRECATED))
 		{
-			markers.add(this.position, "access.field.deprecated", this.name);
+			markers.add(this.position, "field.access.deprecated", this.name);
 		}
 		
-		byte access = context.getAccessibility(this.field);
-		if (access == IContext.STATIC)
+		switch (context.getVisibility(this.field))
 		{
+		case IContext.STATIC:
 			markers.add(this.position, "access.static.field", this.name);
-		}
-		else if (access == IContext.SEALED)
-		{
+			break;
+		case IContext.SEALED:
 			markers.add(this.position, "access.sealed.field", this.name);
-		}
-		else if ((access & IContext.WRITE_ACCESS) == 0)
-		{
+			break;
+		case IContext.INVISIBLE:
 			markers.add(this.position, "access.invisible.field", this.name);
+			break;
 		}
 	}
 	

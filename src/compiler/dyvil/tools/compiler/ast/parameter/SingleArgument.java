@@ -146,7 +146,7 @@ public final class SingleArgument implements IArguments, IValued
 		IValue value1 = this.value.withType(type);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.value.getPosition(), "access.method.argument_type", param.getName());
+			Marker marker = markers.create(this.value.getPosition(), "method.access.argument_type", param.getName());
 			marker.addInfo("Required Type: " + type);
 			marker.addInfo("Value Type: " + this.value.getType());
 		}
@@ -176,7 +176,7 @@ public final class SingleArgument implements IArguments, IValued
 		value1 = this.value.withType(type.getElementType());
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.value.getPosition(), "access.method.argument_type", param.getName());
+			Marker marker = markers.create(this.value.getPosition(), "method.access.argument_type", param.getName());
 			marker.addInfo("Required Type: " + type);
 			marker.addInfo("Value Type: " + this.value.getType());
 		}

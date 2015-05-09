@@ -7,12 +7,14 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class CaptureField implements IVariable
 {
@@ -57,12 +59,6 @@ public final class CaptureField implements IVariable
 	public int getAccessLevel()
 	{
 		return this.field.getAccessLevel();
-	}
-	
-	@Override
-	public byte getAccessibility()
-	{
-		return this.field.getAccessibility();
 	}
 	
 	@Override
@@ -189,6 +185,24 @@ public final class CaptureField implements IVariable
 	public int getIndex()
 	{
 		return 0;
+	}
+	
+	@Override
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
+	{
+		if (instance == null)
+		{
+			markers.add(position, "field.access.unqualified", this.name);
+			return new ThisValue(position, this.theClass.getType());
+		}
+		
+		return instance;
+	}
+	
+	@Override
+	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	{
+		return this.field.checkAssign(markers, position, instance, newValue);
 	}
 	
 	@Override

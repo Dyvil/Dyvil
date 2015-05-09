@@ -195,7 +195,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 				IValue value1 = value.withType(type);
 				if (value1 == null)
 				{
-					Marker marker = markers.create(value.getPosition(), "access.method.argument_type", key);
+					Marker marker = markers.create(value.getPosition(), "method.access.argument_type", key);
 					marker.addInfo("Required Type: " + type);
 					marker.addInfo("Value Type: " + value.getType());
 				}

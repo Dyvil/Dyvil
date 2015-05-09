@@ -222,8 +222,8 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 				}
 				else
 				{
-					Marker marker = markers.create(this.position, "access.assign_call.update");
-					marker.addInfo("Instance Type: " + type);
+					Marker marker = markers.create(this.position, "method.compound.update");
+					marker.addInfo("Callee Type: " + type);
 				}
 			}
 		}
@@ -249,28 +249,27 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 			IType type2 = this.getType();
 			if (!type1.isSuperTypeOf(type2))
 			{
-				Marker marker = markers.create(this.position, "access.assign_call.type", this.name, this.instance.toString());
-				marker.addInfo("Field Type: " + type1);
+				Marker marker = markers.create(this.position, "method.compound.type", this.name, this.instance.toString());
+				marker.addInfo("Callee Type: " + type1);
 				marker.addInfo("Method Type: " + type2);
 			}
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.position, "access.method.deprecated", this.name);
+				markers.add(this.position, "method.access.deprecated", this.name.unqualified);
 			}
 			
-			byte access = context.getAccessibility(this.method);
-			if (access == IContext.STATIC)
+			switch (context.getVisibility(this.method))
 			{
-				markers.add(this.position, "access.method.instance", this.name);
-			}
-			else if (access == IContext.SEALED)
-			{
-				markers.add(this.position, "access.method.sealed", this.name);
-			}
-			else if ((access & IContext.READ_ACCESS) == 0)
-			{
-				markers.add(this.position, "access.method.invisible", this.name);
+			case IContext.STATIC:
+				markers.add(this.position, "method.access.instance", this.name.unqualified);
+				break;
+			case IContext.SEALED:
+				markers.add(this.position, "method.access.sealed", this.name.unqualified);
+				break;
+			case IContext.INVISIBLE:
+				markers.add(this.position, "method.access.invisible", this.name.unqualified);
+				break;
 			}
 		}
 		

@@ -178,9 +178,9 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.context.getAccessibility(member);
+		return this.context.getVisibility(member);
 	}
 	
 	@Override

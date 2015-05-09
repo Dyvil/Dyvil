@@ -121,7 +121,7 @@ public class UnknownType extends ASTNode implements IType
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		return 0;
 	}

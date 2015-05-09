@@ -383,9 +383,9 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.context.getAccessibility(member);
+		return this.context.getVisibility(member);
 	}
 	
 	@Override

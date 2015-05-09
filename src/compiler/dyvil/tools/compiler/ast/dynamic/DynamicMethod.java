@@ -179,9 +179,9 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return IContext.READ_ACCESS;
+		return IContext.VISIBLE;
 	}
 	
 	@Override
@@ -208,12 +208,6 @@ public class DynamicMethod extends ASTNode implements IMethod
 	
 	@Override
 	public int getAccessLevel()
-	{
-		return 0;
-	}
-	
-	@Override
-	public byte getAccessibility()
 	{
 		return 0;
 	}

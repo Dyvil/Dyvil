@@ -370,21 +370,20 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 		{
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.position, "access.method.deprecated", this.name);
+				markers.add(this.position, "method.access.deprecated", this.name);
 			}
 			
-			byte access = context.getAccessibility(this.method);
-			if (access == IContext.STATIC)
+			switch (context.getVisibility(this.method))
 			{
-				markers.add(this.position, "access.method.instance", this.name);
-			}
-			else if (access == IContext.SEALED)
-			{
-				markers.add(this.position, "access.method.sealed", this.name);
-			}
-			else if ((access & IContext.READ_ACCESS) == 0)
-			{
-				markers.add(this.position, "access.method.invisible", this.name);
+			case IContext.STATIC:
+				markers.add(this.position, "method.access.instance", this.name);
+				break;
+			case IContext.SEALED:
+				markers.add(this.position, "method.access.sealed", this.name);
+				break;
+			case IContext.INVISIBLE:
+				markers.add(this.position, "method.access.invisible", this.name);
+				break;
 			}
 		}
 		
