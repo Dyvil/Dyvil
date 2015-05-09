@@ -2,8 +2,6 @@ package dyvil.collection;
 
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -27,12 +25,6 @@ public interface MutableCollection<E> extends Collection<E>
 	
 	@Override
 	public Iterator<E> iterator();
-	
-	@Override
-	public default Spliterator<E> spliterator()
-	{
-		return Spliterators.spliterator(this.iterator(), this.size(), 0);
-	}
 	
 	@Override
 	public void forEach(Consumer<? super E> action);

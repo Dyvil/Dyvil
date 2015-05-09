@@ -87,11 +87,11 @@ public class ArrayList<E> implements MutableList<E>
 	{
 		if (index < 0)
 		{
-			throw new IndexOutOfBoundsException("ArrayList Index out of Bounds: " + index + " < 0");
+			throw new IndexOutOfBoundsException("List Index out of Bounds: " + index + " < 0");
 		}
 		if (index >= this.size)
 		{
-			throw new IndexOutOfBoundsException("ArrayList Index out of Bounds: " + index + " >= " + this.size);
+			throw new IndexOutOfBoundsException("List Index out of Bounds: " + index + " >= " + this.size);
 		}
 	}
 	

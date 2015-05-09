@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import dyvil.collection.ArrayIterator;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
+import dyvil.lang.Entry;
 import dyvil.lang.Map;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.tuple.Tuple2;
@@ -56,9 +57,8 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		this.entries = new Tuple2[this.size];
 		
 		int index = 0;
-		for (Iterator<Map.Entry<K, V>> iterator = map.entryIterator(); iterator.hasNext();)
+		for (Entry<K, V> entry : map)
 		{
-			Map.Entry<K, V> entry = iterator.next();
 			this.entries[index++] = new Tuple2(entry.getKey(), entry.getValue());
 		}
 	}
@@ -76,7 +76,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public Iterator<Tuple2<K, V>> iterator()
+	public Iterator<Entry<K, V>> iterator()
 	{
 		return new ArrayIterator<>(this.entries, this.size);
 	}
@@ -124,13 +124,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public Iterator<Entry<K, V>> entryIterator()
-	{
-		return new ArrayIterator(this.entries, this.size);
-	}
-	
-	@Override
-	public void forEach(Consumer<? super Tuple2<K, V>> action)
+	public void forEach(Consumer<? super Entry<K, V>> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{

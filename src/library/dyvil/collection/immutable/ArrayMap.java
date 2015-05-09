@@ -9,16 +9,17 @@ import java.util.function.Consumer;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
 import dyvil.collection.mutable.HashMap;
+import dyvil.lang.Entry;
 import dyvil.lang.Map;
 import dyvil.tuple.Tuple2;
 
 public class ArrayMap<K, V> implements ImmutableMap<K, V>
 {
-	protected class Entry implements Map.Entry<K, V>
+	protected class ArrayEntry implements Entry<K, V>
 	{
 		private int	index;
 		
-		private Entry(int index)
+		private ArrayEntry(int index)
 		{
 			this.index = index;
 		}
@@ -94,9 +95,8 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		this.values = (V[]) new Object[this.size];
 		
 		int index = 0;
-		for (Iterator<Map.Entry<K, V>> iterator = map.entryIterator(); iterator.hasNext();)
+		for (Entry<K, V> entry : map)
 		{
-			Map.Entry<K, V> entry = iterator.next();
 			this.keys[index] = entry.getKey();
 			this.values[index] = entry.getValue();
 			index++;
@@ -116,9 +116,9 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public Iterator<Tuple2<K, V>> iterator()
+	public Iterator<Entry<K, V>> iterator()
 	{
-		return new Iterator<Tuple2<K, V>>()
+		return new Iterator<Entry<K, V>>()
 		{
 			private int	index;
 			
@@ -129,11 +129,9 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 			}
 			
 			@Override
-			public Tuple2<K, V> next()
+			public Entry<K, V> next()
 			{
-				Tuple2<K, V> tuple = new Tuple2(ArrayMap.this.keys[this.index], ArrayMap.this.values[this.index]);
-				this.index++;
-				return tuple;
+				return new ArrayEntry(this.index++);
 			}
 		};
 	}
@@ -181,29 +179,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public Iterator<Map.Entry<K, V>> entryIterator()
-	{
-		return new Iterator<Map.Entry<K, V>>()
-		{
-			
-			private int	index;
-			
-			@Override
-			public boolean hasNext()
-			{
-				return this.index < ArrayMap.this.size;
-			}
-			
-			@Override
-			public Map.Entry<K, V> next()
-			{
-				return new Entry(this.index++);
-			}
-		};
-	}
-	
-	@Override
-	public void forEach(Consumer<? super Tuple2<K, V>> action)
+	public void forEach(Consumer<? super Entry<K, V>> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -337,9 +313,8 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		System.arraycopy(this.keys, 0, keys, 0, index);
 		System.arraycopy(this.values, 0, values, 0, index);
 		
-		for (Iterator iterator = map.entryIterator(); iterator.hasNext();)
+		for (Entry<? extends K, ? extends V> entry : map)
 		{
-			Entry entry = (Entry) iterator.next();
 			keys[index] = entry.getKey();
 			values[index] = entry.getValue();
 			index++;

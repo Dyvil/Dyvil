@@ -1,7 +1,7 @@
 package dyvil.collection;
 
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import dyvil.lang.Int;
 import dyvil.lang.List;
@@ -41,7 +41,7 @@ public interface MutableMatrix<E> extends Matrix<E>
 	// Non-mutating Operations
 	
 	@Override
-	public List<E> flatten();
+	public MutableList<E> flatten();
 	
 	@Override
 	public MutableMatrix<E> transposed();
@@ -76,7 +76,7 @@ public interface MutableMatrix<E> extends Matrix<E>
 	public void removeRow(int index);
 	
 	@Override
-	public void removeColumn();
+	public void removeColumn(int column);
 	
 	@Override
 	public void clear();
@@ -85,7 +85,7 @@ public interface MutableMatrix<E> extends Matrix<E>
 	public void transpose();
 	
 	@Override
-	public void map(BinaryOperator<E> mapper);
+	public void map(UnaryOperator<E> mapper);
 	
 	// Search Operations
 	
@@ -118,7 +118,10 @@ public interface MutableMatrix<E> extends Matrix<E>
 	public MutableMatrix<E> copy();
 	
 	@Override
-	public MutableMatrix<E> mutable();
+	public default MutableMatrix<E> mutable()
+	{
+		return this;
+	}
 	
 	@Override
 	public ImmutableMatrix<E> immutable();

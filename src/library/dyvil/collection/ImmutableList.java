@@ -64,7 +64,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	@Override
 	public default Spliterator<E> spliterator()
 	{
-		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.IMMUTABLE);
+		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED | Spliterator.IMMUTABLE);
 	}
 	
 	@Override

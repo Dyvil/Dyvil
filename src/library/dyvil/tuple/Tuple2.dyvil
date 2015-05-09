@@ -1,6 +1,6 @@
 package dyvil.tuple
 
-import dyvil.lang.Map.Entry
+import dyvil.lang.Entry
 
 public case class Tuple2[A, B](public A _1, public B _2) implements Entry[A, B]
 {

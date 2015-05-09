@@ -96,7 +96,7 @@ public interface Collection<E> extends Iterable<E>
 	@Override
 	public default Spliterator<E> spliterator()
 	{
-		return Spliterators.spliterator(this.iterator(), this.size(), 0);
+		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
 	}
 	
 	@Override

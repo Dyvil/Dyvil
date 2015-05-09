@@ -10,8 +10,8 @@ import java.util.function.Consumer;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
 import dyvil.collection.SingletonIterator;
+import dyvil.lang.Entry;
 import dyvil.lang.Map;
-import dyvil.lang.Map.Entry;
 import dyvil.tuple.Tuple2;
 
 public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
@@ -43,9 +43,9 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public Iterator<Tuple2<K, V>> iterator()
+	public Iterator<Entry<K, V>> iterator()
 	{
-		return new SingletonIterator<>(new Tuple2<>(this.key, this.value));
+		return new SingletonIterator<>(this);
 	}
 	
 	@Override
@@ -61,12 +61,6 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public Iterator<Entry<K, V>> entryIterator()
-	{
-		return new SingletonIterator(this);
-	}
-	
-	@Override
 	public K getKey()
 	{
 		return this.key;
@@ -79,9 +73,9 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public void forEach(Consumer<? super Tuple2<K, V>> action)
+	public void forEach(Consumer<? super Entry<K, V>> action)
 	{
-		action.accept(new Tuple2<>(this.key, this.value));
+		action.accept(this);
 	}
 	
 	@Override
@@ -126,9 +120,9 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 		int index = 1;
 		Tuple2<? extends K, ? extends V>[] tuples = new Tuple2[1 + map.size()];
 		tuples[0] = new Tuple2(this.key, this.value);
-		for (Tuple2<? extends K, ? extends V> entry : map)
+		for (Entry<? extends K, ? extends V> entry : map)
 		{
-			tuples[index++] = entry;
+			tuples[index++] = new Tuple2<K, V>(entry.getKey(), entry.getValue());
 		}
 		return new TupleMap(tuples, index);
 	}

@@ -1,14 +1,18 @@
 package dyvil.lang;
 
 import java.lang.reflect.Array;
-import java.util.function.BinaryOperator;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.tuple.Tuple2;
 
-public interface Matrix<E>
+public interface Matrix<E> extends Iterable<E>
 {
 	// Accessors
 	
@@ -20,6 +24,23 @@ public interface Matrix<E>
 	{
 		return this.rows() * this.columns();
 	}
+	
+	public default boolean isEmpty()
+	{
+		return this.rows() * this.columns() == 0;
+	}
+	
+	@Override
+	public Iterator<E> iterator();
+	
+	@Override
+	public default Spliterator<E> spliterator()
+	{
+		return Spliterators.spliterator(this.iterator(), this.cells(), Spliterator.SIZED);
+	}
+	
+	@Override
+	public void forEach(Consumer<? super E> action);
 	
 	public boolean $qmark(Object element);
 	
@@ -61,13 +82,13 @@ public interface Matrix<E>
 	
 	public void removeRow(int index);
 	
-	public void removeColumn();
+	public void removeColumn(int column);
 	
 	public void clear();
 	
 	public void transpose();
 	
-	public void map(BinaryOperator<E> mapper);
+	public void map(UnaryOperator<E> mapper);
 	
 	// Search Operations
 	

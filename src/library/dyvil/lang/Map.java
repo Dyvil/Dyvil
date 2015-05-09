@@ -16,14 +16,14 @@ import dyvil.tuple.Tuple2;
 
 @NilConvertible
 @ArrayConvertible
-public interface Map<K, V> extends Iterable<Tuple2<K, V>>
+public interface Map<K, V> extends Iterable<Entry<K, V>>
 {
 	public static <K, V> MutableMap<K, V> apply()
 	{
 		return MutableMap.apply();
 	}
 	
-	public static <K, V> ImmutableMap<K, V> apply(Tuple2<K, V> entry)
+	public static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
 	{
 		return ImmutableMap.apply(entry);
 	}
@@ -31,13 +31,6 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
 	{
 		return ImmutableMap.apply(entries);
-	}
-	
-	public static interface Entry<K, V>
-	{
-		public K getKey();
-		
-		public V getValue();
 	}
 	
 	// Simple Getters
@@ -62,23 +55,23 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 	
 	/**
 	 * Creates and returns an {@link Iterator} over the mappings of this map,
-	 * packed in {@linkplain Tuple2 Tuples} containing the key as their first
+	 * packed in {@linkplain Entry Tuples} containing the key as their first
 	 * value and the value as their second value.
 	 * 
 	 * @return an iterator over the mappings of this map
 	 */
 	@Override
-	public Iterator<Tuple2<K, V>> iterator();
+	public Iterator<Entry<K, V>> iterator();
 	
 	/**
 	 * Creates and returns an {@link Spliterator} over the mappings of this map,
-	 * packed in {@linkplain Tuple2 Tuples} containing the key as their first
+	 * packed in {@linkplain Entry Tuples} containing the key as their first
 	 * value and the value as their second value.
 	 * 
 	 * @return an iterator over the mappings of this map
 	 */
 	@Override
-	public default Spliterator<Tuple2<K, V>> spliterator()
+	public default Spliterator<Entry<K, V>> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), 0);
 	}
@@ -87,10 +80,8 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 	
 	public Iterator<V> valueIterator();
 	
-	public Iterator<Entry<K, V>> entryIterator();
-	
 	@Override
-	public void forEach(Consumer<? super Tuple2<K, V>> action);
+	public void forEach(Consumer<? super Entry<K, V>> action);
 	
 	public void forEach(BiConsumer<? super K, ? super V> action);
 	
@@ -127,9 +118,9 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 	 *            the entry
 	 * @return true, if this map contains the mapping represented by the entry
 	 */
-	public default boolean $qmark(Tuple2<? extends K, ? extends V> entry)
+	public default boolean $qmark(Entry<? extends K, ? extends V> entry)
 	{
-		return this.$qmark(entry._1, entry._2);
+		return this.$qmark(entry.getKey(), entry.getValue());
 	}
 	
 	/**
@@ -168,9 +159,9 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 	 */
 	public Map<K, V> $plus(K key, V value);
 	
-	public default Map<K, V> $plus(Tuple2<? extends K, ? extends V> entry)
+	public default Map<K, V> $plus(Entry<? extends K, ? extends V> entry)
 	{
-		return this.$plus(entry._1, entry._2);
+		return this.$plus(entry.getKey(), entry.getValue());
 	}
 	
 	public Map<K, V> $plus$plus(Map<? extends K, ? extends V> map);
@@ -179,9 +170,9 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 	
 	public Map<K, V> $minus(K key, V value);
 	
-	public default Map<K, V> $minus(Tuple2<? extends K, ? extends V> entry)
+	public default Map<K, V> $minus(Entry<? extends K, ? extends V> entry)
 	{
-		return this.$minus(entry._1, entry._2);
+		return this.$minus(entry.getKey(), entry.getValue());
 	}
 	
 	public Map<K, V> $minus$colon(V value);
@@ -200,9 +191,9 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 	
 	public V put(K key, V value);
 	
-	public default void $plus$eq(Tuple2<? extends K, ? extends V> entry)
+	public default void $plus$eq(Entry<? extends K, ? extends V> entry)
 	{
-		this.update(entry._1, entry._2);
+		this.update(entry.getKey(), entry.getValue());
 	}
 	
 	public void $plus$plus$eq(Map<? extends K, ? extends V> map);
@@ -213,9 +204,9 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>
 	
 	public boolean remove(K key, V value);
 	
-	public default void $minus$eq(Tuple2<? extends K, ? extends V> entry)
+	public default void $minus$eq(Entry<? extends K, ? extends V> entry)
 	{
-		this.remove(entry._1, entry._2);
+		this.remove(entry.getKey(), entry.getValue());
 	}
 	
 	public void $minus$colon$eq(V value);

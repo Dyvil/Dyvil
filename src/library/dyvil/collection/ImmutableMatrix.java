@@ -1,7 +1,7 @@
 package dyvil.collection;
 
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import dyvil.lang.*;
 import dyvil.tuple.Tuple2;
@@ -98,7 +98,7 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	}
 	
 	@Override
-	public default void removeColumn()
+	public default void removeColumn(int column)
 	{
 		throw new ImmutableException("removeColumn() on Immutable Matrix");
 	}
@@ -116,7 +116,7 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	}
 	
 	@Override
-	public default void map(BinaryOperator<E> mapper)
+	public default void map(UnaryOperator<E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable Matrix");
 	}

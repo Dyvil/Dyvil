@@ -12,6 +12,7 @@ import dyvil.annotation.mutating;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
 import dyvil.collection.immutable.TupleMap;
+import dyvil.lang.Entry;
 import dyvil.lang.Immutable;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.Map;
@@ -33,9 +34,9 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 		return new SingletonMap(key, value);
 	}
 	
-	public static <K, V> ImmutableMap<K, V> apply(Tuple2<K, V> entry)
+	public static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
 	{
-		return new SingletonMap(entry._1, entry._2);
+		return new SingletonMap(entry.getKey(), entry.getValue());
 	}
 	
 	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
@@ -46,8 +47,8 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 		case 0:
 			return EmptyMap.apply();
 		case 1:
-			Tuple2<? extends K, ? extends V> entry = entries[0];
-			return new SingletonMap(entry._1, entry._2);
+			Entry<? extends K, ? extends V> entry = entries[0];
+			return new SingletonMap(entry.getKey(), entry.getValue());
 		default:
 			return new TupleMap(entries, len, true);
 		}
@@ -59,10 +60,10 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public int size();
 	
 	@Override
-	public Iterator<Tuple2<K, V>> iterator();
+	public Iterator<Entry<K, V>> iterator();
 	
 	@Override
-	public default Spliterator<Tuple2<K, V>> spliterator()
+	public default Spliterator<Entry<K, V>> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), 0);
 	}
@@ -74,10 +75,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public Iterator<V> valueIterator();
 	
 	@Override
-	public Iterator<Entry<K, V>> entryIterator();
-	
-	@Override
-	public void forEach(Consumer<? super Tuple2<K, V>> action);
+	public void forEach(Consumer<? super Entry<K, V>> action);
 	
 	@Override
 	public void forEach(BiConsumer<? super K, ? super V> action);
@@ -89,9 +87,9 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public boolean $qmark(Object key, Object value);
 	
 	@Override
-	public default boolean $qmark(Tuple2<? extends K, ? extends V> entry)
+	public default boolean $qmark(Entry<? extends K, ? extends V> entry)
 	{
-		return this.$qmark(entry._1, entry._2);
+		return this.$qmark(entry.getKey(), entry.getValue());
 	}
 	
 	@Override
@@ -106,9 +104,9 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public ImmutableMap<K, V> $plus(K key, V value);
 	
 	@Override
-	public default ImmutableMap<K, V> $plus(Tuple2<? extends K, ? extends V> entry)
+	public default ImmutableMap<K, V> $plus(Entry<? extends K, ? extends V> entry)
 	{
-		return this.$plus(entry._1, entry._2);
+		return this.$plus(entry.getKey(), entry.getValue());
 	}
 	
 	@Override
@@ -121,9 +119,9 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public ImmutableMap<K, V> $minus(K key, V value);
 	
 	@Override
-	public default ImmutableMap<K, V> $minus(Tuple2<? extends K, ? extends V> entry)
+	public default ImmutableMap<K, V> $minus(Entry<? extends K, ? extends V> entry)
 	{
-		return this.$minus(entry._1, entry._2);
+		return this.$minus(entry.getKey(), entry.getValue());
 	}
 	
 	@Override
@@ -163,7 +161,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	
 	@Override
 	@mutating
-	public default void $plus$eq(Tuple2<? extends K, ? extends V> entry)
+	public default void $plus$eq(Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("+= on Immutable Map");
 	}
@@ -198,7 +196,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	
 	@Override
 	@mutating
-	public default void $minus$eq(Tuple2<? extends K, ? extends V> entry)
+	public default void $minus$eq(Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
