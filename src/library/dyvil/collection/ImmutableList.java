@@ -48,11 +48,6 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 		return new ArrayList(array);
 	}
 	
-	public static <E> ImmutableList<E> apply(Iterable<E> iterable)
-	{
-		return MutableList.apply(iterable).immutable();
-	}
-	
 	// Accessors
 	
 	@Override

@@ -157,7 +157,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	// toArray
 	
 	@Override
-	public void toArray(Object[] store);
+	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

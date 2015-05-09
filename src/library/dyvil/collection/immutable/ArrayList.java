@@ -366,9 +366,9 @@ public class ArrayList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public void toArray(Object[] store)
+	public void toArray(int index, Object[] store)
 	{
-		System.arraycopy(this.elements, 0, store, 0, this.size);
+		System.arraycopy(this.elements, 0, store, index, this.size);
 	}
 	
 	@Override

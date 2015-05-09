@@ -37,19 +37,9 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 		return new ArrayList(new Object[] { e1, e2, e3 }, 3, true);
 	}
 	
-	public static <E> MutableList<E> apply(E... array)
+	public static <E> MutableList<E> apply(E... elements)
 	{
-		return new ArrayList(array);
-	}
-	
-	public static <E> MutableList<E> apply(Iterable<E> iterable)
-	{
-		ArrayList<E> list = new ArrayList();
-		for (E e : iterable)
-		{
-			list.$plus$eq(e);
-		}
-		return list;
+		return new ArrayList(elements, true);
 	}
 	
 	// Accessors
@@ -176,7 +166,7 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	// toArray
 	
 	@Override
-	public void toArray(Object[] store);
+	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

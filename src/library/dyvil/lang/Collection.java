@@ -11,7 +11,9 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import dyvil.collection.ImmutableCollection;
+import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableCollection;
+import dyvil.collection.MutableList;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
@@ -46,14 +48,14 @@ public interface Collection<E> extends Iterable<E>
 	 * @see List#apply()
 	 * @return an empty collection
 	 */
-	public static <E> Collection<E> apply()
+	public static <E> MutableCollection<E> apply()
 	{
-		return List.apply();
+		return MutableList.apply();
 	}
 	
 	public static <E> Collection<E> apply(E... elements)
 	{
-		return List.apply(elements);
+		return ImmutableList.apply(elements);
 	}
 	
 	// Accessors
@@ -355,7 +357,7 @@ public interface Collection<E> extends Iterable<E>
 	public default Object[] toArray()
 	{
 		Object[] array = new Object[this.size()];
-		this.toArray(array);
+		this.toArray(0, array);
 		return array;
 	}
 	
@@ -373,22 +375,18 @@ public interface Collection<E> extends Iterable<E>
 	public default E[] toArray(Class<E> type)
 	{
 		E[] array = (E[]) Array.newInstance(type, this.size());
-		this.toArray(array);
+		this.toArray(0, array);
 		return array;
 	}
 	
 	// Copying
 	
-	/**
-	 * Stores the elements of this collection in the given {@code store} array.
-	 * If the {@code store} array is not large enough to hold all the elements
-	 * of this collection, a copy of it is created, filled with the elements and
-	 * returned.
-	 * 
-	 * @param store
-	 *            the store array
-	 */
-	public void toArray(Object[] store);
+	public default void toArray(Object[] store)
+	{
+		this.toArray(0, store);
+	}
+	
+	public void toArray(int index, Object[] store);
 	
 	/**
 	 * Creates a copy of this collection. The general contract of this method is

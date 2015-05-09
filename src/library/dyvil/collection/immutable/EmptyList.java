@@ -171,7 +171,7 @@ public class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public void toArray(Object[] store)
+	public void toArray(int index, Object[] store)
 	{
 	}
 	

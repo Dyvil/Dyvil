@@ -8,14 +8,21 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import dyvil.lang.Collection;
+import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
+@ArrayConvertible
 public interface MutableCollection<E> extends Collection<E>
 {
 	public static <E> MutableCollection<E> apply()
 	{
 		return MutableList.apply();
+	}
+	
+	public static <E> MutableCollection<E> apply(E... elements)
+	{
+		return MutableList.apply(elements);
 	}
 	
 	// Accessors
@@ -96,7 +103,7 @@ public interface MutableCollection<E> extends Collection<E>
 	// toArray
 	
 	@Override
-	public void toArray(Object[] store);
+	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

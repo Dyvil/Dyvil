@@ -25,7 +25,7 @@ public interface List<E> extends Collection<E>
 	
 	public static <E> ImmutableList<E> apply(E... array)
 	{
-		return new dyvil.collection.immutable.ArrayList(array);
+		return new dyvil.collection.immutable.ArrayList(array, true);
 	}
 	
 	// Simple getters
@@ -281,13 +281,7 @@ public interface List<E> extends Collection<E>
 	// toArray
 	
 	@Override
-	public Object[] toArray();
-	
-	@Override
-	public E[] toArray(Class<E> type);
-	
-	@Override
-	public void toArray(Object[] store);
+	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

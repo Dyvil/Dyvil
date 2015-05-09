@@ -247,11 +247,8 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 		int oldRows = this.rows;
 		this.resize(this.rows + 1, this.columns);
 		
-		int offset = oldRows * this.columns;
-		for (int i = 0; i < size; i++)
-		{
-			this.cells[i + offset] = row.get(i);
-		}
+		// Let the row do it's thing, but with the base offset.
+		row.toArray(oldRows * this.columns, this.cells);
 	}
 	
 	@Override

@@ -106,7 +106,11 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
-		return ImmutableList.apply(collection);
+		int len = 1 + collection.size();
+		Object[] array = new Object[len];
+		array[0] = this.element;
+		collection.toArray(1, array);
+		return new ArrayList(array, len, true);
 	}
 	
 	@Override
@@ -188,9 +192,9 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public void toArray(Object[] store)
+	public void toArray(int index, Object[] store)
 	{
-		store[0] = this.element;
+		store[index] = this.element;
 	}
 	
 	@Override
