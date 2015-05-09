@@ -229,12 +229,17 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 			return;
 		}
 		
-		if (this.instance != null)
+		if (this.field.hasModifier(Modifiers.STATIC))
+		{
+			this.value.writeExpression(writer);
+			writer.writeInsn(Opcodes.DUP);
+		}
+		else
 		{
 			this.instance.writeExpression(writer);
+			this.value.writeExpression(writer);
+			writer.writeInsn(Opcodes.DUP_X1);
 		}
-		this.value.writeExpression(writer);
-		writer.writeInsn(Opcodes.DUP);
 		this.field.writeSet(writer, null, null);
 	}
 	

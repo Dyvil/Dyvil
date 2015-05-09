@@ -240,10 +240,10 @@ public final class FormatStringExpression extends ASTNode implements IValue
 		
 		for (int i = 0; i < len; i++)
 		{
-			buffer.append("${");
+			buffer.append("\\(");
 			this.values[i].toString(prefix, buffer);
 			s = this.strings[i + 1];
-			buffer.append('}');
+			buffer.append(')');
 			StringValue.append(s, s.length(), buffer);
 		}
 		buffer.append('"');
