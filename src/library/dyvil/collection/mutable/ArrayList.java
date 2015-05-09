@@ -661,7 +661,7 @@ public class ArrayList<E> implements MutableList<E>
 	{
 		System.arraycopy(this.elements, 0, store, 0, this.size);
 	}
-
+	
 	@Override
 	public MutableList<E> copy()
 	{

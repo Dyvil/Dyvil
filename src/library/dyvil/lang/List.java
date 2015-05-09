@@ -244,8 +244,8 @@ public interface List<E> extends Collection<E>
 	public void sort();
 	
 	/**
-	 * Sorts the elements of this list. The sorting order is specified by
-	 * the given {@code comparator}.
+	 * Sorts the elements of this list. The sorting order is specified by the
+	 * given {@code comparator}.
 	 * 
 	 * @param comparator
 	 *            the comparator that defines the order of the elements

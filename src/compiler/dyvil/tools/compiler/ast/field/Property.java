@@ -138,11 +138,11 @@ public class Property extends Member implements IProperty, IContext
 			markers.add(position, "property.assign.readonly", this.name.unqualified);
 		}
 		
-		IValue value1 = newValue.withType(type);
+		IValue value1 = newValue.withType(this.type);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "property.assign.type", this.name.unqualified);
-			marker.addInfo("Property Type: " + type);
+			marker.addInfo("Property Type: " + this.type);
 			marker.addInfo("Value Type: " + newValue.getType());
 		}
 		else

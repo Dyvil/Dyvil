@@ -714,11 +714,15 @@ public class Method extends Member implements IMethod
 	{
 		IType type = instance.getType();
 		if (!Types.IMMUTABLE.isSuperTypeOf(type))
+		{
 			return;
+		}
 		
 		Annotation a = this.getAnnotation(Types.MUTATING_CLASS);
 		if (a == null)
+		{
 			return;
+		}
 		
 		IValue v = a.arguments.getValue(0, Annotation.VALUE);
 		String s = v != null ? ((StringValue) v).value : mutating.VALUE_DEFAULT;

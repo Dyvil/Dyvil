@@ -154,7 +154,7 @@ public final class PrimitiveType extends Type
 		}
 		return super.classEquals(type);
 	}
-
+	
 	@Override
 	public boolean isResolved()
 	{
@@ -180,7 +180,7 @@ public final class PrimitiveType extends Type
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
@@ -189,12 +189,12 @@ public final class PrimitiveType extends Type
 			this.theClass.getMethodMatches(list, instance, name, arguments);
 		}
 	}
-
+	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 	}
-
+	
 	@Override
 	public String getInternalName()
 	{
@@ -347,16 +347,34 @@ public final class PrimitiveType extends Type
 	public void writeTypeExpression(MethodWriter writer)
 	{
 		int i;
-		switch (this.typecode) {
-		case ClassFormat.T_BOOLEAN: i = dyvil.reflect.type.PrimitiveType.BOOLEAN; break;
-		case ClassFormat.T_BYTE: i = dyvil.reflect.type.PrimitiveType.BYTE; break;
-		case ClassFormat.T_SHORT: i = dyvil.reflect.type.PrimitiveType.SHORT; break;
-		case ClassFormat.T_CHAR: i = dyvil.reflect.type.PrimitiveType.CHAR; break;
-		case ClassFormat.T_INT: i = dyvil.reflect.type.PrimitiveType.INT; break;
-		case ClassFormat.T_LONG: i = dyvil.reflect.type.PrimitiveType.LONG; break;
-		case ClassFormat.T_FLOAT: i = dyvil.reflect.type.PrimitiveType.FLOAT; break;
-		case ClassFormat.T_DOUBLE: i = dyvil.reflect.type.PrimitiveType.DOUBLE; break;
-		default: i = 0;
+		switch (this.typecode)
+		{
+		case ClassFormat.T_BOOLEAN:
+			i = dyvil.reflect.type.PrimitiveType.BOOLEAN;
+			break;
+		case ClassFormat.T_BYTE:
+			i = dyvil.reflect.type.PrimitiveType.BYTE;
+			break;
+		case ClassFormat.T_SHORT:
+			i = dyvil.reflect.type.PrimitiveType.SHORT;
+			break;
+		case ClassFormat.T_CHAR:
+			i = dyvil.reflect.type.PrimitiveType.CHAR;
+			break;
+		case ClassFormat.T_INT:
+			i = dyvil.reflect.type.PrimitiveType.INT;
+			break;
+		case ClassFormat.T_LONG:
+			i = dyvil.reflect.type.PrimitiveType.LONG;
+			break;
+		case ClassFormat.T_FLOAT:
+			i = dyvil.reflect.type.PrimitiveType.FLOAT;
+			break;
+		case ClassFormat.T_DOUBLE:
+			i = dyvil.reflect.type.PrimitiveType.DOUBLE;
+			break;
+		default:
+			i = 0;
 		}
 		
 		writer.writeLDC(i);

@@ -102,7 +102,9 @@ public final class CastOperator extends ASTNode implements IValue
 		}
 		
 		if (!this.type.isResolved())
+		{
 			return this;
+		}
 		
 		if (!this.typeHint && this.type.isSuperTypeOf(this.value.getType()))
 		{

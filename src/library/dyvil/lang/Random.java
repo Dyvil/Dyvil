@@ -84,12 +84,12 @@ public interface Random
 	{
 		int r = next(31);
 		int m = max - 1;
-		if ((max & m) == 0) // power of two
-			r = (int) ((max * (long) r) >> 31);
-		else
+		if ((max & m) == 0)
 		{
-			for (int u = r; u - (r = u % max) + m < 0; u = next(31))
-				;
+			return (int) (max * (long) r >> 31);
+		}
+		for (int u = r; u - (r = u % max) + m < 0; u = next(31))
+		{
 		}
 		return r;
 	}
@@ -106,19 +106,19 @@ public interface Random
 	
 	public default long nextLong()
 	{
-		return ((long) (next(32)) << 32) + next(32);
+		return ((long) next(32) << 32) + next(32);
 	}
 	
 	public default long nextLong(long max)
 	{
 		long r = this.nextLong();
 		long m = max - 1;
-		if ((max & m) == 0L) // power of two
-			r &= m;
-		else
-		{ // reject over-represented candidates
-			for (long u = r >>> 1; u + m - (r = u % max) < 0L; u = this.nextLong() >>> 1)
-				;
+		if ((max & m) == 0L)
+		{
+			return r & m;
+		}
+		for (long u = r >>> 1; u + m - (r = u % max) < 0L; u = this.nextLong() >>> 1)
+		{
 		}
 		return r;
 	}
@@ -145,7 +145,7 @@ public interface Random
 	
 	public default double nextDouble()
 	{
-		return (((long) (next(26)) << 27) + next(27)) * DOUBLE_UNIT;
+		return (((long) next(26) << 27) + next(27)) * DOUBLE_UNIT;
 	}
 	
 	public default double nextDouble(double max)

@@ -370,7 +370,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	{
 		System.arraycopy(this.elements, 0, store, 0, this.size);
 	}
-
+	
 	@Override
 	public ImmutableList<E> copy()
 	{

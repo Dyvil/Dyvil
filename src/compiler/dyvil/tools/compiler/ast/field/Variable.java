@@ -187,13 +187,13 @@ public final class Variable extends Member implements IVariable
 	{
 		return this.type.getExtendedName();
 	}
-
+	
 	@Override
 	public String getSignature()
 	{
 		return this.type.getSignature();
 	}
-
+	
 	@Override
 	public void write(ClassWriter writer)
 	{

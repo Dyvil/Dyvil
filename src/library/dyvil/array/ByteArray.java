@@ -88,7 +88,7 @@ public interface ByteArray
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
-
+	
 	public static @infix @inline boolean $eq$eq(byte[] array1, byte[] array2)
 	{
 		return Arrays.equals(array1, array2);
