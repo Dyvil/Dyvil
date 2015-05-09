@@ -14,15 +14,64 @@ import dyvil.collection.MutableList;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+/**
+ * A <b>List</b> is a data type that represents an ordered (sequential)
+ * {@linkplain Collection collection}. A list supports access using integer
+ * indexes in a way similar to arrays. However, they also support various
+ * operations for easily modifying the structure of their elements, examples for
+ * which are the {@linkplain #add(Object) add} or {@linkplain #remove(Object)
+ * remove} operations. Since a list is also a {@linkplain Collection}, it also
+ * supports various querying operations including {@linkplain #map(Function)
+ * map}, {@linkplain #filter(Predicate) filter} or
+ * {@linkplain #flatMap(Function) flatMap} and new sequential operations such as
+ * {@linkplain #sort() sort}.
+ * <p>
+ * As with {@linkplain Collection collections}, lists also make a clear
+ * distinction between {@linkplain MutableList mutable} and
+ * {@linkplain ImmutableList immutable} data. For the latter, the <i>Dyvil
+ * Collection Framework</i> provides various memory-efficient implementations
+ * specialized for lists with zero, one or multiple elements.
+ * <p>
+ * Since this interface is both {@link NilConvertible} and
+ * {@link ArrayConvertible}, it is possible to initialize both mutable and
+ * immutable lists with simple expressions, as shown in the below example.
+ * 
+ * <pre>
+ * List[int] mutable = nil // Creates an empty, mutable list
+ * List[String] immutable = [ "a", "b", "c" ] // Creates an immutable list from the array
+ * </pre>
+ * 
+ * @author Clashsoft
+ * @param <E>
+ *            the element type
+ */
 @NilConvertible
 @ArrayConvertible
 public interface List<E> extends Collection<E>
 {
+	/**
+	 * Returns an empty, mutable list. This method is primarily for use with the
+	 * {@code nil} literal in <i>Dyvil</i> and internally creates an empty
+	 * {@link dyvil.collection.mutable.ArrayList ArrayList}.
+	 * 
+	 * @return an empty, mutable list
+	 */
 	public static <E> MutableList<E> apply()
 	{
 		return new dyvil.collection.mutable.ArrayList();
 	}
 	
+	/**
+	 * Returns an immutable list containing all of the given {@code elements}.
+	 * This method is primarily for use with <i>Array Expressions</i> in
+	 * <i>Dyvil</i> and internally creates an
+	 * {@link dyvil.collection.immutable.ArrayList ArrayList} from the given
+	 * {@code elements}.
+	 * 
+	 * @param elements
+	 *            the elements of the returned collection
+	 * @return an immutable list containing all of the given elements
+	 */
 	public static <E> ImmutableList<E> apply(E... array)
 	{
 		return new dyvil.collection.immutable.ArrayList(array, true);
@@ -78,6 +127,27 @@ public interface List<E> extends Collection<E>
 	
 	// Non-mutating Operations
 	
+	/**
+	 * Creates and returns a {@linkplain List} containing {@code length} of the
+	 * elements of this list starting from the {@code startIndex}. If the
+	 * {@code startIndex} or the end index ({@code startIndex + length}) exceeds
+	 * the size of this list, an exception will be thrown.
+	 * <p>
+	 * Note that for {@linkplain MutableList mutable lists}, it is not
+	 * guaranteed that changes to the sub-list will be reflected in the list is
+	 * was created from. Although it is not an absolute requirement,
+	 * implementations should return a list that, when mutated, does <b>not</b>
+	 * reflect the changes in this list. This behavior is implemented in all
+	 * {@linkplain MutableList mutable list} implementations of the <i>Dyvil
+	 * Collection Framework</i>.
+	 * 
+	 * @param startIndex
+	 *            the start index of the sub list
+	 * @param length
+	 *            the length of the sub list
+	 * @return a sub-list with {@code length} elements starting from the
+	 *         {@code startIndex}
+	 */
 	public List<E> subList(int startIndex, int length);
 	
 	@Override

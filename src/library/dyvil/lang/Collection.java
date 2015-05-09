@@ -31,7 +31,16 @@ import dyvil.lang.literal.NilConvertible;
  * Collection[String] c = nil
  * </pre>
  * 
- * Would create an empty list and assign it to the variable {@code c}.
+ * Would create an empty list by calling {@link #apply()} and assign it to the
+ * variable {@code c}.
+ * <p>
+ * Furthermore, since this interface also supports the {@link ArrayConvertible}
+ * annotation, it is possible to create a collection using <i>Array
+ * Expressions</i> in <i>Dyvil</i>, as shown in the below example.
+ * 
+ * <pre>
+ * Collection[String] c = [ 1, 2, 3 ]
+ * </pre>
  * 
  * @author Clashsoft
  * @param <E>
@@ -42,18 +51,29 @@ import dyvil.lang.literal.NilConvertible;
 public interface Collection<E> extends Iterable<E>
 {
 	/**
-	 * Returns an empty collection. This method is primarily for use with the
-	 * {@code nil} literal in <i>Dyvil</i>.
+	 * Returns an empty, mutable collection. This method is primarily for use
+	 * with the {@code nil} literal in <i>Dyvil</i> and is defined by
+	 * {@link MutableList#apply()}.
 	 * 
-	 * @see List#apply()
-	 * @return an empty collection
+	 * @see MutableList#apply()
+	 * @return an empty, mutable collection
 	 */
 	public static <E> MutableCollection<E> apply()
 	{
 		return MutableList.apply();
 	}
 	
-	public static <E> Collection<E> apply(E... elements)
+	/**
+	 * Returns an immutable collection containing all of the given
+	 * {@code elements}. This method is primarily for use with <i>Array
+	 * Expressions</i> in <i>Dyvil</i> and is defined by
+	 * {@link ImmutableList#apply(Object...)}.
+	 * 
+	 * @param elements
+	 *            the elements of the returned collection
+	 * @return an immutable collection containing all of the given elements
+	 */
+	public static <E> ImmutableCollection<E> apply(E... elements)
 	{
 		return ImmutableList.apply(elements);
 	}

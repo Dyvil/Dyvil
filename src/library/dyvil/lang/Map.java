@@ -146,24 +146,48 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	// Non-mutating Operations
 	
 	/**
-	 * Returns a map that contains all mappings of this map plus the new mapping
-	 * specified by {@code key} and {@code value}. It depends on the type of
-	 * this map if this method returns a new map or the mapping is simply added
-	 * to this map.
+	 * Returns a map that contains all entries of this map plus the new entry
+	 * specified by {@code key} and {@code value} as if it were added by
+	 * {@link #update(Object, Object)}. If the {@code key} is already present in
+	 * this map, a map is returned that uses the given {@code value} instead of
+	 * the previous value for the {@code key}, and that has the same size as
+	 * this map.
 	 * 
 	 * @param key
 	 *            the key
 	 * @param value
 	 *            the value
-	 * @return a map that contains all mappings of this map plus the new mapping
+	 * @return a map that contains all entries of this map plus the new entry
 	 */
 	public Map<K, V> $plus(K key, V value);
 	
+	/**
+	 * Returns a map that contains all entries of this map plus the new
+	 * {@code entry}, as if it were added by {@link #update(Object, Object)}. If
+	 * the {@code key} is already present in this map, a map is returned that
+	 * uses the given {@code value} instead of the previous value for the
+	 * {@code key}, and that has the same size as this map.
+	 * 
+	 * @see #$plus(Object, Object)
+	 * @param entry
+	 *            the entry
+	 * @return a map that contains all entries of this map plus the new entry
+	 */
 	public default Map<K, V> $plus(Entry<? extends K, ? extends V> entry)
 	{
 		return this.$plus(entry.getKey(), entry.getValue());
 	}
 	
+	/**
+	 * Returns a map that contains all entries of this map plus all entries of
+	 * the given {@code map}, as if they were added by
+	 * {@link #update(Object, Object)}. If a key in the given map is already
+	 * present in this map, a map is returned that uses the value from the given
+	 * {@code map} for that key.
+	 * 
+	 * @param map
+	 * @return
+	 */
 	public Map<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
 	public Map<K, V> $minus(K key);
