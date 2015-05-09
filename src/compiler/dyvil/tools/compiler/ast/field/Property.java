@@ -108,16 +108,23 @@ public class Property extends Member implements IProperty, IContext
 	{
 		if (instance != null)
 		{
-			if ((this.modifiers & Modifiers.STATIC) != 0 && instance.valueTag() != IValue.CLASS_ACCESS)
+			if ((this.modifiers & Modifiers.STATIC) != 0)
 			{
-				markers.add(this.position, "property.access.static", this.name);
-				return null;
+				if (instance.valueTag() != IValue.CLASS_ACCESS)
+				{
+					markers.add(position, "property.access.static", this.name.unqualified);
+					return null;
+				}
+			}
+			else if (instance.valueTag() == IValue.CLASS_ACCESS)
+			{
+				markers.add(position, "property.access.instance", this.name.unqualified);
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			markers.add(this.position, "property.access.unqualified", this.name);
-			return new ThisValue(this.position, this.theClass.getType());
+			markers.add(position, "property.access.unqualified", this.name.unqualified);
+			return new ThisValue(position, this.theClass.getType());
 		}
 		
 		return instance;
@@ -169,6 +176,7 @@ public class Property extends Member implements IProperty, IContext
 		if (this.set != null)
 		{
 			this.setterParameter = new MethodParameter(this.name, this.type);
+			this.setterParameter.index = 1;
 			this.set = this.set.resolve(markers, this);
 		}
 		if (this.get != null)
@@ -344,8 +352,8 @@ public class Property extends Member implements IProperty, IContext
 		String signature = this.type.getSignature();
 		if (this.get != null)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers | Modifiers.SYNTHETIC, "get$" + this.name.qualified, "()"
-					+ extended, signature == null ? null : "()" + signature, null));
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers, this.name.qualified, "()" + extended, signature == null ? null
+					: "()" + signature, null));
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
@@ -372,8 +380,8 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.set != null)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers | Modifiers.SYNTHETIC, "set$" + this.name.qualified, "("
-					+ extended + ")V", signature == null ? null : "(" + signature + ")V", null));
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers, this.name.qualified + "_$eq", "(" + extended + ")V",
+					signature == null ? null : "(" + signature + ")V", null));
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
@@ -411,7 +419,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		
 		int opcode;
-		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
+		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			opcode = Opcodes.INVOKESTATIC;
 		}
@@ -421,7 +429,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		
 		String owner = this.theClass.getInternalName();
-		String name = "get$" + this.name.qualified;
+		String name = this.name.qualified;
 		String desc = "()" + this.type.getExtendedName();
 		writer.writeInvokeInsn(opcode, owner, name, desc, false);
 	}
@@ -440,7 +448,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		
 		int opcode;
-		if ((this.modifiers & Modifiers.STATIC) == Modifiers.STATIC)
+		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			opcode = Opcodes.INVOKESTATIC;
 		}
@@ -450,7 +458,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		
 		String owner = this.theClass.getInternalName();
-		String name = "set$" + this.name.qualified;
+		String name = this.name.qualified + "_$eq";
 		String desc = "(" + this.type.getExtendedName() + ")V";
 		writer.writeInvokeInsn(opcode, owner, name, desc, false);
 	}
@@ -474,7 +482,15 @@ public class Property extends Member implements IProperty, IContext
 		buffer.append('\n').append(prefix).append('{');
 		if (this.get != null)
 		{
-			buffer.append('\n').append(prefix).append(Formatting.Method.indent).append(Formatting.Field.propertyGet);
+			buffer.append('\n').append(prefix).append(Formatting.Method.indent);
+			if (this.set == null)
+			{
+				this.get.toString(prefix + Formatting.Method.indent, buffer);
+				buffer.append('\n').append(prefix).append('}');
+				return;
+			}
+			
+			buffer.append(Formatting.Field.propertyGet);
 			this.get.toString(prefix + Formatting.Method.indent, buffer);
 			buffer.append(';');
 		}

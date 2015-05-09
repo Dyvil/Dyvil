@@ -138,15 +138,22 @@ public final class ClassParameter extends Member implements IParameter
 	{
 		if (instance != null)
 		{
-			if ((this.modifiers & Modifiers.STATIC) != 0 && instance.valueTag() != IValue.CLASS_ACCESS)
+			if ((this.modifiers & Modifiers.STATIC) != 0)
 			{
-				markers.add(position, "classparameter.access.static", this.name);
-				return null;
+				if (instance.valueTag() != IValue.CLASS_ACCESS)
+				{
+					markers.add(position, "classparameter.access.static", this.name.unqualified);
+					return null;
+				}
+			}
+			else if (instance.valueTag() == IValue.CLASS_ACCESS)
+			{
+				markers.add(position, "classparameter.access.instance", this.name.unqualified);
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			markers.add(position, "classparameter.access.unqualified", this.name);
+			markers.add(position, "classparameter.access.unqualified", this.name.unqualified);
 			return new ThisValue(position, this.theClass.getType());
 		}
 		

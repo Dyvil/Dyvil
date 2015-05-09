@@ -116,16 +116,23 @@ public class Field extends Member implements IField
 	{
 		if (instance != null)
 		{
-			if ((this.modifiers & Modifiers.STATIC) != 0 && instance.valueTag() != IValue.CLASS_ACCESS)
+			if ((this.modifiers & Modifiers.STATIC) != 0)
 			{
-				markers.add(this.position, "field.access.static", this.name);
-				return null;
+				if (instance.valueTag() != IValue.CLASS_ACCESS)
+				{
+					markers.add(position, "field.access.static", this.name.unqualified);
+					return null;
+				}
+			}
+			else if (instance.valueTag() == IValue.CLASS_ACCESS)
+			{
+				markers.add(position, "field.access.instance", this.name.unqualified);
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			markers.add(this.position, "field.access.unqualified", this.name);
-			return new ThisValue(this.position, this.theClass.getType());
+			markers.add(position, "field.access.unqualified", this.name.unqualified);
+			return new ThisValue(position, this.theClass.getType());
 		}
 		
 		return instance;
