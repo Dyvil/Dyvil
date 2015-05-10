@@ -4,7 +4,7 @@ import static dyvil.reflect.Opcodes.*;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
 
-public class Boolean implements Boolean$
+public class Boolean
 {
 	protected static final Boolean	TRUE	= new Boolean(true);
 	protected static final Boolean	FALSE	= new Boolean(false);
@@ -27,63 +27,54 @@ public class Boolean implements Boolean$
 		return this.value;
 	}
 	
-	@Override
 	@Intrinsic({ INSTANCE })
 	public boolean booleanValue()
 	{
 		return this.value;
 	}
 	
-	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, BINV })
 	public @prefix Boolean $bang()
 	{
 		return apply(!this.value);
 	}
 	
-	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
 	public boolean $eq$eq(boolean v)
 	{
 		return this.value == v;
 	}
 	
-	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
 	public boolean $bang$eq(boolean v)
 	{
 		return this.value != v;
 	}
 	
-	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IAND, IFNE })
 	public Boolean $amp(boolean v)
 	{
 		return apply(v && this.value);
 	}
 	
-	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IOR, IFNE })
 	public Boolean $bar(boolean v)
 	{
 		return apply(v || this.value);
 	}
 	
-	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IXOR, IFNE })
 	public Boolean $up(boolean v)
 	{
 		return apply(v != this.value);
 	}
 	
-	@Override
 	@Intrinsic({ INSTANCE, BINV, ARGUMENTS, IOR, IFEQ })
 	public Boolean $eq$eq$gt(boolean v)
 	{
 		return apply(v || !this.value);
 	}
 	
-	@Override
 	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
 	public Boolean $lt$eq$gt(boolean v)
 	{
