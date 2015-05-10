@@ -2,10 +2,15 @@ package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
 
+import org.objectweb.asm.Label;
+
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -20,6 +25,7 @@ public final class Variable extends Member implements IVariable
 {
 	public int		index;
 	public IValue	value;
+	private IType	refType;
 	
 	public Variable()
 	{
@@ -115,6 +121,16 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
+	public IType getCaptureType(boolean init)
+	{
+		if (init && this.refType == null)
+		{
+			return this.refType = Types.getRefType(this.type);
+		}
+		return this.refType;
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
@@ -199,15 +215,78 @@ public final class Variable extends Member implements IVariable
 	{
 	}
 	
+	public void writeLocal(MethodWriter writer, Label start, Label end)
+	{
+		IType type = this.refType != null ? this.refType : this.type;
+		writer.writeLocal(this.index, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
+	}
+	
+	public void writeInit(MethodWriter writer)
+	{
+		if (this.refType != null)
+		{
+			IConstructor c = this.refType.getTheClass().getBody().getConstructor(0);
+			writer.writeTypeInsn(Opcodes.NEW, this.refType.getInternalName());
+			writer.writeInsn(Opcodes.DUP);
+			this.value.writeExpression(writer);
+			c.writeInvoke(writer);
+			
+			this.index = writer.registerLocal();
+			writer.writeVarInsn(Opcodes.ASTORE, this.index);
+			return;
+		}
+		
+		this.value.writeExpression(writer);
+		this.index = writer.registerLocal();
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+	}
+	
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
+		if (this.refType != null)
+		{
+			writer.writeVarInsn(Opcodes.ALOAD, this.index);
+			
+			IClass c = this.refType.getTheClass();
+			IField f = c.getBody().getField(0);
+			f.writeGet(writer, null);
+			
+			if (c == Types.OBJECT_REF_CLASS)
+			{
+				c = this.type.getTheClass();
+				if (c != Types.OBJECT_CLASS)
+				{
+					writer.writeTypeInsn(Opcodes.CHECKCAST, c.getInternalName());
+				}
+			}
+			return;
+		}
+		
 		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
+		if (this.refType != null)
+		{
+			writer.writeVarInsn(Opcodes.ALOAD, this.index);
+			
+			if (value != null)
+			{
+				value.writeExpression(writer);
+			}
+			else
+			{
+				writer.writeInsn(Opcodes.SWAP);
+			}
+			
+			IField f = this.refType.getTheClass().getBody().getField(0);
+			f.writeSet(writer, null, null);
+			return;
+		}
+		
 		if (value != null)
 		{
 			value.writeExpression(writer);

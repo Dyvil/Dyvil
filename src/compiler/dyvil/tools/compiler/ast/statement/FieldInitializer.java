@@ -116,9 +116,7 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 	@Override
 	public void writeStatement(MethodWriter writer)
 	{
-		this.variable.value.writeExpression(writer);
-		this.variable.index = writer.registerLocal();
-		this.variable.writeSet(writer, null, null);
+		this.variable.writeInit(writer);
 	}
 	
 	@Override

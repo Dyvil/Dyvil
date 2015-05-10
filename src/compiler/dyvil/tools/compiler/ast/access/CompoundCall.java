@@ -208,7 +208,8 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		{
 			this.instance.checkTypes(markers, context);
 			
-			if (this.instance.valueTag() == APPLY_METHOD_CALL)
+			int valueTag = this.instance.valueTag();
+			if (valueTag == APPLY_METHOD_CALL)
 			{
 				ApplyMethodCall call = (ApplyMethodCall) this.instance;
 				IValue instance1 = call.instance;
@@ -224,6 +225,14 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 				{
 					Marker marker = markers.create(this.position, "method.compound.update");
 					marker.addInfo("Callee Type: " + type);
+				}
+			}
+			else if (valueTag == FIELD_ACCESS)
+			{
+				FieldAccess fa = (FieldAccess) this.instance;
+				if (fa.field != null)
+				{
+					fa.field.checkAssign(markers, this.instance.getPosition(), this.instance, this);
 				}
 			}
 		}

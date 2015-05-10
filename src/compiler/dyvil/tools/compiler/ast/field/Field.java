@@ -316,7 +316,10 @@ public class Field extends Member implements IField
 			instance.writeExpression(writer);
 		}
 		
-		value.writeExpression(writer);
+		if (value != null)
+		{
+			value.writeExpression(writer);
+		}
 		
 		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;

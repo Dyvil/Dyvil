@@ -15,18 +15,18 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class CaptureVariable implements IVariable
 {
-	public int		index;
-	public IField	variable;
-	private IType	type;
+	public int			index;
+	public IVariable	variable;
+	private IType		refType;
 	
 	public CaptureVariable()
 	{
 	}
 	
-	public CaptureVariable(IField variable)
+	public CaptureVariable(IVariable variable)
 	{
 		this.variable = variable;
-		this.type = variable.getType();
+		this.refType = variable.getType();
 	}
 	
 	@Override
@@ -51,13 +51,17 @@ public class CaptureVariable implements IVariable
 	public void setType(IType type)
 	{
 		this.variable.setType(type);
-		this.type = type;
 	}
 	
 	@Override
 	public IType getType()
 	{
-		return this.type;
+		return this.variable.getType();
+	}
+	
+	public IType getCaptureType()
+	{
+		return this.refType != null ? this.refType : this.variable.getType();
 	}
 	
 	@Override
@@ -171,8 +175,8 @@ public class CaptureVariable implements IVariable
 	@Override
 	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
 	{
-		markers.add(position, "variable.assign.capture", this.variable.getName().unqualified);
-		return newValue;
+		this.refType = this.variable.getCaptureType(true);
+		return this.variable.checkAssign(markers, position, instance, newValue);
 	}
 	
 	@Override
@@ -203,35 +207,36 @@ public class CaptureVariable implements IVariable
 	@Override
 	public String getDescription()
 	{
-		return this.type.getExtendedName();
+		return this.refType.getExtendedName();
 	}
 	
 	@Override
 	public String getSignature()
 	{
-		return this.type.getSignature();
+		return this.refType.getSignature();
 	}
 	
 	@Override
 	public void write(ClassWriter writer)
 	{
-		
 	}
 	
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance)
 	{
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
+		int index = this.variable.getIndex();
+		this.variable.setIndex(this.index);
+		this.variable.writeGet(writer, instance);
+		this.variable.setIndex(index);
 	}
 	
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value)
 	{
-		if (value != null)
-		{
-			value.writeExpression(writer);
-		}
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		int index = this.variable.getIndex();
+		this.variable.setIndex(this.index);
+		this.variable.writeSet(writer, instance, value);
+		this.variable.setIndex(index);
 	}
 	
 	@Override

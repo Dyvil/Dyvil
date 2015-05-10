@@ -518,10 +518,10 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			writer.resetLocals(locals);
 			writer.writeLabel(endLabel);
 			
-			writer.writeLocal(var.index, var.name.qualified, var.type, scopeLabel, endLabel);
-			writer.writeLocal(indexVar.index, "$index", "I", null, scopeLabel, endLabel);
-			writer.writeLocal(lengthVar.index, "$length", "I", null, scopeLabel, endLabel);
-			writer.writeLocal(arrayVar.index, "$array", arrayVar.type, scopeLabel, endLabel);
+			var.writeLocal(writer, scopeLabel, endLabel);
+			indexVar.writeLocal(writer, scopeLabel, endLabel);
+			lengthVar.writeLocal(writer, scopeLabel, endLabel);
+			arrayVar.writeLocal(writer, scopeLabel, endLabel);
 			return;
 		}
 		case ITERATOR:
@@ -576,8 +576,8 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			writer.resetLocals(locals);
 			writer.writeLabel(endLabel);
 			
-			writer.writeLocal(var.index, var.name.qualified, var.type, scopeLabel, endLabel);
-			writer.writeLocal(iteratorVar.index, "$iterator", "Ljava/util/Iterator;", null, scopeLabel, endLabel);
+			var.writeLocal(writer, scopeLabel, endLabel);
+			iteratorVar.writeLocal(writer, scopeLabel, endLabel);
 		}
 		}
 	}

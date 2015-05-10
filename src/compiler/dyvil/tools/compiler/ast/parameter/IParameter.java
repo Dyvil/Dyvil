@@ -7,9 +7,15 @@ import dyvil.tools.compiler.backend.MethodWriter;
 
 public interface IParameter extends IVariable
 {
-	public void setVarargs(boolean varargs);
+	public default void setVarargs(boolean varargs)
+	{
+		
+	}
 	
-	public boolean isVarargs();
+	public default boolean isVarargs()
+	{
+		return false;
+	}
 	
 	public default void setTheClass(IClass iclass)
 	{
