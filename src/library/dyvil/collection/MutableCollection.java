@@ -1,6 +1,5 @@
 package dyvil.collection;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -64,12 +63,6 @@ public interface MutableCollection<E> extends Collection<E>
 	
 	@Override
 	public MutableCollection<E> filtered(Predicate<? super E> condition);
-	
-	@Override
-	public MutableCollection<E> sorted();
-	
-	@Override
-	public MutableCollection<E> sorted(Comparator<? super E> comparator);
 	
 	// Mutating Operations
 	

@@ -97,6 +97,12 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	@Override
 	public MutableList<E> sorted(Comparator<? super E> comparator);
 	
+	@Override
+	public MutableList<E> distinct();
+	
+	@Override
+	public MutableList<E> distinct(Comparator<? super E> comparator);
+	
 	// Mutating Operations
 	
 	@Override
@@ -154,6 +160,12 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	
 	@Override
 	public void sort(Comparator<? super E> comparator);
+	
+	@Override
+	public void distinguish();
+	
+	@Override
+	public void distinguish(Comparator<? super E> comparator);
 	
 	// Search Operations
 	

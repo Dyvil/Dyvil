@@ -23,9 +23,9 @@ public class HashMap<K, V> implements MutableMap<K, V>
 {
 	private static final class HashEntry<K, V> implements Entry<K, V>
 	{
-		K		key;
-		V		value;
-		int		hash;
+		K			key;
+		V			value;
+		int			hash;
 		HashEntry	next;
 		
 		HashEntry(K key, V value, int hash)
@@ -125,8 +125,8 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	{
 		HashEntry<K, V>	next;		// next entry to return
 		HashEntry<K, V>	current;	// current entry
-		int			index;		// current slot
-								
+		int				index;		// current slot
+									
 		EntryIterator()
 		{
 			HashEntry<K, V>[] t = HashMap.this.entries;
@@ -173,7 +173,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	private int					size;
 	private float				loadFactor;
 	private int					threshold;
-	private HashEntry[]				entries;
+	private HashEntry[]			entries;
 	
 	public static <K, V> HashMap<K, V> apply()
 	{

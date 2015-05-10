@@ -159,6 +159,18 @@ public class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	public ImmutableList<E> distinct()
+	{
+		return this;
+	}
+	
+	@Override
+	public ImmutableList<E> distinct(Comparator<? super E> comparator)
+	{
+		return this;
+	}
+	
+	@Override
 	public Object[] toArray()
 	{
 		return ObjectArray.EMPTY;

@@ -7,6 +7,8 @@ import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
@@ -37,6 +39,16 @@ public interface Matrix<E> extends Iterable<E>
 	public default Spliterator<E> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.cells(), Spliterator.SIZED);
+	}
+	
+	public default Stream<E> stream()
+	{
+		return StreamSupport.stream(this.spliterator(), false);
+	}
+	
+	public default Stream<E> parallelStream()
+	{
+		return StreamSupport.stream(this.spliterator(), true);
 	}
 	
 	@Override

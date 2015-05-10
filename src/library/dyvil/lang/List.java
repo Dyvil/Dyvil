@@ -174,11 +174,33 @@ public interface List<E> extends Collection<E>
 	@Override
 	public List<E> filtered(Predicate<? super E> condition);
 	
-	@Override
+	/**
+	 * Returns a list that contains the same elements as this list,
+	 * but in a sorted order. The sorting order is given by the <i>natural
+	 * order</i> of the elements of this list, i.e. the order specified by
+	 * their {@link Comparable#compareTo(Object) compareTo} method. Thus, this
+	 * method will fail if the elements of this list do not implement
+	 * {@link Comparable} interface.
+	 * 
+	 * @return a sorted list of this list's elements
+	 */
 	public List<E> sorted();
 	
-	@Override
+	/**
+	 * Returns a list that contains the same elements as this list,
+	 * but in a sorted order. The sorting order is specified by the given
+	 * {@code comparator}.
+	 * 
+	 * @param comparator
+	 *            the comparator that defines the order of the elements
+	 * @return a sorted list of this list's elements using the given
+	 *         comparator
+	 */
 	public List<E> sorted(Comparator<? super E> comparator);
+	
+	public List<E> distinct();
+	
+	public List<E> distinct(Comparator<? super E> comparator);
 	
 	// Mutating Operations
 	
@@ -325,6 +347,10 @@ public interface List<E> extends Collection<E>
 	 *            the comparator that defines the order of the elements
 	 */
 	public void sort(Comparator<? super E> comparator);
+	
+	public void distinguish();
+	
+	public void distinguish(Comparator<? super E> comparator);
 	
 	// Search Operations
 	

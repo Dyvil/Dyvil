@@ -178,6 +178,18 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	public ImmutableList<E> distinct()
+	{
+		return ImmutableList.apply(this.element);
+	}
+	
+	@Override
+	public ImmutableList<E> distinct(Comparator<? super E> comparator)
+	{
+		return ImmutableList.apply(this.element);
+	}
+	
+	@Override
 	public Object[] toArray()
 	{
 		return new Object[] { this.element };

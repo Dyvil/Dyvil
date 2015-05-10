@@ -151,7 +151,7 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 		{
 			System.arraycopy(this.cells, this.rows * i, newCells, rows * i, columns);
 		}
-		return new ArrayMatrix(rows, columns, cells, true);
+		return new ArrayMatrix(rows, columns, this.cells, true);
 	}
 	
 	@Override
@@ -340,7 +340,7 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 		}
 		
 		int rows = this.rows;
-		int size = rows * columns - 1;
+		int size = rows * this.columns - 1;
 		// holds element to be replaced, eventually becomes next element to move
 		int prev;
 		// location of 't' to be moved
@@ -357,7 +357,7 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 			prev = i;
 			do
 			{
-				next = (i * rows) % size;
+				next = i * rows % size;
 				
 				this.swap(next, prev);
 				cycle.set(i);
@@ -366,7 +366,9 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 			while (i != cycleBegin);
 			
 			for (i = 1; i < size && cycle.get(i); i++)
+			{
 				;
+			}
 		}
 		
 		this.rows = this.columns;

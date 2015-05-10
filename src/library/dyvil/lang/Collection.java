@@ -1,7 +1,6 @@
 package dyvil.lang;
 
 import java.lang.reflect.Array;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -223,30 +222,6 @@ public interface Collection<E> extends Iterable<E>
 	 * @return a collection filtered by the filter condition predicate
 	 */
 	public Collection<E> filtered(Predicate<? super E> condition);
-	
-	/**
-	 * Returns a collection that contains the same elements as this collection,
-	 * but in a sorted order. The sorting order is given by the <i>natural
-	 * order</i> of the elements of this collection, i.e. the order specified by
-	 * their {@link Comparable#compareTo(Object) compareTo} method. Thus, this
-	 * method will fail if the elements in this collection do not implement
-	 * {@link Comparable} interface.
-	 * 
-	 * @return a sorted collection of this collection's elements
-	 */
-	public Collection<E> sorted();
-	
-	/**
-	 * Returns a collection that contains the same elements as this collection,
-	 * but in a sorted order. The sorting order is specified by the given
-	 * {@code comparator}.
-	 * 
-	 * @param comparator
-	 *            the comparator that defines the order of the elements
-	 * @return a sorted collection of this collection's elements using the given
-	 *         comparator
-	 */
-	public Collection<E> sorted(Comparator<? super E> comparator);
 	
 	// Mutating Operations
 	

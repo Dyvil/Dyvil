@@ -1,6 +1,5 @@
 package dyvil.collection;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -68,12 +67,6 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	
 	@Override
 	public ImmutableCollection<E> filtered(Predicate<? super E> condition);
-	
-	@Override
-	public ImmutableCollection<E> sorted();
-	
-	@Override
-	public ImmutableCollection<E> sorted(Comparator<? super E> comparator);
 	
 	// Mutating Operations
 	

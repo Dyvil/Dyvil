@@ -109,6 +109,12 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	@Override
 	public ImmutableList<E> sorted(Comparator<? super E> comparator);
 	
+	@Override
+	public ImmutableList<E> distinct();
+	
+	@Override
+	public ImmutableList<E> distinct(Comparator<? super E> comparator);
+	
 	// Mutating Operations
 	
 	@Override
@@ -248,6 +254,20 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public default void sort(Comparator<? super E> comparator)
 	{
 		throw new ImmutableException("sort() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void distinguish()
+	{
+		throw new ImmutableException("distinguish() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void distinguish(Comparator<? super E> comparator)
+	{
+		throw new ImmutableException("disinguish() on Immutable List");
 	}
 	
 	// Searching
