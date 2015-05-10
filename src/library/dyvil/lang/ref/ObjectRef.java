@@ -1,34 +1,34 @@
 package dyvil.lang.ref;
 
-public class ObjectRef
+public class ObjectRef<T> implements ObjectRef$<T>
 {
-	protected Object	value;
+	public T	value;
 	
-	protected ObjectRef(Object value)
+	public static <T> ObjectRef<T> apply(T value)
+	{
+		return new ObjectRef(value);
+	}
+	
+	public ObjectRef(T value)
 	{
 		this.value = value;
 	}
 	
-	public static ObjectRef get(Object value)
+	@Override
+	public T apply()
 	{
-		return new ObjectRef(value);
+		return this.value;
+	}
+	
+	@Override
+	public void update(T value)
+	{
+		this.value = value;
 	}
 	
 	@Override
 	public String toString()
 	{
 		return this.value == null ? "null" : this.value.toString();
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this.value == obj || obj != null && obj.equals(this.value);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return this.value == null ? 0 : this.value.hashCode();
 	}
 }
