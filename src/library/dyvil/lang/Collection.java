@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import dyvil.collection.ImmutableCollection;
 import dyvil.collection.ImmutableList;
@@ -118,6 +120,16 @@ public interface Collection<E> extends Iterable<E>
 	public default Spliterator<E> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
+	}
+	
+	public default Stream<E> stream()
+	{
+		return StreamSupport.stream(this.spliterator(), false);
+	}
+	
+	public default Stream<E> parallelStream()
+	{
+		return StreamSupport.stream(this.spliterator(), true);
 	}
 	
 	@Override

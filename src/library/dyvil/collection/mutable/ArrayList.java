@@ -347,6 +347,16 @@ public class ArrayList<E> implements MutableList<E>
 		
 		Arrays.sort(array, comparator);
 		
+		return distinctSorted(array, size);
+	}
+	
+	public static @sealed int distinctSorted(Object[] array, int size)
+	{
+		if (size < 2)
+		{
+			return size;
+		}
+		
 		int len = 0;
 		int i = 1;
 		
@@ -364,7 +374,7 @@ public class ArrayList<E> implements MutableList<E>
 		
 		return len + 1;
 	}
-
+	
 	@Override
 	public MutableList<E> distinct()
 	{

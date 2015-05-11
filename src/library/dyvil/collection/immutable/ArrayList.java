@@ -17,10 +17,10 @@ import dyvil.lang.literal.ArrayConvertible;
 @ArrayConvertible
 public class ArrayList<E> implements ImmutableList<E>
 {
-	private final E[]	elements;
-	private final int	size;
+	protected final E[]	elements;
+	protected final int	size;
 	
-	public static <E> ArrayList<E> apply(E[] elements)
+	public static <E> ArrayList<E> apply(E... elements)
 	{
 		return new ArrayList(elements, true);
 	}
@@ -284,7 +284,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		Arrays.sort(array, 0, this.size);
-		return new ArrayList(array, this.size, true);
+		return new SortedArrayList(array, this.size, true);
 	}
 	
 	@Override
@@ -293,7 +293,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		Arrays.sort((E[]) array, 0, this.size, comparator);
-		return new ArrayList(array, this.size, true);
+		return new SortedArrayList(array, this.size, true);
 	}
 	
 	@Override
@@ -311,7 +311,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		int size = dyvil.collection.mutable.ArrayList.distinct((E[]) array, this.size, comparator);
-		return new ArrayList(array, size, true);
+		return new SortedArrayList(array, size, true);
 	}
 	
 	@Override
@@ -392,7 +392,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> copy()
 	{
-		return new ArrayList(this.elements, this.size);
+		return new ArrayList(this.elements, this.size, true);
 	}
 	
 	@Override
