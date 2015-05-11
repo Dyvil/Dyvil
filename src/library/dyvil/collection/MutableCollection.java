@@ -33,9 +33,6 @@ public interface MutableCollection<E> extends Collection<E>
 	public Iterator<E> iterator();
 	
 	@Override
-	public void forEach(Consumer<? super E> action);
-	
-	@Override
 	public boolean $qmark(Object element);
 	
 	// Non-mutating Operations

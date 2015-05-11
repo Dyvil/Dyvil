@@ -463,7 +463,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		HashMap<K, V> map = new HashMap(this.size);
 		for (int i = 0; i < this.size; i++)
 		{
-			map.put(this.keys[i], this.values[i]);
+			map.update(this.keys[i], this.values[i]);
 		}
 		return map;
 	}

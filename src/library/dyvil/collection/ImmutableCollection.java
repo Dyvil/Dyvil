@@ -3,7 +3,6 @@ package dyvil.collection;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -35,9 +34,6 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.IMMUTABLE);
 	}
-	
-	@Override
-	public void forEach(Consumer<? super E> action);
 	
 	@Override
 	public boolean $qmark(Object element);

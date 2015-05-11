@@ -63,9 +63,6 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	}
 	
 	@Override
-	public void forEach(Consumer<? super E> action);
-	
-	@Override
 	public boolean $qmark(Object element);
 	
 	@Override

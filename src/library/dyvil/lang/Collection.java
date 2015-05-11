@@ -133,7 +133,13 @@ public interface Collection<E> extends Iterable<E>
 	}
 	
 	@Override
-	public void forEach(Consumer<? super E> action);
+	public default void forEach(Consumer<? super E> action)
+	{
+		for (E element : this)
+		{
+			action.accept(element);
+		}
+	}
 	
 	/**
 	 * Returns true if and if only this collection contains the element
@@ -256,7 +262,10 @@ public interface Collection<E> extends Iterable<E>
 	 * @param element
 	 *            the element to be added
 	 */
-	public void $plus$eq(E element);
+	public default void $plus$eq(E element)
+	{
+		this.add(element);
+	}
 	
 	/**
 	 * Adds all elements of the given {@code collection} to this collection.
@@ -266,7 +275,13 @@ public interface Collection<E> extends Iterable<E>
 	 * @param collection
 	 *            the collection of elements to be added
 	 */
-	public void $plus$plus$eq(Collection<? extends E> collection);
+	public default void $plus$plus$eq(Collection<? extends E> collection)
+	{
+		for (E e : collection)
+		{
+			this.$plus$eq(e);
+		}
+	}
 	
 	/**
 	 * Removes the given {@code element} from this collection. If the element is
@@ -289,7 +304,10 @@ public interface Collection<E> extends Iterable<E>
 	 * @param element
 	 *            the element to be removed
 	 */
-	public void $minus$eq(E element);
+	public default void $minus$eq(E element)
+	{
+		this.remove(element);
+	}
 	
 	/**
 	 * Removes all elements of the given {@code collection} from this
@@ -299,7 +317,13 @@ public interface Collection<E> extends Iterable<E>
 	 * @param collection
 	 *            the collection of elements to be removed
 	 */
-	public void $minus$minus$eq(Collection<? extends E> collection);
+	public default void $minus$minus$eq(Collection<? extends E> collection)
+	{
+		for (E e : collection)
+		{
+			this.$minus$eq(e);
+		}
+	}
 	
 	/**
 	 * Removes all elements of this collection that are not present in the given

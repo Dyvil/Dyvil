@@ -4,13 +4,13 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
@@ -83,9 +83,6 @@ public interface List<E> extends Collection<E>
 	public int size();
 	
 	@Override
-	public boolean isEmpty();
-	
-	@Override
 	public Iterator<E> iterator();
 	
 	@Override
@@ -93,9 +90,6 @@ public interface List<E> extends Collection<E>
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
 	}
-	
-	@Override
-	public void forEach(Consumer<? super E> action);
 	
 	@Override
 	public boolean $qmark(Object element);
@@ -175,11 +169,11 @@ public interface List<E> extends Collection<E>
 	public List<E> filtered(Predicate<? super E> condition);
 	
 	/**
-	 * Returns a list that contains the same elements as this list,
-	 * but in a sorted order. The sorting order is given by the <i>natural
-	 * order</i> of the elements of this list, i.e. the order specified by
-	 * their {@link Comparable#compareTo(Object) compareTo} method. Thus, this
-	 * method will fail if the elements of this list do not implement
+	 * Returns a list that contains the same elements as this list, but in a
+	 * sorted order. The sorting order is given by the <i>natural order</i> of
+	 * the elements of this list, i.e. the order specified by their
+	 * {@link Comparable#compareTo(Object) compareTo} method. Thus, this method
+	 * will fail if the elements of this list do not implement
 	 * {@link Comparable} interface.
 	 * 
 	 * @return a sorted list of this list's elements
@@ -187,14 +181,13 @@ public interface List<E> extends Collection<E>
 	public List<E> sorted();
 	
 	/**
-	 * Returns a list that contains the same elements as this list,
-	 * but in a sorted order. The sorting order is specified by the given
+	 * Returns a list that contains the same elements as this list, but in a
+	 * sorted order. The sorting order is specified by the given
 	 * {@code comparator}.
 	 * 
 	 * @param comparator
 	 *            the comparator that defines the order of the elements
-	 * @return a sorted list of this list's elements using the given
-	 *         comparator
+	 * @return a sorted list of this list's elements using the given comparator
 	 */
 	public List<E> sorted(Comparator<? super E> comparator);
 	
@@ -290,7 +283,16 @@ public interface List<E> extends Collection<E>
 	public E add(int index, E element);
 	
 	@Override
-	public boolean remove(E element);
+	public default boolean remove(E element)
+	{
+		int index = this.indexOf(element);
+		if (index == -1)
+		{
+			return false;
+		}
+		this.removeAt(index);
+		return true;
+	}
 	
 	/**
 	 * Removes the element at the given {@code index} from this list. This
@@ -302,18 +304,6 @@ public interface List<E> extends Collection<E>
 	 *            the index of the element to remove from this list
 	 */
 	public void removeAt(int index);
-	
-	@Override
-	public void $plus$eq(E element);
-	
-	@Override
-	public void $plus$plus$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $minus$eq(E element);
-	
-	@Override
-	public void $minus$minus$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void $amp$eq(Collection<? extends E> collection);

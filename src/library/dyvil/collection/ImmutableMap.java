@@ -3,10 +3,8 @@ package dyvil.collection;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 
 import dyvil.annotation.mutating;
 import dyvil.collection.immutable.EmptyMap;
@@ -65,20 +63,26 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	@Override
 	public default Spliterator<Entry<K, V>> spliterator()
 	{
-		return Spliterators.spliterator(this.iterator(), this.size(), 0);
+		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.IMMUTABLE);
 	}
 	
 	@Override
 	public Iterator<K> keyIterator();
 	
 	@Override
+	public default Spliterator<K> keySpliterator()
+	{
+		return Spliterators.spliterator(this.keyIterator(), this.size(), Spliterator.IMMUTABLE);
+	}
+	
+	@Override
 	public Iterator<V> valueIterator();
 	
 	@Override
-	public void forEach(Consumer<? super Entry<K, V>> action);
-	
-	@Override
-	public void forEach(BiConsumer<? super K, ? super V> action);
+	public default Spliterator<V> valueSpliterator()
+	{
+		return Spliterators.spliterator(this.valueIterator(), this.size(), Spliterator.IMMUTABLE);
+	}
 	
 	@Override
 	public boolean $qmark(Object key);
@@ -156,7 +160,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	@mutating
 	public default V put(K key, V value)
 	{
-		throw new ImmutableException("+= on Immutable Map");
+		throw new ImmutableException("put() on Immutable Map");
 	}
 	
 	@Override

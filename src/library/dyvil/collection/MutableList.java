@@ -2,7 +2,6 @@ package dyvil.collection;
 
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -49,9 +48,6 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	
 	@Override
 	public Iterator<E> iterator();
-	
-	@Override
-	public void forEach(Consumer<? super E> action);
 	
 	@Override
 	public boolean $qmark(Object element);
@@ -123,22 +119,7 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	public void insert(int index, E element);
 	
 	@Override
-	public boolean remove(E element);
-	
-	@Override
 	public void removeAt(int index);
-	
-	@Override
-	public void $plus$eq(E element);
-	
-	@Override
-	public void $plus$plus$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $minus$eq(E element);
-	
-	@Override
-	public void $minus$minus$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void $amp$eq(Collection<? extends E> collection);

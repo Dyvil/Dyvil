@@ -7,6 +7,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
@@ -76,14 +78,66 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		return Spliterators.spliterator(this.iterator(), this.size(), 0);
 	}
 	
+	public default Stream<Entry<K, V>> stream()
+	{
+		return StreamSupport.stream(this.spliterator(), false);
+	}
+	
+	public default Stream<Entry<K, V>> parallelStream()
+	{
+		return StreamSupport.stream(this.spliterator(), true);
+	}
+	
 	public Iterator<K> keyIterator();
+	
+	public default Spliterator<K> keySpliterator()
+	{
+		return Spliterators.spliterator(this.keyIterator(), this.size(), 0);
+	}
+	
+	public default Stream<K> keyStream()
+	{
+		return StreamSupport.stream(this.keySpliterator(), false);
+	}
+	
+	public default Stream<K> parallelKeyStream()
+	{
+		return StreamSupport.stream(this.keySpliterator(), true);
+	}
 	
 	public Iterator<V> valueIterator();
 	
-	@Override
-	public void forEach(Consumer<? super Entry<K, V>> action);
+	public default Spliterator<V> valueSpliterator()
+	{
+		return Spliterators.spliterator(this.valueIterator(), this.size(), 0);
+	}
 	
-	public void forEach(BiConsumer<? super K, ? super V> action);
+	public default Stream<V> valueStream()
+	{
+		return StreamSupport.stream(this.valueSpliterator(), false);
+	}
+	
+	public default Stream<V> parallelValueStream()
+	{
+		return StreamSupport.stream(this.valueSpliterator(), true);
+	}
+	
+	@Override
+	public default void forEach(Consumer<? super Entry<K, V>> action)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			action.accept(entry);
+		}
+	}
+	
+	public default void forEach(BiConsumer<? super K, ? super V> action)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			action.accept(entry.getKey(), entry.getValue());
+		}
+	}
 	
 	/**
 	 * Returns true if and if only this map contains a mapping for the given
@@ -211,7 +265,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public void clear();
 	
-	public void update(K key, V value);
+	public default void update(K key, V value)
+	{
+		this.put(key, value);
+	}
 	
 	public V put(K key, V value);
 	
@@ -222,7 +279,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public void $plus$plus$eq(Map<? extends K, ? extends V> map);
 	
-	public void $minus$eq(K key);
+	public default void $minus$eq(K key)
+	{
+		this.remove(key);
+	}
 	
 	public V remove(K key);
 	
@@ -235,7 +295,13 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public void $minus$colon$eq(V value);
 	
-	public void $minus$minus$eq(Map<? extends K, ? extends V> map);
+	public default void $minus$minus$eq(Map<? extends K, ? extends V> map)
+	{
+		for (Entry<? extends K, ? extends V> entry : map)
+		{
+			this.remove(entry.getKey());
+		}
+	}
 	
 	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);
 	
