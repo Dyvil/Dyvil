@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -44,14 +45,36 @@ public class StringBuilderExpression implements IValue
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		if (type.isSuperTypeOf(Types.STRING))
+		{
+			return this;
+		}
+		if (type.getTheClass().getAnnotation(StringValue.STRING_CONVERTIBLE) != null)
+		{
+			return new LiteralExpression(type, this);
+		}
+		return null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
-		return false;
+		return type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(StringValue.STRING_CONVERTIBLE) != null;
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
+		if (type == Types.STRING)
+		{
+			return 3;
+		}
+		if (type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(StringValue.STRING_CONVERTIBLE) != null)
+		{
+			return 2;
+		}
 		return 0;
 	}
 	
@@ -97,7 +120,7 @@ public class StringBuilderExpression implements IValue
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i].foldConstants();
+			this.values[i] = this.values[i].foldConstants();
 		}
 		
 		return this;
