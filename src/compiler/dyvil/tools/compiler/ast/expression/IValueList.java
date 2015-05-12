@@ -6,7 +6,10 @@ public interface IValueList extends Iterable<IValue>
 {
 	public int valueCount();
 	
-	public boolean isEmpty();
+	public default boolean isEmpty()
+	{
+		return this.valueCount() == 0;
+	}
 	
 	public void setValue(int index, IValue value);
 	

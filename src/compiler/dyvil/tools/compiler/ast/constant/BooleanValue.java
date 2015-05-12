@@ -98,6 +98,19 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int stringSize()
+	{
+		return this.value ? 4 : 5;
+	}
+	
+	@Override
+	public boolean toStringBuilder(StringBuilder builder)
+	{
+		builder.append(this.value);
+		return true;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 		if (this.value)

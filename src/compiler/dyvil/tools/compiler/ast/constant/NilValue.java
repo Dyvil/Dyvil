@@ -15,7 +15,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class NilValue implements IConstantValue
+public final class NilValue implements IValue
 {
 	public static final IClass	NIL_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("NilConvertible");
 	
@@ -86,6 +86,17 @@ public final class NilValue implements IConstantValue
 	}
 	
 	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		return this;
+	}
+	
+	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		if (this.requiredType == null)
@@ -110,6 +121,17 @@ public final class NilValue implements IConstantValue
 			GenericData data = match.getGenericData(null, null, EmptyArguments.INSTANCE);
 			this.requiredType = match.getType().getConcreteType(data);
 		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		return this;
 	}
 	
 	@Override

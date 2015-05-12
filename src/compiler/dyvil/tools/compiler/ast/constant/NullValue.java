@@ -80,6 +80,19 @@ public final class NullValue implements IConstantValue
 	}
 	
 	@Override
+	public int stringSize()
+	{
+		return 4;
+	}
+	
+	@Override
+	public boolean toStringBuilder(StringBuilder builder)
+	{
+		builder.append("null");
+		return true;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 		writer.writeInsn(Opcodes.ACONST_NULL);

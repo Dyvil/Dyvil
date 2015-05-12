@@ -29,12 +29,13 @@ public interface IValue extends IASTNode, ITyped
 	int	DOUBLE				= 10;
 	int	STRING				= 11;
 	int	FORMAT_STRING		= 12;
+	int	STRINGBUILDER		= 13;
 	
-	int	THIS				= 13;
-	int	SUPER				= 14;
+	int	THIS				= 16;
+	int	SUPER				= 17;
 	
-	int	STATEMENT_LIST		= 16;
-	int	ARRAY				= 17;
+	int	STATEMENT_LIST		= 24;
+	int	ARRAY				= 25;
 	
 	int	CLASS_ACCESS		= 32;
 	int	ENUM				= 33;
@@ -202,8 +203,15 @@ public interface IValue extends IASTNode, ITyped
 		writer.writeJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
-	@Override
-	public void toString(String prefix, StringBuilder buffer);
+	public default int stringSize()
+	{
+		return 20;
+	}
+	
+	public default boolean toStringBuilder(StringBuilder builder)
+	{
+		return false;
+	}
 	
 	public default Object toObject()
 	{
@@ -285,4 +293,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		return null;
 	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer);
 }

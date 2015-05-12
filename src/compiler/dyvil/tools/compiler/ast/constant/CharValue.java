@@ -111,6 +111,19 @@ public final class CharValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
+	public int stringSize()
+	{
+		return 1;
+	}
+	
+	@Override
+	public boolean toStringBuilder(StringBuilder builder)
+	{
+		builder.append(this.value);
+		return true;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter visitor)
 	{
 		visitor.writeLDC(this.value);

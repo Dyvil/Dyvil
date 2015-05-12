@@ -38,4 +38,10 @@ public interface IConstantValue extends IValue
 	{
 		return this;
 	}
+	
+	@Override
+	public int stringSize();
+	
+	@Override
+	public boolean toStringBuilder(StringBuilder builder);
 }

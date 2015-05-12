@@ -122,6 +122,19 @@ public class LongValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
+	public int stringSize()
+	{
+		return Long.toString(this.value).length();
+	}
+	
+	@Override
+	public boolean toStringBuilder(StringBuilder builder)
+	{
+		builder.append(this.value);
+		return true;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 		writer.writeLDC(this.value);

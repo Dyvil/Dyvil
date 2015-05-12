@@ -2,14 +2,13 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ThisValue extends ASTNode implements IConstantValue
+public final class ThisValue extends ASTNode implements IValue
 {
 	public IType	type;
 	
@@ -94,6 +93,28 @@ public final class ThisValue extends ASTNode implements IConstantValue
 		}
 		
 		this.type = context.getThisClass().getType();
+	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		return this;
 	}
 	
 	@Override

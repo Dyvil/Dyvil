@@ -88,6 +88,19 @@ public final class StringValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public int stringSize()
+	{
+		return this.value.length();
+	}
+	
+	@Override
+	public boolean toStringBuilder(StringBuilder builder)
+	{
+		builder.append(this.value);
+		return true;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer)
 	{
 		writer.writeLDC(this.value);

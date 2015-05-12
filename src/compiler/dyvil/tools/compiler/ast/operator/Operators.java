@@ -7,10 +7,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import dyvil.tools.compiler.ast.access.FieldAccess;
-import dyvil.tools.compiler.ast.expression.CaseStatement;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.expression.MatchExpression;
+import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.Types;
 
@@ -75,6 +72,22 @@ public interface Operators
 	public static IValue get(IValue arg1, Name name, IValue arg2)
 	{
 		// Null check
+		if (name == plus)
+		{
+			if (arg1.valueTag() == IValue.STRINGBUILDER)
+			{
+				StringBuilderExpression sbe = (StringBuilderExpression) arg1;
+				sbe.addValue(arg2);
+				return sbe;
+			}
+			if (arg1.isType(Types.STRING) || arg2.isType(Types.STRING))
+			{
+				StringBuilderExpression sbe = new StringBuilderExpression();
+				sbe.addValue(arg1);
+				sbe.addValue(arg2);
+				return sbe;
+			}
+		}
 		if (name == eqeq || name == eqeqeq)
 		{
 			if (arg2.valueTag() == IValue.NULL)
