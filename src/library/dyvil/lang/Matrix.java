@@ -12,8 +12,12 @@ import java.util.stream.StreamSupport;
 
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
+@TupleConvertible
+@ArrayConvertible
 public interface Matrix<E> extends Iterable<E>
 {
 	// Accessors

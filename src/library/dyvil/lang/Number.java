@@ -251,6 +251,18 @@ public interface Number extends Ordered<Number>
 	
 	public Number $percent(Number v);
 	
+	@Override
+	public default Number next()
+	{
+		return this.$plus(1);
+	}
+	
+	@Override
+	public default Number previous()
+	{
+		return this.$minus(1);
+	}
+	
 	// String representations
 	
 	@Override
