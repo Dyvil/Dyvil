@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -7,7 +8,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class WildcardValue implements IValue
+public class WildcardValue implements IConstantValue
 {
 	public ICodePosition	position;
 	
@@ -56,14 +57,15 @@ public class WildcardValue implements IValue
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	public int stringSize()
 	{
+		return this.type.getDefaultValue().stringSize();
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	public boolean toStringBuilder(StringBuilder builder)
 	{
-		return this;
+		return this.type.getDefaultValue().toStringBuilder(builder);
 	}
 	
 	@Override
@@ -73,17 +75,6 @@ public class WildcardValue implements IValue
 		{
 			markers.add(this.position, "wildcard.type");
 		}
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public IValue foldConstants()
-	{
-		return this;
 	}
 	
 	@Override

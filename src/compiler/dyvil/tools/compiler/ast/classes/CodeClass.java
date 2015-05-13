@@ -634,7 +634,7 @@ public class CodeClass extends ASTNode implements IClass
 		if (this.superType != null)
 		{
 			IType type = this.superType.resolveType(typeVar);
-			if (type != null)
+			if (type != Types.ANY)
 			{
 				return type.getConcreteType(concrete);
 			}
@@ -642,12 +642,12 @@ public class CodeClass extends ASTNode implements IClass
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			IType type = this.interfaces[i].resolveType(typeVar);
-			if (type != null)
+			if (type != Types.ANY)
 			{
 				return type.getConcreteType(concrete);
 			}
 		}
-		return null;
+		return Types.ANY;
 	}
 	
 	@Override
@@ -1089,7 +1089,9 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.PACKAGE)
 		{
-			if (this.unit.getPackage() == iclass.getUnit().getPackage())
+			IDyvilHeader unit1 = this.unit;
+			IDyvilHeader unit2 = iclass.getUnit();
+			if (unit1 != null && unit2 != null && unit1.getPackage() == unit2.getPackage())
 			{
 				return VISIBLE;
 			}
