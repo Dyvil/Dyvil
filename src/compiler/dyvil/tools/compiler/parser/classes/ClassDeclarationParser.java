@@ -156,6 +156,26 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 			}
 			if (ParserUtil.isTerminator(type))
 			{
+				if (token.isInferred())
+				{
+					int nextType = token.next().type();
+					switch (nextType)
+					{
+					case Keywords.EXTENDS:
+						this.mode = EXTENDS;
+						return;
+					case Keywords.IMPLEMENTS:
+						this.mode = IMPLEMENTS;
+						return;
+					case Symbols.OPEN_SQUARE_BRACKET:
+						this.mode = GENERICS;
+						return;
+					case Symbols.OPEN_PARENTHESIS:
+						this.mode = PARAMETERS;
+						return;
+					}
+				}
+				
 				pm.popParser();
 				this.theClass.expandPosition(token);
 				return;

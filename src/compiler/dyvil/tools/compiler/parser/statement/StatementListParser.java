@@ -140,13 +140,13 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 				pm.popParser(true);
 				return;
 			}
+			this.mode = EXPRESSION;
 			if (token.prev().type() == Symbols.CLOSE_CURLY_BRACKET)
 			{
-				this.mode = EXPRESSION;
 				pm.reparse();
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Expression List - ';' expected");
+			throw new SyntaxError(token, "Invalid Statement List - ';' expected");
 		}
 	}
 	

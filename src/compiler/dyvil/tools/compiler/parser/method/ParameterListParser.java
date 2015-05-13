@@ -64,6 +64,11 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 		int type = token.type();
 		if (this.mode == TYPE)
 		{
+			if (type == Symbols.SEMICOLON && token.isInferred())
+			{
+				return;
+			}
+			
 			int i = 0;
 			if ((i = ModifierTypes.PARAMETER.parse(type)) != -1)
 			{
@@ -129,7 +134,7 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 				return;
 			}
 			this.reset();
-			if (type == Symbols.COMMA)
+			if (type == Symbols.COMMA || type == Symbols.SEMICOLON)
 			{
 				return;
 			}
