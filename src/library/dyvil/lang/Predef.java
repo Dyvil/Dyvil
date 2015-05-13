@@ -1,6 +1,9 @@
 package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
+
+import java.util.Iterator;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
@@ -196,6 +199,24 @@ public final class Predef
 	public static @inline void println(Object[] v)
 	{
 		System.out.println(ObjectArray.deepToString(v));
+	}
+	
+	public static <T> void println(Iterable<T> iterable)
+	{
+		Iterator<T> iterator = iterable.iterator();
+		if (!iterator.hasNext())
+		{
+			return;
+		}
+		
+		System.out.print('[');
+		System.out.print(iterator.next());
+		while (iterator.hasNext())
+		{
+			System.out.print(", ");
+			System.out.print(iterator.next());
+		}
+		System.out.println(']');
 	}
 	
 	// Tuples

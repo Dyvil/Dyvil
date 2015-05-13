@@ -1,0 +1,6 @@
+package dyvil.annotation
+
+public annotation specialized([Class] values = COMMONS)
+{
+	public static [Class] COMMONS = [ class[int], class[long], class[float], class[double] ];
+}

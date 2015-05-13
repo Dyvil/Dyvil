@@ -2,6 +2,7 @@ package dyvil.collection.immutable;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 import dyvil.lang.Ordered;
 import dyvil.lang.Range;
@@ -37,7 +38,18 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	}
 	
 	@Override
-	public int size()
+	public int count()
+	{
+		int count = 0;
+		for (T current = this.first; current.$lt$eq(last); current = current.next())
+		{
+			count++;
+		}
+		return count;
+	}
+	
+	@Override
+	public int estimateCount()
 	{
 		return -1;
 	}
@@ -47,26 +59,50 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	{
 		return new Iterator<T>()
 		{
-			private T	current	= first;
+			private T	current	= SimpleRange.this.first;
 			
 			@Override
 			public T next()
 			{
-				if (current.$gt(last))
+				if (this.current.$gt(SimpleRange.this.last))
 				{
 					throw new NoSuchElementException("End of Range");
 				}
 				
-				T c = current;
-				current = current.next();
+				T c = this.current;
+				this.current = this.current.next();
 				return c;
 			}
 			
 			@Override
 			public boolean hasNext()
 			{
-				return current.$lt$eq(last);
+				return this.current.$lt$eq(SimpleRange.this.last);
 			}
 		};
+	}
+	
+	@Override
+	public void forEach(Consumer<? super T> action)
+	{
+		for (T current = this.first; current.$lt$eq(last); current = current.next())
+		{
+			action.accept(current);
+		}
+	}
+	
+	@Override
+	public void toArray(int index, Object[] store)
+	{
+		for (T current = this.first; current.$lt$eq(last); current = current.next())
+		{
+			store[index++] = current;
+		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "(" + this.first + ", " + this.last + ")";
 	}
 }

@@ -1,6 +1,7 @@
 package dyvil.collection.immutable;
 
 import java.util.Iterator;
+import java.util.function.Consumer;
 
 import dyvil.collection.ArrayIterator;
 import dyvil.lang.Ordered;
@@ -11,7 +12,7 @@ import dyvil.lang.literal.TupleConvertible;
 public class ArrayRange<T extends Ordered<T>> implements Range<T>
 {
 	protected final Ordered[]	array;
-	protected final int			size;
+	protected final int			count;
 	
 	public static <T extends Ordered<T>> ArrayRange<T> apply(T first, T last)
 	{
@@ -24,7 +25,7 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 		if (size >= 0)
 		{
 			this.array = new Ordered[size];
-			this.size = size;
+			this.count = size;
 			
 			int index = 0;
 			for (T current = first; current.$lt$eq(last); current = current.next())
@@ -51,7 +52,7 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 		}
 		
 		this.array = array;
-		this.size = size;
+		this.count = size;
 	}
 	
 	@Override
@@ -63,18 +64,45 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 	@Override
 	public T last()
 	{
-		return (T) this.array[this.size - 1];
+		return (T) this.array[this.count - 1];
 	}
 	
 	@Override
-	public int size()
+	public int count()
 	{
-		return this.size;
+		return this.count;
+	}
+	
+	@Override
+	public int estimateCount()
+	{
+		return this.count;
 	}
 	
 	@Override
 	public Iterator<T> iterator()
 	{
-		return new ArrayIterator<T>((T[]) this.array, this.size);
+		return new ArrayIterator<T>((T[]) this.array, this.count);
+	}
+	
+	@Override
+	public void forEach(Consumer<? super T> action)
+	{
+		for (int i = 0; i < this.count; i++)
+		{
+			action.accept((T) this.array[i]);
+		}
+	}
+	
+	@Override
+	public void toArray(int index, Object[] store)
+	{
+		System.arraycopy(this.array, 0, store, index, this.count);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "(" + this.array[0] + ", " + this.array[this.count - 1] + ")";
 	}
 }
