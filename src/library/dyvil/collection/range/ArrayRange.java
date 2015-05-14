@@ -1,4 +1,4 @@
-package dyvil.collection.immutable;
+package dyvil.collection.range;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -92,6 +92,19 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 		{
 			action.accept((T) this.array[i]);
 		}
+	}
+	
+	@Override
+	public boolean $qmark(Object o)
+	{
+		for (int i = 0; i < this.count; i++)
+		{
+			if (this.array[i].$eq$eq((T) o))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override

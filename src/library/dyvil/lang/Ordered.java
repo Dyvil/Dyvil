@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public interface Ordered<T> extends Comparable<T>
+public interface Ordered<T extends Ordered<T>> extends Comparable<T>
 {
 	public boolean $eq$eq(T t);
 	

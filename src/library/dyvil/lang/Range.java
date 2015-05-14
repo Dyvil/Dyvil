@@ -6,15 +6,21 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 
-import dyvil.collection.immutable.SimpleRange;
+import dyvil.collection.range.SimpleRange;
+import dyvil.collection.range.StringRange;
 import dyvil.lang.literal.TupleConvertible;
 
 @TupleConvertible
-public interface Range<T extends Ordered<T>> extends Iterable<T>
+public interface Range<T> extends Iterable<T>
 {
 	public static <T extends Ordered<T>> Range<T> apply(T first, T last)
 	{
 		return new SimpleRange(first, last);
+	}
+	
+	public static Range<String> apply(String first, String last)
+	{
+		return new StringRange(first, last);
 	}
 	
 	public T first();
@@ -45,6 +51,8 @@ public interface Range<T extends Ordered<T>> extends Iterable<T>
 	
 	@Override
 	public void forEach(Consumer<? super T> action);
+	
+	public boolean $qmark(Object o);
 	
 	public default Object[] toArray()
 	{

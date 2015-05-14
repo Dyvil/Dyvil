@@ -1,4 +1,4 @@
-package dyvil.collection.immutable;
+package dyvil.collection.range;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -98,6 +98,18 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 		{
 			store[index++] = current;
 		}
+	}
+	
+	@Override
+	public boolean $qmark(Object o)
+	{
+		for (Ordered<T> current = this.first; current.$lt$eq(last); current = current.next())
+		{
+			if (current.$eq$eq((T) o)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
