@@ -56,7 +56,10 @@ public final class IntPattern extends ASTNode implements IPattern
 	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
-		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
+		}
 		writer.writeLDC(this.value);
 		writer.writeJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
 	}
@@ -64,7 +67,10 @@ public final class IntPattern extends ASTNode implements IPattern
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
-		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
+		}
 		writer.writeLDC(this.value);
 		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 	}

@@ -17,11 +17,13 @@ import dyvil.tools.compiler.config.CompilerConfig;
 
 public class ClassWriter extends org.objectweb.asm.ClassWriter
 {
-	private Map<String, String>	commonTypes	= new HashMap();
+	private Map<String, String>		commonTypes		= new HashMap();
+	
+	private static final boolean	COMPUTE_FRAMES	= true;
 	
 	public ClassWriter()
 	{
-		super(DyvilCompiler.asmVersion | org.objectweb.asm.ClassWriter.COMPUTE_FRAMES);
+		super(DyvilCompiler.asmVersion | (COMPUTE_FRAMES ? org.objectweb.asm.ClassWriter.COMPUTE_FRAMES : 0));
 	}
 	
 	public ClassWriter(int api)

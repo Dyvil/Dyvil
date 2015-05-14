@@ -50,7 +50,10 @@ public final class FloatPattern extends ASTNode implements IPattern
 	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
-		writer.writeVarInsn(Opcodes.FLOAD, varIndex);
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(Opcodes.FLOAD, varIndex);
+		}
 		writer.writeLDC(this.value);
 		writer.writeJumpInsn(Opcodes.IF_FCMPEQ, elseLabel);
 	}
@@ -58,7 +61,10 @@ public final class FloatPattern extends ASTNode implements IPattern
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
 	{
-		writer.writeVarInsn(Opcodes.FLOAD, varIndex);
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(Opcodes.FLOAD, varIndex);
+		}
 		writer.writeLDC(this.value);
 		writer.writeJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
 	}
