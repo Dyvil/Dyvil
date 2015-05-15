@@ -245,8 +245,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			this.variable.value = value.resolve(markers, context);
 			
 			IType valueType = value.getType();
-			int arrayDims = valueType.getArrayDimensions();
-			if (arrayDims != 0)
+			if (valueType.isArrayType())
 			{
 				this.type = ARRAY;
 				if (varType == Types.UNKNOWN)
@@ -257,7 +256,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 						markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.name.unqualified);
 					}
 				}
-				else if (!valueType.classEquals(varType) || varType.getArrayDimensions() != arrayDims - 1)
+				else if (!varType.classEquals(valueType.getElementType()))
 				{
 					Marker marker = markers.create(value.getPosition(), "for.array.type");
 					marker.addInfo("Array Type: " + valueType);
@@ -475,19 +474,14 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			
 			// Local Variables
 			int locals = writer.localCount();
-			var.index = locals + 1;
-			indexVar.index = locals + 2;
-			lengthVar.index = locals + 3;
-			arrayVar.index = locals + 4;
-			
 			writer.writeInsn(Opcodes.DUP);
-			arrayVar.writeSet(writer, null, null);
+			arrayVar.writeInit(writer, null);
 			// Load the length
 			writer.writeInsn(Opcodes.ARRAYLENGTH);
-			lengthVar.writeSet(writer, null, null);
+			lengthVar.writeInit(writer, null);
 			// Set index to 0
 			writer.writeLDC(0);
-			indexVar.writeSet(writer, null, null);
+			indexVar.writeInit(writer, null);
 			
 			// Jump to boundary check
 			writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
@@ -496,8 +490,8 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			// Load the element
 			arrayVar.writeGet(writer, null);
 			indexVar.writeGet(writer, null);
-			writer.writeInsn(arrayVar.type.getArrayLoadOpcode());
-			var.writeSet(writer, null, null);
+			writer.writeInsn(var.type.getArrayLoadOpcode());
+			var.writeInit(writer, null);
 			
 			// Action
 			if (this.then != null)

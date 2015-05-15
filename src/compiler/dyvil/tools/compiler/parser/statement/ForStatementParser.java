@@ -81,7 +81,7 @@ public class ForStatementParser extends Parser implements IValued
 			if (type == Symbols.COLON)
 			{
 				this.mode = FOR_END;
-				this.forStatement.type = 3;
+				this.forStatement.type = -1;
 				pm.pushParser(new ExpressionParser(this));
 				return;
 			}

@@ -78,8 +78,8 @@ public final class TypeParser extends Parser implements ITyped
 			}
 			if (type == Keywords.VAR)
 			{
-				this.type = Types.UNKNOWN;
-				this.mode = ARRAY_END;
+				this.typed.setType(Types.UNKNOWN);
+				pm.popParser();
 				return;
 			}
 			if (ParserUtil.isIdentifier(type))

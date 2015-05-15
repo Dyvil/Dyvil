@@ -54,6 +54,8 @@ public class Frame
 			return ClassFormat.FLOAT;
 		case 'D':
 			return ClassFormat.DOUBLE;
+		case '[':
+			return desc.substring(index);
 		case 'L':
 			return desc.substring(index + 1, desc.length() - 1);
 		default:
@@ -82,6 +84,8 @@ public class Frame
 			return ClassFormat.FLOAT;
 		case 'D':
 			return ClassFormat.DOUBLE;
+		case '[':
+			return desc;
 		case 'L':
 			return desc.substring(1, desc.length() - 1);
 		default:
