@@ -53,21 +53,29 @@ public class PropertyParser extends Parser implements IValued
 		
 		if (this.mode == 0)
 		{
-			if (type == Tokens.LETTER_IDENTIFIER)
+			if (token.next().type() == Symbols.COLON)
 			{
-				Name name = token.nameValue();
-				if (name == get)
+				if (type == Tokens.LETTER_IDENTIFIER)
 				{
-					this.mode = GET;
-					return;
+					Name name = token.nameValue();
+					if (name == get)
+					{
+						this.mode = GET;
+						return;
+					}
+					if (name == set)
+					{
+						this.mode = SET;
+						return;
+					}
 				}
-				if (name == set)
-				{
-					this.mode = SET;
-					return;
-				}
+				throw new SyntaxError(token, "Invalid Property Declaration - 'get' or 'set' expected", false);
 			}
-			throw new SyntaxError(token, "Invalid Property Declaration - 'get' or 'set' expected", false);
+			
+			// No 'get:' or 'set:' tag -> Read-Only Property
+			this.mode = GET;
+			pm.pushParser(new ExpressionParser(this), true);
+			return;
 		}
 		if (this.mode > 0) // SET or GET
 		{

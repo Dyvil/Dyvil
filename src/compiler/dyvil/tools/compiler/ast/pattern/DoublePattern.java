@@ -51,7 +51,10 @@ public final class DoublePattern extends ASTNode implements IPattern
 	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.DLOAD, varIndex);
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(Opcodes.DLOAD, varIndex);
+		}
 		writer.writeLDC(this.value);
 		writer.writeJumpInsn(Opcodes.IF_DCMPEQ, elseLabel);
 	}
@@ -59,7 +62,10 @@ public final class DoublePattern extends ASTNode implements IPattern
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.DLOAD, varIndex);
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(Opcodes.DLOAD, varIndex);
+		}
 		writer.writeLDC(this.value);
 		writer.writeJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
 	}

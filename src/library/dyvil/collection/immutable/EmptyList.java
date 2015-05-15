@@ -10,14 +10,22 @@ import java.util.function.Predicate;
 
 import dyvil.array.ObjectArray;
 import dyvil.collection.EmptyIterator;
-import dyvil.collection.mutable.MutableList;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
 public class EmptyList<E> implements ImmutableList<E>
 {
 	static final EmptyList	emptyList	= new EmptyList();
 	
-	public EmptyList()
+	public static <E> EmptyList<E> apply()
+	{
+		return emptyList;
+	}
+	
+	private EmptyList()
 	{
 	}
 	
@@ -59,7 +67,7 @@ public class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public E apply(int index)
 	{
-		throw new IndexOutOfBoundsException("apply() on Empty List");
+		throw new IndexOutOfBoundsException("Empty List.apply()");
 	}
 	
 	@Override
@@ -69,11 +77,11 @@ public class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> slice(int startIndex, int length)
+	public ImmutableList<E> subList(int startIndex, int length)
 	{
 		if (startIndex > 0 || length > 0)
 		{
-			throw new IndexOutOfBoundsException("Slice out of range for Empty List");
+			throw new IndexOutOfBoundsException("Empty List Slice out of range");
 		}
 		return this;
 	}
@@ -151,21 +159,32 @@ public class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	public ImmutableList<E> distinct()
+	{
+		return this;
+	}
+	
+	@Override
+	public ImmutableList<E> distinct(Comparator<? super E> comparator)
+	{
+		return this;
+	}
+	
+	@Override
 	public Object[] toArray()
 	{
 		return ObjectArray.EMPTY;
 	}
 	
 	@Override
-	public Object[] toArray(Object[] store)
-	{
-		return store;
-	}
-	
-	@Override
 	public E[] toArray(Class<E> type)
 	{
 		return (E[]) ObjectArray.EMPTY;
+	}
+	
+	@Override
+	public void toArray(int index, Object[] store)
+	{
 	}
 	
 	@Override

@@ -1,21 +1,23 @@
 package dyvil.lang;
 
 import dyvil.annotation.prefix;
+import dyvil.lang.literal.TupleConvertible;
 
+@TupleConvertible
 public class Complex implements Number
 {
 	protected double	real;
 	protected double	imag;
 	
+	public static Complex apply(double r, double i)
+	{
+		return new Complex(r, i);
+	}
+	
 	protected Complex(double real, double imag)
 	{
 		this.real = real;
 		this.imag = imag;
-	}
-	
-	public static Complex create(double r, double i)
-	{
-		return new Complex(r, i);
 	}
 	
 	public double real()
@@ -79,19 +81,19 @@ public class Complex implements Number
 	@Override
 	public @prefix Complex $minus()
 	{
-		return create(-this.real, -this.imag);
+		return apply(-this.real, -this.imag);
 	}
 	
 	public @prefix Complex $tilde()
 	{
-		return create(-this.real, this.imag);
+		return apply(-this.real, this.imag);
 	}
 	
 	public Complex sqr()
 	{
 		double r = this.real;
 		double i = this.imag;
-		return create(r * r - i * i, 2D * r * i);
+		return apply(r * r - i * i, 2D * r * i);
 	}
 	
 	public Complex rec()
@@ -99,7 +101,7 @@ public class Complex implements Number
 		double r = this.real;
 		double i = this.imag;
 		double m = Math.sqrt(r * r + i * i);
-		return create(Math.sqrt((r + m) / 2), Math.copySign((-r + m) / 2, i));
+		return apply(Math.sqrt((r + m) / 2), Math.copySign((-r + m) / 2, i));
 	}
 	
 	// byte operators
@@ -143,31 +145,31 @@ public class Complex implements Number
 	@Override
 	public Complex $plus(byte v)
 	{
-		return create(this.real + v, this.imag);
+		return apply(this.real + v, this.imag);
 	}
 	
 	@Override
 	public Complex $minus(byte v)
 	{
-		return create(this.real - v, this.imag);
+		return apply(this.real - v, this.imag);
 	}
 	
 	@Override
 	public Complex $times(byte v)
 	{
-		return create(this.real * v, this.imag * v);
+		return apply(this.real * v, this.imag * v);
 	}
 	
 	@Override
 	public Complex $div(byte v)
 	{
-		return create(this.real / v, this.imag / v);
+		return apply(this.real / v, this.imag / v);
 	}
 	
 	@Override
 	public Complex $percent(byte v)
 	{
-		return create(this.real % v, this.imag % v);
+		return apply(this.real % v, this.imag % v);
 	}
 	
 	// short operators
@@ -211,31 +213,31 @@ public class Complex implements Number
 	@Override
 	public Complex $plus(short v)
 	{
-		return create(this.real + v, this.imag);
+		return apply(this.real + v, this.imag);
 	}
 	
 	@Override
 	public Complex $minus(short v)
 	{
-		return create(this.real - v, this.imag);
+		return apply(this.real - v, this.imag);
 	}
 	
 	@Override
 	public Complex $times(short v)
 	{
-		return create(this.real * v, this.imag * v);
+		return apply(this.real * v, this.imag * v);
 	}
 	
 	@Override
 	public Complex $div(short v)
 	{
-		return create(this.real / v, this.imag / v);
+		return apply(this.real / v, this.imag / v);
 	}
 	
 	@Override
 	public Complex $percent(short v)
 	{
-		return create(this.real % v, this.imag % v);
+		return apply(this.real % v, this.imag % v);
 	}
 	
 	// char operators
@@ -279,31 +281,31 @@ public class Complex implements Number
 	@Override
 	public Complex $plus(char v)
 	{
-		return create(this.real + v, this.imag);
+		return apply(this.real + v, this.imag);
 	}
 	
 	@Override
 	public Complex $minus(char v)
 	{
-		return create(this.real - v, this.imag);
+		return apply(this.real - v, this.imag);
 	}
 	
 	@Override
 	public Complex $times(char v)
 	{
-		return create(this.real * v, this.imag * v);
+		return apply(this.real * v, this.imag * v);
 	}
 	
 	@Override
 	public Complex $div(char v)
 	{
-		return create(this.real / v, this.imag / v);
+		return apply(this.real / v, this.imag / v);
 	}
 	
 	@Override
 	public Complex $percent(char v)
 	{
-		return create(this.real % v, this.imag % v);
+		return apply(this.real % v, this.imag % v);
 	}
 	
 	// int operators
@@ -347,31 +349,31 @@ public class Complex implements Number
 	@Override
 	public Complex $plus(int v)
 	{
-		return create(this.real + v, this.imag);
+		return apply(this.real + v, this.imag);
 	}
 	
 	@Override
 	public Complex $minus(int v)
 	{
-		return create(this.real - v, this.imag);
+		return apply(this.real - v, this.imag);
 	}
 	
 	@Override
 	public Complex $times(int v)
 	{
-		return create(this.real * v, this.imag * v);
+		return apply(this.real * v, this.imag * v);
 	}
 	
 	@Override
 	public Complex $div(int v)
 	{
-		return create(this.real / v, this.imag / v);
+		return apply(this.real / v, this.imag / v);
 	}
 	
 	@Override
 	public Complex $percent(int v)
 	{
-		return create(this.real % v, this.imag % v);
+		return apply(this.real % v, this.imag % v);
 	}
 	
 	// long operators
@@ -415,31 +417,31 @@ public class Complex implements Number
 	@Override
 	public Complex $plus(long v)
 	{
-		return create(this.real + v, this.imag);
+		return apply(this.real + v, this.imag);
 	}
 	
 	@Override
 	public Complex $minus(long v)
 	{
-		return create(this.real - v, this.imag);
+		return apply(this.real - v, this.imag);
 	}
 	
 	@Override
 	public Complex $times(long v)
 	{
-		return create(this.real * v, this.imag * v);
+		return apply(this.real * v, this.imag * v);
 	}
 	
 	@Override
 	public Complex $div(long v)
 	{
-		return create(this.real / v, this.imag / v);
+		return apply(this.real / v, this.imag / v);
 	}
 	
 	@Override
 	public Complex $percent(long v)
 	{
-		return create(this.real % v, this.imag % v);
+		return apply(this.real % v, this.imag % v);
 	}
 	
 	// float operators
@@ -483,31 +485,31 @@ public class Complex implements Number
 	@Override
 	public Complex $plus(float v)
 	{
-		return create(this.real + v, this.imag);
+		return apply(this.real + v, this.imag);
 	}
 	
 	@Override
 	public Complex $minus(float v)
 	{
-		return create(this.real - v, this.imag);
+		return apply(this.real - v, this.imag);
 	}
 	
 	@Override
 	public Complex $times(float v)
 	{
-		return create(this.real * v, this.imag * v);
+		return apply(this.real * v, this.imag * v);
 	}
 	
 	@Override
 	public Complex $div(float v)
 	{
-		return create(this.real / v, this.imag / v);
+		return apply(this.real / v, this.imag / v);
 	}
 	
 	@Override
 	public Complex $percent(float v)
 	{
-		return create(this.real % v, this.imag % v);
+		return apply(this.real % v, this.imag % v);
 	}
 	
 	// double operators
@@ -551,31 +553,31 @@ public class Complex implements Number
 	@Override
 	public Complex $plus(double v)
 	{
-		return create(this.real + v, this.imag);
+		return apply(this.real + v, this.imag);
 	}
 	
 	@Override
 	public Complex $minus(double v)
 	{
-		return create(this.real - v, this.imag);
+		return apply(this.real - v, this.imag);
 	}
 	
 	@Override
 	public Complex $times(double v)
 	{
-		return create(this.real * v, this.imag * v);
+		return apply(this.real * v, this.imag * v);
 	}
 	
 	@Override
 	public Complex $div(double v)
 	{
-		return create(this.real / v, this.imag / v);
+		return apply(this.real / v, this.imag / v);
 	}
 	
 	@Override
 	public Complex $percent(double v)
 	{
-		return create(this.real % v, this.imag % v);
+		return apply(this.real % v, this.imag % v);
 	}
 	
 	// Complex operators
@@ -612,23 +614,23 @@ public class Complex implements Number
 	
 	public Complex $plus(Complex v)
 	{
-		return create(this.real + v.real, this.imag + v.imag);
+		return apply(this.real + v.real, this.imag + v.imag);
 	}
 	
 	public Complex $minus(Complex v)
 	{
-		return create(this.real - v.real, this.imag - v.imag);
+		return apply(this.real - v.real, this.imag - v.imag);
 	}
 	
 	public Complex $times(Complex v)
 	{
-		return create(this.real * v.real - this.imag * v.imag, this.imag * v.real + this.real * v.imag);
+		return apply(this.real * v.real - this.imag * v.imag, this.imag * v.real + this.real * v.imag);
 	}
 	
 	public Complex $div(Complex v)
 	{
 		double d = 1D / (v.real * v.real + v.imag * v.imag);
-		return create((this.real * v.real + this.imag * v.imag) * d, (this.imag * v.real - this.real * v.imag) * d);
+		return apply((this.real * v.real + this.imag * v.imag) * d, (this.imag * v.real - this.real * v.imag) * d);
 	}
 	
 	// generic operators
@@ -672,31 +674,31 @@ public class Complex implements Number
 	@Override
 	public Complex $plus(Number v)
 	{
-		return create(this.real + v.doubleValue(), this.imag);
+		return apply(this.real + v.doubleValue(), this.imag);
 	}
 	
 	@Override
 	public Complex $minus(Number v)
 	{
-		return create(this.real - v.doubleValue(), this.imag);
+		return apply(this.real - v.doubleValue(), this.imag);
 	}
 	
 	@Override
 	public Complex $times(Number v)
 	{
-		return create(this.real * v.doubleValue(), this.imag * v.doubleValue());
+		return apply(this.real * v.doubleValue(), this.imag * v.doubleValue());
 	}
 	
 	@Override
 	public Complex $div(Number v)
 	{
-		return create(this.real / v.doubleValue(), this.imag / v.doubleValue());
+		return apply(this.real / v.doubleValue(), this.imag / v.doubleValue());
 	}
 	
 	@Override
 	public Complex $percent(Number v)
 	{
-		return create(this.real % v.doubleValue(), this.imag % v.doubleValue());
+		return apply(this.real % v.doubleValue(), this.imag % v.doubleValue());
 	}
 	
 	@Override

@@ -158,4 +158,9 @@ public final class EmptyArguments implements IArguments
 			buffer.append(Formatting.Method.emptyParameters);
 		}
 	}
+	
+	@Override
+	public void typesToString(StringBuilder buffer)
+	{
+	}
 }

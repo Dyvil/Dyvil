@@ -115,7 +115,7 @@ public final class ClassFormat
 	
 	public static IType extendedToType(String extended)
 	{
-		return readType(extended, 0, extended.length());
+		return readType(extended, 0, extended.length() - 1);
 	}
 	
 	public static IType readReturnType(String desc)
@@ -204,23 +204,23 @@ public final class ClassFormat
 		switch (desc.charAt(start))
 		{
 		case 'V':
-			return Types.VOID.getArrayType(array);
+			return ArrayType.getArrayType(Types.VOID, array);
 		case 'Z':
-			return Types.BOOLEAN.getArrayType(array);
+			return ArrayType.getArrayType(Types.BOOLEAN, array);
 		case 'B':
-			return Types.BYTE.getArrayType(array);
+			return ArrayType.getArrayType(Types.BYTE, array);
 		case 'S':
-			return Types.SHORT.getArrayType(array);
+			return ArrayType.getArrayType(Types.SHORT, array);
 		case 'C':
-			return Types.CHAR.getArrayType(array);
+			return ArrayType.getArrayType(Types.CHAR, array);
 		case 'I':
-			return Types.INT.getArrayType(array);
+			return ArrayType.getArrayType(Types.INT, array);
 		case 'J':
-			return Types.LONG.getArrayType(array);
+			return ArrayType.getArrayType(Types.LONG, array);
 		case 'F':
-			return Types.FLOAT.getArrayType(array);
+			return ArrayType.getArrayType(Types.FLOAT, array);
 		case 'D':
-			return Types.DOUBLE.getArrayType(array);
+			return ArrayType.getArrayType(Types.DOUBLE, array);
 		case 'T':
 		{
 			String s = desc.substring(start + 1, end);
@@ -266,37 +266,40 @@ public final class ClassFormat
 		switch (c)
 		{
 		case 'V':
-			typed.setType(Types.VOID.getArrayType(array));
+			typed.setType(ArrayType.getArrayType(Types.VOID, array));
 			return start + 1;
 		case 'Z':
-			typed.setType(Types.BOOLEAN.getArrayType(array));
+			typed.setType(ArrayType.getArrayType(Types.BOOLEAN, array));
 			return start + 1;
 		case 'B':
-			typed.setType(Types.BYTE.getArrayType(array));
+			typed.setType(ArrayType.getArrayType(Types.BYTE, array));
 			return start + 1;
 		case 'S':
-			typed.setType(Types.SHORT.getArrayType(array));
+			typed.setType(ArrayType.getArrayType(Types.SHORT, array));
 			return start + 1;
 		case 'C':
-			typed.setType(Types.CHAR.getArrayType(array));
+			typed.setType(ArrayType.getArrayType(Types.CHAR, array));
 			return start + 1;
 		case 'I':
-			typed.setType(Types.INT.getArrayType(array));
+			typed.setType(ArrayType.getArrayType(Types.INT, array));
 			return start + 1;
 		case 'J':
-			typed.setType(Types.LONG.getArrayType(array));
+			typed.setType(ArrayType.getArrayType(Types.LONG, array));
 			return start + 1;
 		case 'F':
-			typed.setType(Types.FLOAT.getArrayType(array));
+			typed.setType(ArrayType.getArrayType(Types.FLOAT, array));
 			return start + 1;
 		case 'D':
-			typed.setType(Types.DOUBLE.getArrayType(array));
+			typed.setType(ArrayType.getArrayType(Types.DOUBLE, array));
 			return start + 1;
 		case 'L':
 		{
 			int end1 = getMatchingSemicolon(desc, start, desc.length());
 			IType type = readReferenceType(desc, start + 1, end1);
-			type.setArrayDimensions(array);
+			if (array > 0)
+			{
+				type = ArrayType.getArrayType(type, array);
+			}
 			typed.setType(type);
 			return end1 + 1;
 		}
@@ -304,8 +307,10 @@ public final class ClassFormat
 		{
 			int end1 = desc.indexOf(';', start);
 			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
-			
-			type.setArrayDimensions(array);
+			if (array > 0)
+			{
+				type = ArrayType.getArrayType(type, array);
+			}
 			typed.setType(type);
 			return end1 + 1;
 		}
@@ -345,37 +350,40 @@ public final class ClassFormat
 		switch (c)
 		{
 		case 'V':
-			list.addType(Types.VOID.getArrayType(array));
+			list.addType(ArrayType.getArrayType(Types.VOID, array));
 			return start + 1;
 		case 'Z':
-			list.addType(Types.BOOLEAN.getArrayType(array));
+			list.addType(ArrayType.getArrayType(Types.BOOLEAN, array));
 			return start + 1;
 		case 'B':
-			list.addType(Types.BYTE.getArrayType(array));
+			list.addType(ArrayType.getArrayType(Types.BYTE, array));
 			return start + 1;
 		case 'C':
-			list.addType(Types.CHAR.getArrayType(array));
+			list.addType(ArrayType.getArrayType(Types.CHAR, array));
 			return start + 1;
 		case 'S':
-			list.addType(Types.SHORT.getArrayType(array));
+			list.addType(ArrayType.getArrayType(Types.SHORT, array));
 			return start + 1;
 		case 'I':
-			list.addType(Types.INT.getArrayType(array));
+			list.addType(ArrayType.getArrayType(Types.INT, array));
 			return start + 1;
 		case 'J':
-			list.addType(Types.LONG.getArrayType(array));
+			list.addType(ArrayType.getArrayType(Types.LONG, array));
 			return start + 1;
 		case 'F':
-			list.addType(Types.FLOAT.getArrayType(array));
+			list.addType(ArrayType.getArrayType(Types.FLOAT, array));
 			return start + 1;
 		case 'D':
-			list.addType(Types.DOUBLE.getArrayType(array));
+			list.addType(ArrayType.getArrayType(Types.DOUBLE, array));
 			return start + 1;
 		case 'L':
 		{
 			int end1 = getMatchingSemicolon(desc, start, desc.length());
 			IType type = readReferenceType(desc, start + 1, end1);
-			type.setArrayDimensions(array);
+			if (array > 0)
+			{
+				type = ArrayType.getArrayType(type, array);
+			}
 			list.addType(type);
 			return end1 + 1;
 		}
@@ -383,7 +391,10 @@ public final class ClassFormat
 		{
 			int end1 = desc.indexOf(';', start);
 			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
-			type.setArrayDimensions(array);
+			if (array > 0)
+			{
+				type = ArrayType.getArrayType(type, array);
+			}
 			list.addType(type);
 			return end1 + 1;
 		}

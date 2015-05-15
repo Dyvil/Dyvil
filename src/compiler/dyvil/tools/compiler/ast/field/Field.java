@@ -8,6 +8,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -20,6 +21,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 
 public class Field extends Member implements IField
@@ -108,6 +110,56 @@ public class Field extends Member implements IField
 	public ElementType getAnnotationType()
 	{
 		return ElementType.FIELD;
+	}
+	
+	@Override
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
+	{
+		if (instance != null)
+		{
+			if ((this.modifiers & Modifiers.STATIC) != 0)
+			{
+				if (instance.valueTag() != IValue.CLASS_ACCESS)
+				{
+					markers.add(position, "field.access.static", this.name.unqualified);
+					return null;
+				}
+			}
+			else if (instance.valueTag() == IValue.CLASS_ACCESS)
+			{
+				markers.add(position, "field.access.instance", this.name.unqualified);
+			}
+		}
+		else if ((this.modifiers & Modifiers.STATIC) == 0)
+		{
+			markers.add(position, "field.access.unqualified", this.name.unqualified);
+			return new ThisValue(position, this.theClass.getType());
+		}
+		
+		return instance;
+	}
+	
+	@Override
+	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	{
+		if ((this.modifiers & Modifiers.FINAL) != 0)
+		{
+			markers.add(position, "field.assign.final", this.name.unqualified);
+		}
+		
+		IValue value1 = newValue.withType(this.type);
+		if (value1 == null)
+		{
+			Marker marker = markers.create(newValue.getPosition(), "field.assign.type", this.name.unqualified);
+			marker.addInfo("Field Type: " + this.type);
+			marker.addInfo("Value Type: " + newValue.getType());
+		}
+		else
+		{
+			newValue = value1;
+		}
+		
+		return newValue;
 	}
 	
 	@Override
@@ -265,7 +317,10 @@ public class Field extends Member implements IField
 			instance.writeExpression(writer);
 		}
 		
-		value.writeExpression(writer);
+		if (value != null)
+		{
+			value.writeExpression(writer);
+		}
 		
 		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;

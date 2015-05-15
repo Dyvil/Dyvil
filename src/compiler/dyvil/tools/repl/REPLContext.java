@@ -266,12 +266,12 @@ public class REPLContext implements IValued, IDyvilHeader
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		IClass iclass = member.getTheClass();
 		if (iclass == this || iclass == null)
 		{
-			return member.getAccessibility();
+			return VISIBLE;
 		}
 		
 		int level = member.getAccessLevel();
@@ -286,7 +286,7 @@ public class REPLContext implements IValued, IDyvilHeader
 		}
 		if (level == Modifiers.PUBLIC)
 		{
-			return member.getAccessibility();
+			return VISIBLE;
 		}
 		
 		return INVISIBLE;

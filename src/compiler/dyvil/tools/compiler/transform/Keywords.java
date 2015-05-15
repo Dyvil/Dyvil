@@ -4,8 +4,8 @@ public interface Keywords
 {
 	int	ABSTRACT		= Tokens.KEYWORD | 0x00010000;
 	int	ANNOTATION		= Tokens.KEYWORD | 0x00020000;
-	int	BREAK			= Tokens.KEYWORD | 0x00030000;
-	int	BYTE			= Tokens.KEYWORD | 0x00040000;
+	int	AS				= Tokens.KEYWORD | 0x00030000;
+	int	BREAK			= Tokens.KEYWORD | 0x00040000;
 	int	CASE			= Tokens.KEYWORD | 0x00050000;
 	int	CATCH			= Tokens.KEYWORD | 0x00060000;
 	int	CLASS			= Tokens.KEYWORD | 0x00070000;
@@ -30,20 +30,21 @@ public interface Keywords
 	int	INLINE			= Tokens.KEYWORD | 0x001B0000;
 	int	INFIX			= Tokens.KEYWORD | 0x001C0000;
 	int	INTERFACE		= Tokens.KEYWORD | 0x001D0000;
-	int	LAZY			= Tokens.KEYWORD | 0x001E0000;
-	int	NEW				= Tokens.KEYWORD | 0x001F0000;
-	int	NIL				= Tokens.KEYWORD | 0x00200000;
-	int	NULL			= Tokens.KEYWORD | 0x00210000;
-	int	OBJECT			= Tokens.KEYWORD | 0x00220000;
-	int	OVERRIDE		= Tokens.KEYWORD | 0x00230000;
-	int	OPERATOR		= Tokens.KEYWORD | 0x00240000;
-	int	PACKAGE			= Tokens.KEYWORD | 0x00250000;
-	int	POSTFIX			= Tokens.KEYWORD | 0x00260000;
-	int	PRIVATE			= Tokens.KEYWORD | 0x00270000;
-	int	PROTECTED		= Tokens.KEYWORD | 0x00280000;
-	int	PUBLIC			= Tokens.KEYWORD | 0x00290000;
-	int	RETURN			= Tokens.KEYWORD | 0x002A0000;
-	int	SEALED			= Tokens.KEYWORD | 0x002B0000;
+	int	IS				= Tokens.KEYWORD | 0x001E0000;
+	int	LAZY			= Tokens.KEYWORD | 0x001F0000;
+	int	NEW				= Tokens.KEYWORD | 0x00200000;
+	int	NIL				= Tokens.KEYWORD | 0x00210000;
+	int	NULL			= Tokens.KEYWORD | 0x00220000;
+	int	OBJECT			= Tokens.KEYWORD | 0x00230000;
+	int	OVERRIDE		= Tokens.KEYWORD | 0x00240000;
+	int	OPERATOR		= Tokens.KEYWORD | 0x00250000;
+	int	PACKAGE			= Tokens.KEYWORD | 0x00260000;
+	int	POSTFIX			= Tokens.KEYWORD | 0x00270000;
+	int	PRIVATE			= Tokens.KEYWORD | 0x00280000;
+	int	PROTECTED		= Tokens.KEYWORD | 0x00290000;
+	int	PUBLIC			= Tokens.KEYWORD | 0x002A0000;
+	int	RETURN			= Tokens.KEYWORD | 0x002B0000;
+	int	SEALED			= Tokens.KEYWORD | 0x002C0000;
 	int	STATIC			= Tokens.KEYWORD | 0x002D0000;
 	int	SUPER			= Tokens.KEYWORD | 0x002E0000;
 	int	SYNCHRONIZED	= Tokens.KEYWORD | 0x002F0000;
@@ -52,9 +53,10 @@ public interface Keywords
 	int	THROWS			= Tokens.KEYWORD | 0x00320000;
 	int	TRUE			= Tokens.KEYWORD | 0x00330000;
 	int	TRY				= Tokens.KEYWORD | 0x00340000;
-	int	USING			= Tokens.KEYWORD | 0x00350000;
-	int	VAR				= Tokens.KEYWORD | 0x00360000;
-	int	WHILE			= Tokens.KEYWORD | 0x00370000;
+	int	TYPE			= Tokens.KEYWORD | 0x00350000;
+	int	USING			= Tokens.KEYWORD | 0x00360000;
+	int	VAR				= Tokens.KEYWORD | 0x00370000;
+	int	WHILE			= Tokens.KEYWORD | 0x00380000;
 	
 	public static int getKeywordType(String s)
 	{
@@ -64,10 +66,10 @@ public interface Keywords
 			return ABSTRACT;
 		case "annotation":
 			return ANNOTATION;
+		case "as":
+			return AS;
 		case "break":
 			return BREAK;
-		case "byte":
-			return BYTE;
 		case "case":
 			return CASE;
 		case "catch":
@@ -116,6 +118,8 @@ public interface Keywords
 			return INFIX;
 		case "interface":
 			return INTERFACE;
+		case "is":
+			return IS;
 		case "lazy":
 			return LAZY;
 		case "new":
@@ -160,6 +164,8 @@ public interface Keywords
 			return TRUE;
 		case "try":
 			return TRY;
+		case "type":
+			return TYPE;
 		case "using":
 			return USING;
 		case "var":
@@ -178,10 +184,10 @@ public interface Keywords
 			return "abstract";
 		case ANNOTATION:
 			return "annotation";
+		case AS:
+			return "as";
 		case BREAK:
 			return "break";
-		case BYTE:
-			return "byte";
 		case CASE:
 			return "case";
 		case CATCH:
@@ -230,6 +236,8 @@ public interface Keywords
 			return "infix";
 		case INTERFACE:
 			return "interface";
+		case IS:
+			return "is";
 		case LAZY:
 			return "lazy";
 		case NEW:
@@ -274,6 +282,8 @@ public interface Keywords
 			return "true";
 		case TRY:
 			return "try";
+		case TYPE:
+			return "type";
 		case USING:
 			return "using";
 		case VAR:

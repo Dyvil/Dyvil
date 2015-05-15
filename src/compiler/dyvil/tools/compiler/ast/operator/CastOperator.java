@@ -13,11 +13,19 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class CastOperator extends ASTNode implements IValue
 {
 	public IValue	value;
 	public IType	type;
+	public boolean	typeHint;
+	
+	public CastOperator(ICodePosition position, IValue value)
+	{
+		this.position = position;
+		this.value = value;
+	}
 	
 	public CastOperator(IValue value, IType type)
 	{
@@ -44,6 +52,18 @@ public final class CastOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+	
+	@Override
+	public IValue withType(IType type)
+	{
+		return type.isSuperTypeOf(this.type) ? this : null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		return type.isSuperTypeOf(this.type);
@@ -56,7 +76,7 @@ public final class CastOperator extends ASTNode implements IValue
 		{
 			return 3;
 		}
-		else if (type.isSuperTypeOf(this.type))
+		if (type.isSuperTypeOf(this.type))
 		{
 			return 2;
 		}
@@ -66,6 +86,7 @@ public final class CastOperator extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		this.type = this.type.resolve(markers, context);
 		this.value.resolveTypes(markers, context);
 	}
 	
@@ -73,19 +94,42 @@ public final class CastOperator extends ASTNode implements IValue
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.value = this.value.resolve(markers, context);
+		if (this.type == Types.VOID)
+		{
+			markers.add(this.position, "cast.void");
+			
+			this.value.checkTypes(markers, context);
+			return this;
+		}
+		
+		if (!this.type.isResolved())
+		{
+			return this;
+		}
+		
+		if (!this.typeHint && this.type.isSuperTypeOf(this.value.getType()))
+		{
+			markers.add(this.position, "cast.unnecessary");
+			this.typeHint = true;
+		}
+		
+		IValue value1 = this.value.withType(this.type);
+		if (value1 != null && value1 != this.value)
+		{
+			this.value = value1;
+			this.typeHint = true;
+			this.value.checkTypes(markers, context);
+			this.type = value1.getType();
+			return this;
+		}
+		
+		this.value.checkTypes(markers, context);
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IValue value1 = this.value.withType(this.type);
-		if (value1 != null)
-		{
-			this.value = value1;
-		}
-		
-		this.value.checkTypes(markers, context);
 	}
 	
 	@Override
@@ -93,9 +137,9 @@ public final class CastOperator extends ASTNode implements IValue
 	{
 		this.value.check(markers, context);
 		
-		if (this.type == Types.VOID)
+		if (this.typeHint)
 		{
-			markers.add(this.position, "cast.void");
+			return;
 		}
 		
 		boolean primitiveType = this.type.isPrimitive();
@@ -111,10 +155,6 @@ public final class CastOperator extends ASTNode implements IValue
 		{
 			markers.add(this.position, "cast.primitive");
 		}
-		else if (this.value.isType(this.type))
-		{
-			markers.add(this.position, "cast.unnecessary");
-		}
 	}
 	
 	@Override
@@ -127,6 +167,11 @@ public final class CastOperator extends ASTNode implements IValue
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.value.writeExpression(writer);
+		if (this.typeHint)
+		{
+			return;
+		}
+		
 		if (this.type.isPrimitive())
 		{
 			writePrimitiveCast(this.value.getType(), (PrimitiveType) this.type, writer);
@@ -148,7 +193,7 @@ public final class CastOperator extends ASTNode implements IValue
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.value.toString(prefix, buffer);
-		buffer.append(" :> ");
+		buffer.append(" as ");
 		this.type.toString(prefix, buffer);
 	}
 	

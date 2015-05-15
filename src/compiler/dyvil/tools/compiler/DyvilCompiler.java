@@ -10,6 +10,7 @@ import java.util.logging.Formatter;
 import org.objectweb.asm.Opcodes;
 
 import dyvil.io.AppendableOutputStream;
+import dyvil.io.FileUtils;
 import dyvil.io.LoggerOutputStream;
 import dyvil.tools.compiler.ast.dwt.DWTFile;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
@@ -22,6 +23,7 @@ import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.phase.ICompilerPhase;
+import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
 
 public final class DyvilCompiler
@@ -240,12 +242,16 @@ public final class DyvilCompiler
 			constantFolding = 1;
 			return;
 		case "jar":
+			phases.add(ICompilerPhase.CLEAN);
 			phases.add(ICompilerPhase.JAR);
 			return;
 		case "format":
 			phases.add(ICompilerPhase.TOKENIZE);
 			phases.add(ICompilerPhase.PARSE);
 			phases.add(ICompilerPhase.FORMAT);
+			return;
+		case "clean":
+			phases.add(ICompilerPhase.CLEAN);
 			return;
 		case "print":
 			phases.add(ICompilerPhase.PRINT);
@@ -326,6 +332,38 @@ public final class DyvilCompiler
 			pack.addCompilationUnit(header);
 			units.add(0, header);
 			return;
+		}
+	}
+	
+	public static void test()
+	{
+		String mainType = config.mainType;
+		if (mainType == null)
+		{
+			return;
+		}
+		
+		File file = new File(config.outputDir, config.mainType.replace('.', '/') + ".class");
+		if (!file.exists())
+		{
+			DyvilCompiler.logger.info("The Main Type '" + config.mainType + "' does not exist or was not compiled, skipping test.");
+			return;
+		}
+		
+		new TestThread().start();
+	}
+	
+	public static void clean()
+	{
+		File[] files = config.outputDir.listFiles();
+		if (files == null)
+		{
+			return;
+		}
+		
+		for (File s : files)
+		{
+			FileUtils.delete(s);
 		}
 	}
 }

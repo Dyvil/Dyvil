@@ -33,6 +33,7 @@ public class Package implements INamed, IContext
 	public static Package		dyvilFunction;
 	public static Package		dyvilTuple;
 	public static Package		dyvilLangLiteral;
+	public static Package		dyvilLangRef;
 	public static Package		java;
 	public static Package		javaLang;
 	public static Package		javaLangAnnotation;
@@ -75,6 +76,7 @@ public class Package implements INamed, IContext
 		dyvilFunction = dyvil.resolvePackage("function");
 		dyvilTuple = dyvil.resolvePackage("tuple");
 		dyvilLangLiteral = dyvilLang.resolvePackage("literal");
+		dyvilLangRef = dyvilLang.resolvePackage("ref");
 		java = Library.javaLibrary.resolvePackage("java");
 		javaLang = java.resolvePackage("lang");
 		javaLangAnnotation = javaLang.resolvePackage("annotation");
@@ -219,7 +221,7 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		return 0;
 	}

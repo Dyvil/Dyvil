@@ -46,21 +46,19 @@ public class BoxPattern implements IPattern
 	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
-		IType type = this.boxingMethod.getType();
-		writer.writeTypeInsn(Opcodes.CHECKCAST, type.getInternalName());
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, this.boxingMethod.getTheClass().getInternalName(), this.boxingMethod.getName().qualified,
+		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.boxingMethod.getTheClass().getInternalName(), this.boxingMethod.getName().qualified,
 				this.boxingMethod.getDescriptor(), false);
-		this.pattern.writeJump(writer, varIndex, elseLabel);
+		this.pattern.writeJump(writer, -1, elseLabel);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
-		IType type = this.boxingMethod.getType();
-		writer.writeTypeInsn(Opcodes.CHECKCAST, type.getInternalName());
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, this.boxingMethod.getTheClass().getInternalName(), this.boxingMethod.getName().qualified,
+		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.boxingMethod.getTheClass().getInternalName(), this.boxingMethod.getName().qualified,
 				this.boxingMethod.getDescriptor(), false);
-		this.pattern.writeInvJump(writer, varIndex, elseLabel);
+		this.pattern.writeInvJump(writer, -1, elseLabel);
 	}
 	
 	@Override

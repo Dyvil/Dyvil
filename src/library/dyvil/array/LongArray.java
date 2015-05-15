@@ -9,6 +9,7 @@ import java.util.function.LongUnaryOperator;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 
 public interface LongArray
 {
@@ -80,6 +81,21 @@ public interface LongArray
 	}
 	
 	// Operators
+	
+	public static @infix @inline boolean $qmark(long[] array, long v)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	public static @infix @inline boolean $eq$eq(long[] array1, long[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean $bang$eq(long[] array1, long[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
 	
 	public static @infix long[] $plus(long[] array, long v)
 	{
@@ -197,6 +213,71 @@ public interface LongArray
 		return res;
 	}
 	
+	// Search Operations
+	
+	public static @infix int indexOf(long[] array, long v)
+	{
+		return indexOf(array, v, 0);
+	}
+	
+	public static @infix int indexOf(long[] array, long v, int start)
+	{
+		for (; start < array.length; start++)
+		{
+			if (array[start] == v)
+			{
+				return start;
+			}
+		}
+		return -1;
+	}
+	
+	public static @infix int lastIndexOf(long[] array, long v)
+	{
+		return lastIndexOf(array, v, array.length - 1);
+	}
+	
+	public static @infix int lastIndexOf(long[] array, long v, int start)
+	{
+		for (; start >= 0; start--)
+		{
+			if (array[start] == v)
+			{
+				return start;
+			}
+		}
+		return -1;
+	}
+	
+	public static @infix @inline boolean contains(long[] array, long v)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	public static @infix @inline boolean in(long v, long[] array)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	// Copying
+	
+	public static @infix @inline long[] copy(long[] array)
+	{
+		return array.clone();
+	}
+	
+	// equals, hashCode and toString
+	
+	public static @infix @inline boolean equals(long[] array1, long[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline int hashCode(long[] array)
+	{
+		return Arrays.hashCode(array);
+	}
+	
 	public static @infix String toString(long[] array)
 	{
 		if (array == null)
@@ -242,46 +323,5 @@ public interface LongArray
 			builder.append(array[i]);
 		}
 		builder.append(']');
-	}
-	
-	// Search Operations
-	
-	public static @infix int indexOf(long[] array, long v)
-	{
-		return indexOf(array, v, 0);
-	}
-	
-	public static @infix int indexOf(long[] array, long v, int start)
-	{
-		for (; start < array.length; start++)
-		{
-			if (array[start] == v)
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix int lastIndexOf(long[] array, long v)
-	{
-		return lastIndexOf(array, v, array.length - 1);
-	}
-	
-	public static @infix int lastIndexOf(long[] array, long v, int start)
-	{
-		for (; start >= 0; start--)
-		{
-			if (array[start] == v)
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix boolean contains(long[] array, long v)
-	{
-		return indexOf(array, v, 0) != -1;
 	}
 }

@@ -7,15 +7,23 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import dyvil.collection.EmptyIterator;
-import dyvil.collection.mutable.MutableMap;
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
+import dyvil.lang.Entry;
 import dyvil.lang.Map;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
 public class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
 	static final EmptyMap	emptyMap	= new EmptyMap();
 	
-	public EmptyMap()
+	public static <K, V> EmptyMap<K, V> apply()
+	{
+		return emptyMap;
+	}
+	
+	private EmptyMap()
 	{
 	}
 	
@@ -32,7 +40,7 @@ public class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public Iterator<Tuple2<K, V>> iterator()
+	public Iterator<Entry<K, V>> iterator()
 	{
 		return EmptyIterator.apply();
 	}
@@ -50,13 +58,7 @@ public class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public Iterator<Entry<K, V>> entryIterator()
-	{
-		return EmptyIterator.apply();
-	}
-	
-	@Override
-	public void forEach(Consumer<? super Tuple2<K, V>> action)
+	public void forEach(Consumer<? super Entry<K, V>> action)
 	{
 	}
 	

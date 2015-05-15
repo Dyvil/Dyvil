@@ -384,9 +384,9 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.context.getAccessibility(member);
+		return this.context.getVisibility(member);
 	}
 	
 	@Override
@@ -507,8 +507,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		
 		for (Entry<Name, Variable> entry : this.variables.entrySet())
 		{
-			Variable var = entry.getValue();
-			writer.writeLocal(var.index, var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end);
+			entry.getValue().writeLocal(writer, start, end);
 		}
 	}
 	
@@ -533,7 +532,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 				if (prev != null)
 				{
 					ICodePosition pos = value.getPosition();
-					if (pos != null && pos.endLine() - prev.getPosition().startLine() > 1)
+					if (pos != null && pos.startLine() - prev.getPosition().endLine() > 1)
 					{
 						buffer.append('\n').append(prefix1);
 					}

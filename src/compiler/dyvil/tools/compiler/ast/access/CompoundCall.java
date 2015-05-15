@@ -9,8 +9,6 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -26,9 +24,8 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
-public final class CompoundCall extends ASTNode implements ICall, INamed, IValued, ITypeContext
+public final class CompoundCall extends ASTNode implements ICall, INamed, IValued
 {
 	public Name			name;
 	
@@ -76,8 +73,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		}
 		if (this.type == null)
 		{
-			this.getGenericData();
-			this.type = this.method.getType().getConcreteType(this);
+			this.type = this.method.getType().getConcreteType(this.getGenericData());
 			
 			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
 			{
@@ -164,16 +160,6 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		if (typeVar.getGeneric().isMethod())
-		{
-			return this.genericData.generics[typeVar.getIndex()];
-		}
-		return this.instance.getType().resolveType(typeVar);
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
@@ -203,11 +189,16 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		
 		Marker marker = markers.create(this.position, "resolve.method", this.name.unqualified);
 		marker.addInfo("Qualified Name: " + this.name.unqualified);
-		marker.addInfo("Instance Type: " + this.instance.getType());
-		StringBuilder builder = new StringBuilder("Argument Types: ");
-		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.toString());
-		
+		if (this.instance != null)
+		{
+			marker.addInfo("Callee Type: " + this.instance.getType());
+		}
+		if (!this.arguments.isEmpty())
+		{
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			this.arguments.typesToString(builder);
+			marker.addInfo(builder.toString());
+		}
 		return this;
 	}
 	
@@ -218,7 +209,8 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		{
 			this.instance.checkTypes(markers, context);
 			
-			if (this.instance.valueTag() == APPLY_METHOD_CALL)
+			int valueTag = this.instance.valueTag();
+			if (valueTag == APPLY_METHOD_CALL)
 			{
 				ApplyMethodCall call = (ApplyMethodCall) this.instance;
 				IValue instance1 = call.instance;
@@ -232,15 +224,23 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 				}
 				else
 				{
-					Marker marker = markers.create(this.position, "access.assign_call.update");
-					marker.addInfo("Instance Type: " + type);
+					Marker marker = markers.create(this.position, "method.compound.update");
+					marker.addInfo("Callee Type: " + type);
+				}
+			}
+			else if (valueTag == FIELD_ACCESS)
+			{
+				FieldAccess fa = (FieldAccess) this.instance;
+				if (fa.field != null)
+				{
+					fa.field.checkAssign(markers, this.instance.getPosition(), this.instance, this);
 				}
 			}
 		}
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.method.checkArguments(markers, this.instance, this.arguments, this.getGenericData());
 		}
 		this.arguments.checkTypes(markers, context);
 	}
@@ -259,28 +259,27 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 			IType type2 = this.getType();
 			if (!type1.isSuperTypeOf(type2))
 			{
-				Marker marker = markers.create(this.position, "access.assign_call.type", this.name, this.instance.toString());
-				marker.addInfo("Field Type: " + type1);
+				Marker marker = markers.create(this.position, "method.compound.type", this.name, this.instance.toString());
+				marker.addInfo("Callee Type: " + type1);
 				marker.addInfo("Method Type: " + type2);
 			}
 			
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.position, "access.method.deprecated", this.name);
+				markers.add(this.position, "method.access.deprecated", this.name.unqualified);
 			}
 			
-			byte access = context.getAccessibility(this.method);
-			if (access == IContext.STATIC)
+			switch (context.getVisibility(this.method))
 			{
-				markers.add(this.position, "access.method.instance", this.name);
-			}
-			else if (access == IContext.SEALED)
-			{
-				markers.add(this.position, "access.method.sealed", this.name);
-			}
-			else if ((access & IContext.READ_ACCESS) == 0)
-			{
-				markers.add(this.position, "access.method.invisible", this.name);
+			case IContext.STATIC:
+				markers.add(this.position, "method.access.instance", this.name.unqualified);
+				break;
+			case IContext.SEALED:
+				markers.add(this.position, "method.access.sealed", this.name.unqualified);
+				break;
+			case IContext.INVISIBLE:
+				markers.add(this.position, "method.access.invisible", this.name.unqualified);
+				break;
 			}
 		}
 		

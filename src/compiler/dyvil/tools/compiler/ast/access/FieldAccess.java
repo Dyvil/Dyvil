@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
-import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
@@ -180,18 +179,11 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		if (this.instance != null)
 		{
 			this.instance.checkTypes(markers, context);
-			
-			if (this.field != null && this.field.hasModifier(Modifiers.STATIC) && this.instance.valueTag() != CLASS_ACCESS)
-			{
-				markers.add(this.position, "access.field.static", this.name);
-				this.instance = null;
-				return;
-			}
 		}
-		else if (this.field != null && this.field.isField() && !this.field.hasModifier(Modifiers.STATIC))
+		
+		if (this.field != null)
 		{
-			markers.add(this.position, "access.field.unqualified", this.name);
-			this.instance = new ThisValue(this.position, this.field.getTheClass().getType());
+			this.instance = this.field.checkAccess(markers, this.position, this.instance);
 		}
 	}
 	
@@ -207,21 +199,20 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		{
 			if (this.field.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.position, "access.field.deprecated", this.name);
+				markers.add(this.position, "field.access.deprecated", this.name);
 			}
 			
-			byte access = context.getAccessibility(this.field);
-			if (access == IContext.STATIC)
+			switch (context.getVisibility(this.field))
 			{
-				markers.add(this.position, "access.field.instance", this.name);
-			}
-			else if (access == IContext.SEALED)
-			{
-				markers.add(this.position, "access.field.sealed", this.name);
-			}
-			else if ((access & IContext.READ_ACCESS) == 0)
-			{
-				markers.add(this.position, "access.field.invisible", this.name);
+			case IContext.STATIC:
+				markers.add(this.position, "field.access.instance", this.name);
+				break;
+			case IContext.SEALED:
+				markers.add(this.position, "field.access.sealed", this.name);
+				break;
+			case IContext.INVISIBLE:
+				markers.add(this.position, "field.access.invisible", this.name);
+				break;
 			}
 		}
 	}

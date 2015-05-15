@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.classes;
 import java.lang.annotation.ElementType;
 import java.util.List;
 
+import org.objectweb.asm.Opcodes;
+
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -213,7 +215,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{
@@ -223,7 +225,7 @@ public class CodeClass extends ASTNode implements IClass
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			if (a.type.classEquals(type))
+			if (a.type.getTheClass() == type)
 			{
 				return a;
 			}
@@ -273,12 +275,6 @@ public class CodeClass extends ASTNode implements IClass
 	public int getAccessLevel()
 	{
 		return this.modifiers & Modifiers.ACCESS_MODIFIERS;
-	}
-	
-	@Override
-	public byte getAccessibility()
-	{
-		return IContext.READ_ACCESS;
 	}
 	
 	// Names
@@ -639,7 +635,7 @@ public class CodeClass extends ASTNode implements IClass
 		if (this.superType != null)
 		{
 			IType type = this.superType.resolveType(typeVar);
-			if (type != null)
+			if (type != Types.ANY)
 			{
 				return type.getConcreteType(concrete);
 			}
@@ -647,12 +643,12 @@ public class CodeClass extends ASTNode implements IClass
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			IType type = this.interfaces[i].resolveType(typeVar);
-			if (type != null)
+			if (type != Types.ANY)
 			{
 				return type.getConcreteType(concrete);
 			}
 		}
-		return null;
+		return Types.ANY;
 	}
 	
 	@Override
@@ -721,7 +717,7 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			Annotation a = this.annotations[i];
 			String fullName = a.type.getInternalName();
-			if (fullName != null && this.addRawAnnotation(fullName))
+			if (fullName != null && !this.addRawAnnotation(fullName))
 			{
 				this.removeAnnotation(i--);
 				continue;
@@ -1055,12 +1051,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		IClass iclass = member.getTheClass();
 		if (iclass == this || iclass == null)
 		{
-			return member.getAccessibility();
+			return VISIBLE;
 		}
 		
 		int level = member.getAccessLevel();
@@ -1075,28 +1071,30 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		if (level == Modifiers.PUBLIC)
 		{
-			return member.getAccessibility();
+			return VISIBLE;
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.DERIVED)
 		{
 			if (this.superType != null && this.superType.getTheClass() == iclass)
 			{
-				return member.getAccessibility();
+				return VISIBLE;
 			}
 			
 			for (int i = 0; i < this.interfaceCount; i++)
 			{
 				if (this.interfaces[i].getTheClass() == iclass)
 				{
-					return member.getAccessibility();
+					return VISIBLE;
 				}
 			}
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.PACKAGE)
 		{
-			if (this.unit.getPackage() == iclass.getUnit().getPackage())
+			IDyvilHeader unit1 = this.unit;
+			IDyvilHeader unit2 = iclass.getUnit();
+			if (unit1 != null && unit2 != null && unit1.getPackage() == unit2.getPackage())
 			{
-				return member.getAccessibility();
+				return VISIBLE;
 			}
 		}
 		
@@ -1151,7 +1149,7 @@ public class CodeClass extends ASTNode implements IClass
 			superClass = this.superType.getInternalName();
 		}
 		
-		writer.visit(DyvilCompiler.classVersion, this.modifiers & 0xFFFF, internalName, signature, superClass, interfaces);
+		writer.visit(DyvilCompiler.classVersion, this.modifiers & 0xFFFF | Opcodes.ACC_SUPER, internalName, signature, superClass, interfaces);
 		
 		// Outer Class
 		
@@ -1263,8 +1261,6 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		this.metadata.write(writer, instanceFields);
-		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].write(writer);
@@ -1289,6 +1285,8 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			this.compilables[i].write(writer);
 		}
+		
+		this.metadata.write(writer, instanceFields);
 		
 		IField instanceField = this.metadata.getInstanceField();
 		if (instanceField != null)
@@ -1368,7 +1366,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.body != null)
 		{
-			buffer.append('\n');
+			buffer.append('\n').append(prefix);
 			this.body.toString(prefix, buffer);
 		}
 		else

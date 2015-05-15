@@ -17,6 +17,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class MethodParameter extends Member implements IParameter
 {
@@ -115,6 +116,35 @@ public final class MethodParameter extends Member implements IParameter
 	public ElementType getAnnotationType()
 	{
 		return ElementType.PARAMETER;
+	}
+	
+	@Override
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
+	{
+		return instance;
+	}
+	
+	@Override
+	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	{
+		if ((this.modifiers & Modifiers.FINAL) != 0)
+		{
+			markers.add(position, "parameter.assign.final", this.name.unqualified);
+		}
+		
+		IValue value1 = newValue.withType(this.type);
+		if (value1 == null)
+		{
+			Marker marker = markers.create(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
+			marker.addInfo("Parameter Type: " + this.type);
+			marker.addInfo("Value Type: " + newValue.getType());
+		}
+		else
+		{
+			newValue = value1;
+		}
+		
+		return newValue;
 	}
 	
 	@Override

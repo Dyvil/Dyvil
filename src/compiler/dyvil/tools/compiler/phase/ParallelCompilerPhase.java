@@ -3,6 +3,7 @@ package dyvil.tools.compiler.phase;
 import java.util.Collection;
 import java.util.function.Consumer;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
 public class ParallelCompilerPhase implements ICompilerPhase
@@ -33,10 +34,17 @@ public class ParallelCompilerPhase implements ICompilerPhase
 	@Override
 	public void apply(Collection<ICompilationUnit> units)
 	{
-		// TODO Parallelism
 		for (ICompilationUnit unit : units)
 		{
-			this.apply.accept(unit);
+			try
+			{
+				this.apply.accept(unit);
+			}
+			catch (Throwable t)
+			{
+				DyvilCompiler.logger.warning(this.name + " failed on Compilation Unit '" + unit.getInputFile() + "'");
+				DyvilCompiler.logger.throwing(this.name, "apply", t);
+			}
 		}
 	}
 	

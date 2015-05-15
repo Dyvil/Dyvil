@@ -64,4 +64,9 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	public void check(MarkerList markers, IContext context);
 	
 	public void foldConstants();
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer);
+	
+	public void typesToString(StringBuilder buffer);
 }

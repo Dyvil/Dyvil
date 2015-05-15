@@ -7,25 +7,60 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import dyvil.collection.ArrayIterator;
-import dyvil.collection.mutable.MutableMap;
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
+import dyvil.lang.Entry;
 import dyvil.lang.Map;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.tuple.Tuple2;
 
+@ArrayConvertible
 public class TupleMap<K, V> implements ImmutableMap<K, V>
 {
 	private final int				size;
 	private final Tuple2<K, V>[]	entries;
 	
+	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		return new TupleMap(entries);
+	}
+	
 	public TupleMap(Tuple2<K, V>[] entries)
 	{
 		this.size = entries.length;
-		this.entries = entries;
+		this.entries = new Tuple2[this.size];
+		System.arraycopy(entries, 0, this.entries, 0, this.size);
 	}
 	
 	public TupleMap(Tuple2<K, V>[] entries, int size)
 	{
 		this.size = size;
+		this.entries = new Tuple2[size];
+		System.arraycopy(entries, 0, this.entries, 0, size);
+	}
+	
+	public TupleMap(Tuple2<K, V>[] entries, boolean trusted)
+	{
+		this.size = entries.length;
 		this.entries = entries;
+	}
+	
+	public TupleMap(Tuple2<K, V>[] entries, int size, boolean trusted)
+	{
+		this.size = size;
+		this.entries = entries;
+	}
+	
+	public TupleMap(Map<K, V> map)
+	{
+		this.size = map.size();
+		this.entries = new Tuple2[this.size];
+		
+		int index = 0;
+		for (Entry<K, V> entry : map)
+		{
+			this.entries[index++] = new Tuple2(entry.getKey(), entry.getValue());
+		}
 	}
 	
 	@Override
@@ -41,7 +76,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public Iterator<Tuple2<K, V>> iterator()
+	public Iterator<Entry<K, V>> iterator()
 	{
 		return new ArrayIterator<>(this.entries, this.size);
 	}
@@ -49,19 +84,20 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Iterator<K> keyIterator()
 	{
-		return new Iterator<K>() {
-			private int index;
+		return new Iterator<K>()
+		{
+			private int	index;
 			
 			@Override
 			public boolean hasNext()
 			{
-				return index < size;
+				return this.index < TupleMap.this.size;
 			}
-
+			
 			@Override
 			public K next()
 			{
-				return entries[index++]._1;
+				return TupleMap.this.entries[this.index++]._1;
 			}
 		};
 	}
@@ -69,31 +105,26 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Iterator<V> valueIterator()
 	{
-		return new Iterator<V>() {
-			private int index;
+		return new Iterator<V>()
+		{
+			private int	index;
 			
 			@Override
 			public boolean hasNext()
 			{
-				return index < size;
+				return this.index < TupleMap.this.size;
 			}
-
+			
 			@Override
 			public V next()
 			{
-				return entries[index++]._2;
+				return TupleMap.this.entries[this.index++]._2;
 			}
 		};
 	}
 	
 	@Override
-	public Iterator<Entry<K, V>> entryIterator()
-	{
-		return new ArrayIterator(this.entries, this.size);
-	}
-	
-	@Override
-	public void forEach(Consumer<? super Tuple2<K, V>> action)
+	public void forEach(Consumer<? super Entry<K, V>> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -117,7 +148,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			if (key == entry._1 || (key != null && key.equals(entry._1)))
+			if (key == entry._1 || key != null && key.equals(entry._1))
 			{
 				return true;
 			}
@@ -131,10 +162,12 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			if (key == entry._1 || (key != null && key.equals(entry._1)))
+			if (key == entry._1 || key != null && key.equals(entry._1))
 			{
-				if (value == entry._2 || (value != null && value.equals(entry._2))) {
-				return true;}
+				if (value == entry._2 || value != null && value.equals(entry._2))
+				{
+					return true;
+				}
 			}
 		}
 		return false;
@@ -146,11 +179,12 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			if (value == entry._2 || (value != null && value.equals(entry._2)))
+			if (value == entry._2 || value != null && value.equals(entry._2))
 			{
 				return true;
 			}
-		}return false;
+		}
+		return false;
 	}
 	
 	@Override
@@ -159,7 +193,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			if (key == entry._1 || (key != null && key.equals(entry._1)))
+			if (key == entry._1 || key != null && key.equals(entry._1))
 			{
 				return entry._2;
 			}
@@ -225,5 +259,23 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	public MutableMap<K, V> mutable()
 	{
 		return null;
+	}
+	
+	@Override
+	public String toString()
+	{
+		if (this.size <= 0)
+		{
+			return "[]";
+		}
+		
+		StringBuilder builder = new StringBuilder("[ ");
+		builder.append(this.entries[0]);
+		for (int i = 1; i < this.size; i++)
+		{
+			builder.append(", ");
+			builder.append(this.entries[i]);
+		}
+		return builder.append(" ]").toString();
 	}
 }

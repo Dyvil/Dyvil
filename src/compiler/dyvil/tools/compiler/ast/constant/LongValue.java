@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -15,7 +16,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class LongValue extends ASTNode implements INumericValue
 {
-	public static final Type	LONG_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("LongConvertible"));
+	public static final IClass	LONG_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("LongConvertible");
 	
 	private static LongValue	NULL;
 	
@@ -64,7 +65,7 @@ public class LongValue extends ASTNode implements INumericValue
 		{
 			return new BoxedValue(this, Types.LONG.boxMethod);
 		}
-		if (LONG_CONVERTIBLE.isSuperTypeOf(type))
+		if (type.getTheClass().getAnnotation(LONG_CONVERTIBLE) != null)
 		{
 			return new LiteralExpression(type, this);
 		}
@@ -74,7 +75,7 @@ public class LongValue extends ASTNode implements INumericValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.LONG || type.isSuperTypeOf(Types.LONG) || LONG_CONVERTIBLE.isSuperTypeOf(type);
+		return type == Types.LONG || type.isSuperTypeOf(Types.LONG) || type.getTheClass().getAnnotation(LONG_CONVERTIBLE) != null;
 	}
 	
 	@Override
@@ -84,7 +85,7 @@ public class LongValue extends ASTNode implements INumericValue
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Types.LONG) || LONG_CONVERTIBLE.isSuperTypeOf(type))
+		if (type.isSuperTypeOf(Types.LONG) || type.getTheClass().getAnnotation(LONG_CONVERTIBLE) != null)
 		{
 			return 2;
 		}
@@ -119,6 +120,19 @@ public class LongValue extends ASTNode implements INumericValue
 	public Long toObject()
 	{
 		return Long.valueOf(this.value);
+	}
+	
+	@Override
+	public int stringSize()
+	{
+		return Long.toString(this.value).length();
+	}
+	
+	@Override
+	public boolean toStringBuilder(StringBuilder builder)
+	{
+		builder.append(this.value);
+		return true;
 	}
 	
 	@Override

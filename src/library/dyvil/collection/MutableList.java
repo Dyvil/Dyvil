@@ -1,18 +1,19 @@
-package dyvil.collection.mutable;
+package dyvil.collection;
 
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.collection.immutable.ImmutableList;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
+@ArrayConvertible
 public interface MutableList<E> extends MutableCollection<E>, List<E>
 {
 	public static <E> MutableList<E> apply()
@@ -35,43 +36,18 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 		return new ArrayList(new Object[] { e1, e2, e3 }, 3, true);
 	}
 	
-	public static <E> MutableList<E> apply(E[] array)
+	public static <E> MutableList<E> apply(E... elements)
 	{
-		return new ArrayList(array);
+		return new ArrayList(elements, true);
 	}
 	
-	public static <E> MutableList<E> apply(Iterable<E> iterable)
-	{
-		ArrayList<E> list = new ArrayList();
-		for (E e : iterable)
-		{
-			list.$plus$eq(e);
-		}
-		return list;
-	}
-	
-	// Simple Getters
+	// Accessors
 	
 	@Override
 	public int size();
 	
 	@Override
-	public default boolean isEmpty()
-	{
-		return this.size() == 0;
-	}
-	
-	@Override
 	public Iterator<E> iterator();
-	
-	@Override
-	public default Spliterator<E> spliterator()
-	{
-		return Spliterators.spliterator(this.iterator(), this.size(), 0);
-	}
-	
-	@Override
-	public void forEach(Consumer<? super E> action);
 	
 	@Override
 	public boolean $qmark(Object element);
@@ -85,7 +61,7 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	// Non-mutating Operations
 	
 	@Override
-	public MutableList<E> slice(int startIndex, int length);
+	public MutableList<E> subList(int startIndex, int length);
 	
 	@Override
 	public MutableList<E> $plus(E element);
@@ -117,6 +93,12 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	@Override
 	public MutableList<E> sorted(Comparator<? super E> comparator);
 	
+	@Override
+	public MutableList<E> distinct();
+	
+	@Override
+	public MutableList<E> distinct(Comparator<? super E> comparator);
+	
 	// Mutating Operations
 	
 	@Override
@@ -137,22 +119,7 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	public void insert(int index, E element);
 	
 	@Override
-	public boolean remove(E element);
-	
-	@Override
 	public void removeAt(int index);
-	
-	@Override
-	public void $plus$eq(E element);
-	
-	@Override
-	public void $plus$plus$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $minus$eq(E element);
-	
-	@Override
-	public void $minus$minus$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void $amp$eq(Collection<? extends E> collection);
@@ -176,10 +143,25 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	public void sort(Comparator<? super E> comparator);
 	
 	@Override
+	public void distinguish();
+	
+	@Override
+	public void distinguish(Comparator<? super E> comparator);
+	
+	// Search Operations
+	
+	@Override
 	public int indexOf(E element);
 	
 	@Override
 	public int lastIndexOf(E element);
+	
+	// toArray
+	
+	@Override
+	public void toArray(int index, Object[] store);
+	
+	// Copying
 	
 	@Override
 	public MutableList<E> copy();

@@ -2,8 +2,11 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LiteralExpression;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
@@ -13,7 +16,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class CharValue extends ASTNode implements INumericValue
 {
-	public char	value;
+	public static final IClass	CHAR_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("CharConvertible");
+	
+	public char					value;
 	
 	public CharValue(char value)
 	{
@@ -45,13 +50,21 @@ public final class CharValue extends ASTNode implements INumericValue
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Types.CHAR) ? new BoxedValue(this, Types.CHAR.boxMethod) : null;
+		if (type.isSuperTypeOf(Types.CHAR))
+		{
+			return new BoxedValue(this, Types.CHAR.boxMethod);
+		}
+		if (type.getTheClass().getAnnotation(CHAR_CONVERTIBLE) != null)
+		{
+			return new LiteralExpression(type, this);
+		}
+		return null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.CHAR || type.isSuperTypeOf(Types.CHAR);
+		return type == Types.CHAR || type.isSuperTypeOf(Types.CHAR) || type.getTheClass().getAnnotation(CHAR_CONVERTIBLE) != null;
 	}
 	
 	@Override
@@ -61,7 +74,7 @@ public final class CharValue extends ASTNode implements INumericValue
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Types.CHAR))
+		if (type.isSuperTypeOf(Types.CHAR) || type.getTheClass().getAnnotation(CHAR_CONVERTIBLE) != null)
 		{
 			return 2;
 		}
@@ -96,6 +109,19 @@ public final class CharValue extends ASTNode implements INumericValue
 	public Character toObject()
 	{
 		return Character.valueOf(this.value);
+	}
+	
+	@Override
+	public int stringSize()
+	{
+		return 1;
+	}
+	
+	@Override
+	public boolean toStringBuilder(StringBuilder builder)
+	{
+		builder.append(this.value);
+		return true;
 	}
 	
 	@Override

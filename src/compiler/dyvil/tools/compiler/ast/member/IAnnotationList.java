@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.member;
 import java.lang.annotation.ElementType;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.classes.IClass;
 
 public interface IAnnotationList
 {
@@ -15,7 +15,7 @@ public interface IAnnotationList
 	
 	public Annotation getAnnotation(int index);
 	
-	public Annotation getAnnotation(IType type);
+	public Annotation getAnnotation(IClass type);
 	
 	public default boolean addRawAnnotation(String type)
 	{

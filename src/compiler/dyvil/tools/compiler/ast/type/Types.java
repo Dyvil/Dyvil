@@ -11,7 +11,7 @@ public final class Types
 	public static final UnknownType		UNKNOWN			= new UnknownType();
 	public static final PrimitiveType	VOID			= new PrimitiveType(Name._void, 0);
 	public static final PrimitiveType	BOOLEAN			= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
-	public static final PrimitiveType	BYTE			= new PrimitiveType(Name._byte, ClassFormat.T_BOOLEAN);
+	public static final PrimitiveType	BYTE			= new PrimitiveType(Name._byte, ClassFormat.T_BYTE);
 	public static final PrimitiveType	SHORT			= new PrimitiveType(Name._short, ClassFormat.T_SHORT);
 	public static final PrimitiveType	CHAR			= new PrimitiveType(Name._char, ClassFormat.T_CHAR);
 	public static final PrimitiveType	INT				= new PrimitiveType(Name._int, ClassFormat.T_INT);
@@ -20,16 +20,15 @@ public final class Types
 	public static final PrimitiveType	DOUBLE			= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
 	
 	public static final DynamicType		DYNAMIC			= new DynamicType();
-	public static final Type			ANY				= new Type("dyvil/lang/Any", Name.any);
+	public static final Type			ANY				= new Type("java/lang/Object", Name.any);
 	public static final Type			OBJECT			= new Type("java/lang/Object", Name.getQualified("Object"));
 	public static final Type			STRING			= new Type("java/lang/String", Name.getQualified("String"));
 	public static final Type			CLASS			= new Type("java/lang/Class", Name.getQualified("Class"));
 	public static final Type			PREDEF			= new Type("dyvil/lang/Predef", Name.getQualified("Predef"));
+	public static final Type			TYPE			= new Type("dyvil/lang/Type", Name.getQualified("Type"));
 	
-	public static final Type			AIntrinsic		= new Type("dyvil/annotation/Intrinsic", Name.getQualified("Intrinsic"));
-	public static final Type			AOverride		= new Type("java/lang/Override", Name.getQualified("Override"));
-	public static final Type			ARetention		= new Type("java/lang/annotation/Retention", Name.getQualified("Retention"));
-	public static final Type			ATarget			= new Type("java/lang/annotation/Target", Name.getQualified("Target"));
+	public static final Type			MAP				= new Type("dyvil/lang/Map", Name.getQualified("Map"));
+	public static final Type			IMMUTABLE		= new Type(Package.dyvilLang.resolveClass("Immutable"));
 	
 	public static final IClass			VOID_CLASS		= Package.dyvilLang.resolveClass("Void");
 	public static final IClass			BOOLEAN_CLASS	= Package.dyvilLang.resolveClass("Boolean");
@@ -45,6 +44,16 @@ public final class Types
 	public static final IClass			STRING_CLASS	= Package.javaLang.resolveClass("String");
 	public static final IClass			CLASS_CLASS		= Package.javaLang.resolveClass("Class");
 	public static final IClass			PREDEF_CLASS	= Package.dyvilLang.resolveClass("Predef");
+	public static final IClass			TYPE_CLASS		= Package.dyvilLang.resolveClass("Type");
+	
+	public static final IClass			MAP_CLASS		= Package.dyvilLang.resolveClass("Map");
+	public static final IClass			TUPLE2_CLASS	= TupleType.getTupleClass(2);
+	
+	public static final IClass			INTRINSIC_CLASS	= Package.dyvilAnnotation.resolveClass("Intrinsic");
+	public static final IClass			OVERRIDE_CLASS	= Package.javaLang.resolveClass("Override");
+	public static final IClass			RETENTION_CLASS	= Package.javaLangAnnotation.resolveClass("Retention");
+	public static final IClass			TARGET_CLASS	= Package.javaLangAnnotation.resolveClass("Target");
+	public static final IClass			MUTATING_CLASS	= Package.dyvilAnnotation.resolveClass("mutating");
 	
 	private static IClass				OBJECT_ARRAY_CLASS;
 	private static IClass				BOOLEAN_ARRAY_CLASS;
@@ -55,6 +64,16 @@ public final class Types
 	private static IClass				LONG_ARRAY_CLASS;
 	private static IClass				FLOAT_ARRAY_CLASS;
 	private static IClass				DOUBLE_ARRAY_CLASS;
+	
+	public static IClass				OBJECT_REF_CLASS;
+	private static Type					BOOLEAN_REF;
+	private static Type					BYTE_REF;
+	private static Type					SHORT_REF;
+	private static Type					CHAR_REF;
+	private static Type					INT_REF;
+	private static Type					LONG_REF;
+	private static Type					FLOAT_REF;
+	private static Type					DOUBLE_REF;
 	
 	public static void init()
 	{
@@ -89,11 +108,9 @@ public final class Types
 		STRING.theClass = STRING_CLASS;
 		CLASS.theClass = CLASS_CLASS;
 		PREDEF.theClass = PREDEF_CLASS;
+		TYPE.theClass = TYPE_CLASS;
 		
-		ATarget.theClass = Package.javaLangAnnotation.resolveClass("Target");
-		ARetention.theClass = Package.javaLangAnnotation.resolveClass("Retention");
-		AOverride.theClass = Package.javaLang.resolveClass("Override");
-		AIntrinsic.theClass = Package.dyvilAnnotation.resolveClass("Intrinsic");
+		MAP.theClass = MAP_CLASS;
 	}
 	
 	public static IClass getObjectArray()
@@ -159,5 +176,78 @@ public final class Types
 			return DOUBLE_ARRAY_CLASS;
 		}
 		return getObjectArray();
+	}
+	
+	private static IType getPrimitiveRefType(int typecode)
+	{
+		switch (typecode)
+		{
+		case ClassFormat.T_BOOLEAN:
+			if (BOOLEAN_REF == null)
+			{
+				return BOOLEAN_REF = new Type(Package.dyvilLangRef.resolveClass("BooleanRef"));
+			}
+			return BOOLEAN_REF;
+		case ClassFormat.T_BYTE:
+			if (BYTE_REF == null)
+			{
+				return BYTE_REF = new Type(Package.dyvilLangRef.resolveClass("ByteRef"));
+			}
+			return BYTE_REF;
+		case ClassFormat.T_SHORT:
+			if (SHORT_REF == null)
+			{
+				return SHORT_REF = new Type(Package.dyvilLangRef.resolveClass("ShortRef"));
+			}
+			return SHORT_REF;
+		case ClassFormat.T_CHAR:
+			if (CHAR_REF == null)
+			{
+				return CHAR_REF = new Type(Package.dyvilLangRef.resolveClass("CharRef"));
+			}
+			return CHAR_REF;
+		case ClassFormat.T_INT:
+			if (INT_REF == null)
+			{
+				return INT_REF = new Type(Package.dyvilLangRef.resolveClass("IntRef"));
+			}
+			return INT_REF;
+		case ClassFormat.T_LONG:
+			if (LONG_REF == null)
+			{
+				return LONG_REF = new Type(Package.dyvilLangRef.resolveClass("LongRef"));
+			}
+			return LONG_REF;
+		case ClassFormat.T_FLOAT:
+			if (FLOAT_REF == null)
+			{
+				return FLOAT_REF = new Type(Package.dyvilLangRef.resolveClass("FloatRef"));
+			}
+			return FLOAT_REF;
+		case ClassFormat.T_DOUBLE:
+			if (DOUBLE_REF == null)
+			{
+				return DOUBLE_REF = new Type(Package.dyvilLangRef.resolveClass("DoubleRef"));
+			}
+			return DOUBLE_REF;
+		}
+		return null;
+	}
+	
+	public static IType getRefType(IType type)
+	{
+		switch (type.typeTag())
+		{
+		case IType.PRIMITIVE_TYPE:
+			return getPrimitiveRefType(((PrimitiveType) type).typecode);
+		default:
+			if (OBJECT_REF_CLASS == null)
+			{
+				OBJECT_REF_CLASS = Package.dyvilLangRef.resolveClass("ObjectRef");
+			}
+			GenericType gt = new GenericType(OBJECT_REF_CLASS);
+			gt.addType(type);
+			return gt;
+		}
 	}
 }

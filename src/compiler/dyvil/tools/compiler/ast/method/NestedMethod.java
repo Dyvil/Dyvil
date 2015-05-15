@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -110,7 +111,7 @@ public class NestedMethod extends Method
 		{
 			this.capturedFields = new CaptureVariable[2];
 			this.capturedFieldCount = 1;
-			return this.capturedFields[0] = new CaptureVariable(match);
+			return this.capturedFields[0] = new CaptureVariable((IVariable) match);
 		}
 		
 		// Check if the variable is already in the array
@@ -131,7 +132,7 @@ public class NestedMethod extends Method
 			System.arraycopy(this.capturedFields, 0, temp, 0, index);
 			this.capturedFields = temp;
 		}
-		return this.capturedFields[index] = new CaptureVariable(match);
+		return this.capturedFields[index] = new CaptureVariable((IVariable) match);
 	}
 	
 	@Override
@@ -147,9 +148,9 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.context.getAccessibility(member);
+		return this.context.getVisibility(member);
 	}
 	
 	@Override
@@ -196,7 +197,7 @@ public class NestedMethod extends Method
 		{
 			CaptureVariable capture = this.capturedFields[i];
 			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.variable.getType(), 0);
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getCaptureType(), 0);
 		}
 		
 		index = 0;
@@ -231,36 +232,33 @@ public class NestedMethod extends Method
 		}
 	}
 	
-	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
+	private void writeCaptures(MethodWriter writer) throws BytecodeException
 	{
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].variable.writeGet(writer, null);
+			CaptureVariable var = this.capturedFields[i];
+			writer.writeVarInsn(var.getCaptureType().getLoadOpcode(), var.variable.getIndex());
 		}
-		
+	}
+	
+	@Override
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
+	{
+		this.writeCaptures(writer);
 		super.writeCall(writer, instance, arguments, type);
 	}
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			this.capturedFields[i].variable.writeGet(writer, null);
-		}
-		
+		this.writeCaptures(writer);
 		super.writeJump(writer, dest, instance, arguments);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			this.capturedFields[i].variable.writeGet(writer, null);
-		}
-		
+		this.writeCaptures(writer);
 		super.writeInvJump(writer, dest, instance, arguments);
 	}
 }

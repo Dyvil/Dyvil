@@ -17,8 +17,6 @@ public interface IMember extends INamed, ITyped, IModified, IAnnotationList
 	
 	public int getAccessLevel();
 	
-	public byte getAccessibility();
-	
 	// States
 	
 	public void resolveTypes(MarkerList markers, IContext context);

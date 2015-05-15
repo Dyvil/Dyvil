@@ -8,11 +8,6 @@ public class Short implements Integer
 {
 	protected short	value;
 	
-	protected Short(short value)
-	{
-		this.value = value;
-	}
-	
 	public static Short apply(short v)
 	{
 		if (v >= 0 && v < ConstPool.tableSize)
@@ -20,6 +15,11 @@ public class Short implements Integer
 			return ConstPool.SHORTS[v];
 		}
 		return new Short(v);
+	}
+	
+	protected Short(short value)
+	{
+		this.value = value;
 	}
 	
 	@Intrinsic({ INSTANCE })

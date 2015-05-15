@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
@@ -175,7 +176,7 @@ public final class ExternalClass extends CodeClass
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		if (!this.annotationsResolved)
 		{
@@ -206,6 +207,16 @@ public final class ExternalClass extends CodeClass
 			this.resolveSuperTypes();
 		}
 		return super.resolveType(typeVar, concrete);
+	}
+	
+	@Override
+	public IClassMetadata getMetadata()
+	{
+		if (this.metadata == null)
+		{
+			return this.metadata = IClass.getClassMetadata(this, this.modifiers);
+		}
+		return this.metadata;
 	}
 	
 	@Override
@@ -299,6 +310,11 @@ public final class ExternalClass extends CodeClass
 	@Override
 	public IField resolveField(Name name)
 	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		
 		// Own properties
 		IField field = this.body.getProperty(name);
 		if (field != null)
@@ -333,6 +349,11 @@ public final class ExternalClass extends CodeClass
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		
 		this.body.getMethodMatches(list, instance, name, arguments);
 		
 		if (!list.isEmpty())

@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -245,17 +246,18 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			{
 				this.capturedFields = new CaptureVariable[2];
 				this.capturedFieldCount = 1;
-				return this.capturedFields[0] = new CaptureVariable(match);
+				return this.capturedFields[0] = new CaptureVariable((IVariable) match);
 			}
 			
 			// Check if the variable is already in the array
 			for (int i = 0; i < this.capturedFieldCount; i++)
 			{
-				if (this.capturedFields[i].variable == match)
+				CaptureVariable var = this.capturedFields[i];
+				if (var.variable == match)
 				{
 					// If yes, return the match and skip adding the variable
 					// again.
-					return match;
+					return var;
 				}
 			}
 			
@@ -266,7 +268,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 				System.arraycopy(this.capturedFields, 0, temp, 0, index);
 				this.capturedFields = temp;
 			}
-			return this.capturedFields[index] = new CaptureVariable(match);
+			return this.capturedFields[index] = new CaptureVariable((IVariable) match);
 		}
 		
 		return match;
@@ -285,9 +287,9 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.context.getAccessibility(member);
+		return this.context.getVisibility(member);
 	}
 	
 	@Override
@@ -345,6 +347,15 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			}
 			else
 			{
+				for (int i = 0; i < this.parameterCount; i++)
+				{
+					IParameter param = this.parameters[i];
+					if (param.getType() == null)
+					{
+						param.setType(this.method.getParameter(i).getType());
+					}
+				}
+				
 				this.returnType = this.method.getType();
 			}
 			
@@ -403,7 +414,8 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].variable.writeGet(writer, null);
+			CaptureVariable var = this.capturedFields[i];
+			writer.writeVarInsn(var.getCaptureType().getLoadOpcode(), var.variable.getIndex());
 		}
 		
 		String name = this.getName();
@@ -441,7 +453,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		}
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].getType().appendExtendedName(buffer);
+			this.capturedFields[i].getCaptureType().appendExtendedName(buffer);
 		}
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
@@ -472,7 +484,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		buffer.append('(');
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].getType().appendExtendedName(buffer);
+			this.capturedFields[i].getCaptureType().appendExtendedName(buffer);
 		}
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -500,7 +512,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		{
 			CaptureVariable capture = this.capturedFields[i];
 			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.variable.getType(), 0);
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getCaptureType(), 0);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

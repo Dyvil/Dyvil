@@ -4,21 +4,38 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import dyvil.annotation.sealed;
 import dyvil.collection.ArrayIterator;
-import dyvil.collection.immutable.ImmutableList;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
+@ArrayConvertible
 public class ArrayList<E> implements MutableList<E>
 {
 	private static final int	INITIAL_CAPACITY	= 10;
 	
 	private Object[]			elements;
 	private int					size;
+	
+	public static <E> ArrayList<E> apply()
+	{
+		return new ArrayList();
+	}
+	
+	public static <E> ArrayList<E> apply(E... elements)
+	{
+		return new ArrayList(elements, true);
+	}
 	
 	public ArrayList()
 	{
@@ -30,7 +47,7 @@ public class ArrayList<E> implements MutableList<E>
 		this.elements = new Object[size];
 	}
 	
-	public ArrayList(Object[] elements)
+	public ArrayList(Object... elements)
 	{
 		this.elements = new Object[elements.length];
 		System.arraycopy(elements, 0, this.elements, 0, elements.length);
@@ -56,15 +73,27 @@ public class ArrayList<E> implements MutableList<E>
 		this.size = size;
 	}
 	
+	public ArrayList(Collection<E> collection)
+	{
+		this.size = collection.size();
+		this.elements = new Object[this.size];
+		
+		int index = 0;
+		for (E element : collection)
+		{
+			this.elements[index++] = element;
+		}
+	}
+	
 	private void rangeCheck(int index)
 	{
 		if (index < 0)
 		{
-			throw new IndexOutOfBoundsException("ArrayList Index out of Bounds: " + index + " < 0");
+			throw new IndexOutOfBoundsException("List Index out of Bounds: " + index + " < 0");
 		}
 		if (index >= this.size)
 		{
-			throw new IndexOutOfBoundsException("ArrayList Index out of Bounds: " + index + " >= " + this.size);
+			throw new IndexOutOfBoundsException("List Index out of Bounds: " + index + " >= " + this.size);
 		}
 	}
 	
@@ -138,7 +167,7 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public MutableList<E> slice(int startIndex, int length)
+	public MutableList<E> subList(int startIndex, int length)
 	{
 		this.rangeCheck(startIndex);
 		if (startIndex + length >= this.size)
@@ -289,6 +318,81 @@ public class ArrayList<E> implements MutableList<E>
 		return new ArrayList(array, this.size, true);
 	}
 	
+	public static @sealed int distinct(Object[] array, int size)
+	{
+		if (size < 2)
+		{
+			return size;
+		}
+		
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = i + 1; j < size; j++)
+			{
+				if (Objects.equals(array[i], array[j]))
+				{
+					array[j--] = array[--size];
+				}
+			}
+		}
+		return size;
+	}
+	
+	public static @sealed <T> int distinct(T[] array, int size, Comparator<? super T> comparator)
+	{
+		if (size < 2)
+		{
+			return size;
+		}
+		
+		Arrays.sort(array, comparator);
+		
+		return distinctSorted(array, size);
+	}
+	
+	public static @sealed int distinctSorted(Object[] array, int size)
+	{
+		if (size < 2)
+		{
+			return size;
+		}
+		
+		int len = 0;
+		int i = 1;
+		
+		while (i < size)
+		{
+			if (Objects.equals(array[i], array[len]))
+			{
+				i++;
+			}
+			else
+			{
+				array[++len] = array[i++];
+			}
+		}
+		
+		return len + 1;
+	}
+	
+	@Override
+	public MutableList<E> distinct()
+	{
+		Object[] array = new Object[this.size];
+		System.arraycopy(this.elements, 0, array, 0, this.size);
+		int size = distinct(array, this.size);
+		return new ArrayList(array, size, true);
+	}
+	
+	@Override
+	public MutableList<E> distinct(Comparator<? super E> comparator)
+	{
+		Object[] array = new Object[this.size];
+		System.arraycopy(this.elements, 0, array, 0, this.size);
+		int size = distinct((E[]) array, this.size, comparator);
+		return new ArrayList(array, size, true);
+	}
+	
 	@Override
 	public void resize(int newLength)
 	{
@@ -434,6 +538,7 @@ public class ArrayList<E> implements MutableList<E>
 		this.ensureCapacity(this.size + len);
 		Object[] array = collection.toArray();
 		System.arraycopy(array, 0, this.elements, this.size, len);
+		this.size += len;
 	}
 	
 	@Override
@@ -560,6 +665,18 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
+	public void distinguish()
+	{
+		this.size = distinct(this.elements, this.size);
+	}
+	
+	@Override
+	public void distinguish(Comparator<? super E> comparator)
+	{
+		this.size = distinct((E[]) this.elements, this.size, comparator);
+	}
+	
+	@Override
 	public int indexOf(E element)
 	{
 		if (element == null)
@@ -618,17 +735,6 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public Object[] toArray(Object[] store)
-	{
-		if (store.length < this.size)
-		{
-			return Arrays.copyOf(this.elements, this.size, store.getClass());
-		}
-		System.arraycopy(this.elements, 0, store, 0, this.size);
-		return store;
-	}
-	
-	@Override
 	public E[] toArray(Class<E> type)
 	{
 		E[] array = (E[]) Array.newInstance(type, this.size);
@@ -640,6 +746,12 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
+	public void toArray(int index, Object[] store)
+	{
+		System.arraycopy(this.elements, 0, store, index, this.size);
+	}
+	
+	@Override
 	public MutableList<E> copy()
 	{
 		return new ArrayList(this.elements, this.size);
@@ -648,7 +760,7 @@ public class ArrayList<E> implements MutableList<E>
 	@Override
 	public ImmutableList<E> immutable()
 	{
-		return new dyvil.collection.immutable.ArrayList<>(this.elements, this.size);
+		return new dyvil.collection.immutable.ArrayList(this.elements, this.size);
 	}
 	
 	@Override
@@ -656,17 +768,17 @@ public class ArrayList<E> implements MutableList<E>
 	{
 		if (this.size == 0)
 		{
-			return "[ ]";
+			return "[]";
 		}
 		
-		StringBuilder buf = new StringBuilder("[ ");
+		StringBuilder buf = new StringBuilder(this.size * 10).append('[');
 		buf.append(this.elements[0]);
 		for (int i = 1; i < this.size; i++)
 		{
 			buf.append(", ");
 			buf.append(this.elements[i]);
 		}
-		buf.append(" ]");
+		buf.append(']');
 		return buf.toString();
 	}
 }

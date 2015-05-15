@@ -10,11 +10,13 @@ import java.util.List;
 
 import org.objectweb.asm.Label;
 
+import dyvil.annotation.mutating;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IntValue;
+import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -38,6 +40,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
@@ -312,7 +315,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation annotation = this.annotations[i];
-			if (annotation.type.getTheClass() != Types.AIntrinsic.theClass)
+			if (annotation.type.getTheClass() != Types.INTRINSIC_CLASS)
 			{
 				continue;
 			}
@@ -341,7 +344,7 @@ public class Method extends Member implements IMethod
 			this.exceptions[i] = this.exceptions[i].resolve(markers, this);
 		}
 		
-		int index = 0;
+		int index = (this.modifiers & Modifiers.STATIC) == 0 ? 1 : 0;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
@@ -574,18 +577,18 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		IClass iclass = member.getTheClass();
 		if (iclass == null)
 		{
-			return READ_WRITE_ACCESS;
+			return VISIBLE;
 		}
-		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC) && !(member instanceof IConstructor))
+		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC))
 		{
 			return STATIC;
 		}
-		return this.theClass.getAccessibility(member);
+		return this.theClass.getVisibility(member);
 	}
 	
 	@Override
@@ -681,6 +684,10 @@ public class Method extends Member implements IMethod
 		if (genericData == null)
 		{
 			genericData = new GenericData(this.genericCount);
+			if (instance != null)
+			{
+				genericData.instanceType = instance.getType();
+			}
 			
 			for (int i = 0; i < this.genericCount; i++)
 			{
@@ -690,6 +697,11 @@ public class Method extends Member implements IMethod
 			return genericData;
 		}
 		
+		if (instance != null)
+		{
+			genericData.instanceType = instance.getType();
+		}
+		
 		genericData.setTypeCount(this.genericCount);
 		for (int i = genericData.typeCount(); i < this.genericCount; i++)
 		{
@@ -697,6 +709,39 @@ public class Method extends Member implements IMethod
 		}
 		
 		return genericData;
+	}
+	
+	private void checkMutating(MarkerList markers, IValue instance)
+	{
+		IType type = instance.getType();
+		if (!Types.IMMUTABLE.isSuperTypeOf(type))
+		{
+			return;
+		}
+		
+		Annotation a = this.getAnnotation(Types.MUTATING_CLASS);
+		if (a == null)
+		{
+			return;
+		}
+		
+		IValue v = a.arguments.getValue(0, Annotation.VALUE);
+		String s = v != null ? ((StringValue) v).value : mutating.VALUE_DEFAULT;
+		StringBuilder builder = new StringBuilder(s);
+		
+		int index = builder.indexOf("{method}");
+		if (index >= 0)
+		{
+			builder.replace(index, index + 8, this.name.unqualified);
+		}
+		
+		index = builder.indexOf("{type}");
+		if (index >= 0)
+		{
+			builder.replace(index, index + 6, type.toString());
+		}
+		
+		markers.add(new SemanticError(instance.getPosition(), builder.toString()));
 	}
 	
 	@Override
@@ -712,7 +757,7 @@ public class Method extends Member implements IMethod
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
-				Marker marker = markers.create(instance.getPosition(), "access.method.infix_type", par.getName());
+				Marker marker = markers.create(instance.getPosition(), "method.access.infix_type", par.getName());
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
 			}
@@ -720,6 +765,8 @@ public class Method extends Member implements IMethod
 			{
 				instance = instance1;
 			}
+			
+			this.checkMutating(markers, instance);
 			
 			if ((this.modifiers & Modifiers.VARARGS) != 0)
 			{
@@ -745,11 +792,12 @@ public class Method extends Member implements IMethod
 			IValue instance1 = instance.withType(parType);
 			if (instance1 == null)
 			{
-				Marker marker = markers.create(instance.getPosition(), "access.method.prefix_type", this.name);
+				Marker marker = markers.create(instance.getPosition(), "method.access.prefix_type", this.name);
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
-				
 			}
+			
+			this.checkMutating(markers, instance);
 			return null;
 		}
 		
@@ -762,6 +810,11 @@ public class Method extends Member implements IMethod
 			{
 				arguments.checkValue(i, this.parameters[i], markers, typeContext);
 			}
+			
+			if (instance != null)
+			{
+				this.checkMutating(markers, instance);
+			}
 			return instance;
 		}
 		
@@ -770,6 +823,10 @@ public class Method extends Member implements IMethod
 			arguments.checkValue(i, this.parameters[i], markers, typeContext);
 		}
 		
+		if (instance != null)
+		{
+			this.checkMutating(markers, instance);
+		}
 		return instance;
 	}
 	
@@ -863,7 +920,7 @@ public class Method extends Member implements IMethod
 			this.parameters[i].getType().appendSignature(buffer);
 		}
 		buffer.append(')');
-		this.type.appendExtendedName(buffer);
+		this.type.appendSignature(buffer);
 		return buffer.toString();
 	}
 	

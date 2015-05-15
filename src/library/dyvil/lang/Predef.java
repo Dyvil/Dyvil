@@ -1,10 +1,14 @@
 package dyvil.lang;
 
 import static dyvil.reflect.Opcodes.*;
+
+import java.util.Iterator;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.array.*;
+import dyvil.tuple.Tuple2;
 
 public final class Predef
 {
@@ -43,96 +47,6 @@ public final class Predef
 	public static @infix @inline void toString(Object o, StringBuilder builder)
 	{
 		builder.append(o == null ? "null" : o.toString());
-	}
-	
-	public static @infix @inline String $plus(String s, Object o)
-	{
-		return s + o;
-	}
-	
-	public static @infix @inline String $plus(String s, boolean v)
-	{
-		return s + v;
-	}
-	
-	public static @infix @inline String $plus(String s, byte v)
-	{
-		return s + v;
-	}
-	
-	public static @infix @inline String $plus(String s, short v)
-	{
-		return s + v;
-	}
-	
-	public static @infix @inline String $plus(String s, char v)
-	{
-		return s + v;
-	}
-	
-	public static @infix @inline String $plus(String s, int v)
-	{
-		return s + v;
-	}
-	
-	public static @infix @inline String $plus(String s, long v)
-	{
-		return s + v;
-	}
-	
-	public static @infix @inline String $plus(String s, float v)
-	{
-		return s + v;
-	}
-	
-	public static @infix @inline String $plus(String s, double v)
-	{
-		return s + v;
-	}
-	
-	public static @infix @inline String $plus(Object o, String s)
-	{
-		return o + s;
-	}
-	
-	public static @infix @inline String $plus(boolean v, String s)
-	{
-		return v + s;
-	}
-	
-	public static @infix @inline String $plus(byte v, String s)
-	{
-		return v + s;
-	}
-	
-	public static @infix @inline String $plus(short v, String s)
-	{
-		return v + s;
-	}
-	
-	public static @infix @inline String $plus(char v, String s)
-	{
-		return v + s;
-	}
-	
-	public static @infix @inline String $plus(int v, String s)
-	{
-		return v + s;
-	}
-	
-	public static @infix @inline String $plus(long v, String s)
-	{
-		return v + s;
-	}
-	
-	public static @infix @inline String $plus(float v, String s)
-	{
-		return v + s;
-	}
-	
-	public static @infix @inline String $plus(double v, String s)
-	{
-		return v + s;
 	}
 	
 	// Hashing
@@ -232,7 +146,7 @@ public final class Predef
 		System.out.println(s);
 	}
 	
-	public static @inline void println(Object o)
+	public static void println(Object o)
 	{
 		if (o == null)
 		{
@@ -240,6 +154,69 @@ public final class Predef
 			return;
 		}
 		System.out.println(o.toString());
+	}
+	
+	public static @inline void println(boolean[] v)
+	{
+		System.out.println(BooleanArray.toString(v));
+	}
+	
+	public static @inline void println(byte[] v)
+	{
+		System.out.println(ByteArray.toString(v));
+	}
+	
+	public static @inline void println(short[] v)
+	{
+		System.out.println(ShortArray.toString(v));
+	}
+	
+	public static @inline void println(char[] v)
+	{
+		System.out.println(CharArray.toString(v));
+	}
+	
+	public static @inline void println(int[] v)
+	{
+		System.out.println(IntArray.toString(v));
+	}
+	
+	public static @inline void println(long[] v)
+	{
+		System.out.println(LongArray.toString(v));
+	}
+	
+	public static @inline void println(float[] v)
+	{
+		System.out.println(FloatArray.toString(v));
+	}
+	
+	public static @inline void println(double[] v)
+	{
+		System.out.println(DoubleArray.toString(v));
+	}
+	
+	public static @inline void println(Object[] v)
+	{
+		System.out.println(ObjectArray.deepToString(v));
+	}
+	
+	public static <T> void println(Iterable<T> iterable)
+	{
+		Iterator<T> iterator = iterable.iterator();
+		if (!iterator.hasNext())
+		{
+			return;
+		}
+		
+		System.out.print('[');
+		System.out.print(iterator.next());
+		while (iterator.hasNext())
+		{
+			System.out.print(", ");
+			System.out.print(iterator.next());
+		}
+		System.out.println(']');
 	}
 	
 	// Tuples

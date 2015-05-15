@@ -9,6 +9,7 @@ import java.util.function.IntConsumer;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 
 public interface FloatArray
 {
@@ -80,6 +81,21 @@ public interface FloatArray
 	}
 	
 	// Operators
+	
+	public static @infix @inline boolean $qmark(float[] array, float v)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	public static @infix @inline boolean $eq$eq(float[] array1, float[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean $bang$eq(float[] array1, float[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
 	
 	public static @infix float[] $plus(float[] array, float v)
 	{
@@ -197,6 +213,71 @@ public interface FloatArray
 		return res;
 	}
 	
+	// Search Operations
+	
+	public static @infix int indexOf(float[] array, float v)
+	{
+		return indexOf(array, v, 0);
+	}
+	
+	public static @infix int indexOf(float[] array, float v, int start)
+	{
+		for (; start < array.length; start++)
+		{
+			if (array[start] == v)
+			{
+				return start;
+			}
+		}
+		return -1;
+	}
+	
+	public static @infix int lastIndexOf(float[] array, float v)
+	{
+		return lastIndexOf(array, v, array.length - 1);
+	}
+	
+	public static @infix int lastIndexOf(float[] array, float v, int start)
+	{
+		for (; start >= 0; start--)
+		{
+			if (array[start] == v)
+			{
+				return start;
+			}
+		}
+		return -1;
+	}
+	
+	public static @infix @inline boolean contains(float[] array, float v)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	public static @infix @inline boolean in(float v, float[] array)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	// Copying
+	
+	public static @infix @inline float[] copy(float[] array)
+	{
+		return array.clone();
+	}
+	
+	// equals, hashCode and toString
+	
+	public static @infix @inline boolean equals(float[] array1, float[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline int hashCode(float[] array)
+	{
+		return Arrays.hashCode(array);
+	}
+	
 	public static @infix String toString(float[] array)
 	{
 		if (array == null)
@@ -242,46 +323,5 @@ public interface FloatArray
 			builder.append(array[i]);
 		}
 		builder.append(']');
-	}
-	
-	// Search Operations
-	
-	public static @infix int indexOf(float[] array, float v)
-	{
-		return indexOf(array, v, 0);
-	}
-	
-	public static @infix int indexOf(float[] array, float v, int start)
-	{
-		for (; start < array.length; start++)
-		{
-			if (array[start] == v)
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix int lastIndexOf(float[] array, float v)
-	{
-		return lastIndexOf(array, v, array.length - 1);
-	}
-	
-	public static @infix int lastIndexOf(float[] array, float v, int start)
-	{
-		for (; start >= 0; start--)
-		{
-			if (array[start] == v)
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix boolean contains(float[] array, float v)
-	{
-		return indexOf(array, v, 0) != -1;
 	}
 }

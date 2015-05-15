@@ -3,25 +3,78 @@ package dyvil.lang;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
-import java.util.function.Consumer;
+import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.collection.immutable.ImmutableList;
-import dyvil.collection.mutable.MutableList;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
-public interface List<E> extends Collection<E>, ArrayConvertible
+/**
+ * A <b>List</b> is a data type that represents an ordered (sequential)
+ * {@linkplain Collection collection}. A list supports access using integer
+ * indexes in a way similar to arrays. However, they also support various
+ * operations for easily modifying the structure of their elements, examples for
+ * which are the {@linkplain #add(Object) add} or {@linkplain #remove(Object)
+ * remove} operations. Since a list is also a {@linkplain Collection}, it also
+ * supports various querying operations including {@linkplain #map(Function)
+ * map}, {@linkplain #filter(Predicate) filter} or
+ * {@linkplain #flatMap(Function) flatMap} and new sequential operations such as
+ * {@linkplain #sort() sort}.
+ * <p>
+ * As with {@linkplain Collection collections}, lists also make a clear
+ * distinction between {@linkplain MutableList mutable} and
+ * {@linkplain ImmutableList immutable} data. For the latter, the <i>Dyvil
+ * Collection Framework</i> provides various memory-efficient implementations
+ * specialized for lists with zero, one or multiple elements.
+ * <p>
+ * Since this interface is both {@link NilConvertible} and
+ * {@link ArrayConvertible}, it is possible to initialize both mutable and
+ * immutable lists with simple expressions, as shown in the below example.
+ * 
+ * <pre>
+ * List[int] mutable = nil // Creates an empty, mutable list
+ * List[String] immutable = [ "a", "b", "c" ] // Creates an immutable list from the array
+ * </pre>
+ * 
+ * @author Clashsoft
+ * @param <E>
+ *            the element type
+ */
+@NilConvertible
+@ArrayConvertible
+public interface List<E> extends Collection<E>
 {
+	/**
+	 * Returns an empty, mutable list. This method is primarily for use with the
+	 * {@code nil} literal in <i>Dyvil</i> and internally creates an empty
+	 * {@link dyvil.collection.mutable.ArrayList ArrayList}.
+	 * 
+	 * @return an empty, mutable list
+	 */
 	public static <E> MutableList<E> apply()
 	{
 		return new dyvil.collection.mutable.ArrayList();
 	}
 	
-	public static <E> ImmutableList<E> apply(E[] array)
+	/**
+	 * Returns an immutable list containing all of the given {@code elements}.
+	 * This method is primarily for use with <i>Array Expressions</i> in
+	 * <i>Dyvil</i> and internally creates an
+	 * {@link dyvil.collection.immutable.ArrayList ArrayList} from the given
+	 * {@code elements}.
+	 * 
+	 * @param elements
+	 *            the elements of the returned collection
+	 * @return an immutable list containing all of the given elements
+	 */
+	public static <E> ImmutableList<E> apply(E... array)
 	{
-		return new dyvil.collection.immutable.ArrayList(array);
+		return new dyvil.collection.immutable.ArrayList(array, true);
 	}
 	
 	// Simple getters
@@ -30,16 +83,13 @@ public interface List<E> extends Collection<E>, ArrayConvertible
 	public int size();
 	
 	@Override
-	public boolean isEmpty();
-	
-	@Override
 	public Iterator<E> iterator();
 	
 	@Override
-	public Spliterator<E> spliterator();
-	
-	@Override
-	public void forEach(Consumer<? super E> action);
+	public default Spliterator<E> spliterator()
+	{
+		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
+	}
 	
 	@Override
 	public boolean $qmark(Object element);
@@ -71,7 +121,28 @@ public interface List<E> extends Collection<E>, ArrayConvertible
 	
 	// Non-mutating Operations
 	
-	public List<E> slice(int startIndex, int length);
+	/**
+	 * Creates and returns a {@linkplain List} containing {@code length} of the
+	 * elements of this list starting from the {@code startIndex}. If the
+	 * {@code startIndex} or the end index ({@code startIndex + length}) exceeds
+	 * the size of this list, an exception will be thrown.
+	 * <p>
+	 * Note that for {@linkplain MutableList mutable lists}, it is not
+	 * guaranteed that changes to the sub-list will be reflected in the list is
+	 * was created from. Although it is not an absolute requirement,
+	 * implementations should return a list that, when mutated, does <b>not</b>
+	 * reflect the changes in this list. This behavior is implemented in all
+	 * {@linkplain MutableList mutable list} implementations of the <i>Dyvil
+	 * Collection Framework</i>.
+	 * 
+	 * @param startIndex
+	 *            the start index of the sub list
+	 * @param length
+	 *            the length of the sub list
+	 * @return a sub-list with {@code length} elements starting from the
+	 *         {@code startIndex}
+	 */
+	public List<E> subList(int startIndex, int length);
 	
 	@Override
 	public List<E> $plus(E element);
@@ -97,11 +168,32 @@ public interface List<E> extends Collection<E>, ArrayConvertible
 	@Override
 	public List<E> filtered(Predicate<? super E> condition);
 	
-	@Override
+	/**
+	 * Returns a list that contains the same elements as this list, but in a
+	 * sorted order. The sorting order is given by the <i>natural order</i> of
+	 * the elements of this list, i.e. the order specified by their
+	 * {@link Comparable#compareTo(Object) compareTo} method. Thus, this method
+	 * will fail if the elements of this list do not implement
+	 * {@link Comparable} interface.
+	 * 
+	 * @return a sorted list of this list's elements
+	 */
 	public List<E> sorted();
 	
-	@Override
+	/**
+	 * Returns a list that contains the same elements as this list, but in a
+	 * sorted order. The sorting order is specified by the given
+	 * {@code comparator}.
+	 * 
+	 * @param comparator
+	 *            the comparator that defines the order of the elements
+	 * @return a sorted list of this list's elements using the given comparator
+	 */
 	public List<E> sorted(Comparator<? super E> comparator);
+	
+	public List<E> distinct();
+	
+	public List<E> distinct(Comparator<? super E> comparator);
 	
 	// Mutating Operations
 	
@@ -191,7 +283,16 @@ public interface List<E> extends Collection<E>, ArrayConvertible
 	public E add(int index, E element);
 	
 	@Override
-	public boolean remove(E element);
+	public default boolean remove(E element)
+	{
+		int index = this.indexOf(element);
+		if (index == -1)
+		{
+			return false;
+		}
+		this.removeAt(index);
+		return true;
+	}
 	
 	/**
 	 * Removes the element at the given {@code index} from this list. This
@@ -203,18 +304,6 @@ public interface List<E> extends Collection<E>, ArrayConvertible
 	 *            the index of the element to remove from this list
 	 */
 	public void removeAt(int index);
-	
-	@Override
-	public void $plus$eq(E element);
-	
-	@Override
-	public void $plus$plus$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $minus$eq(E element);
-	
-	@Override
-	public void $minus$minus$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void $amp$eq(Collection<? extends E> collection);
@@ -231,11 +320,27 @@ public interface List<E> extends Collection<E>, ArrayConvertible
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
-	@Override
+	/**
+	 * Sorts the elements of this list. The sorting order is given by the
+	 * <i>natural order</i> of the elements of this collection, i.e. the order
+	 * specified by their {@link Comparable#compareTo(Object) compareTo} method.
+	 * Thus, this method will fail if the elements in this collection do not
+	 * implement {@link Comparable} interface.
+	 */
 	public void sort();
 	
-	@Override
+	/**
+	 * Sorts the elements of this list. The sorting order is specified by the
+	 * given {@code comparator}.
+	 * 
+	 * @param comparator
+	 *            the comparator that defines the order of the elements
+	 */
 	public void sort(Comparator<? super E> comparator);
+	
+	public void distinguish();
+	
+	public void distinguish(Comparator<? super E> comparator);
 	
 	// Search Operations
 	
@@ -258,6 +363,11 @@ public interface List<E> extends Collection<E>, ArrayConvertible
 	 * @return the last index of the element
 	 */
 	public int lastIndexOf(E element);
+	
+	// toArray
+	
+	@Override
+	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

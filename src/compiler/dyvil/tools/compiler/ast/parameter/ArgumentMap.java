@@ -196,7 +196,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 				IValue value1 = value.withType(type);
 				if (value1 == null)
 				{
-					Marker marker = markers.create(value.getPosition(), "access.method.argument_type", key);
+					Marker marker = markers.create(value.getPosition(), "method.access.argument_type", key);
 					marker.addInfo("Required Type: " + type);
 					marker.addInfo("Value Type: " + value.getType());
 				}
@@ -296,17 +296,34 @@ public final class ArgumentMap implements IArguments, IValueMap
 		int len = this.size;
 		for (int i = 0; i < len; i++)
 		{
-			Name key = this.keys[i];
-			IValue v = this.values[i];
-			buffer.append(key).append(Formatting.Method.keyValueSeperator);
+			buffer.append(this.keys[i]).append(Formatting.Method.keyValueSeperator);
+			this.values[i].toString(prefix, buffer);
+			if (i + 1 == len)
+			{
+				break;
+			}
+			buffer.append(", ");
+		}
+		buffer.append(')');
+	}
+	
+	@Override
+	public void typesToString(StringBuilder buffer)
+	{
+		buffer.append('(');
+		int len = this.size;
+		for (int i = 0; i < len; i++)
+		{
+			IType type = this.values[i].getType();
+			buffer.append(this.keys[i]).append(Formatting.Method.keyValueSeperator);
 			
-			if (v == null)
+			if (type == null)
 			{
 				buffer.append("[null-value]");
 			}
 			else
 			{
-				v.toString(prefix, buffer);
+				type.toString("", buffer);
 			}
 			if (i + 1 == len)
 			{

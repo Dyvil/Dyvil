@@ -103,6 +103,18 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 	}
 	
 	@Override
+	public int stringSize()
+	{
+		return this.name.qualified.length();
+	}
+	
+	@Override
+	public boolean toStringBuilder(StringBuilder builder)
+	{
+		return false;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		String owner = this.type.getInternalName();

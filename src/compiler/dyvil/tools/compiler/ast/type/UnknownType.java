@@ -4,6 +4,7 @@ import static dyvil.reflect.Opcodes.*;
 
 import java.util.List;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -18,9 +19,11 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class UnknownType extends ASTNode implements IType
+public class UnknownType extends ASTNode implements IType
 {
 	@Override
 	public int typeTag()
@@ -62,23 +65,6 @@ public final class UnknownType extends ASTNode implements IType
 	public IType getConcreteType(ITypeContext context)
 	{
 		return this;
-	}
-	
-	@Override
-	public void setArrayDimensions(int dimensions)
-	{
-	}
-	
-	@Override
-	public int getArrayDimensions()
-	{
-		return 0;
-	}
-	
-	@Override
-	public boolean isArrayType()
-	{
-		return false;
 	}
 	
 	@Override
@@ -136,7 +122,7 @@ public final class UnknownType extends ASTNode implements IType
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		return 0;
 	}
@@ -199,6 +185,12 @@ public final class UnknownType extends ASTNode implements IType
 	public int getReturnOpcode()
 	{
 		return ARETURN;
+	}
+	
+	@Override
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
+	{
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/UnkownType", "apply", "()Ldyvil/reflect/type/UnkownType;", false);
 	}
 	
 	@Override

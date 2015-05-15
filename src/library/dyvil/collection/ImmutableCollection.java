@@ -1,26 +1,30 @@
-package dyvil.collection.immutable;
+package dyvil.collection;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.collection.mutable.MutableCollection;
+import dyvil.annotation.mutating;
 import dyvil.lang.Collection;
 import dyvil.lang.Immutable;
 import dyvil.lang.ImmutableException;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
 public interface ImmutableCollection<E> extends Collection<E>, Immutable
 {
-	@Override
-	public int size();
+	public static <E> ImmutableCollection<E> apply()
+	{
+		return ImmutableList.apply();
+	}
+	
+	// Accessors
 	
 	@Override
-	public boolean isEmpty();
+	public int size();
 	
 	@Override
 	public Iterator<E> iterator();
@@ -32,10 +36,9 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	}
 	
 	@Override
-	public void forEach(Consumer<? super E> action);
-	
-	@Override
 	public boolean $qmark(Object element);
+	
+	// Non-mutating Operations
 	
 	@Override
 	public ImmutableCollection<E> $plus(E element);
@@ -61,89 +64,91 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	@Override
 	public ImmutableCollection<E> filtered(Predicate<? super E> condition);
 	
-	@Override
-	public ImmutableCollection<E> sorted();
+	// Mutating Operations
 	
 	@Override
-	public ImmutableCollection<E> sorted(Comparator<? super E> comparator);
-	
-	@Override
+	@mutating
 	public default E add(E element)
 	{
 		throw new ImmutableException("add() on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void $plus$eq(E entry)
 	{
 		throw new ImmutableException("+= on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void $plus$plus$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("++= on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default boolean remove(E element)
 	{
 		throw new ImmutableException("remove() on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void $minus$eq(E entry)
 	{
 		throw new ImmutableException("-= on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void $minus$minus$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("--= on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void $amp$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("&= on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void map(UnaryOperator<E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable Collection");
 	}
 	
 	@Override
+	@mutating
 	public default void filter(Predicate<? super E> condition)
 	{
 		throw new ImmutableException("filter() on Immutable Collection");
 	}
 	
-	@Override
-	public default void sort()
-	{
-		throw new ImmutableException("sort() on Immutable Collection");
-	}
+	// toArray
 	
 	@Override
-	public default void sort(Comparator<? super E> comparator)
-	{
-		throw new ImmutableException("sort() on Immutable Collection");
-	}
+	public void toArray(int index, Object[] store);
+	
+	// Copying
 	
 	@Override
 	public ImmutableCollection<E> copy();

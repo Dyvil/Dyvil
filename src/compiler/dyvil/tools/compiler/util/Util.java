@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -56,37 +55,6 @@ public class Util
 				break;
 			}
 			buffer.append(seperator);
-		}
-	}
-	
-	public static void typesToString(String prefix, Iterable<? extends ITyped> list, String seperator, StringBuilder buffer)
-	{
-		Iterator<? extends ITyped> iterator = list.iterator();
-		if (!iterator.hasNext())
-		{
-			return;
-		}
-		
-		while (true)
-		{
-			IType type = iterator.next().getType();
-			if (type == null)
-			{
-				buffer.append("unknown");
-			}
-			else
-			{
-				type.toString(prefix, buffer);
-			}
-			
-			if (iterator.hasNext())
-			{
-				buffer.append(seperator);
-			}
-			else
-			{
-				break;
-			}
 		}
 	}
 	

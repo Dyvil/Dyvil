@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
@@ -63,6 +64,11 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 		int type = token.type();
 		if (this.mode == TYPE)
 		{
+			if (type == Symbols.SEMICOLON && token.isInferred())
+			{
+				return;
+			}
+			
 			int i = 0;
 			if ((i = ModifierTypes.PARAMETER.parse(type)) != -1)
 			{
@@ -99,15 +105,17 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 				if (this.varargs)
 				{
 					this.paramList.setVarargs();
-					this.varargs = false;
-					this.type = this.type.getArrayType();
+					this.type = new ArrayType(this.type);
 				}
 				
 				this.parameter = this.paramList instanceof IClass ? new ClassParameter(token.nameValue(), this.type) : new MethodParameter(token.nameValue(),
 						this.type);
 				this.parameter.setModifiers(this.modifiers);
 				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);
+				this.parameter.setVarargs(this.varargs);
 				this.paramList.addParameter(this.parameter);
+				
+				this.varargs = false;
 				
 				return;
 			}
@@ -126,7 +134,7 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 				return;
 			}
 			this.reset();
-			if (type == Symbols.COMMA)
+			if (type == Symbols.COMMA || type == Symbols.SEMICOLON)
 			{
 				return;
 			}
@@ -179,7 +187,7 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 	}
 	
 	@Override
-	public Annotation getAnnotation(IType type)
+	public Annotation getAnnotation(IClass type)
 	{
 		return null;
 	}

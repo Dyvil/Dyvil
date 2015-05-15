@@ -9,8 +9,6 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.GenericData;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -29,9 +27,8 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.ConstantFolder;
-import dyvil.tools.compiler.util.Util;
 
-public final class MethodCall extends ASTNode implements ICall, INamed, IValued, ITypeContext
+public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 {
 	public IValue		instance;
 	public boolean		dotless;
@@ -79,8 +76,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued,
 		}
 		if (this.type == null)
 		{
-			this.getGenericData();
-			this.type = this.method.getType().getConcreteType(this);
+			this.type = this.method.getType().getConcreteType(this.getGenericData());
 			
 			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
 			{
@@ -164,16 +160,6 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued,
 	public IArguments getArguments()
 	{
 		return this.arguments;
-	}
-	
-	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		if (typeVar.getGeneric().isMethod())
-		{
-			return this.genericData.generics[typeVar.getIndex()];
-		}
-		return this.instance.getType().resolveType(typeVar);
 	}
 	
 	@Override
@@ -295,11 +281,14 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued,
 		marker.addInfo("Qualified Name: " + this.name.qualified);
 		if (this.instance != null)
 		{
-			marker.addInfo("Instance Type: " + this.instance.getType());
+			marker.addInfo("Callee Type: " + this.instance.getType());
 		}
-		StringBuilder builder = new StringBuilder("Argument Types: ");
-		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.toString());
+		if (!this.arguments.isEmpty())
+		{
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			this.arguments.typesToString(builder);
+			marker.addInfo(builder.toString());
+		}
 		return this;
 	}
 	
@@ -365,7 +354,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued,
 		
 		if (this.method != null)
 		{
-			this.instance = this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.instance = this.method.checkArguments(markers, this.instance, this.arguments, this.getGenericData());
 		}
 		this.arguments.checkTypes(markers, context);
 	}
@@ -382,21 +371,20 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued,
 		{
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.position, "access.method.deprecated", this.name);
+				markers.add(this.position, "method.access.deprecated", this.name);
 			}
 			
-			byte access = context.getAccessibility(this.method);
-			if (access == IContext.STATIC)
+			switch (context.getVisibility(this.method))
 			{
-				markers.add(this.position, "access.method.instance", this.name);
-			}
-			else if (access == IContext.SEALED)
-			{
-				markers.add(this.position, "access.method.sealed", this.name);
-			}
-			else if ((access & IContext.READ_ACCESS) == 0)
-			{
-				markers.add(this.position, "access.method.invisible", this.name);
+			case IContext.STATIC:
+				markers.add(this.position, "method.access.instance", this.name);
+				break;
+			case IContext.SEALED:
+				markers.add(this.position, "method.access.sealed", this.name);
+				break;
+			case IContext.INVISIBLE:
+				markers.add(this.position, "method.access.invisible", this.name);
+				break;
 			}
 		}
 		

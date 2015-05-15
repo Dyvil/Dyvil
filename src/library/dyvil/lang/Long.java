@@ -3,15 +3,12 @@ package dyvil.lang;
 import static dyvil.reflect.Opcodes.*;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
+import dyvil.lang.literal.LongConvertible;
 
+@LongConvertible
 public class Long implements Integer
 {
 	protected long	value;
-	
-	protected Long(long value)
-	{
-		this.value = value;
-	}
 	
 	public static Long apply(long value)
 	{
@@ -20,6 +17,11 @@ public class Long implements Integer
 			return ConstPool.LONGS[(int) value];
 		}
 		return new Long(value);
+	}
+	
+	protected Long(long value)
+	{
+		this.value = value;
 	}
 	
 	@Intrinsic({ INSTANCE })

@@ -8,13 +8,21 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
 import dyvil.collection.SingletonIterator;
-import dyvil.collection.mutable.MutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.literal.TupleConvertible;
 
+@TupleConvertible
 public class SingletonList<E> implements ImmutableList<E>
 {
 	private E	element;
+	
+	public static <E> SingletonList<E> apply(E element)
+	{
+		return new SingletonList(element);
+	}
 	
 	public SingletonList(E element)
 	{
@@ -68,7 +76,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> slice(int startIndex, int length)
+	public ImmutableList<E> subList(int startIndex, int length)
 	{
 		if (startIndex > 0 || length > 0)
 		{
@@ -98,7 +106,11 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
-		return ImmutableList.apply(collection);
+		int len = 1 + collection.size();
+		Object[] array = new Object[len];
+		array[0] = this.element;
+		collection.toArray(1, array);
+		return new ArrayList(array, len, true);
 	}
 	
 	@Override
@@ -166,20 +178,21 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public Object[] toArray()
+	public ImmutableList<E> distinct()
 	{
-		return new Object[] { this.element };
+		return ImmutableList.apply(this.element);
 	}
 	
 	@Override
-	public Object[] toArray(Object[] store)
+	public ImmutableList<E> distinct(Comparator<? super E> comparator)
 	{
-		if (store.length == 0)
-		{
-			store = (Object[]) Array.newInstance(store.getClass().getComponentType(), 1);
-		}
-		store[0] = this.element;
-		return store;
+		return ImmutableList.apply(this.element);
+	}
+	
+	@Override
+	public Object[] toArray()
+	{
+		return new Object[] { this.element };
 	}
 	
 	@Override
@@ -188,6 +201,12 @@ public class SingletonList<E> implements ImmutableList<E>
 		E[] array = (E[]) Array.newInstance(type, 1);
 		array[0] = type.cast(this.element);
 		return array;
+	}
+	
+	@Override
+	public void toArray(int index, Object[] store)
+	{
+		store[index] = this.element;
 	}
 	
 	@Override
@@ -205,6 +224,6 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public String toString()
 	{
-		return "[ " + this.element + " ]";
+		return new StringBuilder('[').append(this.element).append(']').toString();
 	}
 }

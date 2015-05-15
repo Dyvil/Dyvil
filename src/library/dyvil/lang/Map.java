@@ -7,40 +7,32 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-import dyvil.collection.immutable.ImmutableMap;
-import dyvil.collection.mutable.MutableMap;
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.tuple.Tuple2;
+import dyvil.tuple.Tuple2;
 
-public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, NilConvertible
+@NilConvertible
+@ArrayConvertible
+public interface Map<K, V> extends Iterable<Entry<K, V>>
 {
 	public static <K, V> MutableMap<K, V> apply()
 	{
 		return MutableMap.apply();
 	}
 	
-	public static <K, V> ImmutableMap<K, V> apply(K key, V value)
+	public static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
 	{
-		return ImmutableMap.apply(key, value);
+		return ImmutableMap.apply(entry);
 	}
 	
-	public static <K, V> ImmutableMap<K, V> apply(Tuple2<K, V> entry)
-	{
-		return ImmutableMap.apply(entry._1, entry._2);
-	}
-	
-	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>[] entries)
+	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
 	{
 		return ImmutableMap.apply(entries);
-	}
-	
-	public interface Entry<K, V>
-	{
-		public K getKey();
-		
-		public V getValue();
 	}
 	
 	// Simple Getters
@@ -58,41 +50,94 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 	 * 
 	 * @return true, if this map contains no mappings
 	 */
-	public boolean isEmpty();
+	public default boolean isEmpty()
+	{
+		return this.size() == 0;
+	}
 	
 	/**
 	 * Creates and returns an {@link Iterator} over the mappings of this map,
-	 * packed in {@linkplain Tuple2 Tuples} containing the key as their first
+	 * packed in {@linkplain Entry Tuples} containing the key as their first
 	 * value and the value as their second value.
 	 * 
 	 * @return an iterator over the mappings of this map
 	 */
 	@Override
-	public Iterator<Tuple2<K, V>> iterator();
+	public Iterator<Entry<K, V>> iterator();
 	
 	/**
 	 * Creates and returns an {@link Spliterator} over the mappings of this map,
-	 * packed in {@linkplain Tuple2 Tuples} containing the key as their first
+	 * packed in {@linkplain Entry Tuples} containing the key as their first
 	 * value and the value as their second value.
 	 * 
 	 * @return an iterator over the mappings of this map
 	 */
 	@Override
-	public default Spliterator<Tuple2<K, V>> spliterator()
+	public default Spliterator<Entry<K, V>> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), 0);
 	}
 	
+	public default Stream<Entry<K, V>> stream()
+	{
+		return StreamSupport.stream(this.spliterator(), false);
+	}
+	
+	public default Stream<Entry<K, V>> parallelStream()
+	{
+		return StreamSupport.stream(this.spliterator(), true);
+	}
+	
 	public Iterator<K> keyIterator();
+	
+	public default Spliterator<K> keySpliterator()
+	{
+		return Spliterators.spliterator(this.keyIterator(), this.size(), 0);
+	}
+	
+	public default Stream<K> keyStream()
+	{
+		return StreamSupport.stream(this.keySpliterator(), false);
+	}
+	
+	public default Stream<K> parallelKeyStream()
+	{
+		return StreamSupport.stream(this.keySpliterator(), true);
+	}
 	
 	public Iterator<V> valueIterator();
 	
-	public Iterator<Entry<K, V>> entryIterator();
+	public default Spliterator<V> valueSpliterator()
+	{
+		return Spliterators.spliterator(this.valueIterator(), this.size(), 0);
+	}
+	
+	public default Stream<V> valueStream()
+	{
+		return StreamSupport.stream(this.valueSpliterator(), false);
+	}
+	
+	public default Stream<V> parallelValueStream()
+	{
+		return StreamSupport.stream(this.valueSpliterator(), true);
+	}
 	
 	@Override
-	public void forEach(Consumer<? super Tuple2<K, V>> action);
+	public default void forEach(Consumer<? super Entry<K, V>> action)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			action.accept(entry);
+		}
+	}
 	
-	public void forEach(BiConsumer<? super K, ? super V> action);
+	public default void forEach(BiConsumer<? super K, ? super V> action)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			action.accept(entry.getKey(), entry.getValue());
+		}
+	}
 	
 	/**
 	 * Returns true if and if only this map contains a mapping for the given
@@ -127,9 +172,9 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 	 *            the entry
 	 * @return true, if this map contains the mapping represented by the entry
 	 */
-	public default boolean $qmark(Tuple2<? extends K, ? extends V> entry)
+	public default boolean $qmark(Entry<? extends K, ? extends V> entry)
 	{
-		return this.$qmark(entry._1, entry._2);
+		return this.$qmark(entry.getKey(), entry.getValue());
 	}
 	
 	/**
@@ -155,33 +200,57 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 	// Non-mutating Operations
 	
 	/**
-	 * Returns a map that contains all mappings of this map plus the new mapping
-	 * specified by {@code key} and {@code value}. It depends on the type of
-	 * this map if this method returns a new map or the mapping is simply added
-	 * to this map.
+	 * Returns a map that contains all entries of this map plus the new entry
+	 * specified by {@code key} and {@code value} as if it were added by
+	 * {@link #update(Object, Object)}. If the {@code key} is already present in
+	 * this map, a map is returned that uses the given {@code value} instead of
+	 * the previous value for the {@code key}, and that has the same size as
+	 * this map.
 	 * 
 	 * @param key
 	 *            the key
 	 * @param value
 	 *            the value
-	 * @return a map that contains all mappings of this map plus the new mapping
+	 * @return a map that contains all entries of this map plus the new entry
 	 */
 	public Map<K, V> $plus(K key, V value);
 	
-	public default Map<K, V> $plus(Tuple2<? extends K, ? extends V> entry)
+	/**
+	 * Returns a map that contains all entries of this map plus the new
+	 * {@code entry}, as if it were added by {@link #update(Object, Object)}. If
+	 * the {@code key} is already present in this map, a map is returned that
+	 * uses the given {@code value} instead of the previous value for the
+	 * {@code key}, and that has the same size as this map.
+	 * 
+	 * @see #$plus(Object, Object)
+	 * @param entry
+	 *            the entry
+	 * @return a map that contains all entries of this map plus the new entry
+	 */
+	public default Map<K, V> $plus(Entry<? extends K, ? extends V> entry)
 	{
-		return this.$plus(entry._1, entry._2);
+		return this.$plus(entry.getKey(), entry.getValue());
 	}
 	
+	/**
+	 * Returns a map that contains all entries of this map plus all entries of
+	 * the given {@code map}, as if they were added by
+	 * {@link #update(Object, Object)}. If a key in the given map is already
+	 * present in this map, a map is returned that uses the value from the given
+	 * {@code map} for that key.
+	 * 
+	 * @param map
+	 * @return
+	 */
 	public Map<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
 	public Map<K, V> $minus(K key);
 	
 	public Map<K, V> $minus(K key, V value);
 	
-	public default Map<K, V> $minus(Tuple2<? extends K, ? extends V> entry)
+	public default Map<K, V> $minus(Entry<? extends K, ? extends V> entry)
 	{
-		return this.$minus(entry._1, entry._2);
+		return this.$minus(entry.getKey(), entry.getValue());
 	}
 	
 	public Map<K, V> $minus$colon(V value);
@@ -196,31 +265,43 @@ public interface Map<K, V> extends Iterable<Tuple2<K, V>>, ArrayConvertible, Nil
 	
 	public void clear();
 	
-	public void update(K key, V value);
+	public default void update(K key, V value)
+	{
+		this.put(key, value);
+	}
 	
 	public V put(K key, V value);
 	
-	public default void $plus$eq(Tuple2<? extends K, ? extends V> entry)
+	public default void $plus$eq(Entry<? extends K, ? extends V> entry)
 	{
-		this.update(entry._1, entry._2);
+		this.update(entry.getKey(), entry.getValue());
 	}
 	
 	public void $plus$plus$eq(Map<? extends K, ? extends V> map);
 	
-	public void $minus$eq(K key);
+	public default void $minus$eq(K key)
+	{
+		this.remove(key);
+	}
 	
 	public V remove(K key);
 	
 	public boolean remove(K key, V value);
 	
-	public default void $minus$eq(Tuple2<? extends K, ? extends V> entry)
+	public default void $minus$eq(Entry<? extends K, ? extends V> entry)
 	{
-		this.remove(entry._1, entry._2);
+		this.remove(entry.getKey(), entry.getValue());
 	}
 	
 	public void $minus$colon$eq(V value);
 	
-	public void $minus$minus$eq(Map<? extends K, ? extends V> map);
+	public default void $minus$minus$eq(Map<? extends K, ? extends V> map)
+	{
+		for (Entry<? extends K, ? extends V> entry : map)
+		{
+			this.remove(entry.getKey());
+		}
+	}
 	
 	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);
 	

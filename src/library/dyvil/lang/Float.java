@@ -3,15 +3,12 @@ package dyvil.lang;
 import static dyvil.reflect.Opcodes.*;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
+import dyvil.lang.literal.FloatConvertible;
 
+@FloatConvertible
 public class Float implements Number
 {
 	protected float	value;
-	
-	protected Float(float value)
-	{
-		this.value = value;
-	}
 	
 	public static Float apply(float v)
 	{
@@ -21,6 +18,11 @@ public class Float implements Number
 			return ConstPool.FLOATS[i];
 		}
 		return new Float(v);
+	}
+	
+	protected Float(float value)
+	{
+		this.value = value;
 	}
 	
 	@Intrinsic({ INSTANCE })

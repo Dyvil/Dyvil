@@ -1,23 +1,24 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class NilValue implements IConstantValue
+public final class NilValue implements IValue
 {
-	public static final IType	NIL_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("NilConvertible"));
+	public static final IClass	NIL_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("NilConvertible");
 	
 	private ICodePosition		position;
 	private IType				requiredType;
@@ -70,7 +71,7 @@ public final class NilValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isArrayType() || NIL_CONVERTIBLE.isSuperTypeOf(type);
+		return type.isArrayType() || type.getTheClass().getAnnotation(NIL_CONVERTIBLE) != null;
 	}
 	
 	@Override
@@ -83,6 +84,17 @@ public final class NilValue implements IConstantValue
 	public Object toObject()
 	{
 		return null;
+	}
+	
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		return this;
 	}
 	
 	@Override
@@ -107,7 +119,20 @@ public final class NilValue implements IConstantValue
 		else
 		{
 			this.method = match;
+			GenericData data = match.getGenericData(null, null, EmptyArguments.INSTANCE);
+			this.requiredType = match.getType().getConcreteType(data);
 		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		return this;
 	}
 	
 	@Override

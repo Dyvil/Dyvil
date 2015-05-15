@@ -15,10 +15,16 @@ import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.token.IdentifierToken;
-import dyvil.tools.compiler.util.TestThread;
 
 public interface ICompilerPhase extends Comparable<ICompilerPhase>
 {
+	/**
+	 * Recursively deletes all files in the output directory.
+	 * 
+	 * @see DyvilCompiler#clean()
+	 */
+	ICompilerPhase	CLEAN			= new CompilerPhase(0, "CLEAN", units -> DyvilCompiler.clean());
+	
 	/**
 	 * Splits the input file into {@link IdentifierToken Tokens} using
 	 * {@link Dlex}.
@@ -87,7 +93,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	/**
 	 * Tests the main type specified in {@link CompilerConfig#mainType}.
 	 */
-	ICompilerPhase	TEST			= new CompilerPhase(110, "TEST", units -> new TestThread().start());
+	ICompilerPhase	TEST			= new CompilerPhase(110, "TEST", units -> DyvilCompiler.test());
 	
 	public String getName();
 	

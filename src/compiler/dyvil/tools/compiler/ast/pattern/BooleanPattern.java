@@ -57,14 +57,20 @@ public final class BooleanPattern extends ASTNode implements IPattern
 	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
+		}
 		writer.writeJumpInsn(this.value ? Opcodes.IFNE : Opcodes.IFEQ, elseLabel);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ILOAD, varIndex);
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
+		}
 		writer.writeJumpInsn(this.value ? Opcodes.IFEQ : Opcodes.IFNE, elseLabel);
 	}
 	

@@ -115,7 +115,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		int index = this.importCount++;
 		if (index >= this.imports.length)
 		{
-			HeaderComponent[] temp = new HeaderComponent[index];
+			HeaderComponent[] temp = new HeaderComponent[index + 1];
 			System.arraycopy(this.imports, 0, temp, 0, this.imports.length);
 			this.imports = temp;
 		}
@@ -128,7 +128,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		int index = this.staticImportCount++;
 		if (index >= this.staticImports.length)
 		{
-			HeaderComponent[] temp = new HeaderComponent[index];
+			HeaderComponent[] temp = new HeaderComponent[index + 1];
 			System.arraycopy(this.staticImports, 0, temp, 0, this.staticImports.length);
 			this.staticImports = temp;
 		}
@@ -334,7 +334,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		throw new UnsupportedOperationException();
 	}

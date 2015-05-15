@@ -207,9 +207,22 @@ public class Constructor extends Member implements IConstructor
 			this.exceptions[i] = this.exceptions[i].resolve(markers, this);
 		}
 		
+		int index = 1;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(markers, this);
+			IParameter param = this.parameters[i];
+			param.resolveTypes(markers, this);
+			param.setIndex(index);
+			
+			IType type = param.getType();
+			if (type == Types.LONG || type == Types.DOUBLE)
+			{
+				index += 2;
+			}
+			else
+			{
+				index++;
+			}
 		}
 		
 		if (this.value != null)
@@ -284,9 +297,12 @@ public class Constructor extends Member implements IConstructor
 		if (match == null)
 		{
 			Marker marker = markers.create(this.position, "resolve.constructor", iclass.getName().qualified);
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			Util.typesToString("", arguments, ", ", builder);
-			marker.addInfo(builder.toString());
+			if (!arguments.isEmpty())
+			{
+				StringBuilder builder = new StringBuilder("Argument Types: ");
+				arguments.typesToString(builder);
+				marker.addInfo(builder.toString());
+			}
 			return new InitializerCall(position, null, arguments, isSuper);
 		}
 		
@@ -426,18 +442,9 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		IClass iclass = member.getTheClass();
-		if (iclass == null)
-		{
-			return READ_WRITE_ACCESS;
-		}
-		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC) && !(member instanceof Constructor))
-		{
-			return STATIC;
-		}
-		return this.theClass.getAccessibility(member);
+		return this.theClass.getVisibility(member);
 	}
 	
 	@Override
@@ -703,7 +710,6 @@ public class Constructor extends Member implements IConstructor
 		
 		if (this.value != null)
 		{
-			buffer.append(Formatting.Method.signatureBodySeperator);
 			this.value.toString(prefix, buffer);
 		}
 		buffer.append(';');

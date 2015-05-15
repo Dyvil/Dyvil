@@ -5,14 +5,22 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public final class SingletonIterator<E> implements Iterator<E>
+import dyvil.lang.literal.TupleConvertible;
+
+@TupleConvertible
+public class SingletonIterator<E> implements Iterator<E>
 {
 	private boolean	returned;
-	private E		e;
+	private final E	element;
 	
-	public SingletonIterator(E e)
+	public static <E> SingletonIterator<E> apply(E element)
 	{
-		this.e = e;
+		return new SingletonIterator(element);
+	}
+	
+	public SingletonIterator(E element)
+	{
+		this.element = element;
 	}
 	
 	@Override
@@ -27,9 +35,9 @@ public final class SingletonIterator<E> implements Iterator<E>
 		if (!this.returned)
 		{
 			this.returned = true;
-			return this.e;
+			return this.element;
 		}
-		throw new NoSuchElementException();
+		throw new NoSuchElementException("Singleton Iterator already returned the element");
 	}
 	
 	@Override
@@ -44,7 +52,7 @@ public final class SingletonIterator<E> implements Iterator<E>
 		Objects.requireNonNull(action);
 		if (!this.returned)
 		{
-			action.accept(this.e);
+			action.accept(this.element);
 			this.returned = true;
 		}
 	}

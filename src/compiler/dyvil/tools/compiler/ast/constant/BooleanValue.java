@@ -4,8 +4,11 @@ import org.objectweb.asm.Label;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LiteralExpression;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
@@ -15,8 +18,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class BooleanValue extends ASTNode implements IConstantValue
 {
-	public static final BooleanValue	TRUE	= new BooleanValue(true);
-	public static final BooleanValue	FALSE	= new BooleanValue(false);
+	public static final IClass			BOOLEAN_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("BooleanConvertible");
+	
+	public static final BooleanValue	TRUE				= new BooleanValue(true);
+	public static final BooleanValue	FALSE				= new BooleanValue(false);
 	
 	public boolean						value;
 	
@@ -56,13 +61,21 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxedValue(this, Types.BOOLEAN.boxMethod) : null;
+		if (type.isSuperTypeOf(Types.BOOLEAN))
+		{
+			return new BoxedValue(this, Types.BOOLEAN.boxMethod);
+		}
+		if (type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null)
+		{
+			return new LiteralExpression(type, this);
+		}
+		return null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN);
+		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) || type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null;
 	}
 	
 	@Override
@@ -72,7 +85,7 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(Types.BOOLEAN))
+		if (type.isSuperTypeOf(Types.BOOLEAN) || type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null)
 		{
 			return 2;
 		}
@@ -83,6 +96,19 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	public Boolean toObject()
 	{
 		return Boolean.valueOf(this.value);
+	}
+	
+	@Override
+	public int stringSize()
+	{
+		return this.value ? 4 : 5;
+	}
+	
+	@Override
+	public boolean toStringBuilder(StringBuilder builder)
+	{
+		builder.append(this.value);
+		return true;
 	}
 	
 	@Override

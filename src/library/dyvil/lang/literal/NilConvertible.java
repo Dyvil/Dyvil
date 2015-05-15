@@ -1,17 +1,17 @@
 package dyvil.lang.literal;
 
 /**
- * Marks a class that can be instantiated with the {@code nil} literal. The
- * process of doing so will cause the compiler to insert a call to a method of
- * that class with the signature {@code static X apply()}. Note that such a
- * method is automatically inserted by the <i>Dyvil Compiler</i> for any
- * {@code case class} that does not take any parameters, as shown in the below
- * example.
+ * Marks a class that can be instantiated with the {@code nil} literal. This
+ * will cause the compiler to insert a call to a method of that class with the
+ * signature {@code static X apply()}. Note that such a method is automatically
+ * inserted by the <i>Dyvil Compiler</i> for any {@code case class} that does
+ * not take any parameters, as shown in the below example.
  * <p>
  * Example:
  * 
  * <pre>
- * case class Nothing implements NilConvertible
+ * {@literal @}NilConvertible
+ * case class Nothing
  * 
  * // ----------
  * 
@@ -20,6 +20,6 @@ package dyvil.lang.literal;
  * 
  * @author Clashsoft
  */
-public interface NilConvertible
+public @interface NilConvertible
 {
 }

@@ -1,14 +1,21 @@
 package dyvil.lang;
 
-import java.util.Comparator;
+import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-import dyvil.collection.immutable.ImmutableCollection;
-import dyvil.collection.immutable.ImmutableList;
-import dyvil.collection.mutable.MutableCollection;
+import dyvil.collection.ImmutableCollection;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableCollection;
+import dyvil.collection.MutableList;
+import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 /**
@@ -18,34 +25,61 @@ import dyvil.lang.literal.NilConvertible;
  * mutable and immutable collections, as there is an (im)mutable counterpart for
  * almost every method in this base class.
  * <p>
- * This interface implements the {@link NilConvertible} interface, meaning that
- * a declaration like
+ * This interface supports the {@link NilConvertible} annotation, meaning that a
+ * declaration like
  * 
  * <pre>
  * Collection[String] c = nil
  * </pre>
  * 
- * Would create an empty, immutable list and assign it to the variable {@code c}.
+ * Would create an empty list by calling {@link #apply()} and assign it to the
+ * variable {@code c}.
+ * <p>
+ * Furthermore, since this interface also supports the {@link ArrayConvertible}
+ * annotation, it is possible to create a collection using <i>Array
+ * Expressions</i> in <i>Dyvil</i>, as shown in the below example.
+ * 
+ * <pre>
+ * Collection[String] c = [ 1, 2, 3 ]
+ * </pre>
  * 
  * @author Clashsoft
  * @param <E>
  *            the element type
  */
-public interface Collection<E> extends Iterable<E>, NilConvertible
+@NilConvertible
+@ArrayConvertible
+public interface Collection<E> extends Iterable<E>
 {
 	/**
-	 * Creates and returns an empty collection. By default, this method returns
-	 * an {@linkplain ImmutableList immutable}, empty {@link List}. This method
-	 * is primarily for use with the {@code nil} literal in <i>Dyvil</i>.
+	 * Returns an empty, mutable collection. This method is primarily for use
+	 * with the {@code nil} literal in <i>Dyvil</i> and is defined by
+	 * {@link MutableList#apply()}.
 	 * 
-	 * @return an empty collection
+	 * @see MutableList#apply()
+	 * @return an empty, mutable collection
 	 */
-	public static <E> Collection<E> apply()
+	public static <E> MutableCollection<E> apply()
 	{
-		return ImmutableList.apply();
+		return MutableList.apply();
 	}
 	
-	// Simple Getters
+	/**
+	 * Returns an immutable collection containing all of the given
+	 * {@code elements}. This method is primarily for use with <i>Array
+	 * Expressions</i> in <i>Dyvil</i> and is defined by
+	 * {@link ImmutableList#apply(Object...)}.
+	 * 
+	 * @param elements
+	 *            the elements of the returned collection
+	 * @return an immutable collection containing all of the given elements
+	 */
+	public static <E> ImmutableCollection<E> apply(E... elements)
+	{
+		return ImmutableList.apply(elements);
+	}
+	
+	// Accessors
 	
 	/**
 	 * Returns the size of this collection, i.e. the number of elements
@@ -85,11 +119,27 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	@Override
 	public default Spliterator<E> spliterator()
 	{
-		return Spliterators.spliterator(this.iterator(), this.size(), 0);
+		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
+	}
+	
+	public default Stream<E> stream()
+	{
+		return StreamSupport.stream(this.spliterator(), false);
+	}
+	
+	public default Stream<E> parallelStream()
+	{
+		return StreamSupport.stream(this.spliterator(), true);
 	}
 	
 	@Override
-	public void forEach(Consumer<? super E> action);
+	public default void forEach(Consumer<? super E> action)
+	{
+		for (E element : this)
+		{
+			action.accept(element);
+		}
+	}
 	
 	/**
 	 * Returns true if and if only this collection contains the element
@@ -191,30 +241,6 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 */
 	public Collection<E> filtered(Predicate<? super E> condition);
 	
-	/**
-	 * Returns a collection that contains the same elements as this collection,
-	 * but in a sorted order. The sorting order is given by the <i>natural
-	 * order</i> of the elements of this collection, i.e. the order specified by
-	 * their {@link Comparable#compareTo(Object) compareTo} method. Thus, this
-	 * method will fail if the elements in this collection do not implement
-	 * {@link Comparable} interface.
-	 * 
-	 * @return a sorted collection of this collection's elements
-	 */
-	public Collection<E> sorted();
-	
-	/**
-	 * Returns a collection that contains the same elements as this collection,
-	 * but in a sorted order. The sorting order is specified by the given
-	 * {@code comparator}.
-	 * 
-	 * @param comparator
-	 *            the comparator that defines the order of the elements
-	 * @return a sorted collection of this collection's elements using the given
-	 *         comparator
-	 */
-	public Collection<E> sorted(Comparator<? super E> comparator);
-	
 	// Mutating Operations
 	
 	/**
@@ -236,7 +262,10 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 * @param element
 	 *            the element to be added
 	 */
-	public void $plus$eq(E element);
+	public default void $plus$eq(E element)
+	{
+		this.add(element);
+	}
 	
 	/**
 	 * Adds all elements of the given {@code collection} to this collection.
@@ -246,7 +275,13 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 * @param collection
 	 *            the collection of elements to be added
 	 */
-	public void $plus$plus$eq(Collection<? extends E> collection);
+	public default void $plus$plus$eq(Collection<? extends E> collection)
+	{
+		for (E e : collection)
+		{
+			this.$plus$eq(e);
+		}
+	}
 	
 	/**
 	 * Removes the given {@code element} from this collection. If the element is
@@ -269,7 +304,10 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 * @param element
 	 *            the element to be removed
 	 */
-	public void $minus$eq(E element);
+	public default void $minus$eq(E element)
+	{
+		this.remove(element);
+	}
 	
 	/**
 	 * Removes all elements of the given {@code collection} from this
@@ -279,7 +317,13 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 * @param collection
 	 *            the collection of elements to be removed
 	 */
-	public void $minus$minus$eq(Collection<? extends E> collection);
+	public default void $minus$minus$eq(Collection<? extends E> collection)
+	{
+		for (E e : collection)
+		{
+			this.$minus$eq(e);
+		}
+	}
 	
 	/**
 	 * Removes all elements of this collection that are not present in the given
@@ -334,44 +378,19 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 */
 	public void filter(Predicate<? super E> condition);
 	
-	/**
-	 * Sorts the elements of this collection. The sorting order is given by the
-	 * <i>natural order</i> of the elements of this collection, i.e. the order
-	 * specified by their {@link Comparable#compareTo(Object) compareTo} method.
-	 * Thus, this method will fail if the elements in this collection do not
-	 * implement {@link Comparable} interface.
-	 */
-	public void sort();
-	
-	/**
-	 * Sorts the elements of this collection. The sorting order is specified by
-	 * the given {@code comparator}.
-	 * 
-	 * @param comparator
-	 *            the comparator that defines the order of the elements
-	 */
-	public void sort(Comparator<? super E> comparator);
-	
-	// ToArray
+	// toArray
 	
 	/**
 	 * Creates and returns an array containing the elements of this collection.
 	 * 
 	 * @return an array of this collection's elements
 	 */
-	public Object[] toArray();
-	
-	/**
-	 * Stores the elements of this collection in the given {@code store} array.
-	 * If the {@code store} array is not large enough to hold all the elements
-	 * of this collection, a copy of it is created, filled with the elements and
-	 * returned.
-	 * 
-	 * @param store
-	 *            the store array
-	 * @return the store array or a resized array
-	 */
-	public Object[] toArray(Object[] store);
+	public default Object[] toArray()
+	{
+		Object[] array = new Object[this.size()];
+		this.toArray(0, array);
+		return array;
+	}
 	
 	/**
 	 * Creates and returns an array containing the elements of this collection.
@@ -384,9 +403,21 @@ public interface Collection<E> extends Iterable<E>, NilConvertible
 	 *            the array type
 	 * @return an array containing this collection's elements
 	 */
-	public E[] toArray(Class<E> type);
+	public default E[] toArray(Class<E> type)
+	{
+		E[] array = (E[]) Array.newInstance(type, this.size());
+		this.toArray(0, array);
+		return array;
+	}
 	
 	// Copying
+	
+	public default void toArray(Object[] store)
+	{
+		this.toArray(0, store);
+	}
+	
+	public void toArray(int index, Object[] store);
 	
 	/**
 	 * Creates a copy of this collection. The general contract of this method is

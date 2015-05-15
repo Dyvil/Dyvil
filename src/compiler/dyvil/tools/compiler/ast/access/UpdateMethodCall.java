@@ -7,8 +7,6 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.GenericData;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
@@ -23,9 +21,8 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.Util;
 
-public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeContext
+public class UpdateMethodCall extends ASTNode implements ICall, IValued
 {
 	public IValue		instance;
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
@@ -69,8 +66,7 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 		}
 		if (this.type == null)
 		{
-			this.getGenericData();
-			return this.type = this.method.getType().getConcreteType(this);
+			return this.type = this.method.getType().getConcreteType(this.getGenericData());
 		}
 		return this.type;
 	}
@@ -139,16 +135,6 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		if (typeVar.getGeneric().isMethod())
-		{
-			return this.genericData.generics[typeVar.getIndex()];
-		}
-		return this.instance.getType().resolveType(typeVar);
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
@@ -176,10 +162,13 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 		}
 		
 		Marker marker = markers.create(this.position, "resolve.method", "update");
-		marker.addInfo("Instance Type: " + this.instance.getType());
-		StringBuilder builder = new StringBuilder("Argument Types: {");
-		Util.typesToString("", this.arguments, ", ", builder);
-		marker.addInfo(builder.append('}').toString());
+		marker.addInfo("Callee Type: " + this.instance.getType());
+		if (!this.arguments.isEmpty())
+		{
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			this.arguments.typesToString(builder);
+			marker.addInfo(builder.toString());
+		}
 		
 		return this;
 	}
@@ -194,7 +183,7 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.instance, this.arguments, this);
+			this.method.checkArguments(markers, this.instance, this.arguments, this.getGenericData());
 		}
 		this.arguments.check(markers, context);
 	}
@@ -213,21 +202,20 @@ public class UpdateMethodCall extends ASTNode implements ICall, IValued, ITypeCo
 		{
 			if (this.method.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.position, "access.method.deprecated", "update");
+				markers.add(this.position, "method.access.deprecated", "update");
 			}
 			
-			byte access = context.getAccessibility(this.method);
-			if (access == IContext.STATIC)
+			switch (context.getVisibility(this.method))
 			{
-				markers.add(this.position, "access.method.instance", "update");
-			}
-			else if (access == IContext.SEALED)
-			{
-				markers.add(this.position, "access.method.sealed", "update");
-			}
-			else if ((access & IContext.READ_ACCESS) == 0)
-			{
-				markers.add(this.position, "access.method.invisible", "update");
+			case IContext.STATIC:
+				markers.add(this.position, "method.access.instance", "update");
+				break;
+			case IContext.SEALED:
+				markers.add(this.position, "method.access.sealed", "update");
+				break;
+			case IContext.INVISIBLE:
+				markers.add(this.position, "method.access.invisible", "update");
+				break;
 			}
 		}
 	}

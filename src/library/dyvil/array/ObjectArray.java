@@ -6,10 +6,14 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 
 public interface ObjectArray
 {
@@ -45,8 +49,6 @@ public interface ObjectArray
 		return array;
 	}
 	
-	// Basic Array Operations
-	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
 	public static @infix <T> int length(T[] array)
 	{
@@ -81,6 +83,21 @@ public interface ObjectArray
 	}
 	
 	// Operators
+	
+	public static @infix @inline <T> boolean $qmark(T[] array, T v)
+	{
+		return indexOf(array, v, 0) != -1;
+	}
+	
+	public static @infix @inline <T> boolean $eq$eq(T[] array1, T[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline <T> boolean $bang$eq(T[] array1, T[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
 	
 	public static @infix <T> T[] $plus(T[] array, T v)
 	{
@@ -209,16 +226,12 @@ public interface ObjectArray
 		return res;
 	}
 	
-	// Array Creation
-	
 	public static @infix <T> T[] newArray(Class<T> type, int size)
 	{
 		return (T[]) Array.newInstance(type, size);
 	}
 	
-	// Component Types
-	
-	public static @infix <T> Class<T> getComponentType(T[] array)
+	public static @infix @inline <T> Class<T> getComponentType(T[] array)
 	{
 		return (Class<T>) array.getClass().getComponentType();
 	}
@@ -237,16 +250,92 @@ public interface ObjectArray
 		}
 	}
 	
-	// Operators
-	
-	public static @infix <T> T[] $plus(T[] a, T[] b)
+	public static @infix <T> Class<T[]> getArrayType(Class<T> componentType)
 	{
-		int len1 = a.length;
-		int len2 = b.length;
-		T[] res = (T[]) new Object[len1 + len2];
-		System.arraycopy(a, 0, res, 0, len1);
-		System.arraycopy(b, 0, res, len1, len2);
-		return res;
+		return (Class<T[]>) Array.newInstance(componentType, 0).getClass();
+	}
+	
+	// Search Operations
+	
+	public static @infix <T> int indexOf(T[] array, T v)
+	{
+		return indexOf(array, v, 0);
+	}
+	
+	public static @infix <T> int indexOf(T[] array, T v, int start)
+	{
+		for (; start < array.length; start++)
+		{
+			if (Objects.equals(v, array[start]))
+			{
+				return start;
+			}
+		}
+		return -1;
+	}
+	
+	public static @infix <T> int lastIndexOf(T[] array, T v)
+	{
+		return lastIndexOf(array, v, array.length - 1);
+	}
+	
+	public static @infix <T> int lastIndexOf(T[] array, T v, int start)
+	{
+		for (; start >= 0; start--)
+		{
+			if (Objects.equals(v, array[start]))
+			{
+				return start;
+			}
+		}
+		return -1;
+	}
+	
+	public static @infix @inline <T> boolean contains(T[] array, T v)
+	{
+		return indexOf(array, v, 0) != -1;
+	}
+	
+	public static @infix @inline <T> boolean in(T v, T[] array)
+	{
+		return indexOf(array, v, 0) != -1;
+	}
+	
+	// Copying
+	
+	public static @infix <T> T[] copy(T[] array)
+	{
+		return array.clone();
+	}
+	
+	public static @infix <T> T[] copy(T[] array, int newLength)
+	{
+		return (T[]) java.util.Arrays.copyOf(array, newLength, array.getClass());
+	}
+	
+	public static @infix <T, N> N[] copy(T[] array, int newLength, Class<? extends N[]> newType)
+	{
+		return java.util.Arrays.<N, T> copyOf(array, newLength, newType);
+	}
+	
+	public static @infix @inline <T> boolean equals(T[] array1, T[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline <T> boolean deepEquals(T[] array1, T[] array2)
+	{
+		return Arrays.deepEquals(array1, array2);
+	}
+	
+	public static @infix @inline <T> int hashCode(T[] array)
+	{
+		return Arrays.hashCode(array);
+	}
+	
+	public static @infix @inline <T> int deepHashCode(T[] array)
+	{
+		return Arrays.deepHashCode(array);
 	}
 	
 	public static @infix <T> String toString(T[] array)
@@ -399,69 +488,12 @@ public interface ObjectArray
 			DoubleArray.toString((double[]) o, builder);
 			return;
 		}
-		if (c.isArray()) {
+		if (c.isArray())
+		{
 			deepToString((Object[]) o, builder);
 			return;
 		}
 		
 		builder.append(o.toString());
-	}
-	
-	// Search Operations
-	
-	public static @infix <T> int indexOf(T[] array, T v)
-	{
-		return indexOf(array, v, 0);
-	}
-	
-	public static @infix <T> int indexOf(T[] array, T v, int start)
-	{
-		for (; start < array.length; start++)
-		{
-			if (Objects.equals(v, array[start]))
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix <T> int lastIndexOf(T[] array, T v)
-	{
-		return lastIndexOf(array, v, array.length - 1);
-	}
-	
-	public static @infix <T> int lastIndexOf(T[] array, T v, int start)
-	{
-		for (; start >= 0; start--)
-		{
-			if (Objects.equals(v, array[start]))
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix <T> boolean contains(T[] array, T v)
-	{
-		return indexOf(array, v, 0) != -1;
-	}
-	
-	// Copying
-	
-	public static @infix <T> T[] copy(T[] array)
-	{
-		return array.clone();
-	}
-	
-	public static @infix <T> T[] copy(T[] array, int newLength)
-	{
-		return (T[]) java.util.Arrays.copyOf(array, newLength, array.getClass());
-	}
-	
-	public static @infix <T, N> N[] copy(T[] array, int newLength, Class<? extends N[]> newType)
-	{
-		return java.util.Arrays.<N, T> copyOf(array, newLength, newType);
 	}
 }

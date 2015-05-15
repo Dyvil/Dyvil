@@ -1,8 +1,11 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
@@ -110,6 +113,24 @@ public final class LambdaType extends Type implements ITyped, ITypeList
 		}
 		this.returnType = this.returnType.resolve(markers, context);
 		return this;
+	}
+	
+	@Override
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
+	{
+		this.returnType.writeTypeExpression(writer);
+		
+		writer.writeLDC(this.parameterCount);
+		writer.writeNewArray("dyvil/lang/Type", 1);
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			writer.writeInsn(Opcodes.DUP);
+			writer.writeLDC(i);
+			this.parameterTypes[i].writeTypeExpression(writer);
+			writer.writeInsn(Opcodes.AASTORE);
+		}
+		
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/FunctionType", "apply", "([Ldyvil/lang/Type;)Ldyvil/reflect/type/FunctionType;", false);
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.generic;
 
 import java.util.List;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -16,23 +17,17 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class TypeVariableType extends ASTNode implements IType
 {
-	public int				arrayDimensions;
 	public ITypeVariable	typeVar;
 	
 	public TypeVariableType(ITypeVariable typeVar)
 	{
 		this.typeVar = typeVar;
-	}
-	
-	public TypeVariableType(ITypeVariable typeVar, int arrayDimensions)
-	{
-		this.typeVar = typeVar;
-		this.arrayDimensions = arrayDimensions;
 	}
 	
 	@Override
@@ -60,40 +55,18 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public IClass getTheClass()
 	{
-		return null;
-	}
-	
-	@Override
-	public void setArrayDimensions(int dimensions)
-	{
-		this.arrayDimensions = dimensions;
-	}
-	
-	@Override
-	public int getArrayDimensions()
-	{
-		return this.arrayDimensions;
-	}
-	
-	@Override
-	public boolean isArrayType()
-	{
-		return this.arrayDimensions > 0;
+		return this.typeVar.getTheClass();
 	}
 	
 	@Override
 	public IType getSuperType()
 	{
-		return this.arrayDimensions > 0 ? Types.OBJECT : null;
+		return null;
 	}
 	
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (this.arrayDimensions != type.getArrayDimensions())
-		{
-			return false;
-		}
 		return this.typeVar.isSuperTypeOf(type);
 	}
 	
@@ -106,10 +79,6 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public boolean equals(IType type)
 	{
-		if (this.arrayDimensions != type.getArrayDimensions())
-		{
-			return false;
-		}
 		return this.typeVar.isSuperTypeOf(type);
 	}
 	
@@ -146,10 +115,6 @@ public final class TypeVariableType extends ASTNode implements IType
 		IType t = context.resolveType(this.typeVar);
 		if (t != null)
 		{
-			if (this.arrayDimensions > 0)
-			{
-				return t.getArrayType(this.arrayDimensions);
-			}
 			if (t.isPrimitive())
 			{
 				return t.getReferenceType();
@@ -218,7 +183,7 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
 		return 0;
 	}
@@ -247,10 +212,6 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
 		buffer.append('L').append(this.getInternalName()).append(';');
 	}
 	
@@ -265,11 +226,14 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
 		buffer.append('T').append(this.typeVar.getName().qualified).append(';');
+	}
+	
+	@Override
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
+	{
+		writer.writeLDC(this.typeVar.getName().qualified);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/TypeArgument", "apply", "(Ljava/lang/String;)Ldyvil/reflect/type/TypeArgument;", false);
 	}
 	
 	@Override
@@ -294,16 +258,6 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
-		
 		buffer.append(this.typeVar.getName());
-		
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append(']');
-		}
 	}
 }

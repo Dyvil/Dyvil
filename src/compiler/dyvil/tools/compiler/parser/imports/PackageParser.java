@@ -5,6 +5,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -34,6 +35,16 @@ public class PackageParser extends Parser
 			this.packageDeclaration.setPackage(this.buffer.toString());
 			
 			pm.popParser();
+			return;
+		}
+		if (type == Keywords.TYPE)
+		{
+			this.buffer.append("type");
+			return;
+		}
+		if (type == Keywords.ANNOTATION)
+		{
+			this.buffer.append("annotation");
 			return;
 		}
 		if (type == Symbols.DOT)

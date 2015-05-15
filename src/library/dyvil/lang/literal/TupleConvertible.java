@@ -1,18 +1,19 @@
 package dyvil.lang.literal;
 
 /**
- * Marks a class that can be instantiated with a tuple literal. The process of
- * doing so will cause the compiler to insert a call to a method of that class
- * with the signature {@code static X apply(Y1, Y2, ... Yi)}, where {@code Yi}
- * is the {@code i}th type of the a tuple with {@code N} types. Note that such a
- * method is automatically inserted by the <i>Dyvil Compiler</i> for any
+ * Marks a class that can be instantiated with a tuple literal. This will cause
+ * the compiler to insert a call to a method of that class with the signature
+ * {@code static X apply(Y1, Y2, ... Yi)}, where {@code Yi} is the {@code i}th
+ * type of the a tuple with {@code N} types. Note that such a method is
+ * automatically inserted by the <i>Dyvil Compiler</i> for any
  * {@code case class X} that takes {@code N} parameters, as shown in the below
  * example.
  * <p>
  * Example:
  * 
  * <pre>
- * case class Point(int x, int y) implements TupleConvertible
+ * {@literal @}TupleConvertible
+ * case class Point(int x, int y)
  * 
  * // generated because this is a case class
  * // public static Point apply(int x, int y) = new Point(x, y)
@@ -24,6 +25,6 @@ package dyvil.lang.literal;
  * 
  * @author Clashsoft
  */
-public interface TupleConvertible
+public @interface TupleConvertible
 {
 }

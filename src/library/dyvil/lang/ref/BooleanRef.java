@@ -1,111 +1,37 @@
 package dyvil.lang.ref;
 
-import dyvil.lang.Boolean;
-import dyvil.lang.Boolean$;
+import dyvil.lang.literal.BooleanConvertible;
 
-public class BooleanRef implements Boolean$
+@BooleanConvertible
+public class BooleanRef implements BooleanRef$
 {
-	protected boolean	value;
+	public boolean	value;
 	
-	protected BooleanRef(boolean value)
-	{
-		this.value = value;
-	}
-	
-	public static BooleanRef create(boolean value)
+	public static BooleanRef apply(boolean value)
 	{
 		return new BooleanRef(value);
 	}
 	
+	public BooleanRef(boolean value)
+	{
+		this.value = value;
+	}
+	
 	@Override
-	public boolean booleanValue()
+	public boolean apply()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public Boolean $bang()
+	public void update(boolean value)
 	{
-		return Boolean.apply(!this.value);
-	}
-	
-	@Override
-	public boolean $eq$eq(boolean v)
-	{
-		return this.value == v;
-	}
-	
-	@Override
-	public boolean $bang$eq(boolean v)
-	{
-		return this.value != v;
-	}
-	
-	@Override
-	public Boolean $amp(boolean v)
-	{
-		return Boolean.apply(this.value && v);
-	}
-	
-	@Override
-	public Boolean $bar(boolean v)
-	{
-		return Boolean.apply(this.value || v);
-	}
-	
-	@Override
-	public Boolean $up(boolean v)
-	{
-		return Boolean.apply(this.value ^ v);
-	}
-	
-	public BooleanRef $amp$eq(boolean v)
-	{
-		this.value &= v;
-		return this;
-	}
-	
-	public BooleanRef $bar$eq(boolean v)
-	{
-		this.value |= v;
-		return this;
-	}
-	
-	public BooleanRef $up$eq(boolean v)
-	{
-		this.value ^= v;
-		return this;
-	}
-	
-	@Override
-	public Boolean$ $eq$eq$gt(boolean v)
-	{
-		this.value = v || !this.value;
-		return this;
-	}
-	
-	@Override
-	public Boolean$ $lt$eq$gt(boolean v)
-	{
-		this.value = this.value == v;
-		return this;
+		this.value = value;
 	}
 	
 	@Override
 	public String toString()
 	{
 		return this.value ? "true" : "false";
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return obj != null && obj.equals(this.value);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return this.value ? 1237 : 1231;
 	}
 }

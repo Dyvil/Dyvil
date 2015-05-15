@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -11,7 +10,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class SuperValue extends ASTNode implements IConstantValue
+public final class SuperValue extends ASTNode implements IValue
 {
 	public IType	type;
 	
@@ -91,7 +90,7 @@ public final class SuperValue extends ASTNode implements IConstantValue
 		}
 		if (context.isStatic())
 		{
-			markers.add(this.position, "access.super.static");
+			markers.add(this.position, "super.access.static");
 			return;
 		}
 		
@@ -99,9 +98,31 @@ public final class SuperValue extends ASTNode implements IConstantValue
 		this.type = thisType.getSuperType();
 		if (this.type == null)
 		{
-			Marker marker = markers.create(this.position, "access.super.type");
+			Marker marker = markers.create(this.position, "super.access.type");
 			marker.addInfo("Enclosing Type: " + thisType);
 		}
+	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		return this;
 	}
 	
 	@Override

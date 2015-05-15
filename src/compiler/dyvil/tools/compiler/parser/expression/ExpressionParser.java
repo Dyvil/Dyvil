@@ -5,12 +5,10 @@ import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.operator.ClassOperator;
-import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.operator.*;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -22,7 +20,6 @@ import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
 import dyvil.tools.compiler.parser.statement.*;
-import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
@@ -46,8 +43,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int		CONSTRUCTOR_END		= 0x400;
 	public static final int		PARAMETERS			= 0x800;
 	public static final int		PARAMETERS_END		= 0x1000;
-	public static final int		GENERICS			= 0x2000;
-	public static final int		GENERICS_END		= 0x4000;
 	
 	public static final int		FUNCTION_POINTER	= 0x8000;
 	
@@ -287,25 +282,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			throw new SyntaxError(token, "Invalid Constructor Argument List - ')' expected", true);
 		}
-		if (this.mode == GENERICS)
-		{
-			this.mode = GENERICS_END;
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
-			{
-				pm.pushParser(new TypeListParser((ITypeList) this.value));
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Generic Type Arguments - '[' expected");
-		}
-		if (this.mode == GENERICS_END)
-		{
-			this.mode = ACCESS;
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
-			{
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Generic Type Arguments - ']' expected");
-		}
 		if (this.mode == FUNCTION_POINTER)
 		{
 			// TODO Constructor Function Pointers
@@ -382,6 +358,20 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			if (type == Symbols.EQUALS)
 			{
 				this.getAssign(pm, token);
+				return;
+			}
+			if (type == Keywords.AS)
+			{
+				CastOperator co = new CastOperator(token.raw(), this.value);
+				pm.pushParser(new TypeParser(co));
+				this.value = co;
+				return;
+			}
+			if (type == Keywords.IS)
+			{
+				InstanceOfOperator io = new InstanceOfOperator(token.raw(), this.value);
+				pm.pushParser(new TypeParser(io));
+				this.value = io;
 				return;
 			}
 			if (type == Symbols.OPEN_PARENTHESIS)
@@ -558,14 +548,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			call.dotless = this.dotless;
 			this.value = call;
 			this.mode = PARAMETERS;
-			return;
-		}
-		if (type1 == Symbols.OPEN_SQUARE_BRACKET)
-		{
-			MethodCall call = new MethodCall(token, this.value, name);
-			call.dotless = this.dotless;
-			this.value = call;
-			this.mode = GENERICS;
 			return;
 		}
 		if (type1 == Symbols.ARROW_OPERATOR)
@@ -823,6 +805,20 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.value = co;
 			pm.skip();
 			pm.pushParser(new TypeParser(co));
+			this.mode = ARRAY_END;
+			return true;
+		}
+		case Keywords.TYPE:
+		{
+			if (token.next().type() != Symbols.OPEN_SQUARE_BRACKET)
+			{
+				return false;
+			}
+			
+			TypeOperator to = new TypeOperator(token);
+			this.value = to;
+			pm.skip();
+			pm.pushParser(new TypeParser(to));
 			this.mode = ARRAY_END;
 			return true;
 		}

@@ -1,6 +1,16 @@
 package dyvil.tuple
 
-public case class Tuple10[A, B, C, D, E, F, G, H, I, J](public A _1, public B _2, public C _3, public D _4, public E _5, public F _6, public G _7, public H _8, public I _9, public J _10)
+public case class Tuple10[A, B, C, D, E, F, G, H, I, J](
+		public final A _1
+		public final B _2
+		public final C _3
+		public final D _4
+		public final E _5
+		public final F _6
+		public final G _7
+		public final H _8
+		public final I _9
+		public final J _10)
 {
-	public override String toString() = @"(${this._1}, ${this._2}, ${this._3}, ${this._4}, ${this._5}, ${this._6}, ${this._7}, ${this._8}, ${this._9}, ${this._10})"
+	public override String toString() = @"(\(this._1), \(this._2), \(this._3), \(this._4), \(this._5), \(this._6), \(this._7), \(this._8), \(this._9), \(this._10))"
 }

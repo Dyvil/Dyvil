@@ -5,11 +5,10 @@ import java.util.Iterator;
 import dyvil.collection.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -20,9 +19,9 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Array extends ASTNode implements IValue, IValueList
 {
-	public static final IType	ARRAY_CONVERTIBLE	= new Type(Package.dyvilLangLiteral.resolveClass("ArrayConvertible"));
+	public static final IClass	ARRAY_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
 	
-	protected IValue[]			values				= new IValue[3];
+	protected IValue[]			values;
 	protected int				valueCount;
 	
 	protected IType				requiredType;
@@ -30,11 +29,19 @@ public final class Array extends ASTNode implements IValue, IValueList
 	
 	public Array()
 	{
+		this.values = new IValue[3];
 	}
 	
 	public Array(ICodePosition position)
 	{
+		this.values = new IValue[3];
 		this.position = position;
+	}
+	
+	public Array(IValue[] values, int valueCount)
+	{
+		this.values = values;
+		this.valueCount = valueCount;
 	}
 	
 	@Override
@@ -89,13 +96,33 @@ public final class Array extends ASTNode implements IValue, IValueList
 			t = Type.findCommonSuperType(t, t1);
 			if (t == null)
 			{
-				this.elementType = Types.ANY;
-				return this.requiredType = Types.ANY.getArrayType(1);
+				t = Types.ANY;
+				break;
 			}
 		}
 		
 		this.elementType = t;
-		return this.requiredType = t.getArrayType();
+		
+		if (t.getTheClass() == Types.TUPLE2_CLASS)
+		{
+			GenericType type = new GenericType(Types.MAP_CLASS);
+			type.genericCount = 2;
+			
+			switch (t.typeTag())
+			{
+			case IType.GENERIC_TYPE:
+			case IType.TUPLE_TYPE:
+				ITypeList t1 = (ITypeList) t;
+				type.generics[0] = t1.getType(0);
+				type.generics[1] = t1.getType(1);
+				break;
+			default:
+				type.generics[0] = type.generics[1] = Types.ANY;
+			}
+			
+			return this.requiredType = type;
+		}
+		return this.requiredType = new ArrayType(t);
 	}
 	
 	@Override
@@ -103,7 +130,12 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			if (ARRAY_CONVERTIBLE.isSuperTypeOf(type))
+			IClass iclass = type.getTheClass();
+			if (iclass == Types.OBJECT_CLASS)
+			{
+				return this;
+			}
+			if (iclass.getAnnotation(ARRAY_CONVERTIBLE) != null)
 			{
 				return new LiteralExpression(type, this);
 			}
@@ -134,7 +166,8 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			return ARRAY_CONVERTIBLE.isSuperTypeOf(type);
+			IClass iclass = type.getTheClass();
+			return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null;
 		}
 		
 		// Skip getting the element type if this is an empty array
@@ -164,7 +197,8 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			return ARRAY_CONVERTIBLE.isSuperTypeOf(type) ? 3 : 0;
+			IClass iclass = type.getTheClass();
+			return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null ? 2 : 0;
 		}
 		
 		// Skip getting the element type if this is an empty array
@@ -190,7 +224,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 		}
 		
 		// Divide by the count
-		return total / this.valueCount;
+		return 1 + total / this.valueCount;
 	}
 	
 	@Override
@@ -333,6 +367,11 @@ public final class Array extends ASTNode implements IValue, IValueList
 			writer.writeLDC(i);
 			value.writeExpression(writer);
 			writer.writeInsn(opcode);
+		}
+		
+		if (this.requiredType.getTheClass() == Types.MAP_CLASS)
+		{
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Map", "apply", "([Ldyvil/tuple/Tuple2;)Ldyvil/collection/immutable/ImmutableMap;", true);
 		}
 	}
 	

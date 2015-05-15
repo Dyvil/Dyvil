@@ -1,11 +1,14 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -35,6 +38,12 @@ public final class GenericType extends Type implements ITypeList
 	public GenericType(IClass iclass)
 	{
 		super(iclass);
+	}
+	
+	@Override
+	public int typeTag()
+	{
+		return GENERIC_TYPE;
 	}
 	
 	// ITypeList Overrides
@@ -220,10 +229,6 @@ public final class GenericType extends Type implements ITypeList
 	@Override
 	public void appendSignature(StringBuilder buf)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buf.append('[');
-		}
 		buf.append('L').append(this.internalName);
 		if (this.generics != null)
 		{
@@ -238,21 +243,32 @@ public final class GenericType extends Type implements ITypeList
 	}
 	
 	@Override
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
+	{
+		writer.writeLDC(this.theClass.getFullName());
+		
+		writer.writeLDC(this.genericCount);
+		writer.writeNewArray("dyvil/lang/Type", 1);
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			writer.writeInsn(Opcodes.DUP);
+			writer.writeLDC(i);
+			this.generics[i].writeTypeExpression(writer);
+			writer.writeInsn(Opcodes.AASTORE);
+		}
+		
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/GenericType", "apply",
+				"(Ljava/lang/String;[Ldyvil/lang/Type;)Ldyvil/reflect/type/GenericType;", false);
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
 		buffer.append(this.name);
 		if (this.generics != null)
 		{
 			buffer.append('[');
 			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
-			buffer.append(']');
-		}
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
 			buffer.append(']');
 		}
 	}
@@ -264,7 +280,6 @@ public final class GenericType extends Type implements ITypeList
 		t.theClass = this.theClass;
 		t.name = this.name;
 		t.internalName = this.internalName;
-		t.arrayDimensions = this.arrayDimensions;
 		if (this.generics != null)
 		{
 			t.genericCount = this.genericCount;

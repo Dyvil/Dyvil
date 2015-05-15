@@ -107,7 +107,7 @@ public final class PrimitiveType extends Type
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.arrayDimensions == 0;
+		return true;
 	}
 	
 	@Override
@@ -131,29 +131,35 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public IType getElementType()
+	public IClass getArrayClass()
 	{
-		int newDims = this.arrayDimensions - 1;
-		if (newDims == 0)
-		{
-			return fromTypecode(this.typecode);
-		}
-		PrimitiveType t = new PrimitiveType(this.name, this.typecode);
-		t.theClass = this.theClass;
-		t.arrayDimensions = newDims;
-		return t;
-	}
-	
-	@Override
-	public boolean isResolved()
-	{
-		return true;
+		return Types.getPrimitiveArray(this.typecode);
 	}
 	
 	@Override
 	public boolean isSuperTypeOf2(IType that)
 	{
 		return this.theClass == that.getTheClass();
+	}
+	
+	@Override
+	public boolean classEquals(IType type)
+	{
+		if (this == type)
+		{
+			return true;
+		}
+		if (type.getName() == this.name)
+		{
+			return true;
+		}
+		return super.classEquals(type);
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return true;
 	}
 	
 	@Override
@@ -168,6 +174,26 @@ public final class PrimitiveType extends Type
 			}
 		}
 		return this;
+	}
+	
+	@Override
+	public IField resolveField(Name name)
+	{
+		return null;
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	{
+		if (this.theClass != null)
+		{
+			this.theClass.getMethodMatches(list, instance, name, arguments);
+		}
+	}
+	
+	@Override
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	{
 	}
 	
 	@Override
@@ -199,20 +225,12 @@ public final class PrimitiveType extends Type
 	@Override
 	public void appendExtendedName(StringBuilder buf)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buf.append('[');
-		}
 		buf.append(this.getInternalName());
 	}
 	
 	@Override
 	public int getLoadOpcode()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return Opcodes.ALOAD;
-		}
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
@@ -260,10 +278,6 @@ public final class PrimitiveType extends Type
 	@Override
 	public int getStoreOpcode()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return Opcodes.ASTORE;
-		}
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
@@ -311,10 +325,6 @@ public final class PrimitiveType extends Type
 	@Override
 	public int getReturnOpcode()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return Opcodes.ARETURN;
-		}
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
@@ -335,43 +345,46 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public Object getFrameType()
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return this.getExtendedName();
-		}
+		int i;
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
-			return ClassFormat.BOOLEAN;
+			i = dyvil.reflect.type.PrimitiveType.BOOLEAN;
+			break;
 		case ClassFormat.T_BYTE:
-			return ClassFormat.BYTE;
+			i = dyvil.reflect.type.PrimitiveType.BYTE;
+			break;
 		case ClassFormat.T_SHORT:
-			return ClassFormat.SHORT;
+			i = dyvil.reflect.type.PrimitiveType.SHORT;
+			break;
 		case ClassFormat.T_CHAR:
-			return ClassFormat.CHAR;
+			i = dyvil.reflect.type.PrimitiveType.CHAR;
+			break;
 		case ClassFormat.T_INT:
-			return ClassFormat.INT;
+			i = dyvil.reflect.type.PrimitiveType.INT;
+			break;
 		case ClassFormat.T_LONG:
-			return ClassFormat.LONG;
+			i = dyvil.reflect.type.PrimitiveType.LONG;
+			break;
 		case ClassFormat.T_FLOAT:
-			return ClassFormat.FLOAT;
+			i = dyvil.reflect.type.PrimitiveType.FLOAT;
+			break;
 		case ClassFormat.T_DOUBLE:
-			return ClassFormat.DOUBLE;
+			i = dyvil.reflect.type.PrimitiveType.DOUBLE;
+			break;
 		default:
-			return ClassFormat.NULL;
+			i = 0;
 		}
+		
+		writer.writeLDC(i);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/PrimitiveType", "apply", "(I)Ldyvil/reflect/type/PrimitiveType;", false);
 	}
 	
 	@Override
-	public void writeDefaultValue(MethodWriter writer) throws BytecodeException
+	public void writeDefaultValue(MethodWriter writer)
 	{
-		if (this.arrayDimensions > 0)
-		{
-			writer.writeInsn(Opcodes.ACONST_NULL);
-			return;
-		}
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
@@ -396,10 +409,6 @@ public final class PrimitiveType extends Type
 	@Override
 	public IConstantValue getDefaultValue()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return NullValue.getNull();
-		}
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
@@ -420,57 +429,10 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public boolean classEquals(IType type)
-	{
-		if (this == type)
-		{
-			return true;
-		}
-		if (type.getName() == this.name)
-		{
-			return true;
-		}
-		return super.classEquals(type);
-	}
-	
-	@Override
-	public IField resolveField(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		if (this.arrayDimensions > 0)
-		{
-			if (this.arrayDimensions == 1)
-			{
-				Types.getPrimitiveArray(this.typecode).getMethodMatches(list, instance, name, arguments);
-				return;
-			}
-			
-			Types.getObjectArray().getMethodMatches(list, instance, name, arguments);
-			return;
-		}
-		
-		if (this.theClass != null)
-		{
-			this.theClass.getMethodMatches(list, instance, name, arguments);
-		}
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-	}
-	
-	@Override
 	public PrimitiveType clone()
 	{
 		PrimitiveType t = new PrimitiveType(this.name, this.typecode);
 		t.theClass = this.theClass;
-		t.arrayDimensions = this.arrayDimensions;
 		return t;
 	}
 }

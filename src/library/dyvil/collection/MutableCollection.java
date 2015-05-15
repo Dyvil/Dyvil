@@ -1,39 +1,40 @@
-package dyvil.collection.mutable;
+package dyvil.collection;
 
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.collection.immutable.ImmutableCollection;
 import dyvil.lang.Collection;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
+@ArrayConvertible
 public interface MutableCollection<E> extends Collection<E>
 {
-	@Override
-	public int size();
+	public static <E> MutableCollection<E> apply()
+	{
+		return MutableList.apply();
+	}
+	
+	public static <E> MutableCollection<E> apply(E... elements)
+	{
+		return MutableList.apply(elements);
+	}
+	
+	// Accessors
 	
 	@Override
-	public boolean isEmpty();
+	public int size();
 	
 	@Override
 	public Iterator<E> iterator();
 	
 	@Override
-	public default Spliterator<E> spliterator()
-	{
-		return Spliterators.spliterator(this.iterator(), this.size(), 0);
-	}
-	
-	@Override
-	public void forEach(Consumer<? super E> action);
-	
-	@Override
 	public boolean $qmark(Object element);
+	
+	// Non-mutating Operations
 	
 	@Override
 	public MutableCollection<E> $plus(E element);
@@ -59,13 +60,7 @@ public interface MutableCollection<E> extends Collection<E>
 	@Override
 	public MutableCollection<E> filtered(Predicate<? super E> condition);
 	
-	@Override
-	public MutableCollection<E> sorted();
-	
-	@Override
-	public MutableCollection<E> sorted(Comparator<? super E> comparator);
-	
-	// Mutating Functions
+	// Mutating Operations
 	
 	@Override
 	public void $plus$eq(E element);
@@ -94,11 +89,12 @@ public interface MutableCollection<E> extends Collection<E>
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
-	@Override
-	public void sort();
+	// toArray
 	
 	@Override
-	public void sort(Comparator<? super E> comparator);
+	public void toArray(int index, Object[] store);
+	
+	// Copying
 	
 	@Override
 	public MutableCollection<E> copy();

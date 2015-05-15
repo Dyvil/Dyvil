@@ -2,8 +2,11 @@ package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
@@ -16,9 +19,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ClassOperator extends ASTNode implements IValue
 {
-	private IType	type;
-	private IType	genericType;
-	public boolean	dotless;
+	public static final IClass	CLASS_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("ClassConvertible");
+	
+	private IType				type;
+	private IType				genericType;
+	public boolean				dotless;
 	
 	public ClassOperator(ICodePosition position)
 	{
@@ -55,25 +60,41 @@ public final class ClassOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		if (type.getTheClass().getAnnotation(CLASS_CONVERTIBLE) != null)
+		{
+			return new LiteralExpression(type, this);
+		}
+		
+		return type.isSuperTypeOf(this.getType()) ? this : null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
-		if (this.genericType == null)
+		if (type.getTheClass().getAnnotation(CLASS_CONVERTIBLE) != null)
 		{
-			GenericType generic = new GenericType(Types.CLASS_CLASS);
-			generic.addType(type);
-			this.genericType = generic;
+			return true;
 		}
-		return type.isSuperTypeOf(this.genericType);
+		
+		return type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type.equals(this.genericType))
+		if (type.getTheClass().getAnnotation(CLASS_CONVERTIBLE) != null)
+		{
+			return 2;
+		}
+		
+		IType thisType = this.getType();
+		if (type.equals(thisType))
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(this.genericType))
+		if (type.isSuperTypeOf(thisType))
 		{
 			return 2;
 		}

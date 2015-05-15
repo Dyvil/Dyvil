@@ -8,11 +8,6 @@ public class Byte implements Integer
 {
 	protected byte	value;
 	
-	protected Byte(byte value)
-	{
-		this.value = value;
-	}
-	
 	public static Byte apply(byte v)
 	{
 		if (v >= 0 && v < ConstPool.tableSize)
@@ -20,6 +15,11 @@ public class Byte implements Integer
 			return ConstPool.BYTES[v];
 		}
 		return new Byte(v);
+	}
+	
+	protected Byte(byte value)
+	{
+		this.value = value;
 	}
 	
 	@Intrinsic({ INSTANCE })

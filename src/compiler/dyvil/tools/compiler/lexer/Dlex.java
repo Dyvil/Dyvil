@@ -53,7 +53,7 @@ public final class Dlex
 					continue;
 				}
 				
-				if (string && c == '}')
+				if (string && c == ')')
 				{
 					type = STRING_2;
 					subtype = STRING_PART;
@@ -273,24 +273,31 @@ public final class Dlex
 					reparse = false;
 					break;
 				}
-				else if (c == '\\' && appendEscape(buf, code.charAt(i + 1)))
+				else if (c == '\\')
 				{
-					i++;
-					continue;
-				}
-				else if (c == '$' && code.charAt(i + 1) == '{')
-				{
-					i += 2;
-					if (buf.length() == 0 || buf.charAt(0) == '}')
+					char c1 = code.charAt(i + 1);
+					if (c1 == '(')
 					{
-						subtype = STRING_PART;
+						i += 2;
+						if (buf.length() == 0 || buf.charAt(0) != '@')
+						{
+							subtype = STRING_PART;
+						}
+						else
+						{
+							subtype = STRING_START;
+						}
+						addToken = true;
+						string = true;
+						break;
 					}
-					else
+					else if (appendEscape(buf, c1))
 					{
-						subtype = STRING_START;
+						i++;
+						continue;
 					}
-					addToken = true;
-					string = true;
+					buf.append('\\');
+					break;
 				}
 				else if (c != '\t')
 				{

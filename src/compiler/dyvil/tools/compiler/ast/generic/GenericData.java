@@ -7,10 +7,11 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
 
-public final class GenericData implements ITypeList
+public final class GenericData implements ITypeList, ITypeContext
 {
 	public IType[]	generics;
 	public int		genericCount;
+	public IType	instanceType;
 	
 	public int		computedGenerics	= -1;
 	
@@ -81,12 +82,30 @@ public final class GenericData implements ITypeList
 		return this.generics[index];
 	}
 	
+	@Override
+	public IType resolveType(ITypeVariable typeVar)
+	{
+		if (typeVar.getGeneric().isMethod())
+		{
+			return this.generics[typeVar.getIndex()];
+		}
+		return this.instanceType.resolveType(typeVar);
+	}
+	
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.typeCount(); i++)
 		{
 			this.generics[i] = this.generics[i].resolve(markers, context);
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		this.toString("", builder);
+		return builder.toString();
 	}
 	
 	public void toString(String prefix, StringBuilder buffer)

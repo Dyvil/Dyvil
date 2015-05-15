@@ -17,11 +17,13 @@ import dyvil.tools.compiler.config.CompilerConfig;
 
 public class ClassWriter extends org.objectweb.asm.ClassWriter
 {
-	private Map<String, String>	commonTypes	= new HashMap();
+	private Map<String, String>		commonTypes		= new HashMap();
+	
+	private static final boolean	COMPUTE_FRAMES	= false;
 	
 	public ClassWriter()
 	{
-		super(DyvilCompiler.asmVersion);
+		super(DyvilCompiler.asmVersion | (COMPUTE_FRAMES ? org.objectweb.asm.ClassWriter.COMPUTE_FRAMES : 0));
 	}
 	
 	public ClassWriter(int api)
@@ -49,17 +51,14 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 	
 	public void addCommonType(IType type1, IType type2, IType common)
 	{
-		StringBuilder buf = new StringBuilder();
-		buf.append(type1.getInternalName()).append(type2.getInternalName());
-		this.commonTypes.put(buf.toString(), common.getInternalName());
+		this.commonTypes.put(type1.getInternalName().concat(type2.getInternalName()), common.getInternalName());
 	}
 	
 	@Override
 	protected String getCommonSuperClass(String type1, String type2)
 	{
-		StringBuilder buf = new StringBuilder();
-		buf.append(type1).append(type2);
-		return this.commonTypes.get(buf.toString());
+		String common = this.commonTypes.get(type1.concat(type2));
+		return common == null ? "java/lang/Object" : common;
 	}
 	
 	public static void generateJAR(List<File> files)

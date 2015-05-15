@@ -148,7 +148,7 @@ public final class ClassAccess extends ASTNode implements IValue
 			return;
 		}
 		
-		markers.add(this.position, "access.type.invalid", this.type.toString());
+		markers.add(this.position, "type.access.invalid", this.type.toString());
 	}
 	
 	@Override
@@ -159,12 +159,12 @@ public final class ClassAccess extends ASTNode implements IValue
 		{
 			if (iclass.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.position, "access.type.deprecated", iclass.getName());
+				markers.add(this.position, "type.access.deprecated", iclass.getName());
 			}
 			
-			if (context.getAccessibility(iclass) == IContext.SEALED)
+			if (context.getVisibility(iclass) == IContext.SEALED)
 			{
-				markers.add(this.position, "access.type.sealed", iclass.getName());
+				markers.add(this.position, "type.access.sealed", iclass.getName());
 			}
 		}
 	}

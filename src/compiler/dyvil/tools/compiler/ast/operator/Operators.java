@@ -6,12 +6,8 @@ import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.access.FieldAccess;
-import dyvil.tools.compiler.ast.expression.CaseStatement;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.expression.MatchExpression;
+import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.Types;
 
@@ -53,8 +49,6 @@ public interface Operators
 	public static final Operator			MOD				= new Operator(Name.percent, 100, INFIX_LEFT);
 	public static final Operator			BSLASH			= new Operator(Name.bslash, 100, INFIX_LEFT);
 	
-	public static final Operator			CAST			= new Operator(Name.colongt, 150, INFIX_LEFT);
-	public static final Operator			INSTANCEOF		= new Operator(Name.ltcolon, 150, INFIX_LEFT);
 	public static final Operator			RARROW			= new Operator(Name.minusgt, 200, INFIX_LEFT);
 	public static final Operator			LARROW			= new Operator(Name.ltminus, 200, INFIX_LEFT);
 	
@@ -78,6 +72,22 @@ public interface Operators
 	public static IValue get(IValue arg1, Name name, IValue arg2)
 	{
 		// Null check
+		if (name == plus)
+		{
+			if (arg1.valueTag() == IValue.STRINGBUILDER)
+			{
+				StringBuilderExpression sbe = (StringBuilderExpression) arg1;
+				sbe.addValue(arg2);
+				return sbe;
+			}
+			if (arg1.isType(Types.STRING) || arg2.isType(Types.STRING))
+			{
+				StringBuilderExpression sbe = new StringBuilderExpression();
+				sbe.addValue(arg1);
+				sbe.addValue(arg2);
+				return sbe;
+			}
+		}
 		if (name == eqeq || name == eqeqeq)
 		{
 			if (arg2.valueTag() == IValue.NULL)
@@ -108,24 +118,6 @@ public interface Operators
 			if (arg1.valueTag() == IValue.FIELD_ACCESS && arg2.valueTag() == IValue.FIELD_ACCESS)
 			{
 				return new SwapOperator((FieldAccess) arg1, (FieldAccess) arg2);
-			}
-			return null;
-		}
-		// Cast Operator
-		if (name == colongt)
-		{
-			if (arg2.valueTag() == IValue.CLASS_ACCESS)
-			{
-				return new CastOperator(arg1, ((ClassAccess) arg2).type);
-			}
-			return null;
-		}
-		// Instanceof Operator
-		if (name == ltcolon)
-		{
-			if (arg2.valueTag() == IValue.CLASS_ACCESS)
-			{
-				return new InstanceOfOperator(arg1, ((ClassAccess) arg2).type);
 			}
 			return null;
 		}

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import java.util.List;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -17,6 +18,8 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -25,7 +28,6 @@ public class Type extends ASTNode implements IType
 	public Name		name;
 	public String	internalName;
 	public IClass	theClass;
-	public int		arrayDimensions;
 	
 	public Type()
 	{
@@ -117,10 +119,6 @@ public class Type extends ASTNode implements IType
 	
 	private static IType superType(IType type1, IType type2)
 	{
-		if (type1.getArrayDimensions() != type2.getArrayDimensions())
-		{
-			return Types.OBJECT;
-		}
 		if (type1.isSuperTypeOf(type2))
 		{
 			return type1;
@@ -164,65 +162,6 @@ public class Type extends ASTNode implements IType
 		return this.theClass;
 	}
 	
-	@Override
-	public void setArrayDimensions(int dimensions)
-	{
-		this.arrayDimensions = dimensions;
-	}
-	
-	@Override
-	public int getArrayDimensions()
-	{
-		return this.arrayDimensions;
-	}
-	
-	@Override
-	public IType getElementType()
-	{
-		Type t = this.clone();
-		t.arrayDimensions--;
-		return t;
-	}
-	
-	@Override
-	public IType getArrayType()
-	{
-		Type t = this.clone();
-		t.arrayDimensions++;
-		return t;
-	}
-	
-	@Override
-	public IType getArrayType(int dimensions)
-	{
-		if (dimensions == this.arrayDimensions)
-		{
-			return this;
-		}
-		
-		Type t = this.clone();
-		t.arrayDimensions = dimensions;
-		return t;
-	}
-	
-	@Override
-	public void addArrayDimension()
-	{
-		this.arrayDimensions++;
-	}
-	
-	@Override
-	public void removeArrayDimension()
-	{
-		this.arrayDimensions--;
-	}
-	
-	@Override
-	public boolean isArrayType()
-	{
-		return this.arrayDimensions > 0;
-	}
-	
 	// Super Type
 	
 	@Override
@@ -250,10 +189,6 @@ public class Type extends ASTNode implements IType
 	@Override
 	public boolean equals(IType type)
 	{
-		if (this.arrayDimensions != type.getArrayDimensions())
-		{
-			return false;
-		}
 		return this.theClass == type.getTheClass();
 	}
 	
@@ -287,12 +222,7 @@ public class Type extends ASTNode implements IType
 			// If the array dimensions of this type are 0, we can assume
 			// that it is exactly the primitive type, so the primitive type
 			// instance is returned.
-			if (this.arrayDimensions == 0)
-			{
-				return t;
-			}
-			
-			return t.getArrayType(this.arrayDimensions);
+			return t;
 		}
 		
 		if (this.internalName != null)
@@ -304,7 +234,7 @@ public class Type extends ASTNode implements IType
 			ITypeVariable typeVar = context.resolveTypeVariable(this.name);
 			if (typeVar != null)
 			{
-				return new TypeVariableType(typeVar, this.arrayDimensions);
+				return new TypeVariableType(typeVar);
 			}
 			
 			// This type is probably not a primitive one, so resolve using
@@ -386,6 +316,18 @@ public class Type extends ASTNode implements IType
 		return this;
 	}
 	
+	@Override
+	public IType resolveType(ITypeVariable typeVar)
+	{
+		return Types.ANY;
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	{
+		return concrete.resolveType(typeVar);
+	}
+	
 	// IContext
 	
 	@Override
@@ -409,23 +351,12 @@ public class Type extends ASTNode implements IType
 	@Override
 	public IField resolveField(Name name)
 	{
-		if (this.arrayDimensions > 0)
-		{
-			return null;
-		}
-		
 		return this.theClass == null ? null : this.theClass.resolveField(name);
 	}
 	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		if (this.arrayDimensions > 0)
-		{
-			Types.getObjectArray().getMethodMatches(list, instance, name, arguments);
-			return;
-		}
-		
 		if (this.theClass != null)
 		{
 			this.theClass.getMethodMatches(list, instance, name, arguments);
@@ -435,16 +366,16 @@ public class Type extends ASTNode implements IType
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
-		if (this.arrayDimensions == 0 && this.theClass != null)
+		if (this.theClass != null)
 		{
 			this.theClass.getConstructorMatches(list, arguments);
 		}
 	}
 	
 	@Override
-	public byte getAccessibility(IMember member)
+	public byte getVisibility(IMember member)
 	{
-		return this.theClass == null ? 0 : this.theClass.getAccessibility(member);
+		return this.theClass == null ? 0 : this.theClass.getVisibility(member);
 	}
 	
 	@Override
@@ -464,22 +395,12 @@ public class Type extends ASTNode implements IType
 	@Override
 	public String getInternalName()
 	{
-		if (this.arrayDimensions > 0)
-		{
-			StringBuilder buf = new StringBuilder();
-			this.appendExtendedName(buf);
-			return buf.toString();
-		}
 		return this.internalName;
 	}
 	
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
 		buffer.append('L').append(this.internalName).append(';');
 	}
 	
@@ -492,11 +413,14 @@ public class Type extends ASTNode implements IType
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
 		buffer.append('L').append(this.internalName).append(';');
+	}
+	
+	@Override
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
+	{
+		writer.writeLDC(this.theClass.getFullName());
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Type", "apply", "(Ljava/lang/String;)Ldyvil/lang/Type;", true);
 	}
 	
 	// Misc
@@ -504,15 +428,7 @@ public class Type extends ASTNode implements IType
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append('[');
-		}
 		buffer.append(this.name);
-		for (int i = 0; i < this.arrayDimensions; i++)
-		{
-			buffer.append(']');
-		}
 	}
 	
 	@Override
@@ -522,7 +438,6 @@ public class Type extends ASTNode implements IType
 		t.theClass = this.theClass;
 		t.name = this.name;
 		t.internalName = this.internalName;
-		t.arrayDimensions = this.arrayDimensions;
 		return t;
 	}
 }

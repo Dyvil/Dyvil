@@ -45,7 +45,16 @@ public class ClassMetadata implements IClassMetadata
 	public void resolve(MarkerList markers, IContext context)
 	{
 		this.constructor.type = this.theClass.getType();
-		this.constructor.setParameters(this.theClass.getParameters(), this.theClass.parameterCount());
+		
+		int parameterCount = this.theClass.parameterCount();
+		
+		IParameter[] parameters = this.theClass.getParameters();
+		this.constructor.setParameters(parameters, parameterCount);
+		
+		if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
+		{
+			this.constructor.setVarargs();
+		}
 	}
 	
 	@Override

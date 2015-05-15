@@ -9,6 +9,7 @@ import java.util.function.IntUnaryOperator;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 
 public interface ShortArray
 {
@@ -80,6 +81,21 @@ public interface ShortArray
 	}
 	
 	// Operators
+	
+	public static @infix @inline boolean $qmark(short[] array, short v)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	public static @infix @inline boolean $eq$eq(short[] array1, short[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline boolean $bang$eq(short[] array1, short[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
 	
 	public static @infix short[] $plus(short[] array, short v)
 	{
@@ -197,6 +213,64 @@ public interface ShortArray
 		return res;
 	}
 	
+	// Search Operations
+	
+	public static @infix int indexOf(short[] array, short v)
+	{
+		return indexOf(array, v, 0);
+	}
+	
+	public static @infix int indexOf(short[] array, short v, int start)
+	{
+		for (; start < array.length; start++)
+		{
+			if (array[start] == v)
+			{
+				return start;
+			}
+		}
+		return -1;
+	}
+	
+	public static @infix int lastIndexOf(short[] array, short v)
+	{
+		return lastIndexOf(array, v, array.length - 1);
+	}
+	
+	public static @infix int lastIndexOf(short[] array, short v, int start)
+	{
+		for (; start >= 0; start--)
+		{
+			if (array[start] == v)
+			{
+				return start;
+			}
+		}
+		return -1;
+	}
+	
+	public static @infix @inline boolean contains(short[] array, short v)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	public static @infix @inline boolean in(short v, short[] array)
+	{
+		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	// equals, hashCode and toString
+	
+	public static @infix @inline boolean equals(short[] array1, short[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+	
+	public static @infix @inline int hashCode(short[] array)
+	{
+		return Arrays.hashCode(array);
+	}
+	
 	public static @infix String toString(short[] array)
 	{
 		if (array == null)
@@ -242,46 +316,5 @@ public interface ShortArray
 			builder.append(array[i]);
 		}
 		builder.append(']');
-	}
-	
-	// Search Operations
-	
-	public static @infix int indexOf(short[] array, short v)
-	{
-		return indexOf(array, v, 0);
-	}
-	
-	public static @infix int indexOf(short[] array, short v, int start)
-	{
-		for (; start < array.length; start++)
-		{
-			if (array[start] == v)
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix int lastIndexOf(short[] array, short v)
-	{
-		return lastIndexOf(array, v, array.length - 1);
-	}
-	
-	public static @infix int lastIndexOf(short[] array, short v, int start)
-	{
-		for (; start >= 0; start--)
-		{
-			if (array[start] == v)
-			{
-				return start;
-			}
-		}
-		return -1;
-	}
-	
-	public static @infix boolean contains(short[] array, short v)
-	{
-		return indexOf(array, v, 0) != -1;
 	}
 }

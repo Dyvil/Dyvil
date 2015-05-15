@@ -196,7 +196,7 @@ public final class ArgumentList implements IArguments, IValueList
 		IValue value1 = value.withType(type);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.getName());
+			Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
 			marker.addInfo("Required Type: " + type);
 			marker.addInfo("Value Type: " + value.getType());
 		}
@@ -228,7 +228,7 @@ public final class ArgumentList implements IArguments, IValueList
 			value1 = value.withType(elementType);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "access.method.argument_type", param.getName());
+				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
 				marker.addInfo("Required Type: " + elementType);
 				marker.addInfo("Value Type: " + value.getType());
 			}
@@ -343,14 +343,31 @@ public final class ArgumentList implements IArguments, IValueList
 		int len = this.size;
 		for (int i = 0; i < len; i++)
 		{
-			IValue v = this.values[i];
-			if (v == null)
+			this.values[i].toString("", buffer);
+			if (i + 1 == len)
 			{
-				buffer.append("[null-value]");
+				break;
+			}
+			buffer.append(", ");
+		}
+		buffer.append(')');
+	}
+	
+	@Override
+	public void typesToString(StringBuilder buffer)
+	{
+		buffer.append('(');
+		int len = this.size;
+		for (int i = 0; i < len; i++)
+		{
+			IType type = this.values[i].getType();
+			if (type == null)
+			{
+				buffer.append("unknown");
 			}
 			else
 			{
-				v.toString(prefix, buffer);
+				type.toString("", buffer);
 			}
 			if (i + 1 == len)
 			{
