@@ -34,7 +34,6 @@ public class ParallelCompilerPhase implements ICompilerPhase
 	@Override
 	public void apply(Collection<ICompilationUnit> units)
 	{
-		// TODO Parallelism
 		for (ICompilationUnit unit : units)
 		{
 			try
