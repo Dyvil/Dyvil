@@ -431,11 +431,9 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			// Variable
 			if (var != null)
 			{
-				var.value.writeExpression(writer);
-				var.index = locals;
-				writer.writeVarInsn(var.type.getStoreOpcode(), var.index);
+				var.writeInit(writer, var.value);
 			}
-			writer.writeLabel(startLabel);
+			writer.writeTargetLabel(startLabel);
 			// Condition
 			if (this.condition != null)
 			{
@@ -459,7 +457,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			// Variable
 			if (var != null)
 			{
-				writer.writeLocal(var.index, var.name.qualified, var.type, startLabel, endLabel);
+				var.writeLocal(writer, startLabel, endLabel);
 			}
 			return;
 		}
@@ -493,7 +491,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			
 			// Jump to boundary check
 			writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
-			writer.writeLabel(startLabel);
+			writer.writeTargetLabel(startLabel);
 			
 			// Load the element
 			arrayVar.writeGet(writer, null);
@@ -546,7 +544,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			
 			// Jump to hasNext check
 			writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
-			writer.writeLabel(startLabel);
+			writer.writeTargetLabel(startLabel);
 			
 			// Invoke Iterator.next()
 			writer.writeVarInsn(Opcodes.ALOAD, iteratorVar.index);

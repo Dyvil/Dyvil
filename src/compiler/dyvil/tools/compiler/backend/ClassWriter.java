@@ -1,9 +1,7 @@
 package dyvil.tools.compiler.backend;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -12,18 +10,13 @@ import java.util.jar.Manifest;
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.CompilerConfig;
 
 public class ClassWriter extends org.objectweb.asm.ClassWriter
 {
-	private Map<String, String>		commonTypes		= new HashMap();
-	
-	private static final boolean	COMPUTE_FRAMES	= false;
-	
 	public ClassWriter()
 	{
-		super(DyvilCompiler.asmVersion | (COMPUTE_FRAMES ? org.objectweb.asm.ClassWriter.COMPUTE_FRAMES : 0));
+		super(DyvilCompiler.asmVersion);
 	}
 	
 	public ClassWriter(int api)
@@ -49,16 +42,11 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		}
 	}
 	
-	public void addCommonType(IType type1, IType type2, IType common)
-	{
-		this.commonTypes.put(type1.getInternalName().concat(type2.getInternalName()), common.getInternalName());
-	}
-	
 	@Override
 	protected String getCommonSuperClass(String type1, String type2)
 	{
-		String common = this.commonTypes.get(type1.concat(type2));
-		return common == null ? "java/lang/Object" : common;
+		assert false : "COMPUTE_FRAMES should not be used!";
+		return "java/lang/Object";
 	}
 	
 	public static void generateJAR(List<File> files)

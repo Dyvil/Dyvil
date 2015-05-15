@@ -222,23 +222,37 @@ public final class Variable extends Member implements IVariable
 		writer.writeLocal(this.index, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
 	}
 	
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
 			IConstructor c = this.refType.getTheClass().getBody().getConstructor(0);
 			writer.writeTypeInsn(Opcodes.NEW, this.refType.getInternalName());
 			writer.writeInsn(Opcodes.DUP);
-			this.value.writeExpression(writer);
+			
+			if (value != null)
+			{
+				value.writeExpression(writer);
+			}
+			else
+			{
+				writer.writeInsn(Opcodes.DUP_X1);
+			}
 			c.writeInvoke(writer);
 			
 			this.index = writer.localCount();
+			
+			writer.setLocalType(this.index, this.refType.getInternalName());
 			writer.writeVarInsn(Opcodes.ASTORE, this.index);
 			return;
 		}
 		
-		this.value.writeExpression(writer);
+		if (value != null)
+		{
+			value.writeExpression(writer);
+		}
 		this.index = writer.localCount();
+		writer.setLocalType(this.index, this.type.getFrameType());
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}
 	

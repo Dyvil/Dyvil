@@ -48,9 +48,15 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void setInstanceMethod(String type)
+	public void setThisType(String type)
 	{
 		this.frame.setInstance(type);
+	}
+	
+	@Override
+	public void setLocalType(int index, Object type)
+	{
+		this.frame.setLocal(index, type);
 	}
 	
 	@Override
@@ -78,6 +84,7 @@ public final class MethodWriterImpl implements MethodWriter
 		if (this.visitFrame)
 		{
 			this.mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, this.frame.localCount, this.frame.locals, this.frame.stackCount, this.frame.stack);
+			this.visitFrame = false;
 		}
 		
 		if (this.hasReturn && this.inlineEnd != null)
@@ -267,15 +274,32 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLabel(Label label)
 	{
-		this.insnCallback();
-		
 		if (label.info != null)
 		{
+			int maxS = this.frame.maxStack;
+			int maxL = this.frame.maxLocals;
 			this.frame = (Frame) label.info;
+			
+			if (maxS > this.frame.maxStack)
+			{
+				this.frame.maxStack = maxS;
+			}
+			if (maxL > this.frame.maxLocals)
+			{
+				this.frame.maxLocals = maxL;
+			}
+			
 			this.visitFrame = true;
 			label.info = null;
 		}
 		
+		this.mv.visitLabel(label);
+	}
+	
+	@Override
+	public void writeTargetLabel(Label label)
+	{
+		this.visitFrame = true;
 		this.mv.visitLabel(label);
 	}
 	
@@ -403,8 +427,6 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeJumpInsn(int opcode, Label target) throws BytecodeException
 	{
-		this.insnCallback();
-		
 		if (opcode > 255)
 		{
 			switch (opcode)
@@ -484,12 +506,14 @@ public final class MethodWriterImpl implements MethodWriter
 			}
 		}
 		
+		this.insnCallback();
+		
 		this.visitFrame = true;
+		this.frame.visitJumpInsn(opcode);
 		
 		target.info = this.frame;
 		this.frame = this.frame.copy();
 		
-		this.frame.visitJumpInsn(opcode);
 		this.mv.visitJumpInsn(opcode, target);
 	}
 	

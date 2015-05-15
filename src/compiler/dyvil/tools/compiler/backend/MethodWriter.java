@@ -15,7 +15,9 @@ public interface MethodWriter
 	
 	public Frame getFrame();
 	
-	public void setInstanceMethod(String type);
+	public void setThisType(String type);
+	
+	public void setLocalType(int index, Object type);
 	
 	// Annotations
 	
@@ -60,6 +62,8 @@ public interface MethodWriter
 	// Labels
 	
 	public void writeLabel(Label label);
+	
+	public void writeTargetLabel(Label label);
 	
 	// Instructions
 	

@@ -117,7 +117,7 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.variable.writeInit(writer);
+		this.variable.writeInit(writer, this.variable.value);
 	}
 	
 	@Override

@@ -358,7 +358,7 @@ public class Property extends Member implements IProperty, IContext
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
-				mw.setInstanceMethod(this.theClass.getInternalName());
+				mw.setThisType(this.theClass.getInternalName());
 			}
 			
 			for (int i = 0; i < this.annotationCount; i++)
@@ -386,7 +386,7 @@ public class Property extends Member implements IProperty, IContext
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
-				mw.setInstanceMethod(this.theClass.getInternalName());
+				mw.setThisType(this.theClass.getInternalName());
 			}
 			
 			for (int i = 0; i < this.annotationCount; i++)

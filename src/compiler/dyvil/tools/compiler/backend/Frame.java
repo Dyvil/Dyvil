@@ -148,12 +148,16 @@ public class Frame
 			Object[] newLocals = new Object[count];
 			System.arraycopy(this.locals, 0, newLocals, 0, this.locals.length);
 			this.locals = newLocals;
-			this.maxLocals = count;
-			return;
 		}
 		if (count > this.maxLocals)
 		{
 			this.maxLocals = count;
+			this.localCount = count;
+			return;
+		}
+		if (count > this.localCount)
+		{
+			this.localCount = count;
 		}
 	}
 	
@@ -178,8 +182,6 @@ public class Frame
 			Object[] newLocals = new Object[count];
 			System.arraycopy(this.stack, 0, newLocals, 0, this.stack.length);
 			this.stack = newLocals;
-			this.maxStack = count;
-			return;
 		}
 		if (count > this.maxStack)
 		{
@@ -670,7 +672,10 @@ public class Frame
 			this.pop();
 			return;
 		case ASTORE:
-			this.setLocal(index, this.stack[this.stackCount - 1]);
+			if (index > this.localCount)
+			{
+				this.setLocal(index, this.stack[this.stackCount - 1]);
+			}
 			this.pop();
 			return;
 		}
@@ -724,7 +729,7 @@ public class Frame
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder("Frame {");
-		builder.append("maxStack: ").append(this.maxStack);
+		builder.append("maxs: (").append(this.maxStack).append(", ").append(this.maxLocals).append(")");
 		if (this.stackCount > 0)
 		{
 			builder.append(", stack: [");
@@ -735,7 +740,6 @@ public class Frame
 			}
 			builder.append(']');
 		}
-		builder.append(", maxLocals: ").append(this.maxLocals);
 		if (this.localCount > 0)
 		{
 			builder.append(", locals: [");

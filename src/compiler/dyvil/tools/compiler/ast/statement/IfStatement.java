@@ -292,12 +292,10 @@ public final class IfStatement extends ASTNode implements IStatement
 		// Else Block
 		if (this.elseThen == null)
 		{
-			writer.getClassWriter().addCommonType(this.then.getType(), this.commonType, this.commonType);
 			this.commonType.writeDefaultValue(writer);
 		}
 		else
 		{
-			writer.getClassWriter().addCommonType(this.then.getType(), this.elseThen.getType(), this.commonType);
 			this.elseThen.writeExpression(writer);
 		}
 		writer.writeLabel(elseEnd);
