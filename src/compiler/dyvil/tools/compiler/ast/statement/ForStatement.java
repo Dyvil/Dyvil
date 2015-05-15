@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -408,14 +409,14 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.writeStatement(writer);
 		writer.writeInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label updateLabel = this.updateLabel.target = new org.objectweb.asm.Label();
@@ -426,15 +427,13 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 		{
 		case DEFAULT:
 		{
-			int locals = writer.registerLocal();
+			int locals = writer.localCount();
 			// Variable
 			if (var != null)
 			{
-				var.value.writeExpression(writer);
-				var.index = locals;
-				writer.writeVarInsn(var.type.getStoreOpcode(), var.index);
+				var.writeInit(writer, var.value);
 			}
-			writer.writeLabel(startLabel);
+			writer.writeTargetLabel(startLabel);
 			// Condition
 			if (this.condition != null)
 			{
@@ -458,7 +457,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			// Variable
 			if (var != null)
 			{
-				writer.writeLocal(var.index, var.name.qualified, var.type, startLabel, endLabel);
+				var.writeLocal(writer, startLabel, endLabel);
 			}
 			return;
 		}
@@ -475,7 +474,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			var.value.writeExpression(writer);
 			
 			// Local Variables
-			int locals = writer.registerLocal();
+			int locals = writer.localCount();
 			var.index = locals + 1;
 			indexVar.index = locals + 2;
 			lengthVar.index = locals + 3;
@@ -492,7 +491,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			
 			// Jump to boundary check
 			writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
-			writer.writeLabel(startLabel);
+			writer.writeTargetLabel(startLabel);
 			
 			// Load the element
 			arrayVar.writeGet(writer, null);
@@ -537,7 +536,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/lang/Iterable", "iterator", "()Ljava/util/Iterator;", true);
 			
 			// Local Variables
-			int locals = writer.registerLocal();
+			int locals = writer.localCount();
 			var.index = locals;
 			iteratorVar.index = locals + 1;
 			// Store Iterator
@@ -545,7 +544,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			
 			// Jump to hasNext check
 			writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
-			writer.writeLabel(startLabel);
+			writer.writeTargetLabel(startLabel);
 			
 			// Invoke Iterator.next()
 			writer.writeVarInsn(Opcodes.ALOAD, iteratorVar.index);

@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IClassMetadata
@@ -70,5 +71,5 @@ public interface IClassMetadata
 	
 	// Compilation
 	
-	public void write(ClassWriter writer, IValue instanceFields);
+	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException;
 }

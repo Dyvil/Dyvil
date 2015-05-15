@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -163,7 +164,7 @@ public final class CastOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.value.writeExpression(writer);
 		if (this.typeHint)
@@ -182,7 +183,7 @@ public final class CastOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(this.type.getReturnOpcode());
@@ -196,7 +197,7 @@ public final class CastOperator extends ASTNode implements IValue
 		this.type.toString(prefix, buffer);
 	}
 	
-	public static void writePrimitiveCast(IType value, PrimitiveType cast, MethodWriter writer)
+	public static void writePrimitiveCast(IType value, PrimitiveType cast, MethodWriter writer) throws BytecodeException
 	{
 		IClass iclass = value.getTheClass();
 		if (iclass == Types.BYTE_CLASS || iclass == Types.SHORT_CLASS || iclass == Types.CHAR_CLASS || iclass == Types.INT_CLASS)
@@ -221,7 +222,7 @@ public final class CastOperator extends ASTNode implements IValue
 		}
 	}
 	
-	private static void writeIntCast(PrimitiveType cast, MethodWriter writer)
+	private static void writeIntCast(PrimitiveType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.typecode)
 		{
@@ -243,7 +244,7 @@ public final class CastOperator extends ASTNode implements IValue
 		}
 	}
 	
-	private static void writeLongCast(PrimitiveType cast, MethodWriter writer)
+	private static void writeLongCast(PrimitiveType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.typecode)
 		{
@@ -273,7 +274,7 @@ public final class CastOperator extends ASTNode implements IValue
 		}
 	}
 	
-	private static void writeFloatCast(PrimitiveType cast, MethodWriter writer)
+	private static void writeFloatCast(PrimitiveType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.typecode)
 		{
@@ -303,7 +304,7 @@ public final class CastOperator extends ASTNode implements IValue
 		}
 	}
 	
-	private static void writeDoubleCast(PrimitiveType cast, MethodWriter writer)
+	private static void writeDoubleCast(PrimitiveType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.typecode)
 		{

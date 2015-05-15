@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class AnonymousClassMetadata implements IClassMetadata
@@ -37,7 +38,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 	{
 	}
 	
-	public void writeConstructorCall(MethodWriter writer, IArguments arguments)
+	public void writeConstructorCall(MethodWriter writer, IArguments arguments) throws BytecodeException
 	{
 		String owner = this.theClass.getInternalName();
 		String name = "<init>";
@@ -69,7 +70,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer, IValue instanceFields)
+	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
 	{
 		CaptureField[] capturedFields = this.theClass.capturedFields;
 		int len = this.theClass.capturedFieldCount;

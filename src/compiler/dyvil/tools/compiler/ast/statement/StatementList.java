@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -406,7 +407,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		if (this.requiredType == Types.VOID)
 		{
@@ -418,7 +419,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
 		
 		writer.writeLabel(start);
-		int count = writer.registerLocal();
+		int count = writer.localCount();
 		int len = this.valueCount - 1;
 		
 		if (this.labels == null)
@@ -467,13 +468,13 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
 		
 		writer.writeLabel(start);
-		int count = writer.registerLocal();
+		int count = writer.localCount();
 		
 		if (this.labels == null)
 		{

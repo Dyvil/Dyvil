@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -135,7 +136,7 @@ public final class NilValue implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		// Write an array type
 		int dims = this.requiredType.getArrayDimensions();
@@ -153,7 +154,7 @@ public final class NilValue implements IValue
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.ARETURN);

@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.transform.CaseClasses;
 
@@ -130,7 +131,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer, IValue instanceFields)
+	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
 	{
 		super.write(writer, instanceFields);
 		MethodWriter mw;
@@ -154,10 +155,11 @@ public final class CaseClassMetadata extends ClassMetadata
 			mw.end(this.theClass.getType());
 		}
 		
+		String internal = this.theClass.getInternalName();
 		if ((this.methods & EQUALS) == 0)
 		{
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));
-			mw.setInstanceMethod();
+			mw.setThisType(internal);
 			mw.registerParameter(0, "obj", Types.OBJECT, 0);
 			mw.begin();
 			CaseClasses.writeEquals(mw, this.theClass);
@@ -167,7 +169,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		if ((this.methods & HASHCODE) == 0)
 		{
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I", null, null));
-			mw.setInstanceMethod();
+			mw.setThisType(internal);
 			mw.begin();
 			CaseClasses.writeHashCode(mw, this.theClass);
 			mw.end();
@@ -176,7 +178,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		if ((this.methods & TOSTRING) == 0)
 		{
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString", "()Ljava/lang/String;", null, null));
-			mw.setInstanceMethod();
+			mw.setThisType(internal);
 			mw.begin();
 			CaseClasses.writeToString(mw, this.theClass);
 			mw.end();

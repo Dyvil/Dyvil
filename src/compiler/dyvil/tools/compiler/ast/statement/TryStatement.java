@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -283,14 +284,14 @@ public final class TryStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		// FIXME
 		this.commonType.writeDefaultValue(writer);
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		org.objectweb.asm.Label tryStart = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label tryEnd = new org.objectweb.asm.Label();
@@ -314,7 +315,7 @@ public final class TryStatement extends ASTNode implements IStatement
 			{
 				// If yes register a new local variable for the exception and
 				// store it.
-				int localCount = writer.registerLocal();
+				int localCount = writer.localCount();
 				
 				writer.writeLabel(handlerLabel);
 				writer.writeVarInsn(Opcodes.ASTORE, localCount);

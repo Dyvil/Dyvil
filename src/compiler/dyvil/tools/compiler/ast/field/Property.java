@@ -24,6 +24,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -346,7 +347,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String extended = this.type.getExtendedName();
 		String signature = this.type.getSignature();
@@ -357,7 +358,7 @@ public class Property extends Member implements IProperty, IContext
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
-				mw.setInstanceMethod();
+				mw.setThisType(this.theClass.getInternalName());
 			}
 			
 			for (int i = 0; i < this.annotationCount; i++)
@@ -385,7 +386,7 @@ public class Property extends Member implements IProperty, IContext
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
-				mw.setInstanceMethod();
+				mw.setThisType(this.theClass.getInternalName());
 			}
 			
 			for (int i = 0; i < this.annotationCount; i++)
@@ -411,7 +412,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance)
+	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
 		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
 		{
@@ -435,7 +436,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value)
+	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
 	{
 		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
 		{

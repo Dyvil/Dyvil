@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, IContext, IParameterized, ITypeList
 {
@@ -93,7 +94,7 @@ public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, I
 	public String[] getInterfaceArray();
 	
 	@Override
-	public void write(ClassWriter writer);
+	public void write(ClassWriter writer) throws BytecodeException;
 	
 	public void writeInnerClassInfo(ClassWriter writer);
 	

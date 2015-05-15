@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class PrimitiveType extends Type
@@ -344,7 +345,32 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public void writeTypeExpression(MethodWriter writer)
+	public Object getFrameType()
+	{
+		switch (this.typecode)
+		{
+		case ClassFormat.T_BOOLEAN:
+			return ClassFormat.BOOLEAN;
+		case ClassFormat.T_BYTE:
+			return ClassFormat.BYTE;
+		case ClassFormat.T_SHORT:
+			return ClassFormat.SHORT;
+		case ClassFormat.T_CHAR:
+			return ClassFormat.CHAR;
+		case ClassFormat.T_INT:
+			return ClassFormat.INT;
+		case ClassFormat.T_LONG:
+			return ClassFormat.LONG;
+		case ClassFormat.T_FLOAT:
+			return ClassFormat.FLOAT;
+		case ClassFormat.T_DOUBLE:
+			return ClassFormat.DOUBLE;
+		}
+		return null;
+	}
+	
+	@Override
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		int i;
 		switch (this.typecode)

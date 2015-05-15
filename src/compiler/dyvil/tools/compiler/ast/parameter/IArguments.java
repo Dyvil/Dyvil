@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IArguments extends IASTNode, Iterable<IValue>
@@ -48,9 +49,9 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context);
 	
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer);
+	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException;
 	
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer);
+	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException;
 	
 	// Phase Methdos
 	

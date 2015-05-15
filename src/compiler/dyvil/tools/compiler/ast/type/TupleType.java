@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
@@ -391,7 +392,7 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public void writeTypeExpression(MethodWriter writer)
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(this.typeCount);
 		writer.writeNewArray("dyvil/lang/Type", 1);

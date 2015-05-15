@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -132,7 +133,7 @@ public final class ClassOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		if (this.type.isPrimitive())
 		{
@@ -180,7 +181,7 @@ public final class ClassOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.ARETURN);

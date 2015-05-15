@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -244,7 +245,7 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
 		{
@@ -288,7 +289,7 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance)
+	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
 		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
 		{
@@ -309,7 +310,7 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value)
+	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
 	{
 		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
 		{

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class TypeInstruction implements IInstruction, IInternalTyped
@@ -38,7 +39,7 @@ public class TypeInstruction implements IInstruction, IInternalTyped
 	}
 	
 	@Override
-	public void write(MethodWriter writer)
+	public void write(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeTypeInsn(this.opcode, this.type);
 	}

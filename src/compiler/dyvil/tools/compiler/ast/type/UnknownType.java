@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class UnknownType extends ASTNode implements IType
@@ -187,7 +188,7 @@ public class UnknownType extends ASTNode implements IType
 	}
 	
 	@Override
-	public void writeTypeExpression(MethodWriter writer)
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/UnkownType", "apply", "()Ldyvil/reflect/type/UnkownType;", false);
 	}

@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IValue extends IASTNode, ITyped
@@ -167,8 +168,9 @@ public interface IValue extends IASTNode, ITyped
 	 * the first element of the stack.
 	 * 
 	 * @param visitor
+	 * @throws BytecodeException TODO
 	 */
-	public void writeExpression(MethodWriter writer);
+	public void writeExpression(MethodWriter writer) throws BytecodeException;
 	
 	/**
 	 * Writes this {@link IValue} to the given {@link MethodWriter}
@@ -176,10 +178,11 @@ public interface IValue extends IASTNode, ITyped
 	 * from the stack.
 	 * 
 	 * @param writer
+	 * @throws BytecodeException TODO
 	 */
-	public void writeStatement(MethodWriter writer);
+	public void writeStatement(MethodWriter writer) throws BytecodeException;
 	
-	public default void writeJump(MethodWriter writer, Label dest)
+	public default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeJumpInsn(Opcodes.IFNE, dest);
@@ -196,8 +199,9 @@ public interface IValue extends IASTNode, ITyped
 	 * 
 	 * @param writer
 	 * @param dest
+	 * @throws BytecodeException TODO
 	 */
-	public default void writeInvJump(MethodWriter writer, Label dest)
+	public default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeJumpInsn(Opcodes.IFEQ, dest);

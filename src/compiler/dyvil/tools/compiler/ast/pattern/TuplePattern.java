@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
@@ -116,12 +117,12 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 	// TODO Re-implement Tuple Pattern Compilation
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 	}
 	

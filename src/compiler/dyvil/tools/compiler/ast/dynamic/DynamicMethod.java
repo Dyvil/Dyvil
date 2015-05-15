@@ -30,6 +30,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class DynamicMethod extends ASTNode implements IMethod
@@ -185,7 +186,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 	}
 	
@@ -411,7 +412,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
 	{
 		StringBuilder desc = new StringBuilder();
 		desc.append('(');
@@ -434,12 +435,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments)
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
 	}
 	

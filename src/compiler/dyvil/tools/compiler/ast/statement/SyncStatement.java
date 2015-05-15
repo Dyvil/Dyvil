@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -111,18 +112,18 @@ public final class SyncStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.write(writer, true);
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.write(writer, false);
 	}
 	
-	private void write(MethodWriter writer, boolean expression)
+	private void write(MethodWriter writer, boolean expression) throws BytecodeException
 	{
 		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label end = new org.objectweb.asm.Label();

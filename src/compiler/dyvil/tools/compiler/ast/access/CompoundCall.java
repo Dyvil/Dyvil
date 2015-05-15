@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -297,7 +298,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		int i = this.instance.valueTag();
 		if (i == FIELD_ACCESS)
@@ -344,7 +345,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		int i = this.instance.valueTag();
 		if (i == FIELD_ACCESS)
@@ -387,7 +388,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		}
 	}
 	
-	private boolean writeIINC(MethodWriter writer, IField f)
+	private boolean writeIINC(MethodWriter writer, IField f) throws BytecodeException
 	{
 		if (this.arguments.size() == 1 && f.getType() == Types.INT && f.isVariable())
 		{

@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -228,24 +229,24 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, this.varIndex);
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 	}
 	
-	public void write(String owner, MethodWriter writer)
+	public void write(String owner, MethodWriter writer) throws BytecodeException
 	{
 		String internal = this.type.getInternalName();
 		String extended = "L" + internal + ";";
 		Label start = new Label();
 		Label end = new Label();
 		
-		int index = this.varIndex = writer.registerLocal();
+		int index = this.varIndex = writer.localCount();
 		writer.writeLabel(start);
 		if (this.getter != null)
 		{

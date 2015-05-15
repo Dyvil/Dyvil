@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.CaseClasses;
@@ -189,7 +190,7 @@ public final class FormatStringExpression extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		int len = this.count / 2;
 		String s = this.strings[0];
@@ -224,7 +225,7 @@ public final class FormatStringExpression extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.ARETURN);

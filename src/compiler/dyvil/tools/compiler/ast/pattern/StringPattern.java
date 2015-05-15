@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class StringPattern extends ASTNode implements IPattern
@@ -44,7 +45,7 @@ public final class StringPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		writer.writeLDC(this.value);
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
@@ -53,7 +54,7 @@ public final class StringPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		writer.writeLDC(this.value);
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);

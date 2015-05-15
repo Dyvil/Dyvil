@@ -38,6 +38,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -1134,7 +1135,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		// Header
 		

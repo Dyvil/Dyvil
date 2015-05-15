@@ -30,6 +30,7 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -395,7 +396,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.name = "lambda$" + this.index;
 		this.lambdaDesc = this.getLambdaDescriptor();
@@ -428,7 +429,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 	}
 	
@@ -495,7 +496,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		boolean instance = this.thisClass != null;
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
@@ -503,7 +504,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		
 		if (instance)
 		{
-			mw.setInstanceMethod();
+			mw.setThisType(this.thisClass.getInternalName());
 		}
 		
 		int index = 0;

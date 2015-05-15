@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -416,7 +417,7 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
-	public void writeTypeExpression(MethodWriter writer)
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(this.theClass.getFullName());
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Type", "apply", "(Ljava/lang/String;)Ldyvil/lang/Type;", true);

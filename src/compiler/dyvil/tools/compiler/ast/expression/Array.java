@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -351,7 +352,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer)
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		IType type = this.elementType;
 		int opcode = type.getArrayStoreOpcode();
@@ -375,7 +376,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer)
+	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.ARETURN);

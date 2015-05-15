@@ -5,13 +5,19 @@ import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface MethodWriter
 {
 	public ClassWriter getClassWriter();
 	
-	public void setInstanceMethod();
+	public Frame getFrame();
+	
+	public void setThisType(String type);
+	
+	public void setLocalType(int index, Object type);
 	
 	// Annotations
 	
@@ -31,7 +37,7 @@ public interface MethodWriter
 	
 	// Local Variables
 	
-	public int registerLocal();
+	public int localCount();
 	
 	public void resetLocals(int count);
 	
@@ -57,39 +63,61 @@ public interface MethodWriter
 	
 	public void writeLabel(Label label);
 	
+	public void writeTargetLabel(Label label);
+	
 	// Instructions
 	
-	public void writeInsn(int opcode);
+	public void writeInsn(int opcode) throws BytecodeException;
 	
-	public void writeIntInsn(int opcode, int operand);
+	public void writeIntInsn(int opcode, int operand) throws BytecodeException;
 	
-	public void writeJumpInsn(int opcode, Label label);
+	public void writeJumpInsn(int opcode, Label label) throws BytecodeException;
 	
-	public void writeTypeInsn(int opcode, String type);
+	public void writeTypeInsn(int opcode, String type) throws BytecodeException;
 	
-	public void writeNewArray(String type, int dims);
+	public void writeNewArray(String type, int dims) throws BytecodeException;
 	
-	public void writeNewArray(IType type, int dims);
+	public void writeNewArray(IType type, int dims) throws BytecodeException;
 	
-	public void writeVarInsn(int opcode, int var);
+	public void writeVarInsn(int opcode, int var) throws BytecodeException;
 	
-	public void writeIINC(int var, int value);
+	public void writeIINC(int index, int value) throws BytecodeException;
 	
 	// Field Instructions
 	
-	public void writeFieldInsn(int opcode, String owner, String name, String desc);
+	public default void writeFieldInsn(int opcode, String owner, String name, String desc) throws BytecodeException
+	{
+		this.writeFieldInsn(opcode, owner, name, desc, Frame.fieldType(desc));
+	}
+	
+	public void writeFieldInsn(int opcode, String owner, String name, String desc, Object fieldType) throws BytecodeException;
 	
 	// Invoke Instructions
 	
-	public void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface);
+	public default void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface) throws BytecodeException
+	{
+		int args = Type.getArgumentsAndReturnSizes(desc) >> 2;
+		if (opcode == Opcodes.INVOKESTATIC)
+		{
+			args--;
+		}
+		this.writeInvokeInsn(opcode, owner, name, desc, args, Frame.returnType(desc), isInterface);
+	}
 	
-	public void writeInvokeDynamic(String name, String desc, Handle bsm, Object... bsmArgs);
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, Object returnType, boolean isInterface) throws BytecodeException;
+	
+	public default void writeInvokeDynamic(String name, String desc, Handle bsm, Object... bsmArgs) throws BytecodeException
+	{
+		this.writeInvokeDynamic(name, desc, Type.getArgumentsAndReturnSizes(desc) >> 2 - 1, Frame.returnType(desc), bsm, bsmArgs);
+	}
+	
+	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs) throws BytecodeException;
 	
 	// Switch Instructions
 	
-	public void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers);
+	public void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers) throws BytecodeException;
 	
-	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers);
+	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers) throws BytecodeException;
 	
 	// Inlining
 	

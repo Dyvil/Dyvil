@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface IPattern extends IASTNode, ITyped
 {
@@ -60,7 +61,7 @@ public interface IPattern extends IASTNode, ITyped
 		return 0;
 	}
 	
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel);
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException;
 	
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel);
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException;
 }

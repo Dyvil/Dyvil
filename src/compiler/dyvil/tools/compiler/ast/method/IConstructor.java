@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IConstructor extends IASTNode, IMember, IBaseMethod, ITypeList, IContext, IClassCompilable
@@ -57,11 +58,11 @@ public interface IConstructor extends IASTNode, IMember, IBaseMethod, ITypeList,
 	
 	public String[] getExceptions();
 	
-	public void writeCall(MethodWriter writer, IArguments arguments, IType type);
+	public void writeCall(MethodWriter writer, IArguments arguments, IType type) throws BytecodeException;
 	
-	public void writeInvoke(MethodWriter writer);
+	public void writeInvoke(MethodWriter writer) throws BytecodeException;
 	
-	public void writeArguments(MethodWriter writer, IArguments arguments);
+	public void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException;
 	
-	public void write(ClassWriter writer, IValue instanceFields);
+	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException;
 }

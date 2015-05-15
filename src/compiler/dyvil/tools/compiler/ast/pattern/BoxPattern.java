@@ -6,6 +6,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public class BoxPattern implements IPattern
 {
@@ -43,7 +44,7 @@ public class BoxPattern implements IPattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.boxingMethod.getTheClass().getInternalName(), this.boxingMethod.getName().qualified,
@@ -52,7 +53,7 @@ public class BoxPattern implements IPattern
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel)
+	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.boxingMethod.getTheClass().getInternalName(), this.boxingMethod.getName().qualified,

@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -255,7 +256,7 @@ public final class ClassParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String desc = this.getDescription();
 		writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
@@ -291,7 +292,7 @@ public final class ClassParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance)
+	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
 		if (instance != null)
 		{
@@ -302,7 +303,7 @@ public final class ClassParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value)
+	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
 	{
 		if (instance != null)
 		{

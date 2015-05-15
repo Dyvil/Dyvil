@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignature, IContext, IClassCompilable
@@ -56,9 +57,9 @@ public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignatur
 	
 	public String[] getExceptions();
 	
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type);
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException;
 	
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments);
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException;
 	
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments);
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException;
 }

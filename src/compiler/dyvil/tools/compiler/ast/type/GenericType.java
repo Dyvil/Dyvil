@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -242,7 +243,7 @@ public final class GenericType extends Type implements ITypeList
 	}
 	
 	@Override
-	public void writeTypeExpression(MethodWriter writer)
+	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(this.theClass.getFullName());
 		
