@@ -28,7 +28,7 @@ public class TryCatchInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeTryCatchBlock(this.start.target, this.end.target, this.handler.target, this.type);
+		writer.writeCatchBlock(this.start.target, this.end.target, this.handler.target, this.type);
 	}
 	
 	@Override

@@ -310,6 +310,11 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
+		if (opcode <= 0)
+		{
+			return;
+		}
+		
 		this.frame.visitInsn(opcode);
 		
 		if (opcode > 255)
@@ -687,13 +692,19 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
+	public void startCatchBlock(String type)
+	{
+		this.frame.push(type);
+	}
+	
+	@Override
 	public void writeFinallyBlock(Label start, Label end, Label handler)
 	{
 		this.mv.visitTryCatchBlock(start, end, handler, null);
 	}
 	
 	@Override
-	public void writeTryCatchBlock(Label start, Label end, Label handler, String type)
+	public void writeCatchBlock(Label start, Label end, Label handler, String type)
 	{
 		this.mv.visitTryCatchBlock(start, end, handler, type);
 	}
@@ -716,6 +727,7 @@ public final class MethodWriterImpl implements MethodWriter
 		
 		if (!this.hasReturn)
 		{
+			this.insnCallback();
 			this.mv.visitInsn(type.getReturnOpcode());
 		}
 		this.mv.visitMaxs(this.frame.maxStack, this.frame.maxLocals);

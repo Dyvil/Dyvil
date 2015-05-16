@@ -297,7 +297,7 @@ public final class TryStatement extends ASTNode implements IStatement
 		org.objectweb.asm.Label tryEnd = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label endLabel = new org.objectweb.asm.Label();
 		
-		writer.writeLabel(tryStart);
+		writer.writeTargetLabel(tryStart);
 		if (this.action != null)
 		{
 			this.action.writeStatement(writer);
@@ -309,6 +309,14 @@ public final class TryStatement extends ASTNode implements IStatement
 		{
 			CatchBlock block = this.catchBlocks[i];
 			org.objectweb.asm.Label handlerLabel = new org.objectweb.asm.Label();
+			String type = block.type.getInternalName();
+			
+			writer.writeTargetLabel(handlerLabel);
+			writer.startCatchBlock(type);
+			// We need a NOP here so the MethodWriter creates a StackMapFrame
+			// that does *not* include the variable that is about to be
+			// registered.
+			writer.writeInsn(Opcodes.NOP);
 			
 			// Check if the block's variable is actually used
 			if (block.variable != null)
@@ -316,22 +324,18 @@ public final class TryStatement extends ASTNode implements IStatement
 				// If yes register a new local variable for the exception and
 				// store it.
 				int localCount = writer.localCount();
-				
-				writer.writeLabel(handlerLabel);
-				writer.writeVarInsn(Opcodes.ASTORE, localCount);
-				block.variable.index = localCount;
+				block.variable.writeInit(writer, null);
 				block.action.writeStatement(writer);
 				writer.resetLocals(localCount);
 			}
 			// Otherwise pop the exception from the stack
 			else
 			{
-				writer.writeLabel(handlerLabel);
 				writer.writeInsn(Opcodes.POP);
 				block.action.writeStatement(writer);
 			}
 			
-			writer.writeTryCatchBlock(tryStart, tryEnd, handlerLabel, block.type.getInternalName());
+			writer.writeCatchBlock(tryStart, tryEnd, handlerLabel, type);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		
@@ -340,6 +344,7 @@ public final class TryStatement extends ASTNode implements IStatement
 			org.objectweb.asm.Label finallyLabel = new org.objectweb.asm.Label();
 			
 			writer.writeLabel(finallyLabel);
+			writer.startCatchBlock("java/lang/Throwable");
 			writer.writeInsn(Opcodes.POP);
 			writer.writeLabel(endLabel);
 			this.finallyBlock.writeStatement(writer);
@@ -358,10 +363,6 @@ public final class TryStatement extends ASTNode implements IStatement
 		if (this.action != null)
 		{
 			this.action.toString(prefix, buffer);
-			if (this.action.isStatement())
-			{
-				buffer.append('\n').append(prefix);
-			}
 		}
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
