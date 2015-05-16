@@ -8,7 +8,14 @@ import dyvil.lang.literal.DoubleConvertible;
 @DoubleConvertible
 public class Double implements Number
 {
-	protected double	value;
+	public static final double	min					= java.lang.Double.MIN_VALUE;
+	public static final double	max					= java.lang.Double.MAX_VALUE;
+	public static final double	NaN					= java.lang.Double.NaN;
+	public static final double	infinity			= java.lang.Double.POSITIVE_INFINITY;
+	public static final double	negative_infinity	= java.lang.Double.NEGATIVE_INFINITY;
+	public static final byte	size				= java.lang.Double.SIZE;
+	
+	protected double			value;
 	
 	public static Double apply(double v)
 	{

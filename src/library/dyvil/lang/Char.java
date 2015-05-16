@@ -8,7 +8,11 @@ import dyvil.lang.literal.CharConvertible;
 @CharConvertible
 public class Char implements Integer
 {
-	protected char	value;
+	public static final char	min		= java.lang.Character.MIN_VALUE;
+	public static final char	max		= java.lang.Character.MAX_VALUE;
+	public static final byte	size	= java.lang.Character.SIZE;
+	
+	protected char				value;
 	
 	public static Char apply(char v)
 	{

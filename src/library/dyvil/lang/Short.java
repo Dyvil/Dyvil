@@ -6,7 +6,11 @@ import dyvil.annotation.prefix;
 
 public class Short implements Integer
 {
-	protected short	value;
+	public static final int		min		= java.lang.Short.MIN_VALUE;
+	public static final int		max		= java.lang.Short.MAX_VALUE;
+	public static final byte	size	= java.lang.Short.SIZE;
+	
+	protected short				value;
 	
 	public static Short apply(short v)
 	{

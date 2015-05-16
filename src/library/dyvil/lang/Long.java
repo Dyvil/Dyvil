@@ -8,7 +8,11 @@ import dyvil.lang.literal.LongConvertible;
 @LongConvertible
 public class Long implements Integer
 {
-	protected long	value;
+	public static final long	min		= java.lang.Long.MIN_VALUE;
+	public static final long	max		= java.lang.Long.MAX_VALUE;
+	public static final byte	size	= java.lang.Long.SIZE;
+	
+	protected long				value;
 	
 	public static Long apply(long value)
 	{

@@ -8,7 +8,11 @@ import dyvil.lang.literal.IntConvertible;
 @IntConvertible
 public class Int implements Integer
 {
-	protected int	value;
+	public static final int		min		= java.lang.Integer.MIN_VALUE;
+	public static final int		max		= java.lang.Integer.MAX_VALUE;
+	public static final byte	size	= java.lang.Integer.SIZE;
+	
+	protected int				value;
 	
 	public static Int apply(int v)
 	{

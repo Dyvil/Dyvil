@@ -8,7 +8,14 @@ import dyvil.lang.literal.FloatConvertible;
 @FloatConvertible
 public class Float implements Number
 {
-	protected float	value;
+	public static final float	min					= java.lang.Float.MIN_VALUE;
+	public static final float	max					= java.lang.Float.MAX_VALUE;
+	public static final float	NaN					= java.lang.Float.NaN;
+	public static final float	infinity			= java.lang.Float.POSITIVE_INFINITY;
+	public static final float	negative_infinity	= java.lang.Float.NEGATIVE_INFINITY;
+	public static final byte	size				= java.lang.Float.SIZE;
+	
+	protected float				value;
 	
 	public static Float apply(float v)
 	{

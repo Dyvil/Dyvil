@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -160,7 +159,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 			IClass iclass = context.resolveClass(this.name);
 			if (iclass != null)
 			{
-				return new ClassAccess(this.position, new Type(iclass));
+				return new ClassAccess(this.position, iclass.getType());
 			}
 		}
 		
