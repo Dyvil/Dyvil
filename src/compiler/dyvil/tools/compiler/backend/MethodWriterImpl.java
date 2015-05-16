@@ -17,7 +17,7 @@ public final class MethodWriterImpl implements MethodWriter
 	public ClassWriter			cw;
 	protected MethodVisitor		mv;
 	
-	private Frame				frame			= new Frame();
+	protected Frame				frame			= new Frame();
 	private boolean				visitFrame;
 	private int					maxLocals;
 	private int					maxStack;
@@ -83,7 +83,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (this.visitFrame)
 		{
-			this.mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, this.frame.localCount, this.frame.locals, this.frame.stackCount, this.frame.stack);
+			this.frame.visitFrame(this.mv);
 			this.visitFrame = false;
 		}
 		
@@ -381,6 +381,21 @@ public final class MethodWriterImpl implements MethodWriter
 				return;
 			case Opcodes.OBJECT_EQUALS:
 				this.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
+				return;
+			case Opcodes.AUTO_SWAP:
+				BackendUtil.swap(this);
+				return;
+			case Opcodes.AUTO_POP:
+				BackendUtil.pop(this);
+				return;
+			case Opcodes.AUTO_POP2:
+				BackendUtil.pop2(this);
+				return;
+			case Opcodes.AUTO_DUP:
+				BackendUtil.dup(this);
+				return;
+			case Opcodes.AUTO_DUP_X1:
+				BackendUtil.dupX1(this);
 				return;
 			}
 			if (opcode >= ICMPEQ && opcode <= ICMPLE)

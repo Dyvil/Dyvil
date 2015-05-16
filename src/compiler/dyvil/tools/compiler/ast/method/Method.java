@@ -1053,7 +1053,7 @@ public class Method extends Member implements IMethod
 		{
 			if (this.type != Types.VOID)
 			{
-				writer.writeInsn(Opcodes.POP);
+				writer.writeInsn(Opcodes.AUTO_POP);
 			}
 			return;
 		}

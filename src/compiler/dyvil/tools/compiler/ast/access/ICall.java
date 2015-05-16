@@ -32,6 +32,8 @@ public interface ICall extends IValue
 					return match;
 				}
 			}
+			
+			return null;
 		}
 		
 		match = context.resolveField(name);

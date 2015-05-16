@@ -316,12 +316,12 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 			if (instance != null)
 			{
 				instance.writeExpression(writer);
-				writer.writeInsn(Opcodes.DUP);
+				writer.writeInsn(Opcodes.AUTO_DUP);
 			}
 			
 			f.writeGet(writer, null);
 			this.method.writeCall(writer, null, this.arguments, null);
-			writer.writeInsn(Opcodes.DUP);
+			writer.writeInsn(Opcodes.AUTO_DUP);
 			f.writeSet(writer, null, null);
 		}
 		else if (i == APPLY_METHOD_CALL)
@@ -362,7 +362,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 			if (instance != null)
 			{
 				instance.writeExpression(writer);
-				writer.writeInsn(Opcodes.DUP);
+				writer.writeInsn(Opcodes.AUTO_DUP);
 			}
 			
 			f.writeGet(writer, null);

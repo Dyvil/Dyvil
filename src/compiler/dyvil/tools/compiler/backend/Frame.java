@@ -2,6 +2,9 @@ package dyvil.tools.compiler.backend;
 
 import static dyvil.reflect.Opcodes.*;
 import static dyvil.tools.compiler.backend.ClassFormat.*;
+
+import org.objectweb.asm.MethodVisitor;
+
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.exception.StackUnderflowException;
 
@@ -215,7 +218,7 @@ public class Frame
 	{
 		if (this.stack[--this.stackCount] == TOP)
 		{
-			Object o = this.stack[this.stackCount];
+			Object o = this.stack[this.stackCount - 1];
 			if (o == LONG || o == DOUBLE)
 			{
 				--this.stackCount;
@@ -228,7 +231,7 @@ public class Frame
 		Object o1 = this.stack[--this.stackCount];
 		if (o1 == TOP)
 		{
-			Object o = this.stack[this.stackCount];
+			Object o = this.stack[this.stackCount - 1];
 			if (o == LONG || o == DOUBLE)
 			{
 				--this.stackCount;
@@ -723,6 +726,21 @@ public class Frame
 		{
 			this.push(returnType);
 		}
+	}
+	
+	public void visitFrame(MethodVisitor mv)
+	{
+		int locals = this.localCount;
+		while (locals > 0 && this.locals[locals - 1] == TOP)
+		{
+			locals--;
+		}
+		int stack = this.stackCount;
+		while (stack > 0 && this.stack[stack - 1] == TOP)
+		{
+			stack--;
+		}
+		mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, locals, this.locals, stack, this.stack);
 	}
 	
 	public Frame copy()

@@ -236,7 +236,7 @@ public final class Variable extends Member implements IVariable
 			}
 			else
 			{
-				writer.writeInsn(Opcodes.DUP_X1);
+				writer.writeInsn(Opcodes.AUTO_DUP_X1);
 			}
 			c.writeInvoke(writer);
 			
@@ -294,7 +294,7 @@ public final class Variable extends Member implements IVariable
 			}
 			else
 			{
-				writer.writeInsn(Opcodes.SWAP);
+				writer.writeInsn(Opcodes.AUTO_SWAP);
 			}
 			
 			IField f = this.refType.getTheClass().getBody().getField(0);

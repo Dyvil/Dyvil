@@ -233,13 +233,13 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 		if (this.instance == null)
 		{
 			this.value.writeExpression(writer);
-			writer.writeInsn(Opcodes.DUP);
+			writer.writeInsn(Opcodes.AUTO_DUP);
 		}
 		else
 		{
 			this.instance.writeExpression(writer);
 			this.value.writeExpression(writer);
-			writer.writeInsn(Opcodes.DUP_X1);
+			writer.writeInsn(Opcodes.AUTO_DUP_X1);
 		}
 		this.field.writeSet(writer, null, null);
 	}

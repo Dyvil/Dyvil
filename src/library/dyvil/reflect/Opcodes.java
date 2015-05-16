@@ -913,6 +913,12 @@ public interface Opcodes
 	
 	public static final int	OBJECT_EQUALS	= 318;
 	
+	public static final int	AUTO_SWAP		= 350;
+	public static final int	AUTO_POP		= 351;
+	public static final int	AUTO_POP2		= 352;
+	public static final int	AUTO_DUP		= 353;
+	public static final int	AUTO_DUP_X1		= 354;
+	
 	public static String toString(int op)
 	{
 		return Printer.OPCODES[op];
