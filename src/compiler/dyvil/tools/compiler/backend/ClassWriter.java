@@ -38,6 +38,7 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		}
 		catch (Throwable ex)
 		{
+			DyvilCompiler.logger.warning("Error during compilation of '" + file + "': " + ex.getMessage());
 			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
 		}
 	}

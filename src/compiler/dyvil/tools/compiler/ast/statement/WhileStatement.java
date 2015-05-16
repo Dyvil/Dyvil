@@ -232,7 +232,7 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
 		
 		// Condition
-		writer.writeLabel(startLabel);
+		writer.writeTargetLabel(startLabel);
 		this.condition.writeInvJump(writer, endLabel);
 		// While Block
 		this.action.writeStatement(writer);

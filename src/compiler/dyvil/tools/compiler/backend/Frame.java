@@ -40,6 +40,8 @@ public class Frame
 		{
 		case 'V':
 			return null;
+		case 'Z':
+			return ClassFormat.BOOLEAN;
 		case 'B':
 			return ClassFormat.BYTE;
 		case 'S':
@@ -70,6 +72,8 @@ public class Frame
 		{
 		case 'V':
 			return null;
+		case 'Z':
+			return ClassFormat.BOOLEAN;
 		case 'B':
 			return ClassFormat.BYTE;
 		case 'S':
@@ -676,9 +680,9 @@ public class Frame
 			this.pop();
 			return;
 		case ASTORE:
-			if (index > this.localCount)
+			if (index >= this.localCount)
 			{
-				this.setLocal(index, this.stack[this.stackCount - 1]);
+				this.setLocal(index, this.peek());
 			}
 			this.pop();
 			return;

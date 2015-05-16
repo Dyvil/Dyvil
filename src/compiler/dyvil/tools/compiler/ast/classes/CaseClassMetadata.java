@@ -160,7 +160,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		{
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));
 			mw.setThisType(internal);
-			mw.registerParameter(0, "obj", Types.OBJECT, 0);
+			mw.registerParameter(1, "obj", Types.OBJECT, 0);
 			mw.begin();
 			CaseClasses.writeEquals(mw, this.theClass);
 			mw.end();

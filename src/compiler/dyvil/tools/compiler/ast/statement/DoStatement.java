@@ -232,7 +232,7 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		
 		// Do Block
 		
-		writer.writeLabel(startLabel);
+		writer.writeTargetLabel(startLabel);
 		this.action.writeStatement(writer);
 		// Condition
 		writer.writeLabel(conditionLabel);
@@ -247,18 +247,9 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		buffer.append(Formatting.Statements.doStart);
 		if (this.action != null)
 		{
-			if (this.action.isStatement())
-			{
-				buffer.append('\n').append(prefix);
-				this.action.toString(prefix, buffer);
-				buffer.append('\n').append(prefix);
-			}
-			else
-			{
 				buffer.append(' ');
 				this.action.toString(prefix, buffer);
 				buffer.append(' ');
-			}
 		}
 		
 		buffer.append(Formatting.Statements.doWhile);
