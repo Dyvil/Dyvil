@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import dyvil.lang.Immutable;
+
 /**
  * Marks a mutating method, i.e. a method that mutates the members of a mutable
  * type. If a method annotated as {@code mutating} is called on any instance of

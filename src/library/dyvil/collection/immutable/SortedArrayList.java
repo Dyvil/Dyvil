@@ -6,7 +6,7 @@ import dyvil.collection.ImmutableList;
 import dyvil.lang.Collection;
 
 public class SortedArrayList<E> extends ArrayList<E>
-{	
+{
 	public SortedArrayList(E[] elements)
 	{
 		super(elements);

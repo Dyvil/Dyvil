@@ -41,7 +41,7 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	public int count()
 	{
 		int count = 0;
-		for (T current = this.first; current.$lt$eq(last); current = current.next())
+		for (T current = this.first; current.$lt$eq(this.last); current = current.next())
 		{
 			count++;
 		}
@@ -85,7 +85,7 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	@Override
 	public void forEach(Consumer<? super T> action)
 	{
-		for (T current = this.first; current.$lt$eq(last); current = current.next())
+		for (T current = this.first; current.$lt$eq(this.last); current = current.next())
 		{
 			action.accept(current);
 		}
@@ -94,7 +94,7 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	@Override
 	public void toArray(int index, Object[] store)
 	{
-		for (T current = this.first; current.$lt$eq(last); current = current.next())
+		for (T current = this.first; current.$lt$eq(this.last); current = current.next())
 		{
 			store[index++] = current;
 		}
@@ -103,9 +103,10 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	@Override
 	public boolean $qmark(Object o)
 	{
-		for (Ordered<T> current = this.first; current.$lt$eq(last); current = current.next())
+		for (Ordered<T> current = this.first; current.$lt$eq(this.last); current = current.next())
 		{
-			if (current.$eq$eq((T) o)) {
+			if (current.$eq$eq((T) o))
+			{
 				return true;
 			}
 		}

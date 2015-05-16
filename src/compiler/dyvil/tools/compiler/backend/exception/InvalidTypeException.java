@@ -2,7 +2,6 @@ package dyvil.tools.compiler.backend.exception;
 
 import dyvil.reflect.Opcodes;
 
-
 public class InvalidTypeException extends BytecodeException
 {
 	private static final long	serialVersionUID	= -3066382947566741703L;

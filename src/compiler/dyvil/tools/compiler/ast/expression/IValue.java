@@ -168,7 +168,8 @@ public interface IValue extends IASTNode, ITyped
 	 * the first element of the stack.
 	 * 
 	 * @param visitor
-	 * @throws BytecodeException TODO
+	 * @throws BytecodeException
+	 *             TODO
 	 */
 	public void writeExpression(MethodWriter writer) throws BytecodeException;
 	
@@ -178,7 +179,8 @@ public interface IValue extends IASTNode, ITyped
 	 * from the stack.
 	 * 
 	 * @param writer
-	 * @throws BytecodeException TODO
+	 * @throws BytecodeException
+	 *             TODO
 	 */
 	public void writeStatement(MethodWriter writer) throws BytecodeException;
 	
@@ -199,7 +201,8 @@ public interface IValue extends IASTNode, ITyped
 	 * 
 	 * @param writer
 	 * @param dest
-	 * @throws BytecodeException TODO
+	 * @throws BytecodeException
+	 *             TODO
 	 */
 	public default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
@@ -297,7 +300,7 @@ public interface IValue extends IASTNode, ITyped
 		}
 		return null;
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer);
 }
