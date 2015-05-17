@@ -156,47 +156,47 @@ public final class Predef
 		System.out.println(o.toString());
 	}
 	
-	public static @inline void println(boolean[] v)
+	public static @inline void println(boolean... v)
 	{
 		System.out.println(BooleanArray.toString(v));
 	}
 	
-	public static @inline void println(byte[] v)
+	public static @inline void println(byte... v)
 	{
 		System.out.println(ByteArray.toString(v));
 	}
 	
-	public static @inline void println(short[] v)
+	public static @inline void println(short... v)
 	{
 		System.out.println(ShortArray.toString(v));
 	}
 	
-	public static @inline void println(char[] v)
+	public static @inline void println(char... v)
 	{
 		System.out.println(CharArray.toString(v));
 	}
 	
-	public static @inline void println(int[] v)
+	public static @inline void println(int... v)
 	{
 		System.out.println(IntArray.toString(v));
 	}
 	
-	public static @inline void println(long[] v)
+	public static @inline void println(long... v)
 	{
 		System.out.println(LongArray.toString(v));
 	}
 	
-	public static @inline void println(float[] v)
+	public static @inline void println(float... v)
 	{
 		System.out.println(FloatArray.toString(v));
 	}
 	
-	public static @inline void println(double[] v)
+	public static @inline void println(double... v)
 	{
 		System.out.println(DoubleArray.toString(v));
 	}
 	
-	public static @inline void println(Object[] v)
+	public static @inline void println(Object... v)
 	{
 		System.out.println(ObjectArray.deepToString(v));
 	}

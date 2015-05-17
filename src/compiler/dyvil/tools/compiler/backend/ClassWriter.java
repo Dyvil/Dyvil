@@ -26,19 +26,35 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 	
 	public static void compile(File file, IClassCompilable iclass)
 	{
-		FileUtils.createFile(file);
+		byte[] bytes;
 		
-		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
+		// First try to compile the file to a byte array
+		try
 		{
 			ClassWriter writer = new ClassWriter();
 			iclass.write(writer);
 			writer.visitEnd();
-			byte[] bytes = writer.toByteArray();
-			os.write(bytes, 0, bytes.length);
+			bytes = writer.toByteArray();
 		}
 		catch (Throwable ex)
 		{
-			DyvilCompiler.logger.warning("Error during compilation of '" + file + "': " + ex.getMessage());
+			// If the compilation fails, skip creating and writing the file.
+			DyvilCompiler.logger.warning("Error during compilation of '" + file + "': " + ex);
+			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
+			return;
+		}
+		
+		// If the compilation was successful, we can try to write the newly
+		// created byte array to a newly created, empty file.
+		FileUtils.createFile(file);
+		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
+		{
+			os.write(bytes, 0, bytes.length);
+		}
+		catch (IOException ex)
+		{
+			// If file saving fails, simply report the error.
+			DyvilCompiler.logger.warning("Failed to save file '" + file + "': " + ex);
 			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
 		}
 	}

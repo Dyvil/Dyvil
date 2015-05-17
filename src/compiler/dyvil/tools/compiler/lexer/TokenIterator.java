@@ -39,6 +39,11 @@ public class TokenIterator implements Iterator<IToken>
 		return this.lastReturned != null ? this.lastReturned.hasNext() : this.next != null;
 	}
 	
+	public IToken current()
+	{
+		return this.next;
+	}
+	
 	@Override
 	public IToken next()
 	{

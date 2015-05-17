@@ -12,6 +12,7 @@ public class Frame
 {
 	protected Object[]	stack;
 	protected int		stackCount;
+	protected int		actualStackCount;
 	protected int		maxStack;
 	
 	protected Object[]	locals;
@@ -33,6 +34,29 @@ public class Frame
 		this.localCount = localCount;
 		this.locals = new Object[localCount];
 		System.arraycopy(locals, 0, this.locals, 0, localCount);
+	}
+	
+	public static int getArgumentCount(String desc)
+	{
+		int index = desc.lastIndexOf(')');
+		int count = 0;
+		for (int i = 1; i < index; i++)
+		{
+			count++;
+			while (desc.charAt(i) == '[')
+			{
+				i++;
+			}
+			if (desc.charAt(i) == 'L')
+			{
+				do
+				{
+					i++;
+				}
+				while (desc.charAt(i) != ';');
+			}
+		}
+		return count;
 	}
 	
 	public static Object returnType(String desc)
@@ -194,9 +218,8 @@ public class Frame
 			System.arraycopy(this.stack, 0, newLocals, 0, this.stack.length);
 			this.stack = newLocals;
 		}
-		if (count > this.maxStack)
-		{
-			this.maxStack = count;
+		if (this.actualStackCount > this.maxStack) {
+			this.maxStack = this.actualStackCount;
 		}
 	}
 	
@@ -204,10 +227,10 @@ public class Frame
 	{
 		if (type == LONG || type == DOUBLE)
 		{
-			this.ensureStack(this.stackCount + 2);
-			this.stack[this.stackCount++] = type;
-			this.stack[this.stackCount++] = TOP;
-			return;
+			this.actualStackCount += 2;
+		}
+		else {
+			this.actualStackCount++;
 		}
 		
 		this.ensureStack(this.stackCount + 1);
@@ -216,44 +239,34 @@ public class Frame
 	
 	public void pop() throws StackUnderflowException
 	{
-		if (this.stack[--this.stackCount] == TOP)
+		Object o = this.stack[--this.stackCount];
+		if (o == LONG || o == DOUBLE)
 		{
-			Object o = this.stack[this.stackCount - 1];
-			if (o == LONG || o == DOUBLE)
-			{
-				--this.stackCount;
-			}
+			this.actualStackCount -= 2;
+		}
+		else
+		{
+			this.actualStackCount--;
 		}
 	}
 	
 	public Object popAndGet() throws StackUnderflowException
 	{
-		Object o1 = this.stack[--this.stackCount];
-		if (o1 == TOP)
+		Object o = this.stack[--this.stackCount];
+		if (o == LONG || o == DOUBLE)
 		{
-			Object o = this.stack[this.stackCount - 1];
-			if (o == LONG || o == DOUBLE)
-			{
-				--this.stackCount;
-				return o;
-			}
+			this.actualStackCount -= 2;
 		}
-		
-		return o1;
+		else
+		{
+			this.actualStackCount--;
+		}
+		return o;
 	}
 	
 	public Object peek()
 	{
-		Object o = this.stack[this.stackCount - 1];
-		if (o == TOP)
-		{
-			Object o1 = this.stack[this.stackCount - 2];
-			if (o1 == LONG || o1 == DOUBLE)
-			{
-				return o1;
-			}
-		}
-		return o;
+		return this.stack[this.stackCount - 1];
 	}
 	
 	public void visitInsn(int opcode) throws BytecodeException
@@ -715,7 +728,6 @@ public class Frame
 	
 	public void visitInvokeInsn(int args, Object returnType) throws BytecodeException
 	{
-		// args is already expanded for LONG and DOUBLE
 		this.stackCount -= args;
 		
 		if (this.stackCount < 0)
@@ -730,17 +742,25 @@ public class Frame
 	
 	public void visitFrame(MethodVisitor mv)
 	{
-		int locals = this.localCount;
-		while (locals > 0 && this.locals[locals - 1] == TOP)
+		Object[] locals = new Object[this.localCount];
+		int localIndex = 0;
+		for (int i = 0; i < this.localCount; i++)
 		{
-			locals--;
+			Object o = this.locals[i];
+			locals[localIndex++] = o;
+			if (o == LONG || o == DOUBLE)
+			{
+				i++;
+			}
 		}
+		
 		int stack = this.stackCount;
 		while (stack > 0 && this.stack[stack - 1] == TOP)
 		{
 			stack--;
 		}
-		mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, locals, this.locals, stack, this.stack);
+		
+		mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, localIndex, locals, stack, this.stack);
 	}
 	
 	public Frame copy()
@@ -748,6 +768,7 @@ public class Frame
 		Frame copy = new Frame(this.stackCount, this.stack, this.localCount, this.locals);
 		copy.maxLocals = this.maxLocals;
 		copy.maxStack = this.maxStack;
+		copy.actualStackCount = this.actualStackCount;
 		return copy;
 	}
 	

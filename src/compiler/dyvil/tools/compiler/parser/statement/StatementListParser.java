@@ -60,6 +60,15 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 		
 		if (type == Symbols.CLOSE_CURLY_BRACKET)
 		{
+			if (this.firstToken != null)
+			{
+				pm.jump(this.firstToken);
+				this.reset();
+				pm.pushParser(new ExpressionParser(this));
+				this.mode = 0;
+				return;
+			}
+			
 			pm.popParser(true);
 			return;
 		}
@@ -133,11 +142,6 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 			if (type == Symbols.SEMICOLON)
 			{
 				this.mode = EXPRESSION;
-				return;
-			}
-			if (ParserUtil.isCloseBracket(type))
-			{
-				pm.popParser(true);
 				return;
 			}
 			this.mode = EXPRESSION;

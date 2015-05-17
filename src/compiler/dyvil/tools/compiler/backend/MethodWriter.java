@@ -96,10 +96,10 @@ public interface MethodWriter
 	
 	public default void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface) throws BytecodeException
 	{
-		int args = Type.getArgumentsAndReturnSizes(desc) >> 2;
-		if (opcode == Opcodes.INVOKESTATIC)
+		int args = Frame.getArgumentCount(desc);
+		if (opcode != Opcodes.INVOKESTATIC)
 		{
-			args--;
+			args++;
 		}
 		this.writeInvokeInsn(opcode, owner, name, desc, args, Frame.returnType(desc), isInterface);
 	}
@@ -108,7 +108,7 @@ public interface MethodWriter
 	
 	public default void writeInvokeDynamic(String name, String desc, Handle bsm, Object... bsmArgs) throws BytecodeException
 	{
-		this.writeInvokeDynamic(name, desc, Type.getArgumentsAndReturnSizes(desc) >> 2 - 1, Frame.returnType(desc), bsm, bsmArgs);
+		this.writeInvokeDynamic(name, desc, Frame.getArgumentCount(desc), Frame.returnType(desc), bsm, bsmArgs);
 	}
 	
 	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs) throws BytecodeException;
