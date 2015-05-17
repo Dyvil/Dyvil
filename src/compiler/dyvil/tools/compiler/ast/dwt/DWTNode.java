@@ -164,7 +164,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				for (IValue v : (IValueList) value)
 				{
 					String s1 = Util.getAdder(key);
-					IMethod m = IContext.resolveMethod(markers, this.theClass, this, Name.getQualified(s1), new SingleArgument(value));
+					IMethod m = IContext.resolveMethod(this.theClass, this, Name.getQualified(s1), new SingleArgument(value));
 					if (m != null)
 					{
 						value.resolve(markers, m);
@@ -184,14 +184,14 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 					continue;
 				}
 				
-				IMethod getter = IContext.resolveMethod(markers, this.theClass, this, Name.getQualified(Util.getGetter(key)), EmptyArguments.INSTANCE);
+				IMethod getter = IContext.resolveMethod(this.theClass, this, Name.getQualified(Util.getGetter(key)), EmptyArguments.INSTANCE);
 				if (getter != null)
 				{
 					node.getter = getter;
 					continue;
 				}
 				
-				IConstructor match = IContext.resolveConstructor(markers, this.theClass, EmptyArguments.INSTANCE);
+				IConstructor match = IContext.resolveConstructor(this.theClass, EmptyArguments.INSTANCE);
 				if (match == null)
 				{
 					markers.add(value.getPosition(), "dwt.component.constructor");
@@ -200,7 +200,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 			else
 			{
 				String s1 = Util.getSetter(key);
-				IMethod m = IContext.resolveMethod(markers, this.theClass, this, Name.getQualified(s1), new SingleArgument(value));
+				IMethod m = IContext.resolveMethod(this.theClass, this, Name.getQualified(s1), new SingleArgument(value));
 				if (m != null)
 				{
 					property.setter = m;

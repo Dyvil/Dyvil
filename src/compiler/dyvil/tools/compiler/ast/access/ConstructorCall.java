@@ -153,7 +153,7 @@ public class ConstructorCall extends ASTNode implements ICall
 			return this;
 		}
 		
-		IConstructor match = IContext.resolveConstructor(markers, this.type, this.arguments);
+		IConstructor match = IContext.resolveConstructor(this.type, this.arguments);
 		if (match == null)
 		{
 			Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());

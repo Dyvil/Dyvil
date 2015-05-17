@@ -108,7 +108,7 @@ public final class ClassAccess extends ASTNode implements IValue
 			return access;
 		}
 		
-		IMethod m = IContext.resolveMethod(markers, context, null, name, EmptyArguments.INSTANCE);
+		IMethod m = IContext.resolveMethod(context, null, name, EmptyArguments.INSTANCE);
 		if (m != null)
 		{
 			MethodCall call = new MethodCall(this.position);

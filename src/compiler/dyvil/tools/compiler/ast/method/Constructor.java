@@ -8,6 +8,7 @@ import org.objectweb.asm.Label;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.access.ApplyMethodCall;
+import dyvil.tools.compiler.ast.access.ICall;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -281,7 +282,7 @@ public class Constructor extends Member implements IConstructor
 		}
 		
 		// Implicit Super Constructor
-		IConstructor match = IContext.resolveConstructor(markers, this.theClass.getSuperType(), EmptyArguments.INSTANCE);
+		IConstructor match = ICall.resolveConstructor(this.theClass.getSuperType(), EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			markers.add(this.position, "constructor.super");
@@ -293,7 +294,7 @@ public class Constructor extends Member implements IConstructor
 	
 	private IValue initializer(ICodePosition position, MarkerList markers, IClass iclass, IArguments arguments, boolean isSuper)
 	{
-		IConstructor match = IContext.resolveConstructor(markers, iclass, arguments);
+		IConstructor match = ICall.resolveConstructor(iclass, arguments);
 		if (match == null)
 		{
 			Marker marker = markers.create(this.position, "resolve.constructor", iclass.getName().qualified);

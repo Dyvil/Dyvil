@@ -120,7 +120,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 	@Override
 	public void resolve()
 	{
-		IConstructor match = IContext.resolveConstructor(this.markers, this.rootNode.theClass, EmptyArguments.INSTANCE);
+		IConstructor match = IContext.resolveConstructor(this.rootNode.theClass, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			this.markers.add(this.position, "dwt.component.constructor");

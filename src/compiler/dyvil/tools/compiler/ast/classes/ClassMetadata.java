@@ -66,7 +66,7 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 		
-		IConstructor match = IContext.resolveConstructor(markers, superType, EmptyArguments.INSTANCE);
+		IConstructor match = IContext.resolveConstructor(superType, EmptyArguments.INSTANCE);
 		if (match != null)
 		{
 			this.superConstructor = match;

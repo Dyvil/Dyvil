@@ -180,7 +180,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		
 		this.arguments.resolve(markers, context);
 		
-		IMethod method = ICall.resolveMethod(markers, context, this.instance, this.name, this.arguments);
+		IMethod method = ICall.resolveMethod(context, this.instance, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
@@ -217,7 +217,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 				IArguments arguments1 = call.arguments.addLastValue(call);
 				
 				IType type = instance1.getType();
-				IMethod match = IContext.resolveMethod(markers, type, instance1, Name.update, arguments1);
+				IMethod match = IContext.resolveMethod(type, instance1, Name.update, arguments1);
 				if (match != null)
 				{
 					this.updateMethod = match;

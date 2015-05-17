@@ -111,7 +111,7 @@ public final class NilValue implements IValue
 			return;
 		}
 		
-		IMethod match = IContext.resolveMethod(markers, this.requiredType, null, Name.apply, EmptyArguments.INSTANCE);
+		IMethod match = IContext.resolveMethod(this.requiredType, null, Name.apply, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			markers.add(this.position, "nil.method", this.requiredType.toString());

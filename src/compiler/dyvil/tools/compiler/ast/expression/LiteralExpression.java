@@ -82,7 +82,7 @@ public final class LiteralExpression implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IMethod match = IContext.resolveMethod(markers, this.type, null, Name.apply, this.arguments);
+		IMethod match = IContext.resolveMethod(this.type, null, Name.apply, this.arguments);
 		if (match == null)
 		{
 			IValue value = this.arguments.getFirstValue();

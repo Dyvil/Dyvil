@@ -218,7 +218,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 			}
 		}
 		
-		IMethod method = ICall.resolveMethod(markers, context, this.instance, this.name, this.arguments);
+		IMethod method = ICall.resolveMethod(context, this.instance, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
@@ -232,7 +232,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 			{
 				String unqualified = this.name.unqualified;
 				Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
-				IMethod method1 = IContext.resolveMethod(markers, this.instance.getType(), null, name, this.arguments);
+				IMethod method1 = IContext.resolveMethod(this.instance.getType(), null, name, this.arguments);
 				if (method1 != null)
 				{
 					CompoundCall call = new CompoundCall(this.position);
@@ -309,7 +309,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 				return null;
 			}
 			// Find the apply method of the type
-			IMethod match = IContext.resolveMethod(markers, type, null, Name.apply, this.arguments);
+			IMethod match = IContext.resolveMethod(type, null, Name.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call
@@ -326,7 +326,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 			access.dotless = this.dotless;
 			
 			// Find the apply method of the field type
-			IMethod match = IContext.resolveMethod(markers, field.getType(), access, Name.apply, this.arguments);
+			IMethod match = IContext.resolveMethod(field.getType(), access, Name.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call

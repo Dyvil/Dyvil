@@ -249,7 +249,7 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return;
 		}
 		
-		IMethod m = IContext.resolveMethod(markers, this.getType(), null, Name.apply, this.arguments = new ArgumentList(this.values, this.valueCount));
+		IMethod m = IContext.resolveMethod(this.getType(), null, Name.apply, this.arguments = new ArgumentList(this.values, this.valueCount));
 		if (m == null)
 		{
 			StringBuilder builder = new StringBuilder();

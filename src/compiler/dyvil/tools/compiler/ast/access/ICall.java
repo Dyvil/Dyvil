@@ -1,22 +1,34 @@
 package dyvil.tools.compiler.ast.access;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface ICall extends IValue
 {
 	public void setArguments(IArguments arguments);
 	
 	public IArguments getArguments();
+	
+	public static IConstructor resolveConstructor(IContext context, IArguments arguments)
+	{
+		List<ConstructorMatch> matches = new ArrayList();
+		context.getConstructorMatches(matches, arguments);
+		return IContext.getBestConstructor(matches);
+	}
 	
 	public static IField resolveField(IContext context, ITyped instance, Name name)
 	{
@@ -44,18 +56,19 @@ public interface ICall extends IValue
 		return null;
 	}
 	
-	public static IMethod resolveMethod(MarkerList markers, IContext context, IValue instance, Name name, IArguments arguments)
+	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
 	{
-		IMethod match;
+		List<MethodMatch> matches = new ArrayList();
 		if (instance != null)
 		{
 			IType type = instance.getType();
 			if (type != null)
 			{
-				match = IContext.resolveMethod(markers, type, instance, name, arguments);
-				if (match != null)
+				type.getMethodMatches(matches, instance, name, arguments);
+				
+				if (!matches.isEmpty())
 				{
-					return match;
+					return IContext.getBestMethod(matches);
 				}
 			}
 		}
@@ -65,25 +78,27 @@ public interface ICall extends IValue
 			IType type = v.getType();
 			if (type != null)
 			{
-				match = IContext.resolveMethod(markers, type, instance, name, EmptyArguments.INSTANCE);
-				if (match != null)
+				type.getMethodMatches(matches, instance, name, EmptyArguments.INSTANCE);
+				
+				if (!matches.isEmpty())
 				{
-					return match;
+					return IContext.getBestMethod(matches);
 				}
 			}
 		}
 		
-		match = IContext.resolveMethod(markers, context, instance, name, arguments);
-		if (match != null)
+		context.getMethodMatches(matches, instance, name, arguments);
+		if (!matches.isEmpty())
 		{
-			return match;
+			return IContext.getBestMethod(matches);
 		}
 		
-		match = IContext.resolveMethod(markers, Types.PREDEF_CLASS, instance, name, arguments);
-		if (match != null)
+		Types.PREDEF_CLASS.getMethodMatches(matches, instance, name, arguments);
+		if (!matches.isEmpty())
 		{
-			return match;
+			return IContext.getBestMethod(matches);
 		}
+		
 		return null;
 	}
 }

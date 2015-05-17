@@ -147,7 +147,7 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued
 		
 		this.arguments.resolve(markers, context);
 		
-		IMethod method = ICall.resolveMethod(markers, context, this.instance, Name.apply, this.arguments);
+		IMethod method = ICall.resolveMethod(context, this.instance, Name.apply, this.arguments);
 		if (method != null)
 		{
 			this.method = method;

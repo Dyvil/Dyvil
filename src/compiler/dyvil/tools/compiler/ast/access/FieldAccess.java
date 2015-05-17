@@ -148,7 +148,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 			return this;
 		}
 		
-		IMethod method = ICall.resolveMethod(null, context, this.instance, this.name, EmptyArguments.INSTANCE);
+		IMethod method = ICall.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
 		if (method != null)
 		{
 			return this.toMethodCall(method);

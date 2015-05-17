@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IContext
 {
@@ -46,49 +45,60 @@ public interface IContext
 	
 	public byte getVisibility(IMember member);
 	
-	public static IMethod resolveMethod(MarkerList markers, IContext context, IValue instance, Name name, IArguments arguments)
+	public static IConstructor resolveConstructor(IContext context, IArguments arguments)
 	{
-		List<MethodMatch> list = new ArrayList();
-		context.getMethodMatches(list, instance, name, arguments);
-		
-		int size = list.size();
+		List<ConstructorMatch> matches = new ArrayList();
+		context.getConstructorMatches(matches, arguments);
+		return getBestConstructor(matches);
+	}
+	
+	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
+	{
+		List<MethodMatch> matches = new ArrayList();
+		context.getMethodMatches(matches, instance, name, arguments);
+		return getBestMethod(matches);
+	}
+	
+	public static IMethod getBestMethod(List<MethodMatch> matches)
+	{
+		int size = matches.size();
 		switch (size)
 		{
 		case 0:
 			return null;
 		case 1:
-			return list.get(0).method;
+			return matches.get(0).method;
 		default:
-			MethodMatch bestMatch = list.get(0);
+			MethodMatch bestMethod = matches.get(0);
+			int bestMatch = bestMethod.match;
 			for (int i = 1; i < size; i++)
 			{
-				MethodMatch m = list.get(i);
-				if (m.match > bestMatch.match)
+				MethodMatch m = matches.get(i);
+				if (m.match > bestMatch)
 				{
-					bestMatch = m;
+					bestMethod = m;
+					bestMatch = m.match;
 				}
 			}
-			return bestMatch.method;
+			
+			return bestMethod.method;
 		}
 	}
 	
-	public static IConstructor resolveConstructor(MarkerList markers, IContext context, IArguments arguments)
+	public static IConstructor getBestConstructor(List<ConstructorMatch> matches)
 	{
-		List<ConstructorMatch> list = new ArrayList();
-		context.getConstructorMatches(list, arguments);
-		
-		int size = list.size();
+		int size = matches.size();
 		switch (size)
 		{
 		case 0:
 			return null;
 		case 1:
-			return list.get(0).constructor;
+			return matches.get(0).constructor;
 		default:
-			ConstructorMatch bestMatch = list.get(0);
+			ConstructorMatch bestMatch = matches.get(0);
 			for (int i = 1; i < size; i++)
 			{
-				ConstructorMatch m = list.get(i);
+				ConstructorMatch m = matches.get(i);
 				if (m.match > bestMatch.match)
 				{
 					bestMatch = m;
