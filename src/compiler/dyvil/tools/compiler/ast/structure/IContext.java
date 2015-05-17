@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.type.IType;
 
 public interface IContext
 {
@@ -44,6 +45,8 @@ public interface IContext
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
 	
 	public byte getVisibility(IMember member);
+	
+	public boolean handleException(IType type);
 	
 	public static IConstructor resolveConstructor(IContext context, IArguments arguments)
 	{

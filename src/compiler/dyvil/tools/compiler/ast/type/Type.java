@@ -426,6 +426,12 @@ public class Type extends ASTNode implements IType
 	// Misc
 	
 	@Override
+	public String toString()
+	{
+		return this.theClass == null ? this.internalName : this.theClass.getFullName();
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.name);

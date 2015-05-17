@@ -220,6 +220,12 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	@Override
 	public byte getVisibility(IMember member);
 	
+	@Override
+	public default boolean handleException(IType type)
+	{
+		return false;
+	}
+	
 	public IMethod getFunctionalMethod();
 	
 	// Compilation

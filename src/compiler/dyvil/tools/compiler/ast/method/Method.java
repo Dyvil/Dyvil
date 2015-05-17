@@ -41,6 +41,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
@@ -446,6 +447,16 @@ public class Method extends Member implements IMethod
 			this.parameters[i].check(markers, context);
 		}
 		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			IType t = this.exceptions[i];
+			if (!Types.THROWABLE.isSuperTypeOf(t))
+			{
+				Marker m = markers.create(t.getPosition(), "method.exception.type");
+				m.addInfo("Exception Type: " + t);
+			}
+		}
+		
 		if (this.value != null)
 		{
 			this.value.check(markers, this);
@@ -574,6 +585,19 @@ public class Method extends Member implements IMethod
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		this.theClass.getConstructorMatches(list, arguments);
+	}
+	
+	@Override
+	public boolean handleException(IType type)
+	{
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			if (this.exceptions[i].isSuperTypeOf(type))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
@@ -711,39 +735,6 @@ public class Method extends Member implements IMethod
 		return genericData;
 	}
 	
-	private void checkMutating(MarkerList markers, IValue instance)
-	{
-		IType type = instance.getType();
-		if (!Types.IMMUTABLE.isSuperTypeOf(type))
-		{
-			return;
-		}
-		
-		Annotation a = this.getAnnotation(Types.MUTATING_CLASS);
-		if (a == null)
-		{
-			return;
-		}
-		
-		IValue v = a.arguments.getValue(0, Annotation.VALUE);
-		String s = v != null ? ((StringValue) v).value : mutating.VALUE_DEFAULT;
-		StringBuilder builder = new StringBuilder(s);
-		
-		int index = builder.indexOf("{method}");
-		if (index >= 0)
-		{
-			builder.replace(index, index + 8, this.name.unqualified);
-		}
-		
-		index = builder.indexOf("{type}");
-		if (index >= 0)
-		{
-			builder.replace(index, index + 6, type.toString());
-		}
-		
-		markers.add(new SemanticError(instance.getPosition(), builder.toString()));
-	}
-	
 	@Override
 	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
@@ -765,8 +756,6 @@ public class Method extends Member implements IMethod
 			{
 				instance = instance1;
 			}
-			
-			this.checkMutating(markers, instance);
 			
 			if ((this.modifiers & Modifiers.VARARGS) != 0)
 			{
@@ -796,8 +785,6 @@ public class Method extends Member implements IMethod
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
 			}
-			
-			this.checkMutating(markers, instance);
 			return null;
 		}
 		
@@ -810,22 +797,12 @@ public class Method extends Member implements IMethod
 			{
 				arguments.checkValue(i, this.parameters[i], markers, typeContext);
 			}
-			
-			if (instance != null)
-			{
-				this.checkMutating(markers, instance);
-			}
 			return instance;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			arguments.checkValue(i, this.parameters[i], markers, typeContext);
-		}
-		
-		if (instance != null)
-		{
-			this.checkMutating(markers, instance);
 		}
 		return instance;
 	}
@@ -867,6 +844,79 @@ public class Method extends Member implements IMethod
 			}
 		}
 		return Types.ANY;
+	}
+	
+	@Override
+	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
+	{
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
+		{
+			markers.add(position, "method.access.deprecated", this.name);
+		}
+		
+		switch (context.getVisibility(this))
+		{
+		case IContext.STATIC:
+			markers.add(position, "method.access.instance", this.name);
+			break;
+		case IContext.SEALED:
+			markers.add(position, "method.access.sealed", this.name);
+			break;
+		case IContext.INVISIBLE:
+			markers.add(position, "method.access.invisible", this.name);
+			break;
+		}
+		
+		if ((this.modifiers & Modifiers.PREFIX) != 0)
+		{
+			this.checkMutating(markers, arguments.getFirstValue());
+		}
+		else if (instance != null)
+		{
+			this.checkMutating(markers, instance);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			IType type = this.exceptions[i];
+			if (!context.handleException(type))
+			{
+				markers.add(position, "method.access.exception", type.toString());
+			}
+		}
+	}
+	
+	private void checkMutating(MarkerList markers, IValue instance)
+	{
+		IType type = instance.getType();
+		if (!Types.IMMUTABLE.isSuperTypeOf(type))
+		{
+			return;
+		}
+		
+		Annotation a = this.getAnnotation(Types.MUTATING_CLASS);
+		if (a == null)
+		{
+			return;
+		}
+		
+		IValue v = a.arguments.getValue(0, Annotation.VALUE);
+		String s = v != null ? ((StringValue) v).value : mutating.VALUE_DEFAULT;
+		StringBuilder builder = new StringBuilder(s);
+		
+		int index = builder.indexOf("{method}");
+		if (index >= 0)
+		{
+			builder.replace(index, index + 8, this.name.unqualified);
+		}
+		
+		index = builder.indexOf("{type}");
+		if (index >= 0)
+		{
+			builder.replace(index, index + 6, type.toString());
+		}
+		
+		markers.add(new SemanticError(instance.getPosition(), builder.toString()));
 	}
 	
 	@Override

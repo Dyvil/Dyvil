@@ -26,6 +26,7 @@ public final class Types
 	public static final Type			CLASS			= new Type("java/lang/Class", Name.getQualified("Class"));
 	public static final Type			PREDEF			= new Type("dyvil/lang/Predef", Name.getQualified("Predef"));
 	public static final Type			TYPE			= new Type("dyvil/lang/Type", Name.getQualified("Type"));
+	public static final Type			THROWABLE		= new Type("java/lang/Throwable", Name.getQualified("Throwable"));
 	
 	public static final Type			MAP				= new Type("dyvil/lang/Map", Name.getQualified("Map"));
 	public static final Type			IMMUTABLE		= new Type(Package.dyvilLang.resolveClass("Immutable"));
@@ -45,6 +46,7 @@ public final class Types
 	public static final IClass			CLASS_CLASS		= Package.javaLang.resolveClass("Class");
 	public static final IClass			PREDEF_CLASS	= Package.dyvilLang.resolveClass("Predef");
 	public static final IClass			TYPE_CLASS		= Package.dyvilLang.resolveClass("Type");
+	public static final IClass			THROWABLE_CLASS	= Package.javaLang.resolveClass("Throwable");
 	
 	public static final IClass			MAP_CLASS		= Package.dyvilLang.resolveClass("Map");
 	public static final IClass			TUPLE2_CLASS	= TupleType.getTupleClass(2);
@@ -109,6 +111,7 @@ public final class Types
 		CLASS.theClass = CLASS_CLASS;
 		PREDEF.theClass = PREDEF_CLASS;
 		TYPE.theClass = TYPE_CLASS;
+		THROWABLE.theClass = THROWABLE_CLASS;
 		
 		MAP.theClass = MAP_CLASS;
 	}

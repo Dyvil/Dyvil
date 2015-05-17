@@ -327,6 +327,12 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
+	public boolean handleException(IType type)
+	{
+		return false;
+	}
+	
+	@Override
 	public byte getVisibility(IMember member)
 	{
 		return this.theClass.getVisibility(member);

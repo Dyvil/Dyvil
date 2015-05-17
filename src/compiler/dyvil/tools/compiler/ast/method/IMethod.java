@@ -17,12 +17,15 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignature, IContext, IClassCompilable
 {
 	public int getSignatureMatch(Name name, IValue instance, IArguments arguments);
 	
 	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext);
+	
+	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	
 	// Misc
 	

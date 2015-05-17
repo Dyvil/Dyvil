@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.INumericValue;
@@ -264,23 +263,7 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 				marker.addInfo("Method Type: " + type2);
 			}
 			
-			if (this.method.hasModifier(Modifiers.DEPRECATED))
-			{
-				markers.add(this.position, "method.access.deprecated", this.name.unqualified);
-			}
-			
-			switch (context.getVisibility(this.method))
-			{
-			case IContext.STATIC:
-				markers.add(this.position, "method.access.instance", this.name.unqualified);
-				break;
-			case IContext.SEALED:
-				markers.add(this.position, "method.access.sealed", this.name.unqualified);
-				break;
-			case IContext.INVISIBLE:
-				markers.add(this.position, "method.access.invisible", this.name.unqualified);
-				break;
-			}
+			this.method.checkCall(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
 		}
 		
 		this.arguments.check(markers, context);

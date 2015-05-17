@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.access;
 
 import org.objectweb.asm.Label;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
@@ -191,23 +190,7 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued
 		
 		if (this.method != null)
 		{
-			if (this.method.hasModifier(Modifiers.DEPRECATED))
-			{
-				markers.add(this.position, "method.access.deprecated", "apply");
-			}
-			
-			switch (context.getVisibility(this.method))
-			{
-			case IContext.STATIC:
-				markers.add(this.position, "method.access.instance", "apply");
-				break;
-			case IContext.SEALED:
-				markers.add(this.position, "method.access.sealed", "apply");
-				break;
-			case IContext.INVISIBLE:
-				markers.add(this.position, "method.access.invisible", "apply");
-				break;
-			}
+			this.method.checkCall(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
 		}
 		
 		this.arguments.check(markers, context);

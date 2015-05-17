@@ -413,7 +413,7 @@ public final class MethodWriterImpl implements MethodWriter
 			}
 			return;
 		}
-		if (opcode >= IRETURN && opcode <= RETURN)
+		if (opcode >= IRETURN && opcode <= RETURN || opcode == ATHROW)
 		{
 			if (this.syncCount > 0)
 			{

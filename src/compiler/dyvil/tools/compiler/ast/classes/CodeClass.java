@@ -1051,6 +1051,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public boolean handleException(IType type)
+	{
+		return false;
+	}
+	
+	@Override
 	public byte getVisibility(IMember member)
 	{
 		IClass iclass = member.getTheClass();

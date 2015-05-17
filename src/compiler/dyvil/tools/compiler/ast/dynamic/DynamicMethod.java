@@ -32,6 +32,7 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class DynamicMethod extends ASTNode implements IMethod
 {
@@ -177,6 +178,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
+	}
+	
+	@Override
+	public boolean handleException(IType type)
+	{
+		return true;
 	}
 	
 	@Override
@@ -373,6 +380,11 @@ public class DynamicMethod extends ASTNode implements IMethod
 	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
 		return instance;
+	}
+	
+	@Override
+	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
+	{
 	}
 	
 	@Override

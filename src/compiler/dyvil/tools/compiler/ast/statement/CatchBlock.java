@@ -119,6 +119,12 @@ public class CatchBlock implements IValued, ITyped, IContext
 	}
 	
 	@Override
+	public boolean handleException(IType type)
+	{
+		return this.context.handleException(type);
+	}
+	
+	@Override
 	public byte getVisibility(IMember member)
 	{
 		return this.context.getVisibility(member);

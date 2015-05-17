@@ -443,6 +443,19 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
+	public boolean handleException(IType type)
+	{
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			if (this.exceptions[i].isSuperTypeOf(type))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
 	public byte getVisibility(IMember member)
 	{
 		return this.theClass.getVisibility(member);

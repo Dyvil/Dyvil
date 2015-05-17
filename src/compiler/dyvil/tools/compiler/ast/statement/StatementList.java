@@ -384,6 +384,12 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
+	public boolean handleException(IType type)
+	{
+		return this.context.handleException(type);
+	}
+	
+	@Override
 	public byte getVisibility(IMember member)
 	{
 		return this.context.getVisibility(member);

@@ -287,6 +287,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
+	public boolean handleException(IType type)
+	{
+		return false;
+	}
+	
+	@Override
 	public byte getVisibility(IMember member)
 	{
 		return this.context.getVisibility(member);

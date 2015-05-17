@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
@@ -334,9 +335,15 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
+	public boolean handleException(IType type)
+	{
+		return false;
+	}
+	
+	@Override
 	public byte getVisibility(IMember member)
 	{
-		throw new UnsupportedOperationException();
+		return 0;
 	}
 	
 	@Override

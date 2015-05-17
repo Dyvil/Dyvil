@@ -262,10 +262,26 @@ public final class GenericType extends Type implements ITypeList
 	}
 	
 	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder(super.toString());
+		if (this.genericCount > 0)
+		{
+			builder.append('[').append(this.generics[0].toString());
+			for (int i = 0; i < this.genericCount; i++)
+			{
+				builder.append(", ").append(this.generics[i].toString());
+			}
+			builder.append(']');
+		}
+		return builder.toString();
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.name);
-		if (this.generics != null)
+		if (this.genericCount > 0)
 		{
 			buffer.append('[');
 			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);

@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
@@ -18,8 +17,6 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class TryStatement extends ASTNode implements IStatement
 {
-	public static final IType	THROWABLE	= new Type(Package.javaLang.resolveClass("Throwable"));
-	
 	public IValue				action;
 	private CatchBlock[]		catchBlocks	= new CatchBlock[1];
 	private int					catchBlockCount;
@@ -247,7 +244,7 @@ public final class TryStatement extends ASTNode implements IStatement
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			if (!THROWABLE.isSuperTypeOf(block.type))
+			if (!Types.THROWABLE.isSuperTypeOf(block.type))
 			{
 				Marker marker = markers.create(block.type.getPosition(), "try.catch.type");
 				marker.addInfo("Exception Type: " + block.type);
