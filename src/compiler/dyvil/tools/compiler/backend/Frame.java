@@ -218,7 +218,8 @@ public class Frame
 			System.arraycopy(this.stack, 0, newLocals, 0, this.stack.length);
 			this.stack = newLocals;
 		}
-		if (this.actualStackCount > this.maxStack) {
+		if (this.actualStackCount > this.maxStack)
+		{
 			this.maxStack = this.actualStackCount;
 		}
 	}
@@ -229,7 +230,8 @@ public class Frame
 		{
 			this.actualStackCount += 2;
 		}
-		else {
+		else
+		{
 			this.actualStackCount++;
 		}
 		
@@ -390,6 +392,7 @@ public class Frame
 			return;
 		case DUP:
 		{
+			this.actualStackCount++;
 			this.ensureStack(this.stackCount + 1);
 			this.stack[this.stackCount] = this.stack[this.stackCount - 1];
 			this.stackCount++;
@@ -397,6 +400,7 @@ public class Frame
 		}
 		case DUP_X1:
 		{
+			this.actualStackCount++;
 			this.ensureStack(this.stackCount + 1);
 			this.stack[this.stackCount] = this.stack[this.stackCount - 2];
 			this.stackCount++;
@@ -404,6 +408,7 @@ public class Frame
 		}
 		case DUP_X2:
 		{
+			this.actualStackCount++;
 			this.ensureStack(this.stackCount + 1);
 			this.stack[this.stackCount] = this.stack[this.stackCount - 3];
 			this.stackCount++;
@@ -411,6 +416,7 @@ public class Frame
 		}
 		case DUP2:
 		{
+			this.actualStackCount += 2;
 			this.ensureStack(this.stackCount + 2);
 			this.stack[this.stackCount] = this.stack[this.stackCount - 2];
 			this.stack[this.stackCount + 1] = this.stack[this.stackCount - 1];
@@ -419,6 +425,7 @@ public class Frame
 		}
 		case DUP2_X1:
 		{
+			this.actualStackCount += 2;
 			this.ensureStack(this.stackCount + 2);
 			this.stack[this.stackCount] = this.stack[this.stackCount - 3];
 			this.stack[this.stackCount + 1] = this.stack[this.stackCount - 2];
@@ -427,6 +434,7 @@ public class Frame
 		}
 		case DUP2_X2:
 		{
+			this.actualStackCount += 2;
 			this.ensureStack(this.stackCount + 2);
 			this.stack[this.stackCount] = this.stack[this.stackCount - 4];
 			this.stack[this.stackCount + 1] = this.stack[this.stackCount - 3];
