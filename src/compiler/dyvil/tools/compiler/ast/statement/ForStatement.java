@@ -34,6 +34,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 	public static final Name		$index			= Name.getQualified("$index");
 	public static final Name		$length			= Name.getQualified("$length");
 	public static final Name		$array			= Name.getQualified("$array");
+	public static final Name		$string			= Name.getQualified("$string");
 	public static final Name		$iterator		= Name.getQualified("$iterator");
 	public static final Name		$forStart		= Name.getQualified("$forStart");
 	public static final Name		$forUpdate		= Name.getQualified("$forCondition");
@@ -42,6 +43,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 	public static final int			DEFAULT			= 0;
 	public static final int			ITERATOR		= 1;
 	public static final int			ARRAY			= 2;
+	public static final int			STRING			= 3;
 	
 	private transient IContext		context;
 	private IStatement				parent;
@@ -147,8 +149,9 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			return this.variable;
 		}
 		
-		if (this.type == ARRAY)
+		switch (this.type)
 		{
+		case ARRAY:
 			if (name == $index)
 			{
 				return this.var1;
@@ -161,6 +164,31 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			{
 				return this.var3;
 			}
+			break;
+		case STRING:
+			if (name == $index)
+			{
+				return this.var1;
+			}
+			if (name == $length)
+			{
+				return this.var2;
+			}
+			if (name == $string)
+			{
+				return this.var3;
+			}
+			break;
+		case ITERATOR:
+			if (name == $iterator)
+			{
+				return this.var1;
+			}
+			break;
+		}
+		
+		if (this.type == ARRAY)
+		{
 		}
 		
 		return this.context.resolveField(name);
@@ -301,6 +329,34 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 				var.type = valueType;
 				var.name = $iterator;
 				this.var1 = var;
+			}
+			else if (Types.STRING.isSuperTypeOf(valueType))
+			{
+				this.type = STRING;
+				if (varType == Types.UNKNOWN)
+				{
+					this.variable.type = varType = Types.CHAR;
+				}
+				else if (!varType.classEquals(Types.CHAR))
+				{
+					Marker marker = markers.create(value.getPosition(), "for.string.type");
+					marker.addInfo("Variable Type: " + varType);
+				}
+				
+				Variable var = new Variable();
+				var.type = Types.INT;
+				var.name = $index;
+				this.var1 = var;
+				
+				var = new Variable();
+				var.type = Types.INT;
+				var.name = $length;
+				this.var2 = var;
+				
+				var = new Variable();
+				var.type = valueType;
+				var.name = $string;
+				this.var3 = var;
 			}
 		}
 		else
@@ -515,6 +571,63 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			indexVar.writeLocal(writer, scopeLabel, endLabel);
 			lengthVar.writeLocal(writer, scopeLabel, endLabel);
 			arrayVar.writeLocal(writer, scopeLabel, endLabel);
+			return;
+		}
+		case STRING:
+		{
+			Variable stringVar = this.var3;
+			Variable indexVar = this.var1;
+			Variable lengthVar = this.var2;
+			
+			org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
+			writer.writeLabel(scopeLabel);
+			
+			// Load the array
+			var.value.writeExpression(writer);
+			
+			// Local Variables
+			int locals = writer.localCount();
+			writer.writeInsn(Opcodes.DUP);
+			stringVar.writeInit(writer, null);
+			// Get the length
+			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
+			lengthVar.writeInit(writer, null);
+			// Set index to 0
+			writer.writeLDC(0);
+			indexVar.writeInit(writer, null);
+			
+			// Jump to boundary check
+			writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
+			writer.writeTargetLabel(startLabel);
+			
+			// Get the char at the index
+			stringVar.writeGet(writer, null);
+			indexVar.writeGet(writer, null);
+			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "charAt", "(I)C", false);
+			var.writeInit(writer, null);
+			
+			// Action
+			if (this.then != null)
+			{
+				this.then.writeStatement(writer);
+			}
+			
+			// Increase index
+			writer.writeIINC(indexVar.index, 1);
+			// Boundary Check
+			writer.writeLabel(updateLabel);
+			indexVar.writeGet(writer, null);
+			lengthVar.writeGet(writer, null);
+			writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
+			
+			// Local Variables
+			writer.resetLocals(locals);
+			writer.writeLabel(endLabel);
+			
+			var.writeLocal(writer, scopeLabel, endLabel);
+			indexVar.writeLocal(writer, scopeLabel, endLabel);
+			lengthVar.writeLocal(writer, scopeLabel, endLabel);
+			stringVar.writeLocal(writer, scopeLabel, endLabel);
 			return;
 		}
 		case ITERATOR:
