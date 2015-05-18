@@ -87,13 +87,13 @@ public class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public int indexOf(E element)
+	public int indexOf(Object element)
 	{
 		return -1;
 	}
 	
 	@Override
-	public int lastIndexOf(E element)
+	public int lastIndexOf(Object element)
 	{
 		return -1;
 	}
@@ -107,11 +107,11 @@ public class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
-		return (ImmutableList<? extends E>) collection.immutable();
+		return new ArrayList(collection);
 	}
 	
 	@Override
-	public ImmutableList<E> $minus(E element)
+	public ImmutableList<E> $minus(Object element)
 	{
 		return this;
 	}
@@ -126,6 +126,18 @@ public class EmptyList<E> implements ImmutableList<E>
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
 	{
 		return this;
+	}
+	
+	@Override
+	public ImmutableList<? extends E> $bar(Collection<? extends E> collection)
+	{
+		return new ArrayList(collection);
+	}
+	
+	@Override
+	public ImmutableList<? extends E> $up(Collection<? extends E> collection)
+	{
+		return new ArrayList(collection);
 	}
 	
 	@Override

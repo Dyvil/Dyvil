@@ -184,7 +184,7 @@ public interface Collection<E> extends Iterable<E>
 	 * @return a collection that contains all elements of this collection
 	 *         excluding the given element
 	 */
-	public Collection<E> $minus(E element);
+	public Collection<E> $minus(Object element);
 	
 	/**
 	 * Returns a collection that contains all elements of this collection
@@ -207,6 +207,30 @@ public interface Collection<E> extends Iterable<E>
 	 *         are present in the given collection
 	 */
 	public Collection<? extends E> $amp(Collection<? extends E> collection);
+	
+	/**
+	 * Returns a collection that contains all elements of this collection plus
+	 * all elements of the given {@code collection} that are not currently
+	 * present in this collection.
+	 * 
+	 * @param collection
+	 *            the collection of elements to be added
+	 * @return a collection that contains all elements of this collection plus
+	 *         all elements in the given collection that are not present in this
+	 *         collection.
+	 */
+	public Collection<? extends E> $bar(Collection<? extends E> collection);
+	
+	/**
+	 * Returns a collection that contains all elements that are present in
+	 * either this or the given {@code collection}, but not in both.
+	 * 
+	 * @param collection
+	 *            the collection
+	 * @return a collection that contains all elements that are present in
+	 *         either this or the given collection, but not in both.
+	 */
+	public Collection<? extends E> $up(Collection<? extends E> collection);
 	
 	/**
 	 * Returns a collection that is mapped from this collection by supplying
@@ -334,6 +358,24 @@ public interface Collection<E> extends Iterable<E>
 	 *            the collection of elements to be retained
 	 */
 	public void $amp$eq(Collection<? extends E> collection);
+	
+	/**
+	 * Adds all elements of the given {@code collection} if they are not already
+	 * present in this collection.
+	 * 
+	 * @param collection
+	 *            the collection to add
+	 */
+	public void $bar$eq(Collection<? extends E> collection);
+	
+	/**
+	 * Removes all elements of the given {@code collection} from this collection
+	 * and adds those that are not currently present in this collection.
+	 * 
+	 * @param collection
+	 *            the collection to XOR with
+	 */
+	public void $up$eq(Collection<? extends E> collection);
 	
 	/**
 	 * Clears this collection such that all elements of this collection are

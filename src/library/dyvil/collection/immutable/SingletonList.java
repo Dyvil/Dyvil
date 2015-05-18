@@ -86,13 +86,13 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public int indexOf(E element)
+	public int indexOf(Object element)
 	{
 		return Objects.equals(this.element, element) ? 0 : -1;
 	}
 	
 	@Override
-	public int lastIndexOf(E element)
+	public int lastIndexOf(Object element)
 	{
 		return Objects.equals(this.element, element) ? 0 : -1;
 	}
@@ -114,7 +114,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> $minus(E element)
+	public ImmutableList<E> $minus(Object element)
 	{
 		if (Objects.equals(this.element, element))
 		{
@@ -141,6 +141,49 @@ public class SingletonList<E> implements ImmutableList<E>
 			return ImmutableList.apply();
 		}
 		return this;
+	}
+	
+	@Override
+	public ImmutableList<? extends E> $bar(Collection<? extends E> collection)
+	{
+		if (collection.$qmark(this.element))
+		{
+			return new ArrayList(collection);
+		}
+		
+		int len = 1 + collection.size();
+		Object[] array = new Object[len];
+		array[0] = this.element;
+		collection.toArray(1, array);
+		return new ArrayList(array, len, true);
+	}
+	
+	@Override
+	public ImmutableList<? extends E> $up(Collection<? extends E> collection)
+	{
+		if (collection.$qmark(this.element))
+		{
+			int len = collection.size();
+			Object[] array = new Object[len];
+			collection.toArray(array);
+			
+			for (int i = 0; i < len; i++)
+			{
+				if (this.element == array[i] || (this.element != null && this.element.equals(array[i])))
+				{
+					System.arraycopy(array, i + 1, array, i, len - i - 1);
+					len--;
+					i--;
+				}
+			}
+			return new ArrayList(array, len, true);
+		}
+		
+		int len = 1 + collection.size();
+		Object[] array = new Object[len];
+		array[0] = this.element;
+		collection.toArray(1, array);
+		return new ArrayList(array, len, true);
 	}
 	
 	@Override

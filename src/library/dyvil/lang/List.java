@@ -151,13 +151,19 @@ public interface List<E> extends Collection<E>
 	public List<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	@Override
-	public List<E> $minus(E element);
+	public List<E> $minus(Object element);
 	
 	@Override
 	public List<? extends E> $minus$minus(Collection<? extends E> collection);
 	
 	@Override
 	public List<? extends E> $amp(Collection<? extends E> collection);
+	
+	@Override
+	public List<? extends E> $bar(Collection<? extends E> collection);
+	
+	@Override
+	public List<? extends E> $up(Collection<? extends E> collection);
 	
 	@Override
 	public <R> List<R> mapped(Function<? super E, ? extends R> mapper);
@@ -309,6 +315,12 @@ public interface List<E> extends Collection<E>
 	public void $amp$eq(Collection<? extends E> collection);
 	
 	@Override
+	public void $bar$eq(Collection<? extends E> collection);
+	
+	@Override
+	public void $up$eq(Collection<? extends E> collection);
+	
+	@Override
 	public void clear();
 	
 	@Override
@@ -352,7 +364,7 @@ public interface List<E> extends Collection<E>
 	 *            the element to search
 	 * @return the first index of the element
 	 */
-	public int indexOf(E element);
+	public int indexOf(Object element);
 	
 	/**
 	 * Returns the last index of the given {@code element} in this list, and
@@ -362,7 +374,7 @@ public interface List<E> extends Collection<E>
 	 *            the element to search
 	 * @return the last index of the element
 	 */
-	public int lastIndexOf(E element);
+	public int lastIndexOf(Object element);
 	
 	// toArray
 	

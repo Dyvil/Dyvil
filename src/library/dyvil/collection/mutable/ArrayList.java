@@ -202,7 +202,7 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public MutableList<E> $minus(E element)
+	public MutableList<E> $minus(Object element)
 	{
 		int index = this.indexOf(element);
 		if (index < 0)
@@ -256,7 +256,18 @@ public class ArrayList<E> implements MutableList<E>
 			}
 		}
 		return new ArrayList(array, index, true);
-		
+	}
+	
+	@Override
+	public MutableList<? extends E> $bar(Collection<? extends E> collection)
+	{
+		return null; // FIXME
+	}
+	
+	@Override
+	public MutableList<? extends E> $up(Collection<? extends E> collection)
+	{
+		return null; // FIXME
 	}
 	
 	@Override
@@ -593,6 +604,18 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
+	public void $bar$eq(Collection<? extends E> collection)
+	{
+		// FIXME
+	}
+	
+	@Override
+	public void $up$eq(Collection<? extends E> collection)
+	{
+		// FIXME
+	}
+	
+	@Override
 	public void clear()
 	{
 		for (int i = 0; i < this.size; i++)
@@ -677,7 +700,7 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public int indexOf(E element)
+	public int indexOf(Object element)
 	{
 		if (element == null)
 		{
@@ -702,7 +725,7 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public int lastIndexOf(E element)
+	public int lastIndexOf(Object element)
 	{
 		if (element == null)
 		{

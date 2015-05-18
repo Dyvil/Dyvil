@@ -82,13 +82,19 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	@Override
-	public ImmutableList<E> $minus(E element);
+	public ImmutableList<E> $minus(Object element);
 	
 	@Override
 	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection);
 	
 	@Override
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection);
+	
+	@Override
+	public ImmutableList<? extends E> $bar(Collection<? extends E> collection);
+	
+	@Override
+	public ImmutableList<? extends E> $up(Collection<? extends E> collection);
 	
 	@Override
 	public <R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper);
@@ -212,6 +218,20 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	@mutating
+	public default void $bar$eq(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("|= on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void $up$eq(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("^= on Immutable List");
+	}
+	
+	@Override
+	@mutating
 	public default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable List");
@@ -269,15 +289,15 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	// Searching
 	
 	@Override
-	public int indexOf(E element);
+	public int indexOf(Object element);
 	
 	@Override
-	public int lastIndexOf(E element);
+	public int lastIndexOf(Object element);
 	
 	// toArray
 	
 	@Override
-	public Object[] toArray();
+	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

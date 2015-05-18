@@ -47,13 +47,19 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	public ImmutableCollection<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	@Override
-	public ImmutableCollection<E> $minus(E element);
+	public ImmutableCollection<E> $minus(Object element);
 	
 	@Override
 	public ImmutableCollection<? extends E> $minus$minus(Collection<? extends E> collection);
 	
 	@Override
 	public ImmutableCollection<? extends E> $amp(Collection<? extends E> collection);
+	
+	@Override
+	public ImmutableCollection<? extends E> $bar(Collection<? extends E> collection);
+	
+	@Override
+	public ImmutableCollection<? extends E> $up(Collection<? extends E> collection);
 	
 	@Override
 	public <R> ImmutableCollection<R> mapped(Function<? super E, ? extends R> mapper);
@@ -113,6 +119,20 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	public default void $amp$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("&= on Immutable Collection");
+	}
+	
+	@Override
+	@mutating
+	public default void $bar$eq(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("|= on Immutable Collection");
+	}
+	
+	@Override
+	@mutating
+	public default void $up$eq(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("^= on Immutable Collection");
 	}
 	
 	@Override

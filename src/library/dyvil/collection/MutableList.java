@@ -70,13 +70,19 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	public MutableList<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	@Override
-	public MutableList<E> $minus(E element);
+	public MutableList<E> $minus(Object element);
 	
 	@Override
 	public MutableList<? extends E> $minus$minus(Collection<? extends E> collection);
 	
 	@Override
 	public MutableList<? extends E> $amp(Collection<? extends E> collection);
+	
+	@Override
+	public MutableList<? extends E> $bar(Collection<? extends E> collection);
+	
+	@Override
+	public MutableList<? extends E> $up(Collection<? extends E> collection);
 	
 	@Override
 	public <R> MutableList<R> mapped(Function<? super E, ? extends R> mapper);
@@ -119,10 +125,25 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	public void insert(int index, E element);
 	
 	@Override
+	public E add(E element);
+	
+	@Override
+	public E add(int index, E element);
+	
+	@Override
 	public void removeAt(int index);
 	
 	@Override
+	public boolean remove(E element);
+	
+	@Override
 	public void $amp$eq(Collection<? extends E> collection);
+	
+	@Override
+	public void $bar$eq(Collection<? extends E> collection);
+	
+	@Override
+	public void $up$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void clear();
@@ -151,10 +172,10 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	// Search Operations
 	
 	@Override
-	public int indexOf(E element);
+	public int indexOf(Object element);
 	
 	@Override
-	public int lastIndexOf(E element);
+	public int lastIndexOf(Object element);
 	
 	// toArray
 	

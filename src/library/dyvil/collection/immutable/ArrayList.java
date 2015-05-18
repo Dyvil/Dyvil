@@ -25,7 +25,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		return new ArrayList(elements, true);
 	}
 	
-	public ArrayList(E[] elements)
+	public ArrayList(E... elements)
 	{
 		this.elements = (E[]) new Object[elements.length];
 		System.arraycopy(elements, 0, this.elements, 0, elements.length);
@@ -180,7 +180,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> $minus(E element)
+	public ImmutableList<E> $minus(Object element)
 	{
 		int index = this.indexOf(element);
 		if (index < 0)
@@ -234,7 +234,48 @@ public class ArrayList<E> implements ImmutableList<E>
 			}
 		}
 		return new ArrayList(array, index, true);
+	}
+	
+	@Override
+	public ImmutableList<? extends E> $bar(Collection<? extends E> collection)
+	{
+		int index = 0;
+		int len = collection.size();
+		Object[] array = new Object[this.size + len];
 		
+		for (int i = 0; i < this.size; i++)
+		{
+			Object e = this.elements[i];
+			if (!collection.$qmark(e))
+			{
+				array[index++] = e;
+			}
+		}
+		collection.toArray(index, array);
+		return new ArrayList(array, index + len, true);
+	}
+	
+	@Override
+	public ImmutableList<? extends E> $up(Collection<? extends E> collection)
+	{
+		int index = 0;
+		Object[] array = new Object[this.size + collection.size()];
+		for (int i = 0; i < this.size; i++)
+		{
+			Object e = this.elements[i];
+			if (!collection.$qmark(e))
+			{
+				array[index++] = e;
+			}
+		}
+		for (E e : collection)
+		{
+			if (!this.$qmark(e))
+			{
+				array[index++] = e;
+			}
+		}
+		return new ArrayList(array, index, true);
 	}
 	
 	@Override
@@ -315,7 +356,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public int indexOf(E element)
+	public int indexOf(Object element)
 	{
 		if (element == null)
 		{
@@ -340,7 +381,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public int lastIndexOf(E element)
+	public int lastIndexOf(Object element)
 	{
 		if (element == null)
 		{

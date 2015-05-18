@@ -43,13 +43,19 @@ public interface MutableCollection<E> extends Collection<E>
 	public MutableCollection<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	@Override
-	public MutableCollection<E> $minus(E element);
+	public MutableCollection<E> $minus(Object element);
 	
 	@Override
 	public MutableCollection<? extends E> $minus$minus(Collection<? extends E> collection);
 	
 	@Override
 	public MutableCollection<? extends E> $amp(Collection<? extends E> collection);
+	
+	@Override
+	public MutableCollection<? extends E> $bar(Collection<? extends E> collection);
+	
+	@Override
+	public MutableCollection<? extends E> $up(Collection<? extends E> collection);
 	
 	@Override
 	public <R> MutableCollection<R> mapped(Function<? super E, ? extends R> mapper);
@@ -63,19 +69,19 @@ public interface MutableCollection<E> extends Collection<E>
 	// Mutating Operations
 	
 	@Override
-	public void $plus$eq(E element);
+	public E add(E element);
 	
 	@Override
-	public void $plus$plus$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $minus$eq(E element);
-	
-	@Override
-	public void $minus$minus$eq(Collection<? extends E> collection);
+	public boolean remove(E element);
 	
 	@Override
 	public void $amp$eq(Collection<? extends E> collection);
+	
+	@Override
+	public void $bar$eq(Collection<? extends E> collection);
+	
+	@Override
+	public void $up$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void clear();
