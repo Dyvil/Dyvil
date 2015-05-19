@@ -493,11 +493,7 @@ public final class ExternalClass extends CodeClass
 			field.setValue(IValue.fromObject(value));
 		}
 		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) == 0 || (access & Modifiers.SYNTHETIC) == 0)
-		{
-			this.body.addField(field);
-		}
-		else
+		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0 && name.equals("$instance"))
 		{
 			// This is the instance field of a singleton object class, ignore
 			// annotations as it shouldn't have any
@@ -505,6 +501,7 @@ public final class ExternalClass extends CodeClass
 			return null;
 		}
 		
+		this.body.addField(field);
 		return new SimpleFieldVisitor(field);
 	}
 	
@@ -539,9 +536,10 @@ public final class ExternalClass extends CodeClass
 			return new SimpleMethodVisitor(constructor);
 		}
 		
-		Method method = new ExternalMethod(this);
+		ExternalMethod method = new ExternalMethod(this);
 		method.name = name1;
 		method.modifiers = access;
+		method.descriptor = desc;
 		
 		if (signature != null)
 		{

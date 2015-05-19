@@ -62,6 +62,7 @@ public class Method extends Member implements IMethod
 	
 	public IValue				value;
 	
+	public String				descriptor;
 	protected int[]				intrinsicOpcodes;
 	
 	public Method(IClass iclass)
@@ -934,6 +935,11 @@ public class Method extends Member implements IMethod
 	@Override
 	public String getDescriptor()
 	{
+		if (this.descriptor != null)
+		{
+			return this.descriptor;
+		}
+		
 		StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
@@ -942,7 +948,7 @@ public class Method extends Member implements IMethod
 		}
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
-		return buffer.toString();
+		return this.descriptor = buffer.toString();
 	}
 	
 	@Override

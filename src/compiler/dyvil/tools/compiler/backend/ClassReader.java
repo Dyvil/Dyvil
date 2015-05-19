@@ -26,7 +26,7 @@ public class ClassReader extends ClassVisitor
 		{
 			org.objectweb.asm.ClassReader reader = new org.objectweb.asm.ClassReader(is);
 			ClassReader visitor = new ClassReader(bclass);
-			reader.accept(visitor, org.objectweb.asm.ClassReader.SKIP_DEBUG | org.objectweb.asm.ClassReader.SKIP_FRAMES);
+			reader.accept(visitor, org.objectweb.asm.ClassReader.SKIP_FRAMES);
 			
 			return bclass;
 		}

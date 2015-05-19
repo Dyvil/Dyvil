@@ -215,15 +215,6 @@ public class Type extends ASTNode implements IType
 		}
 		
 		IClass iclass;
-		// Try to resolve the name of this Type as a primitive type
-		IType t = resolvePrimitive(this.name);
-		if (t != null)
-		{
-			// If the array dimensions of this type are 0, we can assume
-			// that it is exactly the primitive type, so the primitive type
-			// instance is returned.
-			return t;
-		}
 		
 		if (this.internalName != null)
 		{
@@ -231,6 +222,16 @@ public class Type extends ASTNode implements IType
 		}
 		else
 		{
+			// Try to resolve the name of this Type as a primitive type
+			IType t = resolvePrimitive(this.name);
+			if (t != null)
+			{
+				// If the array dimensions of this type are 0, we can assume
+				// that it is exactly the primitive type, so the primitive type
+				// instance is returned.
+				return t;
+			}
+			
 			ITypeVariable typeVar = context.resolveTypeVariable(this.name);
 			if (typeVar != null)
 			{
