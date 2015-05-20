@@ -130,6 +130,14 @@ public class StringBuilderExpression implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
+		if (this.valueCount == 2 && this.values[0].isType(Types.STRING) && this.values[1].isType(Types.STRING))
+		{
+			this.values[0].writeExpression(writer);
+			this.values[1].writeExpression(writer);
+			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat", "(Ljava/lang/String;)Ljava/lang/String;", false);
+			return;
+		}
+		
 		int estSize = 0;
 		for (int i = 0; i < this.valueCount; i++)
 		{
