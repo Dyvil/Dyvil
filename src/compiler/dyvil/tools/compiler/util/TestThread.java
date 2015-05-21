@@ -48,8 +48,13 @@ public final class TestThread extends Thread
 			m.invoke(null, new Object[] { args });
 			
 			now = System.currentTimeMillis() - now;
+
+			System.setOut(out);
+			System.setErr(err);
 			
 			DyvilCompiler.logger.log(Level.INFO, "Test completed (" + Util.toTime(now) + ")");
+			
+			return;
 		}
 		catch (VerifyError ve)
 		{
@@ -61,6 +66,8 @@ public final class TestThread extends Thread
 			builder.append("Main Args: ").append(Arrays.toString(args));
 			builder.append("\n\n----- ERROR -----\n");
 			DyvilCompiler.logger.log(Level.SEVERE, builder.toString(), ve);
+			
+			return;
 		}
 		catch (InvocationTargetException ex)
 		{
@@ -83,8 +90,5 @@ public final class TestThread extends Thread
 			
 			return;
 		}
-		
-		System.setOut(out);
-		System.setErr(err);
 	}
 }

@@ -47,7 +47,6 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
-	private static final int	INLINABLE		= Modifiers.INLINE;
 	private static final int	INLINE_TRESHOLD	= 10;
 	
 	protected IClass			theClass;
@@ -1098,11 +1097,6 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() < INLINE_TRESHOLD)
-		{
-			// FIXME
-		}
-		
 		this.writeInvoke(writer, instance, arguments);
 		
 		if (type == Types.VOID)
@@ -1146,11 +1140,6 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() < INLINE_TRESHOLD)
-		{
-			// FIXME
-		}
-		
 		this.writeInvoke(writer, instance, arguments);
 		writer.writeJumpInsn(IFEQ, dest);
 	}
@@ -1176,11 +1165,6 @@ public class Method extends Member implements IMethod
 		{
 			this.writeInvIntrinsic(writer, dest, instance, arguments);
 			return;
-		}
-		
-		if ((this.modifiers & INLINABLE) != 0 && writer.inlineOffset() < INLINE_TRESHOLD)
-		{
-			// FIXME
 		}
 		
 		this.writeInvoke(writer, instance, arguments);
