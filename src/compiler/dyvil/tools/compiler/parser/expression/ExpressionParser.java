@@ -502,6 +502,13 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				return;
 			}
 			
+			if (ParserUtil.isTerminator2(type))
+			{
+				this.mode = ACCESS;
+				pm.reparse();
+				return;
+			}
+			
 			SingleArgument sa = new SingleArgument();
 			cc.arguments = sa;
 			pm.pushParser(new ExpressionParser(sa), true);

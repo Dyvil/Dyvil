@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -52,13 +53,13 @@ public class SwapOperator extends ASTNode implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.VOID || type == Types.UNKNOWN;
+		return type == Types.VOID;
 	}
 	
 	@Override
 	public IValue withType(IType type)
 	{
-		return type == Types.VOID || type == Types.UNKNOWN ? this : null;
+		return type == Types.VOID ? this : null;
 	}
 	
 	@Override
@@ -87,6 +88,15 @@ public class SwapOperator extends ASTNode implements IValue
 	{
 		this.left.checkTypes(markers, context);
 		this.right.checkTypes(markers, context);
+		
+		IType type1 = this.left.getType();
+		IType type2 = this.right.getType();
+		if (!type1.equals(type2))
+		{
+			Marker m = markers.create(this.position, "swap.type");
+			m.addInfo("Left-Hand Type: " + type1);
+			m.addInfo("Right-Hand Type: " + type2);
+		}
 	}
 	
 	@Override

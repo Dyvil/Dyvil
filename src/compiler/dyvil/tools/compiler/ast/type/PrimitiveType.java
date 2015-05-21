@@ -454,6 +454,12 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
+	public String toString()
+	{
+		return this.name.qualified;
+	}
+	
+	@Override
 	public PrimitiveType clone()
 	{
 		PrimitiveType t = new PrimitiveType(this.name, this.typecode);

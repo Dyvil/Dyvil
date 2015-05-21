@@ -187,10 +187,6 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			break;
 		}
 		
-		if (this.type == ARRAY)
-		{
-		}
-		
 		return this.context.resolveField(name);
 	}
 	
