@@ -375,6 +375,11 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 	{
 		if (this.arguments.size() == 1 && f.getType() == Types.INT && f.isVariable())
 		{
+			if (((IVariable) f).isCaptureType())
+			{
+				return false;
+			}
+			
 			boolean minus = false;
 			if (this.name == Name.plus || (minus = this.name == Name.minus))
 			{

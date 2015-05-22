@@ -14,6 +14,11 @@ public interface IVariable extends IField
 	
 	public int getIndex();
 	
+	public default boolean isCaptureType()
+	{
+		return false;
+	}
+	
 	public default IType getCaptureType(boolean init)
 	{
 		return null;

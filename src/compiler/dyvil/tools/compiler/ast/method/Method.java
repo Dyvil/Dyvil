@@ -15,6 +15,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.expression.Array;
@@ -52,7 +53,7 @@ public class Method extends Member implements IMethod
 	protected ITypeVariable[]	generics;
 	protected int				genericCount;
 	
-	protected IParameter[]		parameters		= new MethodParameter[3];
+	protected IParameter[]		parameters	= new MethodParameter[3];
 	protected int				parameterCount;
 	protected IType[]			exceptions;
 	protected int				exceptionCount;
@@ -468,6 +469,22 @@ public class Method extends Member implements IMethod
 		else if ((this.modifiers & Modifiers.ABSTRACT) == 0 && !this.theClass.isAbstract())
 		{
 			markers.add(this.position, "method.unimplemented", this.name);
+		}
+		
+		// Check for duplicate methods
+		
+		String desc = this.getDescriptor();
+		IClassBody body = this.theClass.getBody();
+		for (int i = body.methodCount() - 1; i >= 0; i--)
+		{
+			IMethod m = body.getMethod(i);
+			if (m != this && m.getName() == this.name)
+			{
+				if (m.getDescriptor().equals(desc))
+				{
+					markers.add(this.position, "method.duplicate", this.name, desc);
+				}
+			}
 		}
 	}
 	

@@ -168,6 +168,18 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
+	public boolean isCaptureType()
+	{
+		return this.refType != null;
+	}
+	
+	@Override
+	public IType getCaptureType(boolean init)
+	{
+		return this.refType != null ? this.refType : this.variable.getCaptureType(init);
+	}
+	
+	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
 	{
 		return this.variable.checkAccess(markers, position, instance);
