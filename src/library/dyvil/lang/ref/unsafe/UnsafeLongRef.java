@@ -7,8 +7,8 @@ import dyvil.reflect.ReflectUtils;
 
 public final class UnsafeLongRef implements ILongRef
 {
-	private Object	base;
-	private long	offset;
+	private final Object	base;
+	private final long		offset;
 	
 	public UnsafeLongRef(Field staticField)
 	{

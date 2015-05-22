@@ -7,8 +7,8 @@ import dyvil.reflect.ReflectUtils;
 
 public final class UnsafeCharRef implements ICharRef
 {
-	private Object	base;
-	private long	offset;
+	private final Object	base;
+	private final long		offset;
 	
 	public UnsafeCharRef(Field staticField)
 	{

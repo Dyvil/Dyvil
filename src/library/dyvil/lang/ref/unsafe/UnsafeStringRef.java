@@ -7,8 +7,8 @@ import dyvil.reflect.ReflectUtils;
 
 public final class UnsafeStringRef implements IStringRef
 {
-	private Object	base;
-	private long	offset;
+	private final Object	base;
+	private final long		offset;
 	
 	public UnsafeStringRef(Field staticField)
 	{
