@@ -231,6 +231,11 @@ public class Field extends Member implements IField
 		{
 			this.value.check(markers, context);
 		}
+		
+		if (this.type == Types.VOID)
+		{
+			markers.add(this.position, "field.type.void");
+		}
 	}
 	
 	@Override

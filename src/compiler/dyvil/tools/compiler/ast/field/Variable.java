@@ -189,6 +189,11 @@ public final class Variable extends Member implements IVariable
 		super.check(markers, context);
 		
 		this.value.check(markers, context);
+		
+		if (this.type == Types.VOID)
+		{
+			markers.add(this.position, "variable.type.void");
+		}
 	}
 	
 	@Override

@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.generic.TypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethodSignature;
 import dyvil.tools.compiler.ast.type.*;
 
@@ -160,7 +161,14 @@ public final class ClassFormat
 			i = readTypeList(desc, i, method);
 		}
 		i++;
-		readTyped(desc, i, method);
+		i = readTyped(desc, i, method);
+		
+		// Throwables
+		int len = desc.length();
+		while (i < len && desc.charAt(i) == '^')
+		{
+			i = readException(desc, i + 1, method);
+		}
 	}
 	
 	public static void readConstructorType(String desc, IConstructor constructor)
@@ -169,6 +177,13 @@ public final class ClassFormat
 		while (desc.charAt(i) != ')')
 		{
 			i = readTypeList(desc, i, constructor);
+		}
+		i += 2;
+		
+		int len = desc.length();
+		while (i < len && desc.charAt(i) == '^')
+		{
+			i = readException(desc, i + 1, constructor);
 		}
 	}
 	
@@ -437,6 +452,28 @@ public final class ClassFormat
 		}
 		generic.addTypeVariable(typeVar);
 		return index;
+	}
+	
+	private static int readException(String desc, int start, IExceptionList list)
+	{
+		switch (desc.charAt(start))
+		{
+		case 'L':
+		{
+			int end1 = getMatchingSemicolon(desc, start, desc.length());
+			IType type = readReferenceType(desc, start + 1, end1);
+			list.addException(type);
+			return end1 + 1;
+		}
+		case 'T':
+		{
+			int end1 = desc.indexOf(';', start);
+			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
+			list.addException(type);
+			return end1 + 1;
+		}
+		}
+		return start;
 	}
 	
 	private static int getMatchingSemicolon(String s, int start, int end)

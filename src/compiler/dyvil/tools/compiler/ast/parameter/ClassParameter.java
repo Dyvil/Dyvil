@@ -253,6 +253,11 @@ public final class ClassParameter extends Member implements IParameter
 		{
 			this.defaultValue.check(markers, context);
 		}
+		
+		if (this.type == Types.VOID)
+		{
+			markers.add(this.position, "classparameter.type.void");
+		}
 	}
 	
 	@Override

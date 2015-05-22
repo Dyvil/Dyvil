@@ -146,7 +146,7 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 	{
 		if (this.action != null)
 		{
-			this.action.check(markers, context);
+			this.action.checkTypes(markers, context);
 		}
 		if (this.condition != null)
 		{
@@ -175,10 +175,6 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		if (this.condition != null)
 		{
 			this.condition.check(markers, context);
-		}
-		else
-		{
-			markers.add(this.position, "do.condition.invalid");
 		}
 	}
 	
@@ -236,7 +232,14 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		this.action.writeStatement(writer);
 		// Condition
 		writer.writeLabel(conditionLabel);
-		this.condition.writeJump(writer, startLabel);
+		if (this.condition != null)
+		{
+			this.condition.writeJump(writer, startLabel);
+		}
+		else
+		{
+			writer.writeJumpInsn(Opcodes.GOTO, startLabel);
+		}
 		
 		writer.writeLabel(endLabel);
 	}
@@ -247,16 +250,16 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		buffer.append(Formatting.Statements.doStart);
 		if (this.action != null)
 		{
-				buffer.append(' ');
-				this.action.toString(prefix, buffer);
-				buffer.append(' ');
+			buffer.append(' ');
+			this.action.toString(prefix, buffer);
 		}
 		
-		buffer.append(Formatting.Statements.doWhile);
 		if (this.condition != null)
 		{
+			buffer.append(' ');
+			buffer.append(Formatting.Statements.doWhile);
 			this.condition.toString(prefix, buffer);
+			buffer.append(Formatting.Statements.doEnd);
 		}
-		buffer.append(Formatting.Statements.doEnd);
 	}
 }

@@ -42,6 +42,10 @@ public final class PrimitiveType extends Type
 		{
 			return Types.VOID;
 		}
+		if (iclass == Types.BOOLEAN_CLASS)
+		{
+			return Types.BOOLEAN;
+		}
 		if (iclass == Types.BYTE_CLASS)
 		{
 			return Types.BYTE;

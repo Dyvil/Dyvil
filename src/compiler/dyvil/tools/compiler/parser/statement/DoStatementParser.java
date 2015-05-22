@@ -45,6 +45,12 @@ public class DoStatementParser extends Parser implements IValued
 		int type = token.type();
 		if (this.mode == WHILE)
 		{
+			if (type == Keywords.WHILE)
+			{
+				this.mode = CONDITION;
+				return;
+			}
+			
 			if (ParserUtil.isTerminator(type))
 			{
 				if (token.next().type() == Keywords.WHILE)
@@ -54,14 +60,9 @@ public class DoStatementParser extends Parser implements IValued
 					return;
 				}
 			}
-			else if (type == Keywords.WHILE)
-			{
-				this.mode = CONDITION;
-				return;
-			}
 			
 			pm.popParser(true);
-			throw new SyntaxError(token, "Invalid Do-While Statement - 'while' expected");
+			return;
 		}
 		if (this.mode == CONDITION)
 		{

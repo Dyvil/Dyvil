@@ -218,6 +218,11 @@ public final class MethodParameter extends Member implements IParameter
 		{
 			this.defaultValue.check(markers, context);
 		}
+		
+		if (this.type == Types.VOID)
+		{
+			markers.add(this.position, "parameter.type.void");
+		}
 	}
 	
 	@Override

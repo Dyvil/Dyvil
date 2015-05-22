@@ -304,6 +304,13 @@ public final class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
+		if (this.then == null)
+		{
+			this.condition.writeExpression(writer);
+			writer.writeInsn(Opcodes.POP);
+			return;
+		}
+		
 		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
 		
 		if (this.elseThen != null)

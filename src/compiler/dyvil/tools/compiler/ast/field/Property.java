@@ -251,6 +251,11 @@ public class Property extends Member implements IProperty, IContext
 		if (this.set != null)
 		{
 			this.set.check(markers, context);
+			
+			if (this.type == Types.VOID)
+			{
+				markers.add(this.position, "property.type.void");
+			}
 		}
 		// If both are null
 		else if (this.get == null)

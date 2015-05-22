@@ -549,6 +549,14 @@ public final class ExternalClass extends CodeClass
 		else
 		{
 			ClassFormat.readMethodType(desc, method);
+			
+			if (exceptions != null)
+			{
+				for (String s : exceptions)
+				{
+					method.addException(ClassFormat.internalToType(s));
+				}
+			}
 		}
 		
 		if ((access & Modifiers.VARARGS) != 0)
