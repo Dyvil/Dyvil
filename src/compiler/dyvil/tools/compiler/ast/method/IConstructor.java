@@ -15,12 +15,15 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IConstructor extends IASTNode, IMember, IBaseMethod, ITypeList, IContext, IClassCompilable
 {
 	public int getSignatureMatch(IArguments arguments);
 	
 	public void checkArguments(MarkerList markers, IArguments arguments);
+	
+	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
 	
 	// Misc
 	

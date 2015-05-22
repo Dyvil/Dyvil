@@ -47,8 +47,6 @@ import dyvil.tools.compiler.util.Util;
 
 public class Method extends Member implements IMethod
 {
-	private static final int	INLINE_TRESHOLD	= 10;
-	
 	protected IClass			theClass;
 	
 	protected ITypeVariable[]	generics;
@@ -879,7 +877,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			IType type = this.exceptions[i];
-			if (!context.handleException(type))
+			if (!Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context.handleException(type))
 			{
 				markers.add(position, "method.access.exception", type.toString());
 			}

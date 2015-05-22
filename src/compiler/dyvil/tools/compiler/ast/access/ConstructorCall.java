@@ -207,20 +207,7 @@ public class ConstructorCall extends ASTNode implements ICall
 		
 		if (this.constructor != null)
 		{
-			if (this.constructor.hasModifier(Modifiers.DEPRECATED))
-			{
-				markers.add(this.position, "constructor.access.deprecated", iclass.getName());
-			}
-			
-			switch (context.getVisibility(this.constructor))
-			{
-			case IContext.SEALED:
-				markers.add(this.position, "constructor.access.sealed", iclass.getName());
-				break;
-			case IContext.INVISIBLE:
-				markers.add(this.position, "constructor.access.invisible", iclass.getName());
-				break;
-			}
+			this.constructor.checkCall(markers, this.position, context, this.arguments);
 		}
 	}
 	

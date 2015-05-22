@@ -8,54 +8,56 @@ import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class Types
 {
-	public static final UnknownType		UNKNOWN			= new UnknownType();
-	public static final PrimitiveType	VOID			= new PrimitiveType(Name._void, 0);
-	public static final PrimitiveType	BOOLEAN			= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
-	public static final PrimitiveType	BYTE			= new PrimitiveType(Name._byte, ClassFormat.T_BYTE);
-	public static final PrimitiveType	SHORT			= new PrimitiveType(Name._short, ClassFormat.T_SHORT);
-	public static final PrimitiveType	CHAR			= new PrimitiveType(Name._char, ClassFormat.T_CHAR);
-	public static final PrimitiveType	INT				= new PrimitiveType(Name._int, ClassFormat.T_INT);
-	public static final PrimitiveType	LONG			= new PrimitiveType(Name._long, ClassFormat.T_LONG);
-	public static final PrimitiveType	FLOAT			= new PrimitiveType(Name._float, ClassFormat.T_FLOAT);
-	public static final PrimitiveType	DOUBLE			= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
+	public static final UnknownType		UNKNOWN					= new UnknownType();
+	public static final PrimitiveType	VOID					= new PrimitiveType(Name._void, 0);
+	public static final PrimitiveType	BOOLEAN					= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
+	public static final PrimitiveType	BYTE					= new PrimitiveType(Name._byte, ClassFormat.T_BYTE);
+	public static final PrimitiveType	SHORT					= new PrimitiveType(Name._short, ClassFormat.T_SHORT);
+	public static final PrimitiveType	CHAR					= new PrimitiveType(Name._char, ClassFormat.T_CHAR);
+	public static final PrimitiveType	INT						= new PrimitiveType(Name._int, ClassFormat.T_INT);
+	public static final PrimitiveType	LONG					= new PrimitiveType(Name._long, ClassFormat.T_LONG);
+	public static final PrimitiveType	FLOAT					= new PrimitiveType(Name._float, ClassFormat.T_FLOAT);
+	public static final PrimitiveType	DOUBLE					= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
 	
-	public static final DynamicType		DYNAMIC			= new DynamicType();
-	public static final Type			ANY				= new Type("java/lang/Object", Name.any);
-	public static final Type			OBJECT			= new Type("java/lang/Object", Name.getQualified("Object"));
-	public static final Type			STRING			= new Type("java/lang/String", Name.getQualified("String"));
-	public static final Type			CLASS			= new Type("java/lang/Class", Name.getQualified("Class"));
-	public static final Type			PREDEF			= new Type("dyvil/lang/Predef", Name.getQualified("Predef"));
-	public static final Type			TYPE			= new Type("dyvil/lang/Type", Name.getQualified("Type"));
-	public static final Type			THROWABLE		= new Type("java/lang/Throwable", Name.getQualified("Throwable"));
+	public static final DynamicType		DYNAMIC					= new DynamicType();
+	public static final Type			ANY						= new Type("java/lang/Object", Name.any);
+	public static final Type			OBJECT					= new Type("java/lang/Object", Name.getQualified("Object"));
+	public static final Type			STRING					= new Type("java/lang/String", Name.getQualified("String"));
+	public static final Type			CLASS					= new Type("java/lang/Class", Name.getQualified("Class"));
+	public static final Type			PREDEF					= new Type("dyvil/lang/Predef", Name.getQualified("Predef"));
+	public static final Type			TYPE					= new Type("dyvil/lang/Type", Name.getQualified("Type"));
+	public static final Type			THROWABLE				= new Type("java/lang/Throwable", Name.getQualified("Throwable"));
+	public static final Type			RUNTIME_EXCEPTION		= new Type("java/lang/RuntimeException", Name.getQualified("RuntimeException"));
 	
-	public static final Type			MAP				= new Type("dyvil/lang/Map", Name.getQualified("Map"));
-	public static final Type			IMMUTABLE		= new Type(Package.dyvilLang.resolveClass("Immutable"));
+	public static final Type			MAP						= new Type("dyvil/lang/Map", Name.getQualified("Map"));
+	public static final Type			IMMUTABLE				= new Type(Package.dyvilLang.resolveClass("Immutable"));
 	
-	public static final IClass			VOID_CLASS		= Package.dyvilLang.resolveClass("Void");
-	public static final IClass			BOOLEAN_CLASS	= Package.dyvilLang.resolveClass("Boolean");
-	public static final IClass			BYTE_CLASS		= Package.dyvilLang.resolveClass("Byte");
-	public static final IClass			SHORT_CLASS		= Package.dyvilLang.resolveClass("Short");
-	public static final IClass			CHAR_CLASS		= Package.dyvilLang.resolveClass("Char");
-	public static final IClass			INT_CLASS		= Package.dyvilLang.resolveClass("Int");
-	public static final IClass			LONG_CLASS		= Package.dyvilLang.resolveClass("Long");
-	public static final IClass			FLOAT_CLASS		= Package.dyvilLang.resolveClass("Float");
-	public static final IClass			DOUBLE_CLASS	= Package.dyvilLang.resolveClass("Double");
+	public static final IClass			VOID_CLASS				= Package.dyvilLang.resolveClass("Void");
+	public static final IClass			BOOLEAN_CLASS			= Package.dyvilLang.resolveClass("Boolean");
+	public static final IClass			BYTE_CLASS				= Package.dyvilLang.resolveClass("Byte");
+	public static final IClass			SHORT_CLASS				= Package.dyvilLang.resolveClass("Short");
+	public static final IClass			CHAR_CLASS				= Package.dyvilLang.resolveClass("Char");
+	public static final IClass			INT_CLASS				= Package.dyvilLang.resolveClass("Int");
+	public static final IClass			LONG_CLASS				= Package.dyvilLang.resolveClass("Long");
+	public static final IClass			FLOAT_CLASS				= Package.dyvilLang.resolveClass("Float");
+	public static final IClass			DOUBLE_CLASS			= Package.dyvilLang.resolveClass("Double");
 	
-	public static final IClass			OBJECT_CLASS	= Package.javaLang.resolveClass("Object");
-	public static final IClass			STRING_CLASS	= Package.javaLang.resolveClass("String");
-	public static final IClass			CLASS_CLASS		= Package.javaLang.resolveClass("Class");
-	public static final IClass			PREDEF_CLASS	= Package.dyvilLang.resolveClass("Predef");
-	public static final IClass			TYPE_CLASS		= Package.dyvilLang.resolveClass("Type");
-	public static final IClass			THROWABLE_CLASS	= Package.javaLang.resolveClass("Throwable");
+	public static final IClass			OBJECT_CLASS			= Package.javaLang.resolveClass("Object");
+	public static final IClass			STRING_CLASS			= Package.javaLang.resolveClass("String");
+	public static final IClass			CLASS_CLASS				= Package.javaLang.resolveClass("Class");
+	public static final IClass			PREDEF_CLASS			= Package.dyvilLang.resolveClass("Predef");
+	public static final IClass			TYPE_CLASS				= Package.dyvilLang.resolveClass("Type");
+	public static final IClass			THROWABLE_CLASS			= Package.javaLang.resolveClass("Throwable");
+	public static final IClass			RUNTIME_EXCEPTION_CLASS	= Package.javaLang.resolveClass("RuntimeException");
 	
-	public static final IClass			MAP_CLASS		= Package.dyvilLang.resolveClass("Map");
-	public static final IClass			TUPLE2_CLASS	= TupleType.getTupleClass(2);
+	public static final IClass			MAP_CLASS				= Package.dyvilLang.resolveClass("Map");
+	public static final IClass			TUPLE2_CLASS			= TupleType.getTupleClass(2);
 	
-	public static final IClass			INTRINSIC_CLASS	= Package.dyvilAnnotation.resolveClass("Intrinsic");
-	public static final IClass			OVERRIDE_CLASS	= Package.javaLang.resolveClass("Override");
-	public static final IClass			RETENTION_CLASS	= Package.javaLangAnnotation.resolveClass("Retention");
-	public static final IClass			TARGET_CLASS	= Package.javaLangAnnotation.resolveClass("Target");
-	public static final IClass			MUTATING_CLASS	= Package.dyvilAnnotation.resolveClass("mutating");
+	public static final IClass			INTRINSIC_CLASS			= Package.dyvilAnnotation.resolveClass("Intrinsic");
+	public static final IClass			OVERRIDE_CLASS			= Package.javaLang.resolveClass("Override");
+	public static final IClass			RETENTION_CLASS			= Package.javaLangAnnotation.resolveClass("Retention");
+	public static final IClass			TARGET_CLASS			= Package.javaLangAnnotation.resolveClass("Target");
+	public static final IClass			MUTATING_CLASS			= Package.dyvilAnnotation.resolveClass("mutating");
 	
 	private static IClass				OBJECT_ARRAY_CLASS;
 	private static IClass				BOOLEAN_ARRAY_CLASS;
@@ -112,6 +114,7 @@ public final class Types
 		PREDEF.theClass = PREDEF_CLASS;
 		TYPE.theClass = TYPE_CLASS;
 		THROWABLE.theClass = THROWABLE_CLASS;
+		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS;
 		
 		MAP.theClass = MAP_CLASS;
 	}

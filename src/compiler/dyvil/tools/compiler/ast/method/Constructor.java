@@ -275,7 +275,7 @@ public class Constructor extends Member implements IConstructor
 				}
 				else if (valueType == IValue.THIS)
 				{
-					sl.setValue(0, this.initializer(amc.instance.getPosition(), markers, this.theClass, amc.arguments, true));
+					sl.setValue(0, this.initializer(amc.instance.getPosition(), markers, this.theClass, amc.arguments, false));
 					return;
 				}
 			}
@@ -352,6 +352,16 @@ public class Constructor extends Member implements IConstructor
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].check(markers, context);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			IType t = this.exceptions[i];
+			if (!Types.THROWABLE.isSuperTypeOf(t))
+			{
+				Marker m = markers.create(t.getPosition(), "method.exception.type");
+				m.addInfo("Exception Type: " + t);
+			}
 		}
 		
 		if (this.value != null)
@@ -537,6 +547,34 @@ public class Constructor extends Member implements IConstructor
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			arguments.checkValue(i, this.parameters[i], markers, this.type);
+		}
+	}
+	
+	@Override
+	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
+	{
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
+		{
+			markers.add(this.position, "constructor.access.deprecated", this.theClass.getName());
+		}
+		
+		switch (context.getVisibility(this))
+		{
+		case IContext.SEALED:
+			markers.add(this.position, "constructor.access.sealed", this.theClass.getName());
+			break;
+		case IContext.INVISIBLE:
+			markers.add(this.position, "constructor.access.invisible", this.theClass.getName());
+			break;
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			IType type = this.exceptions[i];
+			if (!Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context.handleException(type))
+			{
+				markers.add(position, "method.access.exception", type.toString());
+			}
 		}
 	}
 	

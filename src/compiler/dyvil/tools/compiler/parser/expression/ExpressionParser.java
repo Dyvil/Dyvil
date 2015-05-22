@@ -963,7 +963,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		case Keywords.THROW:
 		{
-			ThrowStatement statement = new ThrowStatement(token.raw());
+			ThrowStatement statement = new ThrowStatement();
 			pm.pushParser(new ExpressionParser(statement));
 			this.mode = 0;
 			this.value = statement;

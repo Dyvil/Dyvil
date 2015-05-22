@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -11,15 +10,13 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ThrowStatement extends ASTNode implements IValue, IValued
+public final class ThrowStatement implements IValue, IValued
 {
 	private IValue	value;
 	
-	public ThrowStatement(ICodePosition position)
+	public ThrowStatement()
 	{
-		this.position = position;
 	}
 	
 	@Override
@@ -98,6 +95,12 @@ public class ThrowStatement extends ASTNode implements IValue, IValued
 	public void check(MarkerList markers, IContext context)
 	{
 		this.value.check(markers, context);
+		
+		IType type = this.value.getType();
+		if (Types.THROWABLE.isSuperTypeOf(type) && !Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context.handleException(this.value.getType()))
+		{
+			markers.add(this.value.getPosition(), "method.access.exception", type.toString());
+		}
 	}
 	
 	@Override

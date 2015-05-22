@@ -23,8 +23,6 @@ public final class MethodWriterImpl implements MethodWriter
 	private int					maxStack;
 	
 	private boolean				hasReturn;
-	private int					inlineOffset;
-	private Label				inlineEnd;
 	
 	private int[]				syncLocals;
 	private int					syncCount;
@@ -85,13 +83,6 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			this.frame.visitFrame(this.mv);
 			this.visitFrame = false;
-		}
-		
-		if (this.hasReturn && this.inlineEnd != null)
-		{
-			this.mv.visitJumpInsn(Opcodes.GOTO, this.inlineEnd);
-			this.visitFrame = true;
-			this.hasReturn = false;
 		}
 	}
 	
@@ -315,8 +306,6 @@ public final class MethodWriterImpl implements MethodWriter
 			return;
 		}
 		
-		this.frame.visitInsn(opcode);
-		
 		if (opcode > 255)
 		{
 			switch (opcode)
@@ -398,6 +387,7 @@ public final class MethodWriterImpl implements MethodWriter
 				BackendUtil.dupX1(this);
 				return;
 			}
+
 			if (opcode >= ICMPEQ && opcode <= ICMPLE)
 			{
 				opcode -= ICMPEQ;
@@ -413,6 +403,9 @@ public final class MethodWriterImpl implements MethodWriter
 			}
 			return;
 		}
+		
+		this.frame.visitInsn(opcode);
+		
 		if (opcode >= IRETURN && opcode <= RETURN || opcode == ATHROW)
 		{
 			if (this.syncCount > 0)
@@ -423,11 +416,8 @@ public final class MethodWriterImpl implements MethodWriter
 					this.mv.visitInsn(Opcodes.MONITOREXIT);
 				}
 			}
-			this.hasReturn = true;
-			if (this.inlineEnd != null)
-			{
-				return;
-			}
+			this.visitFrame = true;
+			this.hasReturn = opcode != ATHROW;
 		}
 		this.mv.visitInsn(opcode);
 	}
@@ -661,23 +651,17 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public int inlineOffset()
 	{
-		return this.inlineOffset;
+		return 0;
 	}
 	
 	@Override
 	public void startInline(Label end, int localCount)
 	{
-		this.inlineEnd = end;
-		this.inlineOffset = localCount;
 	}
 	
 	@Override
 	public void endInline(Label end, int localCount)
 	{
-		this.writeLabel(end);
-		this.inlineEnd = null;
-		this.inlineOffset = 0;
-		this.hasReturn = false;
 	}
 	
 	@Override

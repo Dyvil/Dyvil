@@ -1,10 +1,20 @@
 package dyvil.tools.compiler.ast.statement;
 
+import java.util.List;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
@@ -15,16 +25,17 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class TryStatement extends ASTNode implements IStatement
+public final class TryStatement extends ASTNode implements IStatement, IContext
 {
-	public IValue				action;
-	private CatchBlock[]		catchBlocks	= new CatchBlock[1];
-	private int					catchBlockCount;
-	public IValue				finallyBlock;
+	public IValue			action;
+	private CatchBlock[]	catchBlocks	= new CatchBlock[1];
+	private int				catchBlockCount;
+	public IValue			finallyBlock;
 	
-	private IType				commonType;
+	private IType			commonType;
 	
-	private IStatement			parent;
+	private IStatement		parent;
+	private IContext		context;
 	
 	public TryStatement(ICodePosition position)
 	{
@@ -238,7 +249,9 @@ public final class TryStatement extends ASTNode implements IStatement
 	{
 		if (this.action != null)
 		{
-			this.action.check(markers, context);
+			this.context = context;
+			this.action.check(markers, this);
+			this.context = null;
 		}
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
@@ -278,6 +291,73 @@ public final class TryStatement extends ASTNode implements IStatement
 			this.finallyBlock = this.finallyBlock.foldConstants();
 		}
 		return this;
+	}
+	
+	@Override
+	public boolean isStatic()
+	{
+		return this.context.isStatic();
+	}
+	
+	@Override
+	public IClass getThisClass()
+	{
+		return this.context.getThisClass();
+	}
+	
+	@Override
+	public Package resolvePackage(Name name)
+	{
+		return this.context.resolvePackage(name);
+	}
+	
+	@Override
+	public IClass resolveClass(Name name)
+	{
+		return this.context.resolveClass(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.context.resolveTypeVariable(name);
+	}
+	
+	@Override
+	public IField resolveField(Name name)
+	{
+		return this.context.resolveField(name);
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	{
+		this.context.getMethodMatches(list, instance, name, arguments);
+	}
+	
+	@Override
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	{
+		this.context.getConstructorMatches(list, arguments);
+	}
+	
+	@Override
+	public byte getVisibility(IMember member)
+	{
+		return this.context.getVisibility(member);
+	}
+	
+	@Override
+	public boolean handleException(IType type)
+	{
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			if (this.catchBlocks[i].type.isSuperTypeOf(type))
+			{
+				return true;
+			}
+		}
+		return this.context.handleException(type);
 	}
 	
 	@Override
