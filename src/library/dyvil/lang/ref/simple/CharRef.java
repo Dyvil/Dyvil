@@ -1,9 +1,10 @@
-package dyvil.lang.ref;
+package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.CharConvertible;
+import dyvil.lang.ref.ICharRef;
 
 @CharConvertible
-public class CharRef implements CharRef$
+public class CharRef implements ICharRef
 {
 	public char	value;
 	
@@ -18,13 +19,13 @@ public class CharRef implements CharRef$
 	}
 	
 	@Override
-	public char apply()
+	public char get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void update(char value)
+	public void set(char value)
 	{
 		this.value = value;
 	}

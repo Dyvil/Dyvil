@@ -191,49 +191,49 @@ public final class Types
 		case ClassFormat.T_BOOLEAN:
 			if (BOOLEAN_REF == null)
 			{
-				return BOOLEAN_REF = new Type(Package.dyvilLangRef.resolveClass("BooleanRef"));
+				return BOOLEAN_REF = new Type(Package.dyvilLangRefSimple.resolveClass("BooleanRef"));
 			}
 			return BOOLEAN_REF;
 		case ClassFormat.T_BYTE:
 			if (BYTE_REF == null)
 			{
-				return BYTE_REF = new Type(Package.dyvilLangRef.resolveClass("ByteRef"));
+				return BYTE_REF = new Type(Package.dyvilLangRefSimple.resolveClass("ByteRef"));
 			}
 			return BYTE_REF;
 		case ClassFormat.T_SHORT:
 			if (SHORT_REF == null)
 			{
-				return SHORT_REF = new Type(Package.dyvilLangRef.resolveClass("ShortRef"));
+				return SHORT_REF = new Type(Package.dyvilLangRefSimple.resolveClass("ShortRef"));
 			}
 			return SHORT_REF;
 		case ClassFormat.T_CHAR:
 			if (CHAR_REF == null)
 			{
-				return CHAR_REF = new Type(Package.dyvilLangRef.resolveClass("CharRef"));
+				return CHAR_REF = new Type(Package.dyvilLangRefSimple.resolveClass("CharRef"));
 			}
 			return CHAR_REF;
 		case ClassFormat.T_INT:
 			if (INT_REF == null)
 			{
-				return INT_REF = new Type(Package.dyvilLangRef.resolveClass("IntRef"));
+				return INT_REF = new Type(Package.dyvilLangRefSimple.resolveClass("IntRef"));
 			}
 			return INT_REF;
 		case ClassFormat.T_LONG:
 			if (LONG_REF == null)
 			{
-				return LONG_REF = new Type(Package.dyvilLangRef.resolveClass("LongRef"));
+				return LONG_REF = new Type(Package.dyvilLangRefSimple.resolveClass("LongRef"));
 			}
 			return LONG_REF;
 		case ClassFormat.T_FLOAT:
 			if (FLOAT_REF == null)
 			{
-				return FLOAT_REF = new Type(Package.dyvilLangRef.resolveClass("FloatRef"));
+				return FLOAT_REF = new Type(Package.dyvilLangRefSimple.resolveClass("FloatRef"));
 			}
 			return FLOAT_REF;
 		case ClassFormat.T_DOUBLE:
 			if (DOUBLE_REF == null)
 			{
-				return DOUBLE_REF = new Type(Package.dyvilLangRef.resolveClass("DoubleRef"));
+				return DOUBLE_REF = new Type(Package.dyvilLangRefSimple.resolveClass("DoubleRef"));
 			}
 			return DOUBLE_REF;
 		}
@@ -249,7 +249,7 @@ public final class Types
 		default:
 			if (OBJECT_REF_CLASS == null)
 			{
-				OBJECT_REF_CLASS = Package.dyvilLangRef.resolveClass("ObjectRef");
+				OBJECT_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("ObjectRef");
 			}
 			GenericType gt = new GenericType(OBJECT_REF_CLASS);
 			gt.addType(type);

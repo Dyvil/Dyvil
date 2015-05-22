@@ -1,9 +1,10 @@
-package dyvil.lang.ref;
+package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.DoubleConvertible;
+import dyvil.lang.ref.IDoubleRef;
 
 @DoubleConvertible
-public class DoubleRef implements DoubleRef$
+public class DoubleRef implements IDoubleRef
 {
 	public double	value;
 	
@@ -18,13 +19,13 @@ public class DoubleRef implements DoubleRef$
 	}
 	
 	@Override
-	public double apply()
+	public double get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void update(double value)
+	public void set(double value)
 	{
 		this.value = value;
 	}

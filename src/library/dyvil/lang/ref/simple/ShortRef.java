@@ -1,9 +1,10 @@
-package dyvil.lang.ref;
+package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.IntConvertible;
+import dyvil.lang.ref.IShortRef;
 
 @IntConvertible
-public class ShortRef implements ShortRef$
+public class ShortRef implements IShortRef
 {
 	public short	value;
 	
@@ -18,13 +19,13 @@ public class ShortRef implements ShortRef$
 	}
 	
 	@Override
-	public short apply()
+	public short get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void update(short value)
+	public void set(short value)
 	{
 		this.value = value;
 	}

@@ -1,9 +1,10 @@
-package dyvil.lang.ref;
+package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.BooleanConvertible;
+import dyvil.lang.ref.IBooleanRef;
 
 @BooleanConvertible
-public class BooleanRef implements BooleanRef$
+public class BooleanRef implements IBooleanRef
 {
 	public boolean	value;
 	
@@ -18,13 +19,13 @@ public class BooleanRef implements BooleanRef$
 	}
 	
 	@Override
-	public boolean apply()
+	public boolean get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void update(boolean value)
+	public void set(boolean value)
 	{
 		this.value = value;
 	}

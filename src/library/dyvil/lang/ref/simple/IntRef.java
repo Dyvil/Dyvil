@@ -1,9 +1,10 @@
-package dyvil.lang.ref;
+package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.IntConvertible;
+import dyvil.lang.ref.IIntRef;
 
 @IntConvertible
-public class IntRef implements IntRef$
+public class IntRef implements IIntRef
 {
 	public int	value;
 	
@@ -18,13 +19,13 @@ public class IntRef implements IntRef$
 	}
 	
 	@Override
-	public int apply()
+	public int get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void update(int value)
+	public void set(int value)
 	{
 		this.value = value;
 	}

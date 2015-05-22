@@ -1,6 +1,8 @@
-package dyvil.lang.ref;
+package dyvil.lang.ref.simple;
 
-public class ObjectRef<T> implements ObjectRef$<T>
+import dyvil.lang.ref.IObjectRef;
+
+public class ObjectRef<T> implements IObjectRef<T>
 {
 	public T	value;
 	
@@ -15,13 +17,13 @@ public class ObjectRef<T> implements ObjectRef$<T>
 	}
 	
 	@Override
-	public T apply()
+	public T get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void update(T value)
+	public void set(T value)
 	{
 		this.value = value;
 	}

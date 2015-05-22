@@ -1,9 +1,10 @@
-package dyvil.lang.ref;
+package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.LongConvertible;
+import dyvil.lang.ref.ILongRef;
 
 @LongConvertible
-public class LongRef implements LongRef$
+public class LongRef implements ILongRef
 {
 	public long	value;
 	
@@ -18,13 +19,13 @@ public class LongRef implements LongRef$
 	}
 	
 	@Override
-	public long apply()
+	public long get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void update(long value)
+	public void set(long value)
 	{
 		this.value = value;
 	}

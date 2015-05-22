@@ -1,9 +1,11 @@
-package dyvil.lang.ref;
+package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.StringConvertible;
+import dyvil.lang.ref.IObjectRef;
+import dyvil.lang.ref.IStringRef;
 
 @StringConvertible
-public class StringRef implements StringRef$, ObjectRef$<String>
+public class StringRef implements IStringRef, IObjectRef<String>
 {
 	public String	value;
 	
@@ -18,13 +20,13 @@ public class StringRef implements StringRef$, ObjectRef$<String>
 	}
 	
 	@Override
-	public String apply()
+	public String get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void update(String value)
+	public void set(String value)
 	{
 		this.value = value;
 	}

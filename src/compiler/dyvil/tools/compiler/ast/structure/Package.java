@@ -35,6 +35,7 @@ public class Package implements INamed, IContext
 	public static Package		dyvilTuple;
 	public static Package		dyvilLangLiteral;
 	public static Package		dyvilLangRef;
+	public static Package		dyvilLangRefSimple;
 	public static Package		java;
 	public static Package		javaLang;
 	public static Package		javaLangAnnotation;
@@ -78,6 +79,7 @@ public class Package implements INamed, IContext
 		dyvilTuple = dyvil.resolvePackage("tuple");
 		dyvilLangLiteral = dyvilLang.resolvePackage("literal");
 		dyvilLangRef = dyvilLang.resolvePackage("ref");
+		dyvilLangRefSimple = dyvilLangRef.resolvePackage("simple");
 		java = Library.javaLibrary.resolvePackage("java");
 		javaLang = java.resolvePackage("lang");
 		javaLangAnnotation = javaLang.resolvePackage("annotation");

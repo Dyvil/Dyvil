@@ -1,9 +1,10 @@
-package dyvil.lang.ref;
+package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.FloatConvertible;
+import dyvil.lang.ref.IFloatRef;
 
 @FloatConvertible
-public class FloatRef implements FloatRef$
+public class FloatRef implements IFloatRef
 {
 	public float	value;
 	
@@ -18,13 +19,13 @@ public class FloatRef implements FloatRef$
 	}
 	
 	@Override
-	public float apply()
+	public float get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void update(float value)
+	public void set(float value)
 	{
 		this.value = value;
 	}

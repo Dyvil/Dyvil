@@ -1,9 +1,10 @@
-package dyvil.lang.ref;
+package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.IntConvertible;
+import dyvil.lang.ref.IByteRef;
 
 @IntConvertible
-public class ByteRef implements ByteRef$
+public class ByteRef implements IByteRef
 {
 	public byte	value;
 	
@@ -18,13 +19,13 @@ public class ByteRef implements ByteRef$
 	}
 	
 	@Override
-	public byte apply()
+	public byte get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void update(byte value)
+	public void set(byte value)
 	{
 		this.value = value;
 	}
