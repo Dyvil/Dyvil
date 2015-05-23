@@ -5,7 +5,7 @@ import dyvil.lang.ref.IDoubleRef;
 public class DoubleArrayRef implements IDoubleRef
 {
 	protected final double[]	array;
-	protected final int		index;
+	protected final int			index;
 	
 	public DoubleArrayRef(double[] array, int index)
 	{

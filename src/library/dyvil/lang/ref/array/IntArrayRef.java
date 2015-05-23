@@ -5,7 +5,7 @@ import dyvil.lang.ref.IIntRef;
 public class IntArrayRef implements IIntRef
 {
 	protected final int[]	array;
-	protected final int	index;
+	protected final int		index;
 	
 	public IntArrayRef(int[] array, int index)
 	{

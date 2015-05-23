@@ -5,7 +5,7 @@ import dyvil.lang.ref.IStringRef;
 public class StringArrayRef implements IStringRef
 {
 	protected final String[]	array;
-	protected final int		index;
+	protected final int			index;
 	
 	public StringArrayRef(String[] array, int index)
 	{

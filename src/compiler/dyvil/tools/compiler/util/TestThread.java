@@ -48,7 +48,7 @@ public final class TestThread extends Thread
 			m.invoke(null, new Object[] { args });
 			
 			now = System.currentTimeMillis() - now;
-
+			
 			System.setOut(out);
 			System.setErr(err);
 			

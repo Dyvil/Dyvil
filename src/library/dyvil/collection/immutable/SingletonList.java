@@ -169,7 +169,7 @@ public class SingletonList<E> implements ImmutableList<E>
 			
 			for (int i = 0; i < len; i++)
 			{
-				if (this.element == array[i] || (this.element != null && this.element.equals(array[i])))
+				if (this.element == array[i] || this.element != null && this.element.equals(array[i]))
 				{
 					System.arraycopy(array, i + 1, array, i, len - i - 1);
 					len--;

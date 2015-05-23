@@ -387,7 +387,7 @@ public final class MethodWriterImpl implements MethodWriter
 				BackendUtil.dupX1(this);
 				return;
 			}
-
+			
 			if (opcode >= ICMPEQ && opcode <= ICMPLE)
 			{
 				opcode -= ICMPEQ;
