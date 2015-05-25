@@ -27,6 +27,11 @@ public final class ArgumentList implements IArguments, IValueList
 		this.values = new IValue[3];
 	}
 	
+	public ArgumentList(int size)
+	{
+		this.values = new IValue[size];
+	}
+	
 	public ArgumentList(IValue[] values, int size)
 	{
 		this.values = values;

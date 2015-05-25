@@ -86,7 +86,9 @@ public final class LiteralExpression implements IValue
 		if (match == null)
 		{
 			IValue value = this.arguments.getFirstValue();
-			markers.add(value.getPosition(), "literal.method", value.getType().toString(), this.type.toString());
+			StringBuilder builder = new StringBuilder();
+			this.arguments.typesToString(builder);
+			markers.add(value.getPosition(), "literal.method", value.getType().getName(), this.type.toString(), builder);
 		}
 		else
 		{

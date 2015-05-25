@@ -72,9 +72,12 @@ public final class FormatStringExpression extends ASTNode implements IValue
 				string = new StringValue("");
 			}
 			
-			ArgumentList list = new ArgumentList();
+			ArgumentList list = new ArgumentList(1 + len);
 			list.addValue(string);
-			list.addValue(new Array(this.values, len));
+			for (int i = 0; i < len; i++)
+			{
+				list.addValue(this.values[i]);
+			}
 			
 			return new LiteralExpression(type, list);
 		}
