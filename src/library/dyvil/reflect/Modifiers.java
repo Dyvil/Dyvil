@@ -93,15 +93,15 @@ public interface Modifiers
 	public static final int	NATIVE					= 0x00000100;
 	
 	/**
-	 * Modifier used to declare that a class is an {@code interface}.
-	 */
-	public static final int	INTERFACE_CLASS			= 0x00000200;
-	
-	/**
 	 * {@code abstract} modifier.
 	 */
 	public static final int	ABSTRACT				= 0x00000400;
 	
+	/**
+	 * Modifier used to declare that a class is an {@code interface}.
+	 */
+	public static final int	INTERFACE_CLASS			= 0x00000200 | ABSTRACT;
+
 	/**
 	 * {@code stricfp} modifier.
 	 */

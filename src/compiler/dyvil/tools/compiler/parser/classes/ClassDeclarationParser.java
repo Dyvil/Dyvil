@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.classes;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -132,6 +133,13 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 		{
 			if (type == Keywords.EXTENDS)
 			{
+				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+				{
+					pm.pushParser(new TypeListParser(this));
+					this.mode = BODY;
+					return;
+				}
+				
 				pm.pushParser(new TypeParser(this));
 				this.mode = IMPLEMENTS | BODY;
 				return;
@@ -141,8 +149,14 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 		{
 			if (type == Keywords.IMPLEMENTS)
 			{
+				
 				pm.pushParser(new TypeListParser(this));
 				this.mode = BODY;
+				
+				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+				{
+					throw new SyntaxError(token, "Interfaces cannot implement other interfaces - Use 'extends' instead");
+				}
 				return;
 			}
 		}

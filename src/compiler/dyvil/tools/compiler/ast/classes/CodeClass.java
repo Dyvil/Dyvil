@@ -262,13 +262,13 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean hasModifier(int mod)
 	{
-		return (this.modifiers & mod) != 0;
+		return (this.modifiers & mod) == mod;
 	}
 	
 	@Override
 	public boolean isAbstract()
 	{
-		return (this.modifiers & Modifiers.INTERFACE_CLASS) != 0 || (this.modifiers & Modifiers.ABSTRACT) != 0;
+		return (this.modifiers & Modifiers.ABSTRACT) != 0;
 	}
 	
 	@Override
@@ -550,7 +550,7 @@ public class CodeClass extends ASTNode implements IClass
 	public IMethod getFunctionalMethod()
 	{
 		// Copy in ExternalClass
-		if ((this.modifiers & Modifiers.ABSTRACT | Modifiers.INTERFACE_CLASS) == 0)
+		if ((this.modifiers & Modifiers.ABSTRACT) == 0)
 		{
 			return null;
 		}
@@ -1155,7 +1155,12 @@ public class CodeClass extends ASTNode implements IClass
 			superClass = this.superType.getInternalName();
 		}
 		
-		writer.visit(DyvilCompiler.classVersion, this.modifiers & 0xFFFF | Opcodes.ACC_SUPER, internalName, signature, superClass, interfaces);
+		int mods = this.modifiers & 0x67631;
+		if ((mods & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
+		{
+			mods |= Opcodes.ACC_SUPER;
+		}
+		writer.visit(DyvilCompiler.classVersion, mods, internalName, signature, superClass, interfaces);
 		
 		// Outer Class
 		
@@ -1323,7 +1328,16 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		if (this.outerClass != null)
 		{
-			writer.visitInnerClass(this.internalName, this.outerClass.getInternalName(), this.name.qualified, this.modifiers | Modifiers.STATIC);
+			int mods = this.modifiers & 0x761F;
+			if ((mods & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
+			{
+				mods |= Opcodes.ACC_STATIC;
+			}
+			else
+			{
+				mods &= ~Opcodes.ACC_STATIC;
+			}
+			writer.visitInnerClass(this.internalName, this.outerClass.getInternalName(), this.name.qualified, mods);
 		}
 	}
 	
