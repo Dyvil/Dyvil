@@ -67,8 +67,6 @@ public final class Name
 	public static final Name				minusgt			= new Name("->", "$minus$gt");
 	public static final Name				ltminus			= new Name("<-", "$lt$minus");
 	
-	public static final Name				colongt			= new Name(":>", "$colon$gt");
-	public static final Name				ltcolon			= new Name("<:", "$lt$colon");
 	
 	public final String						qualified;
 	public final String						unqualified;

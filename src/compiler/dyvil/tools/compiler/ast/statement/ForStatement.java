@@ -28,42 +28,42 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ForStatement extends ASTNode implements IStatement, IContext, ILoop
 {
-	public static final IType		ITERABLE		= new Type(Package.javaLang.resolveClass("Iterable"));
-	private static ITypeVariable	ITERABLE_TYPE	= ITERABLE.getTheClass().getTypeVariable(0);
+	public static final IType			ITERABLE		= new Type(Package.javaLang.resolveClass("Iterable"));
+	public static final ITypeVariable	ITERABLE_TYPE	= ITERABLE.getTheClass().getTypeVariable(0);
 	
-	public static final Name		$index			= Name.getQualified("$index");
-	public static final Name		$length			= Name.getQualified("$length");
-	public static final Name		$array			= Name.getQualified("$array");
-	public static final Name		$string			= Name.getQualified("$string");
-	public static final Name		$iterator		= Name.getQualified("$iterator");
-	public static final Name		$forStart		= Name.getQualified("$forStart");
-	public static final Name		$forUpdate		= Name.getQualified("$forCondition");
-	public static final Name		$forEnd			= Name.getQualified("$forEnd");
+	public static final Name			$index			= Name.getQualified("$index");
+	public static final Name			$length			= Name.getQualified("$length");
+	public static final Name			$array			= Name.getQualified("$array");
+	public static final Name			$string			= Name.getQualified("$string");
+	public static final Name			$iterator		= Name.getQualified("$iterator");
+	public static final Name			$forStart		= Name.getQualified("$forStart");
+	public static final Name			$forUpdate		= Name.getQualified("$forCondition");
+	public static final Name			$forEnd			= Name.getQualified("$forEnd");
 	
-	public static final int			DEFAULT			= 0;
-	public static final int			ITERATOR		= 1;
-	public static final int			ARRAY			= 2;
-	public static final int			STRING			= 3;
+	public static final int				DEFAULT			= 0;
+	public static final int				ITERATOR		= 1;
+	public static final int				ARRAY			= 2;
+	public static final int				STRING			= 3;
 	
-	private transient IContext		context;
-	private IStatement				parent;
+	private transient IContext			context;
+	private IStatement					parent;
 	
-	public Variable					variable;
+	public Variable						variable;
 	
-	public IValue					condition;
-	public IValue					update;
+	public IValue						condition;
+	public IValue						update;
 	
-	public byte						type;
+	public byte							type;
 	
-	public IValue					then;
+	public IValue						then;
 	
-	protected Label					startLabel;
-	protected Label					updateLabel;
-	protected Label					endLabel;
+	protected Label						startLabel;
+	protected Label						updateLabel;
+	protected Label						endLabel;
 	
-	protected Variable				var1;
-	protected Variable				var2;
-	protected Variable				var3;
+	protected Variable					var1;
+	protected Variable					var2;
+	protected Variable					var3;
 	
 	public ForStatement(ICodePosition position)
 	{
@@ -272,7 +272,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 		{
 			IType varType = this.variable.type;
 			IValue value = this.variable.value;
-			this.variable.value = value.resolve(markers, context);
+			this.variable.value = value = value.resolve(markers, context);
 			
 			IType valueType = value.getType();
 			if (valueType.isArrayType())
@@ -359,6 +359,12 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 				var.type = valueType;
 				var.name = $string;
 				this.var3 = var;
+			}
+			else
+			{
+				Marker m = markers.create(this.position, "for.invalid");
+				m.addInfo("Variable Type: " + varType);
+				m.addInfo("Value Type: " + valueType);
 			}
 		}
 		else
@@ -584,7 +590,7 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
 			writer.writeLabel(scopeLabel);
 			
-			// Load the array
+			// Load the String
 			var.value.writeExpression(writer);
 			
 			// Local Variables
@@ -634,7 +640,6 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 		}
 		case ITERATOR:
 		{
-			
 			Variable iteratorVar = this.var1;
 			
 			org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
@@ -646,10 +651,10 @@ public final class ForStatement extends ASTNode implements IStatement, IContext,
 			
 			// Local Variables
 			int locals = writer.localCount();
-			var.index = locals;
-			iteratorVar.index = locals + 1;
+			var.index = locals + 1;
+			
 			// Store Iterator
-			writer.writeVarInsn(Opcodes.ASTORE, iteratorVar.index);
+			writer.writeVarInsn(Opcodes.ASTORE, iteratorVar.index = locals);
 			
 			// Jump to hasNext check
 			writer.writeJumpInsn(Opcodes.GOTO, updateLabel);

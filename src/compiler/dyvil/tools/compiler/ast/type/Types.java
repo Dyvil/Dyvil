@@ -256,4 +256,53 @@ public final class Types
 			return gt;
 		}
 	}
+
+	public static IType findCommonSuperType(IType type1, IType type2)
+	{
+		IType t = superType(type1, type2);
+		if (t != null)
+		{
+			return t;
+		}
+		
+		IType superType1 = type1;
+		while (true)
+		{
+			superType1 = superType1.getSuperType();
+			if (superType1 == null)
+			{
+				break;
+			}
+			
+			IType superType2 = type2;
+			while (true)
+			{
+				superType2 = superType2.getSuperType();
+				if (superType2 == null)
+				{
+					break;
+				}
+				
+				t = superType(superType1, superType2);
+				if (t != null)
+				{
+					return t;
+				}
+			}
+		}
+		return ANY;
+	}
+
+	static IType superType(IType type1, IType type2)
+	{
+		if (type1.isSuperTypeOf(type2))
+		{
+			return type1;
+		}
+		if (type2.isSuperTypeOf(type1))
+		{
+			return type2;
+		}
+		return null;
+	}
 }

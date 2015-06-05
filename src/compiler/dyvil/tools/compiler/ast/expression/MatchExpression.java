@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -81,7 +80,7 @@ public final class MatchExpression extends ASTNode implements IValue
 				continue;
 			}
 			
-			t = Type.findCommonSuperType(t, t1);
+			t = Types.findCommonSuperType(t, t1);
 			if (t == null)
 			{
 				return this.type = Types.VOID;

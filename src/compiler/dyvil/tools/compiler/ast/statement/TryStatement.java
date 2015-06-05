@@ -16,7 +16,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -68,7 +67,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			IType t1 = this.catchBlocks[i].action.getType();
-			type = Type.findCommonSuperType(type, t1);
+			type = Types.findCommonSuperType(type, t1);
 			if (type == null)
 			{
 				return this.commonType = Types.ANY;

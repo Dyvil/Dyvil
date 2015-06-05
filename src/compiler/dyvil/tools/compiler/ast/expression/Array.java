@@ -93,7 +93,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 		for (int i = 1; i < len; i++)
 		{
 			IType t1 = this.values[i].getType();
-			t = Type.findCommonSuperType(t, t1);
+			t = Types.findCommonSuperType(t, t1);
 			if (t == null)
 			{
 				t = Types.ANY;

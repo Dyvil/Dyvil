@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -91,7 +90,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		{
 			if (this.elseThen != null)
 			{
-				return this.commonType = Type.findCommonSuperType(this.then.getType(), this.elseThen.getType());
+				return this.commonType = Types.findCommonSuperType(this.then.getType(), this.elseThen.getType());
 			}
 			return this.commonType = this.then.getType();
 		}

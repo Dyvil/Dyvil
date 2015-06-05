@@ -268,7 +268,7 @@ public final class GenericType extends Type implements ITypeList
 		if (this.genericCount > 0)
 		{
 			builder.append('[').append(this.generics[0].toString());
-			for (int i = 0; i < this.genericCount; i++)
+			for (int i = 1; i < this.genericCount; i++)
 			{
 				builder.append(", ").append(this.generics[i].toString());
 			}

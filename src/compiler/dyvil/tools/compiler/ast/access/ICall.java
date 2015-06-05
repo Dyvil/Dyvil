@@ -72,7 +72,20 @@ public interface ICall extends IValue
 				}
 			}
 		}
-		else if (arguments.size() == 1)
+		
+		context.getMethodMatches(matches, instance, name, arguments);
+		if (!matches.isEmpty())
+		{
+			return IContext.getBestMethod(matches);
+		}
+		
+		Types.PREDEF_CLASS.getMethodMatches(matches, instance, name, arguments);
+		if (!matches.isEmpty())
+		{
+			return IContext.getBestMethod(matches);
+		}
+		
+		if (instance == null && arguments.size() == 1)
 		{
 			IValue v = arguments.getFirstValue();
 			IType type = v.getType();
@@ -85,18 +98,6 @@ public interface ICall extends IValue
 					return IContext.getBestMethod(matches);
 				}
 			}
-		}
-		
-		context.getMethodMatches(matches, instance, name, arguments);
-		if (!matches.isEmpty())
-		{
-			return IContext.getBestMethod(matches);
-		}
-		
-		Types.PREDEF_CLASS.getMethodMatches(matches, instance, name, arguments);
-		if (!matches.isEmpty())
-		{
-			return IContext.getBestMethod(matches);
 		}
 		
 		return null;
