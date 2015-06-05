@@ -4,6 +4,7 @@ import static dyvil.reflect.Opcodes.*;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
@@ -186,6 +187,30 @@ public interface BooleanArray
 		{
 			res[i] = mapper.test(Boolean.apply(array[i]));
 		}
+		return res;
+	}
+	
+	public static @infix boolean[] flatMapped(boolean[] array, Function<Boolean, boolean[]> mapper)
+	{
+		int len = array.length;
+		int size = 0;
+		boolean[] res = EMPTY;
+		
+		for (int i = 0; i < len; i++)
+		{
+			boolean[] a = mapper.apply(Boolean.apply(array[i]));
+			int alen = a.length;
+			if (size + alen >= res.length)
+			{
+				boolean[] newRes = new boolean[size + alen];
+				System.arraycopy(res, 0, newRes, 0, res.length);
+				res = newRes;
+			}
+			
+			System.arraycopy(a, 0, res, size, alen);
+			size += alen;
+		}
+		
 		return res;
 	}
 	

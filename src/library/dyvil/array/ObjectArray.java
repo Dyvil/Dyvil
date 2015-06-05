@@ -7,9 +7,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
@@ -181,15 +181,39 @@ public interface ObjectArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix <T> T[] mapped(T[] array, UnaryOperator<T> mapper)
+	public static @infix <T, U> U[] mapped(T[] array, Function<T, U> mapper)
 	{
 		int len = array.length;
 		// We can safely use clone here because no data will be leaked
-		T[] res = array.clone();
+		U[] res = (U[]) new Object[len];
 		for (int i = 0; i < len; i++)
 		{
 			res[i] = mapper.apply(array[i]);
 		}
+		return res;
+	}
+	
+	public static @infix <T, U> U[] flatMapped(T[] array, Function<T, U[]> mapper)
+	{
+		int len = array.length;
+		int size = 0;
+		U[] res = (U[]) EMPTY;
+		
+		for (int i = 0; i < len; i++)
+		{
+			U[] a = mapper.apply(array[i]);
+			int alen = a.length;
+			if (size + alen >= res.length)
+			{
+				U[] newRes = (U[]) new Object[size + alen];
+				System.arraycopy(res, 0, newRes, 0, res.length);
+				res = newRes;
+			}
+			
+			System.arraycopy(a, 0, res, size, alen);
+			size += alen;
+		}
+		
 		return res;
 	}
 	

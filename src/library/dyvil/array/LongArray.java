@@ -4,6 +4,7 @@ import static dyvil.reflect.Opcodes.*;
 
 import java.util.Arrays;
 import java.util.function.IntConsumer;
+import java.util.function.LongFunction;
 import java.util.function.LongPredicate;
 import java.util.function.LongUnaryOperator;
 
@@ -185,6 +186,30 @@ public interface LongArray
 		{
 			res[i] = mapper.applyAsLong(array[i]);
 		}
+		return res;
+	}
+	
+	public static @infix long[] flatMapped(long[] array, LongFunction<long[]> mapper)
+	{
+		int len = array.length;
+		int size = 0;
+		long[] res = EMPTY;
+		
+		for (int i = 0; i < len; i++)
+		{
+			long[] a = mapper.apply(array[i]);
+			int alen = a.length;
+			if (size + alen >= res.length)
+			{
+				long[] newRes = new long[size + alen];
+				System.arraycopy(res, 0, newRes, 0, res.length);
+				res = newRes;
+			}
+			
+			System.arraycopy(a, 0, res, size, alen);
+			size += alen;
+		}
+		
 		return res;
 	}
 	

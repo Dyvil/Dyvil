@@ -2,6 +2,7 @@ package dyvil.math;
 
 import dyvil.annotation.Utility;
 import dyvil.annotation.infix;
+import dyvil.annotation.postfix;
 
 /**
  * The {@linkplain Utility utility class} <b>MathUtils</b> can be used for
@@ -114,6 +115,58 @@ public final class MathUtils
 		return c <= d ? c : d;
 	}
 	
+	public static @infix @postfix int min(int... ints)
+	{
+		int min = Integer.MAX_VALUE;
+		for (int i : ints)
+		{
+			if (i < min)
+			{
+				min = i;
+			}
+		}
+		return min;
+	}
+	
+	public static @infix @postfix long min(long... longs)
+	{
+		long min = Long.MAX_VALUE;
+		for (long i : longs)
+		{
+			if (i < min)
+			{
+				min = i;
+			}
+		}
+		return min;
+	}
+	
+	public static @infix @postfix float min(float... floats)
+	{
+		float min = Float.POSITIVE_INFINITY;
+		for (float i : floats)
+		{
+			if (i < min)
+			{
+				min = i;
+			}
+		}
+		return min;
+	}
+	
+	public static @infix @postfix double min(double... doubles)
+	{
+		double min = Double.NEGATIVE_INFINITY;
+		for (double i : doubles)
+		{
+			if (i < min)
+			{
+				min = i;
+			}
+		}
+		return min;
+	}
+	
 	public static int max(int a, int b, int c)
 	{
 		int d = a > b ? a : b;
@@ -136,6 +189,58 @@ public final class MathUtils
 	{
 		double d = a > b ? a : b;
 		return c > d ? c : d;
+	}
+	
+	public static @infix @postfix int max(int... ints)
+	{
+		int max = Integer.MIN_VALUE;
+		for (int i : ints)
+		{
+			if (i > max)
+			{
+				max = i;
+			}
+		}
+		return max;
+	}
+	
+	public static @infix @postfix long max(long... longs)
+	{
+		long max = Long.MIN_VALUE;
+		for (long i : longs)
+		{
+			if (i > max)
+			{
+				max = i;
+			}
+		}
+		return max;
+	}
+	
+	public static @infix @postfix float max(float... floats)
+	{
+		float max = Float.NEGATIVE_INFINITY;
+		for (float i : floats)
+		{
+			if (i > max)
+			{
+				max = i;
+			}
+		}
+		return max;
+	}
+	
+	public static @infix @postfix double max(double... doubles)
+	{
+		double max = Double.NEGATIVE_INFINITY;
+		for (double i : doubles)
+		{
+			if (i > max)
+			{
+				max = i;
+			}
+		}
+		return max;
 	}
 	
 	/**
@@ -547,7 +652,7 @@ public final class MathUtils
 		return min + (max - min) * d;
 	}
 	
-	public static @infix int $bang(int v)
+	public static @postfix int $bang(int v)
 	{
 		int j = v;
 		while (v > 1)
@@ -557,7 +662,7 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static @infix long $bang(long v)
+	public static @postfix long $bang(long v)
 	{
 		long j = v;
 		while (v > 1L)
@@ -567,7 +672,7 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static @infix float $bang(float v)
+	public static @postfix float $bang(float v)
 	{
 		float j = v;
 		while (v > 1F)
@@ -577,7 +682,7 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static @infix double $bang(double v)
+	public static @postfix double $bang(double v)
 	{
 		double j = v;
 		while (v > 1D)

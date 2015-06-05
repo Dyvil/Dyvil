@@ -3,6 +3,7 @@ package dyvil.array;
 import static dyvil.reflect.Opcodes.*;
 
 import java.util.Arrays;
+import java.util.function.DoubleFunction;
 import java.util.function.DoublePredicate;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.IntConsumer;
@@ -185,6 +186,30 @@ public interface DoubleArray
 		{
 			res[i] = mapper.applyAsDouble(array[i]);
 		}
+		return res;
+	}
+	
+	public static @infix double[] flatMapped(double[] array, DoubleFunction<double[]> mapper)
+	{
+		int len = array.length;
+		int size = 0;
+		double[] res = EMPTY;
+		
+		for (int i = 0; i < len; i++)
+		{
+			double[] a = mapper.apply(array[i]);
+			int alen = a.length;
+			if (size + alen >= res.length)
+			{
+				double[] newRes = new double[size + alen];
+				System.arraycopy(res, 0, newRes, 0, res.length);
+				res = newRes;
+			}
+			
+			System.arraycopy(a, 0, res, size, alen);
+			size += alen;
+		}
+		
 		return res;
 	}
 	

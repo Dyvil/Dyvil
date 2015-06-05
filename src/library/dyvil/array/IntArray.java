@@ -4,6 +4,7 @@ import static dyvil.reflect.Opcodes.*;
 
 import java.util.Arrays;
 import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
@@ -185,6 +186,30 @@ public interface IntArray
 		{
 			res[i] = mapper.applyAsInt(array[i]);
 		}
+		return res;
+	}
+	
+	public static @infix int[] flatMapped(int[] array, IntFunction<int[]> mapper)
+	{
+		int len = array.length;
+		int size = 0;
+		int[] res = EMPTY;
+		
+		for (int i = 0; i < len; i++)
+		{
+			int[] a = mapper.apply(array[i]);
+			int alen = a.length;
+			if (size + alen >= res.length)
+			{
+				int[] newRes = new int[size + alen];
+				System.arraycopy(res, 0, newRes, 0, res.length);
+				res = newRes;
+			}
+			
+			System.arraycopy(a, 0, res, size, alen);
+			size += alen;
+		}
+		
 		return res;
 	}
 	
