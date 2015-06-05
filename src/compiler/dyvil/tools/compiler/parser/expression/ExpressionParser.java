@@ -427,8 +427,8 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				if (this.dotless && this.operator != null)
 				{
 					Operator operator = pm.getOperator(name);
-					int p = this.operator.precedence;
-					if (p > operator.precedence)
+					int p;
+					if (operator == null || (p = this.operator.precedence) > operator.precedence)
 					{
 						this.field.setValue(this.value);
 						pm.popParser(true);

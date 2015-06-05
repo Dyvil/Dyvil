@@ -223,6 +223,7 @@ public class Method extends Member implements IMethod
 			this.modifiers |= Modifiers.INLINE;
 			return false;
 		case "dyvil/annotation/infix":
+		case "dyvil/annotation/postfix":
 			this.modifiers |= Modifiers.INFIX;
 			return false;
 		case "dyvil/annotation/prefix":
