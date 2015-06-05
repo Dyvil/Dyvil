@@ -59,6 +59,7 @@ public interface IValue extends IASTNode, ITyped
 	int	CLASS_OPERATOR		= 54;
 	int	TYPE_OPERATOR		= 55;
 	int	NULLCHECK			= 56;
+	int	RANGE_OPERATOR		= 57;
 	
 	int	TUPLE				= 64;
 	int	CASE_STATEMENT		= 65;

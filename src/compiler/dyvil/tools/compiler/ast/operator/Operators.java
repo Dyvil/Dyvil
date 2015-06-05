@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.operator;
 
 import static dyvil.tools.compiler.ast.member.Name.*;
 import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
+import static dyvil.tools.compiler.ast.operator.Operator.INFIX_NONE;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -51,6 +52,7 @@ public interface Operators
 	
 	public static final Operator			RARROW			= new Operator(Name.minusgt, 200, INFIX_LEFT);
 	public static final Operator			LARROW			= new Operator(Name.ltminus, 200, INFIX_LEFT);
+	public static final Operator			DOTDOT			= new Operator(Name.dotdot, 200, INFIX_NONE);
 	
 	public static int index(Name name)
 	{
@@ -109,6 +111,18 @@ public interface Operators
 			if (arg1.valueTag() == IValue.NULL)
 			{
 				return new NullCheckOperator(arg2, false);
+			}
+			return null;
+		}
+		if (name == dotdot)
+		{
+			if (arg1.isType(RangeOperator.ORDERED) && arg2.isType(RangeOperator.ORDERED))
+			{
+				return new RangeOperator(arg1, arg2);
+			}
+			if (arg1.isType(Types.STRING) && arg2.isType(Types.STRING))
+			{
+				return new RangeOperator(arg1, arg2, Types.STRING);
 			}
 			return null;
 		}
