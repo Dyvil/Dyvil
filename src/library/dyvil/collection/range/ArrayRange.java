@@ -116,6 +116,6 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 	@Override
 	public String toString()
 	{
-		return "(" + this.array[0] + ", " + this.array[this.count - 1] + ")";
+		return this.array[0] + " .. " + this.array[this.count - 1];
 	}
 }

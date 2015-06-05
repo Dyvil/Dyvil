@@ -14,6 +14,8 @@ import java.util.function.Predicate;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.range.StringRange;
+import dyvil.lang.Ordered;
 
 public interface ObjectArray
 {
@@ -45,6 +47,28 @@ public interface ObjectArray
 		for (int i = 0; i < count; i++)
 		{
 			array[i] = generator.apply(i);
+		}
+		return array;
+	}
+	
+	public static <T extends Ordered<T>> T[] range(T start, T end)
+	{
+		int i = 0;
+		Ordered[] array = new Ordered[start.distanceTo(end) + 1];
+		for (T current = start; current.$lt$eq(end); current = current.next())
+		{
+			array[i++] = start;
+		}
+		return (T[]) array;
+	}
+	
+	public static String[] range(String start, String end)
+	{
+		int i = 0;
+		String[] array = new String[StringRange.distance(start, end) + 1];
+		for (String current = start; current.compareTo(end) <= 0; current = StringRange.next(current))
+		{
+			array[i++] = current;
 		}
 		return array;
 	}

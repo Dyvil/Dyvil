@@ -311,50 +311,6 @@ public final class MathUtils
 		return d > i ? i + 1 : i;
 	}
 	
-	public static @infix int[] $dot$dot(int min, int max)
-	{
-		int len = max - min + 1;
-		int[] arr = new int[len];
-		for (int i = 0; i < len; i++)
-		{
-			arr[i] = min + i;
-		}
-		return arr;
-	}
-	
-	public static @infix long[] $dot$dot(long min, long max)
-	{
-		int len = (int) (max - min + 1);
-		long[] arr = new long[len];
-		for (int i = 0; i < len; i++)
-		{
-			arr[i] = min + i;
-		}
-		return arr;
-	}
-	
-	public static @infix float[] $dot$dot(float min, float max)
-	{
-		int len = (int) (max - min + 1);
-		float[] arr = new float[len];
-		for (int i = 0; i < len; i++)
-		{
-			arr[i] = min + i;
-		}
-		return arr;
-	}
-	
-	public static @infix double[] $dot$dot(double min, double max)
-	{
-		int len = (int) (max - min + 1);
-		double[] arr = new double[len];
-		for (int i = 0; i < len; i++)
-		{
-			arr[i] = min + i;
-		}
-		return arr;
-	}
-	
 	public static @infix float sin(float f)
 	{
 		return sinTable[(int) (f * sinFactor2) & 0xFFFF];

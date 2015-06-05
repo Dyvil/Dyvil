@@ -23,7 +23,12 @@ public class StringRange implements Range<String>
 		this.last = last;
 	}
 	
-	private static String next(String s)
+	public static int distance(String s1, String s2)
+	{
+		return Integer.parseInt(s2, 36) - Integer.parseInt(s1, 36);
+	}
+	
+	public static String next(String s)
 	{
 		int len = s.length();
 		
@@ -64,7 +69,7 @@ public class StringRange implements Range<String>
 	@Override
 	public int count()
 	{
-		return Integer.parseInt(this.last, 36) - Integer.parseInt(this.first, 36) + 1;
+		return distance(this.first, this.last) + 1;
 	}
 	
 	@Override
@@ -124,6 +129,6 @@ public class StringRange implements Range<String>
 	@Override
 	public String toString()
 	{
-		return "(" + this.first + ", " + this.last + ")";
+		return this.first + " .. " + this.last;
 	}
 }

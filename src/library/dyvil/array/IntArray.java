@@ -46,6 +46,17 @@ public interface IntArray
 		return array;
 	}
 	
+	public static int[] range(int start, int end)
+	{
+		int i = 0;
+		int[] array = new int[end - start + 1];
+		for (; start <= end; start++)
+		{
+			array[i++] = start;
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

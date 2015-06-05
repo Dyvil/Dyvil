@@ -46,6 +46,17 @@ public interface ByteArray
 		return array;
 	}
 	
+	public static byte[] range(byte start, byte end)
+	{
+		int i = 0;
+		byte[] array = new byte[end - start + 1];
+		for (; start <= end; start++)
+		{
+			array[i++] = start;
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

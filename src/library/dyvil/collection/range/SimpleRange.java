@@ -116,6 +116,6 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	@Override
 	public String toString()
 	{
-		return "(" + this.first + ", " + this.last + ")";
+		return this.first + " .. " + this.last;
 	}
 }
