@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.statement.ForStatement;
+import dyvil.tools.compiler.ast.statement.foreach.IterableForStatement;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.*;
@@ -106,9 +106,9 @@ public class RangeOperator implements IValue
 			IType elementType = type.getElementType();
 			return this.withElementType(type, elementType);
 		}
-		if (ForStatement.ITERABLE.equals(type) || RANGE.isSuperTypeOf(type))
+		if (Types.ITERABLE.equals(type) || RANGE.isSuperTypeOf(type))
 		{
-			IType iterableType = type.resolveType(ForStatement.ITERABLE_TYPE);
+			IType iterableType = type.resolveType(IterableForStatement.ITERABLE_TYPE);
 			return this.withElementType(type, iterableType);
 		}
 		return type.isSuperTypeOf(this.getType()) ? this : null;
@@ -122,9 +122,9 @@ public class RangeOperator implements IValue
 			IType elementType = type.getElementType();
 			return this.isElementType(elementType);
 		}
-		if (ForStatement.ITERABLE.equals(type) || RANGE.isSuperTypeOf(type))
+		if (Types.ITERABLE.equals(type) || RANGE.isSuperTypeOf(type))
 		{
-			IType iterableType = type.resolveType(ForStatement.ITERABLE_TYPE);
+			IType iterableType = type.resolveType(IterableForStatement.ITERABLE_TYPE);
 			return this.isElementType(iterableType);
 		}
 		return type.isSuperTypeOf(RANGE);
@@ -138,9 +138,9 @@ public class RangeOperator implements IValue
 			IType elementType = type.getElementType();
 			return this.isElementType(elementType) ? 3 : 0;
 		}
-		if (ForStatement.ITERABLE.equals(type) || RANGE.isSuperTypeOf(type))
+		if (Types.ITERABLE.equals(type) || RANGE.isSuperTypeOf(type))
 		{
-			IType iterableType = type.resolveType(ForStatement.ITERABLE_TYPE);
+			IType iterableType = type.resolveType(IterableForStatement.ITERABLE_TYPE);
 			return this.isElementType(iterableType) ? 3 : 0;
 		}
 		return type.isSuperTypeOf(RANGE) ? 2 : 0;

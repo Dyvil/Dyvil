@@ -26,6 +26,7 @@ public final class Types
 	public static final Type			CLASS					= new Type("java/lang/Class", Name.getQualified("Class"));
 	public static final Type			PREDEF					= new Type("dyvil/lang/Predef", Name.getQualified("Predef"));
 	public static final Type			TYPE					= new Type("dyvil/lang/Type", Name.getQualified("Type"));
+	public static final IType			ITERABLE				= new Type(Package.javaLang.resolveClass("Iterable"));
 	public static final Type			THROWABLE				= new Type("java/lang/Throwable", Name.getQualified("Throwable"));
 	public static final Type			RUNTIME_EXCEPTION		= new Type("java/lang/RuntimeException", Name.getQualified("RuntimeException"));
 	
@@ -256,7 +257,7 @@ public final class Types
 			return gt;
 		}
 	}
-
+	
 	public static IType findCommonSuperType(IType type1, IType type2)
 	{
 		IType t = superType(type1, type2);
@@ -292,7 +293,7 @@ public final class Types
 		}
 		return ANY;
 	}
-
+	
 	static IType superType(IType type1, IType type2)
 	{
 		if (type1.isSuperTypeOf(type2))

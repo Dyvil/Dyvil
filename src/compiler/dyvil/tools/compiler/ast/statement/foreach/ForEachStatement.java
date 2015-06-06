@@ -1,4 +1,8 @@
-package dyvil.tools.compiler.ast.statement;
+package dyvil.tools.compiler.ast.statement.foreach;
+
+import static dyvil.tools.compiler.ast.statement.ForStatement.$forEnd;
+import static dyvil.tools.compiler.ast.statement.ForStatement.$forStart;
+import static dyvil.tools.compiler.ast.statement.ForStatement.$forUpdate;
 
 import java.util.List;
 
@@ -13,6 +17,9 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.statement.ILoop;
+import dyvil.tools.compiler.ast.statement.IStatement;
+import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -23,35 +30,25 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ForStatement implements IStatement, IContext, ILoop
+public class ForEachStatement implements IStatement, IContext, ILoop
 {
-	public static final Name		$forStart	= Name.getQualified("$forStart");
-	public static final Name		$forUpdate	= Name.getQualified("$forCondition");
-	public static final Name		$forEnd		= Name.getQualified("$forEnd");
-	
 	protected transient IContext	context;
 	protected IStatement			parent;
 	
 	public Variable					variable;
-	
-	public IValue					condition;
-	public IValue					update;
-	
 	public IValue					action;
 	
 	protected Label					startLabel;
 	protected Label					updateLabel;
 	protected Label					endLabel;
 	
-	public ForStatement(Variable variable, IValue condition, IValue update, IValue action)
+	public ForEachStatement(Variable var, IValue action)
 	{
 		this.startLabel = new Label($forStart);
 		this.updateLabel = new Label($forUpdate);
 		this.endLabel = new Label($forEnd);
 		
-		this.variable = variable;
-		this.condition = condition;
-		this.update = update;
+		this.variable = var;
 		this.action = action;
 	}
 	
@@ -183,14 +180,6 @@ public class ForStatement implements IStatement, IContext, ILoop
 		{
 			this.variable.resolveTypes(markers, context);
 		}
-		if (this.condition != null)
-		{
-			this.condition.resolveTypes(markers, context);
-		}
-		if (this.update != null)
-		{
-			this.update.resolveTypes(markers, context);
-		}
 		
 		if (this.action != null)
 		{
@@ -208,18 +197,68 @@ public class ForStatement implements IStatement, IContext, ILoop
 	{
 		this.context = context;
 		
-		if (this.variable != null)
+		IType varType = this.variable.type;
+		IValue value = this.variable.value;
+		this.variable.value = value = value.resolve(markers, context);
+		
+		IType valueType = value.getType();
+		if (valueType.isArrayType())
 		{
-			this.variable.resolve(markers, context);
+			if (varType == Types.UNKNOWN)
+			{
+				this.variable.type = varType = valueType.getElementType();
+				if (varType == Types.UNKNOWN)
+				{
+					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.name.unqualified);
+				}
+			}
+			else if (!varType.classEquals(valueType.getElementType()))
+			{
+				Marker marker = markers.create(value.getPosition(), "for.array.type");
+				marker.addInfo("Array Type: " + valueType);
+				marker.addInfo("Variable Type: " + varType);
+			}
+			
+			return new ArrayForStatement(this.variable, this.action.resolve(markers, this), valueType);
 		}
-		if (this.condition != null)
+		if (Types.ITERABLE.isSuperTypeOf(valueType))
 		{
-			this.condition = this.condition.resolve(markers, this);
+			IType iterableType = valueType.resolveType(IterableForStatement.ITERABLE_TYPE);
+			if (varType == Types.UNKNOWN)
+			{
+				this.variable.type = varType = iterableType;
+				if (varType == Types.UNKNOWN)
+				{
+					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.name.unqualified);
+				}
+			}
+			else if (!varType.isSuperTypeOf(iterableType))
+			{
+				Marker m = markers.create(value.getPosition(), "for.iterable.type");
+				m.addInfo("Iterable Type: " + iterableType);
+				m.addInfo("Variable Type: " + varType);
+			}
+			
+			return new IterableForStatement(this.variable, this.action.resolve(markers, this), valueType);
 		}
-		if (this.update != null)
+		if (Types.STRING.isSuperTypeOf(valueType))
 		{
-			this.update = this.update.resolve(markers, this);
+			if (varType == Types.UNKNOWN)
+			{
+				this.variable.type = varType = Types.CHAR;
+			}
+			else if (!varType.classEquals(Types.CHAR))
+			{
+				Marker marker = markers.create(value.getPosition(), "for.string.type");
+				marker.addInfo("Variable Type: " + varType);
+			}
+			
+			return new StringForStatement(this.variable, this.action.resolve(markers, this));
 		}
+		
+		Marker m = markers.create(this.variable.position, "for.invalid");
+		m.addInfo("Variable Type: " + varType);
+		m.addInfo("Value Type: " + valueType);
 		
 		if (this.action != null)
 		{
@@ -235,28 +274,9 @@ public class ForStatement implements IStatement, IContext, ILoop
 	{
 		if (this.variable != null)
 		{
-			this.variable.checkTypes(markers, context);
+			this.variable.value.checkTypes(markers, context);
 		}
 		this.context = context;
-		if (this.update != null)
-		{
-			this.update.checkTypes(markers, this);
-		}
-		if (this.condition != null)
-		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN);
-			if (condition1 == null)
-			{
-				Marker marker = markers.create(this.condition.getPosition(), "for.condition.type");
-				marker.addInfo("Condition Type: " + this.condition.getType());
-			}
-			else
-			{
-				this.condition = condition1;
-			}
-			
-			this.condition.checkTypes(markers, this);
-		}
 		if (this.action != null)
 		{
 			this.action.checkTypes(markers, this);
@@ -271,15 +291,7 @@ public class ForStatement implements IStatement, IContext, ILoop
 		
 		if (this.variable != null)
 		{
-			this.variable.check(markers, context);
-		}
-		if (this.update != null)
-		{
-			this.update.check(markers, this);
-		}
-		if (this.condition != null)
-		{
-			this.condition.check(markers, this);
+			this.variable.value.check(markers, context);
 		}
 		if (this.action != null)
 		{
@@ -292,22 +304,9 @@ public class ForStatement implements IStatement, IContext, ILoop
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.variable != null)
-		{
-			this.variable.foldConstants();
-		}
-		if (this.condition != null)
-		{
-			this.condition = this.condition.foldConstants();
-		}
-		if (this.update != null)
-		{
-			this.update = this.update.foldConstants();
-		}
+		this.variable.foldConstants();
 		if (this.action != null)
-		{
 			this.action = this.action.foldConstants();
-		}
 		return this;
 	}
 	
@@ -321,66 +320,16 @@ public class ForStatement implements IStatement, IContext, ILoop
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label updateLabel = this.updateLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
-		
-		Variable var = this.variable;
-		
-		int locals = writer.localCount();
-		// Variable
-		if (var != null)
-		{
-			var.writeInit(writer, var.value);
-		}
-		writer.writeTargetLabel(startLabel);
-		// Condition
-		if (this.condition != null)
-		{
-			this.condition.writeInvJump(writer, endLabel);
-		}
-		// Then
-		if (this.action != null)
-		{
-			this.action.writeStatement(writer);
-		}
-		// Update
-		writer.writeLabel(updateLabel);
-		if (this.update != null)
-		{
-			this.update.writeStatement(writer);
-		}
-		// Go back to Condition
-		writer.writeJumpInsn(Opcodes.GOTO, startLabel);
-		writer.resetLocals(locals);
-		writer.writeLabel(endLabel);
-		// Variable
-		if (var != null)
-		{
-			var.writeLocal(writer, startLabel, endLabel);
-		}
+		throw new BytecodeException("Cannot compile invalid ForEach statement");
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Statements.forStart);
-		if (this.variable != null)
-		{
-			this.variable.toString(prefix, buffer);
-		}
-		buffer.append(';');
-		if (this.condition != null)
-		{
-			buffer.append(' ');
-			this.condition.toString(prefix, buffer);
-		}
-		buffer.append(';');
-		if (this.update != null)
-		{
-			buffer.append(' ');
-			this.update.toString(prefix, buffer);
-		}
+		this.variable.type.toString(prefix, buffer);
+		buffer.append(' ').append(this.variable.name).append(Formatting.Statements.forEachSeperator);
+		this.variable.value.toString(prefix, buffer);
 		buffer.append(Formatting.Statements.forEnd);
 		
 		if (this.action != null)

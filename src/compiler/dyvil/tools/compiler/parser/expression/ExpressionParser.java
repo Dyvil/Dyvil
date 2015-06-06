@@ -880,9 +880,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		case Keywords.FOR:
 		{
-			ForStatement statement = new ForStatement(token);
-			this.value = statement;
-			pm.pushParser(new ForStatementParser(statement));
+			pm.pushParser(new ForStatementParser(this.field));
 			this.mode = 0;
 			return true;
 		}
@@ -1007,6 +1005,10 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		if (this.mode == PATTERN_END)
 		{
 			((CaseStatement) this.value).setCondition(value);
+		}
+		else
+		{
+			this.value = value;
 		}
 	}
 	

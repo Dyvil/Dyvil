@@ -528,20 +528,21 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		{
 			buffer.append('\n').append(prefix).append('{').append('\n');
 			String prefix1 = prefix + Formatting.Method.indent;
-			IValue prev = null;
+			ICodePosition prevPos = null;
 			
 			for (int i = 0; i < this.valueCount; i++)
 			{
 				IValue value = this.values[i];
 				buffer.append(prefix1);
 				
-				if (prev != null)
+				if (prevPos != null)
 				{
 					ICodePosition pos = value.getPosition();
-					if (pos != null && pos.startLine() - prev.getPosition().endLine() > 1)
+					if (pos != null && pos.startLine() - prevPos.endLine() > 1)
 					{
 						buffer.append('\n').append(prefix1);
 					}
+					prevPos = pos;
 				}
 				
 				if (this.labels != null)
@@ -555,7 +556,6 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 				
 				value.toString(prefix1, buffer);
 				buffer.append(";\n");
-				prev = value;
 			}
 			buffer.append(prefix).append('}');
 		}

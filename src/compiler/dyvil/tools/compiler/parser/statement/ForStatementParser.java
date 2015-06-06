@@ -2,7 +2,9 @@ package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
+import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.ForStatement;
+import dyvil.tools.compiler.ast.statement.foreach.ForEachStatement;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -24,11 +26,17 @@ public class ForStatementParser extends Parser implements IValued
 	public static final int	STATEMENT		= 128;
 	public static final int	STATEMENT_END	= 256;
 	
-	public ForStatement		forStatement;
+	public IValued			field;
 	
-	public ForStatementParser(ForStatement forStatement)
+	private Variable		variable;
+	private IValue			update;
+	private IValue			condition;
+	private IValue			action;
+	private boolean			forEach;
+	
+	public ForStatementParser(IValued field)
 	{
-		this.forStatement = forStatement;
+		this.field = field;
 		this.mode = FOR;
 	}
 	
@@ -36,6 +44,15 @@ public class ForStatementParser extends Parser implements IValued
 	public void reset()
 	{
 		this.mode = FOR;
+	}
+	
+	private IValue makeForStatement()
+	{
+		if (this.forEach)
+		{ 
+			return new ForEachStatement(this.variable, this.action);
+		}
+		return new ForStatement(this.variable, this.condition, this.update, this.action);
 	}
 	
 	@Override
@@ -61,7 +78,8 @@ public class ForStatementParser extends Parser implements IValued
 				return;
 			}
 			
-			pm.pushParser(new TypeParser(this.forStatement), true);
+			this.variable = new Variable();
+			pm.pushParser(new TypeParser(this.variable), true);
 			this.mode = VARIABLE;
 			return;
 		}
@@ -70,7 +88,8 @@ public class ForStatementParser extends Parser implements IValued
 			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.forStatement.variable.setName(token.nameValue());
+				this.variable.name = token.nameValue();
+				this.variable.position = token.raw();
 				return;
 			}
 			
@@ -81,14 +100,15 @@ public class ForStatementParser extends Parser implements IValued
 			if (type == Symbols.COLON)
 			{
 				this.mode = FOR_END;
-				this.forStatement.type = -1;
-				pm.pushParser(new ExpressionParser(this));
+				this.forEach = true;
+				pm.pushParser(new ExpressionParser(this.variable));
 				return;
 			}
+			
 			this.mode = VARIABLE_END;
 			if (type == Symbols.EQUALS)
 			{
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this.variable));
 				return;
 			}
 			throw new SyntaxError(token, "Invalid For Statement - ';' or ':' expected", true);
@@ -137,6 +157,7 @@ public class ForStatementParser extends Parser implements IValued
 			if (ParserUtil.isTerminator(type) && !token.isInferred())
 			{
 				pm.popParser(true);
+				this.field.setValue(this.makeForStatement());
 				return;
 			}
 			
@@ -147,6 +168,7 @@ public class ForStatementParser extends Parser implements IValued
 		if (this.mode == STATEMENT_END)
 		{
 			pm.popParser(true);
+			this.field.setValue(this.makeForStatement());
 			return;
 		}
 	}
@@ -156,26 +178,26 @@ public class ForStatementParser extends Parser implements IValued
 	{
 		if (this.mode == VARIABLE_END)
 		{
-			this.forStatement.variable.value = value;
+			this.variable.value = value;
 		}
 		else if (this.mode == CONDITION_END)
 		{
-			this.forStatement.condition = value;
+			this.condition = value;
 		}
 		else if (this.mode == FOR_END)
 		{
-			if (this.forStatement.type != 0)
+			if (this.forEach)
 			{
-				this.forStatement.variable.value = value;
+				this.variable.value = value;
 			}
 			else
 			{
-				this.forStatement.update = value;
+				this.update = value;
 			}
 		}
 		else if (this.mode == STATEMENT_END)
 		{
-			this.forStatement.then = value;
+			this.action = value;
 		}
 	}
 	
