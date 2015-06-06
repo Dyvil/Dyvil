@@ -5,7 +5,6 @@ import java.util.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
@@ -123,15 +122,15 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public IValue box(IValue value)
+	public IMethod getBoxMethod()
 	{
-		return new BoxedValue(value, this.boxMethod);
+		return this.boxMethod;
 	}
 	
 	@Override
-	public IValue unbox(IValue value)
+	public IMethod getUnboxMethod()
 	{
-		return new BoxedValue(value, this.unboxMethod);
+		return this.unboxMethod;
 	}
 	
 	@Override

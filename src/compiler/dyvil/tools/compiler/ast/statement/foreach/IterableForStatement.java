@@ -6,6 +6,8 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -18,13 +20,14 @@ public class IterableForStatement extends ForEachStatement
 	public static final Name			$iterator		= Name.getQualified("$iterator");
 	
 	protected Variable					iteratorVar;
+	protected IMethod					boxMethod;
 	
 	public IterableForStatement(Variable variable, IValue action)
 	{
-		this(variable, action, variable.value.getType());
+		this(variable, action, variable.value.getType(), variable.value.getType().resolveType(ITERABLE_TYPE));
 	}
 	
-	public IterableForStatement(Variable variable, IValue action, IType valueType)
+	public IterableForStatement(Variable variable, IValue action, IType valueType, IType elementType)
 	{
 		super(variable, action);
 		
@@ -32,6 +35,20 @@ public class IterableForStatement extends ForEachStatement
 		var.type = valueType;
 		var.name = $iterator;
 		this.iteratorVar = var;
+		
+		IType varType = variable.type;
+		boolean primitive = varType.isPrimitive();
+		if (primitive != elementType.isPrimitive())
+		{
+			if (primitive)
+			{
+				this.boxMethod = varType.getUnboxMethod();
+			}
+			else
+			{
+				this.boxMethod = elementType.getBoxMethod();
+			}
+		}
 	}
 	
 	@Override
@@ -82,12 +99,18 @@ public class IterableForStatement extends ForEachStatement
 		writer.writeVarInsn(Opcodes.ALOAD, iteratorVar.index);
 		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
 		// Cast to the variable type
-		if (!var.type.equals(Types.OBJECT))
+		// Auto(un)boxing
+		if (this.boxMethod != null)
+		{
+			writer.writeTypeInsn(Opcodes.CHECKCAST, this.boxMethod.getTheClass().getInternalName());
+			this.boxMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null);
+		}
+		else if (!var.type.equals(Types.OBJECT))
 		{
 			writer.writeTypeInsn(Opcodes.CHECKCAST, var.type.getInternalName());
 		}
 		// Store the next element
-		writer.writeVarInsn(Opcodes.ASTORE, var.index);
+		writer.writeVarInsn(var.type.getStoreOpcode(), var.index);
 		
 		// Action
 		if (this.action != null)

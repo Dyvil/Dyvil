@@ -118,8 +118,12 @@ public interface IValue extends IASTNode, ITyped
 	
 	public default IValue withType(IType type)
 	{
-		IType type1 = this.getType();
-		if (type1 == null)
+		IType thisType = this.getType();
+		if (thisType == null)
+		{
+			return null;
+		}
+		if (!type.isSuperTypeOf(thisType))
 		{
 			return null;
 		}
@@ -127,23 +131,15 @@ public interface IValue extends IASTNode, ITyped
 		boolean primitive = this.isPrimitive();
 		if (primitive != type.isPrimitive())
 		{
-			if (!type.isSuperTypeOf(type1))
-			{
-				return null;
-			}
-			// Primitive -> Object
+			// Box Primitive -> Object
 			if (primitive)
 			{
-				return type1.box(this);
+				return new BoxedValue(this, thisType.getBoxMethod());
 			}
-			// Object -> Primitive
-			return type.unbox(this);
+			// Unbox Object -> Primitive
+			return new BoxedValue(this, type.getUnboxMethod());
 		}
-		if (type.isSuperTypeOf(type1))
-		{
-			return this;
-		}
-		return null;
+		return this;
 	}
 	
 	@Override

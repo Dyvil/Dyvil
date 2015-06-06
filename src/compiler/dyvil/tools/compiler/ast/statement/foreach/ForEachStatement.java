@@ -254,7 +254,7 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new ArrayForStatement(this.variable, this.action.resolve(markers, this), valueType);
+			return new ArrayForStatement(this.variable, this.action == null ? null : this.action.resolve(markers, this), valueType);
 		}
 		if (Types.ITERABLE.isSuperTypeOf(valueType))
 		{
@@ -274,7 +274,7 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 				m.addInfo("Variable Type: " + varType);
 			}
 			
-			return new IterableForStatement(this.variable, this.action.resolve(markers, this), valueType);
+			return new IterableForStatement(this.variable, this.action == null ? null : this.action.resolve(markers, this), valueType, iterableType);
 		}
 		if (Types.STRING.isSuperTypeOf(valueType))
 		{
@@ -288,7 +288,7 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new StringForStatement(this.variable, this.action.resolve(markers, this));
+			return new StringForStatement(this.variable, this.action == null ? null : this.action.resolve(markers, this));
 		}
 		
 		Marker m = markers.create(this.variable.position, "for.invalid");

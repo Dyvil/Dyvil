@@ -1166,7 +1166,7 @@ public class Method extends Member implements IMethod
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
-		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
+		else if (this.intrinsicOpcodes != null && (instance != null && instance.isPrimitive()))
 		{
 			this.writeIntrinsic(writer, instance, arguments);
 			return;

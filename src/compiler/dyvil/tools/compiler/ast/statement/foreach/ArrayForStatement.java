@@ -5,6 +5,8 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -19,6 +21,8 @@ public class ArrayForStatement extends ForEachStatement
 	protected Variable			indexVar;
 	protected Variable			lengthVar;
 	protected Variable			arrayVar;
+	
+	protected IMethod			boxMethod;
 	
 	public ArrayForStatement(Variable var, IValue action)
 	{
@@ -40,9 +44,24 @@ public class ArrayForStatement extends ForEachStatement
 		this.lengthVar = temp;
 		
 		temp = new Variable();
-		temp.type = var.value.getType();
+		temp.type = arrayType;
 		temp.name = $array;
 		this.arrayVar = temp;
+		
+		IType elementType = arrayType.getElementType();
+		IType varType = var.type;
+		boolean primitive = varType.isPrimitive();
+		if (primitive != elementType.isPrimitive())
+		{
+			if (primitive)
+			{
+				this.boxMethod = varType.getUnboxMethod();
+			}
+			else
+			{
+				this.boxMethod = elementType.getBoxMethod();
+			}
+		}
 	}
 	
 	@Override
@@ -106,7 +125,13 @@ public class ArrayForStatement extends ForEachStatement
 		// Load the element
 		arrayVar.writeGet(writer, null);
 		indexVar.writeGet(writer, null);
-		writer.writeInsn(var.type.getArrayLoadOpcode());
+		writer.writeInsn(arrayVar.type.getElementType().getArrayLoadOpcode());
+		// Auto(un)boxing
+		if (this.boxMethod != null)
+		{
+			this.boxMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null);
+		}
+		// Store variable
 		var.writeInit(writer, null);
 		
 		// Action

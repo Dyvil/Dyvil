@@ -58,12 +58,12 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return this;
 	}
 	
-	public default IValue box(IValue value)
+	public default IMethod getBoxMethod()
 	{
 		return null;
 	}
 	
-	public default IValue unbox(IValue value)
+	public default IMethod getUnboxMethod()
 	{
 		return null;
 	}
