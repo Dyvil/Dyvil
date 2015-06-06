@@ -130,7 +130,12 @@ public class ArrayType implements IType, ITyped
 		{
 			return this.type.getTheClass() == Types.OBJECT_CLASS;
 		}
-		return this.type.isSuperTypeOf(type.getElementType());
+		IType elementType = type.getElementType();
+		if (elementType.isPrimitive() != this.type.isPrimitive())
+		{
+			return false;
+		}
+		return this.type.isSuperTypeOf(elementType);
 	}
 	
 	@Override
@@ -281,9 +286,7 @@ public class ArrayType implements IType, ITyped
 	@Override
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder();
-		this.toString("", builder);
-		return builder.toString();
+		return "[" + this.type.toString() + "]";
 	}
 	
 	@Override
