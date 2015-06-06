@@ -176,7 +176,7 @@ public class ConstructorCall extends ASTNode implements ICall
 	{
 		if (this.constructor != null)
 		{
-			this.constructor.checkArguments(markers, this.arguments);
+			this.constructor.checkArguments(markers, this.position, context, this.arguments);
 		}
 		this.arguments.checkTypes(markers, context);
 	}

@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ExternalConstructor extends Constructor
 {
@@ -152,7 +153,7 @@ public class ExternalConstructor extends Constructor
 	}
 	
 	@Override
-	public void checkArguments(MarkerList markers, IArguments arguments)
+	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
 	{
 		if (!this.returnTypeResolved)
 		{
@@ -162,6 +163,6 @@ public class ExternalConstructor extends Constructor
 		{
 			this.resolveParameters();
 		}
-		super.checkArguments(markers, arguments);
+		super.checkArguments(markers, position, context, arguments);
 	}
 }

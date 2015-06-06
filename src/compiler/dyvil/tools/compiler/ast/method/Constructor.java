@@ -529,7 +529,7 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void checkArguments(MarkerList markers, IArguments arguments)
+	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
 	{
 		int len = arguments.size();
 		if ((this.modifiers & Modifiers.VARARGS) != 0)

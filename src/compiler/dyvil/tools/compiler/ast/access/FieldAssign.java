@@ -170,7 +170,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 		
 		if (this.field != null)
 		{
-			this.instance = this.field.checkAccess(markers, this.position, this.instance);
+			this.instance = this.field.checkAccess(markers, this.position, this.instance, context);
 			this.value = this.field.checkAssign(markers, this.position, this.instance, this.value);
 		}
 		

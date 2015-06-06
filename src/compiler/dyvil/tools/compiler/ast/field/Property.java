@@ -105,7 +105,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		if (instance != null)
 		{

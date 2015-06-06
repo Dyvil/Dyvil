@@ -180,9 +180,9 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
-		return this.variable.checkAccess(markers, position, instance);
+		return this.variable.checkAccess(markers, position, instance, context);
 	}
 	
 	@Override

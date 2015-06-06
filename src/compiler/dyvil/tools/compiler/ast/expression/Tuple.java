@@ -268,7 +268,7 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 		else
 		{
 			this.method = m;
-			m.checkArguments(markers, null, this.arguments, null);
+			m.checkArguments(markers, this.position, context, null, this.arguments, null);
 		}
 	}
 	

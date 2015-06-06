@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -425,7 +426,7 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
-			this.value.checkTypes(markers, context);
+			this.value.checkTypes(markers, this);
 		}
 		else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
 		{
@@ -646,6 +647,16 @@ public class Method extends Member implements IMethod
 			return 1;
 		}
 		
+		if (instance == null && this.modifiers == Modifiers.PREFIX)
+		{
+			int m = arguments.getFirstValue().getTypeMatch(this.theClass.getType());
+			if (m == 0)
+			{
+				return 0;
+			}
+			return 1 + m;
+		}
+		
 		int parIndex = 0;
 		int match = 1;
 		int len = arguments.size();
@@ -753,7 +764,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
 		int len = arguments.size();
 		IType parType;
@@ -803,6 +814,34 @@ public class Method extends Member implements IMethod
 				marker.addInfo("Value Type: " + instance.getType());
 			}
 			return null;
+		}
+		
+		if (instance != null)
+		{
+			if ((this.modifiers & Modifiers.STATIC) != 0)
+			{
+				if (instance.valueTag() != IValue.CLASS_ACCESS)
+				{
+					markers.add(position, "method.access.static", this.name.unqualified);
+					instance = null;
+				}
+			}
+			else if (instance.valueTag() == IValue.CLASS_ACCESS)
+			{
+				markers.add(position, "method.access.instance", this.name.unqualified);
+			}
+		}
+		else if ((this.modifiers & Modifiers.STATIC) == 0)
+		{
+			if (context.isStatic())
+			{
+				markers.add(position, "method.access.instance", this.name);
+			}
+			else
+			{
+				markers.add(position, "method.access.unqualified", this.name.unqualified);
+				instance = new ThisValue(position, context.getThisClass().getType());
+			}
 		}
 		
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
@@ -886,7 +925,8 @@ public class Method extends Member implements IMethod
 		
 		if ((this.modifiers & Modifiers.PREFIX) != 0)
 		{
-			this.checkMutating(markers, arguments.getFirstValue());
+			IValue value = arguments.getFirstValue();
+			this.checkMutating(markers, value != null ? value : instance);
 		}
 		else if (instance != null)
 		{

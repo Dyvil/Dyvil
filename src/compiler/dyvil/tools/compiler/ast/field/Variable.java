@@ -93,7 +93,7 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		return instance;
 	}

@@ -21,7 +21,7 @@ public interface IConstructor extends IASTNode, IMember, IBaseMethod, ITypeList,
 {
 	public int getSignatureMatch(IArguments arguments);
 	
-	public void checkArguments(MarkerList markers, IArguments arguments);
+	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
 	
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
 	

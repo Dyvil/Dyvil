@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -11,7 +12,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ThisValue extends ASTNode implements IValue
 {
-	public IType	type;
+	public IType	type	= Types.UNKNOWN;
 	
 	public ThisValue(IType type)
 	{

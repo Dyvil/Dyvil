@@ -94,7 +94,7 @@ public final class LiteralExpression implements IValue
 		{
 			this.method = match;
 			GenericData data = match.getGenericData(null, null, this.arguments);
-			match.checkArguments(markers, null, this.arguments, data);
+			match.checkArguments(markers, null, context, null, this.arguments, data);
 			this.type = match.getType().getConcreteType(data);
 		}
 		

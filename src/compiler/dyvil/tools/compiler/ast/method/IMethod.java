@@ -23,7 +23,7 @@ public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignatur
 {
 	public int getSignatureMatch(Name name, IValue instance, IArguments arguments);
 	
-	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext);
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	

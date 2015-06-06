@@ -27,7 +27,7 @@ import dyvil.tools.compiler.util.ModifierTypes;
 public class Field extends Member implements IField
 {
 	protected IClass	theClass;
-	private IValue		value;
+	protected IValue	value;
 	
 	public Field(IClass iclass)
 	{
@@ -113,7 +113,7 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		if (instance != null)
 		{
@@ -132,8 +132,15 @@ public class Field extends Member implements IField
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			markers.add(position, "field.access.unqualified", this.name.unqualified);
-			return new ThisValue(position, this.theClass.getType());
+			if (context.isStatic())
+			{
+				markers.add(position, "field.access.instance", this.name);
+			}
+			else
+			{
+				markers.add(position, "field.access.unqualified", this.name.unqualified);
+				return new ThisValue(position, this.theClass.getType());
+			}
 		}
 		
 		return instance;

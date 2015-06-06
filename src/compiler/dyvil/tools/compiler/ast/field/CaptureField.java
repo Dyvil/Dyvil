@@ -189,7 +189,7 @@ public final class CaptureField implements IVariable
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		if (instance == null)
 		{

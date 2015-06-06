@@ -16,7 +16,7 @@ public interface IStatement extends IValue
 	@Override
 	public default IType getType()
 	{
-		return Types.UNKNOWN;
+		return Types.VOID;
 	}
 	
 	@Override

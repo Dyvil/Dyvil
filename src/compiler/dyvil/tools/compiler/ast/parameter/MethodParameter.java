@@ -119,7 +119,7 @@ public final class MethodParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		return instance;
 	}

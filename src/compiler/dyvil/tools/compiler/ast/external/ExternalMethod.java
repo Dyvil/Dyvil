@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ExternalMethod extends Method
 {
@@ -168,7 +169,7 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public IValue checkArguments(MarkerList markers, IValue instance, IArguments arguments, ITypeContext typeContext)
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
 		if (!this.annotationsResolved)
 		{
@@ -178,7 +179,7 @@ public final class ExternalMethod extends Method
 		{
 			this.resolveParameters();
 		}
-		return super.checkArguments(markers, instance, arguments, typeContext);
+		return super.checkArguments(markers, position, context, instance, arguments, typeContext);
 	}
 	
 	@Override

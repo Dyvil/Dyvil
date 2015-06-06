@@ -9,11 +9,13 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IdentifierToken;
 
 public interface ICompilerPhase extends Comparable<ICompilerPhase>
@@ -50,7 +52,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 * Resolves other things such as lambda expressions or annotations and
 	 * checks types. This will be called after {@link IValue#withType(IType)}
 	 * has been called. Mainly used by
-	 * {@link IMethod#checkArguments(MarkerList, IValue, IArguments, ITypeContext)}
+	 * {@link IMethod#checkArguments(MarkerList, ICodePosition, IContext, IValue, IArguments, ITypeContext)}
 	 * .
 	 */
 	ICompilerPhase	CHECK_TYPES		= new ParallelCompilerPhase(45, "CHECK_TYPES", ICompilationUnit::checkTypes);
