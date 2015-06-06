@@ -122,7 +122,7 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	@Override
 	public IField resolveField(Name name)
 	{
-		if (this.variable != null && this.variable.name == name)
+		if (this.variable.name == name)
 		{
 			return this.variable;
 		}
@@ -209,7 +209,7 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 				this.variable.type = varType = valueType.getElementType();
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.name.unqualified);
+					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.name);
 				}
 			}
 			else if (!varType.classEquals(valueType.getElementType()))
@@ -229,7 +229,7 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 				this.variable.type = varType = iterableType;
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.name.unqualified);
+					markers.add(this.variable.position, "for.variable.infer", this.variable.name);
 				}
 			}
 			else if (!varType.isSuperTypeOf(iterableType))

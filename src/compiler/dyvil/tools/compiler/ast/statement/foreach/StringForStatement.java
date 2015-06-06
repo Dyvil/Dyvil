@@ -83,13 +83,14 @@ public class StringForStatement extends ForEachStatement
 		stringVar.writeInit(writer, null);
 		// Get the length
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
+		writer.writeInsn(Opcodes.DUP);
 		lengthVar.writeInit(writer, null);
 		// Set index to 0
 		writer.writeLDC(0);
 		indexVar.writeInit(writer, null);
 		
-		// Jump to boundary check
-		writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
+		// Initial Boundary Check - if the length is 0, skip the loop.
+		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
 		writer.writeTargetLabel(startLabel);
 		
 		// Get the char at the index
@@ -104,10 +105,10 @@ public class StringForStatement extends ForEachStatement
 			this.action.writeStatement(writer);
 		}
 		
+		writer.writeLabel(updateLabel);
 		// Increase index
 		writer.writeIINC(indexVar.index, 1);
 		// Boundary Check
-		writer.writeLabel(updateLabel);
 		indexVar.writeGet(writer, null);
 		lengthVar.writeGet(writer, null);
 		writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);

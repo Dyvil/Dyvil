@@ -416,6 +416,15 @@ public class Frame
 		}
 		case DUP2:
 		{
+			Object o = this.stack[this.stackCount - 1];
+			if (o == LONG || o == DOUBLE)
+			{
+				this.actualStackCount += 2;
+				this.ensureStack(this.stackCount + 1);
+				this.stack[this.stackCount++] = o;
+				return;
+			}
+			
 			this.actualStackCount += 2;
 			this.ensureStack(this.stackCount + 2);
 			this.stack[this.stackCount] = this.stack[this.stackCount - 2];

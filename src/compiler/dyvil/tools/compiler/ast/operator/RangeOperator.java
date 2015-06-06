@@ -21,9 +21,9 @@ public class RangeOperator implements IValue
 	public static final Type			ORDERED			= new Type(ORDERED_CLASS);
 	private static final ITypeVariable	ORDERED_TYPE	= ORDERED_CLASS.getTypeVariable(0);
 	
-	private IValue						value1;
-	private IValue						value2;
-	private IType						elementType;
+	public IValue						value1;
+	public IValue						value2;
+	private IType						elementType = Types.UNKNOWN;
 	private IType						type;
 	
 	public RangeOperator(IValue value1, IValue value2)
@@ -45,12 +45,17 @@ public class RangeOperator implements IValue
 		return RANGE_OPERATOR;
 	}
 	
+	public IType getElementType()
+	{
+		return this.elementType;
+	}
+	
 	@Override
 	public IType getType()
 	{
 		if (this.type == null)
 		{
-			if (this.elementType == null)
+			if (this.elementType == Types.UNKNOWN)
 			{
 				this.elementType = Types.findCommonSuperType(this.value1.getType(), this.value2.getType());
 			}

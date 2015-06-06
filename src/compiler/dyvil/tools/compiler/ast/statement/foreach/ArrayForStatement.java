@@ -93,13 +93,14 @@ public class ArrayForStatement extends ForEachStatement
 		arrayVar.writeInit(writer, null);
 		// Load the length
 		writer.writeInsn(Opcodes.ARRAYLENGTH);
+		writer.writeInsn(Opcodes.DUP);
 		lengthVar.writeInit(writer, null);
 		// Set index to 0
 		writer.writeLDC(0);
 		indexVar.writeInit(writer, null);
 		
-		// Jump to boundary check
-		writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
+		// Initial Boundary Check - if the length is 0, skip the loop
+		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
 		writer.writeTargetLabel(startLabel);
 		
 		// Load the element
@@ -114,10 +115,10 @@ public class ArrayForStatement extends ForEachStatement
 			this.action.writeStatement(writer);
 		}
 		
+		writer.writeLabel(updateLabel);
 		// Increase index
 		writer.writeIINC(indexVar.index, 1);
 		// Boundary Check
-		writer.writeLabel(updateLabel);
 		indexVar.writeGet(writer, null);
 		lengthVar.writeGet(writer, null);
 		writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
