@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.operator.RangeOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.ILoop;
 import dyvil.tools.compiler.ast.statement.IStatement;
@@ -200,6 +201,40 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 		IType varType = this.variable.type;
 		IValue value = this.variable.value;
 		this.variable.value = value = value.resolve(markers, context);
+		
+		if (value.valueTag() == IValue.RANGE_OPERATOR)
+		{
+			RangeOperator ro = (RangeOperator) value;
+			IValue value1 = ro.value1;
+			IValue value2 = ro.value2;
+			IType rangeType = ro.getElementType();
+			
+			if (varType == Types.UNKNOWN)
+			{
+				if (rangeType == Types.UNKNOWN)
+				{
+					rangeType = Types.findCommonSuperType(value1.getType(), value2.getType());
+				}
+				
+				this.variable.type = varType = rangeType;
+				if (varType == Types.UNKNOWN)
+				{
+					markers.add(this.variable.position, "for.variable.infer", this.variable.name);
+				}
+			}
+			else if (rangeType == Types.UNKNOWN)
+			{
+				rangeType = varType;
+			}
+			else if (!varType.isSuperTypeOf(rangeType))
+			{
+				Marker marker = markers.create(value1.getPosition(), "for.range.type");
+				marker.addInfo("Range Type: " + rangeType);
+				marker.addInfo("Variable Type: " + varType);
+			}
+			
+			return new RangeForStatement(this.variable, value1, value2, this.action == null ? null : this.action.resolve(markers, this));
+		}
 		
 		IType valueType = value.getType();
 		if (valueType.isArrayType())
