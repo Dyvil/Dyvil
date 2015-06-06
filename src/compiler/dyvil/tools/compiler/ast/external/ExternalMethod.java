@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.external;
 
 import org.objectweb.asm.Label;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IntValue;
@@ -92,7 +93,8 @@ public final class ExternalMethod extends Method
 			this.resolveGenerics();
 		}
 		this.parametersResolved = true;
-		int index = 0;
+		
+		int index = (this.modifiers & Modifiers.STATIC) == 0 ? 1 : 0;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];

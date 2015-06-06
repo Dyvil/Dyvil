@@ -62,6 +62,7 @@ public class Method extends Member implements IMethod
 	
 	public String				descriptor;
 	protected int[]				intrinsicOpcodes;
+	protected IMethod			overrideMethod;
 	
 	public Method(IClass iclass)
 	{
@@ -430,16 +431,16 @@ public class Method extends Member implements IMethod
 		{
 			this.modifiers |= Modifiers.ABSTRACT;
 		}
+		
+		if ((this.modifiers & Modifiers.STATIC) == 0)
+		{
+			this.checkOverride(markers, context);
+		}
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if ((this.modifiers & Modifiers.STATIC) == 0)
-		{
-			this.checkOverride(markers, context);
-		}
-		
 		super.check(markers, context);
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -491,7 +492,7 @@ public class Method extends Member implements IMethod
 	
 	private void checkOverride(MarkerList markers, IContext context)
 	{
-		IMethod overrideMethod = this.theClass.getSuperMethod(this.name, this.parameters, this.parameterCount);
+		overrideMethod = this.theClass.getSuperMethod(this.name, this.parameters, this.parameterCount);
 		if (overrideMethod == null)
 		{
 			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
@@ -1078,16 +1079,74 @@ public class Method extends Member implements IMethod
 			mw.end(this.type);
 		}
 		
-		if ((this.modifiers & Modifiers.STATIC) == 0)
-		{
-			mw.writeLocal(0, "this", this.theClass.getType(), start, end);
-		}
-		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
 			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getType(), start, end);
 		}
+		
+		if ((this.modifiers & Modifiers.STATIC) != 0)
+			return;
+		
+		mw.writeLocal(0, "this", this.theClass.getType(), start, end);
+		
+		if (this.overrideMethod == null)
+		{
+			return;
+		}
+		
+		// Check if a bridge method has to be generated
+		if (!generateBridge())
+		{
+			return;
+		}
+		
+		// Generate a bridge method
+		mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers | Modifiers.SYNTHETIC | Modifiers.BRIDGE, this.name.qualified,
+				this.overrideMethod.getDescriptor(), this.overrideMethod.getSignature(), this.overrideMethod.getExceptions()));
+		
+		start = new Label();
+		end = new Label();
+		
+		mw.begin();
+		mw.setThisType(this.theClass.getInternalName());
+		mw.writeVarInsn(Opcodes.ALOAD, 0);
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IParameter param = this.overrideMethod.getParameter(i);
+			IType type1 = this.parameters[i].getType();
+			IType type2 = param.getType();
+			
+			param.write(mw);
+			mw.writeVarInsn(type1.getLoadOpcode(), param.getIndex());
+			if (!type1.equals(type2))
+			{
+				mw.writeTypeInsn(Opcodes.CHECKCAST, type1.getInternalName());
+			}
+		}
+		
+		mw.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), false);
+		mw.writeInsn(this.type.getReturnOpcode());
+		mw.end();
+	}
+	
+	private boolean generateBridge()
+	{
+		if (!this.type.equals(this.overrideMethod.getType()))
+		{
+			return true;
+		}
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IType type1 = this.parameters[i].getType();
+			IType type2 = this.overrideMethod.getParameter(i).getType();
+			if (!type1.equals(type2))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
