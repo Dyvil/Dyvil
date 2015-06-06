@@ -25,16 +25,21 @@ import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.CodePosition;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class REPLContext implements IValued, IDyvilHeader
 {
-	private int					resultIndex;
+	private static final CodePosition	CODE_POSITION	= new CodePosition(1, 0, 1);
 	
-	private Map<Name, Variable>	variables	= new HashMap();
+	protected static int				resultIndex;
 	
-	private IValue				value;
+	private Map<Name, REPLVariable>		variables		= new HashMap();
+	
+	private IValue						value;
 	
 	public void processValue()
 	{
@@ -45,35 +50,39 @@ public class REPLContext implements IValued, IDyvilHeader
 		
 		MarkerList markers = new MarkerList();
 		Name name;
-		Variable var;
+		IValue value;
+		IType type;
+		ICodePosition position;
 		
 		if (this.value.valueTag() == IValue.VARIABLE)
 		{
-			var = ((FieldInitializer) this.value).variable;
+			Variable var = ((FieldInitializer) this.value).variable;
 			name = var.name;
-			this.value = var.value;
+			value = var.value;
+			type = var.type;
+			position = var.position;
 			
-			if (var.value == null)
+			if (value == null)
 			{
 				return;
 			}
-			
-			var.resolveTypes(markers, this);
-			var.resolve(markers, this);
-			var.check(markers, this);
-			var.foldConstants();
 		}
 		else
 		{
-			name = Name.getQualified("res" + this.resultIndex++);
-			var = new Variable(null, name, null);
-			this.value.resolveTypes(markers, this);
-			this.value = this.value.resolve(markers, this);
-			this.value.check(markers, this);
-			this.value = this.value.foldConstants();
-			var.setValue(this.value);
-			var.setType(this.value.getType());
+			name = Name.getQualified("res" + resultIndex);
+			value = this.value;
+			type = Types.UNKNOWN;
+			position = CODE_POSITION;
 		}
+		
+		this.value = null;
+		
+		REPLVariable field = new REPLVariable(position, name, type, value);
+		field.resolveTypes(markers, this);
+		field.resolve(markers, this);
+		field.checkTypes(markers, this);
+		field.check(markers, this);
+		field.foldConstants();
 		
 		if (!markers.isEmpty())
 		{
@@ -93,8 +102,13 @@ public class REPLContext implements IValued, IDyvilHeader
 			}
 		}
 		
-		this.variables.put(name, var);
-		System.out.println(var.toString());
+		field.compute();
+		if (field.getType() != Types.VOID)
+		{
+			this.variables.put(name, field);
+			System.out.println(field.toString());
+			resultIndex++;
+		}
 	}
 	
 	@Override

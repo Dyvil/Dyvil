@@ -12,11 +12,12 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 
 public class DyvilREPL
 {
-	public static final String	VERSION	= "1.0.0";
+	public static final String		VERSION	= "1.0.0";
 	
-	private static REPLContext	context	= new REPLContext();
-	private static REPLParser	parser	= new REPLParser();
-	protected static String		currentCode;
+	private static BufferedReader	reader;
+	private static REPLContext		context	= new REPLContext();
+	private static REPLParser		parser	= new REPLParser();
+	protected static String			currentCode;
 	
 	public static void main(String[] args) throws Exception
 	{
@@ -27,33 +28,32 @@ public class DyvilREPL
 		Package.init();
 		Types.init();
 		
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		String line = null;
+		reader = new BufferedReader(new InputStreamReader(System.in));
 		
 		do
 		{
-			System.out.print("> ");
-			try
-			{
-				line = reader.readLine();
-				process(line);
-			}
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
+			loop();
 		}
-		while (line != null);
+		while (currentCode != null);
 	}
 	
-	public static void process(String text)
+	public static synchronized void loop()
 	{
-		currentCode = text;
-		TokenIterator tokens = Dlex.tokenIterator(text);
-		if (parser.parse(tokens, new ExpressionParser(context)))
+		System.out.print("> ");
+		
+		try
 		{
-			context.processValue();
-			return;
+			currentCode = reader.readLine();
+			TokenIterator tokens = Dlex.tokenIterator(currentCode + ";");
+			if (parser.parse(tokens, new ExpressionParser(context)))
+			{
+				context.processValue();
+				return;
+			}
+		}
+		catch (Throwable t)
+		{
+			t.printStackTrace();
 		}
 	}
 }

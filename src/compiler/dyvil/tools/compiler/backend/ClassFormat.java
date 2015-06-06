@@ -33,6 +33,8 @@ public final class ClassFormat
 	public static final int		T_INT				= 10;
 	public static final int		T_LONG				= 11;
 	
+	public static final int		ACC_SUPER			= Opcodes.ACC_SUPER;
+	
 	public static final Integer	UNINITIALIZED_THIS	= Opcodes.UNINITIALIZED_THIS;
 	public static final Integer	NULL				= Opcodes.NULL;
 	public static final Integer	TOP					= Opcodes.TOP;
