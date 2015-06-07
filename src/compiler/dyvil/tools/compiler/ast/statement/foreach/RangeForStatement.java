@@ -16,11 +16,11 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class RangeForStatement extends ForEachStatement
 {
-	public IValue	value1;
-	public IValue	value2;
+	public IValue		value1;
+	public IValue		value2;
 	
-	private Variable startVar;
-	private  Variable endVar;
+	private Variable	startVar;
+	private Variable	endVar;
 	
 	public RangeForStatement(Variable var, IValue value1, IValue value2, IValue action)
 	{
@@ -44,28 +44,28 @@ public class RangeForStatement extends ForEachStatement
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		IType rangeType = this.variable.type;
-		IValue v = value1.withType(rangeType);
+		IValue v = this.value1.withType(rangeType);
 		if (v == null)
 		{
-			Marker marker = markers.create(value1.getPosition(), "for.range.type");
-			marker.addInfo("Value Type: " + value1.getType());
+			Marker marker = markers.create(this.value1.getPosition(), "for.range.type");
+			marker.addInfo("Value Type: " + this.value1.getType());
 			marker.addInfo("Variable Type: " + rangeType);
 		}
 		else
 		{
-			value1 = v;
+			this.value1 = v;
 		}
 		
-		v = value2.withType(rangeType);
+		v = this.value2.withType(rangeType);
 		if (v == null)
 		{
-			Marker marker = markers.create(value2.getPosition(), "for.range.type");
-			marker.addInfo("Value Type: " + value2.getType());
+			Marker marker = markers.create(this.value2.getPosition(), "for.range.type");
+			marker.addInfo("Value Type: " + this.value2.getType());
 			marker.addInfo("Variable Type: " + rangeType);
 		}
 		else
 		{
-			value2 = v;
+			this.value2 = v;
 		}
 		
 		if (this.action != null)
@@ -141,7 +141,8 @@ public class RangeForStatement extends ForEachStatement
 		// Increment / Next and Boundary Check
 		
 		writer.writeLabel(updateLabel);
-		switch (type) {
+		switch (type)
+		{
 		case 0: // Integers
 			writer.writeIINC(var.index, 1);
 			writer.writeVarInsn(Opcodes.ILOAD, var.index);

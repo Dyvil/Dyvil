@@ -11,11 +11,11 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public class StringForStatement extends ForEachStatement
 {
-	public static final Name			$string			= Name.getQualified("$string");
+	public static final Name	$string	= Name.getQualified("$string");
 	
-	protected Variable	indexVar;
-	protected Variable	lengthVar;
-	protected Variable	stringVar;
+	protected Variable			indexVar;
+	protected Variable			lengthVar;
+	protected Variable			stringVar;
 	
 	public StringForStatement(Variable var, IValue action)
 	{

@@ -28,26 +28,26 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ExpressionParser extends Parser implements ITyped, IValued
 {
-	public static final int		VALUE				= 0x1;
-	public static final int		LIST_END			= 0x2;
-	private static final int	ARRAY_END			= 0x4;
-	public static final int		TUPLE_END			= 0x8;
+	public static final int		VALUE			= 0x1;
+	public static final int		LIST_END		= 0x2;
+	private static final int	ARRAY_END		= 0x4;
+	public static final int		TUPLE_END		= 0x8;
 	
-	public static final int		ACCESS				= 0x10;
-	public static final int		ACCESS_2			= 0x20;
+	public static final int		ACCESS			= 0x10;
+	public static final int		ACCESS_2		= 0x20;
 	
-	public static final int		LAMBDA				= 0x40;
-	public static final int		STATEMENT			= 0x80;
-	public static final int		TYPE				= 0x100;
-	public static final int		CONSTRUCTOR			= 0x200;
-	public static final int		CONSTRUCTOR_END		= 0x400;
-	public static final int		PARAMETERS			= 0x800;
-	public static final int		PARAMETERS_END		= 0x1000;
+	public static final int		LAMBDA			= 0x40;
+	public static final int		STATEMENT		= 0x80;
+	public static final int		TYPE			= 0x100;
+	public static final int		CONSTRUCTOR		= 0x200;
+	public static final int		CONSTRUCTOR_END	= 0x400;
+	public static final int		PARAMETERS		= 0x800;
+	public static final int		PARAMETERS_END	= 0x1000;
 	
-	public static final int		BYTECODE_END		= 0x10000;
+	public static final int		BYTECODE_END	= 0x10000;
 	
-	public static final int		PATTERN_IF			= 0x20000;
-	public static final int		PATTERN_END			= 0x40000;
+	public static final int		PATTERN_IF		= 0x20000;
+	public static final int		PATTERN_END		= 0x40000;
 	
 	protected IValued			field;
 	

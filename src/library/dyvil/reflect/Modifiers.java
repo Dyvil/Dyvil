@@ -101,7 +101,7 @@ public interface Modifiers
 	 * Modifier used to declare that a class is an {@code interface}.
 	 */
 	public static final int	INTERFACE_CLASS			= 0x00000200 | ABSTRACT;
-
+	
 	/**
 	 * {@code stricfp} modifier.
 	 */

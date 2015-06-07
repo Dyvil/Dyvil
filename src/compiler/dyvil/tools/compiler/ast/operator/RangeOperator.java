@@ -23,7 +23,7 @@ public class RangeOperator implements IValue
 	
 	public IValue						value1;
 	public IValue						value2;
-	private IType						elementType = Types.UNKNOWN;
+	private IType						elementType		= Types.UNKNOWN;
 	private IType						type;
 	
 	public RangeOperator(IValue value1, IValue value2)

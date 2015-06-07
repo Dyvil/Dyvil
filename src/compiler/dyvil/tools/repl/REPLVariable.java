@@ -79,8 +79,8 @@ public class REPLVariable extends Field
 		{
 			try
 			{
-				className = "REPL$" + classID++;
-				Class c = generateClass(value, type, className);
+				this.className = "REPL$" + classID++;
+				Class c = generateClass(this.value, this.type, this.className);
 				
 				if (this.type != Types.VOID)
 				{
@@ -184,7 +184,7 @@ public class REPLVariable extends Field
 		}
 		
 		String extended = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.GETSTATIC, className, "value", extended);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, this.className, "value", extended);
 	}
 	
 	@Override

@@ -8,7 +8,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public class REPLResult implements IConstantValue
 {
-	private final Object value;
+	private final Object	value;
 	
 	public REPLResult(Object value)
 	{
@@ -26,48 +26,48 @@ public class REPLResult implements IConstantValue
 	{
 		return false;
 	}
-
+	
 	@Override
 	public IType getType()
 	{
 		return Types.ANY;
 	}
-
+	
 	@Override
 	public boolean isType(IType type)
 	{
 		return false;
 	}
-
+	
 	@Override
 	public int getTypeMatch(IType type)
 	{
 		return 0;
 	}
-
+	
 	@Override
 	public int stringSize()
 	{
 		return 20;
 	}
-
+	
 	@Override
 	public boolean toStringBuilder(StringBuilder builder)
 	{
 		builder.append(this.value);
 		return true;
 	}
-
+	
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 	}
-
+	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

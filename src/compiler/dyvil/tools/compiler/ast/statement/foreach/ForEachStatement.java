@@ -341,7 +341,9 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	{
 		this.variable.foldConstants();
 		if (this.action != null)
+		{
 			this.action = this.action.foldConstants();
+		}
 		return this;
 	}
 	

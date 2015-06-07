@@ -493,8 +493,8 @@ public class Method extends Member implements IMethod
 	
 	private void checkOverride(MarkerList markers, IContext context)
 	{
-		overrideMethod = this.theClass.getSuperMethod(this.name, this.parameters, this.parameterCount);
-		if (overrideMethod == null)
+		this.overrideMethod = this.theClass.getSuperMethod(this.name, this.parameters, this.parameterCount);
+		if (this.overrideMethod == null)
 		{
 			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
 			{
@@ -507,13 +507,13 @@ public class Method extends Member implements IMethod
 		{
 			markers.add(this.position, "method.overrides", this.name);
 		}
-		else if (overrideMethod.hasModifier(Modifiers.FINAL))
+		else if (this.overrideMethod.hasModifier(Modifiers.FINAL))
 		{
 			markers.add(this.position, "method.override.final", this.name);
 		}
 		else
 		{
-			IType type = overrideMethod.getType();
+			IType type = this.overrideMethod.getType();
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
 				Marker marker = markers.create(this.position, "method.override.type", this.name);
@@ -1126,7 +1126,9 @@ public class Method extends Member implements IMethod
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) != 0)
+		{
 			return;
+		}
 		
 		mw.writeLocal(0, "this", this.theClass.getType(), start, end);
 		
@@ -1188,7 +1190,7 @@ public class Method extends Member implements IMethod
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
-		else if (this.intrinsicOpcodes != null && (instance != null && instance.isPrimitive()))
+		else if (this.intrinsicOpcodes != null && instance != null && instance.isPrimitive())
 		{
 			this.writeIntrinsic(writer, instance, arguments);
 			return;

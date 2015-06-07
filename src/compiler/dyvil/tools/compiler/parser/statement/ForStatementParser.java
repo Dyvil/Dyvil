@@ -49,7 +49,7 @@ public class ForStatementParser extends Parser implements IValued
 	private IValue makeForStatement()
 	{
 		if (this.forEach)
-		{ 
+		{
 			return new ForEachStatement(this.variable, this.action);
 		}
 		return new ForStatement(this.variable, this.condition, this.update, this.action);
