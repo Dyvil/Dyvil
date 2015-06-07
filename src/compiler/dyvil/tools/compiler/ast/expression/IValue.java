@@ -8,9 +8,7 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -256,6 +254,8 @@ public interface IValue extends IASTNode, ITyped
 		else if (c == int[].class)
 		{
 			Array valueList = new Array(null);
+			valueList.requiredType = new ArrayType(Types.INT);
+			valueList.elementType = Types.INT;
 			for (int i : (int[]) o)
 			{
 				valueList.addValue(new IntValue(i));
@@ -265,6 +265,8 @@ public interface IValue extends IASTNode, ITyped
 		else if (c == long[].class)
 		{
 			Array valueList = new Array();
+			valueList.requiredType = new ArrayType(Types.LONG);
+			valueList.elementType = Types.LONG;
 			for (long l : (long[]) o)
 			{
 				valueList.addValue(new LongValue(l));
@@ -274,6 +276,8 @@ public interface IValue extends IASTNode, ITyped
 		else if (c == float[].class)
 		{
 			Array valueList = new Array();
+			valueList.requiredType = new ArrayType(Types.FLOAT);
+			valueList.elementType = Types.FLOAT;
 			for (float f : (float[]) o)
 			{
 				valueList.addValue(new FloatValue(f));
@@ -283,6 +287,8 @@ public interface IValue extends IASTNode, ITyped
 		else if (c == double[].class)
 		{
 			Array valueList = new Array();
+			valueList.requiredType = new ArrayType(Types.DOUBLE);
+			valueList.elementType = Types.DOUBLE;
 			for (double d : (double[]) o)
 			{
 				valueList.addValue(new DoubleValue(d));

@@ -806,7 +806,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public HashMap<K, V> copy()
 	{
-		int len = MathUtils.powerOfTwo(this.size);
+		int len = MathUtils.powerOfTwo(this.size + 2);
 		HashEntry[] newEntries = new HashEntry[len];
 		for (HashEntry<K, V> e : this.entries)
 		{

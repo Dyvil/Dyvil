@@ -165,8 +165,14 @@ public final class CompoundCall extends ASTNode implements ICall, INamed, IValue
 		{
 			this.instance.resolveTypes(markers, context);
 		}
-		
-		this.arguments.resolveTypes(markers, context);
+		if (this.arguments.isEmpty())
+		{
+			this.arguments = EmptyArguments.VISIBLE;
+		}
+		else
+		{
+			this.arguments.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override

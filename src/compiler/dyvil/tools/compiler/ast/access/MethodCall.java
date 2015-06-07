@@ -173,7 +173,14 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 		{
 			this.instance.resolveTypes(markers, context);
 		}
-		this.arguments.resolveTypes(markers, context);
+		if (this.arguments.isEmpty())
+		{
+			this.arguments = EmptyArguments.VISIBLE;
+		}
+		else
+		{
+			this.arguments.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override

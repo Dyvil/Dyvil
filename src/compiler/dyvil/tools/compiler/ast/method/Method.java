@@ -1270,9 +1270,9 @@ public class Method extends Member implements IMethod
 		writer.writeJumpInsn(IFNE, dest);
 	}
 	
-	private void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException
+	private void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
-		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			int len = this.parameterCount;
 			if ((this.modifiers & Modifiers.VARARGS) != 0)
@@ -1342,7 +1342,7 @@ public class Method extends Member implements IMethod
 					}
 					else if (insn == ARGUMENTS)
 					{
-						this.writeArguments(writer, arguments);
+						this.writeArguments(writer, instance, arguments);
 					}
 					else
 					{
@@ -1377,7 +1377,7 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				this.writeArguments(writer, arguments);
+				this.writeArguments(writer, instance, arguments);
 			}
 			else
 			{
@@ -1396,7 +1396,7 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				this.writeArguments(writer, arguments);
+				this.writeArguments(writer, instance, arguments);
 			}
 			else if (Opcodes.isJumpOpcode(i))
 			{
@@ -1419,7 +1419,7 @@ public class Method extends Member implements IMethod
 			}
 			else if (i == ARGUMENTS)
 			{
-				this.writeArguments(writer, arguments);
+				this.writeArguments(writer, instance, arguments);
 			}
 			else if (Opcodes.isJumpOpcode(i))
 			{
@@ -1439,7 +1439,7 @@ public class Method extends Member implements IMethod
 			instance.writeExpression(writer);
 		}
 		
-		this.writeArguments(writer, arguments);
+		this.writeArguments(writer, instance, arguments);
 		
 		int opcode;
 		int modifiers = this.modifiers;

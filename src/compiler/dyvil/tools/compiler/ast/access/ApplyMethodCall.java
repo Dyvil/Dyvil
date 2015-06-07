@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -132,8 +133,14 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued
 		{
 			this.instance.resolveTypes(markers, context);
 		}
-		
-		this.arguments.resolveTypes(markers, context);
+		if (this.arguments.isEmpty())
+		{
+			this.arguments = EmptyArguments.VISIBLE;
+		}
+		else
+		{
+			this.arguments.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
@@ -143,7 +150,6 @@ public class ApplyMethodCall extends ASTNode implements ICall, IValued
 		{
 			this.instance = this.instance.resolve(markers, context);
 		}
-		
 		this.arguments.resolve(markers, context);
 		
 		IMethod method = ICall.resolveMethod(context, this.instance, Name.apply, this.arguments);

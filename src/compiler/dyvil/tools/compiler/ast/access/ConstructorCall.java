@@ -105,7 +105,15 @@ public class ConstructorCall extends ASTNode implements ICall
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context);
-		this.arguments.resolveTypes(markers, context);
+		
+		if (this.arguments.isEmpty())
+		{
+			this.arguments = EmptyArguments.VISIBLE;
+		}
+		else
+		{
+			this.arguments.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
