@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.library.Library;
+import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 
 public class DyvilREPL
@@ -50,9 +51,15 @@ public class DyvilREPL
 		{
 			currentCode = reader.readLine();
 			TokenIterator tokens = Dlex.tokenIterator(currentCode + ";");
+			
 			if (parser.parse(tokens, new ExpressionParser(context)))
 			{
 				context.processValue();
+				return;
+			}
+			if (parser.parse(tokens, new DyvilHeaderParser(context)))
+			{
+				context.processHeader();
 				return;
 			}
 		}

@@ -78,9 +78,6 @@ public class REPLParser implements IParserManager
 			}
 			catch (SyntaxError ex)
 			{
-				StringBuilder buf = new StringBuilder();
-				ex.log(DyvilREPL.currentCode, buf);
-				System.out.println(buf.toString());
 				return false;
 			}
 			catch (Exception ex)
