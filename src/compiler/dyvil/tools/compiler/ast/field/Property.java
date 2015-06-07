@@ -237,6 +237,50 @@ public class Property extends Member implements IProperty, IContext
 			
 			this.set.checkTypes(markers, context);
 		}
+		
+		if ((this.modifiers & Modifiers.STATIC) == 0)
+		{
+			this.checkOverride(markers);
+		}
+	}
+	
+	private void checkOverride(MarkerList markers)
+	{
+		IField f = this.theClass.getSuperType().resolveField(this.name);
+		if (f == null)
+		{
+			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
+			{
+				markers.add(this.position, "property.override", this.name);
+			}
+			return;
+		}
+		
+		if (!(f instanceof IProperty))
+		{
+			return;
+		}
+		
+		this.overrideProperty = (IProperty) f;
+		
+		if ((this.modifiers & Modifiers.OVERRIDE) == 0)
+		{
+			markers.add(this.position, "property.overrides", this.name);
+		}
+		else if (this.overrideProperty.hasModifier(Modifiers.FINAL))
+		{
+			markers.add(this.position, "property.override.final", this.name);
+		}
+		else
+		{
+			IType type = this.overrideProperty.getType();
+			if (type != this.type && !type.equals(this.type))
+			{
+				Marker marker = markers.create(this.position, "property.override.type", this.name);
+				marker.addInfo("Property Type: " + this.type);
+				marker.addInfo("Overriden Property Type: " + type);
+			}
+		}
 	}
 	
 	@Override
