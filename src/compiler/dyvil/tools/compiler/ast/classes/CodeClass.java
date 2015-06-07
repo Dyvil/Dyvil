@@ -1155,7 +1155,7 @@ public class CodeClass extends ASTNode implements IClass
 			superClass = this.superType.getInternalName();
 		}
 		
-		int mods = this.modifiers & 0x67631;
+		int mods = this.modifiers & 0x7631;
 		if ((mods & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
 		{
 			mods |= Opcodes.ACC_SUPER;
