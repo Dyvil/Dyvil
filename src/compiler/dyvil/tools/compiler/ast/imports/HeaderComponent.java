@@ -43,6 +43,11 @@ public final class HeaderComponent extends ASTNode implements IImport
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic)
 	{
+		if (this.theImport == null)
+		{
+			return;
+		}
+		
 		this.theImport.resolveTypes(markers, Package.rootPackage, this.isStatic);
 		
 		IImport iimport = this.theImport.getChild();

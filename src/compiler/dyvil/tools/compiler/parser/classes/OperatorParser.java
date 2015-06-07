@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 
@@ -46,35 +46,38 @@ public final class OperatorParser extends Parser
 		}
 		if (this.mode == TYPE)
 		{
-			if (type != Tokens.LETTER_IDENTIFIER)
+			switch (type)
 			{
-				this.mode = CLOSE_BRACKET;
-				throw new SyntaxError(token, "Invalid Operator - Type expected", true);
-			}
-			Name name = token.nameValue();
-			switch (name.qualified)
-			{
-			case "prefix":
+			case Keywords.PREFIX:
 				this.operator.type = Operator.PREFIX;
 				this.mode = CLOSE_BRACKET;
 				return;
-			case "postfix":
+			case Keywords.POSTFIX:
 				this.operator.type = Operator.POSTFIX;
 				this.mode = CLOSE_BRACKET;
 				return;
-			case "none":
+			case Keywords.INFIX:
 				this.operator.type = Operator.INFIX_NONE;
 				this.mode = COMMA;
 				return;
-			case "left":
-				this.operator.type = Operator.INFIX_LEFT;
-				this.mode = COMMA;
-				return;
-			case "right":
-				this.operator.type = Operator.INFIX_RIGHT;
-				this.mode = COMMA;
-				return;
+			case Tokens.LETTER_IDENTIFIER:
+				switch (token.nameValue().qualified)
+				{
+				case "none":
+					this.operator.type = Operator.INFIX_NONE;
+					this.mode = COMMA;
+					return;
+				case "left":
+					this.operator.type = Operator.INFIX_LEFT;
+					this.mode = COMMA;
+					return;
+				case "right":
+					this.operator.type = Operator.INFIX_RIGHT;
+					this.mode = COMMA;
+					return;
+				}
 			}
+			throw new SyntaxError(token, "Invalid Operator Type - Invalid " + token);
 		}
 		if (this.mode == COMMA)
 		{

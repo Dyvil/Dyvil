@@ -51,6 +51,14 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	
 	protected Map<Name, Operator>	operators		= new IdentityHashMap();
 	
+	public DyvilHeader(String name)
+	{
+		this.inputFile = null;
+		this.outputDirectory = null;
+		this.outputFile = null;
+		this.name = name;
+	}
+	
 	public DyvilHeader(Package pack, CodeFile input, File output)
 	{
 		this.pack = pack;

@@ -40,6 +40,7 @@ public interface Keywords
 	int	OPERATOR		= Tokens.KEYWORD | 0x00250000;
 	int	PACKAGE			= Tokens.KEYWORD | 0x00260000;
 	int	POSTFIX			= Tokens.KEYWORD | 0x00270000;
+	int	PREFIX			= Tokens.KEYWORD | 0x00390000;
 	int	PRIVATE			= Tokens.KEYWORD | 0x00280000;
 	int	PROTECTED		= Tokens.KEYWORD | 0x00290000;
 	int	PUBLIC			= Tokens.KEYWORD | 0x002A0000;
@@ -138,6 +139,8 @@ public interface Keywords
 			return PACKAGE;
 		case "postfix":
 			return POSTFIX;
+		case "prefix":
+			return PREFIX;
 		case "private":
 			return PRIVATE;
 		case "protected":
@@ -256,6 +259,8 @@ public interface Keywords
 			return "package";
 		case POSTFIX:
 			return "postfix";
+		case PREFIX:
+			return "prefix";
 		case PRIVATE:
 			return "private";
 		case PROTECTED:
