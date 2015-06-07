@@ -65,7 +65,7 @@ public interface IValue extends IASTNode, ITyped
 	int	CASE_STATEMENT		= 65;
 	int	MATCH				= 66;
 	int	LAMBDA				= 67;
-	int	FUNCTION			= 68;
+	int	PARTIAL_FUNCTION	= 68;
 	int	BYTECODE			= 69;
 	
 	int	RETURN				= 70;

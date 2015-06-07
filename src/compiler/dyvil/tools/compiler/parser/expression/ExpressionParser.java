@@ -44,8 +44,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int		PARAMETERS			= 0x800;
 	public static final int		PARAMETERS_END		= 0x1000;
 	
-	public static final int		FUNCTION_POINTER	= 0x8000;
-	
 	public static final int		BYTECODE_END		= 0x10000;
 	
 	public static final int		PATTERN_IF			= 0x20000;
@@ -282,19 +280,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			throw new SyntaxError(token, "Invalid Constructor Argument List - ')' expected", true);
 		}
-		if (this.mode == FUNCTION_POINTER)
-		{
-			// TODO Constructor Function Pointers
-			pm.popParser();
-			if (ParserUtil.isIdentifier(type))
-			{
-				FunctionPointer fl = new FunctionPointer(token.raw(), token.nameValue());
-				fl.instance = this.value;
-				this.field.setValue(fl);
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Function Pointer - Identifier expected");
-		}
 		if (this.mode == BYTECODE_END)
 		{
 			this.field.setValue(this.value);
@@ -338,11 +323,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			{
 				this.mode = ACCESS_2;
 				this.dotless = false;
-				return;
-			}
-			if (type == Symbols.HASH)
-			{
-				this.mode = FUNCTION_POINTER;
 				return;
 			}
 			

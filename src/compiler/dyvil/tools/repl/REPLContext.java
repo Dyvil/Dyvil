@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.imports.HeaderComponent;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
@@ -21,7 +20,6 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -50,31 +48,10 @@ public class REPLContext implements IValued, IDyvilHeader
 		}
 		
 		MarkerList markers = new MarkerList();
-		Name name;
-		IValue value;
-		IType type;
-		ICodePosition position;
-		
-		if (this.value.valueTag() == IValue.VARIABLE)
-		{
-			Variable var = ((FieldInitializer) this.value).variable;
-			name = var.name;
-			value = var.value;
-			type = var.type;
-			position = var.position;
-			
-			if (value == null)
-			{
-				return;
-			}
-		}
-		else
-		{
-			name = Name.getQualified("res" + resultIndex);
-			value = this.value;
-			type = Types.UNKNOWN;
-			position = CODE_POSITION;
-		}
+		Name name = Name.getQualified("res" + resultIndex);
+		IValue value = this.value;
+		IType type = Types.UNKNOWN;
+		ICodePosition position = CODE_POSITION;
 		
 		this.value = null;
 		
