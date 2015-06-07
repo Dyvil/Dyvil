@@ -83,11 +83,6 @@ public final class ThisValue extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.type != null)
-		{
-			return;
-		}
-		
 		if (context.isStatic())
 		{
 			markers.add(this.position, "this.access.static");

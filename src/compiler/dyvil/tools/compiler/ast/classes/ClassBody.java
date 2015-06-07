@@ -288,7 +288,7 @@ public class ClassBody extends ASTNode implements IClassBody
 			{
 				IType t1 = parameters[p].getType();
 				IType t2 = m.getParameter(p).getType();
-				if (!t1.classEquals(t2) && t1.getArrayDimensions() != t2.getArrayDimensions())
+				if (!t1.equals(t2))
 				{
 					continue outer;
 				}

@@ -1136,7 +1136,7 @@ public class Method extends Member implements IMethod
 		}
 		
 		// Check if a bridge method has to be generated
-		if (!generateBridge())
+		if (this.descriptor.equals(this.overrideMethod.getDescriptor()))
 		{
 			return;
 		}
@@ -1169,24 +1169,6 @@ public class Method extends Member implements IMethod
 		mw.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), false);
 		mw.writeInsn(this.type.getReturnOpcode());
 		mw.end();
-	}
-	
-	private boolean generateBridge()
-	{
-		if (!this.type.equals(this.overrideMethod.getType()))
-		{
-			return true;
-		}
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IType type1 = this.parameters[i].getType();
-			IType type2 = this.overrideMethod.getParameter(i).getType();
-			if (!type1.equals(type2))
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	@Override

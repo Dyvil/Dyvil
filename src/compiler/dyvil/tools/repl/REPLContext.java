@@ -38,6 +38,7 @@ public class REPLContext implements IValued, IDyvilHeader
 	protected static int				resultIndex;
 	
 	private Map<Name, REPLVariable>		variables		= new HashMap();
+	private Map<Name, Operator>			operators		= new HashMap();
 	
 	private IValue						value;
 	
@@ -120,13 +121,11 @@ public class REPLContext implements IValued, IDyvilHeader
 	@Override
 	public void setPackage(Package pack)
 	{
-		// unsupported
 	}
 	
 	@Override
 	public Package getPackage()
 	{
-		// unsupported
 		return null;
 	}
 	
@@ -161,12 +160,13 @@ public class REPLContext implements IValued, IDyvilHeader
 	@Override
 	public void addOperator(Operator op)
 	{
+		this.operators.put(op.name, op);
 	}
 	
 	@Override
 	public Operator getOperator(Name name)
 	{
-		return null;
+		return this.operators.get(name);
 	}
 	
 	@Override

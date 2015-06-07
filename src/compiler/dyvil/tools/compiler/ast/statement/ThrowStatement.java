@@ -40,7 +40,7 @@ public final class ThrowStatement implements IValue, IValued
 	@Override
 	public IType getType()
 	{
-		return Types.UNKNOWN;
+		return Types.VOID;
 	}
 	
 	@Override

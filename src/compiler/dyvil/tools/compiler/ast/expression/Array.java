@@ -371,7 +371,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 		
 		if (this.requiredType.getTheClass() == Types.MAP_CLASS)
 		{
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Map", "apply", "([Ldyvil/tuple/Tuple2;)Ldyvil/collection/immutable/ImmutableMap;", true);
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Map", "apply", "([Ldyvil/tuple/Tuple2;)Ldyvil/collection/ImmutableMap;", true);
 		}
 	}
 	

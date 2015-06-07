@@ -91,11 +91,27 @@ public class REPLVariable extends Field
 					{
 						this.value = v;
 					}
+					else
+					{
+						this.value = new REPLResult(result);
+					}
 				}
 				else
 				{
 					ReflectUtils.unsafe.ensureClassInitialized(c);
 				}
+			}
+			catch (ExceptionInInitializerError t)
+			{
+				Throwable ex = t.getCause();
+				System.err.println(ex.getClass().getCanonicalName() + ": " + ex.getMessage());
+				StackTraceElement[] trace = ex.getStackTrace();
+				int len = trace.length - 10;
+				for (int i = 0; i < len; i++)
+				{
+					System.err.println("\tat " + trace[i]);
+				}
+				this.value = this.type.getDefaultValue();
 			}
 			catch (Throwable t)
 			{
@@ -141,7 +157,15 @@ public class REPLVariable extends Field
 		writer.visitEnd();
 		
 		byte[] bytes = writer.toByteArray();
-		return ReflectUtils.unsafe.defineClass(className, bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
+		
+		if (type != Types.VOID)
+		{
+			// The type contains the value, so we have to keep the class loaded.
+			return ReflectUtils.unsafe.defineClass(className, bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
+		}
+		// We don't have any variables, so we can throw the Class away after
+		// it has been loaded.
+		return ReflectUtils.unsafe.defineAnonymousClass(REPLVariable.class, bytes, null);
 	}
 	
 	@Override
@@ -153,7 +177,7 @@ public class REPLVariable extends Field
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
-		if (this.className == null)
+		if (this.className == null || this.value.isConstant())
 		{
 			this.value.writeExpression(writer);
 			return;

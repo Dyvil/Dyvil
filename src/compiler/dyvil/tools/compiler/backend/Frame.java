@@ -224,6 +224,20 @@ public class Frame
 		}
 	}
 	
+	public void set(Object type)
+	{
+		if (type == LONG || type == DOUBLE)
+		{
+			Object o = this.stack[this.stackCount - 1];
+			if (o != LONG && o != DOUBLE)
+			{
+				this.actualStackCount++;
+			}
+		}
+		
+		this.stack[this.stackCount - 1] = type;
+	}
+	
 	public void push(Object type)
 	{
 		if (type == LONG || type == DOUBLE)

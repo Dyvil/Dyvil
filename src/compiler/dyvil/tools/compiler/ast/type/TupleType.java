@@ -408,6 +408,18 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder("(");
+		builder.append(this.types[0]);
+		for (int i = 1; i < this.typeCount; i++)
+		{
+			builder.append(", ").append(this.types[i]);
+		}
+		return builder.append(")").toString();
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Expression.tupleStart);

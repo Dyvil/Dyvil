@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -186,33 +185,6 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 		}
 		
 		this.value.check(markers, context);
-		
-		if (this.field == null)
-		{
-			return;
-		}
-		
-		if (this.field.hasModifier(Modifiers.FINAL))
-		{
-			markers.add(this.position, "access.final.field", this.name);
-		}
-		if (this.field.hasModifier(Modifiers.DEPRECATED))
-		{
-			markers.add(this.position, "field.access.deprecated", this.name);
-		}
-		
-		switch (context.getVisibility(this.field))
-		{
-		case IContext.STATIC:
-			markers.add(this.position, "access.static.field", this.name);
-			break;
-		case IContext.SEALED:
-			markers.add(this.position, "access.sealed.field", this.name);
-			break;
-		case IContext.INVISIBLE:
-			markers.add(this.position, "access.invisible.field", this.name);
-			break;
-		}
 	}
 	
 	@Override

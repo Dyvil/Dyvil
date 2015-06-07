@@ -1,6 +1,9 @@
 package dyvil.tools.repl;
 
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -98,6 +101,17 @@ public class REPLParser implements IParserManager
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public Operator getOperator(Name name)
+	{
+		Operator op = DyvilREPL.context.getOperator(name);
+		if (op != null)
+		{
+			return op;
+		}
+		return Operators.map.get(name);
 	}
 	
 	protected boolean isRoot()

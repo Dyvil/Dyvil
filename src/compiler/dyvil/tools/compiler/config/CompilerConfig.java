@@ -27,6 +27,11 @@ public class CompilerConfig
 	{
 		this.addLibrary(Library.dyvilLibrary);
 		this.addLibrary(Library.javaLibrary);
+		
+		if (Library.dyvilBinLibrary != null)
+		{
+			this.addLibrary(Library.dyvilBinLibrary);
+		}
 	}
 	
 	public void addLibraryFile(File file)

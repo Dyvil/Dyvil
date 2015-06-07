@@ -380,7 +380,7 @@ public class Type extends ASTNode implements IType
 	@Override
 	public String toString()
 	{
-		return this.theClass == null ? this.internalName : this.theClass.getFullName();
+		return this.theClass == null ? this.name.toString() : this.theClass.getFullName();
 	}
 	
 	@Override

@@ -281,11 +281,13 @@ public final class IfStatement extends ASTNode implements IStatement
 	{
 		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
+		Object commonFrameType = this.commonType.getFrameType();
 		
 		// Condition
 		this.condition.writeInvJump(writer, elseStart);
 		// If Block
 		this.then.writeExpression(writer);
+		writer.getFrame().set(commonFrameType);
 		writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
 		writer.writeLabel(elseStart);
 		// Else Block
@@ -297,6 +299,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		{
 			this.elseThen.writeExpression(writer);
 		}
+		writer.getFrame().set(commonFrameType);
 		writer.writeLabel(elseEnd);
 	}
 	

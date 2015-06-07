@@ -14,6 +14,10 @@ public abstract class Library
 	public static final File	javaLibraryLocation;
 	public static final File	dyvilLibraryLocation;
 	
+	public static final Library	dyvilLibrary;
+	public static final Library	dyvilBinLibrary;
+	public static final Library	javaLibrary;
+	
 	static
 	{
 		String s = System.getProperty("sun.boot.class.path");
@@ -43,13 +47,23 @@ public abstract class Library
 			}
 			dyvilLibraryLocation = new File(s);
 		}
+		
+		dyvilLibrary = load(dyvilLibraryLocation);
+		javaLibrary = load(javaLibraryLocation);
+		
+		bin = new File("dbin");
+		if (bin.exists())
+		{
+			dyvilBinLibrary = load(bin);
+		}
+		else
+		{
+			dyvilBinLibrary = null;
+		}
 	}
 	
-	public static final Library	dyvilLibrary	= load(dyvilLibraryLocation);
-	public static final Library	javaLibrary		= load(javaLibraryLocation);
-	
 	public File					file;
-	public Map<String, Package>	packages		= new HashMap();
+	public Map<String, Package>	packages	= new HashMap();
 	
 	protected Library(File file)
 	{
