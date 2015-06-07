@@ -104,6 +104,13 @@ public final class ClassOperator extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		if (this.type == null)
+		{
+			this.type = Types.UNKNOWN;
+			markers.add(this.position, "classoperator.invalid");
+			return;
+		}
+		
 		this.type = this.type.resolve(markers, context);
 		GenericType generic = new GenericType(Types.CLASS_CLASS);
 		generic.addType(this.type);

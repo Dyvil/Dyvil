@@ -121,6 +121,11 @@ public class ConstantFolder
 		}
 		if (op == Name.div)
 		{
+			float i2 = v2.floatValue();
+			return i2 == 0F ? null : new FloatValue(v1.floatValue() / i2);
+		}
+		if (op == Name.bslash)
+		{
 			int i2 = v2.intValue();
 			return i2 == 0 ? null : new IntValue(v1.intValue() / i2);
 		}
@@ -171,6 +176,11 @@ public class ConstantFolder
 			return new LongValue(v1.longValue() * v2.longValue());
 		}
 		if (op == Name.div)
+		{
+			double l2 = v2.doubleValue();
+			return l2 == 0D ? null : new DoubleValue(v1.longValue() / l2);
+		}
+		if (op == Name.bslash)
 		{
 			long l2 = v2.longValue();
 			return l2 == 0L ? null : new LongValue(v1.longValue() / l2);

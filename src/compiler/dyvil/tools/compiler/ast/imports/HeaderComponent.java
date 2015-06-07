@@ -50,7 +50,7 @@ public final class HeaderComponent extends ASTNode implements IImport
 		
 		this.theImport.resolveTypes(markers, Package.rootPackage, this.isStatic);
 		
-		IImport iimport = this.theImport.getChild();
+		IImport iimport = this.theImport;
 		while (true)
 		{
 			IImport child = iimport.getChild();

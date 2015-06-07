@@ -62,6 +62,8 @@ public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignatur
 	
 	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException;
 	
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException;
+	
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException;
 	
 	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException;

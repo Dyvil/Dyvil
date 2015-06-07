@@ -830,6 +830,10 @@ public class Method extends Member implements IMethod
 			{
 				markers.add(position, "method.access.instance", this.name.unqualified);
 			}
+			else if (this.intrinsicOpcodes == null && instance.isPrimitive())
+			{
+				instance = instance.withType(this.theClass.getType());
+			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
@@ -1190,13 +1194,13 @@ public class Method extends Member implements IMethod
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
-		else if (this.intrinsicOpcodes != null && instance != null && instance.isPrimitive())
+		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
 		{
 			this.writeIntrinsic(writer, instance, arguments);
 			return;
 		}
 		
-		this.writeInvoke(writer, instance, arguments);
+		this.writeArgumentsAndInvoke(writer, instance, arguments);
 		
 		if (type == Types.VOID)
 		{
@@ -1211,7 +1215,7 @@ public class Method extends Member implements IMethod
 		{
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
-				writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
+				writer.writeTypeInsn(Opcodes.CHECKCAST, type.getInternalName());
 			}
 		}
 	}
@@ -1238,8 +1242,7 @@ public class Method extends Member implements IMethod
 			this.writeIntrinsic(writer, dest, instance, arguments);
 			return;
 		}
-		
-		this.writeInvoke(writer, instance, arguments);
+		this.writeArgumentsAndInvoke(writer, instance, arguments);
 		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
@@ -1266,7 +1269,8 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		this.writeInvoke(writer, instance, arguments);
+		this.writeArgumentsAndInvoke(writer, instance, arguments);
+		
 		writer.writeJumpInsn(IFNE, dest);
 	}
 	
@@ -1432,15 +1436,19 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	private void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
 		}
-		
 		this.writeArguments(writer, instance, arguments);
-		
+		this.writeInvoke(writer, instance, arguments);
+	}
+	
+	@Override
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	{
 		int opcode;
 		int modifiers = this.modifiers;
 		if ((modifiers & Modifiers.STATIC) != 0)
@@ -1468,71 +1476,6 @@ public class Method extends Member implements IMethod
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
 		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS));
-	}
-	
-	private void writeInlineArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
-	{
-		if (instance != null)
-		{
-			instance.writeExpression(writer);
-			writer.writeVarInsn(instance.getType().getStoreOpcode(), writer.localCount());
-		}
-		
-		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			if ((this.modifiers & Modifiers.VARARGS) != 0)
-			{
-				int len = this.parameterCount - 1;
-				IParameter param;
-				for (int i = 1, j = 0; i < len; i++, j++)
-				{
-					param = this.parameters[i];
-					arguments.writeValue(j, param.getName(), param.getValue(), writer);
-					writer.writeVarInsn(param.getType().getStoreOpcode(), writer.localCount());
-				}
-				param = this.parameters[len];
-				arguments.writeVarargsValue(len - 1, param.getName(), param.getType(), writer);
-				writer.writeVarInsn(Opcodes.ASTORE, writer.localCount());
-				return;
-			}
-			
-			for (int i = 1, j = 0; i < this.parameterCount; i++, j++)
-			{
-				IParameter param = this.parameters[i];
-				arguments.writeValue(j, param.getName(), param.getValue(), writer);
-				writer.writeVarInsn(param.getType().getStoreOpcode(), writer.localCount());
-			}
-			return;
-		}
-		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
-		{
-			arguments.writeValue(0, Name._this, null, writer);
-			writer.writeVarInsn(Opcodes.ASTORE, writer.localCount());
-			return;
-		}
-		
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
-		{
-			int len = this.parameterCount - 1;
-			IParameter param;
-			for (int i = 0; i < len; i++)
-			{
-				param = this.parameters[i];
-				arguments.writeValue(i, param.getName(), param.getValue(), writer);
-				writer.writeVarInsn(param.getType().getStoreOpcode(), writer.localCount());
-			}
-			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
-			writer.writeVarInsn(Opcodes.ASTORE, writer.localCount());
-			return;
-		}
-		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IParameter param = this.parameters[i];
-			arguments.writeValue(i, param.getName(), param.getValue(), writer);
-			writer.writeVarInsn(param.getType().getStoreOpcode(), writer.localCount());
-		}
 	}
 	
 	@Override

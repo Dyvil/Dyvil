@@ -102,6 +102,13 @@ public final class TypeOperator extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		if (this.type == null)
+		{
+			this.type = Types.UNKNOWN;
+			markers.add(this.position, "typeoperator.invalid");
+			return;
+		}
+		
 		this.type = this.type.resolve(markers, context);
 		GenericType generic = new GenericType(Types.TYPE_CLASS);
 		generic.addType(this.type);

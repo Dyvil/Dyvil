@@ -182,6 +182,10 @@ public final class SimpleImport extends ASTNode implements IImport
 			return;
 		}
 		
+		if (this.methods == null)
+		{
+			return;
+		}
 		for (IMethod m : this.methods)
 		{
 			int match = m.getSignatureMatch(name, instance, arguments);

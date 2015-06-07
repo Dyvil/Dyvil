@@ -615,6 +615,12 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	
 	private void getAssign(IParserManager pm, IToken token) throws SyntaxError
 	{
+		if (this.value == null)
+		{
+			this.mode = VALUE;
+			throw new SyntaxError(token, "Invalid Assignment - Delete this token");
+		}
+		
 		ICodePosition position = this.value.getPosition();
 		int i = this.value.valueTag();
 		if (i == IValue.FIELD_ACCESS)

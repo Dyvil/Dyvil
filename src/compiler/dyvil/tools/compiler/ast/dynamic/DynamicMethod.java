@@ -447,6 +447,11 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	{
+	}
+	
+	@Override
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
 	{
 	}

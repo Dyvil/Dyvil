@@ -63,6 +63,11 @@ public final class NullCheckOperator implements IValue
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.value.checkTypes(markers, context);
+		
+		if (this.value.isPrimitive())
+		{
+			markers.add(this.value.getPosition(), "nullcheck.primitive");
+		}
 	}
 	
 	@Override

@@ -82,7 +82,7 @@ public interface Operators
 				sbe.addValue(arg2);
 				return sbe;
 			}
-			if (arg1.isType(Types.STRING) || arg2.isType(Types.STRING))
+			if ((arg1.isType(Types.STRING) && arg1.valueTag() != IValue.NULL) || (arg2.isType(Types.STRING) && arg2.valueTag() != IValue.NULL))
 			{
 				StringBuilderExpression sbe = new StringBuilderExpression();
 				sbe.addValue(arg1);

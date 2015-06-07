@@ -104,7 +104,14 @@ public class ConstructorCall extends ASTNode implements ICall
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
+		if (this.type != null)
+		{
+			this.type = this.type.resolve(markers, context);
+		}
+		else
+		{
+			markers.add(this.position, "constructor.invalid");
+		}
 		
 		if (this.arguments.isEmpty())
 		{
@@ -121,7 +128,7 @@ public class ConstructorCall extends ASTNode implements ICall
 	{
 		this.arguments.resolve(markers, context);
 		
-		if (!this.type.isResolved())
+		if (this.type == null || !this.type.isResolved())
 		{
 			return this;
 		}
@@ -194,7 +201,7 @@ public class ConstructorCall extends ASTNode implements ICall
 	{
 		this.arguments.check(markers, context);
 		
-		if (this.type.isArrayType())
+		if (this.type == null || this.type.isArrayType())
 		{
 			return;
 		}

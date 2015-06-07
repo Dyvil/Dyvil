@@ -555,16 +555,16 @@ public class Constructor extends Member implements IConstructor
 	{
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
 		{
-			markers.add(this.position, "constructor.access.deprecated", this.theClass.getName());
+			markers.add(position, "constructor.access.deprecated", this.theClass.getName());
 		}
 		
 		switch (context.getVisibility(this))
 		{
 		case IContext.SEALED:
-			markers.add(this.position, "constructor.access.sealed", this.theClass.getName());
+			markers.add(position, "constructor.access.sealed", this.theClass.getName());
 			break;
 		case IContext.INVISIBLE:
-			markers.add(this.position, "constructor.access.invisible", this.theClass.getName());
+			markers.add(position, "constructor.access.invisible", this.theClass.getName());
 			break;
 		}
 		

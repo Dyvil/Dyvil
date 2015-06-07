@@ -231,7 +231,7 @@ public final class Dlex
 					addToken = true;
 					reparse = false;
 				}
-				else if (isDigit(c) || c == '.' || c == 'e')
+				else if (isDigit(c) || c == 'e')
 				{
 					buf.append(c);
 				}

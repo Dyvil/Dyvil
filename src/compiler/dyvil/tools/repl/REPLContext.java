@@ -41,8 +41,32 @@ public class REPLContext extends DyvilHeader implements IValued
 		super("REPL");
 	}
 	
+	private boolean reportErrors(MarkerList markers)
+	{
+		if (!markers.isEmpty())
+		{
+			StringBuilder buf = new StringBuilder();
+			String code = DyvilREPL.currentCode;
+			markers.sort();
+			for (Marker m : markers)
+			{
+				m.log(code, buf);
+			}
+			
+			System.err.println(buf.toString());
+			
+			if (markers.getErrors() > 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	protected void processHeader()
 	{
+		MarkerList markers = new MarkerList();
+		
 		if (tempClass != null)
 		{
 			tempClass.resolveTypes(markers, this);
@@ -61,6 +85,11 @@ public class REPLContext extends DyvilHeader implements IValued
 			return;
 		}
 		headerComponent.resolveTypes(markers, this, false);
+		
+		if (this.reportErrors(markers))
+		{
+			return;
+		}
 		
 		boolean isStatic = headerComponent.isStatic;
 		
@@ -100,22 +129,9 @@ public class REPLContext extends DyvilHeader implements IValued
 		field.check(markers, this);
 		field.foldConstants();
 		
-		if (!markers.isEmpty())
+		if (this.reportErrors(markers))
 		{
-			StringBuilder buf = new StringBuilder();
-			String code = DyvilREPL.currentCode;
-			markers.sort();
-			for (Marker m : markers)
-			{
-				m.log(code, buf);
-			}
-			
-			System.err.println(buf.toString());
-			
-			if (markers.getErrors() > 0)
-			{
-				return;
-			}
+			return;
 		}
 		
 		field.compute();

@@ -190,7 +190,7 @@ public class UnknownType extends ASTNode implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/UnkownType", "apply", "()Ldyvil/reflect/type/UnkownType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/UnknownType", "apply", "()Ldyvil/reflect/type/UnknownType;", false);
 	}
 	
 	@Override

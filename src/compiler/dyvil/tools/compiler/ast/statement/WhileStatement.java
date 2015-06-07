@@ -223,11 +223,6 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		if (this.action == null)
-		{
-			this.condition.writeStatement(writer);
-		}
-		
 		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
 		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
 		
@@ -235,7 +230,10 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 		writer.writeTargetLabel(startLabel);
 		this.condition.writeInvJump(writer, endLabel);
 		// While Block
-		this.action.writeStatement(writer);
+		if (this.action != null)
+		{
+			this.action.writeStatement(writer);
+		}
 		writer.writeJumpInsn(Opcodes.GOTO, startLabel);
 		
 		writer.writeLabel(endLabel);
