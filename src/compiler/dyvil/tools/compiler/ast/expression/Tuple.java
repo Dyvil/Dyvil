@@ -120,7 +120,16 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 		TupleType t = new TupleType(this.valueCount);
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			t.addType(this.values[i].getType());
+			IType type = this.values[i].getType();
+			// Tuple Value Boxing
+			if (type.isPrimitive())
+			{
+				t.addType(type.getReferenceType());
+			}
+			else
+			{
+				t.addType(type);
+			}
 		}
 		return this.tupleType = t;
 	}
@@ -190,23 +199,11 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		TupleType tupleType = new TupleType();
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue v = this.values[i];
 			v.resolveTypes(markers, context);
-			
-			IType t = v.getType();
-			if (t.isPrimitive())
-			{
-				tupleType.addType(t.getReferenceType());
-			}
-			else
-			{
-				tupleType.addType(t);
-			}
 		}
-		this.tupleType = tupleType;
 	}
 	
 	@Override

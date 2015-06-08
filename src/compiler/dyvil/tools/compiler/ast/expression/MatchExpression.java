@@ -41,7 +41,7 @@ public final class MatchExpression extends ASTNode implements IValue
 	{
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			IValue v = this.cases[i];
+			IValue v = this.cases[i].value;
 			if (v != null && v.isPrimitive())
 			{
 				return true;
@@ -73,7 +73,7 @@ public final class MatchExpression extends ASTNode implements IValue
 			{
 				continue;
 			}
-			IType t1 = this.cases[i].value.getType();
+			IType t1 = v.getType();
 			if (t == null)
 			{
 				t = t1;
@@ -148,7 +148,7 @@ public final class MatchExpression extends ASTNode implements IValue
 	{
 		this.value = this.value.resolve(markers, context);
 		
-		IType type = this.type = this.value.getType();
+		IType type = this.value.getType();
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			CaseStatement c = this.cases[i];

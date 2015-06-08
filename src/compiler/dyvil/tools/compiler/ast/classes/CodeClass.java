@@ -451,6 +451,10 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean isSubTypeOf(IType type)
 	{
+		if (this == type.getTheClass())
+		{
+			return true;
+		}
 		if (this.superType != null && type.isSuperTypeOf2(this.superType))
 		{
 			return true;

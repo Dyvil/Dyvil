@@ -22,4 +22,10 @@ public final @sealed class JavaBasedRandom extends java.util.Random implements R
 	{
 		return super.next(bits);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "Random()";
+	}
 }

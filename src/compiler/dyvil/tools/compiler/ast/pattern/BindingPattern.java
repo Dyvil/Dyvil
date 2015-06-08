@@ -68,7 +68,12 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.pattern == null || this.pattern.isType(type);
+		if (this.pattern == null || this.pattern.isType(type))
+		{
+			this.type = type;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override

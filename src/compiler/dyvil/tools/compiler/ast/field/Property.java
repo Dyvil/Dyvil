@@ -39,6 +39,7 @@ public class Property extends Member implements IProperty, IContext
 	public IValue				set;
 	
 	protected MethodParameter	setterParameter;
+	private IProperty			overrideProperty;
 	
 	public Property(IClass iclass)
 	{
