@@ -4,6 +4,10 @@ import dyvil.tools.compiler.ast.expression.IValue;
 
 public interface IProperty extends IField
 {
+	public void setAccess(byte access);
+	
+	public byte getAccess();
+	
 	public void setGetter(IValue get);
 	
 	public IValue getGetter();

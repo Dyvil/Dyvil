@@ -33,12 +33,17 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 public class Property extends Member implements IProperty, IContext
 {
+	private static final byte	GETTER	= 1;
+	private static final byte	SETTER	= 2;
+	
 	private IClass				theClass;
 	
-	public IValue				get;
-	public IValue				set;
+	protected IValue			get;
+	protected IValue			set;
+	protected byte				access;
 	
 	protected MethodParameter	setterParameter;
+	protected IProperty			overrideProperty;
 	
 	public Property(IClass iclass)
 	{
@@ -81,9 +86,22 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
+	public void setAccess(byte access)
+	{
+		this.access = access;
+	}
+	
+	@Override
+	public byte getAccess()
+	{
+		return this.access;
+	}
+	
+	@Override
 	public void setGetter(IValue get)
 	{
 		this.get = get;
+		this.access |= GETTER;
 	}
 	
 	@Override
@@ -96,6 +114,7 @@ public class Property extends Member implements IProperty, IContext
 	public void setSetter(IValue set)
 	{
 		this.set = set;
+		this.access |= SETTER;
 	}
 	
 	@Override
@@ -174,10 +193,14 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.resolve(markers, context);
 		
-		if (this.set != null)
+		if ((this.access & SETTER) != 0)
 		{
 			this.setterParameter = new MethodParameter(this.name, this.type);
 			this.setterParameter.index = 1;
+		}
+		
+		if (this.set != null)
+		{
 			this.set = this.set.resolve(markers, this);
 		}
 		if (this.get != null)
@@ -219,11 +242,13 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.checkTypes(markers, context);
 		
-		if (this.get != null)
+		boolean getter = this.get != null;
+		boolean setter = this.set != null;
+		if (getter)
 		{
 			this.get.checkTypes(markers, context);
 		}
-		if (this.set != null)
+		if (setter)
 		{
 			IValue set1 = this.set.withType(Types.VOID);
 			if (set1 == null)
@@ -241,6 +266,20 @@ public class Property extends Member implements IProperty, IContext
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
 			this.checkOverride(markers);
+		}
+		
+		if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+		{
+			// Either setter or getter is implemented, but not both
+			if (setter != getter)
+			{
+				markers.add(this.position, "property.interface.invalid", this.name);
+			}
+			// Neither is implemented, so this is an abstract property
+			else if (!setter && !getter)
+			{
+				this.modifiers |= Modifiers.ABSTRACT;
+			}
 		}
 	}
 	
@@ -301,8 +340,9 @@ public class Property extends Member implements IProperty, IContext
 				markers.add(this.position, "property.type.void");
 			}
 		}
-		// If both are null
-		else if (this.get == null)
+		
+		// No setter and no getter
+		if (this.access == 0)
 		{
 			markers.add(this.position, "property.empty", this.name);
 		}
@@ -406,10 +446,16 @@ public class Property extends Member implements IProperty, IContext
 	{
 		String extended = this.type.getExtendedName();
 		String signature = this.type.getSignature();
-		if (this.get != null)
+		if ((this.access & GETTER) != 0)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers, this.name.qualified, "()" + extended, signature == null ? null
-					: "()" + signature, null));
+			int modifiers = this.modifiers;
+			if (this.get == null)
+			{
+				modifiers |= Modifiers.ABSTRACT;
+			}
+			
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified, "()" + extended, signature == null ? null : "()"
+					+ signature, null));
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
@@ -430,13 +476,22 @@ public class Property extends Member implements IProperty, IContext
 				mw.addAnnotation("Ldyvil/annotation/sealed;", false);
 			}
 			
-			mw.begin();
-			this.get.writeExpression(mw);
-			mw.end(this.type);
+			if (this.get != null)
+			{
+				mw.begin();
+				this.get.writeExpression(mw);
+				mw.end(this.type);
+			}
 		}
-		if (this.set != null)
+		if ((this.access & SETTER) != 0)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers, this.name.qualified + "_$eq", "(" + extended + ")V",
+			int modifiers = this.modifiers;
+			if (this.set == null)
+			{
+				modifiers |= Modifiers.ABSTRACT;
+			}
+			
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified + "_$eq", "(" + extended + ")V",
 					signature == null ? null : "(" + signature + ")V", null));
 			
 			if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -460,9 +515,12 @@ public class Property extends Member implements IProperty, IContext
 			
 			this.setterParameter.write(mw);
 			
-			mw.begin();
-			this.set.writeStatement(mw);
-			mw.end(Types.VOID);
+			if (this.set != null)
+			{
+				mw.begin();
+				this.set.writeStatement(mw);
+				mw.end(Types.VOID);
+			}
 		}
 	}
 	
@@ -535,12 +593,33 @@ public class Property extends Member implements IProperty, IContext
 		buffer.append(' ');
 		buffer.append(this.name);
 		
+		if (this.get == null && this.set == null)
+		{
+			if ((this.access & GETTER) != 0)
+			{
+				if ((this.access & SETTER) != 0)
+				{
+					buffer.append(" { get; set }");
+					return;
+				}
+				buffer.append(" { get }");
+				return;
+			}
+			if ((this.access & SETTER) != 0)
+			{
+				buffer.append(" { set }");
+				return;
+			}
+			buffer.append("{ }");
+		}
+		
 		buffer.append('\n').append(prefix).append('{');
 		if (this.get != null)
 		{
 			buffer.append('\n').append(prefix).append(Formatting.Method.indent);
 			if (this.set == null)
 			{
+				buffer.append(Formatting.Field.propertyGet);
 				this.get.toString(prefix + Formatting.Method.indent, buffer);
 				buffer.append('\n').append(prefix).append('}');
 				return;
@@ -552,7 +631,8 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.set != null)
 		{
-			buffer.append('\n').append(prefix).append(Formatting.Method.indent).append(Formatting.Field.propertySet);
+			buffer.append('\n').append(prefix).append(Formatting.Method.indent);
+			buffer.append(Formatting.Field.propertySet);
 			this.set.toString(prefix + Formatting.Method.indent, buffer);
 			buffer.append(';');
 		}

@@ -40,11 +40,6 @@ public class PropertyParser extends Parser implements IValued
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
-		{
-			this.mode = 0;
-			return;
-		}
 		if (type == Symbols.CLOSE_CURLY_BRACKET)
 		{
 			pm.popParser();
@@ -53,9 +48,15 @@ public class PropertyParser extends Parser implements IValued
 		
 		if (this.mode == 0)
 		{
-			if (token.next().type() == Symbols.COLON)
+			if (type == Symbols.SEMICOLON)
 			{
-				if (type == Tokens.LETTER_IDENTIFIER)
+				return;
+			}
+			
+			if (type == Tokens.LETTER_IDENTIFIER)
+			{
+				int nextType = token.next().type();
+				if (nextType == Symbols.COLON || nextType == Symbols.CLOSE_CURLY_BRACKET || nextType == Symbols.SEMICOLON)
 				{
 					Name name = token.nameValue();
 					if (name == get)
@@ -69,7 +70,6 @@ public class PropertyParser extends Parser implements IValued
 						return;
 					}
 				}
-				throw new SyntaxError(token, "Invalid Property Declaration - 'get' or 'set' expected", false);
 			}
 			
 			// No 'get:' or 'set:' tag -> Read-Only Property
@@ -79,9 +79,15 @@ public class PropertyParser extends Parser implements IValued
 		}
 		if (this.mode > 0) // SET or GET
 		{
+			this.property.setAccess((byte) (this.property.getAccess() | this.mode));
 			if (type == Symbols.COLON)
 			{
 				pm.pushParser(new ExpressionParser(this));
+				return;
+			}
+			if (type == Symbols.SEMICOLON || type == Symbols.CLOSE_CURLY_BRACKET)
+			{
+				this.mode = 0;
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Property Declaration - ':' expected");
@@ -93,11 +99,11 @@ public class PropertyParser extends Parser implements IValued
 	{
 		if (this.mode == GET)
 		{
-			this.property.get = value;
+			this.property.setGetter(value);
 		}
 		else if (this.mode == SET)
 		{
-			this.property.set = value;
+			this.property.setSetter(value);
 		}
 	}
 	
