@@ -79,6 +79,10 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		{
 			return this.requiredType;
 		}
+		if (this.valueCount == 0)
+		{
+			return this.requiredType = Types.VOID;
+		}
 		return this.requiredType = this.values[this.valueCount - 1].getType();
 	}
 	
