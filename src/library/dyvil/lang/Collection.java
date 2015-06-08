@@ -269,14 +269,17 @@ public interface Collection<E> extends Iterable<E>
 	
 	/**
 	 * Adds the element given by {@code element} to this collection and returns
-	 * the old element, if any. This method should throw an
-	 * {@link ImmutableException} if this is an immutable collection.
+	 * the {@code true} if it was not present in this collection, {@code false}
+	 * otherwise (does not apply to {@link List Lists} as the element will
+	 * always be appended at the end of the list, therefore always returning
+	 * {@code false}). This method should throw an {@link ImmutableException} if
+	 * this is an immutable collection.
 	 * 
 	 * @param element
 	 *            the element to be added
 	 * @return the old element
 	 */
-	public E add(E element);
+	public boolean add(E element);
 	
 	/**
 	 * Adds the element given by {@code element} to this collection. This method

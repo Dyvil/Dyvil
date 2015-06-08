@@ -74,7 +74,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	
 	@Override
 	@mutating
-	public default E add(E element)
+	public default boolean add(E element)
 	{
 		throw new ImmutableException("add() on Immutable Collection");
 	}

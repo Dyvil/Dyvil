@@ -88,7 +88,7 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	// Mutating Operations
 	
 	@Override
-	public default E add(E element)
+	public default boolean add(E element)
 	{
 		throw new ImmutableException("add() on Immutable Set");
 	}

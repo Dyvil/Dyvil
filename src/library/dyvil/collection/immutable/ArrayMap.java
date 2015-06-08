@@ -323,7 +323,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key)
+	public ImmutableMap<K, V> $minus(Object key)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -345,7 +345,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key, V value)
+	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -371,7 +371,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(V value)
+	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -393,7 +393,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];

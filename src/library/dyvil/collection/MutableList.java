@@ -125,7 +125,7 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	public void insert(int index, E element);
 	
 	@Override
-	public E add(E element);
+	public boolean add(E element);
 	
 	@Override
 	public E add(int index, E element);

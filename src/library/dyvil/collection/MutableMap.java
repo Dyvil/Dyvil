@@ -76,16 +76,16 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
 	@Override
-	public MutableMap<K, V> $minus(K key);
+	public MutableMap<K, V> $minus(Object key);
 	
 	@Override
-	public MutableMap<K, V> $minus(K key, V value);
+	public MutableMap<K, V> $minus(Object key, Object value);
 	
 	@Override
-	public MutableMap<K, V> $minus$colon(V value);
+	public MutableMap<K, V> $minus$colon(Object value);
 	
 	@Override
-	public MutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map);
+	public MutableMap<K, V> $minus$minus(Map<? super K, ? super V> map);
 	
 	@Override
 	public <U> MutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
@@ -102,16 +102,13 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public V put(K key, V value);
 	
 	@Override
-	public void $plus$plus$eq(Map<? extends K, ? extends V> map);
+	public V remove(Object key);
 	
 	@Override
-	public V remove(K key);
+	public boolean remove(Object key, Object value);
 	
 	@Override
-	public boolean remove(K key, V value);
-	
-	@Override
-	public void $minus$colon$eq(V value);
+	public void $minus$colon$eq(Object value);
 	
 	@Override
 	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);

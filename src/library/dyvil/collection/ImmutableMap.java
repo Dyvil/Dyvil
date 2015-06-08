@@ -117,22 +117,22 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key);
+	public ImmutableMap<K, V> $minus(Object key);
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key, V value);
+	public ImmutableMap<K, V> $minus(Object key, Object value);
 	
 	@Override
-	public default ImmutableMap<K, V> $minus(Entry<? extends K, ? extends V> entry)
+	public default ImmutableMap<K, V> $minus(Entry<? super K, ? super V> entry)
 	{
 		return this.$minus(entry.getKey(), entry.getValue());
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(V value);
+	public ImmutableMap<K, V> $minus$colon(Object value);
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map);
+	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map);
 	
 	@Override
 	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
@@ -179,42 +179,42 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	
 	@Override
 	@mutating
-	public default void $minus$eq(K key)
+	public default void $minus$eq(Object key)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
 	
 	@Override
 	@mutating
-	public default V remove(K key)
+	public default V remove(Object key)
 	{
 		throw new ImmutableException("remove() on Immutable Map");
 	}
 	
 	@Override
 	@mutating
-	public default boolean remove(K key, V value)
+	public default boolean remove(Object key, Object value)
 	{
 		throw new ImmutableException("remove() on Immutable Map");
 	}
 	
 	@Override
 	@mutating
-	public default void $minus$eq(Entry<? extends K, ? extends V> entry)
+	public default void $minus$eq(Entry<? super K, ? super V> entry)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
 	
 	@Override
 	@mutating
-	public default void $minus$colon$eq(V value)
+	public default void $minus$colon$eq(Object value)
 	{
 		throw new ImmutableException("-:= on Immutable Map");
 	}
 	
 	@Override
 	@mutating
-	public default void $minus$minus$eq(Map<? extends K, ? extends V> map)
+	public default void $minus$minus$eq(Map<? super K, ? super V> map)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}

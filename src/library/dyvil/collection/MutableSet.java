@@ -59,7 +59,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	// Mutating Operations
 	
 	@Override
-	public E add(E element);
+	public boolean add(E element);
 	
 	@Override
 	public boolean remove(E element);

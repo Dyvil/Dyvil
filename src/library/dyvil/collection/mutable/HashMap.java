@@ -429,7 +429,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public MutableMap<K, V> $minus(K key)
+	public MutableMap<K, V> $minus(Object key)
 	{
 		HashMap<K, V> copy = this.copy();
 		copy.$minus$eq(key);
@@ -437,7 +437,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public MutableMap<K, V> $minus(K key, V value)
+	public MutableMap<K, V> $minus(Object key, Object value)
 	{
 		HashMap<K, V> copy = this.copy();
 		copy.$minus(key);
@@ -445,7 +445,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public MutableMap<K, V> $minus$colon(V value)
+	public MutableMap<K, V> $minus$colon(Object value)
 	{
 		HashMap<K, V> copy = this.copy();
 		copy.$minus$colon(value);
@@ -453,7 +453,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public MutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
+	public MutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
 		HashMap<K, V> copy = this.copy();
 		copy.$minus$minus(map);
@@ -571,15 +571,6 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		return null;
 	}
 	
-	@Override
-	public void $plus$plus$eq(Map<? extends K, ? extends V> map)
-	{
-		for (Entry<? extends K, ? extends V> entry : map)
-		{
-			this.update(entry.getKey(), entry.getValue());
-		}
-	}
-	
 	private V removeNull()
 	{
 		HashEntry<K, V> prev = this.entries[0];
@@ -609,7 +600,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public void $minus$eq(K key)
+	public void $minus$eq(Object key)
 	{
 		if (key == null)
 		{
@@ -644,7 +635,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public V remove(K key)
+	public V remove(Object key)
 	{
 		if (key == null)
 		{
@@ -682,7 +673,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public boolean remove(K key, V value)
+	public boolean remove(Object key, Object value)
 	{
 		int hash = key == null ? 0 : hash(key.hashCode());
 		int i = index(hash, this.entries.length);
@@ -719,7 +710,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public void $minus$colon$eq(V value)
+	public void $minus$colon$eq(Object value)
 	{
 		for (int i = 0; i < this.entries.length; i++)
 		{
@@ -747,15 +738,6 @@ public class HashMap<K, V> implements MutableMap<K, V>
 				prev = e;
 				e = next;
 			}
-		}
-	}
-	
-	@Override
-	public void $minus$minus$eq(Map<? extends K, ? extends V> map)
-	{
-		for (Entry<? extends K, ? extends V> entry : map)
-		{
-			this.remove(entry.getKey(), entry.getValue());
 		}
 	}
 	
@@ -794,8 +776,6 @@ public class HashMap<K, V> implements MutableMap<K, V>
 					{
 						prev.next = next;
 					}
-					
-					return;
 				}
 				prev = e;
 				e = next;

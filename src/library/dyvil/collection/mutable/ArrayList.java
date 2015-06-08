@@ -261,13 +261,13 @@ public class ArrayList<E> implements MutableList<E>
 	@Override
 	public MutableList<? extends E> $bar(Collection<? extends E> collection)
 	{
-		return null; // FIXME
+		return null; // FIXME Test in immutable.ArrayList
 	}
 	
 	@Override
 	public MutableList<? extends E> $up(Collection<? extends E> collection)
 	{
-		return null; // FIXME
+		return null; // FIXME Test in immutable.ArrayList
 	}
 	
 	@Override
@@ -462,10 +462,10 @@ public class ArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public E add(E element)
+	public boolean add(E element)
 	{
 		this.$plus$eq(element);
-		return null;
+		return true;
 	}
 	
 	@Override
@@ -606,13 +606,13 @@ public class ArrayList<E> implements MutableList<E>
 	@Override
 	public void $bar$eq(Collection<? extends E> collection)
 	{
-		// FIXME
+		// FIXME Test in immutable.ArrayList
 	}
 	
 	@Override
 	public void $up$eq(Collection<? extends E> collection)
 	{
-		// FIXME
+		// FIXME Test in immutable.ArrayList
 	}
 	
 	@Override

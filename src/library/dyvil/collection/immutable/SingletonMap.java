@@ -128,25 +128,25 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key)
+	public ImmutableMap<K, V> $minus(Object key)
 	{
 		return Objects.equals(this.key, key) ? EmptyMap.emptyMap : this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key, V value)
+	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
 		return Objects.equals(this.key, key) && Objects.equals(this.value, value) ? EmptyMap.emptyMap : this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(V value)
+	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
 		return Objects.equals(this.value, value) ? EmptyMap.emptyMap : this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
 		return map.$qmark(this.key, this.value) ? EmptyMap.emptyMap : this;
 	}

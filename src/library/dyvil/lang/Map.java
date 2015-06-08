@@ -244,18 +244,18 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 */
 	public Map<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
-	public Map<K, V> $minus(K key);
+	public Map<K, V> $minus(Object key);
 	
-	public Map<K, V> $minus(K key, V value);
+	public Map<K, V> $minus(Object key, Object value);
 	
-	public default Map<K, V> $minus(Entry<? extends K, ? extends V> entry)
+	public default Map<K, V> $minus(Entry<? super K, ? super V> entry)
 	{
 		return this.$minus(entry.getKey(), entry.getValue());
 	}
 	
-	public Map<K, V> $minus$colon(V value);
+	public Map<K, V> $minus$colon(Object value);
 	
-	public Map<K, V> $minus$minus(Map<? extends K, ? extends V> map);
+	public Map<K, V> $minus$minus(Map<? super K, ? super V> map);
 	
 	public <U> Map<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
 	
@@ -277,27 +277,33 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		this.update(entry.getKey(), entry.getValue());
 	}
 	
-	public void $plus$plus$eq(Map<? extends K, ? extends V> map);
+	public default void $plus$plus$eq(Map<? extends K, ? extends V> map)
+	{
+		for (Entry<? extends K, ? extends V> entry : map)
+		{
+			this.update(entry.getKey(), entry.getValue());
+		}
+	}
 	
-	public default void $minus$eq(K key)
+	public default void $minus$eq(Object key)
 	{
 		this.remove(key);
 	}
 	
-	public V remove(K key);
+	public V remove(Object key);
 	
-	public boolean remove(K key, V value);
+	public boolean remove(Object key, Object value);
 	
-	public default void $minus$eq(Entry<? extends K, ? extends V> entry)
+	public default void $minus$eq(Entry<? super K, ? super V> entry)
 	{
 		this.remove(entry.getKey(), entry.getValue());
 	}
 	
-	public void $minus$colon$eq(V value);
+	public void $minus$colon$eq(Object value);
 	
-	public default void $minus$minus$eq(Map<? extends K, ? extends V> map)
+	public default void $minus$minus$eq(Map<? super K, ? super V> map)
 	{
-		for (Entry<? extends K, ? extends V> entry : map)
+		for (Entry<? super K, ? super V> entry : map)
 		{
 			this.remove(entry.getKey());
 		}

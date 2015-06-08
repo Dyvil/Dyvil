@@ -155,7 +155,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	@mutating
-	public default E add(E element)
+	public default boolean add(E element)
 	{
 		throw new ImmutableException("add() on Immutable List");
 	}

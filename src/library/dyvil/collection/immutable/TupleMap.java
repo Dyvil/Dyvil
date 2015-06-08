@@ -214,25 +214,25 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key)
+	public ImmutableMap<K, V> $minus(Object key)
 	{
 		return null;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key, V value)
+	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
 		return null;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(V value)
+	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
 		return null;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
 		return null;
 	}

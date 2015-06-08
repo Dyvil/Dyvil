@@ -104,25 +104,25 @@ public class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key)
+	public ImmutableMap<K, V> $minus(Object key)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key, V value)
+	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(V value)
+	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
 		return this;
 	}

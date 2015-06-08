@@ -272,7 +272,7 @@ public interface List<E> extends Collection<E>
 	public void insert(int index, E element);
 	
 	@Override
-	public E add(E element);
+	public boolean add(E element);
 	
 	/**
 	 * Inserts the element at the given {@code index} of this list. Unlike

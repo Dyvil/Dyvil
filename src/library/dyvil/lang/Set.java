@@ -83,7 +83,7 @@ public interface Set<E> extends Collection<E>
 	// Mutating Operations
 	
 	@Override
-	public E add(E element);
+	public boolean add(E element);
 	
 	@Override
 	public boolean remove(E element);
