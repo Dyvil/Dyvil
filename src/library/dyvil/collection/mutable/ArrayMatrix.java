@@ -12,14 +12,26 @@ import dyvil.collection.MutableList;
 import dyvil.collection.MutableMatrix;
 import dyvil.lang.Int;
 import dyvil.lang.List;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
 
+@NilConvertible
 public class ArrayMatrix<E> implements MutableMatrix<E>
 {
 	private int			rows;
 	private int			columns;
 	
 	private Object[]	cells;
+	
+	public static <E> ArrayList<E> apply()
+	{
+		return new ArrayList();
+	}
+	
+	public ArrayMatrix()
+	{
+		this.cells = new Object[0];
+	}
 	
 	public ArrayMatrix(int rows, int columns)
 	{
@@ -43,6 +55,24 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 		this.rows = rows;
 		this.columns = columns;
 		this.cells = cells;
+	}
+	
+	public ArrayMatrix(Object[][] cells)
+	{
+		this.rows = cells.length;
+		if (this.rows == 0)
+		{
+			this.cells = new Object[0];
+			return;
+		}
+		
+		this.columns = cells[0].length;
+		this.cells = new Object[this.rows * this.columns];
+		for (int row = 0; row < this.rows; row++)
+		{
+			Object[] rowArray = cells[row];
+			System.arraycopy(rowArray, 0, this.cells, row * this.columns, this.columns);
+		}
 	}
 	
 	private void rowRangeCheck(int row)
@@ -225,7 +255,7 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 		}
 		
 		Object[] newArray = new Object[rows * columns];
-		for (int i = 0; i < rows; i++)
+		for (int i = 0; i < this.rows; i++)
 		{
 			// Copy row by row
 			System.arraycopy(this.cells, i * this.columns, newArray, i * columns, this.columns);
@@ -239,7 +269,12 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 	public void addRow(List<E> row)
 	{
 		int size = row.size();
-		if (size > this.columns)
+		if (this.columns == 0 || this.rows == 0)
+		{
+			this.columns = size;
+			this.rows = 0;
+		}
+		else if (size > this.columns)
 		{
 			throw new IllegalArgumentException("Invalid Row: " + size + " > " + this.columns);
 		}
@@ -255,7 +290,12 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 	public void addColumn(List<E> column)
 	{
 		int size = column.size();
-		if (size > this.rows)
+		if (this.columns == 0 || this.rows == 0)
+		{
+			this.rows = size;
+			this.columns = 0;
+		}
+		else if (size > this.rows)
 		{
 			throw new IllegalArgumentException("Invalid Column: " + size + " > " + this.rows);
 		}
@@ -272,13 +312,65 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 	@Override
 	public void insertRow(int index, List<E> row)
 	{
-		// FIXME
+		if (index == this.rows)
+		{
+			this.addRow(row);
+			return;
+		}
+		
+		this.rowRangeCheck(index);
+		int size = row.size();
+		if (this.columns == 0 || this.rows == 0)
+		{
+			this.columns = size;
+			this.rows = 0;
+		}
+		else if (size > this.columns)
+		{
+			throw new IllegalArgumentException("Invalid Row: " + size + " > " + this.columns);
+		}
+		
+		int oldRows = this.rows;
+		int cellIndex = this.columns * index;
+		this.resize(this.rows + 1, this.columns);
+		System.arraycopy(this.cells, cellIndex, this.cells, cellIndex + this.columns, oldRows * this.columns - cellIndex);
+		row.toArray(cellIndex, this.cells);
 	}
 	
 	@Override
 	public void insertColumn(int index, List<E> column)
 	{
-		// FIXME
+		if (index == this.columns)
+		{
+			this.addColumn(column);
+			return;
+		}
+		
+		this.columnRangeCheck(index);
+		int size = column.size();
+		if (this.columns == 0 || this.rows == 0)
+		{
+			this.rows = size;
+			this.columns = 0;
+		}
+		else if (size > this.rows)
+		{
+			throw new IllegalArgumentException("Invalid Column: " + size + " > " + this.rows);
+		}
+		
+		int newColumns = this.columns + 1;
+		Object[] newCells = new Object[this.rows * newColumns];
+		for (int i = 0; i < this.rows; i++)
+		{
+			if (index > 0)
+			{
+				System.arraycopy(this.cells, i * columns, newCells, i * newColumns, index);
+			}
+			newCells[i * newColumns + index] = column.get(i);
+			System.arraycopy(this.cells, i * columns + index, newCells, i * newColumns + index + 1, this.columns - index);
+		}
+		this.columns = newColumns;
+		this.cells = newCells;
 	}
 	
 	@Override
@@ -300,13 +392,37 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 	@Override
 	public void removeRow(int index)
 	{
-		// FIXME
+		this.rowRangeCheck(index);
+		
+		int start = (index + 1) * this.columns;
+		int end = index * this.columns;
+		int cells = this.rows * this.columns;
+		System.arraycopy(this.cells, start, this.cells, end, cells - start);
+		for (int i = cells - end; i < cells; i++)
+		{
+			// Null the remaining cells to let GC do its thing
+			this.cells[i] = null;
+		}
+		this.rows--;
 	}
 	
 	@Override
 	public void removeColumn(int column)
 	{
-		// FIXME
+		this.columnRangeCheck(column);
+		
+		int newColumns = this.columns - 1;
+		Object[] newCells = new Object[this.rows * newColumns];
+		for (int i = 0; i < this.rows; i++)
+		{
+			if (column > 0)
+			{
+				System.arraycopy(this.cells, i * columns, newCells, i * newColumns, column);
+			}
+			System.arraycopy(this.cells, i * columns + column + 1, newCells, i * newColumns + column, this.columns - column - 1);
+		}
+		this.columns = newColumns;
+		this.cells = newCells;
 	}
 	
 	@Override
@@ -431,12 +547,14 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 	@Override
 	public void rowArray(int row, Object[] store)
 	{
+		this.rowRangeCheck(row);
 		System.arraycopy(this.cells, row * this.columns, store, 0, this.columns);
 	}
 	
 	@Override
 	public void columnArray(int column, Object[] store)
 	{
+		this.columnRangeCheck(column);
 		for (int i = 0; i < this.columns; i++)
 		{
 			store[i] = this.cells[column + i * this.rows];
@@ -462,7 +580,7 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 	@Override
 	public MutableMatrix<E> copy()
 	{
-		return new ArrayMatrix(this.rows, this.columns, this.cells, true);
+		return new ArrayMatrix(this.rows, this.columns, this.cells);
 	}
 	
 	@Override

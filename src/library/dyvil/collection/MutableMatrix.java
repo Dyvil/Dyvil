@@ -3,13 +3,28 @@ package dyvil.collection;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import dyvil.collection.mutable.ArrayMatrix;
 import dyvil.lang.Int;
 import dyvil.lang.List;
 import dyvil.lang.Matrix;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
 
+@NilConvertible
+@ArrayConvertible
 public interface MutableMatrix<E> extends Matrix<E>
 {
+	public static <E> MutableMatrix<E> apply()
+	{
+		return new ArrayMatrix();
+	}
+	
+	public static <E> MutableMatrix<E> apply(E[][] cells)
+	{
+		return new ArrayMatrix(cells);
+	}
+	
 	// Accessors
 	
 	@Override
