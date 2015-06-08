@@ -139,14 +139,27 @@ public final class NilValue implements IValue
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		// Write an array type
-		int dims = this.requiredType.getArrayDimensions();
-		if (dims > 0)
+		if (this.requiredType.isArrayType())
 		{
-			for (int i = 0; i < dims; i++)
+			IType elementType = this.requiredType.getElementType();
+			if (elementType.isPrimitive())
 			{
+				// Write a Field Access to the EMPTY fields in the Primitive
+				// Array Classes
+				writer.writeFieldInsn(Opcodes.GETSTATIC, this.requiredType.getTheClass().getInternalName(), "EMPTY", this.requiredType.getExtendedName());
+				return;
+			}
+			
+			writer.writeLDC(0);
+			int dims = 1;
+			while (elementType.isArrayType())
+			{
+				elementType = elementType.getElementType();
+				dims++;
 				writer.writeLDC(0);
 			}
-			writer.writeNewArray(this.requiredType, dims);
+			
+			writer.writeNewArray(elementType, dims);
 			return;
 		}
 		

@@ -570,7 +570,12 @@ public final class MethodWriterImpl implements MethodWriter
 		
 		this.insnCallback();
 		
-		String extended = type.getExtendedName();
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < dims; i++) {
+			builder.append('[');
+		}
+		type.appendExtendedName(builder);
+		String extended = builder.toString();
 		this.frame.visitNewArray(extended, dims);
 		
 		this.mv.visitMultiANewArrayInsn(extended, dims);

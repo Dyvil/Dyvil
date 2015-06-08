@@ -302,6 +302,12 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (this.elementType == null)
 		{
+			if (this.valueCount == 0)
+			{
+				markers.add(this.position, "array.empty");
+				return;
+			}
+			
 			this.getType();
 			
 			for (int i = 0; i < this.valueCount; i++)
