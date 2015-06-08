@@ -5,11 +5,32 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import dyvil.collection.mutable.HashMap;
+import dyvil.collection.mutable.MapBasedSet;
 import dyvil.lang.Collection;
 import dyvil.lang.Set;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
+@ArrayConvertible
 public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 {
+	public static <E> MutableSet<E> apply()
+	{
+		return new MapBasedSet<E>(new HashMap<E, Object>());
+	}
+	
+	public static <E> MutableSet<E> apply(E... elements)
+	{
+		HashMap<E, Object> hashMap = new HashMap(elements.length);
+		for (E element : elements)
+		{
+			hashMap.put(element, VALUE);
+		}
+		return new MapBasedSet<E>(hashMap);
+	}
+	
 	// Accessors
 	
 	@Override

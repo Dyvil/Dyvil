@@ -7,11 +7,22 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import dyvil.annotation.sealed;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
 public interface Set<E> extends Collection<E>
 {
+	@sealed
+	Object	VALUE	= new Object();
+	
+	public static <E> MutableSet<E> apply()
+	{
+		return MutableSet.apply();
+	}
+	
 	// Accessors
 	
 	@Override
