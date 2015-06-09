@@ -2,6 +2,7 @@ package dyvil.collection.iterator;
 
 import java.util.Iterator;
 
+import dyvil.array.ObjectArray;
 import dyvil.lang.literal.ArrayConvertible;
 
 @ArrayConvertible
@@ -51,5 +52,13 @@ public class ArrayIterator<E> implements Iterator<E>
 	public void remove()
 	{
 		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder("ArrayIterator(array: ");
+		ObjectArray.deepToString(this.array);
+		return builder.append(", index: ").append(this.index).append(", end: ").append(this.size).append(')').toString();
 	}
 }

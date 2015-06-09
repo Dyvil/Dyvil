@@ -127,8 +127,26 @@ public class StringRange implements Range<String>
 	}
 	
 	@Override
+	public Range<String> copy()
+	{
+		return new StringRange(this.first, this.last);
+	}
+	
+	@Override
 	public String toString()
 	{
 		return this.first + " .. " + this.last;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Range.rangeEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Range.rangeHashCode(this);
 	}
 }

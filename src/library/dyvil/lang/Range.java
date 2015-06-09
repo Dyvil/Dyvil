@@ -68,7 +68,7 @@ public interface Range<T> extends Iterable<T>
 		return array;
 	}
 	
-	// Copying
+	// toArray
 	
 	public default void toArray(Object[] store)
 	{
@@ -76,4 +76,38 @@ public interface Range<T> extends Iterable<T>
 	}
 	
 	public void toArray(int index, Object[] store);
+	
+	// Copying
+	
+	public Range<T> copy();
+	
+	// toString, equals and hashCode
+	
+	@Override
+	public String toString();
+	
+	@Override
+	public boolean equals(Object obj);
+	
+	@Override
+	public int hashCode();
+	
+	public static boolean rangeEquals(Range<?> range, Object o)
+	{
+		if (!(o instanceof Range))
+		{
+			return false;
+		}
+		return rangeEquals(range, (Range) o);
+	}
+	
+	public static boolean rangeEquals(Range<?> range1, Range<?> range2)
+	{
+		return range1.first().equals(range2.first()) && range1.last().equals(range2.last());
+	}
+	
+	public static int rangeHashCode(Range<?> range)
+	{
+		return range.first().hashCode() * 31 + range.last().hashCode();
+	}
 }

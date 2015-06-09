@@ -56,4 +56,10 @@ public class SingletonIterator<E> implements Iterator<E>
 			this.returned = true;
 		}
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "SingletonIterator(element: " + this.element + ", returned: " + this.returned + ")";
+	}
 }

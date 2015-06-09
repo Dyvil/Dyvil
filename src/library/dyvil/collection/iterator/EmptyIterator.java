@@ -42,4 +42,10 @@ public class EmptyIterator<E> implements Iterator<E>
 	public void forEachRemaining(Consumer<? super E> action)
 	{
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "EmptyIterator()";
+	}
 }

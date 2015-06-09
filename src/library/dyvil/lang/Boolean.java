@@ -102,7 +102,7 @@ public class Boolean
 		{
 			return true;
 		}
-		if (obj == null || !(obj instanceof Number))
+		if (obj == null || !(obj instanceof Boolean))
 		{
 			return false;
 		}

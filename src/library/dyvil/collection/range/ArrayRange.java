@@ -55,6 +55,11 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 		this.count = size;
 	}
 	
+	private ArrayRange(Ordered[] array, int count) {
+		this.array = array;
+		this.count = count;
+	}
+	
 	@Override
 	public T first()
 	{
@@ -114,8 +119,26 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 	}
 	
 	@Override
+	public Range<T> copy()
+	{
+		return new ArrayRange(this.array, this.count);
+	}
+	
+	@Override
 	public String toString()
 	{
 		return this.array[0] + " .. " + this.array[this.count - 1];
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Range.rangeEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Range.rangeHashCode(this);
 	}
 }
