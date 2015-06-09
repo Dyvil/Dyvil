@@ -123,5 +123,17 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
+	public default MutableSet<E> mutableCopy()
+	{
+		return this.copy();
+	}
+	
+	@Override
 	public ImmutableSet<E> immutable();
+	
+	@Override
+	public default ImmutableSet<E> immutableCopy()
+	{
+		return this.immutable();
+	}
 }

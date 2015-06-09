@@ -319,7 +319,13 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public MutableMap<K, V> mutable();
 	
+	public MutableMap<K, V> mutableCopy();
+	
 	public ImmutableMap<K, V> immutable();
+	
+	public ImmutableMap<K, V> immutableCopy();
+	
+	// toString, equals and hashCode
 	
 	@Override
 	public String toString();

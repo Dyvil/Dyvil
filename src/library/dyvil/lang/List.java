@@ -157,12 +157,6 @@ public interface List<E> extends Collection<E>
 	public List<? extends E> $amp(Collection<? extends E> collection);
 	
 	@Override
-	public List<? extends E> $bar(Collection<? extends E> collection);
-	
-	@Override
-	public List<? extends E> $up(Collection<? extends E> collection);
-	
-	@Override
 	public <R> List<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
@@ -310,12 +304,6 @@ public interface List<E> extends Collection<E>
 	
 	@Override
 	public void $amp$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $bar$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $up$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void clear();

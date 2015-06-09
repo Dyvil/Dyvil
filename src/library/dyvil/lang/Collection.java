@@ -210,30 +210,6 @@ public interface Collection<E> extends Iterable<E>
 	public Collection<? extends E> $amp(Collection<? extends E> collection);
 	
 	/**
-	 * Returns a collection that contains all elements of this collection plus
-	 * all elements of the given {@code collection} that are not currently
-	 * present in this collection.
-	 * 
-	 * @param collection
-	 *            the collection of elements to be added
-	 * @return a collection that contains all elements of this collection plus
-	 *         all elements in the given collection that are not present in this
-	 *         collection.
-	 */
-	public Collection<? extends E> $bar(Collection<? extends E> collection);
-	
-	/**
-	 * Returns a collection that contains all elements that are present in
-	 * either this or the given {@code collection}, but not in both.
-	 * 
-	 * @param collection
-	 *            the collection
-	 * @return a collection that contains all elements that are present in
-	 *         either this or the given collection, but not in both.
-	 */
-	public Collection<? extends E> $up(Collection<? extends E> collection);
-	
-	/**
 	 * Returns a collection that is mapped from this collection by supplying
 	 * each of this collection's elements to the given {@code mapper}, and
 	 * adding the returned mappings to a new collection.
@@ -364,24 +340,6 @@ public interface Collection<E> extends Iterable<E>
 	public void $amp$eq(Collection<? extends E> collection);
 	
 	/**
-	 * Adds all elements of the given {@code collection} if they are not already
-	 * present in this collection.
-	 * 
-	 * @param collection
-	 *            the collection to add
-	 */
-	public void $bar$eq(Collection<? extends E> collection);
-	
-	/**
-	 * Removes all elements of the given {@code collection} from this collection
-	 * and adds those that are not currently present in this collection.
-	 * 
-	 * @param collection
-	 *            the collection to XOR with
-	 */
-	public void $up$eq(Collection<? extends E> collection);
-	
-	/**
 	 * Clears this collection such that all elements of this collection are
 	 * removed and {@link #size()} returns {@code 0} after an invocation of this
 	 * method. Note that implementations of this method in classes using an
@@ -456,14 +414,14 @@ public interface Collection<E> extends Iterable<E>
 		return array;
 	}
 	
-	// Copying
-	
 	public default void toArray(Object[] store)
 	{
 		this.toArray(0, store);
 	}
 	
 	public void toArray(int index, Object[] store);
+	
+	// Copying
 	
 	/**
 	 * Creates a copy of this collection. The general contract of this method is
@@ -487,6 +445,8 @@ public interface Collection<E> extends Iterable<E>
 	 */
 	public MutableCollection<E> mutable();
 	
+	public MutableCollection<E> mutableCopy();
+	
 	/**
 	 * Returns an immutable copy of this collection. Already immutable
 	 * collections should return themselves when this method is called on them,
@@ -495,6 +455,10 @@ public interface Collection<E> extends Iterable<E>
 	 * @return an immutable copy of this collection
 	 */
 	public ImmutableCollection<E> immutable();
+	
+	public ImmutableCollection<E> immutableCopy();
+	
+	// toString, equals and hashCode
 	
 	@Override
 	public String toString();

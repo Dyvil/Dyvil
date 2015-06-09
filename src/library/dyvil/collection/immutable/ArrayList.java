@@ -8,9 +8,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.collection.ArrayIterator;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
 import dyvil.lang.literal.ArrayConvertible;
@@ -230,48 +230,6 @@ public class ArrayList<E> implements ImmutableList<E>
 		{
 			Object e = this.elements[i];
 			if (collection.$qmark(e))
-			{
-				array[index++] = e;
-			}
-		}
-		return new ArrayList(array, index, true);
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $bar(Collection<? extends E> collection)
-	{
-		int index = 0;
-		int len = collection.size();
-		Object[] array = new Object[this.size + len];
-		
-		for (int i = 0; i < this.size; i++)
-		{
-			Object e = this.elements[i];
-			if (!collection.$qmark(e))
-			{
-				array[index++] = e;
-			}
-		}
-		collection.toArray(index, array);
-		return new ArrayList(array, index + len, true);
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $up(Collection<? extends E> collection)
-	{
-		int index = 0;
-		Object[] array = new Object[this.size + collection.size()];
-		for (int i = 0; i < this.size; i++)
-		{
-			Object e = this.elements[i];
-			if (!collection.$qmark(e))
-			{
-				array[index++] = e;
-			}
-		}
-		for (E e : collection)
-		{
-			if (!this.$qmark(e))
 			{
 				array[index++] = e;
 			}

@@ -188,7 +188,13 @@ public interface Matrix<E> extends Iterable<E>
 	
 	public MutableMatrix<E> mutable();
 	
+	public MutableMatrix<E> mutableCopy();
+	
 	public ImmutableMatrix<E> immutable();
+	
+	public ImmutableMatrix<E> immutableCopy();
+	
+	// toString, equals and hashCode
 	
 	@Override
 	public String toString();

@@ -6,9 +6,9 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.collection.EmptyIterator;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
+import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.Entry;
 import dyvil.lang.Map;
 import dyvil.lang.literal.NilConvertible;

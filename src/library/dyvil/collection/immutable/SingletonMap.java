@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
-import dyvil.collection.SingletonIterator;
+import dyvil.collection.iterator.SingletonIterator;
 import dyvil.lang.Entry;
 import dyvil.lang.Map;
 import dyvil.tuple.Tuple2;

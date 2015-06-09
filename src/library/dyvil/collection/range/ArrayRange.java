@@ -3,7 +3,7 @@ package dyvil.collection.range;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import dyvil.collection.ArrayIterator;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Ordered;
 import dyvil.lang.Range;
 import dyvil.lang.literal.TupleConvertible;

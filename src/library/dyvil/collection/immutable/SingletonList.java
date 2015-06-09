@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
-import dyvil.collection.SingletonIterator;
+import dyvil.collection.iterator.SingletonIterator;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
 import dyvil.lang.literal.TupleConvertible;
@@ -142,49 +142,6 @@ public class SingletonList<E> implements ImmutableList<E>
 			return ImmutableList.apply();
 		}
 		return this;
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $bar(Collection<? extends E> collection)
-	{
-		if (collection.$qmark(this.element))
-		{
-			return new ArrayList(collection);
-		}
-		
-		int len = 1 + collection.size();
-		Object[] array = new Object[len];
-		array[0] = this.element;
-		collection.toArray(1, array);
-		return new ArrayList(array, len, true);
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $up(Collection<? extends E> collection)
-	{
-		if (collection.$qmark(this.element))
-		{
-			int len = collection.size();
-			Object[] array = new Object[len];
-			collection.toArray(array);
-			
-			for (int i = 0; i < len; i++)
-			{
-				if (this.element == array[i] || this.element != null && this.element.equals(array[i]))
-				{
-					System.arraycopy(array, i + 1, array, i, len - i - 1);
-					len--;
-					i--;
-				}
-			}
-			return new ArrayList(array, len, true);
-		}
-		
-		int len = 1 + collection.size();
-		Object[] array = new Object[len];
-		array[0] = this.element;
-		collection.toArray(1, array);
-		return new ArrayList(array, len, true);
 	}
 	
 	@Override

@@ -79,12 +79,6 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	public MutableList<? extends E> $amp(Collection<? extends E> collection);
 	
 	@Override
-	public MutableList<? extends E> $bar(Collection<? extends E> collection);
-	
-	@Override
-	public MutableList<? extends E> $up(Collection<? extends E> collection);
-	
-	@Override
 	public <R> MutableList<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
@@ -140,12 +134,6 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	public void $amp$eq(Collection<? extends E> collection);
 	
 	@Override
-	public void $bar$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $up$eq(Collection<? extends E> collection);
-	
-	@Override
 	public void clear();
 	
 	@Override
@@ -194,5 +182,17 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	}
 	
 	@Override
+	public default MutableList<E> mutableCopy()
+	{
+		return this.copy();
+	}
+	
+	@Override
 	public ImmutableList<E> immutable();
+	
+	@Override
+	public default ImmutableList<E> immutableCopy()
+	{
+		return this.immutable();
+	}
 }

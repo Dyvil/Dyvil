@@ -11,9 +11,9 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import dyvil.annotation.sealed;
-import dyvil.collection.ArrayIterator;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
 import dyvil.lang.literal.ArrayConvertible;
@@ -257,18 +257,6 @@ public class ArrayList<E> implements MutableList<E>
 			}
 		}
 		return new ArrayList(array, index, true);
-	}
-	
-	@Override
-	public MutableList<? extends E> $bar(Collection<? extends E> collection)
-	{
-		return null; // FIXME Test in immutable.ArrayList
-	}
-	
-	@Override
-	public MutableList<? extends E> $up(Collection<? extends E> collection)
-	{
-		return null; // FIXME Test in immutable.ArrayList
 	}
 	
 	@Override
@@ -602,18 +590,6 @@ public class ArrayList<E> implements MutableList<E>
 		}
 		this.elements = array;
 		this.size = index;
-	}
-	
-	@Override
-	public void $bar$eq(Collection<? extends E> collection)
-	{
-		// FIXME Test in immutable.ArrayList
-	}
-	
-	@Override
-	public void $up$eq(Collection<? extends E> collection)
-	{
-		// FIXME Test in immutable.ArrayList
 	}
 	
 	@Override

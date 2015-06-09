@@ -9,9 +9,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import dyvil.array.ObjectArray;
-import dyvil.collection.EmptyIterator;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
+import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
 import dyvil.lang.literal.NilConvertible;
@@ -127,18 +127,6 @@ public class EmptyList<E> implements ImmutableList<E>
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
 	{
 		return this;
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $bar(Collection<? extends E> collection)
-	{
-		return new ArrayList(collection);
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $up(Collection<? extends E> collection)
-	{
-		return new ArrayList(collection);
 	}
 	
 	@Override

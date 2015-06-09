@@ -242,8 +242,20 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public MutableMap<K, V> mutable();
 	
 	@Override
+	public default MutableMap<K, V> mutableCopy()
+	{
+		return this.mutable();
+	}
+	
+	@Override
 	public default ImmutableMap<K, V> immutable()
 	{
 		return this;
+	}
+	
+	@Override
+	public default ImmutableMap<K, V> immutableCopy()
+	{
+		return this.copy();
 	}
 }

@@ -139,5 +139,17 @@ public interface MutableMatrix<E> extends Matrix<E>
 	}
 	
 	@Override
+	public default MutableMatrix<E> mutableCopy()
+	{
+		return this.copy();
+	}
+	
+	@Override
 	public ImmutableMatrix<E> immutable();
+	
+	@Override
+	public default ImmutableMatrix<E> immutableCopy()
+	{
+		return this.immutable();
+	}
 }

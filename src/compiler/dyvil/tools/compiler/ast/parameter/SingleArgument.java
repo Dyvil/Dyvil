@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.parameter;
 import java.util.Collections;
 import java.util.Iterator;
 
-import dyvil.collection.SingletonIterator;
+import dyvil.collection.iterator.SingletonIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;

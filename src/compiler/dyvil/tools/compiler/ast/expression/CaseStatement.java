@@ -44,7 +44,7 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	@Override
 	public IType getType()
 	{
-		return Types.UNKNOWN;
+		return Types.VOID;
 	}
 	
 	@Override

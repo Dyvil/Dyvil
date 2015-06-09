@@ -56,12 +56,6 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	public ImmutableCollection<? extends E> $amp(Collection<? extends E> collection);
 	
 	@Override
-	public ImmutableCollection<? extends E> $bar(Collection<? extends E> collection);
-	
-	@Override
-	public ImmutableCollection<? extends E> $up(Collection<? extends E> collection);
-	
-	@Override
 	public <R> ImmutableCollection<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
@@ -123,20 +117,6 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	
 	@Override
 	@mutating
-	public default void $bar$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("|= on Immutable Collection");
-	}
-	
-	@Override
-	@mutating
-	public default void $up$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("^= on Immutable Collection");
-	}
-	
-	@Override
-	@mutating
 	public default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable Collection");
@@ -177,8 +157,20 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	public MutableCollection<E> mutable();
 	
 	@Override
+	public default MutableCollection<E> mutableCopy()
+	{
+		return this.mutable();
+	}
+	
+	@Override
 	public default ImmutableCollection<E> immutable()
 	{
 		return this;
+	}
+	
+	@Override
+	public default ImmutableCollection<E> immutableCopy()
+	{
+		return this.copy();
 	}
 }

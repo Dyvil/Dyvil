@@ -6,10 +6,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import dyvil.collection.ArrayIterator;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableList;
 import dyvil.collection.MutableMatrix;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Int;
 import dyvil.lang.List;
 import dyvil.lang.Matrix;

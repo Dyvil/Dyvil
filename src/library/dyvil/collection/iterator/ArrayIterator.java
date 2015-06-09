@@ -1,4 +1,4 @@
-package dyvil.collection;
+package dyvil.collection.iterator;
 
 import java.util.Iterator;
 
