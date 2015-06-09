@@ -189,4 +189,49 @@ public interface Matrix<E> extends Iterable<E>
 	public MutableMatrix<E> mutable();
 	
 	public ImmutableMatrix<E> immutable();
+	
+	@Override
+	public String toString();
+	
+	@Override
+	public boolean equals(Object obj);
+	
+	@Override
+	public int hashCode();
+	
+	public static boolean matrixEquals(Matrix<?> matrix, Object o)
+	{
+		if (!(o instanceof Matrix))
+		{
+			return false;
+		}
+		
+		return matrixEquals(matrix, o);
+	}
+	
+	public static boolean matrixEquals(Matrix<?> m1, Matrix<?> m2)
+	{
+		int rows = m1.rows();
+		if (rows != m2.rows())
+		{
+			return false;
+		}
+		int columns = m1.columns();
+		if (columns != m2.columns())
+		{
+			return false;
+		}
+		
+		return Collection.orderedEquals(m1, m2);
+	}
+	
+	public static int matrixHashCode(Matrix<?> matrix)
+	{
+		int result = matrix.rows() * 31 + matrix.columns();
+		for (Object o : matrix)
+		{
+			result = result * 31 + (o == null ? 0 : o.hashCode());
+		}
+		return result;
+	}
 }

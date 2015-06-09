@@ -180,4 +180,16 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	{
 		return "[ " + this.key + " -> " + this.value + " ]";
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Map.mapEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Map.mapHashCode(this);
+	}
 }

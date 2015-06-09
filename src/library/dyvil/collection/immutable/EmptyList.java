@@ -13,6 +13,7 @@ import dyvil.collection.EmptyIterator;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.List;
 import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
@@ -215,5 +216,17 @@ public class EmptyList<E> implements ImmutableList<E>
 	public String toString()
 	{
 		return "[]";
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return List.listEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return List.listHashCode(this);
 	}
 }

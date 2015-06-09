@@ -12,6 +12,7 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
 import dyvil.collection.SingletonIterator;
 import dyvil.lang.Collection;
+import dyvil.lang.List;
 import dyvil.lang.literal.TupleConvertible;
 
 @TupleConvertible
@@ -268,5 +269,17 @@ public class SingletonList<E> implements ImmutableList<E>
 	public String toString()
 	{
 		return new StringBuilder('[').append(this.element).append(']').toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return List.listEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return List.listHashCode(this);
 	}
 }

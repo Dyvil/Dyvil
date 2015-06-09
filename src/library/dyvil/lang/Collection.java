@@ -2,6 +2,7 @@ package dyvil.lang;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
@@ -494,4 +495,46 @@ public interface Collection<E> extends Iterable<E>
 	 * @return an immutable copy of this collection
 	 */
 	public ImmutableCollection<E> immutable();
+	
+	@Override
+	public String toString();
+	
+	@Override
+	public boolean equals(Object obj);
+	
+	@Override
+	public int hashCode();
+	
+	public static boolean orderedEquals(Iterable<?> c1, Iterable<?> c2)
+	{
+		Iterator iterator1 = c1.iterator();
+		Iterator iterator2 = c2.iterator();
+		while (iterator1.hasNext())
+		{
+			Object o1 = iterator1.next();
+			Object o2 = iterator2.next();
+			if (!Objects.equals(o1, o2))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static boolean unorderedEquals(Collection<?> c1, Collection<?> c2)
+	{
+		if (c1.size() != c2.size())
+		{
+			return false;
+		}
+		
+		for (Object o : c1)
+		{
+			if (!c2.$qmark(o))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 }

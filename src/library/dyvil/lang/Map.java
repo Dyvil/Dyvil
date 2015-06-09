@@ -320,4 +320,59 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	public MutableMap<K, V> mutable();
 	
 	public ImmutableMap<K, V> immutable();
+	
+	@Override
+	public String toString();
+	
+	@Override
+	public boolean equals(Object obj);
+	
+	@Override
+	public int hashCode();
+	
+	public static boolean mapEquals(Map<?, ?> map, Object obj)
+	{
+		if (!(obj instanceof Map))
+		{
+			return false;
+		}
+		
+		return mapEquals(map, (Map) obj);
+	}
+	
+	public static boolean mapEquals(Map<?, ?> map1, Map<?, ?> map2)
+	{
+		if (map1.size() != map2.size())
+		{
+			return false;
+		}
+		
+		for (Entry<?, ?> e : map1)
+		{
+			if (!map2.$qmark(e))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static int mapHashCode(Map<?, ?> map)
+	{
+		int sum = 0;
+		int product = 1;
+		for (Entry<?, ?> o : map)
+		{
+			Object key = o.getKey();
+			Object value = o.getValue();
+			if (key == null && value == null)
+			{
+				continue;
+			}
+			int hash = (key == null ? 0 : key.hashCode()) * 31 + (value == null ? 0 : value.hashCode());
+			sum += hash;
+			product *= hash;
+		}
+		return sum * 31 + product;
+	}
 }

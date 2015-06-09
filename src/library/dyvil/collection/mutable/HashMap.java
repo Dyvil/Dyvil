@@ -836,4 +836,16 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		int len = buf.length();
 		return buf.replace(len - 2, len, " ]").toString();
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Map.mapEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Map.mapHashCode(this);
+	}
 }

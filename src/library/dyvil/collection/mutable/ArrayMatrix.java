@@ -12,6 +12,7 @@ import dyvil.collection.MutableList;
 import dyvil.collection.MutableMatrix;
 import dyvil.lang.Int;
 import dyvil.lang.List;
+import dyvil.lang.Matrix;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
 
@@ -624,5 +625,17 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 			this.rowToString(builder, i);
 		}
 		return builder.append(']').toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Matrix.matrixEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Matrix.matrixHashCode(this);
 	}
 }

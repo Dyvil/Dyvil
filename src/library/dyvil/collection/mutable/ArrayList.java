@@ -15,6 +15,7 @@ import dyvil.collection.ArrayIterator;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.List;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
@@ -803,5 +804,17 @@ public class ArrayList<E> implements MutableList<E>
 		}
 		buf.append(']');
 		return buf.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return List.listEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return List.listHashCode(this);
 	}
 }

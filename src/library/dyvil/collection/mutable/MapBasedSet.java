@@ -10,6 +10,7 @@ import dyvil.collection.MutableMap;
 import dyvil.collection.MutableSet;
 import dyvil.lang.Collection;
 import dyvil.lang.Entry;
+import dyvil.lang.Set;
 
 public class MapBasedSet<E> implements MutableSet<E>
 {
@@ -195,5 +196,17 @@ public class MapBasedSet<E> implements MutableSet<E>
 			}
 		}
 		return builder.append("]").toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Set.setEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Set.setHashCode(this);
 	}
 }

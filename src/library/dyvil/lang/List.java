@@ -1,9 +1,6 @@
 package dyvil.lang;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -391,4 +388,45 @@ public interface List<E> extends Collection<E>
 	
 	@Override
 	public ImmutableList<E> immutable();
+
+	public static boolean listEquals(List<?> list, Object o)
+	{
+		if (!(o instanceof List))
+		{
+			return false;
+		}
+		
+		return listEquals((List) list, (List) o);
+	}
+
+	public static boolean listEquals(List<?> c1, List<?> c2)
+	{
+		if (c1.size() != c2.size())
+		{
+			return false;
+		}
+		
+		Iterator iterator1 = c1.iterator();
+		Iterator iterator2 = c2.iterator();
+		while (iterator1.hasNext())
+		{
+			Object o1 = iterator1.next();
+			Object o2 = iterator2.next();
+			if (!Objects.equals(o1, o2))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static int listHashCode(List<?> list)
+	{
+		int result = 1;
+		for (Object o : list)
+		{
+			result = 31 * result + (o == null ? 0 : o.hashCode());
+		}
+		return result;
+	}
 }

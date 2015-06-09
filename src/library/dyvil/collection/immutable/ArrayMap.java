@@ -485,4 +485,16 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		}
 		return builder.append(" ]").toString();
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Map.mapEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Map.mapHashCode(this);
+	}
 }
