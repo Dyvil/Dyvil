@@ -186,16 +186,19 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		switch (type)
 		{
-		case "dyvil.lang.annotation.sealed":
+		case "dyvil/annotation/sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
-		case "dyvil.lang.annotation.Strict":
+		case "dyvil/annotation/Strict":
 			this.modifiers |= Modifiers.STRICT;
 			return false;
-		case "java.lang.Deprecated":
+		case "dyvil/annotation/object":
+			this.modifiers |= Modifiers.OBJECT_CLASS;
+			return false;
+		case "java/lang/Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
 			return false;
-		case "java.lang.FunctionalInterface":
+		case "java/lang/FunctionalInterface":
 			this.modifiers |= Modifiers.FUNCTIONAL;
 			return false;
 		}
@@ -720,8 +723,8 @@ public class CodeClass extends ASTNode implements IClass
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			String fullName = a.type.getInternalName();
-			if (fullName != null && !this.addRawAnnotation(fullName))
+			String internalName = a.type.getInternalName();
+			if (internalName != null && !this.addRawAnnotation(internalName))
 			{
 				this.removeAnnotation(i--);
 				continue;

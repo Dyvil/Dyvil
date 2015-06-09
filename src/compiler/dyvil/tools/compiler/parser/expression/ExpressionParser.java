@@ -103,15 +103,19 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
+				int nextType = token.next().type();
+				if (nextType == Symbols.CLOSE_PARENTHESIS)
+				{
+					this.value = new VoidValue(token.to(token.next()));
+					pm.skip();
+					this.mode = 0;
+					return;
+				}
 				this.mode = TUPLE_END;
 				Tuple tv = new Tuple(token);
 				this.value = tv;
 				
-				int nextType = token.next().type();
-				if (nextType != Symbols.CLOSE_PARENTHESIS)
-				{
-					pm.pushParser(new ExpressionListParser(tv));
-				}
+				pm.pushParser(new ExpressionListParser(tv));
 				return;
 			}
 			if (type == Symbols.OPEN_SQUARE_BRACKET)

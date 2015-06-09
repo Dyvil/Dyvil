@@ -15,20 +15,21 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IValue extends IASTNode, ITyped
 {
-	int	NULL				= 0;
-	int	NIL					= 1;
-	int	WILDCARD			= 2;
-	int	BOOLEAN				= 3;
-	int	BYTE				= 4;
-	int	SHORT				= 5;
-	int	CHAR				= 6;
-	int	INT					= 7;
-	int	LONG				= 8;
-	int	FLOAT				= 9;
-	int	DOUBLE				= 10;
-	int	STRING				= 11;
-	int	FORMAT_STRING		= 12;
-	int	STRINGBUILDER		= 13;
+	int	VOID				= 0;
+	int	NULL				= 1;
+	int	NIL					= 2;
+	int	WILDCARD			= 3;
+	int	BOOLEAN				= 4;
+	int	BYTE				= 5;
+	int	SHORT				= 6;
+	int	CHAR				= 7;
+	int	INT					= 8;
+	int	LONG				= 9;
+	int	FLOAT				= 10;
+	int	DOUBLE				= 11;
+	int	STRING				= 12;
+	int	FORMAT_STRING		= 13;
+	int	STRINGBUILDER		= 14;
 	
 	int	THIS				= 16;
 	int	SUPER				= 17;

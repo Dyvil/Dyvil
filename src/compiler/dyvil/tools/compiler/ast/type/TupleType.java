@@ -170,47 +170,26 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (type.isGenericType())
+		if (!tupleClasses[this.typeCount].isSubTypeOf(type))
 		{
-			if (this.getTheClass() != type.getTheClass())
-			{
-				return false;
-			}
-			
-			GenericType generic = (GenericType) type;
-			if (this.typeCount != generic.typeCount())
-			{
-				return false;
-			}
-			
-			for (int i = 0; i < this.typeCount; i++)
-			{
-				if (!generic.getType(i).equals(this.types[i]))
-				{
-					return false;
-				}
-			}
-			return true;
+			return false;
 		}
-		if (type instanceof TupleType)
+		int typeTag = type.typeTag();
+		if (typeTag != GENERIC_TYPE && typeTag != TUPLE_TYPE)
 		{
-			TupleType tuple = (TupleType) type;
-			
-			if (this.typeCount != tuple.typeCount)
+			return false;
+		}
+		
+		ITypeList typeList = (ITypeList) type;
+		
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			if (typeList.getType(i).isSuperTypeOf(this.types[i]))
 			{
 				return false;
 			}
-			
-			for (int i = 0; i < this.typeCount; i++)
-			{
-				if (!tuple.types[i].equals(this.types[i]))
-				{
-					return false;
-				}
-			}
-			return true;
 		}
-		return Types.OBJECT.classEquals(type);
+		return true;
 	}
 	
 	@Override
@@ -255,8 +234,17 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public TupleType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context)
 	{
+		if (this.typeCount == 0)
+		{
+			return Types.VOID;
+		}
+		if (this.typeCount == 1)
+		{
+			return this.types[0].resolve(markers, context);
+		}
+		
 		for (int i = 0; i < this.typeCount; i++)
 		{
 			IType t = this.types[i].resolve(markers, context);

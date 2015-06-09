@@ -75,48 +75,48 @@ public class REPLVariable extends Field
 	
 	protected void compute()
 	{
-		if (this.className == null && !this.value.isConstant())
+		if (this.className != null || this.value.isConstant())
+			return;
+		
+		try
 		{
-			try
+			this.className = "REPL$" + classID++;
+			Class c = generateClass(this.value, this.type, this.className);
+			
+			if (this.type != Types.VOID)
 			{
-				this.className = "REPL$" + classID++;
-				Class c = generateClass(this.value, this.type, this.className);
-				
-				if (this.type != Types.VOID)
+				java.lang.reflect.Field[] fields = c.getDeclaredFields();
+				Object result = fields[0].get(null);
+				IValue v = IValue.fromObject(result);
+				if (v != null)
 				{
-					java.lang.reflect.Field[] fields = c.getDeclaredFields();
-					Object result = fields[0].get(null);
-					IValue v = IValue.fromObject(result);
-					if (v != null)
-					{
-						this.value = v;
-					}
-					else
-					{
-						this.value = new REPLResult(result);
-					}
+					this.value = v;
 				}
 				else
 				{
-					ReflectUtils.unsafe.ensureClassInitialized(c);
+					this.value = new REPLResult(result);
 				}
 			}
-			catch (ExceptionInInitializerError t)
+			else
 			{
-				Throwable ex = t.getCause();
-				System.err.println(ex.getClass().getCanonicalName() + ": " + ex.getMessage());
-				StackTraceElement[] trace = ex.getStackTrace();
-				int len = trace.length - 10;
-				for (int i = 0; i < len; i++)
-				{
-					System.err.println("\tat " + trace[i]);
-				}
-				this.value = this.type.getDefaultValue();
+				ReflectUtils.unsafe.ensureClassInitialized(c);
 			}
-			catch (Throwable t)
+		}
+		catch (ExceptionInInitializerError t)
+		{
+			Throwable ex = t.getCause();
+			System.err.println(ex.getClass().getCanonicalName() + ": " + ex.getMessage());
+			StackTraceElement[] trace = ex.getStackTrace();
+			int len = trace.length - 10;
+			for (int i = 0; i < len; i++)
 			{
-				t.printStackTrace();
+				System.err.println("\tat " + trace[i]);
 			}
+			this.value = this.type.getDefaultValue();
+		}
+		catch (Throwable t)
+		{
+			t.printStackTrace();
 		}
 	}
 	
@@ -177,9 +177,15 @@ public class REPLVariable extends Field
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
-		if (this.className == null || this.value.isConstant())
+		if (this.value.isConstant())
 		{
 			this.value.writeExpression(writer);
+			return;
+		}
+		
+		if (this.className == null)
+		{
+			this.type.writeDefaultValue(writer);
 			return;
 		}
 		

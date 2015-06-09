@@ -417,7 +417,7 @@ public final class MethodWriterImpl implements MethodWriter
 				}
 			}
 			this.visitFrame = true;
-			this.hasReturn = opcode != ATHROW;
+			this.hasReturn = true;
 		}
 		this.mv.visitInsn(opcode);
 	}

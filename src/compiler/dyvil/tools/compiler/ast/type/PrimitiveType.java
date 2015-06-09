@@ -232,6 +232,12 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
+	public void appendSignature(StringBuilder buf)
+	{
+		buf.append(this.getInternalName());
+	}
+	
+	@Override
 	public int getLoadOpcode()
 	{
 		switch (this.typecode)

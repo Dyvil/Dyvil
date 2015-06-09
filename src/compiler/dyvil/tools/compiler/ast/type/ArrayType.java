@@ -147,6 +147,10 @@ public class ArrayType implements IType, ITyped
 	@Override
 	public IType resolve(MarkerList markers, IContext context)
 	{
+		if (this.type == null)
+		{
+			this.type = Types.ANY;
+		}
 		this.type = this.type.resolve(markers, context);
 		return this;
 	}

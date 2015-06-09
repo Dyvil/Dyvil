@@ -46,6 +46,7 @@ public final class ExternalClass extends CodeClass
 	
 	private List<IType>	innerTypes;
 	
+	private boolean		metadataResolved;
 	private boolean		superTypesResolved;
 	private boolean		genericsResolved;
 	private boolean		annotationsResolved;
@@ -54,6 +55,12 @@ public final class ExternalClass extends CodeClass
 	public ExternalClass(Name name)
 	{
 		this.name = name;
+	}
+	
+	private void resolveMetadata()
+	{
+		this.metadata = IClass.getClassMetadata(this, this.modifiers);
+		this.metadata.resolve(null, this);
 	}
 	
 	private void resolveGenerics()
@@ -87,9 +94,9 @@ public final class ExternalClass extends CodeClass
 			this.interfaces[i] = this.interfaces[i].resolve(null, this);
 		}
 		
-		if (this.metadata == null)
+		if (!this.metadataResolved)
 		{
-			this.metadata = IClass.getClassMetadata(this, this.modifiers);
+			this.resolveMetadata();
 		}
 		this.metadata.resolve(null, Package.rootPackage);
 	}
@@ -100,6 +107,12 @@ public final class ExternalClass extends CodeClass
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			this.annotations[i].resolveTypes(null, Package.rootPackage);
+			
+			String internalName = this.annotations[i].type.getInternalName();
+			if (!this.addRawAnnotation(internalName))
+			{
+				this.removeAnnotation(i--);
+			}
 		}
 	}
 	
@@ -191,9 +204,9 @@ public final class ExternalClass extends CodeClass
 	@Override
 	public void addParameter(IParameter param)
 	{
-		if (this.metadata == null)
+		if (!this.metadataResolved)
 		{
-			this.metadata = IClass.getClassMetadata(this, this.modifiers);
+			this.resolveMetadata();
 		}
 		super.addParameter(param);
 	}
@@ -215,9 +228,9 @@ public final class ExternalClass extends CodeClass
 	@Override
 	public IClassMetadata getMetadata()
 	{
-		if (this.metadata == null)
+		if (!this.metadataResolved)
 		{
-			return this.metadata = IClass.getClassMetadata(this, this.modifiers);
+			this.resolveMetadata();
 		}
 		return this.metadata;
 	}

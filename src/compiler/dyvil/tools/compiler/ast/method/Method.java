@@ -823,8 +823,8 @@ public class Method extends Member implements IMethod
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
 					markers.add(position, "method.access.static", this.name.unqualified);
-					instance = null;
 				}
+				instance = null;
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
@@ -1182,10 +1182,6 @@ public class Method extends Member implements IMethod
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			if (instance != null && instance.valueTag() == IValue.CLASS_ACCESS)
-			{
-				instance = null;
-			}
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
@@ -1225,10 +1221,6 @@ public class Method extends Member implements IMethod
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			if (instance != null && instance.valueTag() == IValue.CLASS_ACCESS)
-			{
-				instance = null;
-			}
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
@@ -1251,10 +1243,6 @@ public class Method extends Member implements IMethod
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			if (instance != null && instance.valueTag() == IValue.CLASS_ACCESS)
-			{
-				instance = null;
-			}
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
