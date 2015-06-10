@@ -248,7 +248,6 @@ public final class MatchExpression extends ASTNode implements IValue
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
-		Label destLabel = null;
 		for (int i = 0; i < this.caseCount;)
 		{
 			CaseStatement c = this.cases[i];
@@ -256,48 +255,27 @@ public final class MatchExpression extends ASTNode implements IValue
 			IValue condition = c.condition;
 			IValue value = c.value;
 			
-			if (value == null)
-			{
-				if (destLabel == null)
-				{
-					destLabel = new Label();
-				}
-				
-				if (condition != null)
-				{
-					pattern.writeInvJump(writer, varIndex, elseLabel);
-					condition.writeJump(writer, destLabel);
-				}
-				else
-				{
-					pattern.writeJump(writer, varIndex, destLabel);
-				}
-				
-				writer.resetLocals(localCount);
-				++i;
-				continue;
-			}
-			
 			pattern.writeInvJump(writer, varIndex, elseLabel);
 			if (condition != null)
 			{
 				condition.writeInvJump(writer, elseLabel);
 			}
 			
-			if (destLabel != null)
+			if (value != null)
 			{
-				writer.writeLabel(destLabel);
-				destLabel = null;
+				if (expr)
+				{
+					value.writeExpression(writer);
+					writer.getFrame().set(frameType);
+				}
+				else
+				{
+					value.writeStatement(writer);
+				}
 			}
-			
-			if (expr)
+			else if (expr)
 			{
-				value.writeExpression(writer);
-				writer.getFrame().set(frameType);
-			}
-			else
-			{
-				value.writeStatement(writer);
+				this.type.writeDefaultValue(writer);
 			}
 			
 			writer.resetLocals(localCount);
