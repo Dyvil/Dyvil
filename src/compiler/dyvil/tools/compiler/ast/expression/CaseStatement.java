@@ -2,10 +2,17 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.List;
 
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+
+import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -14,21 +21,32 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.pattern.IPatterned;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class CaseStatement extends ASTNode implements IValue, IValued, IPatterned, IContext
+public final class CaseStatement extends ASTNode implements IValue, IValued, IPatterned, IClassCompilable, IContext
 {
-	protected IPattern			pattern;
-	protected IValue			condition;
-	protected IValue			value;
+	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
+	public static final ITypeVariable	PAR_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(0);
+	public static final ITypeVariable	RETURN_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(1);
 	
-	private transient IContext	context;
+	protected IPattern					pattern;
+	protected IValue					condition;
+	protected IValue					value;
+	
+	protected IType						type;
+	private String						internalClassName;
+	
+	private transient IContext			context;
 	
 	public CaseStatement(ICodePosition position)
 	{
@@ -41,21 +59,54 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 		return CASE_STATEMENT;
 	}
 	
+	public void setMatchCase()
+	{
+		this.type = Types.UNKNOWN;
+	}
+	
 	@Override
 	public IType getType()
 	{
-		return Types.VOID;
+		if (this.type == null)
+		{
+			GenericType gt = new GenericType(PARTIALFUNCTION_CLASS);
+			IType t1 = this.pattern.getType();
+			if (t1.isPrimitive())
+			{
+				t1 = t1.getReferenceType();
+			}
+			gt.addType(t1);
+			
+			t1 = this.value.getType();
+			if (t1.isPrimitive())
+			{
+				t1 = t1.getReferenceType();
+			}
+			gt.addType(t1);
+			return this.type = gt;
+		}
+		return this.type;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.VOID;
+		IClass iclass = type.getTheClass();
+		return iclass == Types.OBJECT_CLASS || iclass == PARTIALFUNCTION_CLASS;
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
+		IClass iclass = type.getTheClass();
+		if (iclass == Types.OBJECT_CLASS)
+		{
+			return 2;
+		}
+		if (iclass == PARTIALFUNCTION_CLASS)
+		{
+			return 3;
+		}
 		return 0;
 	}
 	
@@ -98,7 +149,7 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	@Override
 	public boolean isStatic()
 	{
-		return this.context.isStatic();
+		return true;
 	}
 	
 	@Override
@@ -134,7 +185,11 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 			return f;
 		}
 		
-		return this.context.resolveField(name);
+		if (this.type == Types.UNKNOWN)
+		{
+			return this.context.resolveField(name);
+		}
+		return null;
 	}
 	
 	@Override
@@ -200,10 +255,33 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 		{
 			this.condition.checkTypes(markers, this);
 		}
+		
+		if (this.type != Types.UNKNOWN)
+		{
+			IClass iclass = context.getThisClass();
+			IDyvilHeader unit = iclass.getUnit();
+			this.internalClassName = iclass.getInternalName() + "$" + unit.innerClassCount();
+			unit.addInnerClass(this);
+			
+			if (this.pattern != null)
+			{
+				this.pattern.resolve(markers, context);
+				IType type1 = this.type.resolveType(PAR_TYPE);
+				this.pattern = this.pattern.withType(type1);
+				this.pattern.checkTypes(markers, context);
+			}
+			if (this.value != null)
+			{
+				IType type1 = this.type.resolveType(RETURN_TYPE);
+				this.value = this.value.withType(type1);
+			}
+		}
+		
 		if (this.value != null)
 		{
 			this.value.checkTypes(markers, this);
 		}
+		
 		this.context = null;
 	}
 	
@@ -237,13 +315,130 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	}
 	
 	@Override
+	public String getFileName()
+	{
+		return this.internalClassName.substring(this.internalClassName.lastIndexOf('/') + 1);
+	}
+	
+	@Override
+	public void write(ClassWriter writer) throws BytecodeException
+	{
+		IType parType = this.type.resolveType(PAR_TYPE);
+		IType returnType = this.type.resolveType(RETURN_TYPE);
+		String parFrameType = parType.getInternalName();
+		
+		StringBuilder builder = new StringBuilder("Ljava/lang/Object;");
+		this.type.appendSignature(builder);
+		
+		// Header
+		String signature = builder.toString();
+		writer.visit(DyvilCompiler.classVersion, 0, this.internalClassName, signature, "java/lang/Object", new String[] { "dyvil/function/PartialFunction" });
+		
+		// Constructor
+		MethodVisitor mv = writer.visitMethod(0, "<init>", "()V", null, null);
+		mv.visitCode();
+		mv.visitVarInsn(Opcodes.ALOAD, 0);
+		mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+		mv.visitInsn(Opcodes.RETURN);
+		mv.visitMaxs(1, 1);
+		mv.visitEnd();
+		
+		// isDefined
+		
+		StringBuilder descBuilder = new StringBuilder();
+		descBuilder.append('(');
+		parType.appendExtendedName(descBuilder);
+		String definedDesc = descBuilder.append(")Z").toString();
+		
+		StringBuilder signatureBuilder = new StringBuilder();
+		signatureBuilder.append('(');
+		parType.appendSignature(signatureBuilder);
+		signature = signatureBuilder.append(")Z").toString();
+		
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "isDefined", definedDesc, signature, null));
+		Label elseLabel = new Label();
+		mw.begin();
+		mw.setThisType(this.internalClassName);
+		mw.setLocalType(1, parFrameType);
+		this.pattern.writeInvJump(mw, 1, elseLabel);
+		if (this.condition != null)
+		{
+			this.condition.writeInvJump(mw, elseLabel);
+		}
+		mw.writeLDC(1);
+		mw.writeInsn(Opcodes.IRETURN);
+		mw.writeLabel(elseLabel);
+		mw.writeLDC(0);
+		mw.writeInsn(Opcodes.IRETURN);
+		mw.end();
+		
+		// apply
+		
+		descBuilder.deleteCharAt(descBuilder.length() - 1);
+		returnType.appendExtendedName(descBuilder);
+		String applyDesc = descBuilder.toString();
+		
+		signatureBuilder.deleteCharAt(signatureBuilder.length() - 1);
+		returnType.appendExtendedName(signatureBuilder);
+		signature = signatureBuilder.toString();
+		
+		mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "apply", applyDesc, signature, null));
+		elseLabel = new Label();
+		mw.begin();
+		mw.setThisType(this.internalClassName);
+		mw.setLocalType(1, parFrameType);
+		mw.writeVarInsn(Opcodes.ALOAD, 0);
+		mw.writeVarInsn(Opcodes.ALOAD, 1);
+		mw.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.internalClassName, "isDefined", definedDesc, false);
+		mw.writeJumpInsn(Opcodes.IFNE, elseLabel);
+		mw.writeInsn(Opcodes.ACONST_NULL);
+		mw.writeInsn(Opcodes.ARETURN);
+		mw.writeLabel(elseLabel);
+		this.value.writeExpression(mw);
+		mw.writeInsn(Opcodes.ARETURN);
+		mw.end(returnType);
+		
+		// Bridge Methods
+		
+		if (!parType.classEquals(Types.OBJECT) || !returnType.classEquals(Types.OBJECT))
+		{
+			// isDefined bridge
+			
+			mv = writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, "isDefined", "(Ljava/lang/Object;)Z", null, null);
+			mv.visitCode();
+			mv.visitVarInsn(Opcodes.ALOAD, 0);
+			mv.visitVarInsn(Opcodes.ALOAD, 1);
+			mv.visitTypeInsn(Opcodes.CHECKCAST, parFrameType);
+			mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, this.internalClassName, "isDefined", definedDesc, false);
+			mv.visitInsn(Opcodes.IRETURN);
+			mv.visitMaxs(2, 2);
+			
+			// apply bridge
+			
+			mv = writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, "apply", "(Ljava/lang/Object;)Ljava/lang/Object;", null, null);
+			mv.visitCode();
+			mv.visitVarInsn(Opcodes.ALOAD, 0);
+			mv.visitVarInsn(Opcodes.ALOAD, 1);
+			mv.visitTypeInsn(Opcodes.CHECKCAST, parFrameType);
+			mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, this.internalClassName, "apply", applyDesc, false);
+			mv.visitInsn(Opcodes.ARETURN);
+			mv.visitMaxs(2, 2);
+		}
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
+		writer.writeTypeInsn(Opcodes.NEW, this.internalClassName);
+		writer.writeInsn(Opcodes.DUP);
+		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, this.internalClassName, "<init>", "()V", false);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
+		this.writeExpression(writer);
+		writer.writeInsn(Opcodes.ARETURN);
 	}
 	
 	@Override

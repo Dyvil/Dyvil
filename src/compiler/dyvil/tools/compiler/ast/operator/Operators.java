@@ -171,6 +171,7 @@ public interface Operators
 				}
 				
 				cases[i] = (CaseStatement) v;
+				cases[i].setMatchCase();
 			}
 			
 			return new MatchExpression(arg1, cases);

@@ -139,7 +139,9 @@ public final class MatchExpression extends ASTNode implements IValue
 		this.value.resolveTypes(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			this.cases[i].resolveTypes(markers, context);
+			CaseStatement caseStatement = this.cases[i];
+			caseStatement.setMatchCase();
+			caseStatement.resolveTypes(markers, context);
 		}
 	}
 	
