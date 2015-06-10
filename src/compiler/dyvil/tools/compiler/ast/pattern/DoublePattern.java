@@ -35,11 +35,7 @@ public final class DoublePattern extends ASTNode implements IPattern
 	@Override
 	public IPattern withType(IType type)
 	{
-		if (type == Types.DOUBLE)
-		{
-			return this;
-		}
-		return type.isSuperTypeOf(Types.DOUBLE) ? new BoxPattern(this, Types.DOUBLE.unboxMethod) : null;
+		return IPattern.primitiveWithType(this, type, Types.DOUBLE);
 	}
 	
 	@Override

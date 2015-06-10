@@ -35,11 +35,7 @@ public final class CharPattern extends ASTNode implements IPattern
 	@Override
 	public IPattern withType(IType type)
 	{
-		if (type == Types.CHAR)
-		{
-			return this;
-		}
-		return type.isSuperTypeOf(Types.CHAR) ? new BoxPattern(this, Types.CHAR.unboxMethod) : null;
+		return IPattern.primitiveWithType(this, type, Types.CHAR);
 	}
 	
 	@Override

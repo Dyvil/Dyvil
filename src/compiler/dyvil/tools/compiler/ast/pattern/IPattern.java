@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -49,6 +50,23 @@ public interface IPattern extends IASTNode, ITyped
 	};
 	
 	public IPattern withType(IType type);
+	
+	public static IPattern primitiveWithType(IPattern pattern, IType type, PrimitiveType primitiveType)
+	{
+		if (type == primitiveType)
+		{
+			return pattern;
+		}
+		if (type.classEquals(primitiveType))
+		{
+			return new BoxPattern(pattern, primitiveType.unboxMethod);
+		}
+		if (type.isSuperTypeOf(primitiveType))
+		{
+			return new TypeCheckPattern(new BoxPattern(pattern, primitiveType.unboxMethod), primitiveType.getReferenceType());
+		}
+		return null;
+	}
 	
 	@Override
 	public boolean isType(IType type);

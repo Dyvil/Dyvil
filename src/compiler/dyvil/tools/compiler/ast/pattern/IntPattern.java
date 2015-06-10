@@ -41,11 +41,7 @@ public final class IntPattern extends ASTNode implements IPattern
 	@Override
 	public IPattern withType(IType type)
 	{
-		if (type == Types.INT)
-		{
-			return this;
-		}
-		return type.isSuperTypeOf(Types.INT) ? new BoxPattern(this, Types.INT.unboxMethod) : null;
+		return IPattern.primitiveWithType(this, type, Types.INT);
 	}
 	
 	@Override

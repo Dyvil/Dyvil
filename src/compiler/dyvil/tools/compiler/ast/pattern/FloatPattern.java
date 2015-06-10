@@ -35,11 +35,7 @@ public final class FloatPattern extends ASTNode implements IPattern
 	@Override
 	public IPattern withType(IType type)
 	{
-		if (type == Types.FLOAT)
-		{
-			return this;
-		}
-		return type.isSuperTypeOf(Types.FLOAT) ? new BoxPattern(this, Types.FLOAT.unboxMethod) : null;
+		return IPattern.primitiveWithType(this, type, Types.FLOAT);
 	}
 	
 	@Override

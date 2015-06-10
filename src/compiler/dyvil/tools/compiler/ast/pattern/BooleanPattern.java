@@ -35,11 +35,7 @@ public final class BooleanPattern extends ASTNode implements IPattern
 	@Override
 	public IPattern withType(IType type)
 	{
-		if (type == Types.BOOLEAN)
-		{
-			return this;
-		}
-		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxPattern(this, Types.BOOLEAN.unboxMethod) : null;
+		return IPattern.primitiveWithType(this, type, Types.BOOLEAN);
 	}
 	
 	@Override

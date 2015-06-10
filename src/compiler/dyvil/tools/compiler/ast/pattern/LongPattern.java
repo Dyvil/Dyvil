@@ -35,11 +35,7 @@ public final class LongPattern extends ASTNode implements IPattern
 	@Override
 	public IPattern withType(IType type)
 	{
-		if (type == Types.LONG)
-		{
-			return this;
-		}
-		return type.isSuperTypeOf(Types.LONG) ? new BoxPattern(this, Types.LONG.unboxMethod) : null;
+		return IPattern.primitiveWithType(this, type, Types.LONG);
 	}
 	
 	@Override
