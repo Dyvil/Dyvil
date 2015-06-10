@@ -113,9 +113,16 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public IPattern resolve(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context);
+		
+		for (int i = 0; i < this.patternCount; i++)
+		{
+			this.patterns[i] = this.patterns[i].resolve(markers, context);
+		}
+		
+		return this;
 	}
 	
 	@Override
@@ -150,8 +157,10 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 			}
 			else
 			{
-				this.patterns[i] = pattern1;
+				this.patterns[i] = pattern = pattern1;
 			}
+			
+			pattern.checkTypes(markers, context);
 		}
 	}
 	

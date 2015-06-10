@@ -16,7 +16,7 @@ public final class BindingPattern extends ASTNode implements IPattern
 {
 	private Name		name;
 	private Variable	variable;
-	private IType		type = Types.UNKNOWN;
+	private IType		type	= Types.UNKNOWN;
 	
 	public BindingPattern(ICodePosition position, Name name)
 	{
@@ -33,7 +33,7 @@ public final class BindingPattern extends ASTNode implements IPattern
 	@Override
 	public boolean isExhaustive()
 	{
-		return true;
+		return this.type == Types.ANY || this.type == Types.UNKNOWN;
 	}
 	
 	@Override
@@ -45,8 +45,12 @@ public final class BindingPattern extends ASTNode implements IPattern
 	@Override
 	public IPattern withType(IType type)
 	{
-		this.type = type;
-		return this;
+		if (this.type == Types.ANY || this.type == Types.UNKNOWN)
+		{
+			this.type = type;
+			return this;
+		}
+		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
 	@Override

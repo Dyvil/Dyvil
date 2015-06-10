@@ -127,7 +127,7 @@ public interface IValue extends IASTNode, ITyped
 			return null;
 		}
 		
-		boolean primitive = this.isPrimitive();
+		boolean primitive = thisType.isPrimitive();
 		if (primitive != type.isPrimitive())
 		{
 			// Box Primitive -> Object

@@ -178,7 +178,9 @@ public interface Operators
 		}
 		if (arg2.valueTag() == IValue.CASE_STATEMENT)
 		{
-			return new MatchExpression(arg1, new CaseStatement[] { (CaseStatement) arg2 });
+			CaseStatement cs = (CaseStatement) arg2;
+			cs.setMatchCase();
+			return new MatchExpression(arg1, new CaseStatement[] { cs });
 		}
 		return null;
 	}

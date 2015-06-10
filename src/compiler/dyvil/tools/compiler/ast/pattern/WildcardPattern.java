@@ -50,12 +50,19 @@ public final class WildcardPattern extends ASTNode implements IPattern
 	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
-		writer.writeInsn(Opcodes.AUTO_POP);
+		if (varIndex < 0)
+		{
+			writer.writeInsn(Opcodes.AUTO_POP);
+		}
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
+		if (varIndex < 0)
+		{
+			writer.writeInsn(Opcodes.AUTO_POP);
+		}
 	}
 	
 	@Override

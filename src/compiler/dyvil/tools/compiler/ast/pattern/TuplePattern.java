@@ -134,6 +134,17 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 	}
 	
 	@Override
+	public IPattern resolve(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.patternCount; i++)
+		{
+			this.patterns[i] = this.patterns[i].resolve(markers, context);
+		}
+		
+		return this;
+	}
+	
+	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		ITypeList typeList = (ITypeList) this.tupleType;
@@ -151,8 +162,10 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			}
 			else
 			{
-				this.patterns[i] = pattern1;
+				this.patterns[i] = pattern = pattern1;
 			}
+			
+			pattern.checkTypes(markers, context);
 		}
 	}
 	

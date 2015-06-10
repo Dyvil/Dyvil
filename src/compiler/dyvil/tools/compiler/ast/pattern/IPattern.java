@@ -79,8 +79,9 @@ public interface IPattern extends IASTNode, ITyped
 		return null;
 	}
 	
-	public default void resolve(MarkerList markers, IContext context)
+	public default IPattern resolve(MarkerList markers, IContext context)
 	{
+		return this;
 	}
 	
 	public default void checkTypes(MarkerList markers, IContext context)

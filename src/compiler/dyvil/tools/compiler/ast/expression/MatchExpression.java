@@ -160,7 +160,7 @@ public final class MatchExpression extends ASTNode implements IValue
 			}
 			
 			IPattern pattern = c.pattern;
-			pattern.resolve(markers, context);
+			pattern = pattern.resolve(markers, context);
 			
 			if (pattern.isExhaustive())
 			{
@@ -179,10 +179,11 @@ public final class MatchExpression extends ASTNode implements IValue
 			}
 			else
 			{
-				c.pattern = pattern = pattern1;
+				pattern = pattern1;
 			}
 			
 			pattern.checkTypes(markers, context);
+			c.pattern = pattern;
 			
 			this.cases[i].resolve(markers, context);
 		}

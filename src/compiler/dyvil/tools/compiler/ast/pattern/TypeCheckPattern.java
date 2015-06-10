@@ -89,17 +89,26 @@ public class TypeCheckPattern implements IPattern
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 		writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
 		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
-		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
-		this.pattern.writeInvJump(writer, -1, elseLabel);
-		writer.resetLocals(varIndex);
+		
+		if (this.pattern.getPatternType() != WILDCARD)
+		{
+			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
+			this.pattern.writeInvJump(writer, -1, elseLabel);
+		}
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.pattern.toString(prefix, buffer);
-		buffer.append(" as ");
-		this.type.toString(prefix, buffer);
+		if (this.pattern != null)
+		{
+			this.pattern.toString(prefix, buffer);
+		}
+		if (!this.pattern.isType(this.type))
+		{
+			buffer.append(" as ");
+			this.type.toString(prefix, buffer);
+		}
 	}
 }

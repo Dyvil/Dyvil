@@ -79,12 +79,19 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 			}
 			gt.addType(t1);
 			
-			t1 = this.value.getType();
-			if (t1.isPrimitive())
+			if (this.value != null)
 			{
-				t1 = t1.getReferenceType();
+				t1 = this.value.getType();
+				if (t1.isPrimitive())
+				{
+					t1 = t1.getReferenceType();
+				}
+				gt.addType(t1);
 			}
-			gt.addType(t1);
+			else
+			{
+				gt.addType(new Type(Types.VOID_CLASS));
+			}
 			return this.type = gt;
 		}
 		return this.type;
@@ -269,6 +276,11 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 		
 		if (this.type != Types.UNKNOWN)
 		{
+			if (this.type == null)
+			{
+				this.getType();
+			}
+			
 			IClass iclass = context.getThisClass();
 			IDyvilHeader unit = iclass.getUnit();
 			this.internalClassName = iclass.getInternalName() + "$" + unit.innerClassCount();
@@ -405,7 +417,14 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 		mw.writeInsn(Opcodes.ACONST_NULL);
 		mw.writeInsn(Opcodes.ARETURN);
 		mw.writeLabel(elseLabel);
-		this.value.writeExpression(mw);
+		if (this.value != null)
+		{
+			this.value.writeExpression(mw);
+		}
+		else
+		{
+			mw.writeInsn(Opcodes.ACONST_NULL);
+		}
 		mw.writeInsn(Opcodes.ARETURN);
 		mw.end(returnType);
 		

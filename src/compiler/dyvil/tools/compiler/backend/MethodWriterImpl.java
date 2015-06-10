@@ -305,8 +305,6 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeInsn(int opcode) throws BytecodeException
 	{
-		this.insnCallback();
-		
 		if (opcode <= 0)
 		{
 			return;
@@ -317,6 +315,7 @@ public final class MethodWriterImpl implements MethodWriter
 			switch (opcode)
 			{
 			case Opcodes.LCONST_M1:
+				this.frame.push(ClassFormat.LONG);
 				this.mv.visitLdcInsn(LONG_MINUS_ONE);
 				return;
 			case Opcodes.BINV:
@@ -339,42 +338,54 @@ public final class MethodWriterImpl implements MethodWriter
 				this.mv.visitInsn(Opcodes.IXOR);
 				return;
 			case Opcodes.L2B:
+				this.frame.set(ClassFormat.BYTE);
 				this.mv.visitInsn(Opcodes.L2I);
 				this.mv.visitInsn(Opcodes.I2B);
 				return;
 			case Opcodes.L2S:
+				this.frame.set(ClassFormat.SHORT);
 				this.mv.visitInsn(Opcodes.L2I);
 				this.mv.visitInsn(Opcodes.I2S);
 				return;
 			case Opcodes.L2C:
+				this.frame.set(ClassFormat.CHAR);
 				this.mv.visitInsn(Opcodes.L2I);
 				this.mv.visitInsn(Opcodes.I2C);
 				return;
 			case Opcodes.F2B:
+				this.frame.set(ClassFormat.BYTE);
 				this.mv.visitInsn(Opcodes.F2I);
 				this.mv.visitInsn(Opcodes.I2B);
 				return;
 			case Opcodes.F2S:
+				this.frame.set(ClassFormat.SHORT);
 				this.mv.visitInsn(Opcodes.F2I);
 				this.mv.visitInsn(Opcodes.I2S);
 				return;
 			case Opcodes.F2C:
+				this.frame.set(ClassFormat.CHAR);
 				this.mv.visitInsn(Opcodes.F2I);
 				this.mv.visitInsn(Opcodes.I2C);
 				return;
 			case Opcodes.D2B:
+				this.frame.set(ClassFormat.BYTE);
 				this.mv.visitInsn(Opcodes.D2I);
 				this.mv.visitInsn(Opcodes.I2B);
 				return;
 			case Opcodes.D2S:
+				this.frame.set(ClassFormat.SHORT);
 				this.mv.visitInsn(Opcodes.D2I);
 				this.mv.visitInsn(Opcodes.I2S);
 				return;
 			case Opcodes.D2C:
+				this.frame.set(ClassFormat.CHAR);
 				this.mv.visitInsn(Opcodes.D2I);
 				this.mv.visitInsn(Opcodes.I2C);
 				return;
 			case Opcodes.OBJECT_EQUALS:
+				this.frame.pop();
+				this.frame.pop();
+				this.frame.push(ClassFormat.INT);
 				this.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
 				return;
 			case Opcodes.AUTO_SWAP:
@@ -409,6 +420,8 @@ public final class MethodWriterImpl implements MethodWriter
 			}
 			return;
 		}
+		
+		this.insnCallback();
 		
 		this.frame.visitInsn(opcode);
 		

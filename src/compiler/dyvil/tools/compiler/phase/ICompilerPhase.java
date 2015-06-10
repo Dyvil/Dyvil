@@ -49,13 +49,18 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	ICompilerPhase	RESOLVE			= new ParallelCompilerPhase(40, "RESOLVE", ICompilationUnit::resolve);
 	
 	/**
+	 * Prints the AST.
+	 */
+	ICompilerPhase	PRINT			= new ParallelCompilerPhase(45, "PRINT", unit -> DyvilCompiler.logger.info(unit.getInputFile() + ":\n" + unit.toString()));
+	
+	/**
 	 * Resolves other things such as lambda expressions or annotations and
 	 * checks types. This will be called after {@link IValue#withType(IType)}
 	 * has been called. Mainly used by
 	 * {@link IMethod#checkArguments(MarkerList, ICodePosition, IContext, IValue, IArguments, ITypeContext)}
 	 * .
 	 */
-	ICompilerPhase	CHECK_TYPES		= new ParallelCompilerPhase(45, "CHECK_TYPES", ICompilationUnit::checkTypes);
+	ICompilerPhase	CHECK_TYPES		= new ParallelCompilerPhase(50, "CHECK_TYPES", ICompilationUnit::checkTypes);
 	
 	/**
 	 * Checks for semantical errors. The general contract of this method is that
@@ -63,12 +68,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 * everything is correct). Thus, it should not do any more linking or
 	 * resolving.
 	 */
-	ICompilerPhase	CHECK			= new ParallelCompilerPhase(50, "CHECK", ICompilationUnit::check);
-	
-	/**
-	 * Prints the AST.
-	 */
-	ICompilerPhase	PRINT			= new ParallelCompilerPhase(60, "PRINT", unit -> DyvilCompiler.logger.info(unit.getInputFile() + ":\n" + unit.toString()));
+	ICompilerPhase	CHECK			= new ParallelCompilerPhase(60, "CHECK", ICompilationUnit::check);
 	
 	/**
 	 * Saves the formatted AST to the input file
