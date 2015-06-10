@@ -5,7 +5,7 @@ import java.io.File;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.classes.NestedClass;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.Formatting;
@@ -16,10 +16,10 @@ import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 
 public final class DyvilUnit extends DyvilHeader
 {
-	private IClass[]		classes			= new IClass[1];
-	private int				classCount;
-	private NestedClass[]	innerClasses	= new NestedClass[1];
-	private int				innerClassCount;
+	private IClass[]			classes			= new IClass[1];
+	private int					classCount;
+	private IClassCompilable[]	innerClasses	= new IClassCompilable[2];
+	private int					innerClassCount;
 	
 	public DyvilUnit(Package pack, CodeFile input, File output)
 	{
@@ -72,22 +72,22 @@ public final class DyvilUnit extends DyvilHeader
 	}
 	
 	@Override
-	public void addInnerClass(NestedClass iclass)
+	public void addInnerClass(IClassCompilable iclass)
 	{
 		int index = this.innerClassCount++;
 		if (index >= this.innerClasses.length)
 		{
-			NestedClass[] temp = new NestedClass[this.innerClassCount];
+			IClassCompilable[] temp = new IClassCompilable[this.innerClassCount];
 			System.arraycopy(this.innerClasses, 0, temp, 0, this.innerClasses.length);
 			this.innerClasses = temp;
 		}
 		this.innerClasses[index] = iclass;
 		
-		iclass.setIndex(index);
+		iclass.setInnerIndex(index);
 	}
 	
 	@Override
-	public NestedClass getInnerClass(int index)
+	public IClassCompilable getInnerClass(int index)
 	{
 		return this.innerClasses[index];
 	}
@@ -213,8 +213,8 @@ public final class DyvilUnit extends DyvilHeader
 		
 		for (int i = 0; i < this.innerClassCount; i++)
 		{
-			NestedClass iclass = this.innerClasses[i];
-			String name = iclass.getName().qualified + ".class";
+			IClassCompilable iclass = this.innerClasses[i];
+			String name = iclass.getFileName() + ".class";
 			File file = new File(this.outputDirectory, name);
 			ClassWriter.compile(file, iclass);
 		}

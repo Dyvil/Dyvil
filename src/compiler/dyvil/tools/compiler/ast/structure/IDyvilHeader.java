@@ -2,9 +2,9 @@ package dyvil.tools.compiler.ast.structure;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
-import dyvil.tools.compiler.ast.classes.NestedClass;
 import dyvil.tools.compiler.ast.imports.HeaderComponent;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 
@@ -54,9 +54,9 @@ public interface IDyvilHeader extends IContext, IClassList
 	
 	public int innerClassCount();
 	
-	public void addInnerClass(NestedClass iclass);
+	public void addInnerClass(IClassCompilable iclass);
 	
-	public NestedClass getInnerClass(int index);
+	public IClassCompilable getInnerClass(int index);
 	
 	// Compilation
 	

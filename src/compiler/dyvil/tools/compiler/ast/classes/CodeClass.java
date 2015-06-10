@@ -542,6 +542,39 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public int compilableCount()
+	{
+		return this.compilableCount;
+	}
+
+	@Override
+	public void addCompilable(IClassCompilable compilable)
+	{
+		if (this.compilables == null)
+		{
+			this.compilables = new IClassCompilable[2];
+			this.compilables[0] = compilable;
+			this.compilableCount = 1;
+			return;
+		}
+		
+		int index = this.compilableCount++;
+		if (this.compilableCount > this.compilables.length)
+		{
+			IClassCompilable[] temp = new IClassCompilable[this.compilableCount];
+			System.arraycopy(this.compilables, 0, temp, 0, index);
+			this.compilables = temp;
+		}
+		this.compilables[index] = compilable;
+	}
+
+	@Override
+	public IClassCompilable getCompilable(int index)
+	{
+		return this.compilables[index];
+	}
+
+	@Override
 	public void setMetadata(IClassMetadata metadata)
 	{
 		this.metadata = metadata;
@@ -1115,36 +1148,9 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public int compilableCount()
+	public String getFileName()
 	{
-		return this.compilableCount;
-	}
-	
-	@Override
-	public void addCompilable(IClassCompilable compilable)
-	{
-		if (this.compilables == null)
-		{
-			this.compilables = new IClassCompilable[2];
-			this.compilables[0] = compilable;
-			this.compilableCount = 1;
-			return;
-		}
-		
-		int index = this.compilableCount++;
-		if (this.compilableCount > this.compilables.length)
-		{
-			IClassCompilable[] temp = new IClassCompilable[this.compilableCount];
-			System.arraycopy(this.compilables, 0, temp, 0, index);
-			this.compilables = temp;
-		}
-		this.compilables[index] = compilable;
-	}
-	
-	@Override
-	public IClassCompilable getCompilable(int index)
-	{
-		return this.compilables[index];
+		return this.getName().qualified;
 	}
 	
 	@Override

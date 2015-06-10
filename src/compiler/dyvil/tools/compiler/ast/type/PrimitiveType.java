@@ -117,7 +117,10 @@ public final class PrimitiveType extends Type
 	public final IType getReferenceType()
 	{
 		Type type = new Type(this.position, this.theClass);
-		type.name = this.name;
+		if (this != Types.VOID)
+		{
+			type.name = this.name;
+		}
 		return type;
 	}
 	

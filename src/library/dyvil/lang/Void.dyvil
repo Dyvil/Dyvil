@@ -1,3 +1,8 @@
 package dyvil.lang;
 
 public final object Void
+{
+	public static Void apply() = instance
+			
+	public void unapply() { }
+}

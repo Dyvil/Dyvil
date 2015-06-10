@@ -5,13 +5,13 @@ import java.util.Map;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.NestedClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.imports.HeaderComponent;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
@@ -176,9 +176,8 @@ public class REPLContext extends DyvilHeader implements IValued
 	}
 	
 	@Override
-	public void addInnerClass(NestedClass iclass)
+	public void addInnerClass(IClassCompilable iclass)
 	{
-		this.tempClass = iclass;
 	}
 	
 	@Override

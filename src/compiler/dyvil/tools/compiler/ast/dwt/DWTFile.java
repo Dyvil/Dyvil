@@ -180,6 +180,12 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 	}
 	
 	@Override
+	public String getFileName()
+	{
+		return this.name;
+	}
+	
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC, this.internalName, null, "java/lang/Object", null);

@@ -26,7 +26,8 @@ public class NestedClass extends CodeClass
 	{
 	}
 	
-	public void setIndex(int index)
+	@Override
+	public void setInnerIndex(int index)
 	{
 		String s = Integer.toString(index);
 		this.name = Name.getQualified(this.unit.getName() + "$" + s);

@@ -165,7 +165,6 @@ public interface IValue extends IASTNode, ITyped
 	 * 
 	 * @param visitor
 	 * @throws BytecodeException
-	 *             TODO
 	 */
 	public void writeExpression(MethodWriter writer) throws BytecodeException;
 	
@@ -176,7 +175,6 @@ public interface IValue extends IASTNode, ITyped
 	 * 
 	 * @param writer
 	 * @throws BytecodeException
-	 *             TODO
 	 */
 	public void writeStatement(MethodWriter writer) throws BytecodeException;
 	
@@ -198,7 +196,6 @@ public interface IValue extends IASTNode, ITyped
 	 * @param writer
 	 * @param dest
 	 * @throws BytecodeException
-	 *             TODO
 	 */
 	public default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
