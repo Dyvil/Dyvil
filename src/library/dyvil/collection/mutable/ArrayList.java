@@ -13,7 +13,6 @@ import java.util.function.UnaryOperator;
 import dyvil.annotation.sealed;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
-import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
 import dyvil.lang.literal.ArrayConvertible;
@@ -25,8 +24,8 @@ public class ArrayList<E> implements MutableList<E>
 {
 	private static final int	INITIAL_CAPACITY	= 10;
 	
-	private Object[]			elements;
-	private int					size;
+	protected Object[]			elements;
+	protected int				size;
 	
 	public static <E> ArrayList<E> apply()
 	{
@@ -113,7 +112,39 @@ public class ArrayList<E> implements MutableList<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return new ArrayIterator(this.elements, this.size);
+		return new Iterator<E>()
+		{
+			int	index;
+			
+			@Override
+			public boolean hasNext()
+			{
+				return this.index < ArrayList.this.size;
+			}
+			
+			@Override
+			public E next()
+			{
+				return (E) ArrayList.this.elements[this.index++];
+			}
+			
+			@Override
+			public void remove()
+			{
+				if (this.index <= 0)
+				{
+					throw new IllegalStateException();
+				}
+				ArrayList.this.removeAt(this.index - 1);
+				this.index--;
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "ListIterator(" + ArrayList.this + ")";
+			}
+		};
 	}
 	
 	@Override

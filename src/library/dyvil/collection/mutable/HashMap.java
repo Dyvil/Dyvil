@@ -164,6 +164,36 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			}
 			return e;
 		}
+		
+		public final void remove()
+		{
+			HashEntry<K, V> e = this.current;
+			if (e == null)
+			{
+				throw new IllegalStateException();
+			}
+			
+			HashMap.this.size--;
+			this.current = null;
+			int index = index(e.hash, HashMap.this.entries.length);
+			HashEntry<K, V> entry = HashMap.this.entries[index];
+			if (entry == e)
+			{
+				HashMap.this.entries[index] = e.next;
+			}
+			else
+			{
+				HashEntry<K, V> prev;
+				do
+				{
+					prev = entry;
+					entry = entry.next;
+				}
+				while (entry != e);
+				
+				prev.next = e.next;
+			}
+		}
 	}
 	
 	private static final int	DEFAULT_SIZE		= 16;
@@ -295,6 +325,12 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			{
 				return this.nextEntry();
 			}
+			
+			@Override
+			public String toString()
+			{
+				return "EntryIterator(" + HashMap.this + ")";
+			}
 		}
 		
 		return new EntryIteratorImpl();
@@ -309,7 +345,13 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			public K next()
 			{
 				return this.nextEntry().key;
-			};
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "KeyIterator(" + HashMap.this + ")";
+			}
 		}
 		
 		return new KeyIterator();
@@ -324,7 +366,13 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			public V next()
 			{
 				return this.nextEntry().value;
-			};
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "ValueIterator(" + HashMap.this + ")";
+			}
 		}
 		
 		return new ValueIterator();

@@ -14,8 +14,7 @@ import dyvil.lang.Set;
 
 public class MapBasedSet<E> implements MutableSet<E>
 {
-	private static final Object			VALUE	= new Object();
-	private final MutableMap<E, Object>	map;
+	protected MutableMap<E, Object>	map;
 	
 	public MapBasedSet(MutableMap<E, ? extends Object> map)
 	{
@@ -55,45 +54,112 @@ public class MapBasedSet<E> implements MutableSet<E>
 	@Override
 	public MutableSet<? extends E> $minus$minus(Collection<? extends E> collection)
 	{
-		return null; // TODO MapBasedSet --
+		MutableMap<E, Object> map = new HashMap();
+		for (Entry<E, Object> entry : this.map)
+		{
+			E element = entry.getKey();
+			if (!collection.$qmark(element))
+			{
+				map.update(element, VALUE);
+			}
+		}
+		return new MapBasedSet(map);
 	}
 	
 	@Override
 	public MutableSet<? extends E> $amp(Collection<? extends E> collection)
 	{
-		return null; // TODO MapBasedSet &
+		MutableMap<E, Object> map = new HashMap();
+		for (Entry<E, Object> entry : this.map)
+		{
+			E element = entry.getKey();
+			if (collection.$qmark(element))
+			{
+				map.update(element, VALUE);
+			}
+		}
+		return new MapBasedSet(map);
 	}
 	
 	@Override
 	public MutableSet<? extends E> $bar(Collection<? extends E> collection)
 	{
-		return null; // TODO MapBasedSet |
+		MutableMap<E, Object> map = this.map.copy();
+		for (E element : collection)
+		{
+			map.update(element, VALUE);
+		}
+		return new MapBasedSet(map);
 	}
 	
 	@Override
 	public MutableSet<? extends E> $up(Collection<? extends E> collection)
 	{
-		return null; // TODO MapBasedSet ^
+		MutableMap<E, Object> map = new HashMap();
+		for (Entry<E, Object> entry : this.map)
+		{
+			E element = entry.getKey();
+			if (!collection.$qmark(element))
+			{
+				map.update(element, VALUE);
+			}
+		}
+		for (E element : collection)
+		{
+			if (!this.$qmark(element))
+			{
+				map.update(element, VALUE);
+			}
+		}
+		return new MapBasedSet(map);
 	}
 	
 	@Override
 	public <R> MutableSet<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		return null; // TODO MapBasedSet.mapped
+		MutableMap<R, Object> map = new HashMap();
+		for (Entry<E, Object> entry : this.map)
+		{
+			map.update(mapper.apply(entry.getKey()), VALUE);
+		}
+		return new MapBasedSet(map);
 	}
 	
 	@Override
 	public <R> MutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		return null; // TODO MapBasedSet.flatMapped
+		MutableMap<R, Object> map = new HashMap();
+		for (Entry<E, Object> entry : this.map)
+		{
+			for (R element : mapper.apply(entry.getKey()))
+			{
+				map.update(element, VALUE);
+			}
+		}
+		return new MapBasedSet(map);
 	}
 	
 	@Override
 	public MutableSet<E> filtered(Predicate<? super E> condition)
 	{
-		return null; // TODO MapBasedSet.filtered
+		MutableMap<E, Object> map = new HashMap();
+		for (Entry<E, Object> entry : this.map)
+		{
+			E element = entry.getKey();
+			if (condition.test(element))
+			{
+				map.update(element, VALUE);
+			}
+		}
+		return new MapBasedSet(map);
 	}
 	
+	@Override
+	public void clear()
+	{
+		this.map.clear();
+	}
+
 	@Override
 	public boolean add(E element)
 	{
@@ -109,7 +175,15 @@ public class MapBasedSet<E> implements MutableSet<E>
 	@Override
 	public void $amp$eq(Collection<? extends E> collection)
 	{
-		// TODO MapBasedSet &=
+		Iterator<Entry<E, Object>> iterator = this.map.iterator();
+		while (iterator.hasNext())
+		{
+			E element = iterator.next().getKey();
+			if (!collection.$qmark(element))
+			{
+				iterator.remove();
+			}
+		}
 	}
 	
 	@Override
@@ -124,31 +198,61 @@ public class MapBasedSet<E> implements MutableSet<E>
 	@Override
 	public void $up$eq(Collection<? extends E> collection)
 	{
-		// TODO MapBasedSet ^=
-	}
-	
-	@Override
-	public void clear()
-	{
-		this.map.clear();
+		HashMap<E, Object> newMap = new HashMap();
+		for (Entry<E, Object> entry : this.map)
+		{
+			E element = entry.getKey();
+			if (!collection.$qmark(element))
+			{
+				newMap.update(element, VALUE);
+			}
+		}
+		for (E element : collection)
+		{
+			if (!this.$qmark(element))
+			{
+				newMap.update(element, VALUE);
+			}
+		}
+		this.map = newMap;
 	}
 	
 	@Override
 	public void map(UnaryOperator<E> mapper)
 	{
-		// TODO MapBasedSet.map
+		HashMap<E, Object> newMap = new HashMap();
+		for (Entry<E, Object> entry : this.map)
+		{
+			newMap.update(mapper.apply(entry.getKey()), VALUE);
+		}
+		this.map = newMap;
 	}
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
-		// TODO MapBasedSet.flatMap
+		HashMap<E, Object> newMap = new HashMap();
+		for (Entry<E, Object> entry : this.map)
+		{
+			for (E element : mapper.apply(entry.getKey()))
+			{
+				newMap.update(element, VALUE);
+			}
+		}
+		this.map = newMap;
 	}
 	
 	@Override
 	public void filter(Predicate<? super E> condition)
 	{
-		// TODO MapBasedSet.filter
+		Iterator<Entry<E, Object>> iterator = this.map.iterator();
+		while (iterator.hasNext())
+		{
+			if (!condition.test(iterator.next().getKey()))
+			{
+				iterator.remove();
+			}
+		}
 	}
 	
 	@Override
@@ -169,7 +273,7 @@ public class MapBasedSet<E> implements MutableSet<E>
 	@Override
 	public ImmutableSet<E> immutable()
 	{
-		// TODO Add the immutable.MapBasedSet implementation when this one is ready
+		// TODO immutable.MapBasedSet
 		return null;
 	}
 	

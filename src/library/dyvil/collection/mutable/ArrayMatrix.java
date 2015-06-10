@@ -587,7 +587,7 @@ public class ArrayMatrix<E> implements MutableMatrix<E>
 	@Override
 	public ImmutableMatrix<E> immutable()
 	{
-		// FIXME
+		// TODO immutable.ArrayMatrix
 		return null;
 	}
 	
