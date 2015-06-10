@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
@@ -230,17 +231,21 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			ITypeList typeList = (ITypeList) this.tupleType;
 			for (int i = 0; i < this.valueCount; i++)
 			{
-				IValue v1 = this.values[i].withType(typeList.getType(i));
-				if (v1 != null)
+				IType type = typeList.getType(i);
+				IValue value = this.values[i];
+				IValue value1 = value.withType(type);
+				if (value1 == null)
 				{
-					this.values[i] = v1;
+					Marker m = markers.create(value.getPosition(), "tuple.type");
+					m.addInfo("Pattern Type: " + value.getType());
+					m.addInfo("Tuple Type: " + type);
 				}
 				else
 				{
-					// TODO Handle error?
+					this.values[i] = value = value1;
 				}
 				
-				this.values[i].checkTypes(markers, context);
+				value.checkTypes(markers, context);
 			}
 			
 			return;

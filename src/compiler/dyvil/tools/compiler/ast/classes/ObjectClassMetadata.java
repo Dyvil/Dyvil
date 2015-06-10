@@ -86,6 +86,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			// object type.
 			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "toString", "()Ljava/lang/String;", null, null));
 			mw.begin();
+			mw.setThisType(this.theClass.getInternalName());
 			mw.writeLDC(this.theClass.getName().unqualified);
 			mw.writeInsn(Opcodes.ARETURN);
 			mw.end(Types.STRING);

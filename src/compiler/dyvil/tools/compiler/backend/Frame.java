@@ -466,9 +466,9 @@ public class Frame
 		}
 		case SWAP:
 		{
-			Object o = this.stack[this.stackCount];
-			this.stack[this.stackCount] = this.stack[this.stackCount - 1];
-			this.stack[this.stackCount - 1] = o;
+			Object o = this.stack[this.stackCount - 1];
+			this.stack[this.stackCount - 1] = this.stack[this.stackCount - 2];
+			this.stack[this.stackCount - 2] = o;
 			return;
 		}
 		case IADD:

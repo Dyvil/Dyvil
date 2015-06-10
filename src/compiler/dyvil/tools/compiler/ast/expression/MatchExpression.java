@@ -240,6 +240,7 @@ public final class MatchExpression extends ASTNode implements IValue
 		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
 		
 		int localCount = writer.localCount();
+		Object frameType = expr ? this.type.getFrameType() : null;
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
@@ -288,6 +289,7 @@ public final class MatchExpression extends ASTNode implements IValue
 			if (expr)
 			{
 				value.writeExpression(writer);
+				writer.getFrame().set(frameType);
 			}
 			else
 			{
@@ -313,9 +315,10 @@ public final class MatchExpression extends ASTNode implements IValue
 			String desc = "(" + (type.isPrimitive() ? type.getExtendedName() + ")V" : "Ljava/lang/Object;)V");
 			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", desc, false);
 			writer.writeInsn(Opcodes.ATHROW);
-			writer.resetLocals(varIndex);
+			writer.setHasReturn(false);
 		}
 		writer.writeLabel(endLabel);
+		writer.resetLocals(varIndex);
 	}
 	
 	@Override

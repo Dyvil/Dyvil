@@ -19,6 +19,8 @@ public interface MethodWriter
 	
 	public void setLocalType(int index, Object type);
 	
+	public void setHasReturn(boolean hasReturn);
+	
 	// Annotations
 	
 	public AnnotationVisitor addAnnotation(String type, boolean visible);

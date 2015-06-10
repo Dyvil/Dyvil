@@ -58,6 +58,12 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
+	public void setHasReturn(boolean hasReturn)
+	{
+		this.hasReturn = hasReturn;
+	}
+	
+	@Override
 	public void begin()
 	{
 		this.mv.visitCode();
