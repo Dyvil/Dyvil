@@ -48,18 +48,16 @@ public final class StringPattern extends ASTNode implements IPattern
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		writer.writeLDC(this.value);
-		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
-		writer.writeJumpInsn(Opcodes.IFNE, elseLabel);
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+		}
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		writer.writeLDC(this.value);
-		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
-		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
 	}
 	
 	@Override

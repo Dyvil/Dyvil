@@ -12,12 +12,11 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class BindingPattern extends ASTNode implements IPattern, IPatterned
+public final class BindingPattern extends ASTNode implements IPattern
 {
 	private Name		name;
-	private IPattern	pattern;
 	private Variable	variable;
-	private IType		type;
+	private IType		type = Types.UNKNOWN;
 	
 	public BindingPattern(ICodePosition position, Name name)
 	{
@@ -34,33 +33,18 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	@Override
 	public boolean isExhaustive()
 	{
-		return this.pattern.isExhaustive();
+		return true;
 	}
 	
 	@Override
 	public IType getType()
 	{
-		if (this.pattern == null)
-		{
-			return Types.ANY;
-		}
-		return this.pattern.getType();
+		return this.type;
 	}
 	
 	@Override
 	public IPattern withType(IType type)
 	{
-		if (this.pattern == null)
-		{
-			return this;
-		}
-		IPattern pattern1 = this.pattern.withType(type);
-		if (pattern1 == null)
-		{
-			return null;
-		}
-		
-		this.pattern = pattern1;
 		this.type = type;
 		return this;
 	}
@@ -68,24 +52,7 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 	@Override
 	public boolean isType(IType type)
 	{
-		if (this.pattern == null || this.pattern.isType(type))
-		{
-			this.type = type;
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public void setPattern(IPattern pattern)
-	{
-		this.pattern = pattern;
-	}
-	
-	@Override
-	public IPattern getPattern()
-	{
-		return this.pattern;
+		return true;
 	}
 	
 	@Override
@@ -114,10 +81,6 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 		{
 			this.writeVar(writer, varIndex);
 		}
-		if (this.pattern != null)
-		{
-			this.pattern.writeJump(writer, varIndex, elseLabel);
-		}
 	}
 	
 	@Override
@@ -127,28 +90,23 @@ public final class BindingPattern extends ASTNode implements IPattern, IPatterne
 		{
 			this.writeVar(writer, varIndex);
 		}
-		if (this.pattern != null)
-		{
-			this.pattern.writeInvJump(writer, varIndex, elseLabel);
-		}
 	}
 	
 	private void writeVar(MethodWriter writer, int varIndex) throws BytecodeException
 	{
 		this.variable.type = this.type;
-		writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
+		}
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.name).append(" = ");
-		if (this.pattern == null)
-		{
-			buffer.append('_');
-			return;
-		}
-		this.pattern.toString(prefix, buffer);
+		this.type.toString(prefix, buffer);
+		buffer.append(' ');
+		buffer.append(this.name);
 	}
 }

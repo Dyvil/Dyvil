@@ -5,10 +5,12 @@ import org.objectweb.asm.Label;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IPattern extends IASTNode, ITyped
 {
@@ -54,6 +56,14 @@ public interface IPattern extends IASTNode, ITyped
 	public default IField resolveField(Name name)
 	{
 		return null;
+	}
+	
+	public default void resolve(MarkerList markers, IContext context)
+	{
+	}
+	
+	public default void checkTypes(MarkerList markers, IContext context)
+	{
 	}
 	
 	public default int intValue()

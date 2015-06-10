@@ -6,12 +6,15 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
@@ -65,12 +68,10 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 		
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			IPattern pattern1 = this.patterns[i].withType(typeList.getType(i));
-			if (pattern1 == null)
+			if (!this.patterns[i].isType(typeList.getType(i)))
 			{
 				return null;
 			}
-			this.patterns[i] = pattern1;
 		}
 		this.tupleType = type;
 		return this;
@@ -133,11 +134,40 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 	}
 	
 	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		ITypeList typeList = (ITypeList) this.tupleType;
+		
+		for (int i = 0; i < this.patternCount; i++)
+		{
+			IType type = typeList.getType(i);
+			IPattern pattern = this.patterns[i];
+			IPattern pattern1 = pattern.withType(type);
+			if (pattern1 == null)
+			{
+				Marker m = markers.create(pattern.getPosition(), "tuple.pattern.type");
+				m.addInfo("Pattern Type: " + pattern.getType());
+				m.addInfo("Tuple Type: " + type);
+			}
+			else
+			{
+				this.patterns[i] = pattern1;
+			}
+		}
+	}
+	
+	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		ITypeList typeList = (ITypeList) this.tupleType;
 		String internal = this.tupleType.getInternalName();
 		Label target = new Label();
+		
+		if (varIndex < 0)
+		{
+			varIndex = writer.localCount();
+			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
+		}
 		
 		for (int i = 0; i < this.patternCount; i++)
 		{
@@ -151,11 +181,10 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 			writer.writeFieldInsn(Opcodes.GETFIELD, internal, "_" + (i + 1), "Ljava/lang/Object;");
 			writer.writeTypeInsn(Opcodes.CHECKCAST, typeList.getType(i).getInternalName());
-			writer.writeVarInsn(Opcodes.ASTORE, varIndex + 1);
-			this.patterns[i].writeInvJump(writer, varIndex + 1, target);
+			this.patterns[i].writeInvJump(writer, -1, target);
 		}
 		
-		writer.resetLocals(varIndex + 1);
+		writer.resetLocals(varIndex);
 		writer.writeJumpInsn(Opcodes.GOTO, elseLabel);
 		writer.writeLabel(target);
 	}
@@ -165,6 +194,12 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 	{
 		ITypeList typeList = (ITypeList) this.tupleType;
 		String internal = this.tupleType.getInternalName();
+		
+		if (varIndex < 0)
+		{
+			varIndex = writer.localCount();
+			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
+		}
 		
 		for (int i = 0; i < this.patternCount; i++)
 		{
@@ -178,11 +213,10 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 			writer.writeFieldInsn(Opcodes.GETFIELD, internal, "_" + (i + 1), "Ljava/lang/Object;");
 			writer.writeTypeInsn(Opcodes.CHECKCAST, typeList.getType(i).getInternalName());
-			writer.writeVarInsn(Opcodes.ASTORE, varIndex + 1);
-			this.patterns[i].writeInvJump(writer, varIndex + 1, elseLabel);
+			this.patterns[i].writeInvJump(writer, -1, elseLabel);
 		}
 		
-		writer.resetLocals(varIndex + 1);
+		writer.resetLocals(varIndex);
 	}
 	
 	@Override
