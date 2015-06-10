@@ -273,8 +273,7 @@ public class MapBasedSet<E> implements MutableSet<E>
 	@Override
 	public ImmutableSet<E> immutable()
 	{
-		// TODO immutable.MapBasedSet
-		return null;
+		return new dyvil.collection.immutable.MapBasedSet<E>(this.map.immutable());
 	}
 	
 	@Override
