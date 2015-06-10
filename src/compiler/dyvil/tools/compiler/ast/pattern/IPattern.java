@@ -30,9 +30,12 @@ public interface IPattern extends IASTNode, ITyped
 	int	TUPLE		= 17;
 	int	LIST		= 18;
 	
+	int	CASE_CLASS	= 24;
+	
 	int	BINDING		= 32;
 	int	WILDCARD	= 33;
 	int	BOXED		= 34;
+	int	TYPECHECK	= 35;
 	
 	public int getPatternType();
 	

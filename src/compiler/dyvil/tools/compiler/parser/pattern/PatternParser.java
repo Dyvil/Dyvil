@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.parser.pattern;
 
 import dyvil.tools.compiler.ast.pattern.*;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -12,9 +13,10 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class PatternParser extends Parser
 {
-	public static final int	PATTERN		= 1;
-	public static final int	ARRAY_END	= 2;
-	public static final int	TUPLE_END	= 4;
+	public static final int	PATTERN			= 1;
+	public static final int	ARRAY_END		= 2;
+	public static final int	TUPLE_END		= 4;
+	public static final int	CASE_CLASS_END	= 8;
 	
 	protected IPatterned	patterned;
 	
@@ -50,6 +52,19 @@ public class PatternParser extends Parser
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
+				IToken next = token.next();
+				if (next.type() == Symbols.OPEN_PARENTHESIS)
+				{
+					CaseClassPattern ccp = new CaseClassPattern(token.raw());
+					ccp.setType(new Type(token.nameValue()));
+					pm.pushParser(new PatternListParser(ccp));
+					pm.skip();
+					this.pattern = ccp;
+					this.mode = CASE_CLASS_END;
+					return;
+				}
+				
+				throw new SyntaxError(next, "Invalid Case Class Pattern - '(' expected");
 			}
 			if (type == Keywords.VAR)
 			{
