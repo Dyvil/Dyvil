@@ -6,6 +6,7 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
@@ -40,6 +41,14 @@ public class PatternParser extends Parser
 		int type = token.type();
 		if (this.mode == 0 || type == Symbols.COLON)
 		{
+			if (type == Keywords.AS)
+			{
+				TypeCheckPattern tcp = new TypeCheckPattern(token.raw(), this.pattern);
+				this.pattern = tcp;
+				pm.pushParser(new TypeParser(tcp));
+				return;
+			}
+			
 			pm.popParser(true);
 			if (this.pattern != null)
 			{
@@ -97,8 +106,8 @@ public class PatternParser extends Parser
 			IPattern p = parsePrimitive(token, type);
 			if (p != null)
 			{
-				pm.popParser();
-				this.patterned.setPattern(p);
+				this.pattern = p;
+				this.mode = 0;
 				return;
 			}
 			

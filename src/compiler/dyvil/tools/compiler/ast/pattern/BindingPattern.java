@@ -109,8 +109,7 @@ public final class BindingPattern extends ASTNode implements IPattern
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.type.toString(prefix, buffer);
-		buffer.append(' ');
+		buffer.append("var ");
 		buffer.append(this.name);
 	}
 }

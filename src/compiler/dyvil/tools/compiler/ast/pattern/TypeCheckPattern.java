@@ -10,11 +10,19 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class TypeCheckPattern implements IPattern
 {
-	private IPattern	pattern;
-	private IType		type;
+	private ICodePosition	position;
+	private IPattern		pattern;
+	private IType			type;
+	
+	public TypeCheckPattern(ICodePosition position, IPattern pattern)
+	{
+		this.position = position;
+		this.pattern = pattern;
+	}
 	
 	public TypeCheckPattern(IPattern pattern, IType type)
 	{
@@ -23,9 +31,21 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
 	public int getPatternType()
 	{
 		return TYPECHECK;
+	}
+	
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 	
 	@Override
@@ -42,8 +62,7 @@ public class TypeCheckPattern implements IPattern
 			return null;
 		}
 		
-		this.type = type;
-		return this;
+		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
 	@Override
@@ -59,16 +78,42 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public IPattern resolve(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
-		this.pattern.resolve(markers, context);
+		if (this.pattern != null)
+		{
+			this.pattern = this.pattern.resolve(markers, context);
+		}
+		
+		if (this.type != null)
+		{
+			this.type = this.type.resolve(markers, context);
+			
+			if (this.pattern != null && this.pattern.getPatternType() != WILDCARD)
+			{
+				this.pattern = this.pattern.withType(this.type);
+			}
+			
+			if (this.type.isPrimitive())
+			{
+				markers.add(this.type.getPosition(), "pattern.typecheck.primitive");
+			}
+		}
+		else
+		{
+			markers.add(this.position, "pattern.typecheck.invalid");
+		}
+		
+		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.pattern.checkTypes(markers, context);
+		if (this.pattern != null)
+		{
+			this.pattern.checkTypes(markers, context);
+		}
 	}
 	
 	@Override
@@ -105,7 +150,8 @@ public class TypeCheckPattern implements IPattern
 		{
 			this.pattern.toString(prefix, buffer);
 		}
-		if (!this.pattern.isType(this.type))
+		int patternType = this.pattern.getPatternType();
+		if (patternType == BINDING || (patternType != CASE_CLASS && !this.pattern.isType(this.type)))
 		{
 			buffer.append(" as ");
 			this.type.toString(prefix, buffer);
