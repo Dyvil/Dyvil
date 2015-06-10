@@ -13,6 +13,7 @@ import dyvil.collection.MutableList;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
+import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 
 @ArrayConvertible
@@ -28,8 +29,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	
 	public ArrayList(E... elements)
 	{
-		this.elements = (E[]) new Object[elements.length];
-		System.arraycopy(elements, 0, this.elements, 0, elements.length);
+		this.elements = elements.clone();
 		this.size = elements.length;
 	}
 	
@@ -301,7 +301,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = dyvil.collection.mutable.ArrayList.distinct(array, this.size);
+		int size = Set.distinct(array, this.size);
 		return new ArrayList(array, size, true);
 	}
 	
@@ -310,7 +310,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = dyvil.collection.mutable.ArrayList.distinct((E[]) array, this.size, comparator);
+		int size = Set.distinct((E[]) array, this.size, comparator);
 		return new SortedArrayList(array, size, true);
 	}
 	

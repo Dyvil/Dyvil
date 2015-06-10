@@ -1,8 +1,6 @@
 package dyvil.lang;
 
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -10,9 +8,11 @@ import java.util.function.UnaryOperator;
 import dyvil.annotation.sealed;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
+import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
+@ArrayConvertible
 public interface Set<E> extends Collection<E>
 {
 	@sealed
@@ -21,6 +21,11 @@ public interface Set<E> extends Collection<E>
 	public static <E> MutableSet<E> apply()
 	{
 		return MutableSet.apply();
+	}
+	
+	public static <E> ImmutableSet<E> apply(E... elements)
+	{
+		return ImmutableSet.apply(elements);
 	}
 	
 	// Accessors
@@ -204,5 +209,62 @@ public interface Set<E> extends Collection<E>
 			product *= hash;
 		}
 		return sum * 31 + product;
+	}
+	
+	public static @sealed int distinct(Object[] array, int size)
+	{
+		if (size < 2)
+		{
+			return size;
+		}
+		
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = i + 1; j < size; j++)
+			{
+				if (Objects.equals(array[i], array[j]))
+				{
+					array[j--] = array[--size];
+				}
+			}
+		}
+		return size;
+	}
+	
+	public static @sealed <T> int distinct(T[] array, int size, Comparator<? super T> comparator)
+	{
+		if (size < 2)
+		{
+			return size;
+		}
+		
+		Arrays.sort(array, comparator);
+		
+		return distinctSorted(array, size);
+	}
+	
+	public static @sealed int distinctSorted(Object[] array, int size)
+	{
+		if (size < 2)
+		{
+			return size;
+		}
+		
+		int len = 0;
+		int i = 1;
+		
+		while (i < size)
+		{
+			if (Objects.equals(array[i], array[len]))
+			{
+				i++;
+			}
+			else
+			{
+				array[++len] = array[i++];
+			}
+		}
+		
+		return len + 1;
 	}
 }

@@ -7,12 +7,27 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import dyvil.collection.immutable.ArraySet;
 import dyvil.lang.Collection;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.Set;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+@NilConvertible
+@ArrayConvertible
 public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 {
+	public static <E> ImmutableSet<E> apply()
+	{
+		return null; // TODO EmptySet
+	}
+	
+	public static <E> ImmutableSet<E> apply(E... elements)
+	{
+		return new ArraySet(elements, true);
+	}
+	
 	// Accessors
 	
 	@Override
@@ -140,6 +155,8 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	{
 		throw new ImmutableException("^= on Immutable Set");
 	}
+	
+	// Mutating Operations
 	
 	@Override
 	public default void clear()

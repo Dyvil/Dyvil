@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 import dyvil.collection.ImmutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.Set;
 
 public class SortedArrayList<E> extends ArrayList<E>
 {
@@ -49,7 +50,7 @@ public class SortedArrayList<E> extends ArrayList<E>
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = dyvil.collection.mutable.ArrayList.distinctSorted(array, this.size);
+		int size = Set.distinctSorted(array, this.size);
 		return new SortedArrayList(array, size, true);
 	}
 	
@@ -58,7 +59,7 @@ public class SortedArrayList<E> extends ArrayList<E>
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = dyvil.collection.mutable.ArrayList.distinctSorted(array, this.size);
+		int size = Set.distinctSorted(array, this.size);
 		return new SortedArrayList(array, size, true);
 	}
 	

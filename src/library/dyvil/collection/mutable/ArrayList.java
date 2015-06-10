@@ -4,17 +4,16 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.annotation.sealed;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
+import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
@@ -49,8 +48,7 @@ public class ArrayList<E> implements MutableList<E>
 	
 	public ArrayList(Object... elements)
 	{
-		this.elements = new Object[elements.length];
-		System.arraycopy(elements, 0, this.elements, 0, elements.length);
+		this.elements = elements.clone();
 		this.size = elements.length;
 	}
 	
@@ -349,69 +347,12 @@ public class ArrayList<E> implements MutableList<E>
 		return new ArrayList(array, this.size, true);
 	}
 	
-	public static @sealed int distinct(Object[] array, int size)
-	{
-		if (size < 2)
-		{
-			return size;
-		}
-		
-		for (int i = 0; i < size; i++)
-		{
-			for (int j = i + 1; j < size; j++)
-			{
-				if (Objects.equals(array[i], array[j]))
-				{
-					array[j--] = array[--size];
-				}
-			}
-		}
-		return size;
-	}
-	
-	public static @sealed <T> int distinct(T[] array, int size, Comparator<? super T> comparator)
-	{
-		if (size < 2)
-		{
-			return size;
-		}
-		
-		Arrays.sort(array, comparator);
-		
-		return distinctSorted(array, size);
-	}
-	
-	public static @sealed int distinctSorted(Object[] array, int size)
-	{
-		if (size < 2)
-		{
-			return size;
-		}
-		
-		int len = 0;
-		int i = 1;
-		
-		while (i < size)
-		{
-			if (Objects.equals(array[i], array[len]))
-			{
-				i++;
-			}
-			else
-			{
-				array[++len] = array[i++];
-			}
-		}
-		
-		return len + 1;
-	}
-	
 	@Override
 	public MutableList<E> distinct()
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = distinct(array, this.size);
+		int size = Set.distinct(array, this.size);
 		return new ArrayList(array, size, true);
 	}
 	
@@ -420,7 +361,7 @@ public class ArrayList<E> implements MutableList<E>
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = distinct((E[]) array, this.size, comparator);
+		int size = Set.distinct((E[]) array, this.size, comparator);
 		return new ArrayList(array, size, true);
 	}
 	
@@ -698,13 +639,13 @@ public class ArrayList<E> implements MutableList<E>
 	@Override
 	public void distinguish()
 	{
-		this.size = distinct(this.elements, this.size);
+		this.size = Set.distinct(this.elements, this.size);
 	}
 	
 	@Override
 	public void distinguish(Comparator<? super E> comparator)
 	{
-		this.size = distinct((E[]) this.elements, this.size, comparator);
+		this.size = Set.distinct((E[]) this.elements, this.size, comparator);
 	}
 	
 	@Override
