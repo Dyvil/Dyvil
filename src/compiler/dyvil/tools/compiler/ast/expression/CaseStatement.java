@@ -25,6 +25,7 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -36,6 +37,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public final class CaseStatement extends ASTNode implements IValue, IValued, IPatterned, IClassCompilable, IContext
 {
 	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
+	public static final Type			PARTIALFUNCTION			= new Type(PARTIALFUNCTION_CLASS);
 	public static final ITypeVariable	PAR_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(0);
 	public static final ITypeVariable	RETURN_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(1);
 	
@@ -89,23 +91,32 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	}
 	
 	@Override
+	public IValue withType(IType type)
+	{
+		if (this.isType(type))
+		{
+			this.type = type;
+			return this;
+		}
+		return null;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
-		IClass iclass = type.getTheClass();
-		return iclass == Types.OBJECT_CLASS || iclass == PARTIALFUNCTION_CLASS;
+		return type.isSuperTypeOf(PARTIALFUNCTION);
 	}
 	
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		IClass iclass = type.getTheClass();
-		if (iclass == Types.OBJECT_CLASS)
-		{
-			return 2;
-		}
-		if (iclass == PARTIALFUNCTION_CLASS)
+		if (type.getTheClass() == PARTIALFUNCTION_CLASS)
 		{
 			return 3;
+		}
+		if (this.isType(type))
+		{
+			return 2;
 		}
 		return 0;
 	}
