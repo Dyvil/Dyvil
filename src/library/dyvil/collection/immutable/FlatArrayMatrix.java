@@ -1,65 +1,69 @@
 package dyvil.collection.immutable;
 
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Int;
 import dyvil.lang.Matrix;
 import dyvil.tuple.Tuple2;
 
-public class ArrayMatrix<E> implements ImmutableMatrix<E>
+public class FlatArrayMatrix<E> implements ImmutableMatrix<E>
 {
 	private int			rows;
 	private int			columns;
 	
-	private Object[][]	cells;
+	private Object[]	cells;
 	
-	public ArrayMatrix(E[]... cells)
+	public FlatArrayMatrix()
 	{
-		this.rows = cells.length;
-		if (this.rows == 0)
-		{
-			this.columns = 0;
-			return;
-		}
-		
-		this.columns = cells[0].length;
-		this.cells = new Object[this.rows][this.columns];
-		for (int i = 0; i < this.rows; i++)
-		{
-			System.arraycopy(cells[i], 0, this.cells[i], 0, this.columns);
-		}
+		this.cells = new Object[0];
 	}
 	
-	public ArrayMatrix(int rows, int columns)
+	public FlatArrayMatrix(int rows, int columns)
 	{
 		this.rows = rows;
 		this.columns = columns;
-		this.cells = new Object[rows][columns];
+		this.cells = new Object[rows * columns];
 	}
 	
-	public ArrayMatrix(int rows, int columns, E[][] cells)
+	public FlatArrayMatrix(int rows, int columns, E[] cells)
 	{
 		this.rows = rows;
 		this.columns = columns;
 		
-		this.cells = new Object[rows][columns];
-		for (int i = 0; i < rows; i++)
-		{
-			System.arraycopy(cells[i], 0, this.cells[i], 0, columns);
-		}
+		int len = rows * columns;
+		this.cells = new Object[len];
+		System.arraycopy(cells, 0, this.cells, 0, len);
 	}
 	
-	public ArrayMatrix(int rows, int columns, Object[][] cells, boolean trusted)
+	public FlatArrayMatrix(int rows, int columns, Object[] cells, boolean trusted)
 	{
 		this.rows = rows;
 		this.columns = columns;
 		this.cells = cells;
+	}
+	
+	public FlatArrayMatrix(Object[][] cells)
+	{
+		this.rows = cells.length;
+		if (this.rows == 0)
+		{
+			this.cells = new Object[0];
+			return;
+		}
+		
+		this.columns = cells[0].length;
+		this.cells = new Object[this.rows * this.columns];
+		for (int row = 0; row < this.rows; row++)
+		{
+			Object[] rowArray = cells[row];
+			System.arraycopy(rowArray, 0, this.cells, row * this.columns, this.columns);
+		}
 	}
 	
 	private void rowRangeCheck(int row)
@@ -106,6 +110,11 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 		}
 	}
 	
+	private int index(int row, int column)
+	{
+		return column + row * this.columns;
+	}
+	
 	@Override
 	public int rows()
 	{
@@ -121,83 +130,36 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return new Iterator<E>()
-		{
-			private int	row;
-			private int	column;
-			
-			@Override
-			public boolean hasNext()
-			{
-				return this.column < columns && this.row < rows;
-			}
-			
-			@Override
-			public E next()
-			{
-				int row = this.row;
-				int column = this.column;
-				if (this.column + 1 == columns)
-				{
-					this.column = 0;
-					this.row++;
-				}
-				else
-				{
-					this.column++;
-				}
-				return (E) cells[row][column];
-			}
-			
-			@Override
-			public String toString()
-			{
-				return "ArrayMatrixIterator(matrix: " + ArrayMatrix.this + ", row: " + this.row + ", column: " + this.column + ")";
-			}
-		};
+		return new ArrayIterator(this.cells, this.rows * this.columns);
 	}
 	
 	@Override
 	public void forEach(Consumer<? super E> action)
 	{
-		for (int row = 0; row < this.rows; row++)
+		int cells = this.rows * this.columns;
+		for (int i = 0; i < cells; i++)
 		{
-			Object[] rowArray = this.cells[row];
-			for (int column = 0; column < this.columns; column++)
-			{
-				action.accept((E) rowArray[column]);
-			}
+			action.accept((E) this.cells[i]);
 		}
 	}
 	
 	@Override
 	public boolean $qmark(Object element)
 	{
-		for (int row = 0; row < this.rows; row++)
-		{
-			Object[] rowArray = this.cells[row];
-			for (int column = 0; column < this.columns; column++)
-			{
-				if (Objects.equals(rowArray[column], element))
-				{
-					return true;
-				}
-			}
-		}
-		return false;
+		return this.indexOf(element) >= 0;
 	}
 	
 	@Override
 	public E apply(int row, int column)
 	{
 		this.rangeCheck(row, column);
-		return (E) this.cells[row][column];
+		return (E) this.cells[this.index(row, column)];
 	}
 	
 	@Override
 	public E get(int row, int column)
 	{
-		return (E) this.cells[row][column];
+		return (E) this.cells[this.index(row, column)];
 	}
 	
 	@Override
@@ -205,13 +167,12 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	{
 		this.rangeCheck(row, column);
 		this.rangeCheck(row + rows - 1, column + columns - 1);
-		
-		Object[][] newCells = new Object[rows][columns];
+		Object[] newCells = new Object[rows * columns];
 		for (int i = 0; i < rows; i++)
 		{
-			System.arraycopy(this.cells[row + i], column, newCells[i], 0, columns);
+			System.arraycopy(this.cells, this.index(row + i, column), newCells, columns * i, columns);
 		}
-		return new ArrayMatrix(rows, columns, newCells, true);
+		return new FlatArrayMatrix(rows, columns, newCells, true);
 	}
 	
 	@Override
@@ -219,7 +180,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	{
 		this.rowRangeCheck(row);
 		Object[] array = new Object[this.columns];
-		System.arraycopy(this.cells[row], 0, array, 0, this.columns);
+		System.arraycopy(this.cells, row * this.columns, array, 0, this.columns);
 		return new ArrayList(array, this.columns, true);
 	}
 	
@@ -228,9 +189,9 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	{
 		this.columnRangeCheck(column);
 		Object[] array = new Object[this.rows];
-		for (int i = 0; i < this.rows; i++)
+		for (int i = 0; i < this.columns; i++)
 		{
-			array[i] = this.cells[i][column];
+			array[i] = this.cells[column + i * this.rows];
 		}
 		return new ArrayList(array, this.rows, true);
 	}
@@ -240,93 +201,79 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	{
 		int len = this.rows * this.columns;
 		Object[] array = new Object[len];
-		for (int i = 0; i < this.rows; i++)
-		{
-			System.arraycopy(this.cells[i], 0, array, i * this.columns, this.columns);
-		}
+		System.arraycopy(this.cells, 0, array, 0, len);
 		return new ArrayList(array, len, true);
 	}
 	
 	@Override
 	public ImmutableMatrix<E> transposed()
 	{
-		Object[][] newArray = new Object[this.columns][this.rows];
+		int len = this.rows * this.columns;
+		Object[] newArray = new Object[len];
 		for (int i = 0; i < this.rows; i++)
 		{
-			Object[] newRow = newArray[i];
+			int i1 = i * this.columns;
 			for (int j = 0; j < this.columns; j++)
 			{
-				newRow[j] = this.cells[j][i];
+				newArray[i + j * this.rows] = this.cells[j + i1];
 			}
 		}
-		return new ArrayMatrix(this.columns, this.rows, newArray, true);
+		return new FlatArrayMatrix(this.columns, this.rows, newArray, true);
 	}
 	
 	@Override
 	public <R> ImmutableMatrix<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		Object[][] newArray = new Object[this.columns][this.rows];
-		for (int row = 0; row < this.rows; row++)
+		int len = this.rows * this.columns;
+		Object[] array = new Object[len];
+		for (int i = 0; i < len; i++)
 		{
-			Object[] oldRow = this.cells[row];
-			Object[] newRow = newArray[row];
-			for (int column = 0; column < this.columns; column++)
+			array[i] = mapper.apply((E) this.cells[i]);
+		}
+		return new FlatArrayMatrix(this.rows, this.columns, array, true);
+	}
+	
+	private int indexOf(Object element)
+	{
+		int cells = this.rows * this.columns;
+		if (element == null)
+		{
+			for (int i = 0; i < cells; i++)
 			{
-				newRow[column] = mapper.apply((E) oldRow[column]);
+				if (this.cells[i] == null)
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+		for (int i = 0; i < cells; i++)
+		{
+			if (element.equals(this.cells[i]))
+			{
+				return i;
 			}
 		}
-		return new ArrayMatrix(this.rows, this.columns, newArray, true);
+		return -1;
 	}
 	
 	@Override
 	public int rowOf(Object element)
 	{
-		for (int row = 0; row < this.rows; row++)
-		{
-			Object[] rowArray = this.cells[row];
-			for (int column = 0; column < this.columns; column++)
-			{
-				if (Objects.equals(rowArray[column], element))
-				{
-					return row;
-				}
-			}
-		}
-		return -1;
+		return this.indexOf(element) / this.columns;
 	}
 	
 	@Override
 	public int columnOf(Object element)
 	{
-		for (int row = 0; row < this.rows; row++)
-		{
-			Object[] rowArray = this.cells[row];
-			for (int column = 0; column < this.columns; column++)
-			{
-				if (Objects.equals(rowArray[column], element))
-				{
-					return column;
-				}
-			}
-		}
-		return -1;
+		return this.indexOf(element) % this.rows;
 	}
 	
 	@Override
 	public Tuple2<Int, Int> cellOf(Object element)
 	{
-		for (int row = 0; row < this.rows; row++)
-		{
-			Object[] rowArray = this.cells[row];
-			for (int column = 0; column < this.columns; column++)
-			{
-				if (Objects.equals(rowArray[column], element))
-				{
-					return new Tuple2(Int.apply(row), Int.apply(column));
-				}
-			}
-		}
-		return null;
+		int index = this.indexOf(element);
+		return index == -1 ? null : new Tuple2(Int.apply(index / this.columns), Int.apply(index % this.rows));
 	}
 	
 	@Override
@@ -365,7 +312,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	@Override
 	public ImmutableMatrix<E> copy()
 	{
-		return new ArrayMatrix(this.rows, this.columns, this.cells);
+		return new FlatArrayMatrix(this.rows, this.columns, this.cells);
 	}
 	
 	@Override
@@ -374,7 +321,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 		return new dyvil.collection.mutable.ArrayMatrix(this.rows, this.columns, this.cells);
 	}
 	
-	private void rowToString(StringBuilder builder, Object[] row)
+	private void rowToString(StringBuilder builder, int row)
 	{
 		if (this.columns == 0)
 		{
@@ -383,10 +330,11 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 		}
 		
 		builder.append('[');
-		builder.append(row[0]);
+		int index = row * this.columns;
+		builder.append(this.cells[index]);
 		for (int i = 1; i < this.columns; i++)
 		{
-			builder.append(", ").append(row[i]);
+			builder.append(", ").append(this.cells[index + i]);
 		}
 		builder.append(']');
 	}
@@ -400,11 +348,11 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 		}
 		
 		StringBuilder builder = new StringBuilder(this.rows * this.columns * 10).append('[');
-		this.rowToString(builder, this.cells[0]);
+		this.rowToString(builder, 0);
 		for (int i = 1; i < this.rows; i++)
 		{
 			builder.append(", ");
-			this.rowToString(builder, this.cells[i]);
+			this.rowToString(builder, i);
 		}
 		return builder.append(']').toString();
 	}

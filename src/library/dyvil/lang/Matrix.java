@@ -219,7 +219,7 @@ public interface Matrix<E> extends Iterable<E>
 			return false;
 		}
 		
-		return matrixEquals(matrix, o);
+		return matrixEquals(matrix, (Matrix) o);
 	}
 	
 	public static boolean matrixEquals(Matrix<?> m1, Matrix<?> m2)

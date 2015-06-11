@@ -52,7 +52,7 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	// Non-mutating Operations
 	
 	@Override
-	public List<E> flatten();
+	public ImmutableList<E> flatten();
 	
 	@Override
 	public ImmutableMatrix<E> transposed();
