@@ -48,6 +48,29 @@ public class ArraySet<E> implements ImmutableSet<E>
 		this.size = size;
 	}
 	
+	public ArraySet(Collection<E> elements)
+	{
+		Object[] array = new Object[elements.size()];
+		int index = 0;
+		outer:
+		for (E element : elements)
+		{
+			// Check if the element is already present in the array
+			for (int i = 0; i < index; i++)
+			{
+				if (Objects.equals(array[i], element))
+				{
+					continue outer;
+				}
+			}
+			
+			array[index++] = element;
+		}
+		
+		this.array = (E[]) array;
+		this.size = index;
+	}
+	
 	@Override
 	public int size()
 	{
@@ -201,7 +224,34 @@ public class ArraySet<E> implements ImmutableSet<E>
 	@Override
 	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		return null; // TODO ArraySet.flatMapped
+		Object[] newArray = new Object[this.size << 2];
+		int index = 0;
+		for (int i = 0; i < this.size; i++)
+		{
+			results:
+			for (R result : mapper.apply(this.array[i]))
+			{
+				// Search if the mapped element is already present in the array
+				for (int j = 0; j < index; j++)
+				{
+					if (Objects.equals(newArray[j], result))
+					{
+						continue results;
+					}
+				}
+				
+				// Add the element to the array
+				int index1 = index++;
+				if (index1 >= newArray.length)
+				{
+					Object[] temp = new Object[index << 1];
+					System.arraycopy(newArray, 0, temp, 0, newArray.length);
+					newArray = temp;
+				}
+				newArray[index1] = result;
+			}
+		}
+		return new ArraySet(newArray, index, true);
 	}
 	
 	@Override

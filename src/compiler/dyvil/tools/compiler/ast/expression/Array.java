@@ -131,7 +131,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 		if (!type.isArrayType())
 		{
 			IClass iclass = type.getTheClass();
-			if (iclass == Types.OBJECT_CLASS)
+			if (iclass == Types.OBJECT_CLASS || iclass == null)
 			{
 				return this;
 			}
