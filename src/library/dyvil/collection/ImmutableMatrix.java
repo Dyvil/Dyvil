@@ -3,11 +3,24 @@ package dyvil.collection;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import dyvil.collection.immutable.ArrayMatrix;
 import dyvil.lang.*;
+import dyvil.lang.literal.ArrayConvertible;
 import dyvil.tuple.Tuple2;
 
+@ArrayConvertible
 public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 {
+	public static <E> ImmutableMatrix<E> apply(E[]... elements)
+	{
+		return new ArrayMatrix(elements);
+	}
+	
+	public static <E> ImmutableMatrix<E> create(int rows, int columns)
+	{
+		return new ArrayMatrix<E>(rows, columns);
+	}
+	
 	// Accessors
 	
 	@Override
@@ -28,7 +41,7 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	// Sub-view Operations
 	
 	@Override
-	public MutableMatrix<E> subMatrix(int row, int rows, int column, int columns);
+	public ImmutableMatrix<E> subMatrix(int row, int rows, int column, int columns);
 	
 	@Override
 	public ImmutableList<E> row(int row);

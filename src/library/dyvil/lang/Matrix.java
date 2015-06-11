@@ -13,14 +13,21 @@ import java.util.stream.StreamSupport;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
 
+@NilConvertible
 @ArrayConvertible
 public interface Matrix<E> extends Iterable<E>
 {
 	public static <E> MutableMatrix<E> apply()
 	{
-		return MutableMatrix.<E> apply();
+		return MutableMatrix.apply();
+	}
+	
+	public static <E> ImmutableMatrix<E> apply(E[]... elements)
+	{
+		return ImmutableMatrix.apply(elements);
 	}
 	
 	// Accessors

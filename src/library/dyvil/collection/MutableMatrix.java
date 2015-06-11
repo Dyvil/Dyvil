@@ -20,7 +20,7 @@ public interface MutableMatrix<E> extends Matrix<E>
 		return new ArrayMatrix();
 	}
 	
-	public static <E> MutableMatrix<E> apply(E[][] cells)
+	public static <E> MutableMatrix<E> apply(E[]... cells)
 	{
 		return new ArrayMatrix(cells);
 	}
