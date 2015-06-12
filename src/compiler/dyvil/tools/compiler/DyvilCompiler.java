@@ -13,9 +13,7 @@ import dyvil.io.AppendableOutputStream;
 import dyvil.io.FileUtils;
 import dyvil.io.LoggerOutputStream;
 import dyvil.tools.compiler.ast.dwt.DWTFile;
-import dyvil.tools.compiler.ast.structure.DyvilHeader;
-import dyvil.tools.compiler.ast.structure.DyvilUnit;
-import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.ast.structure.*;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
@@ -116,6 +114,8 @@ public final class DyvilCompiler
 		logger.info("Compiling " + packages + (packages == 1 ? " Package, " : " Packages, ") + fileCount + (fileCount == 1 ? " File (" : " Files (")
 				+ unitCount + (unitCount == 1 ? " Compilation Unit)" : " Compilation Units)"));
 		logger.info("");
+		
+		units.sort(IDyvilHeader.HEADERS_FIRST);
 		
 		// Apply states
 		if (debug)
@@ -326,7 +326,7 @@ public final class DyvilCompiler
 			units.add(unit);
 			return;
 		}
-		if (fileName.endsWith(".dyh"))
+		if (fileName.endsWith(".dyvilh") || fileName.endsWith(".dyh"))
 		{
 			DyvilHeader header = new DyvilHeader(pack, (CodeFile) source, output);
 			pack.addCompilationUnit(header);

@@ -147,33 +147,9 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 	@Override
 	public void compile()
 	{
-		int size = this.markers.size();
-		if (size > 0)
+		if (ICompilationUnit.printMarkers(this.markers, "DWT File", this.name, this.inputFile))
 		{
-			StringBuilder buf = new StringBuilder("Problems in DWT File ").append(this.inputFile).append(":\n\n");
-			String code = this.inputFile.getCode();
-			
-			int warnings = 0;
-			int errors = 0;
-			for (Marker marker : this.markers)
-			{
-				if (marker.isError())
-				{
-					errors++;
-				}
-				else
-				{
-					warnings++;
-				}
-				marker.log(code, buf);
-			}
-			buf.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
-			DyvilCompiler.logger.info(buf.toString());
-			if (errors > 0)
-			{
-				DyvilCompiler.logger.warning(this.name + " was not compiled due to errors in the DWT File");
-				return;
-			}
+			return;
 		}
 		
 		ClassWriter.compile(this.outputFile, this);

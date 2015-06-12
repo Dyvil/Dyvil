@@ -51,6 +51,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected int					includeCount;
 	
 	protected Map<Name, Operator>	operators		= new IdentityHashMap();
+	protected Map<Name, Operator>	inheritedOperators;
 	
 	public DyvilHeader(String name)
 	{
@@ -75,6 +76,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		end = name.lastIndexOf('.');
 		this.outputDirectory = new File(name.substring(0, start));
 		this.outputFile = new File(name.substring(0, end) + ".class");
+	}
+	
+	@Override
+	public boolean isHeader()
+	{
+		return true;
 	}
 	
 	@Override
@@ -154,7 +161,10 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			this.includes[0] = component;
 			this.includeCount = 1;
 			
-			this.inheritedOperators = new IdentityHashMap();
+			if (!this.isHeader())
+			{
+				this.inheritedOperators = new IdentityHashMap();
+			}
 		}
 		else
 		{
@@ -167,6 +177,17 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			}
 			this.includes[index] = component;
 		}
+		
+		if (this.isHeader())
+		{
+			this.markers.add(component.getPosition(), "header.include");
+			return;
+		}
+		
+		// Resolve the header
+		
+		component.resolve(this.markers);
+		component.addOperators(this.inheritedOperators);
 	}
 	
 	@Override
@@ -190,7 +211,16 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public Operator getOperator(Name name)
 	{
-		return this.operators.get(name);
+		Operator op1 = this.operators.get(name);
+		if (op1 != null)
+		{
+			return op1;
+		}
+		if (this.inheritedOperators == null)
+		{
+			return null;
+		}
+		return this.inheritedOperators.get(op1);
 	}
 	
 	@Override
@@ -287,6 +317,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void compile()
 	{
+		if (ICompilationUnit.printMarkers(this.markers, "Dyvil Header", this.name, this.inputFile))
+		{
+			return;
+		}
+		
+		// TODO Compilation
 	}
 	
 	@Override
@@ -425,6 +461,17 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			{
 				buffer.append('\n');
 			}
+		}
+		
+		if (this.includeCount > 0)
+		{
+			for (int i = 0; i < this.includeCount; i++)
+			{
+				buffer.append(prefix);
+				this.includes[i].toString(prefix, buffer);
+				buffer.append(";\n");
+			}
+			buffer.append('\n');
 		}
 		
 		if (this.importCount > 0)

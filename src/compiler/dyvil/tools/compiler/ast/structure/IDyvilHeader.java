@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.structure;
 
+import java.util.Comparator;
 import java.util.Map;
 
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -14,6 +15,29 @@ import dyvil.tools.compiler.ast.operator.Operator;
 
 public interface IDyvilHeader extends IContext, IClassList, IOperatorMap
 {
+	Comparator<? super ICompilationUnit>	HEADERS_FIRST	= (c1, c2) -> {
+																final boolean h1 = c1.isHeader();
+																final boolean h2 = c2.isHeader();
+																if (h1 == h2)
+																{
+																	return 0;
+																}
+																if (h1)
+																{
+																	return -1;
+																}
+																if (h2)
+																{
+																	return 1;
+																}
+																return 0;
+															};
+	
+	public default boolean isHeader()
+	{
+		return true;
+	}
+	
 	public String getName();
 	
 	// Package

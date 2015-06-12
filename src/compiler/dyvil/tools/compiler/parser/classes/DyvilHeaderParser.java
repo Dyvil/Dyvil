@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
+import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -9,8 +10,10 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
+import dyvil.tools.compiler.parser.imports.IncludeParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
 import dyvil.tools.compiler.transform.Keywords;
+import dyvil.tools.compiler.transform.Symbols;
 
 public class DyvilHeaderParser extends Parser
 {
@@ -35,8 +38,6 @@ public class DyvilHeaderParser extends Parser
 	{
 		if (token.type() == Keywords.PACKAGE)
 		{
-			this.mode = IMPORT;
-			
 			PackageDecl pack = new PackageDecl(token.raw());
 			this.unit.setPackageDeclaration(pack);
 			pm.pushParser(new PackageParser(pack));
@@ -50,7 +51,6 @@ public class DyvilHeaderParser extends Parser
 		int type = token.type();
 		if (type == Keywords.IMPORT)
 		{
-			this.mode = IMPORT;
 			ImportDeclaration i = new ImportDeclaration(token.raw());
 			this.unit.addImport(i);
 			pm.pushParser(new ImportParser(i));
@@ -58,7 +58,6 @@ public class DyvilHeaderParser extends Parser
 		}
 		if (type == Keywords.USING)
 		{
-			this.mode = IMPORT;
 			ImportDeclaration i = new ImportDeclaration(token.raw(), true);
 			this.unit.addStaticImport(i);
 			pm.pushParser(new ImportParser(i));
@@ -66,11 +65,16 @@ public class DyvilHeaderParser extends Parser
 		}
 		if (type == Keywords.OPERATOR)
 		{
-			this.mode = IMPORT;
 			Operator operator = new Operator(token.next().nameValue());
 			this.unit.addOperator(operator);
 			pm.skip();
 			pm.pushParser(new OperatorParser(operator));
+			return true;
+		}
+		if (type == Keywords.INCLUDE)
+		{
+			IncludeDeclaration i = new IncludeDeclaration(token.raw());
+			pm.pushParser(new IncludeParser(this.unit, i));
 			return true;
 		}
 		return false;
@@ -79,10 +83,15 @@ public class DyvilHeaderParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
+		if (token.type() == Symbols.SEMICOLON)
+		{
+			return;
+		}
 		if (this.isInMode(PACKAGE))
 		{
 			if (this.parsePackage(pm, token))
 			{
+				this.mode = IMPORT;
 				return;
 			}
 		}

@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.structure;
 
 import java.io.File;
 
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
@@ -10,7 +9,6 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 
@@ -24,6 +22,12 @@ public final class DyvilUnit extends DyvilHeader
 	public DyvilUnit(Package pack, CodeFile input, File output)
 	{
 		super(pack, input, output);
+	}
+	
+	@Override
+	public boolean isHeader()
+	{
+		return false;
 	}
 	
 	@Override
@@ -160,26 +164,9 @@ public final class DyvilUnit extends DyvilHeader
 	@Override
 	public void compile()
 	{
-		int size = this.markers.size();
-		if (size > 0)
+		if (ICompilationUnit.printMarkers(this.markers, "Dyvil Unit", this.name, this.inputFile))
 		{
-			StringBuilder buf = new StringBuilder("Problems in Dyvil File ").append(this.inputFile).append(":\n\n");
-			String code = this.inputFile.getCode();
-			
-			int warnings = this.markers.getWarnings();
-			int errors = this.markers.getErrors();
-			this.markers.sort();
-			for (Marker marker : this.markers)
-			{
-				marker.log(code, buf);
-			}
-			buf.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
-			DyvilCompiler.logger.info(buf.toString());
-			if (errors > 0)
-			{
-				DyvilCompiler.logger.warning(this.name + " was not compiled due to errors in the Compilation Unit\n");
-				return;
-			}
+			return;
 		}
 		
 		for (int i = 0; i < this.classCount; i++)
