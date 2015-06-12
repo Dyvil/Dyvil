@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.imports.HeaderComponent;
+import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -33,7 +33,7 @@ public class REPLContext extends DyvilHeader implements IValued
 	private Map<Name, REPLVariable>		variables		= new HashMap();
 	
 	private IValue						value;
-	private HeaderComponent				headerComponent;
+	private ImportDeclaration				headerComponent;
 	private IClass						tempClass;
 	
 	public REPLContext()
@@ -158,13 +158,13 @@ public class REPLContext extends DyvilHeader implements IValued
 	}
 	
 	@Override
-	public void addImport(HeaderComponent component)
+	public void addImport(ImportDeclaration component)
 	{
 		headerComponent = component;
 	}
 	
 	@Override
-	public void addStaticImport(HeaderComponent component)
+	public void addStaticImport(ImportDeclaration component)
 	{
 		headerComponent = component;
 	}

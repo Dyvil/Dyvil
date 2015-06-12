@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.tools.compiler.ast.imports.HeaderComponent;
+import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -52,7 +52,7 @@ public final class DyvilHeaderParser extends Parser
 			if (type == Keywords.IMPORT)
 			{
 				this.mode = IMPORT;
-				HeaderComponent i = new HeaderComponent(token.raw());
+				ImportDeclaration i = new ImportDeclaration(token.raw());
 				this.unit.addImport(i);
 				pm.pushParser(new ImportParser(i));
 				return;
@@ -60,7 +60,7 @@ public final class DyvilHeaderParser extends Parser
 			if (type == Keywords.USING)
 			{
 				this.mode = IMPORT;
-				HeaderComponent i = new HeaderComponent(token.raw(), true);
+				ImportDeclaration i = new ImportDeclaration(token.raw(), true);
 				this.unit.addStaticImport(i);
 				pm.pushParser(new ImportParser(i));
 				return;

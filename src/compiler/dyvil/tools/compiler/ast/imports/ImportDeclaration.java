@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class HeaderComponent extends ASTNode implements IImport
+public final class ImportDeclaration extends ASTNode implements IImport
 {
 	public static final int	IMPORT	= 0;
 	public static final int	USING	= 1;
@@ -23,12 +23,12 @@ public final class HeaderComponent extends ASTNode implements IImport
 	public IImport			last;
 	public boolean			isStatic;
 	
-	public HeaderComponent(ICodePosition position)
+	public ImportDeclaration(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public HeaderComponent(ICodePosition position, boolean isStatic)
+	public ImportDeclaration(ICodePosition position, boolean isStatic)
 	{
 		this.position = position;
 		this.isStatic = isStatic;

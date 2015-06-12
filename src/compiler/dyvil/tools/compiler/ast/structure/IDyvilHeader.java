@@ -1,14 +1,18 @@
 package dyvil.tools.compiler.ast.structure;
 
+import java.util.Map;
+
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
-import dyvil.tools.compiler.ast.imports.HeaderComponent;
+import dyvil.tools.compiler.ast.imports.ImportDeclaration;
+import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDecl;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 
-public interface IDyvilHeader extends IContext, IClassList
+public interface IDyvilHeader extends IContext, IClassList, IOperatorMap
 {
 	public String getName();
 	
@@ -26,17 +30,23 @@ public interface IDyvilHeader extends IContext, IClassList
 	
 	// Include
 	
-	public void addImport(HeaderComponent i);
+	public void addImport(ImportDeclaration component);
 	
-	public void addStaticImport(HeaderComponent i);
+	public void addStaticImport(ImportDeclaration component);
 	
 	public boolean hasStaticImports();
 	
+	public void addInclude(IncludeDeclaration component);
+	
 	// Operators
 	
-	public void addOperator(Operator op);
+	public Map<Name, Operator> getOperators();
 	
+	@Override
 	public Operator getOperator(Name name);
+	
+	@Override
+	public void addOperator(Operator op);
 	
 	// Classes
 	

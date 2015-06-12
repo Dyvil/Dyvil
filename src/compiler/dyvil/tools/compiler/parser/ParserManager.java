@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.parser;
 
-import java.util.Map;
-
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.lexer.TokenIterator;
@@ -13,13 +12,13 @@ import dyvil.tools.compiler.lexer.token.IToken;
 
 public final class ParserManager implements IParserManager
 {
-	protected Parser			parser;
+	protected Parser		parser;
 	
-	public Map<Name, Operator>	operators;
+	protected IOperatorMap	operators;
 	
-	protected TokenIterator		tokens;
-	protected int				skip;
-	protected boolean			reparse;
+	protected TokenIterator	tokens;
+	protected int			skip;
+	protected boolean		reparse;
 	
 	public ParserManager()
 	{
@@ -39,6 +38,29 @@ public final class ParserManager implements IParserManager
 		this.parser = parser;
 	}
 	
+	@Override
+	public void setOperatorMap(IOperatorMap operators)
+	{
+		this.operators = operators;
+	}
+	
+	@Override
+	public IOperatorMap getOperatorMap()
+	{
+		return this.operators;
+	}
+	
+	@Override
+	public Operator getOperator(Name name)
+	{
+		Operator op = this.operators.getOperator(name);
+		if (op != null)
+		{
+			return op;
+		}
+		return Operators.map.get(name);
+	}
+
 	public final void parse(MarkerList markers, TokenIterator tokens)
 	{
 		this.tokens = tokens;
@@ -111,17 +133,6 @@ public final class ParserManager implements IParserManager
 				System.out.println(token + ":\t\t" + this.parser.name + " @ " + this.parser.mode);
 			}
 		}
-	}
-	
-	@Override
-	public Operator getOperator(Name name)
-	{
-		Operator op = this.operators.get(name);
-		if (op != null)
-		{
-			return op;
-		}
-		return Operators.map.get(name);
 	}
 	
 	@Override
