@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
@@ -99,7 +100,7 @@ public class HeaderFile
 		}
 		
 		String name = dis.readUTF();
-		DyvilHeader header = new DyvilHeader(name);
+		DyvilHeader header = new ExternalHeader(name);
 		
 		// Include Declarations
 		/*
@@ -122,7 +123,7 @@ public class HeaderFile
 		{
 			ImportDeclaration id = new ImportDeclaration(null, true);
 			id.read(dis);
-			header.addImport(id);
+			header.addStaticImport(id);
 		}
 		
 		int operators = dis.readShort();
