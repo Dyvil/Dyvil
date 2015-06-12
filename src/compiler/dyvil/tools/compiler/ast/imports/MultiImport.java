@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.ast.imports;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
@@ -24,6 +27,12 @@ public final class MultiImport extends ASTNode implements IImport
 	public MultiImport(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	@Override
+	public int importTag()
+	{
+		return MULTI;
 	}
 	
 	@Override
@@ -96,6 +105,30 @@ public final class MultiImport extends ASTNode implements IImport
 		for (int i = 0; i < this.childrenCount; i++)
 		{
 			this.children[i].getMethodMatches(list, instance, name, arguments);
+		}
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeShort(this.childrenCount);
+		for (int i = 0; i < this.childrenCount; i++)
+		{
+			IImport child = this.children[i];
+			dos.writeByte(child.importTag());
+			child.write(dos);
+		}
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		this.childrenCount = dis.readShort();
+		this.children = new IImport[this.childrenCount];
+		for (int i = 0; i < this.childrenCount; i++)
+		{
+			IImport child = IImport.fromTag(dis.readByte());
+			child.read(dis);
 		}
 	}
 	

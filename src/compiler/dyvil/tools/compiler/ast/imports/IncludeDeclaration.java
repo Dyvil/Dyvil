@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.ast.imports;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Map;
 
 import dyvil.tools.compiler.ast.IASTNode;
@@ -28,6 +31,11 @@ public class IncludeDeclaration implements IASTNode
 	public ICodePosition getPosition()
 	{
 		return this.position;
+	}
+	
+	public IDyvilHeader getHeader()
+	{
+		return this.header;
 	}
 	
 	public void addNamePart(Name name)
@@ -78,6 +86,25 @@ public class IncludeDeclaration implements IASTNode
 		}
 		
 		operatorMap.putAll(this.header.getOperators());
+	}
+	
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeShort(this.namePartCount);
+		for (int i = 0; i < this.namePartCount; i++)
+		{
+			dos.writeUTF(this.nameParts[i].qualified);
+		}
+	}
+	
+	public void read(DataInputStream dis) throws IOException
+	{
+		this.namePartCount = dis.readShort();
+		this.nameParts = new Name[this.namePartCount];
+		for (int i = 0; i < this.namePartCount; i++)
+		{
+			this.nameParts[i] = Name.getQualified(dis.readUTF());
+		}
 	}
 	
 	@Override

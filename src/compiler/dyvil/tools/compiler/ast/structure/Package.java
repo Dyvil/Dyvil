@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
@@ -124,7 +124,7 @@ public class Package implements INamed, IContext
 		return pack;
 	}
 	
-	public void check(PackageDecl packageDecl, CodeFile file, MarkerList markers)
+	public void check(PackageDeclaration packageDecl, CodeFile file, MarkerList markers)
 	{
 		if (packageDecl == null)
 		{

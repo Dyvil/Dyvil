@@ -24,28 +24,16 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		super(api);
 	}
 	
-	public static void compile(File file, IClassCompilable iclass)
+	public static byte[] compile(IClassCompilable iclass) throws Throwable
 	{
-		byte[] bytes;
-		
-		// First try to compile the file to a byte array
-		try
-		{
-			ClassWriter writer = new ClassWriter();
-			iclass.write(writer);
-			writer.visitEnd();
-			bytes = writer.toByteArray();
-		}
-		catch (Throwable ex)
-		{
-			// If the compilation fails, skip creating and writing the file.
-			DyvilCompiler.logger.warning("Error during compilation of '" + file + "': " + ex);
-			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
-			return;
-		}
-		
-		// If the compilation was successful, we can try to write the newly
-		// created byte array to a newly created, empty file.
+		ClassWriter writer = new ClassWriter();
+		iclass.write(writer);
+		writer.visitEnd();
+		return writer.toByteArray();
+	}
+	
+	public static void save(File file, byte[] bytes)
+	{
 		FileUtils.createFile(file);
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 		{
@@ -57,6 +45,28 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 			DyvilCompiler.logger.warning("Failed to save file '" + file + "': " + ex);
 			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
 		}
+	}
+	
+	public static void compile(File file, IClassCompilable iclass)
+	{
+		byte[] bytes;
+		
+		// First try to compile the file to a byte array
+		try
+		{
+			bytes = compile(iclass);
+		}
+		catch (Throwable ex)
+		{
+			// If the compilation fails, skip creating and writing the file.
+			DyvilCompiler.logger.warning("Error during compilation of '" + file + "': " + ex);
+			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
+			return;
+		}
+		
+		// If the compilation was successful, we can try to write the newly
+		// created byte array to a newly created, empty file.
+		save(file, bytes);
 	}
 	
 	@Override

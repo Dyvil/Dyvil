@@ -3,16 +3,16 @@ package dyvil.tools.compiler.ast.imports;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class PackageDecl extends ASTNode
+public class PackageDeclaration extends ASTNode
 {
 	public String	thePackage;
 	
-	public PackageDecl(ICodePosition position)
+	public PackageDeclaration(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	public PackageDecl(ICodePosition position, String thePackage)
+	public PackageDeclaration(ICodePosition position, String thePackage)
 	{
 		this.position = position;
 		this.thePackage = thePackage;

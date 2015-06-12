@@ -9,6 +9,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.CaseClasses;
 
 public class StringBuilderExpression implements IValue
@@ -24,6 +25,12 @@ public class StringBuilderExpression implements IValue
 	public int valueTag()
 	{
 		return STRINGBUILDER;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.values[0].getPosition();
 	}
 	
 	public void addValue(IValue value)

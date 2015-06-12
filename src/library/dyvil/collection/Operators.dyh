@@ -1,0 +1,13 @@
+package dyvil.collection
+
+// Collection Operators
+operator ? { none, 120 }
+operator ++ { left, 120 }
+operator -- { left, 120 }
+operator ++= { right, 120 }
+operator --= { right, 120 }
+
+// Map Operators
+operator ?: { none, 120 }
+operator -: { none, 120 }
+operator -:= { right, 120 }

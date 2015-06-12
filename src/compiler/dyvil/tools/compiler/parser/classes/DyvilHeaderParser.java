@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
-import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -38,7 +38,7 @@ public class DyvilHeaderParser extends Parser
 	{
 		if (token.type() == Keywords.PACKAGE)
 		{
-			PackageDecl pack = new PackageDecl(token.raw());
+			PackageDeclaration pack = new PackageDeclaration(token.raw());
 			this.unit.setPackageDeclaration(pack);
 			pm.pushParser(new PackageParser(pack));
 			return true;

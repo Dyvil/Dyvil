@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
-import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
@@ -48,19 +48,35 @@ public interface IDyvilHeader extends IContext, IClassList, IOperatorMap
 	
 	// Package Declaration
 	
-	public void setPackageDeclaration(PackageDecl pack);
+	public void setPackageDeclaration(PackageDeclaration pack);
 	
-	public PackageDecl getPackageDeclaration();
+	public PackageDeclaration getPackageDeclaration();
 	
-	// Include
+	// Import
+	
+	public int importCount();
 	
 	public void addImport(ImportDeclaration component);
 	
-	public void addStaticImport(ImportDeclaration component);
+	public ImportDeclaration getImport(int index);
+	
+	// Using
 	
 	public boolean hasStaticImports();
 	
+	public int staticImportCount();
+	
+	public void addStaticImport(ImportDeclaration component);
+	
+	public ImportDeclaration getStaticImport(int index);
+	
+	// Include
+	
+	public int includeCount();
+	
 	public void addInclude(IncludeDeclaration component);
+	
+	public IncludeDeclaration getInclude(int index);
 	
 	// Operators
 	

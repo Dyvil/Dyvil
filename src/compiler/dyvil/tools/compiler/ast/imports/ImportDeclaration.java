@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.ast.imports;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
@@ -32,6 +35,12 @@ public final class ImportDeclaration extends ASTNode implements IImport
 	{
 		this.position = position;
 		this.isStatic = isStatic;
+	}
+	
+	@Override
+	public int importTag()
+	{
+		return -1;
 	}
 	
 	@Override
@@ -100,5 +109,19 @@ public final class ImportDeclaration extends ASTNode implements IImport
 			buffer.append("import ");
 		}
 		this.theImport.toString(prefix, buffer);
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeByte(this.theImport.importTag());
+		this.theImport.write(dos);
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		this.theImport = IImport.fromTag(dis.readByte());
+		this.theImport.read(dis);
 	}
 }

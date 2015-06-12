@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.operator;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.tools.compiler.ast.member.Name;
 
 public final class Operator
@@ -50,6 +54,27 @@ public final class Operator
 		StringBuilder buf = new StringBuilder();
 		this.toString(buf);
 		return buf.toString();
+	}
+	
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeUTF(this.name.qualified);
+		dos.writeByte(this.type);
+		if (this.type > PREFIX && this.type < POSTFIX)
+		{
+			dos.writeInt(this.precedence);
+		}
+	}
+	
+	public static Operator read(DataInputStream dis) throws IOException
+	{
+		Name name = Name.getQualified(dis.readUTF());
+		byte type = dis.readByte();
+		if (type > PREFIX && type < POSTFIX)
+		{
+			return new Operator(name, dis.readInt(), type);
+		}
+		return new Operator(name, type);
 	}
 	
 	public void toString(StringBuilder buffer)
