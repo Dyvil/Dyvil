@@ -405,22 +405,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			}
 		}
 		
-		// Package Classes
-		iclass = this.pack.resolveClass(name);
-		if (iclass != null)
+		if (this.pack != null)
 		{
-			return iclass;
+			return this.pack.resolveClass(name);
 		}
-		
-		// Standart Dyvil Classes
-		iclass = Package.dyvilLang.resolveClass(name);
-		if (iclass != null)
-		{
-			return iclass;
-		}
-		
-		// Standart Java Classes
-		return Package.javaLang.resolveClass(name);
+		return null;
 	}
 	
 	@Override

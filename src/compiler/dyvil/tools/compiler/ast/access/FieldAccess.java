@@ -156,7 +156,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		
 		if (this.instance == null)
 		{
-			IClass iclass = context.resolveClass(this.name);
+			IClass iclass = IContext.resolveClass(context, this.name);
 			if (iclass != null)
 			{
 				return new ClassAccess(this.position, iclass.getType());

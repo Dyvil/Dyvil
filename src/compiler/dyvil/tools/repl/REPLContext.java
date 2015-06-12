@@ -202,6 +202,7 @@ public class REPLContext extends DyvilHeader implements IValued
 	public IClass resolveClass(Name name)
 	{
 		IClass iclass;
+		
 		// Imported Classes
 		for (int i = 0; i < this.importCount; i++)
 		{
@@ -212,15 +213,7 @@ public class REPLContext extends DyvilHeader implements IValued
 			}
 		}
 		
-		// Standart Dyvil Classes
-		iclass = Package.dyvilLang.resolveClass(name);
-		if (iclass != null)
-		{
-			return iclass;
-		}
-		
-		// Standart Java Classes
-		return Package.javaLang.resolveClass(name);
+		return null;
 	}
 	
 	@Override

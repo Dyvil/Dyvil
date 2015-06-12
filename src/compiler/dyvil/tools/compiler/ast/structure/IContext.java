@@ -48,6 +48,25 @@ public interface IContext
 	
 	public boolean handleException(IType type);
 	
+	public static IClass resolveClass(IContext context, Name name)
+	{
+		IClass iclass = context.resolveClass(name);
+		if (iclass != null)
+		{
+			return iclass;
+		}
+		
+		// Standart Dyvil Classes
+		iclass = Package.dyvilLang.resolveClass(name);
+		if (iclass != null)
+		{
+			return iclass;
+		}
+		
+		// Standart Java Classes
+		return Package.javaLang.resolveClass(name);
+	}
+	
 	public static IConstructor resolveConstructor(IContext context, IArguments arguments)
 	{
 		List<ConstructorMatch> matches = new ArrayList();
