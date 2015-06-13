@@ -207,16 +207,16 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 		
 		if (args == 1)
 		{
-			IValue argument = this.arguments.getFirstValue();
 			IValue op;
 			if (this.instance != null)
 			{
-				op = Operators.get(this.instance, this.name, argument);
+				op = Operators.getPriority(this.instance, this.name, this.arguments.getFirstValue());
 			}
 			else
 			{
-				op = Operators.get(this.name, argument);
+				op = Operators.getPriority(this.name, this.arguments.getFirstValue());
 			}
+			
 			if (op != null)
 			{
 				op.setPosition(this.position);
@@ -248,6 +248,13 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 					call.name = name;
 					return call;
 				}
+			}
+			
+			IValue op = Operators.get(this.instance, this.name, this.arguments.getFirstValue());
+			if (op != null)
+			{
+				op.setPosition(this.position);
+				return op;
 			}
 		}
 		

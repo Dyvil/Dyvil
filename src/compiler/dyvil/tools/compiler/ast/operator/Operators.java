@@ -59,7 +59,7 @@ public interface Operators
 		return 0;
 	}
 	
-	public static IValue get(Name name, IValue arg1)
+	public static IValue getPriority(Name name, IValue arg1)
 	{
 		if (name == bang)
 		{
@@ -71,25 +71,8 @@ public interface Operators
 		return null;
 	}
 	
-	public static IValue get(IValue arg1, Name name, IValue arg2)
+	public static IValue getPriority(IValue arg1, Name name, IValue arg2)
 	{
-		// Null check
-		if (name == plus)
-		{
-			if (arg1.valueTag() == IValue.STRINGBUILDER)
-			{
-				StringBuilderExpression sbe = (StringBuilderExpression) arg1;
-				sbe.addValue(arg2);
-				return sbe;
-			}
-			if ((arg1.isType(Types.STRING) && arg1.valueTag() != IValue.NULL) || (arg2.isType(Types.STRING) && arg2.valueTag() != IValue.NULL))
-			{
-				StringBuilderExpression sbe = new StringBuilderExpression();
-				sbe.addValue(arg1);
-				sbe.addValue(arg2);
-				return sbe;
-			}
-		}
 		if (name == eqeq || name == eqeqeq)
 		{
 			if (arg2.valueTag() == IValue.NULL)
@@ -112,7 +95,27 @@ public interface Operators
 			{
 				return new NullCheckOperator(arg2, false);
 			}
-			return null;
+		}
+		return null;
+	}
+	
+	public static IValue get(IValue arg1, Name name, IValue arg2)
+	{
+		if (name == plus)
+		{
+			if (arg1.valueTag() == IValue.STRINGBUILDER)
+			{
+				StringBuilderExpression sbe = (StringBuilderExpression) arg1;
+				sbe.addValue(arg2);
+				return sbe;
+			}
+			if ((arg1.isType(Types.STRING) && arg1.valueTag() != IValue.NULL) || (arg2.isType(Types.STRING) && arg2.valueTag() != IValue.NULL))
+			{
+				StringBuilderExpression sbe = new StringBuilderExpression();
+				sbe.addValue(arg1);
+				sbe.addValue(arg2);
+				return sbe;
+			}
 		}
 		if (name == dotdot)
 		{
