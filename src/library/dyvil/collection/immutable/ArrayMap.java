@@ -35,6 +35,24 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		{
 			return ArrayMap.this.values[this.index];
 		}
+		
+		@Override
+		public String toString()
+		{
+			return Entry.entryToString(this);
+		}
+		
+		@Override
+		public boolean equals(Object obj)
+		{
+			return Entry.entryEquals(this, obj);
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return Entry.entryHashCode(this);
+		}
 	}
 	
 	private final int	size;

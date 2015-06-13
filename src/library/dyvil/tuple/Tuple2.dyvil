@@ -12,4 +12,6 @@ public case class Tuple2[A, B](
 	public override A getKey() = this._1
 	
 	public override B getValue() = this._2
+	
+	public override int hashCode() = Entry entryHashCode this
 }

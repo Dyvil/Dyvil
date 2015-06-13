@@ -189,12 +189,20 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public boolean equals(Object obj)
 	{
-		return Map.mapEquals(this, obj);
+		if (obj instanceof Map)
+		{
+			return Map.mapEquals(this, (Map) obj);
+		}
+		if (obj instanceof Entry)
+		{
+			return Entry.entryEquals(this, (Entry) obj);
+		}
+		return false;
 	}
 	
 	@Override
 	public int hashCode()
 	{
-		return Map.mapHashCode(this);
+		return Entry.entryHashCode(this);
 	}
 }
