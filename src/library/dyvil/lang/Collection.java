@@ -469,15 +469,41 @@ public interface Collection<E> extends Iterable<E>
 	@Override
 	public int hashCode();
 	
-	public static boolean orderedEquals(Iterable<?> c1, Iterable<?> c2)
+	public static <E> String collectionToString(Collection<E> collection)
 	{
-		Iterator iterator1 = c1.iterator();
-		Iterator iterator2 = c2.iterator();
+		if (collection.isEmpty())
+		{
+			return "[]";
+		}
+		
+		StringBuilder builder = new StringBuilder("[");
+		Iterator<E> iterator = collection.iterator();
+		while (true)
+		{
+			E element = iterator.next();
+			builder.append(element);
+			if (iterator.hasNext())
+			{
+				builder.append(", ");
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		return builder.append(']').toString();
+	}
+	
+	public static <E> boolean orderedEquals(Iterable<E> c1, Iterable<E> c2)
+	{
+		Iterator<E> iterator1 = c1.iterator();
+		Iterator<E> iterator2 = c2.iterator();
 		while (iterator1.hasNext())
 		{
-			Object o1 = iterator1.next();
-			Object o2 = iterator2.next();
-			if (!Objects.equals(o1, o2))
+			E e1 = iterator1.next();
+			E e2 = iterator2.next();
+			if (!Objects.equals(e1, e2))
 			{
 				return false;
 			}
@@ -485,7 +511,7 @@ public interface Collection<E> extends Iterable<E>
 		return true;
 	}
 	
-	public static boolean unorderedEquals(Collection<?> c1, Collection<?> c2)
+	public static <E> boolean unorderedEquals(Collection<E> c1, Collection<E> c2)
 	{
 		if (c1.size() != c2.size())
 		{

@@ -167,44 +167,37 @@ public interface Set<E> extends Collection<E>
 	@Override
 	public ImmutableSet<E> immutable();
 	
-	public static boolean setEquals(Set<?> set, Object o)
+	public static <E> boolean setEquals(Set<E> set, Object o)
 	{
 		if (!(o instanceof Set))
 		{
 			return false;
 		}
 		
-		return setEquals((Set) set, (Set) o);
+		return setEquals(set, (Set) o);
 	}
 	
-	public static boolean setEquals(Set<?> c1, Set<?> c2)
+	public static <E> boolean setEquals(Set<E> c1, Set<E> c2)
 	{
 		if (c1.size() != c2.size())
 		{
 			return false;
 		}
 		
-		for (Object o : c1)
-		{
-			if (!c2.$qmark(o))
-			{
-				return false;
-			}
-		}
-		return true;
+		return Collection.unorderedEquals(c1, c2);
 	}
 	
-	public static int setHashCode(Set<?> set)
+	public static <E> int setHashCode(Set<E> set)
 	{
 		int sum = 0;
 		int product = 1;
-		for (Object o : set)
+		for (E element : set)
 		{
-			if (o == null)
+			if (element == null)
 			{
 				continue;
 			}
-			int hash = o.hashCode();
+			int hash = element.hashCode();
 			sum += hash;
 			product *= hash;
 		}

@@ -336,7 +336,32 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	@Override
 	public int hashCode();
 	
-	public static boolean mapEquals(Map<?, ?> map, Object obj)
+	public static <K, V> String mapToString(Map<K, V> map)
+	{
+		if (map.isEmpty())
+		{
+			return "[]";
+		}
+		
+		StringBuilder builder = new StringBuilder("[ ");
+		Iterator<Entry<K, V>> iterator = map.iterator();
+		while (true)
+		{
+			Entry<K, V> entry = iterator.next();
+			builder.append(entry.getKey()).append(" -> ").append(entry.getValue());
+			if (iterator.hasNext())
+			{
+				builder.append(", ");
+			}
+			else
+			{
+				break;
+			}
+		}
+		return builder.append(" ]").toString();
+	}
+	
+	public static <K, V> boolean mapEquals(Map<K, V> map, Object obj)
 	{
 		if (!(obj instanceof Map))
 		{
@@ -346,14 +371,14 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		return mapEquals(map, (Map) obj);
 	}
 	
-	public static boolean mapEquals(Map<?, ?> map1, Map<?, ?> map2)
+	public static <K, V> boolean mapEquals(Map<K, V> map1, Map<K, V> map2)
 	{
 		if (map1.size() != map2.size())
 		{
 			return false;
 		}
 		
-		for (Entry<?, ?> e : map1)
+		for (Entry<K, V> e : map1)
 		{
 			if (!map2.$qmark(e))
 			{
@@ -363,14 +388,14 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		return true;
 	}
 	
-	public static int mapHashCode(Map<?, ?> map)
+	public static <K, V> int mapHashCode(Map<K, V> map)
 	{
 		int sum = 0;
 		int product = 1;
-		for (Entry<?, ?> o : map)
+		for (Entry<K, V> o : map)
 		{
-			Object key = o.getKey();
-			Object value = o.getValue();
+			K key = o.getKey();
+			V value = o.getValue();
 			if (key == null && value == null)
 			{
 				continue;

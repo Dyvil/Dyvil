@@ -396,7 +396,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	{
 		if (this.rows == 0)
 		{
-			return "[]";
+			return "[[]]";
 		}
 		
 		StringBuilder builder = new StringBuilder(this.rows * this.columns * 10).append('[');

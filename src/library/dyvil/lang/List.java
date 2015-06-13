@@ -377,38 +377,27 @@ public interface List<E> extends Collection<E>
 	@Override
 	public ImmutableList<E> immutable();
 
-	public static boolean listEquals(List<?> list, Object o)
+	public static <E> boolean listEquals(List<E> list, Object o)
 	{
 		if (!(o instanceof List))
 		{
 			return false;
 		}
 		
-		return listEquals((List) list, (List) o);
+		return listEquals(list, (List) o);
 	}
 
-	public static boolean listEquals(List<?> c1, List<?> c2)
+	public static <E> boolean listEquals(List<E> c1, List<E> c2)
 	{
 		if (c1.size() != c2.size())
 		{
 			return false;
 		}
 		
-		Iterator iterator1 = c1.iterator();
-		Iterator iterator2 = c2.iterator();
-		while (iterator1.hasNext())
-		{
-			Object o1 = iterator1.next();
-			Object o2 = iterator2.next();
-			if (!Objects.equals(o1, o2))
-			{
-				return false;
-			}
-		}
-		return true;
+		return Collection.orderedEquals(c1, c2);
 	}
 
-	public static int listHashCode(List<?> list)
+	public static <E> int listHashCode(List<E> list)
 	{
 		int result = 1;
 		for (Object o : list)

@@ -270,11 +270,12 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		}
 		
 		StringBuilder builder = new StringBuilder("[ ");
-		builder.append(this.entries[0]);
+		Tuple2<K, V> entry = this.entries[0];
+		builder.append(entry._1).append(" -> ").append(entry._2);
 		for (int i = 1; i < this.size; i++)
 		{
-			builder.append(", ");
-			builder.append(this.entries[i]);
+			entry = this.entries[i];
+			builder.append(", ").append(entry._1).append(" -> ").append(entry._2);
 		}
 		return builder.append(" ]").toString();
 	}

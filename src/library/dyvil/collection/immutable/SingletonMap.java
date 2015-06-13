@@ -24,6 +24,11 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 		return new SingletonMap(key, value);
 	}
 	
+	public static <K, V> SingletonMap<K, V> apply(Entry<K, V> entry)
+	{
+		return new SingletonMap(entry.getKey(), entry.getValue());
+	}
+	
 	public SingletonMap(K key, V value)
 	{
 		this.key = key;
@@ -130,25 +135,25 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public ImmutableMap<K, V> $minus(Object key)
 	{
-		return Objects.equals(this.key, key) ? EmptyMap.emptyMap : this;
+		return Objects.equals(this.key, key) ? EmptyMap.instance : this;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
-		return Objects.equals(this.key, key) && Objects.equals(this.value, value) ? EmptyMap.emptyMap : this;
+		return Objects.equals(this.key, key) && Objects.equals(this.value, value) ? EmptyMap.instance : this;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
-		return Objects.equals(this.value, value) ? EmptyMap.emptyMap : this;
+		return Objects.equals(this.value, value) ? EmptyMap.instance : this;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
-		return map.$qmark(this.key, this.value) ? EmptyMap.emptyMap : this;
+		return map.$qmark(this.key, this.value) ? EmptyMap.instance : this;
 	}
 	
 	@Override
@@ -160,7 +165,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
-		return condition.test(this.key, this.value) ? this : EmptyMap.emptyMap;
+		return condition.test(this.key, this.value) ? this : EmptyMap.instance;
 	}
 	
 	@Override

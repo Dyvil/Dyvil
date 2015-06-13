@@ -206,7 +206,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	@Override
 	public String toString()
 	{
-		return new StringBuilder('[').append(this.element).append(']').toString();
+		return new StringBuilder().append('[').append(this.element).append(']').toString();
 	}
 	
 	@Override

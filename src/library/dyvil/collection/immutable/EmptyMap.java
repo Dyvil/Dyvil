@@ -6,6 +6,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+import dyvil.annotation.object;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
 import dyvil.collection.iterator.EmptyIterator;
@@ -14,13 +15,13 @@ import dyvil.lang.Map;
 import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
-public class EmptyMap<K, V> implements ImmutableMap<K, V>
+public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
-	static final EmptyMap	emptyMap	= new EmptyMap();
+	public static final EmptyMap	instance	= new EmptyMap();
 	
 	public static <K, V> EmptyMap<K, V> apply()
 	{
-		return emptyMap;
+		return instance;
 	}
 	
 	private EmptyMap()

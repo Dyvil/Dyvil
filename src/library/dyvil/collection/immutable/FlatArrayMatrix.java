@@ -321,40 +321,36 @@ public class FlatArrayMatrix<E> implements ImmutableMatrix<E>
 		return new dyvil.collection.mutable.ArrayMatrix(this.rows, this.columns, this.cells);
 	}
 	
-	private void rowToString(StringBuilder builder, int row)
-	{
-		if (this.columns == 0)
-		{
-			builder.append("[]");
-			return;
-		}
-		
-		builder.append('[');
-		int index = row * this.columns;
-		builder.append(this.cells[index]);
-		for (int i = 1; i < this.columns; i++)
-		{
-			builder.append(", ").append(this.cells[index + i]);
-		}
-		builder.append(']');
-	}
-	
 	@Override
 	public String toString()
 	{
-		if (this.rows == 0)
+		if (this.rows == 0 || this.columns == 0)
 		{
-			return "[]";
+			return "[[]]";
 		}
 		
-		StringBuilder builder = new StringBuilder(this.rows * this.columns * 10).append('[');
-		this.rowToString(builder, 0);
-		for (int i = 1; i < this.rows; i++)
+		int cells = this.rows * this.columns;
+		StringBuilder builder = new StringBuilder(cells * 10).append("[[");
+		for (int i = 0;;)
 		{
-			builder.append(", ");
-			this.rowToString(builder, i);
+			builder.append(this.cells[i]);
+			if (++i < cells)
+			{
+				if (i == this.columns)
+				{
+					builder.append("], [");
+				}
+				else
+				{
+					builder.append(", ");
+				}
+			}
+			else
+			{
+				break;
+			}
 		}
-		return builder.append(']').toString();
+		return builder.append("]]").toString();
 	}
 	
 	@Override

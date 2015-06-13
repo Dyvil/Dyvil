@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.annotation.object;
 import dyvil.array.ObjectArray;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
@@ -17,13 +18,13 @@ import dyvil.lang.List;
 import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
-public class EmptyList<E> implements ImmutableList<E>
+public @object class EmptyList<E> implements ImmutableList<E>
 {
-	static final EmptyList	emptyList	= new EmptyList();
+	public static final EmptyList	instance	= new EmptyList();
 	
 	public static <E> EmptyList<E> apply()
 	{
-		return emptyList;
+		return instance;
 	}
 	
 	private EmptyList()

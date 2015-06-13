@@ -212,7 +212,42 @@ public interface Matrix<E> extends Iterable<E>
 	@Override
 	public int hashCode();
 	
-	public static boolean matrixEquals(Matrix<?> matrix, Object o)
+	public static <E> String matrixToString(Matrix<E> matrix)
+	{
+		if (matrix.isEmpty())
+		{
+			return "[[]]";
+		}
+		
+		int columns = matrix.columns();
+		int column = 0;
+		
+		StringBuilder builder = new StringBuilder("[[");
+		Iterator<E> iterator = matrix.iterator();
+		while (true)
+		{
+			builder.append(iterator.next());
+			if (iterator.hasNext())
+			{
+				if (++column == columns)
+				{
+					builder.append("], [");
+					column = 0;
+				}
+				else
+				{
+					builder.append(", ");
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+		return builder.append("]]").toString();
+	}
+	
+	public static <E> boolean matrixEquals(Matrix<E> matrix, Object o)
 	{
 		if (!(o instanceof Matrix))
 		{
@@ -222,7 +257,7 @@ public interface Matrix<E> extends Iterable<E>
 		return matrixEquals(matrix, (Matrix) o);
 	}
 	
-	public static boolean matrixEquals(Matrix<?> m1, Matrix<?> m2)
+	public static <E> boolean matrixEquals(Matrix<E> m1, Matrix<E> m2)
 	{
 		int rows = m1.rows();
 		if (rows != m2.rows())
@@ -238,7 +273,7 @@ public interface Matrix<E> extends Iterable<E>
 		return Collection.orderedEquals(m1, m2);
 	}
 	
-	public static int matrixHashCode(Matrix<?> matrix)
+	public static <E> int matrixHashCode(Matrix<E> matrix)
 	{
 		int result = matrix.rows() * 31 + matrix.columns();
 		for (Object o : matrix)

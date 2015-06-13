@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.annotation.object;
 import dyvil.array.ObjectArray;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
@@ -16,13 +17,13 @@ import dyvil.lang.Set;
 import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
-public class EmptySet<E> implements ImmutableSet<E>
+public @object class EmptySet<E> implements ImmutableSet<E>
 {
-	static final EmptySet	emptySet	= new EmptySet();
+	public static final EmptySet	instance	= new EmptySet();
 	
 	public static <E> EmptySet<E> apply()
 	{
-		return emptySet;
+		return instance;
 	}
 	
 	private EmptySet()
