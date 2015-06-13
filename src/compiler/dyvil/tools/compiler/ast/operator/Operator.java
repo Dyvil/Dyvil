@@ -79,25 +79,23 @@ public final class Operator
 	
 	public void toString(StringBuilder buffer)
 	{
-		buffer.append("operator ").append(this.name).append(" { ");
 		switch (this.type)
 		{
 		case PREFIX:
-			buffer.append("prefix");
-			break;
-		case INFIX_LEFT:
-			buffer.append("left, ").append(this.precedence);
-			break;
-		case INFIX_NONE:
-			buffer.append("none, ").append(this.precedence);
-			break;
-		case INFIX_RIGHT:
-			buffer.append("right, ").append(this.precedence);
-			break;
+			buffer.append("prefix operator ").append(this.name);
+			return;
 		case POSTFIX:
-			buffer.append("postfix");
-			break;
+			buffer.append("postfix operator ").append(this.name);
+			return;
+		case INFIX_LEFT:
+			buffer.append("infix operator ").append(this.name).append(" { left, ").append(this.precedence).append(" }");
+			return;
+		case INFIX_NONE:
+			buffer.append("infix operator ").append(this.name).append(" { none, ").append(this.precedence).append(" }");
+			return;
+		case INFIX_RIGHT:
+			buffer.append("infix operator ").append(this.name).append(" { right, ").append(this.precedence).append(" }");
+			return;
 		}
-		buffer.append(" }");
 	}
 }

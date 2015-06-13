@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -65,10 +64,12 @@ public class DyvilHeaderParser extends Parser
 		}
 		if (type == Keywords.OPERATOR)
 		{
-			Operator operator = new Operator(token.next().nameValue());
-			this.unit.addOperator(operator);
-			pm.skip();
-			pm.pushParser(new OperatorParser(operator));
+			pm.pushParser(new OperatorParser(this.unit, true), true);
+			return true;
+		}
+		if (type == Keywords.PREFIX || type == Keywords.POSTFIX || type == Keywords.INFIX)
+		{
+			pm.pushParser(new OperatorParser(this.unit, false), true);
 			return true;
 		}
 		if (type == Keywords.INCLUDE)
