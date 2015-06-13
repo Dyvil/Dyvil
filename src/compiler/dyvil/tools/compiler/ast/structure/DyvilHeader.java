@@ -183,8 +183,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		return this.includeCount;
 	}
 	
-	@Override
-	public void addInclude(IncludeDeclaration component)
+	protected void addIncludeToArray(IncludeDeclaration component)
 	{
 		if (this.includes == null)
 		{
@@ -208,6 +207,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			}
 			this.includes[index] = component;
 		}
+	}
+	
+	@Override
+	public void addInclude(IncludeDeclaration component)
+	{
+		this.addIncludeToArray(component);
 		
 		if (this.isHeader())
 		{
@@ -473,6 +478,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
+	public String getFullName()
+	{
+		return this.pack.fullName + '.' + this.name;
+	}
+	
+	@Override
 	public String getFullName(String name)
 	{
 		if (!name.equals(this.name))
@@ -480,6 +491,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			name = this.name + '.' + name;
 		}
 		return this.pack.fullName + '.' + name;
+	}
+	
+	@Override
+	public String getInternalName()
+	{
+		return this.pack.internalName + this.name;
 	}
 	
 	@Override

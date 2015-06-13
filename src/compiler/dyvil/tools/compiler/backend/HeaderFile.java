@@ -39,7 +39,7 @@ public class HeaderFile
 		ClassWriter.save(file, bytes);
 	}
 	
-	public static IDyvilHeader read(InputStream is)
+	public static DyvilHeader read(InputStream is)
 	{
 		try (DataInputStream dis = new DataInputStream(is))
 		{

@@ -110,7 +110,11 @@ public interface IDyvilHeader extends IContext, IClassList, IOperatorMap
 	
 	// Compilation
 	
+	public String getInternalName();
+	
 	public String getInternalName(String subClass);
+	
+	public String getFullName();
 	
 	public String getFullName(String subClass);
 }

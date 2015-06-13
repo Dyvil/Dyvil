@@ -7,6 +7,7 @@ import java.util.List;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassReader;
@@ -186,7 +187,8 @@ public class ExternalPackage extends Package
 		InputStream is = library.getInputStream(fileName);
 		if (is != null)
 		{
-			IDyvilHeader header = HeaderFile.read(is);
+			DyvilHeader header = HeaderFile.read(is);
+			header.pack = this;
 			this.units.add(header);
 			return header;
 		}

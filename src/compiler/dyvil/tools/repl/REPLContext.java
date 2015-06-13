@@ -9,14 +9,13 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
+import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -33,7 +32,8 @@ public class REPLContext extends DyvilHeader implements IValued
 	private Map<Name, REPLVariable>		variables		= new HashMap();
 	
 	private IValue						value;
-	private ImportDeclaration				headerComponent;
+	private ImportDeclaration			importDeclaration;
+	private IncludeDeclaration			includeDeclaration;
 	private IClass						tempClass;
 	
 	public REPLContext()
@@ -80,31 +80,47 @@ public class REPLContext extends DyvilHeader implements IValued
 			tempClass = null;
 		}
 		
-		if (this.headerComponent == null || this.headerComponent.theImport == null)
+		if (this.includeDeclaration != null)
+		{
+			IncludeDeclaration inc = this.includeDeclaration;
+			this.includeDeclaration = null;
+			inc.resolve(markers);
+			
+			if (this.reportErrors(markers))
+			{
+				return;
+			}
+			
+			this.addIncludeToArray(inc);
+			System.out.println("Included " + inc.getHeader().getFullName());
+			return;
+		}
+		
+		if (this.importDeclaration == null || this.importDeclaration.theImport == null)
 		{
 			return;
 		}
-		headerComponent.resolveTypes(markers, this, false);
+		importDeclaration.resolveTypes(markers, this, false);
 		
 		if (this.reportErrors(markers))
 		{
 			return;
 		}
 		
-		boolean isStatic = headerComponent.isStatic;
+		boolean isStatic = importDeclaration.isStatic;
 		
 		if (isStatic)
 		{
-			super.addStaticImport(headerComponent);
-			System.out.println("Using " + headerComponent.theImport);
+			super.addStaticImport(importDeclaration);
+			System.out.println("Using " + importDeclaration.theImport);
 		}
 		else
 		{
-			super.addImport(headerComponent);
-			System.out.println("Imported " + headerComponent.theImport);
+			super.addImport(importDeclaration);
+			System.out.println("Imported " + importDeclaration.theImport);
 		}
 		
-		headerComponent = null;
+		importDeclaration = null;
 	}
 	
 	protected void processValue()
@@ -160,13 +176,19 @@ public class REPLContext extends DyvilHeader implements IValued
 	@Override
 	public void addImport(ImportDeclaration component)
 	{
-		headerComponent = component;
+		importDeclaration = component;
 	}
 	
 	@Override
 	public void addStaticImport(ImportDeclaration component)
 	{
-		headerComponent = component;
+		importDeclaration = component;
+	}
+	
+	@Override
+	public void addInclude(IncludeDeclaration component)
+	{
+		includeDeclaration = component;
 	}
 	
 	@Override
@@ -178,48 +200,6 @@ public class REPLContext extends DyvilHeader implements IValued
 	@Override
 	public void addInnerClass(IClassCompilable iclass)
 	{
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return null;
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		IClass iclass;
-		
-		// Imported Classes
-		for (int i = 0; i < this.importCount; i++)
-		{
-			iclass = this.imports[i].resolveClass(name);
-			if (iclass != null)
-			{
-				return iclass;
-			}
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
 	}
 	
 	@Override
