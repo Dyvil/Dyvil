@@ -56,6 +56,12 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		{
 			return this.value;
 		}
+
+		@Override
+		public String toString()
+		{
+			return this.key + " -> " + this.value;
+		}
 		
 		@Override
 		public int hashCode()
@@ -109,19 +115,13 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		}
 		
 		@Override
-		public String toString()
-		{
-			return this.key + " -> " + this.value;
-		}
-		
-		@Override
 		public HashEntry<K, V> clone()
 		{
 			return new HashEntry(this.key, this.value, this.hash, this.next);
 		}
 	}
 	
-	private abstract class EntryIterator
+	private abstract class EntryIterator<E> implements Iterator<E>
 	{
 		HashEntry<K, V>	next;		// next entry to return
 		HashEntry<K, V>	current;	// current entry
@@ -142,6 +142,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			}
 		}
 		
+		@Override
 		public final boolean hasNext()
 		{
 			return this.next != null;
@@ -165,6 +166,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			return e;
 		}
 		
+		@Override
 		public final void remove()
 		{
 			HashEntry<K, V> e = this.current;
@@ -196,14 +198,14 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		}
 	}
 	
-	private static final int	DEFAULT_SIZE		= 16;
-	private static final float	DEFAULT_LOAD_FACTOR	= 0.75F;
-	private static final int	MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
+	static final int	DEFAULT_CAPACITY	= 16;
+	static final float	DEFAULT_LOAD_FACTOR	= 0.75F;
+	static final int	MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
 	
-	private int					size;
-	private float				loadFactor;
-	private int					threshold;
-	private HashEntry[]			entries;
+	private int			size;
+	private float		loadFactor;
+	private int			threshold;
+	private HashEntry[]	entries;
 	
 	public static <K, V> HashMap<K, V> apply()
 	{
@@ -220,7 +222,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	
 	public HashMap()
 	{
-		this(DEFAULT_SIZE, DEFAULT_LOAD_FACTOR);
+		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
 	
 	public HashMap(int size)
@@ -230,7 +232,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	
 	public HashMap(float loadFactor)
 	{
-		this(DEFAULT_SIZE, loadFactor);
+		this(DEFAULT_CAPACITY, loadFactor);
 	}
 	
 	public HashMap(int size, float loadFactor)
@@ -318,7 +320,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
-		class EntryIteratorImpl extends EntryIterator implements Iterator<Entry<K, V>>
+		return new EntryIterator<Entry<K, V>>()
 		{
 			@Override
 			public HashEntry<K, V> next()
@@ -331,15 +333,13 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			{
 				return "EntryIterator(" + HashMap.this + ")";
 			}
-		}
-		
-		return new EntryIteratorImpl();
+		};
 	}
 	
 	@Override
 	public Iterator<K> keyIterator()
 	{
-		class KeyIterator extends EntryIterator implements Iterator<K>
+		return new EntryIterator<K>()
 		{
 			@Override
 			public K next()
@@ -352,15 +352,13 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			{
 				return "KeyIterator(" + HashMap.this + ")";
 			}
-		}
-		
-		return new KeyIterator();
+		};
 	}
 	
 	@Override
 	public Iterator<V> valueIterator()
 	{
-		class ValueIterator extends EntryIterator implements Iterator<V>
+		return new EntryIterator<V>()
 		{
 			@Override
 			public V next()
@@ -373,9 +371,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			{
 				return "ValueIterator(" + HashMap.this + ")";
 			}
-		}
-		
-		return new ValueIterator();
+		};
 	}
 	
 	@Override
