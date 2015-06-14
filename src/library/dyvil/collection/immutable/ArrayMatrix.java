@@ -371,7 +371,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	@Override
 	public MutableMatrix<E> mutable()
 	{
-		return new dyvil.collection.mutable.ArrayMatrix(this.rows, this.columns, this.cells);
+		return new dyvil.collection.mutable.FlatArrayMatrix(this.rows, this.columns, this.cells);
 	}
 	
 	private void rowToString(StringBuilder builder, Object[] row)

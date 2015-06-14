@@ -1,6 +1,5 @@
 package dyvil.collection.immutable;
 
-import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -8,12 +7,13 @@ import dyvil.collection.ImmutableMap;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableMap;
 import dyvil.collection.MutableSet;
+import dyvil.collection.impl.AbstractMapBasedSet;
 import dyvil.collection.mutable.HashMap;
 import dyvil.lang.Collection;
 import dyvil.lang.Entry;
-import dyvil.lang.Set;
+import dyvil.lang.Map;
 
-public class MapBasedSet<E> implements ImmutableSet<E>
+public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableSet<E>
 {
 	protected ImmutableMap<E, Object>	map;
 	
@@ -23,21 +23,9 @@ public class MapBasedSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public int size()
+	protected Map<E, Object> map()
 	{
-		return this.map.size();
-	}
-	
-	@Override
-	public Iterator<E> iterator()
-	{
-		return this.map.keyIterator();
-	}
-	
-	@Override
-	public boolean $qmark(Object element)
-	{
-		return this.map.$qmark(element);
+		return this.map;
 	}
 	
 	@Override
@@ -156,15 +144,6 @@ public class MapBasedSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public void toArray(int index, Object[] store)
-	{
-		for (Entry<E, Object> e : this.map)
-		{
-			store[index++] = e.getKey();
-		}
-	}
-	
-	@Override
 	public ImmutableSet<E> copy()
 	{
 		return new MapBasedSet(this.map.copy());
@@ -174,42 +153,5 @@ public class MapBasedSet<E> implements ImmutableSet<E>
 	public MutableSet<E> mutable()
 	{
 		return new dyvil.collection.mutable.MapBasedSet<E>(this.map.mutable());
-	}
-	
-	@Override
-	public String toString()
-	{
-		if (this.map.isEmpty())
-		{
-			return "[]";
-		}
-		
-		StringBuilder builder = new StringBuilder("[");
-		Iterator<Entry<E, Object>> iterator = this.map.iterator();
-		while (true)
-		{
-			builder.append(iterator.next().getKey());
-			if (iterator.hasNext())
-			{
-				builder.append(", ");
-			}
-			else
-			{
-				break;
-			}
-		}
-		return builder.append("]").toString();
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return Set.setEquals(this, obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return Set.setHashCode(this);
 	}
 }

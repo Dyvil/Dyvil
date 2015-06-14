@@ -3,7 +3,7 @@ package dyvil.collection;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import dyvil.collection.mutable.ArrayMatrix;
+import dyvil.collection.mutable.FlatArrayMatrix;
 import dyvil.lang.Int;
 import dyvil.lang.List;
 import dyvil.lang.Matrix;
@@ -17,12 +17,12 @@ public interface MutableMatrix<E> extends Matrix<E>
 {
 	public static <E> MutableMatrix<E> apply()
 	{
-		return new ArrayMatrix();
+		return new FlatArrayMatrix();
 	}
 	
 	public static <E> MutableMatrix<E> apply(E[]... cells)
 	{
-		return new ArrayMatrix(cells);
+		return new FlatArrayMatrix(cells);
 	}
 	
 	// Accessors

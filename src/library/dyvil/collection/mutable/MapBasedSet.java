@@ -8,11 +8,12 @@ import java.util.function.UnaryOperator;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableMap;
 import dyvil.collection.MutableSet;
+import dyvil.collection.impl.AbstractMapBasedSet;
 import dyvil.lang.Collection;
 import dyvil.lang.Entry;
-import dyvil.lang.Set;
+import dyvil.lang.Map;
 
-public class MapBasedSet<E> implements MutableSet<E>
+public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet<E>
 {
 	protected MutableMap<E, Object>	map;
 	
@@ -22,21 +23,9 @@ public class MapBasedSet<E> implements MutableSet<E>
 	}
 	
 	@Override
-	public int size()
+	protected Map<E, Object> map()
 	{
-		return this.map.size();
-	}
-	
-	@Override
-	public Iterator<E> iterator()
-	{
-		return this.map.keyIterator();
-	}
-	
-	@Override
-	public boolean $qmark(Object element)
-	{
-		return this.map.$qmark(element);
+		return this.map;
 	}
 	
 	@Override
@@ -256,15 +245,6 @@ public class MapBasedSet<E> implements MutableSet<E>
 	}
 	
 	@Override
-	public void toArray(int index, Object[] store)
-	{
-		for (Entry<E, Object> e : this.map)
-		{
-			store[index++] = e.getKey();
-		}
-	}
-	
-	@Override
 	public MutableSet<E> copy()
 	{
 		return new MapBasedSet(this.map.copy());
@@ -274,42 +254,5 @@ public class MapBasedSet<E> implements MutableSet<E>
 	public ImmutableSet<E> immutable()
 	{
 		return new dyvil.collection.immutable.MapBasedSet<E>(this.map.immutable());
-	}
-	
-	@Override
-	public String toString()
-	{
-		if (this.map.isEmpty())
-		{
-			return "[]";
-		}
-		
-		StringBuilder builder = new StringBuilder("[");
-		Iterator<Entry<E, Object>> iterator = this.map.iterator();
-		while (true)
-		{
-			builder.append(iterator.next().getKey());
-			if (iterator.hasNext())
-			{
-				builder.append(", ");
-			}
-			else
-			{
-				break;
-			}
-		}
-		return builder.append("]").toString();
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return Set.setEquals(this, obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return Set.setHashCode(this);
 	}
 }

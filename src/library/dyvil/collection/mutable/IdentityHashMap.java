@@ -165,7 +165,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	{
 		this.size = size;
 		this.threshold = treshold;
-		this.table = table.clone();
+		this.table = table;
 	}
 	
 	public IdentityHashMap()
@@ -634,7 +634,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new IdentityHashMap(this.size, this.threshold, this.table);
+		return new IdentityHashMap(this.size, this.threshold, this.table.clone());
 	}
 	
 	@Override
