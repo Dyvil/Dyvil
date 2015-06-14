@@ -1,6 +1,7 @@
 package dyvil.lang;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.BiConsumer;
@@ -263,15 +264,6 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	// Mutating Operations
 	
-	public void clear();
-	
-	public default void update(K key, V value)
-	{
-		this.put(key, value);
-	}
-	
-	public V put(K key, V value);
-	
 	public default void $plus$eq(Entry<? extends K, ? extends V> entry)
 	{
 		this.update(entry.getKey(), entry.getValue());
@@ -287,26 +279,100 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public default void $minus$eq(Object key)
 	{
-		this.remove(key);
+		this.removeKey(key);
 	}
-	
-	public V remove(Object key);
-	
-	public boolean remove(Object key, Object value);
 	
 	public default void $minus$eq(Entry<? super K, ? super V> entry)
 	{
-		this.remove(entry.getKey(), entry.getValue());
+		this.remove(entry);
 	}
 	
-	public void $minus$colon$eq(Object value);
+	public default void $minus$colon$eq(Object value)
+	{
+		this.removeValue(value);
+	}
+	
+	public default void $minus$minus$eq(Collection<? super K> keys)
+	{
+		for (Object key : keys)
+		{
+			this.$minus$eq(key);
+		}
+	}
 	
 	public default void $minus$minus$eq(Map<? super K, ? super V> map)
 	{
 		for (Entry<? super K, ? super V> entry : map)
 		{
-			this.remove(entry.getKey());
+			this.$minus$eq(entry);
 		}
+	}
+	
+	public void clear();
+	
+	public default void update(K key, V value)
+	{
+		this.put(key, value);
+	}
+	
+	public V put(K key, V value);
+	
+	public default V put(Entry<? extends K, ? extends V> entry)
+	{
+		return this.put(entry.getKey(), entry.getValue());
+	}
+	
+	public default boolean putAll(Map<? extends K, ? extends V> map)
+	{
+		boolean added = false;
+		for (Entry<? extends K, ? extends V> entry : map)
+		{
+			if (this.put(entry) == null)
+			{
+				added = true;
+			}
+		}
+		return added;
+	}
+	
+	public V removeKey(Object key);
+	
+	public boolean removeValue(Object value);
+	
+	public default boolean remove(Object key, Object value)
+	{
+		return Objects.equals(this.removeKey(key), value);
+	}
+	
+	public default boolean remove(Entry<? super K, ? super V> entry)
+	{
+		return this.remove(entry.getKey(), entry.getValue());
+	}
+	
+	public default boolean removeKeys(Collection<? super K> keys)
+	{
+		boolean removed = false;
+		for (Object key : keys)
+		{
+			if (this.removeKey(key) != null)
+			{
+				removed = true;
+			}
+		}
+		return removed;
+	}
+	
+	public default boolean removeAll(Map<? super K, ? super V> map)
+	{
+		boolean removed = false;
+		for (Entry<? super K, ? super V> entry : map)
+		{
+			if (this.remove(entry))
+			{
+				removed = true;
+			}
+		}
+		return removed;
 	}
 	
 	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);

@@ -56,7 +56,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		{
 			return this.value;
 		}
-
+		
 		@Override
 		public String toString()
 		{
@@ -599,42 +599,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public void $minus$eq(Object key)
-	{
-		if (key == null)
-		{
-			this.removeNull();
-			return;
-		}
-		
-		int hash = hash(key.hashCode());
-		int i = index(hash, this.entries.length);
-		HashEntry<K, V> prev = this.entries[i];
-		HashEntry<K, V> e = prev;
-		
-		while (e != null)
-		{
-			HashEntry<K, V> next = e.next;
-			Object k;
-			if (e.hash == hash && ((k = e.key) == key || key.equals(k)))
-			{
-				this.size--;
-				if (prev == e)
-				{
-					this.entries[i] = next;
-				}
-				else
-				{
-					prev.next = next;
-				}
-			}
-			prev = e;
-			e = next;
-		}
-	}
-	
-	@Override
-	public V remove(Object key)
+	public V removeKey(Object key)
 	{
 		if (key == null)
 		{
@@ -672,44 +637,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public boolean remove(Object key, Object value)
-	{
-		int hash = key == null ? 0 : hash(key.hashCode());
-		int i = index(hash, this.entries.length);
-		HashEntry<K, V> prev = this.entries[i];
-		HashEntry<K, V> e = prev;
-		
-		while (e != null)
-		{
-			HashEntry<K, V> next = e.next;
-			if (e.hash == hash)
-			{
-				Object k = e.key;
-				Object v = e.value;
-				if ((k == key || key.equals(k)) && (v == value || value != null && value.equals(v)))
-				{
-					this.size--;
-					if (prev == e)
-					{
-						this.entries[i] = next;
-					}
-					else
-					{
-						prev.next = next;
-					}
-					
-					return true;
-				}
-			}
-			prev = e;
-			e = next;
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public void $minus$colon$eq(Object value)
+	public boolean removeValue(Object value)
 	{
 		for (int i = 0; i < this.entries.length; i++)
 		{
@@ -732,12 +660,14 @@ public class HashMap<K, V> implements MutableMap<K, V>
 						prev.next = next;
 					}
 					
-					return;
+					return true;
 				}
 				prev = e;
 				e = next;
 			}
 		}
+		
+		return false;
 	}
 	
 	@Override

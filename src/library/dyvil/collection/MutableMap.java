@@ -102,13 +102,10 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public V put(K key, V value);
 	
 	@Override
-	public V remove(Object key);
+	public V removeKey(Object key);
 	
 	@Override
-	public boolean remove(Object key, Object value);
-	
-	@Override
-	public void $minus$colon$eq(Object value);
+	public boolean removeValue(Object value);
 	
 	@Override
 	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);

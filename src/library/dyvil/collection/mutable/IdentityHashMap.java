@@ -117,7 +117,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 			
 			if (tab != IdentityHashMap.this.table)
 			{
-				IdentityHashMap.this.remove(key);
+				IdentityHashMap.this.removeKey(key);
 				return;
 			}
 			
@@ -514,8 +514,28 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		return null;
 	}
 	
+	private void closeDeletion(int index)
+	{
+		Object[] tab = this.table;
+		int len = tab.length;
+		
+		Object item;
+		for (int i = nextKeyIndex(index, len); (item = tab[i]) != null; i = nextKeyIndex(i, len))
+		{
+			int r = hash(item, len);
+			if (i < r && (r <= index || index <= i) || r <= index && index <= i)
+			{
+				tab[index] = item;
+				tab[index + 1] = tab[i + 1];
+				tab[i] = null;
+				tab[i + 1] = null;
+				index = i;
+			}
+		}
+	}
+	
 	@Override
-	public V remove(Object key)
+	public V removeKey(Object key)
 	{
 		Object k = maskNull(key);
 		Object[] tab = this.table;
@@ -542,24 +562,21 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		}
 	}
 	
-	private void closeDeletion(int index)
+	@Override
+	public boolean removeValue(Object value)
 	{
+		boolean removed = false;
 		Object[] tab = this.table;
-		int len = tab.length;
-		
-		Object item;
-		for (int i = nextKeyIndex(index, len); (item = tab[i]) != null; i = nextKeyIndex(i, len))
+		for (int i = 1; i < tab.length; i += 2)
 		{
-			int r = hash(item, len);
-			if (i < r && (r <= index || index <= i) || r <= index && index <= i)
+			if (tab[i] == value && tab[i - 1] != null)
 			{
-				tab[index] = item;
-				tab[index + 1] = tab[i + 1];
-				tab[i] = null;
-				tab[i + 1] = null;
-				index = i;
+				tab[i] = tab[i - 1] = null;
+				removed = true;
+				this.closeDeletion(i);
 			}
 		}
+		return removed;
 	}
 	
 	@Override
@@ -590,20 +607,6 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 				return false;
 			}
 			i = nextKeyIndex(i, len);
-		}
-	}
-	
-	@Override
-	public void $minus$colon$eq(Object value)
-	{
-		Object[] tab = this.table;
-		for (int i = 1; i < tab.length; i += 2)
-		{
-			if (tab[i] == value && tab[i - 1] != null)
-			{
-				tab[i] = tab[i - 1] = null;
-				this.closeDeletion(i);
-			}
 		}
 	}
 	

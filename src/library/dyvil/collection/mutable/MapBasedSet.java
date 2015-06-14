@@ -158,7 +158,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	@Override
 	public boolean remove(E element)
 	{
-		return this.map.remove(element) == VALUE;
+		return this.map.removeKey(element) == VALUE;
 	}
 	
 	@Override

@@ -10,10 +10,7 @@ import dyvil.annotation.mutating;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
 import dyvil.collection.immutable.TupleMap;
-import dyvil.lang.Entry;
-import dyvil.lang.Immutable;
-import dyvil.lang.ImmutableException;
-import dyvil.lang.Map;
+import dyvil.lang.*;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
@@ -186,20 +183,6 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	
 	@Override
 	@mutating
-	public default V remove(Object key)
-	{
-		throw new ImmutableException("remove() on Immutable Map");
-	}
-	
-	@Override
-	@mutating
-	public default boolean remove(Object key, Object value)
-	{
-		throw new ImmutableException("remove() on Immutable Map");
-	}
-	
-	@Override
-	@mutating
 	public default void $minus$eq(Entry<? super K, ? super V> entry)
 	{
 		throw new ImmutableException("-= on Immutable Map");
@@ -217,6 +200,38 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public default void $minus$minus$eq(Map<? super K, ? super V> map)
 	{
 		throw new ImmutableException("-= on Immutable Map");
+	}
+	
+	@Override
+	@mutating
+	public default V removeKey(Object key)
+	{
+		throw new ImmutableException("removeKey() on Immutable Map");
+	}
+	
+	@Override
+	public default boolean removeValue(Object value)
+	{
+		throw new ImmutableException("removeValue() on Immutable Map");
+	}
+	
+	@Override
+	@mutating
+	public default boolean remove(Object key, Object value)
+	{
+		throw new ImmutableException("remove() on Immutable Map");
+	}
+	
+	@Override
+	public default boolean removeKeys(Collection<? super K> keys)
+	{
+		throw new ImmutableException("removeKeys() on Immutable Map");
+	}
+	
+	@Override
+	public default boolean removeAll(Map<? super K, ? super V> map)
+	{
+		throw new ImmutableException("removeAll() on Immutable Map");
 	}
 	
 	@Override

@@ -148,7 +148,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public V remove(Object key)
+	public V removeKey(Object key)
 	{
 		if (!this.checkType(key))
 		{
@@ -186,8 +186,9 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public void $minus$colon$eq(Object value)
+	public boolean removeValue(Object value)
 	{
+		boolean removed = false;
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
 		{
@@ -195,8 +196,10 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			{
 				this.size--;
 				this.values[i] = null;
+				removed = true;
 			}
 		}
+		return removed;
 	}
 	
 	@Override
