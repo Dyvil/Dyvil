@@ -73,9 +73,15 @@ public class REPLVariable extends Field
 		}
 	}
 	
+	private static boolean isConstant(IValue value)
+	{
+		int tag = value.valueTag();
+		return tag >= 0 && tag != IValue.NIL && tag <= IValue.STRING;
+	}
+	
 	protected void compute()
 	{
-		if (this.className != null || this.value.isConstant())
+		if (this.className != null || isConstant(this.value))
 			return;
 		
 		try
@@ -177,7 +183,7 @@ public class REPLVariable extends Field
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
-		if (this.value.isConstant())
+		if (isConstant(this.value))
 		{
 			this.value.writeExpression(writer);
 			return;

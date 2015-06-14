@@ -139,17 +139,18 @@ public class REPLContext extends DyvilHeader implements IValued
 		this.value = null;
 		
 		REPLVariable field = new REPLVariable(position, name, type, value);
+		field.modifiers = Modifiers.FINAL;
 		field.resolveTypes(markers, this);
 		field.resolve(markers, this);
 		field.checkTypes(markers, this);
 		field.check(markers, this);
-		field.foldConstants();
 		
 		if (this.reportErrors(markers))
 		{
 			return;
 		}
 		
+		field.foldConstants();
 		field.compute();
 		if (field.getType() != Types.VOID)
 		{
