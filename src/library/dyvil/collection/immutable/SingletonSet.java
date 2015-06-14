@@ -54,7 +54,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
 		return Objects.equals(element, this.element);
 	}
@@ -78,7 +78,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	@Override
 	public ImmutableSet<? extends E> $minus$minus(Collection<? extends E> collection)
 	{
-		if (collection.$qmark(this.element))
+		if (collection.contains(this.element))
 		{
 			return ImmutableSet.apply();
 		}
@@ -88,7 +88,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	@Override
 	public ImmutableSet<? extends E> $amp(Collection<? extends E> collection)
 	{
-		if (!collection.$qmark(this.element))
+		if (!collection.contains(this.element))
 		{
 			return ImmutableSet.apply();
 		}
@@ -98,7 +98,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	@Override
 	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection)
 	{
-		if (!collection.$qmark(this))
+		if (!collection.contains(this))
 		{
 			return new ArraySet(collection);
 		}
@@ -125,7 +125,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	@Override
 	public ImmutableSet<? extends E> $up(Collection<? extends E> collection)
 	{
-		if (!collection.$qmark(this.element))
+		if (!collection.contains(this.element))
 		{
 			return new ArraySet(collection);
 		}

@@ -69,19 +69,19 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
 		return false;
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
 		return false;
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		return false;
 	}

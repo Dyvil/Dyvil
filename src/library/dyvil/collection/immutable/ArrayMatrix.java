@@ -171,7 +171,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
 		for (int row = 0; row < this.rows; row++)
 		{

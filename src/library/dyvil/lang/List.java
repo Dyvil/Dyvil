@@ -89,7 +89,7 @@ public interface List<E> extends Collection<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	/**
 	 * Returns the element at the given {@code index}. This method throws an

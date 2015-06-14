@@ -82,19 +82,13 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	}
 	
 	@Override
-	public boolean $qmark(Object key);
+	public boolean containsKey(Object key);
 	
 	@Override
-	public boolean $qmark(Object key, Object value);
+	public boolean containsValue(Object value);
 	
 	@Override
-	public default boolean $qmark(Entry<? extends K, ? extends V> entry)
-	{
-		return this.$qmark(entry.getKey(), entry.getValue());
-	}
-	
-	@Override
-	public boolean $qmark$colon(V value);
+	public boolean contains(Object key, Object value);
 	
 	@Override
 	public V apply(K key);

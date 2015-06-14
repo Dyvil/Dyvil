@@ -184,7 +184,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
 		if (!this.checkType(key))
 		{
@@ -195,7 +195,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
 		if (!this.checkType(key))
 		{
@@ -207,7 +207,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)

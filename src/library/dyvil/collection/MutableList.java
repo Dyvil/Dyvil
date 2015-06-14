@@ -50,7 +50,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	public Iterator<E> iterator();
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	@Override
 	public E apply(int index);

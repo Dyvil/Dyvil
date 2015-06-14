@@ -60,7 +60,7 @@ public @object class EmptySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
 		return false;
 	}

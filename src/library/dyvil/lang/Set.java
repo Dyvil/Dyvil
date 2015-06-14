@@ -43,7 +43,7 @@ public interface Set<E> extends Collection<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	
@@ -155,7 +155,7 @@ public interface Set<E> extends Collection<E>
 		boolean changed = false;
 		for (E element : collection)
 		{
-			if (!this.$qmark(element))
+			if (!this.contains(element))
 			{
 				this.$plus$eq(element);
 				changed = true;
@@ -163,7 +163,7 @@ public interface Set<E> extends Collection<E>
 		}
 		for (E element : this)
 		{
-			if (!collection.$qmark(element))
+			if (!collection.contains(element))
 			{
 				this.$minus$eq(element);
 				changed = true;

@@ -150,7 +150,20 @@ public interface Collection<E> extends Iterable<E>
 	 *            the element
 	 * @return true, if this collection contains the element
 	 */
-	public boolean $qmark(Object element);
+	public default boolean $qmark(Object element)
+	{
+		return this.contains(element);
+	}
+	
+	/**
+	 * Returns true if and if only this collection contains the element
+	 * specified by {@code element}.
+	 * 
+	 * @param element
+	 *            the element
+	 * @return true, if this collection contains the element
+	 */
+	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	
@@ -415,7 +428,7 @@ public interface Collection<E> extends Iterable<E>
 		Iterator<E> iterator = this.iterator();
 		while (iterator.hasNext())
 		{
-			if (!collection.$qmark(iterator.next()))
+			if (!collection.contains(iterator.next()))
 			{
 				iterator.remove();
 				removed = true;
@@ -594,7 +607,7 @@ public interface Collection<E> extends Iterable<E>
 		
 		for (Object o : c1)
 		{
-			if (!c2.$qmark(o))
+			if (!c2.contains(o))
 			{
 				return false;
 			}

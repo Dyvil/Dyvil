@@ -333,7 +333,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
 		Object k = maskNull(key);
 		Object[] tab = this.table;
@@ -355,7 +355,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
 		Object k = maskNull(key);
 		Object[] tab = this.table;
@@ -377,7 +377,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		Object[] tab = this.table;
 		for (int i = 1; i < tab.length; i += 2)

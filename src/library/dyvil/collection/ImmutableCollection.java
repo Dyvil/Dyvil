@@ -36,7 +36,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	}
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	

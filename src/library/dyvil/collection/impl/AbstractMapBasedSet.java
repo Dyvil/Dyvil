@@ -23,9 +23,9 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
-		return this.map().$qmark(element);
+		return this.map().containsKey(element);
 	}
 	
 	@Override

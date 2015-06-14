@@ -94,7 +94,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
 		if (element == null)
 		{

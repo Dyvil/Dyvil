@@ -40,7 +40,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	public Iterator<E> iterator();
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	

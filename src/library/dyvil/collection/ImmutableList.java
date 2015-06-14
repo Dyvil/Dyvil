@@ -62,7 +62,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	@Override
 	public E apply(int index);

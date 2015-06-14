@@ -17,7 +17,7 @@ public interface JavaMaps
 	// Accessors
 	
 	/**
-	 * @see Map#$qmark(Object)
+	 * @see Map#containsKey(Object)
 	 */
 	public static @infix @inline boolean $qmark(java.util.Map map, Object key)
 	{
@@ -25,7 +25,7 @@ public interface JavaMaps
 	}
 	
 	/**
-	 * @see Map#$qmark(Object, Object)
+	 * @see Map#contains(Object, Object)
 	 */
 	public static @infix boolean $qmark(java.util.Map map, Object key, Object value)
 	{
@@ -33,7 +33,7 @@ public interface JavaMaps
 	}
 	
 	/**
-	 * @see Map#$qmark(Tuple2)
+	 * @see Map#contains(Tuple2)
 	 */
 	public static @infix boolean $qmark(java.util.Map map, Tuple2 entry)
 	{
@@ -41,7 +41,7 @@ public interface JavaMaps
 	}
 	
 	/**
-	 * @see Map#$qmark$colon(Object)
+	 * @see Map#containsValue(Object)
 	 */
 	public static @infix @inline boolean $qmark$colon(java.util.Map map, Object value)
 	{

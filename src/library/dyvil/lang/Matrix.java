@@ -43,7 +43,7 @@ public interface Matrix<E> extends Iterable<E>
 	
 	public default boolean isEmpty()
 	{
-		return this.rows() * this.columns() == 0;
+		return this.rows() == 0 || this.columns() == 0;
 	}
 	
 	@Override
@@ -68,7 +68,12 @@ public interface Matrix<E> extends Iterable<E>
 	@Override
 	public void forEach(Consumer<? super E> action);
 	
-	public boolean $qmark(Object element);
+	public default boolean $qmark(Object element)
+	{
+		return this.contains(element);
+	}
+	
+	public boolean contains(Object element);
 	
 	public E apply(int row, int column);
 	

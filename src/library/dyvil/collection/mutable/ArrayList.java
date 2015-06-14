@@ -170,7 +170,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		for (int i = 0; i < this.size; i++)
 		{
 			Object e = this.elements[i];
-			if (!collection.$qmark(e))
+			if (!collection.contains(e))
 			{
 				array[index++] = e;
 			}
@@ -187,7 +187,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		for (int i = 0; i < this.size; i++)
 		{
 			Object e = this.elements[i];
-			if (collection.$qmark(e))
+			if (collection.contains(e))
 			{
 				array[index++] = e;
 			}
@@ -287,7 +287,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		for (int i = 0; i < this.size; i++)
 		{
 			Object e = this.elements[i];
-			if (!collection.$qmark(e))
+			if (!collection.contains(e))
 			{
 				array[index++] = e;
 			}
@@ -456,7 +456,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		for (int i = 0; i < this.size; i++)
 		{
 			Object e = this.elements[i];
-			if (collection.$qmark(e))
+			if (collection.contains(e))
 			{
 				array[index++] = e;
 			}

@@ -148,7 +148,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the key
 	 * @return true, if this map contains a mapping for the key
 	 */
-	public boolean $qmark(Object key);
+	public default boolean $qmark(Object key)
+	{
+		return this.containsKey(key);
+	}
 	
 	/**
 	 * Returns true if and if only this map contains a mapping that maps the
@@ -160,7 +163,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the value
 	 * @return true, if this map contains a mapping for the key and the value
 	 */
-	public boolean $qmark(Object key, Object value);
+	public default boolean $qmark(Object key, Object value)
+	{
+		return this.contains(key, value);
+	}
 	
 	/**
 	 * Returns true if and if only this map contains a mapping that maps the
@@ -173,9 +179,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the entry
 	 * @return true, if this map contains the mapping represented by the entry
 	 */
-	public default boolean $qmark(Entry<? extends K, ? extends V> entry)
+	public default boolean $qmark(Entry<? super K, ? super V> entry)
 	{
-		return this.$qmark(entry.getKey(), entry.getValue());
+		return this.contains(entry.getKey(), entry.getValue());
 	}
 	
 	/**
@@ -186,7 +192,58 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the value
 	 * @return true, if this map contains a mapping to the value
 	 */
-	public boolean $qmark$colon(V value);
+	public default boolean $qmark$colon(Object value)
+	{
+		return this.containsValue(value);
+	}
+	
+	/**
+	 * Returns true if and if only this map contains a mapping for the given
+	 * {@code key}.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return true, if this map contains a mapping for the key
+	 */
+	public boolean containsKey(Object key);
+	
+	/**
+	 * Returns true if and if only this map contains a mapping to the given
+	 * {@code value}.
+	 * 
+	 * @param value
+	 *            the value
+	 * @return true, if this map contains a mapping to the value
+	 */
+	public boolean containsValue(Object value);
+
+	/**
+	 * Returns true if and if only this map contains a mapping that maps the
+	 * given {@code key} to the given {@code value}.
+	 * 
+	 * @param key
+	 *            the key
+	 * @param value
+	 *            the value
+	 * @return true, if this map contains a mapping for the key and the value
+	 */
+	public boolean contains(Object key, Object value);
+	
+	/**
+	 * Returns true if and if only this map contains a mapping that maps the
+	 * key, as given by the first value of the {@code entry} to the value, as
+	 * given by the second value of the {@code entry}. The default
+	 * implementation of this method delegates to the {@link $qmark(Object,
+	 * Object)} method.
+	 * 
+	 * @param entry
+	 *            the entry
+	 * @return true, if this map contains the mapping represented by the entry
+	 */
+	public default boolean contains(Entry<? extends K, ? extends V> entry)
+	{
+		return this.contains(entry.getKey(), entry.getValue());
+	}
 	
 	/**
 	 * Gets and returns the value for the given {@code key}. If no mapping for
@@ -446,7 +503,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		
 		for (Entry<K, V> e : map1)
 		{
-			if (!map2.$qmark(e))
+			if (!map2.contains(e))
 			{
 				return false;
 			}

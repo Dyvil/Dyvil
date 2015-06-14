@@ -215,7 +215,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
 		if (key == null)
 		{
@@ -239,7 +239,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
 		if (key == null)
 		{
@@ -263,7 +263,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		if (value == null)
 		{
@@ -420,7 +420,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			K k = this.keys[i];
-			if (map.$qmark(k))
+			if (map.containsKey(k))
 			{
 				continue;
 			}

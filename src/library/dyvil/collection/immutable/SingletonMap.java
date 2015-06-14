@@ -90,19 +90,19 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
 		return Objects.equals(this.key, key);
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
 		return Objects.equals(this.key, key) && Objects.equals(this.value, value);
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		return Objects.equals(this.value, value);
 	}
@@ -153,7 +153,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
-		return map.$qmark(this.key, this.value) ? EmptyMap.instance : this;
+		return map.contains(this.key, this.value) ? EmptyMap.instance : this;
 	}
 	
 	@Override

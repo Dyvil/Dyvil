@@ -18,7 +18,7 @@ public interface JavaCollections
 	// Access Operations
 	
 	/**
-	 * @see Collection#$qmark(Object)
+	 * @see Collection#contains(Object)
 	 */
 	public static @infix @inline boolean $qmark(java.util.Collection collection, Object o)
 	{

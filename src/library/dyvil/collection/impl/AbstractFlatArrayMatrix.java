@@ -153,7 +153,7 @@ public abstract class AbstractFlatArrayMatrix<E> implements Matrix<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
 		return this.indexOf(element) >= 0;
 	}

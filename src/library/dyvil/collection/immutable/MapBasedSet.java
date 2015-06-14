@@ -47,7 +47,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		for (Entry<E, Object> entry : this.map)
 		{
 			E element = entry.getKey();
-			if (!collection.$qmark(element))
+			if (!collection.contains(element))
 			{
 				map.update(element, VALUE);
 			}
@@ -62,7 +62,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		for (Entry<E, Object> entry : this.map)
 		{
 			E element = entry.getKey();
-			if (collection.$qmark(element))
+			if (collection.contains(element))
 			{
 				map.update(element, VALUE);
 			}
@@ -88,14 +88,14 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		for (Entry<E, Object> entry : this.map)
 		{
 			E element = entry.getKey();
-			if (!collection.$qmark(element))
+			if (!collection.contains(element))
 			{
 				map.update(element, VALUE);
 			}
 		}
 		for (E element : collection)
 		{
-			if (!this.$qmark(element))
+			if (!this.contains(element))
 			{
 				map.update(element, VALUE);
 			}

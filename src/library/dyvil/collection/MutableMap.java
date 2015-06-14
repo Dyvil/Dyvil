@@ -56,13 +56,13 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public Iterator<V> valueIterator();
 	
 	@Override
-	public boolean $qmark(Object key);
+	public boolean containsKey(Object key);
 	
 	@Override
-	public boolean $qmark(Object key, Object value);
+	public boolean containsValue(Object value);
 	
 	@Override
-	public boolean $qmark$colon(V value);
+	public boolean contains(Object key, Object value);
 	
 	@Override
 	public V apply(K key);

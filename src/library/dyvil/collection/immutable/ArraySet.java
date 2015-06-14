@@ -84,7 +84,7 @@ public class ArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -99,7 +99,7 @@ public class ArraySet<E> implements ImmutableSet<E>
 	@Override
 	public ImmutableSet<E> $plus(E element)
 	{
-		if (this.$qmark(element))
+		if (this.contains(element))
 		{
 			return this;
 		}
@@ -134,7 +134,7 @@ public class ArraySet<E> implements ImmutableSet<E>
 		for (int i = 0; i < this.size; i++)
 		{
 			E element = this.array[i];
-			if (!collection.$qmark(element))
+			if (!collection.contains(element))
 			{
 				newArray[index++] = element;
 			}
@@ -150,7 +150,7 @@ public class ArraySet<E> implements ImmutableSet<E>
 		for (int i = 0; i < this.size; i++)
 		{
 			E element = this.array[i];
-			if (collection.$qmark(element))
+			if (collection.contains(element))
 			{
 				newArray[index++] = element;
 			}
@@ -166,7 +166,7 @@ public class ArraySet<E> implements ImmutableSet<E>
 		System.arraycopy(this.array, 0, newArray, 0, this.size);
 		for (E element : collection)
 		{
-			if (!this.$qmark(element))
+			if (!this.contains(element))
 			{
 				newArray[size++] = element;
 			}
@@ -182,14 +182,14 @@ public class ArraySet<E> implements ImmutableSet<E>
 		for (int i = 0; i < this.size; i++)
 		{
 			E element = this.array[i];
-			if (!collection.$qmark(element))
+			if (!collection.contains(element))
 			{
 				newArray[index++] = element;
 			}
 		}
 		for (E element : collection)
 		{
-			if (!this.$qmark(element))
+			if (!this.contains(element))
 			{
 				newArray[index++] = element;
 			}

@@ -55,7 +55,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
 		return Objects.equals(element, this.element);
 	}
@@ -127,7 +127,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection)
 	{
-		if (collection.$qmark(this.element))
+		if (collection.contains(this.element))
 		{
 			return ImmutableList.apply();
 		}
@@ -137,7 +137,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
 	{
-		if (!collection.$qmark(this.element))
+		if (!collection.contains(this.element))
 		{
 			return ImmutableList.apply();
 		}

@@ -34,7 +34,7 @@ public interface MutableMatrix<E> extends Matrix<E>
 	public int columns();
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	@Override
 	public E apply(int row, int column);

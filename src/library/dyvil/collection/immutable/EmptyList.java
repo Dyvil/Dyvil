@@ -61,7 +61,7 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
 		return false;
 	}

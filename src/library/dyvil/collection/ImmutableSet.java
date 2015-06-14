@@ -43,7 +43,7 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	

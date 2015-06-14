@@ -143,7 +143,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -157,7 +157,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -174,7 +174,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
