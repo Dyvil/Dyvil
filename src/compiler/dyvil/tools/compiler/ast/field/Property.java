@@ -115,8 +115,8 @@ public class Property extends Member implements IProperty, IContext
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
 					markers.add(position, "property.access.static", this.name.unqualified);
-					return null;
 				}
+				return null;
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
@@ -470,7 +470,7 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
-		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
+		if (instance != null)
 		{
 			instance.writeExpression(writer);
 		}
@@ -494,7 +494,7 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
 	{
-		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
+		if (instance != null)
 		{
 			instance.writeExpression(writer);
 		}
