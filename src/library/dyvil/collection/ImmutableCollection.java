@@ -68,11 +68,11 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	
 	@Override
 	@mutating
-	public default boolean add(E element)
+	public default void clear()
 	{
-		throw new ImmutableException("add() on Immutable Collection");
+		throw new ImmutableException("clear() on Immutable Collection");
 	}
-	
+
 	@Override
 	@mutating
 	public default void $plus$eq(E entry)
@@ -87,12 +87,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 		throw new ImmutableException("++= on Immutable Collection");
 	}
 	
-	@Override
-	@mutating
-	public default boolean remove(E element)
-	{
-		throw new ImmutableException("remove() on Immutable Collection");
-	}
+	// Mutating Operations
 	
 	@Override
 	@mutating
@@ -115,13 +110,42 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 		throw new ImmutableException("&= on Immutable Collection");
 	}
 	
+	
+	
+	// Mutating Operations
+	
 	@Override
 	@mutating
-	public default void clear()
+	public default boolean add(E element)
 	{
-		throw new ImmutableException("clear() on Immutable Collection");
+		throw new ImmutableException("add() on Immutable Collection");
 	}
 	
+	@Override
+	public default boolean addAll(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("addAll() on Immutable Collection");
+	}
+
+	@Override
+	@mutating
+	public default boolean remove(E element)
+	{
+		throw new ImmutableException("remove() on Immutable Collection");
+	}
+	
+	@Override
+	public default boolean removeAll(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("removeAll() on Immutable Collection");
+	}
+	
+	@Override
+	public default boolean intersect(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("intersect() on Immutable Collection");
+	}
+
 	@Override
 	@mutating
 	public default void map(UnaryOperator<E> mapper)

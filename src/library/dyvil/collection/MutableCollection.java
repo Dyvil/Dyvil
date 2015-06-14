@@ -63,16 +63,13 @@ public interface MutableCollection<E> extends Collection<E>
 	// Mutating Operations
 	
 	@Override
+	public void clear();
+	
+	@Override
 	public boolean add(E element);
 	
 	@Override
 	public boolean remove(E element);
-	
-	@Override
-	public void $amp$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void clear();
 	
 	@Override
 	public void filter(Predicate<? super E> condition);

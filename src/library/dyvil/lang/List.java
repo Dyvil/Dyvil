@@ -194,6 +194,12 @@ public interface List<E> extends Collection<E>
 	
 	// Mutating Operations
 	
+	@Override
+	public void $plus$eq(E element);
+	
+	@Override
+	public void clear();
+	
 	/**
 	 * Resizes this list to the given size. This method, unlike
 	 * {@link #ensureCapacity(int)}, actually changes the size as returned by
@@ -260,10 +266,17 @@ public interface List<E> extends Collection<E>
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of the bounds of this list
 	 */
-	public void insert(int index, E element);
+	public default void insert(int index, E element)
+	{
+		this.add(index, element);
+	}
 	
 	@Override
-	public boolean add(E element);
+	public default boolean add(E element)
+	{
+		this.$plus$eq(element);
+		return true;
+	}
 	
 	/**
 	 * Inserts the element at the given {@code index} of this list. Unlike
@@ -280,16 +293,7 @@ public interface List<E> extends Collection<E>
 	public E add(int index, E element);
 	
 	@Override
-	public default boolean remove(E element)
-	{
-		int index = this.indexOf(element);
-		if (index == -1)
-		{
-			return false;
-		}
-		this.removeAt(index);
-		return true;
-	}
+	public boolean remove(E element);
 	
 	/**
 	 * Removes the element at the given {@code index} from this list. This
@@ -301,12 +305,6 @@ public interface List<E> extends Collection<E>
 	 *            the index of the element to remove from this list
 	 */
 	public void removeAt(int index);
-	
-	@Override
-	public void $amp$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void clear();
 	
 	@Override
 	public void filter(Predicate<? super E> condition);
@@ -376,7 +374,7 @@ public interface List<E> extends Collection<E>
 	
 	@Override
 	public ImmutableList<E> immutable();
-
+	
 	public static <E> boolean listEquals(List<E> list, Object o)
 	{
 		if (!(o instanceof List))
@@ -386,7 +384,7 @@ public interface List<E> extends Collection<E>
 		
 		return listEquals(list, (List) o);
 	}
-
+	
 	public static <E> boolean listEquals(List<E> c1, List<E> c2)
 	{
 		if (c1.size() != c2.size())
@@ -396,7 +394,7 @@ public interface List<E> extends Collection<E>
 		
 		return Collection.orderedEquals(c1, c2);
 	}
-
+	
 	public static <E> int listHashCode(List<E> list)
 	{
 		int result = 1;

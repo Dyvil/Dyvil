@@ -14,7 +14,7 @@ import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
 @ArrayConvertible
-public interface MutableList<E> extends MutableCollection<E>, List<E>
+public interface MutableList<E> extends List<E>, MutableCollection<E>
 {
 	public static <E> MutableList<E> apply()
 	{
@@ -102,24 +102,16 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	// Mutating Operations
 	
 	@Override
-	public void resize(int newLength);
+	public void $plus$eq(E element);
 	
 	@Override
-	public default void ensureCapacity(int minSize)
-	{
-	}
+	public void resize(int newLength);
 	
 	@Override
 	public void update(int index, E element);
 	
 	@Override
 	public E set(int index, E element);
-	
-	@Override
-	public void insert(int index, E element);
-	
-	@Override
-	public boolean add(E element);
 	
 	@Override
 	public E add(int index, E element);
@@ -129,9 +121,6 @@ public interface MutableList<E> extends MutableCollection<E>, List<E>
 	
 	@Override
 	public boolean remove(E element);
-	
-	@Override
-	public void $amp$eq(Collection<? extends E> collection);
 	
 	@Override
 	public void clear();

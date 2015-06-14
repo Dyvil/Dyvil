@@ -245,20 +245,6 @@ public interface Collection<E> extends Iterable<E>
 	// Mutating Operations
 	
 	/**
-	 * Adds the element given by {@code element} to this collection and returns
-	 * the {@code true} if it was not present in this collection, {@code false}
-	 * otherwise (does not apply to {@link List Lists} as the element will
-	 * always be appended at the end of the list, therefore always returning
-	 * {@code false}). This method should throw an {@link ImmutableException} if
-	 * this is an immutable collection.
-	 * 
-	 * @param element
-	 *            the element to be added
-	 * @return the old element
-	 */
-	public boolean add(E element);
-	
-	/**
 	 * Adds the element given by {@code element} to this collection. This method
 	 * should throw an {@link ImmutableException} if this is an immutable
 	 * collection.
@@ -287,18 +273,7 @@ public interface Collection<E> extends Iterable<E>
 		}
 	}
 	
-	/**
-	 * Removes the given {@code element} from this collection. If the element is
-	 * not present in this list, it is simply ignored and {@code false} is
-	 * returned. Otherwise, if the element has been successfully removed,
-	 * {@code true} is returned.
-	 * 
-	 * @param element
-	 *            the element to be removed
-	 * @return true, iff the element has been removed successfully, false
-	 *         otherwise
-	 */
-	public boolean remove(E element);
+	// Mutating Operations
 	
 	/**
 	 * Removes the element given by {@code element} from this collection. This
@@ -329,6 +304,8 @@ public interface Collection<E> extends Iterable<E>
 		}
 	}
 	
+	// Mutating Operations
+	
 	/**
 	 * Removes all elements of this collection that are not present in the given
 	 * {@code collection}. This method should throw an
@@ -337,7 +314,12 @@ public interface Collection<E> extends Iterable<E>
 	 * @param collection
 	 *            the collection of elements to be retained
 	 */
-	public void $amp$eq(Collection<? extends E> collection);
+	public default void $amp$eq(Collection<? extends E> collection)
+	{
+		this.intersect(collection);
+	}
+	
+	// Mutating Operations
 	
 	/**
 	 * Clears this collection such that all elements of this collection are
@@ -349,6 +331,98 @@ public interface Collection<E> extends Iterable<E>
 	 * memory and are eventually garbage-collected.
 	 */
 	public void clear();
+	
+	/**
+	 * Adds the element given by {@code element} to this collection and returns
+	 * the {@code true} if it was not present in this collection, {@code false}
+	 * otherwise (does not apply to {@link List Lists} as the element will
+	 * always be appended at the end of the list, therefore always returning
+	 * {@code false}). This method should throw an {@link ImmutableException} if
+	 * this is an immutable collection.
+	 * 
+	 * @param element
+	 *            the element to be added
+	 * @return the old element
+	 */
+	public boolean add(E element);
+	
+	/**
+	 * Adds all elements of the given {@code collection} to this collection.
+	 * This method should throw an {@link ImmutableException} if this is an
+	 * immutable collection.
+	 * 
+	 * @param collection
+	 *            the collection of elements to be added
+	 */
+	public default boolean addAll(Collection<? extends E> collection)
+	{
+		boolean added = false;
+		for (E element : collection)
+		{
+			if (this.add(element))
+			{
+				added = true;
+			}
+		}
+		return added;
+	}
+	
+	/**
+	 * Removes the given {@code element} from this collection. If the element is
+	 * not present in this list, it is simply ignored and {@code false} is
+	 * returned. Otherwise, if the element has been successfully removed,
+	 * {@code true} is returned.
+	 * 
+	 * @param element
+	 *            the element to be removed
+	 * @return true, iff the element has been removed successfully, false
+	 *         otherwise
+	 */
+	public boolean remove(E element);
+	
+	/**
+	 * Removes all elements of the given {@code collection} from this
+	 * collection. This method should throw an {@link ImmutableException} if the
+	 * callee is an immutable collection.
+	 * 
+	 * @param collection
+	 *            the collection of elements to be removed
+	 */
+	public default boolean removeAll(Collection<? extends E> collection)
+	{
+		boolean removed = false;
+		for (E e : collection)
+		{
+			if (this.remove(e))
+			{
+				removed = true;
+			}
+		}
+		return removed;
+	}
+	
+	/**
+	 * Removes all elements of this collection that are not present in the given
+	 * {@code collection}. This method should throw an
+	 * {@link ImmutableException} if this is an immutable collection.
+	 * 
+	 * @param collection
+	 *            the collection of elements to be retained
+	 */
+	public default boolean intersect(Collection<? extends E> collection)
+	{
+		boolean removed = false;
+		Iterator<E> iterator = this.iterator();
+		while (iterator.hasNext())
+		{
+			if (!collection.$qmark(iterator.next()))
+			{
+				iterator.remove();
+				removed = true;
+			}
+		}
+		return removed;
+	}
 	
 	/**
 	 * Maps the elements of this collection using the given {@code mapper}. This

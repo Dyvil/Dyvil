@@ -3,6 +3,7 @@ package dyvil.collection.mutable;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -272,6 +273,41 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
+	public void $plus$eq(E element)
+	{
+		this.ensureCapacity(this.size + 1);
+		this.elements[this.size++] = element;
+	}
+	
+	@Override
+	public void $minus$minus$eq(Collection<? extends E> collection)
+	{
+		int index = 0;
+		Object[] array = new Object[this.size];
+		for (int i = 0; i < this.size; i++)
+		{
+			Object e = this.elements[i];
+			if (!collection.$qmark(e))
+			{
+				array[index++] = e;
+			}
+		}
+		this.elements = array;
+		this.size = index;
+	}
+	
+	@Override
+	public void clear()
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.elements[i] = null;
+		}
+		
+		this.size = 0;
+	}
+	
+	@Override
 	public void resize(int newLength)
 	{
 		if (newLength < this.size)
@@ -329,13 +365,6 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public boolean add(E element)
-	{
-		this.$plus$eq(element);
-		return true;
-	}
-	
-	@Override
 	public void insert(int index, E element)
 	{
 		if (index == this.size)
@@ -373,21 +402,38 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public boolean remove(E element)
+	public boolean addAll(Collection<? extends E> collection)
 	{
-		int index = this.indexOf(element);
-		if (index < 0)
+		if (collection.isEmpty())
 		{
 			return false;
 		}
 		
-		int numMoved = --this.size - index;
-		if (numMoved > 0)
-		{
-			System.arraycopy(this.elements, index + 1, this.elements, index, numMoved);
-		}
-		this.elements[this.size] = null;
+		this.ensureCapacity(this.size + collection.size());
+		collection.toArray(this.size, this.elements);
 		return true;
+	}
+	
+	@Override
+	public boolean remove(E element)
+	{
+		boolean removed = false;
+		for (int index = 0; index < this.size; index++)
+		{
+			if (Objects.equals(element, this.elements[index]))
+			{
+				int numMoved = --this.size - index;
+				if (numMoved > 0)
+				{
+					System.arraycopy(this.elements, index + 1, this.elements, index, numMoved);
+				}
+				index--;
+				removed = true;
+				this.elements[this.size] = null;
+			}
+		}
+		
+		return removed;
 	}
 	
 	@Override
@@ -400,57 +446,6 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 			System.arraycopy(this.elements, index + 1, this.elements, index, numMoved);
 		}
 		this.elements[this.size] = null;
-	}
-	
-	@Override
-	public void $plus$eq(E element)
-	{
-		this.ensureCapacity(this.size + 1);
-		this.elements[this.size++] = element;
-	}
-	
-	@Override
-	public void $plus$plus$eq(Collection<? extends E> collection)
-	{
-		int len = collection.size();
-		this.ensureCapacity(this.size + len);
-		Object[] array = collection.toArray();
-		System.arraycopy(array, 0, this.elements, this.size, len);
-		this.size += len;
-	}
-	
-	@Override
-	public void $minus$eq(E element)
-	{
-		int index = this.indexOf(element);
-		if (index < 0)
-		{
-			return;
-		}
-		
-		int numMoved = --this.size - index;
-		if (numMoved > 0)
-		{
-			System.arraycopy(this.elements, index + 1, this.elements, index, numMoved);
-		}
-		this.elements[this.size] = null;
-	}
-	
-	@Override
-	public void $minus$minus$eq(Collection<? extends E> collection)
-	{
-		int index = 0;
-		Object[] array = new Object[this.size];
-		for (int i = 0; i < this.size; i++)
-		{
-			Object e = this.elements[i];
-			if (!collection.$qmark(e))
-			{
-				array[index++] = e;
-			}
-		}
-		this.elements = array;
-		this.size = index;
 	}
 	
 	@Override
@@ -468,17 +463,6 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		}
 		this.elements = array;
 		this.size = index;
-	}
-	
-	@Override
-	public void clear()
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.elements[i] = null;
-		}
-		
-		this.size = 0;
 	}
 	
 	@Override

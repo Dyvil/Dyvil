@@ -112,15 +112,6 @@ public interface Set<E> extends Collection<E>
 	
 	// Mutating Operations
 	
-	@Override
-	public boolean add(E element);
-	
-	@Override
-	public boolean remove(E element);
-	
-	@Override
-	public void $amp$eq(Collection<? extends E> collection);
-	
 	/**
 	 * Adds all elements of the given {@code collection} if they are not already
 	 * present in this set.
@@ -128,7 +119,10 @@ public interface Set<E> extends Collection<E>
 	 * @param collection
 	 *            the collection to add
 	 */
-	public void $bar$eq(Collection<? extends E> collection);
+	public default void $bar$eq(Collection<? extends E> collection)
+	{
+		this.addAll(collection);
+	}
 	
 	/**
 	 * Removes all elements of the given {@code collection} from this collection
@@ -137,10 +131,46 @@ public interface Set<E> extends Collection<E>
 	 * @param collection
 	 *            the collection to XOR with
 	 */
-	public void $up$eq(Collection<? extends E> collection);
+	public default void $up$eq(Collection<? extends E> collection)
+	{
+		this.intersect(collection);
+	}
 	
 	@Override
 	public void clear();
+	
+	@Override
+	public boolean add(E element);
+	
+	@Override
+	public boolean remove(E element);
+	
+	public default boolean union(Collection<? extends E> collection)
+	{
+		return this.addAll(collection);
+	}
+	
+	public default boolean exclusiveOr(Collection<? extends E> collection)
+	{
+		boolean changed = false;
+		for (E element : collection)
+		{
+			if (!this.$qmark(element))
+			{
+				this.$plus$eq(element);
+				changed = true;
+			}
+		}
+		for (E element : this)
+		{
+			if (!collection.$qmark(element))
+			{
+				this.$minus$eq(element);
+				changed = true;
+			}
+		}
+		return changed;
+	}
 	
 	@Override
 	public void map(UnaryOperator<E> mapper);

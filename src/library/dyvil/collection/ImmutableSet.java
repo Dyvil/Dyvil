@@ -103,18 +103,6 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	// Mutating Operations
 	
 	@Override
-	public default boolean add(E element)
-	{
-		throw new ImmutableException("add() on Immutable Set");
-	}
-	
-	@Override
-	public default boolean remove(E element)
-	{
-		throw new ImmutableException("remove() on Immutable Set");
-	}
-	
-	@Override
 	public default void $plus$eq(E element)
 	{
 		throw new ImmutableException("+= on Immutable Set");
@@ -158,10 +146,54 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	
 	// Mutating Operations
 	
+	// Mutating Operations
+	
 	@Override
 	public default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean add(E element)
+	{
+		throw new ImmutableException("add() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean addAll(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("addAll() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean remove(E element)
+	{
+		throw new ImmutableException("remove() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean removeAll(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("removeAll() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean intersect(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("intersect() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean union(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("union() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean exclusiveOr(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("exclusiveOr() on Immutable Set");
 	}
 	
 	@Override

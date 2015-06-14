@@ -115,6 +115,48 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	@mutating
+	public default void $plus$eq(E element)
+	{
+		throw new ImmutableException("+= on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void $plus$plus$eq(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("++= on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void $minus$eq(E element)
+	{
+		throw new ImmutableException("-= on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void $minus$minus$eq(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("--= on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void $amp$eq(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("&= on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void clear()
+	{
+		throw new ImmutableException("clear() on Immutable List");
+	}
+	
+	@Override
+	@mutating
 	public default void resize(int newLength)
 	{
 		throw new ImmutableException("resize() on Immutable List");
@@ -162,6 +204,12 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	}
 	
 	@Override
+	public default boolean addAll(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("addAll() on Immutable List");
+	}
+	
+	@Override
 	@mutating
 	public default boolean remove(E element)
 	{
@@ -177,44 +225,15 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	@mutating
-	public default void $plus$eq(E element)
+	public default boolean removeAll(Collection<? extends E> collection)
 	{
-		throw new ImmutableException("+= on Immutable List");
+		throw new ImmutableException("removeAll() on Immutable List");
 	}
 	
 	@Override
-	@mutating
-	public default void $plus$plus$eq(Collection<? extends E> collection)
+	public default boolean intersect(Collection<? extends E> collection)
 	{
-		throw new ImmutableException("++= on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default void $minus$eq(E element)
-	{
-		throw new ImmutableException("-= on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default void $minus$minus$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("--= on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default void $amp$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("&= on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default void clear()
-	{
-		throw new ImmutableException("clear() on Immutable List");
+		throw new ImmutableException("intersect() on Immutable List");
 	}
 	
 	@Override
