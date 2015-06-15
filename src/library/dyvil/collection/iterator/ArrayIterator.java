@@ -2,8 +2,9 @@ package dyvil.collection.iterator;
 
 import java.util.Iterator;
 
-import dyvil.array.ObjectArray;
 import dyvil.lang.literal.ArrayConvertible;
+
+import dyvil.array.ObjectArray;
 
 @ArrayConvertible
 public class ArrayIterator<E> implements Iterator<E>

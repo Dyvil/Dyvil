@@ -1,8 +1,6 @@
 package dyvil.collection;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -10,8 +8,6 @@ import java.util.function.UnaryOperator;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.mutable.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public interface JavaCollections
 {

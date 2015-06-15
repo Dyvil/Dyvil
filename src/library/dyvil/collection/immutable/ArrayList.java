@@ -6,13 +6,14 @@ import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.lang.Collection;
+import dyvil.lang.Set;
+import dyvil.lang.literal.ArrayConvertible;
+
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
 import dyvil.collection.impl.AbstractArrayList;
 import dyvil.collection.iterator.ArrayIterator;
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
-import dyvil.lang.literal.ArrayConvertible;
 
 @ArrayConvertible
 public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<E>

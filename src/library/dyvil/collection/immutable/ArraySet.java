@@ -5,12 +5,13 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Collection;
 import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
+
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
+import dyvil.collection.iterator.ArrayIterator;
 
 @ArrayConvertible
 public class ArraySet<E> implements ImmutableSet<E>

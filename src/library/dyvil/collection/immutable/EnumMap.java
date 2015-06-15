@@ -4,15 +4,16 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.annotation.sealed;
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
-import dyvil.collection.impl.AbstractEnumMap;
 import dyvil.lang.Entry;
 import dyvil.lang.Map;
 import dyvil.lang.Type;
 import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.TypeConvertible;
+
+import dyvil.annotation.sealed;
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
+import dyvil.collection.impl.AbstractEnumMap;
 
 @ClassConvertible
 @TypeConvertible

@@ -12,7 +12,7 @@ import dyvil.tools.compiler.util.ParserUtil;
 public class PackageParser extends Parser
 {
 	protected PackageDeclaration	packageDeclaration;
-	private StringBuilder	buffer	= new StringBuilder();
+	private StringBuilder			buffer	= new StringBuilder();
 	
 	public PackageParser(PackageDeclaration pack)
 	{

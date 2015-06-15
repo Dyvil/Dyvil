@@ -8,8 +8,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.*;
 
-import org.objectweb.asm.Opcodes;
-
 import dyvil.io.AppendableOutputStream;
 import dyvil.io.FileUtils;
 import dyvil.io.LoggerOutputStream;
@@ -23,6 +21,8 @@ import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.sources.FileFinder;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Opcodes;
 
 public final class DyvilCompiler
 {
@@ -111,8 +111,8 @@ public final class DyvilCompiler
 		int unitCount = fileFinder.units.size();
 		int packages = Package.rootPackage.subPackages.size();
 		now = System.nanoTime() - now;
-		logger.info("Found " + packages + (packages == 1 ? " Package, " : " Packages, ") + fileCount + (fileCount == 1 ? " File (" : " Files (")
-				+ unitCount + (unitCount == 1 ? " Compilation Unit)" : " Compilation Units)") + " (" + Util.toTime(now) + ")");
+		logger.info("Found " + packages + (packages == 1 ? " Package, " : " Packages, ") + fileCount + (fileCount == 1 ? " File (" : " Files (") + unitCount
+				+ (unitCount == 1 ? " Compilation Unit)" : " Compilation Units)") + " (" + Util.toTime(now) + ")");
 		logger.info("");
 		
 		now = System.nanoTime();

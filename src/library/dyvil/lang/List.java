@@ -1,15 +1,19 @@
 package dyvil.lang;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
 
 /**
  * A <b>List</b> is a data type that represents an ordered (sequential)

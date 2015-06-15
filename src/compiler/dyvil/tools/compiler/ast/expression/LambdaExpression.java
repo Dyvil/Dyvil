@@ -2,8 +2,6 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.lang.List;
 
-import org.objectweb.asm.Handle;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -37,6 +35,8 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Handle;
 
 public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IContext
 {
@@ -328,7 +328,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		IContext.addCompilable(context, this);	
+		IContext.addCompilable(context, this);
 		return this;
 	}
 	

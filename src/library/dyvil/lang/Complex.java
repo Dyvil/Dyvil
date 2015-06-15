@@ -1,7 +1,8 @@
 package dyvil.lang;
 
-import dyvil.annotation.prefix;
 import dyvil.lang.literal.TupleConvertible;
+
+import dyvil.annotation.prefix;
 
 @TupleConvertible
 public class Complex implements Number

@@ -3,8 +3,9 @@ package dyvil.tools.repl;
 import java.util.HashMap;
 import java.util.Map;
 
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.List;
+
+import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -71,17 +72,17 @@ public class REPLContext extends DyvilHeader implements IValued
 	{
 		MarkerList markers = new MarkerList();
 		
-		if (tempClass != null)
+		if (this.tempClass != null)
 		{
-			tempClass.resolveTypes(markers, this);
-			tempClass.resolve(markers, this);
-			tempClass.checkTypes(markers, this);
-			tempClass.check(markers, this);
-			tempClass.foldConstants();
+			this.tempClass.resolveTypes(markers, this);
+			this.tempClass.resolve(markers, this);
+			this.tempClass.checkTypes(markers, this);
+			this.tempClass.check(markers, this);
+			this.tempClass.foldConstants();
 			
-			super.addClass(tempClass);
-			System.out.println("Defined class " + tempClass.getName());
-			tempClass = null;
+			super.addClass(this.tempClass);
+			System.out.println("Defined class " + this.tempClass.getName());
+			this.tempClass = null;
 		}
 		
 		if (this.includeDeclaration != null)
@@ -104,27 +105,27 @@ public class REPLContext extends DyvilHeader implements IValued
 		{
 			return;
 		}
-		importDeclaration.resolveTypes(markers, this, false);
+		this.importDeclaration.resolveTypes(markers, this, false);
 		
 		if (this.reportErrors(markers))
 		{
 			return;
 		}
 		
-		boolean isStatic = importDeclaration.isStatic;
+		boolean isStatic = this.importDeclaration.isStatic;
 		
 		if (isStatic)
 		{
-			super.addUsing(importDeclaration);
-			System.out.println("Using " + importDeclaration.theImport);
+			super.addUsing(this.importDeclaration);
+			System.out.println("Using " + this.importDeclaration.theImport);
 		}
 		else
 		{
-			super.addImport(importDeclaration);
-			System.out.println("Imported " + importDeclaration.theImport);
+			super.addImport(this.importDeclaration);
+			System.out.println("Imported " + this.importDeclaration.theImport);
 		}
 		
-		importDeclaration = null;
+		this.importDeclaration = null;
 	}
 	
 	protected void processValue()
@@ -188,19 +189,19 @@ public class REPLContext extends DyvilHeader implements IValued
 	@Override
 	public void addImport(ImportDeclaration component)
 	{
-		importDeclaration = component;
+		this.importDeclaration = component;
 	}
 	
 	@Override
 	public void addUsing(ImportDeclaration component)
 	{
-		importDeclaration = component;
+		this.importDeclaration = component;
 	}
 	
 	@Override
 	public void addInclude(IncludeDeclaration component)
 	{
-		includeDeclaration = component;
+		this.includeDeclaration = component;
 	}
 	
 	@Override

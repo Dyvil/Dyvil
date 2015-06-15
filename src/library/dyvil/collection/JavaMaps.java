@@ -4,12 +4,13 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+import dyvil.lang.Map;
+
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
-import dyvil.lang.Map;
 import dyvil.tuple.Tuple2;
 
 public interface JavaMaps

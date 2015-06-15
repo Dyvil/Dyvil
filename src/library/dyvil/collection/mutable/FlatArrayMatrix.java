@@ -4,12 +4,13 @@ import java.util.BitSet;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import dyvil.lang.List;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableList;
 import dyvil.collection.MutableMatrix;
 import dyvil.collection.impl.AbstractFlatArrayMatrix;
-import dyvil.lang.List;
-import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
 public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements MutableMatrix<E>
@@ -243,10 +244,10 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		{
 			if (index > 0)
 			{
-				System.arraycopy(this.cells, i * columns, newCells, i * newColumns, index);
+				System.arraycopy(this.cells, i * this.columns, newCells, i * newColumns, index);
 			}
 			newCells[i * newColumns + index] = column.get(i);
-			System.arraycopy(this.cells, i * columns + index, newCells, i * newColumns + index + 1, this.columns - index);
+			System.arraycopy(this.cells, i * this.columns + index, newCells, i * newColumns + index + 1, this.columns - index);
 		}
 		this.columns = newColumns;
 		this.cells = newCells;
@@ -296,9 +297,9 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		{
 			if (column > 0)
 			{
-				System.arraycopy(this.cells, i * columns, newCells, i * newColumns, column);
+				System.arraycopy(this.cells, i * this.columns, newCells, i * newColumns, column);
 			}
-			System.arraycopy(this.cells, i * columns + column + 1, newCells, i * newColumns + column, this.columns - column - 1);
+			System.arraycopy(this.cells, i * this.columns + column + 1, newCells, i * newColumns + column, this.columns - column - 1);
 		}
 		this.columns = newColumns;
 		this.cells = newCells;

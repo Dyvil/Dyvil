@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.transform;
 
-import static dyvil.reflect.Opcodes.*;
-
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IField;
@@ -13,6 +9,10 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+
+import org.objectweb.asm.Label;
+
+import static dyvil.reflect.Opcodes.*;
 
 public interface CaseClasses
 {

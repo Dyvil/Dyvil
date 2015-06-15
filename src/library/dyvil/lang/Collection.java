@@ -12,12 +12,13 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.ImmutableCollection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableCollection;
 import dyvil.collection.MutableList;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
 
 /**
  * The base class of all collection classes in the <i>Dyvil Collection

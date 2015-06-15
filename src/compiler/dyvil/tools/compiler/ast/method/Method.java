@@ -1,14 +1,8 @@
 package dyvil.tools.compiler.ast.method;
 
-import static dyvil.reflect.Opcodes.ARGUMENTS;
-import static dyvil.reflect.Opcodes.IFEQ;
-import static dyvil.reflect.Opcodes.IFNE;
-import static dyvil.reflect.Opcodes.INSTANCE;
-
 import java.lang.annotation.ElementType;
-import dyvil.lang.List;
 
-import org.objectweb.asm.Label;
+import dyvil.lang.List;
 
 import dyvil.annotation.mutating;
 import dyvil.reflect.Modifiers;
@@ -47,6 +41,13 @@ import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Label;
+
+import static dyvil.reflect.Opcodes.ARGUMENTS;
+import static dyvil.reflect.Opcodes.IFEQ;
+import static dyvil.reflect.Opcodes.IFNE;
+import static dyvil.reflect.Opcodes.INSTANCE;
 
 public class Method extends Member implements IMethod
 {

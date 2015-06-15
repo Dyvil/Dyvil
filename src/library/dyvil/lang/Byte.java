@@ -1,8 +1,9 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.*;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
+
+import static dyvil.reflect.Opcodes.*;
 
 public class Byte implements Integer
 {

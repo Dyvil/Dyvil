@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.backend;
 
-import org.objectweb.asm.Opcodes;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
@@ -11,6 +9,8 @@ import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethodSignature;
 import dyvil.tools.compiler.ast.type.*;
+
+import org.objectweb.asm.Opcodes;
 
 public final class ClassFormat
 {

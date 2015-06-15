@@ -2,9 +2,10 @@ package dyvil.collection.immutable;
 
 import java.util.Comparator;
 
-import dyvil.collection.ImmutableList;
 import dyvil.lang.Collection;
 import dyvil.lang.Set;
+
+import dyvil.collection.ImmutableList;
 
 public class SortedArrayList<E> extends ArrayList<E>
 {

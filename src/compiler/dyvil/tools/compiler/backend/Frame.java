@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.backend;
 
-import static dyvil.reflect.Opcodes.*;
-import static dyvil.tools.compiler.backend.ClassFormat.*;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.backend.exception.StackUnderflowException;
 
 import org.objectweb.asm.MethodVisitor;
 
-import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.backend.exception.StackUnderflowException;
+import static dyvil.reflect.Opcodes.*;
+import static dyvil.tools.compiler.backend.ClassFormat.*;
 
 public class Frame
 {

@@ -1,14 +1,14 @@
 package dyvil.tools.compiler.backend;
 
-import static dyvil.reflect.Opcodes.*;
-
-import org.objectweb.asm.*;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+
+import org.objectweb.asm.*;
+
+import static dyvil.reflect.Opcodes.*;
 
 public final class MethodWriterImpl implements MethodWriter
 {
@@ -590,7 +590,8 @@ public final class MethodWriterImpl implements MethodWriter
 		this.insnCallback();
 		
 		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < dims; i++) {
+		for (int i = 0; i < dims; i++)
+		{
 			builder.append('[');
 		}
 		type.appendExtendedName(builder);

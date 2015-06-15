@@ -1,9 +1,11 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.*;
+import dyvil.lang.literal.IntConvertible;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
-import dyvil.lang.literal.IntConvertible;
+
+import static dyvil.reflect.Opcodes.*;
 
 @IntConvertible
 public class Int implements Integer

@@ -3,10 +3,11 @@ package dyvil.collection.range;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Ordered;
 import dyvil.lang.Range;
 import dyvil.lang.literal.TupleConvertible;
+
+import dyvil.collection.iterator.ArrayIterator;
 
 @TupleConvertible
 public class ArrayRange<T extends Ordered<T>> implements Range<T>
@@ -55,7 +56,8 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 		this.count = size;
 	}
 	
-	private ArrayRange(Ordered[] array, int count) {
+	private ArrayRange(Ordered[] array, int count)
+	{
 		this.array = array;
 		this.count = count;
 	}

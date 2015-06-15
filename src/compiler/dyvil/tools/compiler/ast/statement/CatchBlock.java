@@ -65,7 +65,7 @@ public class CatchBlock implements IValued, ITyped, IContext
 	{
 		return this.context.isStatic();
 	}
-
+	
 	@Override
 	public IDyvilHeader getHeader()
 	{

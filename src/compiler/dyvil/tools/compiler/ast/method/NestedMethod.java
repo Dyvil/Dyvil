@@ -2,8 +2,6 @@ package dyvil.tools.compiler.ast.method;
 
 import dyvil.lang.List;
 
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -22,6 +20,8 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+
+import org.objectweb.asm.Label;
 
 public class NestedMethod extends Method
 {

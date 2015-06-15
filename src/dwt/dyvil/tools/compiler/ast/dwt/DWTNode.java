@@ -2,10 +2,9 @@ package dyvil.tools.compiler.ast.dwt;
 
 import java.util.Map;
 
-import org.objectweb.asm.Label;
+import dyvil.lang.List;
 
 import dyvil.collection.mutable.ArrayList;
-import dyvil.lang.List;
 import dyvil.reflect.Opcodes;
 import dyvil.string.StringUtils;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -28,6 +27,8 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Label;
 
 public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 {

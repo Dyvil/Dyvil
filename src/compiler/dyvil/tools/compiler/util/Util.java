@@ -3,6 +3,7 @@ package dyvil.tools.compiler.util;
 import java.util.Iterator;
 
 import dyvil.lang.Collection;
+
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;

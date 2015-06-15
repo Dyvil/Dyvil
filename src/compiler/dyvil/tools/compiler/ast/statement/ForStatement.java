@@ -98,7 +98,7 @@ public class ForStatement implements IStatement, IContext, ILoop
 	{
 		return this.context.isStatic();
 	}
-
+	
 	@Override
 	public IDyvilHeader getHeader()
 	{

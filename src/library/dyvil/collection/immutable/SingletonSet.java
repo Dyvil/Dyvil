@@ -7,12 +7,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.iterator.SingletonIterator;
 import dyvil.lang.Collection;
 import dyvil.lang.Set;
 import dyvil.lang.literal.TupleConvertible;
+
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
+import dyvil.collection.iterator.SingletonIterator;
 
 @TupleConvertible
 public class SingletonSet<E> implements ImmutableSet<E>

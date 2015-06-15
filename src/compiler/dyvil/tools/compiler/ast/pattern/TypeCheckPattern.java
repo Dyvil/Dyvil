@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.pattern;
 
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
@@ -11,6 +9,8 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+
+import org.objectweb.asm.Label;
 
 public class TypeCheckPattern implements IPattern
 {
@@ -151,7 +151,7 @@ public class TypeCheckPattern implements IPattern
 			this.pattern.toString(prefix, buffer);
 		}
 		int patternType = this.pattern.getPatternType();
-		if (patternType == BINDING || (patternType != CASE_CLASS && !this.pattern.isType(this.type)))
+		if (patternType == BINDING || patternType != CASE_CLASS && !this.pattern.isType(this.type))
 		{
 			buffer.append(" as ");
 			this.type.toString(prefix, buffer);

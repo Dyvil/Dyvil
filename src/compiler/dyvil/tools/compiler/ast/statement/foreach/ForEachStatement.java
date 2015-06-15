@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.statement.foreach;
 
-import static dyvil.tools.compiler.ast.statement.ForStatement.$forEnd;
-import static dyvil.tools.compiler.ast.statement.ForStatement.$forStart;
-import static dyvil.tools.compiler.ast.statement.ForStatement.$forUpdate;
-
 import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
@@ -31,6 +27,10 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+
+import static dyvil.tools.compiler.ast.statement.ForStatement.$forEnd;
+import static dyvil.tools.compiler.ast.statement.ForStatement.$forStart;
+import static dyvil.tools.compiler.ast.statement.ForStatement.$forUpdate;
 
 public class ForEachStatement implements IStatement, IContext, ILoop
 {

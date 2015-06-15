@@ -8,12 +8,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.collection.ImmutableList;
-import dyvil.collection.MutableList;
-import dyvil.collection.iterator.SingletonIterator;
 import dyvil.lang.Collection;
 import dyvil.lang.List;
 import dyvil.lang.literal.TupleConvertible;
+
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
+import dyvil.collection.iterator.SingletonIterator;
 
 @TupleConvertible
 public class SingletonList<E> implements ImmutableList<E>

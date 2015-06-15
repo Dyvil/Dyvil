@@ -2,13 +2,13 @@ package dyvil.tools.compiler.backend;
 
 import java.io.InputStream;
 
-import org.objectweb.asm.*;
-
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
+
+import org.objectweb.asm.*;
 
 public class ClassReader extends ClassVisitor
 {

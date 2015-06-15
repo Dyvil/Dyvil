@@ -3,11 +3,12 @@ package dyvil.string;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dyvil.lang.List;
+
 import dyvil.annotation.Utility;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.lang.List;
 import dyvil.math.MathUtils;
 import dyvil.random.RandomUtils;
 

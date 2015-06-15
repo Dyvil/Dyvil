@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.pattern;
 
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IField;
@@ -17,6 +15,8 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Label;
 
 public final class TuplePattern extends ASTNode implements IPattern, IPatternList
 {

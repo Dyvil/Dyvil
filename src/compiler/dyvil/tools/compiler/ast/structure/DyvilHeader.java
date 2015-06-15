@@ -2,9 +2,10 @@ package dyvil.tools.compiler.ast.structure;
 
 import java.io.File;
 import java.util.IdentityHashMap;
-import dyvil.lang.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;

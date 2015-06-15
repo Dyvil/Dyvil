@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.pattern;
 
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -17,6 +15,8 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Label;
 
 public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 {
@@ -86,7 +86,7 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 		if (index >= this.patterns.length)
 		{
 			IPattern[] temp = new IPattern[index + 1];
-			System.arraycopy(patterns, 0, temp, 0, patterns.length);
+			System.arraycopy(this.patterns, 0, temp, 0, this.patterns.length);
 			this.patterns = temp;
 		}
 		this.patterns[index] = pattern;
@@ -201,7 +201,7 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 	{
 		this.type.toString(prefix, buffer);
 		buffer.append('(');
-		Util.astToString(prefix, patterns, patternCount, Formatting.Expression.tupleSeperator, buffer);
+		Util.astToString(prefix, this.patterns, this.patternCount, Formatting.Expression.tupleSeperator, buffer);
 		buffer.append(')');
 	}
 }

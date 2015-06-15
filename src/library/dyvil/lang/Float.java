@@ -1,9 +1,11 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.*;
+import dyvil.lang.literal.FloatConvertible;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
-import dyvil.lang.literal.FloatConvertible;
+
+import static dyvil.reflect.Opcodes.*;
 
 @FloatConvertible
 public class Float implements Number

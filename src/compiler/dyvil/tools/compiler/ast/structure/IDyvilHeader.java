@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 
 public interface IDyvilHeader extends IContext, IClassList, IOperatorMap
-{	
+{
 	public default boolean isHeader()
 	{
 		return true;

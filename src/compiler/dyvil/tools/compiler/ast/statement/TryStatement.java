@@ -298,7 +298,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	{
 		return this.context.isStatic();
 	}
-
+	
 	@Override
 	public IDyvilHeader getHeader()
 	{

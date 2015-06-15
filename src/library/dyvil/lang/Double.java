@@ -1,9 +1,11 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.*;
+import dyvil.lang.literal.DoubleConvertible;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
-import dyvil.lang.literal.DoubleConvertible;
+
+import static dyvil.reflect.Opcodes.*;
 
 @DoubleConvertible
 public class Double implements Number

@@ -1,9 +1,10 @@
 package dyvil.tools.compiler.ast.structure;
 
-import dyvil.collection.mutable.ArrayList;
-import dyvil.collection.mutable.HashMap;
 import dyvil.lang.List;
 import dyvil.lang.Map;
+
+import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;

@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
@@ -12,6 +10,8 @@ import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+
+import org.objectweb.asm.Label;
 
 public interface IValue extends IASTNode, ITyped
 {

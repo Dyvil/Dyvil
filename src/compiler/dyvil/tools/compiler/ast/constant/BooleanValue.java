@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.constant;
 
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -15,6 +13,8 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+
+import org.objectweb.asm.Label;
 
 public final class BooleanValue extends ASTNode implements IConstantValue
 {

@@ -8,15 +8,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.annotation.mutating;
-import dyvil.collection.immutable.ArrayList;
-import dyvil.collection.immutable.EmptyList;
-import dyvil.collection.immutable.SingletonList;
 import dyvil.lang.Collection;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.List;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+
+import dyvil.annotation.mutating;
+import dyvil.collection.immutable.ArrayList;
+import dyvil.collection.immutable.EmptyList;
+import dyvil.collection.immutable.SingletonList;
 
 @NilConvertible
 @ArrayConvertible

@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.ast.dynamic;
 
 import java.lang.annotation.ElementType;
-import dyvil.lang.List;
 
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
+import dyvil.lang.List;
 
 import dyvil.array.ObjectArray;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -34,6 +32,9 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
 
 public class DynamicMethod extends ASTNode implements IMethod
 {

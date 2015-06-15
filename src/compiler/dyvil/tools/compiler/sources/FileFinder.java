@@ -2,8 +2,9 @@ package dyvil.tools.compiler.sources;
 
 import java.io.File;
 
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.List;
+
+import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -21,7 +22,7 @@ public class FileFinder
 			String name = source.getName();
 			for (String s : source.list())
 			{
-				findUnits(new CodeFile(source, s), new File(output, s), pack == null ? Package.rootPackage : pack.createSubPackage(name));
+				this.findUnits(new CodeFile(source, s), new File(output, s), pack == null ? Package.rootPackage : pack.createSubPackage(name));
 			}
 			return;
 		}
@@ -54,11 +55,11 @@ public class FileFinder
 		
 		if (unit.isHeader())
 		{
-			units.insert(0, unit);
+			this.units.insert(0, unit);
 		}
 		else
 		{
-			units.add(unit);
+			this.units.add(unit);
 		}
 	}
 }

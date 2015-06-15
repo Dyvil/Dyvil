@@ -3,6 +3,7 @@ package dyvil.tools.repl;
 import java.security.ProtectionDomain;
 
 import dyvil.lang.List;
+
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
@@ -81,8 +82,10 @@ public class REPLVariable extends Field
 	
 	protected void compute(String className, List<IClassCompilable> compilableList)
 	{
-		if (this.className != null || (isConstant(this.value) && !compilableList.isEmpty()))
+		if (this.className != null || isConstant(this.value) && !compilableList.isEmpty())
+		{
 			return;
+		}
 		
 		try
 		{

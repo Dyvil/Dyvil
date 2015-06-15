@@ -1,9 +1,11 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.*;
+import dyvil.lang.literal.LongConvertible;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.prefix;
-import dyvil.lang.literal.LongConvertible;
+
+import static dyvil.reflect.Opcodes.*;
 
 @LongConvertible
 public class Long implements Integer

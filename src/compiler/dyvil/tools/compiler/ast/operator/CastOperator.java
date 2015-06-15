@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.operator;
 
-import static dyvil.reflect.Opcodes.*;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -14,6 +13,8 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+
+import static dyvil.reflect.Opcodes.*;
 
 public final class CastOperator extends ASTNode implements IValue
 {

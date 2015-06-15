@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.pattern;
 
-import org.objectweb.asm.Label;
-
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
@@ -12,6 +10,8 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+
+import org.objectweb.asm.Label;
 
 public interface IPattern extends IASTNode, ITyped
 {

@@ -6,11 +6,12 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+import dyvil.lang.Entry;
+import dyvil.lang.Map;
+
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
 import dyvil.collection.mutable.HashMap;
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.tuple.Tuple2;
 
 public class ArrayMap<K, V> implements ImmutableMap<K, V>

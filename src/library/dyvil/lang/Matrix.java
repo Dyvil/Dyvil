@@ -10,10 +10,11 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import dyvil.collection.ImmutableMatrix;
-import dyvil.collection.MutableMatrix;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+
+import dyvil.collection.ImmutableMatrix;
+import dyvil.collection.MutableMatrix;
 import dyvil.tuple.Tuple2;
 
 @NilConvertible

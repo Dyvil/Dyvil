@@ -1,8 +1,9 @@
 package dyvil.lang;
 
-import dyvil.annotation.infix;
 import dyvil.lang.literal.IntConvertible;
 import dyvil.lang.literal.LongConvertible;
+
+import dyvil.annotation.infix;
 
 @IntConvertible
 @LongConvertible

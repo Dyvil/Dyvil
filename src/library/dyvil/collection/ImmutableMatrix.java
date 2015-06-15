@@ -3,9 +3,10 @@ package dyvil.collection;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import dyvil.collection.immutable.ArrayMatrix;
 import dyvil.lang.*;
 import dyvil.lang.literal.ArrayConvertible;
+
+import dyvil.collection.immutable.ArrayMatrix;
 import dyvil.tuple.Tuple2;
 
 @ArrayConvertible

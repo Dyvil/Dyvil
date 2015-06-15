@@ -8,14 +8,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.lang.Collection;
+import dyvil.lang.List;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.annotation.object;
 import dyvil.array.ObjectArray;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.EmptyIterator;
-import dyvil.lang.Collection;
-import dyvil.lang.List;
-import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
 public @object class EmptyList<E> implements ImmutableList<E>

@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import org.objectweb.asm.Label;
-
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -9,6 +7,8 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+
+import org.objectweb.asm.Label;
 
 public final class EncapsulatedValue implements IValue, IValued
 {

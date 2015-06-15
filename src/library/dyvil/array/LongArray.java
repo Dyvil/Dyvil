@@ -1,7 +1,5 @@
 package dyvil.array;
 
-import static dyvil.reflect.Opcodes.*;
-
 import java.util.Arrays;
 import java.util.function.IntConsumer;
 import java.util.function.LongFunction;
@@ -11,6 +9,8 @@ import java.util.function.LongUnaryOperator;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+
+import static dyvil.reflect.Opcodes.*;
 
 public interface LongArray
 {

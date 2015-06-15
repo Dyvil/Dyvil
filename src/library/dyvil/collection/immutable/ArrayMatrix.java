@@ -5,11 +5,12 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import dyvil.lang.Int;
+import dyvil.lang.Matrix;
+
 import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
-import dyvil.lang.Int;
-import dyvil.lang.Matrix;
 import dyvil.tuple.Tuple2;
 
 public class ArrayMatrix<E> implements ImmutableMatrix<E>
@@ -129,7 +130,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 			@Override
 			public boolean hasNext()
 			{
-				return this.column < columns && this.row < rows;
+				return this.column < ArrayMatrix.this.columns && this.row < ArrayMatrix.this.rows;
 			}
 			
 			@Override
@@ -137,7 +138,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 			{
 				int row = this.row;
 				int column = this.column;
-				if (this.column + 1 == columns)
+				if (this.column + 1 == ArrayMatrix.this.columns)
 				{
 					this.column = 0;
 					this.row++;
@@ -146,7 +147,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 				{
 					this.column++;
 				}
-				return (E) cells[row][column];
+				return (E) ArrayMatrix.this.cells[row][column];
 			}
 			
 			@Override

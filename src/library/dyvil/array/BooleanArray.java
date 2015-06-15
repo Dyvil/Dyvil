@@ -1,17 +1,18 @@
 package dyvil.array;
 
-import static dyvil.reflect.Opcodes.*;
-
 import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
+import dyvil.lang.Boolean;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
-import dyvil.lang.Boolean;
+
+import static dyvil.reflect.Opcodes.*;
 
 public interface BooleanArray
 {

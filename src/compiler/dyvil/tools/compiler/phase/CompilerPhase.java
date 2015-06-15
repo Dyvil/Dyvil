@@ -3,6 +3,7 @@ package dyvil.tools.compiler.phase;
 import java.util.function.Consumer;
 
 import dyvil.lang.Collection;
+
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
 public class CompilerPhase implements ICompilerPhase

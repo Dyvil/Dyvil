@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.ast.external;
 
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
+import dyvil.lang.List;
 
 import dyvil.collection.mutable.ArrayList;
-import dyvil.lang.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -37,6 +35,9 @@ import dyvil.tools.compiler.backend.visitor.BytecodeVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
 
 public final class ExternalClass extends CodeClass
 {

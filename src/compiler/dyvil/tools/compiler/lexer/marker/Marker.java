@@ -1,7 +1,8 @@
 package dyvil.tools.compiler.lexer.marker;
 
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.List;
+
+import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class Marker extends Throwable implements Comparable<Marker>

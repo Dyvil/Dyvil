@@ -7,11 +7,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.annotation.mutating;
 import dyvil.lang.Collection;
 import dyvil.lang.Immutable;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.literal.NilConvertible;
+
+import dyvil.annotation.mutating;
 
 @NilConvertible
 public interface ImmutableCollection<E> extends Collection<E>, Immutable
@@ -72,7 +73,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	{
 		throw new ImmutableException("clear() on Immutable Collection");
 	}
-
+	
 	@Override
 	@mutating
 	public default void $plus$eq(E entry)
@@ -110,8 +111,6 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 		throw new ImmutableException("&= on Immutable Collection");
 	}
 	
-	
-	
 	// Mutating Operations
 	
 	@Override
@@ -126,7 +125,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	{
 		throw new ImmutableException("addAll() on Immutable Collection");
 	}
-
+	
 	@Override
 	@mutating
 	public default boolean remove(E element)
@@ -145,7 +144,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	{
 		throw new ImmutableException("intersect() on Immutable Collection");
 	}
-
+	
 	@Override
 	@mutating
 	public default void map(UnaryOperator<E> mapper)

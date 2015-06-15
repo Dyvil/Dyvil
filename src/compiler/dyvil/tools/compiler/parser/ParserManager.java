@@ -60,7 +60,7 @@ public final class ParserManager implements IParserManager
 		}
 		return Operators.map.get(name);
 	}
-
+	
 	public final void parse(MarkerList markers, TokenIterator tokens)
 	{
 		this.tokens = tokens;

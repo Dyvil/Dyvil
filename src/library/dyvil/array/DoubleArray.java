@@ -1,7 +1,5 @@
 package dyvil.array;
 
-import static dyvil.reflect.Opcodes.*;
-
 import java.util.Arrays;
 import java.util.function.DoubleFunction;
 import java.util.function.DoublePredicate;
@@ -11,6 +9,8 @@ import java.util.function.IntConsumer;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+
+import static dyvil.reflect.Opcodes.*;
 
 public interface DoubleArray
 {

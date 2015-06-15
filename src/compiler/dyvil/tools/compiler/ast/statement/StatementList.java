@@ -2,11 +2,12 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.Iterator;
 
-import dyvil.collection.iterator.ArrayIterator;
-import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.lang.Entry;
 import dyvil.lang.List;
 import dyvil.lang.Map;
+
+import dyvil.collection.iterator.ArrayIterator;
+import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -339,7 +340,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	{
 		return this.context.isStatic();
 	}
-
+	
 	@Override
 	public IDyvilHeader getHeader()
 	{

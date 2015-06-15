@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.operator;
 
-import static dyvil.tools.compiler.ast.member.Name.*;
-import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
-import static dyvil.tools.compiler.ast.operator.Operator.INFIX_NONE;
-
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -11,6 +7,10 @@ import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.Types;
+
+import static dyvil.tools.compiler.ast.member.Name.*;
+import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
+import static dyvil.tools.compiler.ast.operator.Operator.INFIX_NONE;
 
 public interface Operators
 {
@@ -109,7 +109,7 @@ public interface Operators
 				sbe.addValue(arg2);
 				return sbe;
 			}
-			if ((arg1.isType(Types.STRING) && arg1.valueTag() != IValue.NULL) || (arg2.isType(Types.STRING) && arg2.valueTag() != IValue.NULL))
+			if (arg1.isType(Types.STRING) && arg1.valueTag() != IValue.NULL || arg2.isType(Types.STRING) && arg2.valueTag() != IValue.NULL)
 			{
 				StringBuilderExpression sbe = new StringBuilderExpression();
 				sbe.addValue(arg1);

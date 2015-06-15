@@ -4,10 +4,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import sun.misc.SharedSecrets;
 import dyvil.lang.Entry;
 import dyvil.lang.Map;
 import dyvil.lang.Type;
+
+import sun.misc.SharedSecrets;
 
 public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 {
@@ -23,19 +24,19 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		@Override
 		public K getKey()
 		{
-			return keys[this.index];
+			return AbstractEnumMap.this.keys[this.index];
 		}
 		
 		@Override
 		public V getValue()
 		{
-			return (V) values[this.index];
+			return (V) AbstractEnumMap.this.values[this.index];
 		}
 		
 		@Override
 		public String toString()
 		{
-			return keys[this.index] + " -> " + values[this.index];
+			return AbstractEnumMap.this.keys[this.index] + " -> " + AbstractEnumMap.this.values[this.index];
 		}
 		
 		@Override
@@ -59,7 +60,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		@Override
 		public boolean hasNext()
 		{
-			Object[] tab = values;
+			Object[] tab = AbstractEnumMap.this.values;
 			for (int i = this.index; i < tab.length; i++)
 			{
 				Object key = tab[i];

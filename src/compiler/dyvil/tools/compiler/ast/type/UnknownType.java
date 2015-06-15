@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import static dyvil.reflect.Opcodes.*;
-
 import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
@@ -22,6 +20,8 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+
+import static dyvil.reflect.Opcodes.*;
 
 public class UnknownType extends ASTNode implements IType
 {

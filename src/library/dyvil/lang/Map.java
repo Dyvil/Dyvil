@@ -11,10 +11,11 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
 import dyvil.tuple.Tuple2;
 
 @NilConvertible
@@ -216,7 +217,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 * @return true, if this map contains a mapping to the value
 	 */
 	public boolean containsValue(Object value);
-
+	
 	/**
 	 * Returns true if and if only this map contains a mapping that maps the
 	 * given {@code key} to the given {@code value}.

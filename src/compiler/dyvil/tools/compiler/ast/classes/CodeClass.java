@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.ast.classes;
 
 import java.lang.annotation.ElementType;
-import dyvil.lang.List;
 
-import org.objectweb.asm.Opcodes;
+import dyvil.lang.List;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
@@ -44,6 +43,8 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Opcodes;
 
 public class CodeClass extends ASTNode implements IClass
 {
@@ -546,7 +547,7 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		return this.compilableCount;
 	}
-
+	
 	@Override
 	public void addCompilable(IClassCompilable compilable)
 	{
@@ -567,13 +568,13 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		this.compilables[index] = compilable;
 	}
-
+	
 	@Override
 	public IClassCompilable getCompilable(int index)
 	{
 		return this.compilables[index];
 	}
-
+	
 	@Override
 	public void setMetadata(IClassMetadata metadata)
 	{

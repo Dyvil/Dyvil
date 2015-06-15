@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.ast.method;
 
 import java.lang.annotation.ElementType;
-import dyvil.lang.List;
 
-import org.objectweb.asm.Label;
+import dyvil.lang.List;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -37,6 +36,8 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Label;
 
 public class Constructor extends Member implements IConstructor
 {

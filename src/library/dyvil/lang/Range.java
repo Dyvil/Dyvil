@@ -6,9 +6,10 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 
+import dyvil.lang.literal.TupleConvertible;
+
 import dyvil.collection.range.SimpleRange;
 import dyvil.collection.range.StringRange;
-import dyvil.lang.literal.TupleConvertible;
 
 @TupleConvertible
 public interface Range<T> extends Iterable<T>

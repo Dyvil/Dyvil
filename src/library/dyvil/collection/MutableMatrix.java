@@ -3,12 +3,13 @@ package dyvil.collection;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import dyvil.collection.mutable.FlatArrayMatrix;
 import dyvil.lang.Int;
 import dyvil.lang.List;
 import dyvil.lang.Matrix;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+
+import dyvil.collection.mutable.FlatArrayMatrix;
 import dyvil.tuple.Tuple2;
 
 @NilConvertible

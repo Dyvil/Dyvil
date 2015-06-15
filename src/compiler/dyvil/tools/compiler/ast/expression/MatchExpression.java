@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.pattern.IPattern;
@@ -14,14 +12,16 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
+import org.objectweb.asm.Label;
+
 public final class MatchExpression extends ASTNode implements IValue
 {
-	private IValue			value;
+	private IValue				value;
 	private CaseExpression[]	cases;
-	private int				caseCount;
-	private boolean			exhaustive;
+	private int					caseCount;
+	private boolean				exhaustive;
 	
-	private IType			type;
+	private IType				type;
 	
 	public MatchExpression(IValue value, CaseExpression[] cases)
 	{
