@@ -24,6 +24,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -138,6 +139,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	public boolean isStatic()
 	{
 		return true;
+	}
+	
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return null;
 	}
 	
 	@Override

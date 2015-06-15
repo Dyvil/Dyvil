@@ -884,6 +884,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.unit;
+	}
+	
+	@Override
 	public IClass getThisClass()
 	{
 		return this;

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -25,12 +26,9 @@ public interface IContext
 	
 	public boolean isStatic();
 	
-	public IClass getThisClass();
+	public IDyvilHeader getHeader();
 	
-	public default IField getEnclosingInstance(IClass iclass)
-	{
-		return null;
-	}
+	public IClass getThisClass();
 	
 	public Package resolvePackage(Name name);
 	

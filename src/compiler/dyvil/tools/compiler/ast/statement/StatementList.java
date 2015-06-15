@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -334,6 +335,12 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	public boolean isStatic()
 	{
 		return this.context.isStatic();
+	}
+
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.context.getHeader();
 	}
 	
 	@Override

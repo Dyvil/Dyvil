@@ -171,6 +171,12 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	}
 	
 	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.context.getHeader();
+	}
+	
+	@Override
 	public IClass getThisClass()
 	{
 		return this.context.getThisClass();

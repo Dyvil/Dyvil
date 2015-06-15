@@ -204,6 +204,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.context.getHeader();
+	}
+	
+	@Override
 	public IClass getThisClass()
 	{
 		return this.thisClass = this.context.getThisClass();

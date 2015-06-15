@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -399,6 +400,12 @@ public class Constructor extends Member implements IConstructor
 	public boolean isStatic()
 	{
 		return false;
+	}
+	
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.theClass.getHeader();
 	}
 	
 	@Override

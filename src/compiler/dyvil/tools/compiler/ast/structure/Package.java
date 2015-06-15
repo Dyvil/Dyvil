@@ -154,6 +154,12 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
+	public IDyvilHeader getHeader()
+	{
+		return null;
+	}
+	
+	@Override
 	public IClass getThisClass()
 	{
 		return null;

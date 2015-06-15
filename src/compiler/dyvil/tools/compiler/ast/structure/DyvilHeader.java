@@ -372,6 +372,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		return true;
 	}
+
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this;
+	}
 	
 	@Override
 	public IClass getThisClass()

@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -328,6 +329,12 @@ public class Property extends Member implements IProperty, IContext
 	public boolean isStatic()
 	{
 		return (this.modifiers & Modifiers.STATIC) != 0;
+	}
+	
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.theClass.getHeader();
 	}
 	
 	@Override

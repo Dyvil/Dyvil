@@ -22,6 +22,7 @@ import dyvil.tools.compiler.ast.statement.ILoop;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -94,6 +95,12 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	public boolean isStatic()
 	{
 		return this.context.isStatic();
+	}
+	
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.context.getHeader();
 	}
 	
 	@Override
