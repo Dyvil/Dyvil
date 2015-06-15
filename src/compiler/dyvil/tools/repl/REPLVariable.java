@@ -2,12 +2,14 @@ package dyvil.tools.repl;
 
 import java.security.ProtectionDomain;
 
+import dyvil.lang.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -25,8 +27,6 @@ public class REPLVariable extends Field
 {
 	private static final ClassLoader		CLASS_LOADER		= REPLVariable.class.getClassLoader();
 	private static final ProtectionDomain	PROTECTION_DOMAIN	= REPLVariable.class.getProtectionDomain();
-	
-	private static int						classID				= 0;
 	
 	protected String						className;
 	
@@ -79,15 +79,15 @@ public class REPLVariable extends Field
 		return tag >= 0 && tag != IValue.NIL && tag <= IValue.STRING;
 	}
 	
-	protected void compute()
+	protected void compute(String className, List<IClassCompilable> compilableList)
 	{
-		if (this.className != null || isConstant(this.value))
+		if (this.className != null || (isConstant(this.value) && !compilableList.isEmpty()))
 			return;
 		
 		try
 		{
-			this.className = "REPL$" + classID++;
-			Class c = generateClass(this.value, this.type, this.className);
+			this.className = className;
+			Class c = generateClass(this.value, this.type, this.className, compilableList);
 			
 			if (this.type != Types.VOID)
 			{
@@ -126,7 +126,7 @@ public class REPLVariable extends Field
 		}
 	}
 	
-	private static Class generateClass(IValue value, IType type, String className) throws Throwable
+	private static Class generateClass(IValue value, IType type, String className, List<IClassCompilable> compilableList) throws Throwable
 	{
 		String extendedType = type.getExtendedName();
 		ClassWriter writer = new ClassWriter();
@@ -159,6 +159,13 @@ public class REPLVariable extends Field
 		// Finish Method compilation
 		mw.writeInsn(Opcodes.RETURN);
 		mw.end();
+		
+		// Compilables
+		for (IClassCompilable c : compilableList)
+		{
+			c.write(writer);
+		}
+		
 		// Finish Class compilation
 		writer.visitEnd();
 		

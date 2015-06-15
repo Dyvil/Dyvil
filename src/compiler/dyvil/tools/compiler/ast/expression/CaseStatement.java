@@ -61,6 +61,18 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 		return CASE_STATEMENT;
 	}
 	
+	@Override
+	public boolean hasSeparateFile()
+	{
+		return true;
+	}
+	
+	@Override
+	public void setInnerIndex(String internalName, int index)
+	{
+		this.internalClassName = internalName + "$" + index;
+	}
+	
 	public void setMatchCase()
 	{
 		this.type = Types.UNKNOWN;
@@ -287,10 +299,7 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 				this.getType();
 			}
 			
-			IClass iclass = context.getThisClass();
-			IDyvilHeader unit = iclass.getUnit();
-			this.internalClassName = iclass.getInternalName() + "$" + unit.innerClassCount();
-			unit.addInnerClass(this);
+			IContext.addCompilable(context, this);
 			
 			if (this.pattern != null)
 			{

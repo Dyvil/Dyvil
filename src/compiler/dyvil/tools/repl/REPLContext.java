@@ -3,6 +3,8 @@ package dyvil.tools.repl;
 import java.util.HashMap;
 import java.util.Map;
 
+import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -35,6 +37,8 @@ public class REPLContext extends DyvilHeader implements IValued
 	private ImportDeclaration			importDeclaration;
 	private IncludeDeclaration			includeDeclaration;
 	private IClass						tempClass;
+	private List<IClassCompilable>		compilableList	= new ArrayList();
+	private List<IClassCompilable>		innerClassList	= new ArrayList();
 	
 	public REPLContext()
 	{
@@ -151,7 +155,14 @@ public class REPLContext extends DyvilHeader implements IValued
 		}
 		
 		field.foldConstants();
-		field.compute();
+		
+		// TODO Inner Classes
+		
+		field.compute("REPL$" + resultIndex, this.compilableList);
+		
+		this.compilableList.clear();
+		this.innerClassList.clear();
+		
 		if (field.getType() != Types.VOID)
 		{
 			this.variables.put(name, field);
@@ -201,6 +212,17 @@ public class REPLContext extends DyvilHeader implements IValued
 	@Override
 	public void addInnerClass(IClassCompilable iclass)
 	{
+		String name = "REPL$" + resultIndex;
+		if (iclass.hasSeparateFile())
+		{
+			iclass.setInnerIndex(name, this.innerClassList.size());
+			this.innerClassList.add(iclass);
+		}
+		else
+		{
+			iclass.setInnerIndex(name, this.compilableList.size());
+			this.compilableList.add(iclass);
+		}
 	}
 	
 	@Override

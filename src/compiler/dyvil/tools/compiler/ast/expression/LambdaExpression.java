@@ -22,6 +22,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.LambdaType;
@@ -58,7 +59,6 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	protected IMethod			method;
 	
 	private IContext			context;
-	private int					index;
 	
 	private String				owner;
 	private String				name;
@@ -93,6 +93,13 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	public int valueTag()
 	{
 		return LAMBDA;
+	}
+	
+	@Override
+	public void setInnerIndex(String internalName, int index)
+	{
+		this.owner = internalName;
+		this.name = "lambda$" + index;
 	}
 	
 	@Override
@@ -321,17 +328,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		// Value gets resolved in check()
-		IClass iclass = context.getThisClass();
-		if (iclass == null)
-		{
-			return this;
-		}
-		
-		this.owner = iclass.getInternalName();
-		this.index = iclass.compilableCount();
-		iclass.addCompilable(this);
-		
+		IContext.addCompilable(context, this);	
 		return this;
 	}
 	
@@ -410,7 +407,6 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.name = "lambda$" + this.index;
 		this.lambdaDesc = this.getLambdaDescriptor();
 		
 		int handleType;
@@ -430,7 +426,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			writer.writeVarInsn(var.getCaptureType().getLoadOpcode(), var.variable.getIndex());
 		}
 		
-		String name = this.getName();
+		String name = this.name;
 		String desc = this.getLambdaDescriptor();
 		String invokedName = this.method.getName().qualified;
 		String invokedType = this.getInvokeDescriptor();
@@ -443,16 +439,6 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-	}
-	
-	private String getName()
-	{
-		if (this.name != null)
-		{
-			return this.name;
-		}
-		
-		return this.name = "lambda$" + this.index;
 	}
 	
 	private String getInvokeDescriptor()
@@ -512,7 +498,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	{
 		boolean instance = this.thisClass != null;
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.getName(), this.getLambdaDescriptor(), null, null));
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name, this.getLambdaDescriptor(), null, null));
 		
 		if (instance)
 		{

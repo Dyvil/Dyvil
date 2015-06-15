@@ -46,6 +46,19 @@ public interface IContext
 	
 	public boolean handleException(IType type);
 	
+	public static void addCompilable(IContext context, IClassCompilable compilable)
+	{
+		IClass iclass = context.getThisClass();
+		if (iclass != null)
+		{
+			iclass.addCompilable(compilable);
+			return;
+		}
+		
+		IDyvilHeader header = context.getHeader();
+		header.addInnerClass(compilable);
+	}
+	
 	public static IClass resolveClass(IContext context, Name name)
 	{
 		IClass iclass = context.resolveClass(name);

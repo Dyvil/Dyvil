@@ -87,7 +87,7 @@ public final class DyvilUnit extends DyvilHeader
 		}
 		this.innerClasses[index] = iclass;
 		
-		iclass.setInnerIndex(index);
+		iclass.setInnerIndex(null, index);
 	}
 	
 	@Override
