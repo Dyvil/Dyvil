@@ -505,7 +505,6 @@ public class Property extends Member implements IProperty, IContext
 		{
 			instance.writeExpression(writer);
 		}
-		
 		if (value != null)
 		{
 			value.writeExpression(writer);

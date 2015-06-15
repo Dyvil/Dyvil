@@ -255,6 +255,11 @@ public class Frame
 	
 	public void pop() throws StackUnderflowException
 	{
+		if (this.stackCount == 0)
+		{
+			throw new StackUnderflowException();
+		}
+		
 		Object o = this.stack[--this.stackCount];
 		if (o == LONG || o == DOUBLE)
 		{
