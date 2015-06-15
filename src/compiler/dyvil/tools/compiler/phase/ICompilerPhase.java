@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.phase;
 
-import java.util.Collection;
-
 import dyvil.io.FileUtils;
+import dyvil.lang.Collection;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -90,7 +89,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 * Converts the .class files in the bin directory to a JAR file, sets up the
 	 * classpath and signs the JAR.
 	 */
-	ICompilerPhase	JAR				= new CompilerPhase(100, "JAR", units -> ClassWriter.generateJAR(DyvilCompiler.files));
+	ICompilerPhase	JAR				= new CompilerPhase(100, "JAR", units -> ClassWriter.generateJAR(DyvilCompiler.fileFinder.files));
 	
 	/**
 	 * Tests the main type specified in {@link CompilerConfig#mainType}.
