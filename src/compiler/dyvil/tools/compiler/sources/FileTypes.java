@@ -25,7 +25,9 @@ public class FileTypes
 																	@Override
 																	public ICompilationUnit createUnit(Package pack, CodeFile inputFile, File outputFile)
 																	{
-																		return new DyvilUnit(pack, inputFile, outputFile);
+																		DyvilUnit unit = new DyvilUnit(pack, inputFile, outputFile);
+																		pack.addHeader(unit);
+																		return unit;
 																	}
 																};
 	
@@ -40,7 +42,9 @@ public class FileTypes
 																	@Override
 																	public ICompilationUnit createUnit(Package pack, CodeFile inputFile, File outputFile)
 																	{
-																		return new DyvilHeader(pack, inputFile, outputFile);
+																		DyvilHeader header = new DyvilHeader(pack, inputFile, outputFile);
+																		pack.addHeader(header);
+																		return header;
 																	}
 																};
 	
