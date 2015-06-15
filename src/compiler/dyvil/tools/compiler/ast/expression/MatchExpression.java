@@ -17,13 +17,13 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 public final class MatchExpression extends ASTNode implements IValue
 {
 	private IValue			value;
-	private CaseStatement[]	cases;
+	private CaseExpression[]	cases;
 	private int				caseCount;
 	private boolean			exhaustive;
 	
 	private IType			type;
 	
-	public MatchExpression(IValue value, CaseStatement[] cases)
+	public MatchExpression(IValue value, CaseExpression[] cases)
 	{
 		this.value = value;
 		this.cases = cases;
@@ -139,7 +139,7 @@ public final class MatchExpression extends ASTNode implements IValue
 		this.value.resolveTypes(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			CaseStatement caseStatement = this.cases[i];
+			CaseExpression caseStatement = this.cases[i];
 			caseStatement.setMatchCase();
 			caseStatement.resolveTypes(markers, context);
 		}
@@ -153,7 +153,7 @@ public final class MatchExpression extends ASTNode implements IValue
 		IType type = this.value.getType();
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			CaseStatement c = this.cases[i];
+			CaseExpression c = this.cases[i];
 			if (this.exhaustive)
 			{
 				markers.add(c.getPosition(), "pattern.dead");
@@ -253,7 +253,7 @@ public final class MatchExpression extends ASTNode implements IValue
 		Label endLabel = new Label();
 		for (int i = 0; i < this.caseCount;)
 		{
-			CaseStatement c = this.cases[i];
+			CaseExpression c = this.cases[i];
 			IPattern pattern = c.pattern;
 			IValue condition = c.condition;
 			IValue value = c.value;

@@ -34,7 +34,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class CaseStatement extends ASTNode implements IValue, IValued, IPatterned, IClassCompilable, IContext
+public final class CaseExpression extends ASTNode implements IValue, IValued, IPatterned, IClassCompilable, IContext
 {
 	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
 	public static final Type			PARTIALFUNCTION			= new Type(PARTIALFUNCTION_CLASS);
@@ -50,7 +50,7 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	
 	private transient IContext			context;
 	
-	public CaseStatement(ICodePosition position)
+	public CaseExpression(ICodePosition position)
 	{
 		this.position = position;
 	}
@@ -268,7 +268,7 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	}
 	
 	@Override
-	public CaseStatement resolve(MarkerList markers, IContext context)
+	public CaseExpression resolve(MarkerList markers, IContext context)
 	{
 		this.context = context;
 		if (this.condition != null)
@@ -339,7 +339,7 @@ public final class CaseStatement extends ASTNode implements IValue, IValued, IPa
 	}
 	
 	@Override
-	public CaseStatement foldConstants()
+	public CaseExpression foldConstants()
 	{
 		if (this.condition != null)
 		{

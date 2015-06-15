@@ -74,11 +74,11 @@ public class HeaderFile
 		}
 		
 		// Using Declarations
-		int staticImports = header.staticImportCount();
+		int staticImports = header.usingCount();
 		dos.writeShort(staticImports);
 		for (int i = 0; i < staticImports; i++)
 		{
-			header.getStaticImport(i).write(dos);
+			header.getUsing(i).write(dos);
 		}
 		
 		// Operators Declarations
@@ -123,7 +123,7 @@ public class HeaderFile
 		{
 			ImportDeclaration id = new ImportDeclaration(null, true);
 			id.read(dis);
-			header.addStaticImport(id);
+			header.addUsing(id);
 		}
 		
 		int operators = dis.readShort();

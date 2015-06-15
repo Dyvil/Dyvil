@@ -322,14 +322,14 @@ public final class DyvilCompiler
 		if (fileName.endsWith(".dyvil") || fileName.endsWith(".dyv"))
 		{
 			DyvilUnit unit = new DyvilUnit(pack, (CodeFile) source, output);
-			pack.addCompilationUnit(unit);
+			pack.addHeader(unit);
 			units.add(unit);
 			return;
 		}
 		if (fileName.endsWith(".dyvilh") || fileName.endsWith(".dyh"))
 		{
 			DyvilHeader header = new DyvilHeader(pack, (CodeFile) source, output);
-			pack.addCompilationUnit(header);
+			pack.addHeader(header);
 			units.add(0, header);
 			return;
 		}

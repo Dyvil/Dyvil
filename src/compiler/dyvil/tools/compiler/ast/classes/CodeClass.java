@@ -981,7 +981,7 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.unit != null && this.unit.hasStaticImports())
+		if (this.unit != null && this.unit.hasMemberImports())
 		{
 			// Static Imports
 			match = this.unit.resolveField(name);
@@ -1029,7 +1029,7 @@ public class CodeClass extends ASTNode implements IClass
 			return;
 		}
 		
-		if (this.unit != null && this.unit.hasStaticImports())
+		if (this.unit != null && this.unit.hasMemberImports())
 		{
 			this.unit.getMethodMatches(list, instance, name, arguments);
 		}

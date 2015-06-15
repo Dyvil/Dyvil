@@ -40,18 +40,18 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public Package					pack;
 	
 	protected TokenIterator			tokens;
-	protected MarkerList			markers			= new MarkerList();
+	protected MarkerList			markers		= new MarkerList();
 	
 	protected PackageDeclaration	packageDeclaration;
 	
-	protected ImportDeclaration[]	imports			= new ImportDeclaration[5];
+	protected ImportDeclaration[]	imports		= new ImportDeclaration[5];
 	protected int					importCount;
-	protected ImportDeclaration[]	staticImports	= new ImportDeclaration[1];
-	protected int					staticImportCount;
+	protected ImportDeclaration[]	usings		= new ImportDeclaration[1];
+	protected int					usingCount;
 	protected IncludeDeclaration[]	includes;
 	protected int					includeCount;
 	
-	protected Map<Name, Operator>	operators		= new IdentityHashMap();
+	protected Map<Name, Operator>	operators	= new IdentityHashMap();
 	protected Map<Name, Operator>	inheritedOperators;
 	
 	public DyvilHeader(String name)
@@ -153,28 +153,28 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public int staticImportCount()
+	public int usingCount()
 	{
-		return this.staticImportCount;
+		return this.usingCount;
 	}
 	
 	@Override
-	public void addStaticImport(ImportDeclaration component)
+	public void addUsing(ImportDeclaration component)
 	{
-		int index = this.staticImportCount++;
-		if (index >= this.staticImports.length)
+		int index = this.usingCount++;
+		if (index >= this.usings.length)
 		{
 			ImportDeclaration[] temp = new ImportDeclaration[index + 1];
-			System.arraycopy(this.staticImports, 0, temp, 0, this.staticImports.length);
-			this.staticImports = temp;
+			System.arraycopy(this.usings, 0, temp, 0, this.usings.length);
+			this.usings = temp;
 		}
-		this.staticImports[index] = component;
+		this.usings[index] = component;
 	}
 	
 	@Override
-	public ImportDeclaration getStaticImport(int index)
+	public ImportDeclaration getUsing(int index)
 	{
-		return this.staticImports[index];
+		return this.usings[index];
 	}
 	
 	@Override
@@ -233,9 +233,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public boolean hasStaticImports()
+	public boolean hasMemberImports()
 	{
-		return this.staticImportCount > 0 || this.includeCount > 0;
+		return this.usingCount > 0 || this.includeCount > 0;
 	}
 	
 	@Override
@@ -329,9 +329,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			this.imports[i].resolveTypes(this.markers, this, false);
 		}
 		
-		for (int i = 0; i < this.staticImportCount; i++)
+		for (int i = 0; i < this.usingCount; i++)
 		{
-			this.staticImports[i].resolveTypes(this.markers, this, true);
+			this.usings[i].resolveTypes(this.markers, this, true);
 		}
 	}
 	
@@ -372,7 +372,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		return true;
 	}
-
+	
 	@Override
 	public IDyvilHeader getHeader()
 	{
@@ -432,9 +432,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public IField resolveField(Name name)
 	{
-		for (int i = 0; i < this.staticImportCount; i++)
+		for (int i = 0; i < this.usingCount; i++)
 		{
-			IField field = this.staticImports[i].resolveField(name);
+			IField field = this.usings[i].resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -455,9 +455,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		for (int i = 0; i < this.staticImportCount; i++)
+		for (int i = 0; i < this.usingCount; i++)
 		{
-			this.staticImports[i].getMethodMatches(list, instance, name, arguments);
+			this.usings[i].getMethodMatches(list, instance, name, arguments);
 		}
 		
 		for (int i = 0; i < this.includeCount; i++)
@@ -562,12 +562,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			}
 		}
 		
-		if (this.staticImportCount > 0)
+		if (this.usingCount > 0)
 		{
-			for (int i = 0; i < this.staticImportCount; i++)
+			for (int i = 0; i < this.usingCount; i++)
 			{
 				buffer.append(prefix);
-				this.staticImports[i].toString(prefix, buffer);
+				this.usings[i].toString(prefix, buffer);
 				buffer.append(";\n");
 			}
 			if (Formatting.Import.newLine)

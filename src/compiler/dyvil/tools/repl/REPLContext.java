@@ -115,7 +115,7 @@ public class REPLContext extends DyvilHeader implements IValued
 		
 		if (isStatic)
 		{
-			super.addStaticImport(importDeclaration);
+			super.addUsing(importDeclaration);
 			System.out.println("Using " + importDeclaration.theImport);
 		}
 		else
@@ -192,7 +192,7 @@ public class REPLContext extends DyvilHeader implements IValued
 	}
 	
 	@Override
-	public void addStaticImport(ImportDeclaration component)
+	public void addUsing(ImportDeclaration component)
 	{
 		importDeclaration = component;
 	}

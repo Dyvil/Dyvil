@@ -189,7 +189,7 @@ public class ExternalPackage extends Package
 		{
 			DyvilHeader header = HeaderFile.read(is);
 			header.pack = this;
-			this.units.add(header);
+			this.headers.add(header);
 			return header;
 		}
 		return null;

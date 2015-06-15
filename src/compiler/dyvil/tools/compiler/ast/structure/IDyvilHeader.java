@@ -62,13 +62,13 @@ public interface IDyvilHeader extends IContext, IClassList, IOperatorMap
 	
 	// Using
 	
-	public boolean hasStaticImports();
+	public boolean hasMemberImports();
 	
-	public int staticImportCount();
+	public int usingCount();
 	
-	public void addStaticImport(ImportDeclaration component);
+	public void addUsing(ImportDeclaration component);
 	
-	public ImportDeclaration getStaticImport(int index);
+	public ImportDeclaration getUsing(int index);
 	
 	// Include
 	

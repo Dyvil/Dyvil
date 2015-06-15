@@ -163,7 +163,7 @@ public interface Operators
 		{
 			IValueList list = (IValueList) arg2;
 			int len = list.valueCount();
-			CaseStatement[] cases = new CaseStatement[len];
+			CaseExpression[] cases = new CaseExpression[len];
 			for (int i = 0; i < len; i++)
 			{
 				IValue v = list.getValue(i);
@@ -173,7 +173,7 @@ public interface Operators
 					return null;
 				}
 				
-				cases[i] = (CaseStatement) v;
+				cases[i] = (CaseExpression) v;
 				cases[i].setMatchCase();
 			}
 			
@@ -181,9 +181,9 @@ public interface Operators
 		}
 		if (arg2.valueTag() == IValue.CASE_STATEMENT)
 		{
-			CaseStatement cs = (CaseStatement) arg2;
+			CaseExpression cs = (CaseExpression) arg2;
 			cs.setMatchCase();
-			return new MatchExpression(arg1, new CaseStatement[] { cs });
+			return new MatchExpression(arg1, new CaseExpression[] { cs });
 		}
 		return null;
 	}

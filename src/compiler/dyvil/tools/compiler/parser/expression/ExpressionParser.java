@@ -915,7 +915,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		case Keywords.CASE:
 		{
-			CaseStatement pattern = new CaseStatement(token.raw());
+			CaseExpression pattern = new CaseExpression(token.raw());
 			pm.pushParser(new PatternParser(pattern));
 			this.mode = PATTERN_IF;
 			this.value = pattern;
@@ -994,7 +994,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	{
 		if (this.mode == PATTERN_END)
 		{
-			((CaseStatement) this.value).setCondition(value);
+			((CaseExpression) this.value).setCondition(value);
 		}
 		else
 		{

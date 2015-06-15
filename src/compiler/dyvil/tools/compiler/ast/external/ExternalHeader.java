@@ -32,9 +32,9 @@ public class ExternalHeader extends DyvilHeader
 	private void resolveStaticImports()
 	{
 		this.staticImportsResolved = true;
-		for (int i = 0; i < this.staticImportCount; i++)
+		for (int i = 0; i < this.usingCount; i++)
 		{
-			this.staticImports[i].resolveTypes(null, this, true);
+			this.usings[i].resolveTypes(null, this, true);
 		}
 	}
 	

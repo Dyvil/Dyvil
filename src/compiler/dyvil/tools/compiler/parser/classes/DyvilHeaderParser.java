@@ -58,7 +58,7 @@ public class DyvilHeaderParser extends Parser
 		if (type == Keywords.USING)
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw(), true);
-			this.unit.addStaticImport(i);
+			this.unit.addUsing(i);
 			pm.pushParser(new ImportParser(i));
 			return true;
 		}
