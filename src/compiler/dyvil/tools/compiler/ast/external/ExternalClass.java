@@ -1,12 +1,10 @@
 package dyvil.tools.compiler.ast.external;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 
+import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -122,10 +120,11 @@ public final class ExternalClass extends CodeClass
 		
 		if (this.innerTypes != null)
 		{
-			for (ListIterator<IType> iterator = this.innerTypes.listIterator(); iterator.hasNext();)
+			int len = this.innerTypes.size();
+			for (int i = 0; i < len; i++)
 			{
-				IType t = iterator.next();
-				iterator.set(t.resolve(null, Package.rootPackage));
+				IType t = this.innerTypes.get(i);
+				this.innerTypes.set(i, t.resolve(null, Package.rootPackage));
 				t.getTheClass().setOuterClass(this);
 			}
 		}

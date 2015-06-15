@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
-import java.util.List;
+import dyvil.lang.List;
 import java.util.Set;
 
 import dyvil.tools.compiler.ast.expression.IValue;

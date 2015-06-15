@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;

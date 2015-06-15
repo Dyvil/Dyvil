@@ -6,7 +6,7 @@ import static dyvil.reflect.Opcodes.IFNE;
 import static dyvil.reflect.Opcodes.INSTANCE;
 
 import java.lang.annotation.ElementType;
-import java.util.List;
+import dyvil.lang.List;
 
 import org.objectweb.asm.Label;
 

@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.external;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
+import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.List;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.Name;
@@ -28,7 +28,7 @@ public class ExternalPackage extends Package
 	@Override
 	public Package createSubPackage(String name)
 	{
-		Package pack = this.subPackages.get(name);
+		Package pack = this.subPackages.apply(name);
 		if (pack != null)
 		{
 			return pack;

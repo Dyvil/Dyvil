@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.structure;
 
 import java.io.File;
 import java.util.IdentityHashMap;
-import java.util.List;
+import dyvil.lang.List;
 import java.util.Map;
 import java.util.Map.Entry;
 

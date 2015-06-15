@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.config;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
+import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.List;
 import dyvil.tools.compiler.library.Library;
 
 public class CompilerConfig
@@ -82,7 +82,7 @@ public class CompilerConfig
 	
 	public String[] getMainArgs()
 	{
-		return this.mainArgs.toArray(new String[this.mainArgs.size()]);
+		return this.mainArgs.toArray(String.class);
 	}
 	
 	@Override

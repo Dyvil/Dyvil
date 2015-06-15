@@ -1,13 +1,15 @@
 package dyvil.io;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.List;
 
 import dyvil.annotation.Utility;
 import dyvil.annotation.infix;
+import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.List;
 
 /**
  * The {@linkplain Utility utility interface} <b>FileUtils</b> can be used for
@@ -165,9 +167,19 @@ public interface FileUtils
 		{
 			return null;
 		}
-		try
+		try (BufferedReader reader = Files.newBufferedReader(file.toPath()))
 		{
-			return Files.readAllLines(file.toPath(), Charset.defaultCharset());
+			List<String> result = new ArrayList();
+			for (;;)
+			{
+				String line = reader.readLine();
+				if (line == null)
+				{
+					break;
+				}
+				result.add(line);
+			}
+			return result;
 		}
 		catch (IOException ex)
 		{

@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.ast.dwt;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.objectweb.asm.Label;
 
+import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.List;
 import dyvil.reflect.Opcodes;
 import dyvil.string.StringUtils;
 import dyvil.tools.compiler.ast.ASTNode;

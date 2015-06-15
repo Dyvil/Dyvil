@@ -1,10 +1,9 @@
 package dyvil.tools.compiler.ast.structure;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.mutable.HashMap;
+import dyvil.lang.List;
+import dyvil.lang.Map;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -113,7 +112,7 @@ public class Package implements INamed, IContext
 	
 	public Package createSubPackage(String name)
 	{
-		Package pack = this.subPackages.get(name);
+		Package pack = this.subPackages.apply(name);
 		if (pack != null)
 		{
 			return pack;
@@ -173,7 +172,7 @@ public class Package implements INamed, IContext
 	
 	public Package resolvePackage(String name)
 	{
-		return this.subPackages.get(name);
+		return this.subPackages.apply(name);
 	}
 	
 	public IDyvilHeader resolveHeader(String name)

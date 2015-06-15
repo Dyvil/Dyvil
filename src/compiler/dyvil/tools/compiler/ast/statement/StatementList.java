@@ -1,9 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.Iterator;
 
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.collection.mutable.IdentityHashMap;
+import dyvil.lang.Entry;
+import dyvil.lang.List;
+import dyvil.lang.Map;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -372,7 +375,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	{
 		if (this.variables != null)
 		{
-			IField field = this.variables.get(name);
+			IField field = this.variables.apply(name);
 			if (field != null)
 			{
 				return field;
@@ -477,7 +480,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			return;
 		}
 		
-		for (Entry<Name, Variable> entry : this.variables.entrySet())
+		for (Entry<Name, Variable> entry : this.variables)
 		{
 			Variable var = entry.getValue();
 			writer.writeLocal(var.index, var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end);
@@ -522,7 +525,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			return;
 		}
 		
-		for (Entry<Name, Variable> entry : this.variables.entrySet())
+		for (Entry<Name, Variable> entry : this.variables)
 		{
 			entry.getValue().writeLocal(writer, start, end);
 		}

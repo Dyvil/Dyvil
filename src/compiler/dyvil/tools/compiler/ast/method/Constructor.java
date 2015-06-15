@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.method;
 
 import java.lang.annotation.ElementType;
-import java.util.List;
+import dyvil.lang.List;
 
 import org.objectweb.asm.Label;
 

@@ -10,8 +10,8 @@ import java.util.function.UnaryOperator;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.lang.Collection;
-import dyvil.lang.List;
+import java.util.Collection;
+import java.util.List;
 
 public interface JavaCollections
 {

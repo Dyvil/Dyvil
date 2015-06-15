@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;

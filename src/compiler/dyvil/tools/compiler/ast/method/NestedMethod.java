@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import org.objectweb.asm.Label;
 

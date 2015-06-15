@@ -1,11 +1,8 @@
 package dyvil.tools.compiler.util;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
-import java.util.function.Predicate;
 
+import dyvil.lang.Collection;
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
@@ -13,15 +10,10 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class Util
 {
-	public static final List<ITyped>	EMPTY_TYPES	= Collections.EMPTY_LIST;
-	
-	public static final Predicate<?>	ISNULL		= a -> a == null;
-	
 	public static void astToString(String prefix, Collection list, String seperator, StringBuilder buffer)
 	{
 		if (!list.isEmpty())

@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.ast.structure;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;

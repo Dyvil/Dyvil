@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
-import java.util.List;
+import dyvil.lang.List;
 import java.util.logging.Level;
 
 import dyvil.tools.compiler.DyvilCompiler;

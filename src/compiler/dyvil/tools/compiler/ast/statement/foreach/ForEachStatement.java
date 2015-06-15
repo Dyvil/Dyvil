@@ -4,7 +4,7 @@ import static dyvil.tools.compiler.ast.statement.ForStatement.$forEnd;
 import static dyvil.tools.compiler.ast.statement.ForStatement.$forStart;
 import static dyvil.tools.compiler.ast.statement.ForStatement.$forUpdate;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;

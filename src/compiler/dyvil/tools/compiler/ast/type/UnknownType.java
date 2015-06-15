@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import static dyvil.reflect.Opcodes.*;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;

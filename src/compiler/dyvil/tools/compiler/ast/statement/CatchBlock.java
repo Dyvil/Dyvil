@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;

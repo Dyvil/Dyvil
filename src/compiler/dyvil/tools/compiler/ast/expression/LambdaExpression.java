@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import org.objectweb.asm.Handle;
 
