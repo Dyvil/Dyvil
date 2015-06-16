@@ -196,23 +196,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		
 		if (this.field != null)
 		{
-			if (this.field.hasModifier(Modifiers.DEPRECATED))
-			{
-				markers.add(this.position, "field.access.deprecated", this.name);
-			}
-			
-			switch (context.getVisibility(this.field))
-			{
-			case IContext.STATIC:
-				markers.add(this.position, "field.access.instance", this.name);
-				break;
-			case IContext.SEALED:
-				markers.add(this.position, "field.access.sealed", this.name);
-				break;
-			case IContext.INVISIBLE:
-				markers.add(this.position, "field.access.invisible", this.name);
-				break;
-			}
+			this.field.checkAccess(markers, this.position, instance, context);
 		}
 	}
 	

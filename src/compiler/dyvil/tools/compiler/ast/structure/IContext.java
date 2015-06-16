@@ -21,8 +21,7 @@ public interface IContext
 {
 	public static final byte	VISIBLE		= 0;
 	public static final byte	INVISIBLE	= 1;
-	public static final byte	STATIC		= 2;
-	public static final byte	SEALED		= 3;
+	public static final byte	SEALED		= 2;
 	
 	public boolean isStatic();
 	

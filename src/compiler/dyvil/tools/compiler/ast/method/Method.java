@@ -629,15 +629,6 @@ public class Method extends Member implements IMethod
 	@Override
 	public byte getVisibility(IMember member)
 	{
-		IClass iclass = member.getTheClass();
-		if (iclass == null)
-		{
-			return VISIBLE;
-		}
-		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC))
-		{
-			return STATIC;
-		}
 		return this.theClass.getVisibility(member);
 	}
 	
@@ -924,9 +915,6 @@ public class Method extends Member implements IMethod
 		
 		switch (context.getVisibility(this))
 		{
-		case IContext.STATIC:
-			markers.add(position, "method.access.instance", this.name);
-			break;
 		case IContext.SEALED:
 			markers.add(position, "method.access.sealed", this.name);
 			break;

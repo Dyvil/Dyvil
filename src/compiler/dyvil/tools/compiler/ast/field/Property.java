@@ -118,7 +118,7 @@ public class Property extends Member implements IProperty, IContext
 				{
 					markers.add(position, "property.access.static", this.name.unqualified);
 				}
-				return null;
+				instance = null;
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
@@ -127,8 +127,30 @@ public class Property extends Member implements IProperty, IContext
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			markers.add(position, "property.access.unqualified", this.name.unqualified);
-			return new ThisValue(position, this.theClass.getType());
+			if (context.isStatic())
+			{
+				markers.add(position, "property.access.instance", this.name.unqualified);
+			}
+			else
+			{
+				markers.add(position, "property.access.unqualified", this.name.unqualified);
+				instance = new ThisValue(position, this.theClass.getType());
+			}
+		}
+		
+		if (this.hasModifier(Modifiers.DEPRECATED))
+		{
+			markers.add(position, "property.access.deprecated", this.name);
+		}
+		
+		switch (context.getVisibility(this))
+		{
+		case IContext.SEALED:
+			markers.add(position, "property.access.sealed", this.name);
+			break;
+		case IContext.INVISIBLE:
+			markers.add(position, "property.access.invisible", this.name);
+			break;
 		}
 		
 		return instance;

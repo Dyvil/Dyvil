@@ -123,7 +123,7 @@ public class Field extends Member implements IField
 				{
 					markers.add(position, "field.access.static", this.name.unqualified);
 				}
-				return null;
+				instance = null;
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
@@ -139,8 +139,23 @@ public class Field extends Member implements IField
 			else
 			{
 				markers.add(position, "field.access.unqualified", this.name.unqualified);
-				return new ThisValue(position, this.theClass.getType());
+				instance = new ThisValue(position, this.theClass.getType());
 			}
+		}
+		
+		if (this.hasModifier(Modifiers.DEPRECATED))
+		{
+			markers.add(position, "field.access.deprecated", this.name);
+		}
+		
+		switch (context.getVisibility(this))
+		{
+		case IContext.SEALED:
+			markers.add(position, "field.access.sealed", this.name);
+			break;
+		case IContext.INVISIBLE:
+			markers.add(position, "field.access.invisible", this.name);
+			break;
 		}
 		
 		return instance;
