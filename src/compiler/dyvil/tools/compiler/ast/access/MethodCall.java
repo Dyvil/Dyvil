@@ -1,42 +1,25 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.Operators;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Type;
-import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.ConstantFolder;
 
-import org.objectweb.asm.Label;
-
-public final class MethodCall extends ASTNode implements ICall, INamed, IValued
+public final class MethodCall extends AbstractCall implements INamed
 {
-	public IValue		instance;
-	public boolean		dotless;
-	public Name			name;
-	public GenericData	genericData;
-	public IArguments	arguments	= EmptyArguments.INSTANCE;
-	
-	public IMethod		method;
-	private IType		type;
+	public boolean	dotless;
+	public Name		name;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -51,78 +34,10 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 		this.name = name;
 	}
 	
-	private GenericData getGenericData()
-	{
-		if (this.method == null || this.genericData != null && this.genericData.computedGenerics >= 0)
-		{
-			return this.genericData;
-		}
-		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
-	}
-	
 	@Override
 	public int valueTag()
 	{
 		return METHOD_CALL;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		if (this.method == null)
-		{
-			return Types.UNKNOWN;
-		}
-		if (this.type == null)
-		{
-			this.type = this.method.getType().getConcreteType(this.getGenericData());
-			
-			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
-			{
-				this.type = PrimitiveType.getPrimitiveType(this.type);
-			}
-		}
-		return this.type;
-	}
-	
-	@Override
-	public IValue withType(IType type)
-	{
-		return type == Types.VOID ? this : ICall.super.withType(type);
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		if (type == Types.VOID)
-		{
-			return true;
-		}
-		if (this.method == null)
-		{
-			return false;
-		}
-		return type.isSuperTypeOf(this.getType());
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.method == null)
-		{
-			return 0;
-		}
-		
-		IType type1 = this.method.getType();
-		if (type.equals(type1))
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(type1))
-		{
-			return 2;
-		}
-		return 0;
 	}
 	
 	@Override
@@ -138,30 +53,6 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 	}
 	
 	@Override
-	public void setValue(IValue value)
-	{
-		this.instance = value;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.instance;
-	}
-	
-	@Override
-	public void setArguments(IArguments arguments)
-	{
-		this.arguments = arguments;
-	}
-	
-	@Override
-	public IArguments getArguments()
-	{
-		return this.arguments;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.genericData != null)
@@ -169,18 +60,7 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 			this.genericData.resolveTypes(markers, context);
 		}
 		
-		if (this.instance != null)
-		{
-			this.instance.resolveTypes(markers, context);
-		}
-		if (this.arguments.isEmpty())
-		{
-			this.arguments = EmptyArguments.VISIBLE;
-		}
-		else
-		{
-			this.arguments.resolveTypes(markers, context);
-		}
+		super.resolveTypes(markers, context);
 	}
 	
 	@Override
@@ -358,37 +238,6 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		if (this.instance != null)
-		{
-			this.instance.checkTypes(markers, context);
-		}
-		
-		if (this.method != null)
-		{
-			this.instance = this.method.checkArguments(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
-		}
-		this.arguments.checkTypes(markers, context);
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		if (this.instance != null)
-		{
-			this.instance.check(markers, context);
-		}
-		
-		if (this.method != null)
-		{
-			this.method.checkCall(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
-		}
-		
-		this.arguments.check(markers, context);
-	}
-	
-	@Override
 	public IValue foldConstants()
 	{
 		this.arguments.foldConstants();
@@ -428,30 +277,6 @@ public final class MethodCall extends ASTNode implements ICall, INamed, IValued
 			this.instance = this.instance.foldConstants();
 		}
 		return this;
-	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.method.writeCall(writer, this.instance, this.arguments, this.type);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.method.writeCall(writer, this.instance, this.arguments, Types.VOID);
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
-	{
-		this.method.writeJump(writer, dest, this.instance, this.arguments);
-	}
-	
-	@Override
-	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
-	{
-		this.method.writeInvJump(writer, dest, this.instance, this.arguments);
 	}
 	
 	@Override
