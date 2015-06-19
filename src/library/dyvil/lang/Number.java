@@ -263,6 +263,12 @@ public interface Number extends Ordered<Number>
 		return this.$minus(1);
 	}
 	
+	@Override
+	public default int distanceTo(Number o)
+	{
+		return o.intValue() - this.intValue();
+	}
+	
 	// String representations
 	
 	@Override

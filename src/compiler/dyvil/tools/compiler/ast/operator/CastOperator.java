@@ -108,12 +108,6 @@ public final class CastOperator extends ASTNode implements IValue
 			return this;
 		}
 		
-		if (!this.typeHint && this.type.equals(this.value.getType()))
-		{
-			markers.add(this.position, "cast.unnecessary");
-			this.typeHint = true;
-		}
-		
 		IValue value1 = this.value.withType(this.type);
 		if (value1 != null && value1 != this.value)
 		{
@@ -122,6 +116,12 @@ public final class CastOperator extends ASTNode implements IValue
 			this.value.checkTypes(markers, context);
 			this.type = value1.getType();
 			return this;
+		}
+		
+		if (!this.typeHint && this.type.equals(this.value.getType()))
+		{
+			markers.add(this.position, "cast.unnecessary");
+			this.typeHint = true;
 		}
 		
 		this.value.checkTypes(markers, context);
