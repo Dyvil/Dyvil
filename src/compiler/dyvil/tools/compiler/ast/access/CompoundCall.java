@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.constant.INumericValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -23,15 +22,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class CompoundCall extends AbstractCall implements INamed
 {
-	public Name			name;
+	public Name		name;
 	
-	public IValue		instance;
-	public IArguments	arguments	= EmptyArguments.INSTANCE;
-	
-	public IMethod		method;
-	public IMethod		updateMethod;
-	private GenericData	genericData;
-	private IType		type;
+	public IMethod	updateMethod;
 	
 	public CompoundCall(ICodePosition position)
 	{
@@ -72,7 +65,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 	@Override
 	public IValue getValue()
 	{
-		return null;
+		return this.arguments.getLastValue();
 	}
 	
 	@Override
@@ -107,11 +100,9 @@ public final class CompoundCall extends AbstractCall implements INamed
 			if (valueTag == APPLY_CALL)
 			{
 				ApplyMethodCall call = (ApplyMethodCall) this.instance;
-				IValue instance1 = call.instance;
 				IArguments arguments1 = call.arguments.addLastValue(call);
 				
-				IType type = instance1.getType();
-				IMethod match = IContext.resolveMethod(type, instance1, Name.update, arguments1);
+				IMethod match = ICall.resolveMethod(context, call.instance, Name.update, arguments1);
 				if (match != null)
 				{
 					this.updateMethod = match;
@@ -119,7 +110,23 @@ public final class CompoundCall extends AbstractCall implements INamed
 				else
 				{
 					Marker marker = markers.create(this.position, "method.compound.update");
-					marker.addInfo("Callee Type: " + type);
+					marker.addInfo("Callee Type: " + call.instance.getType());
+				}
+			}
+			else if (valueTag == SUBSCRIPT_GET)
+			{
+				SubscriptGetter setter = (SubscriptGetter) this.instance;
+				IArguments arguments1 = setter.arguments.addLastValue(setter);
+				
+				IMethod match = ICall.resolveMethod(context, setter.instance, Name.subscript_$eq, arguments1);
+				if (match != null)
+				{
+					this.updateMethod = match;
+				}
+				else
+				{
+					Marker marker = markers.create(this.position, "method.compound.subscript");
+					marker.addInfo("Callee Type: " + setter.instance.getType());
 				}
 			}
 			else if (valueTag == FIELD_ACCESS)
@@ -191,9 +198,9 @@ public final class CompoundCall extends AbstractCall implements INamed
 			writer.writeInsn(Opcodes.AUTO_DUP);
 			f.writeSet(writer, null, null);
 		}
-		else if (i == APPLY_CALL)
+		else if (i == APPLY_CALL || i == SUBSCRIPT_GET)
 		{
-			ApplyMethodCall call = (ApplyMethodCall) this.instance;
+			AbstractCall call = (AbstractCall) this.instance;
 			
 			call.instance.writeExpression(writer);
 			
@@ -236,9 +243,9 @@ public final class CompoundCall extends AbstractCall implements INamed
 			this.method.writeCall(writer, null, this.arguments, null);
 			f.writeSet(writer, null, null);
 		}
-		else if (i == APPLY_CALL)
+		else if (i == APPLY_CALL || i == SUBSCRIPT_SET)
 		{
-			ApplyMethodCall call = (ApplyMethodCall) this.instance;
+			AbstractCall call = (ApplyMethodCall) this.instance;
 			
 			call.instance.writeExpression(writer);
 			
