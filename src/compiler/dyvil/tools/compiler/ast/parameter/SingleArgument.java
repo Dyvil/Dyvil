@@ -76,6 +76,18 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
+	public IValue getLastValue()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public void setLastValue(IValue value)
+	{
+		this.value = value;
+	}
+	
+	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;

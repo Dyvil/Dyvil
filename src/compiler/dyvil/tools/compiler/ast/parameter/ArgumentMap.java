@@ -138,6 +138,18 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
+	public IValue getLastValue()
+	{
+		return this.values[this.size - 1];
+	}
+	
+	@Override
+	public void setLastValue(IValue value)
+	{
+		this.values[this.size - 1] = value;
+	}
+	
+	@Override
 	public void setValue(int index, IParameter param, IValue value)
 	{
 		Name key = param.getName();

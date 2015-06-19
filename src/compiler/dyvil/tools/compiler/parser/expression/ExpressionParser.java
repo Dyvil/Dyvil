@@ -363,7 +363,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				this.value = getter;
 				this.mode = SUBSCRIPT_END;
 				
-				pm.pushParser(new ExpressionListParser(getter.getArray()));
+				pm.pushParser(new ExpressionListParser(getter.getArguments()));
 				return;
 			}
 			if (type == Symbols.OPEN_PARENTHESIS)
@@ -558,7 +558,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = SUBSCRIPT_END;
 			
 			pm.skip();
-			pm.pushParser(new ExpressionListParser(getter.getArray()));
+			pm.pushParser(new ExpressionListParser(getter.getArguments()));
 			return;
 		}
 		if (type1 == Symbols.ARROW_OPERATOR)
@@ -646,44 +646,42 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		
 		ICodePosition position = this.value.getPosition();
-		int i = this.value.valueTag();
-		if (i == IValue.FIELD_ACCESS)
+		int valueType = this.value.valueTag();
+		switch (valueType)
+		{
+		case IValue.FIELD_ACCESS:
 		{
 			FieldAccess fa = (FieldAccess) this.value;
-			FieldAssign assign = new FieldAssign(position);
-			assign.instance = fa.instance;
-			assign.name = fa.name;
-			
+			FieldAssign assign = new FieldAssign(position, fa.instance, fa.name);
 			this.value = assign;
 			pm.pushParser(new ExpressionParser(assign));
 			return;
 		}
-		else if (i == IValue.APPLY_CALL)
+		case IValue.APPLY_CALL:
 		{
 			ApplyMethodCall call = (ApplyMethodCall) this.value;
-			
-			UpdateMethodCall updateCall = new UpdateMethodCall(position);
-			updateCall.instance = call.instance;
-			updateCall.arguments = call.arguments;
-			
+			UpdateMethodCall updateCall = new UpdateMethodCall(position, call.instance, call.arguments);
 			this.value = updateCall;
 			pm.pushParser(new ExpressionParser(updateCall));
 			return;
 		}
-		else if (i == IValue.METHOD_CALL)
+		case IValue.METHOD_CALL:
 		{
 			MethodCall call = (MethodCall) this.value;
-			FieldAccess fa = new FieldAccess(position);
-			fa.instance = call.instance;
-			fa.name = call.name;
-			
-			UpdateMethodCall updateCall = new UpdateMethodCall(position);
-			updateCall.arguments = call.arguments;
-			updateCall.instance = fa;
-			
+			FieldAccess fa = new FieldAccess(position, call.instance, call.name);
+			UpdateMethodCall updateCall = new UpdateMethodCall(position, fa, call.arguments);
 			this.value = updateCall;
 			pm.pushParser(new ExpressionParser(updateCall));
 			return;
+		}
+		case IValue.SUBSCRIPT_GET:
+		{
+			SubscriptGetter getter = (SubscriptGetter) this.value;
+			SubscriptSetter setter = new SubscriptSetter(position, getter.instance, getter.arguments);
+			this.value = setter;
+			pm.pushParser(new ExpressionParser(setter));
+			return;
+		}
 		}
 		
 		throw new SyntaxError(token, "Invalid Assignment");

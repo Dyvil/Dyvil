@@ -38,6 +38,11 @@ public final class ArgumentList implements IArguments, IValueList
 		this.size = size;
 	}
 	
+	public IValue[] getValues()
+	{
+		return this.values;
+	}
+	
 	@Override
 	public Iterator<IValue> iterator()
 	{
@@ -90,6 +95,18 @@ public final class ArgumentList implements IArguments, IValueList
 	public void setFirstValue(IValue value)
 	{
 		this.values[0] = value;
+	}
+	
+	@Override
+	public IValue getLastValue()
+	{
+		return this.values[this.size - 1];
+	}
+	
+	@Override
+	public void setLastValue(IValue value)
+	{
+		this.values[this.size - 1] = value;
 	}
 	
 	@Override

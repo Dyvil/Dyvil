@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
@@ -13,34 +14,29 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class SubscriptGetter extends AbstractCall
 {
-	private Array	argument;
-	
 	public SubscriptGetter(ICodePosition position)
 	{
 		this.position = position;
-		
-		this.argument = new Array();
-		this.arguments = new SingleArgument(this.argument);
+		this.arguments = new ArgumentList();
 	}
 	
 	public SubscriptGetter(ICodePosition position, IValue instance)
 	{
 		this.position = position;
 		this.instance = instance;
-		
-		this.argument = new Array();
-		this.arguments = new SingleArgument(this.argument);
-	}
-	
-	public Array getArray()
-	{
-		return this.argument;
+		this.arguments = new ArgumentList();
 	}
 	
 	@Override
 	public int valueTag()
 	{
 		return SUBSCRIPT_GET;
+	}
+	
+	@Override
+	public ArgumentList getArguments()
+	{
+		return (ArgumentList) this.arguments;
 	}
 	
 	@Override
@@ -59,41 +55,43 @@ public class SubscriptGetter extends AbstractCall
 				if (v1 != null)
 				{
 					this.instance = v1;
-					this.argument.resolve(markers, context);
+					this.arguments.resolve(markers, context);
 				}
 				else
 				{
-					this.argument.resolve(markers, context);
-					IMethod m = ICall.resolveMethod(context, fa.instance, fa.name, this.arguments);
+					this.arguments.resolve(markers, context);
+					IArguments arguments = new SingleArgument(new Array(((ArgumentList) this.arguments).getValues(), this.arguments.size()));
+					
+					IMethod m = ICall.resolveMethod(context, fa.instance, fa.name, arguments);
 					if (m != null)
 					{
 						MethodCall mc = new MethodCall(fa.position, fa.instance, fa.name);
 						mc.method = m;
-						mc.arguments = this.arguments;
+						mc.arguments = arguments;
 						mc.dotless = fa.dotless;
 						return mc;
 					}
 					
-					ICall.addResolveMarker(markers, this.position, fa.instance, fa.name, this.arguments);
+					ICall.addResolveMarker(markers, this.position, fa.instance, fa.name, arguments);
 					return this;
 				}
 			}
 			else
 			{
 				this.instance = this.instance.resolve(markers, context);
-				this.argument.resolve(markers, context);
+				this.arguments.resolve(markers, context);
 			}
 		}
 		else
 		{
-			this.argument.resolve(markers, context);
+			this.arguments.resolve(markers, context);
 		}
 		
-		int count = this.argument.valueCount();
+		int count = this.arguments.size();
 		ArgumentList argumentList = new ArgumentList(count);
 		for (int i = 0; i < count; i++)
 		{
-			argumentList.addValue(this.argument.getValue(i));
+			argumentList.addValue(this.arguments.getValue(i, null));
 		}
 		
 		IMethod m = ICall.resolveMethod(context, this.instance, Name.subscript, argumentList);
@@ -117,12 +115,12 @@ public class SubscriptGetter extends AbstractCall
 		}
 		
 		buffer.append('[');
-		int count = this.argument.valueCount();
-		this.argument.getValue(0).toString(prefix, buffer);
+		int count = this.arguments.size();
+		this.arguments.getValue(0, null).toString(prefix, buffer);
 		for (int i = 1; i < count; i++)
 		{
 			buffer.append(Formatting.Expression.arraySeperator);
-			this.argument.getValue(i).toString(prefix, buffer);
+			this.arguments.getValue(i, null).toString(prefix, buffer);
 		}
 		buffer.append(']');
 	}

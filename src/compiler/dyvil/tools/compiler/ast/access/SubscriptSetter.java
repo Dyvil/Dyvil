@@ -10,14 +10,9 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class UpdateMethodCall extends AbstractCall
+public class SubscriptSetter extends AbstractCall
 {
-	public UpdateMethodCall(ICodePosition position)
-	{
-		this.position = position;
-	}
-	
-	public UpdateMethodCall(ICodePosition position, IValue instance, IArguments arguments)
+	public SubscriptSetter(ICodePosition position, IValue instance, IArguments arguments)
 	{
 		this.position = position;
 		this.instance = instance;
@@ -27,7 +22,7 @@ public class UpdateMethodCall extends AbstractCall
 	@Override
 	public int valueTag()
 	{
-		return UPDATE_CALL;
+		return SUBSCRIPT_SET;
 	}
 	
 	@Override
@@ -51,14 +46,13 @@ public class UpdateMethodCall extends AbstractCall
 		}
 		this.arguments.resolve(markers, context);
 		
-		IMethod method = ICall.resolveMethod(context, this.instance, Name.update, this.arguments);
-		if (method != null)
-		{
-			this.method = method;
+		IMethod m = ICall.resolveMethod(context, instance, Name.subscript_$eq, arguments);
+		if (m != null) {
+			this.method = m;
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, position, instance, Name.update, arguments);
+		ICall.addResolveMarker(markers, position, instance, Name.subscript_$eq, arguments);
 		return this;
 	}
 	
@@ -72,16 +66,16 @@ public class UpdateMethodCall extends AbstractCall
 		
 		if (this.arguments instanceof ArgumentList)
 		{
-			buffer.append(Formatting.Method.parametersStart);
+			buffer.append('[');
 			int len = this.arguments.size() - 1;
 			
 			this.arguments.getValue(0, null).toString(prefix, buffer);
 			for (int i = 1; i < len; i++)
 			{
-				buffer.append(Formatting.Method.parameterSeperator);
+				buffer.append(", ");
 				this.arguments.getValue(i, null).toString(prefix, buffer);
 			}
-			buffer.append(Formatting.Method.parametersEnd);
+			buffer.append(']');
 			buffer.append(Formatting.Field.keyValueSeperator);
 			this.arguments.getValue(len, null).toString(prefix, buffer);
 		}

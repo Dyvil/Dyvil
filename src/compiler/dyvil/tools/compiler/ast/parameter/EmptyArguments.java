@@ -71,6 +71,17 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
+	public IValue getLastValue()
+	{
+		return null;
+	}
+	
+	@Override
+	public void setLastValue(IValue value)
+	{
+	}
+	
+	@Override
 	public void setValue(int index, IParameter param, IValue value)
 	{
 	}
