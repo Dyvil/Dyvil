@@ -2,11 +2,11 @@ package dyvil.lang.ref.unsafe;
 
 import java.lang.reflect.Field;
 
-import dyvil.lang.ref.IObjectRef;
+import dyvil.lang.ref.ObjectRef;
 
 import dyvil.reflect.ReflectUtils;
 
-public final class UnsafeObjectRef<T> implements IObjectRef<T>
+public final class UnsafeObjectRef<T> implements ObjectRef<T>
 {
 	private final Object	base;
 	private final long		offset;

@@ -1,19 +1,19 @@
 package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.StringConvertible;
-import dyvil.lang.ref.IStringRef;
+import dyvil.lang.ref.StringRef;
 
 @StringConvertible
-public class StringRef implements IStringRef
+public class SimpleStringRef implements StringRef
 {
 	public String	value;
 	
-	public static StringRef apply(String value)
+	public static SimpleStringRef apply(String value)
 	{
-		return new StringRef(value);
+		return new SimpleStringRef(value);
 	}
 	
-	public StringRef(String value)
+	public SimpleStringRef(String value)
 	{
 		this.value = value;
 	}

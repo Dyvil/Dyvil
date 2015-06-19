@@ -1,6 +1,6 @@
 package dyvil.lang.ref;
 
-public interface IIntRef
+public interface IntRef
 {
 	public int get();
 	

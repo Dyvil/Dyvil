@@ -1,8 +1,8 @@
 package dyvil.lang.ref.array;
 
-import dyvil.lang.ref.IIntRef;
+import dyvil.lang.ref.IntRef;
 
-public class IntArrayRef implements IIntRef
+public class IntArrayRef implements IntRef
 {
 	protected final int[]	array;
 	protected final int		index;

@@ -1,6 +1,6 @@
 package dyvil.lang.ref;
 
-public interface IDoubleRef
+public interface DoubleRef
 {
 	public double get();
 	

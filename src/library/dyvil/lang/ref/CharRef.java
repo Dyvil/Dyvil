@@ -1,6 +1,6 @@
 package dyvil.lang.ref;
 
-public interface ICharRef
+public interface CharRef
 {
 	public char get();
 	

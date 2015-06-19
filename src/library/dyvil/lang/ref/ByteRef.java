@@ -1,6 +1,6 @@
 package dyvil.lang.ref;
 
-public interface IByteRef
+public interface ByteRef
 {
 	public byte get();
 	

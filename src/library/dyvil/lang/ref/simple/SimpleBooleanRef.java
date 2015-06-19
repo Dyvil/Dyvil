@@ -1,19 +1,19 @@
 package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.BooleanConvertible;
-import dyvil.lang.ref.IBooleanRef;
+import dyvil.lang.ref.BooleanRef;
 
 @BooleanConvertible
-public class BooleanRef implements IBooleanRef
+public class SimpleBooleanRef implements BooleanRef
 {
 	public boolean	value;
 	
-	public static BooleanRef apply(boolean value)
+	public static SimpleBooleanRef apply(boolean value)
 	{
-		return new BooleanRef(value);
+		return new SimpleBooleanRef(value);
 	}
 	
-	public BooleanRef(boolean value)
+	public SimpleBooleanRef(boolean value)
 	{
 		this.value = value;
 	}

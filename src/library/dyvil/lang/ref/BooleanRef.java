@@ -1,6 +1,6 @@
 package dyvil.lang.ref;
 
-public interface IBooleanRef
+public interface BooleanRef
 {
 	public boolean get();
 	

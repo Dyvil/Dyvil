@@ -1,19 +1,19 @@
 package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.FloatConvertible;
-import dyvil.lang.ref.IFloatRef;
+import dyvil.lang.ref.FloatRef;
 
 @FloatConvertible
-public class FloatRef implements IFloatRef
+public class SimpleFloatRef implements FloatRef
 {
 	public float	value;
 	
-	public static FloatRef apply(float value)
+	public static SimpleFloatRef apply(float value)
 	{
-		return new FloatRef(value);
+		return new SimpleFloatRef(value);
 	}
 	
-	public FloatRef(float value)
+	public SimpleFloatRef(float value)
 	{
 		this.value = value;
 	}

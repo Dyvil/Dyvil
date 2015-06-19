@@ -1,8 +1,8 @@
 package dyvil.lang.ref.array;
 
-import dyvil.lang.ref.IStringRef;
+import dyvil.lang.ref.StringRef;
 
-public class StringArrayRef implements IStringRef
+public class StringArrayRef implements StringRef
 {
 	protected final String[]	array;
 	protected final int			index;

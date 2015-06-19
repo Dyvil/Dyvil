@@ -1,8 +1,8 @@
 package dyvil.lang.ref.array;
 
-import dyvil.lang.ref.ICharRef;
+import dyvil.lang.ref.CharRef;
 
-public class CharArrayRef implements ICharRef
+public class CharArrayRef implements CharRef
 {
 	protected final char[]	array;
 	protected final int		index;

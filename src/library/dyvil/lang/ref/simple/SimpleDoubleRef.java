@@ -1,19 +1,19 @@
 package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.DoubleConvertible;
-import dyvil.lang.ref.IDoubleRef;
+import dyvil.lang.ref.DoubleRef;
 
 @DoubleConvertible
-public class DoubleRef implements IDoubleRef
+public class SimpleDoubleRef implements DoubleRef
 {
 	public double	value;
 	
-	public static DoubleRef apply(double value)
+	public static SimpleDoubleRef apply(double value)
 	{
-		return new DoubleRef(value);
+		return new SimpleDoubleRef(value);
 	}
 	
-	public DoubleRef(double value)
+	public SimpleDoubleRef(double value)
 	{
 		this.value = value;
 	}

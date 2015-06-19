@@ -1,6 +1,6 @@
 package dyvil.lang.ref;
 
-public interface IShortRef
+public interface ShortRef
 {
 	public short get();
 	

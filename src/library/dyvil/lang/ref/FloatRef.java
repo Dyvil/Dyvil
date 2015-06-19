@@ -1,6 +1,6 @@
 package dyvil.lang.ref;
 
-public interface IFloatRef
+public interface FloatRef
 {
 	public float get();
 	

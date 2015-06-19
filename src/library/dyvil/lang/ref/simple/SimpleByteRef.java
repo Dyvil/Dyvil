@@ -1,19 +1,19 @@
 package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.IntConvertible;
-import dyvil.lang.ref.IByteRef;
+import dyvil.lang.ref.ByteRef;
 
 @IntConvertible
-public class ByteRef implements IByteRef
+public class SimpleByteRef implements ByteRef
 {
 	public byte	value;
 	
-	public static ByteRef apply(byte value)
+	public static SimpleByteRef apply(byte value)
 	{
-		return new ByteRef(value);
+		return new SimpleByteRef(value);
 	}
 	
-	public ByteRef(byte value)
+	public SimpleByteRef(byte value)
 	{
 		this.value = value;
 	}

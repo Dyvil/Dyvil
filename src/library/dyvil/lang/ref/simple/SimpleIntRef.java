@@ -1,19 +1,19 @@
 package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.IntConvertible;
-import dyvil.lang.ref.IIntRef;
+import dyvil.lang.ref.IntRef;
 
 @IntConvertible
-public class IntRef implements IIntRef
+public class SimpleIntRef implements IntRef
 {
 	public int	value;
 	
-	public static IntRef apply(int value)
+	public static SimpleIntRef apply(int value)
 	{
-		return new IntRef(value);
+		return new SimpleIntRef(value);
 	}
 	
-	public IntRef(int value)
+	public SimpleIntRef(int value)
 	{
 		this.value = value;
 	}

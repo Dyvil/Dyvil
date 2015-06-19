@@ -1,6 +1,6 @@
 package dyvil.lang.ref;
 
-public interface ILongRef
+public interface LongRef
 {
 	public long get();
 	

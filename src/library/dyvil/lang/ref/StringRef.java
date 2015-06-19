@@ -1,6 +1,6 @@
 package dyvil.lang.ref;
 
-public interface IStringRef extends IObjectRef<String>
+public interface StringRef extends ObjectRef<String>
 {
 	@Override
 	public String get();

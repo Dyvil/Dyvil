@@ -1,6 +1,6 @@
 package dyvil.lang.ref;
 
-public interface IObjectRef<T>
+public interface ObjectRef<T>
 {
 	public T get();
 	

@@ -1,19 +1,19 @@
 package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.CharConvertible;
-import dyvil.lang.ref.ICharRef;
+import dyvil.lang.ref.CharRef;
 
 @CharConvertible
-public class CharRef implements ICharRef
+public class SimpleCharRef implements CharRef
 {
 	public char	value;
 	
-	public static CharRef apply(char value)
+	public static SimpleCharRef apply(char value)
 	{
-		return new CharRef(value);
+		return new SimpleCharRef(value);
 	}
 	
-	public CharRef(char value)
+	public SimpleCharRef(char value)
 	{
 		this.value = value;
 	}

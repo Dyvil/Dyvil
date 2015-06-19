@@ -1,19 +1,19 @@
 package dyvil.lang.ref.simple;
 
 import dyvil.lang.literal.IntConvertible;
-import dyvil.lang.ref.IShortRef;
+import dyvil.lang.ref.ShortRef;
 
 @IntConvertible
-public class ShortRef implements IShortRef
+public class SimpleShortRef implements ShortRef
 {
 	public short	value;
 	
-	public static ShortRef apply(short value)
+	public static SimpleShortRef apply(short value)
 	{
-		return new ShortRef(value);
+		return new SimpleShortRef(value);
 	}
 	
-	public ShortRef(short value)
+	public SimpleShortRef(short value)
 	{
 		this.value = value;
 	}

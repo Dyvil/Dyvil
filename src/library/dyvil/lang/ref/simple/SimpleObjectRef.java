@@ -1,17 +1,17 @@
 package dyvil.lang.ref.simple;
 
-import dyvil.lang.ref.IObjectRef;
+import dyvil.lang.ref.ObjectRef;
 
-public class ObjectRef<T> implements IObjectRef<T>
+public class SimpleObjectRef<T> implements ObjectRef<T>
 {
 	public T	value;
 	
-	public static <T> ObjectRef<T> apply(T value)
+	public static <T> SimpleObjectRef<T> apply(T value)
 	{
-		return new ObjectRef(value);
+		return new SimpleObjectRef(value);
 	}
 	
-	public ObjectRef(T value)
+	public SimpleObjectRef(T value)
 	{
 		this.value = value;
 	}
