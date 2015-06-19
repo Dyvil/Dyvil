@@ -66,13 +66,13 @@ public interface FloatArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, FALOAD })
-	public static @infix float apply(float[] array, int i)
+	public static @infix float subscript(float[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, FASTORE })
-	public static @infix void update(float[] array, int i, float v)
+	public static @infix void subscript_$eq(float[] array, int i, float v)
 	{
 		array[i] = v;
 	}

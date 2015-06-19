@@ -125,14 +125,8 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		}
 	}
 	
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	protected IValue resolveFieldAccess(IContext context)
 	{
-		if (this.instance != null)
-		{
-			this.instance = this.instance.resolve(markers, context);
-		}
-		
 		IField field = ICall.resolveField(context, this.instance, this.name);
 		if (field != null)
 		{
@@ -161,6 +155,23 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 			{
 				return new ClassAccess(this.position, iclass.getType());
 			}
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance = this.instance.resolve(markers, context);
+		}
+		
+		IValue v = this.resolveFieldAccess(context);
+		if (v != null)
+		{
+			return v;
 		}
 		
 		Marker marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);

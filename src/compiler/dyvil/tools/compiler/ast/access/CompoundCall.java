@@ -92,18 +92,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 			return this;
 		}
 		
-		Marker marker = markers.create(this.position, "resolve.method", this.name.unqualified);
-		marker.addInfo("Qualified Name: " + this.name.unqualified);
-		if (this.instance != null)
-		{
-			marker.addInfo("Callee Type: " + this.instance.getType());
-		}
-		if (!this.arguments.isEmpty())
-		{
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			this.arguments.typesToString(builder);
-			marker.addInfo(builder.toString());
-		}
+		ICall.addResolveMarker(markers, position, instance, name, arguments);
 		return this;
 	}
 	
@@ -115,7 +104,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 			this.instance.checkTypes(markers, context);
 			
 			int valueTag = this.instance.valueTag();
-			if (valueTag == APPLY_METHOD_CALL)
+			if (valueTag == APPLY_CALL)
 			{
 				ApplyMethodCall call = (ApplyMethodCall) this.instance;
 				IValue instance1 = call.instance;
@@ -202,7 +191,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 			writer.writeInsn(Opcodes.AUTO_DUP);
 			f.writeSet(writer, null, null);
 		}
-		else if (i == APPLY_METHOD_CALL)
+		else if (i == APPLY_CALL)
 		{
 			ApplyMethodCall call = (ApplyMethodCall) this.instance;
 			
@@ -247,7 +236,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 			this.method.writeCall(writer, null, this.arguments, null);
 			f.writeSet(writer, null, null);
 		}
-		else if (i == APPLY_METHOD_CALL)
+		else if (i == APPLY_CALL)
 		{
 			ApplyMethodCall call = (ApplyMethodCall) this.instance;
 			

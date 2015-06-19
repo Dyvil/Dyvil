@@ -89,7 +89,8 @@ public class ParserUtil
 	public static boolean isTerminator2(int type)
 	{
 		return type == Symbols.DOT || type == Symbols.COMMA || type == Symbols.SEMICOLON || type == Symbols.EQUALS || type == Keywords.IS
-				|| type == Keywords.AS || (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET || type == Tokens.STRING_PART || type == Tokens.STRING_END;
+				|| type == Keywords.AS || (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET || type == Symbols.OPEN_SQUARE_BRACKET
+				|| type == Tokens.STRING_PART || type == Tokens.STRING_END;
 	}
 	
 	public static boolean isSeperator(int type)

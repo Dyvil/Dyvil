@@ -36,18 +36,27 @@ public interface IValue extends IASTNode, ITyped
 	
 	int	STATEMENT_LIST		= 24;
 	int	ARRAY				= 25;
+	int	TUPLE				= 26;
+	int	CASE_STATEMENT		= 27;
+	int	MATCH				= 28;
+	int	LAMBDA				= 29;
+	int	PARTIAL_FUNCTION	= 30;
+	int	BYTECODE			= 31;
 	
 	int	CLASS_ACCESS		= 32;
 	int	ENUM				= 33;
 	int	FIELD_ACCESS		= 34;
 	int	FIELD_ASSIGN		= 35;
 	int	METHOD_CALL			= 36;
-	int	APPLY_METHOD_CALL	= 37;
-	int	UPDATE_METHOD_CALL	= 38;
-	int	CONSTRUCTOR_CALL	= 39;
-	int	INITIALIZER_CALL	= 40;
-	int	VARIABLE			= 41;
-	int	NESTED_METHOD		= 42;
+	int	APPLY_CALL			= 37;
+	int	UPDATE_CALL			= 38;
+	int	SUBSCRIPT_GET		= 39;
+	int	SUBSCRIPT_SET		= 40;
+	int	CONSTRUCTOR_CALL	= 41;
+	int	INITIALIZER_CALL	= 42;
+	
+	int	VARIABLE			= 43;
+	int	NESTED_METHOD		= 44;
 	
 	int	CAST_OPERATOR		= 48;
 	int	ISOF_OPERATOR		= 49;
@@ -59,13 +68,6 @@ public interface IValue extends IASTNode, ITyped
 	int	TYPE_OPERATOR		= 55;
 	int	NULLCHECK			= 56;
 	int	RANGE_OPERATOR		= 57;
-	
-	int	TUPLE				= 64;
-	int	CASE_STATEMENT		= 65;
-	int	MATCH				= 66;
-	int	LAMBDA				= 67;
-	int	PARTIAL_FUNCTION	= 68;
-	int	BYTECODE			= 69;
 	
 	int	RETURN				= 70;
 	int	IF					= 71;

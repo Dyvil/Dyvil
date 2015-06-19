@@ -6,8 +6,6 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -16,6 +14,9 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface ICall extends IValue
 {
@@ -23,11 +24,29 @@ public interface ICall extends IValue
 	
 	public IArguments getArguments();
 	
-	public static IConstructor resolveConstructor(IContext context, IArguments arguments)
+	public static void addResolveMarker(MarkerList markers, ICodePosition position, IValue instance, Name name, IArguments arguments)
 	{
-		List<ConstructorMatch> matches = new ArrayList();
-		context.getConstructorMatches(matches, arguments);
-		return IContext.getBestConstructor(matches);
+		if (arguments == EmptyArguments.INSTANCE)
+		{
+			Marker marker = markers.create(position, "resolve.method_field", name);
+			if (instance != null)
+			{
+				marker.addInfo("Callee Type: " + instance.getType());
+			}
+			return;
+		}
+		
+		Marker marker = markers.create(position, "resolve.method", name);
+		if (instance != null)
+		{
+			marker.addInfo("Callee Type: " + instance.getType());
+		}
+		if (!arguments.isEmpty())
+		{
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			arguments.typesToString(builder);
+			marker.addInfo(builder.toString());
+		}
 	}
 	
 	public static IField resolveField(IContext context, ITyped instance, Name name)

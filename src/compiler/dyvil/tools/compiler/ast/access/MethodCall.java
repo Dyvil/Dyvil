@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.ConstantFolder;
@@ -161,27 +160,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			}
 		}
 		
-		Marker marker;
-		if (this.arguments.isEmpty())
-		{
-			marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);
-		}
-		else
-		{
-			marker = markers.create(this.position, "resolve.method", this.name.unqualified);
-		}
-		
-		marker.addInfo("Qualified Name: " + this.name.qualified);
-		if (this.instance != null)
-		{
-			marker.addInfo("Callee Type: " + this.instance.getType());
-		}
-		if (!this.arguments.isEmpty())
-		{
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			this.arguments.typesToString(builder);
-			marker.addInfo(builder.toString());
-		}
+		ICall.addResolveMarker(markers, position, instance, name, arguments);
 		return this;
 	}
 	

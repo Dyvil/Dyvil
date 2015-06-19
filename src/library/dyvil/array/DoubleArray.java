@@ -66,13 +66,13 @@ public interface DoubleArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, DALOAD })
-	public static @infix double apply(double[] array, int i)
+	public static @infix double subscript(double[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, DASTORE })
-	public static @infix void update(double[] array, int i, double v)
+	public static @infix void subscript_$eq(double[] array, int i, double v)
 	{
 		array[i] = v;
 	}

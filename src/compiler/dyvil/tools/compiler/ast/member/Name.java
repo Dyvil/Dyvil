@@ -14,6 +14,7 @@ public final class Name
 	public static final Name				apply			= new Name("apply");
 	public static final Name				unapply			= new Name("unapply");
 	public static final Name				update			= new Name("update");
+	public static final Name				subscript		= new Name("subscript");
 	public static final Name				match			= new Name("match");
 	public static final Name				equals			= new Name("equals");
 	public static final Name				hashCode		= new Name("hashCode");

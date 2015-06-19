@@ -66,13 +66,13 @@ public interface LongArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, LALOAD })
-	public static @infix long apply(long[] array, int i)
+	public static @infix long subscript(long[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, LASTORE })
-	public static @infix void update(long[] array, int i, long v)
+	public static @infix void subscript_$eq(long[] array, int i, long v)
 	{
 		array[i] = v;
 	}

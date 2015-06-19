@@ -66,13 +66,13 @@ public interface IntArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IALOAD })
-	public static @infix int apply(int[] array, int i)
+	public static @infix int subscript(int[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, IASTORE })
-	public static @infix void update(int[] array, int i, int v)
+	public static @infix void subscript_$eq(int[] array, int i, int v)
 	{
 		array[i] = v;
 	}

@@ -207,4 +207,12 @@ public abstract class AbstractCall implements ICall, IValued
 	{
 		this.method.writeInvJump(writer, dest, this.instance, this.arguments);
 	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		this.toString("", builder);
+		return builder.toString();
+	}
 }

@@ -57,13 +57,13 @@ public interface BooleanArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, BALOAD })
-	public static @infix boolean apply(boolean[] array, int i)
+	public static @infix boolean subscript(boolean[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, BASTORE })
-	public static @infix void update(boolean[] array, int i, boolean v)
+	public static @infix void subscript_$eq(boolean[] array, int i, boolean v)
 	{
 		array[i] = v;
 	}

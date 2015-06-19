@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -21,7 +20,7 @@ public class UpdateMethodCall extends AbstractCall
 	@Override
 	public int valueTag()
 	{
-		return UPDATE_METHOD_CALL;
+		return UPDATE_CALL;
 	}
 	
 	@Override
@@ -63,15 +62,7 @@ public class UpdateMethodCall extends AbstractCall
 			return this;
 		}
 		
-		Marker marker = markers.create(this.position, "resolve.method", "update");
-		marker.addInfo("Callee Type: " + this.instance.getType());
-		if (!this.arguments.isEmpty())
-		{
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			this.arguments.typesToString(builder);
-			marker.addInfo(builder.toString());
-		}
-		
+		ICall.addResolveMarker(markers, position, instance, Name.update, arguments);
 		return this;
 	}
 	

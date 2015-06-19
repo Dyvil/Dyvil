@@ -66,13 +66,13 @@ public interface CharArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, CALOAD })
-	public static @infix char apply(char[] array, int i)
+	public static @infix char subscript(char[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, CASTORE })
-	public static @infix void update(char[] array, int i, char v)
+	public static @infix void subscript_$eq(char[] array, int i, char v)
 	{
 		array[i] = v;
 	}

@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -18,7 +17,7 @@ public class ApplyMethodCall extends AbstractCall
 	@Override
 	public int valueTag()
 	{
-		return APPLY_METHOD_CALL;
+		return APPLY_CALL;
 	}
 	
 	@Override
@@ -37,15 +36,7 @@ public class ApplyMethodCall extends AbstractCall
 			return this;
 		}
 		
-		Marker marker = markers.create(this.position, "resolve.method", "apply");
-		marker.addInfo("Callee Type: " + this.instance.getType());
-		if (!this.arguments.isEmpty())
-		{
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			this.arguments.typesToString(builder);
-			marker.addInfo(builder.toString());
-		}
-		
+		ICall.addResolveMarker(markers, this.position, this.instance, Name.apply, this.arguments);
 		return this;
 	}
 	

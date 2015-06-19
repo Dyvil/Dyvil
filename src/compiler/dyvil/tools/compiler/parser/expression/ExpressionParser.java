@@ -41,8 +41,8 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int		TYPE			= 0x100;
 	public static final int		CONSTRUCTOR		= 0x200;
 	public static final int		CONSTRUCTOR_END	= 0x400;
-	public static final int		PARAMETERS		= 0x800;
-	public static final int		PARAMETERS_END	= 0x1000;
+	public static final int		PARAMETERS_END	= 0x800;
+	public static final int		SUBSCRIPT_END	= 0x1000;
 	
 	public static final int		BYTECODE_END	= 0x10000;
 	
@@ -244,17 +244,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			throw new SyntaxError(token, "Invalid Tuple - ')' expected", true);
 		}
-		if (this.mode == PARAMETERS)
-		{
-			this.mode = PARAMETERS_END;
-			if (type == Symbols.OPEN_PARENTHESIS)
-			{
-				ICall call = (ICall) this.value;
-				call.setArguments(this.getArguments(pm, token.next()));
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Argument List - '(' expected", true);
-		}
 		if (this.mode == PARAMETERS_END)
 		{
 			this.mode = ACCESS;
@@ -264,6 +253,16 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Argument List - ')' expected", true);
+		}
+		if (this.mode == SUBSCRIPT_END)
+		{
+			this.mode = ACCESS;
+			this.value.expandPosition(token);
+			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			{
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Subscript Arguments - ']' expected", true);
 		}
 		if (this.mode == CONSTRUCTOR_END)
 		{
@@ -356,6 +355,15 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				InstanceOfOperator io = new InstanceOfOperator(token.raw(), this.value);
 				pm.pushParser(new TypeParser(io));
 				this.value = io;
+				return;
+			}
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
+			{
+				SubscriptGetter getter = new SubscriptGetter(token, this.value);
+				this.value = getter;
+				this.mode = SUBSCRIPT_END;
+				
+				pm.pushParser(new ExpressionListParser(getter.getArray()));
 				return;
 			}
 			if (type == Symbols.OPEN_PARENTHESIS)
@@ -535,10 +543,22 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		int type1 = next.type();
 		if (type1 == Symbols.OPEN_PARENTHESIS)
 		{
-			MethodCall call = new MethodCall(token, this.value, name);
+			MethodCall call = new MethodCall(token.raw(), this.value, name);
 			call.dotless = this.dotless;
 			this.value = call;
-			this.mode = PARAMETERS;
+			this.mode = PARAMETERS_END;
+			pm.skip();
+			call.setArguments(this.getArguments(pm, next.next()));
+			return;
+		}
+		if (type1 == Symbols.OPEN_SQUARE_BRACKET)
+		{
+			SubscriptGetter getter = new SubscriptGetter(token, new FieldAccess(token.raw(), this.value, name));
+			this.value = getter;
+			this.mode = SUBSCRIPT_END;
+			
+			pm.skip();
+			pm.pushParser(new ExpressionListParser(getter.getArray()));
 			return;
 		}
 		if (type1 == Symbols.ARROW_OPERATOR)
@@ -638,7 +658,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.pushParser(new ExpressionParser(assign));
 			return;
 		}
-		else if (i == IValue.APPLY_METHOD_CALL)
+		else if (i == IValue.APPLY_CALL)
 		{
 			ApplyMethodCall call = (ApplyMethodCall) this.value;
 			

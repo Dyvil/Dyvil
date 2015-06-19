@@ -66,13 +66,13 @@ public interface ByteArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, BALOAD })
-	public static @infix byte apply(byte[] array, int i)
+	public static @infix byte subscript(byte[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, BASTORE })
-	public static @infix void update(byte[] array, int i, byte v)
+	public static @infix void subscript_$eq(byte[] array, int i, byte v)
 	{
 		array[i] = v;
 	}
