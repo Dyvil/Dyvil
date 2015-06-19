@@ -20,14 +20,12 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-import static dyvil.reflect.Opcodes.*;
-
-public class UnknownType implements IType
+public class NullType implements IType
 {
 	@Override
 	public int typeTag()
 	{
-		return UNKNOWN;
+		return NULL;
 	}
 	
 	@Override
@@ -38,10 +36,8 @@ public class UnknownType implements IType
 	@Override
 	public Name getName()
 	{
-		return Name.getQualified("var");
+		return Name._null;
 	}
-	
-	// IContext
 	
 	@Override
 	public void setClass(IClass theClass)
@@ -52,18 +48,6 @@ public class UnknownType implements IType
 	public IClass getTheClass()
 	{
 		return null;
-	}
-	
-	@Override
-	public boolean hasTypeVariables()
-	{
-		return false;
-	}
-	
-	@Override
-	public IType getConcreteType(ITypeContext context)
-	{
-		return this;
 	}
 	
 	@Override
@@ -84,7 +68,17 @@ public class UnknownType implements IType
 		return this;
 	}
 	
-	// IContext
+	@Override
+	public boolean hasTypeVariables()
+	{
+		return false;
+	}
+	
+	@Override
+	public IType getConcreteType(ITypeContext context)
+	{
+		return this;
+	}
 	
 	@Override
 	public Package resolvePackage(Name name)
@@ -132,8 +126,6 @@ public class UnknownType implements IType
 		return null;
 	}
 	
-	// Compilation
-	
 	@Override
 	public void setInternalName(String name)
 	{
@@ -142,71 +134,36 @@ public class UnknownType implements IType
 	@Override
 	public String getInternalName()
 	{
-		return "java/lang/Object";
+		return "dyvil/lang/Null";
 	}
 	
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
-		buffer.append("Ljava/lang/Object;");
+		buffer.append("Ldyvil/lang/Null;");
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-	}
-	
-	@Override
-	public int getLoadOpcode()
-	{
-		return ALOAD;
-	}
-	
-	@Override
-	public int getArrayLoadOpcode()
-	{
-		return AALOAD;
-	}
-	
-	@Override
-	public int getStoreOpcode()
-	{
-		return ASTORE;
-	}
-	
-	@Override
-	public int getArrayStoreOpcode()
-	{
-		return AASTORE;
-	}
-	
-	@Override
-	public int getReturnOpcode()
-	{
-		return ARETURN;
+		buffer.append("Ldyvil/lang/Null;");
 	}
 	
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeInvokeInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/UnknownType", "instance", "Ldyvil/reflect/type/UnknownType;", false);
+		writer.writeInvokeInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/NullType", "instance", "Ldyvil/reflect/type/NullType;", false);
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("null");
 	}
 	
 	@Override
 	public IType clone()
 	{
 		return this;
-	}
-	
-	@Override
-	public String toString()
-	{
-		return "var";
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append("var");
 	}
 }

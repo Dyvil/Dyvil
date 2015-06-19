@@ -6,17 +6,17 @@ import dyvil.lang.literal.NilConvertible;
 import dyvil.annotation.object;
 
 @NilConvertible
-public @object class UnknownType<T> implements Type<T>
+public @object class NullType implements Type<Object>
 {
-	public static final UnknownType	instance	= new UnknownType();
+	public static final NullType	instance	= new NullType();
 	
-	public static <T> UnknownType<T> apply()
+	public static NullType apply()
 	{
 		return instance;
 	}
 	
 	@Override
-	public Class getTheClass()
+	public Class<Object> getTheClass()
 	{
 		return null;
 	}
@@ -24,24 +24,24 @@ public @object class UnknownType<T> implements Type<T>
 	@Override
 	public String getName()
 	{
-		return "var";
-	}
-	
-	@Override
-	public String getQualifiedName()
-	{
-		return "var";
+		return "null";
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "var";
+		return "null";
+	}
+	
+	@Override
+	public String getQualifiedName()
+	{
+		return "dyvil/lang/Null";
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append("Ljava/lang/Object;");
+		builder.append("Ldyvil/lang/Null;");
 	}
 }

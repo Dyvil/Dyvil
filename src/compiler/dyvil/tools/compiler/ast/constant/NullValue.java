@@ -53,7 +53,7 @@ public final class NullValue implements IConstantValue
 	@Override
 	public IType getType()
 	{
-		return Types.UNKNOWN;
+		return Types.NULL;
 	}
 	
 	@Override

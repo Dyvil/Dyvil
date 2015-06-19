@@ -82,6 +82,12 @@ public final class TypeParser extends Parser implements ITyped
 				pm.popParser();
 				return;
 			}
+			if (type == Keywords.NULL)
+			{
+				this.typed.setType(Types.NULL);
+				pm.popParser();
+				return;
+			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				if (token.next().type() == Symbols.OPEN_SQUARE_BRACKET)

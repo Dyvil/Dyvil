@@ -27,7 +27,8 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IType extends IASTNode, INamed, IContext, ITypeContext
 {
-	int	UNKNOWN			= 0;
+	int	UNKNOWN			= -1;
+	int	NULL			= 0;
 	int	TYPE			= 1;
 	int	PRIMITIVE_TYPE	= 2;
 	int	GENERIC_TYPE	= 3;
@@ -300,6 +301,9 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	{
 		return NullValue.getNull();
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer);
 	
 	// Misc
 	

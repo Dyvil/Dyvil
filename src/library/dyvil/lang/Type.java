@@ -16,7 +16,7 @@ public interface Type<T>
 {
 	public static <T> Type<T> apply()
 	{
-		return UnknownType.apply();
+		return UnknownType.instance;
 	}
 	
 	public static <T> Type<T> apply(String className)

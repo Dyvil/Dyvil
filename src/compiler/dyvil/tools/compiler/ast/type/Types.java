@@ -8,7 +8,6 @@ import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class Types
 {
-	public static final UnknownType		UNKNOWN					= new UnknownType();
 	public static final PrimitiveType	VOID					= new PrimitiveType(Name._void, 0);
 	public static final PrimitiveType	BOOLEAN					= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
 	public static final PrimitiveType	BYTE					= new PrimitiveType(Name._byte, ClassFormat.T_BYTE);
@@ -20,6 +19,8 @@ public final class Types
 	public static final PrimitiveType	DOUBLE					= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
 	
 	public static final DynamicType		DYNAMIC					= new DynamicType();
+	public static final UnknownType		UNKNOWN					= new UnknownType();
+	public static final NullType		NULL					= new NullType();
 	public static final Type			ANY						= new Type("java/lang/Object", Name.any);
 	public static final Type			OBJECT					= new Type("java/lang/Object", Name.getQualified("Object"));
 	public static final Type			STRING					= new Type("java/lang/String", Name.getQualified("String"));

@@ -21,6 +21,7 @@ public final class Name
 	
 	public static final Name				_this			= new Name("this");
 	public static final Name				_class			= new Name("class");
+	public static final Name				_null			= new Name("null");
 	
 	public static final Name				_void			= new Name("void");
 	public static final Name				_boolean		= new Name("boolean");
