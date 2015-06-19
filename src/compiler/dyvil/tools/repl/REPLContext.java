@@ -7,6 +7,7 @@ import dyvil.lang.List;
 
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
@@ -21,6 +22,7 @@ import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.CodePosition;
@@ -34,6 +36,8 @@ public class REPLContext extends DyvilHeader implements IValued
 	
 	private Map<Name, REPLVariable>		variables		= new HashMap();
 	
+	private String currentClassName;
+	private String						currentInternalName;
 	private IValue						value;
 	private ImportDeclaration			importDeclaration;
 	private IncludeDeclaration			includeDeclaration;
@@ -136,6 +140,8 @@ public class REPLContext extends DyvilHeader implements IValued
 		}
 		
 		MarkerList markers = new MarkerList();
+		this.currentClassName = "REPL" + resultIndex;
+		this.currentInternalName = "repl/".concat(this.currentClassName);
 		Name name = Name.getQualified("res" + resultIndex);
 		IValue value = this.value;
 		IType type = Types.UNKNOWN;
@@ -157,9 +163,21 @@ public class REPLContext extends DyvilHeader implements IValued
 		
 		field.foldConstants();
 		
-		// TODO Inner Classes
+		for (IClassCompilable icc : this.innerClassList)
+		{
+			try
+			{
+				String fileName = icc.getFileName();
+				byte[] bytes = ClassWriter.compile(icc);
+				ReflectUtils.unsafe.defineClass(fileName, bytes, 0, bytes.length, null, null);
+			}
+			catch (Throwable t)
+			{
+				t.printStackTrace();
+			}
+		}
 		
-		field.compute("REPL$" + resultIndex, this.compilableList);
+		field.compute(this.currentInternalName, this.compilableList);
 		
 		this.compilableList.clear();
 		this.innerClassList.clear();
@@ -213,15 +231,14 @@ public class REPLContext extends DyvilHeader implements IValued
 	@Override
 	public void addInnerClass(IClassCompilable iclass)
 	{
-		String name = "REPL$" + resultIndex;
 		if (iclass.hasSeparateFile())
 		{
-			iclass.setInnerIndex(name, this.innerClassList.size());
+			iclass.setInnerIndex(this.currentInternalName, this.innerClassList.size());
 			this.innerClassList.add(iclass);
 		}
 		else
 		{
-			iclass.setInnerIndex(name, this.compilableList.size());
+			iclass.setInnerIndex(this.currentInternalName, this.compilableList.size());
 			this.compilableList.add(iclass);
 		}
 	}
@@ -268,6 +285,36 @@ public class REPLContext extends DyvilHeader implements IValued
 		}
 		
 		return INVISIBLE;
+	}
+	
+	@Override
+	public String getName()
+	{
+		return this.currentClassName;
+	}
+	
+	@Override
+	public String getFullName()
+	{
+		return this.currentInternalName;
+	}
+	
+	@Override
+	public String getFullName(String name)
+	{
+		return this.currentInternalName + '$' + name;
+	}
+	
+	@Override
+	public String getInternalName()
+	{
+		return this.currentInternalName;
+	}
+	
+	@Override
+	public String getInternalName(String name)
+	{
+		return this.currentInternalName + '$' + name;
 	}
 	
 	@Override

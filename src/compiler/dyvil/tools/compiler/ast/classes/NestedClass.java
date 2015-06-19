@@ -29,10 +29,12 @@ public class NestedClass extends CodeClass
 	@Override
 	public void setInnerIndex(String internalName, int index)
 	{
-		String s = Integer.toString(index);
-		this.name = Name.getQualified(this.unit.getName() + "$" + s);
-		this.fullName = this.unit.getFullName(s);
-		this.internalName = this.unit.getInternalName(s);
+		String outerName = this.outerClass == null ? this.unit.getName() : this.outerClass.getFileName();
+		String indexString = Integer.toString(index);
+		
+		this.name = Name.getQualified(outerName + '$' + indexString);
+		this.fullName = this.unit.getFullName(indexString);
+		this.internalName = this.unit.getInternalName(indexString);
 	}
 	
 	@Override
