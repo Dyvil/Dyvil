@@ -215,11 +215,6 @@ public final class TypeParser extends Parser implements ITyped
 		}
 	}
 	
-	public void end()
-	{
-		this.typed.setType(this.type);
-	}
-	
 	@Override
 	public void setType(IType type)
 	{

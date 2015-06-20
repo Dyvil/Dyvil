@@ -82,11 +82,11 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		this.parameterCount = 1;
 	}
 	
-	public LambdaExpression(ICodePosition position, IParameter[] params)
+	public LambdaExpression(ICodePosition position, IParameter[] params, int paramCount)
 	{
 		this.position = position;
 		this.parameters = params;
-		this.parameterCount = params.length;
+		this.parameterCount = paramCount;
 	}
 	
 	@Override

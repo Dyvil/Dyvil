@@ -134,6 +134,14 @@ public final class LambdaType extends Type implements ITyped, ITypeList
 	}
 	
 	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		this.toString("", sb);
+		return sb.toString();
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Method.parametersStart);

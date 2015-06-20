@@ -31,12 +31,10 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int		VALUE			= 0x1;
 	public static final int		LIST_END		= 0x2;
 	private static final int	ARRAY_END		= 0x4;
-	public static final int		TUPLE_END		= 0x8;
 	
 	public static final int		ACCESS			= 0x10;
 	public static final int		ACCESS_2		= 0x20;
 	
-	public static final int		LAMBDA			= 0x40;
 	public static final int		STATEMENT		= 0x80;
 	public static final int		TYPE			= 0x100;
 	public static final int		CONSTRUCTOR		= 0x200;
@@ -111,11 +109,9 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 					this.mode = 0;
 					return;
 				}
-				this.mode = TUPLE_END;
-				Tuple tv = new Tuple(token);
-				this.value = tv;
 				
-				pm.pushParser(new ExpressionListParser(tv));
+				pm.pushParser(new LambdaOrTupleParser(this), true);
+				this.mode = ACCESS;
 				return;
 			}
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
@@ -234,16 +230,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser(true);
 			throw new SyntaxError(token, "Invalid Statement List - '}' expected");
 		}
-		if (this.mode == TUPLE_END)
-		{
-			this.mode = ACCESS | LAMBDA;
-			if (type == Symbols.CLOSE_PARENTHESIS)
-			{
-				this.value.expandPosition(token);
-				return;
-			}
-			throw new SyntaxError(token, "Invalid Tuple - ')' expected", true);
-		}
 		if (this.mode == PARAMETERS_END)
 		{
 			this.mode = ACCESS;
@@ -303,24 +289,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.popParser(true);
 			return;
 		}
-		if (this.isInMode(LAMBDA))
-		{
-			if (type == Symbols.ARROW_OPERATOR)
-			{
-				LambdaExpression lv = getLambdaValue(this.value);
-				if (lv != null)
-				{
-					lv.expandPosition(token);
-					this.field.setValue(lv);
-					pm.popParser();
-					pm.pushParser(new ExpressionParser(lv));
-					return;
-				}
-				
-				throw new SyntaxError(token, "Invalid Lambda Expression");
-			}
-		}
-		if (this.isInMode(ACCESS))
+		if (this.mode == ACCESS)
 		{
 			if (type == Symbols.DOT)
 			{
@@ -405,7 +374,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				return;
 			}
 		}
-		if (this.isInMode(ACCESS_2))
+		if (this.mode == ACCESS_2)
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
@@ -473,7 +442,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			}
 			throw new SyntaxError(token, "Invalid Access - Invalid " + token);
 		}
-		if (this.isInMode(CONSTRUCTOR))
+		if (this.mode == CONSTRUCTOR)
 		{
 			ConstructorCall cc = (ConstructorCall) this.value;
 			if (type == Symbols.OPEN_CURLY_BRACKET)
@@ -685,48 +654,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		
 		throw new SyntaxError(token, "Invalid Assignment");
-	}
-	
-	private static LambdaExpression getLambdaValue(IValue value)
-	{
-		int type = value.valueTag();
-		if (type != IValue.TUPLE)
-		{
-			return null;
-		}
-		
-		Tuple tv = (Tuple) value;
-		int len = tv.valueCount();
-		MethodParameter[] params = new MethodParameter[len];
-		
-		for (int i = 0; i < len; i++)
-		{
-			IValue v = tv.getValue(i);
-			type = v.valueTag();
-			if (type == IValue.FIELD_ACCESS)
-			{
-				FieldAccess fa = (FieldAccess) v;
-				if (!fa.dotless)
-				{
-					return null;
-				}
-				
-				if (fa.instance.valueTag() != IValue.CLASS_ACCESS)
-				{
-					return null;
-				}
-				
-				MethodParameter param = new MethodParameter();
-				param.name = fa.name;
-				param.type = ((ClassAccess) fa.instance).type;
-				params[i] = param;
-				continue;
-			}
-			
-			return null;
-		}
-		
-		return new LambdaExpression(tv.position, params);
 	}
 	
 	public void end()
