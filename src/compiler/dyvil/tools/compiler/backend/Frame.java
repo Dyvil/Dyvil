@@ -126,6 +126,10 @@ public class Frame
 	
 	public static String frameTypeName(Object o)
 	{
+		if (o == BOOLEAN)
+		{
+			return "boolean";
+		}
 		if (o == BYTE)
 		{
 			return "byte";

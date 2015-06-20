@@ -1231,7 +1231,7 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		this.writeArgumentsAndInvoke(writer, instance, arguments);
-		writer.writeJumpInsn(IFEQ, dest);
+		writer.writeJumpInsn(IFNE, dest);
 	}
 	
 	@Override
@@ -1255,7 +1255,7 @@ public class Method extends Member implements IMethod
 		
 		this.writeArgumentsAndInvoke(writer, instance, arguments);
 		
-		writer.writeJumpInsn(IFNE, dest);
+		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
 	private void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException

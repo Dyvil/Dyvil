@@ -79,6 +79,12 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 			{
 				return this.current.$lt$eq(SimpleRange.this.last);
 			}
+			
+			@Override
+			public String toString()
+			{
+				return "RangeIterator(" + SimpleRange.this + ")";
+			}
 		};
 	}
 	
