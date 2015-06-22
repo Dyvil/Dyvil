@@ -248,23 +248,37 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	/**
 	 * Gets and returns the value for the given {@code key}. If no mapping for
+	 * the {@code key} exists, {@code null} is returned. This alias forwarder
+	 * for Dyvil Subscript Syntax delegates to {@link #get(Object)}.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return the value
+	 */
+	public default V subscript(K key)
+	{
+		return this.get(key);
+	}
+	
+	/**
+	 * Gets and returns the value for the given {@code key}. If no mapping for
 	 * the {@code key} exists, {@code null} is returned.
 	 * 
 	 * @param key
 	 *            the key
 	 * @return the value
 	 */
-	public V apply(K key);
+	public V get(K key);
 	
 	// Non-mutating Operations
 	
 	/**
 	 * Returns a map that contains all entries of this map plus the new entry
 	 * specified by {@code key} and {@code value} as if it were added by
-	 * {@link #update(Object, Object)}. If the {@code key} is already present in
-	 * this map, a map is returned that uses the given {@code value} instead of
-	 * the previous value for the {@code key}, and that has the same size as
-	 * this map.
+	 * {@link #subscript_$eq(Object, Object)}. If the {@code key} is already
+	 * present in this map, a map is returned that uses the given {@code value}
+	 * instead of the previous value for the {@code key}, and that has the same
+	 * size as this map.
 	 * 
 	 * @param key
 	 *            the key
@@ -276,10 +290,11 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	/**
 	 * Returns a map that contains all entries of this map plus the new
-	 * {@code entry}, as if it were added by {@link #update(Object, Object)}. If
-	 * the {@code key} is already present in this map, a map is returned that
-	 * uses the given {@code value} instead of the previous value for the
-	 * {@code key}, and that has the same size as this map.
+	 * {@code entry}, as if it were added by
+	 * {@link #subscript_$eq(Object, Object)}. If the {@code key} is already
+	 * present in this map, a map is returned that uses the given {@code value}
+	 * instead of the previous value for the {@code key}, and that has the same
+	 * size as this map.
 	 * 
 	 * @see #$plus(Object, Object)
 	 * @param entry
@@ -294,9 +309,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	/**
 	 * Returns a map that contains all entries of this map plus all entries of
 	 * the given {@code map}, as if they were added by
-	 * {@link #update(Object, Object)}. If a key in the given map is already
-	 * present in this map, a map is returned that uses the value from the given
-	 * {@code map} for that key.
+	 * {@link #subscript_$eq(Object, Object)}. If a key in the given map is
+	 * already present in this map, a map is returned that uses the value from
+	 * the given {@code map} for that key.
 	 * 
 	 * @param map
 	 * @return
@@ -324,14 +339,14 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public default void $plus$eq(Entry<? extends K, ? extends V> entry)
 	{
-		this.update(entry.getKey(), entry.getValue());
+		this.subscript_$eq(entry.getKey(), entry.getValue());
 	}
 	
 	public default void $plus$plus$eq(Map<? extends K, ? extends V> map)
 	{
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
-			this.update(entry.getKey(), entry.getValue());
+			this.subscript_$eq(entry.getKey(), entry.getValue());
 		}
 	}
 	
@@ -368,7 +383,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public void clear();
 	
-	public default void update(K key, V value)
+	public default void subscript_$eq(K key, V value)
 	{
 		this.put(key, value);
 	}

@@ -51,9 +51,9 @@ public class FileTypes
 	
 	static
 	{
-		fileTypes.update("dyv", DYVIL_UNIT);
-		fileTypes.update("dyvil", DYVIL_UNIT);
-		fileTypes.update("dyh", DYVIL_HEADER);
-		fileTypes.update("dyvilh", DYVIL_HEADER);
+		fileTypes.put("dyv", DYVIL_UNIT);
+		fileTypes.put("dyvil", DYVIL_UNIT);
+		fileTypes.put("dyh", DYVIL_HEADER);
+		fileTypes.put("dyvilh", DYVIL_HEADER);
 	}
 }

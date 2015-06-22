@@ -23,7 +23,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public static <K, V> MutableMap<K, V> apply(K key, V value)
 	{
 		HashMap<K, V> map = new HashMap(1);
-		map.update(key, value);
+		map.subscript_$eq(key, value);
 		return map;
 	}
 	
@@ -37,7 +37,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 		HashMap<K, V> map = new HashMap(entries.length);
 		for (Entry<? extends K, ? extends V> entry : entries)
 		{
-			map.update(entry.getKey(), entry.getValue());
+			map.subscript_$eq(entry.getKey(), entry.getValue());
 		}
 		return map;
 	}
@@ -66,7 +66,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public boolean contains(Object key, Object value);
 	
 	@Override
-	public V apply(K key);
+	public V get(K key);
 	
 	// Non-mutating Operations
 	

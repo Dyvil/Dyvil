@@ -109,7 +109,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public V apply(K key)
+	public V get(K key)
 	{
 		return Objects.equals(this.key, key) ? this.value : null;
 	}

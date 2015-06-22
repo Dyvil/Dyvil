@@ -92,7 +92,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	public boolean contains(Object key, Object value);
 	
 	@Override
-	public V apply(K key);
+	public V get(K key);
 	
 	// Non-mutating Operations
 	
@@ -143,7 +143,7 @@ public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
 	
 	@Override
 	@mutating
-	public default void update(K key, V value)
+	public default void subscript_$eq(K key, V value)
 	{
 		throw new ImmutableException("() on Immutable Map");
 	}

@@ -62,7 +62,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public E apply(int index)
+	public E subscript(int index)
 	{
 		if (index == 0)
 		{

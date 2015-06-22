@@ -50,7 +50,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 			E element = entry.getKey();
 			if (!collection.contains(element))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		return new MapBasedSet(map.immutable());
@@ -65,7 +65,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 			E element = entry.getKey();
 			if (collection.contains(element))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		return new MapBasedSet(map.immutable());
@@ -77,7 +77,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		MutableMap<E, Object> map = this.map.mutableCopy();
 		for (E element : collection)
 		{
-			map.update(element, VALUE);
+			map.subscript_$eq(element, VALUE);
 		}
 		return new MapBasedSet(map.immutable());
 	}
@@ -91,14 +91,14 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 			E element = entry.getKey();
 			if (!collection.contains(element))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		for (E element : collection)
 		{
 			if (!this.contains(element))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		return new MapBasedSet(map.immutable());
@@ -110,7 +110,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		MutableMap<R, Object> map = new HashMap();
 		for (Entry<E, Object> entry : this.map)
 		{
-			map.update(mapper.apply(entry.getKey()), VALUE);
+			map.subscript_$eq(mapper.apply(entry.getKey()), VALUE);
 		}
 		return new MapBasedSet(map.immutable());
 	}
@@ -123,7 +123,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		{
 			for (R element : mapper.apply(entry.getKey()))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		return new MapBasedSet(map.immutable());
@@ -138,7 +138,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 			E element = entry.getKey();
 			if (condition.test(element))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		return new MapBasedSet(map.immutable());

@@ -50,7 +50,7 @@ public interface JavaMaps
 	}
 	
 	/**
-	 * @see Map#apply(Object)
+	 * @see Map#get(Object)
 	 */
 	public static @infix @inline <K, V> V apply(java.util.Map<K, V> map, K key)
 	{
@@ -60,7 +60,7 @@ public interface JavaMaps
 	// Mutating Operations
 	
 	/**
-	 * @see Map#update(Object, Object)
+	 * @see Map#subscript_$eq(Object, Object)
 	 */
 	public static @infix @inline <K, V> void update(java.util.Map<K, V> map, K key, V value)
 	{
@@ -142,7 +142,7 @@ public interface JavaMaps
 		MutableMap<K, V> newMap = new dyvil.collection.mutable.HashMap();
 		for (java.util.Map.Entry<K, V> entry : map.entrySet())
 		{
-			newMap.update(entry.getKey(), entry.getValue());
+			newMap.subscript_$eq(entry.getKey(), entry.getValue());
 		}
 		return newMap;
 	}

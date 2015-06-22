@@ -106,11 +106,11 @@ public interface List<E> extends Collection<E>
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of the bounds of this list
 	 */
-	public E apply(int index);
+	public E subscript(int index);
 	
 	/**
 	 * Returns the element at the given {@code index}. Unlike
-	 * {@link #apply(int)}, this method will not throw any exceptions if the
+	 * {@link #subscript(int)}, this method will not throw any exceptions if the
 	 * given {@code index} is out of bounds. Instead, it silently ignores the
 	 * error and returns {@code null}.
 	 * 
@@ -242,11 +242,11 @@ public interface List<E> extends Collection<E>
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of the bounds of this list
 	 */
-	public void update(int index, E element);
+	public void subscript_$eq(int index, E element);
 	
 	/**
 	 * Updates the element at the given {@code index} of this list. Unlike
-	 * {@link #update(int, Object)}, this method will not throw any exceptions
+	 * {@link #subscript_$eq(int, Object)}, this method will not throw any exceptions
 	 * if the given {@code index} is out of bounds. Instead, it silently ignores
 	 * the error and returns {@code null}.
 	 * 

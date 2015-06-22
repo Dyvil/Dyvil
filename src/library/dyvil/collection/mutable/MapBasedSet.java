@@ -50,7 +50,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 			E element = entry.getKey();
 			if (!collection.contains(element))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		return new MapBasedSet(map);
@@ -65,7 +65,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 			E element = entry.getKey();
 			if (collection.contains(element))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		return new MapBasedSet(map);
@@ -77,7 +77,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		MutableMap<E, Object> map = this.map.copy();
 		for (E element : collection)
 		{
-			map.update(element, VALUE);
+			map.subscript_$eq(element, VALUE);
 		}
 		return new MapBasedSet(map);
 	}
@@ -91,14 +91,14 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 			E element = entry.getKey();
 			if (!collection.contains(element))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		for (E element : collection)
 		{
 			if (!this.contains(element))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		return new MapBasedSet(map);
@@ -110,7 +110,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		MutableMap<R, Object> map = new HashMap();
 		for (Entry<E, Object> entry : this.map)
 		{
-			map.update(mapper.apply(entry.getKey()), VALUE);
+			map.subscript_$eq(mapper.apply(entry.getKey()), VALUE);
 		}
 		return new MapBasedSet(map);
 	}
@@ -123,7 +123,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		{
 			for (R element : mapper.apply(entry.getKey()))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		return new MapBasedSet(map);
@@ -138,7 +138,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 			E element = entry.getKey();
 			if (condition.test(element))
 			{
-				map.update(element, VALUE);
+				map.subscript_$eq(element, VALUE);
 			}
 		}
 		return new MapBasedSet(map);
@@ -181,7 +181,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	{
 		for (E element : collection)
 		{
-			this.map.update(element, VALUE);
+			this.map.subscript_$eq(element, VALUE);
 		}
 	}
 	
@@ -194,14 +194,14 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 			E element = entry.getKey();
 			if (!collection.contains(element))
 			{
-				newMap.update(element, VALUE);
+				newMap.subscript_$eq(element, VALUE);
 			}
 		}
 		for (E element : collection)
 		{
 			if (!this.contains(element))
 			{
-				newMap.update(element, VALUE);
+				newMap.subscript_$eq(element, VALUE);
 			}
 		}
 		this.map = newMap;
@@ -213,7 +213,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		HashMap<E, Object> newMap = new HashMap();
 		for (Entry<E, Object> entry : this.map)
 		{
-			newMap.update(mapper.apply(entry.getKey()), VALUE);
+			newMap.subscript_$eq(mapper.apply(entry.getKey()), VALUE);
 		}
 		this.map = newMap;
 	}
@@ -226,7 +226,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		{
 			for (E element : mapper.apply(entry.getKey()))
 			{
-				newMap.update(element, VALUE);
+				newMap.subscript_$eq(element, VALUE);
 			}
 		}
 		this.map = newMap;

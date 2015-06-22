@@ -76,7 +76,7 @@ public interface Matrix<E> extends Iterable<E>
 	
 	public boolean contains(Object element);
 	
-	public E apply(int row, int column);
+	public E subscript(int row, int column);
 	
 	public E get(int row, int column);
 	
@@ -108,7 +108,7 @@ public interface Matrix<E> extends Iterable<E>
 	
 	public void insertColumn(int index, List<E> column);
 	
-	public void update(int row, int column, E element);
+	public void subscript_$eq(int row, int column, E element);
 	
 	public E set(int row, int column, E element);
 	

@@ -66,7 +66,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public boolean contains(Object element);
 	
 	@Override
-	public E apply(int index);
+	public E subscript(int index);
 	
 	@Override
 	public E get(int index);
@@ -171,7 +171,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	@mutating
-	public default void update(int index, E element)
+	public default void subscript_$eq(int index, E element)
 	{
 		throw new ImmutableException("update() on Immutable List");
 	}

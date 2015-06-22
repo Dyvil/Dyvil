@@ -212,7 +212,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		this(map.size(), DEFAULT_LOAD_FACTOR);
 		for (Entry<K, V> entry : map)
 		{
-			this.update(entry.getKey(), entry.getValue());
+			this.subscript_$eq(entry.getKey(), entry.getValue());
 		}
 	}
 	
@@ -359,13 +359,13 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public boolean containsKey(Object key)
 	{
-		return this.apply((K) key) != null;
+		return this.get((K) key) != null;
 	}
 	
 	@Override
 	public boolean contains(Object key, Object value)
 	{
-		return value.equals(this.apply((K) key));
+		return value.equals(this.get((K) key));
 	}
 	
 	@Override
@@ -386,7 +386,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public V apply(K key)
+	public V get(K key)
 	{
 		if (key == null)
 		{
@@ -416,7 +416,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	public MutableMap<K, V> $plus(K key, V value)
 	{
 		HashMap<K, V> copy = this.copy();
-		copy.update(key, value);
+		copy.subscript_$eq(key, value);
 		return copy;
 	}
 	
@@ -523,7 +523,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public void update(K key, V value)
+	public void subscript_$eq(K key, V value)
 	{
 		if (key == null)
 		{

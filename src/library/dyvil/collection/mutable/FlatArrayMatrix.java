@@ -254,7 +254,7 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 	}
 	
 	@Override
-	public void update(int row, int column, E element)
+	public void subscript_$eq(int row, int column, E element)
 	{
 		this.rangeCheck(row, column);
 		this.cells[this.index(row, column)] = element;

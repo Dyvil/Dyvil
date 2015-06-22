@@ -38,7 +38,7 @@ public interface MutableMatrix<E> extends Matrix<E>
 	public boolean contains(Object element);
 	
 	@Override
-	public E apply(int row, int column);
+	public E subscript(int row, int column);
 	
 	@Override
 	public E get(int row, int column);
@@ -83,7 +83,7 @@ public interface MutableMatrix<E> extends Matrix<E>
 	public void insertColumn(int index, List<E> column);
 	
 	@Override
-	public void update(int row, int column, E element);
+	public void subscript_$eq(int row, int column, E element);
 	
 	@Override
 	public E set(int row, int column, E element);

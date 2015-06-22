@@ -53,7 +53,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		}
 		
 		MutableMap<K, V> copy = this.copy();
-		copy.update(key, value);
+		copy.subscript_$eq(key, value);
 		return copy;
 	}
 	

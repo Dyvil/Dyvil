@@ -29,7 +29,7 @@ public class ExternalPackage extends Package
 	@Override
 	public Package createSubPackage(String name)
 	{
-		Package pack = this.subPackages.apply(name);
+		Package pack = this.subPackages.get(name);
 		if (pack != null)
 		{
 			return pack;

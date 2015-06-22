@@ -34,7 +34,7 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	public boolean contains(Object element);
 	
 	@Override
-	public E apply(int row, int column);
+	public E subscript(int row, int column);
 	
 	@Override
 	public E get(int row, int column);
@@ -94,7 +94,7 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	}
 	
 	@Override
-	public default void update(int row, int column, E element)
+	public default void subscript_$eq(int row, int column, E element)
 	{
 		throw new ImmutableException("update() on Immutable Matrix");
 	}

@@ -41,7 +41,7 @@ public class FileFinder
 		this.files.add(output);
 		String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
 		
-		IFileType fileType = FileTypes.fileTypes.apply(extension);
+		IFileType fileType = FileTypes.fileTypes.get(extension);
 		if (fileType == null)
 		{
 			return; // Skip: Unknown File Type

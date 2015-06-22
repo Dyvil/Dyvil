@@ -119,7 +119,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 	
 	@Override
-	public E apply(int index)
+	public E subscript(int index)
 	{
 		this.rangeCheck(index);
 		return (E) this.elements[index];

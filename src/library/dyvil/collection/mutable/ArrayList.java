@@ -342,7 +342,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public void update(int index, E element)
+	public void subscript_$eq(int index, E element)
 	{
 		this.rangeCheck(index);
 		this.elements[index] = element;

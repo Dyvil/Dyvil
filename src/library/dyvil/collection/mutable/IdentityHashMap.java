@@ -204,7 +204,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		this(map.size(), DEFAULT_LOAD_FACTOR);
 		for (Entry<K, V> entry : map)
 		{
-			this.update(entry.getKey(), entry.getValue());
+			this.subscript_$eq(entry.getKey(), entry.getValue());
 		}
 	}
 	
@@ -393,7 +393,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public V apply(K key)
+	public V get(K key)
 	{
 		Object k = maskNull(key);
 		Object[] tab = this.table;
@@ -418,7 +418,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	public MutableMap<K, V> $plus(K key, V value)
 	{
 		MutableMap<K, V> copy = this.copy();
-		copy.update(key, value);
+		copy.subscript_$eq(key, value);
 		return copy;
 	}
 	

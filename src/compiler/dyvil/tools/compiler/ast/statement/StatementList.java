@@ -376,7 +376,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	{
 		if (this.variables != null)
 		{
-			IField field = this.variables.apply(name);
+			IField field = this.variables.get(name);
 			if (field != null)
 			{
 				return field;

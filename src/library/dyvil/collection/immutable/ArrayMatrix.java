@@ -189,7 +189,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	}
 	
 	@Override
-	public E apply(int row, int column)
+	public E subscript(int row, int column)
 	{
 		this.rangeCheck(row, column);
 		return (E) this.cells[row][column];

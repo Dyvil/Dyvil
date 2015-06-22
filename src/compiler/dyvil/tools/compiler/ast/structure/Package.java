@@ -113,7 +113,7 @@ public class Package implements INamed, IContext
 	
 	public Package createSubPackage(String name)
 	{
-		Package pack = this.subPackages.apply(name);
+		Package pack = this.subPackages.get(name);
 		if (pack != null)
 		{
 			return pack;
@@ -173,7 +173,7 @@ public class Package implements INamed, IContext
 	
 	public Package resolvePackage(String name)
 	{
-		return this.subPackages.apply(name);
+		return this.subPackages.get(name);
 	}
 	
 	public IDyvilHeader resolveHeader(String name)

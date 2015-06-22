@@ -68,7 +68,7 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public E apply(int index)
+	public E subscript(int index)
 	{
 		throw new IndexOutOfBoundsException("Empty List.apply()");
 	}

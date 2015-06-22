@@ -22,7 +22,7 @@ public interface JavaCollections
 	}
 	
 	/**
-	 * @see List#apply(int)
+	 * @see List#subscript(int)
 	 */
 	public static @infix @inline <E> E apply(java.util.List<E> list, int index)
 	{
@@ -32,7 +32,7 @@ public interface JavaCollections
 	// Mutating Operations
 	
 	/**
-	 * @see List#update(int, Object)
+	 * @see List#subscript_$eq(int, Object)
 	 */
 	public static @infix @inline <E> void update(java.util.List<E> list, int index, E element)
 	{
