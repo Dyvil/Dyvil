@@ -115,8 +115,18 @@ public final class Name
 			return name;
 		}
 		
-		name = new Name(Symbols.unqualify(value), Symbols.qualify(value));
-		return name;
+		return new Name(Symbols.unqualify(value), Symbols.qualify(value));
+	}
+	
+	public static Name getSpecial(String value)
+	{
+		Name name = map.get(value);
+		if (name != null)
+		{
+			return name;
+		}
+		
+		return new Name('`' + value + '`', '`' + Symbols.qualify(value) + '`');
 	}
 	
 	public static Name getQualified(String value)
