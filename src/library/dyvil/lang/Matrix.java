@@ -26,6 +26,11 @@ public interface Matrix<E> extends Iterable<E>
 		return MutableMatrix.apply();
 	}
 	
+	public static <E> MutableMatrix<E> apply(int rows, int columns)
+	{
+		return MutableMatrix.apply(rows, columns);
+	}
+	
 	public static <E> ImmutableMatrix<E> apply(E[]... elements)
 	{
 		return ImmutableMatrix.apply(elements);
@@ -235,7 +240,7 @@ public interface Matrix<E> extends Iterable<E>
 			builder.append(iterator.next());
 			if (iterator.hasNext())
 			{
-				if (++column == columns)
+				if (++column >= columns)
 				{
 					builder.append("], [");
 					column = 0;

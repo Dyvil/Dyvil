@@ -21,6 +21,11 @@ public interface MutableMatrix<E> extends Matrix<E>
 		return new FlatArrayMatrix();
 	}
 	
+	public static <E> MutableMatrix<E> apply(int rows, int columns)
+	{
+		return new FlatArrayMatrix(rows, columns);
+	}
+	
 	public static <E> MutableMatrix<E> apply(E[]... cells)
 	{
 		return new FlatArrayMatrix(cells);

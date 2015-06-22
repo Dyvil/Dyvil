@@ -258,24 +258,23 @@ public abstract class AbstractFlatArrayMatrix<E> implements Matrix<E>
 		
 		int cells = this.rows * this.columns;
 		StringBuilder builder = new StringBuilder(cells * 10).append("[[");
-		for (int i = 0;;)
+		for (int i = 0, column = 0;;)
 		{
 			builder.append(this.cells[i]);
 			if (++i < cells)
 			{
-				if (i == this.columns)
+				if (++column == this.columns)
 				{
 					builder.append("], [");
+					column = 0;
 				}
 				else
 				{
 					builder.append(", ");
 				}
+				continue;
 			}
-			else
-			{
-				break;
-			}
+			break;
 		}
 		return builder.append("]]").toString();
 	}
