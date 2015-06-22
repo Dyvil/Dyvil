@@ -137,19 +137,6 @@ public final class MethodCall extends AbstractCall implements INamed
 			}
 		}
 		
-		if (args == 0)
-		{
-			IField field = ICall.resolveField(context, this.instance, this.name);
-			if (field != null)
-			{
-				FieldAccess access = new FieldAccess(this.position);
-				access.field = field;
-				access.instance = this.instance;
-				access.name = this.name;
-				access.dotless = this.dotless;
-				return access;
-			}
-		}
 		// Resolve Apply Method
 		if (this.instance == null)
 		{
@@ -212,6 +199,7 @@ public final class MethodCall extends AbstractCall implements INamed
 		call.method = method;
 		call.instance = instance;
 		call.arguments = this.arguments;
+		call.genericData = this.genericData;
 		
 		return call;
 	}

@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.*;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.*;
 import dyvil.tools.compiler.ast.parameter.*;
@@ -20,6 +21,7 @@ import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
 import dyvil.tools.compiler.parser.statement.*;
+import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
@@ -28,24 +30,25 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ExpressionParser extends Parser implements ITyped, IValued
 {
-	public static final int		VALUE			= 0x1;
-	public static final int		LIST_END		= 0x2;
-	private static final int	ARRAY_END		= 0x4;
+	public static final int		VALUE				= 0x1;
+	public static final int		LIST_END			= 0x2;
+	private static final int	ARRAY_END			= 0x4;
 	
-	public static final int		ACCESS			= 0x10;
-	public static final int		ACCESS_2		= 0x20;
+	public static final int		ACCESS				= 0x10;
+	public static final int		ACCESS_2			= 0x20;
 	
-	public static final int		STATEMENT		= 0x80;
-	public static final int		TYPE			= 0x100;
-	public static final int		CONSTRUCTOR		= 0x200;
-	public static final int		CONSTRUCTOR_END	= 0x400;
-	public static final int		PARAMETERS_END	= 0x800;
-	public static final int		SUBSCRIPT_END	= 0x1000;
+	public static final int		STATEMENT			= 0x80;
+	public static final int		TYPE				= 0x100;
+	public static final int		CONSTRUCTOR			= 0x200;
+	public static final int		CONSTRUCTOR_END		= 0x400;
+	public static final int		PARAMETERS_END		= 0x800;
+	public static final int		SUBSCRIPT_END		= 0x1000;
+	public static final int		TYPE_ARGUMENTS_END	= 0x2000;
 	
-	public static final int		BYTECODE_END	= 0x10000;
+	public static final int		BYTECODE_END		= 0x10000;
 	
-	public static final int		PATTERN_IF		= 0x20000;
-	public static final int		PATTERN_END		= 0x40000;
+	public static final int		PATTERN_IF			= 0x20000;
+	public static final int		PATTERN_END			= 0x40000;
 	
 	protected IValued			field;
 	
@@ -279,6 +282,27 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Bytecode Expression - '}' expected", true);
+		}
+		if (this.mode == TYPE_ARGUMENTS_END)
+		{
+			MethodCall mc = (MethodCall) this.value;
+			IToken next = token.next();
+			if (next.type() == Symbols.OPEN_PARENTHESIS)
+			{
+				pm.skip();
+				mc.arguments = this.getArguments(pm, next.next());
+			}
+			else
+			{
+				mc.arguments = EmptyArguments.INSTANCE;
+			}
+			
+			this.mode = ACCESS;
+			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			{
+				return;
+			}
+			throw new SyntaxError(token, "Invalid Method Type Parameter List - ']' expected");
 		}
 		if (ParserUtil.isCloseBracket(type))
 		{
@@ -537,6 +561,18 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.field.setValue(lv);
 			this.field = lv;
 			pm.skip();
+			return;
+		}
+		if (type1 == Symbols.GENERIC_CALL)
+		{
+			MethodCall mc = new MethodCall(token.raw(), this.value, token.nameValue());
+			GenericData gd = new GenericData();
+			mc.setGenericData(gd);
+			mc.dotless = this.dotless;
+			this.value = mc;
+			this.mode = TYPE_ARGUMENTS_END;
+			pm.skip();
+			pm.pushParser(new TypeListParser(gd));
 			return;
 		}
 		Operator op = pm.getOperator(name);

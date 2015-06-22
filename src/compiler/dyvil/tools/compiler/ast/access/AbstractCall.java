@@ -27,6 +27,11 @@ public abstract class AbstractCall implements ICall, IValued
 	protected IType			type;
 	protected GenericData	genericData;
 	
+	public void setGenericData(GenericData data)
+	{
+		this.genericData = data;
+	}
+	
 	protected GenericData getGenericData()
 	{
 		if (this.method == null || this.genericData != null && this.genericData.computedGenerics >= 0)

@@ -34,7 +34,7 @@ public final class GenericData implements ITypeList, ITypeContext
 	
 	public void setTypeCount(int count)
 	{
-		this.computedGenerics = count;
+		this.computedGenerics = count - this.genericCount;
 		
 		if (this.generics == null)
 		{
@@ -118,7 +118,7 @@ public final class GenericData implements ITypeList, ITypeContext
 		
 		if (len > 0)
 		{
-			buffer.append('[');
+			buffer.append('#').append('[');
 			Util.astToString(prefix, this.generics, len, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
 		}

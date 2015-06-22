@@ -48,6 +48,15 @@ public class ApplyMethodCall extends AbstractCall
 			this.instance.toString(prefix, buffer);
 		}
 		
+		if (this.genericData != null)
+		{
+			if (this.instance != null || this.instance.valueTag() != FIELD_ACCESS)
+			{
+				buffer.append(".apply");
+			}
+			this.genericData.toString(prefix, buffer);
+		}
+		
 		this.arguments.toString(prefix, buffer);
 	}
 }

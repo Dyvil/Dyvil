@@ -66,7 +66,8 @@ public final class Dlex
 				subtype = m & 0xFFFF0000;
 			}
 			
-			typeswitch: switch (type)
+			typeswitch:
+			switch (type)
 			{
 			case IDENTIFIER:
 				if (subtype == MOD_DOTS)
@@ -342,6 +343,14 @@ public final class Dlex
 					buf.append(c);
 				}
 				break;
+			case GENERIC_CALL:
+				if (c == '[')
+				{
+					addToken = true;
+					reparse = false;
+					break;
+				}
+				continue;
 			}
 			
 			if (addToken)
@@ -375,6 +384,12 @@ public final class Dlex
 		{
 		case '`':
 			return SPECIAL_IDENTIFIER;
+		case '#':
+			if (code.charAt(i + 1) == '[')
+			{
+				return GENERIC_CALL;
+			}
+			return IDENTIFIER | MOD_SYMBOL;
 		case '"':
 			return STRING;
 		case '\'':
@@ -568,6 +583,8 @@ public final class Dlex
 			return new StringToken(prev, STRING_END, s, line, start, start + len);
 		case CHAR:
 			return new CharToken(prev, s.charAt(1), line, start);
+		case GENERIC_CALL:
+			return new SymbolToken(prev, Symbols.GENERIC_CALL, line, start);
 		}
 		return null;
 	}
