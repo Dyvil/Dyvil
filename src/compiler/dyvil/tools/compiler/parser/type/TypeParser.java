@@ -50,8 +50,9 @@ public final class TypeParser extends Parser implements ITyped
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (this.mode == NAME)
+		switch (this.mode)
 		{
+		case NAME:
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				TupleType tupleType = new TupleType();
@@ -90,7 +91,8 @@ public final class TypeParser extends Parser implements ITyped
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				if (token.next().type() == Symbols.OPEN_SQUARE_BRACKET)
+				int nextType = token.next().type();
+				if (nextType == Symbols.OPEN_SQUARE_BRACKET || nextType == Symbols.GENERIC_CALL)
 				{
 					this.type = new GenericType(token, token.nameValue());
 					this.mode = GENERICS;
@@ -108,16 +110,13 @@ public final class TypeParser extends Parser implements ITyped
 				this.mode = WILDCARD_TYPE;
 				return;
 			}
-			
 			if (ParserUtil.isTerminator(type))
 			{
 				pm.popParser(true);
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Type - Invalid " + token);
-		}
-		if (this.mode == TUPLE_END)
-		{
+		case TUPLE_END:
 			this.typed.setType(this.type);
 			pm.popParser();
 			if (type == Symbols.CLOSE_PARENTHESIS)
@@ -134,22 +133,16 @@ public final class TypeParser extends Parser implements ITyped
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Tuple Type - ')' expected");
-		}
-		if (this.mode == LAMBDA_TYPE)
-		{
+		case LAMBDA_TYPE:
 			pm.pushParser(new TypeParser((LambdaType) this.type));
 			this.mode = LAMBDA_END;
 			return;
-		}
-		if (this.mode == LAMBDA_END)
-		{
+		case LAMBDA_END:
 			this.type.expandPosition(token.prev());
 			this.typed.setType(this.type);
 			pm.popParser(true);
 			return;
-		}
-		if (this.mode == ARRAY_END)
-		{
+		case ARRAY_END:
 			this.type.expandPosition(token);
 			this.typed.setType(this.type);
 			pm.popParser();
@@ -158,23 +151,18 @@ public final class TypeParser extends Parser implements ITyped
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Array Type - ']' expected", true);
-		}
-		if (this.mode == GENERICS)
-		{
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
+		case GENERICS:
+			if (type == Symbols.OPEN_SQUARE_BRACKET || type == Symbols.GENERIC_CALL)
 			{
 				pm.pushParser(new TypeListParser((GenericType) this.type));
 				this.mode = GENERICS_END;
 				return;
 			}
-			
 			this.type.expandPosition(token.prev());
 			this.typed.setType(this.type);
 			pm.popParser(true);
 			return;
-		}
-		if (this.mode == WILDCARD_TYPE)
-		{
+		case WILDCARD_TYPE:
 			Name name = token.nameValue();
 			if (this.boundMode == 0)
 			{
@@ -202,9 +190,7 @@ public final class TypeParser extends Parser implements ITyped
 			this.typed.setType(this.type);
 			pm.popParser(true);
 			return;
-		}
-		if (this.mode == GENERICS_END)
-		{
+		case GENERICS_END:
 			this.typed.setType(this.type);
 			pm.popParser();
 			if (type == Symbols.CLOSE_SQUARE_BRACKET)
