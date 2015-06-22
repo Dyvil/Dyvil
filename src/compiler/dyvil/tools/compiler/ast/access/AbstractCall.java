@@ -152,7 +152,7 @@ public abstract class AbstractCall implements ICall, IValued
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
+			this.instance = this.method.checkArguments(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
 		}
 		this.arguments.checkTypes(markers, context);
 	}
