@@ -3,6 +3,7 @@ package dyvil.lang;
 import dyvil.lang.literal.FloatConvertible;
 
 import dyvil.annotation.Intrinsic;
+import dyvil.annotation.infix;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
@@ -29,15 +30,14 @@ public class Float implements Number
 		return new Float(v);
 	}
 	
+	public static @infix float unapply(Float v)
+	{
+		return v == null ? 0F : v.value;
+	}
+	
 	protected Float(float value)
 	{
 		this.value = value;
-	}
-	
-	@Intrinsic({ INSTANCE })
-	public float unapply()
-	{
-		return this.value;
 	}
 	
 	@Override

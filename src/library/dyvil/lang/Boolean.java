@@ -1,10 +1,14 @@
 package dyvil.lang;
 
+import dyvil.lang.literal.BooleanConvertible;
+
 import dyvil.annotation.Intrinsic;
+import dyvil.annotation.infix;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
 
+@BooleanConvertible
 public class Boolean
 {
 	protected static final Boolean	TRUE	= new Boolean(true);
@@ -12,20 +16,19 @@ public class Boolean
 	
 	protected boolean				value;
 	
-	protected Boolean(boolean value)
-	{
-		this.value = value;
-	}
-	
 	public static Boolean apply(boolean value)
 	{
 		return value ? TRUE : FALSE;
 	}
 	
-	@Intrinsic({ INSTANCE })
-	public boolean unapply()
+	public static @infix boolean unapply(Boolean v)
 	{
-		return this.value;
+		return v == null ? false : v.value;
+	}
+	
+	protected Boolean(boolean value)
+	{
+		this.value = value;
 	}
 	
 	@Intrinsic({ INSTANCE })

@@ -1,10 +1,14 @@
 package dyvil.lang;
 
+import dyvil.lang.literal.IntConvertible;
+
 import dyvil.annotation.Intrinsic;
+import dyvil.annotation.infix;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
 
+@IntConvertible
 public class Short implements Integer
 {
 	public static final int		min		= java.lang.Short.MIN_VALUE;
@@ -22,15 +26,14 @@ public class Short implements Integer
 		return new Short(v);
 	}
 	
+	public static @infix short unapply(Short v)
+	{
+		return v == null ? 0 : v.value;
+	}
+	
 	protected Short(short value)
 	{
 		this.value = value;
-	}
-	
-	@Intrinsic({ INSTANCE })
-	public short unapply()
-	{
-		return this.value;
 	}
 	
 	@Override

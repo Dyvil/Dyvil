@@ -3,6 +3,7 @@ package dyvil.lang;
 import dyvil.lang.literal.DoubleConvertible;
 
 import dyvil.annotation.Intrinsic;
+import dyvil.annotation.infix;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
@@ -29,15 +30,14 @@ public class Double implements Number
 		return new Double(v);
 	}
 	
+	public static @infix double unapply(Double v)
+	{
+		return v == null ? 0D : v.value;
+	}
+	
 	protected Double(double value)
 	{
 		this.value = value;
-	}
-	
-	@Intrinsic({ INSTANCE })
-	public double unapply()
-	{
-		return this.value;
 	}
 	
 	@Override

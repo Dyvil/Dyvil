@@ -1,10 +1,14 @@
 package dyvil.lang;
 
+import dyvil.lang.literal.IntConvertible;
+
 import dyvil.annotation.Intrinsic;
+import dyvil.annotation.infix;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
 
+@IntConvertible
 public class Byte implements Integer
 {
 	public static final byte	min		= java.lang.Byte.MIN_VALUE;
@@ -22,15 +26,14 @@ public class Byte implements Integer
 		return new Byte(v);
 	}
 	
+	public static @infix byte unapply(Byte v)
+	{
+		return v == null ? 0 : v.value;
+	}
+	
 	protected Byte(byte value)
 	{
 		this.value = value;
-	}
-	
-	@Intrinsic({ INSTANCE })
-	public byte unapply()
-	{
-		return this.value;
 	}
 	
 	@Override
