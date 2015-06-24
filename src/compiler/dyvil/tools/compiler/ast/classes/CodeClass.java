@@ -551,6 +551,8 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void addCompilable(IClassCompilable compilable)
 	{
+		compilable.setInnerIndex(this.internalName, this.compilableCount);
+		
 		if (this.compilables == null)
 		{
 			this.compilables = new IClassCompilable[2];

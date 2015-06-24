@@ -174,7 +174,7 @@ public class REPLVariable extends Field
 		
 		byte[] bytes = writer.toByteArray();
 		
-		if (type != Types.VOID)
+		if (type != Types.VOID || !compilableList.isEmpty())
 		{
 			// The type contains the value, so we have to keep the class loaded.
 			return ReflectUtils.unsafe.defineClass(className, bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);

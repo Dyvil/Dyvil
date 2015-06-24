@@ -263,7 +263,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		{
 			return null;
 		}
-		return this.inheritedOperators.get(op1);
+		return this.inheritedOperators.get(name);
 	}
 	
 	@Override

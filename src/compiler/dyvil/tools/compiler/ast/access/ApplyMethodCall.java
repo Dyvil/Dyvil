@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.access;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -12,6 +13,13 @@ public class ApplyMethodCall extends AbstractCall
 	public ApplyMethodCall(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	public ApplyMethodCall(ICodePosition position, IValue instance, IArguments arguments)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.arguments = arguments;
 	}
 	
 	@Override

@@ -33,11 +33,11 @@ public class REPLContext extends DyvilHeader implements IValued
 	private static final CodePosition	CODE_POSITION	= new CodePosition(1, 0, 1);
 	
 	protected static int				resultIndex;
+	protected static int				classIndex;
 	
 	private Map<Name, REPLVariable>		variables		= new HashMap();
 	
-	private String currentClassName;
-	private String						currentInternalName;
+	private String						currentClassName;
 	private IValue						value;
 	private ImportDeclaration			importDeclaration;
 	private IncludeDeclaration			includeDeclaration;
@@ -140,8 +140,8 @@ public class REPLContext extends DyvilHeader implements IValued
 		}
 		
 		MarkerList markers = new MarkerList();
-		this.currentClassName = "REPL" + resultIndex;
-		this.currentInternalName = "repl/".concat(this.currentClassName);
+		this.currentClassName = "REPL" + classIndex++;
+		
 		Name name = Name.getQualified("res" + resultIndex);
 		IValue value = this.value;
 		IType type = Types.UNKNOWN;
@@ -177,7 +177,7 @@ public class REPLContext extends DyvilHeader implements IValued
 			}
 		}
 		
-		field.compute(this.currentInternalName, this.compilableList);
+		field.compute(this.currentClassName, this.compilableList);
 		
 		this.compilableList.clear();
 		this.innerClassList.clear();
@@ -233,12 +233,12 @@ public class REPLContext extends DyvilHeader implements IValued
 	{
 		if (iclass.hasSeparateFile())
 		{
-			iclass.setInnerIndex(this.currentInternalName, this.innerClassList.size());
+			iclass.setInnerIndex(this.currentClassName, this.innerClassList.size());
 			this.innerClassList.add(iclass);
 		}
 		else
 		{
-			iclass.setInnerIndex(this.currentInternalName, this.compilableList.size());
+			iclass.setInnerIndex(this.currentClassName, this.compilableList.size());
 			this.compilableList.add(iclass);
 		}
 	}
@@ -296,25 +296,25 @@ public class REPLContext extends DyvilHeader implements IValued
 	@Override
 	public String getFullName()
 	{
-		return this.currentInternalName;
+		return this.currentClassName;
 	}
 	
 	@Override
 	public String getFullName(String name)
 	{
-		return this.currentInternalName + '$' + name;
+		return this.currentClassName + '$' + name;
 	}
 	
 	@Override
 	public String getInternalName()
 	{
-		return this.currentInternalName;
+		return this.currentClassName;
 	}
 	
 	@Override
 	public String getInternalName(String name)
 	{
-		return this.currentInternalName + '$' + name;
+		return this.currentClassName + '$' + name;
 	}
 	
 	@Override
