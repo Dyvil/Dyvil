@@ -327,7 +327,6 @@ public final class Array extends ASTNode implements IValue, IValueList
 				Marker marker = markers.create(value.getPosition(), "array.element.type");
 				marker.addInfo("Array Type: " + this.requiredType);
 				marker.addInfo("Array Element Type: " + value.getType());
-				
 			}
 			else
 			{

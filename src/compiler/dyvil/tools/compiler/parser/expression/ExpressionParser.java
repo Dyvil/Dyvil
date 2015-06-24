@@ -513,8 +513,8 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	private void getAccess(IParserManager pm, Name name, IToken token, int type) throws SyntaxError
 	{
 		IToken next = token.next();
-		int type1 = next.type();
-		if (type1 == Symbols.OPEN_PARENTHESIS)
+		int nextType = next.type();
+		if (nextType == Symbols.OPEN_PARENTHESIS)
 		{
 			MethodCall call = new MethodCall(token.raw(), this.value, name);
 			call.dotless = this.dotless;
@@ -524,7 +524,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			call.setArguments(this.getArguments(pm, next.next()));
 			return;
 		}
-		if (type1 == Symbols.OPEN_SQUARE_BRACKET)
+		if (nextType == Symbols.OPEN_SQUARE_BRACKET)
 		{
 			SubscriptGetter getter = new SubscriptGetter(token, new FieldAccess(token.raw(), this.value, name));
 			this.value = getter;
@@ -534,7 +534,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.pushParser(new ExpressionListParser(getter.getArguments()));
 			return;
 		}
-		if (type1 == Symbols.ARROW_OPERATOR)
+		if (nextType == Symbols.ARROW_OPERATOR)
 		{
 			LambdaExpression lv = new LambdaExpression(next.raw(), name);
 			this.mode = VALUE;
@@ -543,7 +543,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			pm.skip();
 			return;
 		}
-		if (type1 == Symbols.GENERIC_CALL)
+		if (nextType == Symbols.GENERIC_CALL)
 		{
 			MethodCall mc = new MethodCall(token.raw(), this.value, token.nameValue());
 			GenericData gd = new GenericData();
@@ -590,7 +590,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		}
 		if (!name.qualified.endsWith("$eq"))
 		{
-			if (ParserUtil.isTerminator2(type1))
+			if (ParserUtil.isTerminator2(nextType))
 			{
 				FieldAccess access = new FieldAccess(token, this.value, name);
 				access.dotless = this.dotless;
@@ -598,13 +598,16 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 				this.mode = ACCESS;
 				return;
 			}
-			if (ParserUtil.isIdentifier(type1) && !ParserUtil.isTerminator2(next.next().type()))
+			if (ParserUtil.isIdentifier(nextType))
 			{
-				FieldAccess access = new FieldAccess(token, this.value, name);
-				access.dotless = this.dotless;
-				this.value = access;
-				this.mode = ACCESS;
-				return;
+				if (ParserUtil.isOperator(pm, next, nextType) || !ParserUtil.isTerminator2(next.next().type()))
+				{
+					FieldAccess access = new FieldAccess(token, this.value, name);
+					access.dotless = this.dotless;
+					this.value = access;
+					this.mode = ACCESS;
+					return;
+				}
 			}
 		}
 		

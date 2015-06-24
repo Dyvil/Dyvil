@@ -78,7 +78,8 @@ public class IfStatementParser extends Parser implements IValued
 		{
 			if (ParserUtil.isTerminator(type))
 			{
-				if (token.next().type() == Keywords.ELSE)
+				IToken next = token.getNext();
+				if (next != null && next.type() == Keywords.ELSE)
 				{
 					return;
 				}

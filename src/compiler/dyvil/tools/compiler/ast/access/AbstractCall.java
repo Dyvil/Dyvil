@@ -32,6 +32,12 @@ public abstract class AbstractCall implements ICall, IValued
 		this.genericData = data;
 	}
 	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
 	protected GenericData getGenericData()
 	{
 		if (this.method == null || this.genericData != null && this.genericData.computedGenerics >= 0)

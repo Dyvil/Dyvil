@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
@@ -96,6 +97,15 @@ public class ParserUtil
 	public static boolean isSeperator(int type)
 	{
 		return type == Symbols.COMMA || type == Symbols.SEMICOLON;
+	}
+	
+	public static boolean isOperator(IParserManager pm, IToken token, int type)
+	{
+		if (type == Tokens.SYMBOL_IDENTIFIER || type == Tokens.DOT_IDENTIFIER)
+		{
+			return true;
+		}
+		return pm.getOperator(token.nameValue()) != null;
 	}
 	
 	public static IValue parsePrimitive(IToken token, int type) throws SyntaxError

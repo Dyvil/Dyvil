@@ -10,14 +10,12 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.ParserUtil;
 
 public class DoStatementParser extends Parser implements IValued
 {
 	public static final int	DO				= 1;
 	public static final int	WHILE			= 2;
-	public static final int	CONDITION		= 4;
-	public static final int	CONDITION_END	= 8;
+	public static final int END = 4;
 	
 	public DoStatement		statement;
 	
@@ -47,16 +45,18 @@ public class DoStatementParser extends Parser implements IValued
 		{
 			if (type == Keywords.WHILE)
 			{
-				this.mode = CONDITION;
+				this.mode = END;
+				pm.pushParser(new ExpressionParser(this));
 				return;
 			}
 			
-			if (ParserUtil.isTerminator(type))
+			if (type == Symbols.SEMICOLON)
 			{
 				if (token.next().type() == Keywords.WHILE)
 				{
+					this.mode = END;
 					pm.skip(1);
-					this.mode = CONDITION;
+					pm.pushParser(new ExpressionParser(this));
 					return;
 				}
 			}
@@ -64,36 +64,11 @@ public class DoStatementParser extends Parser implements IValued
 			pm.popParser(true);
 			return;
 		}
-		if (this.mode == CONDITION)
+		if (this.mode == END)
 		{
-			if (type == Symbols.OPEN_PARENTHESIS)
-			{
-				pm.pushParser(new ExpressionParser(this));
-				this.mode = CONDITION_END;
-				return;
-			}
-			
-			pm.pushParser(new ExpressionParser(this));
-			this.mode = CONDITION_END;
-			throw new SyntaxError(token, "Invalid Do-While Statement - '(' expected");
+			pm.popParser(true);
+			return;
 		}
-		if (this.mode == CONDITION_END)
-		{
-			if (type == Symbols.CLOSE_PARENTHESIS)
-			{
-				pm.popParser();
-				return;
-			}
-			
-			pm.popParser();
-			throw new SyntaxError(token, "Invalid Do-While Statement - ')' expected");
-		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 	
 	@Override
@@ -103,9 +78,15 @@ public class DoStatementParser extends Parser implements IValued
 		{
 			this.statement.action = value;
 		}
-		else if (this.mode == CONDITION_END)
+		else if (this.mode == END)
 		{
 			this.statement.condition = value;
 		}
+	}
+	
+	@Override
+	public IValue getValue()
+	{
+		return null;
 	}
 }
