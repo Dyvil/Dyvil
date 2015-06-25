@@ -7,11 +7,15 @@ import dyvil.tools.compiler.ast.classes.IClass;
 
 public interface IAnnotationList
 {
+	public int annotationCount();
+	
 	public void setAnnotation(int index, Annotation annotation);
 	
 	public void addAnnotation(Annotation annotation);
 	
 	public void removeAnnotation(int index);
+	
+	public Annotation[] getAnnotations();
 	
 	public Annotation getAnnotation(int index);
 	

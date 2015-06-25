@@ -118,6 +118,12 @@ public final class CaptureField implements IVariable
 	}
 	
 	@Override
+	public int annotationCount()
+	{
+		return this.field.annotationCount();
+	}
+	
+	@Override
 	public void setAnnotations(Annotation[] annotations, int count)
 	{
 		this.field.setAnnotations(annotations, count);
@@ -145,6 +151,12 @@ public final class CaptureField implements IVariable
 	public void removeAnnotation(int index)
 	{
 		this.field.removeAnnotation(index);
+	}
+	
+	@Override
+	public Annotation[] getAnnotations()
+	{
+		return this.field.getAnnotations();
 	}
 	
 	@Override

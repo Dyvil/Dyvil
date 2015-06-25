@@ -138,6 +138,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public int annotationCount()
+	{
+		return this.annotationCount;
+	}
+	
+	@Override
 	public void setAnnotations(Annotation[] annotations, int count)
 	{
 		this.annotations = annotations;
@@ -210,6 +216,12 @@ public class CodeClass extends ASTNode implements IClass
 	public ElementType getAnnotationType()
 	{
 		return ElementType.TYPE;
+	}
+	
+	@Override
+	public Annotation[] getAnnotations()
+	{
+		return this.annotations;
 	}
 	
 	@Override

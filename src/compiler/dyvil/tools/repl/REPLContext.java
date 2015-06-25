@@ -26,7 +26,6 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.CodePosition;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class REPLContext extends DyvilHeader implements IValued
 {
@@ -139,18 +138,15 @@ public class REPLContext extends DyvilHeader implements IValued
 			return;
 		}
 		
+		IValue value = this.value;
 		MarkerList markers = new MarkerList();
 		this.currentClassName = "REPL" + classIndex++;
-		
-		Name name = Name.getQualified("res" + resultIndex);
-		IValue value = this.value;
-		IType type = Types.UNKNOWN;
-		ICodePosition position = CODE_POSITION;
-		
 		this.value = null;
 		
-		REPLVariable field = new REPLVariable(position, name, type, value);
+		Name name = Name.getQualified("res" + resultIndex);
+		REPLVariable field = new REPLVariable(CODE_POSITION, name, Types.UNKNOWN, value);
 		field.modifiers = Modifiers.FINAL;
+		
 		field.resolveTypes(markers, this);
 		field.resolve(markers, this);
 		field.checkTypes(markers, this);

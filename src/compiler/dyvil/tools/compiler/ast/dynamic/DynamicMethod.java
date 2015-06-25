@@ -298,6 +298,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public int annotationCount()
+	{
+		return 0;
+	}
+	
+	@Override
 	public void setAnnotation(int index, Annotation annotation)
 	{
 	}
@@ -310,6 +316,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	@Override
 	public void removeAnnotation(int index)
 	{
+	}
+	
+	@Override
+	public Annotation[] getAnnotations()
+	{
+		return null;
 	}
 	
 	@Override

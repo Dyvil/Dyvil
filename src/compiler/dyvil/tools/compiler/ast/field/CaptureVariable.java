@@ -96,6 +96,12 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
+	public int annotationCount()
+	{
+		return this.annotationCount();
+	}
+	
+	@Override
 	public void setAnnotations(Annotation[] annotations, int count)
 	{
 		this.variable.setAnnotations(annotations, count);
@@ -123,6 +129,12 @@ public class CaptureVariable implements IVariable
 	public void removeAnnotation(int index)
 	{
 		this.variable.removeAnnotation(index);
+	}
+	
+	@Override
+	public Annotation[] getAnnotations()
+	{
+		return this.variable.getAnnotations();
 	}
 	
 	@Override

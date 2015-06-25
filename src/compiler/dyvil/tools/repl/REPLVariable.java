@@ -212,5 +212,13 @@ public class REPLVariable extends Field
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
 	{
+		if (this.className == null)
+		{
+			writer.writeInsn(Opcodes.AUTO_POP);
+			return;
+		}
+		
+		String extended = this.type.getExtendedName();
+		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, "value", extended);
 	}
 }
