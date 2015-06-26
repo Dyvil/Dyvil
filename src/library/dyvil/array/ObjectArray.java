@@ -1,7 +1,5 @@
 package dyvil.array;
 
-import static dyvil.reflect.Opcodes.*;
-
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -11,11 +9,14 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
+import dyvil.lang.Ordered;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.range.StringRange;
-import dyvil.lang.Ordered;
+
+import static dyvil.reflect.Opcodes.*;
 
 public interface ObjectArray
 {
@@ -80,13 +81,13 @@ public interface ObjectArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, AALOAD })
-	public static @infix <T> T apply(T[] array, int i)
+	public static @infix <T> T subscript(T[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, AASTORE })
-	public static @infix <T> void update(T[] array, int i, T v)
+	public static @infix <T> void subscript_$eq(T[] array, int i, T v)
 	{
 		array[i] = v;
 	}

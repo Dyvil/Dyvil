@@ -1,9 +1,10 @@
 package dyvil.tools.compiler.transform;
 
-import static dyvil.tools.compiler.ast.expression.IValue.*;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
+
+import static dyvil.tools.compiler.ast.expression.IValue.*;
 
 public class ConstantFolder
 {

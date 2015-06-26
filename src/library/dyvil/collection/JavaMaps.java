@@ -4,12 +4,13 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+import dyvil.lang.Map;
+
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
-import dyvil.lang.Map;
 import dyvil.tuple.Tuple2;
 
 public interface JavaMaps
@@ -17,7 +18,7 @@ public interface JavaMaps
 	// Accessors
 	
 	/**
-	 * @see Map#$qmark(Object)
+	 * @see Map#containsKey(Object)
 	 */
 	public static @infix @inline boolean $qmark(java.util.Map map, Object key)
 	{
@@ -25,7 +26,7 @@ public interface JavaMaps
 	}
 	
 	/**
-	 * @see Map#$qmark(Object, Object)
+	 * @see Map#contains(Object, Object)
 	 */
 	public static @infix boolean $qmark(java.util.Map map, Object key, Object value)
 	{
@@ -33,7 +34,7 @@ public interface JavaMaps
 	}
 	
 	/**
-	 * @see Map#$qmark(Tuple2)
+	 * @see Map#contains(Tuple2)
 	 */
 	public static @infix boolean $qmark(java.util.Map map, Tuple2 entry)
 	{
@@ -41,7 +42,7 @@ public interface JavaMaps
 	}
 	
 	/**
-	 * @see Map#$qmark$colon(Object)
+	 * @see Map#containsValue(Object)
 	 */
 	public static @infix @inline boolean $qmark$colon(java.util.Map map, Object value)
 	{
@@ -49,7 +50,7 @@ public interface JavaMaps
 	}
 	
 	/**
-	 * @see Map#apply(Object)
+	 * @see Map#get(Object)
 	 */
 	public static @infix @inline <K, V> V apply(java.util.Map<K, V> map, K key)
 	{
@@ -59,7 +60,7 @@ public interface JavaMaps
 	// Mutating Operations
 	
 	/**
-	 * @see Map#update(Object, Object)
+	 * @see Map#subscript_$eq(Object, Object)
 	 */
 	public static @infix @inline <K, V> void update(java.util.Map<K, V> map, K key, V value)
 	{
@@ -141,7 +142,7 @@ public interface JavaMaps
 		MutableMap<K, V> newMap = new dyvil.collection.mutable.HashMap();
 		for (java.util.Map.Entry<K, V> entry : map.entrySet())
 		{
-			newMap.update(entry.getKey(), entry.getValue());
+			newMap.subscript_$eq(entry.getKey(), entry.getValue());
 		}
 		return newMap;
 	}

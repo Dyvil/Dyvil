@@ -2,8 +2,9 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
-import java.util.List;
 import java.util.Set;
+
+import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;

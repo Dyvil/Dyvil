@@ -33,7 +33,7 @@ public class ClassConstructor extends ConstructorCall
 		this.type = this.type.resolve(markers, context);
 		this.arguments.resolveTypes(markers, context);
 		
-		IDyvilHeader header = context.getThisClass().getUnit();
+		IDyvilHeader header = context.getHeader();
 		this.nestedClass.setUnit(header);
 		header.addInnerClass(this.nestedClass);
 		

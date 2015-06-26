@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.Iterator;
 
-import dyvil.collection.ArrayIterator;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
@@ -120,7 +121,16 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 		TupleType t = new TupleType(this.valueCount);
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			t.addType(this.values[i].getType());
+			IType type = this.values[i].getType();
+			// Tuple Value Boxing
+			if (type.isPrimitive())
+			{
+				t.addType(type.getReferenceType());
+			}
+			else
+			{
+				t.addType(type);
+			}
 		}
 		return this.tupleType = t;
 	}
@@ -190,23 +200,11 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		TupleType tupleType = new TupleType();
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue v = this.values[i];
 			v.resolveTypes(markers, context);
-			
-			IType t = v.getType();
-			if (t.isPrimitive())
-			{
-				tupleType.addType(t.getReferenceType());
-			}
-			else
-			{
-				tupleType.addType(t);
-			}
 		}
-		this.tupleType = tupleType;
 	}
 	
 	@Override
@@ -233,17 +231,21 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			ITypeList typeList = (ITypeList) this.tupleType;
 			for (int i = 0; i < this.valueCount; i++)
 			{
-				IValue v1 = this.values[i].withType(typeList.getType(i));
-				if (v1 != null)
+				IType type = typeList.getType(i);
+				IValue value = this.values[i];
+				IValue value1 = value.withType(type);
+				if (value1 == null)
 				{
-					this.values[i] = v1;
+					Marker m = markers.create(value.getPosition(), "tuple.type");
+					m.addInfo("Pattern Type: " + value.getType());
+					m.addInfo("Tuple Type: " + type);
 				}
 				else
 				{
-					// TODO Handle error?
+					this.values[i] = value = value1;
 				}
 				
-				this.values[i].checkTypes(markers, context);
+				value.checkTypes(markers, context);
 			}
 			
 			return;

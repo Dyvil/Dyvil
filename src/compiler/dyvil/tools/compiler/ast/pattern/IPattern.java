@@ -1,14 +1,17 @@
 package dyvil.tools.compiler.ast.pattern;
 
-import org.objectweb.asm.Label;
-
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
+
+import org.objectweb.asm.Label;
 
 public interface IPattern extends IASTNode, ITyped
 {
@@ -27,9 +30,12 @@ public interface IPattern extends IASTNode, ITyped
 	int	TUPLE		= 17;
 	int	LIST		= 18;
 	
+	int	CASE_CLASS	= 24;
+	
 	int	BINDING		= 32;
 	int	WILDCARD	= 33;
 	int	BOXED		= 34;
+	int	TYPECHECK	= 35;
 	
 	public int getPatternType();
 	
@@ -48,12 +54,38 @@ public interface IPattern extends IASTNode, ITyped
 	
 	public IPattern withType(IType type);
 	
+	public static IPattern primitiveWithType(IPattern pattern, IType type, PrimitiveType primitiveType)
+	{
+		if (type == primitiveType)
+		{
+			return pattern;
+		}
+		if (type.classEquals(primitiveType))
+		{
+			return new BoxPattern(pattern, primitiveType.unboxMethod);
+		}
+		if (type.isSuperTypeOf(primitiveType))
+		{
+			return new TypeCheckPattern(new BoxPattern(pattern, primitiveType.unboxMethod), primitiveType.getReferenceType());
+		}
+		return null;
+	}
+	
 	@Override
 	public boolean isType(IType type);
 	
 	public default IField resolveField(Name name)
 	{
 		return null;
+	}
+	
+	public default IPattern resolve(MarkerList markers, IContext context)
+	{
+		return this;
+	}
+	
+	public default void checkTypes(MarkerList markers, IContext context)
+	{
 	}
 	
 	public default int intValue()

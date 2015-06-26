@@ -1,8 +1,8 @@
 package dyvil.lang.ref.array;
 
-import dyvil.lang.ref.ILongRef;
+import dyvil.lang.ref.LongRef;
 
-public class LongArrayRef implements ILongRef
+public class LongArrayRef implements LongRef
 {
 	protected final long[]	array;
 	protected final int		index;

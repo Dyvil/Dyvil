@@ -1,9 +1,10 @@
 package dyvil.tools.compiler.backend;
 
+import dyvil.tools.compiler.backend.exception.BytecodeException;
+
 import static dyvil.reflect.Opcodes.*;
 import static dyvil.tools.compiler.backend.ClassFormat.DOUBLE;
 import static dyvil.tools.compiler.backend.ClassFormat.LONG;
-import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface BackendUtil
 {

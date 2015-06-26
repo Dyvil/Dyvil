@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -117,7 +117,10 @@ public final class PrimitiveType extends Type
 	public final IType getReferenceType()
 	{
 		Type type = new Type(this.position, this.theClass);
-		type.name = this.name;
+		if (this != Types.VOID)
+		{
+			type.name = this.name;
+		}
 		return type;
 	}
 	
@@ -227,6 +230,12 @@ public final class PrimitiveType extends Type
 	
 	@Override
 	public void appendExtendedName(StringBuilder buf)
+	{
+		buf.append(this.getInternalName());
+	}
+	
+	@Override
+	public void appendSignature(StringBuilder buf)
 	{
 		buf.append(this.getInternalName());
 	}

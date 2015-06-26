@@ -1,8 +1,8 @@
 package dyvil.lang.ref.array;
 
-import dyvil.lang.ref.IDoubleRef;
+import dyvil.lang.ref.DoubleRef;
 
-public class DoubleArrayRef implements IDoubleRef
+public class DoubleArrayRef implements DoubleRef
 {
 	protected final double[]	array;
 	protected final int			index;

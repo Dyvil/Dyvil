@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.parameter;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import dyvil.collection.ArrayIterator;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueMap;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -135,6 +135,18 @@ public final class ArgumentMap implements IArguments, IValueMap
 	public void setFirstValue(IValue value)
 	{
 		this.values[0] = value;
+	}
+	
+	@Override
+	public IValue getLastValue()
+	{
+		return this.values[this.size - 1];
+	}
+	
+	@Override
+	public void setLastValue(IValue value)
+	{
+		this.values[this.size - 1] = value;
 	}
 	
 	@Override

@@ -7,13 +7,14 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
-import dyvil.collection.immutable.ArrayMap;
 import dyvil.lang.Entry;
 import dyvil.lang.Map;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
+import dyvil.collection.immutable.ArrayMap;
 import dyvil.math.MathUtils;
 import dyvil.tuple.Tuple2;
 
@@ -58,70 +59,25 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		}
 		
 		@Override
-		public int hashCode()
-		{
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + (this.key == null ? 0 : this.key.hashCode());
-			result = prime * result + (this.value == null ? 0 : this.value.hashCode());
-			return result;
-		}
-		
-		@Override
-		public boolean equals(Object obj)
-		{
-			if (this == obj)
-			{
-				return true;
-			}
-			if (obj == null)
-			{
-				return false;
-			}
-			if (this.getClass() != obj.getClass())
-			{
-				return false;
-			}
-			HashEntry other = (HashEntry) obj;
-			if (this.key == null)
-			{
-				if (other.key != null)
-				{
-					return false;
-				}
-			}
-			else if (!this.key.equals(other.key))
-			{
-				return false;
-			}
-			if (this.value == null)
-			{
-				if (other.value != null)
-				{
-					return false;
-				}
-			}
-			else if (!this.value.equals(other.value))
-			{
-				return false;
-			}
-			return true;
-		}
-		
-		@Override
 		public String toString()
 		{
 			return this.key + " -> " + this.value;
 		}
 		
 		@Override
-		public HashEntry<K, V> clone()
+		public boolean equals(Object obj)
 		{
-			return new HashEntry(this.key, this.value, this.hash, this.next);
+			return Entry.entryEquals(this, obj);
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return Entry.entryHashCode(this);
 		}
 	}
 	
-	private abstract class EntryIterator
+	private abstract class EntryIterator<E> implements Iterator<E>
 	{
 		HashEntry<K, V>	next;		// next entry to return
 		HashEntry<K, V>	current;	// current entry
@@ -142,6 +98,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			}
 		}
 		
+		@Override
 		public final boolean hasNext()
 		{
 			return this.next != null;
@@ -164,16 +121,47 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			}
 			return e;
 		}
+		
+		@Override
+		public final void remove()
+		{
+			HashEntry<K, V> e = this.current;
+			if (e == null)
+			{
+				throw new IllegalStateException();
+			}
+			
+			HashMap.this.size--;
+			this.current = null;
+			int index = index(e.hash, HashMap.this.entries.length);
+			HashEntry<K, V> entry = HashMap.this.entries[index];
+			if (entry == e)
+			{
+				HashMap.this.entries[index] = e.next;
+			}
+			else
+			{
+				HashEntry<K, V> prev;
+				do
+				{
+					prev = entry;
+					entry = entry.next;
+				}
+				while (entry != e);
+				
+				prev.next = e.next;
+			}
+		}
 	}
 	
-	private static final int	DEFAULT_SIZE		= 16;
-	private static final float	DEFAULT_LOAD_FACTOR	= 0.75F;
-	private static final int	MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
+	static final int	DEFAULT_CAPACITY	= 16;
+	static final float	DEFAULT_LOAD_FACTOR	= 0.75F;
+	static final int	MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
 	
-	private int					size;
-	private float				loadFactor;
-	private int					threshold;
-	private HashEntry[]			entries;
+	private int			size;
+	private float		loadFactor;
+	private int			threshold;
+	private HashEntry[]	entries;
 	
 	public static <K, V> HashMap<K, V> apply()
 	{
@@ -190,7 +178,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	
 	public HashMap()
 	{
-		this(DEFAULT_SIZE, DEFAULT_LOAD_FACTOR);
+		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
 	
 	public HashMap(int size)
@@ -200,7 +188,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	
 	public HashMap(float loadFactor)
 	{
-		this(DEFAULT_SIZE, loadFactor);
+		this(DEFAULT_CAPACITY, loadFactor);
 	}
 	
 	public HashMap(int size, float loadFactor)
@@ -224,7 +212,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		this(map.size(), DEFAULT_LOAD_FACTOR);
 		for (Entry<K, V> entry : map)
 		{
-			this.update(entry.getKey(), entry.getValue());
+			this.subscript_$eq(entry.getKey(), entry.getValue());
 		}
 	}
 	
@@ -288,46 +276,58 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
-		class EntryIteratorImpl extends EntryIterator implements Iterator<Entry<K, V>>
+		return new EntryIterator<Entry<K, V>>()
 		{
 			@Override
 			public HashEntry<K, V> next()
 			{
 				return this.nextEntry();
 			}
-		}
-		
-		return new EntryIteratorImpl();
+			
+			@Override
+			public String toString()
+			{
+				return "EntryIterator(" + HashMap.this + ")";
+			}
+		};
 	}
 	
 	@Override
 	public Iterator<K> keyIterator()
 	{
-		class KeyIterator extends EntryIterator implements Iterator<K>
+		return new EntryIterator<K>()
 		{
 			@Override
 			public K next()
 			{
 				return this.nextEntry().key;
-			};
-		}
-		
-		return new KeyIterator();
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "KeyIterator(" + HashMap.this + ")";
+			}
+		};
 	}
 	
 	@Override
 	public Iterator<V> valueIterator()
 	{
-		class ValueIterator extends EntryIterator implements Iterator<V>
+		return new EntryIterator<V>()
 		{
 			@Override
 			public V next()
 			{
 				return this.nextEntry().value;
-			};
-		}
-		
-		return new ValueIterator();
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "ValueIterator(" + HashMap.this + ")";
+			}
+		};
 	}
 	
 	@Override
@@ -357,19 +357,19 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
-		return this.apply((K) key) != null;
+		return this.get((K) key) != null;
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
-		return value.equals(this.apply((K) key));
+		return value.equals(this.get((K) key));
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		for (HashEntry<K, V> e : this.entries)
 		{
@@ -386,7 +386,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public V apply(K key)
+	public V get(K key)
 	{
 		if (key == null)
 		{
@@ -416,7 +416,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	public MutableMap<K, V> $plus(K key, V value)
 	{
 		HashMap<K, V> copy = this.copy();
-		copy.update(key, value);
+		copy.subscript_$eq(key, value);
 		return copy;
 	}
 	
@@ -429,7 +429,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public MutableMap<K, V> $minus(K key)
+	public MutableMap<K, V> $minus(Object key)
 	{
 		HashMap<K, V> copy = this.copy();
 		copy.$minus$eq(key);
@@ -437,7 +437,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public MutableMap<K, V> $minus(K key, V value)
+	public MutableMap<K, V> $minus(Object key, Object value)
 	{
 		HashMap<K, V> copy = this.copy();
 		copy.$minus(key);
@@ -445,7 +445,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public MutableMap<K, V> $minus$colon(V value)
+	public MutableMap<K, V> $minus$colon(Object value)
 	{
 		HashMap<K, V> copy = this.copy();
 		copy.$minus$colon(value);
@@ -453,7 +453,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public MutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
+	public MutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
 		HashMap<K, V> copy = this.copy();
 		copy.$minus$minus(map);
@@ -523,7 +523,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public void update(K key, V value)
+	public void subscript_$eq(K key, V value)
 	{
 		if (key == null)
 		{
@@ -571,15 +571,6 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		return null;
 	}
 	
-	@Override
-	public void $plus$plus$eq(Map<? extends K, ? extends V> map)
-	{
-		for (Entry<? extends K, ? extends V> entry : map)
-		{
-			this.update(entry.getKey(), entry.getValue());
-		}
-	}
-	
 	private V removeNull()
 	{
 		HashEntry<K, V> prev = this.entries[0];
@@ -609,42 +600,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public void $minus$eq(K key)
-	{
-		if (key == null)
-		{
-			this.removeNull();
-			return;
-		}
-		
-		int hash = hash(key.hashCode());
-		int i = index(hash, this.entries.length);
-		HashEntry<K, V> prev = this.entries[i];
-		HashEntry<K, V> e = prev;
-		
-		while (e != null)
-		{
-			HashEntry<K, V> next = e.next;
-			Object k;
-			if (e.hash == hash && ((k = e.key) == key || key.equals(k)))
-			{
-				this.size--;
-				if (prev == e)
-				{
-					this.entries[i] = next;
-				}
-				else
-				{
-					prev.next = next;
-				}
-			}
-			prev = e;
-			e = next;
-		}
-	}
-	
-	@Override
-	public V remove(K key)
+	public V removeKey(Object key)
 	{
 		if (key == null)
 		{
@@ -682,44 +638,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public boolean remove(K key, V value)
-	{
-		int hash = key == null ? 0 : hash(key.hashCode());
-		int i = index(hash, this.entries.length);
-		HashEntry<K, V> prev = this.entries[i];
-		HashEntry<K, V> e = prev;
-		
-		while (e != null)
-		{
-			HashEntry<K, V> next = e.next;
-			if (e.hash == hash)
-			{
-				Object k = e.key;
-				Object v = e.value;
-				if ((k == key || key.equals(k)) && (v == value || value != null && value.equals(v)))
-				{
-					this.size--;
-					if (prev == e)
-					{
-						this.entries[i] = next;
-					}
-					else
-					{
-						prev.next = next;
-					}
-					
-					return true;
-				}
-			}
-			prev = e;
-			e = next;
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public void $minus$colon$eq(V value)
+	public boolean removeValue(Object value)
 	{
 		for (int i = 0; i < this.entries.length; i++)
 		{
@@ -742,21 +661,14 @@ public class HashMap<K, V> implements MutableMap<K, V>
 						prev.next = next;
 					}
 					
-					return;
+					return true;
 				}
 				prev = e;
 				e = next;
 			}
 		}
-	}
-	
-	@Override
-	public void $minus$minus$eq(Map<? extends K, ? extends V> map)
-	{
-		for (Entry<? extends K, ? extends V> entry : map)
-		{
-			this.remove(entry.getKey(), entry.getValue());
-		}
+		
+		return false;
 	}
 	
 	@Override
@@ -794,8 +706,6 @@ public class HashMap<K, V> implements MutableMap<K, V>
 					{
 						prev.next = next;
 					}
-					
-					return;
 				}
 				prev = e;
 				e = next;
@@ -855,5 +765,17 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		}
 		int len = buf.length();
 		return buf.replace(len - 2, len, " ]").toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Map.mapEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Map.mapHashCode(this);
 	}
 }

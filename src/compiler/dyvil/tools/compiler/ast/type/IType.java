@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -26,7 +27,8 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IType extends IASTNode, INamed, IContext, ITypeContext
 {
-	int	UNKNOWN			= 0;
+	int	UNKNOWN			= -1;
+	int	NULL			= 0;
 	int	TYPE			= 1;
 	int	PRIMITIVE_TYPE	= 2;
 	int	GENERIC_TYPE	= 3;
@@ -194,6 +196,12 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	}
 	
 	@Override
+	public default IDyvilHeader getHeader()
+	{
+		return this.getTheClass().getHeader();
+	}
+	
+	@Override
 	public default IClass getThisClass()
 	{
 		return this.getTheClass();
@@ -293,6 +301,9 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	{
 		return NullValue.getNull();
 	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer);
 	
 	// Misc
 	

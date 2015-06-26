@@ -273,7 +273,14 @@ public final class ClassBodyParser extends Parser implements ITyped, IAnnotation
 		this.type = type;
 	}
 	
-	private Annotation[] getAnnotations()
+	@Override
+	public int annotationCount()
+	{
+		return this.annotationCount;
+	}
+	
+	@Override
+	public Annotation[] getAnnotations()
 	{
 		Annotation[] a = new Annotation[this.annotationCount];
 		System.arraycopy(this.annotations, 0, a, 0, this.annotationCount);

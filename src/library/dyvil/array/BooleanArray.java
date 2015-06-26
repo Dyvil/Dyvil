@@ -1,17 +1,18 @@
 package dyvil.array;
 
-import static dyvil.reflect.Opcodes.*;
-
 import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
+import dyvil.lang.Boolean;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
-import dyvil.lang.Boolean;
+
+import static dyvil.reflect.Opcodes.*;
 
 public interface BooleanArray
 {
@@ -56,13 +57,13 @@ public interface BooleanArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, BALOAD })
-	public static @infix boolean apply(boolean[] array, int i)
+	public static @infix boolean subscript(boolean[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, BASTORE })
-	public static @infix void update(boolean[] array, int i, boolean v)
+	public static @infix void subscript_$eq(boolean[] array, int i, boolean v)
 	{
 		array[i] = v;
 	}

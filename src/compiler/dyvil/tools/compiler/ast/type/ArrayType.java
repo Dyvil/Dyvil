@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -118,24 +118,23 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
+	public boolean equals(IType type)
+	{
+		if (!type.isArrayType())
+		{
+			return false;
+		}
+		return this.type.equals(type.getElementType());
+	}
+	
+	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		int arrayDims = type.getArrayDimensions();
-		if (arrayDims == 0)
+		if (!type.isArrayType())
 		{
 			return false;
 		}
-		int thisDims = this.getArrayDimensions();
-		if (arrayDims > thisDims)
-		{
-			return this.type.getTheClass() == Types.OBJECT_CLASS;
-		}
-		IType elementType = type.getElementType();
-		if (elementType.isPrimitive() != this.type.isPrimitive())
-		{
-			return false;
-		}
-		return this.type.isSuperTypeOf(elementType);
+		return this.type.isSuperTypeOf(type.getElementType());
 	}
 	
 	@Override
@@ -147,6 +146,10 @@ public class ArrayType implements IType, ITyped
 	@Override
 	public IType resolve(MarkerList markers, IContext context)
 	{
+		if (this.type == null)
+		{
+			this.type = Types.ANY;
+		}
 		this.type = this.type.resolve(markers, context);
 		return this;
 	}

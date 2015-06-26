@@ -2,10 +2,11 @@ package dyvil.lang.ref.unsafe;
 
 import java.lang.reflect.Field;
 
-import dyvil.lang.ref.IShortRef;
+import dyvil.lang.ref.ShortRef;
+
 import dyvil.reflect.ReflectUtils;
 
-public final class UnsafeShortRef implements IShortRef
+public final class UnsafeShortRef implements ShortRef
 {
 	private final Object	base;
 	private final long		offset;

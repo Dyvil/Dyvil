@@ -7,9 +7,31 @@ import java.util.function.UnaryOperator;
 
 import dyvil.lang.Collection;
 import dyvil.lang.Set;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.mutable.HashMap;
+import dyvil.collection.mutable.MapBasedSet;
+
+@NilConvertible
+@ArrayConvertible
 public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 {
+	public static <E> MutableSet<E> apply()
+	{
+		return new MapBasedSet<E>(new HashMap<E, Object>());
+	}
+	
+	public static <E> MutableSet<E> apply(E... elements)
+	{
+		HashMap<E, Object> hashMap = new HashMap(elements.length);
+		for (E element : elements)
+		{
+			hashMap.put(element, VALUE);
+		}
+		return new MapBasedSet<E>(hashMap);
+	}
+	
 	// Accessors
 	
 	@Override
@@ -19,7 +41,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	public Iterator<E> iterator();
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	
@@ -59,22 +81,13 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	// Mutating Operations
 	
 	@Override
-	public E add(E element);
+	public void clear();
+	
+	@Override
+	public boolean add(E element);
 	
 	@Override
 	public boolean remove(E element);
-	
-	@Override
-	public void $amp$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $bar$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $up$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void clear();
 	
 	@Override
 	public void map(UnaryOperator<E> mapper);
@@ -102,5 +115,17 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
+	public default MutableSet<E> mutableCopy()
+	{
+		return this.copy();
+	}
+	
+	@Override
 	public ImmutableSet<E> immutable();
+	
+	@Override
+	public default ImmutableSet<E> immutableCopy()
+	{
+		return this.immutable();
+	}
 }

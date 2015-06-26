@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.operator;
 
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
@@ -13,6 +11,8 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+
+import org.objectweb.asm.Label;
 
 public final class NotOperator extends ASTNode implements IValue
 {

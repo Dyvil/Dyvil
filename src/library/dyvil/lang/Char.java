@@ -1,9 +1,12 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.*;
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.prefix;
 import dyvil.lang.literal.CharConvertible;
+
+import dyvil.annotation.Intrinsic;
+import dyvil.annotation.infix;
+import dyvil.annotation.prefix;
+
+import static dyvil.reflect.Opcodes.*;
 
 @CharConvertible
 public class Char implements Integer
@@ -23,15 +26,14 @@ public class Char implements Integer
 		return new Char(v);
 	}
 	
+	public static @infix char unapply(Char v)
+	{
+		return v == null ? 0 : v.value;
+	}
+	
 	protected Char(char value)
 	{
 		this.value = value;
-	}
-	
-	@Intrinsic({ INSTANCE })
-	public char unapply()
-	{
-		return this.value;
 	}
 	
 	@Override

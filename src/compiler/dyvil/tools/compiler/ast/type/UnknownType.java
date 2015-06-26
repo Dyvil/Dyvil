@@ -1,11 +1,8 @@
 package dyvil.tools.compiler.ast.type;
 
-import static dyvil.reflect.Opcodes.*;
-
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -23,7 +20,9 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class UnknownType extends ASTNode implements IType
+import static dyvil.reflect.Opcodes.*;
+
+public class UnknownType implements IType
 {
 	@Override
 	public int typeTag()
@@ -190,7 +189,7 @@ public class UnknownType extends ASTNode implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/UnknownType", "apply", "()Ldyvil/reflect/type/UnknownType;", false);
+		writer.writeInvokeInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/UnknownType", "instance", "Ldyvil/reflect/type/UnknownType;", false);
 	}
 	
 	@Override

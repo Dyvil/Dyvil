@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import java.util.Iterator;
 
-import dyvil.collection.ArrayIterator;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
@@ -36,6 +36,11 @@ public final class ArgumentList implements IArguments, IValueList
 	{
 		this.values = values;
 		this.size = size;
+	}
+	
+	public IValue[] getValues()
+	{
+		return this.values;
 	}
 	
 	@Override
@@ -90,6 +95,18 @@ public final class ArgumentList implements IArguments, IValueList
 	public void setFirstValue(IValue value)
 	{
 		this.values[0] = value;
+	}
+	
+	@Override
+	public IValue getLastValue()
+	{
+		return this.values[this.size - 1];
+	}
+	
+	@Override
+	public void setLastValue(IValue value)
+	{
+		this.values[this.size - 1] = value;
 	}
 	
 	@Override

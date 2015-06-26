@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.backend;
 
-import static dyvil.reflect.Opcodes.*;
-import static dyvil.tools.compiler.backend.ClassFormat.*;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.backend.exception.StackUnderflowException;
 
 import org.objectweb.asm.MethodVisitor;
 
-import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.backend.exception.StackUnderflowException;
+import static dyvil.reflect.Opcodes.*;
+import static dyvil.tools.compiler.backend.ClassFormat.*;
 
 public class Frame
 {
@@ -126,6 +126,10 @@ public class Frame
 	
 	public static String frameTypeName(Object o)
 	{
+		if (o == BOOLEAN)
+		{
+			return "boolean";
+		}
 		if (o == BYTE)
 		{
 			return "byte";
@@ -255,6 +259,11 @@ public class Frame
 	
 	public void pop() throws StackUnderflowException
 	{
+		if (this.stackCount == 0)
+		{
+			throw new StackUnderflowException();
+		}
+		
 		Object o = this.stack[--this.stackCount];
 		if (o == LONG || o == DOUBLE)
 		{
@@ -466,9 +475,9 @@ public class Frame
 		}
 		case SWAP:
 		{
-			Object o = this.stack[this.stackCount];
-			this.stack[this.stackCount] = this.stack[this.stackCount - 1];
-			this.stack[this.stackCount - 1] = o;
+			Object o = this.stack[this.stackCount - 1];
+			this.stack[this.stackCount - 1] = this.stack[this.stackCount - 2];
+			this.stack[this.stackCount - 2] = o;
 			return;
 		}
 		case IADD:

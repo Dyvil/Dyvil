@@ -1,147 +1,67 @@
 package dyvil.collection.immutable;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.collection.ArrayIterator;
-import dyvil.collection.ImmutableList;
-import dyvil.collection.MutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
+import dyvil.collection.impl.AbstractArrayList;
+import dyvil.collection.iterator.ArrayIterator;
+
 @ArrayConvertible
-public class ArrayList<E> implements ImmutableList<E>
+public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<E>
 {
-	protected final E[]	elements;
-	protected final int	size;
-	
 	public static <E> ArrayList<E> apply(E... elements)
 	{
 		return new ArrayList(elements, true);
 	}
 	
-	public ArrayList(E... elements)
+	public ArrayList()
 	{
-		this.elements = (E[]) new Object[elements.length];
-		System.arraycopy(elements, 0, this.elements, 0, elements.length);
-		this.size = elements.length;
+		super();
 	}
 	
-	public ArrayList(E[] elements, int size)
+	public ArrayList(int size)
 	{
-		this.elements = (E[]) new Object[size];
-		System.arraycopy(elements, 0, this.elements, 0, size);
-		this.size = size;
+		super(size);
 	}
 	
-	public ArrayList(E[] elements, boolean trusted)
+	public ArrayList(Object... elements)
 	{
-		this.elements = elements;
-		this.size = elements.length;
+		super(elements);
 	}
 	
-	public ArrayList(E[] elements, int size, boolean trusted)
+	public ArrayList(Object[] elements, boolean trusted)
 	{
-		this.elements = elements;
-		this.size = size;
+		super(elements, trusted);
 	}
 	
-	public ArrayList(Collection<E> elements)
+	public ArrayList(Object[] elements, int size)
 	{
-		this.size = elements.size();
-		this.elements = (E[]) new Object[this.size];
-		
-		int index = 0;
-		for (E element : elements)
-		{
-			this.elements[index++] = element;
-		}
+		super(elements, size);
 	}
 	
-	private void rangeCheck(int index)
+	public ArrayList(Object[] elements, int size, boolean trusted)
 	{
-		if (index < 0)
-		{
-			throw new IndexOutOfBoundsException("ArrayList Index out of Bounds: " + index + " < 0");
-		}
-		if (index >= this.size)
-		{
-			throw new IndexOutOfBoundsException("ArrayList Index out of Bounds: " + index + " >= " + this.size);
-		}
+		super(elements, size, trusted);
 	}
 	
-	@Override
-	public int size()
+	public ArrayList(Collection<E> collection)
 	{
-		return this.size;
-	}
-	
-	@Override
-	public boolean isEmpty()
-	{
-		return this.size == 0;
+		super(collection);
 	}
 	
 	@Override
 	public Iterator<E> iterator()
 	{
 		return new ArrayIterator(this.elements, this.size);
-	}
-	
-	@Override
-	public void forEach(Consumer<? super E> action)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			action.accept(this.elements[i]);
-		}
-	}
-	
-	@Override
-	public boolean $qmark(Object element)
-	{
-		if (element == null)
-		{
-			for (int i = 0; i < this.size; i++)
-			{
-				if (this.elements[i] == null)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		
-		for (int i = 0; i < this.size; i++)
-		{
-			if (element.equals(this.elements[i]))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	@Override
-	public E apply(int index)
-	{
-		this.rangeCheck(index);
-		return this.elements[index];
-	}
-	
-	@Override
-	public E get(int index)
-	{
-		if (index < 0 || index >= this.size)
-		{
-			return null;
-		}
-		return this.elements[index];
 	}
 	
 	@Override
@@ -211,7 +131,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		for (int i = 0; i < this.size; i++)
 		{
 			Object e = this.elements[i];
-			if (!collection.$qmark(e))
+			if (!collection.contains(e))
 			{
 				array[index++] = e;
 			}
@@ -228,49 +148,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		for (int i = 0; i < this.size; i++)
 		{
 			Object e = this.elements[i];
-			if (collection.$qmark(e))
-			{
-				array[index++] = e;
-			}
-		}
-		return new ArrayList(array, index, true);
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $bar(Collection<? extends E> collection)
-	{
-		int index = 0;
-		int len = collection.size();
-		Object[] array = new Object[this.size + len];
-		
-		for (int i = 0; i < this.size; i++)
-		{
-			Object e = this.elements[i];
-			if (!collection.$qmark(e))
-			{
-				array[index++] = e;
-			}
-		}
-		collection.toArray(index, array);
-		return new ArrayList(array, index + len, true);
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $up(Collection<? extends E> collection)
-	{
-		int index = 0;
-		Object[] array = new Object[this.size + collection.size()];
-		for (int i = 0; i < this.size; i++)
-		{
-			Object e = this.elements[i];
-			if (!collection.$qmark(e))
-			{
-				array[index++] = e;
-			}
-		}
-		for (E e : collection)
-		{
-			if (!this.$qmark(e))
+			if (collection.contains(e))
 			{
 				array[index++] = e;
 			}
@@ -284,7 +162,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		Object[] array = new Object[this.size];
 		for (int i = 0; i < this.size; i++)
 		{
-			array[i] = mapper.apply(this.elements[i]);
+			array[i] = mapper.apply((E) this.elements[i]);
 		}
 		return new ArrayList(array, this.size, true);
 	}
@@ -295,7 +173,7 @@ public class ArrayList<E> implements ImmutableList<E>
 		dyvil.collection.mutable.ArrayList<R> list = new dyvil.collection.mutable.ArrayList(this.size << 2);
 		for (int i = 0; i < this.size; i++)
 		{
-			for (R r : mapper.apply(this.elements[i]))
+			for (R r : mapper.apply((E) this.elements[i]))
 			{
 				list.$plus$eq(r);
 			}
@@ -342,7 +220,7 @@ public class ArrayList<E> implements ImmutableList<E>
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = dyvil.collection.mutable.ArrayList.distinct(array, this.size);
+		int size = Set.distinct(array, this.size);
 		return new ArrayList(array, size, true);
 	}
 	
@@ -351,83 +229,8 @@ public class ArrayList<E> implements ImmutableList<E>
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = dyvil.collection.mutable.ArrayList.distinct((E[]) array, this.size, comparator);
+		int size = Set.distinct((E[]) array, this.size, comparator);
 		return new SortedArrayList(array, size, true);
-	}
-	
-	@Override
-	public int indexOf(Object element)
-	{
-		if (element == null)
-		{
-			for (int i = 0; i < this.size; i++)
-			{
-				if (this.elements[i] == null)
-				{
-					return i;
-				}
-			}
-			return -1;
-		}
-		
-		for (int i = 0; i < this.size; i++)
-		{
-			if (element.equals(this.elements[i]))
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-	
-	@Override
-	public int lastIndexOf(Object element)
-	{
-		if (element == null)
-		{
-			for (int i = this.size - 1; i >= 0; i--)
-			{
-				if (this.elements[i] == null)
-				{
-					return i;
-				}
-			}
-			return -1;
-		}
-		
-		for (int i = this.size - 1; i >= 0; i--)
-		{
-			if (element.equals(this.elements[i]))
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-	
-	@Override
-	public Object[] toArray()
-	{
-		Object[] array = new Object[this.size];
-		System.arraycopy(this.elements, 0, array, 0, this.size);
-		return array;
-	}
-	
-	@Override
-	public E[] toArray(Class<E> type)
-	{
-		E[] array = (E[]) Array.newInstance(type, this.size);
-		for (int i = 0; i < this.size; i++)
-		{
-			array[i] = type.cast(this.elements[i]);
-		}
-		return array;
-	}
-	
-	@Override
-	public void toArray(int index, Object[] store)
-	{
-		System.arraycopy(this.elements, 0, store, index, this.size);
 	}
 	
 	@Override
@@ -440,24 +243,5 @@ public class ArrayList<E> implements ImmutableList<E>
 	public MutableList<E> mutable()
 	{
 		return new dyvil.collection.mutable.ArrayList(this.elements, this.size);
-	}
-	
-	@Override
-	public String toString()
-	{
-		if (this.size == 0)
-		{
-			return "[]";
-		}
-		
-		StringBuilder buf = new StringBuilder(this.size * 10).append('[');
-		buf.append(this.elements[0]);
-		for (int i = 1; i < this.size; i++)
-		{
-			buf.append(", ");
-			buf.append(this.elements[i]);
-		}
-		buf.append(']');
-		return buf.toString();
 	}
 }

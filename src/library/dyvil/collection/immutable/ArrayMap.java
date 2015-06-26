@@ -6,11 +6,12 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+import dyvil.lang.Entry;
+import dyvil.lang.Map;
+
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
 import dyvil.collection.mutable.HashMap;
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.tuple.Tuple2;
 
 public class ArrayMap<K, V> implements ImmutableMap<K, V>
@@ -34,6 +35,24 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		public V getValue()
 		{
 			return ArrayMap.this.values[this.index];
+		}
+		
+		@Override
+		public String toString()
+		{
+			return Entry.entryToString(this);
+		}
+		
+		@Override
+		public boolean equals(Object obj)
+		{
+			return Entry.entryEquals(this, obj);
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return Entry.entryHashCode(this);
 		}
 	}
 	
@@ -197,7 +216,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
 		if (key == null)
 		{
@@ -221,7 +240,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
 		if (key == null)
 		{
@@ -245,7 +264,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		if (value == null)
 		{
@@ -269,7 +288,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public V apply(K key)
+	public V get(K key)
 	{
 		if (key == null)
 		{
@@ -323,7 +342,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key)
+	public ImmutableMap<K, V> $minus(Object key)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -345,7 +364,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key, V value)
+	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -371,7 +390,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(V value)
+	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -393,7 +412,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -402,7 +421,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			K k = this.keys[i];
-			if (map.$qmark(k))
+			if (map.containsKey(k))
 			{
 				continue;
 			}
@@ -463,7 +482,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		HashMap<K, V> map = new HashMap(this.size);
 		for (int i = 0; i < this.size; i++)
 		{
-			map.update(this.keys[i], this.values[i]);
+			map.subscript_$eq(this.keys[i], this.values[i]);
 		}
 		return map;
 	}
@@ -484,5 +503,17 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 			builder.append(this.keys[i]).append(" -> ").append(this.values[i]);
 		}
 		return builder.append(" ]").toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Map.mapEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Map.mapHashCode(this);
 	}
 }

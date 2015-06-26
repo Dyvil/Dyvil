@@ -3,17 +3,15 @@ package dyvil.tools.compiler.library;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public final class JarLibrary extends Library
 {
-	private JarFile		jarFile;
-	private Set<String>	packageNames	= new TreeSet();
+	private FileSystem							jarFileSystem;
 	
 	public JarLibrary(File file)
 	{
@@ -25,22 +23,20 @@ public final class JarLibrary extends Library
 	{
 		try
 		{
-			this.jarFile = new JarFile(this.file);
-			
-			Enumeration e = this.jarFile.entries();
-			while (e.hasMoreElements())
-			{
-				JarEntry entry = (JarEntry) e.nextElement();
-				String name = entry.getName();
-				int index = name.length();
-				while ((index = name.lastIndexOf('/', index - 1)) != -1)
-				{
-					if (!this.packageNames.add(name.substring(0, index)))
-					{
-						break;
-					}
-				}
-			}
+			URI uri = URI.create("jar:file:" + this.file.getAbsolutePath());
+			this.jarFileSystem = FileSystems.newFileSystem(uri, packages);
+		}
+		catch (IOException ex)
+		{
+		}
+	}
+	
+	@Override
+	public void unloadLibrary()
+	{
+		try
+		{
+			this.jarFileSystem.close();
 		}
 		catch (IOException ex)
 		{
@@ -50,18 +46,18 @@ public final class JarLibrary extends Library
 	@Override
 	public boolean isSubPackage(String name)
 	{
-		return this.packageNames.contains(name);
+		return Files.exists(this.jarFileSystem.getPath(name), emptyLinkOptions);
 	}
 	
 	@Override
 	public InputStream getInputStream(String fileName)
 	{
-		ZipEntry entry = this.jarFile.getEntry(fileName);
-		if (entry != null)
+		Path path = this.jarFileSystem.getPath(fileName);
+		if (Files.exists(path, emptyLinkOptions))
 		{
 			try
 			{
-				return this.jarFile.getInputStream(entry);
+				return Files.newInputStream(path, emptyLinkOptions);
 			}
 			catch (IOException ex)
 			{

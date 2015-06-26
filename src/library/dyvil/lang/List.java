@@ -8,11 +8,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
 
 /**
  * A <b>List</b> is a data type that represents an ordered (sequential)
@@ -92,7 +93,7 @@ public interface List<E> extends Collection<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	/**
 	 * Returns the element at the given {@code index}. This method throws an
@@ -105,11 +106,11 @@ public interface List<E> extends Collection<E>
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of the bounds of this list
 	 */
-	public E apply(int index);
+	public E subscript(int index);
 	
 	/**
 	 * Returns the element at the given {@code index}. Unlike
-	 * {@link #apply(int)}, this method will not throw any exceptions if the
+	 * {@link #subscript(int)}, this method will not throw any exceptions if the
 	 * given {@code index} is out of bounds. Instead, it silently ignores the
 	 * error and returns {@code null}.
 	 * 
@@ -160,12 +161,6 @@ public interface List<E> extends Collection<E>
 	public List<? extends E> $amp(Collection<? extends E> collection);
 	
 	@Override
-	public List<? extends E> $bar(Collection<? extends E> collection);
-	
-	@Override
-	public List<? extends E> $up(Collection<? extends E> collection);
-	
-	@Override
 	public <R> List<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
@@ -202,6 +197,12 @@ public interface List<E> extends Collection<E>
 	public List<E> distinct(Comparator<? super E> comparator);
 	
 	// Mutating Operations
+	
+	@Override
+	public void $plus$eq(E element);
+	
+	@Override
+	public void clear();
 	
 	/**
 	 * Resizes this list to the given size. This method, unlike
@@ -241,11 +242,11 @@ public interface List<E> extends Collection<E>
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of the bounds of this list
 	 */
-	public void update(int index, E element);
+	public void subscript_$eq(int index, E element);
 	
 	/**
 	 * Updates the element at the given {@code index} of this list. Unlike
-	 * {@link #update(int, Object)}, this method will not throw any exceptions
+	 * {@link #subscript_$eq(int, Object)}, this method will not throw any exceptions
 	 * if the given {@code index} is out of bounds. Instead, it silently ignores
 	 * the error and returns {@code null}.
 	 * 
@@ -269,10 +270,17 @@ public interface List<E> extends Collection<E>
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of the bounds of this list
 	 */
-	public void insert(int index, E element);
+	public default void insert(int index, E element)
+	{
+		this.add(index, element);
+	}
 	
 	@Override
-	public E add(E element);
+	public default boolean add(E element)
+	{
+		this.$plus$eq(element);
+		return true;
+	}
 	
 	/**
 	 * Inserts the element at the given {@code index} of this list. Unlike
@@ -289,16 +297,7 @@ public interface List<E> extends Collection<E>
 	public E add(int index, E element);
 	
 	@Override
-	public default boolean remove(E element)
-	{
-		int index = this.indexOf(element);
-		if (index == -1)
-		{
-			return false;
-		}
-		this.removeAt(index);
-		return true;
-	}
+	public boolean remove(E element);
 	
 	/**
 	 * Removes the element at the given {@code index} from this list. This
@@ -310,18 +309,6 @@ public interface List<E> extends Collection<E>
 	 *            the index of the element to remove from this list
 	 */
 	public void removeAt(int index);
-	
-	@Override
-	public void $amp$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $bar$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $up$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void clear();
 	
 	@Override
 	public void filter(Predicate<? super E> condition);
@@ -391,4 +378,34 @@ public interface List<E> extends Collection<E>
 	
 	@Override
 	public ImmutableList<E> immutable();
+	
+	public static <E> boolean listEquals(List<E> list, Object o)
+	{
+		if (!(o instanceof List))
+		{
+			return false;
+		}
+		
+		return listEquals(list, (List) o);
+	}
+	
+	public static <E> boolean listEquals(List<E> c1, List<E> c2)
+	{
+		if (c1.size() != c2.size())
+		{
+			return false;
+		}
+		
+		return Collection.orderedEquals(c1, c2);
+	}
+	
+	public static <E> int listHashCode(List<E> list)
+	{
+		int result = 1;
+		for (Object o : list)
+		{
+			result = 31 * result + (o == null ? 0 : o.hashCode());
+		}
+		return result;
+	}
 }

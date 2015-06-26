@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.ast.classes;
 
 import java.lang.annotation.ElementType;
-import java.util.List;
 
-import org.objectweb.asm.Opcodes;
+import dyvil.lang.List;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
@@ -44,6 +43,8 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Opcodes;
 
 public class CodeClass extends ASTNode implements IClass
 {
@@ -137,6 +138,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public int annotationCount()
+	{
+		return this.annotationCount;
+	}
+	
+	@Override
 	public void setAnnotations(Annotation[] annotations, int count)
 	{
 		this.annotations = annotations;
@@ -186,16 +193,19 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		switch (type)
 		{
-		case "dyvil.lang.annotation.sealed":
+		case "dyvil/annotation/sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
-		case "dyvil.lang.annotation.Strict":
+		case "dyvil/annotation/Strict":
 			this.modifiers |= Modifiers.STRICT;
 			return false;
-		case "java.lang.Deprecated":
+		case "dyvil/annotation/object":
+			this.modifiers |= Modifiers.OBJECT_CLASS;
+			return false;
+		case "java/lang/Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
 			return false;
-		case "java.lang.FunctionalInterface":
+		case "java/lang/FunctionalInterface":
 			this.modifiers |= Modifiers.FUNCTIONAL;
 			return false;
 		}
@@ -206,6 +216,12 @@ public class CodeClass extends ASTNode implements IClass
 	public ElementType getAnnotationType()
 	{
 		return ElementType.TYPE;
+	}
+	
+	@Override
+	public Annotation[] getAnnotations()
+	{
+		return this.annotations;
 	}
 	
 	@Override
@@ -451,6 +467,10 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean isSubTypeOf(IType type)
 	{
+		if (this == type.getTheClass())
+		{
+			return true;
+		}
 		if (this.superType != null && type.isSuperTypeOf2(this.superType))
 		{
 			return true;
@@ -532,6 +552,41 @@ public class CodeClass extends ASTNode implements IClass
 	public IClassBody getBody()
 	{
 		return this.body;
+	}
+	
+	@Override
+	public int compilableCount()
+	{
+		return this.compilableCount;
+	}
+	
+	@Override
+	public void addCompilable(IClassCompilable compilable)
+	{
+		compilable.setInnerIndex(this.internalName, this.compilableCount);
+		
+		if (this.compilables == null)
+		{
+			this.compilables = new IClassCompilable[2];
+			this.compilables[0] = compilable;
+			this.compilableCount = 1;
+			return;
+		}
+		
+		int index = this.compilableCount++;
+		if (this.compilableCount > this.compilables.length)
+		{
+			IClassCompilable[] temp = new IClassCompilable[this.compilableCount];
+			System.arraycopy(this.compilables, 0, temp, 0, index);
+			this.compilables = temp;
+		}
+		this.compilables[index] = compilable;
+	}
+	
+	@Override
+	public IClassCompilable getCompilable(int index)
+	{
+		return this.compilables[index];
 	}
 	
 	@Override
@@ -716,8 +771,8 @@ public class CodeClass extends ASTNode implements IClass
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			String fullName = a.type.getInternalName();
-			if (fullName != null && !this.addRawAnnotation(fullName))
+			String internalName = a.type.getInternalName();
+			if (internalName != null && !this.addRawAnnotation(internalName))
 			{
 				this.removeAnnotation(i--);
 				continue;
@@ -844,6 +899,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.unit;
+	}
+	
+	@Override
 	public IClass getThisClass()
 	{
 		return this;
@@ -935,7 +996,7 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.unit != null && this.unit.hasStaticImports())
+		if (this.unit != null && this.unit.hasMemberImports())
 		{
 			// Static Imports
 			match = this.unit.resolveField(name);
@@ -983,7 +1044,7 @@ public class CodeClass extends ASTNode implements IClass
 			return;
 		}
 		
-		if (this.unit != null && this.unit.hasStaticImports())
+		if (this.unit != null && this.unit.hasMemberImports())
 		{
 			this.unit.getMethodMatches(list, instance, name, arguments);
 		}
@@ -1108,36 +1169,9 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public int compilableCount()
+	public String getFileName()
 	{
-		return this.compilableCount;
-	}
-	
-	@Override
-	public void addCompilable(IClassCompilable compilable)
-	{
-		if (this.compilables == null)
-		{
-			this.compilables = new IClassCompilable[2];
-			this.compilables[0] = compilable;
-			this.compilableCount = 1;
-			return;
-		}
-		
-		int index = this.compilableCount++;
-		if (this.compilableCount > this.compilables.length)
-		{
-			IClassCompilable[] temp = new IClassCompilable[this.compilableCount];
-			System.arraycopy(this.compilables, 0, temp, 0, index);
-			this.compilables = temp;
-		}
-		this.compilables[index] = compilable;
-	}
-	
-	@Override
-	public IClassCompilable getCompilable(int index)
-	{
-		return this.compilables[index];
+		return this.getName().qualified;
 	}
 	
 	@Override

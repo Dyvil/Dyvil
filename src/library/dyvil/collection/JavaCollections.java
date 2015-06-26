@@ -1,8 +1,6 @@
 package dyvil.collection;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -10,15 +8,13 @@ import java.util.function.UnaryOperator;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.lang.Collection;
-import dyvil.lang.List;
 
 public interface JavaCollections
 {
 	// Access Operations
 	
 	/**
-	 * @see Collection#$qmark(Object)
+	 * @see Collection#contains(Object)
 	 */
 	public static @infix @inline boolean $qmark(java.util.Collection collection, Object o)
 	{
@@ -26,7 +22,7 @@ public interface JavaCollections
 	}
 	
 	/**
-	 * @see List#apply(int)
+	 * @see List#subscript(int)
 	 */
 	public static @infix @inline <E> E apply(java.util.List<E> list, int index)
 	{
@@ -36,7 +32,7 @@ public interface JavaCollections
 	// Mutating Operations
 	
 	/**
-	 * @see List#update(int, Object)
+	 * @see List#subscript_$eq(int, Object)
 	 */
 	public static @infix @inline <E> void update(java.util.List<E> list, int index, E element)
 	{

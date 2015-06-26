@@ -2,6 +2,7 @@ package dyvil.lang;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
@@ -11,12 +12,13 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.ImmutableCollection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableCollection;
 import dyvil.collection.MutableList;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
 
 /**
  * The base class of all collection classes in the <i>Dyvil Collection
@@ -149,7 +151,20 @@ public interface Collection<E> extends Iterable<E>
 	 *            the element
 	 * @return true, if this collection contains the element
 	 */
-	public boolean $qmark(Object element);
+	public default boolean $qmark(Object element)
+	{
+		return this.contains(element);
+	}
+	
+	/**
+	 * Returns true if and if only this collection contains the element
+	 * specified by {@code element}.
+	 * 
+	 * @param element
+	 *            the element
+	 * @return true, if this collection contains the element
+	 */
+	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	
@@ -209,30 +224,6 @@ public interface Collection<E> extends Iterable<E>
 	public Collection<? extends E> $amp(Collection<? extends E> collection);
 	
 	/**
-	 * Returns a collection that contains all elements of this collection plus
-	 * all elements of the given {@code collection} that are not currently
-	 * present in this collection.
-	 * 
-	 * @param collection
-	 *            the collection of elements to be added
-	 * @return a collection that contains all elements of this collection plus
-	 *         all elements in the given collection that are not present in this
-	 *         collection.
-	 */
-	public Collection<? extends E> $bar(Collection<? extends E> collection);
-	
-	/**
-	 * Returns a collection that contains all elements that are present in
-	 * either this or the given {@code collection}, but not in both.
-	 * 
-	 * @param collection
-	 *            the collection
-	 * @return a collection that contains all elements that are present in
-	 *         either this or the given collection, but not in both.
-	 */
-	public Collection<? extends E> $up(Collection<? extends E> collection);
-	
-	/**
 	 * Returns a collection that is mapped from this collection by supplying
 	 * each of this collection's elements to the given {@code mapper}, and
 	 * adding the returned mappings to a new collection.
@@ -268,17 +259,6 @@ public interface Collection<E> extends Iterable<E>
 	// Mutating Operations
 	
 	/**
-	 * Adds the element given by {@code element} to this collection and returns
-	 * the old element, if any. This method should throw an
-	 * {@link ImmutableException} if this is an immutable collection.
-	 * 
-	 * @param element
-	 *            the element to be added
-	 * @return the old element
-	 */
-	public E add(E element);
-	
-	/**
 	 * Adds the element given by {@code element} to this collection. This method
 	 * should throw an {@link ImmutableException} if this is an immutable
 	 * collection.
@@ -307,18 +287,7 @@ public interface Collection<E> extends Iterable<E>
 		}
 	}
 	
-	/**
-	 * Removes the given {@code element} from this collection. If the element is
-	 * not present in this list, it is simply ignored and {@code false} is
-	 * returned. Otherwise, if the element has been successfully removed,
-	 * {@code true} is returned.
-	 * 
-	 * @param element
-	 *            the element to be removed
-	 * @return true, iff the element has been removed successfully, false
-	 *         otherwise
-	 */
-	public boolean remove(E element);
+	// Mutating Operations
 	
 	/**
 	 * Removes the element given by {@code element} from this collection. This
@@ -349,6 +318,8 @@ public interface Collection<E> extends Iterable<E>
 		}
 	}
 	
+	// Mutating Operations
+	
 	/**
 	 * Removes all elements of this collection that are not present in the given
 	 * {@code collection}. This method should throw an
@@ -357,25 +328,12 @@ public interface Collection<E> extends Iterable<E>
 	 * @param collection
 	 *            the collection of elements to be retained
 	 */
-	public void $amp$eq(Collection<? extends E> collection);
+	public default void $amp$eq(Collection<? extends E> collection)
+	{
+		this.intersect(collection);
+	}
 	
-	/**
-	 * Adds all elements of the given {@code collection} if they are not already
-	 * present in this collection.
-	 * 
-	 * @param collection
-	 *            the collection to add
-	 */
-	public void $bar$eq(Collection<? extends E> collection);
-	
-	/**
-	 * Removes all elements of the given {@code collection} from this collection
-	 * and adds those that are not currently present in this collection.
-	 * 
-	 * @param collection
-	 *            the collection to XOR with
-	 */
-	public void $up$eq(Collection<? extends E> collection);
+	// Mutating Operations
 	
 	/**
 	 * Clears this collection such that all elements of this collection are
@@ -387,6 +345,98 @@ public interface Collection<E> extends Iterable<E>
 	 * memory and are eventually garbage-collected.
 	 */
 	public void clear();
+	
+	/**
+	 * Adds the element given by {@code element} to this collection and returns
+	 * the {@code true} if it was not present in this collection, {@code false}
+	 * otherwise (does not apply to {@link List Lists} as the element will
+	 * always be appended at the end of the list, therefore always returning
+	 * {@code false}). This method should throw an {@link ImmutableException} if
+	 * this is an immutable collection.
+	 * 
+	 * @param element
+	 *            the element to be added
+	 * @return the old element
+	 */
+	public boolean add(E element);
+	
+	/**
+	 * Adds all elements of the given {@code collection} to this collection.
+	 * This method should throw an {@link ImmutableException} if this is an
+	 * immutable collection.
+	 * 
+	 * @param collection
+	 *            the collection of elements to be added
+	 */
+	public default boolean addAll(Collection<? extends E> collection)
+	{
+		boolean added = false;
+		for (E element : collection)
+		{
+			if (this.add(element))
+			{
+				added = true;
+			}
+		}
+		return added;
+	}
+	
+	/**
+	 * Removes the given {@code element} from this collection. If the element is
+	 * not present in this list, it is simply ignored and {@code false} is
+	 * returned. Otherwise, if the element has been successfully removed,
+	 * {@code true} is returned.
+	 * 
+	 * @param element
+	 *            the element to be removed
+	 * @return true, iff the element has been removed successfully, false
+	 *         otherwise
+	 */
+	public boolean remove(E element);
+	
+	/**
+	 * Removes all elements of the given {@code collection} from this
+	 * collection. This method should throw an {@link ImmutableException} if the
+	 * callee is an immutable collection.
+	 * 
+	 * @param collection
+	 *            the collection of elements to be removed
+	 */
+	public default boolean removeAll(Collection<? extends E> collection)
+	{
+		boolean removed = false;
+		for (E e : collection)
+		{
+			if (this.remove(e))
+			{
+				removed = true;
+			}
+		}
+		return removed;
+	}
+	
+	/**
+	 * Removes all elements of this collection that are not present in the given
+	 * {@code collection}. This method should throw an
+	 * {@link ImmutableException} if this is an immutable collection.
+	 * 
+	 * @param collection
+	 *            the collection of elements to be retained
+	 */
+	public default boolean intersect(Collection<? extends E> collection)
+	{
+		boolean removed = false;
+		Iterator<E> iterator = this.iterator();
+		while (iterator.hasNext())
+		{
+			if (!collection.contains(iterator.next()))
+			{
+				iterator.remove();
+				removed = true;
+			}
+		}
+		return removed;
+	}
 	
 	/**
 	 * Maps the elements of this collection using the given {@code mapper}. This
@@ -452,14 +502,14 @@ public interface Collection<E> extends Iterable<E>
 		return array;
 	}
 	
-	// Copying
-	
 	public default void toArray(Object[] store)
 	{
 		this.toArray(0, store);
 	}
 	
 	public void toArray(int index, Object[] store);
+	
+	// Copying
 	
 	/**
 	 * Creates a copy of this collection. The general contract of this method is
@@ -483,6 +533,8 @@ public interface Collection<E> extends Iterable<E>
 	 */
 	public MutableCollection<E> mutable();
 	
+	public MutableCollection<E> mutableCopy();
+	
 	/**
 	 * Returns an immutable copy of this collection. Already immutable
 	 * collections should return themselves when this method is called on them,
@@ -491,4 +543,76 @@ public interface Collection<E> extends Iterable<E>
 	 * @return an immutable copy of this collection
 	 */
 	public ImmutableCollection<E> immutable();
+	
+	public ImmutableCollection<E> immutableCopy();
+	
+	// toString, equals and hashCode
+	
+	@Override
+	public String toString();
+	
+	@Override
+	public boolean equals(Object obj);
+	
+	@Override
+	public int hashCode();
+	
+	public static <E> String collectionToString(Collection<E> collection)
+	{
+		if (collection.isEmpty())
+		{
+			return "[]";
+		}
+		
+		StringBuilder builder = new StringBuilder("[");
+		Iterator<E> iterator = collection.iterator();
+		while (true)
+		{
+			E element = iterator.next();
+			builder.append(element);
+			if (iterator.hasNext())
+			{
+				builder.append(", ");
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		return builder.append(']').toString();
+	}
+	
+	public static <E> boolean orderedEquals(Iterable<E> c1, Iterable<E> c2)
+	{
+		Iterator<E> iterator1 = c1.iterator();
+		Iterator<E> iterator2 = c2.iterator();
+		while (iterator1.hasNext())
+		{
+			E e1 = iterator1.next();
+			E e2 = iterator2.next();
+			if (!Objects.equals(e1, e2))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static <E> boolean unorderedEquals(Collection<E> c1, Collection<E> c2)
+	{
+		if (c1.size() != c2.size())
+		{
+			return false;
+		}
+		
+		for (Object o : c1)
+		{
+			if (!c2.contains(o))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 }

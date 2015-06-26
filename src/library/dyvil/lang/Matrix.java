@@ -10,16 +10,32 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.TupleConvertible;
 import dyvil.tuple.Tuple2;
 
-@TupleConvertible
+@NilConvertible
 @ArrayConvertible
 public interface Matrix<E> extends Iterable<E>
 {
+	public static <E> MutableMatrix<E> apply()
+	{
+		return MutableMatrix.apply();
+	}
+	
+	public static <E> MutableMatrix<E> apply(int rows, int columns)
+	{
+		return MutableMatrix.apply(rows, columns);
+	}
+	
+	public static <E> ImmutableMatrix<E> apply(E[]... elements)
+	{
+		return ImmutableMatrix.apply(elements);
+	}
+	
 	// Accessors
 	
 	public int rows();
@@ -33,7 +49,7 @@ public interface Matrix<E> extends Iterable<E>
 	
 	public default boolean isEmpty()
 	{
-		return this.rows() * this.columns() == 0;
+		return this.rows() == 0 || this.columns() == 0;
 	}
 	
 	@Override
@@ -58,9 +74,14 @@ public interface Matrix<E> extends Iterable<E>
 	@Override
 	public void forEach(Consumer<? super E> action);
 	
-	public boolean $qmark(Object element);
+	public default boolean $qmark(Object element)
+	{
+		return this.contains(element);
+	}
 	
-	public E apply(int row, int column);
+	public boolean contains(Object element);
+	
+	public E subscript(int row, int column);
 	
 	public E get(int row, int column);
 	
@@ -92,7 +113,7 @@ public interface Matrix<E> extends Iterable<E>
 	
 	public void insertColumn(int index, List<E> column);
 	
-	public void update(int row, int column, E element);
+	public void subscript_$eq(int row, int column, E element);
 	
 	public E set(int row, int column, E element);
 	
@@ -185,5 +206,91 @@ public interface Matrix<E> extends Iterable<E>
 	
 	public MutableMatrix<E> mutable();
 	
+	public MutableMatrix<E> mutableCopy();
+	
 	public ImmutableMatrix<E> immutable();
+	
+	public ImmutableMatrix<E> immutableCopy();
+	
+	// toString, equals and hashCode
+	
+	@Override
+	public String toString();
+	
+	@Override
+	public boolean equals(Object obj);
+	
+	@Override
+	public int hashCode();
+	
+	public static <E> String matrixToString(Matrix<E> matrix)
+	{
+		if (matrix.isEmpty())
+		{
+			return "[[]]";
+		}
+		
+		int columns = matrix.columns();
+		int column = 0;
+		
+		StringBuilder builder = new StringBuilder("[[");
+		Iterator<E> iterator = matrix.iterator();
+		while (true)
+		{
+			builder.append(iterator.next());
+			if (iterator.hasNext())
+			{
+				if (++column >= columns)
+				{
+					builder.append("], [");
+					column = 0;
+				}
+				else
+				{
+					builder.append(", ");
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+		return builder.append("]]").toString();
+	}
+	
+	public static <E> boolean matrixEquals(Matrix<E> matrix, Object o)
+	{
+		if (!(o instanceof Matrix))
+		{
+			return false;
+		}
+		
+		return matrixEquals(matrix, (Matrix) o);
+	}
+	
+	public static <E> boolean matrixEquals(Matrix<E> m1, Matrix<E> m2)
+	{
+		int rows = m1.rows();
+		if (rows != m2.rows())
+		{
+			return false;
+		}
+		int columns = m1.columns();
+		if (columns != m2.columns())
+		{
+			return false;
+		}
+		
+		return Collection.orderedEquals(m1, m2);
+	}
+	
+	public static <E> int matrixHashCode(Matrix<E> matrix)
+	{
+		int result = matrix.rows() * 31 + matrix.columns();
+		for (Object o : matrix)
+		{
+			result = result * 31 + (o == null ? 0 : o.hashCode());
+		}
+		return result;
+	}
 }

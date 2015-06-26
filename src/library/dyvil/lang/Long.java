@@ -1,9 +1,12 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.*;
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.prefix;
 import dyvil.lang.literal.LongConvertible;
+
+import dyvil.annotation.Intrinsic;
+import dyvil.annotation.infix;
+import dyvil.annotation.prefix;
+
+import static dyvil.reflect.Opcodes.*;
 
 @LongConvertible
 public class Long implements Integer
@@ -23,15 +26,14 @@ public class Long implements Integer
 		return new Long(value);
 	}
 	
+	public static @infix long unapply(Long v)
+	{
+		return v == null ? 0L : v.value;
+	}
+	
 	protected Long(long value)
 	{
 		this.value = value;
-	}
-	
-	@Intrinsic({ INSTANCE })
-	public long unapply()
-	{
-		return this.value;
 	}
 	
 	@Override

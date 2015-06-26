@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.lexer;
 
-import static dyvil.tools.compiler.transform.Tokens.*;
-import static dyvil.tools.compiler.util.ParserUtil.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.lexer.token.*;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
+
+import static dyvil.tools.compiler.transform.Tokens.*;
+import static dyvil.tools.compiler.util.ParserUtil.*;
 
 public final class Dlex
 {
@@ -65,6 +66,7 @@ public final class Dlex
 				subtype = m & 0xFFFF0000;
 			}
 			
+			typeswitch:
 			switch (type)
 			{
 			case IDENTIFIER:
@@ -110,6 +112,26 @@ public final class Dlex
 					addToken = true;
 				}
 				break;
+			case SPECIAL_IDENTIFIER:
+				switch (c)
+				{
+				case '\n':
+				case '\t':
+				case '\b':
+					continue;
+				case '`':
+					if (buf.length() == 0)
+					{
+						continue;
+					}
+					
+					addToken = true;
+					reparse = false;
+					break typeswitch;
+				default:
+					buf.append(c);
+					continue;
+				}
 			case SYMBOL:
 				buf.append(c);
 				addToken = true;
@@ -321,6 +343,14 @@ public final class Dlex
 					buf.append(c);
 				}
 				break;
+			case GENERIC_CALL:
+				if (c == '[')
+				{
+					addToken = true;
+					reparse = false;
+					break;
+				}
+				continue;
 			}
 			
 			if (addToken)
@@ -352,6 +382,14 @@ public final class Dlex
 	{
 		switch (c)
 		{
+		case '`':
+			return SPECIAL_IDENTIFIER;
+		case '#':
+			if (code.charAt(i + 1) == '[')
+			{
+				return GENERIC_CALL;
+			}
+			return IDENTIFIER | MOD_SYMBOL;
 		case '"':
 			return STRING;
 		case '\'':
@@ -488,6 +526,8 @@ public final class Dlex
 			}
 			return new SymbolToken(prev, i, line, start);
 		}
+		case SPECIAL_IDENTIFIER:
+			return new IdentifierToken(prev, Name.getSpecial(s), type, line, start, start + len);
 		case SYMBOL:
 		case Symbols.DOT:
 		case Symbols.COLON:
@@ -543,6 +583,8 @@ public final class Dlex
 			return new StringToken(prev, STRING_END, s, line, start, start + len);
 		case CHAR:
 			return new CharToken(prev, s.charAt(1), line, start);
+		case GENERIC_CALL:
+			return new SymbolToken(prev, Symbols.GENERIC_CALL, line, start);
 		}
 		return null;
 	}

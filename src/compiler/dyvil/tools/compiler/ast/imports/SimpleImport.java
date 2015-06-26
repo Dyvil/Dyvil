@@ -1,8 +1,12 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
+import dyvil.lang.List;
+
+import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
@@ -39,6 +43,12 @@ public final class SimpleImport extends ASTNode implements IImport
 	{
 		this.position = position;
 		this.name = name;
+	}
+	
+	@Override
+	public int importTag()
+	{
+		return SIMPLE;
 	}
 	
 	@Override
@@ -193,6 +203,49 @@ public final class SimpleImport extends ASTNode implements IImport
 			{
 				list.add(new MethodMatch(m, match));
 			}
+		}
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeUTF(this.name.qualified);
+		if (this.alias != null)
+		{
+			dos.writeUTF(this.alias.qualified);
+		}
+		else
+		{
+			dos.writeUTF("");
+		}
+		
+		if (this.child != null)
+		{
+			dos.writeByte(this.child.importTag());
+			this.child.write(dos);
+		}
+		else
+		{
+			dos.writeByte(0);
+		}
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		this.name = Name.getQualified(dis.readUTF());
+		
+		String alias = dis.readUTF();
+		if (!alias.isEmpty())
+		{
+			this.alias = Name.getQualified(alias);
+		}
+		
+		byte childTag = dis.readByte();
+		if (childTag != 0)
+		{
+			this.child = IImport.fromTag(childTag);
+			this.child.read(dis);
 		}
 	}
 	

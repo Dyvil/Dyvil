@@ -2,10 +2,11 @@ package dyvil.lang.ref.unsafe;
 
 import java.lang.reflect.Field;
 
-import dyvil.lang.ref.IByteRef;
+import dyvil.lang.ref.ByteRef;
+
 import dyvil.reflect.ReflectUtils;
 
-public final class UnsafeByteRef implements IByteRef
+public final class UnsafeByteRef implements ByteRef
 {
 	private final Object	base;
 	private final long		offset;

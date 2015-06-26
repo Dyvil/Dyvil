@@ -3,8 +3,6 @@ package dyvil.tools.compiler.backend.visitor;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import org.objectweb.asm.*;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -12,6 +10,8 @@ import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.backend.ClassFormat;
+
+import org.objectweb.asm.*;
 
 public final class BytecodeVisitor extends MethodVisitor
 {

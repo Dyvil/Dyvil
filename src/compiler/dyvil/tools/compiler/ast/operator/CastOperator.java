@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.operator;
 
-import static dyvil.reflect.Opcodes.*;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -14,6 +13,8 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+
+import static dyvil.reflect.Opcodes.*;
 
 public final class CastOperator extends ASTNode implements IValue
 {
@@ -107,12 +108,6 @@ public final class CastOperator extends ASTNode implements IValue
 			return this;
 		}
 		
-		if (!this.typeHint && this.type.equals(this.value.getType()))
-		{
-			markers.add(this.position, "cast.unnecessary");
-			this.typeHint = true;
-		}
-		
 		IValue value1 = this.value.withType(this.type);
 		if (value1 != null && value1 != this.value)
 		{
@@ -121,6 +116,12 @@ public final class CastOperator extends ASTNode implements IValue
 			this.value.checkTypes(markers, context);
 			this.type = value1.getType();
 			return this;
+		}
+		
+		if (!this.typeHint && this.type.equals(this.value.getType()))
+		{
+			markers.add(this.position, "cast.unnecessary");
+			this.typeHint = true;
 		}
 		
 		this.value.checkTypes(markers, context);

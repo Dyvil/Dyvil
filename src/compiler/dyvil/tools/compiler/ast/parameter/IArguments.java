@@ -33,6 +33,12 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public void setFirstValue(IValue value);
 	
+	// Last Values
+	
+	public IValue getLastValue();
+	
+	public void setLastValue(IValue value);
+	
 	// Used by Methods
 	
 	public void setValue(int index, IParameter param, IValue value);

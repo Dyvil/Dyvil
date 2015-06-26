@@ -1,5 +1,6 @@
 package dyvil.tools.repl;
 
+import dyvil.array.ObjectArray;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -71,6 +72,11 @@ public class REPLResult implements IConstantValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		if (this.value.getClass().isArray())
+		{
+			ObjectArray.toString(this.value, buffer);
+			return;
+		}
 		buffer.append(this.value);
 	}
 }

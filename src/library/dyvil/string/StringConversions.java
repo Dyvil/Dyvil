@@ -138,6 +138,42 @@ public final class StringConversions
 		}
 	}
 	
+	public static @infix long toLong(String s)
+	{
+		try
+		{
+			return Long.parseLong(s, 10);
+		}
+		catch (NumberFormatException ex)
+		{
+			return 0;
+		}
+	}
+	
+	public static @infix long toLong(String s, long _default)
+	{
+		try
+		{
+			return Long.parseLong(s, 10);
+		}
+		catch (NumberFormatException ex)
+		{
+			return _default;
+		}
+	}
+	
+	public static @infix long toLong(String s, long _default, int radix)
+	{
+		try
+		{
+			return Long.parseLong(s, radix);
+		}
+		catch (NumberFormatException ex)
+		{
+			return _default;
+		}
+	}
+	
 	public static @infix float toFloat(String s)
 	{
 		try

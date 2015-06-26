@@ -1,7 +1,8 @@
 package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
-import java.util.List;
+
+import dyvil.lang.List;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -18,6 +19,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -133,8 +135,8 @@ public class Property extends Member implements IProperty, IContext
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
 					markers.add(position, "property.access.static", this.name.unqualified);
-					return null;
 				}
+				instance = null;
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
@@ -143,8 +145,30 @@ public class Property extends Member implements IProperty, IContext
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			markers.add(position, "property.access.unqualified", this.name.unqualified);
-			return new ThisValue(position, this.theClass.getType());
+			if (context.isStatic())
+			{
+				markers.add(position, "property.access.instance", this.name.unqualified);
+			}
+			else
+			{
+				markers.add(position, "property.access.unqualified", this.name.unqualified);
+				instance = new ThisValue(position, this.theClass.getType());
+			}
+		}
+		
+		if (this.hasModifier(Modifiers.DEPRECATED))
+		{
+			markers.add(position, "property.access.deprecated", this.name);
+		}
+		
+		switch (context.getVisibility(this))
+		{
+		case IContext.SEALED:
+			markers.add(position, "property.access.sealed", this.name);
+			break;
+		case IContext.INVISIBLE:
+			markers.add(position, "property.access.invisible", this.name);
+			break;
 		}
 		
 		return instance;
@@ -370,6 +394,12 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.theClass.getHeader();
+	}
+	
+	@Override
 	public IClass getThisClass()
 	{
 		return this.theClass;
@@ -527,7 +557,7 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
-		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
+		if (instance != null)
 		{
 			instance.writeExpression(writer);
 		}
@@ -551,11 +581,10 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
 	{
-		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
+		if (instance != null)
 		{
 			instance.writeExpression(writer);
 		}
-		
 		if (value != null)
 		{
 			value.writeExpression(writer);

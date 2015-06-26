@@ -2,10 +2,11 @@ package dyvil.lang.ref.unsafe;
 
 import java.lang.reflect.Field;
 
-import dyvil.lang.ref.IBooleanRef;
+import dyvil.lang.ref.BooleanRef;
+
 import dyvil.reflect.ReflectUtils;
 
-public final class UnsafeBooleanRef implements IBooleanRef
+public final class UnsafeBooleanRef implements BooleanRef
 {
 	private final Object	base;
 	private final long		offset;

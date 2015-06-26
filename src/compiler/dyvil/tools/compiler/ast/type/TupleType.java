@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -44,47 +44,26 @@ public final class TupleType implements IType, ITypeList
 	
 	public static boolean isSuperType(IType type, ITyped[] typedArray, int count)
 	{
-		if (type.isGenericType())
+		if (!tupleClasses[count].isSubTypeOf(type))
 		{
-			if (!type.getTheClass().getInternalName().equals("dyvil/tuple/Tuple" + count))
-			{
-				return false;
-			}
-			
-			GenericType generic = (GenericType) type;
-			if (count != generic.typeCount())
-			{
-				return false;
-			}
-			
-			for (int i = 0; i < count; i++)
-			{
-				if (!typedArray[i].isType(generic.getType(i)))
-				{
-					return false;
-				}
-			}
-			return true;
+			return false;
 		}
-		if (type instanceof TupleType)
+		int typeTag = type.typeTag();
+		if (typeTag != GENERIC_TYPE && typeTag != TUPLE_TYPE)
 		{
-			TupleType tuple = (TupleType) type;
-			
-			if (count != tuple.typeCount)
+			return false;
+		}
+		
+		ITypeList typeList = (ITypeList) type;
+		
+		for (int i = 0; i < count; i++)
+		{
+			if (!typedArray[i].isType(typeList.getType(i)))
 			{
 				return false;
 			}
-			
-			for (int i = 0; i < count; i++)
-			{
-				if (!typedArray[i].isType(tuple.getType(i)))
-				{
-					return false;
-				}
-			}
-			return true;
 		}
-		return type.classEquals(Types.OBJECT) || type.classEquals(Types.ANY);
+		return true;
 	}
 	
 	public static String getConstructorDescriptor(int typeCount)
@@ -191,47 +170,26 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (type.isGenericType())
+		if (!tupleClasses[this.typeCount].isSubTypeOf(type))
 		{
-			if (this.getTheClass() != type.getTheClass())
-			{
-				return false;
-			}
-			
-			GenericType generic = (GenericType) type;
-			if (this.typeCount != generic.typeCount())
-			{
-				return false;
-			}
-			
-			for (int i = 0; i < this.typeCount; i++)
-			{
-				if (!generic.getType(i).equals(this.types[i]))
-				{
-					return false;
-				}
-			}
-			return true;
+			return false;
 		}
-		if (type instanceof TupleType)
+		int typeTag = type.typeTag();
+		if (typeTag != GENERIC_TYPE && typeTag != TUPLE_TYPE)
 		{
-			TupleType tuple = (TupleType) type;
-			
-			if (this.typeCount != tuple.typeCount)
+			return false;
+		}
+		
+		ITypeList typeList = (ITypeList) type;
+		
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			if (typeList.getType(i).isSuperTypeOf(this.types[i]))
 			{
 				return false;
 			}
-			
-			for (int i = 0; i < this.typeCount; i++)
-			{
-				if (!tuple.types[i].equals(this.types[i]))
-				{
-					return false;
-				}
-			}
-			return true;
 		}
-		return Types.OBJECT.classEquals(type);
+		return true;
 	}
 	
 	@Override
@@ -276,12 +234,22 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public TupleType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context)
 	{
+		if (this.typeCount == 0)
+		{
+			return Types.VOID;
+		}
+		if (this.typeCount == 1)
+		{
+			return this.types[0].resolve(markers, context);
+		}
+		
 		for (int i = 0; i < this.typeCount; i++)
 		{
 			IType t = this.types[i].resolve(markers, context);
 			
+			// Tuple Value Boxing
 			if (t.isPrimitive())
 			{
 				this.types[i] = t.getReferenceType();

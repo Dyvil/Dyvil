@@ -21,7 +21,6 @@ public final class ClassAccess extends ASTNode implements IValue
 	private static final byte	APPLY_CALL		= 2;
 	
 	public IType				type;
-	private boolean				access;
 	
 	public ClassAccess(IType type)
 	{
@@ -63,7 +62,6 @@ public final class ClassAccess extends ASTNode implements IValue
 	{
 		if (type.isSuperTypeOf(this.type))
 		{
-			this.access = true;
 			return this;
 		}
 		return null;
@@ -130,11 +128,24 @@ public final class ClassAccess extends ASTNode implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (!this.access)
+		IClass iclass = this.type.getTheClass();
+		if (iclass != null)
 		{
-			return;
+			if (iclass.hasModifier(Modifiers.DEPRECATED))
+			{
+				markers.add(this.position, "type.access.deprecated", iclass.getName());
+			}
+			
+			if (context.getVisibility(iclass) == IContext.SEALED)
+			{
+				markers.add(this.position, "type.access.sealed", iclass.getName());
+			}
 		}
-		
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
 		IClass iclass = this.type.getTheClass();
 		if (iclass == null)
 		{
@@ -152,24 +163,6 @@ public final class ClassAccess extends ASTNode implements IValue
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		IClass iclass = this.type.getTheClass();
-		if (iclass != null)
-		{
-			if (iclass.hasModifier(Modifiers.DEPRECATED))
-			{
-				markers.add(this.position, "type.access.deprecated", iclass.getName());
-			}
-			
-			if (context.getVisibility(iclass) == IContext.SEALED)
-			{
-				markers.add(this.position, "type.access.sealed", iclass.getName());
-			}
-		}
-	}
-	
-	@Override
 	public IValue foldConstants()
 	{
 		return this;
@@ -178,11 +171,6 @@ public final class ClassAccess extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (!this.access)
-		{
-			return;
-		}
-		
 		IClass iclass = this.type.getTheClass();
 		if (iclass != null)
 		{
@@ -197,6 +185,7 @@ public final class ClassAccess extends ASTNode implements IValue
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
+		System.out.println();
 	}
 	
 	@Override

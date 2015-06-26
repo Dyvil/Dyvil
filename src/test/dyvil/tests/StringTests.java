@@ -1,10 +1,10 @@
 package dyvil.tests;
 
-import static org.junit.Assert.assertEquals;
+import dyvil.string.StringUtils;
 
 import org.junit.Test;
 
-import dyvil.string.StringUtils;
+import static org.junit.Assert.assertEquals;
 
 public class StringTests
 {

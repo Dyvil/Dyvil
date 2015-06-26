@@ -1,15 +1,15 @@
 package dyvil.tools.compiler.ast.structure;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import dyvil.lang.List;
+import dyvil.lang.Map;
 
+import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
@@ -45,7 +45,7 @@ public class Package implements INamed, IContext
 	public String				fullName;
 	public String				internalName;
 	
-	public List<IDyvilHeader>	units		= new ArrayList();
+	public List<IDyvilHeader>	headers		= new ArrayList();
 	public Map<String, Package>	subPackages	= new HashMap();
 	
 	protected Package()
@@ -101,9 +101,9 @@ public class Package implements INamed, IContext
 	
 	// Units
 	
-	public void addCompilationUnit(IDyvilHeader unit)
+	public void addHeader(IDyvilHeader unit)
 	{
-		this.units.add(unit);
+		this.headers.add(unit);
 	}
 	
 	public void addSubPackage(Package pack)
@@ -124,7 +124,7 @@ public class Package implements INamed, IContext
 		return pack;
 	}
 	
-	public void check(PackageDecl packageDecl, CodeFile file, MarkerList markers)
+	public void check(PackageDeclaration packageDecl, CodeFile file, MarkerList markers)
 	{
 		if (packageDecl == null)
 		{
@@ -154,6 +154,12 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
+	public IDyvilHeader getHeader()
+	{
+		return null;
+	}
+	
+	@Override
 	public IClass getThisClass()
 	{
 		return null;
@@ -172,7 +178,7 @@ public class Package implements INamed, IContext
 	
 	public IDyvilHeader resolveHeader(String name)
 	{
-		for (IDyvilHeader unit : this.units)
+		for (IDyvilHeader unit : this.headers)
 		{
 			if (unit.getName().equals(name))
 			{
@@ -190,7 +196,7 @@ public class Package implements INamed, IContext
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		for (IDyvilHeader c : this.units)
+		for (IDyvilHeader c : this.headers)
 		{
 			if (c.getName().equals(name.qualified))
 			{

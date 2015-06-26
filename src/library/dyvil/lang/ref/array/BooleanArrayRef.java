@@ -1,8 +1,8 @@
 package dyvil.lang.ref.array;
 
-import dyvil.lang.ref.IBooleanRef;
+import dyvil.lang.ref.BooleanRef;
 
-public class BooleanArrayRef implements IBooleanRef
+public class BooleanArrayRef implements BooleanRef
 {
 	protected final boolean[]	array;
 	protected final int			index;

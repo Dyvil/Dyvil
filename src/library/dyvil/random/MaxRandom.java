@@ -1,6 +1,7 @@
 package dyvil.random;
 
 import dyvil.lang.Random;
+
 import dyvil.math.MathUtils;
 
 /**

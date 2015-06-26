@@ -17,7 +17,7 @@ import dyvil.reflect.Modifiers;
  * @version 1.0
  */
 @Retention(RetentionPolicy.CLASS)
-@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR })
 public @interface sealed
 {
 }

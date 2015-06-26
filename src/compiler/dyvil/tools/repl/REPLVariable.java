@@ -2,12 +2,15 @@ package dyvil.tools.repl;
 
 import java.security.ProtectionDomain;
 
+import dyvil.lang.List;
+
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -25,8 +28,6 @@ public class REPLVariable extends Field
 {
 	private static final ClassLoader		CLASS_LOADER		= REPLVariable.class.getClassLoader();
 	private static final ProtectionDomain	PROTECTION_DOMAIN	= REPLVariable.class.getProtectionDomain();
-	
-	private static int						classID				= 0;
 	
 	protected String						className;
 	
@@ -73,54 +74,62 @@ public class REPLVariable extends Field
 		}
 	}
 	
-	protected void compute()
+	private static boolean isConstant(IValue value)
 	{
-		if (this.className == null && !this.value.isConstant())
+		int tag = value.valueTag();
+		return tag >= 0 && tag != IValue.NIL && tag <= IValue.STRING;
+	}
+	
+	protected void compute(String className, List<IClassCompilable> compilableList)
+	{
+		if (this.className != null || isConstant(this.value) && !compilableList.isEmpty())
 		{
-			try
+			return;
+		}
+		
+		try
+		{
+			this.className = className;
+			Class c = generateClass(this.value, this.type, this.className, compilableList);
+			
+			if (this.type != Types.VOID)
 			{
-				this.className = "REPL$" + classID++;
-				Class c = generateClass(this.value, this.type, this.className);
-				
-				if (this.type != Types.VOID)
+				java.lang.reflect.Field[] fields = c.getDeclaredFields();
+				Object result = fields[0].get(null);
+				IValue v = IValue.fromObject(result);
+				if (v != null)
 				{
-					java.lang.reflect.Field[] fields = c.getDeclaredFields();
-					Object result = fields[0].get(null);
-					IValue v = IValue.fromObject(result);
-					if (v != null)
-					{
-						this.value = v;
-					}
-					else
-					{
-						this.value = new REPLResult(result);
-					}
+					this.value = v;
 				}
 				else
 				{
-					ReflectUtils.unsafe.ensureClassInitialized(c);
+					this.value = new REPLResult(result);
 				}
 			}
-			catch (ExceptionInInitializerError t)
+			else
 			{
-				Throwable ex = t.getCause();
-				System.err.println(ex.getClass().getCanonicalName() + ": " + ex.getMessage());
-				StackTraceElement[] trace = ex.getStackTrace();
-				int len = trace.length - 10;
-				for (int i = 0; i < len; i++)
-				{
-					System.err.println("\tat " + trace[i]);
-				}
-				this.value = this.type.getDefaultValue();
+				ReflectUtils.unsafe.ensureClassInitialized(c);
 			}
-			catch (Throwable t)
+		}
+		catch (ExceptionInInitializerError t)
+		{
+			Throwable ex = t.getCause();
+			System.err.println(ex.getClass().getCanonicalName() + ": " + ex.getMessage());
+			StackTraceElement[] trace = ex.getStackTrace();
+			int len = trace.length - 10;
+			for (int i = 0; i < len; i++)
 			{
-				t.printStackTrace();
+				System.err.println("\tat " + trace[i]);
 			}
+			this.value = this.type.getDefaultValue();
+		}
+		catch (Throwable t)
+		{
+			t.printStackTrace();
 		}
 	}
 	
-	private static Class generateClass(IValue value, IType type, String className) throws Throwable
+	private static Class generateClass(IValue value, IType type, String className, List<IClassCompilable> compilableList) throws Throwable
 	{
 		String extendedType = type.getExtendedName();
 		ClassWriter writer = new ClassWriter();
@@ -153,12 +162,19 @@ public class REPLVariable extends Field
 		// Finish Method compilation
 		mw.writeInsn(Opcodes.RETURN);
 		mw.end();
+		
+		// Compilables
+		for (IClassCompilable c : compilableList)
+		{
+			c.write(writer);
+		}
+		
 		// Finish Class compilation
 		writer.visitEnd();
 		
 		byte[] bytes = writer.toByteArray();
 		
-		if (type != Types.VOID)
+		if (type != Types.VOID || !compilableList.isEmpty())
 		{
 			// The type contains the value, so we have to keep the class loaded.
 			return ReflectUtils.unsafe.defineClass(className, bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
@@ -177,9 +193,15 @@ public class REPLVariable extends Field
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
-		if (this.className == null || this.value.isConstant())
+		if (isConstant(this.value))
 		{
 			this.value.writeExpression(writer);
+			return;
+		}
+		
+		if (this.className == null)
+		{
+			this.type.writeDefaultValue(writer);
 			return;
 		}
 		
@@ -190,5 +212,13 @@ public class REPLVariable extends Field
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
 	{
+		if (this.className == null)
+		{
+			writer.writeInsn(Opcodes.AUTO_POP);
+			return;
+		}
+		
+		String extended = this.type.getExtendedName();
+		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, "value", extended);
 	}
 }

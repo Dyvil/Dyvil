@@ -1,7 +1,5 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.*;
-
 import java.util.Iterator;
 
 import dyvil.annotation.Intrinsic;
@@ -9,6 +7,8 @@ import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.array.*;
 import dyvil.tuple.Tuple2;
+
+import static dyvil.reflect.Opcodes.*;
 
 public final class Predef
 {

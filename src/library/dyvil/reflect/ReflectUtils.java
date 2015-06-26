@@ -3,9 +3,11 @@ package dyvil.reflect;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+
+import dyvil.lang.List;
+
+import dyvil.collection.mutable.ArrayList;
 
 public final class ReflectUtils
 {

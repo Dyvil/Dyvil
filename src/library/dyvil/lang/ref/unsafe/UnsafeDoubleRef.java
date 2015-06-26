@@ -2,10 +2,11 @@ package dyvil.lang.ref.unsafe;
 
 import java.lang.reflect.Field;
 
-import dyvil.lang.ref.IDoubleRef;
+import dyvil.lang.ref.DoubleRef;
+
 import dyvil.reflect.ReflectUtils;
 
-public final class UnsafeDoubleRef implements IDoubleRef
+public final class UnsafeDoubleRef implements DoubleRef
 {
 	private final Object	base;
 	private final long		offset;

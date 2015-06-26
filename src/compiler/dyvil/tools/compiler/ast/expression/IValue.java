@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
@@ -13,40 +11,52 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
+import org.objectweb.asm.Label;
+
 public interface IValue extends IASTNode, ITyped
 {
-	int	NULL				= 0;
-	int	NIL					= 1;
-	int	WILDCARD			= 2;
-	int	BOOLEAN				= 3;
-	int	BYTE				= 4;
-	int	SHORT				= 5;
-	int	CHAR				= 6;
-	int	INT					= 7;
-	int	LONG				= 8;
-	int	FLOAT				= 9;
-	int	DOUBLE				= 10;
-	int	STRING				= 11;
-	int	FORMAT_STRING		= 12;
-	int	STRINGBUILDER		= 13;
+	int	VOID				= 0;
+	int	NULL				= 1;
+	int	NIL					= 2;
+	int	WILDCARD			= 3;
+	int	BOOLEAN				= 4;
+	int	BYTE				= 5;
+	int	SHORT				= 6;
+	int	CHAR				= 7;
+	int	INT					= 8;
+	int	LONG				= 9;
+	int	FLOAT				= 10;
+	int	DOUBLE				= 11;
+	int	STRING				= 12;
+	int	FORMAT_STRING		= 13;
+	int	STRINGBUILDER		= 14;
 	
 	int	THIS				= 16;
 	int	SUPER				= 17;
 	
 	int	STATEMENT_LIST		= 24;
 	int	ARRAY				= 25;
+	int	TUPLE				= 26;
+	int	CASE_STATEMENT		= 27;
+	int	MATCH				= 28;
+	int	LAMBDA				= 29;
+	int	PARTIAL_FUNCTION	= 30;
+	int	BYTECODE			= 31;
 	
 	int	CLASS_ACCESS		= 32;
 	int	ENUM				= 33;
 	int	FIELD_ACCESS		= 34;
 	int	FIELD_ASSIGN		= 35;
 	int	METHOD_CALL			= 36;
-	int	APPLY_METHOD_CALL	= 37;
-	int	UPDATE_METHOD_CALL	= 38;
-	int	CONSTRUCTOR_CALL	= 39;
-	int	INITIALIZER_CALL	= 40;
-	int	VARIABLE			= 41;
-	int	NESTED_METHOD		= 42;
+	int	APPLY_CALL			= 37;
+	int	UPDATE_CALL			= 38;
+	int	SUBSCRIPT_GET		= 39;
+	int	SUBSCRIPT_SET		= 40;
+	int	CONSTRUCTOR_CALL	= 41;
+	int	INITIALIZER_CALL	= 42;
+	
+	int	VARIABLE			= 43;
+	int	NESTED_METHOD		= 44;
 	
 	int	CAST_OPERATOR		= 48;
 	int	ISOF_OPERATOR		= 49;
@@ -58,13 +68,6 @@ public interface IValue extends IASTNode, ITyped
 	int	TYPE_OPERATOR		= 55;
 	int	NULLCHECK			= 56;
 	int	RANGE_OPERATOR		= 57;
-	
-	int	TUPLE				= 64;
-	int	CASE_STATEMENT		= 65;
-	int	MATCH				= 66;
-	int	LAMBDA				= 67;
-	int	PARTIAL_FUNCTION	= 68;
-	int	BYTECODE			= 69;
 	
 	int	RETURN				= 70;
 	int	IF					= 71;
@@ -126,7 +129,7 @@ public interface IValue extends IASTNode, ITyped
 			return null;
 		}
 		
-		boolean primitive = this.isPrimitive();
+		boolean primitive = thisType.isPrimitive();
 		if (primitive != type.isPrimitive())
 		{
 			// Box Primitive -> Object
@@ -164,7 +167,6 @@ public interface IValue extends IASTNode, ITyped
 	 * 
 	 * @param visitor
 	 * @throws BytecodeException
-	 *             TODO
 	 */
 	public void writeExpression(MethodWriter writer) throws BytecodeException;
 	
@@ -175,7 +177,6 @@ public interface IValue extends IASTNode, ITyped
 	 * 
 	 * @param writer
 	 * @throws BytecodeException
-	 *             TODO
 	 */
 	public void writeStatement(MethodWriter writer) throws BytecodeException;
 	
@@ -197,7 +198,6 @@ public interface IValue extends IASTNode, ITyped
 	 * @param writer
 	 * @param dest
 	 * @throws BytecodeException
-	 *             TODO
 	 */
 	public default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{

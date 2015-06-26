@@ -1,7 +1,5 @@
 package dyvil.array;
 
-import static dyvil.reflect.Opcodes.*;
-
 import java.util.Arrays;
 import java.util.function.IntConsumer;
 import java.util.function.LongFunction;
@@ -11,6 +9,8 @@ import java.util.function.LongUnaryOperator;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+
+import static dyvil.reflect.Opcodes.*;
 
 public interface LongArray
 {
@@ -66,13 +66,13 @@ public interface LongArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, LALOAD })
-	public static @infix long apply(long[] array, int i)
+	public static @infix long subscript(long[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, LASTORE })
-	public static @infix void update(long[] array, int i, long v)
+	public static @infix void subscript_$eq(long[] array, int i, long v)
 	{
 		array[i] = v;
 	}

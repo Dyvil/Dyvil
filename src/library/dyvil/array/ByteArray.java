@@ -1,7 +1,5 @@
 package dyvil.array;
 
-import static dyvil.reflect.Opcodes.*;
-
 import java.util.Arrays;
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
@@ -11,6 +9,8 @@ import java.util.function.IntUnaryOperator;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+
+import static dyvil.reflect.Opcodes.*;
 
 public interface ByteArray
 {
@@ -66,13 +66,13 @@ public interface ByteArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, BALOAD })
-	public static @infix byte apply(byte[] array, int i)
+	public static @infix byte subscript(byte[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, BASTORE })
-	public static @infix void update(byte[] array, int i, byte v)
+	public static @infix void subscript_$eq(byte[] array, int i, byte v)
 	{
 		array[i] = v;
 	}

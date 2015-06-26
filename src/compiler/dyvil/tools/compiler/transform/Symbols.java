@@ -54,6 +54,7 @@ public final class Symbols
 	public static final int					WILDCARD				= Tokens.SYMBOL | 0x00070000;
 	public static final int					ARROW_OPERATOR			= Tokens.SYMBOL | 0x00080000;
 	public static final int					ELLIPSIS				= Tokens.SYMBOL | 0x00090000;
+	public static final int					GENERIC_CALL			= Tokens.SYMBOL | 0x000A0000;
 	
 	private static void addReplacement(char symbol, String replacement)
 	{

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import java.util.Iterator;
 
-import dyvil.collection.ArrayIterator;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -131,7 +131,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 		if (!type.isArrayType())
 		{
 			IClass iclass = type.getTheClass();
-			if (iclass == Types.OBJECT_CLASS)
+			if (iclass == Types.OBJECT_CLASS || iclass == null)
 			{
 				return this;
 			}
@@ -302,6 +302,12 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (this.elementType == null)
 		{
+			if (this.valueCount == 0)
+			{
+				markers.add(this.position, "array.empty");
+				return;
+			}
+			
 			this.getType();
 			
 			for (int i = 0; i < this.valueCount; i++)
@@ -321,7 +327,6 @@ public final class Array extends ASTNode implements IValue, IValueList
 				Marker marker = markers.create(value.getPosition(), "array.element.type");
 				marker.addInfo("Array Type: " + this.requiredType);
 				marker.addInfo("Array Element Type: " + value.getType());
-				
 			}
 			else
 			{

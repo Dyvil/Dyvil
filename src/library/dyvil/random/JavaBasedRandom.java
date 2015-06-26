@@ -1,7 +1,8 @@
 package dyvil.random;
 
-import dyvil.annotation.sealed;
 import dyvil.lang.Random;
+
+import dyvil.annotation.sealed;
 
 public final @sealed class JavaBasedRandom extends java.util.Random implements Random
 {
@@ -21,5 +22,11 @@ public final @sealed class JavaBasedRandom extends java.util.Random implements R
 	public int next(int bits)
 	{
 		return super.next(bits);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "Random()";
 	}
 }

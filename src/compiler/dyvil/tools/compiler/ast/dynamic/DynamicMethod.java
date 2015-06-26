@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.ast.dynamic;
 
 import java.lang.annotation.ElementType;
-import java.util.List;
 
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
+import dyvil.lang.List;
 
 import dyvil.array.ObjectArray;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -24,6 +22,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -33,6 +32,9 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
 
 public class DynamicMethod extends ASTNode implements IMethod
 {
@@ -138,6 +140,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	public boolean isStatic()
 	{
 		return true;
+	}
+	
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return null;
 	}
 	
 	@Override
@@ -290,6 +298,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public int annotationCount()
+	{
+		return 0;
+	}
+	
+	@Override
 	public void setAnnotation(int index, Annotation annotation)
 	{
 	}
@@ -302,6 +316,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	@Override
 	public void removeAnnotation(int index)
 	{
+	}
+	
+	@Override
+	public Annotation[] getAnnotations()
+	{
+		return null;
 	}
 	
 	@Override

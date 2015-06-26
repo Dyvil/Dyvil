@@ -32,7 +32,7 @@ public interface MutableCollection<E> extends Collection<E>
 	public Iterator<E> iterator();
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	
@@ -52,12 +52,6 @@ public interface MutableCollection<E> extends Collection<E>
 	public MutableCollection<? extends E> $amp(Collection<? extends E> collection);
 	
 	@Override
-	public MutableCollection<? extends E> $bar(Collection<? extends E> collection);
-	
-	@Override
-	public MutableCollection<? extends E> $up(Collection<? extends E> collection);
-	
-	@Override
 	public <R> MutableCollection<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
@@ -69,22 +63,13 @@ public interface MutableCollection<E> extends Collection<E>
 	// Mutating Operations
 	
 	@Override
-	public E add(E element);
+	public void clear();
+	
+	@Override
+	public boolean add(E element);
 	
 	@Override
 	public boolean remove(E element);
-	
-	@Override
-	public void $amp$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $bar$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void $up$eq(Collection<? extends E> collection);
-	
-	@Override
-	public void clear();
 	
 	@Override
 	public void filter(Predicate<? super E> condition);
@@ -112,5 +97,17 @@ public interface MutableCollection<E> extends Collection<E>
 	}
 	
 	@Override
+	public default MutableCollection<E> mutableCopy()
+	{
+		return this.copy();
+	}
+	
+	@Override
 	public ImmutableCollection<E> immutable();
+	
+	@Override
+	public default ImmutableCollection<E> immutableCopy()
+	{
+		return this.immutable();
+	}
 }

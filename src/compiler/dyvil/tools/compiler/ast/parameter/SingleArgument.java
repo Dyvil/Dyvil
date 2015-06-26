@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.parameter;
 import java.util.Collections;
 import java.util.Iterator;
 
-import dyvil.collection.SingletonIterator;
+import dyvil.collection.iterator.SingletonIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
@@ -71,6 +71,18 @@ public final class SingleArgument implements IArguments, IValued
 	
 	@Override
 	public void setFirstValue(IValue value)
+	{
+		this.value = value;
+	}
+	
+	@Override
+	public IValue getLastValue()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public void setLastValue(IValue value)
 	{
 		this.value = value;
 	}

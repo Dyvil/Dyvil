@@ -3,14 +3,16 @@ package dyvil.reflect.type;
 import dyvil.lang.Type;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.annotation.object;
+
 @NilConvertible
-public class UnknownType<T> implements Type<T>
+public @object class UnknownType<T> implements Type<T>
 {
-	private static final UnknownType	unknownType	= new UnknownType();
+	public static final UnknownType	instance	= new UnknownType();
 	
 	public static <T> UnknownType<T> apply()
 	{
-		return unknownType;
+		return instance;
 	}
 	
 	@Override

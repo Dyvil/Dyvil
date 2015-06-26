@@ -1,7 +1,8 @@
 package dyvil.tools.compiler.phase;
 
-import java.util.Collection;
 import java.util.function.Consumer;
+
+import dyvil.lang.Collection;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;

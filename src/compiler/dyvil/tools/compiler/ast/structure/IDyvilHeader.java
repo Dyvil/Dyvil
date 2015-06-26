@@ -1,15 +1,24 @@
 package dyvil.tools.compiler.ast.structure;
 
+import java.util.Map;
+
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
-import dyvil.tools.compiler.ast.classes.NestedClass;
-import dyvil.tools.compiler.ast.imports.HeaderComponent;
-import dyvil.tools.compiler.ast.imports.PackageDecl;
+import dyvil.tools.compiler.ast.imports.ImportDeclaration;
+import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
+import dyvil.tools.compiler.ast.imports.PackageDeclaration;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 
-public interface IDyvilHeader extends IContext, IClassList
+public interface IDyvilHeader extends IContext, IClassList, IOperatorMap
 {
+	public default boolean isHeader()
+	{
+		return true;
+	}
+	
 	public String getName();
 	
 	// Package
@@ -20,23 +29,45 @@ public interface IDyvilHeader extends IContext, IClassList
 	
 	// Package Declaration
 	
-	public void setPackageDeclaration(PackageDecl pack);
+	public void setPackageDeclaration(PackageDeclaration pack);
 	
-	public PackageDecl getPackageDeclaration();
+	public PackageDeclaration getPackageDeclaration();
+	
+	// Import
+	
+	public int importCount();
+	
+	public void addImport(ImportDeclaration component);
+	
+	public ImportDeclaration getImport(int index);
+	
+	// Using
+	
+	public boolean hasMemberImports();
+	
+	public int usingCount();
+	
+	public void addUsing(ImportDeclaration component);
+	
+	public ImportDeclaration getUsing(int index);
 	
 	// Include
 	
-	public void addImport(HeaderComponent i);
+	public int includeCount();
 	
-	public void addStaticImport(HeaderComponent i);
+	public void addInclude(IncludeDeclaration component);
 	
-	public boolean hasStaticImports();
+	public IncludeDeclaration getInclude(int index);
 	
 	// Operators
 	
-	public void addOperator(Operator op);
+	public Map<Name, Operator> getOperators();
 	
+	@Override
 	public Operator getOperator(Name name);
+	
+	@Override
+	public void addOperator(Operator op);
 	
 	// Classes
 	
@@ -54,13 +85,17 @@ public interface IDyvilHeader extends IContext, IClassList
 	
 	public int innerClassCount();
 	
-	public void addInnerClass(NestedClass iclass);
+	public void addInnerClass(IClassCompilable iclass);
 	
-	public NestedClass getInnerClass(int index);
+	public IClassCompilable getInnerClass(int index);
 	
 	// Compilation
 	
+	public String getInternalName();
+	
 	public String getInternalName(String subClass);
+	
+	public String getFullName();
 	
 	public String getFullName(String subClass);
 }

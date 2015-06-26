@@ -11,14 +11,14 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class StatementListParser extends Parser implements IValued, ITyped, IParserManager
+public final class StatementListParser extends EmulatorParser implements IValued, ITyped
 {
 	private static final int	EXPRESSION	= 1;
 	private static final int	TYPE		= 2;
@@ -28,12 +28,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 	
 	private Name				label;
 	
-	private IToken				firstToken;
-	private TypeParser			typeParser;
 	private IType				type;
-	
-	private Parser				parser;
-	private IParserManager		pm;
 	
 	public StatementListParser(StatementList valueList)
 	{
@@ -47,7 +42,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 		this.mode = EXPRESSION;
 		this.label = null;
 		this.firstToken = null;
-		this.typeParser = null;
+		this.tryParser = null;
 		this.pm = null;
 		this.type = null;
 		this.parser = null;
@@ -83,7 +78,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 			}
 			
 			this.firstToken = token;
-			this.parser = this.typeParser = new TypeParser(this);
+			this.parser = this.tryParser = new TypeParser(this);
 			this.pm = pm;
 			this.mode = TYPE;
 		}
@@ -93,7 +88,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 			{
 				if (this.type == null)
 				{
-					this.typeParser.end();
+					System.out.println();
 				}
 				
 				if (this.type != null)
@@ -114,7 +109,7 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 				pm.skip();
 				return;
 			}
-			else if (this.typeParser == null)
+			else if (this.tryParser == null)
 			{
 				pm.jump(this.firstToken);
 				this.reset();
@@ -172,86 +167,6 @@ public final class StatementListParser extends Parser implements IValued, ITyped
 	public void setType(IType type)
 	{
 		this.type = type;
-	}
-	
-	@Override
-	public void skip()
-	{
-		this.pm.skip();
-	}
-	
-	@Override
-	public void skip(int n)
-	{
-		this.pm.skip(n);
-	}
-	
-	@Override
-	public void reparse()
-	{
-		this.pm.reparse();
-	}
-	
-	@Override
-	public void jump(IToken token)
-	{
-		this.pm.jump(token);
-	}
-	
-	@Override
-	public void setParser(Parser parser)
-	{
-		this.parser = parser;
-	}
-	
-	@Override
-	public Parser getParser()
-	{
-		return this.parser;
-	}
-	
-	@Override
-	public void pushParser(Parser parser)
-	{
-		parser.setParent(this.parser);
-		this.parser = parser;
-	}
-	
-	@Override
-	public void pushParser(Parser parser, boolean reparse)
-	{
-		parser.setParent(this.parser);
-		this.parser = parser;
-		this.pm.reparse();
-	}
-	
-	@Override
-	public void popParser()
-	{
-		if (this.parser == this.typeParser)
-		{
-			this.typeParser = null;
-			return;
-		}
-		
-		this.parser = this.parser.getParent();
-	}
-	
-	@Override
-	public void popParser(boolean reparse) throws SyntaxError
-	{
-		if (reparse)
-		{
-			this.pm.reparse();
-		}
-		
-		if (this.parser == this.typeParser)
-		{
-			this.typeParser = null;
-			return;
-		}
-		
-		this.parser = this.parser.getParent();
 	}
 	
 	// ----- Ignore -----

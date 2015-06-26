@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.CaptureField;
@@ -26,12 +26,15 @@ public class NestedClass extends CodeClass
 	{
 	}
 	
-	public void setIndex(int index)
+	@Override
+	public void setInnerIndex(String internalName, int index)
 	{
-		String s = Integer.toString(index);
-		this.name = Name.getQualified(this.unit.getName() + "$" + s);
-		this.fullName = this.unit.getFullName(s);
-		this.internalName = this.unit.getInternalName(s);
+		String outerName = this.outerClass == null ? this.unit.getName() : this.outerClass.getFileName();
+		String indexString = Integer.toString(index);
+		
+		this.name = Name.getQualified(outerName + '$' + indexString);
+		this.fullName = this.unit.getFullName(indexString);
+		this.internalName = this.unit.getInternalName(indexString);
 	}
 	
 	@Override

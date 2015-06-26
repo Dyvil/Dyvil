@@ -1,9 +1,13 @@
 package dyvil.tools.compiler.ast.statement;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.Iterator;
 
-import dyvil.collection.ArrayIterator;
+import dyvil.lang.Entry;
+import dyvil.lang.List;
+import dyvil.lang.Map;
+
+import dyvil.collection.iterator.ArrayIterator;
+import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -17,6 +21,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -78,6 +83,10 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		if (this.requiredType != null)
 		{
 			return this.requiredType;
+		}
+		if (this.valueCount == 0)
+		{
+			return this.requiredType = Types.VOID;
 		}
 		return this.requiredType = this.values[this.valueCount - 1].getType();
 	}
@@ -333,6 +342,12 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.context.getHeader();
+	}
+	
+	@Override
 	public IClass getThisClass()
 	{
 		return this.context.getThisClass();
@@ -466,7 +481,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			return;
 		}
 		
-		for (Entry<Name, Variable> entry : this.variables.entrySet())
+		for (Entry<Name, Variable> entry : this.variables)
 		{
 			Variable var = entry.getValue();
 			writer.writeLocal(var.index, var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end);
@@ -511,7 +526,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			return;
 		}
 		
-		for (Entry<Name, Variable> entry : this.variables.entrySet())
+		for (Entry<Name, Variable> entry : this.variables)
 		{
 			entry.getValue().writeLocal(writer, start, end);
 		}

@@ -10,9 +10,25 @@ import java.util.function.UnaryOperator;
 import dyvil.lang.Collection;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.Set;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.immutable.ArraySet;
+
+@NilConvertible
+@ArrayConvertible
 public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 {
+	public static <E> ImmutableSet<E> apply()
+	{
+		return null; // TODO EmptySet
+	}
+	
+	public static <E> ImmutableSet<E> apply(E... elements)
+	{
+		return new ArraySet(elements, true);
+	}
+	
 	// Accessors
 	
 	@Override
@@ -28,7 +44,7 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	
@@ -88,18 +104,6 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	// Mutating Operations
 	
 	@Override
-	public default E add(E element)
-	{
-		throw new ImmutableException("add() on Immutable Set");
-	}
-	
-	@Override
-	public default boolean remove(E element)
-	{
-		throw new ImmutableException("remove() on Immutable Set");
-	}
-	
-	@Override
 	public default void $plus$eq(E element)
 	{
 		throw new ImmutableException("+= on Immutable Set");
@@ -141,10 +145,56 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 		throw new ImmutableException("^= on Immutable Set");
 	}
 	
+	// Mutating Operations
+	
+	// Mutating Operations
+	
 	@Override
 	public default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean add(E element)
+	{
+		throw new ImmutableException("add() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean addAll(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("addAll() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean remove(E element)
+	{
+		throw new ImmutableException("remove() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean removeAll(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("removeAll() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean intersect(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("intersect() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean union(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("union() on Immutable Set");
+	}
+	
+	@Override
+	public default boolean exclusiveOr(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("exclusiveOr() on Immutable Set");
 	}
 	
 	@Override
@@ -179,8 +229,20 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	public MutableSet<E> mutable();
 	
 	@Override
+	public default MutableSet<E> mutableCopy()
+	{
+		return this.mutable();
+	}
+	
+	@Override
 	public default ImmutableSet<E> immutable()
 	{
 		return this;
+	}
+	
+	@Override
+	public default ImmutableSet<E> immutableCopy()
+	{
+		return this.copy();
 	}
 }

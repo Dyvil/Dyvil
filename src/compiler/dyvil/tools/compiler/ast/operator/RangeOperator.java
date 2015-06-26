@@ -86,18 +86,14 @@ public class RangeOperator implements IValue
 	
 	private IValue withElementType(IType type, IType elementType)
 	{
-		IValue value1 = this.value1.withType(elementType);
-		if (value1 == null)
+		if (!this.value1.isType(elementType))
 		{
 			return null;
 		}
-		IValue value2 = this.value2.withType(elementType);
-		if (value2 == null)
+		if (!this.value2.isType(elementType))
 		{
 			return null;
 		}
-		this.value1 = value1;
-		this.value2 = value2;
 		this.type = type;
 		this.elementType = elementType;
 		return this;
@@ -169,6 +165,26 @@ public class RangeOperator implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		IValue value1 = this.value1.withType(this.elementType);
+		if (value1 == null)
+		{
+			// TODO Handle error?
+		}
+		else
+		{
+			this.value1 = value1;
+		}
+		
+		value1 = this.value2.withType(this.elementType);
+		if (value1 == null)
+		{
+			// ...
+		}
+		else
+		{
+			this.value2 = value1;
+		}
+		
 		this.value1.checkTypes(markers, context);
 		this.value2.checkTypes(markers, context);
 	}

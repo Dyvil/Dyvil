@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
@@ -191,7 +191,7 @@ public class Type extends ASTNode implements IType
 			
 			// This type is probably not a primitive one, so resolve using
 			// the context.
-			iclass = context.resolveClass(this.name);
+			iclass = IContext.resolveClass(context, this.name);
 		}
 		
 		if (iclass != null)

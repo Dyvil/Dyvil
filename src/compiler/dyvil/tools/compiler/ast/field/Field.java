@@ -2,8 +2,6 @@ package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
 
-import org.objectweb.asm.FieldVisitor;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -23,6 +21,8 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
+
+import org.objectweb.asm.FieldVisitor;
 
 public class Field extends Member implements IField
 {
@@ -122,8 +122,8 @@ public class Field extends Member implements IField
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
 					markers.add(position, "field.access.static", this.name.unqualified);
-					return null;
 				}
+				instance = null;
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
@@ -139,8 +139,23 @@ public class Field extends Member implements IField
 			else
 			{
 				markers.add(position, "field.access.unqualified", this.name.unqualified);
-				return new ThisValue(position, this.theClass.getType());
+				instance = new ThisValue(position, this.theClass.getType());
 			}
+		}
+		
+		if (this.hasModifier(Modifiers.DEPRECATED))
+		{
+			markers.add(position, "field.access.deprecated", this.name);
+		}
+		
+		switch (context.getVisibility(this))
+		{
+		case IContext.SEALED:
+			markers.add(position, "field.access.sealed", this.name);
+			break;
+		case IContext.INVISIBLE:
+			markers.add(position, "field.access.invisible", this.name);
+			break;
 		}
 		
 		return instance;
@@ -303,7 +318,7 @@ public class Field extends Member implements IField
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
-		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
+		if (instance != null)
 		{
 			instance.writeExpression(writer);
 		}
@@ -324,11 +339,10 @@ public class Field extends Member implements IField
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
 	{
-		if (instance != null && ((this.modifiers & Modifiers.STATIC) == 0 || instance.valueTag() != IValue.CLASS_ACCESS))
+		if (instance != null)
 		{
 			instance.writeExpression(writer);
 		}
-		
 		if (value != null)
 		{
 			value.writeExpression(writer);

@@ -1,7 +1,5 @@
 package dyvil.array;
 
-import static dyvil.reflect.Opcodes.*;
-
 import java.util.Arrays;
 import java.util.function.DoubleFunction;
 import java.util.function.DoublePredicate;
@@ -11,6 +9,8 @@ import java.util.function.IntConsumer;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+
+import static dyvil.reflect.Opcodes.*;
 
 public interface FloatArray
 {
@@ -66,13 +66,13 @@ public interface FloatArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, FALOAD })
-	public static @infix float apply(float[] array, int i)
+	public static @infix float subscript(float[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, FASTORE })
-	public static @infix void update(float[] array, int i, float v)
+	public static @infix void subscript_$eq(float[] array, int i, float v)
 	{
 		array[i] = v;
 	}

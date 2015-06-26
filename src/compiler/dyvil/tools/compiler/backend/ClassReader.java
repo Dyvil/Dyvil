@@ -2,13 +2,13 @@ package dyvil.tools.compiler.backend;
 
 import java.io.InputStream;
 
-import org.objectweb.asm.*;
-
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
+
+import org.objectweb.asm.*;
 
 public class ClassReader extends ClassVisitor
 {
@@ -57,8 +57,13 @@ public class ClassReader extends ClassVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String name, boolean visible)
 	{
-		Annotation annotation = new Annotation(null, ClassFormat.extendedToType(name));
-		return new AnnotationVisitorImpl(this.theClass, annotation);
+		String internal = ClassFormat.extendedToInternal(name);
+		if (this.theClass.addRawAnnotation(internal))
+		{
+			Annotation annotation = new Annotation(null, ClassFormat.internalToType(internal));
+			return new AnnotationVisitorImpl(this.theClass, annotation);
+		}
+		return null;
 	}
 	
 	@Override

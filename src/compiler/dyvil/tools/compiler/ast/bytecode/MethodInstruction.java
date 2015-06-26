@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import org.objectweb.asm.Type;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+
+import org.objectweb.asm.Type;
 
 public final class MethodInstruction implements IInstruction
 {

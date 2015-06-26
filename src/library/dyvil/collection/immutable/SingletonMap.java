@@ -7,11 +7,12 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
-import dyvil.collection.SingletonIterator;
 import dyvil.lang.Entry;
 import dyvil.lang.Map;
+
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
+import dyvil.collection.iterator.SingletonIterator;
 import dyvil.tuple.Tuple2;
 
 public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
@@ -22,6 +23,11 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	public static <K, V> SingletonMap<K, V> apply(K key, V value)
 	{
 		return new SingletonMap(key, value);
+	}
+	
+	public static <K, V> SingletonMap<K, V> apply(Entry<K, V> entry)
+	{
+		return new SingletonMap(entry.getKey(), entry.getValue());
 	}
 	
 	public SingletonMap(K key, V value)
@@ -85,25 +91,25 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
 		return Objects.equals(this.key, key);
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
 		return Objects.equals(this.key, key) && Objects.equals(this.value, value);
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		return Objects.equals(this.value, value);
 	}
 	
 	@Override
-	public V apply(K key)
+	public V get(K key)
 	{
 		return Objects.equals(this.key, key) ? this.value : null;
 	}
@@ -128,27 +134,27 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key)
+	public ImmutableMap<K, V> $minus(Object key)
 	{
-		return Objects.equals(this.key, key) ? EmptyMap.emptyMap : this;
+		return Objects.equals(this.key, key) ? EmptyMap.instance : this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key, V value)
+	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
-		return Objects.equals(this.key, key) && Objects.equals(this.value, value) ? EmptyMap.emptyMap : this;
+		return Objects.equals(this.key, key) && Objects.equals(this.value, value) ? EmptyMap.instance : this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(V value)
+	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
-		return Objects.equals(this.value, value) ? EmptyMap.emptyMap : this;
+		return Objects.equals(this.value, value) ? EmptyMap.instance : this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
-		return map.$qmark(this.key, this.value) ? EmptyMap.emptyMap : this;
+		return map.contains(this.key, this.value) ? EmptyMap.instance : this;
 	}
 	
 	@Override
@@ -160,7 +166,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
-		return condition.test(this.key, this.value) ? this : EmptyMap.emptyMap;
+		return condition.test(this.key, this.value) ? this : EmptyMap.instance;
 	}
 	
 	@Override
@@ -179,5 +185,25 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	public String toString()
 	{
 		return "[ " + this.key + " -> " + this.value + " ]";
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof Map)
+		{
+			return Map.mapEquals(this, (Map) obj);
+		}
+		if (obj instanceof Entry)
+		{
+			return Entry.entryEquals(this, (Entry) obj);
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Entry.entryHashCode(this);
 	}
 }

@@ -1,9 +1,12 @@
 package dyvil.lang;
 
-import static dyvil.reflect.Opcodes.*;
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.prefix;
 import dyvil.lang.literal.IntConvertible;
+
+import dyvil.annotation.Intrinsic;
+import dyvil.annotation.infix;
+import dyvil.annotation.prefix;
+
+import static dyvil.reflect.Opcodes.*;
 
 @IntConvertible
 public class Int implements Integer
@@ -23,15 +26,14 @@ public class Int implements Integer
 		return new Int(v);
 	}
 	
+	public static @infix int unapply(Int v)
+	{
+		return v == null ? 0 : v.value;
+	}
+	
 	protected Int(int value)
 	{
 		this.value = value;
-	}
-	
-	@Intrinsic({ INSTANCE })
-	public int unapply()
-	{
-		return this.value;
 	}
 	
 	@Override

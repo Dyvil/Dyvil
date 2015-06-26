@@ -92,6 +92,10 @@ public final class GenericType extends Type implements ITypeList
 	{
 		if (typeVar.getGeneric() != this.theClass)
 		{
+			if (this.theClass == null)
+			{
+				return Types.ANY;
+			}
 			return this.theClass.resolveType(typeVar, this);
 		}
 		return this.generics[typeVar.getIndex()];
@@ -147,7 +151,7 @@ public final class GenericType extends Type implements ITypeList
 		}
 		else
 		{
-			iclass = context.resolveClass(this.name);
+			iclass = IContext.resolveClass(context, this.name);
 		}
 		
 		if (iclass != null)

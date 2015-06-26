@@ -4,11 +4,12 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.collection.mutable.HashMap;
 import dyvil.lang.Entry;
 import dyvil.lang.Map;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+
+import dyvil.collection.mutable.HashMap;
 
 @NilConvertible
 @ArrayConvertible
@@ -22,7 +23,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public static <K, V> MutableMap<K, V> apply(K key, V value)
 	{
 		HashMap<K, V> map = new HashMap(1);
-		map.update(key, value);
+		map.subscript_$eq(key, value);
 		return map;
 	}
 	
@@ -36,7 +37,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 		HashMap<K, V> map = new HashMap(entries.length);
 		for (Entry<? extends K, ? extends V> entry : entries)
 		{
-			map.update(entry.getKey(), entry.getValue());
+			map.subscript_$eq(entry.getKey(), entry.getValue());
 		}
 		return map;
 	}
@@ -56,16 +57,16 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public Iterator<V> valueIterator();
 	
 	@Override
-	public boolean $qmark(Object key);
+	public boolean containsKey(Object key);
 	
 	@Override
-	public boolean $qmark(Object key, Object value);
+	public boolean containsValue(Object value);
 	
 	@Override
-	public boolean $qmark$colon(V value);
+	public boolean contains(Object key, Object value);
 	
 	@Override
-	public V apply(K key);
+	public V get(K key);
 	
 	// Non-mutating Operations
 	
@@ -76,16 +77,16 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
 	@Override
-	public MutableMap<K, V> $minus(K key);
+	public MutableMap<K, V> $minus(Object key);
 	
 	@Override
-	public MutableMap<K, V> $minus(K key, V value);
+	public MutableMap<K, V> $minus(Object key, Object value);
 	
 	@Override
-	public MutableMap<K, V> $minus$colon(V value);
+	public MutableMap<K, V> $minus$colon(Object value);
 	
 	@Override
-	public MutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map);
+	public MutableMap<K, V> $minus$minus(Map<? super K, ? super V> map);
 	
 	@Override
 	public <U> MutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
@@ -102,16 +103,10 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public V put(K key, V value);
 	
 	@Override
-	public void $plus$plus$eq(Map<? extends K, ? extends V> map);
+	public V removeKey(Object key);
 	
 	@Override
-	public V remove(K key);
-	
-	@Override
-	public boolean remove(K key, V value);
-	
-	@Override
-	public void $minus$colon$eq(V value);
+	public boolean removeValue(Object value);
 	
 	@Override
 	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);
@@ -131,5 +126,17 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
+	public default MutableMap<K, V> mutableCopy()
+	{
+		return this.copy();
+	}
+	
+	@Override
 	public ImmutableMap<K, V> immutable();
+	
+	@Override
+	public default ImmutableMap<K, V> immutableCopy()
+	{
+		return this.immutable();
+	}
 }

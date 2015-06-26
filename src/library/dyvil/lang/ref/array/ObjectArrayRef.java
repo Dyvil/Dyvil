@@ -1,8 +1,8 @@
 package dyvil.lang.ref.array;
 
-import dyvil.lang.ref.IObjectRef;
+import dyvil.lang.ref.ObjectRef;
 
-public class ObjectArrayRef<T> implements IObjectRef<T>
+public class ObjectArrayRef<T> implements ObjectRef<T>
 {
 	protected final T[]	array;
 	protected final int	index;

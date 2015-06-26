@@ -3,19 +3,14 @@ package dyvil.tools.compiler;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.*;
-import java.util.logging.Formatter;
-
-import org.objectweb.asm.Opcodes;
 
 import dyvil.io.AppendableOutputStream;
 import dyvil.io.FileUtils;
 import dyvil.io.LoggerOutputStream;
-import dyvil.tools.compiler.ast.dwt.DWTFile;
-import dyvil.tools.compiler.ast.structure.DyvilHeader;
-import dyvil.tools.compiler.ast.structure.DyvilUnit;
-import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
@@ -23,37 +18,39 @@ import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.phase.ICompilerPhase;
+import dyvil.tools.compiler.sources.FileFinder;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
 
+import org.objectweb.asm.Opcodes;
+
 public final class DyvilCompiler
 {
-	public static final String				VERSION				= "1.0.0";
-	public static final String				DYVIL_VERSION		= "1.0.0";
+	public static final String			VERSION				= "1.0.0";
+	public static final String			DYVIL_VERSION		= "1.0.0";
 	
-	public static boolean					parseStack;
-	public static String					logFile;
-	public static boolean					debug;
-	public static int						constantFolding;
+	public static boolean				parseStack;
+	public static String				logFile;
+	public static boolean				debug;
+	public static int					constantFolding;
 	
-	public static int						classVersion		= Opcodes.V1_8;
-	public static int						asmVersion			= Opcodes.ASM5;
-	public static int						maxConstantDepth	= 10;
+	public static int					classVersion		= Opcodes.V1_8;
+	public static int					asmVersion			= Opcodes.ASM5;
+	public static int					maxConstantDepth	= 10;
 	
-	public static Logger					logger				= Logger.getLogger("DYVILC");
-	public static LoggerOutputStream		loggerOut			= new LoggerOutputStream(logger, "TEST-OUT");
-	public static LoggerOutputStream		loggerErr			= new LoggerOutputStream(logger, "TEST-ERR");
-	public static DateFormat				format				= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static Logger				logger				= Logger.getLogger("DYVILC");
+	public static LoggerOutputStream	loggerOut			= new LoggerOutputStream(logger, "TEST-OUT");
+	public static LoggerOutputStream	loggerErr			= new LoggerOutputStream(logger, "TEST-ERR");
+	public static DateFormat			format				= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	public static CompilerConfig			config				= new CompilerConfig();
-	public static Set<ICompilerPhase>		phases				= new TreeSet();
-	
-	public static List<File>				files				= new ArrayList();
-	public static List<ICompilationUnit>	units				= new ArrayList();
+	public static CompilerConfig		config				= new CompilerConfig();
+	public static Set<ICompilerPhase>	phases				= new TreeSet();
+	public static FileFinder			fileFinder			= new FileFinder();
 	
 	public static void main(String[] args)
 	{
 		long now = System.nanoTime();
+		long totalTime = now;
 		
 		// Sets up States from arguments
 		for (int i = 1; i < args.length; i++)
@@ -108,14 +105,17 @@ public final class DyvilCompiler
 		logger.info("Compiling '" + sourceDir + "' to '" + outputDir + "'");
 		
 		// Scan for Packages and Compilation Units
-		findUnits(sourceDir, outputDir, null);
+		fileFinder.findUnits(sourceDir, outputDir, null);
 		
-		int fileCount = files.size();
-		int unitCount = units.size();
+		int fileCount = fileFinder.files.size();
+		int unitCount = fileFinder.units.size();
 		int packages = Package.rootPackage.subPackages.size();
-		logger.info("Compiling " + packages + (packages == 1 ? " Package, " : " Packages, ") + fileCount + (fileCount == 1 ? " File (" : " Files (")
-				+ unitCount + (unitCount == 1 ? " Compilation Unit)" : " Compilation Units)"));
+		now = System.nanoTime() - now;
+		logger.info("Found " + packages + (packages == 1 ? " Package, " : " Packages, ") + fileCount + (fileCount == 1 ? " File (" : " Files (") + unitCount
+				+ (unitCount == 1 ? " Compilation Unit)" : " Compilation Units)") + " (" + Util.toTime(now) + ")");
 		logger.info("");
+		
+		now = System.nanoTime();
 		
 		// Apply states
 		if (debug)
@@ -127,7 +127,7 @@ public final class DyvilCompiler
 				logger.info("Applying " + phase.getName());
 				try
 				{
-					phase.apply(units);
+					phase.apply(fileFinder.units);
 					now1 = System.nanoTime() - now1;
 					logger.info(phase.getName() + " completed (" + Util.toTime(now1) + ")");
 				}
@@ -147,7 +147,7 @@ public final class DyvilCompiler
 			{
 				try
 				{
-					phase.apply(units);
+					phase.apply(fileFinder.units);
 				}
 				catch (Throwable t)
 				{
@@ -159,8 +159,10 @@ public final class DyvilCompiler
 			}
 		}
 		
+		long l = System.nanoTime();
+		
 		logger.info("");
-		logger.info("Compilation finished (" + Util.toTime(System.nanoTime() - now) + ")");
+		logger.info("Compilation finished (" + Util.toTime(l - now) + ", Total Running Time: " + Util.toTime(l - totalTime) + ")");
 	}
 	
 	private static void initLogger()
@@ -288,51 +290,6 @@ public final class DyvilCompiler
 		}
 		
 		System.err.println("Invalid Argument '" + s + "'. Ignoring.");
-	}
-	
-	private static void findUnits(File source, File output, Package pack)
-	{
-		if (source.isDirectory())
-		{
-			String name = source.getName();
-			for (String s : source.list())
-			{
-				findUnits(new CodeFile(source, s), new File(output, s), pack == null ? Package.rootPackage : pack.createSubPackage(name));
-			}
-			return;
-		}
-		
-		String fileName = source.getPath();
-		if (!config.compileFile(fileName))
-		{
-			return;
-		}
-		
-		if (fileName.endsWith("Thumbs.db") || fileName.endsWith(".DS_Store"))
-		{
-			return;
-		}
-		files.add(output);
-		if (fileName.endsWith(".dwt"))
-		{
-			DWTFile dwt = new DWTFile(pack, (CodeFile) source, output);
-			units.add(dwt);
-			return;
-		}
-		if (fileName.endsWith(".dyvil") || fileName.endsWith(".dyv"))
-		{
-			DyvilUnit unit = new DyvilUnit(pack, (CodeFile) source, output);
-			pack.addCompilationUnit(unit);
-			units.add(unit);
-			return;
-		}
-		if (fileName.endsWith(".dyh"))
-		{
-			DyvilHeader header = new DyvilHeader(pack, (CodeFile) source, output);
-			pack.addCompilationUnit(header);
-			units.add(0, header);
-			return;
-		}
 	}
 	
 	public static void test()

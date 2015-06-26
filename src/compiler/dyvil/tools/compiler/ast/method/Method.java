@@ -1,14 +1,8 @@
 package dyvil.tools.compiler.ast.method;
 
-import static dyvil.reflect.Opcodes.ARGUMENTS;
-import static dyvil.reflect.Opcodes.IFEQ;
-import static dyvil.reflect.Opcodes.IFNE;
-import static dyvil.reflect.Opcodes.INSTANCE;
-
 import java.lang.annotation.ElementType;
-import java.util.List;
 
-import org.objectweb.asm.Label;
+import dyvil.lang.List;
 
 import dyvil.annotation.mutating;
 import dyvil.reflect.Modifiers;
@@ -32,6 +26,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -46,6 +41,13 @@ import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Label;
+
+import static dyvil.reflect.Opcodes.ARGUMENTS;
+import static dyvil.reflect.Opcodes.IFEQ;
+import static dyvil.reflect.Opcodes.IFNE;
+import static dyvil.reflect.Opcodes.INSTANCE;
 
 public class Method extends Member implements IMethod
 {
@@ -546,6 +548,12 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.theClass.getHeader();
+	}
+	
+	@Override
 	public IClass getThisClass()
 	{
 		return this.theClass;
@@ -621,15 +629,6 @@ public class Method extends Member implements IMethod
 	@Override
 	public byte getVisibility(IMember member)
 	{
-		IClass iclass = member.getTheClass();
-		if (iclass == null)
-		{
-			return VISIBLE;
-		}
-		if ((this.modifiers & Modifiers.STATIC) != 0 && iclass == this.theClass && !member.hasModifier(Modifiers.STATIC))
-		{
-			return STATIC;
-		}
 		return this.theClass.getVisibility(member);
 	}
 	
@@ -823,8 +822,8 @@ public class Method extends Member implements IMethod
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
 					markers.add(position, "method.access.static", this.name.unqualified);
-					instance = null;
 				}
+				instance = null;
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
@@ -916,9 +915,6 @@ public class Method extends Member implements IMethod
 		
 		switch (context.getVisibility(this))
 		{
-		case IContext.STATIC:
-			markers.add(position, "method.access.instance", this.name);
-			break;
 		case IContext.SEALED:
 			markers.add(position, "method.access.sealed", this.name);
 			break;
@@ -1182,10 +1178,6 @@ public class Method extends Member implements IMethod
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			if (instance != null && instance.valueTag() == IValue.CLASS_ACCESS)
-			{
-				instance = null;
-			}
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
@@ -1225,10 +1217,6 @@ public class Method extends Member implements IMethod
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			if (instance != null && instance.valueTag() == IValue.CLASS_ACCESS)
-			{
-				instance = null;
-			}
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
@@ -1243,7 +1231,7 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		this.writeArgumentsAndInvoke(writer, instance, arguments);
-		writer.writeJumpInsn(IFEQ, dest);
+		writer.writeJumpInsn(IFNE, dest);
 	}
 	
 	@Override
@@ -1251,10 +1239,6 @@ public class Method extends Member implements IMethod
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
-			if (instance != null && instance.valueTag() == IValue.CLASS_ACCESS)
-			{
-				instance = null;
-			}
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
@@ -1271,7 +1255,7 @@ public class Method extends Member implements IMethod
 		
 		this.writeArgumentsAndInvoke(writer, instance, arguments);
 		
-		writer.writeJumpInsn(IFNE, dest);
+		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
 	private void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException

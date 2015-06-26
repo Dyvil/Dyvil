@@ -94,6 +94,12 @@ public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, I
 	public String[] getInterfaceArray();
 	
 	@Override
+	public default boolean hasSeparateFile()
+	{
+		return true;
+	}
+	
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException;
 	
 	public void writeInnerClassInfo(ClassWriter writer);

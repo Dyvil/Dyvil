@@ -2,9 +2,9 @@ package dyvil.reflect;
 
 import jdk.internal.org.objectweb.asm.Label;
 
-import org.objectweb.asm.util.Printer;
-
 import dyvil.annotation.Intrinsic;
+
+import org.objectweb.asm.util.Printer;
 
 /**
  * The <b>Opcodes</b> interface declares all opcodes that can be used in

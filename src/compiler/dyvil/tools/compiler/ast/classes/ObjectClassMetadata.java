@@ -37,7 +37,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		IClassBody body = this.theClass.getBody();
 		if (body != null)
 		{
-			if (body.constructorCount() > 0)
+			if (markers != null && body.constructorCount() > 0)
 			{
 				markers.add(this.theClass.getPosition(), "class.object.constructor", this.theClass.getName().qualified);
 			}
@@ -45,6 +45,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			IField f = body.getField(Name.instance);
 			if (f != null)
 			{
+				this.instanceField = f;
 				return;
 			}
 		}
@@ -85,6 +86,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			// object type.
 			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "toString", "()Ljava/lang/String;", null, null));
 			mw.begin();
+			mw.setThisType(this.theClass.getInternalName());
 			mw.writeLDC(this.theClass.getName().unqualified);
 			mw.writeInsn(Opcodes.ARETURN);
 			mw.end(Types.STRING);

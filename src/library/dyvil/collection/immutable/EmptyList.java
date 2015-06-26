@@ -8,21 +8,24 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.array.ObjectArray;
-import dyvil.collection.EmptyIterator;
-import dyvil.collection.ImmutableList;
-import dyvil.collection.MutableList;
 import dyvil.lang.Collection;
+import dyvil.lang.List;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.annotation.object;
+import dyvil.array.ObjectArray;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
+import dyvil.collection.iterator.EmptyIterator;
+
 @NilConvertible
-public class EmptyList<E> implements ImmutableList<E>
+public @object class EmptyList<E> implements ImmutableList<E>
 {
-	static final EmptyList	emptyList	= new EmptyList();
+	public static final EmptyList	instance	= new EmptyList();
 	
 	public static <E> EmptyList<E> apply()
 	{
-		return emptyList;
+		return instance;
 	}
 	
 	private EmptyList()
@@ -59,13 +62,13 @@ public class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
 		return false;
 	}
 	
 	@Override
-	public E apply(int index)
+	public E subscript(int index)
 	{
 		throw new IndexOutOfBoundsException("Empty List.apply()");
 	}
@@ -126,18 +129,6 @@ public class EmptyList<E> implements ImmutableList<E>
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
 	{
 		return this;
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $bar(Collection<? extends E> collection)
-	{
-		return new ArrayList(collection);
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $up(Collection<? extends E> collection)
-	{
-		return new ArrayList(collection);
 	}
 	
 	@Override
@@ -215,5 +206,17 @@ public class EmptyList<E> implements ImmutableList<E>
 	public String toString()
 	{
 		return "[]";
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return List.listEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return List.listHashCode(this);
 	}
 }

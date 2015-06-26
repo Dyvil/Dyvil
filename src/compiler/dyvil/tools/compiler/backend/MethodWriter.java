@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.backend;
 
+import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
+
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
-
-import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface MethodWriter
 {
@@ -18,6 +18,8 @@ public interface MethodWriter
 	public void setThisType(String type);
 	
 	public void setLocalType(int index, Object type);
+	
+	public void setHasReturn(boolean hasReturn);
 	
 	// Annotations
 	

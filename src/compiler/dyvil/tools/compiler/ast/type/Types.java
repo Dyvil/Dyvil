@@ -8,7 +8,6 @@ import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class Types
 {
-	public static final UnknownType		UNKNOWN					= new UnknownType();
 	public static final PrimitiveType	VOID					= new PrimitiveType(Name._void, 0);
 	public static final PrimitiveType	BOOLEAN					= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
 	public static final PrimitiveType	BYTE					= new PrimitiveType(Name._byte, ClassFormat.T_BYTE);
@@ -20,6 +19,8 @@ public final class Types
 	public static final PrimitiveType	DOUBLE					= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
 	
 	public static final DynamicType		DYNAMIC					= new DynamicType();
+	public static final UnknownType		UNKNOWN					= new UnknownType();
+	public static final NullType		NULL					= new NullType();
 	public static final Type			ANY						= new Type("java/lang/Object", Name.any);
 	public static final Type			OBJECT					= new Type("java/lang/Object", Name.getQualified("Object"));
 	public static final Type			STRING					= new Type("java/lang/String", Name.getQualified("String"));
@@ -83,6 +84,8 @@ public final class Types
 	public static void init()
 	{
 		VOID.theClass = VOID_CLASS;
+		VOID.boxMethod = VOID_CLASS.getBody().getMethod(Name.apply);
+		VOID.unboxMethod = VOID_CLASS.getBody().getMethod(Name.unapply);
 		BOOLEAN.theClass = BOOLEAN_CLASS;
 		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.apply);
 		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.unapply);
@@ -192,49 +195,49 @@ public final class Types
 		case ClassFormat.T_BOOLEAN:
 			if (BOOLEAN_REF == null)
 			{
-				return BOOLEAN_REF = new Type(Package.dyvilLangRefSimple.resolveClass("BooleanRef"));
+				return BOOLEAN_REF = new Type(Package.dyvilLangRefSimple.resolveClass("SimpleBooleanRef"));
 			}
 			return BOOLEAN_REF;
 		case ClassFormat.T_BYTE:
 			if (BYTE_REF == null)
 			{
-				return BYTE_REF = new Type(Package.dyvilLangRefSimple.resolveClass("ByteRef"));
+				return BYTE_REF = new Type(Package.dyvilLangRefSimple.resolveClass("SimpleByteRef"));
 			}
 			return BYTE_REF;
 		case ClassFormat.T_SHORT:
 			if (SHORT_REF == null)
 			{
-				return SHORT_REF = new Type(Package.dyvilLangRefSimple.resolveClass("ShortRef"));
+				return SHORT_REF = new Type(Package.dyvilLangRefSimple.resolveClass("SimpleShortRef"));
 			}
 			return SHORT_REF;
 		case ClassFormat.T_CHAR:
 			if (CHAR_REF == null)
 			{
-				return CHAR_REF = new Type(Package.dyvilLangRefSimple.resolveClass("CharRef"));
+				return CHAR_REF = new Type(Package.dyvilLangRefSimple.resolveClass("SimpleCharRef"));
 			}
 			return CHAR_REF;
 		case ClassFormat.T_INT:
 			if (INT_REF == null)
 			{
-				return INT_REF = new Type(Package.dyvilLangRefSimple.resolveClass("IntRef"));
+				return INT_REF = new Type(Package.dyvilLangRefSimple.resolveClass("SimpleIntRef"));
 			}
 			return INT_REF;
 		case ClassFormat.T_LONG:
 			if (LONG_REF == null)
 			{
-				return LONG_REF = new Type(Package.dyvilLangRefSimple.resolveClass("LongRef"));
+				return LONG_REF = new Type(Package.dyvilLangRefSimple.resolveClass("SimpleLongRef"));
 			}
 			return LONG_REF;
 		case ClassFormat.T_FLOAT:
 			if (FLOAT_REF == null)
 			{
-				return FLOAT_REF = new Type(Package.dyvilLangRefSimple.resolveClass("FloatRef"));
+				return FLOAT_REF = new Type(Package.dyvilLangRefSimple.resolveClass("SimpleFloatRef"));
 			}
 			return FLOAT_REF;
 		case ClassFormat.T_DOUBLE:
 			if (DOUBLE_REF == null)
 			{
-				return DOUBLE_REF = new Type(Package.dyvilLangRefSimple.resolveClass("DoubleRef"));
+				return DOUBLE_REF = new Type(Package.dyvilLangRefSimple.resolveClass("SimpleDoubleRef"));
 			}
 			return DOUBLE_REF;
 		}
@@ -250,7 +253,7 @@ public final class Types
 		default:
 			if (OBJECT_REF_CLASS == null)
 			{
-				OBJECT_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("ObjectRef");
+				OBJECT_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("SimpleObjectRef");
 			}
 			GenericType gt = new GenericType(OBJECT_REF_CLASS);
 			gt.addType(type);

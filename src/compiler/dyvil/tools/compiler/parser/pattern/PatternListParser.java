@@ -32,6 +32,16 @@ public final class PatternListParser extends Parser implements IPatterned
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
+		if (ParserUtil.isCloseBracket(type))
+		{
+			if (this.pattern != null)
+			{
+				this.patternList.addPattern(this.pattern);
+			}
+			pm.popParser(true);
+			return;
+		}
+		
 		if (this.mode == 0)
 		{
 			this.mode = 1;
@@ -40,12 +50,6 @@ public final class PatternListParser extends Parser implements IPatterned
 		}
 		if (this.mode == 1)
 		{
-			if (ParserUtil.isCloseBracket(type))
-			{
-				this.patternList.addPattern(this.pattern);
-				pm.popParser(true);
-				return;
-			}
 			this.mode = 0;
 			if (type == Symbols.COMMA)
 			{

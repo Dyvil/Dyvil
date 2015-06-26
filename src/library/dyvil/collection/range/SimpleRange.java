@@ -79,6 +79,12 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 			{
 				return this.current.$lt$eq(SimpleRange.this.last);
 			}
+			
+			@Override
+			public String toString()
+			{
+				return "RangeIterator(" + SimpleRange.this + ")";
+			}
 		};
 	}
 	
@@ -114,8 +120,26 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	}
 	
 	@Override
+	public Range<T> copy()
+	{
+		return new SimpleRange(this.first, this.last);
+	}
+	
+	@Override
 	public String toString()
 	{
 		return this.first + " .. " + this.last;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Range.rangeEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Range.rangeHashCode(this);
 	}
 }

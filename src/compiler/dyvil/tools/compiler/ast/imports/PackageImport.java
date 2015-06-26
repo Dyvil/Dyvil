@@ -1,6 +1,10 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.util.List;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.CodeClass;
@@ -26,8 +30,9 @@ public final class PackageImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public void addImport(IImport iimport)
+	public int importTag()
 	{
+		return PACKAGE;
 	}
 	
 	@Override
@@ -83,6 +88,16 @@ public final class PackageImport extends ASTNode implements IImport
 			return;
 		}
 		this.theClass.getMethodMatches(list, instance, name, arguments);
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
 	}
 	
 	@Override

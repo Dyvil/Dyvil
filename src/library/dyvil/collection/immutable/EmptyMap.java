@@ -6,21 +6,23 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.collection.EmptyIterator;
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
 import dyvil.lang.Entry;
 import dyvil.lang.Map;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.annotation.object;
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
+import dyvil.collection.iterator.EmptyIterator;
+
 @NilConvertible
-public class EmptyMap<K, V> implements ImmutableMap<K, V>
+public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
-	static final EmptyMap	emptyMap	= new EmptyMap();
+	public static final EmptyMap	instance	= new EmptyMap();
 	
 	public static <K, V> EmptyMap<K, V> apply()
 	{
-		return emptyMap;
+		return instance;
 	}
 	
 	private EmptyMap()
@@ -68,25 +70,25 @@ public class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
 		return false;
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
 		return false;
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		return false;
 	}
 	
 	@Override
-	public V apply(K key)
+	public V get(K key)
 	{
 		return null;
 	}
@@ -104,25 +106,25 @@ public class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key)
+	public ImmutableMap<K, V> $minus(Object key)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key, V value)
+	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(V value)
+	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
 		return this;
 	}
@@ -155,5 +157,17 @@ public class EmptyMap<K, V> implements ImmutableMap<K, V>
 	public String toString()
 	{
 		return "[]";
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Map.mapEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Map.mapHashCode(this);
 	}
 }

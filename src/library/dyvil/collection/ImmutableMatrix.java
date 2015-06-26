@@ -4,10 +4,24 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import dyvil.lang.*;
+import dyvil.lang.literal.ArrayConvertible;
+
+import dyvil.collection.immutable.ArrayMatrix;
 import dyvil.tuple.Tuple2;
 
+@ArrayConvertible
 public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 {
+	public static <E> ImmutableMatrix<E> apply(E[]... elements)
+	{
+		return new ArrayMatrix(elements);
+	}
+	
+	public static <E> ImmutableMatrix<E> create(int rows, int columns)
+	{
+		return new ArrayMatrix<E>(rows, columns);
+	}
+	
 	// Accessors
 	
 	@Override
@@ -17,10 +31,10 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	public int columns();
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	@Override
-	public E apply(int row, int column);
+	public E subscript(int row, int column);
 	
 	@Override
 	public E get(int row, int column);
@@ -28,7 +42,7 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	// Sub-view Operations
 	
 	@Override
-	public MutableMatrix<E> subMatrix(int row, int rows, int column, int columns);
+	public ImmutableMatrix<E> subMatrix(int row, int rows, int column, int columns);
 	
 	@Override
 	public ImmutableList<E> row(int row);
@@ -39,7 +53,7 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	// Non-mutating Operations
 	
 	@Override
-	public List<E> flatten();
+	public ImmutableList<E> flatten();
 	
 	@Override
 	public ImmutableMatrix<E> transposed();
@@ -80,7 +94,7 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	}
 	
 	@Override
-	public default void update(int row, int column, E element)
+	public default void subscript_$eq(int row, int column, E element)
 	{
 		throw new ImmutableException("update() on Immutable Matrix");
 	}
@@ -155,5 +169,20 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	public MutableMatrix<E> mutable();
 	
 	@Override
-	public ImmutableMatrix<E> immutable();
+	public default MutableMatrix<E> mutableCopy()
+	{
+		return this.mutable();
+	}
+	
+	@Override
+	public default ImmutableMatrix<E> immutable()
+	{
+		return this;
+	}
+	
+	@Override
+	public default ImmutableMatrix<E> immutableCopy()
+	{
+		return this.copy();
+	}
 }

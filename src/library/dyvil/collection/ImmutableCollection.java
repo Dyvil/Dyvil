@@ -7,11 +7,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.annotation.mutating;
 import dyvil.lang.Collection;
 import dyvil.lang.Immutable;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.literal.NilConvertible;
+
+import dyvil.annotation.mutating;
 
 @NilConvertible
 public interface ImmutableCollection<E> extends Collection<E>, Immutable
@@ -36,7 +37,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	}
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	
@@ -56,12 +57,6 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	public ImmutableCollection<? extends E> $amp(Collection<? extends E> collection);
 	
 	@Override
-	public ImmutableCollection<? extends E> $bar(Collection<? extends E> collection);
-	
-	@Override
-	public ImmutableCollection<? extends E> $up(Collection<? extends E> collection);
-	
-	@Override
 	public <R> ImmutableCollection<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
@@ -74,9 +69,9 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	
 	@Override
 	@mutating
-	public default E add(E element)
+	public default void clear()
 	{
-		throw new ImmutableException("add() on Immutable Collection");
+		throw new ImmutableException("clear() on Immutable Collection");
 	}
 	
 	@Override
@@ -93,12 +88,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 		throw new ImmutableException("++= on Immutable Collection");
 	}
 	
-	@Override
-	@mutating
-	public default boolean remove(E element)
-	{
-		throw new ImmutableException("remove() on Immutable Collection");
-	}
+	// Mutating Operations
 	
 	@Override
 	@mutating
@@ -121,25 +111,38 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 		throw new ImmutableException("&= on Immutable Collection");
 	}
 	
+	// Mutating Operations
+	
 	@Override
 	@mutating
-	public default void $bar$eq(Collection<? extends E> collection)
+	public default boolean add(E element)
 	{
-		throw new ImmutableException("|= on Immutable Collection");
+		throw new ImmutableException("add() on Immutable Collection");
+	}
+	
+	@Override
+	public default boolean addAll(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("addAll() on Immutable Collection");
 	}
 	
 	@Override
 	@mutating
-	public default void $up$eq(Collection<? extends E> collection)
+	public default boolean remove(E element)
 	{
-		throw new ImmutableException("^= on Immutable Collection");
+		throw new ImmutableException("remove() on Immutable Collection");
 	}
 	
 	@Override
-	@mutating
-	public default void clear()
+	public default boolean removeAll(Collection<? extends E> collection)
 	{
-		throw new ImmutableException("clear() on Immutable Collection");
+		throw new ImmutableException("removeAll() on Immutable Collection");
+	}
+	
+	@Override
+	public default boolean intersect(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("intersect() on Immutable Collection");
 	}
 	
 	@Override
@@ -177,8 +180,20 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	public MutableCollection<E> mutable();
 	
 	@Override
+	public default MutableCollection<E> mutableCopy()
+	{
+		return this.mutable();
+	}
+	
+	@Override
 	public default ImmutableCollection<E> immutable()
 	{
 		return this;
+	}
+	
+	@Override
+	public default ImmutableCollection<E> immutableCopy()
+	{
+		return this.copy();
 	}
 }

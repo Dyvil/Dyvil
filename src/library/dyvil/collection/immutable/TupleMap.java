@@ -6,12 +6,13 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.collection.ArrayIterator;
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
 import dyvil.lang.Entry;
 import dyvil.lang.Map;
 import dyvil.lang.literal.ArrayConvertible;
+
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.MutableMap;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tuple.Tuple2;
 
 @ArrayConvertible
@@ -143,7 +144,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key)
+	public boolean containsKey(Object key)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -157,7 +158,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark(Object key, Object value)
+	public boolean contains(Object key, Object value)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -174,7 +175,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public boolean $qmark$colon(V value)
+	public boolean containsValue(Object value)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -188,7 +189,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public V apply(K key)
+	public V get(K key)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -214,25 +215,25 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key)
+	public ImmutableMap<K, V> $minus(Object key)
 	{
 		return null;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(K key, V value)
+	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
 		return null;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(V value)
+	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
 		return null;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
 	{
 		return null;
 	}
@@ -270,11 +271,12 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		}
 		
 		StringBuilder builder = new StringBuilder("[ ");
-		builder.append(this.entries[0]);
+		Tuple2<K, V> entry = this.entries[0];
+		builder.append(entry._1).append(" -> ").append(entry._2);
 		for (int i = 1; i < this.size; i++)
 		{
-			builder.append(", ");
-			builder.append(this.entries[i]);
+			entry = this.entries[i];
+			builder.append(", ").append(entry._1).append(" -> ").append(entry._2);
 		}
 		return builder.append(" ]").toString();
 	}

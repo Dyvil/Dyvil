@@ -1,14 +1,12 @@
 package dyvil.tools.compiler.ast.method;
 
 import java.lang.annotation.ElementType;
-import java.util.List;
 
-import org.objectweb.asm.Label;
+import dyvil.lang.List;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.access.ApplyMethodCall;
-import dyvil.tools.compiler.ast.access.ICall;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -23,6 +21,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -36,6 +35,8 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
+
+import org.objectweb.asm.Label;
 
 public class Constructor extends Member implements IConstructor
 {
@@ -263,7 +264,7 @@ public class Constructor extends Member implements IConstructor
 		if (sl.valueCount() > 0)
 		{
 			IValue first = sl.getValue(0);
-			if (first.valueTag() == IValue.APPLY_METHOD_CALL)
+			if (first.valueTag() == IValue.APPLY_CALL)
 			{
 				ApplyMethodCall amc = (ApplyMethodCall) first;
 				int valueType = amc.instance.valueTag();
@@ -282,7 +283,7 @@ public class Constructor extends Member implements IConstructor
 		}
 		
 		// Implicit Super Constructor
-		IConstructor match = ICall.resolveConstructor(this.theClass.getSuperType(), EmptyArguments.INSTANCE);
+		IConstructor match = IContext.resolveConstructor(this.theClass.getSuperType(), EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			markers.add(this.position, "constructor.super");
@@ -294,7 +295,7 @@ public class Constructor extends Member implements IConstructor
 	
 	private IValue initializer(ICodePosition position, MarkerList markers, IClass iclass, IArguments arguments, boolean isSuper)
 	{
-		IConstructor match = ICall.resolveConstructor(iclass, arguments);
+		IConstructor match = IContext.resolveConstructor(iclass, arguments);
 		if (match == null)
 		{
 			Marker marker = markers.create(this.position, "resolve.constructor", iclass.getName().qualified);
@@ -399,6 +400,12 @@ public class Constructor extends Member implements IConstructor
 	public boolean isStatic()
 	{
 		return false;
+	}
+	
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.theClass.getHeader();
 	}
 	
 	@Override

@@ -1,12 +1,13 @@
 package dyvil.tools.compiler.ast.structure;
 
-import java.util.ArrayList;
-import java.util.List;
+import dyvil.lang.List;
 
+import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -20,17 +21,13 @@ public interface IContext
 {
 	public static final byte	VISIBLE		= 0;
 	public static final byte	INVISIBLE	= 1;
-	public static final byte	STATIC		= 2;
-	public static final byte	SEALED		= 3;
+	public static final byte	SEALED		= 2;
 	
 	public boolean isStatic();
 	
-	public IClass getThisClass();
+	public IDyvilHeader getHeader();
 	
-	public default IField getEnclosingInstance(IClass iclass)
-	{
-		return null;
-	}
+	public IClass getThisClass();
 	
 	public Package resolvePackage(Name name);
 	
@@ -47,6 +44,38 @@ public interface IContext
 	public byte getVisibility(IMember member);
 	
 	public boolean handleException(IType type);
+	
+	public static void addCompilable(IContext context, IClassCompilable compilable)
+	{
+		IClass iclass = context.getThisClass();
+		if (iclass != null)
+		{
+			iclass.addCompilable(compilable);
+			return;
+		}
+		
+		IDyvilHeader header = context.getHeader();
+		header.addInnerClass(compilable);
+	}
+	
+	public static IClass resolveClass(IContext context, Name name)
+	{
+		IClass iclass = context.resolveClass(name);
+		if (iclass != null)
+		{
+			return iclass;
+		}
+		
+		// Standart Dyvil Classes
+		iclass = Package.dyvilLang.resolveClass(name);
+		if (iclass != null)
+		{
+			return iclass;
+		}
+		
+		// Standart Java Classes
+		return Package.javaLang.resolveClass(name);
+	}
 	
 	public static IConstructor resolveConstructor(IContext context, IArguments arguments)
 	{

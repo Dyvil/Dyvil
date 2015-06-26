@@ -1,0 +1,11 @@
+package dyvil.array
+
+using	dyvil.array.BooleanArray._
+using	dyvil.array.ByteArray._
+using	dyvil.array.ShortArray._
+using	dyvil.array.CharArray._
+using	dyvil.array.IntArray._
+using	dyvil.array.LongArray._
+using	dyvil.array.FloatArray._
+using	dyvil.array.DoubleArray._
+using	dyvil.array.ObjectArray._

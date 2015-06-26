@@ -1,8 +1,8 @@
 package dyvil.lang.ref.array;
 
-import dyvil.lang.ref.IByteRef;
+import dyvil.lang.ref.ByteRef;
 
-public class ByteArrayRef implements IByteRef
+public class ByteArrayRef implements ByteRef
 {
 	protected final byte[]	array;
 	protected final int		index;

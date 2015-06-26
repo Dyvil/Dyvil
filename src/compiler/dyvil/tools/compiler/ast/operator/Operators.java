@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.operator;
 
-import static dyvil.tools.compiler.ast.member.Name.*;
-import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
-import static dyvil.tools.compiler.ast.operator.Operator.INFIX_NONE;
-
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -11,6 +7,10 @@ import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.Types;
+
+import static dyvil.tools.compiler.ast.member.Name.*;
+import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
+import static dyvil.tools.compiler.ast.operator.Operator.INFIX_NONE;
 
 public interface Operators
 {
@@ -59,7 +59,7 @@ public interface Operators
 		return 0;
 	}
 	
-	public static IValue get(Name name, IValue arg1)
+	public static IValue getPriority(Name name, IValue arg1)
 	{
 		if (name == bang)
 		{
@@ -71,25 +71,8 @@ public interface Operators
 		return null;
 	}
 	
-	public static IValue get(IValue arg1, Name name, IValue arg2)
+	public static IValue getPriority(IValue arg1, Name name, IValue arg2)
 	{
-		// Null check
-		if (name == plus)
-		{
-			if (arg1.valueTag() == IValue.STRINGBUILDER)
-			{
-				StringBuilderExpression sbe = (StringBuilderExpression) arg1;
-				sbe.addValue(arg2);
-				return sbe;
-			}
-			if ((arg1.isType(Types.STRING) && arg1.valueTag() != IValue.NULL) || (arg2.isType(Types.STRING) && arg2.valueTag() != IValue.NULL))
-			{
-				StringBuilderExpression sbe = new StringBuilderExpression();
-				sbe.addValue(arg1);
-				sbe.addValue(arg2);
-				return sbe;
-			}
-		}
 		if (name == eqeq || name == eqeqeq)
 		{
 			if (arg2.valueTag() == IValue.NULL)
@@ -112,7 +95,27 @@ public interface Operators
 			{
 				return new NullCheckOperator(arg2, false);
 			}
-			return null;
+		}
+		return null;
+	}
+	
+	public static IValue get(IValue arg1, Name name, IValue arg2)
+	{
+		if (name == plus)
+		{
+			if (arg1.valueTag() == IValue.STRINGBUILDER)
+			{
+				StringBuilderExpression sbe = (StringBuilderExpression) arg1;
+				sbe.addValue(arg2);
+				return sbe;
+			}
+			if (arg1.isType(Types.STRING) && arg1.valueTag() != IValue.NULL || arg2.isType(Types.STRING) && arg2.valueTag() != IValue.NULL)
+			{
+				StringBuilderExpression sbe = new StringBuilderExpression();
+				sbe.addValue(arg1);
+				sbe.addValue(arg2);
+				return sbe;
+			}
 		}
 		if (name == dotdot)
 		{
@@ -160,7 +163,7 @@ public interface Operators
 		{
 			IValueList list = (IValueList) arg2;
 			int len = list.valueCount();
-			CaseStatement[] cases = new CaseStatement[len];
+			CaseExpression[] cases = new CaseExpression[len];
 			for (int i = 0; i < len; i++)
 			{
 				IValue v = list.getValue(i);
@@ -170,14 +173,17 @@ public interface Operators
 					return null;
 				}
 				
-				cases[i] = (CaseStatement) v;
+				cases[i] = (CaseExpression) v;
+				cases[i].setMatchCase();
 			}
 			
 			return new MatchExpression(arg1, cases);
 		}
 		if (arg2.valueTag() == IValue.CASE_STATEMENT)
 		{
-			return new MatchExpression(arg1, new CaseStatement[] { (CaseStatement) arg2 });
+			CaseExpression cs = (CaseExpression) arg2;
+			cs.setMatchCase();
+			return new MatchExpression(arg1, new CaseExpression[] { cs });
 		}
 		return null;
 	}

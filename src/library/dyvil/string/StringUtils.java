@@ -3,11 +3,12 @@ package dyvil.string;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dyvil.lang.List;
+
 import dyvil.annotation.Utility;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.lang.List;
 import dyvil.math.MathUtils;
 import dyvil.random.RandomUtils;
 
@@ -27,6 +28,37 @@ public interface StringUtils
 {
 	public static final String[]	EMPTY_STRING_ARRAY	= new String[0];
 	
+	public static @infix String $times(String string, int count)
+	{
+		
+		switch (count)
+		{
+		case 0:
+			return "";
+		case 1:
+			return string;
+		case 2:
+			if (string == null)
+			{
+				return "nullnull";
+			}
+			return string.concat(string);
+		}
+		
+		if (string == null)
+		{
+			string = "null";
+		}
+		
+		StringBuilder builder = new StringBuilder(string.length() * count);
+		for (int i = 0; i < count; i++)
+		{
+			builder.append(string);
+		}
+		
+		return builder.toString();
+	}
+	
 	/**
 	 * Formats the given {@link String} {@code format} with the given
 	 * {@code Object[] args} using {@link String#format(String, Object...)}.
@@ -42,6 +74,14 @@ public interface StringUtils
 		return String.format(format, args);
 	}
 	
+	public static @infix String[] words(String string)
+	{
+		List<String> words = wordList(string);
+		String[] array = new String[words.size()];
+		words.toArray(array);
+		return array;
+	}
+	
 	/**
 	 * Returns a list of words contained in the given {@code string}. A 'word'
 	 * is described as a sequence of letter characters, which are themselves
@@ -52,7 +92,7 @@ public interface StringUtils
 	 *            the string to split
 	 * @return a list of words in the given string
 	 */
-	public static @infix List<String> getWords(String string)
+	public static @infix List<String> wordList(String string)
 	{
 		List<String> words = new ArrayList();
 		StringBuilder buffer = new StringBuilder(10);
@@ -60,13 +100,13 @@ public interface StringUtils
 		for (int i = 0; i < string.length(); i++)
 		{
 			char c = string.charAt(i);
-			buffer.append(c);
 			if (!CharUtils.isLetter(c))
 			{
 				words.add(buffer.toString());
 				buffer.delete(0, buffer.length());
 				continue;
 			}
+			buffer.append(c);
 		}
 		
 		if (buffer.length() > 0)
@@ -327,7 +367,7 @@ public interface StringUtils
 			}
 			builder.append(curr);
 		}
-		return builder.toString();
+		return builder.append(next).toString();
 	}
 	
 	public static @infix String toTitleCase(String s)

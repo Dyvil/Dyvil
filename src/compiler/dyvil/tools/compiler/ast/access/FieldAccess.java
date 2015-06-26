@@ -125,14 +125,8 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		}
 	}
 	
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	protected IValue resolveFieldAccess(IContext context)
 	{
-		if (this.instance != null)
-		{
-			this.instance = this.instance.resolve(markers, context);
-		}
-		
 		IField field = ICall.resolveField(context, this.instance, this.name);
 		if (field != null)
 		{
@@ -156,11 +150,28 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		
 		if (this.instance == null)
 		{
-			IClass iclass = context.resolveClass(this.name);
+			IClass iclass = IContext.resolveClass(context, this.name);
 			if (iclass != null)
 			{
 				return new ClassAccess(this.position, iclass.getType());
 			}
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance = this.instance.resolve(markers, context);
+		}
+		
+		IValue v = this.resolveFieldAccess(context);
+		if (v != null)
+		{
+			return v;
 		}
 		
 		Marker marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);
@@ -196,23 +207,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		
 		if (this.field != null)
 		{
-			if (this.field.hasModifier(Modifiers.DEPRECATED))
-			{
-				markers.add(this.position, "field.access.deprecated", this.name);
-			}
-			
-			switch (context.getVisibility(this.field))
-			{
-			case IContext.STATIC:
-				markers.add(this.position, "field.access.instance", this.name);
-				break;
-			case IContext.SEALED:
-				markers.add(this.position, "field.access.sealed", this.name);
-				break;
-			case IContext.INVISIBLE:
-				markers.add(this.position, "field.access.invisible", this.name);
-				break;
-			}
+			this.field.checkAccess(markers, this.position, instance, context);
 		}
 	}
 	

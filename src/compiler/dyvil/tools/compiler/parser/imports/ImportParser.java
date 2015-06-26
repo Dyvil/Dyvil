@@ -112,12 +112,12 @@ public final class ImportParser extends Parser
 		}
 		if (this.isInMode(ALIAS))
 		{
-			if (type == Symbols.ARROW_OPERATOR)
+			if (type == Symbols.ARROW_OPERATOR || type == Keywords.AS)
 			{
 				IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()))
 				{
-					this.theImport.setAlias(token.nameValue());
+					this.theImport.setAlias(next.nameValue());
 					pm.skip();
 					return;
 				}

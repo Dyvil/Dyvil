@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import org.objectweb.asm.Label;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.pattern.IPattern;
@@ -14,16 +12,18 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
+import org.objectweb.asm.Label;
+
 public final class MatchExpression extends ASTNode implements IValue
 {
-	private IValue			value;
-	private CaseStatement[]	cases;
-	private int				caseCount;
-	private boolean			exhaustive;
+	private IValue				value;
+	private CaseExpression[]	cases;
+	private int					caseCount;
+	private boolean				exhaustive;
 	
-	private IType			type;
+	private IType				type;
 	
-	public MatchExpression(IValue value, CaseStatement[] cases)
+	public MatchExpression(IValue value, CaseExpression[] cases)
 	{
 		this.value = value;
 		this.cases = cases;
@@ -41,7 +41,7 @@ public final class MatchExpression extends ASTNode implements IValue
 	{
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			IValue v = this.cases[i];
+			IValue v = this.cases[i].value;
 			if (v != null && v.isPrimitive())
 			{
 				return true;
@@ -73,7 +73,7 @@ public final class MatchExpression extends ASTNode implements IValue
 			{
 				continue;
 			}
-			IType t1 = this.cases[i].value.getType();
+			IType t1 = v.getType();
 			if (t == null)
 			{
 				t = t1;
@@ -139,7 +139,9 @@ public final class MatchExpression extends ASTNode implements IValue
 		this.value.resolveTypes(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			this.cases[i].resolveTypes(markers, context);
+			CaseExpression caseStatement = this.cases[i];
+			caseStatement.setMatchCase();
+			caseStatement.resolveTypes(markers, context);
 		}
 	}
 	
@@ -148,16 +150,18 @@ public final class MatchExpression extends ASTNode implements IValue
 	{
 		this.value = this.value.resolve(markers, context);
 		
-		IType type = this.type = this.value.getType();
+		IType type = this.value.getType();
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			CaseStatement c = this.cases[i];
+			CaseExpression c = this.cases[i];
 			if (this.exhaustive)
 			{
 				markers.add(c.getPosition(), "pattern.dead");
 			}
 			
 			IPattern pattern = c.pattern;
+			pattern = pattern.resolve(markers, context);
+			
 			if (pattern.isExhaustive())
 			{
 				if (c.condition == null)
@@ -175,8 +179,11 @@ public final class MatchExpression extends ASTNode implements IValue
 			}
 			else
 			{
-				c.pattern = pattern1;
+				pattern = pattern1;
 			}
+			
+			pattern.checkTypes(markers, context);
+			c.pattern = pattern;
 			
 			this.cases[i].resolve(markers, context);
 		}
@@ -240,38 +247,16 @@ public final class MatchExpression extends ASTNode implements IValue
 		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
 		
 		int localCount = writer.localCount();
+		Object frameType = expr ? this.type.getFrameType() : null;
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
-		Label destLabel = null;
 		for (int i = 0; i < this.caseCount;)
 		{
-			CaseStatement c = this.cases[i];
+			CaseExpression c = this.cases[i];
 			IPattern pattern = c.pattern;
 			IValue condition = c.condition;
 			IValue value = c.value;
-			
-			if (value == null)
-			{
-				if (destLabel == null)
-				{
-					destLabel = new Label();
-				}
-				
-				if (condition != null)
-				{
-					pattern.writeInvJump(writer, varIndex, elseLabel);
-					condition.writeJump(writer, destLabel);
-				}
-				else
-				{
-					pattern.writeJump(writer, varIndex, destLabel);
-				}
-				
-				writer.resetLocals(localCount);
-				++i;
-				continue;
-			}
 			
 			pattern.writeInvJump(writer, varIndex, elseLabel);
 			if (condition != null)
@@ -279,19 +264,21 @@ public final class MatchExpression extends ASTNode implements IValue
 				condition.writeInvJump(writer, elseLabel);
 			}
 			
-			if (destLabel != null)
+			if (value != null)
 			{
-				writer.writeLabel(destLabel);
-				destLabel = null;
+				if (expr)
+				{
+					value.writeExpression(writer);
+					writer.getFrame().set(frameType);
+				}
+				else
+				{
+					value.writeStatement(writer);
+				}
 			}
-			
-			if (expr)
+			else if (expr)
 			{
-				value.writeExpression(writer);
-			}
-			else
-			{
-				value.writeStatement(writer);
+				this.type.writeDefaultValue(writer);
 			}
 			
 			writer.resetLocals(localCount);
@@ -313,9 +300,10 @@ public final class MatchExpression extends ASTNode implements IValue
 			String desc = "(" + (type.isPrimitive() ? type.getExtendedName() + ")V" : "Ljava/lang/Object;)V");
 			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", desc, false);
 			writer.writeInsn(Opcodes.ATHROW);
-			writer.resetLocals(varIndex);
+			writer.setHasReturn(false);
 		}
 		writer.writeLabel(endLabel);
+		writer.resetLocals(varIndex);
 	}
 	
 	@Override

@@ -1,7 +1,5 @@
 package dyvil.array;
 
-import static dyvil.reflect.Opcodes.*;
-
 import java.util.Arrays;
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
@@ -11,6 +9,8 @@ import java.util.function.IntUnaryOperator;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+
+import static dyvil.reflect.Opcodes.*;
 
 public interface CharArray
 {
@@ -66,13 +66,13 @@ public interface CharArray
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, CALOAD })
-	public static @infix char apply(char[] array, int i)
+	public static @infix char subscript(char[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, CASTORE })
-	public static @infix void update(char[] array, int i, char v)
+	public static @infix void subscript_$eq(char[] array, int i, char v)
 	{
 		array[i] = v;
 	}

@@ -8,11 +8,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.lang.Collection;
+import dyvil.lang.List;
+import dyvil.lang.literal.TupleConvertible;
+
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
-import dyvil.collection.SingletonIterator;
-import dyvil.lang.Collection;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.collection.iterator.SingletonIterator;
 
 @TupleConvertible
 public class SingletonList<E> implements ImmutableList<E>
@@ -54,13 +56,13 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element)
+	public boolean contains(Object element)
 	{
 		return Objects.equals(element, this.element);
 	}
 	
 	@Override
-	public E apply(int index)
+	public E subscript(int index)
 	{
 		if (index == 0)
 		{
@@ -126,7 +128,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection)
 	{
-		if (collection.$qmark(this.element))
+		if (collection.contains(this.element))
 		{
 			return ImmutableList.apply();
 		}
@@ -136,54 +138,11 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
 	{
-		if (!collection.$qmark(this.element))
+		if (!collection.contains(this.element))
 		{
 			return ImmutableList.apply();
 		}
 		return this;
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $bar(Collection<? extends E> collection)
-	{
-		if (collection.$qmark(this.element))
-		{
-			return new ArrayList(collection);
-		}
-		
-		int len = 1 + collection.size();
-		Object[] array = new Object[len];
-		array[0] = this.element;
-		collection.toArray(1, array);
-		return new ArrayList(array, len, true);
-	}
-	
-	@Override
-	public ImmutableList<? extends E> $up(Collection<? extends E> collection)
-	{
-		if (collection.$qmark(this.element))
-		{
-			int len = collection.size();
-			Object[] array = new Object[len];
-			collection.toArray(array);
-			
-			for (int i = 0; i < len; i++)
-			{
-				if (this.element == array[i] || this.element != null && this.element.equals(array[i]))
-				{
-					System.arraycopy(array, i + 1, array, i, len - i - 1);
-					len--;
-					i--;
-				}
-			}
-			return new ArrayList(array, len, true);
-		}
-		
-		int len = 1 + collection.size();
-		Object[] array = new Object[len];
-		array[0] = this.element;
-		collection.toArray(1, array);
-		return new ArrayList(array, len, true);
 	}
 	
 	@Override
@@ -267,6 +226,18 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public String toString()
 	{
-		return new StringBuilder('[').append(this.element).append(']').toString();
+		return new StringBuilder().append('[').append(this.element).append(']').toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return List.listEquals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return List.listHashCode(this);
 	}
 }

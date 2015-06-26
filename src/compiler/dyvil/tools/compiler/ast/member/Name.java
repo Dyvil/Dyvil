@@ -14,6 +14,8 @@ public final class Name
 	public static final Name				apply			= new Name("apply");
 	public static final Name				unapply			= new Name("unapply");
 	public static final Name				update			= new Name("update");
+	public static final Name				subscript		= new Name("subscript");
+	public static final Name				subscript_$eq	= new Name("subscript_=", "subscript_$eq");
 	public static final Name				match			= new Name("match");
 	public static final Name				equals			= new Name("equals");
 	public static final Name				hashCode		= new Name("hashCode");
@@ -21,6 +23,7 @@ public final class Name
 	
 	public static final Name				_this			= new Name("this");
 	public static final Name				_class			= new Name("class");
+	public static final Name				_null			= new Name("null");
 	
 	public static final Name				_void			= new Name("void");
 	public static final Name				_boolean		= new Name("boolean");
@@ -112,8 +115,18 @@ public final class Name
 			return name;
 		}
 		
-		name = new Name(Symbols.unqualify(value), Symbols.qualify(value));
-		return name;
+		return new Name(Symbols.unqualify(value), Symbols.qualify(value));
+	}
+	
+	public static Name getSpecial(String value)
+	{
+		Name name = map.get(value);
+		if (name != null)
+		{
+			return name;
+		}
+		
+		return new Name('`' + value + '`', '`' + Symbols.qualify(value) + '`');
 	}
 	
 	public static Name getQualified(String value)

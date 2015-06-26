@@ -6,10 +6,31 @@ import java.util.function.UnaryOperator;
 import dyvil.lang.Int;
 import dyvil.lang.List;
 import dyvil.lang.Matrix;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
+import dyvil.collection.mutable.FlatArrayMatrix;
 import dyvil.tuple.Tuple2;
 
+@NilConvertible
+@ArrayConvertible
 public interface MutableMatrix<E> extends Matrix<E>
 {
+	public static <E> MutableMatrix<E> apply()
+	{
+		return new FlatArrayMatrix();
+	}
+	
+	public static <E> MutableMatrix<E> apply(int rows, int columns)
+	{
+		return new FlatArrayMatrix(rows, columns);
+	}
+	
+	public static <E> MutableMatrix<E> apply(E[]... cells)
+	{
+		return new FlatArrayMatrix(cells);
+	}
+	
 	// Accessors
 	
 	@Override
@@ -19,10 +40,10 @@ public interface MutableMatrix<E> extends Matrix<E>
 	public int columns();
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	@Override
-	public E apply(int row, int column);
+	public E subscript(int row, int column);
 	
 	@Override
 	public E get(int row, int column);
@@ -67,7 +88,7 @@ public interface MutableMatrix<E> extends Matrix<E>
 	public void insertColumn(int index, List<E> column);
 	
 	@Override
-	public void update(int row, int column, E element);
+	public void subscript_$eq(int row, int column, E element);
 	
 	@Override
 	public E set(int row, int column, E element);
@@ -124,5 +145,17 @@ public interface MutableMatrix<E> extends Matrix<E>
 	}
 	
 	@Override
+	public default MutableMatrix<E> mutableCopy()
+	{
+		return this.copy();
+	}
+	
+	@Override
 	public ImmutableMatrix<E> immutable();
+	
+	@Override
+	public default ImmutableMatrix<E> immutableCopy()
+	{
+		return this.immutable();
+	}
 }

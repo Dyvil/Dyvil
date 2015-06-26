@@ -38,6 +38,33 @@ public class AnonymousClassMetadata implements IClassMetadata
 	{
 	}
 	
+	private String getDesc()
+	{
+		if (this.desc != null)
+		{
+			return this.desc;
+		}
+		
+		int len = this.constructor.parameterCount();
+		;
+		StringBuilder buf = new StringBuilder();
+		
+		buf.append('(');
+		for (int i = 0; i < len; i++)
+		{
+			this.constructor.getParameter(i).getType().appendExtendedName(buf);
+		}
+		
+		CaptureField[] capturedFields = this.theClass.capturedFields;
+		len = this.theClass.capturedFieldCount;
+		for (int i = 0; i < len; i++)
+		{
+			capturedFields[i].getType().appendExtendedName(buf);
+		}
+		
+		return this.desc = buf.append(")V").toString();
+	}
+	
 	public void writeConstructorCall(MethodWriter writer, IArguments arguments) throws BytecodeException
 	{
 		String owner = this.theClass.getInternalName();
@@ -47,26 +74,14 @@ public class AnonymousClassMetadata implements IClassMetadata
 		
 		this.constructor.writeArguments(writer, arguments);
 		
-		int params = this.constructor.parameterCount();
-		StringBuilder buf = new StringBuilder();
-		buf.append('(');
-		for (int i = 0; i < params; i++)
-		{
-			this.constructor.getParameter(i).getType().appendExtendedName(buf);
-		}
-		
 		CaptureField[] capturedFields = this.theClass.capturedFields;
 		int len = this.theClass.capturedFieldCount;
 		for (int i = 0; i < len; i++)
 		{
-			CaptureField field = capturedFields[i];
-			field.field.writeGet(writer, null);
-			field.getType().appendExtendedName(buf);
+			capturedFields[i].field.writeGet(writer, null);
 		}
-		buf.append(")V");
-		this.desc = buf.toString();
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, this.desc, false);
+		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, this.getDesc(), false);
 	}
 	
 	@Override
@@ -75,8 +90,10 @@ public class AnonymousClassMetadata implements IClassMetadata
 		CaptureField[] capturedFields = this.theClass.capturedFields;
 		int len = this.theClass.capturedFieldCount;
 		
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PROTECTED | Modifiers.MANDATED, "<init>", this.desc, null, null));
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.MANDATED, "<init>", this.getDesc(), null, null));
 		int params = this.constructor.parameterCount();
+		
+		mw.setThisType(this.theClass.getInternalName());
 		for (int i = 0; i < params; i++)
 		{
 			this.constructor.getParameter(i).write(mw);

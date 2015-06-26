@@ -1,8 +1,8 @@
 package dyvil.lang.ref.array;
 
-import dyvil.lang.ref.IShortRef;
+import dyvil.lang.ref.ShortRef;
 
-public class ShortArrayRef implements IShortRef
+public class ShortArrayRef implements ShortRef
 {
 	protected final short[]	array;
 	protected final int		index;

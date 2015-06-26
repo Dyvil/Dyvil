@@ -8,15 +8,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.annotation.mutating;
-import dyvil.collection.immutable.ArrayList;
-import dyvil.collection.immutable.EmptyList;
-import dyvil.collection.immutable.SingletonList;
 import dyvil.lang.Collection;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.List;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+
+import dyvil.annotation.mutating;
+import dyvil.collection.immutable.ArrayList;
+import dyvil.collection.immutable.EmptyList;
+import dyvil.collection.immutable.SingletonList;
 
 @NilConvertible
 @ArrayConvertible
@@ -62,10 +63,10 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	}
 	
 	@Override
-	public boolean $qmark(Object element);
+	public boolean contains(Object element);
 	
 	@Override
-	public E apply(int index);
+	public E subscript(int index);
 	
 	@Override
 	public E get(int index);
@@ -91,12 +92,6 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection);
 	
 	@Override
-	public ImmutableList<? extends E> $bar(Collection<? extends E> collection);
-	
-	@Override
-	public ImmutableList<? extends E> $up(Collection<? extends E> collection);
-	
-	@Override
 	public <R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
@@ -118,68 +113,6 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public ImmutableList<E> distinct(Comparator<? super E> comparator);
 	
 	// Mutating Operations
-	
-	@Override
-	@mutating
-	public default void resize(int newLength)
-	{
-		throw new ImmutableException("resize() on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default void ensureCapacity(int minSize)
-	{
-	}
-	
-	@Override
-	@mutating
-	public default void update(int index, E element)
-	{
-		throw new ImmutableException("update() on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default E set(int index, E element)
-	{
-		throw new ImmutableException("set() on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default void insert(int index, E element)
-	{
-		throw new ImmutableException("insert() on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default E add(E element)
-	{
-		throw new ImmutableException("add() on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default E add(int index, E element)
-	{
-		throw new ImmutableException("add() on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default boolean remove(E element)
-	{
-		throw new ImmutableException("remove() on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default void removeAt(int index)
-	{
-		throw new ImmutableException("removeAt() on Immutable List");
-	}
 	
 	@Override
 	@mutating
@@ -218,23 +151,90 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	@mutating
-	public default void $bar$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("|= on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default void $up$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("^= on Immutable List");
-	}
-	
-	@Override
-	@mutating
 	public default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void resize(int newLength)
+	{
+		throw new ImmutableException("resize() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void ensureCapacity(int minSize)
+	{
+	}
+	
+	@Override
+	@mutating
+	public default void subscript_$eq(int index, E element)
+	{
+		throw new ImmutableException("update() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default E set(int index, E element)
+	{
+		throw new ImmutableException("set() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void insert(int index, E element)
+	{
+		throw new ImmutableException("insert() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default boolean add(E element)
+	{
+		throw new ImmutableException("add() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default E add(int index, E element)
+	{
+		throw new ImmutableException("add() on Immutable List");
+	}
+	
+	@Override
+	public default boolean addAll(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("addAll() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default boolean remove(E element)
+	{
+		throw new ImmutableException("remove() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void removeAt(int index)
+	{
+		throw new ImmutableException("removeAt() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default boolean removeAll(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("removeAll() on Immutable List");
+	}
+	
+	@Override
+	public default boolean intersect(Collection<? extends E> collection)
+	{
+		throw new ImmutableException("intersect() on Immutable List");
 	}
 	
 	@Override
@@ -308,8 +308,20 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public MutableList<E> mutable();
 	
 	@Override
+	public default MutableList<E> mutableCopy()
+	{
+		return this.mutable();
+	}
+	
+	@Override
 	public default ImmutableList<E> immutable()
 	{
 		return this;
+	}
+	
+	@Override
+	public default ImmutableList<E> immutableCopy()
+	{
+		return this.copy();
 	}
 }

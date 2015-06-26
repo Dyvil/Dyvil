@@ -1,10 +1,6 @@
 package dyvil.tools.compiler.ast.statement.foreach;
 
-import static dyvil.tools.compiler.ast.statement.ForStatement.$forEnd;
-import static dyvil.tools.compiler.ast.statement.ForStatement.$forStart;
-import static dyvil.tools.compiler.ast.statement.ForStatement.$forUpdate;
-
-import java.util.List;
+import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -22,6 +18,7 @@ import dyvil.tools.compiler.ast.statement.ILoop;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -30,6 +27,10 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+
+import static dyvil.tools.compiler.ast.statement.ForStatement.$forEnd;
+import static dyvil.tools.compiler.ast.statement.ForStatement.$forStart;
+import static dyvil.tools.compiler.ast.statement.ForStatement.$forUpdate;
 
 public class ForEachStatement implements IStatement, IContext, ILoop
 {
@@ -94,6 +95,12 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	public boolean isStatic()
 	{
 		return this.context.isStatic();
+	}
+	
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.context.getHeader();
 	}
 	
 	@Override

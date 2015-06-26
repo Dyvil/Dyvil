@@ -48,6 +48,12 @@ public abstract class Member extends ASTNode implements IMember
 	}
 	
 	@Override
+	public int annotationCount()
+	{
+		return this.annotationCount;
+	}
+	
+	@Override
 	public void setAnnotations(Annotation[] annotations, int count)
 	{
 		this.annotations = annotations;
@@ -90,6 +96,12 @@ public abstract class Member extends ASTNode implements IMember
 			System.arraycopy(this.annotations, index + 1, this.annotations, index, numMoved);
 		}
 		this.annotations[--this.annotationCount] = null;
+	}
+	
+	@Override
+	public Annotation[] getAnnotations()
+	{
+		return this.annotations;
 	}
 	
 	@Override

@@ -1,8 +1,8 @@
 package dyvil.lang.ref.array;
 
-import dyvil.lang.ref.IFloatRef;
+import dyvil.lang.ref.FloatRef;
 
-public class FloatArrayRef implements IFloatRef
+public class FloatArrayRef implements FloatRef
 {
 	protected final float[]	array;
 	protected final int		index;
