@@ -7,7 +7,6 @@ import java.io.IOException;
 import dyvil.lang.List;
 
 import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -22,11 +21,10 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class SimpleImport extends ASTNode implements IImport
+public final class SimpleImport extends Import
 {
 	public Name				name;
 	public Name				alias;
-	public IImport			child;
 	
 	private IClass			theClass;
 	private Package			thePackage;
@@ -36,12 +34,12 @@ public final class SimpleImport extends ASTNode implements IImport
 	
 	public SimpleImport(ICodePosition position)
 	{
-		this.position = position;
+		super(position);
 	}
 	
 	public SimpleImport(ICodePosition position, Name name)
 	{
-		this.position = position;
+		super(position);
 		this.name = name;
 	}
 	
@@ -52,23 +50,12 @@ public final class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public void addImport(IImport iimport)
-	{
-		this.child = iimport;
-	}
-	
-	@Override
-	public IImport getChild()
-	{
-		return this.child;
-	}
-	
-	@Override
 	public void setAlias(Name alias)
 	{
 		this.alias = alias;
 	}
 	
+	@Override
 	public Name getAlias()
 	{
 		return this.alias;
@@ -77,7 +64,13 @@ public final class SimpleImport extends ASTNode implements IImport
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
-		if (using && this.child == null)
+		if (this.parent != null)
+		{
+			this.parent.resolveTypes(markers, context, false);
+			context = this.parent.getContext();
+		}
+		
+		if (using)
 		{
 			if (!(context instanceof IClass))
 			{
@@ -117,10 +110,6 @@ public final class SimpleImport extends ASTNode implements IImport
 		if (pack != null)
 		{
 			this.thePackage = pack;
-			if (this.child != null)
-			{
-				this.child.resolveTypes(markers, pack, using);
-			}
 			return;
 		}
 		
@@ -128,10 +117,6 @@ public final class SimpleImport extends ASTNode implements IImport
 		if (iclass != null)
 		{
 			this.theClass = iclass;
-			if (this.child != null)
-			{
-				this.child.resolveTypes(markers, iclass, using);
-			}
 			return;
 		}
 		
@@ -139,12 +124,14 @@ public final class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
+	public IContext getContext()
+	{
+		return this.theClass != null ? this.theClass : this.thePackage;
+	}
+	
+	@Override
 	public Package resolvePackage(Name name)
 	{
-		if (this.child != null)
-		{
-			return this.child.resolvePackage(name);
-		}
 		if (name == this.name || name == this.alias)
 		{
 			return this.thePackage;
@@ -155,10 +142,6 @@ public final class SimpleImport extends ASTNode implements IImport
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		if (this.child != null)
-		{
-			return this.child.resolveClass(name);
-		}
 		if (name == this.name || name == this.alias)
 		{
 			return this.theClass;
@@ -169,10 +152,6 @@ public final class SimpleImport extends ASTNode implements IImport
 	@Override
 	public IField resolveField(Name name)
 	{
-		if (this.child != null)
-		{
-			return this.child.resolveField(name);
-		}
 		if (name == this.name || name == this.alias)
 		{
 			return this.field;
@@ -183,10 +162,6 @@ public final class SimpleImport extends ASTNode implements IImport
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		if (this.child != null)
-		{
-			this.child.getMethodMatches(list, instance, name, arguments);
-		}
 		if (name != this.name && name != this.alias)
 		{
 			return;
@@ -209,6 +184,8 @@ public final class SimpleImport extends ASTNode implements IImport
 	@Override
 	public void write(DataOutputStream dos) throws IOException
 	{
+		IImport.writeImport(this.parent, dos);
+		
 		dos.writeUTF(this.name.qualified);
 		if (this.alias != null)
 		{
@@ -218,21 +195,13 @@ public final class SimpleImport extends ASTNode implements IImport
 		{
 			dos.writeUTF("");
 		}
-		
-		if (this.child != null)
-		{
-			dos.writeByte(this.child.importTag());
-			this.child.write(dos);
-		}
-		else
-		{
-			dos.writeByte(0);
-		}
 	}
 	
 	@Override
 	public void read(DataInputStream dis) throws IOException
 	{
+		this.parent = IImport.readImport(dis);
+		
 		this.name = Name.getQualified(dis.readUTF());
 		
 		String alias = dis.readUTF();
@@ -240,28 +209,17 @@ public final class SimpleImport extends ASTNode implements IImport
 		{
 			this.alias = Name.getQualified(alias);
 		}
-		
-		byte childTag = dis.readByte();
-		if (childTag != 0)
-		{
-			this.child = IImport.fromTag(childTag);
-			this.child.read(dis);
-		}
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		this.appendParent(prefix, buffer);
 		buffer.append(this.name);
 		if (this.alias != null)
 		{
 			buffer.append(Formatting.Import.aliasSeperator);
 			buffer.append(this.alias);
-		}
-		if (this.child != null)
-		{
-			buffer.append('.');
-			this.child.toString(prefix, buffer);
 		}
 	}
 }

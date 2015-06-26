@@ -312,11 +312,14 @@ public final class ExternalClass extends CodeClass
 			this.resolveInnerTypes();
 		}
 		
-		for (IType t : this.innerTypes)
+		if (this.innerTypes != null)
 		{
-			if (t.getName() == name)
+			for (IType t : this.innerTypes)
 			{
-				return t.getTheClass();
+				if (t.getName() == name)
+				{
+					return t.getTheClass();
+				}
 			}
 		}
 		

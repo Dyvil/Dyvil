@@ -41,18 +41,20 @@ public interface IImport extends IASTNode
 	
 	public void resolveTypes(MarkerList markers, IContext context, boolean using);
 	
-	public default void addImport(IImport iimport)
-	{
-	}
+	public void setParent(IImport parent);
 	
-	public default IImport getChild()
-	{
-		return null;
-	}
+	public IImport getParent();
 	
 	public default void setAlias(Name alias)
 	{
 	}
+	
+	public default Name getAlias()
+	{
+		return null;
+	}
+	
+	public IContext getContext();
 	
 	public Package resolvePackage(Name name);
 	
@@ -63,6 +65,30 @@ public interface IImport extends IASTNode
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
 	
 	// Compilation
+	
+	public static void writeImport(IImport iimport, DataOutputStream dos) throws IOException
+	{
+		if (iimport == null)
+		{
+			dos.writeByte(0);
+			return;
+		}
+		
+		dos.writeByte(iimport.importTag());
+		iimport.write(dos);
+	}
+	
+	public static IImport readImport(DataInputStream dis) throws IOException
+	{
+		byte type = dis.readByte();
+		if (type == 0)
+		{
+			return null;
+		}
+		IImport iimport = fromTag(type);
+		iimport.read(dis);
+		return iimport;
+	}
 	
 	public void write(DataOutputStream dos) throws IOException;
 	

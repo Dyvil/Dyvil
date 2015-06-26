@@ -51,15 +51,19 @@ public class DyvilHeaderParser extends Parser
 		if (type == Keywords.IMPORT)
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw());
-			this.unit.addImport(i);
-			pm.pushParser(new ImportParser(i));
+			pm.pushParser(new ImportParser(im -> {
+				i.setImport(im);
+				this.unit.addImport(i);
+			}));
 			return true;
 		}
 		if (type == Keywords.USING)
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw(), true);
-			this.unit.addUsing(i);
-			pm.pushParser(new ImportParser(i));
+			pm.pushParser(new ImportParser(im -> {
+				i.setImport(im);
+				this.unit.addUsing(i);
+			}));
 			return true;
 		}
 		if (type == Keywords.OPERATOR)

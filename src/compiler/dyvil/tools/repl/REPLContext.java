@@ -37,10 +37,6 @@ public class REPLContext extends DyvilHeader implements IValued
 	private Map<Name, REPLVariable>		variables		= new HashMap();
 	
 	private String						currentClassName;
-	private IValue						value;
-	private ImportDeclaration			importDeclaration;
-	private IncludeDeclaration			includeDeclaration;
-	private IClass						tempClass;
 	private List<IClassCompilable>		compilableList	= new ArrayList();
 	private List<IClassCompilable>		innerClassList	= new ArrayList();
 	
@@ -71,77 +67,11 @@ public class REPLContext extends DyvilHeader implements IValued
 		return false;
 	}
 	
-	protected void processHeader()
+	@Override
+	public void setValue(IValue value)
 	{
-		MarkerList markers = new MarkerList();
-		
-		if (this.tempClass != null)
-		{
-			this.tempClass.resolveTypes(markers, this);
-			this.tempClass.resolve(markers, this);
-			this.tempClass.checkTypes(markers, this);
-			this.tempClass.check(markers, this);
-			this.tempClass.foldConstants();
-			
-			super.addClass(this.tempClass);
-			System.out.println("Defined class " + this.tempClass.getName());
-			this.tempClass = null;
-		}
-		
-		if (this.includeDeclaration != null)
-		{
-			IncludeDeclaration inc = this.includeDeclaration;
-			this.includeDeclaration = null;
-			inc.resolve(markers);
-			
-			if (this.reportErrors(markers))
-			{
-				return;
-			}
-			
-			this.addIncludeToArray(inc);
-			System.out.println("Included " + inc.getHeader().getFullName());
-			return;
-		}
-		
-		if (this.importDeclaration == null || this.importDeclaration.theImport == null)
-		{
-			return;
-		}
-		this.importDeclaration.resolveTypes(markers, this, false);
-		
-		if (this.reportErrors(markers))
-		{
-			return;
-		}
-		
-		boolean isStatic = this.importDeclaration.isStatic;
-		
-		if (isStatic)
-		{
-			super.addUsing(this.importDeclaration);
-			System.out.println("Using " + this.importDeclaration.theImport);
-		}
-		else
-		{
-			super.addImport(this.importDeclaration);
-			System.out.println("Imported " + this.importDeclaration.theImport);
-		}
-		
-		this.importDeclaration = null;
-	}
-	
-	protected void processValue()
-	{
-		if (this.value == null)
-		{
-			return;
-		}
-		
-		IValue value = this.value;
 		MarkerList markers = new MarkerList();
 		this.currentClassName = "REPL" + classIndex++;
-		this.value = null;
 		
 		Name name = Name.getQualified("res" + resultIndex);
 		REPLVariable field = new REPLVariable(CODE_POSITION, name, Types.UNKNOWN, value);
@@ -185,12 +115,17 @@ public class REPLContext extends DyvilHeader implements IValued
 			resultIndex++;
 		}
 	}
-	
+
+	@Override
+	public IValue getValue()
+	{
+		return null;
+	}
+
 	@Override
 	public void addOperator(Operator op)
 	{
 		this.operators.put(op.name, op);
-		
 		System.out.println("Defined " + op);
 	}
 	
@@ -201,27 +136,61 @@ public class REPLContext extends DyvilHeader implements IValued
 	}
 	
 	@Override
-	public void addImport(ImportDeclaration component)
+	public void addImport(ImportDeclaration declaration)
 	{
-		this.importDeclaration = component;
+		MarkerList markers = new MarkerList();
+		declaration.resolveTypes(markers, this, false);
+		
+		if (this.reportErrors(markers))
+		{
+			return;
+		}
+		
+		super.addImport(declaration);
+		System.out.println("Added import declaration for '" + declaration.theImport + "'");
 	}
 	
 	@Override
-	public void addUsing(ImportDeclaration component)
+	public void addUsing(ImportDeclaration declaration)
 	{
-		this.importDeclaration = component;
+		MarkerList markers = new MarkerList();
+		declaration.resolveTypes(markers, this, true);
+		
+		if (this.reportErrors(markers))
+		{
+			return;
+		}
+		
+		super.addImport(declaration);
+		System.out.println("Added using declaration for '" + declaration.theImport + "'");
 	}
 	
 	@Override
 	public void addInclude(IncludeDeclaration component)
 	{
-		this.includeDeclaration = component;
+		component.resolve(markers);
+		
+		if (this.reportErrors(markers))
+		{
+			return;
+		}
+		
+		this.addIncludeToArray(component);
+		System.out.println("Included the header '" + component.getHeader().getFullName() + "'");
+		return;
 	}
 	
 	@Override
 	public void addClass(IClass iclass)
 	{
-		this.tempClass = iclass;
+		iclass.resolveTypes(markers, this);
+		iclass.resolve(markers, this);
+		iclass.checkTypes(markers, this);
+		iclass.check(markers, this);
+		iclass.foldConstants();
+		
+		super.addClass(iclass);
+		System.out.println("Defined class " + iclass.getName());
 	}
 	
 	@Override
@@ -247,7 +216,8 @@ public class REPLContext extends DyvilHeader implements IValued
 		{
 			return f;
 		}
-		return null;
+		
+		return super.resolveField(name);
 	}
 	
 	@Override
@@ -311,17 +281,5 @@ public class REPLContext extends DyvilHeader implements IValued
 	public String getInternalName(String name)
 	{
 		return this.currentClassName + '$' + name;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		this.value = value;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.value;
 	}
 }

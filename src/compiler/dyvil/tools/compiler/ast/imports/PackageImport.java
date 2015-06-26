@@ -6,8 +6,6 @@ import java.io.IOException;
 
 import dyvil.lang.List;
 
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -19,14 +17,13 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class PackageImport extends ASTNode implements IImport
+public final class PackageImport extends Import
 {
-	private Package	thePackage;
-	private IClass	theClass;
+	private IContext	context;
 	
 	public PackageImport(ICodePosition position)
 	{
-		this.position = position;
+		super(position);
 	}
 	
 	@Override
@@ -38,6 +35,12 @@ public final class PackageImport extends ASTNode implements IImport
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
+		if (this.parent != null)
+		{
+			this.parent.resolveTypes(markers, context, false);
+			context = this.parent.getContext();
+		}
+		
 		if (using)
 		{
 			if (!(context instanceof IClass))
@@ -46,7 +49,7 @@ public final class PackageImport extends ASTNode implements IImport
 				return;
 			}
 			
-			this.theClass = (CodeClass) context;
+			this.context = context;
 			return;
 		}
 		
@@ -55,39 +58,37 @@ public final class PackageImport extends ASTNode implements IImport
 			markers.add(this.position, "import.package.invalid");
 			return;
 		}
-		this.thePackage = (Package) context;
+		this.context = context;
+	}
+	
+	@Override
+	public IContext getContext()
+	{
+		return this.context;
 	}
 	
 	@Override
 	public Package resolvePackage(Name name)
 	{
-		return this.thePackage.resolvePackage(name.qualified);
+		return this.context.resolvePackage(name);
 	}
 	
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.thePackage.resolveClass(name.qualified);
+		return this.context.resolveClass(name);
 	}
 	
 	@Override
 	public IField resolveField(Name name)
 	{
-		if (this.theClass == null)
-		{
-			return null;
-		}
-		return this.theClass.resolveField(name);
+		return this.context.resolveField(name);
 	}
 	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		if (this.theClass == null)
-		{
-			return;
-		}
-		this.theClass.getMethodMatches(list, instance, name, arguments);
+		this.context.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
@@ -103,6 +104,7 @@ public final class PackageImport extends ASTNode implements IImport
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		this.appendParent(prefix, buffer);
 		buffer.append('_');
 	}
 }

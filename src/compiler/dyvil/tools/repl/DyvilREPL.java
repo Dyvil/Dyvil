@@ -54,12 +54,10 @@ public class DyvilREPL
 			
 			if (parser.parse(tokens, new ExpressionParser(context)))
 			{
-				context.processValue();
 				return;
 			}
 			if (parser.parse(tokens, new DyvilHeaderParser(context)))
 			{
-				context.processHeader();
 				return;
 			}
 		}
