@@ -199,6 +199,12 @@ public class NamedType implements IType
 	}
 	
 	@Override
+	public String toString()
+	{
+		return this.name.toString();
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.name);

@@ -123,6 +123,12 @@ public class InternalType implements IType
 	}
 	
 	@Override
+	public String toString()
+	{
+		return ClassFormat.internalToPackage(this.internalName);
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(ClassFormat.internalToPackage(this.internalName));

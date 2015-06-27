@@ -204,6 +204,7 @@ public final class TupleType implements IType, ITypeList
 	public IType getConcreteType(ITypeContext context)
 	{
 		TupleType tt = new TupleType(this.typeCount);
+		tt.typeCount = this.typeCount;
 		for (int i = 0; i < this.typeCount; i++)
 		{
 			tt.types[i] = this.types[i].getConcreteType(context);
@@ -354,6 +355,7 @@ public final class TupleType implements IType, ITypeList
 	public IType clone()
 	{
 		TupleType tt = new TupleType(this.typeCount);
+		tt.typeCount = this.typeCount;
 		System.arraycopy(this.types, 0, tt.types, 0, this.typeCount);
 		return tt;
 	}
