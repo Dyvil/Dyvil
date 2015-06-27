@@ -22,7 +22,7 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -37,7 +37,7 @@ import org.objectweb.asm.MethodVisitor;
 public final class CaseExpression extends ASTNode implements IValue, IValued, IPatternConsumer, IClassCompilable, IContext
 {
 	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
-	public static final Type			PARTIALFUNCTION			= new Type(PARTIALFUNCTION_CLASS);
+	public static final ClassType			PARTIALFUNCTION			= new ClassType(PARTIALFUNCTION_CLASS);
 	public static final ITypeVariable	PAR_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(0);
 	public static final ITypeVariable	RETURN_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(1);
 	
@@ -102,7 +102,7 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 			}
 			else
 			{
-				gt.addType(new Type(Types.VOID_CLASS));
+				gt.addType(new ClassType(Types.VOID_CLASS));
 			}
 			return this.type = gt;
 		}

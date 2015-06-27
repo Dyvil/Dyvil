@@ -59,7 +59,7 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			return null;
 		}
 		int typeTag = type.typeTag();
-		if (typeTag != IType.GENERIC_TYPE && typeTag != IType.TUPLE_TYPE)
+		if (typeTag != IType.GENERIC && typeTag != IType.TUPLE)
 		{
 			return null;
 		}

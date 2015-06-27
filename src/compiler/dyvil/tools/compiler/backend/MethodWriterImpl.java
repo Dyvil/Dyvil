@@ -255,7 +255,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
-		this.frame.push(type.getInternalName());
+		this.frame.push("java/lang/Class");
 		
 		this.mv.visitLdcInsn(type);
 	}
@@ -571,7 +571,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (dims == 1)
 		{
-			if (type.typeTag() == IType.PRIMITIVE_TYPE)
+			if (type.typeTag() == IType.PRIMITIVE)
 			{
 				this.writeIntInsn(Opcodes.NEWARRAY, ((PrimitiveType) type).typecode);
 				return;

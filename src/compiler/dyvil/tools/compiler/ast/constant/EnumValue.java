@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -27,7 +27,7 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 		this.name = name;
 	}
 	
-	public EnumValue(ICodePosition position, Type type, Name name)
+	public EnumValue(ICodePosition position, ClassType type, Name name)
 	{
 		this.position = position;
 		this.type = type;

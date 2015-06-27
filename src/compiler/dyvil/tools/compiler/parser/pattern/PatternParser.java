@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.pattern;
 
 import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.pattern.*;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.NamedType;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -66,7 +66,7 @@ public class PatternParser extends Parser
 				if (next.type() == Symbols.OPEN_PARENTHESIS)
 				{
 					CaseClassPattern ccp = new CaseClassPattern(token.raw());
-					ccp.setType(new Type(token.nameValue()));
+					ccp.setType(new NamedType(token.raw(), token.nameValue()));
 					pm.pushParser(new PatternListParser(ccp));
 					pm.skip();
 					this.pattern = ccp;

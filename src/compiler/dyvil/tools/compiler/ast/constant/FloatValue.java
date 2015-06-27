@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -49,7 +48,7 @@ public class FloatValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return Types.FLOAT;
 	}

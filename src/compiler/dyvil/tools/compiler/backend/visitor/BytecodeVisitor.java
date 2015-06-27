@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 import org.objectweb.asm.*;
@@ -51,7 +52,7 @@ public final class BytecodeVisitor extends MethodVisitor
 		String internal = ClassFormat.extendedToInternal(type);
 		if (this.method.addRawAnnotation(internal))
 		{
-			Annotation annotation = new Annotation(new dyvil.tools.compiler.ast.type.Type(internal));
+			Annotation annotation = new Annotation(new InternalType(internal));
 			return new AnnotationVisitorImpl(this.method, annotation);
 		}
 		return null;

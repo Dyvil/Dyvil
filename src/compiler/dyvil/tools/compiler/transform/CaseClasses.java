@@ -149,7 +149,7 @@ public interface CaseClasses
 	{
 		switch (type.typeTag())
 		{
-		case IType.PRIMITIVE_TYPE:
+		case IType.PRIMITIVE:
 			switch (((PrimitiveType) type).typecode)
 			{
 			case ClassFormat.T_BOOLEAN:
@@ -179,7 +179,7 @@ public interface CaseClasses
 			default:
 				return;
 			}
-		case IType.ARRAY_TYPE:
+		case IType.ARRAY:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepEquals", "([Ljava/lang/Object;[Ljava/lang/Object;)Z", true);
 			return;
 		default:
@@ -299,7 +299,7 @@ public interface CaseClasses
 	{
 		switch (type.typeTag())
 		{
-		case IType.PRIMITIVE_TYPE:
+		case IType.PRIMITIVE:
 			switch (((PrimitiveType) type).typecode)
 			{
 			case ClassFormat.T_BOOLEAN:
@@ -329,7 +329,7 @@ public interface CaseClasses
 			default:
 				return;
 			}
-		case IType.ARRAY_TYPE:
+		case IType.ARRAY:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepHashCode", "([Ljava/lang/Object;)I", true);
 			return;
 		default:
@@ -416,7 +416,7 @@ public interface CaseClasses
 	{
 		switch (type.typeTag())
 		{
-		case IType.PRIMITIVE_TYPE:
+		case IType.PRIMITIVE:
 			switch (((PrimitiveType) type).typecode)
 			{
 			case ClassFormat.T_BOOLEAN:
@@ -446,7 +446,7 @@ public interface CaseClasses
 			default:
 				return;
 			}
-		case IType.ARRAY_TYPE:
+		case IType.ARRAY:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepToString", "([Ljava/lang/Object;Ljava/lang/StringBuilder;)V", true);
 			return;
 		default:

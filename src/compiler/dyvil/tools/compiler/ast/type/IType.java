@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -25,23 +24,27 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public interface IType extends IASTNode, INamed, IContext, ITypeContext
+public interface IType extends IASTNode, IContext, ITypeContext
 {
-	int	UNKNOWN			= -1;
-	int	NULL			= 0;
-	int	TYPE			= 1;
-	int	PRIMITIVE_TYPE	= 2;
-	int	GENERIC_TYPE	= 3;
+	int	UNKNOWN				= -1;
+	int	NULL				= 0;
+	int	ANY					= 1;
+	int	DYNAMIC				= 2;
+	int	PRIMITIVE			= 3;
+	int	ARRAY				= 4;
+	int	MULTI_ARRAY			= 5;
 	
-	int	TYPE_VAR_TYPE	= 4;
-	int	WILDCARD_TYPE	= 5;
+	int	CLASS				= 8;
+	int	NAMED				= 9;
+	int	INTERNAL			= 10;
 	
-	int	ARRAY_TYPE		= 6;
-	int	MULTI_ARRAY		= 7;
-	int	TUPLE_TYPE		= 8;
-	int	FUNCTION_TYPE	= 9;
+	int	TUPLE				= 16;
+	int	LAMBDA				= 17;
 	
-	int	DYNAMIC			= 10;
+	int	GENERIC				= 32;
+	int	TYPE_VAR_TYPE		= 33;
+	int	INTERNAL_TYPE_VAR	= 34;
+	int	WILDCARD_TYPE		= 35;
 	
 	public int typeTag();
 	
@@ -70,17 +73,9 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return null;
 	}
 	
-	// Full Name
-	
-	@Override
-	public void setName(Name name);
-	
-	@Override
 	public Name getName();
 	
 	// Container Class
-	
-	public void setClass(IClass theClass);
 	
 	public IClass getTheClass();
 	
@@ -108,7 +103,15 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	// Super Type
 	
-	public IType getSuperType();
+	public default IType getSuperType()
+	{
+		IClass iclass = this.getTheClass();
+		if (iclass != null)
+		{
+			return iclass.getSuperType();
+		}
+		return Types.OBJECT;
+	}
 	
 	/**
 	 * Returns true if {@code type} is a subtype of this type
@@ -119,11 +122,16 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	public default boolean isSuperTypeOf(IType type)
 	{
 		IClass thisClass = this.getTheClass();
-		IClass thatClass = type.getTheClass();
+		if (thisClass == Types.OBJECT_CLASS)
+		{
+			return true;
+		}
 		if (type.isArrayType())
 		{
-			return thisClass == Types.OBJECT_CLASS;
+			return false;
 		}
+		
+		IClass thatClass = type.getTheClass();
 		if (thatClass != null)
 		{
 			return thatClass == thisClass || thatClass.isSubTypeOf(this);
@@ -208,13 +216,22 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	}
 	
 	@Override
-	public Package resolvePackage(Name name);
+	public default Package resolvePackage(Name name)
+	{
+		return null;
+	}
 	
 	@Override
-	public IClass resolveClass(Name name);
+	public default IClass resolveClass(Name name)
+	{
+		return null;
+	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name);
+	public default ITypeVariable resolveTypeVariable(Name name)
+	{
+		return null;
+	}
 	
 	@Override
 	public IDataMember resolveField(Name name);
@@ -237,8 +254,6 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	public IMethod getFunctionalMethod();
 	
 	// Compilation
-	
-	public void setInternalName(String name);
 	
 	public String getInternalName();
 	

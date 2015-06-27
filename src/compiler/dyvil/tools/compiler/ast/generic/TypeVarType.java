@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.generic;
 import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -15,17 +14,16 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class TypeVariableType extends ASTNode implements IType
+public final class TypeVarType implements IType
 {
 	public ITypeVariable	typeVar;
 	
-	public TypeVariableType(ITypeVariable typeVar)
+	public TypeVarType(ITypeVariable typeVar)
 	{
 		this.typeVar = typeVar;
 	}
@@ -37,19 +35,9 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
-	public void setName(Name name)
-	{
-	}
-	
-	@Override
 	public Name getName()
 	{
 		return null;
-	}
-	
-	@Override
-	public void setClass(IClass theClass)
-	{
 	}
 	
 	@Override
@@ -137,36 +125,6 @@ public final class TypeVariableType extends ASTNode implements IType
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return false;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return null;
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
@@ -192,11 +150,6 @@ public final class TypeVariableType extends ASTNode implements IType
 	public IMethod getFunctionalMethod()
 	{
 		return null;
-	}
-	
-	@Override
-	public void setInternalName(String name)
-	{
 	}
 	
 	@Override
@@ -239,7 +192,7 @@ public final class TypeVariableType extends ASTNode implements IType
 	@Override
 	public IType clone()
 	{
-		return new TypeVariableType(this.typeVar);
+		return new TypeVarType(this.typeVar);
 	}
 	
 	@Override

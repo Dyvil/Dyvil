@@ -16,9 +16,9 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 public class RangeOperator implements IValue
 {
 	public static final IClass			RANGE_CLASS		= Package.dyvilLang.resolveClass("Range");
-	public static final Type			RANGE			= new Type(RANGE_CLASS);
+	public static final ClassType			RANGE			= new ClassType(RANGE_CLASS);
 	public static final IClass			ORDERED_CLASS	= Package.dyvilLang.resolveClass("Ordered");
-	public static final Type			ORDERED			= new Type(ORDERED_CLASS);
+	public static final ClassType			ORDERED			= new ClassType(ORDERED_CLASS);
 	private static final ITypeVariable	ORDERED_TYPE	= ORDERED_CLASS.getTypeVariable(0);
 	
 	public IValue						value1;
@@ -210,7 +210,7 @@ public class RangeOperator implements IValue
 			this.value1.writeExpression(writer);
 			this.value2.writeExpression(writer);
 			
-			if (this.elementType.typeTag() == IType.PRIMITIVE_TYPE)
+			if (this.elementType.typeTag() == IType.PRIMITIVE)
 			{
 				switch (((PrimitiveType) this.elementType).typecode)
 				{

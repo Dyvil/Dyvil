@@ -82,7 +82,7 @@ public class RangeForStatement extends ForEachStatement
 		// Determine the 'type' of the range to fasten up compilation.
 		byte type = 5;
 		IType rangeType = this.variable.type;
-		if (rangeType.typeTag() == IType.PRIMITIVE_TYPE)
+		if (rangeType.typeTag() == IType.PRIMITIVE)
 		{
 			switch (((PrimitiveType) rangeType).typecode)
 			{

@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.TypeVariableType;
+import dyvil.tools.compiler.ast.generic.TypeVarType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -73,7 +73,7 @@ public final class ExternalClass extends CodeClass
 			{
 				ITypeVariable var = this.generics[i];
 				var.resolveTypes(null, Package.rootPackage);
-				type.addType(new TypeVariableType(var));
+				type.addType(new TypeVarType(var));
 			}
 			
 			this.type = type;
@@ -497,7 +497,7 @@ public final class ExternalClass extends CodeClass
 			}
 		}
 		
-		this.type = new dyvil.tools.compiler.ast.type.Type(this);
+		this.type = new dyvil.tools.compiler.ast.type.ClassType(this);
 	}
 	
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)

@@ -10,7 +10,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
 
-public final class LambdaType extends Type implements ITyped, ITypeList
+public final class LambdaType extends ClassType implements ITyped, ITypeList
 {
 	public static final IClass[]	functionClasses	= new IClass[22];
 	

@@ -49,7 +49,7 @@ public final class TupleType implements IType, ITypeList
 			return false;
 		}
 		int typeTag = type.typeTag();
-		if (typeTag != GENERIC_TYPE && typeTag != TUPLE_TYPE)
+		if (typeTag != GENERIC && typeTag != TUPLE)
 		{
 			return false;
 		}
@@ -109,7 +109,7 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public int typeTag()
 	{
-		return TUPLE_TYPE;
+		return TUPLE;
 	}
 	
 	@Override
@@ -119,19 +119,9 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public void setName(Name name)
-	{
-	}
-	
-	@Override
 	public Name getName()
 	{
 		return null;
-	}
-	
-	@Override
-	public void setClass(IClass theClass)
-	{
 	}
 	
 	@Override
@@ -175,7 +165,7 @@ public final class TupleType implements IType, ITypeList
 			return false;
 		}
 		int typeTag = type.typeTag();
-		if (typeTag != GENERIC_TYPE && typeTag != TUPLE_TYPE)
+		if (typeTag != GENERIC && typeTag != TUPLE)
 		{
 			return false;
 		}
@@ -263,36 +253,6 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.getTheClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return this.getTheClass().resolveField(name);
@@ -320,11 +280,6 @@ public final class TupleType implements IType, ITypeList
 	public IMethod getFunctionalMethod()
 	{
 		return null;
-	}
-	
-	@Override
-	public void setInternalName(String name)
-	{
 	}
 	
 	@Override

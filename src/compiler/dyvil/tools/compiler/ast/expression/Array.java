@@ -106,18 +106,18 @@ public final class Array extends ASTNode implements IValue, IValueList
 		if (t.getTheClass() == Types.TUPLE2_CLASS)
 		{
 			GenericType type = new GenericType(Types.MAP_CLASS);
-			type.genericCount = 2;
+			type.typeArgumentCount = 2;
 			
 			switch (t.typeTag())
 			{
-			case IType.GENERIC_TYPE:
-			case IType.TUPLE_TYPE:
+			case IType.GENERIC:
+			case IType.TUPLE:
 				ITypeList t1 = (ITypeList) t;
-				type.generics[0] = t1.getType(0);
-				type.generics[1] = t1.getType(1);
+				type.typeArguments[0] = t1.getType(0);
+				type.typeArguments[1] = t1.getType(1);
 				break;
 			default:
-				type.generics[0] = type.generics[1] = Types.ANY;
+				type.typeArguments[0] = type.typeArguments[1] = Types.ANY;
 			}
 			
 			return this.requiredType = type;

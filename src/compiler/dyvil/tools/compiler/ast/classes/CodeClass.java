@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.TypeVariableType;
+import dyvil.tools.compiler.ast.generic.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -33,7 +33,7 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -712,14 +712,14 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				ITypeVariable var = this.generics[i];
 				var.resolveTypes(markers, context);
-				type.addType(new TypeVariableType(var));
+				type.addType(new TypeVarType(var));
 			}
 			
 			this.type = type;
 		}
 		else
 		{
-			this.type = new Type(this);
+			this.type = new ClassType(this);
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)

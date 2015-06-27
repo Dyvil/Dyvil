@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.NamedType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -64,7 +64,7 @@ public final class Annotation extends ASTNode implements ITyped
 	{
 		this.position = position;
 		this.name = name;
-		this.type = new Type(position, name);
+		this.type = new NamedType(position, name);
 	}
 	
 	@Override

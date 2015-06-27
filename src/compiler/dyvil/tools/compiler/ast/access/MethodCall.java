@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -8,8 +9,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -155,27 +155,25 @@ public final class MethodCall extends AbstractCall implements INamed
 	{
 		IValue instance;
 		IMethod method;
-		IType type = null;
 		
 		IDataMember field = context.resolveField(this.name);
 		if (field == null)
 		{
 			// Find a type
-			type = new Type(this.position, this.name).resolve(null, context);
-			if (!type.isResolved())
-			{
-				// No type found -> Not an apply method call
+			IClass iclass = context.resolveClass(this.name);
+			if (iclass == null) {
 				return null;
 			}
+			
 			// Find the apply method of the type
-			IMethod match = IContext.resolveMethod(type, null, Name.apply, this.arguments);
+			IMethod match = IContext.resolveMethod(iclass, null, Name.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call
 				return null;
 			}
 			method = match;
-			instance = new ClassAccess(this.position, type);
+			instance = new ClassAccess(this.position, new ClassType(iclass));
 		}
 		else
 		{

@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -55,7 +54,7 @@ public class ArrayType implements IType, ITyped
 	@Override
 	public int typeTag()
 	{
-		return ARRAY_TYPE;
+		return ARRAY;
 	}
 	
 	@Override
@@ -71,20 +70,9 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public void setName(Name name)
-	{
-		this.type.setName(name);
-	}
-	
-	@Override
 	public Name getName()
 	{
 		return this.type.getName();
-	}
-	
-	@Override
-	public void setClass(IClass theClass)
-	{
 	}
 	
 	@Override
@@ -179,36 +167,6 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.type.getArrayClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
@@ -235,11 +193,6 @@ public class ArrayType implements IType, ITyped
 	public IMethod getFunctionalMethod()
 	{
 		return null;
-	}
-	
-	@Override
-	public void setInternalName(String name)
-	{
 	}
 	
 	@Override

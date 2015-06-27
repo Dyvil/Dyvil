@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -207,7 +207,7 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 	}
 	
 	@Override
-	public Type getType()
+	public ClassType getType()
 	{
 		return null;
 	}

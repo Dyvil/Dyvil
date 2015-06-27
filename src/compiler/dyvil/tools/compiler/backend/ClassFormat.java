@@ -2,6 +2,7 @@ package dyvil.tools.compiler.backend;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.generic.InternalTypeVarType;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
@@ -111,9 +112,7 @@ public final class ClassFormat
 	
 	public static IType internalToType(String internal)
 	{
-		Type type = new Type();
-		setInternalName(type, internal, 0, internal.length());
-		return type;
+		return new InternalType(internal);
 	}
 	
 	public static IType extendedToType(String extended)
@@ -189,26 +188,6 @@ public final class ClassFormat
 		}
 	}
 	
-	private static void setInternalName(IType type, String desc, int start, int end)
-	{
-		int index = desc.lastIndexOf('$', end);
-		if (index < start)
-		{
-			index = desc.lastIndexOf('/', end);
-			if (index < start)
-			{
-				// No slash in type name, skip internal -> package name
-				// conversion
-				type.setName(Name.getQualified(desc.substring(start, end)));
-				type.setInternalName(desc.substring(start, end));
-				return;
-			}
-		}
-		
-		type.setName(Name.getQualified(desc.substring(index + 1, end)));
-		type.setInternalName(desc.substring(start, end));
-	}
-	
 	private static IType readType(String desc, int start, int end)
 	{
 		int array = 0;
@@ -239,10 +218,7 @@ public final class ClassFormat
 		case 'D':
 			return ArrayType.getArrayType(Types.DOUBLE, array);
 		case 'T':
-		{
-			String s = desc.substring(start + 1, end);
-			return new Type(Name.getQualified(s));
-		}
+			return new InternalTypeVarType(desc.substring(start + 1, end));
 		case 'L':
 			return readReferenceType(desc, start + 1, end);
 		}
@@ -252,10 +228,9 @@ public final class ClassFormat
 	private static IType readReferenceType(String desc, int start, int end)
 	{
 		int index = desc.indexOf('<', start);
-		if (index != -1 && index < end)
+		if (index >= 0 && index < end)
 		{
-			GenericType type = new GenericType();
-			setInternalName(type, desc, start, index);
+			GenericType type = readGenericType(desc, start, index);
 			index++;
 			
 			while (desc.charAt(index) != '>')
@@ -265,9 +240,27 @@ public final class ClassFormat
 			return type;
 		}
 		
-		IType type = new Type();
-		setInternalName(type, desc, start, end);
-		return type;
+		return new InternalType(desc.substring(start, end));
+	}
+	
+	private static GenericType readGenericType(String desc, int start, int end)
+	{
+		int index = desc.lastIndexOf('$', end);
+		if (index < start)
+		{
+			index = desc.lastIndexOf('/', end);
+			if (index < start)
+			{
+				// No slash in type name, skip internal -> package name
+				// conversion
+				String internal = desc.substring(start, end);
+				return new GenericType(internal, Name.getQualified(internal));
+			}
+		}
+		
+		String internal = desc.substring(start, end);
+		Name name = Name.getQualified(desc.substring(index + 1, end));
+		return new GenericType(internal, name);
 	}
 	
 	private static int readTyped(String desc, int start, ITyped typed)
@@ -323,7 +316,7 @@ public final class ClassFormat
 		case 'T':
 		{
 			int end1 = desc.indexOf(';', start);
-			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
+			IType type = new InternalTypeVarType(desc.substring(start + 1, end1));
 			if (array > 0)
 			{
 				type = ArrayType.getArrayType(type, array);
@@ -407,7 +400,7 @@ public final class ClassFormat
 		case 'T':
 		{
 			int end1 = desc.indexOf(';', start);
-			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
+			IType type = new InternalTypeVarType(desc.substring(start + 1, end1));
 			if (array > 0)
 			{
 				type = ArrayType.getArrayType(type, array);
@@ -470,7 +463,7 @@ public final class ClassFormat
 		case 'T':
 		{
 			int end1 = desc.indexOf(';', start);
-			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
+			IType type = new InternalTypeVarType(desc.substring(start + 1, end1));
 			list.addException(type);
 			return end1 + 1;
 		}

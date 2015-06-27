@@ -7,6 +7,8 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -18,15 +20,17 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class PrimitiveType extends Type
+public final class PrimitiveType implements IType
 {
+	public Name		name;
+	public IClass	theClass;
 	public int		typecode;
 	public IMethod	boxMethod;
 	public IMethod	unboxMethod;
 	
 	public PrimitiveType(Name name, int typecode)
 	{
-		super(name);
+		this.name = name;
 		this.typecode = typecode;
 	}
 	
@@ -104,7 +108,7 @@ public final class PrimitiveType extends Type
 	@Override
 	public int typeTag()
 	{
-		return PRIMITIVE_TYPE;
+		return PRIMITIVE;
 	}
 	
 	@Override
@@ -116,12 +120,7 @@ public final class PrimitiveType extends Type
 	@Override
 	public final IType getReferenceType()
 	{
-		Type type = new Type(this.position, this.theClass);
-		if (this != Types.VOID)
-		{
-			type.name = this.name;
-		}
-		return type;
+		return new ClassType(this.theClass);
 	}
 	
 	@Override
@@ -143,6 +142,18 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
+	public Name getName()
+	{
+		return this.name;
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		return this.theClass;
+	}
+	
+	@Override
 	public boolean isSuperTypeOf2(IType that)
 	{
 		return this.theClass == that.getTheClass();
@@ -159,7 +170,7 @@ public final class PrimitiveType extends Type
 		{
 			return true;
 		}
-		return super.classEquals(type);
+		return IType.super.classEquals(type);
 	}
 	
 	@Override
@@ -171,14 +182,18 @@ public final class PrimitiveType extends Type
 	@Override
 	public IType resolve(MarkerList markers, IContext context)
 	{
-		if (this.theClass == null)
-		{
-			IType t = resolvePrimitive(this.name);
-			if (t != null)
-			{
-				this.theClass = t.getTheClass();
-			}
-		}
+		return this;
+	}
+	
+	@Override
+	public boolean hasTypeVariables()
+	{
+		return false;
+	}
+	
+	@Override
+	public IType getConcreteType(ITypeContext context)
+	{
 		return this;
 	}
 	
@@ -200,6 +215,18 @@ public final class PrimitiveType extends Type
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
+	}
+	
+	@Override
+	public byte getVisibility(IClassMember member)
+	{
+		return 0;
+	}
+	
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		return null;
 	}
 	
 	@Override
@@ -469,6 +496,12 @@ public final class PrimitiveType extends Type
 	public String toString()
 	{
 		return this.name.qualified;
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(this.name);
 	}
 	
 	@Override

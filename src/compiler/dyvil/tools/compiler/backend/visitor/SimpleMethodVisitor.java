@@ -5,7 +5,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ICallableMember;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -52,7 +52,7 @@ public final class SimpleMethodVisitor extends MethodVisitor
 		String internal = ClassFormat.extendedToInternal(type);
 		if (this.method.addRawAnnotation(internal))
 		{
-			Annotation annotation = new Annotation(new Type(internal));
+			Annotation annotation = new Annotation(new InternalType(internal));
 			return new AnnotationVisitorImpl(this.method, annotation);
 		}
 		return null;

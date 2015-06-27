@@ -100,7 +100,7 @@ public final class TypeParser extends Parser implements ITyped
 					return;
 				}
 				
-				this.type = new Type(token.raw(), token.nameValue());
+				this.type = new NamedType(token.raw(), token.nameValue());
 				this.typed.setType(this.type);
 				pm.popParser();
 				return;

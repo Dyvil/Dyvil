@@ -3,7 +3,7 @@ package dyvil.tools.compiler.backend.visitor;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -31,7 +31,7 @@ public class AnnotationClassVisitor extends MethodVisitor
 		String internal = ClassFormat.extendedToInternal(type);
 		if (this.parameter.addRawAnnotation(internal))
 		{
-			Annotation annotation = new Annotation(new Type(internal));
+			Annotation annotation = new Annotation(new InternalType(internal));
 			return new AnnotationVisitorImpl(this.parameter, annotation);
 		}
 		return null;
