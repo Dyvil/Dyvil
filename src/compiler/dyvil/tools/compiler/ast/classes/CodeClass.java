@@ -294,8 +294,11 @@ public class CodeClass extends ASTNode implements IClass
 	public void setName(Name name)
 	{
 		this.name = name;
-		this.internalName = this.unit.getInternalName(name.qualified);
-		this.fullName = this.unit.getFullName(name.qualified);
+		if (this.unit != null)
+		{
+			this.internalName = this.unit.getInternalName(name.qualified);
+			this.fullName = this.unit.getFullName(name.qualified);
+		}
 	}
 	
 	@Override

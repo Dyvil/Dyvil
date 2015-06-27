@@ -21,15 +21,9 @@ public interface IDataMember extends IASTNode, IMember, IValued
 		return false;
 	}
 	
-	public default boolean isField()
-	{
-		return false;
-	}
+	public boolean isField();
 	
-	public default boolean isVariable()
-	{
-		return true;
-	}
+	public boolean isVariable();
 	
 	// Compilation
 	

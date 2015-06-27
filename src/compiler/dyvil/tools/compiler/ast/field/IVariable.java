@@ -5,6 +5,12 @@ import dyvil.tools.compiler.ast.type.IType;
 public interface IVariable extends IDataMember
 {
 	@Override
+	public default boolean isField()
+	{
+		return false;
+	}
+	
+	@Override
 	public default boolean isVariable()
 	{
 		return true;

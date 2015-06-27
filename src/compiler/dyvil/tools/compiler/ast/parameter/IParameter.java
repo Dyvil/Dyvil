@@ -10,9 +10,18 @@ import dyvil.tools.compiler.backend.MethodWriter;
 public interface IParameter extends IVariable, IClassMember, IClassCompilable
 {
 	@Override
+	public default void setTheClass(IClass iclass)
+	{
+	}
+	
+	@Override
 	public default IClass getTheClass()
 	{
 		return null;
+	}
+	
+	public default void setMethod(ICallableMember method)
+	{
 	}
 	
 	@Override
@@ -29,14 +38,6 @@ public interface IParameter extends IVariable, IClassMember, IClassCompilable
 	public default boolean isVarargs()
 	{
 		return false;
-	}
-	
-	public default void setTheClass(IClass iclass)
-	{
-	}
-	
-	public default void setMethod(ICallableMember method)
-	{
 	}
 	
 	public void write(MethodWriter mw);

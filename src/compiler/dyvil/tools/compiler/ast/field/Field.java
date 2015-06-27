@@ -51,6 +51,12 @@ public class Field extends Member implements IField
 	{
 		return true;
 	}
+
+	@Override
+	public void setTheClass(IClass iclass)
+	{
+		this.theClass = iclass;
+	}
 	
 	@Override
 	public IClass getTheClass()

@@ -57,6 +57,12 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
+	public void setTheClass(IClass iclass)
+	{
+		this.theClass = iclass;
+	}
+	
+	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;

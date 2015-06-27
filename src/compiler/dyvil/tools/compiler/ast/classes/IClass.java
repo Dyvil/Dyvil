@@ -20,6 +20,11 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 public interface IClass extends IASTNode, IClassCompilable, IClassMember, IGeneric, IContext, IParameterized, ITypeList
 {
 	@Override
+	public default void setTheClass(IClass iclass)
+	{
+	}
+	
+	@Override
 	public default IClass getTheClass()
 	{
 		return this;

@@ -61,9 +61,9 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public void setTheClass(IClass iclass)
 	{
-		return ElementType.FIELD;
+		this.theClass = iclass;
 	}
 	
 	@Override
@@ -78,6 +78,12 @@ public class Property extends Member implements IProperty, IContext
 		return true;
 	}
 	
+	@Override
+	public ElementType getAnnotationType()
+	{
+		return ElementType.FIELD;
+	}
+
 	@Override
 	public void setValue(IValue value)
 	{

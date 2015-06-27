@@ -5,4 +5,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 public interface IClassMember extends IMember
 {
 	public IClass getTheClass();
+	
+	public void setTheClass(IClass iclass);
 }

@@ -49,6 +49,11 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public void setTheClass(IClass iclass)
+	{
+	}
+	
+	@Override
 	public IClass getTheClass()
 	{
 		return null;
