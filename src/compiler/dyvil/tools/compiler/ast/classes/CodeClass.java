@@ -484,30 +484,6 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public int typeCount()
-	{
-		return this.interfaceCount;
-	}
-	
-	@Override
-	public void setType(int index, IType type)
-	{
-		this.interfaces[index] = type;
-	}
-	
-	@Override
-	public void addType(IType type)
-	{
-		this.addInterface(type);
-	}
-	
-	@Override
-	public IType getType(int index)
-	{
-		return this.interfaces[index];
-	}
-	
-	@Override
 	public int interfaceCount()
 	{
 		return this.interfaceCount;

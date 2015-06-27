@@ -2,12 +2,11 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.backend.MethodWriter;
 
-public interface IParameter extends IVariable, IClassMember, IClassCompilable
+public interface IParameter extends IVariable, IClassMember
 {
 	@Override
 	public default void setTheClass(IClass iclass)

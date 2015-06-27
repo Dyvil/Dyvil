@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.member;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 
-public interface IClassMember extends IMember
+public interface IClassMember extends IMember, IClassCompilable
 {
 	public IClass getTheClass();
 	

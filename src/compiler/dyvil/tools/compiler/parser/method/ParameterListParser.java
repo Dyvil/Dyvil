@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.parser.method;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.member.IAnnotationList;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -12,8 +10,6 @@ import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -25,7 +21,7 @@ import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class ParameterListParser extends Parser implements IAnnotationList, ITyped
+public final class ParameterListParser extends Parser implements ITypeConsumer
 {
 	public static final int		TYPE		= 1;
 	public static final int		NAME		= 2;
@@ -149,13 +145,11 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 		this.type = type;
 	}
 	
-	@Override
 	public int annotationCount()
 	{
 		return this.annotationCount;
 	}
 	
-	@Override
 	public Annotation[] getAnnotations()
 	{
 		Annotation[] a = new Annotation[this.annotationCount];
@@ -163,7 +157,6 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 		return a;
 	}
 	
-	@Override
 	public void addAnnotation(Annotation annotation)
 	{
 		int index = this.annotationCount++;
@@ -174,41 +167,5 @@ public final class ParameterListParser extends Parser implements IAnnotationList
 			this.annotations = temp;
 		}
 		this.annotations[index] = annotation;
-	}
-	
-	// Override Methods
-	
-	@Override
-	public void setAnnotation(int index, Annotation annotation)
-	{
-	}
-	
-	@Override
-	public void removeAnnotation(int index)
-	{
-	}
-	
-	@Override
-	public Annotation getAnnotation(int index)
-	{
-		return null;
-	}
-	
-	@Override
-	public Annotation getAnnotation(IClass type)
-	{
-		return null;
-	}
-	
-	@Override
-	public ElementType getAnnotationType()
-	{
-		return null;
-	}
-	
-	@Override
-	public ClassType getType()
-	{
-		return null;
 	}
 }

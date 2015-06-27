@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.parser.classes;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -12,7 +10,6 @@ import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Property;
-import dyvil.tools.compiler.ast.member.IAnnotationList;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Constructor;
@@ -36,7 +33,7 @@ import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class ClassBodyParser extends Parser implements ITypeConsumer, IAnnotationList
+public final class ClassBodyParser extends Parser implements ITypeConsumer
 {
 	public static final int			TYPE			= 1;
 	public static final int			NAME			= 2;
@@ -298,13 +295,11 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer, IAnn
 		this.type = type;
 	}
 	
-	@Override
 	public int annotationCount()
 	{
 		return this.annotationCount;
 	}
 	
-	@Override
 	public Annotation[] getAnnotations()
 	{
 		Annotation[] a = new Annotation[this.annotationCount];
@@ -312,7 +307,6 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer, IAnn
 		return a;
 	}
 	
-	@Override
 	public void addAnnotation(Annotation annotation)
 	{
 		int index = this.annotationCount++;
@@ -323,35 +317,5 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer, IAnn
 			this.annotations = temp;
 		}
 		this.annotations[index] = annotation;
-	}
-	
-	// Override Methods
-	
-	@Override
-	public void setAnnotation(int index, Annotation annotation)
-	{
-	}
-	
-	@Override
-	public void removeAnnotation(int index)
-	{
-	}
-	
-	@Override
-	public Annotation getAnnotation(int index)
-	{
-		return null;
-	}
-	
-	@Override
-	public Annotation getAnnotation(IClass type)
-	{
-		return null;
-	}
-	
-	@Override
-	public ElementType getAnnotationType()
-	{
-		return null;
 	}
 }

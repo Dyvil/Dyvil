@@ -486,6 +486,11 @@ public class Method extends Member implements IMethod
 		
 		String desc = this.getDescriptor();
 		IClassBody body = this.theClass.getBody();
+		if (body == null)
+		{
+			return;
+		}
+		
 		for (int i = body.methodCount() - 1; i >= 0; i--)
 		{
 			IMethod m = body.getMethod(i);

@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.method;
 
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -17,7 +16,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public interface IConstructor extends IASTNode, IClassMember, ICallableMember, ITypeList, IContext, IClassCompilable
+public interface IConstructor extends IASTNode, IClassMember, ICallableMember, ITypeList, IContext
 {
 	public int getSignatureMatch(IArguments arguments);
 	

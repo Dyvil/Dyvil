@@ -1,14 +1,11 @@
 package dyvil.tools.compiler.ast.member;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IMember extends INamed, ITyped, IModified, IAnnotationList
 {
-	public void setAnnotations(Annotation[] annotations, int count);
-	
 	public int getAccessLevel();
 	
 	// States
