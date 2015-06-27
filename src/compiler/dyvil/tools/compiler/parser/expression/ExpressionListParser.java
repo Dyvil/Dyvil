@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -12,7 +12,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class ExpressionListParser extends Parser implements IValued
+public final class ExpressionListParser extends Parser implements IValueConsumer
 {
 	private static final int	EXPRESSION	= 1;
 	private static final int	SEPARATOR	= 2;
@@ -91,11 +91,5 @@ public final class ExpressionListParser extends Parser implements IValued
 		{
 			this.valueList.addValue(value);
 		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

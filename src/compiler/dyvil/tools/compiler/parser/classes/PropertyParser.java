@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -21,12 +20,10 @@ public class PropertyParser extends Parser implements IValued
 	public static final Name	get	= Name.getQualified("get");
 	public static final Name	set	= Name.getQualified("set");
 	
-	protected IContext			context;
 	protected Property			property;
 	
-	public PropertyParser(IContext context, Property property)
+	public PropertyParser(Property property)
 	{
-		this.context = context;
 		this.property = property;
 	}
 	

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.pattern;
 
+import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.pattern.*;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -14,18 +15,18 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class PatternParser extends Parser
 {
-	public static final int	PATTERN			= 1;
-	public static final int	ARRAY_END		= 2;
-	public static final int	TUPLE_END		= 4;
-	public static final int	CASE_CLASS_END	= 8;
+	public static final int		PATTERN			= 1;
+	public static final int		ARRAY_END		= 2;
+	public static final int		TUPLE_END		= 4;
+	public static final int		CASE_CLASS_END	= 8;
 	
-	protected IPatterned	patterned;
+	protected IPatternConsumer	consumer;
 	
-	private IPattern		pattern;
+	private IPattern			pattern;
 	
-	public PatternParser(IPatterned patterned)
+	public PatternParser(IPatternConsumer consumer)
 	{
-		this.patterned = patterned;
+		this.consumer = consumer;
 		this.mode = PATTERN;
 	}
 	
@@ -52,7 +53,7 @@ public class PatternParser extends Parser
 			pm.popParser(true);
 			if (this.pattern != null)
 			{
-				this.patterned.setPattern(this.pattern);
+				this.consumer.setPattern(this.pattern);
 			}
 			return;
 		}
@@ -118,12 +119,12 @@ public class PatternParser extends Parser
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				this.pattern.expandPosition(token);
-				this.patterned.setPattern(this.pattern);
+				this.consumer.setPattern(this.pattern);
 				pm.popParser();
 				return;
 			}
 			this.pattern.expandPosition(token.prev());
-			this.patterned.setPattern(this.pattern);
+			this.consumer.setPattern(this.pattern);
 			pm.popParser(true);
 			throw new SyntaxError(token, "Invalid Array Pattern - '}' expected");
 		}
@@ -132,12 +133,12 @@ public class PatternParser extends Parser
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				this.pattern.expandPosition(token);
-				this.patterned.setPattern(this.pattern);
+				this.consumer.setPattern(this.pattern);
 				pm.popParser();
 				return;
 			}
 			this.pattern.expandPosition(token.prev());
-			this.patterned.setPattern(this.pattern);
+			this.consumer.setPattern(this.pattern);
 			pm.popParser(true);
 			throw new SyntaxError(token, "Invalid Tuple Pattern - ')' expected");
 		}
@@ -145,11 +146,11 @@ public class PatternParser extends Parser
 		{
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
-				this.patterned.setPattern(this.pattern);
+				this.consumer.setPattern(this.pattern);
 				pm.popParser();
 				return;
 			}
-			this.patterned.setPattern(this.pattern);
+			this.consumer.setPattern(this.pattern);
 			pm.popParser(true);
 			throw new SyntaxError(token, "Invalid Case Class Pattern - ')' expected");
 		}

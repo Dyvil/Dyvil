@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.statement.CatchBlock;
 import dyvil.tools.compiler.ast.statement.TryStatement;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -14,7 +14,7 @@ import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class TryStatementParser extends Parser implements IValued
+public final class TryStatementParser extends Parser implements IValueConsumer
 {
 	private static final int	ACTION		= 1;
 	private static final int	CATCH		= 2;
@@ -118,11 +118,5 @@ public final class TryStatementParser extends Parser implements IValued
 		{
 			this.statement.finallyBlock = value;
 		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

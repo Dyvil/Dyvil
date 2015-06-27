@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.parser.method;
 
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -11,7 +10,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class ExceptionListParser extends Parser implements ITyped
+public class ExceptionListParser extends Parser implements ITypeConsumer
 {
 	private static final int	TYPE		= 0;
 	private static final int	SEPERATOR	= 1;
@@ -62,11 +61,5 @@ public class ExceptionListParser extends Parser implements ITyped
 	public void setType(IType type)
 	{
 		this.exceptionList.addException(type);
-	}
-	
-	@Override
-	public Type getType()
-	{
-		return null;
 	}
 }

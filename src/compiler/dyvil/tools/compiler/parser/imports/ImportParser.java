@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.parser.imports;
 
-import java.util.function.Consumer;
-
+import dyvil.tools.compiler.ast.consumer.IImportConsumer;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.MultiImport;
 import dyvil.tools.compiler.ast.imports.PackageImport;
@@ -24,10 +23,10 @@ public final class ImportParser extends Parser
 	public static final int		DOT_ALIAS	= 2;
 	public static final int		MULTIIMPORT	= 4;
 	
-	protected Consumer<IImport>	consumer;
+	protected IImportConsumer	consumer;
 	protected IImport			theImport;
 	
-	public ImportParser(Consumer<IImport> consumer)
+	public ImportParser(IImportConsumer consumer)
 	{
 		this.consumer = consumer;
 		this.mode = IMPORT;
@@ -45,13 +44,13 @@ public final class ImportParser extends Parser
 		int type = token.type();
 		if (type == Symbols.SEMICOLON)
 		{
-			this.consumer.accept(this.theImport);
+			this.consumer.setImport(this.theImport);
 			pm.popParser();
 			return;
 		}
 		if (type == Symbols.COMMA || this.mode == 0)
 		{
-			this.consumer.accept(this.theImport);
+			this.consumer.setImport(this.theImport);
 			pm.popParser(true);
 			return;
 		}

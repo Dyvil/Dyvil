@@ -2,9 +2,7 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.classes.CodeClass;
-import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassList;
+import dyvil.tools.compiler.ast.classes.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
@@ -164,7 +162,9 @@ public final class ClassDeclarationParser extends Parser implements ITyped, ITyp
 		{
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
-				pm.pushParser(new ClassBodyParser(this.theClass));
+				IClassBody body = new ClassBody(this.theClass);
+				this.theClass.setBody(body);
+				pm.pushParser(new ClassBodyParser(this.theClass, body));
 				this.mode = BODY_END;
 				return;
 			}

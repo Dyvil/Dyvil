@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.expression.LambdaExpression;
 import dyvil.tools.compiler.ast.expression.Tuple;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -15,25 +15,25 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public class LambdaOrTupleParser extends EmulatorParser implements IParameterList
 {
-	protected static final int START = 0;
+	protected static final int	START		= 0;
 	protected static final int	PARAMETERS	= 1;
 	protected static final int	TUPLE		= 2;
 	protected static final int	TUPLE_END	= 4;
 	protected static final int	ARROW		= 8;
 	protected static final int	END			= 16;
 	
-	protected IValued			field;
+	protected IValueConsumer	consumer;
 	
 	private IParameter[]		params;
 	private int					parameterCount;
 	
 	private IValue				value;
 	
-	public LambdaOrTupleParser(IValued field)
+	public LambdaOrTupleParser(IValueConsumer consumer)
 	{
 		this.mode = START;
 		this.parser = this.tryParser = new ParameterListParser(this);
-		this.field = field;
+		this.consumer = consumer;
 	}
 	
 	@Override
@@ -45,7 +45,8 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 	@Override
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
-		if (this.mode == START) {
+		if (this.mode == START)
+		{
 			this.firstToken = token;
 			this.pm = pm;
 			this.mode = PARAMETERS;
@@ -91,7 +92,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			if (token.type() == Symbols.CLOSE_PARENTHESIS)
 			{
 				this.value.expandPosition(token);
-				this.field.setValue(this.value);
+				this.consumer.setValue(this.value);
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Tuple - ')' expected", true);
@@ -114,7 +115,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 		if (this.mode == END)
 		{
 			pm.popParser(true);
-			this.field.setValue(this.value);
+			this.consumer.setValue(this.value);
 			return;
 		}
 	}

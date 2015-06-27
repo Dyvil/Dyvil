@@ -1,14 +1,14 @@
 package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.access.FieldAssign;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.EmulatorParser;
@@ -18,7 +18,7 @@ import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class StatementListParser extends EmulatorParser implements IValued, ITyped
+public final class StatementListParser extends EmulatorParser implements IValueConsumer, ITypeConsumer
 {
 	private static final int	EXPRESSION	= 1;
 	private static final int	TYPE		= 2;
@@ -167,19 +167,5 @@ public final class StatementListParser extends EmulatorParser implements IValued
 	public void setType(IType type)
 	{
 		this.type = type;
-	}
-	
-	// ----- Ignore -----
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return null;
 	}
 }

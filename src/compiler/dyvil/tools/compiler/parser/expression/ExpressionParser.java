@@ -2,7 +2,11 @@ package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.member.Name;
@@ -11,7 +15,6 @@ import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -28,7 +31,7 @@ import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class ExpressionParser extends Parser implements ITyped, IValued
+public final class ExpressionParser extends Parser implements ITypeConsumer, IValueConsumer
 {
 	public static final int		VALUE				= 0x1;
 	public static final int		LIST_END			= 0x2;
@@ -50,7 +53,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	public static final int		PATTERN_IF			= 0x20000;
 	public static final int		PATTERN_END			= 0x40000;
 	
-	protected IValued			field;
+	protected IValueConsumer	field;
 	
 	private IValue				value;
 	
@@ -58,7 +61,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	private Operator			operator;
 	private boolean				prefix;
 	
-	public ExpressionParser(IValued field)
+	public ExpressionParser(IValueConsumer field)
 	{
 		this.mode = VALUE;
 		this.field = field;
@@ -241,10 +244,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			ConstructorCall cc = (ConstructorCall) this.value;
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
-				ClassConstructor cc2 = cc.toClassConstructor();
-				pm.pushParser(new ClassBodyParser(cc2.getNestedClass()));
-				this.mode = LIST_END;
-				this.value = cc2;
+				this.createBody(cc.toClassConstructor(), pm);
 				return;
 			}
 			
@@ -274,11 +274,7 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			this.mode = ACCESS;
 			if (token.next().type() == Symbols.OPEN_CURLY_BRACKET)
 			{
-				ClassConstructor cc = ((ConstructorCall) this.value).toClassConstructor();
-				pm.skip();
-				pm.pushParser(new ClassBodyParser(cc.getNestedClass()));
-				this.value = cc;
-				this.mode = LIST_END;
+				this.createBody(((ConstructorCall) this.value).toClassConstructor(), pm);
 				return;
 			}
 			this.value.expandPosition(token);
@@ -489,6 +485,16 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 			return;
 		}
 		throw new SyntaxError(token, "Invalid Expression - Invalid " + token);
+	}
+	
+	private void createBody(ClassConstructor cc, IParserManager pm)
+	{
+		IClass iclass = cc.getNestedClass();
+		IClassBody body = iclass.getBody();
+		pm.pushParser(new ClassBodyParser(iclass, body));
+		this.mode = LIST_END;
+		this.value = cc;
+		return;
 	}
 	
 	private IArguments getArguments(IParserManager pm, IToken next) throws SyntaxError
@@ -948,12 +954,6 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 	}
 	
 	@Override
-	public Type getType()
-	{
-		return null;
-	}
-	
-	@Override
 	public void setValue(IValue value)
 	{
 		if (this.mode == PATTERN_END)
@@ -964,11 +964,5 @@ public final class ExpressionParser extends Parser implements ITyped, IValued
 		{
 			this.value = value;
 		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

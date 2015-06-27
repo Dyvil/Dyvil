@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -12,7 +12,7 @@ import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class IfStatementParser extends Parser implements IValued
+public class IfStatementParser extends Parser implements IValueConsumer
 {
 	public static final int	IF				= 1;
 	public static final int	CONDITION_END	= 2;
@@ -114,11 +114,5 @@ public class IfStatementParser extends Parser implements IValued
 		{
 			this.statement.setElse(value);
 		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

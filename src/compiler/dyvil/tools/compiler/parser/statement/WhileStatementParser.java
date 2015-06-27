@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.statement.WhileStatement;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -11,7 +11,7 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class WhileStatementParser extends Parser implements IValued
+public final class WhileStatementParser extends Parser implements IValueConsumer
 {
 	public static final int		CONDITION		= 1;
 	public static final int		CONDITION_END	= 2;
@@ -85,11 +85,5 @@ public final class WhileStatementParser extends Parser implements IValued
 		{
 			this.statement.action = value;
 		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

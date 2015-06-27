@@ -7,6 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
@@ -16,7 +17,6 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.pattern.IPattern;
-import dyvil.tools.compiler.ast.pattern.IPatterned;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -34,7 +34,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-public final class CaseExpression extends ASTNode implements IValue, IValued, IPatterned, IClassCompilable, IContext
+public final class CaseExpression extends ASTNode implements IValue, IValued, IPatternConsumer, IClassCompilable, IContext
 {
 	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
 	public static final Type			PARTIALFUNCTION			= new Type(PARTIALFUNCTION_CLASS);
@@ -168,7 +168,6 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		this.pattern = pattern;
 	}
 	
-	@Override
 	public IPattern getPattern()
 	{
 		return this.pattern;

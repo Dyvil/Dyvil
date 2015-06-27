@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueMap;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -11,7 +11,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public class ExpressionMapParser extends Parser implements IValued
+public class ExpressionMapParser extends Parser implements IValueConsumer
 {
 	public static final int	NAME		= 1;
 	public static final int	VALUE		= 2;
@@ -78,11 +78,5 @@ public class ExpressionMapParser extends Parser implements IValued
 	{
 		this.valueMap.addValue(this.key, value);
 		this.key = null;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

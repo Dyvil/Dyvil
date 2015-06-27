@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.type;
 
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.generic.IBounded;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
@@ -26,15 +27,15 @@ public final class TypeParser extends Parser implements ITyped
 	public static final int	UPPER			= 1;
 	public static final int	LOWER			= 2;
 	
-	protected ITyped		typed;
+	protected ITypeConsumer	typed;
 	
 	private byte			boundMode;
 	
 	private IType			type;
 	
-	public TypeParser(ITyped typed)
+	public TypeParser(ITypeConsumer consumer)
 	{
-		this.typed = typed;
+		this.typed = consumer;
 		this.mode = NAME;
 	}
 	

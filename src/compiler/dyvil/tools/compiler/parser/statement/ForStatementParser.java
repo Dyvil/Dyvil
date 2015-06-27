@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Variable;
@@ -26,7 +27,7 @@ public class ForStatementParser extends Parser implements IValued
 	public static final int	STATEMENT		= 128;
 	public static final int	STATEMENT_END	= 256;
 	
-	public IValued			field;
+	public IValueConsumer	field;
 	
 	private Variable		variable;
 	private IValue			update;
@@ -34,7 +35,7 @@ public class ForStatementParser extends Parser implements IValued
 	private IValue			action;
 	private boolean			forEach;
 	
-	public ForStatementParser(IValued field)
+	public ForStatementParser(IValueConsumer field)
 	{
 		this.field = field;
 		this.mode = FOR;
