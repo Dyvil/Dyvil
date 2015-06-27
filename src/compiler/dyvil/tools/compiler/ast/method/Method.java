@@ -1130,7 +1130,7 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		mw.writeLocal(0, "this", this.theClass.getInternalName(), null, start, end);
+		mw.writeLocal(0, "this", 'L' + this.theClass.getInternalName() + ';', null, start, end);
 		
 		if (this.overrideMethod == null)
 		{

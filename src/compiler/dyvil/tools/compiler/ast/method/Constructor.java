@@ -693,7 +693,7 @@ public class Constructor extends Member implements IConstructor
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.writeLocal(0, "this", this.theClass.getInternalName(), null, start, end);
+			mw.writeLocal(0, "this", 'L' + this.theClass.getInternalName() + ';', null, start, end);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
