@@ -84,6 +84,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		
 		if (this.reportErrors(markers))
 		{
+			this.compilableList.clear();
+			this.innerClassList.clear();
 			return false;
 		}
 		
@@ -221,6 +223,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		this.currentClassName = "REPL" + classIndex++;
 		
 		REPLVariable var = new REPLVariable(field.getPosition(), field.getName(), field.getType(), field.getValue());
+		var.setAnnotations(field.getAnnotations(), field.annotationCount());
+		var.modifiers = field.getModifiers();
+		
 		if (this.computeVariable(var))
 		{
 			this.variables.put(var.name, var);
