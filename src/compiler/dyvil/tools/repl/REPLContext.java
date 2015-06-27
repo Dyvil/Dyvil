@@ -9,15 +9,20 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.external.ExternalClass;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
@@ -27,7 +32,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 
-public class REPLContext extends DyvilHeader implements IValued
+public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer
 {
 	private static final CodePosition	CODE_POSITION	= new CodePosition(1, 0, 1);
 	
@@ -67,16 +72,11 @@ public class REPLContext extends DyvilHeader implements IValued
 		return false;
 	}
 	
-	@Override
-	public void setValue(IValue value)
+	private boolean computeVariable(REPLVariable field)
 	{
-		MarkerList markers = new MarkerList();
 		this.currentClassName = "REPL" + classIndex++;
 		
-		Name name = Name.getQualified("res" + resultIndex);
-		REPLVariable field = new REPLVariable(CODE_POSITION, name, Types.UNKNOWN, value);
-		field.modifiers = Modifiers.FINAL;
-		
+		MarkerList markers = new MarkerList();
 		field.resolveTypes(markers, this);
 		field.resolve(markers, this);
 		field.checkTypes(markers, this);
@@ -84,7 +84,7 @@ public class REPLContext extends DyvilHeader implements IValued
 		
 		if (this.reportErrors(markers))
 		{
-			return;
+			return false;
 		}
 		
 		field.foldConstants();
@@ -107,21 +107,27 @@ public class REPLContext extends DyvilHeader implements IValued
 		
 		this.compilableList.clear();
 		this.innerClassList.clear();
+		return true;
+	}
+	
+	@Override
+	public void setValue(IValue value)
+	{
+		Name name = Name.getQualified("res" + resultIndex);
+		REPLVariable field = new REPLVariable(CODE_POSITION, name, Types.UNKNOWN, value);
+		field.modifiers = Modifiers.FINAL;
 		
-		if (field.getType() != Types.VOID)
+		if (this.computeVariable(field))
 		{
-			this.variables.put(name, field);
-			System.out.println(field.toString());
-			resultIndex++;
+			if (field.getType() != Types.VOID)
+			{
+				this.variables.put(field.name, field);
+				System.out.println(field.toString());
+				resultIndex++;
+			}
 		}
 	}
-
-	@Override
-	public IValue getValue()
-	{
-		return null;
-	}
-
+	
 	@Override
 	public void addOperator(Operator op)
 	{
@@ -183,6 +189,7 @@ public class REPLContext extends DyvilHeader implements IValued
 	@Override
 	public void addClass(IClass iclass)
 	{
+		MarkerList markers = new MarkerList();
 		iclass.resolveTypes(markers, this);
 		iclass.resolve(markers, this);
 		iclass.checkTypes(markers, this);
@@ -209,7 +216,37 @@ public class REPLContext extends DyvilHeader implements IValued
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public void addField(IField field)
+	{
+		this.currentClassName = "REPL" + classIndex++;
+		
+		REPLVariable var = new REPLVariable(field.getPosition(), field.getName(), field.getType(), field.getValue());
+		if (this.computeVariable(var))
+		{
+			this.variables.put(var.name, var);
+			System.out.println(var.toString());
+		}
+	}
+	
+	@Override
+	public void addProperty(IProperty property)
+	{
+		System.out.println(property);
+	}
+	
+	@Override
+	public void addMethod(IMethod method)
+	{
+		System.out.println(method);
+	}
+	
+	@Override
+	public void addConstructor(IConstructor constructor)
+	{
+	}
+	
+	@Override
+	public IDataMember resolveField(Name name)
 	{
 		IField f = this.variables.get(name);
 		if (f != null)

@@ -82,7 +82,7 @@ public class REPLVariable extends Field
 	
 	protected void compute(String className, List<IClassCompilable> compilableList)
 	{
-		if (this.className != null || isConstant(this.value) && !compilableList.isEmpty())
+		if (this.className != null || (this.isConstant() && !compilableList.isEmpty()))
 		{
 			return;
 		}
@@ -90,7 +90,7 @@ public class REPLVariable extends Field
 		try
 		{
 			this.className = className;
-			Class c = generateClass(this.value, this.type, this.className, compilableList);
+			Class c = this.generateClass(this.className, compilableList);
 			
 			if (this.type != Types.VOID)
 			{
@@ -128,8 +128,13 @@ public class REPLVariable extends Field
 			t.printStackTrace();
 		}
 	}
+
+	private boolean isConstant()
+	{
+		return (this.modifiers & Modifiers.FINAL) != 0 && isConstant(this.value);
+	}
 	
-	private static Class generateClass(IValue value, IType type, String className, List<IClassCompilable> compilableList) throws Throwable
+	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
 	{
 		String extendedType = type.getExtendedName();
 		ClassWriter writer = new ClassWriter();
@@ -139,7 +144,7 @@ public class REPLVariable extends Field
 		if (type != Types.VOID)
 		{
 			// Generate the field holding the value
-			writer.visitField(Modifiers.PUBLIC | Modifiers.FINAL | Modifiers.STATIC | Modifiers.SYNTHETIC, "value", extendedType, null, null);
+			writer.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, "value", extendedType, null, null);
 		}
 		
 		// Generate <clinit> static initializer
@@ -193,7 +198,7 @@ public class REPLVariable extends Field
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
-		if (isConstant(this.value))
+		if (this.isConstant())
 		{
 			this.value.writeExpression(writer);
 			return;
