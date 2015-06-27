@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -226,7 +226,7 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public byte getVisibility(IClassMember member)
 	{
 		return this.type.getArrayClass().getVisibility(member);
 	}

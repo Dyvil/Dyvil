@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -55,7 +55,7 @@ public interface IStaticContext extends IContext
 	}
 	
 	@Override
-	public default byte getVisibility(IMember member)
+	public default byte getVisibility(IClassMember member)
 	{
 		return 0;
 	}

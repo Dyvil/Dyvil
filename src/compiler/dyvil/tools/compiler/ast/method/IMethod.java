@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -19,7 +19,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 import org.objectweb.asm.Label;
 
-public interface IMethod extends IASTNode, IMember, IBaseMethod, IMethodSignature, IContext, IClassCompilable
+public interface IMethod extends IASTNode, IClassMember, IBaseMethod, IMethodSignature, IContext, IClassCompilable
 {
 	public int getSignatureMatch(Name name, IValue instance, IArguments arguments);
 	

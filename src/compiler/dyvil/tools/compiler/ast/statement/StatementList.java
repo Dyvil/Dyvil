@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -405,7 +405,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public byte getVisibility(IClassMember member)
 	{
 		return this.context.getVisibility(member);
 	}

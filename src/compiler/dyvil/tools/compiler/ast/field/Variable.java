@@ -122,18 +122,29 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public boolean isCaptureType()
+	public boolean isCapturable()
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean isReferenceType()
 	{
 		return this.refType != null;
 	}
 	
 	@Override
-	public IType getCaptureType(boolean init)
+	public void setReferenceType()
 	{
-		if (init && this.refType == null)
+		if (this.refType == null)
 		{
-			return this.refType = Types.getRefType(this.type);
+			this.refType = Types.getRefType(this.type);
 		}
+	}
+	
+	@Override
+	public IType getReferenceType()
+	{
 		return this.refType;
 	}
 	

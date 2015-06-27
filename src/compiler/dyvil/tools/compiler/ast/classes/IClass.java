@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -17,8 +17,14 @@ import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
-public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, IContext, IParameterized, ITypeList
+public interface IClass extends IASTNode, IClassCompilable, IClassMember, IGeneric, IContext, IParameterized, ITypeList
 {
+	@Override
+	public default IClass getTheClass()
+	{
+		return this;
+	}
+	
 	public void setUnit(IDyvilHeader unit);
 	
 	public IDyvilHeader getUnit();
@@ -75,7 +81,7 @@ public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, I
 	
 	public IMethod getSuperMethod(Name name, IParameter[] parameters, int parameterCount);
 	
-	public boolean isMember(IMember member);
+	public boolean isMember(IClassMember member);
 	
 	// Other Compilables (Lambda Expressions, ...)
 	

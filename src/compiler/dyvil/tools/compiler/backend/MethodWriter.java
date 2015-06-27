@@ -45,8 +45,6 @@ public interface MethodWriter
 	
 	public void writeLocal(int index, String name, String desc, String signature, Label start, Label end);
 	
-	public void writeLocal(int index, String name, IType type, Label start, Label end);
-	
 	// Constants
 	
 	public void writeLDC(int value);

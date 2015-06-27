@@ -266,7 +266,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 	{
 		if (this.arguments.size() == 1 && f.getType() == Types.INT && f.isVariable())
 		{
-			if (((IVariable) f).isCaptureType())
+			if (((IVariable) f).isReferenceType())
 			{
 				return false;
 			}

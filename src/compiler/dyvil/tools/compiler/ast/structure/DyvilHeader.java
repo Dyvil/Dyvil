@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -479,7 +479,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public byte getVisibility(IClassMember member)
 	{
 		return 0;
 	}

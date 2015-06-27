@@ -14,13 +14,32 @@ public interface IVariable extends IField
 	
 	public int getIndex();
 	
-	public default boolean isCaptureType()
+	public default boolean isCapturable()
 	{
 		return false;
 	}
 	
-	public default IType getCaptureType(boolean init)
+	public default boolean isReferenceType()
+	{
+		return false;
+	}
+	
+	public default void setReferenceType()
+	{
+	}
+	
+	public default IType getReferenceType()
 	{
 		return null;
+	}
+	
+	public default void appendDescription(StringBuilder buf)
+	{
+		buf.append(this.getDescription());
+	}
+	
+	public default void appendSignature(StringBuilder buf)
+	{
+		buf.append(this.getSignature());
 	}
 }

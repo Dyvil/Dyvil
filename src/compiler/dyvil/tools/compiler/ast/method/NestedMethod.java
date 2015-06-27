@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -148,7 +148,7 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public byte getVisibility(IClassMember member)
 	{
 		return this.context.getVisibility(member);
 	}
@@ -197,7 +197,7 @@ public class NestedMethod extends Method
 		{
 			CaptureVariable capture = this.capturedFields[i];
 			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getCaptureType(), 0);
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getReferenceType(), 0);
 		}
 		
 		index = 0;
@@ -222,13 +222,13 @@ public class NestedMethod extends Method
 		
 		if (this.thisClass != null)
 		{
-			mw.writeLocal(0, "this", this.theClass.getType(), start, end);
+			mw.writeLocal(0, "this", this.theClass.getInternalName(), null, start, end);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getType(), start, end);
+			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
 		}
 	}
 	
@@ -237,7 +237,7 @@ public class NestedMethod extends Method
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getCaptureType().getLoadOpcode(), var.variable.getIndex());
+			writer.writeVarInsn(var.getReferenceType().getLoadOpcode(), var.variable.getIndex());
 		}
 	}
 	

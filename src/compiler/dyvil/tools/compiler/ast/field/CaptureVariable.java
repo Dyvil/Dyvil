@@ -18,7 +18,7 @@ public class CaptureVariable implements IVariable
 {
 	public int			index;
 	public IVariable	variable;
-	private IType		refType;
+	public IType		type;
 	
 	public CaptureVariable()
 	{
@@ -27,7 +27,7 @@ public class CaptureVariable implements IVariable
 	public CaptureVariable(IVariable variable)
 	{
 		this.variable = variable;
-		this.refType = variable.getType();
+		this.type = variable.getType();
 	}
 	
 	@Override
@@ -58,11 +58,6 @@ public class CaptureVariable implements IVariable
 	public IType getType()
 	{
 		return this.variable.getType();
-	}
-	
-	public IType getCaptureType()
-	{
-		return this.refType != null ? this.refType : this.variable.getType();
 	}
 	
 	@Override
@@ -180,15 +175,21 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public boolean isCaptureType()
+	public boolean isReferenceType()
 	{
-		return this.refType != null;
+		return this.variable.isReferenceType();
 	}
 	
 	@Override
-	public IType getCaptureType(boolean init)
+	public void setReferenceType()
 	{
-		return this.refType != null ? this.refType : this.variable.getCaptureType(init);
+		this.variable.setReferenceType();
+	}
+	
+	@Override
+	public IType getReferenceType()
+	{
+		return this.variable.getReferenceType();
 	}
 	
 	@Override
@@ -200,7 +201,16 @@ public class CaptureVariable implements IVariable
 	@Override
 	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
 	{
-		this.refType = this.variable.getCaptureType(true);
+		if (!this.variable.isCapturable())
+		{
+			markers.add(position, "capture.variable", this.variable.getName());
+		}
+		else
+		{
+			this.variable.setReferenceType();
+			this.type = this.variable.getReferenceType();
+		}
+		
 		return this.variable.checkAssign(markers, position, instance, newValue);
 	}
 	
@@ -232,13 +242,13 @@ public class CaptureVariable implements IVariable
 	@Override
 	public String getDescription()
 	{
-		return this.refType.getExtendedName();
+		return this.type.getExtendedName();
 	}
 	
 	@Override
 	public String getSignature()
 	{
-		return this.refType.getSignature();
+		return this.type.getSignature();
 	}
 	
 	@Override

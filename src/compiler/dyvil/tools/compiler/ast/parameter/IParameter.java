@@ -7,6 +7,12 @@ import dyvil.tools.compiler.backend.MethodWriter;
 
 public interface IParameter extends IVariable
 {
+	@Override
+	public boolean isField();
+	
+	@Override
+	public boolean isVariable();
+	
 	public default void setVarargs(boolean varargs)
 	{
 		

@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.TypeVariableType;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -325,7 +325,7 @@ public class Type extends ASTNode implements IType
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public byte getVisibility(IClassMember member)
 	{
 		return this.theClass == null ? 0 : this.theClass.getVisibility(member);
 	}

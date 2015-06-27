@@ -7,7 +7,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
-import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -16,13 +15,11 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.ModifierTypes;
 
-public final class ClassParameter extends Member implements IParameter
+public final class ClassParameter extends Parameter
 {
 	public IClass	theClass;
 	
@@ -59,58 +56,9 @@ public final class ClassParameter extends Member implements IParameter
 		this.theClass = iclass;
 	}
 	
-	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		this.defaultValue = value;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.defaultValue;
-	}
-	
-	@Override
-	public void setIndex(int index)
-	{
-		this.index = index;
-	}
-	
-	@Override
-	public int getIndex()
-	{
-		return this.index;
-	}
-	
-	@Override
-	public void setVarargs(boolean varargs)
-	{
-		this.varargs = varargs;
-	}
-	
-	@Override
-	public boolean isVarargs()
-	{
-		return this.varargs;
-	}
-	
-	@Override
-	public String getDescription()
-	{
-		return this.type.getExtendedName();
-	}
-	
-	@Override
-	public String getSignature()
-	{
-		return this.type.getSignature();
 	}
 	
 	@Override
@@ -185,17 +133,6 @@ public final class ClassParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		super.resolveTypes(markers, context);
-		
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.resolveTypes(markers, context);
-		}
-	}
-	
-	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
@@ -230,17 +167,6 @@ public final class ClassParameter extends Member implements IParameter
 		if (this.type == Types.UNKNOWN)
 		{
 			markers.add(this.position, "classparameter.type.nodefault", this.name.unqualified);
-		}
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		super.checkTypes(markers, context);
-		
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.checkTypes(markers, context);
 		}
 	}
 	
@@ -321,35 +247,5 @@ public final class ClassParameter extends Member implements IParameter
 		}
 		
 		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].toString(prefix, buffer);
-			buffer.append(' ');
-		}
-		
-		buffer.append(ModifierTypes.FIELD.toString(this.modifiers));
-		
-		if (this.varargs)
-		{
-			this.type.getElementType().toString(prefix, buffer);
-			buffer.append("... ");
-		}
-		else
-		{
-			this.type.toString(prefix, buffer);
-			buffer.append(' ');
-		}
-		buffer.append(this.name);
-		
-		if (this.defaultValue != null)
-		{
-			buffer.append(Formatting.Field.keyValueSeperator);
-			this.defaultValue.toString(prefix, buffer);
-		}
 	}
 }

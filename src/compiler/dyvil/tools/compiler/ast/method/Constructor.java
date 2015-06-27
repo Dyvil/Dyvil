@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -473,7 +473,7 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public byte getVisibility(IClassMember member)
 	{
 		return this.theClass.getVisibility(member);
 	}
@@ -592,7 +592,7 @@ public class Constructor extends Member implements IConstructor
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getType().appendExtendedName(buffer);
+			this.parameters[i].appendDescription(buffer);
 		}
 		buffer.append(")V");
 		return buffer.toString();
@@ -610,7 +610,7 @@ public class Constructor extends Member implements IConstructor
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getType().appendSignature(buffer);
+			this.parameters[i].appendSignature(buffer);
 		}
 		buffer.append(")V");
 		return buffer.toString();
@@ -693,13 +693,13 @@ public class Constructor extends Member implements IConstructor
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.writeLocal(0, "this", this.theClass.getType(), start, end);
+			mw.writeLocal(0, "this", this.theClass.getInternalName(), null, start, end);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getType(), start, end);
+			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
 		}
 	}
 	

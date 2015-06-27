@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -306,7 +306,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public byte getVisibility(IClassMember member)
 	{
 		return this.context.getVisibility(member);
 	}
@@ -423,7 +423,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getCaptureType().getLoadOpcode(), var.variable.getIndex());
+			writer.writeVarInsn(var.getReferenceType().getLoadOpcode(), var.variable.getIndex());
 		}
 		
 		String name = this.name;
@@ -451,7 +451,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		}
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].getCaptureType().appendExtendedName(buffer);
+			this.capturedFields[i].getReferenceType().appendExtendedName(buffer);
 		}
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
@@ -482,7 +482,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		buffer.append('(');
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].getCaptureType().appendExtendedName(buffer);
+			this.capturedFields[i].getReferenceType().appendExtendedName(buffer);
 		}
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -510,7 +510,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		{
 			CaptureVariable capture = this.capturedFields[i];
 			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getCaptureType(), 0);
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getReferenceType(), 0);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

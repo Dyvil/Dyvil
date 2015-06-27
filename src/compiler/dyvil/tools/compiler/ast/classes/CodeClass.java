@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.TypeVariableType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -129,12 +129,6 @@ public class CodeClass extends ASTNode implements IClass
 	public IType getType()
 	{
 		return this.type;
-	}
-	
-	@Override
-	public IClass getTheClass()
-	{
-		return this;
 	}
 	
 	@Override
@@ -1106,7 +1100,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public boolean isMember(IMember member)
+	public boolean isMember(IClassMember member)
 	{
 		return this == member.getTheClass();
 	}
@@ -1118,7 +1112,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public byte getVisibility(IClassMember member)
 	{
 		IClass iclass = member.getTheClass();
 		if (iclass == this || iclass == null)

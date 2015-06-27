@@ -50,7 +50,6 @@ public final class CaptureField implements IVariable
 		return this.field.isVariable();
 	}
 	
-	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;

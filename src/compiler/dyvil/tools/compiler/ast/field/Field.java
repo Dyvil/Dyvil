@@ -7,6 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -24,7 +25,7 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 import org.objectweb.asm.FieldVisitor;
 
-public class Field extends Member implements IField
+public class Field extends Member implements IField, IClassMember
 {
 	protected IClass	theClass;
 	protected IValue	value;
@@ -277,7 +278,7 @@ public class Field extends Member implements IField
 		if ((this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
 		{
 			String desc = "()" + this.getDescription();
-			String signature = this.type.getSignature();
+			String signature = this.getSignature();
 			if (signature != null)
 			{
 				signature = "()" + signature;

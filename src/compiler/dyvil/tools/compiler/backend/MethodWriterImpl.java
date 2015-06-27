@@ -129,12 +129,6 @@ public final class MethodWriterImpl implements MethodWriter
 		this.mv.visitLocalVariable(name, desc, signature, start, end, index);
 	}
 	
-	@Override
-	public void writeLocal(int index, String name, IType type, Label start, Label end)
-	{
-		this.mv.visitLocalVariable(name, type.getExtendedName(), type.getSignature(), start, end, index);
-	}
-	
 	// Constants
 	
 	@Override

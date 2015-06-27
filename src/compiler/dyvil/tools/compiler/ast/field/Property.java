@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -64,6 +64,12 @@ public class Property extends Member implements IProperty, IContext
 	public ElementType getAnnotationType()
 	{
 		return ElementType.FIELD;
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		return this.theClass;
 	}
 	
 	@Override
@@ -413,7 +419,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public byte getVisibility(IClassMember member)
 	{
 		return this.theClass.getVisibility(member);
 	}

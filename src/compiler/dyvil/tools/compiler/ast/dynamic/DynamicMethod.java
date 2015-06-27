@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -46,6 +46,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	public DynamicMethod(Name name)
 	{
 		this.name = name;
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		return null;
 	}
 	
 	@Override
@@ -195,7 +201,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public byte getVisibility(IClassMember member)
 	{
 		return IContext.VISIBLE;
 	}
@@ -212,12 +218,6 @@ public class DynamicMethod extends ASTNode implements IMethod
 	
 	@Override
 	public ElementType getAnnotationType()
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass getTheClass()
 	{
 		return null;
 	}
