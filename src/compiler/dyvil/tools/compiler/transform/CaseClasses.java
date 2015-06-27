@@ -2,7 +2,7 @@ package dyvil.tools.compiler.transform;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -71,7 +71,7 @@ public interface CaseClasses
 		writer.writeInsn(IRETURN);
 	}
 	
-	public static void writeEquals(MethodWriter writer, IField field) throws BytecodeException
+	public static void writeEquals(MethodWriter writer, IDataMember field) throws BytecodeException
 	{
 		IType type = field.getType();
 		
@@ -195,7 +195,7 @@ public interface CaseClasses
 		int len = theClass.parameterCount();
 		for (int i = 0; i < len; i++)
 		{
-			IField field = theClass.getParameter(i);
+			IDataMember field = theClass.getParameter(i);
 			// Load the value of the field
 			writer.writeVarInsn(ALOAD, 0);
 			field.writeGet(writer, null);
@@ -352,7 +352,7 @@ public interface CaseClasses
 		int params = theClass.parameterCount();
 		for (int i = 0; i < params; i++)
 		{
-			IField field = theClass.getParameter(i);
+			IDataMember field = theClass.getParameter(i);
 			IType type = field.getType();
 			
 			// Get the field

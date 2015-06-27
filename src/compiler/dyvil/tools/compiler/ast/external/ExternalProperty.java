@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ExternalProperty extends Property
+public final class ExternalProperty extends Property
 {
 	private boolean	annotationsResolved;
 	private boolean	returnTypeResolved;

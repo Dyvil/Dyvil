@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ExternalField extends Field
+public final class ExternalField extends Field
 {
 	private boolean	annotationsResolved;
 	private boolean	returnTypeResolved;

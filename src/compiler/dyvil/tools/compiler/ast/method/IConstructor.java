@@ -17,7 +17,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public interface IConstructor extends IASTNode, IClassMember, IBaseMethod, ITypeList, IContext, IClassCompilable
+public interface IConstructor extends IASTNode, IClassMember, ICallableMember, ITypeList, IContext, IClassCompilable
 {
 	public int getSignatureMatch(IArguments arguments);
 	

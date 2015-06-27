@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -123,9 +123,9 @@ public class SwapOperator extends ASTNode implements IValue
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		IValue leftInstance = this.left.instance;
-		IField leftField = this.left.field;
+		IDataMember leftField = this.left.field;
 		IValue rightInstance = this.right.instance;
-		IField rightField = this.right.field;
+		IDataMember rightField = this.right.field;
 		
 		if (leftInstance != null)
 		{

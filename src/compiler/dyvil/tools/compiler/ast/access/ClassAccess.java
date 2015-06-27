@@ -4,7 +4,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -97,7 +97,7 @@ public final class ClassAccess extends ASTNode implements IValue
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		Name name = this.type.getName();
-		IField f = context.resolveField(name);
+		IDataMember f = context.resolveField(name);
 		if (f != null)
 		{
 			FieldAccess access = new FieldAccess(this.position);
@@ -174,7 +174,7 @@ public final class ClassAccess extends ASTNode implements IValue
 		IClass iclass = this.type.getTheClass();
 		if (iclass != null)
 		{
-			IField field = iclass.getMetadata().getInstanceField();
+			IDataMember field = iclass.getMetadata().getInstanceField();
 			if (field != null)
 			{
 				field.writeGet(writer, null);

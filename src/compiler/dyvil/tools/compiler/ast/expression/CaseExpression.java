@@ -8,7 +8,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -212,9 +212,9 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
-		IField f = this.pattern.resolveField(name);
+		IDataMember f = this.pattern.resolveField(name);
 		if (f != null)
 		{
 			return f;

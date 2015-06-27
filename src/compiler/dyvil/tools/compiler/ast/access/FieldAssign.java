@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -24,7 +24,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 	public IValue	instance;
 	public IValue	value;
 	
-	public IField	field;
+	public IDataMember	field;
 	
 	public FieldAssign(ICodePosition position)
 	{

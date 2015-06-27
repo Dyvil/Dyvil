@@ -5,7 +5,7 @@ import dyvil.lang.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -35,7 +35,7 @@ public interface IContext
 	
 	public ITypeVariable resolveTypeVariable(Name name);
 	
-	public IField resolveField(Name name);
+	public IDataMember resolveField(Name name);
 	
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
 	

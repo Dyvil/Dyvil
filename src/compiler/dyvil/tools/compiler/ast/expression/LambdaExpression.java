@@ -7,7 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.CaptureVariable;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
@@ -241,7 +241,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -252,7 +252,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			}
 		}
 		
-		IField match = this.context.resolveField(name);
+		IDataMember match = this.context.resolveField(name);
 		if (match != null && match.isVariable())
 		{
 			if (this.capturedFields == null)

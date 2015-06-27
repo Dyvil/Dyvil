@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -233,11 +232,6 @@ public final class Variable extends Member implements IVariable
 		return this.type.getSignature();
 	}
 	
-	@Override
-	public void write(ClassWriter writer)
-	{
-	}
-	
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
 		IType type = this.refType != null ? this.refType : this.type;
@@ -286,7 +280,7 @@ public final class Variable extends Member implements IVariable
 			writer.writeVarInsn(Opcodes.ALOAD, this.index);
 			
 			IClass c = this.refType.getTheClass();
-			IField f = c.getBody().getField(0);
+			IDataMember f = c.getBody().getField(0);
 			f.writeGet(writer, null);
 			
 			if (c == Types.OBJECT_REF_CLASS)
@@ -319,7 +313,7 @@ public final class Variable extends Member implements IVariable
 				writer.writeInsn(Opcodes.AUTO_SWAP);
 			}
 			
-			IField f = this.refType.getTheClass().getBody().getField(0);
+			IDataMember f = this.refType.getTheClass().getBody().getField(0);
 			f.writeSet(writer, null, null);
 			return;
 		}

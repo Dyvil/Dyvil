@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.field;
 
 import dyvil.tools.compiler.ast.type.IType;
 
-public interface IVariable extends IField
+public interface IVariable extends IDataMember
 {
 	@Override
 	public default boolean isVariable()

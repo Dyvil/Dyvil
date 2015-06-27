@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.field;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -11,7 +10,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public interface IField extends IASTNode, IMember, IClassCompilable, IValued
+public interface IDataMember extends IASTNode, IMember, IValued
 {
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context);
 	

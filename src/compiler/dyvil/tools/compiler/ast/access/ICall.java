@@ -4,7 +4,7 @@ import dyvil.lang.List;
 
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -49,9 +49,9 @@ public interface ICall extends IValue
 		}
 	}
 	
-	public static IField resolveField(IContext context, ITyped instance, Name name)
+	public static IDataMember resolveField(IContext context, ITyped instance, Name name)
 	{
-		IField match;
+		IDataMember match;
 		if (instance != null)
 		{
 			IType type = instance.getType();

@@ -19,7 +19,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 import org.objectweb.asm.Label;
 
-public interface IMethod extends IASTNode, IClassMember, IBaseMethod, IMethodSignature, IContext, IClassCompilable
+public interface IMethod extends IASTNode, IClassMember, ICallableMember, IMethodSignature, IContext, IClassCompilable
 {
 	public int getSignatureMatch(Name name, IValue instance, IArguments arguments);
 	

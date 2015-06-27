@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -119,11 +119,11 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			IField f = this.patterns[i].resolveField(name);
+			IDataMember f = this.patterns[i].resolveField(name);
 			if (f != null)
 			{
 				return f;

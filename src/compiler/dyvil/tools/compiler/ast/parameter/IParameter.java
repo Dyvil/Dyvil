@@ -2,11 +2,19 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.method.IBaseMethod;
+import dyvil.tools.compiler.ast.member.IClassCompilable;
+import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.backend.MethodWriter;
 
-public interface IParameter extends IVariable
+public interface IParameter extends IVariable, IClassMember, IClassCompilable
 {
+	@Override
+	public default IClass getTheClass()
+	{
+		return null;
+	}
+	
 	@Override
 	public boolean isField();
 	
@@ -27,7 +35,7 @@ public interface IParameter extends IVariable
 	{
 	}
 	
-	public default void setMethod(IBaseMethod method)
+	public default void setMethod(ICallableMember method)
 	{
 	}
 	

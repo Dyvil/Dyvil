@@ -17,11 +17,11 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class CaptureField implements IVariable
+public final class CaptureField implements IField
 {
 	public IClass	theClass;
 	public String	name;
-	public IField	field;
+	public IDataMember	field;
 	private IType	type;
 	
 	public CaptureField(IClass iclass)
@@ -29,7 +29,7 @@ public final class CaptureField implements IVariable
 		this.theClass = iclass;
 	}
 	
-	public CaptureField(IClass iclass, IField field)
+	public CaptureField(IClass iclass, IDataMember field)
 	{
 		this.theClass = iclass;
 		this.field = field;
@@ -50,6 +50,7 @@ public final class CaptureField implements IVariable
 		return this.field.isVariable();
 	}
 	
+	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;
@@ -186,17 +187,6 @@ public final class CaptureField implements IVariable
 	public IValue getValue()
 	{
 		return this.field.getValue();
-	}
-	
-	@Override
-	public void setIndex(int index)
-	{
-	}
-	
-	@Override
-	public int getIndex()
-	{
-		return 0;
 	}
 	
 	@Override

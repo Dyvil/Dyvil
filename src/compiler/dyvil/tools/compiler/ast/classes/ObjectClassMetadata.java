@@ -4,6 +4,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -24,7 +25,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public IField getInstanceField()
+	public IDataMember getInstanceField()
 	{
 		return this.instanceField;
 	}
@@ -61,7 +62,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		if (this.instanceField != null && name == Name.instance)
 		{

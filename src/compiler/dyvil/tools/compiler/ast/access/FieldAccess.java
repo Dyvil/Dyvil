@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -29,7 +29,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 	
 	public boolean	dotless;
 	
-	public IField	field;
+	public IDataMember	field;
 	
 	public FieldAccess(ICodePosition position)
 	{
@@ -127,7 +127,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 	
 	protected IValue resolveFieldAccess(IContext context)
 	{
-		IField field = ICall.resolveField(context, this.instance, this.name);
+		IDataMember field = ICall.resolveField(context, this.instance, this.name);
 		if (field != null)
 		{
 			if (field.isEnumConstant())

@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -249,11 +248,6 @@ public class CaptureVariable implements IVariable
 	public String getSignature()
 	{
 		return this.type.getSignature();
-	}
-	
-	@Override
-	public void write(ClassWriter writer) throws BytecodeException
-	{
 	}
 	
 	@Override

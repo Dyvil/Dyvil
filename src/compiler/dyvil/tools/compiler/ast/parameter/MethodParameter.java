@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.parameter;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.IBaseMethod;
+import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -17,7 +17,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class MethodParameter extends Parameter
 {
-	public IBaseMethod	method;
+	public ICallableMember	method;
 	
 	public MethodParameter()
 	{
@@ -47,7 +47,7 @@ public final class MethodParameter extends Parameter
 	}
 	
 	@Override
-	public void setMethod(IBaseMethod method)
+	public void setMethod(ICallableMember method)
 	{
 		this.method = method;
 	}

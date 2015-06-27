@@ -10,7 +10,7 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -29,7 +29,7 @@ public final class SimpleImport extends Import
 	private IClass			theClass;
 	private Package			thePackage;
 	
-	private IField			field;
+	private IDataMember			field;
 	private List<IMethod>	methods;
 	
 	public SimpleImport(ICodePosition position)
@@ -80,7 +80,7 @@ public final class SimpleImport extends Import
 			
 			IClassBody body = ((IClass) context).getBody();
 			
-			IField field = body.getField(this.name);
+			IDataMember field = body.getField(this.name);
 			if (field != null)
 			{
 				this.field = field;
@@ -150,7 +150,7 @@ public final class SimpleImport extends Import
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		if (name == this.name || name == this.alias)
 		{

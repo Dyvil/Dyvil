@@ -5,7 +5,7 @@ import dyvil.lang.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -203,11 +203,11 @@ public final class WildcardType extends BaseBounded implements IType
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
-			IField f = this.upperBounds[i].resolveField(name);
+			IDataMember f = this.upperBounds[i].resolveField(name);
 			if (f != null)
 			{
 				return f;

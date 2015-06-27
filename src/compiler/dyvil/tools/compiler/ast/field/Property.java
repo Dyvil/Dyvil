@@ -277,7 +277,7 @@ public class Property extends Member implements IProperty, IContext
 	
 	private void checkOverride(MarkerList markers)
 	{
-		IField f = this.theClass.getSuperType().resolveField(this.name);
+		IDataMember f = this.theClass.getSuperType().resolveField(this.name);
 		if (f == null)
 		{
 			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
@@ -385,7 +385,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		if (name == this.name)
 		{

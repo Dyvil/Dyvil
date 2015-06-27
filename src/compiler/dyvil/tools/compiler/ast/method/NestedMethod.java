@@ -6,7 +6,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.CaptureVariable;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -86,7 +86,7 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -97,7 +97,7 @@ public class NestedMethod extends Method
 			}
 		}
 		
-		IField match = this.context.resolveField(name);
+		IDataMember match = this.context.resolveField(name);
 		if (match == null)
 		{
 			return null;

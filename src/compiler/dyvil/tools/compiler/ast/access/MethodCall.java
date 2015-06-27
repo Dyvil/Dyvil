@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -157,7 +157,7 @@ public final class MethodCall extends AbstractCall implements INamed
 		IMethod method;
 		IType type = null;
 		
-		IField field = context.resolveField(this.name);
+		IDataMember field = context.resolveField(this.name);
 		if (field == null)
 		{
 			// Find a type

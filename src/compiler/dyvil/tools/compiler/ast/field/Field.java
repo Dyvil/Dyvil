@@ -7,7 +7,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
@@ -25,7 +24,7 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 import org.objectweb.asm.FieldVisitor;
 
-public class Field extends Member implements IField, IClassMember
+public class Field extends Member implements IField
 {
 	protected IClass	theClass;
 	protected IValue	value;

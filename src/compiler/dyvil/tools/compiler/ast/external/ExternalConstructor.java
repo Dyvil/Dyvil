@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ExternalConstructor extends Constructor
+public final class ExternalConstructor extends Constructor
 {
 	private boolean	annotationsResolved;
 	private boolean	returnTypeResolved;

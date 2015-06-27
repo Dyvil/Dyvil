@@ -9,7 +9,7 @@ import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
@@ -431,11 +431,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.usingCount; i++)
 		{
-			IField field = this.usings[i].resolveField(name);
+			IDataMember field = this.usings[i].resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -444,7 +444,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			IField field = this.includes[i].getHeader().resolveField(name);
+			IDataMember field = this.includes[i].getHeader().resolveField(name);
 			if (field != null)
 			{
 				return field;

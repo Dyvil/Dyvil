@@ -4,7 +4,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.IBaseMethod;
+import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
 
@@ -14,9 +14,9 @@ import org.objectweb.asm.MethodVisitor;
 
 public final class SimpleMethodVisitor extends MethodVisitor
 {
-	private final IBaseMethod	method;
+	private final ICallableMember	method;
 	
-	public SimpleMethodVisitor(IBaseMethod method)
+	public SimpleMethodVisitor(ICallableMember method)
 	{
 		super(DyvilCompiler.asmVersion);
 		this.method = method;

@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.access;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.INumericValue;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
@@ -178,7 +178,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 		if (i == FIELD_ACCESS)
 		{
 			FieldAccess access = (FieldAccess) this.instance;
-			IField f = access.field;
+			IDataMember f = access.field;
 			
 			if (this.writeIINC(writer, f))
 			{
@@ -225,7 +225,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 		if (i == FIELD_ACCESS)
 		{
 			FieldAccess access = (FieldAccess) this.instance;
-			IField f = access.field;
+			IDataMember f = access.field;
 			
 			if (this.writeIINC(writer, f))
 			{
@@ -262,7 +262,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 		}
 	}
 	
-	private boolean writeIINC(MethodWriter writer, IField f) throws BytecodeException
+	private boolean writeIINC(MethodWriter writer, IDataMember f) throws BytecodeException
 	{
 		if (this.arguments.size() == 1 && f.getType() == Types.INT && f.isVariable())
 		{

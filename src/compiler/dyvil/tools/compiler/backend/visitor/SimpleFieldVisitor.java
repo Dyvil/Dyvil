@@ -2,7 +2,7 @@ package dyvil.tools.compiler.backend.visitor;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
 
@@ -11,9 +11,9 @@ import org.objectweb.asm.FieldVisitor;
 
 public class SimpleFieldVisitor extends FieldVisitor
 {
-	private IField	field;
+	private IDataMember	field;
 	
-	public SimpleFieldVisitor(IField field)
+	public SimpleFieldVisitor(IDataMember field)
 	{
 		super(DyvilCompiler.asmVersion);
 		this.field = field;

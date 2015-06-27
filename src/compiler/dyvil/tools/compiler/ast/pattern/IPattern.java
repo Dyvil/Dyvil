@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.tools.compiler.ast.IASTNode;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -74,7 +74,7 @@ public interface IPattern extends IASTNode, ITyped
 	@Override
 	public boolean isType(IType type);
 	
-	public default IField resolveField(Name name)
+	public default IDataMember resolveField(Name name)
 	{
 		return null;
 	}

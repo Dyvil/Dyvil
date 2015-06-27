@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.statement.foreach;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
@@ -51,7 +51,7 @@ public class IterableForStatement extends ForEachStatement
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		if (name == this.variable.name)
 		{

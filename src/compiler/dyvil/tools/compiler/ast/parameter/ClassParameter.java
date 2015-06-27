@@ -7,6 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -19,7 +20,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ClassParameter extends Parameter
+public final class ClassParameter extends Parameter implements IField
 {
 	public IClass	theClass;
 	
@@ -56,6 +57,7 @@ public final class ClassParameter extends Parameter
 		this.theClass = iclass;
 	}
 	
+	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;

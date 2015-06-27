@@ -8,7 +8,7 @@ import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -116,11 +116,11 @@ public final class MultiImport extends Import implements IImportList
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			IField match = this.imports[i].resolveField(name);
+			IDataMember match = this.imports[i].resolveField(name);
 			if (match != null)
 			{
 				return match;

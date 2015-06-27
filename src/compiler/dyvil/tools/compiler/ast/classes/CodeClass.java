@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.TypeVariableType;
@@ -946,7 +947,7 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -960,7 +961,7 @@ public class CodeClass extends ASTNode implements IClass
 		if (this.body != null)
 		{
 			// Own properties
-			IField field = this.body.getProperty(name);
+			IDataMember field = this.body.getProperty(name);
 			if (field != null)
 			{
 				return field;
@@ -974,7 +975,7 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		IField match = this.metadata.resolveField(name);
+		IDataMember match = this.metadata.resolveField(name);
 		if (match != null)
 		{
 			return match;
@@ -1327,7 +1328,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		this.metadata.write(writer, instanceFields);
 		
-		IField instanceField = this.metadata.getInstanceField();
+		IDataMember instanceField = this.metadata.getInstanceField();
 		if (instanceField != null)
 		{
 			FieldAssign assign = new FieldAssign(null);

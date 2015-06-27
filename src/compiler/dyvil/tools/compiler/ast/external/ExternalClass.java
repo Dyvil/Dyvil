@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -327,7 +327,7 @@ public final class ExternalClass extends CodeClass
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		if (!this.genericsResolved)
 		{
@@ -335,7 +335,7 @@ public final class ExternalClass extends CodeClass
 		}
 		
 		// Own properties
-		IField field = this.body.getProperty(name);
+		IDataMember field = this.body.getProperty(name);
 		if (field != null)
 		{
 			return field;
@@ -356,7 +356,7 @@ public final class ExternalClass extends CodeClass
 		// Inherited Fields
 		if (this.superType != null)
 		{
-			IField match = this.superType.resolveField(name);
+			IDataMember match = this.superType.resolveField(name);
 			if (match != null)
 			{
 				return match;

@@ -56,7 +56,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer, IAnn
 	private Annotation[]			annotations		= new Annotation[2];
 	private int						annotationCount;
 	
-	private IMember member;
+	private IMember					member;
 	
 	public ClassBodyParser(IClass theClass, IClassBodyConsumer consumer)
 	{
@@ -131,6 +131,12 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer, IAnn
 			}
 			if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
 			{
+				if (this.theClass == null)
+				{
+					this.mode = 0;
+					throw new SyntaxError(token, "Cannot define a class in this context");
+				}
+				
 				CodeClass codeClass = new CodeClass(null, this.theClass.getUnit(), this.modifiers);
 				codeClass.setAnnotations(this.getAnnotations(), this.annotationCount);
 				codeClass.setOuterClass(this.theClass);

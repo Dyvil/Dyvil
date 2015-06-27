@@ -7,7 +7,7 @@ import java.util.Set;
 import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -20,11 +20,11 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IClassMetadata
 {
-	public default void setInstanceField(IField field)
+	public default void setInstanceField(IDataMember field)
 	{
 	}
 	
-	public default IField getInstanceField()
+	public default IDataMember getInstanceField()
 	{
 		return null;
 	}
@@ -57,7 +57,7 @@ public interface IClassMetadata
 	
 	public void checkTypes(MarkerList markers, IContext context);
 	
-	public default IField resolveField(Name name)
+	public default IDataMember resolveField(Name name)
 	{
 		return null;
 	}
