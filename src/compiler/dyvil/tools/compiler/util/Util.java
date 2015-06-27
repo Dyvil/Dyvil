@@ -9,12 +9,40 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class Util
 {
+	public static void propertySignatureToString(IProperty property, StringBuilder buf)
+	{
+		buf.append(ModifierTypes.FIELD.toString(property.getModifiers()));
+		property.getType().toString("", buf);
+		buf.append(' ').append(property.getName());
+	}
+	
+	public static void methodSignatureToString(IMethod method, StringBuilder buf)
+	{
+		buf.append(ModifierTypes.METHOD.toString(method.getModifiers()));
+		method.getType().toString("", buf);
+		buf.append(' ').append(method.getName()).append('(');
+		
+		int params = method.parameterCount();
+		if (params > 0)
+		{
+			method.getParameter(0).getType().toString("", buf);
+			for (int i = 1; i < params; i++)
+			{
+				buf.append(", ");
+				method.getParameter(i).getType().toString("", buf);
+			}
+		}
+		
+		buf.append(')');
+	}
+	
 	public static void astToString(String prefix, Collection list, String seperator, StringBuilder buffer)
 	{
 		if (!list.isEmpty())

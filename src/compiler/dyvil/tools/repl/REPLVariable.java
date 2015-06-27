@@ -1,7 +1,5 @@
 package dyvil.tools.repl;
 
-import java.security.ProtectionDomain;
-
 import dyvil.lang.List;
 
 import dyvil.reflect.Modifiers;
@@ -26,9 +24,6 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class REPLVariable extends Field
 {
-	private static final ClassLoader		CLASS_LOADER		= REPLVariable.class.getClassLoader();
-	private static final ProtectionDomain	PROTECTION_DOMAIN	= REPLVariable.class.getProtectionDomain();
-	
 	protected String						className;
 	
 	public REPLVariable(ICodePosition position, Name name, IType type, IValue value)
@@ -80,8 +75,10 @@ public class REPLVariable extends Field
 		return tag >= 0 && tag != IValue.NIL && tag <= IValue.STRING;
 	}
 	
-	protected void compute(String className, List<IClassCompilable> compilableList)
+	protected void compute(String className)
 	{
+		List<IClassCompilable> compilableList = DyvilREPL.context.compilableList;
+		
 		if (this.className != null || (this.isConstant() && !compilableList.isEmpty()))
 		{
 			return;
@@ -182,7 +179,7 @@ public class REPLVariable extends Field
 		if (type != Types.VOID || !compilableList.isEmpty())
 		{
 			// The type contains the value, so we have to keep the class loaded.
-			return ReflectUtils.unsafe.defineClass(className, bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
+			return REPLMemberClass.loadClass(className, bytes);
 		}
 		// We don't have any variables, so we can throw the Class away after
 		// it has been loaded.
