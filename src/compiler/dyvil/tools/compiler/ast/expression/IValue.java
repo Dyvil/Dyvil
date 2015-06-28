@@ -121,6 +121,11 @@ public interface IValue extends IASTNode, ITyped
 	
 	public static IValue autoBox(IValue value, IType valueType, IType targetType)
 	{
+		if (!targetType.isSuperTypeOf(valueType))
+		{
+			return null;
+		}
+		
 		boolean primitive = valueType.isPrimitive();
 		if (primitive != targetType.isPrimitive())
 		{

@@ -95,6 +95,17 @@ public final class GenericData implements ITypeList, ITypeContext
 	@Override
 	public void addMapping(ITypeVariable typeVar, IType type)
 	{
+		int index = typeVar.getIndex();
+		if (index >= this.genericCount)
+		{
+			this.genericCount = index + 1;
+		}
+		if (index >= this.generics.length)
+		{
+			IType[] temp = new IType[index + 1];
+			System.arraycopy(this.generics, 0, temp, 0, this.generics.length);
+			this.generics = temp;
+		}
 		this.generics[typeVar.getIndex()] = type;
 	}
 	

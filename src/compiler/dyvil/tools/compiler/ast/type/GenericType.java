@@ -115,9 +115,50 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 	}
 	
 	@Override
+	public boolean equals(IType type)
+	{
+		if (this == type)
+		{
+			return true;
+		}
+		
+		if (!IType.super.equals(type))
+		{
+			return false;
+		}
+		
+		return this.argumentsMatch(type);
+	}
+	
+	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return IType.super.isSuperTypeOf(type);
+		if (this == type)
+		{
+			return true;
+		}
+		
+		if (!IType.super.isSuperTypeOf(type))
+		{
+			return false;
+		}
+		
+		return this.argumentsMatch(type);
+	}
+	
+	protected boolean argumentsMatch(IType type)
+	{
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			ITypeVariable typeVar = this.theClass.getTypeVariable(i);
+			IType otherType = type.resolveType(typeVar);
+			if (!this.typeArguments[i].equals(otherType))
+			{
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	@Override

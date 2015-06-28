@@ -82,7 +82,7 @@ public final class WildcardType extends BaseBounded implements IType
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return super.isSuperTypeOf(type);
+		return this.equals(type);
 	}
 	
 	@Override

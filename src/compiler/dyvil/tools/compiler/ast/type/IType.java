@@ -122,6 +122,11 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	 */
 	public default boolean isSuperTypeOf(IType type)
 	{
+		if (this == type)
+		{
+			return true;
+		}
+		
 		IClass thisClass = this.getTheClass();
 		if (thisClass == Types.OBJECT_CLASS)
 		{
@@ -137,7 +142,7 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		{
 			return thatClass == thisClass || thatClass.isSubTypeOf(this);
 		}
-		return false;
+		return type.equals(this);
 	}
 	
 	public default boolean isSuperTypeOf2(IType type)
