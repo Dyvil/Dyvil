@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -52,18 +51,6 @@ public class NullType implements IType
 	
 	@Override
 	public IType resolve(MarkerList markers, IContext context)
-	{
-		return this;
-	}
-	
-	@Override
-	public boolean hasTypeVariables()
-	{
-		return false;
-	}
-	
-	@Override
-	public IType getConcreteType(ITypeContext context)
 	{
 		return this;
 	}

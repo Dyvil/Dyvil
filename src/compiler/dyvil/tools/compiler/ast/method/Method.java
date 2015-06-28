@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
@@ -751,10 +752,7 @@ public class Method extends Member implements IMethod
 				genericData.instanceType = instance.getType();
 			}
 			
-			for (int i = 0; i < this.genericCount; i++)
-			{
-				genericData.generics[i] = this.inferType(this.generics[i], instance, arguments);
-			}
+			this.inferTypes(genericData, instance, arguments);
 			
 			return genericData;
 		}
@@ -765,10 +763,7 @@ public class Method extends Member implements IMethod
 		}
 		
 		genericData.setTypeCount(this.genericCount);
-		for (int i = genericData.typeCount(); i < this.genericCount; i++)
-		{
-			genericData.generics[i] = this.inferType(this.generics[i], instance, arguments);
-		}
+		this.inferTypes(genericData, instance, arguments);
 		
 		return genericData;
 	}
@@ -877,43 +872,44 @@ public class Method extends Member implements IMethod
 		return instance;
 	}
 	
-	private IType inferType(ITypeVariable typeVar, IValue instance, IArguments arguments)
+	private void inferTypes(GenericData genericData, IValue instance, IArguments arguments)
 	{
-		IType type;
 		int len = arguments.size();
 		IParameter param;
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			type = this.parameters[0].getType().resolveType(typeVar, instance.getType());
-			if (type != null)
-			{
-				return type;
-			}
+			this.parameters[0].getType().inferTypes(instance.getType(), genericData);
 			
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i + 1];
-				type = param.getType().resolveType(typeVar, arguments.getType(i, param));
-				if (type != null)
-				{
-					return type;
-				}
+				param.getType().inferTypes(arguments.getType(i, param), genericData);
 			}
-			
-			return Types.ANY;
 		}
-		
-		len = Math.min(this.parameterCount, len);
-		for (int i = 0; i < len; i++)
+		else
 		{
-			param = this.parameters[i];
-			type = param.getType().resolveType(typeVar, arguments.getType(i, param));
-			if (type != null)
+			len = Math.min(this.parameterCount, len);
+			for (int i = 0; i < len; i++)
 			{
-				return type;
+				param = this.parameters[i];
+				param.getType().inferTypes(arguments.getType(i, param), genericData);
 			}
 		}
-		return Types.ANY;
+	}
+	
+	// TODO Call me somewhere in RESOLVE
+	private void checkTypeVarsInferred(MarkerList markers, ITypeContext typeContext)
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			ITypeVariable typeVar = this.generics[i];
+			IType type = typeContext.resolveType(typeVar);
+			if (type == null || (type.typeTag() == IType.TYPE_VAR_TYPE && ((TypeVarType) type).typeVar == typeVar))
+			{
+				markers.add(position, "method.typevar.infer", this.name, typeVar.getName());
+				typeContext.addMapping(typeVar, Types.ANY);
+			}
+		}
 	}
 	
 	@Override

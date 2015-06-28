@@ -40,6 +40,7 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	
 	int	TUPLE				= 16;
 	int	LAMBDA				= 17;
+	int	LAMBDA_TEMP			= 18;
 	
 	int	GENERIC				= 32;
 	int	TYPE_VAR_TYPE		= 33;
@@ -173,7 +174,10 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	 * 
 	 * @return
 	 */
-	public boolean hasTypeVariables();
+	public default boolean hasTypeVariables()
+	{
+		return false;
+	}
 	
 	/**
 	 * Returns a copy of this type with all type variables replaced.
@@ -182,12 +186,17 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	 *            the type variables
 	 * @return
 	 */
-	public IType getConcreteType(ITypeContext context);
+	public default IType getConcreteType(ITypeContext context)
+	{
+		return this;
+	}
 	
 	/**
-	 * Returns the type argument in this generic type for the given type variable.
+	 * Returns the type argument in this generic type for the given type
+	 * variable.
 	 * <p>
 	 * Example:<br>
+	 * 
 	 * <pre>
 	 * GenericType gt = type[List[String]]
 	 * ITypeVariable tv = type[List].getTypeVariable("E")
@@ -201,9 +210,12 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	}
 	
 	/**
-	 * Returns the type argument in this generic type for the given type variable, where this is the template containing the type variable types and {@code concrete} contains the concrete types.
+	 * Returns the type argument in this generic type for the given type
+	 * variable, where this is the template containing the type variable types
+	 * and {@code concrete} contains the concrete types.
 	 * <p>
 	 * Example:<br>
+	 * 
 	 * <pre>
 	 * GenericType gt1 = type[List].genericType // => List[E]
 	 * GenericType gt2 = type[List[String]]
@@ -214,6 +226,10 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	public default IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
 		return null;
+	}
+	
+	public default void inferTypes(IType concrete, ITypeContext typeContext)
+	{
 	}
 	
 	// IContext

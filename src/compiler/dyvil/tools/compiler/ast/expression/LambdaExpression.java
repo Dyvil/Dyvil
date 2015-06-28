@@ -7,11 +7,13 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.MapTypeContext;
 import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -24,6 +26,7 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.ast.type.LambdaType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -45,6 +48,9 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
 															+ "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodHandle;"
 															+ "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
+	
+	private static final IType	LAMBDA_RETURN	= new InternalType("`lambda-return`");
+	
 	public IParameter[]			parameters;
 	public int					parameterCount;
 	public IValue				value;
@@ -142,22 +148,79 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			this.type = lt;
 			return lt;
 		}
-		if (this.type.hasTypeVariables())
-		{
-			return this.type = this.type.getConcreteType(this);
-		}
 		return this.type;
 	}
 	
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.isType(type))
+		if (!this.isType(type))
 		{
-			this.type = type;
-			return this;
+			return null;
 		}
-		return null;
+		
+		this.type = type;
+		this.method = type.getFunctionalMethod();
+		
+		if (this.method != null)
+		{
+			if (this.method.hasTypeVariables())
+			{
+				for (int i = 0; i < this.parameterCount; i++)
+				{
+					IParameter param = this.parameters[i];
+					IType parType = param.getType();
+					if (parType == null)
+					{
+						parType = this.method.getParameter(i).getType();
+					}
+					param.setType(parType.getConcreteType(this.type));
+				}
+				
+				this.returnType = this.method.getType().getConcreteType(this.type);
+			}
+			else
+			{
+				for (int i = 0; i < this.parameterCount; i++)
+				{
+					IParameter param = this.parameters[i];
+					if (param.getType() == null)
+					{
+						param.setType(this.method.getParameter(i).getType());
+					}
+				}
+				
+				this.returnType = this.method.getType();
+			}
+			
+			this.context = context;
+			this.value = this.value.resolve(markers, this);
+			
+			IValue value1 = this.value.withType(this.returnType, typeContext, markers, this);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(this.value.getPosition(), "lambda.type");
+				marker.addInfo("Method Return Type: " + this.returnType);
+				marker.addInfo("Value Type: " + this.value.getType());
+			}
+			else
+			{
+				this.value = value1;
+			}
+			
+			this.returnType = this.value.getType();
+			
+			this.context = null;
+			
+			ITypeContext tempContext = new MapTypeContext();
+			this.method.getType().inferTypes(this.returnType, tempContext);
+			IType type1 = this.method.getTheClass().getType().getConcreteType(tempContext);
+			
+			type.inferTypes(type1, typeContext);
+			this.type = type.getConcreteType(typeContext);
+		}
+		
+		return this;
 	}
 	
 	@Override
@@ -319,7 +382,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return Types.ANY;
+		return new TypeVarType(typeVar);
 	}
 	
 	@Override
@@ -347,60 +410,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.context = context;
-		
-		if (this.method != null)
-		{
-			if (this.method.hasTypeVariables())
-			{
-				for (int i = 0; i < this.parameterCount; i++)
-				{
-					IParameter param = this.parameters[i];
-					IType type = param.getType();
-					if (type == null)
-					{
-						type = this.method.getParameter(i).getType();
-					}
-					param.setType(type.getConcreteType(this.type));
-				}
-				
-				this.returnType = this.method.getType().getConcreteType(this.type);
-			}
-			else
-			{
-				for (int i = 0; i < this.parameterCount; i++)
-				{
-					IParameter param = this.parameters[i];
-					if (param.getType() == null)
-					{
-						param.setType(this.method.getParameter(i).getType());
-					}
-				}
-				
-				this.returnType = this.method.getType();
-			}
-			
-			this.value = this.value.resolve(markers, this);
-			IValue value1 = this.value.withType(this.returnType, null, markers, context);
-			if (value1 == null)
-			{
-				Marker marker = markers.create(this.value.getPosition(), "lambda.type");
-				marker.addInfo("Method Return Type: " + this.returnType);
-				marker.addInfo("Value Type: " + this.value.getType());
-			}
-			else
-			{
-				this.value = value1;
-			}
-		}
-		else
-		{
-			this.value = this.value.resolve(markers, this);
-			this.returnType = this.value.getType();
-			this.method = this.getType().getFunctionalMethod();
-		}
-		
 		this.value.checkTypes(markers, this);
-		
 		this.context = null;
 	}
 	

@@ -77,16 +77,6 @@ public final class TypeVarType implements IType
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
-	{
-		if (this.typeVar == typeVar)
-		{
-			return concrete.getReferenceType();
-		}
-		return null;
-	}
-	
-	@Override
 	public boolean hasTypeVariables()
 	{
 		return true;
@@ -112,6 +102,24 @@ public final class TypeVarType implements IType
 		return this;
 	}
 	
+	@Override
+	public IType resolveType(ITypeVariable typeVar)
+	{
+		return this.typeVar == typeVar ? this : null;
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	{
+		return this.typeVar == typeVar ? concrete : this;
+	}
+	
+	@Override
+	public void inferTypes(IType concrete, ITypeContext typeContext)
+	{
+		typeContext.addMapping(this.typeVar, concrete);
+	}
+
 	@Override
 	public boolean isResolved()
 	{

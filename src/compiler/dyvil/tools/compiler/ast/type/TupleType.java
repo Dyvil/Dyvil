@@ -215,7 +215,34 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return null;
+		return null; // FIXME
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	{
+		return null; // FIXME
+	}
+	
+	@Override
+	public void inferTypes(IType concrete, ITypeContext typeContext)
+	{
+		int typeTag = concrete.typeTag();
+		if (typeTag != GENERIC && typeTag != TUPLE)
+		{
+			return;
+		}
+		
+		ITypeList typeList = (ITypeList) concrete;
+		if (typeList.typeCount() != this.typeCount)
+		{
+			return;
+		}
+		
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].inferTypes(typeList.getType(i), typeContext);
+		}
 	}
 	
 	@Override

@@ -92,6 +92,12 @@ public final class GenericData implements ITypeList, ITypeContext
 		return this.instanceType.resolveType(typeVar);
 	}
 	
+	@Override
+	public void addMapping(ITypeVariable typeVar, IType type)
+	{
+		this.generics[typeVar.getIndex()] = type;
+	}
+	
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.typeCount(); i++)

@@ -129,6 +129,15 @@ public final class WildcardType extends BaseBounded implements IType
 	}
 	
 	@Override
+	public void inferTypes(IType concrete, ITypeContext typeContext)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].inferTypes(concrete, typeContext);
+		}
+	}
+	
+	@Override
 	public boolean hasTypeVariables()
 	{
 		return false;

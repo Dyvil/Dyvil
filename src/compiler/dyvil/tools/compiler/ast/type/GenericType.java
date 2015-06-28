@@ -133,13 +133,24 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 	}
 	
 	@Override
+	public IType getConcreteType(ITypeContext context)
+	{
+		GenericType copy = this.clone();
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			copy.typeArguments[i] = this.typeArguments[i].getConcreteType(context);
+		}
+		return copy;
+	}
+	
+	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
 		if (typeVar.getGeneric() != this.theClass)
 		{
 			if (this.theClass == null)
 			{
-				return Types.ANY;
+				return null;
 			}
 			return this.theClass.resolveType(typeVar, this);
 		}
@@ -149,36 +160,47 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
-		if (!concrete.isGenericType())
+		IType type;
+		if (concrete.typeTag() != GENERIC)
 		{
 			return null;
 		}
 		
-		IType type;
-		if (this.equals(concrete))
+		GenericType gt = (GenericType) concrete;
+		if (gt.typeArgumentCount != this.typeArgumentCount)
 		{
-			IType[] generics = ((GenericType) concrete).typeArguments;
-			for (int i = 0; i < this.typeArgumentCount; i++)
+			return null;
+		}
+		
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			type = this.typeArguments[i].resolveType(typeVar, gt.typeArguments[i]);
+			if (type != null)
 			{
-				type = this.typeArguments[i].resolveType(typeVar, generics[i]);
-				if (type != null)
-				{
-					return type;
-				}
+				return type;
 			}
 		}
 		return null;
 	}
 	
 	@Override
-	public IType getConcreteType(ITypeContext context)
+	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		GenericType copy = this.clone();
+		if (concrete.typeTag() != GENERIC)
+		{
+			return;
+		}
+		
+		GenericType gt = (GenericType) concrete;
+		if (gt.typeArgumentCount != this.typeArgumentCount)
+		{
+			return;
+		}
+		
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			copy.typeArguments[i] = this.typeArguments[i].getConcreteType(context);
+			this.typeArguments[i].inferTypes(gt.typeArguments[i], typeContext);
 		}
-		return copy;
 	}
 	
 	@Override

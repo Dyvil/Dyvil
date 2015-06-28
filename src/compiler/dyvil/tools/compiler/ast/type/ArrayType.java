@@ -167,6 +167,15 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
+	public void inferTypes(IType concrete, ITypeContext typeContext)
+	{
+		if (concrete.isArrayType())
+		{
+			this.type.inferTypes(concrete.getElementType(), typeContext);
+		}
+	}
+	
+	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;

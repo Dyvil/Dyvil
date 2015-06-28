@@ -188,7 +188,7 @@ public abstract class BaseBounded implements IASTNode, IBounded, ITypeList
 			
 			// Check if the remaining upper bounds are interfaces, and remove if
 			// not.
-			for (int i = 0; i < this.upperBoundCount; i++)
+			for (int i = 1; i < this.upperBoundCount; i++)
 			{
 				type = this.upperBounds[i] = this.upperBounds[i].resolve(markers, context);
 				iclass = type.getTheClass();

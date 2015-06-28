@@ -56,7 +56,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public int typeTag()
 	{
-		return 0;
+		return LAMBDA;
 	}
 	
 	@Override
@@ -163,35 +163,51 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
-		int tag = concrete.typeTag();
-		if (tag == GENERIC || tag == LAMBDA)
+		if (concrete.typeTag() != LAMBDA)
 		{
-			ITypeList typeList = (ITypeList) concrete;
-			
-			for (int i = 0; i < this.parameterCount; i++)
-			{
-				IType concreteType = typeList.getType(i);
-				IType type = this.parameterTypes[i].resolveType(typeVar, concreteType);
-				if (type != null)
-				{
-					return type;
-				}
-			}
-			
-			IType returnType;
-			if (tag == LAMBDA)
-			{
-				returnType = ((LambdaType) concrete).returnType;
-			}
-			else
-			{
-				returnType = ((GenericType) concrete).getType(this.parameterCount);
-			}
-			
-			return this.returnType.resolveType(typeVar, returnType);
+			return null;
 		}
 		
-		return null;
+		LambdaType lambdaType = (LambdaType) concrete;
+		if (lambdaType.parameterCount != this.parameterCount)
+		{
+			return null;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IType concreteType = lambdaType.parameterTypes[i];
+			IType type = this.parameterTypes[i].resolveType(typeVar, concreteType);
+			if (type != null)
+			{
+				return type;
+			}
+		}
+		
+		return this.returnType.resolveType(typeVar, lambdaType.returnType);
+	}
+	
+	@Override
+	public void inferTypes(IType concrete, ITypeContext typeContext)
+	{
+		if (concrete.typeTag() != LAMBDA)
+		{
+			return;
+		}
+		
+		LambdaType lambdaType = (LambdaType) concrete;
+		if (lambdaType.parameterCount != this.parameterCount)
+		{
+			return;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IType concreteType = lambdaType.parameterTypes[i];
+			this.parameterTypes[i].inferTypes(concreteType, typeContext);
+		}
+		
+		this.returnType.inferTypes(lambdaType.returnType, typeContext);
 	}
 	
 	@Override
