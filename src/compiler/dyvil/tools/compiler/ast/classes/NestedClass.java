@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.classes;
 
 import dyvil.lang.List;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.CaptureField;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -12,7 +13,6 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 
 public class NestedClass extends CodeClass

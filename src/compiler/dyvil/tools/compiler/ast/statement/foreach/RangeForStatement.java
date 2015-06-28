@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.statement.foreach;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.ForStatement;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;

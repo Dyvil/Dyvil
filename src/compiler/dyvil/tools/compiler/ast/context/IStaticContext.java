@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.structure;
+package dyvil.tools.compiler.ast.context;
 
 import dyvil.lang.List;
 
@@ -11,6 +11,8 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 
 public interface IStaticContext extends IContext

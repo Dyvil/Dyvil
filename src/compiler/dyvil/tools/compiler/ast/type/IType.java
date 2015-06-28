@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -17,7 +18,6 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -184,12 +184,33 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	 */
 	public IType getConcreteType(ITypeContext context);
 	
+	/**
+	 * Returns the type argument in this generic type for the given type variable.
+	 * <p>
+	 * Example:<br>
+	 * <pre>
+	 * GenericType gt = type[List[String]]
+	 * ITypeVariable tv = type[List].getTypeVariable("E")
+	 * gt.resolveType(tv) // => String
+	 * </pre>
+	 */
 	@Override
 	public default IType resolveType(ITypeVariable typeVar)
 	{
 		return null;
 	}
 	
+	/**
+	 * Returns the type argument in this generic type for the given type variable, where this is the template containing the type variable types and {@code concrete} contains the concrete types.
+	 * <p>
+	 * Example:<br>
+	 * <pre>
+	 * GenericType gt1 = type[List].genericType // => List[E]
+	 * GenericType gt2 = type[List[String]]
+	 * ITypeVariable tv = type[List].getTypeVariable("E")
+	 * gt1.resolveType(tv, gt2) // => String
+	 * </pre>
+	 */
 	public default IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
 		return null;

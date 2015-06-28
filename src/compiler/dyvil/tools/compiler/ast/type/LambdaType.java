@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;

@@ -4,6 +4,7 @@ import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -14,7 +15,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer

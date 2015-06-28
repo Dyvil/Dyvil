@@ -4,6 +4,7 @@ import java.util.Map;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
