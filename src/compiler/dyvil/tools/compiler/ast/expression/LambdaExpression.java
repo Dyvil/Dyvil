@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -38,7 +39,7 @@ import dyvil.tools.compiler.util.Util;
 
 import org.objectweb.asm.Handle;
 
-public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IContext
+public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IContext, ITypeContext
 {
 	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
@@ -131,15 +132,19 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	{
 		if (this.type == null)
 		{
-			LambdaType lt = new LambdaType();
+			LambdaType lt = new LambdaType(this.parameterCount);
 			for (int i = 0; i < this.parameterCount; i++)
 			{
 				IType t = this.parameters[i].getType();
-				lt.addType(t == null ? Types.UNKNOWN : t);
+				lt.addType(t == null ? Types.ANY : t);
 			}
-			lt.returnType = this.value.getType();
+			lt.setType(this.returnType != null ? this.returnType : (this.returnType = this.value.getType()));
 			this.type = lt;
 			return lt;
+		}
+		if (this.type.hasTypeVariables())
+		{
+			return this.type = this.type.getConcreteType(this);
 		}
 		return this.type;
 	}
@@ -312,6 +317,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
+	public IType resolveType(ITypeVariable typeVar)
+	{
+		return Types.ANY;
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
@@ -383,7 +394,9 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		}
 		else
 		{
-			markers.add(this.position, "lambda.method");
+			this.value = this.value.resolve(markers, this);
+			this.returnType = this.value.getType();
+			this.method = this.getType().getFunctionalMethod();
 		}
 		
 		this.value.checkTypes(markers, this);

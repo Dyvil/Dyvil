@@ -1,8 +1,20 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.lang.List;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -10,20 +22,22 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
 
-public final class LambdaType extends ClassType implements ITyped, ITypeList
+public final class LambdaType implements IType, ITyped, ITypeList
 {
 	public static final IClass[]	functionClasses	= new IClass[22];
 	
-	public IType					returnType;
-	protected IType[]				parameterTypes	= new IType[2];
+	protected IType					returnType;
+	protected IType[]				parameterTypes;
 	protected int					parameterCount;
 	
 	public LambdaType()
 	{
+		parameterTypes = new IType[2];
 	}
 	
 	public LambdaType(IType type)
 	{
+		this.parameterTypes = new IType[1];
 		this.parameterTypes[0] = type;
 		this.parameterCount = 1;
 	}
@@ -32,6 +46,23 @@ public final class LambdaType extends ClassType implements ITyped, ITypeList
 	{
 		this.parameterTypes = tupleType.types;
 		this.parameterCount = tupleType.typeCount;
+	}
+	
+	public LambdaType(int typeCount)
+	{
+		parameterTypes = new IType[typeCount];
+	}
+	
+	@Override
+	public int typeTag()
+	{
+		return 0;
+	}
+	
+	@Override
+	public Name getName()
+	{
+		return this.getTheClass().getName();
 	}
 	
 	@Override
@@ -51,7 +82,7 @@ public final class LambdaType extends ClassType implements ITyped, ITypeList
 	@Override
 	public int typeCount()
 	{
-		return 0;
+		return this.parameterCount;
 	}
 	
 	@Override
@@ -84,22 +115,89 @@ public final class LambdaType extends ClassType implements ITyped, ITypeList
 	@Override
 	public IClass getTheClass()
 	{
-		if (this.theClass != null)
-		{
-			return this.theClass;
-		}
-		
 		IClass iclass = functionClasses[this.parameterCount];
 		if (iclass != null)
 		{
-			this.theClass = iclass;
 			return iclass;
 		}
 		
 		iclass = Package.dyvilFunction.resolveClass("Function" + this.parameterCount);
 		functionClasses[this.parameterCount] = iclass;
-		this.theClass = iclass;
 		return iclass;
+	}
+	
+	@Override
+	public boolean hasTypeVariables()
+	{
+		return false;
+	}
+	
+	@Override
+	public IType getConcreteType(ITypeContext context)
+	{
+		LambdaType lt = new LambdaType(this.parameterCount);
+		lt.parameterCount = this.parameterCount;
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			lt.parameterTypes[i] = this.parameterTypes[i].getConcreteType(context);
+		}
+		lt.returnType = this.returnType.getConcreteType(context);
+		return lt;
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IType t = this.parameterTypes[i].resolveType(typeVar);
+			if (t != null)
+			{
+				return t;
+			}
+		}
+		
+		return this.returnType.resolveType(typeVar);
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	{
+		int tag = concrete.typeTag();
+		if (tag == GENERIC || tag == LAMBDA)
+		{
+			ITypeList typeList = (ITypeList) concrete;
+			
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				IType concreteType = typeList.getType(i);
+				IType type = this.parameterTypes[i].resolveType(typeVar, concreteType);
+				if (type != null)
+				{
+					return type;
+				}
+			}
+			
+			IType returnType;
+			if (tag == LAMBDA)
+			{
+				returnType = ((LambdaType) concrete).returnType;
+			}
+			else
+			{
+				returnType = ((GenericType) concrete).getType(this.parameterCount);
+			}
+			
+			return this.returnType.resolveType(typeVar, returnType);
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return true;
 	}
 	
 	@Override
@@ -113,6 +211,35 @@ public final class LambdaType extends ClassType implements ITyped, ITypeList
 		}
 		this.returnType = this.returnType.resolve(markers, context);
 		return this;
+	}
+	
+	@Override
+	public IDataMember resolveField(Name name)
+	{
+		return null;
+	}
+	
+	@Override
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	{
+		this.getTheClass().getMethodMatches(list, instance, name, arguments);
+	}
+	
+	@Override
+	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	{
+	}
+	
+	@Override
+	public byte getVisibility(IClassMember member)
+	{
+		return 0;
+	}
+	
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		return this.getTheClass().getFunctionalMethod();
 	}
 	
 	@Override
@@ -131,6 +258,40 @@ public final class LambdaType extends ClassType implements ITyped, ITypeList
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/FunctionType", "apply", "([Ldyvil/lang/Type;)Ldyvil/reflect/type/FunctionType;", false);
+	}
+	
+	@Override
+	public String getInternalName()
+	{
+		return "dyvil/function/Function" + this.parameterCount;
+	}
+	
+	@Override
+	public void appendExtendedName(StringBuilder buffer)
+	{
+		buffer.append("Ldyvil/function/Function").append(this.parameterCount).append(';');
+	}
+	
+	@Override
+	public void appendSignature(StringBuilder buffer)
+	{
+		buffer.append("Ldyvil/function/Function").append(this.parameterCount).append('<');
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameterTypes[i].appendSignature(buffer);
+		}
+		this.returnType.appendSignature(buffer);
+		buffer.append(">;");
+	}
+	
+	@Override
+	public IType clone()
+	{
+		LambdaType lt = new LambdaType(this.parameterCount);
+		lt.parameterCount = this.parameterCount;
+		System.arraycopy(this.parameterTypes, 0, lt.parameterTypes, 0, parameterCount);
+		lt.returnType = this.returnType;
+		return lt;
 	}
 	
 	@Override

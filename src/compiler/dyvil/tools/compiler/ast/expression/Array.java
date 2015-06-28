@@ -72,11 +72,6 @@ public final class Array extends ASTNode implements IValue, IValueList
 	@Override
 	public IType getType()
 	{
-		if (this.valueCount == 0)
-		{
-			return Types.VOID;
-		}
-		
 		if (this.requiredType != null)
 		{
 			return this.requiredType;
@@ -85,8 +80,8 @@ public final class Array extends ASTNode implements IValue, IValueList
 		int len = this.valueCount;
 		if (len == 0)
 		{
-			this.elementType = Types.UNKNOWN;
-			return this.requiredType = Types.UNKNOWN;
+			this.elementType = Types.ANY;
+			return this.requiredType = new ArrayType(Types.ANY);
 		}
 		
 		IType t = this.values[0].getType();
