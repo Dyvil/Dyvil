@@ -251,7 +251,7 @@ public class ForStatement implements IStatement, IContext, ILoop
 		}
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN, null, markers, context);
 			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "for.condition.type");

@@ -7,6 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -121,38 +122,53 @@ public final class Array extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType arrayType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!type.isArrayType())
+		if (!arrayType.isArrayType())
 		{
-			IClass iclass = type.getTheClass();
+			IClass iclass = arrayType.getTheClass();
 			if (iclass == Types.OBJECT_CLASS || iclass == null)
 			{
 				return this;
 			}
 			if (iclass.getAnnotation(ARRAY_CONVERTIBLE) != null)
 			{
-				return new LiteralExpression(type, this);
+				return new LiteralExpression(arrayType, this);
 			}
 			
 			return null;
 		}
 		
 		// If the type is an array type, get it's element type
-		IType type1 = type.getElementType();
+		IType elementType = arrayType.getElementType();
 		
 		// Check for every value if it is the element type
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			if (!this.values[i].isType(type1))
-			{
-				// If not, this is not the type
+		for (int i = 0; i < this.valueCount; i++) {
+			if (!this.values[i].isType(elementType)) {
 				return null;
 			}
 		}
 		
-		this.elementType = type1;
-		this.requiredType = type;
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			IValue value = this.values[i];
+			IValue value1 = value.withType(elementType, typeContext, markers, context);
+			
+			if (value1 == null)
+			{
+				Marker marker = markers.create(value.getPosition(), "array.element.type");
+				marker.addInfo("Array Type: " + this.requiredType);
+				marker.addInfo("Array Element Type: " + value.getType());
+			}
+			else
+			{
+				value = value1;
+				this.values[i] = value1;
+			}
+		}
+		
+		this.elementType = elementType;
+		this.requiredType = arrayType;
 		return this;
 	}
 	
@@ -311,24 +327,9 @@ public final class Array extends ASTNode implements IValue, IValueList
 			}
 		}
 		
-		IType type = this.elementType;
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue value = this.values[i];
-			IValue value1 = value.withType(type);
-			
-			if (value1 == null)
-			{
-				Marker marker = markers.create(value.getPosition(), "array.element.type");
-				marker.addInfo("Array Type: " + this.requiredType);
-				marker.addInfo("Array Element Type: " + value.getType());
-			}
-			else
-			{
-				value = value1;
-				this.values[i] = value1;
-			}
-			value.checkTypes(markers, context);
+			this.values[i].checkTypes(markers, context);
 		}
 	}
 	

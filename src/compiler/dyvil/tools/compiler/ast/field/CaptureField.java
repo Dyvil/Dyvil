@@ -208,9 +208,9 @@ public final class CaptureField implements IField
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		return this.field.checkAssign(markers, position, instance, newValue);
+		return this.field.checkAssign(markers, context, position, instance, newValue);
 	}
 	
 	@Override

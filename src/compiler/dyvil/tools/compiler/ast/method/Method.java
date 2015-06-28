@@ -403,7 +403,7 @@ public class Method extends Member implements IMethod
 				return;
 			}
 			
-			IValue value1 = this.value.withType(this.type);
+			IValue value1 = this.value.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.position, "method.type", this.name.unqualified);
@@ -783,7 +783,7 @@ public class Method extends Member implements IMethod
 		{
 			IParameter par = this.parameters[0];
 			parType = par.getType().getConcreteType(typeContext);
-			IValue instance1 = instance.withType(parType);
+			IValue instance1 = instance.withType(parType, typeContext, markers, context);
 			if (instance1 == null)
 			{
 				Marker marker = markers.create(instance.getPosition(), "method.access.infix_type", par.getName());
@@ -797,26 +797,26 @@ public class Method extends Member implements IMethod
 			
 			if ((this.modifiers & Modifiers.VARARGS) != 0)
 			{
-				arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1], markers, typeContext);
+				arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1], typeContext, markers, context);
 				
 				for (int i = 0; i < this.parameterCount - 2; i++)
 				{
-					arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
+					arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
 				}
 				return instance;
 			}
 			
 			for (int i = 0; i < this.parameterCount - 1; i++)
 			{
-				arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
+				arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
 			}
 			return instance;
 		}
 		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			parType = this.theClass.getType();
+			parType = this.theClass.getType().getConcreteType(typeContext);
 			instance = arguments.getFirstValue();
-			IValue instance1 = instance.withType(parType);
+			IValue instance1 = instance.withType(parType, typeContext, markers, context);
 			if (instance1 == null)
 			{
 				Marker marker = markers.create(instance.getPosition(), "method.access.prefix_type", this.name);
@@ -842,7 +842,7 @@ public class Method extends Member implements IMethod
 			}
 			else if (this.intrinsicOpcodes == null && instance.isPrimitive())
 			{
-				instance = instance.withType(this.theClass.getType());
+				instance = instance.withType(this.theClass.getType().getConcreteType(typeContext), typeContext, markers, context);
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -861,18 +861,18 @@ public class Method extends Member implements IMethod
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], markers, typeContext);
+			arguments.checkVarargsValue(len, this.parameters[len], typeContext, markers, null);
 			
 			for (int i = 0; i < len; i++)
 			{
-				arguments.checkValue(i, this.parameters[i], markers, typeContext);
+				arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
 			}
 			return instance;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			arguments.checkValue(i, this.parameters[i], markers, typeContext);
+			arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
 		}
 		return instance;
 	}

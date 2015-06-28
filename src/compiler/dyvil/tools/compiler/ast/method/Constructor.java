@@ -256,6 +256,17 @@ public class Constructor extends Member implements IConstructor
 		if (this.value != null)
 		{
 			this.value = this.value.resolve(markers, this);
+			
+			IValue value1 = this.value.withType(Types.VOID, null, markers, context);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(this.position, "constructor.return");
+				marker.addInfo("Expression Type: " + this.value.getType());
+			}
+			else
+			{
+				this.value = value1;
+			}
 		}
 	}
 	
@@ -335,17 +346,6 @@ public class Constructor extends Member implements IConstructor
 			}
 			
 			return;
-		}
-		
-		IValue value1 = this.value.withType(Types.VOID);
-		if (value1 == null)
-		{
-			Marker marker = markers.create(this.position, "constructor.return");
-			marker.addInfo("Expression Type: " + this.value.getType());
-		}
-		else
-		{
-			this.value = value1;
 		}
 		
 		this.value.checkTypes(markers, this);
@@ -548,18 +548,18 @@ public class Constructor extends Member implements IConstructor
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], markers, this.type);
+			arguments.checkVarargsValue(len, this.parameters[len], this.type, markers, context);
 			
 			for (int i = 0; i < len; i++)
 			{
-				arguments.checkValue(i, this.parameters[i], markers, this.type);
+				arguments.checkValue(i, this.parameters[i], this.type, markers, context);
 			}
 			return;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			arguments.checkValue(i, this.parameters[i], markers, this.type);
+			arguments.checkValue(i, this.parameters[i], this.type, markers, context);
 		}
 	}
 	

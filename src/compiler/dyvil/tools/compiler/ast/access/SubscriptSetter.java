@@ -47,8 +47,10 @@ public class SubscriptSetter extends AbstractCall
 		this.arguments.resolve(markers, context);
 		
 		IMethod m = ICall.resolveMethod(context, instance, Name.subscript_$eq, arguments);
-		if (m != null) {
+		if (m != null)
+		{
 			this.method = m;
+			this.checkArguments(markers, context);
 			return this;
 		}
 		

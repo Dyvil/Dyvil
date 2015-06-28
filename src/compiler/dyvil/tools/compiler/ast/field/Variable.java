@@ -98,14 +98,14 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
 		if ((this.modifiers & Modifiers.FINAL) != 0)
 		{
 			markers.add(position, "variable.assign.final", this.name.unqualified);
 		}
 		
-		IValue value1 = newValue.withType(this.type);
+		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
@@ -178,7 +178,7 @@ public final class Variable extends Member implements IVariable
 			return;
 		}
 		
-		IValue value1 = this.value.withType(this.type);
+		IValue value1 = this.value.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.position, "variable.type", this.name.unqualified);

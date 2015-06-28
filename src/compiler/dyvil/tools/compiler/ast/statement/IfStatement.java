@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -98,14 +99,14 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.then == null)
 		{
 			return null;
 		}
 		
-		IValue then1 = this.then.withType(type);
+		IValue then1 = this.then.withType(type, typeContext, markers, context);
 		if (then1 == null)
 		{
 			return null;
@@ -114,7 +115,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		
 		if (this.elseThen != null)
 		{
-			then1 = this.elseThen.withType(type);
+			then1 = this.elseThen.withType(type, typeContext, markers, context);
 			if (then1 == null)
 			{
 				return null;
@@ -201,7 +202,7 @@ public final class IfStatement extends ASTNode implements IStatement
 	{
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN, null, markers, context);
 			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "if.condition.type");

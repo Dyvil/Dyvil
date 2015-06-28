@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -44,7 +45,7 @@ public final class ThrowStatement implements IValue, IValued
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return this;
 	}
@@ -77,7 +78,7 @@ public final class ThrowStatement implements IValue, IValued
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IValue value1 = this.value.withType(Types.THROWABLE);
+		IValue value1 = this.value.withType(Types.THROWABLE, null, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.value.getPosition(), "throw.type");

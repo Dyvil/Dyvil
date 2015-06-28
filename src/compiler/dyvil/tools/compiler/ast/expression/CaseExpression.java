@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -37,7 +38,7 @@ import org.objectweb.asm.MethodVisitor;
 public final class CaseExpression extends ASTNode implements IValue, IValued, IPatternConsumer, IClassCompilable, IContext
 {
 	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
-	public static final ClassType			PARTIALFUNCTION			= new ClassType(PARTIALFUNCTION_CLASS);
+	public static final ClassType		PARTIALFUNCTION			= new ClassType(PARTIALFUNCTION_CLASS);
 	public static final ITypeVariable	PAR_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(0);
 	public static final ITypeVariable	RETURN_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(1);
 	
@@ -110,11 +111,14 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.isType(type))
 		{
 			this.type = type;
+			
+			IType type1 = this.type.resolveType(RETURN_TYPE);
+			this.value = this.value.withType(type1, typeContext, markers, context);
 			return this;
 		}
 		return null;
@@ -270,6 +274,10 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 	public CaseExpression resolve(MarkerList markers, IContext context)
 	{
 		this.context = context;
+		if (this.pattern != null)
+		{
+			this.pattern.resolve(markers, context);
+		}
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, this);
@@ -277,18 +285,6 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		if (this.value != null)
 		{
 			this.value = this.value.resolve(markers, this);
-		}
-		this.context = null;
-		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		this.context = context;
-		if (this.condition != null)
-		{
-			this.condition.checkTypes(markers, this);
 		}
 		
 		if (this.type != Types.UNKNOWN)
@@ -298,22 +294,29 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 				this.getType();
 			}
 			
-			IContext.addCompilable(context, this);
-			
-			if (this.pattern != null)
-			{
-				this.pattern.resolve(markers, context);
-				IType type1 = this.type.resolveType(PAR_TYPE);
-				this.pattern = this.pattern.withType(type1);
-				this.pattern.checkTypes(markers, context);
-			}
-			if (this.value != null)
-			{
-				IType type1 = this.type.resolveType(RETURN_TYPE);
-				this.value = this.value.withType(type1);
-			}
+			IType type1 = this.type.resolveType(PAR_TYPE);
+			this.pattern = this.pattern.withType(type1);
 		}
 		
+		this.context = null;
+		return this;
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		IContext.addCompilable(context, this);
+		
+		this.context = context;
+		
+		if (this.condition != null)
+		{
+			this.condition.checkTypes(markers, this);
+		}		
+		if (this.pattern != null)
+		{
+			this.pattern.checkTypes(markers, context);
+		}
 		if (this.value != null)
 		{
 			this.value.checkTypes(markers, this);

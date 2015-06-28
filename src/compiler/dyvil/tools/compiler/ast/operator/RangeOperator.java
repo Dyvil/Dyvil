@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.statement.foreach.IterableForStatement;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -16,9 +17,9 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 public class RangeOperator implements IValue
 {
 	public static final IClass			RANGE_CLASS		= Package.dyvilLang.resolveClass("Range");
-	public static final ClassType			RANGE			= new ClassType(RANGE_CLASS);
+	public static final ClassType		RANGE			= new ClassType(RANGE_CLASS);
 	public static final IClass			ORDERED_CLASS	= Package.dyvilLang.resolveClass("Ordered");
-	public static final ClassType			ORDERED			= new ClassType(ORDERED_CLASS);
+	public static final ClassType		ORDERED			= new ClassType(ORDERED_CLASS);
 	private static final ITypeVariable	ORDERED_TYPE	= ORDERED_CLASS.getTypeVariable(0);
 	
 	public IValue						value1;
@@ -61,12 +62,9 @@ public class RangeOperator implements IValue
 			}
 			
 			GenericType gt = new GenericType(RANGE_CLASS);
-			
 			if (this.elementType.isPrimitive())
 			{
 				this.elementType = this.elementType.getReferenceType();
-				this.value1 = this.value1.withType(this.elementType);
-				this.value2 = this.value2.withType(this.elementType);
 			}
 			gt.addType(this.elementType);
 			this.type = gt;
@@ -84,33 +82,45 @@ public class RangeOperator implements IValue
 		return this.value1.isType(elementType) && this.value2.isType(elementType);
 	}
 	
-	private IValue withElementType(IType type, IType elementType)
+	private IValue withElementType(IType type, IType elementType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!this.value1.isType(elementType))
+		IValue value1 = this.value1.withType(elementType, typeContext, markers, context);
+		if (value1 == null)
 		{
-			return null;
+			// TODO Handle error
 		}
-		if (!this.value2.isType(elementType))
+		else
 		{
-			return null;
+			this.value1 = value1;
 		}
+		
+		IValue value2 = this.value1.withType(elementType, typeContext, markers, context);
+		if (value2 == null)
+		{
+			// TODO Handle error
+		}
+		else
+		{
+			this.value1 = value2;
+		}
+		
 		this.type = type;
 		this.elementType = elementType;
 		return this;
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type.isArrayType())
 		{
 			IType elementType = type.getElementType();
-			return this.withElementType(type, elementType);
+			return this.withElementType(type, elementType, typeContext, markers, context);
 		}
 		if (Types.ITERABLE.equals(type) || RANGE.isSuperTypeOf(type))
 		{
 			IType iterableType = type.resolveType(IterableForStatement.ITERABLE_TYPE);
-			return this.withElementType(type, iterableType);
+			return this.withElementType(type, iterableType, typeContext, markers, context);
 		}
 		return type.isSuperTypeOf(this.getType()) ? this : null;
 	}
@@ -165,26 +175,6 @@ public class RangeOperator implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IValue value1 = this.value1.withType(this.elementType);
-		if (value1 == null)
-		{
-			// TODO Handle error?
-		}
-		else
-		{
-			this.value1 = value1;
-		}
-		
-		value1 = this.value2.withType(this.elementType);
-		if (value1 == null)
-		{
-			// ...
-		}
-		else
-		{
-			this.value2 = value1;
-		}
-		
 		this.value1.checkTypes(markers, context);
 		this.value2.checkTypes(markers, context);
 	}

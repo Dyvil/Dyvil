@@ -88,10 +88,7 @@ public final class Annotation extends ASTNode implements ITyped
 	public void resolve(MarkerList markers, IContext context)
 	{
 		this.arguments.resolve(markers, context);
-	}
-	
-	public void checkTypes(MarkerList markers, IContext context)
-	{
+		
 		IClass theClass = this.type.getTheClass();
 		if (theClass == null)
 		{
@@ -104,7 +101,7 @@ public final class Annotation extends ASTNode implements ITyped
 			IParameter param = theClass.getParameter(i);
 			IType type = param.getType();
 			IValue value = this.arguments.getValue(i, param);
-			IValue value1 = value.withType(type);
+			IValue value1 = value.withType(type, null, markers, context);
 			
 			if (value1 == null)
 			{
@@ -120,6 +117,11 @@ public final class Annotation extends ASTNode implements ITyped
 				this.arguments.setValue(i, param, value1);
 			}
 		}
+	}
+	
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.arguments.checkTypes(markers, context);
 	}
 	
 	public void check(MarkerList markers, IContext context, ElementType target)

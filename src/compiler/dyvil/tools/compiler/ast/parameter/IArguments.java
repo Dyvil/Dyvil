@@ -51,9 +51,9 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public int getVarargsTypeMatch(int index, IParameter param);
 	
-	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context);
+	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
 	
-	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context);
+	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
 	
 	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException;
 	

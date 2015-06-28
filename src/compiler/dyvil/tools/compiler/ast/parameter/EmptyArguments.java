@@ -127,12 +127,12 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 	}
 	

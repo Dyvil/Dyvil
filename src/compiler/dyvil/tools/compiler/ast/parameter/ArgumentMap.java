@@ -196,16 +196,16 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
 			if (this.keys[i] == key)
 			{
-				IType type = param.getType().getConcreteType(context);
+				IType type = param.getType().getConcreteType(typeContext);
 				IValue value = this.values[i];
-				IValue value1 = value.withType(type);
+				IValue value1 = value.withType(type, typeContext, markers, context);
 				if (value1 == null)
 				{
 					Marker marker = markers.create(value.getPosition(), "method.access.argument_type", key);
@@ -222,9 +222,9 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		this.checkValue(index, param, markers, context);
+		this.checkValue(index, param, typeContext, markers, context);
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -59,7 +60,7 @@ public final class CastOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return type.isSuperTypeOf(this.type) ? this : null;
 	}
@@ -108,7 +109,7 @@ public final class CastOperator extends ASTNode implements IValue
 			return this;
 		}
 		
-		IValue value1 = this.value.withType(this.type);
+		IValue value1 = this.value.withType(this.type, null, markers, context);
 		if (value1 != null && value1 != this.value)
 		{
 			this.value = value1;

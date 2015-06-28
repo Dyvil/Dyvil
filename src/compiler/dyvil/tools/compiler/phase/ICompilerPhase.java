@@ -55,7 +55,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	
 	/**
 	 * Resolves other things such as lambda expressions or annotations and
-	 * checks types. This will be called after {@link IValue#withType(IType)}
+	 * checks types. This will be called after {@link IValue#withType(IType, ITypeContext, MarkerList, IContext)}
 	 * has been called. Mainly used by
 	 * {@link IMethod#checkArguments(MarkerList, ICodePosition, IContext, IValue, IArguments, ITypeContext)}
 	 * .

@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
@@ -57,14 +58,14 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type == Types.UNKNOWN || type == Types.VOID)
 		{
 			return this;
 		}
 		
-		IValue value1 = this.value.withType(type);
+		IValue value1 = this.value.withType(type, typeContext, markers, context);
 		if (value1 == null)
 		{
 			return null;
@@ -170,7 +171,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 		if (this.field != null)
 		{
 			this.instance = this.field.checkAccess(markers, this.position, this.instance, context);
-			this.value = this.field.checkAssign(markers, this.position, this.instance, this.value);
+			this.value = this.field.checkAssign(markers, context, this.position, this.instance, this.value);
 		}
 		
 		this.value.checkTypes(markers, context);

@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.GenericData;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -73,9 +74,9 @@ public abstract class AbstractCall implements ICall, IValued
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return type == Types.VOID ? this : ICall.super.withType(type);
+		return type == Types.VOID ? this : IValue.autoBox(this, this.getType(), type);
 	}
 	
 	@Override
@@ -153,6 +154,14 @@ public abstract class AbstractCall implements ICall, IValued
 		}
 	}
 	
+	protected void checkArguments(MarkerList markers, IContext context)
+	{
+		if (this.method != null)
+		{
+			this.instance = this.method.checkArguments(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
+		}
+	}
+	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -161,10 +170,6 @@ public abstract class AbstractCall implements ICall, IValued
 			this.instance.checkTypes(markers, context);
 		}
 		
-		if (this.method != null)
-		{
-			this.instance = this.method.checkArguments(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
-		}
 		this.arguments.checkTypes(markers, context);
 	}
 	

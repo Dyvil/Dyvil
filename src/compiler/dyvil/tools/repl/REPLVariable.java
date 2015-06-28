@@ -46,7 +46,7 @@ public class REPLVariable extends Field
 				return;
 			}
 			
-			IValue value1 = this.value.withType(this.type);
+			IValue value1 = this.value.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.value.getPosition(), "field.type", this.name.unqualified);

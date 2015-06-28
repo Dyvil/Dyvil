@@ -149,14 +149,14 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (index != 0)
 		{
 			return;
 		}
-		IType type = param.getType().getConcreteType(context);
-		IValue value1 = this.value.withType(type);
+		IType type = param.getType().getConcreteType(typeContext);
+		IValue value1 = this.value.withType(type, typeContext, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.value.getPosition(), "method.access.argument_type", param.getName());
@@ -170,15 +170,15 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (index != 0)
 		{
 			return;
 		}
 		
-		IType type = param.getType().getConcreteType(context);
-		IValue value1 = this.value.withType(type);
+		IType type = param.getType();
+		IValue value1 = this.value.withType(type, typeContext, markers, context);
 		if (value1 != null)
 		{
 			this.value = value1;
@@ -186,7 +186,7 @@ public final class SingleArgument implements IArguments, IValued
 			return;
 		}
 		
-		value1 = this.value.withType(type.getElementType());
+		value1 = this.value.withType(type.getElementType(), typeContext, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.value.getPosition(), "method.access.argument_type", param.getName());

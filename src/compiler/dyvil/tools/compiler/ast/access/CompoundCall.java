@@ -82,6 +82,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 		if (method != null)
 		{
 			this.method = method;
+			this.checkArguments(markers, context);
 			return this;
 		}
 		
@@ -134,7 +135,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 				FieldAccess fa = (FieldAccess) this.instance;
 				if (fa.field != null)
 				{
-					fa.field.checkAssign(markers, this.instance.getPosition(), this.instance, this);
+					fa.field.checkAssign(markers, context, this.instance.getPosition(), this.instance, this);
 				}
 			}
 		}

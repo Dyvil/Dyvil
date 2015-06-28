@@ -206,16 +206,16 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (index >= this.size)
 		{
 			return;
 		}
 		
-		IType type = param.getType().getConcreteType(context);
+		IType type = param.getType().getConcreteType(typeContext);
 		IValue value = this.values[index];
-		IValue value1 = value.withType(type);
+		IValue value1 = value.withType(type, typeContext, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
@@ -229,12 +229,12 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IType varParamType = param.getType().getConcreteType(context);
+		IType varParamType = param.getType().getConcreteType(typeContext);
 		
 		IValue value = this.values[index];
-		IValue value1 = value.withType(varParamType);
+		IValue value1 = value.withType(varParamType, typeContext, markers, context);
 		if (value1 != null)
 		{
 			this.values[index] = value1;
@@ -247,7 +247,7 @@ public final class ArgumentList implements IArguments, IValueList
 		for (; index < this.size; index++)
 		{
 			value = this.values[index];
-			value1 = value.withType(elementType);
+			value1 = value.withType(elementType, typeContext, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());

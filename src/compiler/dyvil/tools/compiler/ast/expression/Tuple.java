@@ -7,6 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
@@ -136,20 +137,32 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.valueCount == 1)
 		{
-			IValue value1 = this.values[0].withType(type);
-			if (value1 != null)
-			{
-				return new EncapsulatedValue(value1);
-			}
+			return this.values[0].withType(type, typeContext, markers, context);
 		}
 		
 		if (TupleType.isSuperType(type, this.values, this.valueCount))
 		{
-			this.getType();
+			ITypeList typeList = (ITypeList) this.getType();
+			for (int i = 0; i < this.valueCount; i++)
+			{
+				IType elementType = typeList.getType(i);
+				IValue value = this.values[i];
+				IValue value1 = value.withType(elementType, typeContext, markers, context);
+				if (value1 == null)
+				{
+					Marker m = markers.create(value.getPosition(), "tuple.type");
+					m.addInfo("Pattern Type: " + value.getType());
+					m.addInfo("Tuple Type: " + elementType);
+				}
+				else
+				{
+					this.values[i] = value = value1;
+				}
+			}
 			return this;
 		}
 		
@@ -226,26 +239,11 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.tupleType instanceof TupleType)
+		if (this.tupleType.typeTag() == IType.TUPLE)
 		{
-			ITypeList typeList = (ITypeList) this.tupleType;
 			for (int i = 0; i < this.valueCount; i++)
 			{
-				IType type = typeList.getType(i);
-				IValue value = this.values[i];
-				IValue value1 = value.withType(type);
-				if (value1 == null)
-				{
-					Marker m = markers.create(value.getPosition(), "tuple.type");
-					m.addInfo("Pattern Type: " + value.getType());
-					m.addInfo("Tuple Type: " + type);
-				}
-				else
-				{
-					this.values[i] = value = value1;
-				}
-				
-				value.checkTypes(markers, context);
+				this.values[i].checkTypes(markers, context);
 			}
 			
 			return;

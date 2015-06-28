@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
@@ -41,10 +42,10 @@ public class RangeForStatement extends ForEachStatement
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		IType rangeType = this.variable.type;
-		IValue v = this.value1.withType(rangeType);
+		IValue v = this.value1.withType(rangeType, typeContext, markers, context);
 		if (v == null)
 		{
 			Marker marker = markers.create(this.value1.getPosition(), "for.range.type");
@@ -56,7 +57,7 @@ public class RangeForStatement extends ForEachStatement
 			this.value1 = v;
 		}
 		
-		v = this.value2.withType(rangeType);
+		v = this.value2.withType(rangeType, typeContext, markers, context);
 		if (v == null)
 		{
 			Marker marker = markers.create(this.value2.getPosition(), "for.range.type");
@@ -67,6 +68,15 @@ public class RangeForStatement extends ForEachStatement
 		{
 			this.value2 = v;
 		}
+		
+		return super.withType(type, typeContext, markers, context);
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.value1.checkTypes(markers, context);
+		this.value2.checkTypes(markers, context);
 		
 		if (this.action != null)
 		{

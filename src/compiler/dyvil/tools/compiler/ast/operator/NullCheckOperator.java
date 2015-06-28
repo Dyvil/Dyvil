@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.operator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -38,6 +39,12 @@ public final class NullCheckOperator implements IValue
 	public boolean isType(IType type)
 	{
 		return type == Types.BOOLEAN;
+	}
+	
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return type == Types.BOOLEAN ? this : IValue.autoBox(this, Types.BOOLEAN, type);
 	}
 	
 	@Override

@@ -198,7 +198,7 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
 		if (!this.variable.isCapturable())
 		{
@@ -210,7 +210,7 @@ public class CaptureVariable implements IVariable
 			this.type = this.variable.getReferenceType();
 		}
 		
-		return this.variable.checkAssign(markers, position, instance, newValue);
+		return this.variable.checkAssign(markers, context, position, instance, newValue);
 	}
 	
 	@Override

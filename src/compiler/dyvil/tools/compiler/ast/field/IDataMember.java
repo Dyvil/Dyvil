@@ -14,7 +14,7 @@ public interface IDataMember extends IASTNode, IMember, IValued
 {
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context);
 	
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue);
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue);
 	
 	public default boolean isEnumConstant()
 	{

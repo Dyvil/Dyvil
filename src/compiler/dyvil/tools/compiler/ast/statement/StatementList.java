@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -92,7 +93,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type == Types.VOID || type == Types.UNKNOWN)
 		{
@@ -100,10 +101,15 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			return this;
 		}
 		
-		if (this.valueCount > 0 && this.values[this.valueCount - 1].isType(type))
+		if (this.valueCount > 0)
 		{
-			this.requiredType = type;
-			return this;
+			IValue v = this.values[this.valueCount - 1].withType(type, typeContext, markers, context);
+			if (v != null)
+			{
+				this.values[this.valueCount - 1] = v;
+				this.requiredType = type;
+				return this;
+			}
 		}
 		
 		return null;
@@ -267,7 +273,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		for (int i = 0; i < len; i++)
 		{
 			IValue v = this.values[i];
-			IValue v1 = v.withType(Types.VOID);
+			IValue v1 = v.withType(Types.VOID, null, markers, context);
 			if (v1 == null)
 			{
 				Marker marker = markers.create(v.getPosition(), "statement.type");
@@ -284,16 +290,11 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		IValue lastValue = this.values[len];
 		if (this.requiredType != null)
 		{
-			IValue value1 = lastValue.withType(this.requiredType);
-			if (value1 == null)
+			if (!lastValue.isType(this.requiredType))
 			{
 				Marker marker = markers.create(lastValue.getPosition(), "block.type");
 				marker.addInfo("Block Type: " + this.requiredType);
 				marker.addInfo("Returning Type: " + lastValue.getType());
-			}
-			else
-			{
-				lastValue = this.values[len] = value1;
 			}
 		}
 		else

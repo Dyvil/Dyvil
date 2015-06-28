@@ -169,14 +169,14 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
 		if (this.set == null)
 		{
 			markers.add(position, "property.assign.readonly", this.name.unqualified);
 		}
 		
-		IValue value1 = newValue.withType(this.type);
+		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "property.assign.type", this.name.unqualified);
@@ -216,6 +216,16 @@ public class Property extends Member implements IProperty, IContext
 			this.setterParameter = new MethodParameter(this.name, this.type);
 			this.setterParameter.index = 1;
 			this.set = this.set.resolve(markers, this);
+			
+			IValue set1 = this.set.withType(Types.VOID, null, markers, context);
+			if (set1 == null)
+			{
+				markers.add(this.set.getPosition(), "property.setter.type", this.name);
+			}
+			else
+			{
+				this.set = set1;
+			}
 		}
 		if (this.get != null)
 		{
@@ -231,7 +241,7 @@ public class Property extends Member implements IProperty, IContext
 				return;
 			}
 			
-			IValue get1 = this.get.withType(this.type);
+			IValue get1 = this.get.withType(this.type, null, markers, context);
 			if (get1 == null)
 			{
 				Marker marker = markers.create(this.get.getPosition(), "property.getter.type", this.name.unqualified);
@@ -262,16 +272,6 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.set != null)
 		{
-			IValue set1 = this.set.withType(Types.VOID);
-			if (set1 == null)
-			{
-				markers.add(this.set.getPosition(), "property.setter.type", this.name);
-			}
-			else
-			{
-				this.set = set1;
-			}
-			
 			this.set.checkTypes(markers, context);
 		}
 		

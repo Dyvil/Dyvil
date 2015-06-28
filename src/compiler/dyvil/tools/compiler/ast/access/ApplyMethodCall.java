@@ -41,6 +41,7 @@ public class ApplyMethodCall extends AbstractCall
 		if (method != null)
 		{
 			this.method = method;
+			this.checkArguments(markers, context);
 			return this;
 		}
 		

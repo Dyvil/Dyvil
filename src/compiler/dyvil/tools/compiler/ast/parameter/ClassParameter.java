@@ -112,14 +112,14 @@ public final class ClassParameter extends Parameter implements IField
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
 		if (newValue != null && (this.modifiers & Modifiers.FINAL) != 0)
 		{
 			markers.add(position, "classparameter.assign.final", this.name.unqualified);
 		}
 		
-		IValue value1 = newValue.withType(this.type);
+		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
@@ -153,7 +153,7 @@ public final class ClassParameter extends Parameter implements IField
 				return;
 			}
 			
-			IValue value1 = this.defaultValue.withType(this.type);
+			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.defaultValue.getPosition(), "classparameter.type", this.name.unqualified);

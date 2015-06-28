@@ -168,14 +168,14 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
 		if ((this.modifiers & Modifiers.FINAL) != 0)
 		{
 			markers.add(position, "field.assign.final", this.name.unqualified);
 		}
 		
-		IValue value1 = newValue.withType(this.type);
+		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "field.assign.type", this.name.unqualified);
@@ -220,7 +220,7 @@ public class Field extends Member implements IField
 				return;
 			}
 			
-			IValue value1 = this.value.withType(this.type);
+			IValue value1 = this.value.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.value.getPosition(), "field.type", this.name.unqualified);

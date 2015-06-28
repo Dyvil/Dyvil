@@ -69,6 +69,7 @@ public class SubscriptGetter extends AbstractCall
 						mc.method = m;
 						mc.arguments = arguments;
 						mc.dotless = fa.dotless;
+						mc.checkArguments(markers, context);
 						return mc;
 					}
 					
@@ -99,6 +100,7 @@ public class SubscriptGetter extends AbstractCall
 		{
 			this.arguments = argumentList;
 			this.method = m;
+			this.checkArguments(markers, context);
 			return this;
 		}
 		

@@ -107,6 +107,7 @@ public final class MethodCall extends AbstractCall implements INamed
 		if (method != null)
 		{
 			this.method = method;
+			this.checkArguments(markers, context);
 			return this;
 		}
 		
@@ -140,9 +141,10 @@ public final class MethodCall extends AbstractCall implements INamed
 		// Resolve Apply Method
 		if (this.instance == null)
 		{
-			IValue apply = this.resolveApply(markers, context);
+			AbstractCall apply = this.resolveApply(markers, context);
 			if (apply != null)
 			{
+				apply.checkArguments(markers, context);
 				return apply;
 			}
 		}
@@ -151,7 +153,7 @@ public final class MethodCall extends AbstractCall implements INamed
 		return this;
 	}
 	
-	private IValue resolveApply(MarkerList markers, IContext context)
+	private AbstractCall resolveApply(MarkerList markers, IContext context)
 	{
 		IValue instance;
 		IMethod method;

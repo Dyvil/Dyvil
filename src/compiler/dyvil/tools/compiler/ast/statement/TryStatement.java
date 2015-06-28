@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -78,11 +79,11 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.finallyBlock != null)
 		{
-			IValue value1 = this.finallyBlock.withType(type);
+			IValue value1 = this.finallyBlock.withType(type, typeContext, markers, context);
 			if (value1 == null)
 			{
 				return null;
@@ -94,7 +95,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		
 		if (this.action != null)
 		{
-			IValue value1 = this.action.withType(type);
+			IValue value1 = this.action.withType(type, typeContext, markers, context);
 			if (value1 == null)
 			{
 				return null;
@@ -104,7 +105,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			IValue value1 = block.action.withType(type);
+			IValue value1 = block.action.withType(type, typeContext, markers, context);
 			if (value1 == null)
 			{
 				return null;

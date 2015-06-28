@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -116,30 +117,22 @@ public interface IValue extends IASTNode, ITyped
 	{
 	}
 	
-	public default IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context);
+	
+	public static IValue autoBox(IValue value, IType valueType, IType targetType)
 	{
-		IType thisType = this.getType();
-		if (thisType == null)
-		{
-			return null;
-		}
-		if (!type.isSuperTypeOf(thisType))
-		{
-			return null;
-		}
-		
-		boolean primitive = thisType.isPrimitive();
-		if (primitive != type.isPrimitive())
+		boolean primitive = valueType.isPrimitive();
+		if (primitive != targetType.isPrimitive())
 		{
 			// Box Primitive -> Object
 			if (primitive)
 			{
-				return new BoxedValue(this, thisType.getBoxMethod());
+				return new BoxedValue(value, valueType.getBoxMethod());
 			}
 			// Unbox Object -> Primitive
-			return new BoxedValue(this, type.getUnboxMethod());
+			return new BoxedValue(value, targetType.getUnboxMethod());
 		}
-		return this;
+		return value;
 	}
 	
 	@Override

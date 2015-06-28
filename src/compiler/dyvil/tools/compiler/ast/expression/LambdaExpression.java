@@ -150,7 +150,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.isType(type))
 		{
@@ -380,7 +380,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			}
 			
 			this.value = this.value.resolve(markers, this);
-			IValue value1 = this.value.withType(this.returnType);
+			IValue value1 = this.value.withType(this.returnType, null, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.value.getPosition(), "lambda.type");

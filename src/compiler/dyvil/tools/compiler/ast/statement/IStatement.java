@@ -1,9 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IStatement extends IValue
 {
@@ -20,9 +23,9 @@ public interface IStatement extends IValue
 	}
 	
 	@Override
-	public default IValue withType(IType type)
+	public default IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return this;
+		return type == Types.VOID ? this : null;
 	}
 	
 	@Override
