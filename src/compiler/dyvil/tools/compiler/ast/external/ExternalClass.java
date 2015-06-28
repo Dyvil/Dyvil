@@ -580,7 +580,7 @@ public final class ExternalClass extends CodeClass
 		
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			method.getParameter(method.parameterCount() - 1).setVarargs(true);
+			method.setVarargsParameter();
 		}
 		
 		boolean flag = true;

@@ -36,6 +36,16 @@ public final class ExternalMethod extends Method
 		super(iclass);
 	}
 	
+	public void setVarargsParameter()
+	{
+		this.parameters[this.parameterCount - 1].setVarargs(true);
+	}
+	
+	public void setParameterName(int index, Name name)
+	{
+		this.parameters[index].setName(name);
+	}
+	
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
