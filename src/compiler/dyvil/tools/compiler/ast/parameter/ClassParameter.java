@@ -150,7 +150,6 @@ public final class ClassParameter extends Parameter implements IField
 				{
 					markers.add(this.position, "classparameter.type.infer", this.name.unqualified);
 				}
-				return;
 			}
 			
 			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);

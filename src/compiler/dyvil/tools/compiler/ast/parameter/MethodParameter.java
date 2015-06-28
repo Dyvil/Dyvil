@@ -92,16 +92,6 @@ public final class MethodParameter extends Parameter
 			
 			this.defaultValue = this.defaultValue.resolve(markers, context);
 			
-			if (this.type == Types.UNKNOWN)
-			{
-				this.type = this.defaultValue.getType();
-				if (this.type == Types.UNKNOWN)
-				{
-					markers.add(this.position, "parameter.type.infer", this.name.unqualified);
-				}
-				return;
-			}
-			
 			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
@@ -114,10 +104,6 @@ public final class MethodParameter extends Parameter
 				this.defaultValue = value1;
 			}
 			return;
-		}
-		if (this.type == Types.UNKNOWN)
-		{
-			markers.add(this.position, "parameter.type.nodefault", this.name.unqualified);
 		}
 	}
 	

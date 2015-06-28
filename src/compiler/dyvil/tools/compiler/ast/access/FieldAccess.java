@@ -132,7 +132,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		}
 	}
 	
-	protected IValue resolveFieldAccess(IContext context)
+	protected IValue resolveFieldAccess(MarkerList markers, IContext context)
 	{
 		IDataMember field = ICall.resolveField(context, this.instance, this.name);
 		if (field != null)
@@ -152,7 +152,9 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		IMethod method = ICall.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
 		if (method != null)
 		{
-			return this.toMethodCall(method);
+			AbstractCall mc = this.toMethodCall(method);
+			mc.checkArguments(markers, context);
+			return mc;
 		}
 		
 		if (this.instance == null)
@@ -175,7 +177,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 			this.instance = this.instance.resolve(markers, context);
 		}
 		
-		IValue v = this.resolveFieldAccess(context);
+		IValue v = this.resolveFieldAccess(markers, context);
 		if (v != null)
 		{
 			return v;

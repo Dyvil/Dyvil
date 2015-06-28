@@ -401,7 +401,6 @@ public class Method extends Member implements IMethod
 				{
 					markers.add(this.position, "method.type.infer", this.name.unqualified);
 				}
-				return;
 			}
 			
 			IValue value1 = this.value.withType(this.type, null, markers, context);
@@ -798,6 +797,8 @@ public class Method extends Member implements IMethod
 				{
 					arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
 				}
+				
+				this.checkTypeVarsInferred(markers, position, typeContext);
 				return instance;
 			}
 			
@@ -805,6 +806,8 @@ public class Method extends Member implements IMethod
 			{
 				arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
 			}
+			
+			this.checkTypeVarsInferred(markers, position, typeContext);
 			return instance;
 		}
 		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
@@ -818,6 +821,8 @@ public class Method extends Member implements IMethod
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
 			}
+			
+			this.checkTypeVarsInferred(markers, position, typeContext);
 			return null;
 		}
 		
@@ -862,6 +867,8 @@ public class Method extends Member implements IMethod
 			{
 				arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
 			}
+			
+			this.checkTypeVarsInferred(markers, position, typeContext);
 			return instance;
 		}
 		
@@ -869,6 +876,8 @@ public class Method extends Member implements IMethod
 		{
 			arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
 		}
+		
+		this.checkTypeVarsInferred(markers, position, typeContext);
 		return instance;
 	}
 	
@@ -897,8 +906,7 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	// TODO Call me somewhere in RESOLVE
-	private void checkTypeVarsInferred(MarkerList markers, ITypeContext typeContext)
+	private void checkTypeVarsInferred(MarkerList markers, ICodePosition position, ITypeContext typeContext)
 	{
 		for (int i = 0; i < this.genericCount; i++)
 		{

@@ -217,7 +217,6 @@ public class Field extends Member implements IField
 				{
 					markers.add(this.position, "field.type.infer", this.name.unqualified);
 				}
-				return;
 			}
 			
 			IValue value1 = this.value.withType(this.type, null, markers, context);

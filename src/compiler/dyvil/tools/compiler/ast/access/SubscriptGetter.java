@@ -51,7 +51,7 @@ public class SubscriptGetter extends AbstractCall
 				{
 					fa.instance = fa.instance.resolve(markers, context);
 				}
-				IValue v1 = fa.resolveFieldAccess(context);
+				IValue v1 = fa.resolveFieldAccess(markers, context);
 				if (v1 != null)
 				{
 					this.instance = v1;

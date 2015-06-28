@@ -162,8 +162,9 @@ public final class MethodCall extends AbstractCall implements INamed
 		if (field == null)
 		{
 			// Find a type
-			IClass iclass = context.resolveClass(this.name);
-			if (iclass == null) {
+			IClass iclass = IContext.resolveClass(context, this.name);
+			if (iclass == null)
+			{
 				return null;
 			}
 			

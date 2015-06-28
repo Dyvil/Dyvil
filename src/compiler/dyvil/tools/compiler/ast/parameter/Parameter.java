@@ -34,8 +34,6 @@ public abstract class Parameter extends Member implements IParameter
 		this.type = type;
 	}
 	
-	
-	
 	@Override
 	public ElementType getAnnotationType()
 	{

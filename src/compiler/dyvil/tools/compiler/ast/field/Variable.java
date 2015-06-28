@@ -175,7 +175,6 @@ public final class Variable extends Member implements IVariable
 			{
 				markers.add(this.position, "variable.type.infer", this.name.unqualified);
 			}
-			return;
 		}
 		
 		IValue value1 = this.value.withType(this.type, null, markers, context);

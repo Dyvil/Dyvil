@@ -43,7 +43,6 @@ public class REPLVariable extends Field
 			if (this.type == Types.UNKNOWN)
 			{
 				this.type = this.value.getType();
-				return;
 			}
 			
 			IValue value1 = this.value.withType(this.type, null, markers, context);
