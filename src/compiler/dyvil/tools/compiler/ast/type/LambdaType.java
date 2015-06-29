@@ -165,13 +165,13 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	{
 		if (concrete.typeTag() != LAMBDA)
 		{
-			return null;
+			return Types.ANY;
 		}
 		
 		LambdaType lambdaType = (LambdaType) concrete;
 		if (lambdaType.parameterCount != this.parameterCount)
 		{
-			return null;
+			return Types.ANY;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

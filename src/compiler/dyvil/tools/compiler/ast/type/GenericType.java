@@ -191,7 +191,7 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 		{
 			if (this.theClass == null)
 			{
-				return null;
+				return Types.ANY;
 			}
 			return this.theClass.resolveType(typeVar, this);
 		}
@@ -204,13 +204,13 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 		IType type;
 		if (concrete.typeTag() != GENERIC)
 		{
-			return null;
+			return Types.ANY;
 		}
 		
 		GenericType gt = (GenericType) concrete;
 		if (gt.typeArgumentCount != this.typeArgumentCount)
 		{
-			return null;
+			return Types.ANY;
 		}
 		
 		for (int i = 0; i < this.typeArgumentCount; i++)
@@ -221,7 +221,7 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 				return type;
 			}
 		}
-		return null;
+		return Types.ANY;
 	}
 	
 	@Override

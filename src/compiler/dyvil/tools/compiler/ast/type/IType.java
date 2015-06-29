@@ -211,7 +211,7 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	@Override
 	public default IType resolveType(ITypeVariable typeVar)
 	{
-		return null;
+		return Types.ANY;
 	}
 	
 	/**
@@ -230,7 +230,7 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	 */
 	public default IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
-		return null;
+		return Types.ANY;
 	}
 	
 	public default void inferTypes(IType concrete, ITypeContext typeContext)

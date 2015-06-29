@@ -110,7 +110,7 @@ public final class WildcardType extends BaseBounded implements IType
 				return type;
 			}
 		}
-		return null;
+		return Types.ANY;
 	}
 	
 	@Override
@@ -125,7 +125,7 @@ public final class WildcardType extends BaseBounded implements IType
 				return type;
 			}
 		}
-		return null;
+		return Types.ANY;
 	}
 	
 	@Override

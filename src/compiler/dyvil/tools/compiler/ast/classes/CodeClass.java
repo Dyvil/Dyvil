@@ -677,7 +677,7 @@ public class CodeClass extends ASTNode implements IClass
 				return type.getConcreteType(concrete);
 			}
 		}
-		return null;
+		return Types.ANY;
 	}
 	
 	@Override

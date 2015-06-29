@@ -163,7 +163,7 @@ public class ArrayType implements IType, ITyped
 	@Override
 	public IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
-		return concrete.isArrayType() ? this.type.resolveType(typeVar, concrete.getElementType()) : null;
+		return concrete.isArrayType() ? this.type.resolveType(typeVar, concrete.getElementType()) : Types.ANY;
 	}
 	
 	@Override

@@ -177,7 +177,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			pm.reparse();
 			return;
 		case PATTERN_IF:
-			
 			this.mode = PATTERN_END;
 			if (type == Keywords.IF)
 			{
@@ -187,8 +186,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case PATTERN_END:
 			if (type == Symbols.COLON)
 			{
-				this.field.setValue(this.value);
-				pm.popParser();
+				this.mode = 0;
 				if (token.next().type() != Keywords.CASE)
 				{
 					pm.pushParser(new ExpressionParser((IValued) this.value));
@@ -543,9 +541,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		if (nextType == Symbols.ARROW_OPERATOR)
 		{
 			LambdaExpression lv = new LambdaExpression(next.raw(), name);
-			this.mode = VALUE;
-			this.field.setValue(lv);
-			this.field = lv;
+			this.mode = 0;
+			pm.pushParser(new ExpressionParser(lv));
 			pm.skip();
 			return;
 		}
