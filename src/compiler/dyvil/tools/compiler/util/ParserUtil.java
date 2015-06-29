@@ -18,32 +18,104 @@ public class ParserUtil
 	
 	public static boolean isOpenBracket(char c)
 	{
-		return c == '(' || c == '[' || c == '{';
+		switch (c)
+		{
+		case '(':
+		case '[':
+		case '{':
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isCloseBracket(char c)
 	{
-		return c == ')' || c == ']' || c == '}';
+		switch (c)
+		{
+		case ')':
+		case ']':
+		case '}':
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isBinDigit(char c)
 	{
-		return c == '0' || c == '1';
+		switch (c)
+		{
+		case '0':
+		case '1':
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isOctDigit(char c)
 	{
-		return c >= '0' && c <= '7';
+		switch (c)
+		{
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isDigit(char c)
 	{
-		return c >= '0' && c <= '9';
+		switch (c)
+		{
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isHexDigit(char c)
 	{
-		return c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F';
+		switch (c)
+		{
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+		case 'a':
+		case 'b':
+		case 'c':
+		case 'd':
+		case 'e':
+		case 'f':
+		case 'A':
+		case 'B':
+		case 'C':
+		case 'D':
+		case 'E':
+		case 'F':
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isLetter(char c)
@@ -53,7 +125,14 @@ public class ParserUtil
 	
 	public static boolean isSymbol(char c)
 	{
-		return c == '.' || c == ',' || c == ';';
+		switch (c)
+		{
+		case '.':
+		case ',':
+		case ';':
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isIdentifierPart(char c)
@@ -63,13 +142,40 @@ public class ParserUtil
 	
 	public static boolean isIdentifierSymbol(char c)
 	{
-		return c >= '!' && c <= '~' && (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && !isSymbol(c) && !isOpenBracket(c)
-				&& !isCloseBracket(c);
+		switch (c)
+		{
+		case '=':
+		case '>':
+		case '<':
+		case '+':
+		case '-':
+		case '*':
+		case '/':
+		case '!':
+		case '@':
+		case '#':
+		case '%':
+		case '^':
+		case '&':
+		case '~':
+		case '?':
+		case '|':
+		case '\\':
+		case ':':
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isSeperator(char c)
 	{
-		return c == ',' || c == ';';
+		switch (c)
+		{
+		case ',':
+		case ';':
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isIdentifier(int type)

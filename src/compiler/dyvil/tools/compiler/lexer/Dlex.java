@@ -79,7 +79,6 @@ public final class Dlex
 					else
 					{
 						addToken = true;
-						reparse = true;
 					}
 				}
 				else if (c == '_' || c == '$')
