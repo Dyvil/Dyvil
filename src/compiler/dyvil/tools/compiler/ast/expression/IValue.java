@@ -295,7 +295,7 @@ public interface IValue extends IASTNode, ITyped
 		else if (c == org.objectweb.asm.Type.class)
 		{
 			org.objectweb.asm.Type type = (org.objectweb.asm.Type) o;
-			return new ClassOperator(new InternalType(type.getInternalName()));
+			return new ClassOperator(Types.fromASMType(type));
 		}
 		return null;
 	}

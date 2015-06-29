@@ -148,9 +148,11 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 	
 	protected boolean argumentsMatch(IType type)
 	{
-		for (int i = 0; i < this.typeArgumentCount; i++)
+		int count = this.theClass.genericCount();
+		for (int i = 0; i < count; i++)
 		{
 			ITypeVariable typeVar = this.theClass.getTypeVariable(i);
+			
 			IType otherType = type.resolveType(typeVar);
 			if (!this.typeArguments[i].equals(otherType))
 			{

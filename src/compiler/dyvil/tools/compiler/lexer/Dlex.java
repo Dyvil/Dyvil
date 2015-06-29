@@ -70,45 +70,64 @@ public final class Dlex
 			switch (type)
 			{
 			case IDENTIFIER:
-				if (subtype == MOD_DOTS)
+				switch (subtype)
 				{
+				case MOD_DOTS:
 					if (c == '.')
 					{
 						buf.append(c);
-					}
-					else
-					{
-						addToken = true;
-					}
-				}
-				else if (c == '_' || c == '$')
-				{
-					subtype = MOD_SYMBOL | MOD_LETTER;
-					buf.append(c);
-				}
-				else
-				{
-					boolean letter = (subtype & MOD_LETTER) != 0;
-					boolean symbol = (subtype & MOD_SYMBOL) != 0;
-					if (letter)
-					{
-						if (isIdentifierPart(c))
-						{
-							subtype = MOD_LETTER;
-							buf.append(c);
-							continue;
-						}
-					}
-					if (symbol)
-					{
-						if (isIdentifierSymbol(c))
-						{
-							subtype = MOD_SYMBOL;
-							buf.append(c);
-							continue;
-						}
+						continue;
 					}
 					addToken = true;
+					break typeswitch;
+				case MOD_LETTER:
+					if (c == '_' || c == '$')
+					{
+						buf.append(c);
+						subtype = MOD_LETTER | MOD_SYMBOL;
+						continue;
+					}
+					if (isIdentifierPart(c))
+					{
+						buf.append(c);
+						continue;
+					}
+					addToken = true;
+					break typeswitch;
+				case MOD_SYMBOL:
+					if (c == '_' || c == '$')
+					{
+						buf.append(c);
+						subtype = MOD_LETTER | MOD_SYMBOL;
+						continue;
+					}
+					if (isIdentifierSymbol(c))
+					{
+						buf.append(c);
+						continue;
+					}
+					addToken = true;
+					break typeswitch;
+				case MOD_LETTER | MOD_SYMBOL:
+					if (c == '_' || c == '$')
+					{
+						buf.append(c);
+						continue;
+					}
+					if (isIdentifierPart(c))
+					{
+						buf.append(c);
+						subtype = MOD_LETTER;
+						continue;
+					}
+					if (isIdentifierSymbol(c))
+					{
+						buf.append(c);
+						subtype = MOD_LETTER;
+						continue;
+					}
+					addToken = true;
+					break typeswitch;
 				}
 				break;
 			case SPECIAL_IDENTIFIER:
@@ -453,6 +472,9 @@ public final class Dlex
 			return Symbols.SEMICOLON;
 		case ',':
 			return Symbols.COMMA;
+		case '_':
+		case '$':
+			return IDENTIFIER | MOD_SYMBOL | MOD_LETTER;
 		}
 		if (isDigit(c))
 		{

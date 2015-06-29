@@ -113,6 +113,36 @@ public final class Types
 		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod(Name.unapply);
 	}
 	
+	public static IType fromASMType(org.objectweb.asm.Type type)
+	{
+		switch (type.getSort())
+		{
+		case org.objectweb.asm.Type.VOID:
+			return VOID;
+		case org.objectweb.asm.Type.BOOLEAN:
+			return BOOLEAN;
+		case org.objectweb.asm.Type.BYTE:
+			return BYTE;
+		case org.objectweb.asm.Type.SHORT:
+			return SHORT;
+		case org.objectweb.asm.Type.CHAR:
+			return CHAR;
+		case org.objectweb.asm.Type.INT:
+			return INT;
+		case org.objectweb.asm.Type.LONG:
+			return LONG;
+		case org.objectweb.asm.Type.FLOAT:
+			return FLOAT;
+		case org.objectweb.asm.Type.DOUBLE:
+			return DOUBLE;
+		case org.objectweb.asm.Type.OBJECT:
+			return new InternalType(type.getInternalName());
+		case org.objectweb.asm.Type.ARRAY:
+			return new ArrayType(fromASMType(type.getElementType()));
+		}
+		return null;
+	}
+	
 	public static IClass getObjectArray()
 	{
 		if (OBJECT_ARRAY_CLASS == null)

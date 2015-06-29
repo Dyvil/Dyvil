@@ -24,11 +24,6 @@ public final class ClassParameter extends Parameter implements IField
 {
 	public IClass	theClass;
 	
-	public int		index;
-	public boolean	varargs;
-	
-	public IValue	defaultValue;
-	
 	public ClassParameter()
 	{
 	}
