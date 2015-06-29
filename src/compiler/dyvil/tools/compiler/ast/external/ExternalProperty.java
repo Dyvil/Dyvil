@@ -36,7 +36,7 @@ public final class ExternalProperty extends Property
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.type.resolve(null, Package.rootPackage);
+		this.type = this.type.resolve(null, this.theClass);
 	}
 	
 	@Override

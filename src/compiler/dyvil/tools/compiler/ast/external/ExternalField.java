@@ -30,7 +30,7 @@ public final class ExternalField extends Field
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.type.resolve(null, Package.rootPackage);
+		this.type = this.type.resolve(null, this.theClass);
 	}
 	
 	@Override

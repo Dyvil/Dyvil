@@ -215,7 +215,7 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return Types.ANY; // FIXME
+		return this.types[typeVar.getIndex()];
 	}
 	
 	@Override

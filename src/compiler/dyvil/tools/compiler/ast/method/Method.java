@@ -394,12 +394,15 @@ public class Method extends Member implements IMethod
 		{
 			this.value = this.value.resolve(markers, this);
 			
+			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
+				inferType = true;
 				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN)
 				{
 					markers.add(this.position, "method.type.infer", this.name.unqualified);
+					this.type = Types.ANY;
 				}
 			}
 			
@@ -413,12 +416,17 @@ public class Method extends Member implements IMethod
 			else
 			{
 				this.value = value1;
+				if (inferType)
+				{
+					this.type = value1.getType();
+				}
 			}
 			return;
 		}
 		if (this.type == Types.UNKNOWN)
 		{
 			markers.add(this.position, "method.type.abstract", this.name.unqualified);
+			this.type = Types.ANY;
 		}
 	}
 	

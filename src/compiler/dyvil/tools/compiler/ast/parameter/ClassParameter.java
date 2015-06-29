@@ -143,12 +143,15 @@ public final class ClassParameter extends Parameter implements IField
 		{
 			this.defaultValue = this.defaultValue.resolve(markers, context);
 			
+			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
+				inferType = true;
 				this.type = this.defaultValue.getType();
 				if (this.type == Types.UNKNOWN)
 				{
 					markers.add(this.position, "classparameter.type.infer", this.name.unqualified);
+					this.type = Types.ANY;
 				}
 			}
 			
@@ -162,12 +165,17 @@ public final class ClassParameter extends Parameter implements IField
 			else
 			{
 				this.defaultValue = value1;
+				if (inferType)
+				{
+					this.type = value1.getType();
+				}
 			}
 			return;
 		}
 		if (this.type == Types.UNKNOWN)
 		{
 			markers.add(this.position, "classparameter.type.nodefault", this.name.unqualified);
+			this.type = Types.ANY;
 		}
 	}
 	

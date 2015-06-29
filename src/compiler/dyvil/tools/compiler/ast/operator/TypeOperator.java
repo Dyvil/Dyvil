@@ -63,7 +63,7 @@ public final class TypeOperator extends ASTNode implements IValue
 	{
 		if (type.getTheClass().getAnnotation(TYPE_CONVERTIBLE) != null)
 		{
-			return new LiteralExpression(type, this);
+			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
 		
 		return type.isSuperTypeOf(this.getType()) ? this : null;

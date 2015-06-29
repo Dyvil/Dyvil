@@ -148,16 +148,12 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		int index = typeVar.getIndex();
+		if (index == this.parameterCount)
 		{
-			IType t = this.parameterTypes[i].resolveType(typeVar);
-			if (t != null)
-			{
-				return t;
-			}
+			return this.returnType;
 		}
-		
-		return this.returnType.resolveType(typeVar);
+		return this.parameterTypes[index];
 	}
 	
 	@Override

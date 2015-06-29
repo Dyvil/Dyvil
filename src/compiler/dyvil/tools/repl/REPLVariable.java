@@ -24,7 +24,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class REPLVariable extends Field
 {
-	protected String						className;
+	protected String	className;
 	
 	public REPLVariable(ICodePosition position, Name name, IType type, IValue value)
 	{
@@ -40,12 +40,14 @@ public class REPLVariable extends Field
 		{
 			this.value = this.value.resolve(markers, context);
 			
+			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
+				inferType = true;
 				this.type = this.value.getType();
 			}
 			
-			IValue value1 = this.value.withType(this.type, null, markers, context);
+			IValue value1 = this.value.withType(this.type, this.type, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.value.getPosition(), "field.type", this.name.unqualified);
@@ -55,6 +57,10 @@ public class REPLVariable extends Field
 			else
 			{
 				this.value = value1;
+				if (inferType)
+				{
+					this.type = value1.getType();
+				}
 			}
 		}
 	}
@@ -124,7 +130,7 @@ public class REPLVariable extends Field
 			t.printStackTrace();
 		}
 	}
-
+	
 	private boolean isConstant()
 	{
 		return (this.modifiers & Modifiers.FINAL) != 0 && isConstant(this.value);

@@ -133,7 +133,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 			}
 			if (iclass.getAnnotation(ARRAY_CONVERTIBLE) != null)
 			{
-				return new LiteralExpression(arrayType, this);
+				return new LiteralExpression(this).withType(arrayType, typeContext, markers, context);
 			}
 			
 			return null;

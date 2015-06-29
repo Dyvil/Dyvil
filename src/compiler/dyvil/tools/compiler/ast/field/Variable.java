@@ -168,16 +168,20 @@ public final class Variable extends Member implements IVariable
 			this.value = this.value.resolve(markers, context);
 		}
 		
+		boolean inferType = false;
+		;
 		if (this.type == Types.UNKNOWN)
 		{
+			inferType = true;
 			this.type = this.value.getType();
 			if (this.type == Types.UNKNOWN)
 			{
 				markers.add(this.position, "variable.type.infer", this.name.unqualified);
+				this.type = Types.ANY;
 			}
 		}
 		
-		IValue value1 = this.value.withType(this.type, null, markers, context);
+		IValue value1 = this.value.withType(this.type, this.type, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.position, "variable.type", this.name.unqualified);
@@ -187,6 +191,10 @@ public final class Variable extends Member implements IVariable
 		else
 		{
 			this.value = value1;
+			if (inferType)
+			{
+				this.type = value1.getType();
+			}
 		}
 	}
 	

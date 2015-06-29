@@ -26,7 +26,6 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.ast.type.LambdaType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -48,8 +47,6 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
 															+ "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodHandle;"
 															+ "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
-	
-	private static final IType	LAMBDA_RETURN	= new InternalType("`lambda-return`");
 	
 	public IParameter[]			parameters;
 	public int					parameterCount;
@@ -216,7 +213,17 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			this.method.getType().inferTypes(this.returnType, tempContext);
 			IType type1 = this.method.getTheClass().getType().getConcreteType(tempContext);
 			
-			type.inferTypes(type1, typeContext);
+			type.inferTypes(type1, typeContext);	
+		}
+		
+		if (this.type.typeTag() == IType.LAMBDA)
+		{
+			// Trash the old lambda type and generate a new one from scratch
+			this.type = null;
+			this.type = this.getType();
+		}
+		else
+		{
 			this.type = type.getConcreteType(typeContext);
 		}
 		
@@ -250,19 +257,17 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		{
 			IParameter lambdaParam = this.parameters[i];
 			IParameter param = method.getParameter(i);
-			IType paramType = lambdaParam.getType();
-			if (paramType == null)
+			IType lambdaParamType = lambdaParam.getType();
+			if (lambdaParamType == null)
 			{
 				continue;
 			}
-			if (!param.getType().equals(paramType))
+			if (!param.getType().equals(lambdaParamType))
 			{
 				return false;
 			}
 		}
 		
-		this.type = type;
-		this.method = method;
 		return true;
 	}
 	

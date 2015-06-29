@@ -35,7 +35,7 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 public class Property extends Member implements IProperty, IContext
 {
-	private IClass				theClass;
+	protected IClass			theClass;
 	
 	public IValue				get;
 	public IValue				set;
@@ -83,7 +83,7 @@ public class Property extends Member implements IProperty, IContext
 	{
 		return ElementType.FIELD;
 	}
-
+	
 	@Override
 	public void setValue(IValue value)
 	{
@@ -217,7 +217,7 @@ public class Property extends Member implements IProperty, IContext
 			this.setterParameter.index = 1;
 			this.set = this.set.resolve(markers, this);
 			
-			IValue set1 = this.set.withType(Types.VOID, null, markers, context);
+			IValue set1 = this.set.withType(Types.VOID, Types.VOID, markers, context);
 			if (set1 == null)
 			{
 				markers.add(this.set.getPosition(), "property.setter.type", this.name);
@@ -231,17 +231,19 @@ public class Property extends Member implements IProperty, IContext
 		{
 			this.get = this.get.resolve(markers, this);
 			
+			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
+				inferType = true;
 				this.type = this.get.getType();
 				if (this.type == Types.UNKNOWN)
 				{
 					markers.add(this.position, "property.type.infer", this.name.unqualified);
+					this.type = Types.ANY;
 				}
-				return;
 			}
 			
-			IValue get1 = this.get.withType(this.type, null, markers, context);
+			IValue get1 = this.get.withType(this.type, this.type, markers, context);
 			if (get1 == null)
 			{
 				Marker marker = markers.create(this.get.getPosition(), "property.getter.type", this.name.unqualified);
@@ -251,6 +253,10 @@ public class Property extends Member implements IProperty, IContext
 			else
 			{
 				this.get = get1;
+				if (inferType)
+				{
+					this.type = get1.getType();
+				}
 			}
 			
 			return;
@@ -258,6 +264,7 @@ public class Property extends Member implements IProperty, IContext
 		if (this.type == Types.UNKNOWN)
 		{
 			markers.add(this.position, "property.type.infer.writeonly", this.name.unqualified);
+			this.type = Types.ANY;
 		}
 	}
 	

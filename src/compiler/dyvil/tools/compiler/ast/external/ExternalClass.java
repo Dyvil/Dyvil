@@ -505,7 +505,8 @@ public final class ExternalClass extends CodeClass
 		Field field = new ExternalField(this);
 		field.setName(Name.get(name));
 		field.setModifiers(access);
-		field.setType(ClassFormat.extendedToType(desc));
+		
+		field.setType(ClassFormat.extendedToType(signature == null ? desc : signature));
 		
 		if (value != null)
 		{

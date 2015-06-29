@@ -51,7 +51,7 @@ public final class FormatStringExpression extends ASTNode implements IValue
 		IClass iclass = type.getTheClass();
 		if (iclass.getAnnotation(StringValue.STRING_CONVERTIBLE) != null)
 		{
-			return new LiteralExpression(type, this);
+			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
 		if (iclass.getAnnotation(FORMAT_STRING_CONVERTIBLE) != null)
 		{
@@ -80,7 +80,7 @@ public final class FormatStringExpression extends ASTNode implements IValue
 				list.addValue(this.values[i]);
 			}
 			
-			return new LiteralExpression(type, list);
+			return new LiteralExpression(list).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}

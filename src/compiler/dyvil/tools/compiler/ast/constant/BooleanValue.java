@@ -69,7 +69,7 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 		}
 		if (type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null)
 		{
-			return new LiteralExpression(type, this);
+			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}

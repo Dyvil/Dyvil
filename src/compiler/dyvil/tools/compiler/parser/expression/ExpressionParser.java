@@ -542,6 +542,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			LambdaExpression lv = new LambdaExpression(next.raw(), name);
 			this.mode = 0;
+			this.value = lv;
 			pm.pushParser(new ExpressionParser(lv));
 			pm.skip();
 			return;

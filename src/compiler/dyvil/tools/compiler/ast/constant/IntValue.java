@@ -69,7 +69,7 @@ public final class IntValue extends ASTNode implements INumericValue
 		}
 		if (type.getTheClass().getAnnotation(INT_CONVERTIBLE) != null)
 		{
-			return new LiteralExpression(type, this);
+			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}

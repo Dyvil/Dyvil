@@ -82,7 +82,7 @@ public class NamedType implements IType
 	@Override
 	public int typeTag()
 	{
-		return 0;
+		return NAMED;
 	}
 	
 	@Override

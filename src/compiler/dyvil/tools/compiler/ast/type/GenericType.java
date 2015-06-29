@@ -434,7 +434,7 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 	@Override
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder(this.name.toString());
+		StringBuilder builder = new StringBuilder(this.theClass != null ? this.theClass.getFullName() : this.name.toString());
 		if (this.typeArgumentCount > 0)
 		{
 			builder.append('[').append(this.typeArguments[0].toString());

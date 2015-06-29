@@ -58,7 +58,7 @@ public final class CharValue extends ASTNode implements INumericValue
 		}
 		if (type.getTheClass().getAnnotation(CHAR_CONVERTIBLE) != null)
 		{
-			return new LiteralExpression(type, this);
+			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}

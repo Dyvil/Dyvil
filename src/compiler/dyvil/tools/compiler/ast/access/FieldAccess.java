@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
@@ -13,7 +14,6 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -23,14 +23,15 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
+public final class FieldAccess extends ASTNode implements IValue, INamed, IValued
 {
-	public IValue	instance;
-	public Name		name;
+	public IValue		instance;
+	public Name			name;
 	
-	public boolean	dotless;
+	public boolean		dotless;
 	
 	public IDataMember	field;
+	protected IType		type;
 	
 	public FieldAccess(ICodePosition position)
 	{
@@ -53,7 +54,19 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 	@Override
 	public IType getType()
 	{
-		return this.field == null ? Types.UNKNOWN : this.field.getType();
+		if (this.type == null)
+		{
+			if (this.field == null)
+			{
+				return Types.UNKNOWN;
+			}
+			if (this.instance == null)
+			{
+				return this.type = this.field.getType();
+			}
+			return this.type = this.field.getType().getConcreteType(this.instance.getType());
+		}
+		return this.type;
 	}
 	
 	@Override
@@ -65,7 +78,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.field == null ? false : type.isSuperTypeOf(this.field.getType());
+		return this.field == null ? false : type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
@@ -76,7 +89,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 			return 0;
 		}
 		
-		IType type1 = this.field.getType();
+		IType type1 = this.getType();
 		if (type.equals(type1))
 		{
 			return 3;
@@ -110,17 +123,6 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 	public IValue getValue()
 	{
 		return this.instance;
-	}
-	
-	@Override
-	public void setArguments(IArguments arguments)
-	{
-	}
-	
-	@Override
-	public IArguments getArguments()
-	{
-		return EmptyArguments.INSTANCE;
 	}
 	
 	@Override
@@ -250,12 +252,17 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.field.writeGet(writer, this.instance);
+		
+		if (!this.type.isSuperTypeOf(this.field.getType()))
+		{
+			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
+		}
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.field.writeGet(writer, this.instance);
+		this.writeExpression(writer);
 		writer.writeInsn(this.field.getType().getReturnOpcode());
 	}
 	

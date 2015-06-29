@@ -10,7 +10,9 @@ import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.Util;
 
 public final class LiteralExpression implements IValue
 {
@@ -19,15 +21,13 @@ public final class LiteralExpression implements IValue
 	
 	private IMethod		method;
 	
-	public LiteralExpression(IType type, IValue literal)
+	public LiteralExpression(IValue literal)
 	{
 		this.arguments = new SingleArgument(literal);
-		this.type = type;
 	}
 	
-	public LiteralExpression(IType type, IArguments arguments)
+	public LiteralExpression(IArguments arguments)
 	{
-		this.type = type;
 		this.arguments = arguments;
 	}
 	
@@ -52,6 +52,34 @@ public final class LiteralExpression implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		IMethod method = IContext.resolveMethod(type, null, Name.apply, this.arguments);
+		if (method == null)
+		{
+			IValue value = this.arguments.getFirstValue();
+			StringBuilder builder = new StringBuilder();
+			this.arguments.typesToString(builder);
+			markers.add(value.getPosition(), "literal.method", value.getType().getName(), this.type.toString(), builder);
+			this.type = type;
+		}
+		else
+		{
+			this.method = method;
+			GenericData data = method.getGenericData(null, null, this.arguments);
+			method.checkArguments(markers, null, context, null, this.arguments, data);
+			this.type = method.getType().getConcreteType(data);
+			
+			if (!type.isSuperTypeOf(this.type))
+			{
+				Marker m = markers.create(this.arguments.getFirstValue().getPosition(), "literal.type");
+				m.addInfo("Required Type: " + type);
+				m.addInfo("Conversion Type: " + this.type);
+				
+				StringBuilder sb = new StringBuilder("Conversion Method: \n\t\t");
+				Util.methodSignatureToString(method, sb);
+				m.addInfo(sb.toString());
+			}
+		}
+		
 		return this;
 	}
 	
@@ -83,22 +111,6 @@ public final class LiteralExpression implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IMethod match = IContext.resolveMethod(this.type, null, Name.apply, this.arguments);
-		if (match == null)
-		{
-			IValue value = this.arguments.getFirstValue();
-			StringBuilder builder = new StringBuilder();
-			this.arguments.typesToString(builder);
-			markers.add(value.getPosition(), "literal.method", value.getType().getName(), this.type.toString(), builder);
-		}
-		else
-		{
-			this.method = match;
-			GenericData data = match.getGenericData(null, null, this.arguments);
-			match.checkArguments(markers, null, context, null, this.arguments, data);
-			this.type = match.getType().getConcreteType(data);
-		}
-		
 		this.arguments.checkTypes(markers, context);
 	}
 	
