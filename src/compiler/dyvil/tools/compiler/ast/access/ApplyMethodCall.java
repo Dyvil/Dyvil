@@ -59,7 +59,7 @@ public class ApplyMethodCall extends AbstractCall
 		
 		if (this.genericData != null)
 		{
-			if (this.instance != null || this.instance.valueTag() != FIELD_ACCESS)
+			if (this.instance != null && this.instance.valueTag() != FIELD_ACCESS)
 			{
 				buffer.append(".apply");
 			}

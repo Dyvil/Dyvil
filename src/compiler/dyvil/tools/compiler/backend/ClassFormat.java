@@ -332,7 +332,7 @@ public final class ClassFormat
 		{
 			int end1 = getMatchingSemicolon(desc, start, desc.length());
 			WildcardType var = new WildcardType();
-			var.addUpperBound(readType(desc, start + 1, end1));
+			var.setUpperBound(readType(desc, start + 1, end1));
 			consumer.setType(var);
 			return end1 + 1;
 		}
@@ -416,7 +416,7 @@ public final class ClassFormat
 		{
 			int end1 = getMatchingSemicolon(desc, start, desc.length());
 			WildcardType var = new WildcardType();
-			var.addUpperBound(readType(desc, start + 1, end1));
+			var.setUpperBound(readType(desc, start + 1, end1));
 			list.addType(var);
 			return end1 + 1;
 		}

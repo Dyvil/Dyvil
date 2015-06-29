@@ -224,7 +224,9 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				pm.pushParser(new TypeVariableListParser(m));
 				return;
 			}
-			return;
+			
+			this.mode = TYPE;
+			throw new SyntaxError(token, "Invalid Declaration - ';', '=', '(', '[' or '{' expected");
 		case GENERICS_END:
 			this.mode = PARAMETERS;
 			if (type == Symbols.CLOSE_SQUARE_BRACKET)
@@ -270,7 +272,9 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				pm.pushParser(new ExceptionListParser((IExceptionList) this.member));
 				return;
 			}
-			return;
+			
+			this.mode = TYPE;
+			throw new SyntaxError(token, "Invalid Method Declaration - ';', '=', '{' or 'throws' expected");
 		case METHOD_END:
 			this.consumer.addMethod((IMethod) this.member);
 			pm.reparse();

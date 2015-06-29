@@ -4,30 +4,24 @@ import dyvil.lang.Type;
 
 public class WildcardType<T> implements Type<T>
 {
-	protected final Type[]	upperBounds;
+	protected final Type	upperBound;
 	protected final Type	lowerBound;
 	
-	public static <T> WildcardType<T> apply(Type lowerBound, Type... upperBounds)
+	public static <T> WildcardType<T> apply(Type lowerBound, Type upperBounds)
 	{
 		return new WildcardType(lowerBound, upperBounds);
 	}
 	
-	public WildcardType(Type lowerBound)
+	public WildcardType(Type upperBounds)
 	{
-		this.lowerBound = lowerBound;
-		this.upperBounds = null;
-	}
-	
-	public WildcardType(Type... upperBounds)
-	{
-		this.upperBounds = upperBounds;
+		this.upperBound = upperBounds;
 		this.lowerBound = null;
 	}
 	
-	public WildcardType(Type lowerBound, Type... upperBounds)
+	public WildcardType(Type lowerBound, Type upperBounds)
 	{
 		this.lowerBound = lowerBound;
-		this.upperBounds = upperBounds;
+		this.upperBound = upperBounds;
 	}
 	
 	@Override
@@ -62,26 +56,13 @@ public class WildcardType<T> implements Type<T>
 		builder.append('_');
 		if (this.lowerBound != null)
 		{
-			builder.append(" <= ");
+			builder.append(" >: ");
 			this.lowerBound.toString(builder);
 		}
-		if (this.upperBounds == null)
+		if (this.upperBound != null)
 		{
-			return;
-		}
-		
-		int len = this.upperBounds.length;
-		if (len == 0)
-		{
-			return;
-		}
-		
-		builder.append(" >= ");
-		this.upperBounds[0].toString(builder);
-		for (int i = 1; i < len; i++)
-		{
-			builder.append(" & ");
-			this.upperBounds[i].toString(builder);
+			builder.append(" <: ");
+			this.upperBound.toString(builder);
 		}
 	}
 	
@@ -93,9 +74,9 @@ public class WildcardType<T> implements Type<T>
 			builder.append("Ljava/lang/Object;");
 			return;
 		}
-		if (this.upperBounds != null && this.upperBounds.length > 0)
+		if (this.upperBound != null)
 		{
-			this.upperBounds[0].appendSignature(builder);
+			this.upperBound.appendSignature(builder);
 		}
 	}
 	
@@ -108,9 +89,12 @@ public class WildcardType<T> implements Type<T>
 			this.lowerBound.appendGenericSignature(builder);
 			return;
 		}
-		if (this.upperBounds != null && this.upperBounds.length > 0)
+		if (this.upperBound != null)
 		{
-			this.upperBounds[0].appendSignature(builder);
+			builder.append('+');
+			this.upperBound.appendSignature(builder);
+			return;
 		}
+		builder.append('*');
 	}
 }

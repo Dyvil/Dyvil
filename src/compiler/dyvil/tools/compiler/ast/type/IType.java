@@ -132,6 +132,10 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		{
 			return true;
 		}
+		if (type.typeTag() == WILDCARD_TYPE)
+		{
+			return type.equals(this);
+		}
 		if (type.isArrayType())
 		{
 			return false;
@@ -142,7 +146,7 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		{
 			return thatClass == thisClass || thatClass.isSubTypeOf(this);
 		}
-		return type.equals(this);
+		return false;
 	}
 	
 	public default boolean isSuperTypeOf2(IType type)

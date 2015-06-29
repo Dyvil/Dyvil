@@ -61,8 +61,10 @@ public final class Name
 	
 	public static final Name				lt				= new Name("<", "$lt");
 	public static final Name				lteq			= new Name("<=", "$lt$eq");
+	public static final Name				ltcolon			= new Name("<:", "$lt$colon");
 	public static final Name				gt				= new Name(">", "$gt");
 	public static final Name				gteq			= new Name(">=", "$gt$eq");
+	public static final Name				gtcolon			= new Name(">:", "$gt$colon");
 	
 	public static final Name				bang			= new Name("!", "$bang");
 	public static final Name				tilde			= new Name("~", "$tilde");

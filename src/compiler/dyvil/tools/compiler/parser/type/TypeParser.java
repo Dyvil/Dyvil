@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.generic.IBounded;
 import dyvil.tools.compiler.ast.generic.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.*;
@@ -13,7 +12,7 @@ import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class TypeParser extends Parser implements ITyped
+public final class TypeParser extends Parser
 {
 	public static final int	NAME			= 1;
 	public static final int	GENERICS		= 2;
@@ -23,9 +22,6 @@ public final class TypeParser extends Parser implements ITyped
 	public static final int	TUPLE_END		= 128;
 	public static final int	LAMBDA_TYPE		= 256;
 	public static final int	LAMBDA_END		= 512;
-	
-	public static final int	UPPER			= 1;
-	public static final int	LOWER			= 2;
 	
 	protected ITypeConsumer	typed;
 	
@@ -165,28 +161,17 @@ public final class TypeParser extends Parser implements ITyped
 			return;
 		case WILDCARD_TYPE:
 			Name name = token.nameValue();
-			if (this.boundMode == 0)
+			if (name == Name.ltcolon) // <: - Upper Bound
 			{
-				if (name == Name.lteq)
-				{
-					pm.pushParser(new TypeParser(this));
-					this.boundMode = LOWER;
-					return;
-				}
-				if (name == Name.gteq)
-				{
-					pm.pushParser(new TypeParser(this));
-					this.boundMode = UPPER;
-					return;
-				}
+				pm.pushParser(new TypeParser(t -> ((WildcardType) this.type).setUpperBound(t)));
+				this.boundMode = 0;
+				return;
 			}
-			else if (this.boundMode == UPPER)
+			if (name == Name.gtcolon) // >: - Lower Bound
 			{
-				if (name == Name.amp)
-				{
-					pm.pushParser(new TypeParser(this));
-					return;
-				}
+				pm.pushParser(new TypeParser(t -> ((WildcardType) this.type).setLowerBound(t)));
+				this.boundMode = 0;
+				return;
 			}
 			this.typed.setType(this.type);
 			pm.popParser(true);
@@ -200,28 +185,5 @@ public final class TypeParser extends Parser implements ITyped
 			}
 			throw new SyntaxError(token, "Invalid Generic Type - ']' expected", true);
 		}
-	}
-	
-	@Override
-	public void setType(IType type)
-	{
-		if (this.boundMode == UPPER)
-		{
-			((IBounded) this.type).addUpperBound(type);
-		}
-		else if (this.boundMode == LOWER)
-		{
-			((IBounded) this.type).setLowerBound(type);
-		}
-		else
-		{
-			((ITyped) this.type).setType(type);
-		}
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return null;
 	}
 }

@@ -1,14 +1,11 @@
 package dyvil.lang;
 
-import dyvil.lang.literal.IntConvertible;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
 
-@IntConvertible
 public class Short implements Integer
 {
 	public static final int		min		= java.lang.Short.MIN_VALUE;

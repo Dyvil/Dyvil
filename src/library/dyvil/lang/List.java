@@ -59,7 +59,12 @@ public interface List<E> extends Collection<E>
 	 */
 	public static <E> MutableList<E> apply()
 	{
-		return new dyvil.collection.mutable.ArrayList();
+		return new dyvil.collection.mutable.ArrayList<E>();
+	}
+	
+	public static <E> ImmutableList<E> apply(E element)
+	{
+		return new dyvil.collection.immutable.SingletonList<E>(element);
 	}
 	
 	/**
@@ -75,7 +80,7 @@ public interface List<E> extends Collection<E>
 	 */
 	public static <E> ImmutableList<E> apply(E... array)
 	{
-		return new dyvil.collection.immutable.ArrayList(array, true);
+		return new dyvil.collection.immutable.ArrayList<E>(array, true);
 	}
 	
 	// Simple getters
@@ -246,9 +251,9 @@ public interface List<E> extends Collection<E>
 	
 	/**
 	 * Updates the element at the given {@code index} of this list. Unlike
-	 * {@link #subscript_$eq(int, Object)}, this method will not throw any exceptions
-	 * if the given {@code index} is out of bounds. Instead, it silently ignores
-	 * the error and returns {@code null}.
+	 * {@link #subscript_$eq(int, Object)}, this method will not throw any
+	 * exceptions if the given {@code index} is out of bounds. Instead, it
+	 * silently ignores the error and returns {@code null}.
 	 * 
 	 * @param index
 	 *            the index of the element to be updated
