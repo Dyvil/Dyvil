@@ -11,8 +11,6 @@ public interface Keywords
 	int	CLASS			= Tokens.KEYWORD | 0x00070000;
 	int	CONST			= Tokens.KEYWORD | 0x00080000;
 	int	CONTINUE		= Tokens.KEYWORD | 0x00090000;
-	int	DERIVED			= Tokens.KEYWORD | 0x000A0000;
-	int	DEPRECATED		= Tokens.KEYWORD | 0x000B0000;
 	int	DO				= Tokens.KEYWORD | 0x000C0000;
 	int	ELSE			= Tokens.KEYWORD | 0x000D0000;
 	int	ENUM			= Tokens.KEYWORD | 0x000E0000;
@@ -25,6 +23,7 @@ public interface Keywords
 	int	GOTO			= Tokens.KEYWORD | 0x00160000;
 	int	IF				= Tokens.KEYWORD | 0x00170000;
 	int	IMPLEMENTS		= Tokens.KEYWORD | 0x00180000;
+	int	IMPLICIT		= Tokens.KEYWORD | 0x003B0000;
 	int	IMPORT			= Tokens.KEYWORD | 0x00190000;
 	int	INCLUDE			= Tokens.KEYWORD | 0x001A0000;
 	int	INLINE			= Tokens.KEYWORD | 0x001B0000;
@@ -32,6 +31,7 @@ public interface Keywords
 	int	INTERFACE		= Tokens.KEYWORD | 0x001D0000;
 	int	IS				= Tokens.KEYWORD | 0x001E0000;
 	int	LAZY			= Tokens.KEYWORD | 0x001F0000;
+	int	MACRO			= Tokens.KEYWORD | 0x003A0000;
 	int	NEW				= Tokens.KEYWORD | 0x00200000;
 	int	NIL				= Tokens.KEYWORD | 0x00210000;
 	int	NULL			= Tokens.KEYWORD | 0x00220000;
@@ -81,10 +81,6 @@ public interface Keywords
 			return CONST;
 		case "continue":
 			return CONTINUE;
-		case "derived":
-			return DERIVED;
-		case "deprecated":
-			return DEPRECATED;
 		case "do":
 			return DO;
 		case "else":
@@ -109,6 +105,8 @@ public interface Keywords
 			return IF;
 		case "implements":
 			return IMPLEMENTS;
+		case "implicit":
+			return IMPLICIT;
 		case "import":
 			return IMPORT;
 		case "include":
@@ -123,6 +121,8 @@ public interface Keywords
 			return IS;
 		case "lazy":
 			return LAZY;
+		case "macro":
+			return MACRO;
 		case "new":
 			return NEW;
 		case "nil":
@@ -201,10 +201,6 @@ public interface Keywords
 			return "const";
 		case CONTINUE:
 			return "continue";
-		case DERIVED:
-			return "derived";
-		case DEPRECATED:
-			return "deprecated";
 		case DO:
 			return "do";
 		case ELSE:
@@ -229,6 +225,8 @@ public interface Keywords
 			return "if";
 		case IMPLEMENTS:
 			return "implements";
+		case IMPLICIT:
+			return "implicit";
 		case IMPORT:
 			return "import";
 		case INCLUDE:
@@ -243,6 +241,8 @@ public interface Keywords
 			return "is";
 		case LAZY:
 			return "lazy";
+		case MACRO:
+			return "macro";
 		case NEW:
 			return "new";
 		case NIL:
