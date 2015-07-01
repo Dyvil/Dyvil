@@ -53,6 +53,19 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		parameterTypes = new IType[typeCount];
 	}
 	
+	public static IClass getLambdaClass(int typeCount)
+	{
+		IClass iclass = functionClasses[typeCount];
+		if (iclass != null)
+		{
+			return iclass;
+		}
+		
+		iclass = Package.dyvilFunction.resolveClass("Function" + typeCount);
+		functionClasses[typeCount] = iclass;
+		return iclass;
+	}
+	
 	@Override
 	public int typeTag()
 	{
@@ -115,15 +128,18 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public IClass getTheClass()
 	{
-		IClass iclass = functionClasses[this.parameterCount];
-		if (iclass != null)
+		return getLambdaClass(this.parameterCount);
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar)
+	{
+		int index = typeVar.getIndex();
+		if (index == this.parameterCount)
 		{
-			return iclass;
+			return this.returnType;
 		}
-		
-		iclass = Package.dyvilFunction.resolveClass("Function" + this.parameterCount);
-		functionClasses[this.parameterCount] = iclass;
-		return iclass;
+		return this.parameterTypes[index];
 	}
 	
 	@Override
@@ -146,64 +162,21 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		int index = typeVar.getIndex();
-		if (index == this.parameterCount)
-		{
-			return this.returnType;
-		}
-		return this.parameterTypes[index];
-	}
-	
-	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
-	{
-		if (concrete.typeTag() != LAMBDA)
-		{
-			return Types.ANY;
-		}
-		
-		LambdaType lambdaType = (LambdaType) concrete;
-		if (lambdaType.parameterCount != this.parameterCount)
-		{
-			return Types.ANY;
-		}
-		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IType concreteType = lambdaType.parameterTypes[i];
-			IType type = this.parameterTypes[i].resolveType(typeVar, concreteType);
-			if (type != null)
-			{
-				return type;
-			}
-		}
-		
-		return this.returnType.resolveType(typeVar, lambdaType.returnType);
-	}
-	
-	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		if (concrete.typeTag() != LAMBDA)
-		{
-			return;
-		}
-		
-		LambdaType lambdaType = (LambdaType) concrete;
-		if (lambdaType.parameterCount != this.parameterCount)
-		{
-			return;
-		}
-		
+		ITypeVariable typeVar;
+		IType concreteType;
+		IClass iclass = this.getTheClass();
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IType concreteType = lambdaType.parameterTypes[i];
+			typeVar = iclass.getTypeVariable(i);
+			concreteType = concrete.getConcreteType(typeContext);
 			this.parameterTypes[i].inferTypes(concreteType, typeContext);
 		}
 		
-		this.returnType.inferTypes(lambdaType.returnType, typeContext);
+		typeVar = iclass.getTypeVariable(this.parameterCount);
+		concreteType = concrete.resolveType(typeVar);
+		this.returnType.inferTypes(concreteType, typeContext);
 	}
 	
 	@Override
@@ -215,8 +188,6 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public LambdaType resolve(MarkerList markers, IContext context)
 	{
-		this.getTheClass();
-		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameterTypes[i] = this.parameterTypes[i].resolve(markers, context);
@@ -234,7 +205,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		this.getTheClass().getMethodMatches(list, instance, name, arguments);
+		getLambdaClass(this.parameterCount).getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
@@ -251,7 +222,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		return this.getTheClass().getFunctionalMethod();
+		return getLambdaClass(this.parameterCount).getFunctionalMethod();
 	}
 	
 	@Override
@@ -317,9 +288,17 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Method.parametersStart);
-		Util.astToString(prefix, this.parameterTypes, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
-		buffer.append(Formatting.Method.parametersEnd);
+		if (this.parameterCount == 1)
+		{
+			this.parameterTypes[0].toString(prefix, buffer);
+		}
+		else
+		{
+			buffer.append(Formatting.Method.parametersStart);
+			Util.astToString(prefix, this.parameterTypes, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
+			buffer.append(Formatting.Method.parametersEnd);
+		}
+		
 		buffer.append(Formatting.Expression.lambdaSeperator);
 		this.returnType.toString("", buffer);
 	}

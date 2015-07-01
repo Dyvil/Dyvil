@@ -59,20 +59,9 @@ public final class ExpressionListParser extends Parser implements IValueConsumer
 		}
 		if (this.mode == SEPARATOR)
 		{
-			if (type == Symbols.COMMA)
+			if (type == Symbols.COMMA || type == Symbols.SEMICOLON)
 			{
 				this.mode = EXPRESSION;
-				return;
-			}
-			if (type == Symbols.SEMICOLON && token.isInferred())
-			{
-				this.mode = EXPRESSION;
-				return;
-			}
-			if (token.prev().type() == Symbols.CLOSE_CURLY_BRACKET)
-			{
-				this.mode = EXPRESSION;
-				pm.reparse();
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Expression List - ',' expected");

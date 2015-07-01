@@ -194,7 +194,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return;
 		}
 		
-		super.addImport(declaration);
+		super.addUsing(declaration);
 		System.out.println("Added using declaration for '" + declaration.theImport + "'");
 	}
 	

@@ -64,7 +64,7 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 		}
 		if (this.mode == SEPERATOR)
 		{
-			if (type == Symbols.COMMA)
+			if (type == Symbols.COMMA || type == Symbols.SEMICOLON)
 			{
 				this.mode = NAME;
 				return;

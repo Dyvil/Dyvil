@@ -42,57 +42,6 @@ public final class TupleType implements IType, ITypeList
 	
 	// ITypeList Overrides
 	
-	public static boolean isSuperType(IType type, ITyped[] typedArray, int count)
-	{
-		if (!tupleClasses[count].isSubTypeOf(type))
-		{
-			return false;
-		}
-		int typeTag = type.typeTag();
-		if (typeTag != GENERIC && typeTag != TUPLE)
-		{
-			return false;
-		}
-		
-		ITypeList typeList = (ITypeList) type;
-		
-		for (int i = 0; i < count; i++)
-		{
-			if (!typedArray[i].isType(typeList.getType(i)))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	public static String getConstructorDescriptor(int typeCount)
-	{
-		if (typeCount < 22)
-		{
-			String s = descriptors[typeCount];
-			if (s != null)
-			{
-				return s;
-			}
-		}
-		
-		StringBuilder buffer = new StringBuilder();
-		buffer.append('(');
-		for (int i = 0; i < typeCount; i++)
-		{
-			buffer.append("Ljava/lang/Object;");
-		}
-		buffer.append(")V");
-		
-		String s = buffer.toString();
-		if (typeCount < 22)
-		{
-			descriptors[typeCount] = s;
-		}
-		return s;
-	}
-	
 	public static IClass getTupleClass(int count)
 	{
 		IClass iclass = tupleClasses[count];
@@ -104,6 +53,45 @@ public final class TupleType implements IType, ITypeList
 		iclass = Package.dyvilTuple.resolveClass("Tuple" + count);
 		tupleClasses[count] = iclass;
 		return iclass;
+	}
+
+	public static String getConstructorDescriptor(int typeCount)
+	{
+		String s = descriptors[typeCount];
+		if (s != null)
+		{
+			return s;
+		}
+		
+		StringBuilder buffer = new StringBuilder();
+		buffer.append('(');
+		for (int i = 0; i < typeCount; i++)
+		{
+			buffer.append("Ljava/lang/Object;");
+		}
+		buffer.append(")V");
+		
+		return descriptors[typeCount] = buffer.toString();
+	}
+
+	public static boolean isSuperType(IType type, ITyped[] typedArray, int count)
+	{
+		IClass iclass = getTupleClass(count);
+		if (!iclass.isSubTypeOf(type))
+		{
+			return false;
+		}
+		
+		for (int i = 0; i < count; i++)
+		{
+			ITypeVariable typeVar = iclass.getTypeVariable(i);
+			IType type1 = type.resolveType(typeVar);
+			if (!typedArray[i].isType(type1))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	@Override
@@ -160,21 +148,17 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (!tupleClasses[this.typeCount].isSubTypeOf(type))
+		IClass iclass = getTupleClass(this.typeCount);
+		if (!iclass.isSubTypeOf(type))
 		{
 			return false;
 		}
-		int typeTag = type.typeTag();
-		if (typeTag != GENERIC && typeTag != TUPLE)
-		{
-			return false;
-		}
-		
-		ITypeList typeList = (ITypeList) type;
 		
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			if (typeList.getType(i).isSuperTypeOf(this.types[i]))
+			ITypeVariable typeVar = iclass.getTypeVariable(i);
+			IType type1 = type.resolveType(typeVar);
+			if (!type1.isSuperTypeOf(this.types[i]))
 			{
 				return false;
 			}
@@ -189,14 +173,24 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public boolean classEquals(IType type)
+	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.isSuperTypeOf(type);
+		// We don't need supertype checking here because typeVar can only come
+		// from the tuple class or Entry[K, V], in which case it is simply
+		// overridden and Tuple2.K yields exactly the same as Entry.K.
+		return this.types[typeVar.getIndex()];
 	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			if (this.types[i].hasTypeVariables())
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 	
@@ -213,35 +207,14 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		return this.types[typeVar.getIndex()];
-	}
-	
-	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
-	{
-		return Types.ANY; // FIXME
-	}
-	
-	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		int typeTag = concrete.typeTag();
-		if (typeTag != GENERIC && typeTag != TUPLE)
-		{
-			return;
-		}
-		
-		ITypeList typeList = (ITypeList) concrete;
-		if (typeList.typeCount() != this.typeCount)
-		{
-			return;
-		}
-		
+		IClass iclass = getTupleClass(this.typeCount);
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			this.types[i].inferTypes(typeList.getType(i), typeContext);
+			ITypeVariable typeVar = iclass.getTypeVariable(i);
+			IType concreteType = concrete.resolveType(typeVar);
+			this.types[i].inferTypes(concreteType, typeContext);
 		}
 	}
 	

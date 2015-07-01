@@ -59,21 +59,6 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		return false;
 	}
 	
-	public default IType getReferenceType()
-	{
-		return this;
-	}
-	
-	public default IMethod getBoxMethod()
-	{
-		return null;
-	}
-	
-	public default IMethod getUnboxMethod()
-	{
-		return null;
-	}
-	
 	public Name getName();
 	
 	// Container Class
@@ -81,6 +66,11 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	public IClass getTheClass();
 	
 	// Arrays
+	
+	public default IType getReferenceType()
+	{
+		return this;
+	}
 	
 	public default boolean isArrayType()
 	{
@@ -172,11 +162,35 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	
 	// Resolve
 	
-	public boolean isResolved();
+	public default IMethod getBoxMethod()
+	{
+		return null;
+	}
 	
-	public IType resolve(MarkerList markers, IContext context);
+	public default IMethod getUnboxMethod()
+	{
+		return null;
+	}
 	
 	// Generics
+	
+	/**
+	 * Returns the type argument in this generic type for the given type
+	 * variable.
+	 * <p>
+	 * Example:<br>
+	 * 
+	 * <pre>
+	 * GenericType gt = type[List[String]]
+	 * ITypeVariable tv = type[List].getTypeVariable("E")
+	 * gt.resolveType(tv) // => String
+	 * </pre>
+	 */
+	@Override
+	public default IType resolveType(ITypeVariable typeVar)
+	{
+		return Types.ANY;
+	}
 	
 	/**
 	 * Returns true if this is or contains any type variables.
@@ -200,46 +214,15 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		return this;
 	}
 	
-	/**
-	 * Returns the type argument in this generic type for the given type
-	 * variable.
-	 * <p>
-	 * Example:<br>
-	 * 
-	 * <pre>
-	 * GenericType gt = type[List[String]]
-	 * ITypeVariable tv = type[List].getTypeVariable("E")
-	 * gt.resolveType(tv) // => String
-	 * </pre>
-	 */
-	@Override
-	public default IType resolveType(ITypeVariable typeVar)
-	{
-		return Types.ANY;
-	}
-	
-	/**
-	 * Returns the type argument in this generic type for the given type
-	 * variable, where this is the template containing the type variable types
-	 * and {@code concrete} contains the concrete types.
-	 * <p>
-	 * Example:<br>
-	 * 
-	 * <pre>
-	 * GenericType gt1 = type[List].genericType // => List[E]
-	 * GenericType gt2 = type[List[String]]
-	 * ITypeVariable tv = type[List].getTypeVariable("E")
-	 * gt1.resolveType(tv, gt2) // => String
-	 * </pre>
-	 */
-	public default IType resolveType(ITypeVariable typeVar, IType concrete)
-	{
-		return Types.ANY;
-	}
-	
 	public default void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 	}
+	
+	// Resolve Types
+	
+	public boolean isResolved();
+	
+	public IType resolve(MarkerList markers, IContext context);
 	
 	// IContext
 	

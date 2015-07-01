@@ -21,7 +21,6 @@ public final class GenericData implements ITypeList, ITypeContext
 	
 	public GenericData(int count)
 	{
-		this.genericCount = count;
 		this.generics = new IType[count];
 		this.computedGenerics = count;
 	}
@@ -96,10 +95,12 @@ public final class GenericData implements ITypeList, ITypeContext
 	public void addMapping(ITypeVariable typeVar, IType type)
 	{
 		int index = typeVar.getIndex();
-		if (index >= this.genericCount)
+		if (index < this.genericCount)
 		{
-			this.genericCount = index + 1;
+			return;
 		}
+		
+		this.genericCount = index + 1;
 		if (index >= this.generics.length)
 		{
 			IType[] temp = new IType[index + 1];

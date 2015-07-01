@@ -1228,7 +1228,7 @@ public class Method extends Member implements IMethod
 		
 		if (type != null)
 		{
-			if (type != this.type && !type.isSuperTypeOf(this.type))
+			if (type != this.type && !type.isSuperTypeOf2(this.type))
 			{
 				writer.writeTypeInsn(Opcodes.CHECKCAST, type.getInternalName());
 			}

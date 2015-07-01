@@ -141,7 +141,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 				IType t = this.parameters[i].getType();
 				lt.addType(t == null ? Types.ANY : t);
 			}
-			lt.setType(this.returnType != null ? this.returnType : (this.returnType = this.value.getType()));
+			lt.setType(this.returnType != null ? this.returnType : Types.UNKNOWN);
 			this.type = lt;
 			return lt;
 		}
@@ -193,6 +193,13 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			this.context = context;
 			this.value = this.value.resolve(markers, this);
 			
+			boolean inferReturn = false;
+			if (this.returnType == Types.UNKNOWN)
+			{
+				inferReturn = true;
+				this.returnType = this.value.getType().getReferenceType();
+			}
+			
 			IValue value1 = this.value.withType(this.returnType, typeContext, markers, this);
 			if (value1 == null)
 			{
@@ -203,9 +210,11 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			else
 			{
 				this.value = value1;
+				if (inferReturn)
+				{
+					this.returnType = this.value.getType();
+				}
 			}
-			
-			this.returnType = this.value.getType();
 			
 			this.context = null;
 			
@@ -213,7 +222,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			this.method.getType().inferTypes(this.returnType, tempContext);
 			IType type1 = this.method.getTheClass().getType().getConcreteType(tempContext);
 			
-			type.inferTypes(type1, typeContext);	
+			type.inferTypes(type1, typeContext);
 		}
 		
 		if (this.type.typeTag() == IType.LAMBDA)

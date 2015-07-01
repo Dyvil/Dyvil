@@ -95,6 +95,15 @@ public final class TypeParser extends Parser
 					this.mode = GENERICS;
 					return;
 				}
+				if (nextType == Symbols.ARROW_OPERATOR)
+				{
+					LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue()));
+					this.type = lt;
+					this.mode = LAMBDA_END;
+					pm.skip();
+					pm.pushParser(new TypeParser(lt));
+					return;
+				}
 				
 				this.type = new NamedType(token.raw(), token.nameValue());
 				this.typed.setType(this.type);
@@ -114,8 +123,6 @@ public final class TypeParser extends Parser
 			}
 			throw new SyntaxError(token, "Invalid Type - Invalid " + token);
 		case TUPLE_END:
-			this.typed.setType(this.type);
-			pm.popParser();
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				if (token.next().type() == Symbols.ARROW_OPERATOR)
@@ -127,6 +134,8 @@ public final class TypeParser extends Parser
 				}
 				
 				this.type.expandPosition(token);
+				this.typed.setType(this.type);
+				pm.popParser();
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Tuple Type - ')' expected");

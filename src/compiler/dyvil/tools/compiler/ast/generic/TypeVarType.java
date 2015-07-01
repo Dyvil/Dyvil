@@ -110,12 +110,6 @@ public final class TypeVarType implements IType
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
-	{
-		return this.typeVar == typeVar ? concrete : this;
-	}
-	
-	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 		typeContext.addMapping(this.typeVar, concrete);

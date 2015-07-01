@@ -138,16 +138,6 @@ public final class WildcardType implements IType
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
-	{
-		if (this.upperBound != null)
-		{
-			return this.upperBound.resolveType(typeVar);
-		}
-		return Types.ANY;
-	}
-	
-	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 		if (this.upperBound != null)

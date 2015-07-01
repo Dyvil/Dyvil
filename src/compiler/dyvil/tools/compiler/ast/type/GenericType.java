@@ -70,6 +70,12 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 	// ITypeList Overrides
 	
 	@Override
+	public boolean isGenericType()
+	{
+		return this.theClass == null || this.theClass.isGeneric();
+	}
+	
+	@Override
 	public Name getName()
 	{
 		return this.name;
@@ -164,15 +170,30 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 	}
 	
 	@Override
-	public boolean isGenericType()
+	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.theClass == null || this.theClass.isGeneric();
+		if (typeVar.getGeneric() != this.theClass)
+		{
+			if (this.theClass == null)
+			{
+				return Types.ANY;
+			}
+			return this.theClass.resolveType(typeVar, this);
+		}
+		return this.typeArguments[typeVar.getIndex()];
 	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{
-		return true;
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			if (this.typeArguments[i].hasTypeVariables())
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
@@ -187,62 +208,13 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		if (typeVar.getGeneric() != this.theClass)
-		{
-			if (this.theClass == null)
-			{
-				return Types.ANY;
-			}
-			return this.theClass.resolveType(typeVar, this);
-		}
-		return this.typeArguments[typeVar.getIndex()];
-	}
-	
-	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
-	{
-		IType type;
-		if (concrete.typeTag() != GENERIC)
-		{
-			return Types.ANY;
-		}
-		
-		GenericType gt = (GenericType) concrete;
-		if (gt.typeArgumentCount != this.typeArgumentCount)
-		{
-			return Types.ANY;
-		}
-		
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			type = this.typeArguments[i].resolveType(typeVar, gt.typeArguments[i]);
-			if (type != null)
-			{
-				return type;
-			}
-		}
-		return Types.ANY;
-	}
-	
-	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		if (concrete.typeTag() != GENERIC)
-		{
-			return;
-		}
-		
-		GenericType gt = (GenericType) concrete;
-		if (gt.typeArgumentCount != this.typeArgumentCount)
-		{
-			return;
-		}
-		
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			this.typeArguments[i].inferTypes(gt.typeArguments[i], typeContext);
+			ITypeVariable typeVar = this.theClass.getTypeVariable(i);
+			IType concreteType = concrete.resolveType(typeVar);
+			this.typeArguments[i].inferTypes(concreteType, typeContext);
 		}
 	}
 	
