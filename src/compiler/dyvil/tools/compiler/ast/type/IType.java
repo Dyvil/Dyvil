@@ -104,6 +104,11 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		return Types.OBJECT;
 	}
 	
+	public default IType combine(IType other)
+	{
+		return Types.findCommonSuperType(this, other);
+	}
+	
 	/**
 	 * Returns true if {@code type} is a subtype of this type
 	 * 
@@ -139,7 +144,7 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		return false;
 	}
 	
-	public default boolean isSuperTypeOf2(IType type)
+	public default boolean isSuperClassOf(IType type)
 	{
 		IClass thisClass = this.getTheClass();
 		IClass thatClass = type.getTheClass();
@@ -272,7 +277,10 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
 	
 	@Override
-	public byte getVisibility(IClassMember member);
+	public default byte getVisibility(IClassMember member)
+	{
+		return 0;
+	}
 	
 	@Override
 	public default boolean handleException(IType type)

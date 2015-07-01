@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -192,12 +191,6 @@ public final class WildcardType implements IType
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return 0;
 	}
 	
 	@Override

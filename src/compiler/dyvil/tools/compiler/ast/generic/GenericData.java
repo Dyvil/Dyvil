@@ -97,6 +97,7 @@ public final class GenericData implements ITypeList, ITypeContext
 		int index = typeVar.getIndex();
 		if (index < this.genericCount)
 		{
+			this.generics[index] = this.generics[index].combine(type);
 			return;
 		}
 		

@@ -469,13 +469,13 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			return true;
 		}
-		if (this.superType != null && type.isSuperTypeOf2(this.superType))
+		if (this.superType != null && type.isSuperClassOf(this.superType))
 		{
 			return true;
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			if (type.isSuperTypeOf2(this.interfaces[i]))
+			if (type.isSuperClassOf(this.interfaces[i]))
 			{
 				return true;
 			}

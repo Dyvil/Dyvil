@@ -78,13 +78,13 @@ public final class TypeVariableParser extends Parser implements ITyped
 			Name name = token.nameValue();
 			if (this.boundMode == 0)
 			{
-				if (name == Name.lteq)
+				if (name == Name.gtcolon) // >: - Lower Bound
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = LOWER;
 					return;
 				}
-				if (name == Name.gteq)
+				if (name == Name.ltcolon) // <: - Upper Bounds
 				{
 					pm.pushParser(new TypeParser(this));
 					this.boundMode = UPPER;
