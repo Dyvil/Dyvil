@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -37,7 +38,7 @@ public class AnnotationVisitorImpl extends AnnotationVisitor
 	static IValue getEnumValue(String enumClass, String name)
 	{
 		IType t = ClassFormat.extendedToType(enumClass);
-		t.resolve(null, Package.rootPackage);
+		t.resolve(null, Package.rootPackage, TypePosition.CLASS);
 		return new EnumValue(t, Name.getQualified(name));
 	}
 	

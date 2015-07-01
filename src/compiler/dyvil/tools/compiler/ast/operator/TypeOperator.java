@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -110,7 +111,7 @@ public final class TypeOperator extends ASTNode implements IValue
 			return;
 		}
 		
-		this.type = this.type.resolve(markers, context);
+		this.type = this.type.resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
 		GenericType generic = new GenericType(Types.TYPE_CLASS);
 		generic.addType(this.type);
 		this.genericType = generic;

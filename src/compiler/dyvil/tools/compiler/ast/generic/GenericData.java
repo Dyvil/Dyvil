@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -115,7 +116,7 @@ public final class GenericData implements ITypeList, ITypeContext
 	{
 		for (int i = 0; i < this.typeCount(); i++)
 		{
-			this.generics[i] = this.generics[i].resolve(markers, context);
+			this.generics[i] = this.generics[i].resolve(markers, context, TypePosition.TYPE);
 		}
 	}
 	

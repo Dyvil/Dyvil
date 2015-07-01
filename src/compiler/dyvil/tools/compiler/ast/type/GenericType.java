@@ -181,7 +181,7 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 		}
 		return this.typeArguments[typeVar.getIndex()];
 	}
-
+	
 	@Override
 	public boolean hasTypeVariables()
 	{
@@ -224,7 +224,7 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		if (this.theClass != null)
 		{
@@ -241,65 +241,81 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 			iclass = IContext.resolveClass(context, this.name);
 		}
 		
-		if (iclass != null)
+		if (iclass == null)
 		{
-			this.theClass = iclass;
-			this.internalName = iclass.getInternalName();
-			
-			if (this.typeArguments == null)
+			if (markers != null)
 			{
-				return this;
-			}
-			
-			int varCount = this.theClass.genericCount();
-			if (varCount == 0)
-			{
-				if (this.typeArgumentCount != 0 && markers != null)
-				{
-					markers.add(this.position, "generic.not_generic", this.name.qualified);
-				}
-				return this;
-			}
-			if (varCount != this.typeArgumentCount && markers != null)
-			{
-				markers.add(this.position, "generic.count");
-				return this;
-			}
-			
-			if (markers == null)
-			{
-				for (int i = 0; i < this.typeArgumentCount; i++)
-				{
-					this.typeArguments[i] = this.typeArguments[i].resolve(markers, context);
-				}
-				return this;
-			}
-			
-			for (int i = 0; i < this.typeArgumentCount; i++)
-			{
-				IType t1 = this.typeArguments[i];
-				IType t2 = t1.resolve(markers, context);
-				
-				if (t2.isPrimitive())
-				{
-					t2 = t2.getReferenceType();
-				}
-				
-				this.typeArguments[i] = t2;
-				
-				ITypeVariable var = this.theClass.getTypeVariable(i);
-				if (!var.isSuperTypeOf(t2))
-				{
-					Marker marker = markers.create(t2.getPosition(), "generic.type", var.getName().qualified);
-					marker.addInfo("Generic Type: " + t2);
-					marker.addInfo("Type Variable: " + var);
-				}
+				markers.add(this.position, "resolve.type", this.toString());
 			}
 			return this;
 		}
-		if (markers != null)
+		
+		this.theClass = iclass;
+		this.internalName = iclass.getInternalName();
+		
+		if (this.typeArguments == null)
 		{
-			markers.add(this.position, "resolve.type", this.toString());
+			return this;
+		}
+		
+		int varCount = this.theClass.genericCount();
+		if (varCount == 0)
+		{
+			if (this.typeArgumentCount != 0 && markers != null)
+			{
+				markers.add(this.position, "generic.not_generic", this.name.qualified);
+			}
+			return this;
+		}
+		if (varCount != this.typeArgumentCount && markers != null)
+		{
+			markers.add(this.position, "generic.count");
+			return this;
+		}
+		
+		if (markers == null)
+		{
+			for (int i = 0; i < this.typeArgumentCount; i++)
+			{
+				this.typeArguments[i] = this.typeArguments[i].resolve(null, context, TypePosition.GENERIC_ARGUMENT);
+			}
+			return this;
+		}
+		
+		if (position == TypePosition.CLASS)
+		{
+			markers.add(this.position, "type.class.generic");
+		}
+		
+		// If the position is a SUPER_TYPE position
+		if (position == TypePosition.SUPER_TYPE || position == TypePosition.SUPER_TYPE_ARGUMENT)
+		{
+			position = TypePosition.SUPER_TYPE_ARGUMENT;
+		}
+		else {
+			// Otherwise, resolve the type arguments with a GENERIC_ARGUMENT position
+			position = TypePosition.GENERIC_ARGUMENT;
+		}
+		
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			IType t1 = this.typeArguments[i];
+			IType t2 = t1.resolve(markers, context, position);
+			
+			if (t2.isPrimitive())
+			{
+				t2 = t2.getReferenceType();
+			}
+			
+			this.typeArguments[i] = t2;
+			
+			ITypeVariable var = this.theClass.getTypeVariable(i);
+			if (!var.isSuperTypeOf(t2))
+			{
+				Marker marker = markers.create(t2.getPosition(), "generic.type", var.getName().qualified);
+				marker.addInfo("Generic Type: " + t2);
+				marker.addInfo("Type Variable: " + var);
+			}
 		}
 		return this;
 	}

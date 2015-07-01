@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -88,7 +89,7 @@ public final class CastOperator extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
+		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
 		this.value.resolveTypes(markers, context);
 	}
 	

@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -91,7 +92,7 @@ public final class ClassAccess extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(null, context);
+		this.type = this.type.resolve(null, context, TypePosition.TYPE);
 	}
 	
 	@Override

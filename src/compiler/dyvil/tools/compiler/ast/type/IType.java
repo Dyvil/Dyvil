@@ -26,6 +26,42 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IType extends IASTNode, IContext, ITypeContext
 {
+	public static enum TypePosition
+	{
+		/**
+		 * Only allows Class Types.
+		 */
+		CLASS,
+		/**
+		 * Allows Class Types and Parameterized Types, but the latter cannot
+		 * involve any Wildcard Types.
+		 */
+		SUPER_TYPE,
+		/**
+		 * Allows Class Types as well as Parameterized Types.
+		 */
+		TYPE,
+		/**
+		 * The type arguments of Parameterized Types used as SUPER_TYPE. Can be
+		 * Class Types, Parameterized Types and Type Variable Types.
+		 */
+		SUPER_TYPE_ARGUMENT,
+		/**
+		 * Allows Class Types, Parameterized Types and Type Variable Types, but
+		 * the latter cannot be contravariant.
+		 */
+		RETURN_TYPE,
+		/**
+		 * Allows Class Types, Parameterized Types and Type Variable Types, but
+		 * the latter cannot be covariant.
+		 */
+		PARAMETER_TYPE,
+		/**
+		 * Allows all Types.
+		 */
+		GENERIC_ARGUMENT;
+	}
+	
 	int	UNKNOWN				= -1;
 	int	NULL				= 0;
 	int	ANY					= 1;
@@ -227,7 +263,7 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	
 	public boolean isResolved();
 	
-	public IType resolve(MarkerList markers, IContext context);
+	public IType resolve(MarkerList markers, IContext context, TypePosition position);
 	
 	// IContext
 	

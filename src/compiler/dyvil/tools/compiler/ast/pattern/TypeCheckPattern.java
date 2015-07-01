@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -87,7 +88,7 @@ public class TypeCheckPattern implements IPattern
 		
 		if (this.type != null)
 		{
-			this.type = this.type.resolve(markers, context);
+			this.type = this.type.resolve(markers, context, TypePosition.CLASS);
 			
 			if (this.pattern != null && this.pattern.getPatternType() != WILDCARD)
 			{

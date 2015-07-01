@@ -31,6 +31,7 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -353,7 +354,7 @@ public class Method extends Member implements IMethod
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolve(markers, this);
+			this.exceptions[i] = this.exceptions[i].resolve(markers, this, TypePosition.TYPE);
 		}
 		
 		int index = (this.modifiers & Modifiers.STATIC) == 0 ? 1 : 0;

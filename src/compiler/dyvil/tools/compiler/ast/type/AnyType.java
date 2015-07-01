@@ -55,7 +55,7 @@ public class AnyType implements IType
 	}
 
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		return this;
 	}

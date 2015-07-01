@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.NamedType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -81,7 +82,7 @@ public final class Annotation extends ASTNode implements ITyped
 	
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
+		this.type = this.type.resolve(markers, context, TypePosition.CLASS);
 		this.arguments.resolveTypes(markers, context);
 	}
 	

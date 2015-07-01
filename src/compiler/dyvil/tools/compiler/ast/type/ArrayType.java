@@ -131,13 +131,19 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
+		if (position == TypePosition.SUPER_TYPE)
+		{
+			markers.add(this.type.getPosition(), "type.super.array");
+			return this.type.resolve(markers, context, TypePosition.SUPER_TYPE);
+		}
+		
 		if (this.type == null)
 		{
 			this.type = Types.ANY;
 		}
-		this.type = this.type.resolve(markers, context);
+		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
 		return this;
 	}
 	

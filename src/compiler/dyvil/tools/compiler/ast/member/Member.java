@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public abstract class Member extends ASTNode implements IMember
@@ -199,7 +200,7 @@ public abstract class Member extends ASTNode implements IMember
 	{
 		if (this.type != null)
 		{
-			this.type = this.type.resolve(markers, context);
+			this.type = this.type.resolve(markers, context, TypePosition.RETURN_TYPE);
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)

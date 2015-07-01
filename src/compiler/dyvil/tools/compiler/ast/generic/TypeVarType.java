@@ -19,7 +19,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class TypeVarType implements IType
+public class TypeVarType implements IType
 {
 	public ITypeVariable	typeVar;
 	
@@ -121,7 +121,7 @@ public final class TypeVarType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		return this;
 	}

@@ -224,7 +224,7 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		if (this.typeCount == 0)
 		{
@@ -232,22 +232,16 @@ public final class TupleType implements IType, ITypeList
 		}
 		if (this.typeCount == 1)
 		{
-			return this.types[0].resolve(markers, context);
+			return this.types[0].resolve(markers, context, position);
 		}
 		
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			IType t = this.types[i].resolve(markers, context);
-			
-			// Tuple Value Boxing
-			if (t.isPrimitive())
-			{
-				this.types[i] = t.getReferenceType();
-			}
-			else
-			{
-				this.types[i] = t;
-			}
+			this.types[i] = this.types[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
+		}
+		
+		if (position == TypePosition.CLASS) {
+			markers.add(this.types[0].getPosition(), "type.class.tuple");
 		}
 		return this;
 	}

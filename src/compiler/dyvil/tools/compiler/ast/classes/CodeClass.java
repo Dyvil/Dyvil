@@ -35,6 +35,7 @@ import dyvil.tools.compiler.ast.type.GenericType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -725,12 +726,12 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.superType != null)
 		{
-			this.superType = this.superType.resolve(markers, this);
+			this.superType = this.superType.resolve(markers, this, TypePosition.SUPER_TYPE);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i] = this.interfaces[i].resolve(markers, this);
+			this.interfaces[i] = this.interfaces[i].resolve(markers, this, TypePosition.SUPER_TYPE);
 		}
 		
 		if (this.body != null)

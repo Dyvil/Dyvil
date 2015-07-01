@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -190,7 +191,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			block.type = block.type.resolve(markers, context);
+			block.type = block.type.resolve(markers, context, TypePosition.CLASS);
 			block.action.resolveTypes(markers, context);
 		}
 		

@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.TypeVarType;
+import dyvil.tools.compiler.ast.generic.PositionedTypeVarType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -103,7 +103,7 @@ public class NamedType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		// Try to resolve the name of this Type as a primitive type
 		IType t = resolvePrimitive(this.name);
@@ -118,7 +118,8 @@ public class NamedType implements IType
 		ITypeVariable typeVar = context.resolveTypeVariable(this.name);
 		if (typeVar != null)
 		{
-			return new TypeVarType(typeVar);
+			// Re-call resolve to make sure the position is properly checked
+			return new PositionedTypeVarType(this.position, typeVar).resolve(markers, context, position);
 		}
 		
 		// This type is probably not a primitive one, so resolve using

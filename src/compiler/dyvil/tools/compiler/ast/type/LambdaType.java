@@ -185,13 +185,18 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	}
 	
 	@Override
-	public LambdaType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i] = this.parameterTypes[i].resolve(markers, context);
+			this.parameterTypes[i] = this.parameterTypes[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
 		}
-		this.returnType = this.returnType.resolve(markers, context);
+		this.returnType = this.returnType.resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
+		
+		if (position == TypePosition.CLASS)
+		{
+			markers.add(this.returnType.getPosition(), "type.class.lambda");
+		}
 		return this;
 	}
 	

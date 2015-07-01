@@ -72,7 +72,7 @@ public class ClassType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		return this;
 	}

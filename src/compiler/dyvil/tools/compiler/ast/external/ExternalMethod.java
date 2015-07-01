@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -85,7 +86,7 @@ public final class ExternalMethod extends Method
 			this.resolveGenerics();
 		}
 		this.returnTypeResolved = true;
-		this.type = this.type.resolve(null, this);
+		this.type = this.type.resolve(null, this, TypePosition.RETURN_TYPE);
 	}
 	
 	private void resolveGenerics()
@@ -129,7 +130,7 @@ public final class ExternalMethod extends Method
 		this.exceptionsResolved = true;
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolve(null, this);
+			this.exceptions[i] = this.exceptions[i].resolve(null, this, TypePosition.TYPE);
 		}
 	}
 	

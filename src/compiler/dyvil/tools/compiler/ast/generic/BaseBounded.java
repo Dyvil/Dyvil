@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -156,13 +157,13 @@ public abstract class BaseBounded implements IASTNode, IBounded, ITypeList
 	{
 		if (this.lowerBound != null)
 		{
-			this.lowerBound = this.lowerBound.resolve(markers, context);
+			this.lowerBound = this.lowerBound.resolve(markers, context, TypePosition.TYPE);
 		}
 		
 		if (this.upperBoundCount > 0)
 		{
 			// The first upper bound is meant to be a class bound.
-			IType type = this.upperBounds[0] = this.upperBounds[0].resolve(markers, context);
+			IType type = this.upperBounds[0] = this.upperBounds[0].resolve(markers, context, TypePosition.TYPE);
 			IClass iclass = type.getTheClass();
 			if (iclass != null)
 			{
@@ -190,7 +191,7 @@ public abstract class BaseBounded implements IASTNode, IBounded, ITypeList
 			// not.
 			for (int i = 1; i < this.upperBoundCount; i++)
 			{
-				type = this.upperBounds[i] = this.upperBounds[i].resolve(markers, context);
+				type = this.upperBounds[i] = this.upperBounds[i].resolve(markers, context, TypePosition.TYPE);
 				iclass = type.getTheClass();
 				if (iclass != null && !iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{

@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.classes.NestedClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -30,7 +31,7 @@ public class ClassConstructor extends ConstructorCall
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
+		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
 		this.arguments.resolveTypes(markers, context);
 		
 		IDyvilHeader header = context.getHeader();

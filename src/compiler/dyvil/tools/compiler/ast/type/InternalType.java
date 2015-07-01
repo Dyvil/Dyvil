@@ -51,7 +51,7 @@ public class InternalType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
 		return new ClassType(iclass);

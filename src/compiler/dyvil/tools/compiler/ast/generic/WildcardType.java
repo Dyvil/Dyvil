@@ -112,15 +112,15 @@ public final class WildcardType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		if (this.upperBound != null)
 		{
-			this.upperBound = this.upperBound.resolve(markers, context);
+			this.upperBound = this.upperBound.resolve(markers, context, TypePosition.TYPE);
 		}
 		if (this.lowerBound != null)
 		{
-			this.lowerBound = this.lowerBound.resolve(markers, context);
+			this.lowerBound = this.lowerBound.resolve(markers, context, TypePosition.TYPE);
 		}
 		
 		return this;
