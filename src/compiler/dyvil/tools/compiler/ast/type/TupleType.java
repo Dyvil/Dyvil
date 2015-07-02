@@ -39,6 +39,12 @@ public final class TupleType implements IType, ITypeList
 		this.types = new IType[size];
 	}
 	
+	public TupleType(IType[] types, int typeCount)
+	{
+		this.types = types;
+		this.typeCount = typeCount;
+	}
+	
 	// ITypeList Overrides
 	
 	public static IClass getTupleClass(int count)
@@ -53,7 +59,7 @@ public final class TupleType implements IType, ITypeList
 		tupleClasses[count] = iclass;
 		return iclass;
 	}
-
+	
 	public static String getConstructorDescriptor(int typeCount)
 	{
 		String s = descriptors[typeCount];
@@ -72,7 +78,7 @@ public final class TupleType implements IType, ITypeList
 		
 		return descriptors[typeCount] = buffer.toString();
 	}
-
+	
 	public static boolean isSuperType(IType type, ITyped[] typedArray, int count)
 	{
 		IClass iclass = getTupleClass(count);
@@ -181,7 +187,7 @@ public final class TupleType implements IType, ITypeList
 		// overridden and Tuple2.K yields exactly the same as Entry.K.
 		return this.types[typeVar.getIndex()];
 	}
-
+	
 	@Override
 	public boolean hasTypeVariables()
 	{
@@ -242,7 +248,8 @@ public final class TupleType implements IType, ITypeList
 			this.types[i] = this.types[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
 		}
 		
-		if (position == TypePosition.CLASS) {
+		if (position == TypePosition.CLASS)
+		{
 			markers.add(this.types[0].getPosition(), "type.class.tuple");
 		}
 		return this;

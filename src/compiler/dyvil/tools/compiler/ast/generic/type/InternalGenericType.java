@@ -13,6 +13,8 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.LambdaType;
+import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -52,13 +54,25 @@ public class InternalGenericType extends GenericType
 	@Override
 	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
-		IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
 		
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
 			this.typeArguments[i] = this.typeArguments[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
 		}
 		
+		if (this.internalName.startsWith("dyvil/tuple/Tuple"))
+		{
+			return new TupleType(this.typeArguments, this.typeArgumentCount);
+		}
+		if (this.internalName.startsWith("dyvil/function/Function"))
+		{
+			int i = this.typeArgumentCount - 1;
+			IType returnType = this.typeArguments[i];
+			this.typeArguments[i] = null;
+			return new LambdaType(this.typeArguments, i, returnType);
+		}
+		
+		IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
 		return new ClassGenericType(iclass, this.typeArguments, this.typeArgumentCount);
 	}
 	

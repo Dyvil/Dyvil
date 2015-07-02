@@ -111,7 +111,7 @@ public abstract class GenericType implements IType, ITypeList
 				"(Ljava/lang/String;[Ldyvil/lang/Type;)Ldyvil/reflect/type/GenericType;", false);
 	}
 	
-	protected final void appendFullTypes(String prefix, StringBuilder builder)
+	protected final void appendFullTypes(StringBuilder builder)
 	{
 		if (this.typeArgumentCount > 0)
 		{

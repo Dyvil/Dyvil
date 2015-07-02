@@ -101,6 +101,12 @@ public class NullType implements IType
 	}
 	
 	@Override
+	public String toString()
+	{
+		return "null";
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("null");

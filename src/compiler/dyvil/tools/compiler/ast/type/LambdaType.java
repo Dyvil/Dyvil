@@ -47,6 +47,13 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		this.parameterCount = tupleType.typeCount;
 	}
 	
+	public LambdaType(IType[] types, int typeCount, IType returnType)
+	{
+		this.parameterTypes = types;
+		this.parameterCount = typeCount;
+		this.returnType = returnType;
+	}
+	
 	public LambdaType(int typeCount)
 	{
 		parameterTypes = new IType[typeCount];

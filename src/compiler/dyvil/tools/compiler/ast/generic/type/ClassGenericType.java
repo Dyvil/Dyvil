@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ClassGenericType extends GenericType
@@ -43,7 +42,7 @@ public final class ClassGenericType extends GenericType
 	@Override
 	public boolean isGenericType()
 	{
-		return this.theClass == null || this.theClass.isGeneric();
+		return this.theClass.isGeneric();
 	}
 	
 	@Override
@@ -112,15 +111,12 @@ public final class ClassGenericType extends GenericType
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		if (typeVar.getGeneric() != this.theClass)
+		int index = typeVar.getIndex();
+		if (this.theClass.getTypeVariable(index) != typeVar)
 		{
-			if (this.theClass == null)
-			{
-				return Types.ANY;
-			}
 			return this.theClass.resolveType(typeVar, this);
 		}
-		return this.typeArguments[typeVar.getIndex()];
+		return this.typeArguments[index];
 	}
 	
 	@Override
@@ -173,41 +169,39 @@ public final class ClassGenericType extends GenericType
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.theClass == null)
-		{
-			return null;
-		}
 		return this.theClass.resolveField(name);
 	}
 	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		if (this.theClass != null)
-		{
 			this.theClass.getMethodMatches(list, instance, name, arguments);
-		}
 	}
 	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
-		if (this.theClass != null)
-		{
 			this.theClass.getConstructorMatches(list, arguments);
-		}
 	}
 	
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		return this.theClass == null ? null : this.theClass.getFunctionalMethod();
+		return this.theClass.getFunctionalMethod();
 	}
 	
 	@Override
 	public String getInternalName()
 	{
 		return this.theClass.getInternalName();
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder(this.theClass.getFullName());
+		this.appendFullTypes(sb);
+		return sb.toString();
 	}
 	
 	@Override
