@@ -383,14 +383,14 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				}
 				else if (prevType == Symbols.CLOSE_SQUARE_BRACKET)
 				{
-					MethodCall mc;
+					AbstractCall mc;
 					if (this.value.valueTag() == IValue.FIELD_ACCESS)
 					{
 						mc = ((FieldAccess) this.value).toMethodCall(null);
 					}
 					else
 					{
-						mc = (MethodCall) this.value;
+						mc = (AbstractCall) this.value;
 					}
 					mc.arguments = args;
 					this.value = mc;

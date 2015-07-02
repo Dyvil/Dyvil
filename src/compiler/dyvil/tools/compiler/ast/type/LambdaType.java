@@ -131,6 +131,35 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	}
 	
 	@Override
+	public boolean isSuperTypeOf(IType type)
+	{
+		if (!IType.super.isSuperTypeOf(type))
+		{
+			return false;
+		}
+		
+		IClass iclass = this.getTheClass();
+		ITypeVariable typeVar;
+		IType type1;
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			typeVar = iclass.getTypeVariable(i);
+			type1 = type.resolveType(typeVar);
+			
+			// Contravariance
+			if (!type1.isSuperTypeOf(this.parameterTypes[i]))
+			{
+				return false;
+			}
+		}
+		
+		typeVar = iclass.getTypeVariable(this.parameterCount);
+		type1 = type.resolveType(typeVar);
+		// Covariance
+		return this.returnType.isSuperTypeOf(type1);
+	}
+	
+	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
 		int index = typeVar.getIndex();

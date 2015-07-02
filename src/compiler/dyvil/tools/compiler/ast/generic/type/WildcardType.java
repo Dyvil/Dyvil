@@ -266,6 +266,8 @@ public final class WildcardType implements IType, ITyped
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/Variance", this.variance.name(), "Ldyvil/reflect/Variance;");
+		
 		if (this.bound != null)
 		{
 			this.bound.writeTypeExpression(writer);
@@ -276,7 +278,7 @@ public final class WildcardType implements IType, ITyped
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/WildcardType", "apply",
-				"(Ldyvil/lang/Type;[Ldyvil/lang/Type;)Ldyvil/reflect/type/WildcardType;", false);
+				"(Ldyvil/reflect/Variance;Ldyvil/lang/Type;)Ldyvil/reflect/type/WildcardType;", false);
 	}
 	
 	@Override

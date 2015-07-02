@@ -111,7 +111,7 @@ public final class TypeOperator extends ASTNode implements IValue
 			return;
 		}
 		
-		this.type = this.type.resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
+		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
 		GenericType generic = new GenericType(Types.TYPE_CLASS);
 		generic.addType(this.type);
 		this.genericType = generic;

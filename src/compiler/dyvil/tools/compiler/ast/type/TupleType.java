@@ -157,7 +157,9 @@ public final class TupleType implements IType, ITypeList
 		{
 			ITypeVariable typeVar = iclass.getTypeVariable(i);
 			IType type1 = type.resolveType(typeVar);
-			if (!type1.isSuperTypeOf(this.types[i]))
+			
+			// Covariance
+			if (!this.types[i].isSuperTypeOf(type1))
 			{
 				return false;
 			}

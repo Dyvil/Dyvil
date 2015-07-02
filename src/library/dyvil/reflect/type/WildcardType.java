@@ -2,26 +2,22 @@ package dyvil.reflect.type;
 
 import dyvil.lang.Type;
 
+import dyvil.reflect.Variance;
+
 public class WildcardType<T> implements Type<T>
 {
-	protected final Type	upperBound;
-	protected final Type	lowerBound;
+	protected final Variance	variance;
+	protected final Type		bound;
 	
-	public static <T> WildcardType<T> apply(Type lowerBound, Type upperBounds)
+	public static <T> WildcardType<T> apply(Variance variance, Type upperBounds)
 	{
-		return new WildcardType(lowerBound, upperBounds);
+		return new WildcardType(variance, upperBounds);
 	}
 	
-	public WildcardType(Type upperBounds)
+	public WildcardType(Variance variance, Type bound)
 	{
-		this.upperBound = upperBounds;
-		this.lowerBound = null;
-	}
-	
-	public WildcardType(Type lowerBound, Type upperBounds)
-	{
-		this.lowerBound = lowerBound;
-		this.upperBound = upperBounds;
+		this.variance = variance;
+		this.bound = bound;
 	}
 	
 	@Override
@@ -54,45 +50,45 @@ public class WildcardType<T> implements Type<T>
 	public void toString(StringBuilder builder)
 	{
 		builder.append('_');
-		if (this.lowerBound != null)
+		if (this.bound != null)
 		{
-			builder.append(" >: ");
-			this.lowerBound.toString(builder);
-		}
-		if (this.upperBound != null)
-		{
-			builder.append(" <: ");
-			this.upperBound.toString(builder);
+			if (this.variance == Variance.CONTRAVARIANT)
+			{
+				builder.append(" >: ");
+			}
+			else
+			{
+				builder.append(" <: ");
+			}
+			this.bound.toString(builder);
 		}
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		if (this.lowerBound != null)
+		if (this.bound != null && this.variance == Variance.COVARIANT)
 		{
-			builder.append("Ljava/lang/Object;");
+			this.bound.appendSignature(builder);
 			return;
 		}
-		if (this.upperBound != null)
-		{
-			this.upperBound.appendSignature(builder);
-		}
+		builder.append("Ljava/lang/Object;");
 	}
 	
 	@Override
 	public void appendGenericSignature(StringBuilder builder)
 	{
-		if (this.lowerBound != null)
+		if (this.bound != null)
 		{
-			builder.append('-');
-			this.lowerBound.appendGenericSignature(builder);
-			return;
-		}
-		if (this.upperBound != null)
-		{
-			builder.append('+');
-			this.upperBound.appendSignature(builder);
+			if (this.variance == Variance.CONTRAVARIANT)
+			{
+				builder.append('-');
+			}
+			else
+			{
+				builder.append('+');
+			}
+			this.bound.appendSignature(builder);
 			return;
 		}
 		builder.append('*');
