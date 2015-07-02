@@ -592,6 +592,21 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public IType resolveType(Name name)
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			ITypeVariable var = this.generics[i];
+			if (var.getName() == name)
+			{
+				return new TypeVarType(var);
+			}
+		}
+		
+		return this.theClass.resolveType(name);
+	}
+	
+	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		for (int i = 0; i < this.genericCount; i++)

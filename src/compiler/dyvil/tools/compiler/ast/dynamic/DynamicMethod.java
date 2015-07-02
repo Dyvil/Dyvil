@@ -178,6 +178,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public IType resolveType(Name name)
+	{
+		return null;
+	}
+	
+	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return null;

@@ -382,6 +382,12 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
+	public IType resolveType(Name name)
+	{
+		return DyvilREPL.context.resolveType(name);
+	}
+	
+	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return DyvilREPL.context.resolveTypeVariable(name);

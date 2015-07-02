@@ -434,6 +434,12 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
+	public IType resolveType(Name name)
+	{
+		return this.theClass.resolveType(name);
+	}
+	
+	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return this.theClass.resolveTypeVariable(name);

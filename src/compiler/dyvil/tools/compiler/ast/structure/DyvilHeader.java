@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.structure;
 
 import java.io.File;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
+import dyvil.lang.Entry;
 import dyvil.lang.List;
+import dyvil.lang.Map;
 
+import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -21,7 +21,9 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.backend.HeaderFile;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
@@ -54,6 +56,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	
 	protected Map<Name, Operator>	operators	= new IdentityHashMap();
 	protected Map<Name, Operator>	inheritedOperators;
+	
+	protected Map<Name, ITypeAlias>	typeAliases	= new IdentityHashMap();
 	
 	public DyvilHeader(String name)
 	{
@@ -267,6 +271,18 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
+	public void addTypeAlias(ITypeAlias typeAlias)
+	{
+		this.typeAliases.put(typeAlias.getName(), typeAlias);
+	}
+	
+	@Override
+	public ITypeAlias getTypeAlias(Name name)
+	{
+		return this.typeAliases.get(name);
+	}
+	
+	@Override
 	public int classCount()
 	{
 		return 0;
@@ -333,6 +349,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		for (int i = 0; i < this.usingCount; i++)
 		{
 			this.usings[i].resolveTypes(this.markers, this, true);
+		}
+		
+		for (Entry<Name, ITypeAlias> entry : this.typeAliases)
+		{
+			entry.getValue().resolve(this.markers, this);
 		}
 	}
 	
@@ -420,6 +441,23 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		if (this.pack != null)
 		{
 			return this.pack.resolveClass(name);
+		}
+		return null;
+	}
+	
+	@Override
+	public IType resolveType(Name name)
+	{
+		ITypeAlias typeAlias = this.typeAliases.get(name);
+		if (typeAlias != null)
+		{
+			return typeAlias.getType();
+		}
+		
+		IClass iclass = this.resolveClass(name);
+		if (iclass != null)
+		{
+			return new ClassType(iclass);
 		}
 		return null;
 	}
@@ -579,7 +617,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		if (!this.operators.isEmpty())
 		{
-			for (Entry<Name, Operator> entry : this.operators.entrySet())
+			for (Entry<Name, Operator> entry : this.operators)
 			{
 				buffer.append(prefix);
 				entry.getValue().toString(buffer);

@@ -326,6 +326,12 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	}
 	
 	@Override
+	public IType resolveType(Name name)
+	{
+		return this.context.resolveType(name);
+	}
+	
+	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return this.context.resolveTypeVariable(name);

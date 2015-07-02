@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 
 public interface IContext
@@ -34,6 +35,8 @@ public interface IContext
 	public Package resolvePackage(Name name);
 	
 	public IClass resolveClass(Name name);
+	
+	public IType resolveType(Name name);
 	
 	public ITypeVariable resolveTypeVariable(Name name);
 	
@@ -77,6 +80,30 @@ public interface IContext
 		
 		// Standart Java Classes
 		return Package.javaLang.resolveClass(name);
+	}
+	
+	public static IType resolveType(IContext context, Name name)
+	{
+		IType itype = context.resolveType(name);
+		if (itype != null)
+		{
+			return itype;
+		}
+		
+		IClass iclass = Package.dyvilLang.resolveClass(name);
+		if (iclass != null)
+		{
+			return new ClassType(iclass);
+		}
+		
+		// Standart Java Classes
+		iclass = Package.javaLang.resolveClass(name);
+		if (iclass != null)
+		{
+			return new ClassType(iclass);
+		}
+		
+		return null;
 	}
 	
 	public static IConstructor resolveConstructor(IContext context, IArguments arguments)

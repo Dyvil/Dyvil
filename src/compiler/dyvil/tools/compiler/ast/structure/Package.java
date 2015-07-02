@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.lexer.CodeFile;
@@ -205,6 +206,17 @@ public class Package implements INamed, IContext
 			}
 		}
 		
+		return null;
+	}
+	
+	@Override
+	public IType resolveType(Name name)
+	{
+		IClass iclass = this.resolveClass(name);
+		if (iclass != null)
+		{
+			return new ClassType(iclass);
+		}
 		return null;
 	}
 	

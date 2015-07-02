@@ -6,8 +6,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -112,8 +110,14 @@ public class NamedType implements IType
 			return t;
 		}
 		
-		ITypeVariable typeVar = context.resolveTypeVariable(this.name);
-		if (typeVar != null)
+		IType type = IContext.resolveType(context, this.name);
+		if (type == null)
+		{
+			markers.add(this.position, "resolve.type", this.toString());
+			return this;
+		}
+		
+		if (type.typeTag() == TYPE_VAR_TYPE)
 		{
 			switch (position)
 			{
@@ -127,19 +131,9 @@ public class NamedType implements IType
 			default:
 				break;
 			}
-			return new TypeVarType(typeVar);
 		}
 		
-		// This type is probably not a primitive one, so resolve using
-		// the context.
-		IClass iclass = IContext.resolveClass(context, this.name);
-		if (iclass != null)
-		{
-			return new ClassType(iclass);
-		}
-		
-		markers.add(this.position, "resolve.type", this.toString());
-		return this;
+		return type;
 	}
 	
 	@Override

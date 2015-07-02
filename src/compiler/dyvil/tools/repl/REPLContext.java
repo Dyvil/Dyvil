@@ -29,6 +29,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -42,7 +43,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	protected static int				resultIndex;
 	protected static int				classIndex;
 	
-	private Map<Name, IField>		variables		= new HashMap();
+	private Map<Name, IField>			variables		= new HashMap();
 	private List<IMethod>				methods			= new ArrayList();
 	
 	private String						currentClassName;
@@ -201,16 +202,32 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addInclude(IncludeDeclaration component)
 	{
-		component.resolve(this.markers);
+		MarkerList markers = new MarkerList();
+		component.resolve(markers);
 		
-		if (this.reportErrors(this.markers))
+		if (this.reportErrors(markers))
 		{
 			return;
 		}
 		
 		this.addIncludeToArray(component);
+		component.addOperators(this.operators);
 		System.out.println("Included the header '" + component.getHeader().getFullName() + "'");
-		return;
+	}
+	
+	@Override
+	public void addTypeAlias(ITypeAlias typeAlias)
+	{
+		MarkerList markers = new MarkerList();
+		
+		typeAlias.resolve(markers, this);
+		if (this.reportErrors(markers))
+		{
+			return;
+		}
+		
+		super.addTypeAlias(typeAlias);
+		System.out.println("Added Type Alias '" + typeAlias.getName() + "' for '" + typeAlias.getType() + "'");
 	}
 	
 	@Override

@@ -105,6 +105,15 @@ public class NamedGenericType extends GenericType
 			position = TypePosition.GENERIC_ARGUMENT;
 		}
 		
+		if (iclass == null)
+		{
+			for (int i = 0; i < this.typeArgumentCount; i++)
+			{
+				this.typeArguments[i] = this.typeArguments[i].resolve(markers, context, position);
+			}
+			return this;
+		}
+		
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
 			IType t1 = this.typeArguments[i];
@@ -154,6 +163,14 @@ public class NamedGenericType extends GenericType
 	public String getInternalName()
 	{
 		return this.name.qualified;
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder(this.name.toString());
+		this.appendFullTypes(sb);
+		return sb.toString();
 	}
 	
 	@Override

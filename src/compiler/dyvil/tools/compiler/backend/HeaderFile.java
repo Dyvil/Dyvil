@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.backend;
 
 import java.io.*;
-import java.util.Map;
-import java.util.Map.Entry;
+
+import dyvil.lang.Entry;
+import dyvil.lang.Map;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
@@ -85,7 +86,7 @@ public class HeaderFile
 		Map<Name, Operator> operators = header.getOperators();
 		int operatorCount = operators.size();
 		dos.writeShort(operatorCount);
-		for (Entry<Name, Operator> entry : operators.entrySet())
+		for (Entry<Name, Operator> entry : operators)
 		{
 			entry.getValue().write(dos);
 		}

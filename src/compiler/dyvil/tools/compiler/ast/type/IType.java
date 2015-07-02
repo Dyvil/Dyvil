@@ -303,6 +303,12 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	}
 	
 	@Override
+	public default IType resolveType(Name name)
+	{
+		return null;
+	}
+	
+	@Override
 	public default ITypeVariable resolveTypeVariable(Name name)
 	{
 		return null;

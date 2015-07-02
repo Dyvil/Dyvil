@@ -39,6 +39,9 @@ public interface IStaticContext extends IContext
 	public IClass resolveClass(Name name);
 	
 	@Override
+	public IType resolveType(Name name);
+	
+	@Override
 	public default ITypeVariable resolveTypeVariable(Name name)
 	{
 		return null;

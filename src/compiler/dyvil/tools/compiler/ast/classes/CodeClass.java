@@ -911,12 +911,31 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
+	public IType resolveType(Name name)
 	{
-		ITypeVariable var;
+		if (name == this.name)
+		{
+			return new ClassType(this);
+		}
+		
 		for (int i = 0; i < this.genericCount; i++)
 		{
-			var = this.generics[i];
+			ITypeVariable var = this.generics[i];
+			if (var.getName() == name)
+			{
+				return new TypeVarType(var);
+			}
+		}
+		
+		return this.unit.resolveType(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			ITypeVariable var = this.generics[i];
 			if (var.getName() == name)
 			{
 				return var;

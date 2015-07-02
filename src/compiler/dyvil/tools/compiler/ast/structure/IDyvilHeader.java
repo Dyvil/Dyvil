@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.structure;
 
-import java.util.Map;
+import dyvil.lang.Map;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
@@ -12,8 +12,10 @@ import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
+import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 
-public interface IDyvilHeader extends IContext, IClassList, IOperatorMap
+public interface IDyvilHeader extends IContext, IClassList, IOperatorMap, ITypeAliasMap
 {
 	public default boolean isHeader()
 	{
@@ -69,6 +71,14 @@ public interface IDyvilHeader extends IContext, IClassList, IOperatorMap
 	
 	@Override
 	public void addOperator(Operator op);
+	
+	// Type Aliases
+	
+	@Override
+	public void addTypeAlias(ITypeAlias typeAlias);
+	
+	@Override
+	public ITypeAlias getTypeAlias(Name name);
 	
 	// Classes
 	

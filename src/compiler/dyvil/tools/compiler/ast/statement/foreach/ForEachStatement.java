@@ -132,6 +132,12 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	}
 	
 	@Override
+	public IType resolveType(Name name)
+	{
+		return this.context.resolveType(name);
+	}
+	
+	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return this.context.resolveTypeVariable(name);

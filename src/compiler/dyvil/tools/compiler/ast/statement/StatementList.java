@@ -367,6 +367,12 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
+	public IType resolveType(Name name)
+	{
+		return this.context.resolveType(name);
+	}
+	
+	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		return this.context.resolveTypeVariable(name);

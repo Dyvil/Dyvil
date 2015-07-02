@@ -398,6 +398,18 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
+	public IType resolveType(Name name)
+	{
+		return this.theClass.resolveType(name);
+	}
+	
+	@Override
+	public ITypeVariable resolveTypeVariable(Name name)
+	{
+		return this.theClass.resolveTypeVariable(name);
+	}
+
+	@Override
 	public IDataMember resolveField(Name name)
 	{
 		if (name == this.name)
@@ -405,12 +417,6 @@ public class Property extends Member implements IProperty, IContext
 			return this.setterParameter;
 		}
 		return this.theClass.resolveField(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.theClass.resolveTypeVariable(name);
 	}
 	
 	@Override
