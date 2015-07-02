@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.generic.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
@@ -121,6 +125,28 @@ public abstract class GenericType implements IType, ITypeList
 				builder.append(", ").append(this.typeArguments[i].toString());
 			}
 			builder.append(']');
+		}
+	}
+	
+	protected final void writeTypeArguments(DataOutputStream dos) throws IOException
+	{
+		dos.writeShort(this.typeArgumentCount);
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			IType.writeType(this.typeArguments[i], dos);
+		}
+	}
+	
+	protected final void readTypeArguments(DataInputStream dis) throws IOException
+	{
+		int len = this.typeArgumentCount = dis.readShort();
+		if (len > this.typeArguments.length)
+		{
+			this.typeArguments = new IType[len];
+		}
+		for (int i = 0; i < len; i++)
+		{
+			this.typeArguments[i] = IType.readType(dis);
 		}
 	}
 	

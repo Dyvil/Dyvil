@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.generic.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
@@ -25,6 +29,10 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 public class TypeVarType implements IType
 {
 	public ITypeVariable	typeVar;
+	
+	public TypeVarType()
+	{
+	}
 	
 	public TypeVarType(ITypeVariable typeVar)
 	{
@@ -186,6 +194,16 @@ public class TypeVarType implements IType
 	{
 		writer.writeLDC(this.typeVar.getName().qualified);
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/TypeArgument", "apply", "(Ljava/lang/String;)Ldyvil/reflect/type/TypeArgument;", false);
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
 	}
 	
 	@Override

@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.type.alias;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
@@ -40,6 +44,20 @@ public class TypeAlias implements ITypeAlias
 	public void resolve(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeUTF(this.name.qualified);
+		this.type.write(dos);
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		this.name = Name.getQualified(dis.readUTF());
+		this.type = IType.readType(dis);
 	}
 	
 	@Override

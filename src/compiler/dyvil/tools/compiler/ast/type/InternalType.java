@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -100,6 +104,18 @@ public class InternalType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeUTF(this.internalName);
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		this.internalName = dis.readUTF();
 	}
 	
 	@Override

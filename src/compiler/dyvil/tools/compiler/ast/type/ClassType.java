@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
@@ -15,6 +19,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.ast.structure.Package;
 
 public class ClassType implements IType
 {
@@ -140,6 +145,19 @@ public class ClassType implements IType
 	{
 		writer.writeLDC(this.theClass.getFullName());
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Type", "apply", "(Ljava/lang/String;)Ldyvil/lang/Type;", true);
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeUTF(this.theClass.getInternalName());
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		String internal = dis.readUTF();
+		this.theClass = Package.rootPackage.resolveInternalClass(internal);
 	}
 	
 	// Misc

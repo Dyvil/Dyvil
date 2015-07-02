@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.generic.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -13,12 +17,17 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ClassGenericType extends GenericType
 {
 	protected IClass	theClass;
+	
+	public ClassGenericType()
+	{
+	}
 	
 	public ClassGenericType(IClass iclass)
 	{
@@ -194,6 +203,21 @@ public final class ClassGenericType extends GenericType
 	public String getInternalName()
 	{
 		return this.theClass.getInternalName();
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeUTF(this.theClass.getInternalName());
+		this.writeTypeArguments(dos);
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		String internal = dis.readUTF();
+		this.theClass = Package.rootPackage.resolveInternalClass(internal);
+		this.readTypeArguments(dis);
 	}
 	
 	@Override

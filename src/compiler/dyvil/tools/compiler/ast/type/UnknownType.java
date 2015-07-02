@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
@@ -148,6 +152,16 @@ public class UnknownType implements IType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/UnknownType", "instance", "Ldyvil/reflect/type/UnknownType;", false);
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
 	}
 	
 	@Override

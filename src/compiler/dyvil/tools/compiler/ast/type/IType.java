@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
@@ -12,6 +16,9 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
+import dyvil.tools.compiler.ast.generic.type.TypeVarType;
+import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -400,6 +407,61 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	{
 		return NullValue.getNull();
 	}
+	
+	public static void writeType(IType type, DataOutputStream dos) throws IOException
+	{
+		dos.writeByte(type.typeTag());
+		type.write(dos);
+	}
+	
+	public static IType readType(DataInputStream dis) throws IOException
+	{
+		byte tag = dis.readByte();
+		IType type;
+		switch (tag)
+		{
+		case UNKNOWN:
+			return Types.UNKNOWN;
+		case NULL:
+			return Types.NULL;
+		case ANY:
+			return Types.ANY;
+		case DYNAMIC:
+			return Types.DYNAMIC;
+		case PRIMITIVE:
+			return PrimitiveType.fromTypecode(dis.readByte());
+		case CLASS:
+			type = new ClassType();
+			break;
+		case GENERIC:
+			type = new ClassGenericType();
+			break;
+		case TUPLE:
+			type = new TupleType();
+			break;
+		case LAMBDA:
+			type = new LambdaType();
+			break;
+		case ARRAY:
+			type = new ArrayType();
+			break;
+		case TYPE_VAR_TYPE:
+			type = new TypeVarType();
+			break;
+		case WILDCARD_TYPE:
+			type = new WildcardType();
+			break;
+		default:
+			return null;
+		}
+		
+		type.read(dis);
+		return type;
+	}
+	
+	public void write(DataOutputStream dos) throws IOException;
+	
+	public void read(DataInputStream dis) throws IOException;
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer);

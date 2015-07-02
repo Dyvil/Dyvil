@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.generic.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -102,6 +106,18 @@ public class InternalGenericType extends GenericType
 	public String getInternalName()
 	{
 		return this.internalName;
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeUTF(this.internalName);
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		this.internalName = dis.readUTF();
 	}
 	
 	@Override

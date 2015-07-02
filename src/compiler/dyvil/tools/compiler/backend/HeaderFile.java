@@ -12,10 +12,12 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
+import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 
 public class HeaderFile
 {
-	private static final int	FILE_VERSION	= 1;
+	private static final int	FILE_VERSION	= 2;
 	
 	public static void write(File file, IDyvilHeader header)
 	{
@@ -82,11 +84,18 @@ public class HeaderFile
 			header.getUsing(i).write(dos);
 		}
 		
-		// Operators Declarations
+		// Operators Definitions
 		Map<Name, Operator> operators = header.getOperators();
-		int operatorCount = operators.size();
-		dos.writeShort(operatorCount);
+		dos.writeShort(operators.size());
 		for (Entry<Name, Operator> entry : operators)
+		{
+			entry.getValue().write(dos);
+		}
+		
+		// Type Aliases
+		Map<Name, ITypeAlias> typeAliases = header.getTypeAliases();
+		dos.writeShort(typeAliases.size());
+		for (Entry<Name, ITypeAlias> entry : typeAliases)
 		{
 			entry.getValue().write(dos);
 		}
@@ -132,6 +141,17 @@ public class HeaderFile
 		{
 			Operator op = Operator.read(dis);
 			header.addOperator(op);
+		}
+		
+		if (fileVersion >= 2)
+		{
+			int typeAliases = dis.readShort();
+			for (int i = 0; i < typeAliases; i++)
+			{
+				TypeAlias ta = new TypeAlias();
+				ta.read(dis);
+				header.addTypeAlias(ta);
+			}
 		}
 		
 		return header;

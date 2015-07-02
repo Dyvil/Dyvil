@@ -50,6 +50,7 @@ public class TypeAliasParser extends Parser
 		case 0:
 			this.map.addTypeAlias(this.typeAlias);
 			pm.popParser(true);
+			return;
 		case TYPE:
 			this.mode = NAME;
 			this.typeAlias = new TypeAlias();

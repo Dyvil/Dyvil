@@ -74,6 +74,8 @@ public interface IDyvilHeader extends IContext, IClassList, IOperatorMap, ITypeA
 	
 	// Type Aliases
 	
+	public Map<Name, ITypeAlias> getTypeAliases();
+	
 	@Override
 	public void addTypeAlias(ITypeAlias typeAlias);
 	

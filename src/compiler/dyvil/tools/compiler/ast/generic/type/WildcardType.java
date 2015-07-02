@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.generic.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
@@ -28,6 +32,10 @@ public final class WildcardType implements IType, ITyped
 	public ICodePosition	position;
 	protected IType			bound;
 	protected Variance		variance;
+	
+	public WildcardType()
+	{
+	}
 	
 	public WildcardType(Variance variance)
 	{
@@ -279,6 +287,38 @@ public final class WildcardType implements IType, ITyped
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/WildcardType", "apply",
 				"(Ldyvil/reflect/Variance;Ldyvil/lang/Type;)Ldyvil/reflect/type/WildcardType;", false);
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		if (this.bound == null)
+		{
+			dos.writeByte(0);
+			return;
+		}
+		
+		dos.writeByte(this.variance.ordinal());
+		IType.writeType(this.bound, dos);
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		byte b = dis.readByte();
+		switch (b)
+		{
+		case 0:
+			return;
+		case 1:
+			this.variance = Variance.COVARIANT;
+			break;
+		case 2:
+			this.variance = Variance.CONTRAVARIANT;
+			break;
+		}
+		
+		this.bound = IType.readType(dis);
 	}
 	
 	@Override

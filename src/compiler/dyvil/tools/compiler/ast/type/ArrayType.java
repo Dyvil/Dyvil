@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
@@ -233,6 +237,18 @@ public class ArrayType implements IType, ITyped
 	{
 		this.type.writeTypeExpression(writer);
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/ArrayType", "apply", "(Ldyvil/lang/Type;)Ldyvil/reflect/type/ArrayType;", false);
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		IType.writeType(this.type, dos);
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		this.type = IType.readType(dis);
 	}
 	
 	@Override

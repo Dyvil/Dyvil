@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.type.alias;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -23,4 +27,8 @@ public interface ITypeAlias extends IASTNode, INamed, ITyped
 	public IType getType();
 	
 	public void resolve(MarkerList markers, IContext context);
+	
+	public void write(DataOutputStream dos) throws IOException;
+	
+	public void read(DataInputStream dis) throws IOException;
 }

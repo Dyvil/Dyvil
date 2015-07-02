@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.type;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
@@ -299,6 +303,32 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		}
 		this.returnType.appendSignature(buffer);
 		buffer.append(">;");
+	}
+	
+	@Override
+	public void write(DataOutputStream dos) throws IOException
+	{
+		dos.writeByte(this.parameterCount);
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IType.writeType(this.parameterTypes[i], dos);
+		}
+		IType.writeType(this.returnType, dos);
+	}
+	
+	@Override
+	public void read(DataInputStream dis) throws IOException
+	{
+		int len = this.parameterCount = dis.readByte();
+		if (len > this.parameterTypes.length)
+		{
+			this.parameterTypes = new IType[len];
+		}
+		for (int i = 0; i < len; i++)
+		{
+			this.parameterTypes[i] = IType.readType(dis);
+		}
+		this.returnType = IType.readType(dis);
 	}
 	
 	@Override

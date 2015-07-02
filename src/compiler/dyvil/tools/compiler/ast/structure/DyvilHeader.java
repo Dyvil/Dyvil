@@ -271,6 +271,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
+	public Map<Name, ITypeAlias> getTypeAliases()
+	{
+		return this.typeAliases;
+	}
+	
+	@Override
 	public void addTypeAlias(ITypeAlias typeAlias)
 	{
 		this.typeAliases.put(typeAlias.getName(), typeAlias);
@@ -459,6 +465,15 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		{
 			return new ClassType(iclass);
 		}
+		
+		for (int i = 0; i < this.includeCount; i++)
+		{
+			IType t = this.includes[i].getHeader().resolveType(name);
+			if (t != null)
+			{
+				return t;
+			}
+		}
 		return null;
 	}
 	
@@ -621,6 +636,20 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			{
 				buffer.append(prefix);
 				entry.getValue().toString(buffer);
+				buffer.append(";\n");
+			}
+			if (Formatting.Import.newLine)
+			{
+				buffer.append('\n');
+			}
+		}
+		
+		if (!this.typeAliases.isEmpty())
+		{
+			for (Entry<Name, ITypeAlias> entry : this.typeAliases)
+			{
+				buffer.append(prefix);
+				entry.getValue().toString("", buffer);
 				buffer.append(";\n");
 			}
 			if (Formatting.Import.newLine)
