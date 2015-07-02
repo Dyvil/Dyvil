@@ -82,7 +82,7 @@ public final class WildcardType implements IType, ITyped
 	@Override
 	public IType getReturnType()
 	{
-		if (this.variance == Variance.CONTRAVARIANT)
+		if (this.bound == null || this.variance == Variance.CONTRAVARIANT)
 		{
 			return Types.ANY;
 		}

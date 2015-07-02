@@ -38,7 +38,7 @@ public class UnknownType implements IType
 	@Override
 	public IClass getTheClass()
 	{
-		return null;
+		return Types.OBJECT_CLASS;
 	}
 	
 	@Override

@@ -62,13 +62,6 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public void setType(IType type)
-	{
-		this.variable = new Variable(type.getPosition());
-		this.variable.type = type;
-	}
-	
-	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		IValue action1 = this.action.withType(type, typeContext, markers, context);
@@ -229,8 +222,8 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 		if (value.valueTag() == IValue.RANGE_OPERATOR)
 		{
 			RangeOperator ro = (RangeOperator) value;
-			IValue value1 = ro.value1;
-			IValue value2 = ro.value2;
+			IValue value1 = ro.getFirstValue();
+			IValue value2 = ro.getLastValue();
 			IType rangeType = ro.getElementType();
 			
 			if (varType == Types.UNKNOWN)
