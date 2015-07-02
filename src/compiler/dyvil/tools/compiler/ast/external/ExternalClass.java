@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Constructor;
@@ -68,7 +68,7 @@ public final class ExternalClass extends CodeClass
 		this.genericsResolved = true;
 		if (this.genericCount > 0)
 		{
-			GenericType type = new GenericType(this);
+			ClassGenericType type = new ClassGenericType(this);
 			
 			for (int i = 0; i < this.genericCount; i++)
 			{

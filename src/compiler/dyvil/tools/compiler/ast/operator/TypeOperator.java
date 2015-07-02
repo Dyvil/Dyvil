@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -52,7 +52,7 @@ public final class TypeOperator extends ASTNode implements IValue
 	{
 		if (this.genericType == null)
 		{
-			GenericType generic = new GenericType(Types.TYPE_CLASS);
+			ClassGenericType generic = new ClassGenericType(Types.TYPE_CLASS);
 			generic.addType(this.type);
 			return this.genericType = generic;
 		}
@@ -112,7 +112,7 @@ public final class TypeOperator extends ASTNode implements IValue
 		}
 		
 		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
-		GenericType generic = new GenericType(Types.TYPE_CLASS);
+		ClassGenericType generic = new ClassGenericType(Types.TYPE_CLASS);
 		generic.addType(this.type);
 		this.genericType = generic;
 	}

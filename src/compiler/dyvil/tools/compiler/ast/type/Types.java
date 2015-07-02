@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
-import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -276,7 +276,7 @@ public final class Types
 			{
 				OBJECT_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("SimpleObjectRef");
 			}
-			GenericType gt = new GenericType(OBJECT_REF_CLASS);
+			ClassGenericType gt = new ClassGenericType(OBJECT_REF_CLASS);
 			gt.addType(type);
 			return gt;
 		}

@@ -2,8 +2,11 @@ package dyvil.tools.compiler.backend;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.generic.*;
+import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.generic.TypeVariable;
+import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.InternalGenericType;
 import dyvil.tools.compiler.ast.generic.type.InternalTypeVarType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
@@ -231,7 +234,7 @@ public final class ClassFormat
 		int index = desc.indexOf('<', start);
 		if (index >= 0 && index < end)
 		{
-			GenericType type = readGenericType(desc, start, index);
+			GenericType type = new InternalGenericType(desc.substring(start, index));
 			index++;
 			
 			while (desc.charAt(index) != '>')
@@ -242,26 +245,6 @@ public final class ClassFormat
 		}
 		
 		return new InternalType(desc.substring(start, end));
-	}
-	
-	private static GenericType readGenericType(String desc, int start, int end)
-	{
-		int index = desc.lastIndexOf('$', end);
-		if (index < start)
-		{
-			index = desc.lastIndexOf('/', end);
-			if (index < start)
-			{
-				// No slash in type name, skip internal -> package name
-				// conversion
-				String internal = desc.substring(start, end);
-				return new GenericType(internal, Name.getQualified(internal));
-			}
-		}
-		
-		String internal = desc.substring(start, end);
-		Name name = Name.getQualified(desc.substring(index + 1, end));
-		return new GenericType(internal, name);
 	}
 	
 	private static int readTyped(String desc, int start, ITypeConsumer consumer)

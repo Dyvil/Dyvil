@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -84,7 +84,7 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 	{
 		if (this.type == null)
 		{
-			GenericType gt = new GenericType(PARTIALFUNCTION_CLASS);
+			ClassGenericType gt = new ClassGenericType(PARTIALFUNCTION_CLASS);
 			IType t1 = this.pattern.getType();
 			if (t1.isPrimitive())
 			{

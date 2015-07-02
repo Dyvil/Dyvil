@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -686,7 +686,7 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		if (this.genericCount > 0)
 		{
-			GenericType type = new GenericType(this);
+			ClassGenericType type = new ClassGenericType(this);
 			
 			for (int i = 0; i < this.genericCount; i++)
 			{

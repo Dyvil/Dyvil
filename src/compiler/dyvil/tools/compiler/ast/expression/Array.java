@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -100,23 +100,12 @@ public final class Array extends ASTNode implements IValue, IValueList
 		
 		this.elementType = t;
 		
-		if (t.getTheClass() == Types.TUPLE2_CLASS)
+		IClass iclass = t.getTheClass();
+		if (iclass == Types.TUPLE2_CLASS)
 		{
-			GenericType type = new GenericType(Types.MAP_CLASS);
-			type.typeArgumentCount = 2;
-			
-			switch (t.typeTag())
-			{
-			case IType.GENERIC:
-			case IType.TUPLE:
-				ITypeList t1 = (ITypeList) t;
-				type.typeArguments[0] = t1.getType(0);
-				type.typeArguments[1] = t1.getType(1);
-				break;
-			default:
-				type.typeArguments[0] = type.typeArguments[1] = Types.ANY;
-			}
-			
+			ClassGenericType type = new ClassGenericType(Types.MAP_CLASS);
+			type.addType(t.resolveType(iclass.getTypeVariable(0)));
+			type.addType(t.resolveType(iclass.getTypeVariable(1)));
 			return this.requiredType = type;
 		}
 		return this.requiredType = new ArrayType(t);

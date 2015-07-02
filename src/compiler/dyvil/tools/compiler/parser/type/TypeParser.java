@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.NamedGenericType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.*;
@@ -97,7 +98,7 @@ public final class TypeParser extends Parser
 				int nextType = token.next().type();
 				if (nextType == Symbols.OPEN_SQUARE_BRACKET || nextType == Symbols.GENERIC_CALL)
 				{
-					this.type = new GenericType(token, token.nameValue());
+					this.type = new NamedGenericType(token.raw(), token.nameValue());
 					this.mode = GENERICS;
 					return;
 				}

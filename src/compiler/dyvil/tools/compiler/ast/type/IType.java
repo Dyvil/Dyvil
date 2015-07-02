@@ -62,26 +62,26 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		GENERIC_ARGUMENT;
 	}
 	
-	int	UNKNOWN				= -1;
-	int	NULL				= 0;
-	int	ANY					= 1;
-	int	DYNAMIC				= 2;
-	int	PRIMITIVE			= 3;
-	int	ARRAY				= 4;
-	int	MULTI_ARRAY			= 5;
+	int	UNKNOWN				= 0;
+	int	NULL				= 1;
+	int	ANY					= 2;
+	int	DYNAMIC				= 3;
+	int	PRIMITIVE			= 4;
 	
 	int	CLASS				= 8;
 	int	NAMED				= 9;
 	int	INTERNAL			= 10;
+	int	GENERIC				= 11;
+	int	GENERIC_NAMED		= 12;
+	int	GENERIC_INTERNAL	= 13;
 	
 	int	TUPLE				= 16;
 	int	LAMBDA				= 17;
-	int	LAMBDA_TEMP			= 18;
+	int	ARRAY				= 18;
 	
-	int	GENERIC				= 32;
-	int	TYPE_VAR_TYPE		= 33;
-	int	INTERNAL_TYPE_VAR	= 34;
-	int	WILDCARD_TYPE		= 35;
+	int	TYPE_VAR_TYPE		= 32;
+	int	INTERNAL_TYPE_VAR	= 33;
+	int	WILDCARD_TYPE		= 34;
 	
 	public int typeTag();
 	
