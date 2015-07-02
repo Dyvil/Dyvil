@@ -2,10 +2,10 @@ package dyvil.tools.compiler.backend;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.generic.IGeneric;
-import dyvil.tools.compiler.ast.generic.InternalTypeVarType;
-import dyvil.tools.compiler.ast.generic.TypeVariable;
-import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.generic.*;
+import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.InternalTypeVarType;
+import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IExceptionList;
@@ -326,21 +326,21 @@ public final class ClassFormat
 			return end1 + 1;
 		}
 		case '*':
-			consumer.setType(new WildcardType());
+			consumer.setType(new WildcardType(Variance.INVARIANT));
 			return start + 1;
 		case '+':
 		{
 			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType();
-			var.setUpperBound(readType(desc, start + 1, end1));
+			WildcardType var = new WildcardType(Variance.COVARIANT);
+			var.setType(readType(desc, start + 1, end1));
 			consumer.setType(var);
 			return end1 + 1;
 		}
 		case '-':
 		{
 			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType();
-			var.setLowerBound(readType(desc, start + 1, end1));
+			WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
+			var.setType(readType(desc, start + 1, end1));
 			consumer.setType(var);
 			return end1 + 1;
 		}
@@ -410,21 +410,21 @@ public final class ClassFormat
 			return end1 + 1;
 		}
 		case '*':
-			list.addType(new WildcardType());
+			list.addType(new WildcardType(Variance.INVARIANT));
 			return start + 1;
 		case '+':
 		{
 			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType();
-			var.setUpperBound(readType(desc, start + 1, end1));
+			WildcardType var = new WildcardType(Variance.COVARIANT);
+			var.setType(readType(desc, start + 1, end1));
 			list.addType(var);
 			return end1 + 1;
 		}
 		case '-':
 		{
 			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType();
-			var.setLowerBound(readType(desc, start + 1, end1));
+			WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
+			var.setType(readType(desc, start + 1, end1));
 			list.addType(var);
 			return end1 + 1;
 		}

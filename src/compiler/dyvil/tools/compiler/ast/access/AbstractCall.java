@@ -63,7 +63,7 @@ public abstract class AbstractCall implements ICall, IValued
 		}
 		if (this.type == null)
 		{
-			this.type = this.method.getType().getConcreteType(this.getGenericData());
+			this.type = this.method.getType().getConcreteType(this.getGenericData()).getReturnType();
 			
 			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
 			{

@@ -1,6 +1,7 @@
-package dyvil.tools.compiler.ast.generic;
+package dyvil.tools.compiler.ast.generic.type;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;

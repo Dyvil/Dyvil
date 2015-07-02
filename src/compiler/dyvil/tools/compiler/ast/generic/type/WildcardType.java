@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.generic;
+package dyvil.tools.compiler.ast.generic.type;
 
 import dyvil.lang.List;
 
@@ -7,27 +7,31 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class WildcardType implements IType
+public final class WildcardType implements IType, ITyped
 {
 	public ICodePosition	position;
-	protected IType			upperBound;
-	protected IType			lowerBound;
+	protected IType			bound;
+	protected Variance		variance;
 	
-	public WildcardType()
+	public WildcardType(Variance variance)
 	{
+		this.variance = variance;
 	}
 	
 	public WildcardType(ICodePosition position)
@@ -35,24 +39,26 @@ public final class WildcardType implements IType
 		this.position = position;
 	}
 	
-	public void setUpperBound(IType upperBound)
+	@Override
+	public void setType(IType upperBound)
 	{
-		this.upperBound = upperBound;
+		this.bound = upperBound;
 	}
 	
-	public IType getUpperBound()
+	@Override
+	public IType getType()
 	{
-		return this.upperBound;
+		return this.bound;
 	}
 	
-	public void setLowerBound(IType lowerBound)
+	public void setVariance(Variance variance)
 	{
-		this.lowerBound = lowerBound;
+		this.variance = variance;
 	}
 	
-	public IType getLowerBound()
+	public Variance getVariance()
 	{
-		return this.lowerBound;
+		return this.variance;
 	}
 	
 	@Override
@@ -70,31 +76,31 @@ public final class WildcardType implements IType
 	@Override
 	public IClass getTheClass()
 	{
-		return this.upperBound != null ? this.upperBound.getTheClass() : Types.OBJECT_CLASS;
+		return this.bound != null ? this.bound.getTheClass() : Types.OBJECT_CLASS;
+	}
+	
+	@Override
+	public IType getReturnType()
+	{
+		if (this.variance == Variance.CONTRAVARIANT)
+		{
+			return Types.ANY;
+		}
+		return this.bound;
 	}
 	
 	@Override
 	public IType getSuperType()
 	{
-		return this.upperBound == null ? Types.UNKNOWN : this.upperBound;
+		return this.bound == null ? Types.UNKNOWN : this.bound;
 	}
 	
 	@Override
 	public boolean equals(IType type)
 	{
-		if (this.upperBound != null)
+		if (this.bound != null)
 		{
-			if (!this.upperBound.isSuperTypeOf(type))
-			{
-				return false;
-			}
-		}
-		if (this.lowerBound != null)
-		{
-			if (!type.isSuperTypeOf(this.lowerBound))
-			{
-				return false;
-			}
+			return this.variance.checkCompatible(this.bound, type);
 		}
 		return true;
 	}
@@ -114,13 +120,15 @@ public final class WildcardType implements IType
 	@Override
 	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
-		if (this.upperBound != null)
+		if (this.bound != null)
 		{
-			this.upperBound = this.upperBound.resolve(markers, context, TypePosition.TYPE);
+			this.bound = this.bound.resolve(markers, context, TypePosition.TYPE);
 		}
-		if (this.lowerBound != null)
+		
+		if (position != TypePosition.GENERIC_ARGUMENT)
 		{
-			this.lowerBound = this.lowerBound.resolve(markers, context, TypePosition.TYPE);
+			markers.add(this.position, "type.invalid.wildcard");
+			return this.bound == null ? Types.ANY : this.bound;
 		}
 		
 		return this;
@@ -129,9 +137,9 @@ public final class WildcardType implements IType
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		if (this.upperBound != null)
+		if (this.bound != null && this.variance == Variance.COVARIANT)
 		{
-			return this.upperBound.resolveType(typeVar);
+			return this.bound.resolveType(typeVar);
 		}
 		return Types.ANY;
 	}
@@ -139,30 +147,26 @@ public final class WildcardType implements IType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		if (this.upperBound != null)
+		if (this.bound != null)
 		{
-			this.upperBound.inferTypes(concrete, typeContext);
+			this.bound.inferTypes(concrete, typeContext);
 		}
 	}
 	
 	@Override
 	public boolean hasTypeVariables()
 	{
-		return false;
+		return this.bound == null ? false : this.bound.hasTypeVariables();
 	}
 	
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		if (this.lowerBound != null)
-		{
-			return this.lowerBound.getConcreteType(context);
-		}
-		
-		if (this.upperBound != null)
+		if (this.bound != null)
 		{
 			WildcardType copy = new WildcardType(this.position);
-			copy.upperBound = this.upperBound.getConcreteType(context);
+			copy.variance = this.variance;
+			copy.bound = this.bound.getConcreteType(context);
 			return copy;
 		}
 		return this;
@@ -171,9 +175,9 @@ public final class WildcardType implements IType
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.upperBound != null)
+		if (this.bound != null && this.variance == Variance.COVARIANT)
 		{
-			return this.upperBound.resolveField(name);
+			return this.bound.resolveField(name);
 		}
 		
 		return null;
@@ -182,9 +186,9 @@ public final class WildcardType implements IType
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		if (this.upperBound != null)
+		if (this.bound != null && this.variance == Variance.COVARIANT)
 		{
-			this.upperBound.getMethodMatches(list, instance, name, arguments);
+			this.bound.getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	
@@ -202,11 +206,11 @@ public final class WildcardType implements IType
 	@Override
 	public String getInternalName()
 	{
-		if (this.upperBound != null)
+		if (this.variance == Variance.CONTRAVARIANT)
 		{
-			return this.upperBound.getInternalName();
+			return "java/lang/Object";
 		}
-		return "java/lang/Object";
+		return this.bound.getInternalName();
 	}
 	
 	@Override
@@ -218,15 +222,10 @@ public final class WildcardType implements IType
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		if (this.lowerBound != null)
+		if (this.bound != null)
 		{
-			buffer.append('-');
-			this.lowerBound.appendSignature(buffer);
-		}
-		else if (this.upperBound != null)
-		{
-			buffer.append('+');
-			this.upperBound.appendSignature(buffer);
+			this.variance.appendPrefix(buffer);
+			this.bound.appendSignature(buffer);
 		}
 		else
 		{
@@ -267,18 +266,9 @@ public final class WildcardType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.lowerBound != null)
+		if (this.bound != null)
 		{
-			this.lowerBound.writeTypeExpression(writer);
-		}
-		else
-		{
-			writer.writeInsn(Opcodes.ACONST_NULL);
-		}
-		
-		if (this.upperBound != null)
-		{
-			this.upperBound.writeTypeExpression(writer);
+			this.bound.writeTypeExpression(writer);
 		}
 		else
 		{
@@ -293,8 +283,8 @@ public final class WildcardType implements IType
 	public WildcardType clone()
 	{
 		WildcardType clone = new WildcardType(this.position);
-		clone.lowerBound = this.lowerBound;
-		clone.upperBound = this.upperBound;
+		clone.variance = this.variance;
+		clone.bound = this.bound;
 		return clone;
 	}
 	
@@ -310,15 +300,10 @@ public final class WildcardType implements IType
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append('_');
-		if (this.lowerBound != null)
+		if (this.bound != null)
 		{
-			buffer.append(Formatting.Type.genericLowerBound);
-			this.lowerBound.toString(prefix, buffer);
-		}
-		if (this.upperBound != null)
-		{
-			buffer.append(Formatting.Type.genericUpperBound);
-			this.upperBound.toString(prefix, buffer);
+			this.variance.appendInfix(buffer);
+			this.bound.toString(prefix, buffer);
 		}
 	}
 }

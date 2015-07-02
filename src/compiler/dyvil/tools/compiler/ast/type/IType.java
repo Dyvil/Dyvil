@@ -101,12 +101,17 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	
 	public IClass getTheClass();
 	
-	// Arrays
-	
 	public default IType getReferenceType()
 	{
 		return this;
 	}
+	
+	public default IType getReturnType()
+	{
+		return this;
+	}
+	
+	// Arrays
 	
 	public default boolean isArrayType()
 	{

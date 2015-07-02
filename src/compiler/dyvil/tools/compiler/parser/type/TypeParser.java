@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.generic.Variance;
+import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -25,8 +27,6 @@ public final class TypeParser extends Parser
 	
 	protected ITypeConsumer	typed;
 	
-	private byte			boundMode;
-	
 	private IType			type;
 	
 	public TypeParser(ITypeConsumer consumer)
@@ -39,7 +39,6 @@ public final class TypeParser extends Parser
 	public void reset()
 	{
 		this.mode = NAME;
-		this.boundMode = 0;
 		this.type = null;
 	}
 	
@@ -49,6 +48,13 @@ public final class TypeParser extends Parser
 		int type = token.type();
 		switch (this.mode)
 		{
+		case 0:
+			if (this.type != null)
+			{
+				this.typed.setType(this.type);
+			}
+			pm.popParser(true);
+			return;
 		case NAME:
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
@@ -170,16 +176,19 @@ public final class TypeParser extends Parser
 			return;
 		case WILDCARD_TYPE:
 			Name name = token.nameValue();
+			WildcardType wt = (WildcardType) this.type;
 			if (name == Name.ltcolon) // <: - Upper Bound
 			{
-				pm.pushParser(new TypeParser(t -> ((WildcardType) this.type).setUpperBound(t)));
-				this.boundMode = 0;
+				wt.setVariance(Variance.COVARIANT);
+				pm.pushParser(new TypeParser(wt));
+				this.mode = 0;
 				return;
 			}
 			if (name == Name.gtcolon) // >: - Lower Bound
 			{
-				pm.pushParser(new TypeParser(t -> ((WildcardType) this.type).setLowerBound(t)));
-				this.boundMode = 0;
+				wt.setVariance(Variance.CONTRAVARIANT);
+				pm.pushParser(new TypeParser(wt));
+				this.mode = 0;
 				return;
 			}
 			this.typed.setType(this.type);

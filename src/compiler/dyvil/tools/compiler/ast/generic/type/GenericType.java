@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.generic.type;
 
 import dyvil.lang.List;
 
@@ -16,6 +16,9 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -153,7 +156,7 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 	
 	protected boolean argumentsMatch(IType type)
 	{
-		int count = this.theClass.genericCount();
+		int count = Math.min(this.typeArgumentCount, this.theClass.genericCount());
 		for (int i = 0; i < count; i++)
 		{
 			ITypeVariable typeVar = this.theClass.getTypeVariable(i);

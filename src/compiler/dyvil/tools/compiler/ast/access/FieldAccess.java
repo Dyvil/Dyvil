@@ -64,7 +64,7 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 			{
 				return this.type = this.field.getType();
 			}
-			return this.type = this.field.getType().getConcreteType(this.instance.getType());
+			return this.type = this.field.getType().getConcreteType(this.instance.getType()).getReturnType();
 		}
 		return this.type;
 	}

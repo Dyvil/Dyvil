@@ -7,13 +7,31 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public interface ITypeVariable extends IASTNode, INamed, IBounded
+public interface ITypeVariable extends IASTNode, INamed
 {
 	public IGeneric getGeneric();
 	
 	public void setIndex(int index);
 	
 	public int getIndex();
+	
+	// Upper Bounds
+	
+	public int upperBoundCount();
+	
+	public void setUpperBound(int index, IType bound);
+	
+	public void addUpperBound(IType bound);
+	
+	public IType getUpperBound(int index);
+	
+	public IType[] getUpperBounds();
+	
+	// Lower Bounds
+	
+	public void setLowerBound(IType bound);
+	
+	public IType getLowerBound();
 	
 	// Super Types
 	
