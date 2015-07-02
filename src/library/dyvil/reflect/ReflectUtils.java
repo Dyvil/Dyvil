@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import dyvil.lang.List;
 
+import dyvil.annotation.infix;
 import dyvil.collection.mutable.ArrayList;
 
 public final class ReflectUtils
@@ -55,12 +56,12 @@ public final class ReflectUtils
 	 * @param flag
 	 *            add or remove
 	 */
-	public static void setModifier(Field field, int mod, boolean flag)
+	public static @infix void setModifier(Field field, int mod, boolean flag)
 	{
 		try
 		{
 			field.setAccessible(true);
-			int modifiers = modifiersField.getInt(field);
+			int modifiers = field.getModifiers();
 			if (flag)
 			{
 				modifiers |= mod;
@@ -74,6 +75,18 @@ public final class ReflectUtils
 		catch (ReflectiveOperationException ex)
 		{
 			ex.printStackTrace();
+		}
+	}
+	
+	public static @infix void setAssignable(Field field)
+	{
+		try
+		{
+			field.setAccessible(true);
+			modifiersField.setInt(field, field.getModifiers() & ~Modifiers.FINAL);
+		}
+		catch (Exception ex)
+		{
 		}
 	}
 	
@@ -575,7 +588,7 @@ public final class ReflectUtils
 		}
 	}
 	
-	public static <T> T createInstance(Class<T> c)
+	public static @infix <T> T createInstance(Class<T> c)
 	{
 		try
 		{
@@ -587,7 +600,7 @@ public final class ReflectUtils
 		}
 	}
 	
-	public static <T> T createInstance(Class<T> c, Object... parameters)
+	public static @infix <T> T createInstance(Class<T> c, Object... parameters)
 	{
 		Class[] parameterTypes = new Class[parameters.length];
 		for (int i = 0; i < parameters.length; i++)
@@ -601,7 +614,7 @@ public final class ReflectUtils
 		return createInstance(c, parameterTypes, parameters);
 	}
 	
-	public static <T> T createInstance(Class<T> c, Class[] parameterTypes, Object... parameters)
+	public static @infix <T> T createInstance(Class<T> c, Class[] parameterTypes, Object... parameters)
 	{
 		try
 		{
@@ -611,6 +624,44 @@ public final class ReflectUtils
 		catch (Exception ex)
 		{
 			return null;
+		}
+	}
+	
+	public static @infix <T> T allocateInstance(Class<T> c)
+	{
+		try
+		{
+			return (T) unsafe.allocateInstance(c);
+		}
+		catch (Exception ex)
+		{
+			return null;
+		}
+	}
+	
+	public static @infix <T> void copyFields(T from, T to)
+	{
+		try
+		{
+			Class<?> c = from.getClass();
+			do
+			{
+				for (Field f : c.getDeclaredFields())
+				{
+					if ((f.getModifiers() & Modifiers.STATIC) == 0)
+					{
+						f.setAccessible(true);
+						f.set(to, f.get(from));
+					}
+				}
+				
+				c = c.getSuperclass();
+			}
+			while (c != null);
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
 		}
 	}
 	
