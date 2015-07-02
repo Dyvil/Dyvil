@@ -8,11 +8,12 @@ import java.util.function.Consumer;
 
 import dyvil.lang.literal.TupleConvertible;
 
+import dyvil.annotation.Covariant;
 import dyvil.collection.range.SimpleRange;
 import dyvil.collection.range.StringRange;
 
 @TupleConvertible
-public interface Range<T> extends Iterable<T>
+public interface Range<@Covariant T> extends Iterable<T>
 {
 	public static <T extends Ordered<T>> Range<T> apply(T first, T last)
 	{

@@ -10,7 +10,7 @@ import dyvil.lang.literal.TupleConvertible;
 
 @NilConvertible
 @TupleConvertible
-public interface Option[T]
+public interface Option[+T]
 {
 	public static Option[T] of[T](T t) = if (t === null) None.instance; else new Some(t);
 	

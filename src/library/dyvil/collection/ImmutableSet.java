@@ -13,11 +13,12 @@ import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.annotation.Covariant;
 import dyvil.collection.immutable.ArraySet;
 
 @NilConvertible
 @ArrayConvertible
-public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
+public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<E>
 {
 	public static <E> ImmutableSet<E> apply()
 	{

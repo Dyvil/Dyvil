@@ -6,11 +6,12 @@ import java.util.function.UnaryOperator;
 import dyvil.lang.*;
 import dyvil.lang.literal.ArrayConvertible;
 
+import dyvil.annotation.Covariant;
 import dyvil.collection.immutable.ArrayMatrix;
 import dyvil.tuple.Tuple2;
 
 @ArrayConvertible
-public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
+public interface ImmutableMatrix<@Covariant E> extends Matrix<E>, Immutable
 {
 	public static <E> ImmutableMatrix<E> apply(E[]... elements)
 	{

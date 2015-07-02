@@ -10,6 +10,7 @@ import dyvil.lang.*;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
@@ -18,7 +19,7 @@ import dyvil.tuple.Tuple2;
 
 @NilConvertible
 @ArrayConvertible
-public interface ImmutableMap<K, V> extends Map<K, V>, Immutable
+public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Immutable
 {
 	public static <K, V> ImmutableMap<K, V> apply()
 	{

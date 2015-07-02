@@ -12,10 +12,11 @@ import dyvil.lang.Immutable;
 import dyvil.lang.ImmutableException;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
 
 @NilConvertible
-public interface ImmutableCollection<E> extends Collection<E>, Immutable
+public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immutable
 {
 	public static <E> ImmutableCollection<E> apply()
 	{

@@ -14,6 +14,7 @@ import dyvil.lang.List;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.immutable.EmptyList;
@@ -21,7 +22,7 @@ import dyvil.collection.immutable.SingletonList;
 
 @NilConvertible
 @ArrayConvertible
-public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
+public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollection<E>
 {
 	public static <E> ImmutableList<E> apply()
 	{
