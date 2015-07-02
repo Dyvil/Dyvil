@@ -39,12 +39,6 @@ public interface IMethod extends IASTNode, IClassMember, ICallableMember, IMetho
 	
 	// Generics
 	
-	@Override
-	public default boolean isMethod()
-	{
-		return true;
-	}
-	
 	public GenericData getGenericData(GenericData data, IValue instance, IArguments arguments);
 	
 	public boolean hasTypeVariables();

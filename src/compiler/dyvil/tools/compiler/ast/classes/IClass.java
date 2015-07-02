@@ -81,7 +81,7 @@ public interface IClass extends IASTNode, IClassMember, IGeneric, IContext, IPar
 	
 	public IMethod getFunctionalMethod();
 	
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount);
+	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete);
 	
 	public IMethod getSuperMethod(Name name, IParameter[] parameters, int parameterCount);
 	

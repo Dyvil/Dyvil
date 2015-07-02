@@ -12,7 +12,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.TypeReference;
 
@@ -296,6 +295,17 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 	}
 	
 	@Override
+	public void write(ClassWriter writer)
+	{
+		if (this.variance != Variance.INVARIANT)
+		{
+			int typeRef = TypeReference.newTypeParameterReference(TypeReference.CLASS_TYPE_PARAMETER, this.index).getValue();
+			String type = this.variance == Variance.CONTRAVARIANT ? "Ldyvil/annotation/Contravariant;" : "Ldyvil/annotation/Covariant;";
+			writer.visitTypeAnnotation(typeRef, null, type, true);
+		}
+	}
+	
+	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
@@ -306,9 +316,9 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		this.variance.appendPrefix(buffer);
 		buffer.append(this.name);
 		
-		this.variance.appendPrefix(buffer);
 		if (this.lowerBound != null)
 		{
 			buffer.append(Formatting.Type.genericLowerBound);

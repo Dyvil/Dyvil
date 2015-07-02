@@ -122,7 +122,7 @@ public final class WildcardType implements IType, ITyped
 	{
 		if (this.bound != null)
 		{
-			this.bound = this.bound.resolve(markers, context, TypePosition.TYPE);
+			this.bound = this.bound.resolve(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 		}
 		
 		if (position != TypePosition.GENERIC_ARGUMENT)

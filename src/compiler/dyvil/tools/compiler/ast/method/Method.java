@@ -754,7 +754,7 @@ public class Method extends Member implements IMethod
 		
 		if (genericData == null)
 		{
-			genericData = new GenericData(this.genericCount);
+			genericData = new GenericData(this, this.genericCount);
 			if (instance != null)
 			{
 				genericData.instanceType = instance.getType();
@@ -765,6 +765,7 @@ public class Method extends Member implements IMethod
 			return genericData;
 		}
 		
+		genericData.method = this;
 		if (instance != null)
 		{
 			genericData.instanceType = instance.getType();

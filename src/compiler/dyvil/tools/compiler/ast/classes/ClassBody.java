@@ -268,7 +268,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount)
+	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
 	{
 		outer:
 		for (int i = 0; i < this.methodCount; i++)
@@ -287,7 +287,7 @@ public class ClassBody extends ASTNode implements IClassBody
 			for (int p = 0; p < parameterCount; p++)
 			{
 				IType t1 = parameters[p].getType();
-				IType t2 = m.getParameter(p).getType();
+				IType t2 = m.getParameter(p).getType().getConcreteType(concrete);
 				if (!t1.equals(t2))
 				{
 					continue outer;

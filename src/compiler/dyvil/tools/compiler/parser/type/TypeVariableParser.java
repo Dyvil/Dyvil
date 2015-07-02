@@ -54,7 +54,7 @@ public final class TypeVariableParser extends Parser implements ITyped
 					IToken next = token.next();
 					if (ParserUtil.isIdentifier(next.type()))
 					{
-						Variance v = name == Name.minus ? Variance.CONTRAVARIANT : Variance.CONTRAVARIANT;
+						Variance v = name == Name.minus ? Variance.CONTRAVARIANT : Variance.COVARIANT;
 						this.variable = new TypeVariable(next, this.generic, next.nameValue(), v);
 						this.mode = TYPE_VARIABLE;
 						pm.skip();

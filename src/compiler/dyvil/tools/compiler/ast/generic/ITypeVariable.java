@@ -7,6 +7,8 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
+import org.objectweb.asm.ClassWriter;
+
 public interface ITypeVariable extends IASTNode, INamed
 {
 	public IGeneric getGeneric();
@@ -52,4 +54,6 @@ public interface ITypeVariable extends IASTNode, INamed
 	// Compilation
 	
 	public void appendSignature(StringBuilder buffer);
+	
+	public void write(ClassWriter writer);
 }

@@ -429,7 +429,7 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount)
+	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
 	{
 		return null;
 	}

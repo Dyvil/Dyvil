@@ -13,6 +13,7 @@ public class PositionedTypeVarType extends TypeVarType
 	public PositionedTypeVarType(ICodePosition position, ITypeVariable typeVar)
 	{
 		super(typeVar);
+		this.position = position;
 	}
 	
 	@Override

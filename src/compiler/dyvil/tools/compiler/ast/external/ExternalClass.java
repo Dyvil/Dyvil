@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.GenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Name;
@@ -37,8 +38,7 @@ import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.*;
 
 public final class ExternalClass extends CodeClass
 {
@@ -499,6 +499,28 @@ public final class ExternalClass extends CodeClass
 		}
 		
 		this.type = new dyvil.tools.compiler.ast.type.ClassType(this);
+	}
+	
+	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
+	{
+		TypeReference ref = new TypeReference(typeRef);
+		switch (ref.getSort())
+		{
+		// TODO implement other sorts
+		case TypeReference.CLASS_TYPE_PARAMETER:
+			ITypeVariable typeVar = this.generics[ref.getTypeParameterIndex()];
+			switch (desc)
+			{
+			case "Ldyvil/annotation/Covariant;":
+				typeVar.setVariance(Variance.COVARIANT);
+				break;
+			case "Ldyvil/annotation/Contravariant;":
+				typeVar.setVariance(Variance.CONTRAVARIANT);
+				break;
+			}
+			// TODO implement other type parameter annotations
+		}
+		return null;
 	}
 	
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)

@@ -78,6 +78,12 @@ public class ClassReader extends ClassVisitor
 	}
 	
 	@Override
+	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
+	{
+		return this.theClass.visitTypeAnnotation(typeRef, typePath, desc, visible);
+	}
+	
+	@Override
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
 		return this.theClass.visitField(access, name, desc, signature, value);

@@ -55,7 +55,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		f.modifiers = Modifiers.PUBLIC | Modifiers.CONST | Modifiers.SYNTHETIC;
 		this.instanceField = f;
 		
-		if (this.theClass.getMethod(Name.toString, null, 0) != null)
+		if (this.theClass.getMethod(Name.toString, null, 0, null) != null)
 		{
 			this.hasToString = true;
 		}

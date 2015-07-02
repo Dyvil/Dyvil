@@ -32,10 +32,10 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ClassType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -1037,11 +1037,11 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount)
+	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
 	{
 		if (this.body != null)
 		{
-			IMethod m = this.body.getMethod(name, parameters, parameterCount);
+			IMethod m = this.body.getMethod(name, parameters, parameterCount, concrete);
 			if (m != null)
 			{
 				return m;
@@ -1058,7 +1058,7 @@ public class CodeClass extends ASTNode implements IClass
 			IClass iclass = this.superType.getTheClass();
 			if (iclass != null)
 			{
-				IMethod m = iclass.getMethod(name, parameters, parameterCount);
+				IMethod m = iclass.getMethod(name, parameters, parameterCount, this.superType);
 				if (m != null)
 				{
 					return m;
@@ -1067,10 +1067,11 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			IClass iclass = this.interfaces[i].getTheClass();
+			IType type = this.interfaces[i];
+			IClass iclass = type.getTheClass();
 			if (iclass != null)
 			{
-				IMethod m = iclass.getMethod(name, parameters, parameterCount);
+				IMethod m = iclass.getMethod(name, parameters, parameterCount, type);
 				if (m != null)
 				{
 					return m;
@@ -1226,6 +1227,13 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				iclass.writeInnerClassInfo(writer);
 			}
+		}
+		
+		// Type Parameter Variances
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].write(writer);
 		}
 		
 		// Fields, Methods and Properties
