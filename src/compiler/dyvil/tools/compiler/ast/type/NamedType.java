@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.type.PositionedTypeVarType;
+import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -109,17 +109,25 @@ public class NamedType implements IType
 		IType t = resolvePrimitive(this.name);
 		if (t != null)
 		{
-			// If the array dimensions of this type are 0, we can assume
-			// that it is exactly the primitive type, so the primitive type
-			// instance is returned.
 			return t;
 		}
 		
 		ITypeVariable typeVar = context.resolveTypeVariable(this.name);
 		if (typeVar != null)
 		{
-			// Re-call resolve to make sure the position is properly checked
-			return new PositionedTypeVarType(this.position, typeVar).resolve(markers, context, position);
+			switch (position)
+			{
+			case CLASS:
+			case TYPE:
+				markers.add(this.position, "type.class.typevar");
+				break;
+			case SUPER_TYPE:
+				markers.add(this.position, "type.super.typevar");
+				break;
+			default:
+				break;
+			}
+			return new TypeVarType(typeVar);
 		}
 		
 		// This type is probably not a primitive one, so resolve using
