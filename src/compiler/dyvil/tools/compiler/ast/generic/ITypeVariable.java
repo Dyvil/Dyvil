@@ -15,6 +15,12 @@ public interface ITypeVariable extends IASTNode, INamed
 	
 	public int getIndex();
 	
+	// Variance
+	
+	public void setVariance(Variance variance);
+	
+	public Variance getVariance();
+	
 	// Upper Bounds
 	
 	public int upperBoundCount();

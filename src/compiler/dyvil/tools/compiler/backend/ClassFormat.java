@@ -434,9 +434,9 @@ public final class ClassFormat
 	
 	private static int readGeneric(String desc, int start, IGeneric generic)
 	{
-		TypeVariable typeVar = new TypeVariable(generic);
 		int index = desc.indexOf(':', start);
-		typeVar.name = Name.getQualified(desc.substring(start, index));
+		Name name = Name.getQualified(desc.substring(start, index));
+		TypeVariable typeVar = new TypeVariable(generic, name);
 		if (desc.charAt(index + 1) == ':')
 		{
 			index++;

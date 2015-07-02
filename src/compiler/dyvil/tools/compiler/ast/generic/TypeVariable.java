@@ -12,11 +12,16 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.TypeReference;
+
 public final class TypeVariable implements ITypeVariable, ITypeList
 {
 	protected ICodePosition	position;
 	
-	public Name				name;
+	protected Variance		variance	= Variance.INVARIANT;
+	protected Name			name;
 	protected IType[]		upperBounds	= new IType[1];
 	protected int			upperBoundCount;
 	protected IType			lowerBound;
@@ -41,11 +46,12 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 		this.generic = generic;
 	}
 	
-	public TypeVariable(ICodePosition position, IGeneric generic, Name name)
+	public TypeVariable(ICodePosition position, IGeneric generic, Name name, Variance variance)
 	{
 		this.position = position;
 		this.name = name;
 		this.generic = generic;
+		this.variance = variance;
 	}
 	
 	@Override
@@ -67,6 +73,18 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 	}
 	
 	@Override
+	public void setVariance(Variance variance)
+	{
+		this.variance = variance;
+	}
+	
+	@Override
+	public Variance getVariance()
+	{
+		return this.variance;
+	}
+	
+	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
@@ -76,51 +94,6 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public void appendSignature(StringBuilder buffer)
-	{
-		buffer.append(this.name).append(':');
-		if (this.upperBoundCount > 0)
-		{
-			if (this.upperBounds[0] != Types.OBJECT || this.upperBoundCount == 1)
-			{
-				this.upperBounds[0].appendSignature(buffer);
-			}
-			
-			for (int i = 1; i < this.upperBoundCount; i++)
-			{
-				buffer.append(':');
-				this.upperBounds[i].appendSignature(buffer);
-			}
-		}
-		else
-		{
-			buffer.append("Ljava/lang/Object;");
-		}
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append(this.name);
-		
-		if (this.lowerBound != null)
-		{
-			buffer.append(Formatting.Type.genericLowerBound);
-			this.lowerBound.toString(prefix, buffer);
-		}
-		if (this.upperBoundCount > 0)
-		{
-			buffer.append(Formatting.Type.genericUpperBound);
-			this.upperBounds[0].toString(prefix, buffer);
-			for (int i = 1; i < this.upperBoundCount; i++)
-			{
-				buffer.append(Formatting.Type.genericBoundSeperator);
-				this.upperBounds[i].toString(prefix, buffer);
-			}
-		}
 	}
 	
 	@Override
@@ -300,10 +273,56 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 	}
 	
 	@Override
+	public void appendSignature(StringBuilder buffer)
+	{
+		buffer.append(this.name).append(':');
+		if (this.upperBoundCount > 0)
+		{
+			if (this.upperBounds[0] != Types.OBJECT || this.upperBoundCount == 1)
+			{
+				this.upperBounds[0].appendSignature(buffer);
+			}
+			
+			for (int i = 1; i < this.upperBoundCount; i++)
+			{
+				buffer.append(':');
+				this.upperBounds[i].appendSignature(buffer);
+			}
+		}
+		else
+		{
+			buffer.append("Ljava/lang/Object;");
+		}
+	}
+	
+	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
 		this.toString("", builder);
 		return builder.toString();
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(this.name);
+		
+		this.variance.appendPrefix(buffer);
+		if (this.lowerBound != null)
+		{
+			buffer.append(Formatting.Type.genericLowerBound);
+			this.lowerBound.toString(prefix, buffer);
+		}
+		if (this.upperBoundCount > 0)
+		{
+			buffer.append(Formatting.Type.genericUpperBound);
+			this.upperBounds[0].toString(prefix, buffer);
+			for (int i = 1; i < this.upperBoundCount; i++)
+			{
+				buffer.append(Formatting.Type.genericBoundSeperator);
+				this.upperBounds[i].toString(prefix, buffer);
+			}
+		}
 	}
 }

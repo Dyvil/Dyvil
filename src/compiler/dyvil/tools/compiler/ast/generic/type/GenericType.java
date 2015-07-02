@@ -162,7 +162,7 @@ public final class GenericType extends ASTNode implements IType, ITypeList
 			ITypeVariable typeVar = this.theClass.getTypeVariable(i);
 			
 			IType otherType = type.resolveType(typeVar);
-			if (!this.typeArguments[i].equals(otherType))
+			if (!typeVar.getVariance().checkCompatible(this.typeArguments[i], otherType))
 			{
 				return false;
 			}
