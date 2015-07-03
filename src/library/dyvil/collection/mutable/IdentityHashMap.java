@@ -271,19 +271,19 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		};
 	}
 	
-	private static final Object	NULL	= new Object();
+	static final Object	NULL	= new Object();
 	
-	private static Object maskNull(Object o)
+	static Object maskNull(Object o)
 	{
 		return o == null ? NULL : o;
 	}
 	
-	private static Object unmaskNull(Object o)
+	static Object unmaskNull(Object o)
 	{
 		return o == NULL ? null : o;
 	}
 	
-	private static int hash(Object x, int length)
+	static int hash(Object x, int length)
 	{
 		int h = System.identityHashCode(x);
 		h = (h << 1) - (h << 8); // Multiply by -127
@@ -393,7 +393,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public V get(K key)
+	public V get(Object key)
 	{
 		Object k = maskNull(key);
 		Object[] tab = this.table;
@@ -644,7 +644,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return null;
+		return null; // TODO immutable.IdentityHashMap
 	}
 	
 	@Override
