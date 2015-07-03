@@ -126,7 +126,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> $minus$minus(Collection<?> collection)
 	{
 		if (collection.contains(this.element))
 		{

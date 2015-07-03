@@ -66,7 +66,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public boolean contains(Object key, Object value);
 	
 	@Override
-	public V get(K key);
+	public V get(Object key);
 	
 	// Non-mutating Operations
 	

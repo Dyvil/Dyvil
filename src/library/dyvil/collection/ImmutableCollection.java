@@ -5,7 +5,6 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.lang.Collection;
 import dyvil.lang.Immutable;
@@ -52,7 +51,7 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immuta
 	public ImmutableCollection<E> $minus(Object element);
 	
 	@Override
-	public ImmutableCollection<? extends E> $minus$minus(Collection<? extends E> collection);
+	public ImmutableCollection<? extends E> $minus$minus(Collection<?> collection);
 	
 	@Override
 	public ImmutableCollection<? extends E> $amp(Collection<? extends E> collection);
@@ -93,14 +92,14 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immuta
 	
 	@Override
 	@mutating
-	public default void $minus$eq(E entry)
+	public default void $minus$eq(Object entry)
 	{
 		throw new ImmutableException("-= on Immutable Collection");
 	}
 	
 	@Override
 	@mutating
-	public default void $minus$minus$eq(Collection<? extends E> collection)
+	public default void $minus$minus$eq(Collection<?> collection)
 	{
 		throw new ImmutableException("--= on Immutable Collection");
 	}
@@ -129,13 +128,13 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immuta
 	
 	@Override
 	@mutating
-	public default boolean remove(E element)
+	public default boolean remove(Object element)
 	{
 		throw new ImmutableException("remove() on Immutable Collection");
 	}
 	
 	@Override
-	public default boolean removeAll(Collection<? extends E> collection)
+	public default boolean removeAll(Collection<?> collection)
 	{
 		throw new ImmutableException("removeAll() on Immutable Collection");
 	}
@@ -148,7 +147,7 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immuta
 	
 	@Override
 	@mutating
-	public default void map(UnaryOperator<E> mapper)
+	public default void map(Function<? super E, ? extends E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable Collection");
 	}

@@ -3,7 +3,6 @@ package dyvil.lang;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
@@ -68,7 +67,7 @@ public interface Set<E> extends Collection<E>
 	 * {@inheritDoc} This operator represents the 'subtract' Set operation.
 	 */
 	@Override
-	public Set<? extends E> $minus$minus(Collection<? extends E> collection);
+	public Set<? extends E> $minus$minus(Collection<?> collection);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'intersect' Set operation.
@@ -144,7 +143,7 @@ public interface Set<E> extends Collection<E>
 	public boolean add(E element);
 	
 	@Override
-	public boolean remove(E element);
+	public boolean remove(Object element);
 	
 	public default boolean union(Collection<? extends E> collection)
 	{
@@ -174,7 +173,7 @@ public interface Set<E> extends Collection<E>
 	}
 	
 	@Override
-	public void map(UnaryOperator<E> mapper);
+	public void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);

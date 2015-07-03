@@ -79,7 +79,7 @@ public @object class EmptySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
 		return this;
 	}

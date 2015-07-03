@@ -189,7 +189,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public V get(K key)
+	public V get(Object key)
 	{
 		for (int i = 0; i < this.size; i++)
 		{

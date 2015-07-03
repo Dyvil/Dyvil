@@ -359,13 +359,13 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public boolean containsKey(Object key)
 	{
-		return this.get((K) key) != null;
+		return this.get(key) != null;
 	}
 	
 	@Override
 	public boolean contains(Object key, Object value)
 	{
-		return value.equals(this.get((K) key));
+		return value.equals(this.get(key));
 	}
 	
 	@Override
@@ -386,7 +386,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public V get(K key)
+	public V get(Object key)
 	{
 		if (key == null)
 		{

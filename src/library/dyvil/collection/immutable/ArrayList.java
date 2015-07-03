@@ -123,7 +123,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> $minus$minus(Collection<?> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];

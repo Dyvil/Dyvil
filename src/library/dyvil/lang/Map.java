@@ -180,7 +180,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the entry
 	 * @return true, if this map contains the mapping represented by the entry
 	 */
-	public default boolean $qmark(Entry<? super K, ? super V> entry)
+	public default boolean $qmark(Entry<?, ?> entry)
 	{
 		return this.contains(entry.getKey(), entry.getValue());
 	}
@@ -241,7 +241,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the entry
 	 * @return true, if this map contains the mapping represented by the entry
 	 */
-	public default boolean contains(Entry<? extends K, ? extends V> entry)
+	public default boolean contains(Entry<?, ?> entry)
 	{
 		return this.contains(entry.getKey(), entry.getValue());
 	}
@@ -255,7 +255,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the key
 	 * @return the value
 	 */
-	public default V subscript(K key)
+	public default V subscript(Object key)
 	{
 		return this.get(key);
 	}
@@ -268,7 +268,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the key
 	 * @return the value
 	 */
-	public V get(K key);
+	public V get(Object key);
 	
 	// Non-mutating Operations
 	
@@ -322,7 +322,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public Map<K, V> $minus(Object key, Object value);
 	
-	public default Map<K, V> $minus(Entry<? super K, ? super V> entry)
+	public default Map<K, V> $minus(Entry<?, ?> entry)
 	{
 		return this.$minus(entry.getKey(), entry.getValue());
 	}
@@ -355,7 +355,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		this.removeKey(key);
 	}
 	
-	public default void $minus$eq(Entry<? super K, ? super V> entry)
+	public default void $minus$eq(Entry<?, ?> entry)
 	{
 		this.remove(entry);
 	}
@@ -365,7 +365,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		this.removeValue(value);
 	}
 	
-	public default void $minus$minus$eq(Collection<? super K> keys)
+	public default void $minus$minus$eq(Collection<?> keys)
 	{
 		for (Object key : keys)
 		{
@@ -373,9 +373,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		}
 	}
 	
-	public default void $minus$minus$eq(Map<? super K, ? super V> map)
+	public default void $minus$minus$eq(Map<?, ?> map)
 	{
-		for (Entry<? super K, ? super V> entry : map)
+		for (Entry<?, ?> entry : map)
 		{
 			this.$minus$eq(entry);
 		}
@@ -417,12 +417,12 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		return Objects.equals(this.removeKey(key), value);
 	}
 	
-	public default boolean remove(Entry<? super K, ? super V> entry)
+	public default boolean remove(Entry<?, ?> entry)
 	{
 		return this.remove(entry.getKey(), entry.getValue());
 	}
 	
-	public default boolean removeKeys(Collection<? super K> keys)
+	public default boolean removeKeys(Collection<?> keys)
 	{
 		boolean removed = false;
 		for (Object key : keys)
@@ -435,10 +435,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		return removed;
 	}
 	
-	public default boolean removeAll(Map<? super K, ? super V> map)
+	public default boolean removeAll(Map<?, ?> map)
 	{
 		boolean removed = false;
-		for (Entry<? super K, ? super V> entry : map)
+		for (Entry<?, ?> entry : map)
 		{
 			if (this.remove(entry))
 			{

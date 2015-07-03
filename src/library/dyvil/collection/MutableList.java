@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.lang.Collection;
 import dyvil.lang.List;
@@ -74,7 +73,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	public MutableList<E> $minus(Object element);
 	
 	@Override
-	public MutableList<? extends E> $minus$minus(Collection<? extends E> collection);
+	public MutableList<? extends E> $minus$minus(Collection<?> collection);
 	
 	@Override
 	public MutableList<? extends E> $amp(Collection<? extends E> collection);
@@ -121,7 +120,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	public void removeAt(int index);
 	
 	@Override
-	public boolean remove(E element);
+	public boolean remove(Object element);
 	
 	@Override
 	public void clear();
@@ -130,7 +129,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	public void filter(Predicate<? super E> condition);
 	
 	@Override
-	public void map(UnaryOperator<E> mapper);
+	public void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);

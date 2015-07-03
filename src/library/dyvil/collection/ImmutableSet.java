@@ -5,7 +5,6 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.lang.Collection;
 import dyvil.lang.ImmutableException;
@@ -15,6 +14,7 @@ import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.Covariant;
 import dyvil.collection.immutable.ArraySet;
+import dyvil.collection.immutable.EmptySet;
 
 @NilConvertible
 @ArrayConvertible
@@ -22,7 +22,7 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 {
 	public static <E> ImmutableSet<E> apply()
 	{
-		return null; // TODO EmptySet
+		return EmptySet.instance;
 	}
 	
 	public static <E> ImmutableSet<E> apply(E... elements)
@@ -70,7 +70,7 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	 * operation.
 	 */
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<? extends E> collection);
+	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'intersect' ImmutableSet
@@ -117,13 +117,13 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	}
 	
 	@Override
-	public default void $minus$eq(E element)
+	public default void $minus$eq(Object element)
 	{
 		throw new ImmutableException("-= on Immutable Set");
 	}
 	
 	@Override
-	public default void $minus$minus$eq(Collection<? extends E> collection)
+	public default void $minus$minus$eq(Collection<?> collection)
 	{
 		throw new ImmutableException("--= on Immutable Set");
 	}
@@ -169,13 +169,13 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	}
 	
 	@Override
-	public default boolean remove(E element)
+	public default boolean remove(Object element)
 	{
 		throw new ImmutableException("remove() on Immutable Set");
 	}
 	
 	@Override
-	public default boolean removeAll(Collection<? extends E> collection)
+	public default boolean removeAll(Collection<?> collection)
 	{
 		throw new ImmutableException("removeAll() on Immutable Set");
 	}
@@ -199,7 +199,7 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	}
 	
 	@Override
-	public default void map(UnaryOperator<E> mapper)
+	public default void map(Function<? super E, ? extends E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable Set");
 	}

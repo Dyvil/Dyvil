@@ -288,7 +288,7 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public V get(K key)
+	public V get(Object key)
 	{
 		if (key == null)
 		{

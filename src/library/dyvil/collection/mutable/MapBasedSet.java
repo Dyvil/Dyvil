@@ -3,7 +3,6 @@ package dyvil.collection.mutable;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.lang.Collection;
 import dyvil.lang.Entry;
@@ -42,7 +41,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 	
 	@Override
-	public MutableSet<? extends E> $minus$minus(Collection<? extends E> collection)
+	public MutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
 		MutableMap<E, Object> map = new HashMap();
 		for (Entry<E, Object> entry : this.map)
@@ -157,7 +156,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 	
 	@Override
-	public boolean remove(E element)
+	public boolean remove(Object element)
 	{
 		return this.map.removeKey(element) == VALUE;
 	}
@@ -208,7 +207,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 	
 	@Override
-	public void map(UnaryOperator<E> mapper)
+	public void map(Function<? super E, ? extends E> mapper)
 	{
 		HashMap<E, Object> newMap = new HashMap();
 		for (Entry<E, Object> entry : this.map)

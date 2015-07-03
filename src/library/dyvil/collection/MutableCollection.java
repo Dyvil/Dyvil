@@ -3,7 +3,6 @@ package dyvil.collection;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.lang.Collection;
 import dyvil.lang.literal.ArrayConvertible;
@@ -46,7 +45,7 @@ public interface MutableCollection<E> extends Collection<E>
 	public MutableCollection<E> $minus(Object element);
 	
 	@Override
-	public MutableCollection<? extends E> $minus$minus(Collection<? extends E> collection);
+	public MutableCollection<? extends E> $minus$minus(Collection<?> collection);
 	
 	@Override
 	public MutableCollection<? extends E> $amp(Collection<? extends E> collection);
@@ -69,13 +68,13 @@ public interface MutableCollection<E> extends Collection<E>
 	public boolean add(E element);
 	
 	@Override
-	public boolean remove(E element);
+	public boolean remove(Object element);
 	
 	@Override
 	public void filter(Predicate<? super E> condition);
 	
 	@Override
-	public void map(UnaryOperator<E> mapper);
+	public void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);

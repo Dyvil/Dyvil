@@ -120,7 +120,7 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> $minus$minus(Collection<?> collection)
 	{
 		return this;
 	}

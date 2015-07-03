@@ -128,7 +128,7 @@ public class ArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
 		Object[] newArray = new Object[this.size];
 		int index = 0;

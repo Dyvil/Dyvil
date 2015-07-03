@@ -6,7 +6,6 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
@@ -160,7 +159,7 @@ public interface List<E> extends Collection<E>
 	public List<E> $minus(Object element);
 	
 	@Override
-	public List<? extends E> $minus$minus(Collection<? extends E> collection);
+	public List<? extends E> $minus$minus(Collection<?> collection);
 	
 	@Override
 	public List<? extends E> $amp(Collection<? extends E> collection);
@@ -302,7 +301,7 @@ public interface List<E> extends Collection<E>
 	public E add(int index, E element);
 	
 	@Override
-	public boolean remove(E element);
+	public boolean remove(Object element);
 	
 	/**
 	 * Removes the element at the given {@code index} from this list. This
@@ -319,7 +318,7 @@ public interface List<E> extends Collection<E>
 	public void filter(Predicate<? super E> condition);
 	
 	@Override
-	public void map(UnaryOperator<E> mapper);
+	public void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);

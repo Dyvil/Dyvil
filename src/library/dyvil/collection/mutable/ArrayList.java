@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.lang.Collection;
 import dyvil.lang.Set;
@@ -163,7 +162,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public MutableList<? extends E> $minus$minus(Collection<? extends E> collection)
+	public MutableList<? extends E> $minus$minus(Collection<?> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];
@@ -281,7 +280,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public void $minus$minus$eq(Collection<? extends E> collection)
+	public void $minus$minus$eq(Collection<?> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];
@@ -416,7 +415,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public boolean remove(E element)
+	public boolean remove(Object element)
 	{
 		boolean removed = false;
 		for (int index = 0; index < this.size; index++)
@@ -484,7 +483,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public void map(UnaryOperator<E> mapper)
+	public void map(Function<? super E, ? extends E> mapper)
 	{
 		for (int i = 0; i < this.size; i++)
 		{

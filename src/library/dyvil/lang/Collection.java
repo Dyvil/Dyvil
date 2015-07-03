@@ -8,7 +8,6 @@ import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -210,7 +209,7 @@ public interface Collection<E> extends Iterable<E>
 	 * @return a collection that contains all elements of this collection
 	 *         excluding all elements of the collection
 	 */
-	public Collection<? extends E> $minus$minus(Collection<? extends E> collection);
+	public Collection<? extends E> $minus$minus(Collection<?> collection);
 	
 	/**
 	 * Returns a collection that contains all elements of this collection that
@@ -297,7 +296,7 @@ public interface Collection<E> extends Iterable<E>
 	 * @param element
 	 *            the element to be removed
 	 */
-	public default void $minus$eq(E element)
+	public default void $minus$eq(Object element)
 	{
 		this.remove(element);
 	}
@@ -310,9 +309,9 @@ public interface Collection<E> extends Iterable<E>
 	 * @param collection
 	 *            the collection of elements to be removed
 	 */
-	public default void $minus$minus$eq(Collection<? extends E> collection)
+	public default void $minus$minus$eq(Collection<?> collection)
 	{
-		for (E e : collection)
+		for (Object e : collection)
 		{
 			this.$minus$eq(e);
 		}
@@ -392,7 +391,7 @@ public interface Collection<E> extends Iterable<E>
 	 * @return true, iff the element has been removed successfully, false
 	 *         otherwise
 	 */
-	public boolean remove(E element);
+	public boolean remove(Object element);
 	
 	/**
 	 * Removes all elements of the given {@code collection} from this
@@ -402,12 +401,12 @@ public interface Collection<E> extends Iterable<E>
 	 * @param collection
 	 *            the collection of elements to be removed
 	 */
-	public default boolean removeAll(Collection<? extends E> collection)
+	public default boolean removeAll(Collection<?> collection)
 	{
 		boolean removed = false;
-		for (E e : collection)
+		for (Object o : collection)
 		{
-			if (this.remove(e))
+			if (this.remove(o))
 			{
 				removed = true;
 			}
@@ -446,7 +445,7 @@ public interface Collection<E> extends Iterable<E>
 	 * @param mapper
 	 *            the mapping function
 	 */
-	public void map(UnaryOperator<E> mapper);
+	public void map(Function<? super E, ? extends E> mapper);
 	
 	/**
 	 * Flat-maps the elements of this collection using the given {@code mapper}.

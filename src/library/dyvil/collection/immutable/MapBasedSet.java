@@ -42,7 +42,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
 		MutableMap<E, Object> map = new HashMap();
 		for (Entry<E, Object> entry : this.map)

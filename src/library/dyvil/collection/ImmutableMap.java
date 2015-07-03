@@ -93,7 +93,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	public boolean contains(Object key, Object value);
 	
 	@Override
-	public V get(K key);
+	public V get(Object key);
 	
 	// Non-mutating Operations
 	
@@ -116,7 +116,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	public ImmutableMap<K, V> $minus(Object key, Object value);
 	
 	@Override
-	public default ImmutableMap<K, V> $minus(Entry<? super K, ? super V> entry)
+	public default ImmutableMap<K, V> $minus(Entry<?, ?> entry)
 	{
 		return this.$minus(entry.getKey(), entry.getValue());
 	}
@@ -179,7 +179,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	
 	@Override
 	@mutating
-	public default void $minus$eq(Entry<? super K, ? super V> entry)
+	public default void $minus$eq(Entry<?, ?> entry)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
@@ -193,7 +193,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	
 	@Override
 	@mutating
-	public default void $minus$minus$eq(Map<? super K, ? super V> map)
+	public default void $minus$minus$eq(Map<?, ?> map)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
@@ -219,13 +219,13 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	}
 	
 	@Override
-	public default boolean removeKeys(Collection<? super K> keys)
+	public default boolean removeKeys(Collection<?> keys)
 	{
 		throw new ImmutableException("removeKeys() on Immutable Map");
 	}
 	
 	@Override
-	public default boolean removeAll(Map<? super K, ? super V> map)
+	public default boolean removeAll(Map<?, ?> map)
 	{
 		throw new ImmutableException("removeAll() on Immutable Map");
 	}

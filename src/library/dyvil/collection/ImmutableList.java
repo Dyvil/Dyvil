@@ -6,7 +6,6 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.lang.Collection;
 import dyvil.lang.ImmutableException;
@@ -87,7 +86,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	public ImmutableList<E> $minus(Object element);
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection);
+	public ImmutableList<? extends E> $minus$minus(Collection<?> collection);
 	
 	@Override
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection);
@@ -131,14 +130,14 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	@mutating
-	public default void $minus$eq(E element)
+	public default void $minus$eq(Object element)
 	{
 		throw new ImmutableException("-= on Immutable List");
 	}
 	
 	@Override
 	@mutating
-	public default void $minus$minus$eq(Collection<? extends E> collection)
+	public default void $minus$minus$eq(Collection<?> collection)
 	{
 		throw new ImmutableException("--= on Immutable List");
 	}
@@ -213,7 +212,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	@mutating
-	public default boolean remove(E element)
+	public default boolean remove(Object element)
 	{
 		throw new ImmutableException("remove() on Immutable List");
 	}
@@ -227,7 +226,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	@mutating
-	public default boolean removeAll(Collection<? extends E> collection)
+	public default boolean removeAll(Collection<?> collection)
 	{
 		throw new ImmutableException("removeAll() on Immutable List");
 	}
@@ -247,7 +246,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	@mutating
-	public default void map(UnaryOperator<E> mapper)
+	public default void map(Function<? super E, ? extends E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable List");
 	}
