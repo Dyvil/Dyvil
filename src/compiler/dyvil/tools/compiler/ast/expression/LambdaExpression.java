@@ -196,7 +196,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			
 			IType valueType = this.value.getType().getReferenceType();
 			
-			IValue value1 = this.value.withType(this.returnType, typeContext, markers, this);
+			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, this);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.value.getPosition(), "lambda.type");
@@ -407,6 +407,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		{
 			IParameter param = this.parameters[i];
 			param.resolveTypes(markers, context);
+			
+			IType type = param.getType();
+			if (type != null && type.isPrimitive())
+			{
+				param.setType(type.getReferenceType());
+			}
 		}
 		
 		this.context = context;
@@ -547,12 +553,13 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name, this.getLambdaDescriptor(), null, null));
 		
+		int index = 0;
 		if (instance)
 		{
 			mw.setThisType(this.thisClass.getInternalName());
+			index = 1;
 		}
 		
-		int index = 0;
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable capture = this.capturedFields[i];

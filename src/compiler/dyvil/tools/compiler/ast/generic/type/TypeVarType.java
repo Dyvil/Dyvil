@@ -102,7 +102,7 @@ public class TypeVarType implements IType
 		}
 		
 		IType t = context.resolveType(this.typeVar);
-		if (t != null)
+		if (t != Types.ANY)
 		{
 			if (t.isPrimitive())
 			{

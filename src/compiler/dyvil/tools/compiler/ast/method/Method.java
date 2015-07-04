@@ -381,6 +381,10 @@ public class Method extends Member implements IMethod
 		{
 			this.value.resolveTypes(markers, this);
 		}
+		else if (this.theClass.hasModifier(Modifiers.ABSTRACT))
+		{
+			this.modifiers |= Modifiers.ABSTRACT;
+		}
 	}
 	
 	@Override
@@ -409,7 +413,7 @@ public class Method extends Member implements IMethod
 				}
 			}
 			
-			IValue value1 = this.value.withType(this.type, null, markers, context);
+			IValue value1 = this.value.withType(this.type, this.type, markers, this);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.position, "method.type", this.name.unqualified);
@@ -446,10 +450,6 @@ public class Method extends Member implements IMethod
 		if (this.value != null)
 		{
 			this.value.checkTypes(markers, this);
-		}
-		else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
-		{
-			this.modifiers |= Modifiers.ABSTRACT;
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -792,10 +792,6 @@ public class Method extends Member implements IMethod
 		if (genericData == null)
 		{
 			genericData = new GenericData(this, this.genericCount);
-			if (instance != null)
-			{
-				genericData.instanceType = instance.getType();
-			}
 			
 			this.inferTypes(genericData, instance, arguments);
 			
@@ -803,10 +799,6 @@ public class Method extends Member implements IMethod
 		}
 		
 		genericData.method = this;
-		if (instance != null)
-		{
-			genericData.instanceType = instance.getType();
-		}
 		
 		genericData.setTypeCount(this.genericCount);
 		this.inferTypes(genericData, instance, arguments);
@@ -930,6 +922,15 @@ public class Method extends Member implements IMethod
 	
 	private void inferTypes(GenericData genericData, IValue instance, IArguments arguments)
 	{
+		if (instance != null)
+		{
+			genericData.instanceType = instance.getType();
+		}
+		else
+		{
+			genericData.instanceType = this.theClass.getType();
+		}
+		
 		int len = arguments.size();
 		IParameter param;
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)

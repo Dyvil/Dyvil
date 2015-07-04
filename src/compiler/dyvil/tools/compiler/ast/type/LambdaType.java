@@ -178,6 +178,10 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		{
 			return this.returnType;
 		}
+		if (index > this.parameterCount)
+		{
+			return Types.ANY;
+		}
 		return this.parameterTypes[index];
 	}
 	
@@ -278,7 +282,8 @@ public final class LambdaType implements IType, ITyped, ITypeList
 			writer.writeInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/FunctionType", "apply", "([Ldyvil/lang/Type;)Ldyvil/reflect/type/FunctionType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/FunctionType", "apply",
+				"(Ldyvil/lang/Type;[Ldyvil/lang/Type;)Ldyvil/reflect/type/FunctionType;", false);
 	}
 	
 	@Override
@@ -354,7 +359,16 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	{
 		if (this.parameterCount == 1)
 		{
-			this.parameterTypes[0].toString(prefix, buffer);
+			if (this.parameterTypes[0].typeTag() == TUPLE)
+			{
+				buffer.append(Formatting.Method.parametersStart);
+				this.parameterTypes[0].toString(prefix, buffer);
+				buffer.append(Formatting.Method.parametersEnd);
+			}
+			else
+			{
+				this.parameterTypes[0].toString(prefix, buffer);
+			}
 			buffer.append(' ');
 		}
 		else if (this.parameterCount > 0)

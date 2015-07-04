@@ -36,7 +36,7 @@ public interface IVariable extends IDataMember
 	
 	public default IType getReferenceType()
 	{
-		return null;
+		return this.getType();
 	}
 	
 	public default void appendDescription(StringBuilder buf)

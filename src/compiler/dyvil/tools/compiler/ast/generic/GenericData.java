@@ -87,11 +87,21 @@ public final class GenericData implements ITypeList, ITypeContext
 		return this.generics[index];
 	}
 	
+	private boolean isMethodTypeVariable(ITypeVariable typeVar)
+	{
+		int index = typeVar.getIndex();
+		if (index >= this.method.genericCount())
+		{
+			return false;
+		}
+		return this.method.getTypeVariable(index) == typeVar;
+	}
+	
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
 		int index = typeVar.getIndex();
-		if (this.method.getTypeVariable(index) == typeVar)
+		if (this.isMethodTypeVariable(typeVar))
 		{
 			if (index > this.genericCount)
 			{
@@ -111,7 +121,7 @@ public final class GenericData implements ITypeList, ITypeContext
 		}
 		
 		int index = typeVar.getIndex();
-		if (this.method.getTypeVariable(index) != typeVar)
+		if (!this.isMethodTypeVariable(typeVar))
 		{
 			return;
 		}
@@ -134,7 +144,7 @@ public final class GenericData implements ITypeList, ITypeContext
 	
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.typeCount(); i++)
+		for (int i = 0; i < this.genericCount; i++)
 		{
 			this.generics[i] = this.generics[i].resolve(markers, context, TypePosition.TYPE);
 		}

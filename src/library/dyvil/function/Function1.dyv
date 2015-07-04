@@ -4,4 +4,10 @@ package dyvil.function
 public interface Function1[-P1, +R]
 {
 	public R apply(P1 par1)
+	
+	public P1 => A andThen[A](R => A other) = x => other(this(x))
+	
+	public A => R compose[A](A => P1 other) = x => this(other(x))
+	
+	public static Function1[T, T] identity[T]() = x => x
 }
