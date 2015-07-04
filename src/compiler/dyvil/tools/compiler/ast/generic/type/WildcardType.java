@@ -98,6 +98,16 @@ public final class WildcardType implements IType, ITyped
 	}
 	
 	@Override
+	public IType getParameterType()
+	{
+		if (this.bound == null || this.variance == Variance.COVARIANT)
+		{
+			return Types.ANY;
+		}
+		return this.bound;
+	}
+	
+	@Override
 	public IType getSuperType()
 	{
 		return this.bound == null ? Types.UNKNOWN : this.bound;

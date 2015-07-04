@@ -118,6 +118,11 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		return this;
 	}
 	
+	public default IType getParameterType()
+	{
+		return this;
+	}
+	
 	// Arrays
 	
 	public default boolean isArrayType()

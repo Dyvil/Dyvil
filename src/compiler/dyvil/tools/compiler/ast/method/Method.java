@@ -674,6 +674,10 @@ public class Method extends Member implements IMethod
 		{
 			return 0;
 		}
+		if ((this.modifiers & Modifiers.SYNTHETIC) != 0)
+		{
+			return 0;
+		}
 		
 		// Only matching the name
 		if (arguments == null)

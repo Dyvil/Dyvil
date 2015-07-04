@@ -115,13 +115,18 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return false;
 		}
 		
+		this.compileVariable(field);
+		return true;
+	}
+	
+	private void compileVariable(REPLVariable field)
+	{
 		field.foldConstants();
 		
 		this.compileInnerClasses();
 		field.compute(this.currentClassName);
 		
 		this.cleanup();
-		return true;
 	}
 	
 	private REPLMemberClass getREPLClass(IClassMember member)
@@ -142,17 +147,43 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	public void setValue(IValue value)
 	{
 		Name name = Name.getQualified("res" + resultIndex);
-		REPLVariable field = new REPLVariable(CODE_POSITION, name, Types.UNKNOWN, value);
+		
+		this.getClassName();
+		
+		MarkerList markers = new MarkerList();
+		value.resolveTypes(markers, this);
+		value = value.resolve(markers, this);
+		
+		IType type = value.getType();
+		IValue value1 = value.withType(type, type, markers, this);
+		if (value1 == null)
+		{
+			// TODO Report error?
+		}
+		else
+		{
+			value = value1;
+			type = value1.getType();
+		}
+		
+		value.checkTypes(markers, this);
+		value.check(markers, this);
+		
+		if (this.reportErrors(markers))
+		{
+			this.cleanup();
+			return;
+		}
+		
+		REPLVariable field = new REPLVariable(CODE_POSITION, name, type, value);
 		field.modifiers = Modifiers.FINAL;
 		
-		if (this.computeVariable(field))
+		this.compileVariable(field);
+		if (type != Types.VOID)
 		{
-			if (field.getType() != Types.VOID)
-			{
-				this.variables.put(field.name, field);
-				System.out.println(field.toString());
-				resultIndex++;
-			}
+			this.variables.put(field.name, field);
+			System.out.println(field.toString());
+			resultIndex++;
 		}
 	}
 	

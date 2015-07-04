@@ -1,10 +1,12 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
@@ -91,6 +93,10 @@ public final class GenericData implements ITypeList, ITypeContext
 		int index = typeVar.getIndex();
 		if (this.method.getTypeVariable(index) == typeVar)
 		{
+			if (index > this.genericCount)
+			{
+				return new TypeVarType(typeVar);
+			}
 			return this.generics[index];
 		}
 		return this.instanceType.resolveType(typeVar);
@@ -99,7 +105,17 @@ public final class GenericData implements ITypeList, ITypeContext
 	@Override
 	public void addMapping(ITypeVariable typeVar, IType type)
 	{
+		if (type == Types.UNKNOWN)
+		{
+			return;
+		}
+		
 		int index = typeVar.getIndex();
+		if (this.method.getTypeVariable(index) != typeVar)
+		{
+			return;
+		}
+		
 		if (index < this.genericCount)
 		{
 			this.generics[index] = this.generics[index].combine(type);

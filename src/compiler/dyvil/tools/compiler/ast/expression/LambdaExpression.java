@@ -169,12 +169,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 					IType parType = param.getType();
 					if (parType == null)
 					{
-						parType = this.method.getParameter(i).getType();
+						parType = this.method.getParameter(i).getType().getConcreteType(this.type).getParameterType();
+						param.setType(parType);
 					}
-					param.setType(parType.getConcreteType(this.type));
 				}
 				
-				this.returnType = this.method.getType().getConcreteType(this.type);
+				this.returnType = this.method.getType().getConcreteType(this.type).getReturnType();
 			}
 			else
 			{
@@ -193,12 +193,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			this.context = context;
 			this.value = this.value.resolve(markers, this);
 			
-			boolean inferReturn = false;
-			if (this.returnType == Types.UNKNOWN)
-			{
-				inferReturn = true;
-				this.returnType = this.value.getType().getReferenceType();
-			}
+			IType valueType = this.value.getType().getReferenceType();
 			
 			IValue value1 = this.value.withType(this.returnType, typeContext, markers, this);
 			if (value1 == null)
@@ -210,16 +205,13 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			else
 			{
 				this.value = value1;
-				if (inferReturn)
-				{
-					this.returnType = this.value.getType();
-				}
+				valueType = this.value.getType();
 			}
 			
 			this.context = null;
 			
 			ITypeContext tempContext = new MapTypeContext();
-			this.method.getType().inferTypes(this.returnType, tempContext);
+			this.method.getType().inferTypes(valueType, tempContext);
 			IType type1 = this.method.getTheClass().getType().getConcreteType(tempContext);
 			
 			type.inferTypes(type1, typeContext);
