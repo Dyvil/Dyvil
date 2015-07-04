@@ -72,7 +72,13 @@ public interface FileUtils
 	 *            the text
 	 * @return true, if successful
 	 */
+	
 	public static @infix boolean write(File file, String text)
+	{
+		return write(file, text.getBytes());
+	}
+	
+	public static @infix boolean write(File file, byte[] bytes)
 	{
 		try
 		{
@@ -81,7 +87,6 @@ public interface FileUtils
 				file.createNewFile();
 			}
 			
-			byte[] bytes = text.getBytes();
 			Files.write(file.toPath(), bytes);
 			return true;
 		}

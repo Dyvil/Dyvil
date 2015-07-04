@@ -350,7 +350,16 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		this.toString("", sb);
+		sb.append('(');
+		if (this.parameterCount > 0)
+		{
+			sb.append(this.parameterTypes[0]);
+			for (int i = 1; i < this.parameterCount; i++)
+			{
+				sb.append(", ").append(this.parameterTypes[i]);
+			}
+		}
+		sb.append(") => ").append(this.returnType);
 		return sb.toString();
 	}
 	

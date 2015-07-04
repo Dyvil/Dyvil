@@ -359,10 +359,13 @@ public final class TupleType implements IType, ITypeList
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder("(");
-		builder.append(this.types[0]);
-		for (int i = 1; i < this.typeCount; i++)
+		if (this.typeCount > 0)
 		{
-			builder.append(", ").append(this.types[i]);
+			builder.append(this.types[0]);
+			for (int i = 1; i < this.typeCount; i++)
+			{
+				builder.append(", ").append(this.types[i]);
+			}
 		}
 		return builder.append(")").toString();
 	}
