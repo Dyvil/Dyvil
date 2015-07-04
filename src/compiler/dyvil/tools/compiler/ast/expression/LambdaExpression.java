@@ -44,7 +44,7 @@ import org.objectweb.asm.Handle;
 
 public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IContext, ITypeContext
 {
-	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
+	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory", "metafactory",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
 															+ "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodHandle;"
 															+ "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
@@ -194,7 +194,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			this.context = context;
 			this.value = this.value.resolve(markers, this);
 			
-			IType valueType = this.value.getType().getReferenceType();
+			IType valueType = this.value.getType();
 			
 			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, this);
 			if (value1 == null)
@@ -407,12 +407,6 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		{
 			IParameter param = this.parameters[i];
 			param.resolveTypes(markers, context);
-			
-			IType type = param.getType();
-			if (type != null && type.isPrimitive())
-			{
-				param.setType(type.getReferenceType());
-			}
 		}
 		
 		this.context = context;

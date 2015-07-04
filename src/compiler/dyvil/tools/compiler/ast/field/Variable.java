@@ -145,7 +145,7 @@ public final class Variable extends Member implements IVariable
 	@Override
 	public IType getReferenceType()
 	{
-		return this.refType;
+		return this.refType == null ? this.type : this.refType;
 	}
 	
 	@Override
