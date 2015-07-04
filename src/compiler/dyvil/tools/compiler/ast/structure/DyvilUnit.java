@@ -162,6 +162,15 @@ public final class DyvilUnit extends DyvilHeader
 	}
 	
 	@Override
+	public void cleanup()
+	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].cleanup(this, null);
+		}
+	}
+	
+	@Override
 	public void compile()
 	{
 		if (ICompilationUnit.printMarkers(this.markers, "Dyvil Unit", this.name, this.inputFile))

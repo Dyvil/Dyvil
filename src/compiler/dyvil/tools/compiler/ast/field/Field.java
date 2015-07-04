@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -282,6 +283,17 @@ public class Field extends Member implements IField
 		if (this.value != null)
 		{
 			this.value = this.value.foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		super.cleanup(context, compilableList);
+		
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(context, compilableList);
 		}
 	}
 	

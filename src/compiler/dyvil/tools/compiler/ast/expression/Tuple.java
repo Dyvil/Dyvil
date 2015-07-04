@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
@@ -225,7 +226,7 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	{
 		if (this.valueCount == 1)
 		{
-			return new EncapsulatedValue(this.values[0].resolve(markers, context));
+			return this.values[0].resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.valueCount; i++)
@@ -287,6 +288,16 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			this.values[i] = this.values[i].foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
 		return this;
 	}

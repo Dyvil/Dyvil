@@ -333,8 +333,9 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers)
 	{
+		IContext context = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].resolveTypes(markers, context);
@@ -358,8 +359,9 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolve(MarkerList markers)
 	{
+		IContext context = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].resolve(markers, context);
@@ -383,8 +385,9 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
+	public void checkTypes(MarkerList markers)
 	{
+		IContext context = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].checkTypes(markers, context);
@@ -408,8 +411,9 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
+	public void check(MarkerList markers)
 	{
+		IContext context = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].check(markers, context);
@@ -454,6 +458,32 @@ public class ClassBody extends ASTNode implements IClassBody
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			this.methods[i].foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup()
+	{
+		IClass iclass = this.theClass;
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].cleanup(iclass, iclass);
+		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			this.fields[i].cleanup(iclass, iclass);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			this.properties[i].cleanup(iclass, iclass);
+		}
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].cleanup(iclass, iclass);
+		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].cleanup(iclass, iclass);
 		}
 	}
 	

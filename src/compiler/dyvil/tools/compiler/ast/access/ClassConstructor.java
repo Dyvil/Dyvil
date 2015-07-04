@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.classes.AnonymousClassMetadata;
 import dyvil.tools.compiler.ast.classes.NestedClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -33,10 +34,6 @@ public class ClassConstructor extends ConstructorCall
 	{
 		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
 		this.arguments.resolveTypes(markers, context);
-		
-		IDyvilHeader header = context.getHeader();
-		this.nestedClass.setUnit(header);
-		header.addInnerClass(this.nestedClass);
 		
 		this.nestedClass.setSuperType(this.type);
 		
@@ -85,6 +82,19 @@ public class ClassConstructor extends ConstructorCall
 		this.arguments.foldConstants();
 		
 		this.nestedClass.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.arguments.cleanup(context, compilableList);
+		this.nestedClass.cleanup(context, compilableList);
+		
+		IDyvilHeader header = context.getHeader();
+		this.nestedClass.setUnit(header);
+		header.addInnerClass(this.nestedClass);
+		
 		return this;
 	}
 	

@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -229,6 +230,13 @@ public class ConstructorCall extends ASTNode implements ICall
 	public IValue foldConstants()
 	{
 		this.arguments.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.arguments.cleanup(context, compilableList);
 		return this;
 	}
 	

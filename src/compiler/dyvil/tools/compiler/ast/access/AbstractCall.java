@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -197,6 +198,17 @@ public abstract class AbstractCall implements ICall, IValued
 			this.instance = this.instance.foldConstants();
 		}
 		this.arguments.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.instance != null)
+		{
+			this.instance = this.instance.cleanup(context, compilableList);
+		}
+		this.arguments.cleanup(context, compilableList);
 		return this;
 	}
 	

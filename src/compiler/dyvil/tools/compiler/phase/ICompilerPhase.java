@@ -82,21 +82,28 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	ICompilerPhase	FOLD_CONSTANTS	= new FoldConstantPhase(90);
 	
 	/**
+	 * Performs the final cleanup on the AST. This also includes special
+	 * registrations such as adding Lambda Expressions to the list of compilable
+	 * elements in classes.
+	 */
+	ICompilerPhase	CLEANUP			= new ParallelCompilerPhase(100, "CLEANUP", ICompilationUnit::cleanup);
+	
+	/**
 	 * Compiles the AST to byte code and stores the generated .class files in
 	 * the bin directory.
 	 */
-	ICompilerPhase	COMPILE			= new ParallelCompilerPhase(100, "COMPILE", unit -> unit.compile());
+	ICompilerPhase	COMPILE			= new ParallelCompilerPhase(200, "COMPILE", ICompilationUnit::compile);
 	
 	/**
 	 * Converts the .class files in the bin directory to a JAR file, sets up the
 	 * classpath and signs the JAR.
 	 */
-	ICompilerPhase	JAR				= new CompilerPhase(110, "JAR", units -> ClassWriter.generateJAR(DyvilCompiler.fileFinder.files));
+	ICompilerPhase	JAR				= new CompilerPhase(210, "JAR", units -> ClassWriter.generateJAR(DyvilCompiler.fileFinder.files));
 	
 	/**
 	 * Tests the main type specified in {@link CompilerConfig#mainType}.
 	 */
-	ICompilerPhase	TEST			= new CompilerPhase(120, "TEST", units -> DyvilCompiler.test());
+	ICompilerPhase	TEST			= new CompilerPhase(1000, "TEST", units -> DyvilCompiler.test());
 	
 	public String getName();
 	

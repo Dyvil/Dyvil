@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -59,7 +60,7 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException;
 	
-	// Phase Methdos
+	// Phase Methods
 	
 	public void resolveTypes(MarkerList markers, IContext context);
 	
@@ -70,6 +71,8 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	public void check(MarkerList markers, IContext context);
 	
 	public void foldConstants();
+	
+	public void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer);

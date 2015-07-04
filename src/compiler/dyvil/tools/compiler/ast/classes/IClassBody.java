@@ -4,7 +4,6 @@ import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -86,13 +85,15 @@ public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 	
 	// Phases
 	
-	public void resolveTypes(MarkerList markers, IContext context);
+	public void resolveTypes(MarkerList markers);
 	
-	public void resolve(MarkerList markers, IContext context);
+	public void resolve(MarkerList markers);
 	
-	public void checkTypes(MarkerList markers, IContext context);
+	public void checkTypes(MarkerList markers);
 	
-	public void check(MarkerList markers, IContext context);
+	public void check(MarkerList markers);
 	
 	public void foldConstants();
+	
+	public void cleanup();
 }

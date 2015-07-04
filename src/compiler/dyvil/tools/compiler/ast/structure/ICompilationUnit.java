@@ -59,5 +59,7 @@ public interface ICompilationUnit extends IASTNode
 	
 	public void foldConstants();
 	
+	public void cleanup();
+	
 	public void compile();
 }

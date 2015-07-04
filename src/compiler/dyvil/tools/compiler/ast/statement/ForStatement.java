@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -321,6 +322,32 @@ public class ForStatement implements IStatement, IContext, ILoop
 		{
 			this.action = this.action.foldConstants();
 		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.context = context;
+		
+		if (this.variable != null)
+		{
+			this.variable.cleanup(context, compilableList);
+		}
+		if (this.update != null)
+		{
+			this.update.cleanup(this, compilableList);
+		}
+		if (this.condition != null)
+		{
+			this.condition.cleanup(this, compilableList);
+		}
+		if (this.action != null)
+		{
+			this.action.cleanup(this, compilableList);
+		}
+		
+		this.context = null;
 		return this;
 	}
 	

@@ -235,6 +235,7 @@ public final class DyvilCompiler
 			phases.add(ICompilerPhase.CHECK_TYPES);
 			phases.add(ICompilerPhase.CHECK);
 			phases.add(ICompilerPhase.COMPILE);
+			phases.add(ICompilerPhase.CLEANUP);
 			return;
 			// case "obfuscate":
 			// case "doc":

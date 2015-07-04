@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -171,6 +172,12 @@ public final class ClassAccess extends ASTNode implements IValue
 	}
 	
 	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		return this;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		IClass iclass = this.type.getTheClass();
@@ -187,7 +194,6 @@ public final class ClassAccess extends ASTNode implements IValue
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		System.out.println();
 	}
 	
 	@Override

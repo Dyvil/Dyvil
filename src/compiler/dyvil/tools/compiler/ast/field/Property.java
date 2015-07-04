@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -364,6 +365,21 @@ public class Property extends Member implements IProperty, IContext
 		if (this.set != null)
 		{
 			this.set = this.set.foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		super.cleanup(context, compilableList);
+		
+		if (this.get != null)
+		{
+			this.get = this.get.cleanup(this, compilableList);
+		}
+		if (this.set != null)
+		{
+			this.set = this.set.cleanup(this, compilableList);
 		}
 	}
 	

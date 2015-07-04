@@ -30,6 +30,7 @@ import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
@@ -736,7 +737,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.body != null)
 		{
-			this.body.resolveTypes(markers, this);
+			this.body.resolveTypes(markers);
 		}
 	}
 	
@@ -765,7 +766,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.body != null)
 		{
-			this.body.resolve(markers, this);
+			this.body.resolve(markers);
 		}
 	}
 	
@@ -786,7 +787,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.body != null)
 		{
-			this.body.checkTypes(markers, this);
+			this.body.checkTypes(markers);
 		}
 	}
 	
@@ -844,7 +845,7 @@ public class CodeClass extends ASTNode implements IClass
 		
 		if (this.body != null)
 		{
-			this.body.check(markers, this);
+			this.body.check(markers);
 		}
 	}
 	
@@ -864,6 +865,25 @@ public class CodeClass extends ASTNode implements IClass
 		if (this.body != null)
 		{
 			this.body.foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			this.annotations[i].cleanup(this, this);
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].cleanup(this, this);
+		}
+		
+		if (this.body != null)
+		{
+			this.body.cleanup();
 		}
 	}
 	

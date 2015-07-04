@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -245,21 +246,15 @@ public final class IfStatement extends ASTNode implements IStatement
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.condition == null)
-		{
-			return this;
-		}
-		
-		if (this.condition.isConstant())
+		if (this.condition != null)
 		{
 			if (this.condition.valueTag() == BOOLEAN)
 			{
-				return ((BooleanValue) this.condition).value ? this.then : this.elseThen;
+				return ((BooleanValue) this.condition).value ? this.then.foldConstants() : this.elseThen.foldConstants();
 			}
-			return this;
+			this.condition = this.condition.foldConstants();
 		}
 		
-		this.condition = this.condition.foldConstants();
 		if (this.then != null)
 		{
 			this.then = this.then.foldConstants();
@@ -267,6 +262,25 @@ public final class IfStatement extends ASTNode implements IStatement
 		if (this.elseThen != null)
 		{
 			this.elseThen = this.elseThen.foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.condition != null)
+		{
+			this.condition = this.condition.cleanup(context, compilableList);
+		}
+		
+		if (this.then != null)
+		{
+			this.then = this.then.cleanup(context, compilableList);
+		}
+		if (this.elseThen != null)
+		{
+			this.elseThen = this.elseThen.cleanup(context, compilableList);
 		}
 		return this;
 	}

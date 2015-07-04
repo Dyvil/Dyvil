@@ -22,6 +22,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -319,19 +320,29 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.valueCount == 1)
+		if (this.valueCount == 1 && this.requiredType != Types.VOID)
 		{
 			return this.values[0].foldConstants();
 		}
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v1 = this.values[i];
-			IValue v2 = v1.foldConstants();
-			if (v1 != v2)
-			{
-				this.values[i] = v2;
-			}
+			this.values[i] = this.values[i].foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.valueCount == 1 && this.requiredType != Types.VOID)
+		{
+			return this.values[0].cleanup(context, compilableList);
+		}
+		
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
 		return this;
 	}

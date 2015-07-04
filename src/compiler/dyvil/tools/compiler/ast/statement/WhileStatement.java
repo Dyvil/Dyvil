@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -195,6 +196,20 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 		if (this.action != null)
 		{
 			this.action = this.action.foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.condition != null)
+		{
+			this.condition = this.condition.cleanup(context, compilableList);
+		}
+		if (this.action != null)
+		{
+			this.action = this.action.cleanup(context, compilableList);
 		}
 		return this;
 	}

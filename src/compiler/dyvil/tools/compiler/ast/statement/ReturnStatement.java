@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -140,7 +141,17 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	{
 		if (this.value != null)
 		{
-			return this.value.foldConstants();
+			this.value = this.value.foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(context, compilableList);
 		}
 		return this;
 	}

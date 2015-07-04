@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -189,6 +190,17 @@ public final class FormatStringExpression extends ASTNode implements IValue
 		for (int i = 0; i < len; i++)
 		{
 			this.values[i] = this.values[i].foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		int len = this.count / 2;
+		for (int i = 0; i < len; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
 		return this;
 	}

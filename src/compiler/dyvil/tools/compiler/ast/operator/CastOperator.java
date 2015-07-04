@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -163,6 +164,19 @@ public final class CastOperator extends ASTNode implements IValue
 	@Override
 	public IValue foldConstants()
 	{
+		this.value = this.value.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.typeHint)
+		{
+			return this.value.cleanup(context, compilableList);
+		}
+		
+		this.value = this.value.cleanup(context, compilableList);
 		return this;
 	}
 	

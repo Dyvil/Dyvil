@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.statement.foreach.IterableForStatement;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -30,7 +31,7 @@ public class RangeOperator implements IValue
 	public ICodePosition				position;
 	protected IValue					firstValue;
 	protected IValue					lastValue;
-	private IType						elementType = Types.UNKNOWN;
+	private IType						elementType		= Types.UNKNOWN;
 	private IType						type;
 	
 	public RangeOperator(IValue value1, IValue value2)
@@ -220,6 +221,16 @@ public class RangeOperator implements IValue
 	@Override
 	public IValue foldConstants()
 	{
+		this.firstValue = this.firstValue.foldConstants();
+		this.lastValue = this.lastValue.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.firstValue = this.firstValue.cleanup(context, compilableList);
+		this.lastValue = this.lastValue.cleanup(context, compilableList);
 		return this;
 	}
 	

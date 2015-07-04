@@ -11,12 +11,13 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterized;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
-public interface IClass extends IASTNode, IClassMember, IGeneric, IContext, IParameterized
+public interface IClass extends IASTNode, IClassMember, IGeneric, IContext, IParameterized, IClassCompilableList
 {
 	@Override
 	public default void setTheClass(IClass iclass)
@@ -89,10 +90,13 @@ public interface IClass extends IASTNode, IClassMember, IGeneric, IContext, IPar
 	
 	// Other Compilables (Lambda Expressions, ...)
 	
+	@Override
 	public int compilableCount();
 	
+	@Override
 	public void addCompilable(IClassCompilable compilable);
 	
+	@Override
 	public IClassCompilable getCompilable(int index);
 	
 	// Compilation

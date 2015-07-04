@@ -16,10 +16,11 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.NamedType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -152,6 +153,11 @@ public final class Annotation extends ASTNode implements ITyped
 	public void foldConstants()
 	{
 		this.arguments.foldConstants();
+	}
+	
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.arguments.cleanup(context, compilableList);
 	}
 	
 	private RetentionPolicy getRetention()

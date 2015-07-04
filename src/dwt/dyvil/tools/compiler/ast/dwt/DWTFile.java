@@ -145,6 +145,11 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 	}
 	
 	@Override
+	public void cleanup()
+	{
+	}
+	
+	@Override
 	public void compile()
 	{
 		if (ICompilationUnit.printMarkers(this.markers, "DWT File", this.name, this.inputFile))

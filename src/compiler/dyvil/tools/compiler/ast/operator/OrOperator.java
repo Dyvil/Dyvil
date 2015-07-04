@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -114,19 +115,23 @@ public final class OrOperator extends ASTNode implements IValue
 	@Override
 	public IValue foldConstants()
 	{
-		int t1 = this.left.valueTag();
-		int t2 = this.right.valueTag();
-		if (t1 == BOOLEAN && ((BooleanValue) this.left).value)
-		{
-			return BooleanValue.TRUE;
-		}
-		if (t2 == BOOLEAN && ((BooleanValue) this.left).value)
+		// Left value is true
+		if (this.left.valueTag() == BOOLEAN && ((BooleanValue) this.left).value)
 		{
 			return BooleanValue.TRUE;
 		}
 		
-		this.left.foldConstants();
-		this.right.foldConstants();
+		this.left = this.left.foldConstants();
+		this.right = this.right.foldConstants();
+		
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.left = this.left.cleanup(context, compilableList);
+		this.right = this.right.cleanup(context, compilableList);
 		
 		return this;
 	}

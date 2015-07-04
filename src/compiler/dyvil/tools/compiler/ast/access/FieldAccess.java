@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -45,6 +46,17 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		this.name = name;
 	}
 	
+	public MethodCall toMethodCall(IMethod method)
+	{
+		MethodCall call = new MethodCall(this.position);
+		call.instance = this.instance;
+		call.name = this.name;
+		call.method = method;
+		call.dotless = this.dotless;
+		call.arguments = EmptyArguments.INSTANCE;
+		return call;
+	}
+
 	@Override
 	public int valueTag()
 	{
@@ -237,15 +249,14 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		return this;
 	}
 	
-	public MethodCall toMethodCall(IMethod method)
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		MethodCall call = new MethodCall(this.position);
-		call.instance = this.instance;
-		call.name = this.name;
-		call.method = method;
-		call.dotless = this.dotless;
-		call.arguments = EmptyArguments.INSTANCE;
-		return call;
+		if (this.instance != null)
+		{
+			this.instance = this.instance.cleanup(context, compilableList);
+		}
+		return this;
 	}
 	
 	@Override

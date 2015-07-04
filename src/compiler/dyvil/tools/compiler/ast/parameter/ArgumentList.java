@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -347,6 +348,15 @@ public final class ArgumentList implements IArguments, IValueList
 		for (int i = 0; i < this.size; i++)
 		{
 			this.values[i] = this.values[i].foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
 	}
 	

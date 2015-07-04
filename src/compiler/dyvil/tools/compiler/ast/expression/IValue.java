@@ -6,7 +6,11 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.type.ArrayType;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -154,6 +158,8 @@ public interface IValue extends IASTNode, ITyped
 	public void check(MarkerList markers, IContext context);
 	
 	public IValue foldConstants();
+	
+	public IValue cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// Compilation
 	

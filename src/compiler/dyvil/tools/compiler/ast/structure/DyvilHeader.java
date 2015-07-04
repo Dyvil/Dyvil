@@ -385,6 +385,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
+	public void cleanup()
+	{
+	}
+	
+	@Override
 	public void compile()
 	{
 		if (ICompilationUnit.printMarkers(this.markers, "Dyvil Header", this.name, this.inputFile))

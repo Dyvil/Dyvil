@@ -24,6 +24,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
@@ -348,6 +349,11 @@ public class REPLMemberClass implements IClass
 	
 	@Override
 	public void foldConstants()
+	{
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 	}
 	

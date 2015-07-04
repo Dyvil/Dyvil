@@ -27,6 +27,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -36,7 +37,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer
+public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer, IClassCompilableList
 {
 	private static final CodePosition	CODE_POSITION	= new CodePosition(1, 0, 1);
 	
@@ -115,6 +116,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return false;
 		}
 		
+		field.cleanup(this, this);
 		this.compileVariable(field);
 		return true;
 	}
@@ -137,7 +139,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		return iclass;
 	}
 	
-	private void cleanup()
+	@Override
+	public void cleanup()
 	{
 		this.compilableList.clear();
 		this.innerClassList.clear();
@@ -174,6 +177,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			this.cleanup();
 			return;
 		}
+		
+		value = value.cleanup(this, this);
 		
 		REPLVariable field = new REPLVariable(CODE_POSITION, name, type, value);
 		field.modifiers = Modifiers.FINAL;
@@ -285,9 +290,27 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		else
 		{
-			iclass.setInnerIndex(this.currentClassName, this.compilableList.size());
-			this.compilableList.add(iclass);
+			this.addCompilable(iclass);
 		}
+	}
+	
+	@Override
+	public int compilableCount()
+	{
+		return this.compilableList.size();
+	}
+	
+	@Override
+	public void addCompilable(IClassCompilable compilable)
+	{
+		compilable.setInnerIndex(this.currentClassName, this.compilableList.size());
+		this.compilableList.add(compilable);
+	}
+	
+	@Override
+	public IClassCompilable getCompilable(int index)
+	{
+		return this.compilableList.get(index);
 	}
 	
 	@Override
@@ -323,6 +346,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		property.foldConstants();
+		property.cleanup(this, this);
 		
 		this.compileInnerClasses();
 		iclass.compile();
@@ -354,6 +378,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		method.foldConstants();
+		method.cleanup(this, this);
 		
 		this.compileInnerClasses();
 		iclass.compile();

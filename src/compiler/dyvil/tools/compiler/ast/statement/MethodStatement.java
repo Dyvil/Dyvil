@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.NestedMethod;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -82,6 +83,17 @@ public class MethodStatement extends ASTNode implements IValue
 	public IValue foldConstants()
 	{
 		this.method.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		compilableList.addCompilable(this.method);
+		
+		this.method.context = context;
+		this.method.cleanup(context, compilableList);
+		this.method.context = null;
 		return this;
 	}
 	

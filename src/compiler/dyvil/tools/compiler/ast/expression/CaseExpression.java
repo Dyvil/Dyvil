@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.pattern.IPattern;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -311,14 +312,12 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IContext.addCompilable(context, this);
-		
 		this.context = context;
 		
 		if (this.condition != null)
 		{
 			this.condition.checkTypes(markers, this);
-		}		
+		}
 		if (this.pattern != null)
 		{
 			this.pattern.checkTypes(markers, context);
@@ -356,6 +355,25 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		if (this.value != null)
 		{
 			this.value = this.value.foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.type != Types.UNKNOWN)
+		{
+			context.getHeader().addInnerClass(this);
+		}
+		
+		if (this.condition != null)
+		{
+			this.condition = this.condition.cleanup(context, compilableList);
+		}
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(context, compilableList);
 		}
 		return this;
 	}

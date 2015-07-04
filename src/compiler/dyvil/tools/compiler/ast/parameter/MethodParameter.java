@@ -88,8 +88,6 @@ public final class MethodParameter extends Parameter
 		
 		if (this.defaultValue != null)
 		{
-			context.getThisClass().addCompilable(this);
-			
 			this.defaultValue = this.defaultValue.resolve(markers, context);
 			
 			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);

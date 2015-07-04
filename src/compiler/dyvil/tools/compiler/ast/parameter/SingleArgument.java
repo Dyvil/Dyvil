@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.Collections;
 import java.util.Iterator;
 
 import dyvil.collection.iterator.SingletonIterator;
@@ -10,6 +9,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -35,13 +35,13 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public int size()
 	{
-		return this.value != null ? 1 : 0;
+		return 1;
 	}
 	
 	@Override
 	public boolean isEmpty()
 	{
-		return this.value == null;
+		return false;
 	}
 	
 	// 'Variations'
@@ -155,6 +155,7 @@ public final class SingleArgument implements IArguments, IValued
 		{
 			return;
 		}
+		
 		IType type = param.getType().getConcreteType(typeContext);
 		IValue value1 = this.value.withType(type, typeContext, markers, context);
 		if (value1 == null)
@@ -238,57 +239,43 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		if (this.value == null)
-		{
-			return Collections.emptyIterator();
-		}
-		
 		return new SingletonIterator<IValue>(this.value);
 	}
 	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.value != null)
-		{
-			this.value.resolveTypes(markers, context);
-		}
+		this.value.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if (this.value != null)
-		{
-			this.value = this.value.resolve(markers, context);
-		}
+		this.value = this.value.resolve(markers, context);
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.value != null)
-		{
-			this.value.checkTypes(markers, context);
-		}
+		this.value.checkTypes(markers, context);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.value != null)
-		{
-			this.value.check(markers, context);
-		}
+		this.value.check(markers, context);
 	}
 	
 	@Override
 	public void foldConstants()
 	{
-		if (this.value != null)
-		{
-			this.value = this.value.foldConstants();
-		}
+		this.value = this.value.foldConstants();
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.value = this.value.cleanup(context, compilableList);
 	}
 	
 	@Override

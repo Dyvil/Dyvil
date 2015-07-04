@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -14,10 +15,10 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 public abstract class Parameter extends Member implements IParameter
 {
-	public int			index;
-	public boolean		varargs;
+	public int		index;
+	public boolean	varargs;
 	
-	public IValue		defaultValue;
+	public IValue	defaultValue;
 	
 	public Parameter()
 	{
@@ -122,6 +123,30 @@ public abstract class Parameter extends Member implements IParameter
 		if (this.defaultValue != null)
 		{
 			this.defaultValue.checkTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		super.foldConstants();
+		
+		if (this.defaultValue != null)
+		{
+			this.defaultValue = this.defaultValue.foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		super.cleanup(context, compilableList);
+		
+		if (this.defaultValue != null)
+		{
+			compilableList.addCompilable(this);
+			
+			this.defaultValue = this.defaultValue.cleanup(context, compilableList);
 		}
 	}
 	

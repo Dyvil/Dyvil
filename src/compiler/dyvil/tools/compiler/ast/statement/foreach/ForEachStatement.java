@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.ILoop;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.Label;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -367,6 +368,19 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 		{
 			this.action = this.action.foldConstants();
 		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.context = context;
+		this.variable.cleanup(this, compilableList);
+		if (this.action != null)
+		{
+			this.action = this.action.cleanup(this, compilableList);
+		}
+		this.context = null;
 		return this;
 	}
 	

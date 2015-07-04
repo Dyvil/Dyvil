@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -20,10 +21,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class FieldAssign extends ASTNode implements IValue, INamed, IValued
 {
-	public Name		name;
+	public Name			name;
 	
-	public IValue	instance;
-	public IValue	value;
+	public IValue		instance;
+	public IValue		value;
 	
 	public IDataMember	field;
 	
@@ -191,7 +192,22 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 	@Override
 	public IValue foldConstants()
 	{
+		if (this.instance != null)
+		{
+			this.instance = this.instance.foldConstants();
+		}
 		this.value = this.value.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.instance != null)
+		{
+			this.instance = this.instance.cleanup(context, compilableList);
+		}
+		this.value = this.value.cleanup(context, compilableList);
 		return this;
 	}
 	

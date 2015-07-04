@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -416,7 +417,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		IContext.addCompilable(context, this);
+		// Resolving the value happens in withType
 		return this;
 	}
 	
@@ -438,6 +439,15 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	public IValue foldConstants()
 	{
 		this.value = this.value.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		compilableList.addCompilable(this);
+		
+		this.value = this.value.cleanup(context, compilableList);
 		return this;
 	}
 	

@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.pattern.IPattern;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -223,6 +224,17 @@ public final class MatchExpression extends ASTNode implements IValue
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.value = this.value.cleanup(context, compilableList);
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			this.cases[i].cleanup(context, compilableList);
 		}
 		return this;
 	}

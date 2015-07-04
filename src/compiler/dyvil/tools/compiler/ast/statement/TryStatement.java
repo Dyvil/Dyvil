@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -291,6 +292,27 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock = this.finallyBlock.foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.action != null)
+		{
+			this.action = this.action.cleanup(context, compilableList);
+		}
+		
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			CatchBlock block = this.catchBlocks[i];
+			block.action = block.action.cleanup(context, compilableList);
+		}
+		
+		if (this.finallyBlock != null)
+		{
+			this.finallyBlock = this.finallyBlock.cleanup(context, compilableList);
 		}
 		return this;
 	}

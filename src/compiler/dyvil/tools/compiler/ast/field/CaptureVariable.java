@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -235,6 +236,11 @@ public class CaptureVariable implements IVariable
 	
 	@Override
 	public void foldConstants()
+	{
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 	}
 	

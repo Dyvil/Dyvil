@@ -22,6 +22,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -261,6 +262,11 @@ public class DynamicMethod extends ASTNode implements IMethod
 	
 	@Override
 	public void foldConstants()
+	{
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 	}
 	

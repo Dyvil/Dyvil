@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -400,6 +401,22 @@ public class Constructor extends Member implements IConstructor
 		if (this.value != null)
 		{
 			this.value = this.value.foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		super.cleanup(context, compilableList);
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].cleanup(this, compilableList);
+		}
+		
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(this, compilableList);
 		}
 	}
 	

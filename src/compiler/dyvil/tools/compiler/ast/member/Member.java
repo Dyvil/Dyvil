@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -251,6 +252,15 @@ public abstract class Member extends ASTNode implements IMember
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			this.annotations[i].foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			this.annotations[i].cleanup(context, compilableList);
 		}
 	}
 	
