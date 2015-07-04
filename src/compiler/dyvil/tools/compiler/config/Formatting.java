@@ -63,11 +63,10 @@ public interface Formatting
 		public static String	sugarCallSeperator			= " ";
 		public static String	keyValueSeperator			= ": ";
 		
-		public static String	pointerSeperator			= "#";
-		
 		public static String	throwsSeperator				= ", ";
 		public static String	signatureThrowsSeperator	= " throws ";
 		public static String	signatureBodySeperator		= " = ";
+		public static String	emptyBody					= " { }";
 		public static String	indent						= "\t";
 	}
 	

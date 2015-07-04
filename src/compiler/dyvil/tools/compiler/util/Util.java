@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.util;
 
-import java.util.Iterator;
-
-import dyvil.lang.Collection;
-
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
@@ -43,39 +39,18 @@ public class Util
 		buf.append(')');
 	}
 	
-	public static void astToString(String prefix, Collection list, String seperator, StringBuilder buffer)
+	public static void astToString(String prefix, IASTNode[] array, int size, String separator, StringBuilder buffer)
 	{
-		if (!list.isEmpty())
+		if (size <= 0)
 		{
-			Iterator iterator = list.iterator();
-			while (true)
-			{
-				IASTNode o = (IASTNode) iterator.next();
-				o.toString(prefix, buffer);
-				
-				if (iterator.hasNext())
-				{
-					buffer.append(seperator);
-				}
-				else
-				{
-					break;
-				}
-			}
+			return;
 		}
-	}
-	
-	public static void astToString(String prefix, IASTNode[] array, int size, String seperator, StringBuilder buffer)
-	{
-		for (int i = 0; i < size; i++)
+		
+		array[0].toString(prefix, buffer);
+		for (int i = 1; i < size; i++)
 		{
-			IASTNode o = array[i];
-			o.toString(prefix, buffer);
-			if (i + 1 == size)
-			{
-				break;
-			}
-			buffer.append(seperator);
+			buffer.append(separator);
+			array[i].toString(prefix, buffer);
 		}
 	}
 	

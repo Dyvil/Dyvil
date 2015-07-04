@@ -27,6 +27,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -1553,11 +1554,28 @@ public class Method extends Member implements IMethod
 			Util.astToString(prefix, this.exceptions, this.exceptionCount, Formatting.Method.throwsSeperator, buffer);
 		}
 		
-		if (this.value != null)
+		if (this.value == null)
+		{
+			buffer.append(';');
+			return;
+		}
+		
+		if (this.value.valueTag() != IValue.STATEMENT_LIST)
 		{
 			buffer.append(Formatting.Method.signatureBodySeperator);
 			this.value.toString(prefix, buffer);
+			buffer.append(';');
+			return;
 		}
-		buffer.append(';');
+		
+		if (((StatementList) this.value).isEmpty())
+		{
+			buffer.append(Formatting.Method.emptyBody);
+			return;
+		}
+		
+		buffer.append(' ');
+		this.value.toString(prefix, buffer);
+		return;
 	}
 }
