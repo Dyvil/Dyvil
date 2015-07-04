@@ -232,7 +232,7 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public boolean isResolved()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override

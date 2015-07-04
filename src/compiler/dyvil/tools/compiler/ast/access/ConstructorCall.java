@@ -170,21 +170,7 @@ public class ConstructorCall extends ASTNode implements ICall
 			return this;
 		}
 		
-		IConstructor match = IContext.resolveConstructor(this.type, this.arguments);
-		if (match == null)
-		{
-			Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());
-			if (!this.arguments.isEmpty())
-			{
-				StringBuilder builder = new StringBuilder("Argument Types: ");
-				this.arguments.typesToString(builder);
-				marker.addInfo(builder.toString());
-			}
-			
-			return this;
-		}
-		
-		this.constructor = match;
+		this.constructor = IContext.resolveConstructor(this.type, this.arguments);
 		return this;
 	}
 	
@@ -215,16 +201,27 @@ public class ConstructorCall extends ASTNode implements ICall
 		}
 		if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
-			markers.add(this.position, "constructor.interface", iclass.getName());
+			markers.add(this.position, "constructor.interface", this.type);
+			return;
 		}
-		else if (iclass.hasModifier(Modifiers.ABSTRACT))
+		if (iclass.hasModifier(Modifiers.ABSTRACT))
 		{
-			markers.add(this.position, "constructor.abstract", iclass.getName());
+			markers.add(this.position, "constructor.abstract", this.type);
 		}
 		
 		if (this.constructor != null)
 		{
 			this.constructor.checkCall(markers, this.position, context, this.arguments);
+		}
+		else
+		{
+			Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());
+			if (!this.arguments.isEmpty())
+			{
+				StringBuilder builder = new StringBuilder("Argument Types: ");
+				this.arguments.typesToString(builder);
+				marker.addInfo(builder.toString());
+			}
 		}
 	}
 	

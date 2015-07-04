@@ -355,12 +355,14 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		if (this.parameterCount == 1)
 		{
 			this.parameterTypes[0].toString(prefix, buffer);
+			buffer.append(' ');
 		}
-		else
+		else if (this.parameterCount > 0)
 		{
 			buffer.append(Formatting.Method.parametersStart);
 			Util.astToString(prefix, this.parameterTypes, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
 			buffer.append(Formatting.Method.parametersEnd);
+			buffer.append(' ');
 		}
 		
 		buffer.append(Formatting.Expression.lambdaSeperator);

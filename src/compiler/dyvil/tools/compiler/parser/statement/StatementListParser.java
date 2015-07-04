@@ -70,11 +70,28 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		
 		if (this.mode == EXPRESSION)
 		{
-			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.COLON)
+			if (type == Symbols.SEMICOLON)
 			{
-				this.label = token.nameValue();
-				pm.skip();
 				return;
+			}
+			if (ParserUtil.isIdentifier(type))
+			{
+				int nextType = token.next().type();
+				if (nextType == Symbols.COLON)
+				{
+					this.label = token.nameValue();
+					pm.skip();
+					return;
+				}
+				if (nextType == Symbols.EQUALS)
+				{
+					FieldAssign fa = new FieldAssign(token.raw(), null, token.nameValue());
+					pm.pushParser(new ExpressionParser(fa));
+					this.statementList.addValue(fa);
+					pm.skip();
+					this.mode = SEPARATOR;
+					return;
+				}
 			}
 			
 			this.firstToken = token;
@@ -86,22 +103,17 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		{
 			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.EQUALS)
 			{
-				if (this.type == null)
-				{
-					System.out.println();
-				}
-				
 				if (this.type != null)
 				{
 					FieldInitializer fi = new FieldInitializer(token.raw(), token.nameValue(), this.type);
 					pm.pushParser(new ExpressionParser(fi));
 					this.statementList.addValue(fi);
 				}
-				else
+				else if (token != this.firstToken)
 				{
-					FieldAssign fa = new FieldAssign(token.raw(), null, token.nameValue());
-					pm.pushParser(new ExpressionParser(fa));
-					this.statementList.addValue(fa);
+					this.parser.parse(this, token);
+					pm.reparse();
+					return;
 				}
 				
 				this.reset();

@@ -109,9 +109,19 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case VALUE:
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
-				int nextType = token.next().type();
-				if (nextType == Symbols.CLOSE_PARENTHESIS)
+				IToken next = token.next();
+				if (next.type() == Symbols.CLOSE_PARENTHESIS)
 				{
+					if (next.next().type() == Symbols.ARROW_OPERATOR)
+					{
+						LambdaExpression le = new LambdaExpression(next.next().raw());
+						this.value = le;
+						pm.skip(2);
+						pm.pushParser(new ExpressionParser(le));
+						this.mode = ACCESS;
+						return;
+					}
+					
 					this.value = new VoidValue(token.to(token.next()));
 					pm.skip();
 					this.mode = 0;
@@ -161,6 +171,14 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				}
 				
 				this.getAccess(pm, token.nameValue(), token, type);
+				return;
+			}
+			if (type == Symbols.ARROW_OPERATOR)
+			{
+				LambdaExpression le = new LambdaExpression(token.raw());
+				this.value = le;
+				this.mode = ACCESS;
+				pm.pushParser(new ExpressionParser(le));
 				return;
 			}
 			if ((type & Tokens.IDENTIFIER) != 0)

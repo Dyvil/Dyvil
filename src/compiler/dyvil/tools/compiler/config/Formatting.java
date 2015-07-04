@@ -113,7 +113,7 @@ public interface Formatting
 		public static String	arrayEnd		= " ]";
 		public static String	arraySeperator	= ", ";
 		
-		public static String	lambdaSeperator	= " => ";
+		public static String	lambdaSeperator	= "=> ";
 		public static String	stringConcat	= " + ";
 	}
 }

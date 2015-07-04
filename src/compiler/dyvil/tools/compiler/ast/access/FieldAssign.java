@@ -60,7 +60,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.UNKNOWN || type == Types.VOID)
+		if (type == Types.VOID)
 		{
 			return this;
 		}
@@ -77,7 +77,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.value == null ? type == Types.UNKNOWN || type == Types.VOID : this.value.isType(type);
+		return type == Types.VOID || this.value.isType(type);
 	}
 	
 	@Override

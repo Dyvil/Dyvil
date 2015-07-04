@@ -253,7 +253,7 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 	{
 		this.field.writeGet(writer, this.instance);
 		
-		if (!this.type.isSuperTypeOf(this.field.getType()))
+		if (this.type != null && !this.type.isSuperTypeOf(this.field.getType()))
 		{
 			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
 		}

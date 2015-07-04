@@ -215,6 +215,8 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			IType type1 = this.method.getTheClass().getType().getConcreteType(tempContext);
 			
 			type.inferTypes(type1, typeContext);
+			
+			this.returnType = valueType;
 		}
 		
 		if (this.type.typeTag() == IType.LAMBDA)
@@ -565,11 +567,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.parameterCount == 0)
-		{
-			buffer.append(Formatting.Method.emptyParameters);
-		}
-		else if (this.parameterCount == 1)
+		if (this.parameterCount == 1)
 		{
 			IParameter param = this.parameters[0];
 			if (param.getType() != null)
@@ -582,10 +580,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			{
 				buffer.append(param.getName());
 			}
+			buffer.append(' ');
 		}
-		else
+		else if (this.parameterCount > 1)
 		{
 			Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
+			buffer.append(' ');
 		}
 		
 		buffer.append(Formatting.Expression.lambdaSeperator);

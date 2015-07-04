@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
@@ -9,7 +8,7 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.Operators;
-import dyvil.tools.compiler.ast.type.ClassType;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -162,21 +161,21 @@ public final class MethodCall extends AbstractCall implements INamed
 		if (field == null)
 		{
 			// Find a type
-			IClass iclass = IContext.resolveClass(context, this.name);
-			if (iclass == null)
+			IType itype = IContext.resolveType(context, this.name);
+			if (itype == null)
 			{
 				return null;
 			}
 			
 			// Find the apply method of the type
-			IMethod match = IContext.resolveMethod(iclass, null, Name.apply, this.arguments);
+			IMethod match = IContext.resolveMethod(itype, null, Name.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call
 				return null;
 			}
 			method = match;
-			instance = new ClassAccess(this.position, new ClassType(iclass));
+			instance = new ClassAccess(this.position, itype);
 		}
 		else
 		{
