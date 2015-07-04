@@ -5,11 +5,11 @@ import dyvil.lang.Collection;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
-public class FoldConstants implements ICompilerPhase
+public class FoldConstantPhase implements ICompilerPhase
 {
 	private int	id;
 	
-	public FoldConstants(int id)
+	public FoldConstantPhase(int id)
 	{
 		this.id = id;
 	}

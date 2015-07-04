@@ -39,28 +39,34 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	ICompilerPhase	PARSE			= new ParallelCompilerPhase(20, "PARSE", ICompilationUnit::parse);
 	
 	/**
+	 * Prints the AST.
+	 */
+	ICompilerPhase	PRINT			= new PrintPhase(30);
+	
+	/**
+	 * Saves the formatted AST to the input file
+	 */
+	ICompilerPhase	FORMAT			= new ParallelCompilerPhase(40, "FORMAT", unit -> FileUtils.write(unit.getInputFile(), unit.toString()));
+	
+	/**
 	 * Resolves packages, classes and types.
 	 */
-	ICompilerPhase	RESOLVE_TYPES	= new ParallelCompilerPhase(30, "RESOLVE_TYPES", ICompilationUnit::resolveTypes);
+	ICompilerPhase	RESOLVE_TYPES	= new ParallelCompilerPhase(50, "RESOLVE_TYPES", ICompilationUnit::resolveTypes);
 	
 	/**
 	 * Resolves methods and field names.
 	 */
-	ICompilerPhase	RESOLVE			= new ParallelCompilerPhase(40, "RESOLVE", ICompilationUnit::resolve);
-	
-	/**
-	 * Prints the AST.
-	 */
-	ICompilerPhase	PRINT			= new ParallelCompilerPhase(45, "PRINT", unit -> DyvilCompiler.logger.info(unit.getInputFile() + ":\n" + unit.toString()));
+	ICompilerPhase	RESOLVE			= new ParallelCompilerPhase(60, "RESOLVE", ICompilationUnit::resolve);
 	
 	/**
 	 * Resolves other things such as lambda expressions or annotations and
-	 * checks types. This will be called after {@link IValue#withType(IType, ITypeContext, MarkerList, IContext)}
-	 * has been called. Mainly used by
+	 * checks types. This will be called after
+	 * {@link IValue#withType(IType, ITypeContext, MarkerList, IContext)} has
+	 * been called. Mainly used by
 	 * {@link IMethod#checkArguments(MarkerList, ICodePosition, IContext, IValue, IArguments, ITypeContext)}
 	 * .
 	 */
-	ICompilerPhase	CHECK_TYPES		= new ParallelCompilerPhase(50, "CHECK_TYPES", ICompilationUnit::checkTypes);
+	ICompilerPhase	CHECK_TYPES		= new ParallelCompilerPhase(70, "CHECK_TYPES", ICompilationUnit::checkTypes);
 	
 	/**
 	 * Checks for semantical errors. The general contract of this method is that
@@ -68,38 +74,39 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 * everything is correct). Thus, it should not do any more linking or
 	 * resolving.
 	 */
-	ICompilerPhase	CHECK			= new ParallelCompilerPhase(60, "CHECK", ICompilationUnit::check);
-	
-	/**
-	 * Saves the formatted AST to the input file
-	 */
-	ICompilerPhase	FORMAT			= new ParallelCompilerPhase(70, "FORMAT", unit -> FileUtils.write(unit.getInputFile(), unit.toString()));
+	ICompilerPhase	CHECK			= new ParallelCompilerPhase(80, "CHECK", ICompilationUnit::check);
 	
 	/**
 	 * Folds constants.
 	 */
-	ICompilerPhase	FOLD_CONSTANTS	= new FoldConstants(80);
+	ICompilerPhase	FOLD_CONSTANTS	= new FoldConstantPhase(90);
 	
 	/**
 	 * Compiles the AST to byte code and stores the generated .class files in
 	 * the bin directory.
 	 */
-	ICompilerPhase	COMPILE			= new ParallelCompilerPhase(90, "COMPILE", unit -> unit.compile());
+	ICompilerPhase	COMPILE			= new ParallelCompilerPhase(100, "COMPILE", unit -> unit.compile());
 	
 	/**
 	 * Converts the .class files in the bin directory to a JAR file, sets up the
 	 * classpath and signs the JAR.
 	 */
-	ICompilerPhase	JAR				= new CompilerPhase(100, "JAR", units -> ClassWriter.generateJAR(DyvilCompiler.fileFinder.files));
+	ICompilerPhase	JAR				= new CompilerPhase(110, "JAR", units -> ClassWriter.generateJAR(DyvilCompiler.fileFinder.files));
 	
 	/**
 	 * Tests the main type specified in {@link CompilerConfig#mainType}.
 	 */
-	ICompilerPhase	TEST			= new CompilerPhase(110, "TEST", units -> DyvilCompiler.test());
+	ICompilerPhase	TEST			= new CompilerPhase(120, "TEST", units -> DyvilCompiler.test());
 	
 	public String getName();
 	
 	public int getID();
 	
 	public void apply(Collection<ICompilationUnit> units);
+	
+	@Override
+	public default int compareTo(ICompilerPhase o)
+	{
+		return Integer.compare(this.getID(), o.getID());
+	}
 }
