@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
+import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -88,7 +89,7 @@ public interface IValue extends IASTNode, ITyped
 	int	GOTO				= 81;
 	
 	// Special Types only used by the compiler
-	int	CAPSULATED			= 128;
+	int	REFERENCE			= 128;
 	int	BOXED				= 129;
 	
 	public int valueTag();
@@ -111,6 +112,11 @@ public interface IValue extends IASTNode, ITyped
 	public default boolean isPrimitive()
 	{
 		return this.getType().isPrimitive();
+	}
+	
+	public default IReference toReference()
+	{
+		return null;
 	}
 	
 	@Override

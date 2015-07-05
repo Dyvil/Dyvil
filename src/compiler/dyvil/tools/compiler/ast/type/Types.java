@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassFormat;
 
@@ -68,6 +69,9 @@ public final class Types
 	
 	public static IClass					OBJECT_SIMPLE_REF_CLASS;
 	private static final ClassType[]		PRIMITIVE_SIMPLE_REF	= new ClassType[16];
+	
+	public static IClass					OBJECT_REF_CLASS;
+	private static final ReferenceType[]	PRIMITIVE_REF			= new ReferenceType[16];
 	
 	public static void init()
 	{
@@ -161,10 +165,22 @@ public final class Types
 		return itype;
 	}
 	
+	public static ReferenceType getRef(IType type)
 	{
+		if (type.isPrimitive())
 		{
+			return getPrimitiveRef((PrimitiveType) type);
 		}
+		
+		if (OBJECT_REF_CLASS == null)
+		{
+			OBJECT_REF_CLASS = Package.dyvilLangRef.resolveClass("ObjectRef");
+		}
+		
+		ReferenceType gt = new ReferenceType(OBJECT_REF_CLASS, type);
+		return gt;
 	}
+	
 	public static IType getSimpleRef(IType type)
 	{
 		if (type.isPrimitive())
