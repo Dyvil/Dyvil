@@ -26,9 +26,11 @@ public class REPLVariable extends Field
 {
 	protected String	className;
 	
-	public REPLVariable(ICodePosition position, Name name, IType type, IValue value)
+	public REPLVariable(ICodePosition position, Name name, IType type, IValue value, String className)
 	{
 		super(null, name, type);
+		this.className = className;
+		this.theClass = new REPLMemberClass(Name.getQualified(className), this);
 		this.position = position;
 		this.value = value;
 	}
@@ -90,18 +92,17 @@ public class REPLVariable extends Field
 		return tag >= 0 && tag != IValue.NIL && tag <= IValue.STRING;
 	}
 	
-	protected void compute(String className)
+	protected void compute()
 	{
 		List<IClassCompilable> compilableList = DyvilREPL.context.compilableList;
 		
-		if (this.className != null || (this.isConstant() && !compilableList.isEmpty()))
+		if (this.isConstant() && !compilableList.isEmpty())
 		{
 			return;
 		}
 		
 		try
 		{
-			this.className = className;
 			Class c = this.generateClass(this.className, compilableList);
 			
 			if (this.type != Types.VOID)
@@ -148,6 +149,7 @@ public class REPLVariable extends Field
 	
 	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
 	{
+		String name = this.name.qualified;
 		String extendedType = type.getExtendedName();
 		ClassWriter writer = new ClassWriter();
 		// Generate Class Header
@@ -156,7 +158,7 @@ public class REPLVariable extends Field
 		if (type != Types.VOID)
 		{
 			// Generate the field holding the value
-			writer.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, "value", extendedType, null, null);
+			writer.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name, extendedType, null, null);
 		}
 		
 		// Compilables
@@ -180,7 +182,7 @@ public class REPLVariable extends Field
 		{
 			value.writeExpression(mw);
 			// Store the value to the field
-			mw.writeFieldInsn(Opcodes.PUTSTATIC, className, "value", extendedType);
+			mw.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
 		}
 		else
 		{
@@ -228,7 +230,7 @@ public class REPLVariable extends Field
 		}
 		
 		String extended = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.GETSTATIC, this.className, "value", extended);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, this.className, this.name.qualified, extended);
 	}
 	
 	@Override
@@ -241,6 +243,6 @@ public class REPLVariable extends Field
 		}
 		
 		String extended = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, "value", extended);
+		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, this.name.qualified, extended);
 	}
 }

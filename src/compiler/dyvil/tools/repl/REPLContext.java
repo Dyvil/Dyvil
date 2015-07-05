@@ -102,8 +102,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	
 	private boolean computeVariable(REPLVariable field)
 	{
-		this.getClassName();
-		
 		MarkerList markers = new MarkerList();
 		field.resolveTypes(markers, this);
 		field.resolve(markers, this);
@@ -126,7 +124,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		field.foldConstants();
 		
 		this.compileInnerClasses();
-		field.compute(this.currentClassName);
+		field.compute();
 		
 		this.cleanup();
 	}
@@ -151,7 +149,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		Name name = Name.getQualified("res" + resultIndex);
 		
-		this.getClassName();
+		String className = this.getClassName();
 		
 		MarkerList markers = new MarkerList();
 		value.resolveTypes(markers, this);
@@ -180,7 +178,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		
 		value = value.cleanup(this, this);
 		
-		REPLVariable field = new REPLVariable(CODE_POSITION, name, type, value);
+		REPLVariable field = new REPLVariable(CODE_POSITION, name, type, value, className);
 		field.modifiers = Modifiers.FINAL;
 		
 		this.compileVariable(field);
@@ -316,8 +314,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addField(IField field)
 	{
-		this.getClassName();
-		REPLVariable var = new REPLVariable(field.getPosition(), field.getName(), field.getType(), field.getValue());
+		String className = this.getClassName();
+		REPLVariable var = new REPLVariable(field.getPosition(), field.getName(), field.getType(), field.getValue(), className);
 		var.setAnnotations(field.getAnnotations(), field.annotationCount());
 		var.modifiers = field.getModifiers();
 		
