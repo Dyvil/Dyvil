@@ -152,7 +152,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	@Override
 	public boolean add(E element)
 	{
-		return this.map.put(element, VALUE) != null;
+		return this.map.put(element, VALUE) == null;
 	}
 	
 	@Override
