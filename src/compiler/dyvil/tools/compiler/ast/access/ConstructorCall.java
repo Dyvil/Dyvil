@@ -114,6 +114,7 @@ public class ConstructorCall extends ASTNode implements ICall
 		else
 		{
 			markers.add(this.position, "constructor.invalid");
+			this.type = Types.UNKNOWN;
 		}
 		
 		if (this.arguments.isEmpty())
@@ -142,7 +143,7 @@ public class ConstructorCall extends ASTNode implements ICall
 			int dims = this.type.getArrayDimensions();
 			if (dims != len)
 			{
-				Marker marker = markers.create(this.position, "constructor.access.array_length");
+				Marker marker = markers.create(this.position, "constructor.access.array.length");
 				marker.addInfo("Type Dimensions: " + dims);
 				marker.addInfo("Number of Length Arguments: " + len);
 				
@@ -160,11 +161,15 @@ public class ConstructorCall extends ASTNode implements ICall
 			for (int i = 0; i < len; i++)
 			{
 				IValue v = paramList.getValue(i);
-				IType t = v.getType();
-				if (t != Types.INT)
+				IValue v1 = v.withType(Types.INT, Types.INT, markers, context);
+				if (v1 == null)
 				{
-					Marker marker = markers.create(v.getPosition(), "constructor.access.arraylength_type");
-					marker.addInfo("Value Type: " + t);
+					Marker marker = markers.create(v.getPosition(), "constructor.access.array.type");
+					marker.addInfo("Value Type: " + v.getType());
+				}
+				else
+				{
+					paramList.setValue(i, v1);
 				}
 			}
 			
@@ -250,18 +255,20 @@ public class ConstructorCall extends ASTNode implements ICall
 			if (len == 1)
 			{
 				this.arguments.getFirstValue().writeExpression(writer);
-				writer.writeNewArray(this.type, 1);
+				writer.writeNewArray(this.type.getElementType(), 1);
 				return;
 			}
 			
 			ArgumentList paramList = (ArgumentList) this.arguments;
+			IType type = this.type;
 			
 			for (int i = 0; i < len; i++)
 			{
 				paramList.getValue(i).writeExpression(writer);
+				type = type.getElementType();
 			}
 			
-			writer.writeNewArray(this.type, len);
+			writer.writeNewArray(type, len);
 			return;
 		}
 		

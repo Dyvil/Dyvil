@@ -26,7 +26,7 @@ public final class NullPattern extends ASTNode implements IPattern
 	@Override
 	public IType getType()
 	{
-		return Types.UNKNOWN;
+		return Types.NULL;
 	}
 	
 	@Override

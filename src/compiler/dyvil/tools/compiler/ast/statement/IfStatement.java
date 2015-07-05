@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
+import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -250,7 +251,21 @@ public final class IfStatement extends ASTNode implements IStatement
 		{
 			if (this.condition.valueTag() == BOOLEAN)
 			{
-				return ((BooleanValue) this.condition).value ? this.then.foldConstants() : this.elseThen.foldConstants();
+				if (((BooleanValue) this.condition).value)
+				{
+					// Condition is true -> Return the action
+					return this.then.foldConstants();
+				}
+				else if (this.elseThen != null)
+				{
+					// Condition is false, else clause exists -> Return else clause
+					return this.elseThen.foldConstants();
+				}
+				else
+				{
+					// Condition is false, no else clause -> Return empty statement (VoidValue)
+					return new VoidValue(this.position);
+				}
 			}
 			this.condition = this.condition.foldConstants();
 		}

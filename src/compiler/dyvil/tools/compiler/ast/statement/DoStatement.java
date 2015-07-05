@@ -2,6 +2,8 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.constant.BooleanValue;
+import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
@@ -188,6 +190,10 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		}
 		if (this.condition != null)
 		{
+			if (this.condition.valueTag() == BOOLEAN && !((BooleanValue) this.condition).value)
+			{
+				return new VoidValue(this.position);
+			}
 			this.condition = this.condition.foldConstants();
 		}
 		return this;
