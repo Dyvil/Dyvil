@@ -149,9 +149,20 @@ public class REPLVariable extends Field
 			writer.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, "value", extendedType, null, null);
 		}
 		
+		// Compilables
+		for (IClassCompilable c : compilableList)
+		{
+			c.write(writer);
+		}
+		
 		// Generate <clinit> static initializer
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V", null, null));
 		mw.begin();
+		
+		for (IClassCompilable c : compilableList)
+		{
+			c.writeStaticInit(mw);
+		}
 		
 		// Write the value
 		
@@ -169,12 +180,6 @@ public class REPLVariable extends Field
 		// Finish Method compilation
 		mw.writeInsn(Opcodes.RETURN);
 		mw.end();
-		
-		// Compilables
-		for (IClassCompilable c : compilableList)
-		{
-			c.write(writer);
-		}
 		
 		// Finish Class compilation
 		writer.visitEnd();

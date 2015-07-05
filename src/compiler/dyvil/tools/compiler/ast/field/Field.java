@@ -342,6 +342,16 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
+	public void writeStaticInit(MethodWriter writer) throws BytecodeException
+	{
+		if ((this.modifiers & Modifiers.STATIC) != 0)
+		{
+			this.value.writeExpression(writer);
+			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified, getDescription());
+		}
+	}
+	
+	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
 		if (instance != null)

@@ -7,7 +7,6 @@ import dyvil.lang.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAssign;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -1297,7 +1296,9 @@ public class CodeClass extends ASTNode implements IClass
 		
 		ThisValue thisValue = new ThisValue(this.type);
 		StatementList instanceFields = new StatementList();
-		StatementList staticFields = new StatementList();
+		
+		IField[] staticFields = new IField[fields + 1];
+		int staticFieldCount = 0;
 		
 		for (int i = 0; i < fields; i++)
 		{
@@ -1311,11 +1312,7 @@ public class CodeClass extends ASTNode implements IClass
 			
 			if (f.hasModifier(Modifiers.STATIC))
 			{
-				FieldAssign assign = new FieldAssign(null);
-				assign.name = f.getName();
-				assign.value = f.getValue();
-				assign.field = f;
-				staticFields.addValue(assign);
+				staticFields[staticFieldCount++] = f;
 			}
 			else
 			{
@@ -1355,27 +1352,17 @@ public class CodeClass extends ASTNode implements IClass
 		
 		this.metadata.write(writer, instanceFields);
 		
-		IDataMember instanceField = this.metadata.getInstanceField();
-		if (instanceField != null)
-		{
-			FieldAssign assign = new FieldAssign(null);
-			assign.name = Name.instance;
-			assign.field = instanceField;
-			ConstructorCall call = new ConstructorCall(null);
-			call.type = this.type;
-			call.constructor = this.metadata.getConstructor();
-			assign.value = call;
-			staticFields.addValue(assign);
-		}
-		else if (staticFields.isEmpty())
-		{
-			return;
-		}
-		
 		// Create the classinit method
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
 		mw.begin();
-		staticFields.writeStatement(mw);
+		for (int i = 0; i < staticFieldCount; i++)
+		{
+			staticFields[i].writeStaticInit(mw);
+		}
+		for (int i = 0; i < this.compilableCount; i++)
+		{
+			this.compilables[i].writeStaticInit(mw);
+		}
 		mw.end(Types.VOID);
 	}
 	

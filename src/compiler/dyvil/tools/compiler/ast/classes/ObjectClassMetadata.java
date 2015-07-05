@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
@@ -54,6 +55,12 @@ public final class ObjectClassMetadata extends ClassMetadata
 		Field f = new Field(this.theClass, Name.instance, this.theClass.getType());
 		f.modifiers = Modifiers.PUBLIC | Modifiers.CONST | Modifiers.SYNTHETIC;
 		this.instanceField = f;
+		
+		ConstructorCall call = new ConstructorCall(null);
+		call.type = this.theClass.getType();
+		call.constructor = this.constructor;
+		
+		f.setValue(call);
 		
 		if (this.theClass.getMethod(Name.toString, null, 0, null) != null)
 		{
