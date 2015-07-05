@@ -159,7 +159,7 @@ public abstract class Parameter extends Member implements IParameter
 			buffer.append(' ');
 		}
 		
-		buffer.append(ModifierTypes.FIELD.toString(this.modifiers));
+		buffer.append(ModifierTypes.PARAMETER.toString(this.modifiers));
 		
 		if (this.varargs)
 		{

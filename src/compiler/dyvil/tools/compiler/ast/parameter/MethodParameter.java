@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ICallableMember;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -18,6 +19,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public final class MethodParameter extends Parameter
 {
 	public ICallableMember	method;
+	
+	protected ReferenceType	refType;
 	
 	public MethodParameter()
 	{
@@ -53,6 +56,24 @@ public final class MethodParameter extends Parameter
 	}
 	
 	@Override
+	public IType getActualType()
+	{
+		return this.refType != null ? this.refType : this.type;
+	}
+	
+	@Override
+	public boolean isCapturable()
+	{
+		return this.refType != null;
+	}
+	
+	@Override
+	public boolean isReferenceType()
+	{
+		return this.refType != null;
+	}
+	
+	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		return instance;
@@ -79,6 +100,17 @@ public final class MethodParameter extends Parameter
 		}
 		
 		return newValue;
+	}
+	
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		super.resolveTypes(markers, context);
+		
+		if ((this.modifiers & Modifiers.VAR) != 0)
+		{
+			this.refType = Types.getRef(this.type);
+		}
 	}
 	
 	@Override
@@ -142,7 +174,7 @@ public final class MethodParameter extends Parameter
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.registerParameter(this.index, this.name.qualified, this.type, 0);
+		writer.registerParameter(this.index, this.name.qualified, this.getActualType(), 0);
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{
@@ -158,12 +190,24 @@ public final class MethodParameter extends Parameter
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
+		if (this.refType != null)
+		{
+			this.refType.writeGet(writer, this.index);
+			return;
+		}
+		
 		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
 	{
+		if (this.refType != null)
+		{
+			this.refType.writeSet(writer, this.index, value);
+			return;
+		}
+		
 		if (value != null)
 		{
 			value.writeExpression(writer);

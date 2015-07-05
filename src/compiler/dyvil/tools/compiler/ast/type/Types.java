@@ -209,6 +209,15 @@ public final class Types
 		return itype;
 	}
 	
+	public static String getInternalRef(IType type, String prefix)
+	{
+		if (type.isPrimitive())
+		{
+			return "dyvil/lang/ref/" + prefix + type.getTheClass().getName().qualified + "Ref";
+		}
+		return "dyvil/lang/ref/" + prefix + "ObjectRef";
+	}
+	
 	public static IType findCommonSuperType(IType type1, IType type2)
 	{
 		IType t = superType(type1, type2);

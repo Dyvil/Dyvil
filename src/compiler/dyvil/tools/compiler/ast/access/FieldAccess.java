@@ -9,11 +9,14 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.reference.StaticFieldReference;
+import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -56,7 +59,7 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		call.arguments = EmptyArguments.INSTANCE;
 		return call;
 	}
-
+	
 	@Override
 	public int valueTag()
 	{
@@ -111,6 +114,19 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 			return 2;
 		}
 		return 0;
+	}
+	
+	@Override
+	public IReference toReference()
+	{
+		if (this.field.isField())
+		{
+			if (this.field.hasModifier(Modifiers.STATIC))
+			{
+				return new StaticFieldReference((IField) this.field);
+			}
+		}
+		return null;
 	}
 	
 	@Override
