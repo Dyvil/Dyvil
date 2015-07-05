@@ -215,7 +215,7 @@ public class Property extends Member implements IProperty, IContext
 		if (this.set != null)
 		{
 			this.setterParameter = new MethodParameter(this.name, this.type);
-			this.setterParameter.index = 1;
+			this.setterParameter.setIndex(1);
 			this.set = this.set.resolve(markers, this);
 			
 			IValue set1 = this.set.withType(Types.VOID, Types.VOID, markers, context);

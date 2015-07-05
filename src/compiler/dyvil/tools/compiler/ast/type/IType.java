@@ -230,6 +230,11 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		return null;
 	}
 	
+	public default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return value.withType(this.getConcreteType(typeContext), typeContext, markers, context);
+	}
+	
 	// Generics
 	
 	/**

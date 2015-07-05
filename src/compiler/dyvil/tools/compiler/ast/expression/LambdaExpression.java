@@ -470,7 +470,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getReferenceType().getLoadOpcode(), var.variable.getIndex());
+			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getIndex());
 		}
 		
 		String name = this.name;
@@ -498,7 +498,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		}
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].getReferenceType().appendExtendedName(buffer);
+			this.capturedFields[i].getActualType().appendExtendedName(buffer);
 		}
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
@@ -529,7 +529,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		buffer.append('(');
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].getReferenceType().appendExtendedName(buffer);
+			this.capturedFields[i].getActualType().appendExtendedName(buffer);
 		}
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -558,7 +558,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		{
 			CaptureVariable capture = this.capturedFields[i];
 			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getReferenceType(), 0);
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getActualType(), 0);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

@@ -15,10 +15,10 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 public abstract class Parameter extends Member implements IParameter
 {
-	public int		index;
-	public boolean	varargs;
+	protected int		index;
+	protected boolean	varargs;
 	
-	public IValue	defaultValue;
+	protected IValue	defaultValue;
 	
 	public Parameter()
 	{

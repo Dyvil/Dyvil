@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ReferenceType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -138,12 +139,12 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType == null)
 		{
-			this.refType = Types.getRefType(this.type);
+			this.refType = Types.getSimpleRef(this.type);
 		}
 	}
 	
 	@Override
-	public IType getReferenceType()
+	public IType getActualType()
 	{
 		return this.refType == null ? this.type : this.refType;
 	}
@@ -318,16 +319,7 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.index);
-			
-			if (value != null)
-			{
-				value.writeExpression(writer);
-			}
-			else
-			{
-				writer.writeInsn(Opcodes.AUTO_SWAP);
-			}
+			ReferenceType.writeGetRef(writer, value, this.index);
 			
 			IDataMember f = this.refType.getTheClass().getBody().getField(0);
 			f.writeSet(writer, null, null);

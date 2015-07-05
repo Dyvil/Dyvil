@@ -187,9 +187,9 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public IType getReferenceType()
+	public IType getActualType()
 	{
-		return this.variable.getReferenceType();
+		return this.variable.getActualType();
 	}
 	
 	@Override
@@ -208,7 +208,7 @@ public class CaptureVariable implements IVariable
 		else
 		{
 			this.variable.setReferenceType();
-			this.type = this.variable.getReferenceType();
+			this.type = this.variable.getActualType();
 		}
 		
 		return this.variable.checkAssign(markers, context, position, instance, newValue);

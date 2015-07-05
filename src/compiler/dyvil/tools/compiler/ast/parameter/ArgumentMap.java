@@ -202,23 +202,25 @@ public final class ArgumentMap implements IArguments, IValueMap
 		Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
-			if (this.keys[i] == key)
+			if (this.keys[i] != key)
 			{
-				IType type = param.getType().getConcreteType(typeContext);
-				IValue value = this.values[i];
-				IValue value1 = value.withType(type, typeContext, markers, context);
-				if (value1 == null)
-				{
-					Marker marker = markers.create(value.getPosition(), "method.access.argument_type", key);
-					marker.addInfo("Required Type: " + type);
-					marker.addInfo("Value Type: " + value.getType());
-				}
-				else
-				{
-					this.values[i] = value1;
-				}
-				return;
+				continue;
 			}
+			
+			IType type = param.getActualType();
+			IValue value = this.values[i];
+			IValue value1 = type.convertValue(value, typeContext, markers, context);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", key);
+				marker.addInfo("Required Type: " + type);
+				marker.addInfo("Value Type: " + value.getType());
+			}
+			else
+			{
+				this.values[i] = value1;
+			}
+			return;
 		}
 	}
 	

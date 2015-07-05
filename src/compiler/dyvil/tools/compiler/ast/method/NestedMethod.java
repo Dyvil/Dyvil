@@ -197,7 +197,7 @@ public class NestedMethod extends Method
 		{
 			CaptureVariable capture = this.capturedFields[i];
 			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getReferenceType(), 0);
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getActualType(), 0);
 		}
 		
 		index = 0;
@@ -237,7 +237,7 @@ public class NestedMethod extends Method
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getReferenceType().getLoadOpcode(), var.variable.getIndex());
+			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getIndex());
 		}
 	}
 	

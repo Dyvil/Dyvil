@@ -668,22 +668,6 @@ public final class MethodWriterImpl implements MethodWriter
 	// Inlining
 	
 	@Override
-	public int inlineOffset()
-	{
-		return 0;
-	}
-	
-	@Override
-	public void startInline(Label end, int localCount)
-	{
-	}
-	
-	@Override
-	public void endInline(Label end, int localCount)
-	{
-	}
-	
-	@Override
 	public int startSync()
 	{
 		if (this.syncLocals == null)

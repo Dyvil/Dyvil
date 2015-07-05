@@ -119,14 +119,6 @@ public interface MethodWriter
 	
 	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers) throws BytecodeException;
 	
-	// Inlining
-	
-	public int inlineOffset();
-	
-	public void startInline(Label end, int localCount);
-	
-	public void endInline(Label end, int localCount);
-	
 	// Blocks
 	
 	public int startSync();

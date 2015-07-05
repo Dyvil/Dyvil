@@ -141,7 +141,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public IClass getArrayClass()
 	{
-		return Types.getPrimitiveArray(this.typecode);
+		return Types.getPrimitiveArray(this);
 	}
 	
 	@Override
