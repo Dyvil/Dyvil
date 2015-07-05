@@ -158,7 +158,7 @@ public final class MethodParameter extends Parameter
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
 	{
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.index + writer.inlineOffset());
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
 	@Override
@@ -168,6 +168,6 @@ public final class MethodParameter extends Parameter
 		{
 			value.writeExpression(writer);
 		}
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index + writer.inlineOffset());
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}
 }

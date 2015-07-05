@@ -344,7 +344,7 @@ public class Field extends Member implements IField
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
-		if ((this.modifiers & Modifiers.STATIC) != 0)
+		if (this.value != null && (this.modifiers & Modifiers.STATIC) != 0)
 		{
 			this.value.writeExpression(writer);
 			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified, getDescription());

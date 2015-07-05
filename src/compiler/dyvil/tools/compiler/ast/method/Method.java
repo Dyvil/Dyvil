@@ -1063,7 +1063,7 @@ public class Method extends Member implements IMethod
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getType().appendExtendedName(buffer);
+			this.parameters[i].getActualType().appendExtendedName(buffer);
 		}
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
@@ -1092,7 +1092,7 @@ public class Method extends Member implements IMethod
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getType().appendSignature(buffer);
+			this.parameters[i].getActualType().appendSignature(buffer);
 		}
 		buffer.append(')');
 		this.type.appendSignature(buffer);

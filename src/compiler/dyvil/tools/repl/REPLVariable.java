@@ -34,6 +34,16 @@ public class REPLVariable extends Field
 	}
 	
 	@Override
+	public boolean hasModifier(int mod)
+	{
+		if (mod == Modifiers.STATIC)
+		{
+			return true;
+		}
+		return (this.modifiers & mod) == mod;
+	}
+	
+	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		if (this.value != null)

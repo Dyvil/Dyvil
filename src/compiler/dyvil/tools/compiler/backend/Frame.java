@@ -425,7 +425,9 @@ public class Frame
 		{
 			this.actualStackCount++;
 			this.ensureStack(this.stackCount + 1);
-			this.stack[this.stackCount] = this.stack[this.stackCount - 2];
+			this.stack[this.stackCount] = this.stack[this.stackCount - 1];
+			this.stack[this.stackCount - 1] = this.stack[this.stackCount - 2];
+			this.stack[this.stackCount - 2] = this.stack[this.stackCount];
 			this.stackCount++;
 			return;
 		}
@@ -433,7 +435,10 @@ public class Frame
 		{
 			this.actualStackCount++;
 			this.ensureStack(this.stackCount + 1);
-			this.stack[this.stackCount] = this.stack[this.stackCount - 3];
+			this.stack[this.stackCount] = this.stack[this.stackCount - 1];
+			this.stack[this.stackCount - 1] = this.stack[this.stackCount - 2];
+			this.stack[this.stackCount - 2] = this.stack[this.stackCount - 3];
+			this.stack[this.stackCount - 3] = this.stack[this.stackCount];
 			this.stackCount++;
 			return;
 		}
