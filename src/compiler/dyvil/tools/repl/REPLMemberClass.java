@@ -494,26 +494,26 @@ public class REPLMemberClass implements IClass
 		return null;
 	}
 	
-	protected static Class loadClass(String name, byte[] bytes)
-	{
-		return ReflectUtils.unsafe.defineClass(name, bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
-	}
-	
-	public void compile()
+	public static Class compile(IClass iclass)
 	{
 		try
 		{
 			ClassWriter cw = new ClassWriter(DyvilCompiler.asmVersion);
-			this.write(cw);
+			iclass.write(cw);
 			cw.visitEnd();
 			byte[] bytes = cw.toByteArray();
-			loadClass(this.name.qualified, bytes);
+			return loadClass(iclass.getName().qualified, bytes);
 		}
 		catch (Throwable t)
 		{
 			t.printStackTrace();
-			return;
+			return null;
 		}
+	}
+	
+	protected static Class loadClass(String name, byte[] bytes)
+	{
+		return ReflectUtils.unsafe.defineClass(name, bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
 	}
 	
 	@Override
@@ -523,7 +523,7 @@ public class REPLMemberClass implements IClass
 		
 		this.member.write(writer);
 		
-		for (IClassCompilable c : DyvilREPL.context.compilableList)
+		for (IClassCompilable c : REPLContext.compilableList)
 		{
 			c.write(writer);
 		}

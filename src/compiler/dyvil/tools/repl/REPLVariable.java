@@ -94,7 +94,7 @@ public class REPLVariable extends Field
 	
 	protected void compute()
 	{
-		List<IClassCompilable> compilableList = DyvilREPL.context.compilableList;
+		List<IClassCompilable> compilableList = REPLContext.compilableList;
 		
 		if (this.isConstant() && !compilableList.isEmpty())
 		{
