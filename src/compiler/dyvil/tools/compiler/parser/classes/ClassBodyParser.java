@@ -12,10 +12,7 @@ import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.Constructor;
-import dyvil.tools.compiler.ast.method.IExceptionList;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -83,15 +80,15 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	{
 		int type = token.type();
 		
-		if (type == Symbols.CLOSE_CURLY_BRACKET)
-		{
-			pm.popParser(true);
-			return;
-		}
-		
 		switch (this.mode)
 		{
 		case TYPE:
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			{
+				pm.popParser(true);
+				return;
+			}
+			
 			if (type == Symbols.SEMICOLON)
 			{
 				if (token.isInferred())
@@ -111,7 +108,6 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				}
 				
 				Constructor c = new Constructor(this.theClass);
-				this.consumer.addConstructor(c);
 				c.position = token.raw();
 				c.modifiers = this.modifiers;
 				c.setAnnotations(this.annotations, this.annotationCount);
@@ -129,7 +125,8 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
 			{
 				IToken next = token.next();
-				if (!ParserUtil.isIdentifier(next.type())) {
+				if (!ParserUtil.isIdentifier(next.type()))
+				{
 					this.reset();
 					throw new SyntaxError(next, "Invalid Class Declaration - Name expected");
 				}
@@ -140,7 +137,6 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 					throw new SyntaxError(token, "Cannot define a class in this context");
 				}
 				
-				
 				Name name = next.nameValue();
 				
 				CodeClass codeClass = new CodeClass(next.raw(), this.theClass.getUnit(), this.modifiers | i);
@@ -149,6 +145,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				codeClass.setOuterClass(this.theClass);
 				
 				ClassDeclarationParser parser = new ClassDeclarationParser(this.theClass.getBody(), codeClass);
+				pm.skip();
 				pm.pushParser(parser);
 				this.reset();
 				return;
@@ -171,13 +168,19 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			IToken next = token.next();
 			type = next.type();
-			if (type == Symbols.SEMICOLON)
+			if (type == Symbols.SEMICOLON || type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				Field f = new Field(this.theClass, token.nameValue(), this.type);
 				f.position = token.raw();
 				f.modifiers = this.modifiers;
 				f.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.consumer.addField(f);
+				
+				if (type == Symbols.CLOSE_CURLY_BRACKET)
+				{
+					pm.popParser(true);
+					return;
+				}
 				
 				pm.skip();
 				this.reset();
@@ -259,6 +262,12 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			throw new SyntaxError(token, "Invalid Parameter List - ')' expected", true);
 		case METHOD_VALUE:
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			{
+				this.consumer.addMethod((IMethod) this.member);
+				pm.popParser(true);
+				return;
+			}
 			if (type == Symbols.SEMICOLON)
 			{
 				this.consumer.addMethod((IMethod) this.member);
@@ -285,7 +294,14 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			this.mode = TYPE;
 			throw new SyntaxError(token, "Invalid Method Declaration - ';', '=', '{' or 'throws' expected");
 		case METHOD_END:
-			this.consumer.addMethod((IMethod) this.member);
+			if (this.member instanceof IMethod)
+			{
+				this.consumer.addMethod((IMethod) this.member);
+			}
+			else
+			{
+				this.consumer.addConstructor((IConstructor) this.member);
+			}
 			pm.reparse();
 			this.reset();
 			return;

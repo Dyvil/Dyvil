@@ -21,18 +21,22 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
 {
-	protected final IClass	theClass;
+	protected static final int	CONSTRUCTOR	= 1;
+	protected static final int	APPLY		= 2;
+	protected static final int	EQUALS		= 4;
+	protected static final int	HASHCODE	= 8;
+	protected static final int	TOSTRING	= 16;
 	
-	protected Constructor	constructor;
-	protected IConstructor	superConstructor;
+	protected final IClass		theClass;
+	
+	protected IConstructor		constructor;
+	protected IConstructor		superConstructor;
+	
+	protected byte				methods;
 	
 	public ClassMetadata(IClass iclass)
 	{
 		this.theClass = iclass;
-		
-		Constructor constructor = new Constructor(this.theClass);
-		constructor.modifiers = Modifiers.PUBLIC;
-		this.constructor = constructor;
 	}
 	
 	@Override
@@ -44,22 +48,43 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		this.constructor.type = this.theClass.getType();
+		IClassBody body = this.theClass.getBody();
+		if (body != null)
+		{
+			IConstructor c = body.getConstructor(this.theClass.getParameters(), this.theClass.parameterCount());
+			if (c != null)
+			{
+				this.constructor = c;
+				this.methods |= CONSTRUCTOR;
+				return;
+			}
+		}
+		
+		Constructor constructor = new Constructor(this.theClass);
+		constructor.type = this.theClass.getType();
+		constructor.modifiers = Modifiers.PUBLIC;
 		
 		int parameterCount = this.theClass.parameterCount();
 		
 		IParameter[] parameters = this.theClass.getParameters();
-		this.constructor.setParameters(parameters, parameterCount);
+		constructor.setParameters(parameters, parameterCount);
 		
 		if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
 		{
-			this.constructor.setVarargs();
+			constructor.setVarargs();
 		}
+		
+		this.constructor = constructor;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if ((this.methods & CONSTRUCTOR) != 0)
+		{
+			return;
+		}
+		
 		IType superType = this.theClass.getSuperType();
 		if (superType == null)
 		{
@@ -79,6 +104,11 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
+		if ((this.methods & CONSTRUCTOR) != 0)
+		{
+			return;
+		}
+		
 		int match = this.constructor.getSignatureMatch(arguments);
 		if (match > 0)
 		{
@@ -89,6 +119,11 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
 	{
+		if ((this.methods & CONSTRUCTOR) != 0)
+		{
+			return;
+		}
+		
 		StatementList list = new StatementList();
 		if (instanceFields != null)
 		{

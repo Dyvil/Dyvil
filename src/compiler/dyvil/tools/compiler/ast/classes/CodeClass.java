@@ -908,10 +908,10 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		if (this.body != null)
 		{
-			IClass clazz = this.body.getClass(name);
-			if (clazz != null)
+			IClass iclass = this.body.getClass(name);
+			if (iclass != null)
 			{
-				return clazz;
+				return iclass;
 			}
 		}
 		
@@ -930,6 +930,15 @@ public class CodeClass extends ASTNode implements IClass
 			return new ClassType(this);
 		}
 		
+		if (this.body != null)
+		{
+			IClass iclass = this.body.getClass(name);
+			if (iclass != null)
+			{
+				return new ClassType(iclass);
+			}
+		}
+		
 		for (int i = 0; i < this.genericCount; i++)
 		{
 			ITypeVariable var = this.generics[i];
@@ -939,6 +948,9 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
+		if (this.outerClass != null) {
+			return this.outerClass.resolveType(name);
+		}
 		return this.unit.resolveType(name);
 	}
 	

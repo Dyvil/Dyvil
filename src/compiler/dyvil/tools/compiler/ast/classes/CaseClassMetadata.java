@@ -23,13 +23,7 @@ import dyvil.tools.compiler.transform.CaseClasses;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
-	private static final int	APPLY		= 1;
-	private static final int	EQUALS		= 2;
-	private static final int	HASHCODE	= 4;
-	private static final int	TOSTRING	= 8;
-	
 	protected IMethod			applyMethod;
-	private byte				methods;
 	
 	public CaseClassMetadata(IClass iclass)
 	{

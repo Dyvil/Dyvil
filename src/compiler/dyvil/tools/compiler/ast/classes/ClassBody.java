@@ -213,6 +213,34 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
+	public IConstructor getConstructor(IParameter[] parameters, int parameterCount)
+	{
+		outer:
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			IConstructor c = this.constructors[i];
+			if (c.parameterCount() != parameterCount)
+			{
+				continue;
+			}
+			
+			for (int p = 0; p < parameterCount; p++)
+			{
+				IType classParamType = parameters[p].getType();
+				IType constructorParamType = c.getParameter(p).getType();
+				if (!classParamType.equals(constructorParamType))
+				{
+					continue outer;
+				}
+			}
+			
+			return c;
+		}
+		
+		return null;
+	}
+	
+	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		for (int i = 0; i < this.constructorCount; i++)

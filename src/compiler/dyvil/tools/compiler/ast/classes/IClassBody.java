@@ -61,6 +61,8 @@ public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 	
 	public IConstructor getConstructor(int index);
 	
+	public IConstructor getConstructor(IParameter[] parameters, int parameterCount);
+	
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
 	
 	// Methods

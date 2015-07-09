@@ -220,7 +220,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.classList.addClass(this.theClass);
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Class Declaration - '{' or ';' expected", true);
+			this.mode = BODY_END;
+			throw new SyntaxError(token, "Invalid Class Declaration - '{' or ';' expected");
 		}
 		if (this.mode == BODY_END)
 		{

@@ -381,6 +381,10 @@ public class Method extends Member implements IMethod
 		{
 			this.value.resolveTypes(markers, this);
 		}
+		else if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+		{
+			this.modifiers |= Modifiers.ABSTRACT | Modifiers.PUBLIC;
+		}
 		else if (this.theClass.hasModifier(Modifiers.ABSTRACT))
 		{
 			this.modifiers |= Modifiers.ABSTRACT;
