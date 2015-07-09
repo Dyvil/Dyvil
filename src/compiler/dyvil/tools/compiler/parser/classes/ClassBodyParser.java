@@ -128,19 +128,28 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
 			{
+				IToken next = token.next();
+				if (!ParserUtil.isIdentifier(next.type())) {
+					this.reset();
+					throw new SyntaxError(next, "Invalid Class Declaration - Name expected");
+				}
+				
 				if (this.theClass == null)
 				{
-					this.mode = 0;
+					this.reset();
 					throw new SyntaxError(token, "Cannot define a class in this context");
 				}
 				
-				CodeClass codeClass = new CodeClass(null, this.theClass.getUnit(), this.modifiers);
+				
+				Name name = next.nameValue();
+				
+				CodeClass codeClass = new CodeClass(next.raw(), this.theClass.getUnit(), this.modifiers | i);
+				codeClass.setName(name);
 				codeClass.setAnnotations(this.getAnnotations(), this.annotationCount);
 				codeClass.setOuterClass(this.theClass);
-				codeClass.setModifiers(this.modifiers);
 				
 				ClassDeclarationParser parser = new ClassDeclarationParser(this.theClass.getBody(), codeClass);
-				pm.pushParser(parser, true);
+				pm.pushParser(parser);
 				this.reset();
 				return;
 			}

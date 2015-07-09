@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.AnonymousClassMetadata;
+import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.classes.NestedClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -116,7 +117,15 @@ public class ClassConstructor extends ConstructorCall
 	{
 		super.toString(prefix, buffer);
 		
-		buffer.append(' ');
-		this.nestedClass.getBody().toString(prefix, buffer);
+		IClassBody body = this.nestedClass.getBody();
+		if (body != null)
+		{
+			buffer.append(' ');
+			body.toString(prefix, buffer);
+		}
+		else
+		{
+			buffer.append(" {}");
+		}
 	}
 }

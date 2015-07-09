@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -51,8 +50,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 			}
 			
 			this.mode = CLASS;
-			CodeClass c = new CodeClass(null, this.unit);
-			pm.pushParser(new ClassDeclarationParser(this.unit, c), true);
+			pm.pushParser(new ClassDeclarationParser(this.unit), true);
 			return;
 		}
 		throw new SyntaxError(token, "Invalid Token - Delete this token");

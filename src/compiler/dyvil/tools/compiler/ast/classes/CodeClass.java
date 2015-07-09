@@ -22,7 +22,6 @@ import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
@@ -407,18 +406,12 @@ public class CodeClass extends ASTNode implements IClass
 	public void addParameter(IParameter param)
 	{
 		param.setTheClass(this);
-		IConstructor constructor = this.metadata.getConstructor();
 		
 		if (this.parameters == null)
 		{
 			this.parameters = new ClassParameter[2];
 			this.parameters[0] = param;
 			this.parameterCount = 1;
-			
-			if (constructor != null)
-			{
-				constructor.setParameters(this.parameters, 1);
-			}
 			return;
 		}
 		
@@ -430,11 +423,6 @@ public class CodeClass extends ASTNode implements IClass
 			this.parameters = temp;
 		}
 		this.parameters[index] = param;
-		
-		if (constructor != null)
-		{
-			constructor.setParameters(this.parameters, this.parameterCount);
-		}
 	}
 	
 	@Override
@@ -684,6 +672,11 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		if (this.metadata == null)
+		{
+			this.metadata = IClass.getClassMetadata(this, this.modifiers);
+		}
+		
 		if (this.genericCount > 0)
 		{
 			ClassGenericType type = new ClassGenericType(this);

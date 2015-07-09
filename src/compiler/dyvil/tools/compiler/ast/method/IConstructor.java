@@ -52,6 +52,9 @@ public interface IConstructor extends IASTNode, IClassMember, ICallableMember, I
 		return null;
 	}
 	
+	@Override
+	public void setType(IType type);
+	
 	// Compilation
 	
 	public String getDescriptor();

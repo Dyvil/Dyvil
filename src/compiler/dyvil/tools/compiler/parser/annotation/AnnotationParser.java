@@ -76,7 +76,7 @@ public class AnnotationParser extends Parser
 				return;
 			}
 			
-			if (!ParserUtil.isIdentifier(type) && !ParserUtil.isTerminator2(type))
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				SingleArgument arg = new SingleArgument();
 				this.annotation.arguments = arg;
