@@ -131,6 +131,8 @@ public interface MutableMap<K, V> extends Map<K, V>
 		return this.copy();
 	}
 	
+	public <RK, RV> MutableMap<RK, RV> emptyCopy();
+	
 	@Override
 	public ImmutableMap<K, V> immutable();
 	

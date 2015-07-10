@@ -71,9 +71,6 @@ public interface MutableCollection<E> extends Collection<E>
 	public boolean remove(Object element);
 	
 	@Override
-	public void filter(Predicate<? super E> condition);
-	
-	@Override
 	public void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
@@ -100,6 +97,8 @@ public interface MutableCollection<E> extends Collection<E>
 	{
 		return this.copy();
 	}
+	
+	public <R> MutableCollection<R> emptyCopy();
 	
 	@Override
 	public ImmutableCollection<E> immutable();

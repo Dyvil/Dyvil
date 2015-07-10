@@ -642,6 +642,12 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new IdentityHashMap(this.size);
+	}
+	
+	@Override
 	public ImmutableMap<K, V> immutable()
 	{
 		return null; // TODO immutable.IdentityHashMap

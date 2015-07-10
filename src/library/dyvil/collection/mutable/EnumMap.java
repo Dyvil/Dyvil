@@ -239,6 +239,12 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new EnumMap(this.type);
+	}
+	
+	@Override
 	public ImmutableMap<K, V> immutable()
 	{
 		return new dyvil.collection.immutable.EnumMap(this.type, this.keys, this.values.clone(), this.size);

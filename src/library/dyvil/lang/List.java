@@ -155,6 +155,17 @@ public interface List<E> extends Collection<E>
 	@Override
 	public List<? extends E> $plus$plus(Collection<? extends E> collection);
 	
+	/**
+	 * {@inheritDoc} Since {@link List Lists} can contain that same element
+	 * multiple times, implementations should behave so that <i>all</i>
+	 * occurrences of the element are removed, not only the first one. This
+	 * behavior can be achieved using this code snippet:
+	 * 
+	 * <pre>
+	 * List copy = list.copy()
+	 * copy.removeAt(list.indexOf(element))
+	 * </pre>
+	 */
 	@Override
 	public List<E> $minus(Object element);
 	
@@ -300,6 +311,16 @@ public interface List<E> extends Collection<E>
 	 */
 	public E add(int index, E element);
 	
+	/**
+	 * {@inheritDoc} Since {@link List Lists} can contain that same element
+	 * multiple times, implementations should behave so that <i>all</i>
+	 * occurrences of the element are removed, not only the first one. This
+	 * behavior can be achieved using this code snippet:
+	 * 
+	 * <pre>
+	 * list.removeAt(list.indexOf(element))
+	 * </pre>
+	 */
 	@Override
 	public boolean remove(Object element);
 	
@@ -313,9 +334,6 @@ public interface List<E> extends Collection<E>
 	 *            the index of the element to remove from this list
 	 */
 	public void removeAt(int index);
-	
-	@Override
-	public void filter(Predicate<? super E> condition);
 	
 	@Override
 	public void map(Function<? super E, ? extends E> mapper);

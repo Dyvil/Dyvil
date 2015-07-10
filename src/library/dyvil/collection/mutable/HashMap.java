@@ -734,7 +734,13 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			}
 		}
 		
-		return new HashMap<>(this.size, this.loadFactor, newEntries);
+		return new HashMap<K, V>(this.size, this.loadFactor, newEntries);
+	}
+	
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new HashMap(this.size, this.loadFactor);
 	}
 	
 	@Override

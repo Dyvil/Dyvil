@@ -178,9 +178,6 @@ public interface Set<E> extends Collection<E>
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
-	@Override
-	public void filter(Predicate<? super E> condition);
-	
 	// toArray
 	
 	@Override

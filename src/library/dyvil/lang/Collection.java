@@ -467,7 +467,17 @@ public interface Collection<E> extends Iterable<E>
 	 * @param condition
 	 *            the filter condition predicate
 	 */
-	public void filter(Predicate<? super E> condition);
+	public default void filter(Predicate<? super E> condition)
+	{
+		Iterator<E> iterator = this.iterator();
+		while (iterator.hasNext())
+		{
+			if (!condition.test(iterator.next()))
+			{
+				iterator.remove();
+			}
+		}
+	}
 	
 	// toArray
 	

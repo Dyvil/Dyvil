@@ -232,22 +232,15 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 	
 	@Override
-	public void filter(Predicate<? super E> condition)
-	{
-		Iterator<Entry<E, Object>> iterator = this.map.iterator();
-		while (iterator.hasNext())
-		{
-			if (!condition.test(iterator.next().getKey()))
-			{
-				iterator.remove();
-			}
-		}
-	}
-	
-	@Override
 	public MutableSet<E> copy()
 	{
 		return new MapBasedSet(this.map.copy());
+	}
+	
+	@Override
+	public MutableSet<E> emptyCopy()
+	{
+		return new MapBasedSet(this.map.emptyCopy());
 	}
 	
 	@Override

@@ -383,6 +383,12 @@ public class IdentityHashSet<E> implements MutableSet<E>
 	}
 	
 	@Override
+	public <R> MutableSet<R> emptyCopy()
+	{
+		return new IdentityHashSet(this.size);
+	}
+	
+	@Override
 	public ImmutableSet<E> immutable()
 	{
 		return null; // TODO immutable.IdentityHashSet

@@ -101,7 +101,8 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default <R> MutableSet<R> mapped(Function<? super E, ? extends R> mapper) {
+	public default <R> MutableSet<R> mapped(Function<? super E, ? extends R> mapper)
+	{
 		MutableSet<R> copy = (MutableSet<R>) this.copy();
 		copy.map((Function) mapper);
 		return copy;
@@ -140,9 +141,6 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
-	@Override
-	public void filter(Predicate<? super E> condition);
-	
 	// toArray
 	
 	@Override
@@ -164,6 +162,9 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	{
 		return this.copy();
 	}
+	
+	@Override
+	public <R> MutableSet<R> emptyCopy();
 	
 	@Override
 	public ImmutableSet<E> immutable();
