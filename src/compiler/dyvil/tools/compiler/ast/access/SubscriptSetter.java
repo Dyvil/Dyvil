@@ -46,7 +46,7 @@ public class SubscriptSetter extends AbstractCall
 		}
 		this.arguments.resolve(markers, context);
 		
-		IMethod m = ICall.resolveMethod(context, instance, Name.subscript_$eq, arguments);
+		IMethod m = ICall.resolveMethod(context, this.instance, Name.subscript_$eq, this.arguments);
 		if (m != null)
 		{
 			this.method = m;
@@ -54,7 +54,7 @@ public class SubscriptSetter extends AbstractCall
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, position, instance, Name.subscript_$eq, arguments);
+		ICall.addResolveMarker(markers, this.position, this.instance, Name.subscript_$eq, this.arguments);
 		return this;
 	}
 	

@@ -124,7 +124,7 @@ public class TypeVarType implements IType
 	{
 		typeContext.addMapping(this.typeVar, concrete);
 	}
-
+	
 	@Override
 	public boolean isResolved()
 	{

@@ -150,12 +150,12 @@ public class REPLVariable extends Field
 	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
 	{
 		String name = this.name.qualified;
-		String extendedType = type.getExtendedName();
+		String extendedType = this.type.getExtendedName();
 		ClassWriter writer = new ClassWriter();
 		// Generate Class Header
 		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className, null, "java/lang/Object", null);
 		
-		if (type != Types.VOID)
+		if (this.type != Types.VOID)
 		{
 			// Generate the field holding the value
 			writer.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name, extendedType, null, null);
@@ -178,15 +178,15 @@ public class REPLVariable extends Field
 		
 		// Write the value
 		
-		if (type != Types.VOID)
+		if (this.type != Types.VOID)
 		{
-			value.writeExpression(mw);
+			this.value.writeExpression(mw);
 			// Store the value to the field
 			mw.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
 		}
 		else
 		{
-			value.writeStatement(mw);
+			this.value.writeStatement(mw);
 		}
 		
 		// Finish Method compilation
@@ -198,7 +198,7 @@ public class REPLVariable extends Field
 		
 		byte[] bytes = writer.toByteArray();
 		
-		if (type != Types.VOID || !compilableList.isEmpty())
+		if (this.type != Types.VOID || !compilableList.isEmpty())
 		{
 			// The type contains the value, so we have to keep the class loaded.
 			return REPLMemberClass.loadClass(className, bytes);

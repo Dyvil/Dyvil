@@ -23,7 +23,7 @@ import dyvil.tools.compiler.transform.CaseClasses;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
-	protected IMethod			applyMethod;
+	protected IMethod	applyMethod;
 	
 	public CaseClassMetadata(IClass iclass)
 	{

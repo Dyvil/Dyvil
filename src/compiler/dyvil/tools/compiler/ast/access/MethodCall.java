@@ -148,7 +148,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			}
 		}
 		
-		ICall.addResolveMarker(markers, position, instance, name, arguments);
+		ICall.addResolveMarker(markers, this.position, this.instance, this.name, this.arguments);
 		return this;
 	}
 	

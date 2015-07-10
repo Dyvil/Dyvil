@@ -731,6 +731,8 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			this.body.resolveTypes(markers);
 		}
+		
+		this.metadata.resolve(markers, context);
 	}
 	
 	@Override
@@ -748,8 +750,6 @@ public class CodeClass extends ASTNode implements IClass
 			
 			a.resolve(markers, context);
 		}
-		
-		this.metadata.resolve(markers, context);
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -948,7 +948,8 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.outerClass != null) {
+		if (this.outerClass != null)
+		{
 			return this.outerClass.resolveType(name);
 		}
 		return this.unit.resolveType(name);

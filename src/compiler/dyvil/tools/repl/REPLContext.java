@@ -44,7 +44,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	private static int						classIndex;
 	private static String					className;
 	
-	private static Map<Name, IField>		fields		= new IdentityHashMap();
+	private static Map<Name, IField>		fields			= new IdentityHashMap();
 	private static List<IMethod>			methods			= new ArrayList();
 	private static Map<Name, IClass>		classes			= new IdentityHashMap();
 	

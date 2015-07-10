@@ -98,7 +98,6 @@ public final class ExternalClass extends CodeClass
 		{
 			this.resolveMetadata();
 		}
-		this.metadata.resolve(null, Package.rootPackage);
 	}
 	
 	private void resolveAnnotations()

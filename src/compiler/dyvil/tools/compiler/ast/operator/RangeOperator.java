@@ -187,7 +187,7 @@ public class RangeOperator implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IValue value1 = this.firstValue.withType(elementType, elementType, markers, context);
+		IValue value1 = this.firstValue.withType(this.elementType, this.elementType, markers, context);
 		if (value1 == null)
 		{
 			// TODO Handle error
@@ -197,7 +197,7 @@ public class RangeOperator implements IValue
 			this.firstValue = value1;
 		}
 		
-		IValue value2 = this.lastValue.withType(elementType, elementType, markers, context);
+		IValue value2 = this.lastValue.withType(this.elementType, this.elementType, markers, context);
 		if (value2 == null)
 		{
 			// TODO Handle error

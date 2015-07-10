@@ -51,7 +51,7 @@ public final class CharUtils
 	 */
 	public static @infix boolean isDigit(char c)
 	{
-		if (c <= 256)
+		if (c < 128)
 		{
 			return c >= '0' && c <= '9';
 		}
@@ -68,7 +68,7 @@ public final class CharUtils
 	 */
 	public static @infix boolean isLetter(char c)
 	{
-		if (c <= 256)
+		if (c < 128)
 		{
 			return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
 		}
@@ -100,9 +100,9 @@ public final class CharUtils
 	 */
 	public static @infix boolean isWhitespace(char c)
 	{
-		if (c <= 256)
+		if (c < 128)
 		{
-			return c <= ' ';
+			return c >= 0x9 && c <= 0xD || c >= 0x1C && c <= 0x20;
 		}
 		return Character.isWhitespace((int) c);
 	}
@@ -117,9 +117,9 @@ public final class CharUtils
 	 */
 	public static @infix boolean isLowerCase(char c)
 	{
-		if (c <= 256)
+		if (c < 128)
 		{
-			return c >= 'a' && c <= 'z' || c >= 0xE0 && c <= 0xFE && c != 0xF7;
+			return c >= 'a' && c <= 'z';
 		}
 		return Character.isLowerCase(c);
 	}
@@ -134,9 +134,9 @@ public final class CharUtils
 	 */
 	public static @infix boolean isUpperCase(char c)
 	{
-		if (c <= 256)
+		if (c < 128)
 		{
-			return c >= 'A' && c <= 'Z' || c >= 0xC0 && c <= 0xDE && c != 0xD7;
+			return c >= 'A' && c <= 'Z';
 		}
 		return Character.isUpperCase(c);
 	}
@@ -151,11 +151,11 @@ public final class CharUtils
 	 */
 	public static @infix char toLowerCase(char c)
 	{
-		if (c >= 'A' && c <= 'Z' || c >= 0xC0 && c <= 0xDE && c != 0xD7)
+		if (c >= 'A' && c <= 'Z')
 		{
 			return (char) (c + 32);
 		}
-		if (c <= 256)
+		if (c < 128)
 		{
 			return c;
 		}
@@ -172,11 +172,11 @@ public final class CharUtils
 	 */
 	public static @infix char toUpperCase(char c)
 	{
-		if (c >= 'a' && c <= 'z' || c >= 0xE0 && c <= 0xFE && c != 0xF7)
+		if (c >= 'a' && c <= 'z')
 		{
 			return (char) (c - 32);
 		}
-		if (c <= 256)
+		if (c < 128)
 		{
 			return c;
 		}
@@ -201,15 +201,15 @@ public final class CharUtils
 	 */
 	public static @infix char invertCase(char c)
 	{
-		if (c >= 'a' && c <= 'z' || c >= 0xE0 && c <= 0xFE && c != 0xF7)
+		if (c >= 'a' && c <= 'z')
 		{
 			return (char) (c - 32);
 		}
-		if (c >= 'A' && c <= 'Z' || c >= 0xC0 && c <= 0xDE && c != 0xD7)
+		if (c >= 'A' && c <= 'Z')
 		{
 			return (char) (c + 32);
 		}
-		if (c <= 256)
+		if (c < 256)
 		{
 			return c;
 		}

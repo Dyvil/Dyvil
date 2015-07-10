@@ -13,9 +13,9 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public class DoStatementParser extends Parser implements IValueConsumer
 {
-	public static final int	DO				= 1;
-	public static final int	WHILE			= 2;
-	public static final int END = 4;
+	public static final int	DO		= 1;
+	public static final int	WHILE	= 2;
+	public static final int	END		= 4;
 	
 	public DoStatement		statement;
 	

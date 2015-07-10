@@ -15,11 +15,11 @@ public enum Wrapper
 	BOOLEAN('Z', boolean.class, Boolean.class, 1),
 	BYTE('B', byte.class, Byte.class, 1),
 	SHORT('S', short.class, Short.class, 2),
-	CHAR('C', char.class, Char.class, 2 | (1 << 4)),
+	CHAR('C', char.class, Char.class, 2 | 1 << 4),
 	INT('I', int.class, Int.class, 4),
 	LONG('J', long.class, Long.class, 8),
-	FLOAT('F', float.class, Float.class, 4 | (1 << 5)),
-	DOUBLE('D', double.class, Double.class, 8 | (1 << 5)),
+	FLOAT('F', float.class, Float.class, 4 | 1 << 5),
+	DOUBLE('D', double.class, Double.class, 8 | 1 << 5),
 	OBJECT('J', Object.class, Object.class, 8);
 	
 	private static final int		SIZE_MASK		= (1 << 4) - 1;
@@ -47,9 +47,9 @@ public enum Wrapper
 			int k = hashPrimitive(localWrapper.primitiveClass);
 			int l = hashWrapper(localWrapper.wrapperClass);
 			int i1 = hashChar(localWrapper.basicTypeChar);
-			assert (FROM_PRIMITIVE[k] == null);
-			assert (FROM_WRAPPER[l] == null);
-			assert (FROM_CHAR[i1] == null);
+			assert FROM_PRIMITIVE[k] == null;
+			assert FROM_WRAPPER[l] == null;
+			assert FROM_CHAR[i1] == null;
 			FROM_PRIMITIVE[k] = localWrapper;
 			FROM_WRAPPER[l] = localWrapper;
 			FROM_CHAR[i1] = localWrapper;
@@ -85,21 +85,25 @@ public enum Wrapper
 	{
 		String str = paramClass.getName();
 		if (str.length() < 3)
+		{
 			return 0;
-		return ((str.charAt(0) + str.charAt(2)) % 16);
+		}
+		return (str.charAt(0) + str.charAt(2)) % 16;
 	}
 	
 	private static int hashWrapper(Class<?> paramClass)
 	{
 		String str = paramClass.getName();
 		if (str.length() < 13)
+		{
 			return 0;
-		return ((3 * str.charAt(12) + str.charAt(13)) & 0xF);
+		}
+		return 3 * str.charAt(12) + str.charAt(13) & 0xF;
 	}
 	
 	private static int hashChar(char paramChar)
 	{
-		return ((paramChar + (paramChar >> '\1')) % 16);
+		return (paramChar + (paramChar >> '\1')) % 16;
 	}
 	
 	public char basicTypeChar()

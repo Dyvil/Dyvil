@@ -20,10 +20,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class CaptureField implements IField
 {
-	public IClass	theClass;
-	public String	name;
+	public IClass		theClass;
+	public String		name;
 	public IDataMember	field;
-	private IType	type;
+	private IType		type;
 	
 	public CaptureField(IClass iclass)
 	{
@@ -50,7 +50,7 @@ public final class CaptureField implements IField
 	{
 		return this.field.isVariable();
 	}
-
+	
 	@Override
 	public void setTheClass(IClass iclass)
 	{

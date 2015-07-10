@@ -35,7 +35,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	
 	public LambdaType()
 	{
-		parameterTypes = new IType[2];
+		this.parameterTypes = new IType[2];
 	}
 	
 	public LambdaType(IType type)
@@ -60,7 +60,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	
 	public LambdaType(int typeCount)
 	{
-		parameterTypes = new IType[typeCount];
+		this.parameterTypes = new IType[typeCount];
 	}
 	
 	public static IClass getLambdaClass(int typeCount)
@@ -381,13 +381,13 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		buffer.append(Formatting.Expression.lambdaSeperator);
 		this.returnType.toString("", buffer);
 	}
-
+	
 	@Override
 	public IType clone()
 	{
 		LambdaType lt = new LambdaType(this.parameterCount);
 		lt.parameterCount = this.parameterCount;
-		System.arraycopy(this.parameterTypes, 0, lt.parameterTypes, 0, parameterCount);
+		System.arraycopy(this.parameterTypes, 0, lt.parameterTypes, 0, this.parameterCount);
 		lt.returnType = this.returnType;
 		return lt;
 	}

@@ -56,7 +56,7 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		call.arguments = EmptyArguments.INSTANCE;
 		return call;
 	}
-
+	
 	@Override
 	public int valueTag()
 	{
@@ -230,7 +230,7 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		
 		if (this.field != null)
 		{
-			this.field.checkAccess(markers, this.position, instance, context);
+			this.field.checkAccess(markers, this.position, this.instance, context);
 		}
 	}
 	

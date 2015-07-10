@@ -16,10 +16,10 @@ import org.objectweb.asm.*;
 
 public final class BytecodeVisitor extends MethodVisitor
 {
-	private ExternalMethod		method;
+	private ExternalMethod	method;
 	
-	private boolean		inline;
-	private Bytecode	bytecode;
+	private boolean			inline;
+	private Bytecode		bytecode;
 	
 	public BytecodeVisitor(ExternalMethod method)
 	{

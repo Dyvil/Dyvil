@@ -258,12 +258,14 @@ public final class IfStatement extends ASTNode implements IStatement
 				}
 				else if (this.elseThen != null)
 				{
-					// Condition is false, else clause exists -> Return else clause
+					// Condition is false, else clause exists -> Return else
+					// clause
 					return this.elseThen.foldConstants();
 				}
 				else
 				{
-					// Condition is false, no else clause -> Return empty statement (VoidValue)
+					// Condition is false, no else clause -> Return empty
+					// statement (VoidValue)
 					return new VoidValue(this.position);
 				}
 			}

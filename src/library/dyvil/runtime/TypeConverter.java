@@ -5,9 +5,9 @@ import jdk.internal.org.objectweb.asm.Type;
 
 import org.objectweb.asm.MethodVisitor;
 
-import static dyvil.runtime.Wrapper.*;
-
 import sun.invoke.util.BytecodeDescriptor;
+
+import static dyvil.runtime.Wrapper.*;
 
 public class TypeConverter
 {
@@ -36,7 +36,7 @@ public class TypeConverter
 			if (w.basicTypeChar() != 'L')
 			{
 				int wi = hashWrapperName(w.wrapperSimpleName());
-				assert (FROM_WRAPPER_NAME[wi] == null);
+				assert FROM_WRAPPER_NAME[wi] == null;
 				FROM_WRAPPER_NAME[wi] = w;
 			}
 		}

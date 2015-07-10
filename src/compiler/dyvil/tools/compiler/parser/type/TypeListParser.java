@@ -27,7 +27,7 @@ public final class TypeListParser extends Parser
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if ((type == Symbols.SEMICOLON && token.isInferred()) || type == Symbols.OPEN_CURLY_BRACKET)
+		if (type == Symbols.SEMICOLON && token.isInferred() || type == Symbols.OPEN_CURLY_BRACKET)
 		{
 			pm.popParser(true);
 			return;

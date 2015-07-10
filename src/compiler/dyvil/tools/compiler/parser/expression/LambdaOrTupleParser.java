@@ -106,7 +106,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 				return;
 			}
 			
-			LambdaExpression le = new LambdaExpression(token.raw(), params, this.parameterCount);
+			LambdaExpression le = new LambdaExpression(token.raw(), this.params, this.parameterCount);
 			pm.pushParser(new ExpressionParser(le));
 			this.value = le;
 			this.mode = END;
@@ -135,8 +135,8 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 		if (index >= this.params.length)
 		{
 			IParameter[] temp = new IParameter[index + 1];
-			System.arraycopy(params, 0, temp, 0, params.length);
-			params = temp;
+			System.arraycopy(this.params, 0, temp, 0, this.params.length);
+			this.params = temp;
 		}
 		this.params[index] = param;
 	}

@@ -59,7 +59,7 @@ public class UpdateMethodCall extends AbstractCall
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, position, instance, Name.update, arguments);
+		ICall.addResolveMarker(markers, this.position, this.instance, Name.update, this.arguments);
 		return this;
 	}
 	

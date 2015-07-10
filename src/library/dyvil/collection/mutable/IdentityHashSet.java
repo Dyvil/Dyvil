@@ -10,6 +10,7 @@ import dyvil.lang.Set;
 
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
+import dyvil.collection.immutable.ArraySet;
 import dyvil.math.MathUtils;
 
 import static dyvil.collection.mutable.IdentityHashMap.*;
@@ -365,9 +366,8 @@ public class IdentityHashSet<E> implements MutableSet<E>
 	{
 		int newLen = MathUtils.powerOfTwo(HashMap.grow(this.size));
 		Object[] newTable = new Object[newLen];
-		for (int i = 0; i < this.table.length; i++)
+		for (Object o : this.table)
 		{
-			Object o = this.table[i];
 			if (o != null)
 			{
 				int index = hash(o, newLen);
@@ -391,7 +391,7 @@ public class IdentityHashSet<E> implements MutableSet<E>
 	@Override
 	public ImmutableSet<E> immutable()
 	{
-		return new dyvil.collection.immutable.ArraySet<E>(this); // TODO immutable.IdentityHashSet
+		return new ArraySet<E>(this); // TODO immutable.IdentityHashSet
 	}
 	
 	@Override

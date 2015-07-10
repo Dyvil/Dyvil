@@ -264,7 +264,7 @@ public class ArrayType implements IType, ITyped
 		this.type.toString(prefix, buffer);
 		buffer.append(']');
 	}
-
+	
 	@Override
 	public IType clone()
 	{

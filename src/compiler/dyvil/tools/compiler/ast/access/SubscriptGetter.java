@@ -106,7 +106,7 @@ public class SubscriptGetter extends AbstractCall
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, position, this.instance, Name.subscript, argumentList);
+		ICall.addResolveMarker(markers, this.position, this.instance, Name.subscript, argumentList);
 		return this;
 	}
 	

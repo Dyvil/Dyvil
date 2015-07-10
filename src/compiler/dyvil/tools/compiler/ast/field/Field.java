@@ -347,7 +347,7 @@ public class Field extends Member implements IField
 		if (this.value != null && (this.modifiers & Modifiers.STATIC) != 0)
 		{
 			this.value.writeExpression(writer);
-			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified, getDescription());
+			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
 		}
 	}
 	

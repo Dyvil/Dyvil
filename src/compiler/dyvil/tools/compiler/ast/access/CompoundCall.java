@@ -86,7 +86,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, position, instance, name, arguments);
+		ICall.addResolveMarker(markers, this.position, this.instance, this.name, this.arguments);
 		return this;
 	}
 	

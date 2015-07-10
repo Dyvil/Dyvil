@@ -108,8 +108,8 @@ public enum ModifierTypes
 			sb.append("public ");
 		}
 		
-		int i = (mod & Modifiers.DERIVED);
-		switch (i) {
+		switch (mod & Modifiers.DERIVED)
+		{
 		case Modifiers.PACKAGE:
 			break;
 		case Modifiers.PROTECTED:

@@ -32,8 +32,8 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -964,7 +964,7 @@ public class Method extends Member implements IMethod
 		{
 			ITypeVariable typeVar = this.generics[i];
 			IType type = typeContext.resolveType(typeVar);
-			if (type == null || (type.typeTag() == IType.TYPE_VAR_TYPE && ((TypeVarType) type).typeVar == typeVar))
+			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && ((TypeVarType) type).typeVar == typeVar)
 			{
 				markers.add(position, "method.typevar.infer", this.name, typeVar.getName());
 				typeContext.addMapping(typeVar, Types.ANY);

@@ -100,6 +100,10 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}
+			if (token.isInferred())
+			{
+				return;
+			}
 			throw new SyntaxError(token, "Invalid " + token + " - Delete this token");
 		}
 		if (this.mode == NAME)
@@ -259,10 +263,10 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			return;
 		}
 		
-		int len = annotations.length;
+		int len = this.annotations.length;
 		Annotation[] temp = new Annotation[len + 1];
-		System.arraycopy(annotations, 0, temp, 0, annotations.length);
-		temp[annotations.length] = annotation;
-		annotations = temp;
+		System.arraycopy(this.annotations, 0, temp, 0, this.annotations.length);
+		temp[this.annotations.length] = annotation;
+		this.annotations = temp;
 	}
 }

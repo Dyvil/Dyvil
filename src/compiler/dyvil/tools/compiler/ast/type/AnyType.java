@@ -27,13 +27,13 @@ public class AnyType implements IType
 	{
 		return ANY;
 	}
-
+	
 	@Override
 	public Name getName()
 	{
 		return Name.any;
 	}
-
+	
 	@Override
 	public IClass getTheClass()
 	{
@@ -51,60 +51,60 @@ public class AnyType implements IType
 	{
 		return true;
 	}
-
+	
 	@Override
 	public boolean isResolved()
 	{
 		return true;
 	}
-
+	
 	@Override
 	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		return this;
 	}
-
+	
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
 		Types.OBJECT_CLASS.getMethodMatches(list, instance, name, arguments);
 	}
-
+	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 	}
-
+	
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
-
+	
 	@Override
 	public String getInternalName()
 	{
 		return "java/lang/Object";
 	}
-
+	
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
 		buffer.append("Ljava/lang/Object;");
 	}
-
+	
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append("Ljava/lang/Object;");
 	}
-
+	
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
@@ -126,13 +126,13 @@ public class AnyType implements IType
 	{
 		return "any";
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("any");
 	}
-
+	
 	@Override
 	public IType clone()
 	{

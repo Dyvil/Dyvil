@@ -1,5 +1,6 @@
 package dyvil.tests;
 
+import dyvil.string.StringConversions;
 import dyvil.string.StringUtils;
 
 import org.junit.Test;
@@ -30,5 +31,15 @@ public class StringTests
 		{
 			assertEquals("Title Case of " + cases[i], titleCase[i], StringUtils.toTitleCase(cases[i]));
 		}
+	}
+	
+	@Test
+	public void testRoman()
+	{
+		assertEquals(StringConversions.toRomanString(2015), "MMXV");
+		assertEquals(StringConversions.toRomanString(1234), "MCCXXXIV");
+		assertEquals(StringConversions.toRomanString(42), "XLII");
+		assertEquals(StringConversions.toRomanString(1971), "MCMLXXI");
+		assertEquals(StringConversions.toRomanString(420), "CDXX");
 	}
 }

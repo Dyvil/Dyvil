@@ -13,27 +13,27 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class TypeAlias implements ITypeAlias
 {
-	protected Name name;
-	protected IType type;
+	protected Name	name;
+	protected IType	type;
 	
 	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
 	}
-
+	
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-
+	
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-
+	
 	@Override
 	public IType getType()
 	{

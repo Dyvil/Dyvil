@@ -4,14 +4,16 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public enum Variance
 {
-	INVARIANT	{
+	INVARIANT
+	{
 		@Override
 		public boolean checkCompatible(IType a, IType b)
 		{
 			return a.equals(b);
 		}
 	},
-	COVARIANT		{
+	COVARIANT
+	{
 		@Override
 		public boolean checkCompatible(IType a, IType b)
 		{
@@ -30,7 +32,8 @@ public enum Variance
 			builder.append(" <: ");
 		}
 	},
-	CONTRAVARIANT{
+	CONTRAVARIANT
+	{
 		@Override
 		public boolean checkCompatible(IType a, IType b)
 		{
@@ -52,7 +55,11 @@ public enum Variance
 	
 	public abstract boolean checkCompatible(IType type1, IType type2);
 	
-	public void appendPrefix(StringBuilder builder) {}
+	public void appendPrefix(StringBuilder builder)
+	{
+	}
 	
-	public void appendInfix(StringBuilder builder) {}
+	public void appendInfix(StringBuilder builder)
+	{
+	}
 }

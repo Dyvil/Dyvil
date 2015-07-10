@@ -11,7 +11,7 @@ import java.nio.file.Path;
 
 public final class JarLibrary extends Library
 {
-	private FileSystem							jarFileSystem;
+	private FileSystem	jarFileSystem;
 	
 	public JarLibrary(File file)
 	{
@@ -24,7 +24,7 @@ public final class JarLibrary extends Library
 		try
 		{
 			URI uri = URI.create("jar:file:" + this.file.getAbsolutePath());
-			this.jarFileSystem = FileSystems.newFileSystem(uri, packages);
+			this.jarFileSystem = FileSystems.newFileSystem(uri, this.packages);
 		}
 		catch (IOException ex)
 		{

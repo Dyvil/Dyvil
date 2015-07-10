@@ -29,7 +29,7 @@ public final class SimpleImport extends Import
 	private IClass			theClass;
 	private Package			thePackage;
 	
-	private IDataMember			field;
+	private IDataMember		field;
 	private List<IMethod>	methods;
 	
 	public SimpleImport(ICodePosition position)

@@ -11,7 +11,9 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.type.ArrayType;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -134,8 +136,10 @@ public final class Array extends ASTNode implements IValue, IValueList
 		IType elementType = arrayType.getElementType();
 		
 		// Check for every value if it is the element type
-		for (int i = 0; i < this.valueCount; i++) {
-			if (!this.values[i].isType(elementType)) {
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			if (!this.values[i].isType(elementType))
+			{
 				return null;
 			}
 		}

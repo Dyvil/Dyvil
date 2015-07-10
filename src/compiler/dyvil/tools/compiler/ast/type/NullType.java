@@ -23,7 +23,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class NullType implements IType
 {
-	private static final IClass NULL_CLASS = Package.dyvilLang.resolveClass("Null");
+	private static final IClass	NULL_CLASS	= Package.dyvilLang.resolveClass("Null");
 	
 	@Override
 	public int typeTag()

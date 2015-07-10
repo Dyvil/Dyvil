@@ -424,7 +424,7 @@ public class Property extends Member implements IProperty, IContext
 	{
 		return this.theClass.resolveTypeVariable(name);
 	}
-
+	
 	@Override
 	public IDataMember resolveField(Name name)
 	{
