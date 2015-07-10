@@ -36,9 +36,6 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immuta
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.IMMUTABLE);
 	}
 	
-	@Override
-	public boolean contains(Object element);
-	
 	// Non-mutating Operations
 	
 	@Override
@@ -165,11 +162,6 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immuta
 	{
 		throw new ImmutableException("filter() on Immutable Collection");
 	}
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

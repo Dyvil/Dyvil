@@ -163,7 +163,29 @@ public interface Collection<E> extends Iterable<E>
 	 *            the element
 	 * @return true, if this collection contains the element
 	 */
-	public boolean contains(Object element);
+	public default boolean contains(Object element)
+	{
+		if (element == null)
+		{
+			for (E e : this)
+			{
+				if (e == null)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		for (E e : this)
+		{
+			if (element.equals(e))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	// Non-mutating Operations
 	
@@ -516,7 +538,13 @@ public interface Collection<E> extends Iterable<E>
 		this.toArray(0, store);
 	}
 	
-	public void toArray(int index, Object[] store);
+	public default void toArray(int index, Object[] store)
+	{
+		for (E e : this)
+		{
+			store[index++] = e;
+		}
+	}
 	
 	// Copying
 	

@@ -64,7 +64,7 @@ public class IdentityHashSet<E> implements MutableSet<E>
 	
 	public IdentityHashSet(Collection<E> collection)
 	{
-		this(collection.size() + 1, DEFAULT_LOAD_FACTOR);
+		this(HashMap.grow(collection.size()), DEFAULT_LOAD_FACTOR);
 		for (E element : collection)
 		{
 			this.$plus$eq(element);
@@ -363,7 +363,7 @@ public class IdentityHashSet<E> implements MutableSet<E>
 	@Override
 	public MutableSet<E> copy()
 	{
-		int newLen = MathUtils.powerOfTwo((this.size + 1) << 1);
+		int newLen = MathUtils.powerOfTwo(HashMap.grow(this.size));
 		Object[] newTable = new Object[newLen];
 		for (int i = 0; i < this.table.length; i++)
 		{
@@ -391,7 +391,7 @@ public class IdentityHashSet<E> implements MutableSet<E>
 	@Override
 	public ImmutableSet<E> immutable()
 	{
-		return null; // TODO immutable.IdentityHashSet
+		return new dyvil.collection.immutable.ArraySet<E>(this); // TODO immutable.IdentityHashSet
 	}
 	
 	@Override

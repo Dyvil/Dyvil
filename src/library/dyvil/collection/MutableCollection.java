@@ -30,9 +30,6 @@ public interface MutableCollection<E> extends Collection<E>
 	@Override
 	public Iterator<E> iterator();
 	
-	@Override
-	public boolean contains(Object element);
-	
 	// Non-mutating Operations
 	
 	@Override
@@ -75,11 +72,6 @@ public interface MutableCollection<E> extends Collection<E>
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

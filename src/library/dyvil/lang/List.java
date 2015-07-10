@@ -96,9 +96,6 @@ public interface List<E> extends Collection<E>
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
 	}
 	
-	@Override
-	public boolean contains(Object element);
-	
 	/**
 	 * Returns the element at the given {@code index}. This method throws an
 	 * {@link IndexOutOfBoundsException} if the given {@code index} is less than
@@ -384,11 +381,6 @@ public interface List<E> extends Collection<E>
 	 * @return the last index of the element
 	 */
 	public int lastIndexOf(Object element);
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

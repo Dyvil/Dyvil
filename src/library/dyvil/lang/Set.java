@@ -42,9 +42,6 @@ public interface Set<E> extends Collection<E>
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.DISTINCT);
 	}
 	
-	@Override
-	public boolean contains(Object element);
-	
 	// Non-mutating Operations
 	
 	@Override
@@ -177,11 +174,6 @@ public interface Set<E> extends Collection<E>
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

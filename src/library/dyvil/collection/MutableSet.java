@@ -10,6 +10,7 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.mutable.HashMap;
+import dyvil.collection.mutable.HashSet;
 import dyvil.collection.mutable.MapBasedSet;
 
 @NilConvertible
@@ -18,7 +19,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 {
 	public static <E> MutableSet<E> apply()
 	{
-		return new MapBasedSet<E>(new HashMap<E, Object>());
+		return new HashSet<E>();
 	}
 	
 	public static <E> MutableSet<E> apply(E... elements)
@@ -38,9 +39,6 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	
 	@Override
 	public Iterator<E> iterator();
-	
-	@Override
-	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	
@@ -140,11 +138,6 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

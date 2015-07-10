@@ -12,6 +12,7 @@ import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
+import dyvil.collection.immutable.ArrayMap;
 import dyvil.math.MathUtils;
 
 @NilConvertible
@@ -201,7 +202,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	
 	public IdentityHashMap(Map<K, V> map)
 	{
-		this(map.size(), DEFAULT_LOAD_FACTOR);
+		this(HashMap.grow(map.size()), DEFAULT_LOAD_FACTOR);
 		for (Entry<K, V> entry : map)
 		{
 			this.subscript_$eq(entry.getKey(), entry.getValue());
@@ -650,7 +651,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return null; // TODO immutable.IdentityHashMap
+		return new ArrayMap(this); // TODO immutable.IdentityHashMap
 	}
 	
 	@Override

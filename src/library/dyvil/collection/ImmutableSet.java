@@ -44,9 +44,6 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.DISTINCT | Spliterator.IMMUTABLE);
 	}
 	
-	@Override
-	public boolean contains(Object element);
-	
 	// Non-mutating Operations
 	
 	@Override
@@ -215,11 +212,6 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	{
 		throw new ImmutableException("filter() on Immutable Set");
 	}
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

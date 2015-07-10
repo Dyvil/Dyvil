@@ -13,36 +13,20 @@ public abstract class AbstractArrayList<E> implements List<E>
 	protected Object[]			elements;
 	protected int				size;
 	
-	public AbstractArrayList()
-	{
-		this.elements = new Object[INITIAL_CAPACITY];
-	}
-	
-	public AbstractArrayList(int size)
-	{
-		this.elements = new Object[size];
-	}
-	
-	public AbstractArrayList(Object... elements)
+	public AbstractArrayList(E... elements)
 	{
 		this.elements = elements.clone();
 		this.size = elements.length;
 	}
 	
-	public AbstractArrayList(Object[] elements, int size)
+	public AbstractArrayList(E[] elements, int size)
 	{
 		this.elements = new Object[size];
 		System.arraycopy(elements, 0, this.elements, 0, size);
 		this.size = size;
 	}
 	
-	public AbstractArrayList(Object[] elements, boolean trusted)
-	{
-		this.elements = elements;
-		this.size = elements.length;
-	}
-	
-	public AbstractArrayList(Object[] elements, int size, boolean trusted)
+	public AbstractArrayList(E[] elements, int size, boolean trusted)
 	{
 		this.elements = elements;
 		this.size = size;

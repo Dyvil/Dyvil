@@ -63,9 +63,6 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	}
 	
 	@Override
-	public boolean contains(Object element);
-	
-	@Override
 	public E subscript(int index);
 	
 	@Override
@@ -293,11 +290,6 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	public int lastIndexOf(Object element);
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	

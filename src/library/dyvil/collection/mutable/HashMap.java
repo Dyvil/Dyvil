@@ -31,7 +31,6 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		
 		HashEntry(K key, V value, int hash)
 		{
-			super();
 			this.key = key;
 			this.value = value;
 			this.hash = hash;
@@ -39,7 +38,6 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		
 		HashEntry(K key, V value, int hash, HashEntry next)
 		{
-			super();
 			this.key = key;
 			this.value = value;
 			this.hash = hash;
@@ -154,6 +152,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		}
 	}
 	
+	static final float	GROWTH_FACTOR		= 1.0625F;
 	static final int	DEFAULT_CAPACITY	= 16;
 	static final float	DEFAULT_LOAD_FACTOR	= 0.75F;
 	static final int	MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
@@ -209,15 +208,16 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	
 	public HashMap(Map<K, V> map)
 	{
-		this(map.size(), DEFAULT_LOAD_FACTOR);
+		this(grow(map.size()), DEFAULT_LOAD_FACTOR);
 		for (Entry<K, V> entry : map)
 		{
 			this.subscript_$eq(entry.getKey(), entry.getValue());
 		}
 	}
 	
-	static int hash(int h)
+	static int hash(Object key)
 	{
+		int h = key == null ? 0 : key.hashCode();
 		h ^= h >>> 20 ^ h >>> 12;
 		return h ^ h >>> 7 ^ h >>> 4;
 	}
@@ -227,9 +227,14 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		return h & length - 1;
 	}
 	
+	static int grow(int size)
+	{
+		return (int) ((size + 1) * GROWTH_FACTOR);
+	}
+	
 	protected void rehash()
 	{
-		HashEntry<?, ?>[] oldMap = this.entries;
+		HashEntry[] oldMap = this.entries;
 		int oldCapacity = oldMap.length;
 		
 		// overflow-conscious code
@@ -243,7 +248,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			}
 			newCapacity = MAX_ARRAY_SIZE;
 		}
-		HashEntry<?, ?>[] newMap = new HashEntry<?, ?>[newCapacity];
+		HashEntry[] newMap = new HashEntry[newCapacity];
 		
 		this.threshold = (int) Math.min(newCapacity * this.loadFactor, MAX_ARRAY_SIZE + 1);
 		this.entries = newMap;
@@ -489,21 +494,18 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	
 	private void addEntry(int hash, K key, V value, int index)
 	{
-		HashEntry<?, ?> tab[] = this.entries;
+		HashEntry[] tab = this.entries;
 		if (this.size >= this.threshold)
 		{
 			// Rehash the table if the threshold is exceeded
 			this.rehash();
 			
 			tab = this.entries;
-			hash = key.hashCode();
-			index = (hash & 0x7FFFFFFF) % tab.length;
+			hash = hash(key);
+			index = index(hash, tab.length);
 		}
 		
-		// Creates the new entry.
-		@SuppressWarnings("unchecked")
-		HashEntry<K, V> e = (HashEntry<K, V>) tab[index];
-		tab[index] = new HashEntry(key, value, hash, e);
+		tab[index] = new HashEntry(key, value, hash, tab[index]);
 		this.size++;
 	}
 	
@@ -531,7 +533,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			return;
 		}
 		
-		int hash = hash(key.hashCode());
+		int hash = hash(key);
 		int i = index(hash, this.entries.length);
 		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
 		{
@@ -554,7 +556,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			return this.putNull(value);
 		}
 		
-		int hash = hash(key.hashCode());
+		int hash = hash(key);
 		int i = index(hash, this.entries.length);
 		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
 		{
@@ -607,7 +609,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			return this.removeNull();
 		}
 		
-		int hash = hash(key.hashCode());
+		int hash = hash(key);
 		int i = index(hash, this.entries.length);
 		HashEntry<K, V> prev = this.entries[i];
 		HashEntry<K, V> e = prev;
@@ -716,7 +718,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public HashMap<K, V> copy()
 	{
-		int len = MathUtils.powerOfTwo(this.size + 2);
+		int len = MathUtils.powerOfTwo(grow(this.size));
 		HashEntry[] newEntries = new HashEntry[len];
 		for (HashEntry<K, V> e : this.entries)
 		{
@@ -746,8 +748,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		// TODO immutable.HashMap
-		return new ArrayMap(this);
+		return new ArrayMap(this); // TODO immutable.HashMap
 	}
 	
 	@Override

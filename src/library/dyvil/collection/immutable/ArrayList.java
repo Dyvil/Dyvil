@@ -28,27 +28,22 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		super();
 	}
 	
-	public ArrayList(int size)
-	{
-		super(size);
-	}
-	
-	public ArrayList(Object... elements)
+	public ArrayList(E... elements)
 	{
 		super(elements);
 	}
 	
-	public ArrayList(Object[] elements, boolean trusted)
+	public ArrayList(E[] elements, boolean trusted)
 	{
-		super(elements, trusted);
+		super(elements, elements.length, trusted);
 	}
 	
-	public ArrayList(Object[] elements, int size)
+	public ArrayList(E[] elements, int size)
 	{
 		super(elements, size);
 	}
 	
-	public ArrayList(Object[] elements, int size, boolean trusted)
+	public ArrayList(E[] elements, int size, boolean trusted)
 	{
 		super(elements, size, trusted);
 	}

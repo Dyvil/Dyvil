@@ -50,9 +50,6 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	public Iterator<E> iterator();
 	
 	@Override
-	public boolean contains(Object element);
-	
-	@Override
 	public E subscript(int index);
 	
 	@Override
@@ -257,11 +254,6 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	
 	@Override
 	public int lastIndexOf(Object element);
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	
