@@ -209,7 +209,7 @@ public final class Types
 		return itype;
 	}
 	
-	public static IType findCommonSuperType(IType type1, IType type2)
+	public static IType combine(IType type1, IType type2)
 	{
 		IType t = superType(type1, type2);
 		if (t != null)

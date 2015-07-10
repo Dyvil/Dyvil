@@ -252,12 +252,6 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public IType clone()
-	{
-		return new ArrayType(this.type);
-	}
-	
-	@Override
 	public String toString()
 	{
 		return "[" + this.type.toString() + "]";
@@ -269,5 +263,23 @@ public class ArrayType implements IType, ITyped
 		buffer.append('[');
 		this.type.toString(prefix, buffer);
 		buffer.append(']');
+	}
+
+	@Override
+	public IType clone()
+	{
+		return new ArrayType(this.type);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this.equals((IType) obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return 127 * this.type.hashCode();
 	}
 }

@@ -134,4 +134,16 @@ public class NullType implements IType
 	{
 		return this;
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this.equals((IType) obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return NULL;
+	}
 }

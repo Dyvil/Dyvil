@@ -181,4 +181,10 @@ public class ClassType implements IType
 		t.theClass = this.theClass;
 		return t;
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this.equals((IType) obj);
+	}
 }

@@ -171,4 +171,16 @@ public abstract class GenericType implements IType, ITypeList
 	
 	@Override
 	public abstract IType clone();
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return IType.equals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return System.identityHashCode(this.getTheClass());
+	}
 }

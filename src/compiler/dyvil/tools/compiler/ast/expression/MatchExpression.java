@@ -82,7 +82,7 @@ public final class MatchExpression extends ASTNode implements IValue
 				continue;
 			}
 			
-			t = Types.findCommonSuperType(t, t1);
+			t = Types.combine(t, t1);
 			if (t == null)
 			{
 				return this.type = Types.VOID;

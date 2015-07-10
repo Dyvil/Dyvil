@@ -97,7 +97,7 @@ public class RangeOperator implements IValue
 		{
 			if (this.elementType == Types.UNKNOWN)
 			{
-				this.elementType = Types.findCommonSuperType(this.firstValue.getType(), this.lastValue.getType());
+				this.elementType = Types.combine(this.firstValue.getType(), this.lastValue.getType());
 			}
 			
 			ClassGenericType gt = new ClassGenericType(RANGE_CLASS);

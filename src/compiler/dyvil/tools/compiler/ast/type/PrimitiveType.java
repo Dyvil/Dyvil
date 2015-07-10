@@ -521,4 +521,16 @@ public final class PrimitiveType implements IType
 		t.theClass = this.theClass;
 		return t;
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this == obj;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.typecode;
+	}
 }

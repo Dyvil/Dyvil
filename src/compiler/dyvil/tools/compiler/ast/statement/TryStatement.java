@@ -71,7 +71,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			IType t1 = this.catchBlocks[i].action.getType();
-			type = Types.findCommonSuperType(type, t1);
+			type = Types.combine(type, t1);
 			if (type == null)
 			{
 				return this.commonType = Types.ANY;

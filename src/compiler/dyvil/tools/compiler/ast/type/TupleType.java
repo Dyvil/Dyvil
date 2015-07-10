@@ -386,4 +386,16 @@ public final class TupleType implements IType, ITypeList
 		System.arraycopy(this.types, 0, tt.types, 0, this.typeCount);
 		return tt;
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return IType.equals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return System.identityHashCode(getTupleClass(this.typeCount));
+	}
 }

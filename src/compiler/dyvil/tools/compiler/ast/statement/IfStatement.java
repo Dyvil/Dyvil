@@ -93,7 +93,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		{
 			if (this.elseThen != null)
 			{
-				return this.commonType = Types.findCommonSuperType(this.then.getType(), this.elseThen.getType());
+				return this.commonType = Types.combine(this.then.getType(), this.elseThen.getType());
 			}
 			return this.commonType = this.then.getType();
 		}

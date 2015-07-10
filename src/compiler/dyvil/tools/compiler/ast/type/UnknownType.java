@@ -181,4 +181,16 @@ public class UnknownType implements IType
 	{
 		buffer.append("var");
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this == obj;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return UNKNOWN;
+	}
 }

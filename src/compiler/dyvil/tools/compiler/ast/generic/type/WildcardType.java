@@ -159,7 +159,7 @@ public final class WildcardType implements IType, ITyped
 		{
 			return this.bound.resolveType(typeVar);
 		}
-		return Types.ANY;
+		return Types.UNKNOWN;
 	}
 	
 	@Override
@@ -357,5 +357,17 @@ public final class WildcardType implements IType, ITyped
 			this.variance.appendInfix(buffer);
 			this.bound.toString(prefix, buffer);
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this.bound == null ? false : this.bound.equals(obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.bound == null ? 0 : 31 * this.bound.hashCode();
 	}
 }

@@ -237,7 +237,7 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 			{
 				if (rangeType == Types.UNKNOWN)
 				{
-					rangeType = Types.findCommonSuperType(value1.getType(), value2.getType());
+					rangeType = Types.combine(value1.getType(), value2.getType());
 				}
 				
 				this.variable.type = varType = rangeType;

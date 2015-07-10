@@ -159,7 +159,7 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	
 	public default IType combine(IType other)
 	{
-		return Types.findCommonSuperType(this, other);
+		return Types.combine(this, other);
 	}
 	
 	/**
@@ -252,7 +252,7 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	@Override
 	public default IType resolveType(ITypeVariable typeVar)
 	{
-		return Types.ANY;
+		return Types.UNKNOWN;
 	}
 	
 	/**
@@ -479,4 +479,15 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	// Misc
 	
 	public IType clone();
+	
+	@Override
+	public boolean equals(Object obj);
+	
+	@Override
+	public int hashCode();
+	
+	public static boolean equals(IType type, Object obj)
+	{
+		return type.classEquals((IType) obj);
+	}
 }

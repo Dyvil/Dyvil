@@ -11,8 +11,26 @@ public final class DynamicType extends UnknownType
 	}
 	
 	@Override
+	public String toString()
+	{
+		return "dynamic";
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("dynamic");
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this == obj;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return DYNAMIC;
 	}
 }

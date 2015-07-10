@@ -102,7 +102,7 @@ public class TypeVarType implements IType
 		}
 		
 		IType t = context.resolveType(this.typeVar);
-		if (t != Types.ANY)
+		if (t != Types.UNKNOWN)
 		{
 			if (t.isPrimitive())
 			{
@@ -116,7 +116,7 @@ public class TypeVarType implements IType
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.typeVar == typeVar ? this : Types.ANY;
+		return this.typeVar == typeVar ? this : Types.UNKNOWN;
 	}
 	
 	@Override

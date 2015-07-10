@@ -180,7 +180,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		}
 		if (index > this.parameterCount)
 		{
-			return Types.ANY;
+			return Types.UNKNOWN;
 		}
 		return this.parameterTypes[index];
 	}
@@ -337,16 +337,6 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	}
 	
 	@Override
-	public IType clone()
-	{
-		LambdaType lt = new LambdaType(this.parameterCount);
-		lt.parameterCount = this.parameterCount;
-		System.arraycopy(this.parameterTypes, 0, lt.parameterTypes, 0, parameterCount);
-		lt.returnType = this.returnType;
-		return lt;
-	}
-	
-	@Override
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
@@ -390,5 +380,27 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		
 		buffer.append(Formatting.Expression.lambdaSeperator);
 		this.returnType.toString("", buffer);
+	}
+
+	@Override
+	public IType clone()
+	{
+		LambdaType lt = new LambdaType(this.parameterCount);
+		lt.parameterCount = this.parameterCount;
+		System.arraycopy(this.parameterTypes, 0, lt.parameterTypes, 0, parameterCount);
+		lt.returnType = this.returnType;
+		return lt;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return IType.equals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return System.identityHashCode(getLambdaClass(this.parameterCount));
 	}
 }
