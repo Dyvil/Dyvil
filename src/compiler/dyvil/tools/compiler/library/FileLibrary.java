@@ -2,7 +2,7 @@ package dyvil.tools.compiler.library;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 public final class FileLibrary extends Library
@@ -25,22 +25,43 @@ public final class FileLibrary extends Library
 	@Override
 	public boolean isSubPackage(String name)
 	{
-		return new File(this.file, name).exists();
+		File f = new File(this.file, name);
+		if (!f.exists())
+		{
+			return false;
+		}
+		
+		try
+		{
+			if (f.getCanonicalPath().endsWith(name))
+			{
+				return true;
+			}
+		}
+		catch (IOException ex)
+		{
+		}
+		return false;
 	}
 	
 	@Override
 	public InputStream getInputStream(String fileName)
 	{
 		File file = new File(this.file, fileName);
-		if (file.exists())
+		if (!file.exists())
 		{
-			try
+			return null;
+		}
+		
+		try
+		{
+			if (file.getCanonicalPath().endsWith(fileName))
 			{
 				return new FileInputStream(file);
 			}
-			catch (FileNotFoundException ex)
-			{
-			}
+		}
+		catch (IOException ex)
+		{
 		}
 		return null;
 	}

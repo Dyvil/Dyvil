@@ -100,10 +100,10 @@ public final class GenericData implements ITypeList, ITypeContext
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		int index = typeVar.getIndex();
 		if (this.isMethodTypeVariable(typeVar))
 		{
-			if (index > this.genericCount)
+			int index = typeVar.getIndex();
+			if (index >= this.genericCount)
 			{
 				return new TypeVarType(typeVar);
 			}

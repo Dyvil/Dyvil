@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -118,6 +119,17 @@ public final class ClassGenericType extends GenericType
 	}
 	
 	@Override
+	public IType combine(IType type)
+	{
+		if (this.argumentsMatch(type))
+		{
+			return this;
+		}
+		
+		return new ClassType(this.theClass);
+	}
+	
+	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
 		int index = typeVar.getIndex();
@@ -184,13 +196,13 @@ public final class ClassGenericType extends GenericType
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-			this.theClass.getMethodMatches(list, instance, name, arguments);
+		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
-			this.theClass.getConstructorMatches(list, arguments);
+		this.theClass.getConstructorMatches(list, arguments);
 	}
 	
 	@Override

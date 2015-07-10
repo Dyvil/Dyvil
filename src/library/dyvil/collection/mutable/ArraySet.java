@@ -26,7 +26,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 	
 	public ArraySet(int size)
 	{
-		super(new Object[size], size, true);
+		super(new Object[size], 0, true);
 	}
 	
 	public ArraySet(E[] elements, int size)

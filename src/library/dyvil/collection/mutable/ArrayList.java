@@ -37,7 +37,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	
 	public ArrayList(int size)
 	{
-		super((E[]) new Object[size], size, true);
+		super((E[]) new Object[size], 0, true);
 	}
 	
 	public ArrayList(E... elements)

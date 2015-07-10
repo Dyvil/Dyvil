@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.lang.Collection;
+import dyvil.lang.Set;
+
+import dyvil.collection.mutable.ArraySet;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
@@ -211,50 +215,55 @@ public final class Types
 	
 	public static IType combine(IType type1, IType type2)
 	{
-		IType t = superType(type1, type2);
-		if (t != null)
-		{
-			return t;
-		}
-		
-		IType superType1 = type1;
-		while (true)
-		{
-			superType1 = superType1.getSuperType();
-			if (superType1 == null)
-			{
-				break;
-			}
-			
-			IType superType2 = type2;
-			while (true)
-			{
-				superType2 = superType2.getSuperType();
-				if (superType2 == null)
-				{
-					break;
-				}
-				
-				t = superType(superType1, superType2);
-				if (t != null)
-				{
-					return t;
-				}
-			}
-		}
-		return ANY;
-	}
-	
-	static IType superType(IType type1, IType type2)
-	{
-		if (type1.isSuperTypeOf(type2))
+		if (type1.equals(type2))
 		{
 			return type1;
 		}
-		if (type2.isSuperTypeOf(type1))
+		
+		Set<IType> types1 = superTypes(type1);
+		Set<IType> types2 = superTypes(type2);
+		
+		for (IType t1 : types1)
 		{
-			return type2;
+			IClass class1 = t1.getTheClass();
+			if (class1 == Types.OBJECT_CLASS)
+			{
+				continue;
+			}
+			
+			for (IType t2 : types2)
+			{
+				if (class1 == t2.getTheClass())
+				{
+					return new ClassType(class1);
+				}
+			}
 		}
-		return null;
+		
+		return Types.ANY;
+	}
+	
+	private static Set<IType> superTypes(IType type)
+	{
+		Set<IType> types = new ArraySet();
+		addSuperTypes(type, types);
+		return types;
+	}
+	
+	private static void addSuperTypes(IType type, Collection<IType> types)
+	{
+		types.add(type);
+		IType superType = type.getSuperType();
+		if (superType != null)
+		{
+			addSuperTypes(superType.getConcreteType(type), types);
+		}
+		
+		IClass iclass = type.getTheClass();
+		int count = iclass.interfaceCount();
+		for (int i = 0; i < count; i++)
+		{
+			addSuperTypes(iclass.getInterface(i).getConcreteType(type), types);
+		}
 	}
 }

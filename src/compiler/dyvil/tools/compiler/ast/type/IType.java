@@ -157,9 +157,9 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		return Types.OBJECT;
 	}
 	
-	public default IType combine(IType other)
+	public default IType combine(IType type)
 	{
-		return Types.combine(this, other);
+		return this;
 	}
 	
 	/**
