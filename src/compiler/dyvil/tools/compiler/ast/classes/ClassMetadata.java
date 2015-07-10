@@ -49,12 +49,18 @@ public class ClassMetadata implements IClassMetadata
 	public void resolve(MarkerList markers, IContext context)
 	{
 		IClassBody body = this.theClass.getBody();
-		if (body != null)
+		if (body != null && body.constructorCount() > 0)
 		{
 			IConstructor c = body.getConstructor(this.theClass.getParameters(), this.theClass.parameterCount());
 			if (c != null)
 			{
 				this.constructor = c;
+				this.methods |= CONSTRUCTOR;
+				return;
+			}
+			
+			if (this.theClass.parameterCount() == 0)
+			{
 				this.methods |= CONSTRUCTOR;
 				return;
 			}

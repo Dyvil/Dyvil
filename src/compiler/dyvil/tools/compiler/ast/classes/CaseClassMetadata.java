@@ -99,7 +99,7 @@ public final class CaseClassMetadata extends ClassMetadata
 				{
 					IType t1 = m.getParameter(i).getType();
 					IType t2 = m.getParameter(i).getType();
-					if (!t1.classEquals(t2) || t1.getArrayDimensions() != t2.getArrayDimensions())
+					if (!t1.equals(t2))
 					{
 						return;
 					}

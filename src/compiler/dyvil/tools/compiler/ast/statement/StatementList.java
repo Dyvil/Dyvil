@@ -204,9 +204,11 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public void addValue(int index, IValue value)
 	{
-		int i = this.valueCount++;
-		System.arraycopy(this.values, index, this.values, index + 1, i - index + 1);
-		this.values[index] = value;
+		IValue[] temp = new IValue[++this.valueCount];
+		System.arraycopy(this.values, 0, temp, 0, index);
+		temp[index] = value;
+		System.arraycopy(this.values, index, temp, index + 1, this.valueCount - index - 1);
+		this.values = temp;
 	}
 	
 	@Override
