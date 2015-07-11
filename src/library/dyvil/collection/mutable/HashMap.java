@@ -16,7 +16,6 @@ import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.math.MathUtils;
-import dyvil.tuple.Tuple2;
 
 @NilConvertible
 @ArrayConvertible
@@ -343,7 +342,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		{
 			while (e != null)
 			{
-				action.accept(new Tuple2(e.key, e.value));
+				action.accept(e);
 				e = e.next;
 			}
 		}

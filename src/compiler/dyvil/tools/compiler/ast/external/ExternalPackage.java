@@ -96,12 +96,19 @@ public class ExternalPackage extends Package
 	@Override
 	public synchronized IClass resolveClass(String name)
 	{
+		Name name1 = Name.getQualified(name);
 		for (IClass iclass : this.classes)
 		{
-			if (name.equals(iclass.getName().qualified))
+			if (name1 == iclass.getName())
 			{
 				return iclass;
 			}
+		}
+		
+		IClass c = super.resolveClass(name);
+		if (c != null)
+		{
+			return c;
 		}
 		
 		return this.loadClass(name);
