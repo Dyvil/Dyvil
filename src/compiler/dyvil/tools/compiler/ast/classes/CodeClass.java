@@ -1358,9 +1358,10 @@ public class CodeClass extends ASTNode implements IClass
 		
 		this.metadata.write(writer, instanceFields);
 		
-		// Create the classinit method
+		// Create the static <clinit> method
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
 		mw.begin();
+		this.metadata.writeStaticInit(mw);
 		for (int i = 0; i < staticFieldCount; i++)
 		{
 			staticFields[i].writeStaticInit(mw);

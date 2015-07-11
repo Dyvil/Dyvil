@@ -147,6 +147,11 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return this.values[0].withType(type, typeContext, markers, context);
 		}
 		
+		if (type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null)
+		{
+			this.tupleType = type;
+			return this;
+		}
 		if (TupleType.isSuperType(type, this.values, this.valueCount))
 		{
 			ITypeList typeList = (ITypeList) this.getType();
@@ -169,11 +174,6 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return this;
 		}
 		
-		if (type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null)
-		{
-			this.tupleType = type;
-			return this;
-		}
 		return null;
 	}
 	
@@ -196,17 +196,12 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return this.values[0].getTypeMatch(type);
 		}
 		
-		if (type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		
 		IType type1 = this.getType();
 		if (type.equals(type1))
 		{
 			return 3;
 		}
-		if (type.isSuperTypeOf(type1))
+		if (type.isSuperTypeOf(type1) || type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null)
 		{
 			return 2;
 		}

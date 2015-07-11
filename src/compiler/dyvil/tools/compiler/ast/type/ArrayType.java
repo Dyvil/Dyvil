@@ -147,7 +147,7 @@ public class ArrayType implements IType, ITyped
 		{
 			this.type = Types.ANY;
 		}
-		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
+		this.type = this.type.resolve(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 		return this;
 	}
 	

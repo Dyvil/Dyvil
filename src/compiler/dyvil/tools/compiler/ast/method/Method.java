@@ -766,7 +766,7 @@ public class Method extends Member implements IMethod
 			}
 			return match;
 		}
-		else if (len > this.parameterCount)
+		else if (len + parIndex > this.parameterCount)
 		{
 			return 0;
 		}
@@ -941,7 +941,7 @@ public class Method extends Member implements IMethod
 		{
 			this.parameters[0].getType().inferTypes(instance.getType(), genericData);
 			
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < len - 1; i++)
 			{
 				param = this.parameters[i + 1];
 				param.getType().inferTypes(arguments.getType(i, param), genericData);

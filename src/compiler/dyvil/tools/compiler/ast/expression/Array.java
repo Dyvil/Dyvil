@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ArrayType;
@@ -74,12 +73,11 @@ public final class Array extends ASTNode implements IValue, IValueList
 		return false;
 	}
 	
-	@Override
-	public IType getType()
+	public IType getElementType()
 	{
-		if (this.requiredType != null)
+		if (this.elementType != null)
 		{
-			return this.requiredType;
+			return this.elementType;
 		}
 		
 		int len = this.valueCount;
@@ -101,39 +99,42 @@ public final class Array extends ASTNode implements IValue, IValueList
 			}
 		}
 		
-		this.elementType = t;
-		
-		IClass iclass = t.getTheClass();
-		if (iclass == Types.TUPLE2_CLASS)
+		return this.elementType = t;
+	}
+	
+	@Override
+	public IType getType()
+	{
+		if (this.requiredType != null)
 		{
-			ClassGenericType type = new ClassGenericType(Types.MAP_CLASS);
-			type.addType(t.resolveType(iclass.getTypeVariable(0)));
-			type.addType(t.resolveType(iclass.getTypeVariable(1)));
-			return this.requiredType = type;
+			return this.requiredType;
 		}
-		return this.requiredType = new ArrayType(t);
+		
+		return this.requiredType = new ArrayType(this.getElementType());
 	}
 	
 	@Override
 	public IValue withType(IType arrayType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		IType elementType;
 		if (!arrayType.isArrayType())
 		{
 			IClass iclass = arrayType.getTheClass();
-			if (iclass == Types.OBJECT_CLASS || iclass == null)
+			if (iclass != Types.OBJECT_CLASS)
 			{
-				return this;
+				return null;
 			}
 			if (iclass.getAnnotation(ARRAY_CONVERTIBLE) != null)
 			{
 				return new LiteralExpression(this).withType(arrayType, typeContext, markers, context);
 			}
-			
-			return null;
+			elementType = this.getElementType();
 		}
-		
-		// If the type is an array type, get it's element type
-		IType elementType = arrayType.getElementType();
+		else
+		{
+			// If the type is an array type, get it's element type
+			elementType = arrayType.getElementType();
+		}
 		
 		// Check for every value if it is the element type
 		for (int i = 0; i < this.valueCount; i++)

@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -76,6 +77,15 @@ public final class ObjectClassMetadata extends ClassMetadata
 			return this.instanceField;
 		}
 		return null;
+	}
+	
+	@Override
+	public void writeStaticInit(MethodWriter mw) throws BytecodeException
+	{
+		if (this.instanceField != null)
+		{
+			this.instanceField.writeStaticInit(mw);
+		}
 	}
 	
 	@Override

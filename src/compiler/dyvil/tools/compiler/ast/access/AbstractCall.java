@@ -102,7 +102,7 @@ public abstract class AbstractCall implements ICall, IValued
 			return 0;
 		}
 		
-		IType type1 = this.method.getType();
+		IType type1 = this.getType();
 		if (type.equals(type1))
 		{
 			return 3;

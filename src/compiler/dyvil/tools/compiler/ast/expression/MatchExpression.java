@@ -162,6 +162,11 @@ public final class MatchExpression extends ASTNode implements IValue
 			}
 			
 			IPattern pattern = c.pattern;
+			if (pattern == null)
+			{
+				continue;
+			}
+			
 			pattern = pattern.resolve(markers, context);
 			
 			if (pattern.isExhaustive())
