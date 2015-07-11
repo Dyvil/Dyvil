@@ -165,26 +165,7 @@ public interface Collection<E> extends Iterable<E>
 	 */
 	public default boolean contains(Object element)
 	{
-		if (element == null)
-		{
-			for (E e : this)
-			{
-				if (e == null)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		
-		for (E e : this)
-		{
-			if (element.equals(e))
-			{
-				return true;
-			}
-		}
-		return false;
+		return iterableContains(this, element);
 	}
 	
 	// Non-mutating Operations
@@ -593,6 +574,30 @@ public interface Collection<E> extends Iterable<E>
 	
 	@Override
 	public int hashCode();
+	
+	public static <E> boolean iterableContains(Iterable<E> iterable, Object element)
+	{
+		if (element == null)
+		{
+			for (E e : iterable)
+			{
+				if (e == null)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		for (E e : iterable)
+		{
+			if (element.equals(e))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	public static <E> String collectionToString(Collection<E> collection)
 	{

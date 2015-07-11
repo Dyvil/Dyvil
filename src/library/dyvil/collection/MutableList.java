@@ -62,7 +62,10 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	
 	public MutableList<E> resized(int newSize);
 	
-	public MutableList<E> withCapacity(int newCapacity);
+	public default MutableList<E> withCapacity(int newCapacity)
+	{
+		return this;
+	}
 	
 	@Override
 	public default MutableList<E> $plus(E element)
@@ -275,7 +278,10 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	@Override
 	public <R> MutableList<R> emptyCopy();
 	
-	public <R> MutableList<R> emptyCopy(int newCapacity);
+	public default <R> MutableList<R> emptyCopy(int newCapacity)
+	{
+		return this.emptyCopy();
+	}
 	
 	@Override
 	public ImmutableList<E> immutable();
