@@ -12,7 +12,7 @@ public class MathTests
 	@Test
 	public void testLog2()
 	{
-		for (int i = 1; i <= 0xEFFFFFFF; i <<= 1)
+		for (int i = 1; i <= 0x3FFFFFFF; i <<= 1)
 		{
 			assertEquals("LogBaseTwo for " + i, i, 1 << MathUtils.logBaseTwo(i));
 		}
@@ -21,7 +21,7 @@ public class MathTests
 	@Test
 	public void testIsPowerOf2()
 	{
-		for (int i = 1; i <= 0xEFFFFFFF; i <<= 1)
+		for (int i = 1; i <= 0x3FFFFFFF; i <<= 1)
 		{
 			assertTrue(i + " is not a power of 2", MathUtils.isPowerOfTwo(i));
 		}

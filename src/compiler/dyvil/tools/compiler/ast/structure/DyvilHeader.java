@@ -442,7 +442,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		// Included Headers
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			iclass = this.includes[i].getHeader().resolveClass(name);
+			iclass = this.includes[i].resolveClass(name);
 			if (iclass != null)
 			{
 				return iclass;
@@ -473,7 +473,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			IType t = this.includes[i].getHeader().resolveType(name);
+			IType t = this.includes[i].resolveType(name);
 			if (t != null)
 			{
 				return t;
@@ -502,7 +502,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			IDataMember field = this.includes[i].getHeader().resolveField(name);
+			IDataMember field = this.includes[i].resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -521,7 +521,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			this.includes[i].getHeader().getMethodMatches(list, instance, name, arguments);
+			this.includes[i].getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	

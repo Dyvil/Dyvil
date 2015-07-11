@@ -105,7 +105,7 @@ public final class DyvilCompiler
 		logger.info("Compiling '" + sourceDir + "' to '" + outputDir + "'");
 		
 		// Scan for Packages and Compilation Units
-		fileFinder.findUnits(sourceDir, outputDir, null);
+		config.findUnits(fileFinder);
 		
 		int fileCount = fileFinder.files.size();
 		int unitCount = fileFinder.units.size();

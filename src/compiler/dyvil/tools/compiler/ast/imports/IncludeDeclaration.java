@@ -4,13 +4,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import dyvil.lang.List;
 import dyvil.lang.Map;
 
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -34,11 +41,6 @@ public class IncludeDeclaration implements IASTNode
 		return this.position;
 	}
 	
-	public IDyvilHeader getHeader()
-	{
-		return this.header;
-	}
-	
 	public void addNamePart(Name name)
 	{
 		int index = this.namePartCount++;
@@ -49,6 +51,34 @@ public class IncludeDeclaration implements IASTNode
 			this.nameParts = temp;
 		}
 		this.nameParts[index] = name;
+	}
+	
+	public IDyvilHeader getHeader()
+	{
+		return this.header;
+	}
+	
+	public IClass resolveClass(Name name)
+	{
+		return this.header == null ? null : this.header.resolveClass(name);
+	}
+	
+	public IType resolveType(Name name)
+	{
+		return this.header == null ? null : this.header.resolveType(name);
+	}
+	
+	public IDataMember resolveField(Name name)
+	{
+		return this.header == null ? null : this.header.resolveField(name);
+	}
+	
+	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	{
+		if (this.header != null)
+		{
+			this.header.getMethodMatches(list, instance, name, arguments);
+		}
 	}
 	
 	public void resolve(MarkerList markers)

@@ -63,6 +63,7 @@ public final class ParserManager implements IParserManager
 	
 	public final void parse(MarkerList markers, TokenIterator tokens)
 	{
+		tokens.reset();
 		this.tokens = tokens;
 		IToken token = null;
 		while (true)

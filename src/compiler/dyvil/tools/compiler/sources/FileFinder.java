@@ -19,16 +19,15 @@ public class FileFinder
 	{
 		if (source.isDirectory())
 		{
-			String name = source.getName();
 			for (String s : source.list())
 			{
-				this.findUnits(new CodeFile(source, s), new File(output, s), pack == null ? Package.rootPackage : pack.createSubPackage(name));
+				this.findUnits(new CodeFile(source, s), new File(output, s), pack.createSubPackage(s));
 			}
 			return;
 		}
 		
 		String fileName = source.getPath();
-		if (!DyvilCompiler.config.compileFile(fileName))
+		if (!DyvilCompiler.config.isExcluded(fileName))
 		{
 			return;
 		}

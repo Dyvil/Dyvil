@@ -8,6 +8,4 @@ output_dir = testbin
 main_type = dyvil.test.Main
 main_args = [ ]
 
-exclude = [ src/test/dyvil/tests/BooleanTest.dyvil ]
-
 libraries = [ dbin ]

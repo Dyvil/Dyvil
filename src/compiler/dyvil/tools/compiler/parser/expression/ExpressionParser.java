@@ -181,6 +181,10 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.pushParser(new ExpressionParser(le));
 				return;
 			}
+			if (type == Symbols.COLON)
+			{
+				throw new SyntaxError(token, "Invalid Colon - Delete this token");
+			}
 			if ((type & Tokens.IDENTIFIER) != 0)
 			{
 				this.getAccess(pm, token.nameValue(), token, type);
@@ -316,10 +320,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.skip();
 				mc.arguments = this.getArguments(pm, next.next());
 			}
-			else
-			{
-				mc.arguments = EmptyArguments.INSTANCE;
-			}
 			
 			this.mode = ACCESS;
 			if (type == Symbols.CLOSE_SQUARE_BRACKET)
@@ -329,6 +329,11 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			throw new SyntaxError(token, "Invalid Method Type Parameter List - ']' expected");
 		}
 		
+		if (type == Symbols.COLON)
+		{
+			this.mode = ACCESS;
+			throw new SyntaxError(token, "Invalid Colon - Delete this token");
+		}
 		if (ParserUtil.isCloseBracket(type))
 		{
 			if (this.value != null)
@@ -599,7 +604,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.value = call;
 			this.mode = ACCESS;
 			call.dotless = this.dotless;
-			if (op.type != Operator.POSTFIX)
+			if (op.type != Operator.POSTFIX && !ParserUtil.isTerminator2(nextType))
 			{
 				SingleArgument sa = new SingleArgument();
 				call.arguments = sa;
