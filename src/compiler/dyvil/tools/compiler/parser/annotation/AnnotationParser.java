@@ -12,7 +12,6 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionListParser;
 import dyvil.tools.compiler.parser.expression.ExpressionMapParser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -81,7 +80,7 @@ public class AnnotationParser extends Parser
 				SingleArgument arg = new SingleArgument();
 				this.annotation.arguments = arg;
 				pm.popParser();
-				pm.pushParser(new ExpressionParser(arg), true);
+				pm.pushParser(pm.newExpressionParser(arg), true);
 				return;
 			}
 			

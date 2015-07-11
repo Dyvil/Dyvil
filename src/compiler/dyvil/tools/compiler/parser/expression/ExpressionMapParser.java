@@ -59,7 +59,7 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 		if (this.mode == VALUE)
 		{
 			this.mode = SEPERATOR;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			return;
 		}
 		if (this.mode == SEPERATOR)

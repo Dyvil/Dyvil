@@ -10,7 +10,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 
-public final class ParserManager implements IParserManager
+public class ParserManager implements IParserManager
 {
 	protected Parser		parser;
 	

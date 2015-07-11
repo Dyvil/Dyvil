@@ -722,18 +722,25 @@ public class Method extends Member implements IMethod
 		int len = arguments.size();
 		
 		// infix modifier implementation
-		int mods = this.modifiers & Modifiers.INFIX;
-		if (instance != null && mods == Modifiers.INFIX)
+		if (instance != null)
 		{
-			IType t2 = this.parameters[0].getType();
-			int m = instance.getTypeMatch(t2);
-			if (m == 0)
+			int mod = (this.modifiers & Modifiers.INFIX);
+			if (mod != 0 && instance.valueTag() == IValue.CLASS_ACCESS)
 			{
-				return 0;
+				instance = null;
 			}
-			match += m;
-			
-			parIndex = 1;
+			else if (mod == Modifiers.INFIX)
+			{
+				IType t2 = this.parameters[0].getType();
+				int m = instance.getTypeMatch(t2);
+				if (m == 0)
+				{
+					return 0;
+				}
+				match += m;
+				
+				parIndex = 1;
+			}
 		}
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
@@ -816,44 +823,7 @@ public class Method extends Member implements IMethod
 		int len = arguments.size();
 		IType parType;
 		
-		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			IParameter par = this.parameters[0];
-			parType = par.getType().getConcreteType(typeContext);
-			IValue instance1 = instance.withType(parType, typeContext, markers, context);
-			if (instance1 == null)
-			{
-				Marker marker = markers.create(instance.getPosition(), "method.access.infix_type", par.getName());
-				marker.addInfo("Required Type: " + parType);
-				marker.addInfo("Value Type: " + instance.getType());
-			}
-			else
-			{
-				instance = instance1;
-			}
-			
-			if ((this.modifiers & Modifiers.VARARGS) != 0)
-			{
-				arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1], typeContext, markers, context);
-				
-				for (int i = 0; i < this.parameterCount - 2; i++)
-				{
-					arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
-				}
-				
-				this.checkTypeVarsInferred(markers, position, typeContext);
-				return instance;
-			}
-			
-			for (int i = 0; i < this.parameterCount - 1; i++)
-			{
-				arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
-			}
-			
-			this.checkTypeVarsInferred(markers, position, typeContext);
-			return instance;
-		}
-		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			parType = this.theClass.getType().getConcreteType(typeContext);
 			instance = arguments.getFirstValue();
@@ -867,6 +837,48 @@ public class Method extends Member implements IMethod
 			
 			this.checkTypeVarsInferred(markers, position, typeContext);
 			return null;
+		}
+		
+		if (instance != null)
+		{
+			int mod = (this.modifiers & Modifiers.INFIX);
+			if (mod == Modifiers.INFIX && instance.valueTag() != IValue.CLASS_ACCESS)
+			{
+				IParameter par = this.parameters[0];
+				parType = par.getType().getConcreteType(typeContext);
+				IValue instance1 = instance.withType(parType, typeContext, markers, context);
+				if (instance1 == null)
+				{
+					Marker marker = markers.create(instance.getPosition(), "method.access.infix_type", par.getName());
+					marker.addInfo("Required Type: " + parType);
+					marker.addInfo("Value Type: " + instance.getType());
+				}
+				else
+				{
+					instance = instance1;
+				}
+				
+				if ((this.modifiers & Modifiers.VARARGS) != 0)
+				{
+					arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1], typeContext, markers, context);
+					
+					for (int i = 0; i < this.parameterCount - 2; i++)
+					{
+						arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
+					}
+					
+					this.checkTypeVarsInferred(markers, position, typeContext);
+					return instance;
+				}
+				
+				for (int i = 0; i < this.parameterCount - 1; i++)
+				{
+					arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
+				}
+				
+				this.checkTypeVarsInferred(markers, position, typeContext);
+				return instance;
+			}
 		}
 		
 		if (instance != null)

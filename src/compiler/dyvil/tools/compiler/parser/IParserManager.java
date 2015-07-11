@@ -1,11 +1,19 @@
 package dyvil.tools.compiler.parser;
 
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.parser.type.TypeVariableParser;
 
 public interface IParserManager
 {
@@ -42,4 +50,26 @@ public interface IParserManager
 	public void popParser();
 	
 	public void popParser(boolean reparse) throws SyntaxError;
+	
+	// Parser Factory Methods
+	
+	public default Parser newExpressionParser(IValueConsumer valueConsumer)
+	{
+		return new ExpressionParser(valueConsumer);
+	}
+	
+	public default Parser newTypeParser(ITypeConsumer typeConsumer)
+	{
+		return new TypeParser(typeConsumer);
+	}
+	
+	public default Parser newAnnotationParser(Annotation annotation)
+	{
+		return new AnnotationParser(annotation);
+	}
+	
+	public default Parser newTypeVariableParser(IGeneric generic)
+	{
+		return new TypeVariableParser(generic);
+	}
 }

@@ -389,10 +389,15 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 	}
 	
+	protected boolean printMarkers()
+	{
+		return ICompilationUnit.printMarkers(this.markers, "Dyvil Header", this.name, this.inputFile);
+	}
+	
 	@Override
 	public void compile()
 	{
-		if (ICompilationUnit.printMarkers(this.markers, "Dyvil Header", this.name, this.inputFile))
+		if (this.printMarkers())
 		{
 			return;
 		}

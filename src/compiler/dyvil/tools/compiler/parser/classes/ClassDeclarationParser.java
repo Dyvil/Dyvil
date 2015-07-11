@@ -14,10 +14,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
@@ -97,7 +95,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				Annotation annotation = new Annotation(token.raw());
 				this.addAnnotation(annotation);
-				pm.pushParser(new AnnotationParser(annotation));
+				pm.pushParser(pm.newAnnotationParser(annotation));
 				return;
 			}
 			if (token.isInferred())
@@ -169,7 +167,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 					return;
 				}
 				
-				pm.pushParser(new TypeParser(this));
+				pm.pushParser(pm.newTypeParser(this));
 				this.mode = POST_EXTENDS;
 				return;
 			}

@@ -70,14 +70,14 @@ public final class TypeParser extends Parser
 				this.mode = ARRAY_END;
 				ArrayType at = new ArrayType();
 				this.type = at;
-				pm.pushParser(new TypeParser(at));
+				pm.pushParser(pm.newTypeParser(at));
 				return;
 			}
 			if (type == Symbols.ARROW_OPERATOR)
 			{
 				LambdaType lt = new LambdaType();
 				this.type = lt;
-				pm.pushParser(new TypeParser(lt));
+				pm.pushParser(pm.newTypeParser(lt));
 				this.mode = LAMBDA_END;
 				return;
 			}
@@ -108,7 +108,7 @@ public final class TypeParser extends Parser
 					this.type = lt;
 					this.mode = LAMBDA_END;
 					pm.skip();
-					pm.pushParser(new TypeParser(lt));
+					pm.pushParser(pm.newTypeParser(lt));
 					return;
 				}
 				
@@ -147,7 +147,7 @@ public final class TypeParser extends Parser
 			}
 			throw new SyntaxError(token, "Invalid Tuple Type - ')' expected");
 		case LAMBDA_TYPE:
-			pm.pushParser(new TypeParser((LambdaType) this.type));
+			pm.pushParser(pm.newTypeParser((LambdaType) this.type));
 			this.mode = LAMBDA_END;
 			return;
 		case LAMBDA_END:
@@ -181,14 +181,14 @@ public final class TypeParser extends Parser
 			if (name == Name.ltcolon) // <: - Upper Bound
 			{
 				wt.setVariance(Variance.COVARIANT);
-				pm.pushParser(new TypeParser(wt));
+				pm.pushParser(pm.newTypeParser(wt));
 				this.mode = 0;
 				return;
 			}
 			if (name == Name.gtcolon) // >: - Lower Bound
 			{
 				wt.setVariance(Variance.CONTRAVARIANT);
-				pm.pushParser(new TypeParser(wt));
+				pm.pushParser(pm.newTypeParser(wt));
 				this.mode = 0;
 				return;
 			}

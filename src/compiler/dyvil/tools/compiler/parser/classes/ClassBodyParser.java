@@ -19,11 +19,8 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.annotation.AnnotationParser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ExceptionListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
@@ -154,17 +151,17 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			{
 				Annotation annotation = new Annotation(token.raw());
 				this.addAnnotation(annotation);
-				pm.pushParser(new AnnotationParser(annotation));
+				pm.pushParser(pm.newAnnotationParser(annotation));
 				return;
 			}
-			pm.pushParser(new TypeParser(this), true);
+			pm.pushParser(pm.newTypeParser(this), true);
 			this.mode = NAME;
 			return;
 		case NAME:
 			if (!ParserUtil.isIdentifier(type))
 			{
 				this.reset();
-				throw new SyntaxError(token, "Invalid Member Declaration - Name expected", true);
+				throw new SyntaxError(token, "Invalid Member Declaration - Name expected");
 			}
 			IToken next = token.next();
 			type = next.type();
@@ -220,7 +217,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.mode = FIELD_END;
 				
 				pm.skip();
-				pm.pushParser(new ExpressionParser(f));
+				pm.pushParser(pm.newExpressionParser(f));
 				return;
 			}
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
@@ -277,12 +274,12 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			this.mode = METHOD_END;
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
-				pm.pushParser(new ExpressionParser((IValueConsumer) this.member), true);
+				pm.pushParser(pm.newExpressionParser((IValueConsumer) this.member), true);
 				return;
 			}
 			if (type == Symbols.EQUALS)
 			{
-				pm.pushParser(new ExpressionParser((IValueConsumer) this.member));
+				pm.pushParser(pm.newExpressionParser((IValueConsumer) this.member));
 				return;
 			}
 			if (type == Keywords.THROWS)

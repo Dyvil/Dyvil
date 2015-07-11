@@ -10,8 +10,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -74,13 +72,13 @@ public class ForStatementParser extends Parser implements IValued
 			if (type == Symbols.SEMICOLON)
 			{
 				// Condition
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = CONDITION_END;
 				return;
 			}
 			
 			this.variable = new Variable();
-			pm.pushParser(new TypeParser(this.variable), true);
+			pm.pushParser(pm.newTypeParser(this.variable), true);
 			this.mode = VARIABLE;
 			return;
 		}
@@ -102,14 +100,14 @@ public class ForStatementParser extends Parser implements IValued
 			{
 				this.mode = FOR_END;
 				this.forEach = true;
-				pm.pushParser(new ExpressionParser(this.variable));
+				pm.pushParser(pm.newExpressionParser(this.variable));
 				return;
 			}
 			
 			this.mode = VARIABLE_END;
 			if (type == Symbols.EQUALS)
 			{
-				pm.pushParser(new ExpressionParser(this.variable));
+				pm.pushParser(pm.newExpressionParser(this.variable));
 				return;
 			}
 			throw new SyntaxError(token, "Invalid For Statement - ';' or ':' expected", true);
@@ -124,7 +122,7 @@ public class ForStatementParser extends Parser implements IValued
 					return;
 				}
 				
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
 			throw new SyntaxError(token, "Invalid for statement - ';' expected", true);
@@ -139,7 +137,7 @@ public class ForStatementParser extends Parser implements IValued
 					return;
 				}
 				
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
 			throw new SyntaxError(token, "Invalid for statement - ';' expected", true);
@@ -162,7 +160,7 @@ public class ForStatementParser extends Parser implements IValued
 				return;
 			}
 			
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = STATEMENT_END;
 			return;
 		}

@@ -7,7 +7,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
@@ -46,7 +45,7 @@ public class PatternParser extends Parser
 			{
 				TypeCheckPattern tcp = new TypeCheckPattern(token.raw(), this.pattern);
 				this.pattern = tcp;
-				pm.pushParser(new TypeParser(tcp));
+				pm.pushParser(pm.newTypeParser(tcp));
 				return;
 			}
 			

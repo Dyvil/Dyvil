@@ -12,7 +12,7 @@ import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 
-public final class DyvilUnit extends DyvilHeader
+public class DyvilUnit extends DyvilHeader
 {
 	private IClass[]			classes			= new IClass[1];
 	private int					classCount;
@@ -171,9 +171,15 @@ public final class DyvilUnit extends DyvilHeader
 	}
 	
 	@Override
+	protected boolean printMarkers()
+	{
+		return ICompilationUnit.printMarkers(this.markers, "Dyvil Unit", this.name, this.inputFile);
+	}
+	
+	@Override
 	public void compile()
 	{
-		if (ICompilationUnit.printMarkers(this.markers, "Dyvil Unit", this.name, this.inputFile))
+		if (this.printMarkers())
 		{
 			return;
 		}

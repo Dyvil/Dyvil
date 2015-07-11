@@ -8,7 +8,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -72,7 +71,7 @@ public class TypeAliasParser extends Parser
 			throw new SyntaxError(token, "Invalid Type Alias - Identifier expected");
 		case EQUAL:
 			this.mode = 0;
-			pm.pushParser(new TypeParser(this.typeAlias));
+			pm.pushParser(pm.newTypeParser(this.typeAlias));
 			if (token.type() == Symbols.EQUALS)
 			{
 				return;

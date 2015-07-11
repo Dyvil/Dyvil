@@ -36,7 +36,7 @@ public final class TypeListParser extends Parser
 		if (this.mode == 0)
 		{
 			this.mode = 1;
-			pm.pushParser(new TypeParser(this.consumer), true);
+			pm.pushParser(pm.newTypeParser(this.consumer), true);
 			return;
 		}
 		if (this.mode == 1)

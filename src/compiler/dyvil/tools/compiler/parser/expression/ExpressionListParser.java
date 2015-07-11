@@ -54,7 +54,7 @@ public final class ExpressionListParser extends Parser implements IValueConsumer
 			}
 			
 			this.mode = SEPARATOR;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			return;
 		}
 		if (this.mode == SEPARATOR)

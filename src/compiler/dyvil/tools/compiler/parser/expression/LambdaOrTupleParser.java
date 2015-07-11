@@ -107,7 +107,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			}
 			
 			LambdaExpression le = new LambdaExpression(token.raw(), this.params, this.parameterCount);
-			pm.pushParser(new ExpressionParser(le));
+			pm.pushParser(pm.newExpressionParser(le));
 			this.value = le;
 			this.mode = END;
 			return;

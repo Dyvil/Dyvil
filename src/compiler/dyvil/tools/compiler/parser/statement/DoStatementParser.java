@@ -7,7 +7,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 
@@ -36,7 +35,7 @@ public class DoStatementParser extends Parser implements IValueConsumer
 	{
 		if (this.mode == DO)
 		{
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = WHILE;
 			return;
 		}
@@ -46,7 +45,7 @@ public class DoStatementParser extends Parser implements IValueConsumer
 			if (type == Keywords.WHILE)
 			{
 				this.mode = END;
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
 			
@@ -56,7 +55,7 @@ public class DoStatementParser extends Parser implements IValueConsumer
 				{
 					this.mode = END;
 					pm.skip(1);
-					pm.pushParser(new ExpressionParser(this));
+					pm.pushParser(pm.newExpressionParser(this));
 					return;
 				}
 			}

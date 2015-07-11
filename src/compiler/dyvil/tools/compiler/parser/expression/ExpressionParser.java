@@ -25,7 +25,6 @@ import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
 import dyvil.tools.compiler.parser.statement.*;
 import dyvil.tools.compiler.parser.type.TypeListParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
@@ -117,7 +116,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 						LambdaExpression le = new LambdaExpression(next.next().raw());
 						this.value = le;
 						pm.skip(2);
-						pm.pushParser(new ExpressionParser(le));
+						pm.pushParser(pm.newExpressionParser(le));
 						this.mode = ACCESS;
 						return;
 					}
@@ -178,7 +177,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				LambdaExpression le = new LambdaExpression(token.raw());
 				this.value = le;
 				this.mode = ACCESS;
-				pm.pushParser(new ExpressionParser(le));
+				pm.pushParser(pm.newExpressionParser(le));
 				return;
 			}
 			if (type == Symbols.COLON)
@@ -202,7 +201,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = PATTERN_END;
 			if (type == Keywords.IF)
 			{
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
 		case PATTERN_END:
@@ -211,7 +210,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.mode = 0;
 				if (token.next().type() != Keywords.CASE)
 				{
-					pm.pushParser(new ExpressionParser((IValued) this.value));
+					pm.pushParser(pm.newExpressionParser((IValued) this.value));
 				}
 				return;
 			}
@@ -286,7 +285,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			
 			SingleArgument sa = new SingleArgument();
 			cc.arguments = sa;
-			pm.pushParser(new ExpressionParser(sa), true);
+			pm.pushParser(pm.newExpressionParser(sa), true);
 			this.mode = 0;
 			return;
 		}
@@ -370,14 +369,14 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (type == Keywords.AS)
 			{
 				CastOperator co = new CastOperator(token.raw(), this.value);
-				pm.pushParser(new TypeParser(co));
+				pm.pushParser(pm.newTypeParser(co));
 				this.value = co;
 				return;
 			}
 			if (type == Keywords.IS)
 			{
 				InstanceOfOperator io = new InstanceOfOperator(token.raw(), this.value);
-				pm.pushParser(new TypeParser(io));
+				pm.pushParser(pm.newTypeParser(io));
 				this.value = io;
 				return;
 			}
@@ -492,7 +491,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				call.arguments = sa;
 				this.value = call;
 				this.mode = 0;
-				pm.pushParser(new ExpressionParser(sa), true);
+				pm.pushParser(pm.newExpressionParser(sa), true);
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Access - Invalid " + token);
@@ -566,7 +565,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			LambdaExpression lv = new LambdaExpression(next.raw(), name);
 			this.mode = 0;
 			this.value = lv;
-			pm.pushParser(new ExpressionParser(lv));
+			pm.pushParser(pm.newExpressionParser(lv));
 			pm.skip();
 			return;
 		}
@@ -594,7 +593,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.value = call;
 				this.mode = ACCESS;
 				
-				ExpressionParser parser = new ExpressionParser(sa);
+				ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
 				parser.operator = op;
 				parser.prefix = true;
 				pm.pushParser(parser);
@@ -609,7 +608,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				SingleArgument sa = new SingleArgument();
 				call.arguments = sa;
 				
-				ExpressionParser parser = new ExpressionParser(sa);
+				ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
 				parser.operator = op;
 				pm.pushParser(parser);
 			}
@@ -646,7 +645,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		SingleArgument sa = new SingleArgument();
 		call.arguments = sa;
 		
-		ExpressionParser parser = new ExpressionParser(sa);
+		ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
 		parser.operator = op;
 		pm.pushParser(parser);
 		return;
@@ -669,7 +668,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			FieldAccess fa = (FieldAccess) this.value;
 			FieldAssign assign = new FieldAssign(position, fa.instance, fa.name);
 			this.value = assign;
-			pm.pushParser(new ExpressionParser(assign));
+			pm.pushParser(pm.newExpressionParser(assign));
 			return;
 		}
 		case IValue.APPLY_CALL:
@@ -677,7 +676,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			ApplyMethodCall call = (ApplyMethodCall) this.value;
 			UpdateMethodCall updateCall = new UpdateMethodCall(position, call.instance, call.arguments);
 			this.value = updateCall;
-			pm.pushParser(new ExpressionParser(updateCall));
+			pm.pushParser(pm.newExpressionParser(updateCall));
 			return;
 		}
 		case IValue.METHOD_CALL:
@@ -686,7 +685,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			FieldAccess fa = new FieldAccess(position, call.instance, call.name);
 			UpdateMethodCall updateCall = new UpdateMethodCall(position, fa, call.arguments);
 			this.value = updateCall;
-			pm.pushParser(new ExpressionParser(updateCall));
+			pm.pushParser(pm.newExpressionParser(updateCall));
 			return;
 		}
 		case IValue.SUBSCRIPT_GET:
@@ -694,7 +693,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			SubscriptGetter getter = (SubscriptGetter) this.value;
 			SubscriptSetter setter = new SubscriptSetter(position, getter.instance, getter.arguments);
 			this.value = setter;
-			pm.pushParser(new ExpressionParser(setter));
+			pm.pushParser(pm.newExpressionParser(setter));
 			return;
 		}
 		}
@@ -792,7 +791,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			ClassOperator co = new ClassOperator(token);
 			this.value = co;
 			pm.skip();
-			pm.pushParser(new TypeParser(co));
+			pm.pushParser(pm.newTypeParser(co));
 			this.mode = ARRAY_END;
 			return true;
 		}
@@ -806,7 +805,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			TypeOperator to = new TypeOperator(token);
 			this.value = to;
 			pm.skip();
-			pm.pushParser(new TypeParser(to));
+			pm.pushParser(pm.newTypeParser(to));
 			this.mode = ARRAY_END;
 			return true;
 		}
@@ -815,14 +814,14 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			ConstructorCall call = new ConstructorCall(token);
 			this.mode = CONSTRUCTOR;
 			this.value = call;
-			pm.pushParser(new TypeParser(this));
+			pm.pushParser(pm.newTypeParser(this));
 			return true;
 		}
 		case Keywords.RETURN:
 		{
 			ReturnStatement rs = new ReturnStatement(token.raw());
 			this.value = rs;
-			pm.pushParser(new ExpressionParser(rs));
+			pm.pushParser(pm.newExpressionParser(rs));
 			return true;
 		}
 		case Keywords.IF:
@@ -943,7 +942,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case Keywords.THROW:
 		{
 			ThrowStatement statement = new ThrowStatement();
-			pm.pushParser(new ExpressionParser(statement));
+			pm.pushParser(pm.newExpressionParser(statement));
 			this.mode = 0;
 			this.value = statement;
 			return true;

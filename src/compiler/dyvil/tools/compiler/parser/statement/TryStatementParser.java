@@ -8,8 +8,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -43,7 +41,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 		if (this.mode == ACTION)
 		{
 			// TODO Try-With-Resource
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = CATCH;
 			return;
 		}
@@ -59,7 +57,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			if (type == Keywords.FINALLY)
 			{
 				pm.popParser();
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = 0;
 				return;
 			}
@@ -77,7 +75,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 		if (this.mode == CATCH_OPEN)
 		{
 			this.mode = CATCH_VAR;
-			pm.pushParser(new TypeParser(this.catchBlock));
+			pm.pushParser(pm.newTypeParser(this.catchBlock));
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				return;
@@ -97,7 +95,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 		if (this.mode == CATCH_CLOSE)
 		{
 			this.mode = CATCH;
-			pm.pushParser(new ExpressionParser(this.catchBlock));
+			pm.pushParser(pm.newExpressionParser(this.catchBlock));
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;

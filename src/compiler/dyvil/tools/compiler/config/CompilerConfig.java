@@ -80,12 +80,12 @@ public class CompilerConfig
 				File output = new File(outputDir, s);
 				Package pack = packageFromFile(s, source.isDirectory());
 				
-				fileFinder.findUnits(source, output, pack);
+				fileFinder.process(source, output, pack);
 			}
 			return;
 		}
 		
-		fileFinder.findUnits(sourceDir, outputDir, Package.rootPackage);
+		fileFinder.process(sourceDir, outputDir, Package.rootPackage);
 	}
 	
 	private static Package packageFromFile(String file, boolean isDirectory)

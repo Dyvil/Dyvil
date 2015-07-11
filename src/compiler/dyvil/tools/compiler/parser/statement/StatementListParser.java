@@ -13,8 +13,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -59,7 +57,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			{
 				pm.jump(this.firstToken);
 				this.reset();
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = 0;
 				return;
 			}
@@ -86,7 +84,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				if (nextType == Symbols.EQUALS)
 				{
 					FieldAssign fa = new FieldAssign(token.raw(), null, token.nameValue());
-					pm.pushParser(new ExpressionParser(fa));
+					pm.pushParser(pm.newExpressionParser(fa));
 					this.statementList.addValue(fa);
 					pm.skip();
 					this.mode = SEPARATOR;
@@ -95,7 +93,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			}
 			
 			this.firstToken = token;
-			this.parser = this.tryParser = new TypeParser(this);
+			this.parser = this.tryParser = pm.newTypeParser(this);
 			this.pm = pm;
 			this.mode = TYPE;
 		}
@@ -106,7 +104,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				if (this.type != null)
 				{
 					FieldInitializer fi = new FieldInitializer(token.raw(), token.nameValue(), this.type);
-					pm.pushParser(new ExpressionParser(fi));
+					pm.pushParser(pm.newExpressionParser(fi));
 					this.statementList.addValue(fi);
 				}
 				else if (token != this.firstToken)
@@ -125,7 +123,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			{
 				pm.jump(this.firstToken);
 				this.reset();
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = SEPARATOR;
 				return;
 			}
@@ -138,7 +136,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			{
 				pm.jump(this.firstToken);
 				this.reset();
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = SEPARATOR;
 			}
 			
