@@ -312,11 +312,11 @@ public final class MatchExpression extends ASTNode implements IValue
 		writer.writeLabel(elseLabel);
 		if (!this.exhaustive)
 		{
-			writer.writeTypeInsn(Opcodes.NEW, "dyvil/lang/MatchError");
+			writer.writeTypeInsn(Opcodes.NEW, "dyvil/util/MatchError");
 			writer.writeInsn(Opcodes.DUP);
 			writer.writeVarInsn(type.getLoadOpcode(), varIndex);
 			String desc = "(" + (type.isPrimitive() ? type.getExtendedName() + ")V" : "Ljava/lang/Object;)V");
-			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/lang/MatchError", "<init>", desc, false);
+			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", desc, false);
 			writer.writeInsn(Opcodes.ATHROW);
 			writer.setHasReturn(false);
 		}

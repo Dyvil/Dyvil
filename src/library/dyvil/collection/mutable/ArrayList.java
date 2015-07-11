@@ -7,13 +7,13 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
+import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArrayList;
 
 @NilConvertible

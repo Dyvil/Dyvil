@@ -2,8 +2,7 @@ package dyvil.tools.compiler.ast.dwt;
 
 import java.util.Map;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Opcodes;
 import dyvil.string.StringUtils;

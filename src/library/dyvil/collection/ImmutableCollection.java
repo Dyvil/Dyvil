@@ -6,13 +6,12 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Immutable;
-import dyvil.lang.ImmutableException;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
+import dyvil.util.Immutable;
+import dyvil.util.ImmutableException;
 
 @NilConvertible
 public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immutable

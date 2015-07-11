@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.lang.Collection;
-
+import dyvil.collection.Collection;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 

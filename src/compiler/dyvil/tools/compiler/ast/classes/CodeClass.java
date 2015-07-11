@@ -2,8 +2,7 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.lang.annotation.ElementType;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;

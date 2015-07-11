@@ -3,8 +3,8 @@ package dyvil.collection.impl;
 import java.lang.reflect.Array;
 import java.util.function.Consumer;
 
-import dyvil.lang.Collection;
-import dyvil.lang.List;
+import dyvil.collection.Collection;
+import dyvil.collection.List;
 
 public abstract class AbstractArrayList<E> implements List<E>
 {

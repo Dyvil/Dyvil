@@ -3,8 +3,8 @@ package dyvil.collection.impl;
 import java.util.Objects;
 import java.util.function.Function;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
+import dyvil.collection.Collection;
+import dyvil.collection.Set;
 
 public abstract class AbstractArraySet<E> implements Set<E>
 {

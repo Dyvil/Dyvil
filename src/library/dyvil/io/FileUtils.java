@@ -6,10 +6,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
-import dyvil.lang.List;
-
 import dyvil.annotation.Utility;
 import dyvil.annotation.infix;
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 
 /**

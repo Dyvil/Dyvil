@@ -4,9 +4,10 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.lang.Type;
+
+import dyvil.collection.Entry;
+import dyvil.collection.Map;
 
 import sun.misc.SharedSecrets;
 

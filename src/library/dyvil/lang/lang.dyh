@@ -1,0 +1,13 @@
+package dyvil.lang
+
+import	dyvil.lang._
+import	java.lang._
+import	dyvil.collection._
+import	dyvil.function.Function1 => Function
+import	dyvil.io.Console
+import	dyvil.random.Random
+import	dyvil.tuple.Tuple2 => Tuple
+import	dyvil.tuple.Tuple2 => Pair
+import	dyvil.tuple.Tuple3 => Triple
+
+using	dyvil.lang.Predef._

@@ -1,4 +1,4 @@
-package dyvil.lang;
+package dyvil.collection;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
@@ -6,6 +6,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 
+import dyvil.lang.Ordered;
 import dyvil.lang.literal.TupleConvertible;
 
 import dyvil.annotation.Covariant;

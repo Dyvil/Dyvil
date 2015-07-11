@@ -1,6 +1,6 @@
 package dyvil.tuple
 
-import dyvil.lang.Entry
+import dyvil.collection.Entry
 
 public case class Tuple2[+A, +B] (
 		public final A _1

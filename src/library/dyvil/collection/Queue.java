@@ -2,8 +2,6 @@ package dyvil.collection;
 
 import java.util.Iterator;
 
-import dyvil.lang.Collection;
-
 /**
  * A <b>Queue</b> represents a FIFO (<b>F</b>irst <b>I</b>n, <b>F</b>irst
  * <b>O</b>ut) mutable data structure. That means that elements will be

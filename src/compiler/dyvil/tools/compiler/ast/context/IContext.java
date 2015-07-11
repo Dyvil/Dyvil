@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.context;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -19,6 +18,7 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 
 public interface IContext
 {
@@ -71,15 +71,7 @@ public interface IContext
 			return iclass;
 		}
 		
-		// Standart Dyvil Classes
-		iclass = Package.dyvilLang.resolveClass(name);
-		if (iclass != null)
-		{
-			return iclass;
-		}
-		
-		// Standart Java Classes
-		return Package.javaLang.resolveClass(name);
+		return Types.LANG_HEADER.resolveClass(name);
 	}
 	
 	public static IType resolveType(IContext context, Name name)
@@ -90,14 +82,7 @@ public interface IContext
 			return itype;
 		}
 		
-		IClass iclass = Package.dyvilLang.resolveClass(name);
-		if (iclass != null)
-		{
-			return new ClassType(iclass);
-		}
-		
-		// Standart Java Classes
-		iclass = Package.javaLang.resolveClass(name);
+		IClass iclass = Types.LANG_HEADER.resolveClass(name);
 		if (iclass != null)
 		{
 			return new ClassType(iclass);

@@ -1,6 +1,5 @@
 package dyvil.random;
 
-import dyvil.lang.Random;
 
 /**
  * A {@link Random} implementation that always returns the minimum value.

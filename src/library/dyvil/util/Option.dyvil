@@ -1,12 +1,12 @@
-package dyvil.lang;
+package dyvil.util
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.Consumer
+import java.util.function.Function
+import java.util.function.Predicate
+import java.util.function.Supplier
 
-import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.literal.NilConvertible
+import dyvil.lang.literal.TupleConvertible
 
 @NilConvertible
 @TupleConvertible

@@ -1,8 +1,7 @@
 package dyvil.tools.repl;
 
-import dyvil.lang.List;
-import dyvil.lang.Map;
-
+import dyvil.collection.List;
+import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;

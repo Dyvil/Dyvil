@@ -4,8 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import dyvil.lang.Map;
-
+import dyvil.collection.Map;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;

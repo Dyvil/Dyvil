@@ -5,9 +5,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
-
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.mutable.ArrayList;

@@ -1,4 +1,4 @@
-package dyvil.lang;
+package dyvil.collection;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
@@ -10,11 +10,10 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.collection.ImmutableMatrix;
-import dyvil.collection.MutableMatrix;
 import dyvil.tuple.Tuple2;
 
 @NilConvertible

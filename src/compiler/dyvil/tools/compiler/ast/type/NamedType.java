@@ -4,8 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -95,7 +94,7 @@ public class NamedType implements IType
 	@Override
 	public IClass getTheClass()
 	{
-		return null;
+		return Types.OBJECT_CLASS;
 	}
 	
 	@Override

@@ -2,9 +2,8 @@ package dyvil.tools.compiler.ast.method;
 
 import java.lang.annotation.ElementType;
 
-import dyvil.lang.List;
-
 import dyvil.annotation.mutating;
+import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -539,7 +538,7 @@ public class Method extends Member implements IMethod
 		{
 			markers.add(this.position, "method.override.final", this.name);
 		}
-		else
+		else if (this.type.isResolved())
 		{
 			IType type = this.overrideMethod.getType();
 			if (type != this.type && !type.isSuperTypeOf(this.type))

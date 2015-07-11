@@ -6,10 +6,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import dyvil.lang.Int;
-import dyvil.lang.Matrix;
 
 import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
+import dyvil.collection.Matrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.tuple.Tuple2;
 

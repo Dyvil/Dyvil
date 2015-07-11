@@ -3,8 +3,7 @@ package dyvil.tools.repl;
 import java.lang.annotation.ElementType;
 import java.security.ProtectionDomain;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.DyvilCompiler;

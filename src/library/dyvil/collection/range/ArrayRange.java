@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import dyvil.lang.Ordered;
-import dyvil.lang.Range;
 import dyvil.lang.literal.TupleConvertible;
 
+import dyvil.collection.Range;
 import dyvil.collection.iterator.ArrayIterator;
 
 @TupleConvertible

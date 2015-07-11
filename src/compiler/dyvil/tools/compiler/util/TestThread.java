@@ -9,8 +9,7 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.logging.Level;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.library.Library;
 

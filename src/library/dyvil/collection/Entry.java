@@ -1,4 +1,4 @@
-package dyvil.lang;
+package dyvil.collection;
 
 import java.util.Objects;
 

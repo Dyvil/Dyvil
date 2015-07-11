@@ -2,8 +2,6 @@ package dyvil.collection;
 
 import java.util.Iterator;
 
-import dyvil.lang.Collection;
-
 /**
  * A <b>Stack</b> represents a LIFO (<b>L</b>ast <b>I</b>n, <b>F</b>irst
  * <b>O</b>ut) mutable data structure. That means that elements will be

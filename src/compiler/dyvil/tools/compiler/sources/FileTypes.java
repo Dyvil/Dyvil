@@ -2,8 +2,7 @@ package dyvil.tools.compiler.sources;
 
 import java.io.File;
 
-import dyvil.lang.Map;
-
+import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.DyvilUnit;

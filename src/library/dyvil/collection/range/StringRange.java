@@ -3,8 +3,9 @@ package dyvil.collection.range;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import dyvil.lang.Range;
 import dyvil.lang.literal.TupleConvertible;
+
+import dyvil.collection.Range;
 
 @TupleConvertible
 public class StringRange implements Range<String>

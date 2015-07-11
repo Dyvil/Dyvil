@@ -1,19 +1,21 @@
 package dyvil.tools.compiler.ast.type;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
-
+import dyvil.collection.Collection;
+import dyvil.collection.Set;
 import dyvil.collection.mutable.ArraySet;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class Types
 {
+	public static final IDyvilHeader		LANG_HEADER				= Package.dyvilLang.resolveHeader("lang");
+	
 	public static final PrimitiveType		VOID					= new PrimitiveType(Name._void, 0);
 	public static final PrimitiveType		BOOLEAN					= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
 	public static final PrimitiveType		BYTE					= new PrimitiveType(Name._byte, ClassFormat.T_BYTE);
@@ -42,14 +44,10 @@ public final class Types
 	public static final IClass				OBJECT_CLASS			= Package.javaLang.resolveClass("Object");
 	public static final IClass				STRING_CLASS			= Package.javaLang.resolveClass("String");
 	public static final IClass				CLASS_CLASS				= Package.javaLang.resolveClass("Class");
-	public static final IClass				PREDEF_CLASS			= Package.dyvilLang.resolveClass("Predef");
 	public static final IClass				TYPE_CLASS				= Package.dyvilLang.resolveClass("Type");
 	public static final IClass				ITERABLE_CLASS			= Package.javaLang.resolveClass("Iterable");
 	public static final IClass				THROWABLE_CLASS			= Package.javaLang.resolveClass("Throwable");
 	public static final IClass				RUNTIME_EXCEPTION_CLASS	= Package.javaLang.resolveClass("RuntimeException");
-	
-	public static final IClass				MAP_CLASS				= Package.dyvilLang.resolveClass("Map");
-	public static final IClass				TUPLE2_CLASS			= TupleType.getTupleClass(2);
 	
 	public static final IClass				INTRINSIC_CLASS			= Package.dyvilAnnotation.resolveClass("Intrinsic");
 	public static final IClass				OVERRIDE_CLASS			= Package.javaLang.resolveClass("Override");
@@ -60,13 +58,11 @@ public final class Types
 	public static final ClassType			OBJECT					= new ClassType(OBJECT_CLASS);
 	public static final ClassType			STRING					= new ClassType(STRING_CLASS);
 	public static final ClassType			CLASS					= new ClassType(CLASS_CLASS);
-	public static final ClassType			PREDEF					= new ClassType(PREDEF_CLASS);
 	public static final ClassType			TYPE					= new ClassType(TYPE_CLASS);
 	public static final IType				ITERABLE				= new ClassType(ITERABLE_CLASS);
 	public static final ClassType			THROWABLE				= new ClassType(THROWABLE_CLASS);
 	public static final ClassType			RUNTIME_EXCEPTION		= new ClassType(RUNTIME_EXCEPTION_CLASS);
-	public static final ClassType			MAP						= new ClassType(MAP_CLASS);
-	public static final ClassType			IMMUTABLE				= new ClassType(Package.dyvilLang.resolveClass("Immutable"));
+	public static final ClassType			IMMUTABLE				= new ClassType(Package.dyvilUtil.resolveClass("Immutable"));
 	
 	private static IClass					OBJECT_ARRAY_CLASS;
 	private static final IClass[]			PRIMITIVE_ARRAY_CLASS	= new IClass[16];

@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.context;
 
-import dyvil.lang.Map;
-
+import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;

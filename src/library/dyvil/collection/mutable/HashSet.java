@@ -5,11 +5,10 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Function;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
-
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.collection.immutable.ArraySet;
 import dyvil.math.MathUtils;
 

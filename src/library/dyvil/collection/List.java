@@ -1,4 +1,4 @@
-package dyvil.lang;
+package dyvil.collection;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -10,8 +10,6 @@ import java.util.function.Predicate;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.collection.ImmutableList;
-import dyvil.collection.MutableList;
 import dyvil.collection.mutable.ArrayList;
 
 /**

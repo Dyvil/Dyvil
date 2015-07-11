@@ -1,4 +1,4 @@
-package dyvil.lang;
+package dyvil.collection;
 
 import java.util.Iterator;
 import java.util.Objects;
@@ -14,8 +14,6 @@ import java.util.stream.StreamSupport;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
 import dyvil.tuple.Tuple2;
 
 @NilConvertible

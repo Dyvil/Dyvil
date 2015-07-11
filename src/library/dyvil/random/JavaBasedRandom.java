@@ -1,7 +1,5 @@
 package dyvil.random;
 
-import dyvil.lang.Random;
-
 import dyvil.annotation.sealed;
 
 public final @sealed class JavaBasedRandom extends java.util.Random implements Random

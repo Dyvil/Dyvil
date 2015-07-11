@@ -1,11 +1,11 @@
-package dyvil.lang;
+package dyvil.util
 
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import dyvil.lang.literal.TupleConvertible;
+import java.util.Objects
+import java.util.function.Consumer
+import java.util.function.Function
+import java.util.function.Predicate
+import java.util.function.Supplier
+import dyvil.lang.literal.TupleConvertible
 
 @TupleConvertible
 public final case class Some[+T](T value) implements Option[T]

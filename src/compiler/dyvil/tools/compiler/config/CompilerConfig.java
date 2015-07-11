@@ -2,8 +2,7 @@ package dyvil.tools.compiler.config;
 
 import java.io.File;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.library.Library;
 

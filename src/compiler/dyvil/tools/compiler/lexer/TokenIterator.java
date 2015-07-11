@@ -97,6 +97,8 @@ public class TokenIterator implements Iterator<IToken>
 			prev = token;
 			token = token.getNext();
 		}
+		
+		prev.setNext(new InferredSemicolon(prev.endLine(), prev.endIndex() + 1));
 	}
 	
 	private void inferSemicolon(IToken token, IToken prev)

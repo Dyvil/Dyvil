@@ -9,6 +9,8 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.annotation.Covariant;
 import dyvil.collection.immutable.ArrayMatrix;
 import dyvil.tuple.Tuple2;
+import dyvil.util.Immutable;
+import dyvil.util.ImmutableException;
 
 @ArrayConvertible
 public interface ImmutableMatrix<@Covariant E> extends Matrix<E>, Immutable

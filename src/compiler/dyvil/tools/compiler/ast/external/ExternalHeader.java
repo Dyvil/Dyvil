@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.external;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;

@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.ast.structure;
 
-import dyvil.lang.List;
-import dyvil.lang.Map;
-
+import dyvil.collection.List;
+import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -30,14 +29,15 @@ public class Package implements INamed, IContext
 	public static RootPackage	rootPackage	= new RootPackage();
 	
 	public static Package		dyvil;
-	public static Package		dyvilLang;
 	public static Package		dyvilAnnotation;
 	public static Package		dyvilArray;
 	public static Package		dyvilFunction;
-	public static Package		dyvilTuple;
+	public static Package		dyvilLang;
 	public static Package		dyvilLangLiteral;
 	public static Package		dyvilLangRef;
 	public static Package		dyvilLangRefSimple;
+	public static Package		dyvilTuple;
+	public static Package		dyvilUtil;
 	public static Package		java;
 	public static Package		javaLang;
 	public static Package		javaLangAnnotation;
@@ -74,14 +74,16 @@ public class Package implements INamed, IContext
 	public static void init()
 	{
 		dyvil = Library.dyvilLibrary.resolvePackage("dyvil");
-		dyvilLang = dyvil.resolvePackage("lang");
 		dyvilAnnotation = dyvil.resolvePackage("annotation");
 		dyvilArray = dyvil.resolvePackage("array");
 		dyvilFunction = dyvil.resolvePackage("function");
-		dyvilTuple = dyvil.resolvePackage("tuple");
+		dyvilLang = dyvil.resolvePackage("lang");
 		dyvilLangLiteral = dyvilLang.resolvePackage("literal");
 		dyvilLangRef = dyvilLang.resolvePackage("ref");
 		dyvilLangRefSimple = dyvilLangRef.resolvePackage("simple");
+		dyvilTuple = dyvil.resolvePackage("tuple");
+		dyvilUtil = dyvil.resolvePackage("util");
+		
 		java = Library.javaLibrary.resolvePackage("java");
 		javaLang = java.resolvePackage("lang");
 		javaLangAnnotation = javaLang.resolvePackage("annotation");

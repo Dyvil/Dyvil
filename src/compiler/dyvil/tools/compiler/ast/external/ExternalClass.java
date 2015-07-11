@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.external;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.MethodCall;

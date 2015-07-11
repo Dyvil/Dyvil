@@ -3,14 +3,7 @@ package dyvil.collection.immutable;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
-
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableMap;
-import dyvil.collection.MutableSet;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractMapBasedSet;
 import dyvil.collection.mutable.HashMap;
 

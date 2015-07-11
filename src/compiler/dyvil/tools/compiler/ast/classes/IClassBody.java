@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;

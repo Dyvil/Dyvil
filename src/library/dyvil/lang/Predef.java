@@ -7,6 +7,7 @@ import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.array.*;
 import dyvil.collection.ImmutableList;
+import dyvil.collection.List;
 import dyvil.tuple.Tuple2;
 
 import static dyvil.reflect.Opcodes.*;

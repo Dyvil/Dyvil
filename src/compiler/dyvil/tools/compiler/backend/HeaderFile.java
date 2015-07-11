@@ -2,9 +2,8 @@ package dyvil.tools.compiler.backend;
 
 import java.io.*;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
-
+import dyvil.collection.Entry;
+import dyvil.collection.Map;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;

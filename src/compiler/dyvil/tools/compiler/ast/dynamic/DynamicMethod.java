@@ -2,9 +2,8 @@ package dyvil.tools.compiler.ast.dynamic;
 
 import java.lang.annotation.ElementType;
 
-import dyvil.lang.List;
-
 import dyvil.array.ObjectArray;
+import dyvil.collection.List;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;

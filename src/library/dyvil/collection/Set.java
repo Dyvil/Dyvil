@@ -1,4 +1,4 @@
-package dyvil.lang;
+package dyvil.collection;
 
 import java.util.*;
 import java.util.function.Function;
@@ -8,8 +8,6 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.sealed;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
 
 @NilConvertible
 @ArrayConvertible

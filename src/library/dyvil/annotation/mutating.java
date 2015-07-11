@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import dyvil.lang.Immutable;
+import dyvil.util.Immutable;
 
 /**
  * Marks a mutating method, i.e. a method that mutates the members of a mutable

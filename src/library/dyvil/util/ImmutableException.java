@@ -1,4 +1,4 @@
-package dyvil.lang;
+package dyvil.util;
 
 /**
  * An {@linkplain Exception} that is thrown when accessing a mutating member of

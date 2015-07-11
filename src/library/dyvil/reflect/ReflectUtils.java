@@ -5,9 +5,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import dyvil.lang.List;
-
 import dyvil.annotation.infix;
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 
 public final class ReflectUtils

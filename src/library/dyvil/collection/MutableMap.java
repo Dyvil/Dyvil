@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 

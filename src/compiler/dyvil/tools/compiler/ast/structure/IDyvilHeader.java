@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.structure;
 
-import dyvil.lang.Map;
-
+import dyvil.collection.Map;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
 import dyvil.tools.compiler.ast.context.IContext;

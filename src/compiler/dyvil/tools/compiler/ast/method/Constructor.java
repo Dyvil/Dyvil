@@ -2,8 +2,7 @@ package dyvil.tools.compiler.ast.method;
 
 import java.lang.annotation.ElementType;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.access.ApplyMethodCall;

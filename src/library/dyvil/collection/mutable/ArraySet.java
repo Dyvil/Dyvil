@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 
-import dyvil.lang.Collection;
 import dyvil.lang.literal.ArrayConvertible;
 
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;

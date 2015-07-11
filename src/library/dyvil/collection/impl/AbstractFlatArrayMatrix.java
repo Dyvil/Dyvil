@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import dyvil.lang.Int;
-import dyvil.lang.Matrix;
 
+import dyvil.collection.Matrix;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tuple.Tuple2;
 

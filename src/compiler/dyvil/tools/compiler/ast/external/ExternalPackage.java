@@ -2,8 +2,7 @@ package dyvil.tools.compiler.ast.external;
 
 import java.io.InputStream;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;

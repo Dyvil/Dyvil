@@ -6,15 +6,13 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.ImmutableException;
-import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.Covariant;
 import dyvil.collection.immutable.ArraySet;
 import dyvil.collection.immutable.EmptySet;
+import dyvil.util.ImmutableException;
 
 @NilConvertible
 @ArrayConvertible

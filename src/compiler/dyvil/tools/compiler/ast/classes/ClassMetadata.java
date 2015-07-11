@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.ClassParameterSetter;
 import dyvil.tools.compiler.ast.access.InitializerCall;

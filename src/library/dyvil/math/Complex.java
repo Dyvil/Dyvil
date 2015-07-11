@@ -1,5 +1,6 @@
-package dyvil.lang;
+package dyvil.math;
 
+import dyvil.lang.Number;
 import dyvil.lang.literal.TupleConvertible;
 
 import dyvil.annotation.prefix;

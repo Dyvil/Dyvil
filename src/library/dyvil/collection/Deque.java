@@ -2,8 +2,6 @@ package dyvil.collection;
 
 import java.util.Iterator;
 
-import dyvil.lang.Collection;
-
 public interface Deque<E> extends Queue<E>, Stack<E>
 {
 	// Collection Methods

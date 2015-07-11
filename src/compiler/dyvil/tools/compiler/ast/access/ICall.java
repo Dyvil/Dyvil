@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -98,12 +97,6 @@ public interface ICall extends IValue
 			return IContext.getBestMethod(matches);
 		}
 		
-		Types.PREDEF_CLASS.getMethodMatches(matches, instance, name, arguments);
-		if (!matches.isEmpty())
-		{
-			return IContext.getBestMethod(matches);
-		}
-		
 		if (instance == null && arguments.size() == 1)
 		{
 			IValue v = arguments.getFirstValue();
@@ -117,6 +110,12 @@ public interface ICall extends IValue
 					return IContext.getBestMethod(matches);
 				}
 			}
+		}
+		
+		Types.LANG_HEADER.getMethodMatches(matches, instance, name, arguments);
+		if (!matches.isEmpty())
+		{
+			return IContext.getBestMethod(matches);
 		}
 		
 		return null;

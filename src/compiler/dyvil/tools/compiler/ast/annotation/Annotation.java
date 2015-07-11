@@ -128,11 +128,12 @@ public final class Annotation extends ASTNode implements ITyped
 	
 	public void check(MarkerList markers, IContext context, ElementType target)
 	{
-		IClass theClass = this.type.getTheClass();
-		if (theClass == null)
+		if (!this.type.isResolved())
 		{
 			return;
 		}
+		
+		IClass theClass = this.type.getTheClass();
 		
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{

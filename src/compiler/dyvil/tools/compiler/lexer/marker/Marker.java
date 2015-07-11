@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.lexer.marker;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 

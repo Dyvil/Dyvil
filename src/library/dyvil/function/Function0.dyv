@@ -1,7 +1,6 @@
 package dyvil.function
 
-@FunctionalInterface
-public interface Function0[+R]
+public functional interface Function0[+R]
 {
 	public R apply()
 }

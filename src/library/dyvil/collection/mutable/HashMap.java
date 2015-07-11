@@ -7,12 +7,12 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
+import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.math.MathUtils;
@@ -259,9 +259,10 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			while (e != null)
 			{
 				int index = index(e.hash, newCapacity);
+				HashEntry next = e.next;
 				e.next = newMap[index];
 				newMap[index] = e;
-				e = e.next;
+				e = next;
 			}
 		}
 	}

@@ -6,7 +6,6 @@ import java.util.Spliterators;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.lang.*;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
@@ -16,6 +15,8 @@ import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
 import dyvil.collection.immutable.TupleMap;
 import dyvil.tuple.Tuple2;
+import dyvil.util.Immutable;
+import dyvil.util.ImmutableException;
 
 @NilConvertible
 @ArrayConvertible

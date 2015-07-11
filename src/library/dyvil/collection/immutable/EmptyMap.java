@@ -6,12 +6,12 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.object;
+import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
+import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.iterator.EmptyIterator;
 

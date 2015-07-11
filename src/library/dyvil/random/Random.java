@@ -1,6 +1,5 @@
-package dyvil.lang;
+package dyvil.random;
 
-import dyvil.random.JavaBasedRandom;
 
 @FunctionalInterface
 public interface Random

@@ -5,8 +5,9 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 import dyvil.lang.Ordered;
-import dyvil.lang.Range;
 import dyvil.lang.literal.TupleConvertible;
+
+import dyvil.collection.Range;
 
 @TupleConvertible
 public class SimpleRange<T extends Ordered<T>> implements Range<T>

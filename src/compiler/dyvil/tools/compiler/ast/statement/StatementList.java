@@ -2,10 +2,9 @@ package dyvil.tools.compiler.ast.statement;
 
 import java.util.Iterator;
 
-import dyvil.lang.Entry;
-import dyvil.lang.List;
-import dyvil.lang.Map;
-
+import dyvil.collection.Entry;
+import dyvil.collection.List;
+import dyvil.collection.Map;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.ASTNode;

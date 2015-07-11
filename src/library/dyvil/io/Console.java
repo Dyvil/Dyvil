@@ -1,4 +1,4 @@
-package dyvil.lang;
+package dyvil.io;
 
 import java.io.*;
 import java.util.function.BooleanSupplier;

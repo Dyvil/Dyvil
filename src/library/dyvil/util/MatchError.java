@@ -1,4 +1,11 @@
-package dyvil.lang;
+package dyvil.util;
+
+import dyvil.lang.*;
+import dyvil.lang.Byte;
+import dyvil.lang.Double;
+import dyvil.lang.Float;
+import dyvil.lang.Long;
+import dyvil.lang.Short;
 
 /**
  * A <b>MatchError</b> is a {@link RuntimeException} thrown when a

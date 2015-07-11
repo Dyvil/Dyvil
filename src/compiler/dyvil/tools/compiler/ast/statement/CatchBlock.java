@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;

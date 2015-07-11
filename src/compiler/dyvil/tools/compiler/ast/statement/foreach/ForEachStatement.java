@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement.foreach;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;

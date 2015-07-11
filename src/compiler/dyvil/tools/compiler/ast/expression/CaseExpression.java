@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
