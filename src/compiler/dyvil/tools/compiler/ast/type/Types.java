@@ -76,8 +76,11 @@ public final class Types
 	public static void init()
 	{
 		VOID.theClass = VOID_CLASS;
-		VOID.boxMethod = VOID_CLASS.getBody().getMethod(Name.apply);
-		VOID.unboxMethod = VOID_CLASS.getBody().getMethod(Name.unapply);
+		if (VOID_CLASS != null)
+		{
+			VOID.boxMethod = VOID_CLASS.getBody().getMethod(Name.apply);
+			VOID.unboxMethod = VOID_CLASS.getBody().getMethod(Name.unapply);
+		}
 		BOOLEAN.theClass = BOOLEAN_CLASS;
 		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.apply);
 		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.unapply);

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
@@ -181,29 +181,29 @@ public final class SimpleImport extends Import
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		IImport.writeImport(this.parent, dos);
+		IImport.writeImport(this.parent, out);
 		
-		dos.writeUTF(this.name.qualified);
+		out.writeUTF(this.name.qualified);
 		if (this.alias != null)
 		{
-			dos.writeUTF(this.alias.qualified);
+			out.writeUTF(this.alias.qualified);
 		}
 		else
 		{
-			dos.writeUTF("");
+			out.writeUTF("");
 		}
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		this.parent = IImport.readImport(dis);
+		this.parent = IImport.readImport(in);
 		
-		this.name = Name.getQualified(dis.readUTF());
+		this.name = Name.getQualified(in.readUTF());
 		
-		String alias = dis.readUTF();
+		String alias = in.readUTF();
 		if (!alias.isEmpty())
 		{
 			this.alias = Name.getQualified(alias);

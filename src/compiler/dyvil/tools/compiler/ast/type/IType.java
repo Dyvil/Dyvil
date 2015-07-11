@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
@@ -417,13 +415,13 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		return NullValue.getNull();
 	}
 	
-	public static void writeType(IType type, DataOutputStream dos) throws IOException
+	public static void writeType(IType type, DataOutput dos) throws IOException
 	{
 		dos.writeByte(type.typeTag());
 		type.write(dos);
 	}
 	
-	public static IType readType(DataInputStream dis) throws IOException
+	public static IType readType(DataInput dis) throws IOException
 	{
 		byte tag = dis.readByte();
 		IType type;
@@ -468,9 +466,9 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		return type;
 	}
 	
-	public void write(DataOutputStream dos) throws IOException;
+	public void write(DataOutput out) throws IOException;
 	
-	public void read(DataInputStream dis) throws IOException;
+	public void read(DataInput in) throws IOException;
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer);

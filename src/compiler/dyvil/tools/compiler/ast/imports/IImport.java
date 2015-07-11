@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import dyvil.collection.List;
 import dyvil.tools.compiler.ast.IASTNode;
@@ -65,7 +63,7 @@ public interface IImport extends IASTNode
 	
 	// Compilation
 	
-	public static void writeImport(IImport iimport, DataOutputStream dos) throws IOException
+	public static void writeImport(IImport iimport, DataOutput dos) throws IOException
 	{
 		if (iimport == null)
 		{
@@ -77,7 +75,7 @@ public interface IImport extends IASTNode
 		iimport.write(dos);
 	}
 	
-	public static IImport readImport(DataInputStream dis) throws IOException
+	public static IImport readImport(DataInput dis) throws IOException
 	{
 		byte type = dis.readByte();
 		if (type == 0)
@@ -89,7 +87,7 @@ public interface IImport extends IASTNode
 		return iimport;
 	}
 	
-	public void write(DataOutputStream dos) throws IOException;
+	public void write(DataOutput out) throws IOException;
 	
-	public void read(DataInputStream dis) throws IOException;
+	public void read(DataInput in) throws IOException;
 }

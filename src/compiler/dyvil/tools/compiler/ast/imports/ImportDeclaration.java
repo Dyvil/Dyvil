@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
@@ -85,13 +85,13 @@ public final class ImportDeclaration extends ASTNode
 		this.theImport.toString(prefix, buffer);
 	}
 	
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput dos) throws IOException
 	{
 		dos.writeByte(this.theImport.importTag());
 		this.theImport.write(dos);
 	}
 	
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput dis) throws IOException
 	{
 		this.theImport = IImport.fromTag(dis.readByte());
 		this.theImport.read(dis);

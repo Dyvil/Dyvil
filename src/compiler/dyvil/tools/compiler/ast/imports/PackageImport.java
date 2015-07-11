@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
@@ -91,15 +91,15 @@ public final class PackageImport extends Import
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		IImport.writeImport(this.parent, dos);
+		IImport.writeImport(this.parent, out);
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		this.parent = IImport.readImport(dis);
+		this.parent = IImport.readImport(in);
 	}
 	
 	@Override

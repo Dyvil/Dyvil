@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
@@ -217,18 +217,18 @@ public final class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		dos.writeUTF(this.theClass.getInternalName());
-		this.writeTypeArguments(dos);
+		out.writeUTF(this.theClass.getInternalName());
+		this.writeTypeArguments(out);
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		String internal = dis.readUTF();
+		String internal = in.readUTF();
 		this.theClass = Package.rootPackage.resolveInternalClass(internal);
-		this.readTypeArguments(dis);
+		this.readTypeArguments(in);
 	}
 	
 	@Override

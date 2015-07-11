@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
@@ -239,15 +239,15 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		IType.writeType(this.type, dos);
+		IType.writeType(this.type, out);
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		this.type = IType.readType(dis);
+		this.type = IType.readType(in);
 	}
 	
 	@Override

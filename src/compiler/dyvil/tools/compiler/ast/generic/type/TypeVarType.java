@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
@@ -10,10 +10,8 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -196,12 +194,12 @@ public class TypeVarType implements IType
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
 	}
 	
@@ -214,14 +212,7 @@ public class TypeVarType implements IType
 	@Override
 	public String toString()
 	{
-		StringBuilder buf = new StringBuilder();
-		IGeneric generic = this.typeVar.getGeneric();
-		this.toString("", buf);
-		if (generic instanceof INamed)
-		{
-			buf.append(" (of type ").append(((INamed) generic).getName()).append(")");
-		}
-		return buf.toString();
+		return this.typeVar.getName().toString();
 	}
 	
 	@Override

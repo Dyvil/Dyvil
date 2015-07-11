@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.backend;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.File;
+import java.io.InputStream;
 
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
@@ -16,17 +19,17 @@ import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 
 public class HeaderFile
 {
-	private static final int	FILE_VERSION	= 2;
+	private static final int	FILE_VERSION	= 1;
 	
 	public static void write(File file, IDyvilHeader header)
 	{
 		byte[] bytes;
 		
 		// First try to compile the file to a byte array
-		try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); DataOutputStream dos = new DataOutputStream(bos))
+		try (ObjectWriter writer = new ObjectWriter())
 		{
-			write(dos, header);
-			bytes = bos.toByteArray();
+			write(writer, header);
+			bytes = writer.toByteArray();
 		}
 		catch (Throwable ex)
 		{
@@ -43,9 +46,9 @@ public class HeaderFile
 	
 	public static DyvilHeader read(InputStream is)
 	{
-		try (DataInputStream dis = new DataInputStream(is))
+		try (ObjectReader reader = new ObjectReader(new DataInputStream(is)))
 		{
-			return read(dis);
+			return read(reader);
 		}
 		catch (Throwable ex)
 		{
@@ -54,7 +57,7 @@ public class HeaderFile
 		return null;
 	}
 	
-	private static void write(DataOutputStream dos, IDyvilHeader header) throws Throwable
+	private static void write(DataOutput dos, IDyvilHeader header) throws Throwable
 	{
 		dos.writeShort(FILE_VERSION);
 		
@@ -100,15 +103,15 @@ public class HeaderFile
 		}
 	}
 	
-	private static DyvilHeader read(DataInputStream dis) throws Throwable
+	private static DyvilHeader read(ObjectReader reader) throws Throwable
 	{
-		int fileVersion = dis.readShort();
+		int fileVersion = reader.readShort();
 		if (fileVersion > FILE_VERSION)
 		{
 			throw new IllegalStateException("Unknown Dyvil Header File Version: " + fileVersion);
 		}
 		
-		String name = dis.readUTF();
+		String name = reader.readUTF();
 		DyvilHeader header = new ExternalHeader(name);
 		
 		// Include Declarations
@@ -119,36 +122,36 @@ public class HeaderFile
 		 */
 		
 		// Import Declarations
-		int imports = dis.readShort();
+		int imports = reader.readShort();
 		for (int i = 0; i < imports; i++)
 		{
 			ImportDeclaration id = new ImportDeclaration(null);
-			id.read(dis);
+			id.read(reader);
 			header.addImport(id);
 		}
 		
-		int staticImports = dis.readShort();
+		int staticImports = reader.readShort();
 		for (int i = 0; i < staticImports; i++)
 		{
 			ImportDeclaration id = new ImportDeclaration(null, true);
-			id.read(dis);
+			id.read(reader);
 			header.addUsing(id);
 		}
 		
-		int operators = dis.readShort();
+		int operators = reader.readShort();
 		for (int i = 0; i < operators; i++)
 		{
-			Operator op = Operator.read(dis);
+			Operator op = Operator.read(reader);
 			header.addOperator(op);
 		}
 		
 		if (fileVersion >= 2)
 		{
-			int typeAliases = dis.readShort();
+			int typeAliases = reader.readShort();
 			for (int i = 0; i < typeAliases; i++)
 			{
 				TypeAlias ta = new TypeAlias();
-				ta.read(dis);
+				ta.read(reader);
 				header.addTypeAlias(ta);
 			}
 		}

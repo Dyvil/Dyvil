@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
@@ -331,26 +331,26 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		dos.writeByte(this.typeCount);
+		out.writeByte(this.typeCount);
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			IType.writeType(this.types[i], dos);
+			IType.writeType(this.types[i], out);
 		}
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		int len = this.typeCount = dis.readByte();
+		int len = this.typeCount = in.readByte();
 		if (len > this.types.length)
 		{
 			this.types = new IType[len];
 		}
 		for (int i = 0; i < len; i++)
 		{
-			this.types[i] = IType.readType(dis);
+			this.types[i] = IType.readType(in);
 		}
 	}
 	

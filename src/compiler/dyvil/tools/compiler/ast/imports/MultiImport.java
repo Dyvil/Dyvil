@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
@@ -138,26 +138,27 @@ public final class MultiImport extends Import implements IImportList
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		dos.writeShort(this.importCount);
+		IImport.writeImport(this.parent, out);
+		
+		out.writeShort(this.importCount);
 		for (int i = 0; i < this.importCount; i++)
 		{
-			IImport child = this.imports[i];
-			dos.writeByte(child.importTag());
-			child.write(dos);
+			IImport.writeImport(this.imports[i], out);
 		}
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		this.importCount = dis.readShort();
+		this.parent = IImport.readImport(in);
+		
+		this.importCount = in.readShort();
 		this.imports = new IImport[this.importCount];
 		for (int i = 0; i < this.importCount; i++)
 		{
-			IImport child = IImport.fromTag(dis.readByte());
-			child.read(dis);
+			this.imports[i] = IImport.readImport(in);
 		}
 	}
 	

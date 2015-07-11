@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.reflect.Opcodes;
@@ -128,7 +128,7 @@ public abstract class GenericType implements IType, ITypeList
 		}
 	}
 	
-	protected final void writeTypeArguments(DataOutputStream dos) throws IOException
+	protected final void writeTypeArguments(DataOutput dos) throws IOException
 	{
 		dos.writeShort(this.typeArgumentCount);
 		for (int i = 0; i < this.typeArgumentCount; i++)
@@ -137,7 +137,7 @@ public abstract class GenericType implements IType, ITypeList
 		}
 	}
 	
-	protected final void readTypeArguments(DataInputStream dis) throws IOException
+	protected final void readTypeArguments(DataInput dis) throws IOException
 	{
 		int len = this.typeArgumentCount = dis.readShort();
 		if (len > this.typeArguments.length)

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
@@ -299,22 +299,22 @@ public final class WildcardType implements IType, ITyped
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
 		if (this.bound == null)
 		{
-			dos.writeByte(0);
+			out.writeByte(0);
 			return;
 		}
 		
-		dos.writeByte(this.variance.ordinal());
-		IType.writeType(this.bound, dos);
+		out.writeByte(this.variance.ordinal());
+		IType.writeType(this.bound, out);
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		byte b = dis.readByte();
+		byte b = in.readByte();
 		switch (b)
 		{
 		case 0:
@@ -327,7 +327,7 @@ public final class WildcardType implements IType, ITyped
 			break;
 		}
 		
-		this.bound = IType.readType(dis);
+		this.bound = IType.readType(in);
 	}
 	
 	@Override

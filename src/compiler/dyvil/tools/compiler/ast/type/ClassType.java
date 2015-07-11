@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
@@ -148,15 +148,15 @@ public class ClassType implements IType
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		dos.writeUTF(this.theClass.getInternalName());
+		out.writeUTF(this.theClass.getInternalName());
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		String internal = dis.readUTF();
+		String internal = in.readUTF();
 		this.theClass = Package.rootPackage.resolveInternalClass(internal);
 	}
 	
