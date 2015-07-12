@@ -97,7 +97,7 @@ public final class ClassGenericType extends GenericType
 			return false;
 		}
 		
-		return this.argumentsMatch(type);
+		return !type.isGenericType() || this.argumentsMatch(type);
 	}
 	
 	protected boolean argumentsMatch(IType type)

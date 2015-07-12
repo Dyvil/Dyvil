@@ -118,14 +118,6 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public MutableList<E> resized(int newSize)
-	{
-		Object[] newArray = new Object[newSize];
-		System.arraycopy(this.elements, 0, newArray, 0, Math.min(this.size, newSize));
-		return new ArrayList(newArray, newSize, true);
-	}
-	
-	@Override
 	public MutableList<E> withCapacity(int newCapacity)
 	{
 		Object[] newArray = new Object[Math.max(this.size, newCapacity)];
@@ -151,8 +143,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		this.size = 0;
 	}
 	
-	@Override
-	public void resize(int newLength)
+	protected void resize(int newLength)
 	{
 		if (newLength < this.size)
 		{

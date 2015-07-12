@@ -215,20 +215,6 @@ public interface List<E> extends Collection<E>
 	public void clear();
 	
 	/**
-	 * Resizes this list to the given size. This method, unlike
-	 * {@link #ensureCapacity(int)}, actually changes the size as returned by
-	 * {@link #size()}. If the {@code newSize} is greater than the current size
-	 * of this list, this method should add {@code null} to the list until the
-	 * new size is reached. If the {@code newSize} is smaller than the current
-	 * size, it should remove elements from the end of the list until the new
-	 * size is reached.
-	 * 
-	 * @param newSize
-	 *            the new size
-	 */
-	public void resize(int newSize);
-	
-	/**
 	 * Ensures the capacity of this list to be at least {@code minSize}. This
 	 * can be used to avoid having to recreate arrays in {@link ArrayList}s when
 	 * the amount of elements to be added is already known.

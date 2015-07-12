@@ -58,11 +58,9 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	@Override
 	public MutableList<E> subList(int startIndex, int length);
 	
-	public MutableList<E> resized(int newSize);
-	
 	public default MutableList<E> withCapacity(int newCapacity)
 	{
-		return this;
+		return this.copy();
 	}
 	
 	@Override
@@ -208,9 +206,6 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	
 	@Override
 	public void $plus$eq(E element);
-	
-	@Override
-	public void resize(int newLength);
 	
 	@Override
 	public void subscript_$eq(int index, E element);

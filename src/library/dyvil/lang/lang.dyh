@@ -8,6 +8,7 @@ import	java.lang._
 import	dyvil.collection._
 import	dyvil.io.Console
 import	dyvil.random.Random
+import	dyvil.function.PartialFunction
 
 // Import Function1, Tuple2 and Tuple3 with more user-friendly names
 import	dyvil.function.Function1 => Function

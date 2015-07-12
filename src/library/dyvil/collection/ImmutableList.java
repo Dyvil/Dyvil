@@ -153,13 +153,6 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	@mutating
-	public default void resize(int newLength)
-	{
-		throw new ImmutableException("resize() on Immutable List");
-	}
-	
-	@Override
-	@mutating
 	public default void ensureCapacity(int minSize)
 	{
 	}
