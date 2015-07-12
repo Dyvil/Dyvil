@@ -38,7 +38,7 @@ import org.objectweb.asm.Label;
 
 public class DynamicMethod extends ASTNode implements IMethod
 {
-	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/dyn/DynamicLinker", "linkMethod",
+	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker", "linkMethod",
 													"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
 	
 	public Name					name;
@@ -465,10 +465,9 @@ public class DynamicMethod extends ASTNode implements IMethod
 		StringBuilder desc = new StringBuilder();
 		desc.append('(');
 		
-		if (instance != null && instance.valueTag() != IValue.CLASS_ACCESS)
+		if (instance != null)
 		{
 			instance.writeExpression(writer);
-			instance.getType().appendExtendedName(desc);
 		}
 		
 		for (IValue v : arguments)
