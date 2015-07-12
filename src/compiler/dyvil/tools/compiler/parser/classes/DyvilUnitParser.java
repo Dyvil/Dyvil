@@ -13,37 +13,33 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 	public DyvilUnitParser(IDyvilHeader unit)
 	{
 		super(unit);
-		this.mode = PACKAGE | IMPORT | CLASS;
+		this.mode = PACKAGE;
 	}
 	
 	@Override
 	public void reset()
 	{
-		this.mode = PACKAGE | IMPORT | CLASS;
+		this.mode = PACKAGE;
 	}
 	
 	@Override
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		if (this.isInMode(PACKAGE))
-		{
+		switch (this.mode) {
+		case PACKAGE:
 			if (this.parsePackage(pm, token))
 			{
-				this.mode = IMPORT | CLASS;
+				this.mode = IMPORT;
 				return;
 			}
-		}
-		if (this.isInMode(IMPORT))
-		{
+		case IMPORT:
 			if (this.parseImport(pm, token))
 			{
-				this.mode = IMPORT | CLASS;
+				this.mode = IMPORT;
 				return;
 			}
-		}
-		if (this.isInMode(CLASS))
-		{
+		case CLASS:
 			if (type == Symbols.SEMICOLON)
 			{
 				return;

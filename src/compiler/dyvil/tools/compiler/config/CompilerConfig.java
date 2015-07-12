@@ -4,7 +4,9 @@ import java.io.File;
 
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.library.Library;
+import dyvil.tools.compiler.sources.FileFinder;
 
 public class CompilerConfig
 {
@@ -54,7 +56,7 @@ public class CompilerConfig
 		this.excludedFiles.add(fileName);
 	}
 	
-	public boolean compileFile(String name)
+	public boolean isExcluded(String name)
 	{
 		for (String s : this.excludedFiles)
 		{
@@ -64,15 +66,45 @@ public class CompilerConfig
 			}
 		}
 		
-		for (String s : this.includedFiles)
+		return true;
+	}
+	
+	public void findUnits(FileFinder fileFinder)
+	{
+		if (!this.includedFiles.isEmpty())
 		{
-			if (name.endsWith(s))
+			for (String s : this.includedFiles)
 			{
-				return true;
+				File source = new File(sourceDir, s);
+				File output = new File(outputDir, s);
+				Package pack = packageFromFile(s, source.isDirectory());
+				
+				fileFinder.process(source, output, pack);
 			}
+			return;
 		}
 		
-		return true;
+		fileFinder.process(sourceDir, outputDir, Package.rootPackage);
+	}
+	
+	private static Package packageFromFile(String file, boolean isDirectory)
+	{
+		int index = 0;
+		Package pack = Package.rootPackage;
+		do
+		{
+			int nextIndex = file.indexOf('/', index + 1);
+			if (nextIndex < 0)
+			{
+				return isDirectory ? pack.resolvePackage(file.substring(index)) : pack;
+			}
+			
+			pack = pack.createSubPackage(file.substring(index, nextIndex));
+			index = nextIndex + 1;
+		}
+		while (index < file.length());
+		
+		return pack;
 	}
 	
 	public String getJarName()

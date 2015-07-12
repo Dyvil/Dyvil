@@ -7,19 +7,19 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public class ExceptionListParser extends Parser implements ITypeConsumer
 {
-	private static final int	TYPE		= 0;
-	private static final int	SEPERATOR	= 1;
+	private static final int	TYPE		= 1;
+	private static final int	SEPARATOR	= 2;
 	
 	protected IExceptionList	exceptionList;
 	
 	public ExceptionListParser(IExceptionList list)
 	{
 		this.exceptionList = list;
+		this.mode = TYPE;
 	}
 	
 	@Override
@@ -40,15 +40,15 @@ public class ExceptionListParser extends Parser implements ITypeConsumer
 		
 		if (this.mode == TYPE)
 		{
-			pm.pushParser(new TypeParser(this), true);
-			this.mode = 1;
+			pm.pushParser(pm.newTypeParser(this), true);
+			this.mode = SEPARATOR;
 			return;
 		}
-		if (this.mode == SEPERATOR)
+		if (this.mode == SEPARATOR)
 		{
 			if (ParserUtil.isSeperator(type))
 			{
-				this.mode = 0;
+				this.mode = TYPE;
 				return;
 			}
 			

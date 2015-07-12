@@ -23,7 +23,7 @@ public abstract class AbstractCall implements ICall, IValued
 {
 	protected ICodePosition	position;
 	public IValue			instance;
-	public IArguments		arguments;
+	public IArguments		arguments = EmptyArguments.INSTANCE;
 	
 	public IMethod			method;
 	protected IType			type;

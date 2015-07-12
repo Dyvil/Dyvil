@@ -10,7 +10,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 
-public final class ParserManager implements IParserManager
+public class ParserManager implements IParserManager
 {
 	protected Parser		parser;
 	
@@ -63,6 +63,7 @@ public final class ParserManager implements IParserManager
 	
 	public final void parse(MarkerList markers, TokenIterator tokens)
 	{
+		tokens.reset();
 		this.tokens = tokens;
 		IToken token = null;
 		while (true)

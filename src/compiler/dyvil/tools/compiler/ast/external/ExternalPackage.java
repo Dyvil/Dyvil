@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassReader;
 import dyvil.tools.compiler.backend.HeaderFile;
 import dyvil.tools.compiler.library.Library;
-import dyvil.tools.compiler.sources.FileTypes;
+import dyvil.tools.compiler.sources.FileType;
 
 public class ExternalPackage extends Package
 {
@@ -129,7 +129,7 @@ public class ExternalPackage extends Package
 	
 	private IClass loadClass(String name)
 	{
-		String fileName = this.internalName + name + FileTypes.CLASS_EXTENSION;
+		String fileName = this.internalName + name + FileType.CLASS_EXTENSION;
 		IClass iclass = this.loadClass(fileName, name, this.library);
 		if (iclass != null)
 		{
@@ -155,7 +155,7 @@ public class ExternalPackage extends Package
 	
 	private IDyvilHeader loadHeader(String name)
 	{
-		String fileName = this.internalName + name + FileTypes.OBJECT_EXTENSION;
+		String fileName = this.internalName + name + FileType.OBJECT_EXTENSION;
 		IDyvilHeader header = this.loadHeader(fileName, name, this.library);
 		if (header != null)
 		{

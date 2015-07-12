@@ -67,6 +67,11 @@ public final class SimpleImport extends Import
 		{
 			this.parent.resolveTypes(markers, context, false);
 			context = this.parent.getContext();
+			
+			if (context == null)
+			{
+				return;
+			}
 		}
 		
 		if (using)

@@ -14,9 +14,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.annotation.AnnotationParser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -75,7 +72,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			{
 				Annotation annotation = new Annotation(token.raw());
 				this.addAnnotation(annotation);
-				pm.pushParser(new AnnotationParser(annotation));
+				pm.pushParser(pm.newAnnotationParser(annotation));
 				return;
 			}
 			if (ParserUtil.isCloseBracket(type))
@@ -85,7 +82,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			}
 			
 			this.mode = NAME;
-			pm.pushParser(new TypeParser(this), true);
+			pm.pushParser(pm.newTypeParser(this), true);
 			return;
 		}
 		if (this.mode == NAME)
@@ -127,7 +124,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			}
 			if (type == Symbols.EQUALS)
 			{
-				pm.pushParser(new ExpressionParser(this.parameter));
+				pm.pushParser(pm.newExpressionParser(this.parameter));
 				return;
 			}
 			this.reset();

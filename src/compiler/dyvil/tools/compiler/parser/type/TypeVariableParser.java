@@ -95,13 +95,13 @@ public final class TypeVariableParser extends Parser implements ITyped
 			{
 				if (name == Name.gtcolon) // >: - Lower Bound
 				{
-					pm.pushParser(new TypeParser(this));
+					pm.pushParser(pm.newTypeParser(this));
 					this.boundMode = LOWER;
 					return;
 				}
 				if (name == Name.ltcolon) // <: - Upper Bounds
 				{
-					pm.pushParser(new TypeParser(this));
+					pm.pushParser(pm.newTypeParser(this));
 					this.boundMode = UPPER;
 					return;
 				}
@@ -110,7 +110,7 @@ public final class TypeVariableParser extends Parser implements ITyped
 			{
 				if (name == Name.amp)
 				{
-					pm.pushParser(new TypeParser(this));
+					pm.pushParser(pm.newTypeParser(this));
 					return;
 				}
 			}

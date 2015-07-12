@@ -25,13 +25,13 @@ public class DyvilHeaderParser extends Parser
 	public DyvilHeaderParser(IDyvilHeader unit)
 	{
 		this.unit = unit;
-		this.mode = PACKAGE | IMPORT;
+		this.mode = PACKAGE;
 	}
 	
 	@Override
 	public void reset()
 	{
-		this.mode = PACKAGE | IMPORT;
+		this.mode = PACKAGE;
 	}
 	
 	protected boolean parsePackage(IParserManager pm, IToken token)
@@ -99,21 +99,19 @@ public class DyvilHeaderParser extends Parser
 		{
 			return;
 		}
-		if (this.isInMode(PACKAGE))
-		{
+		switch (this.mode) {
+		case PACKAGE:
 			if (this.parsePackage(pm, token))
 			{
 				this.mode = IMPORT;
 				return;
 			}
-		}
-		if (this.isInMode(IMPORT))
-		{
+		case IMPORT:
 			if (this.parseImport(pm, token))
 			{
 				return;
-			}
+			}			
 		}
-		throw new SyntaxError(token, "Invalid Token - Delete this token");
+		throw new SyntaxError(token, "Invalid " + token + " - Delete this token");
 	}
 }

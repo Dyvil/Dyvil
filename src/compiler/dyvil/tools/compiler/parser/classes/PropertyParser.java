@@ -8,7 +8,6 @@ import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 
@@ -71,14 +70,14 @@ public class PropertyParser extends Parser implements IValued
 			
 			// No 'get:' or 'set:' tag -> Read-Only Property
 			this.mode = GET;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			return;
 		}
 		if (this.mode > 0) // SET or GET
 		{
 			if (type == Symbols.COLON)
 			{
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Property Declaration - ':' expected");

@@ -11,9 +11,9 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
-import dyvil.tools.compiler.sources.FileTypes;
+import dyvil.tools.compiler.sources.FileType;
 
-public final class DyvilUnit extends DyvilHeader
+public class DyvilUnit extends DyvilHeader
 {
 	private IClass[]			classes			= new IClass[1];
 	private int					classCount;
@@ -172,9 +172,15 @@ public final class DyvilUnit extends DyvilHeader
 	}
 	
 	@Override
+	protected boolean printMarkers()
+	{
+		return ICompilationUnit.printMarkers(this.markers, "Dyvil Unit", this.name, this.inputFile);
+	}
+	
+	@Override
 	public void compile()
 	{
-		if (ICompilationUnit.printMarkers(this.markers, "Dyvil Unit", this.name, this.inputFile))
+		if (this.printMarkers())
 		{
 			return;
 		}
@@ -185,11 +191,11 @@ public final class DyvilUnit extends DyvilHeader
 			String name = iclass.getName().qualified;
 			if (!name.equals(this.name))
 			{
-				name = this.name + "$" + name + FileTypes.CLASS_EXTENSION;
+				name = this.name + "$" + name + FileType.CLASS_EXTENSION;
 			}
 			else
 			{
-				name += FileTypes.CLASS_EXTENSION;
+				name += FileType.CLASS_EXTENSION;
 			}
 			File file = new File(this.outputDirectory, name);
 			ClassWriter.compile(file, iclass);
@@ -201,7 +207,7 @@ public final class DyvilUnit extends DyvilHeader
 				for (int j = 0; j < len; j++)
 				{
 					IClass iclass1 = body.getClass(j);
-					name = this.name + "$" + iclass1.getName().qualified + FileTypes.CLASS_EXTENSION;
+					name = this.name + "$" + iclass1.getName().qualified + FileType.CLASS_EXTENSION;
 					file = new File(this.outputDirectory, name);
 					ClassWriter.compile(file, iclass1);
 				}
@@ -211,7 +217,7 @@ public final class DyvilUnit extends DyvilHeader
 		for (int i = 0; i < this.innerClassCount; i++)
 		{
 			IClassCompilable iclass = this.innerClasses[i];
-			String name = iclass.getFileName() + FileTypes.CLASS_EXTENSION;
+			String name = iclass.getFileName() + FileType.CLASS_EXTENSION;
 			File file = new File(this.outputDirectory, name);
 			ClassWriter.compile(file, iclass);
 		}

@@ -31,7 +31,7 @@ import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
-import dyvil.tools.compiler.sources.FileTypes;
+import dyvil.tools.compiler.sources.FileType;
 
 public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
@@ -81,7 +81,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		start = name.lastIndexOf('/');
 		end = name.lastIndexOf('.');
 		this.outputDirectory = new File(name.substring(0, start));
-		this.outputFile = new File(name.substring(0, end) + FileTypes.OBJECT_EXTENSION);
+		this.outputFile = new File(name.substring(0, end) + FileType.OBJECT_EXTENSION);
 	}
 	
 	@Override
@@ -389,10 +389,15 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 	}
 	
+	protected boolean printMarkers()
+	{
+		return ICompilationUnit.printMarkers(this.markers, "Dyvil Header", this.name, this.inputFile);
+	}
+	
 	@Override
 	public void compile()
 	{
-		if (ICompilationUnit.printMarkers(this.markers, "Dyvil Header", this.name, this.inputFile))
+		if (this.printMarkers())
 		{
 			return;
 		}
@@ -442,7 +447,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		// Included Headers
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			iclass = this.includes[i].getHeader().resolveClass(name);
+			iclass = this.includes[i].resolveClass(name);
 			if (iclass != null)
 			{
 				return iclass;
@@ -473,7 +478,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			IType t = this.includes[i].getHeader().resolveType(name);
+			IType t = this.includes[i].resolveType(name);
 			if (t != null)
 			{
 				return t;
@@ -502,7 +507,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			IDataMember field = this.includes[i].getHeader().resolveField(name);
+			IDataMember field = this.includes[i].resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -521,7 +526,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			this.includes[i].getHeader().getMethodMatches(list, instance, name, arguments);
+			this.includes[i].getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	
