@@ -128,6 +128,18 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
+	public boolean classEquals(IType type)
+	{
+		return type.isArrayType() && this.getElementType().classEquals(type.getElementType());
+	}
+	
+	@Override
+	public boolean isSuperClassOf(IType type)
+	{
+		return type.isArrayType() && this.getElementType().isSuperClassOf(type.getElementType());
+	}
+	
+	@Override
 	public boolean isResolved()
 	{
 		return this.type.isResolved();

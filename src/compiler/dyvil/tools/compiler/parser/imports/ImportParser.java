@@ -104,6 +104,7 @@ public final class ImportParser extends Parser
 				this.mode = DOT_ALIAS;
 				return;
 			}
+			throw new SyntaxError(token, "Invalid Import Declaration - Identifier expected");
 		}
 		if (this.mode == DOT_ALIAS)
 		{
@@ -125,15 +126,25 @@ public final class ImportParser extends Parser
 				
 				throw new SyntaxError(next, "Invalid Import Alias");
 			}
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			{
+				this.consumer.setImport(this.theImport);
+				pm.popParser(true);
+				return;
+			}
+			
+			throw new SyntaxError(token, "Invalid Import Declaration - '.' expected");
 		}
 		if (this.isInMode(MULTIIMPORT))
 		{
+			this.theImport.expandPosition(token);
+			this.consumer.setImport(this.theImport);
+			pm.popParser();
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
-				this.theImport.expandPosition(token);
-				this.mode = 0;
 				return;
 			}
+			throw new SyntaxError(token, "Invalid Multi-Import - '}' expected");
 		}
 	}
 }

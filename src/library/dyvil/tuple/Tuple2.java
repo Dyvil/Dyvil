@@ -2,9 +2,11 @@ package dyvil.tuple;
 
 import java.util.Objects;
 
+import dyvil.annotation.ClassParameters;
 import dyvil.annotation.Covariant;
 import dyvil.collection.Entry;
 
+@ClassParameters(names = { "_1", "_2" })
 public class Tuple2<@Covariant A, @Covariant B> implements Entry<A, B>
 {
 	public final A	_1;

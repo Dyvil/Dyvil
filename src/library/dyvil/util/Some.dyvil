@@ -8,7 +8,7 @@ import java.util.function.Supplier
 import dyvil.lang.literal.TupleConvertible
 
 @TupleConvertible
-public final case class Some[+T](T value) implements Option[T]
+public final case class Some[+T](final T value) implements Option[T]
 {
 	public override T !() = this.value
 	

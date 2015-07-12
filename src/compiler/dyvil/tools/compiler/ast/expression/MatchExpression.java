@@ -189,7 +189,6 @@ public final class MatchExpression extends ASTNode implements IValue
 				pattern = pattern1;
 			}
 			
-			pattern.checkTypes(markers, context);
 			c.pattern = pattern;
 			
 			this.cases[i].resolve(markers, context);

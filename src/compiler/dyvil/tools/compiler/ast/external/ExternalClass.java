@@ -9,12 +9,11 @@ import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
+import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.field.Property;
+import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
@@ -31,10 +30,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
-import dyvil.tools.compiler.backend.visitor.BytecodeVisitor;
-import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
-import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
+import dyvil.tools.compiler.backend.visitor.*;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 import org.objectweb.asm.*;
@@ -48,8 +44,11 @@ public final class ExternalClass extends CodeClass
 	private boolean		metadataResolved;
 	private boolean		superTypesResolved;
 	private boolean		genericsResolved;
+	private boolean		parametersResolved;
 	private boolean		annotationsResolved;
 	private boolean		innerTypesResolved;
+	
+	private String[]	classParameters;
 	
 	public ExternalClass(Name name)
 	{
@@ -77,6 +76,15 @@ public final class ExternalClass extends CodeClass
 			}
 			
 			this.type = type;
+		}
+	}
+	
+	private void resolveParameters()
+	{
+		this.parametersResolved = true;
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].resolveTypes(null, this);
 		}
 	}
 	
@@ -201,13 +209,32 @@ public final class ExternalClass extends CodeClass
 	}
 	
 	@Override
-	public void addParameter(IParameter param)
+	public void addAnnotation(Annotation annotation)
 	{
-		if (!this.metadataResolved)
+		if (!"dyvil/annotation/ClassParameters".equals(annotation.type.getInternalName()))
 		{
-			this.resolveMetadata();
+			super.addAnnotation(annotation);
+			return;
 		}
-		super.addParameter(param);
+		
+		Array array = (Array) annotation.arguments.getFirstValue();
+		int count = array.valueCount();
+		this.classParameters = new String[count];
+		for (int i = 0; i < count; i++)
+		{
+			IValue value = array.getValue(i);
+			this.classParameters[i] = ((StringValue) value).value;
+		}
+	}
+	
+	@Override
+	public IParameter getParameter(int index)
+	{
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
+		}
+		return super.getParameter(index);
 	}
 	
 	@Override
@@ -331,6 +358,19 @@ public final class ExternalClass extends CodeClass
 		if (!this.genericsResolved)
 		{
 			this.resolveGenerics();
+		}
+		
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
+		}
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IParameter param = this.parameters[i];
+			if (param.getName() == name)
+			{
+				return param;
+			}
 		}
 		
 		// Own properties
@@ -499,6 +539,17 @@ public final class ExternalClass extends CodeClass
 		this.type = new dyvil.tools.compiler.ast.type.ClassType(this);
 	}
 	
+	public AnnotationVisitor visitAnnotation(String type, boolean visible)
+	{
+		String internal = ClassFormat.extendedToInternal(type);
+		if (this.addRawAnnotation(internal))
+		{
+			Annotation annotation = new Annotation(null, ClassFormat.internalToType(internal));
+			return new AnnotationVisitorImpl(this, annotation);
+		}
+		return null;
+	}
+	
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
 		TypeReference ref = new TypeReference(typeRef);
@@ -523,26 +574,38 @@ public final class ExternalClass extends CodeClass
 	
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
-		Field field = new ExternalField(this);
-		field.setName(Name.get(name));
-		field.setModifiers(access);
+		IType type = ClassFormat.extendedToType(signature == null ? desc : signature);
 		
-		field.setType(ClassFormat.extendedToType(signature == null ? desc : signature));
+		if (this.classParameters != null)
+		{
+			for (String s : this.classParameters)
+			{
+				if (s.equals(name))
+				{
+					ClassParameter param = new ClassParameter(this, access, Name.get(name), type);
+					this.addParameter(param);
+					return new SimpleFieldVisitor(param);
+				}
+			}
+		}
+		
+		ExternalField field = new ExternalField(this, access, Name.get(name), type);
 		
 		if (value != null)
 		{
 			field.setValue(IValue.fromObject(value));
 		}
 		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0 && name.equals("$instance"))
+		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0 && name.equals("instance"))
 		{
-			// This is the instance field of a singleton object class, ignore
-			// annotations as it shouldn't have any
-			this.metadata.setInstanceField(field);
-			return null;
+			// This is the instance field of a singleton object class
+			this.getMetadata().setInstanceField(field);
+		}
+		else
+		{
+			this.body.addField(field);
 		}
 		
-		this.body.addField(field);
 		return new SimpleFieldVisitor(field);
 	}
 	
@@ -632,5 +695,9 @@ public final class ExternalClass extends CodeClass
 		
 		IType type = ClassFormat.internalToType(name);
 		this.innerTypes.add(type);
+	}
+	
+	public void visitEnd()
+	{
 	}
 }

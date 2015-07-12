@@ -46,7 +46,7 @@ public final class MultiImport extends Import implements IImportList
 		int index = this.importCount++;
 		if (index >= this.imports.length)
 		{
-			IImport[] temp = new IImport[index];
+			IImport[] temp = new IImport[index + 1];
 			System.arraycopy(this.imports, 0, temp, 0, this.imports.length);
 			this.imports = temp;
 		}

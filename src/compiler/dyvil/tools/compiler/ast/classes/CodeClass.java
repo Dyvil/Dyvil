@@ -44,6 +44,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Opcodes;
 
 public class CodeClass extends ASTNode implements IClass
@@ -1330,9 +1331,19 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		for (int i = 0; i < this.parameterCount; i++)
+		if (this.parameterCount > 0)
 		{
-			this.parameters[i].write(writer);
+			AnnotationVisitor av = writer.visitAnnotation("Ldyvil/annotation/ClassParameters;", false);
+			AnnotationVisitor array = av.visitArray("names");
+			
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				IParameter param = this.parameters[i];
+				param.write(writer);
+				array.visit("", param.getName().qualified);
+			}
+			
+			array.visitEnd();
 		}
 		
 		for (int i = 0; i < constructors; i++)

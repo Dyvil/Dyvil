@@ -9,6 +9,7 @@ import	dyvil.collection._
 import	dyvil.io.Console
 import	dyvil.random.Random
 import	dyvil.function.PartialFunction
+import	dyvil.util.{ Option, None, Some }
 
 // Import Function1, Tuple2 and Tuple3 with more user-friendly names
 import	dyvil.function.Function1 => Function

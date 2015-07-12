@@ -28,12 +28,25 @@ public final class ClassParameter extends Parameter implements IField
 	{
 	}
 	
+	public ClassParameter(IClass theClass)
+	{
+		this.theClass = theClass;
+	}
+	
 	public ClassParameter(Name name, IType type)
 	{
 		this.name = name;
 		this.type = type;
 	}
 	
+	public ClassParameter(IClass theClass, int access, Name name, IType type)
+	{
+		this.theClass = theClass;
+		this.name = name;
+		this.type = type;
+		this.modifiers = access;
+	}
+
 	@Override
 	public boolean isField()
 	{
@@ -132,6 +145,8 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
+		this.modifiers |= Modifiers.PUBLIC;
+		
 		super.resolve(markers, context);
 		
 		if (this.defaultValue != null)
