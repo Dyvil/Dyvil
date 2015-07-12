@@ -1,13 +1,19 @@
 package dyvil.lang
 
+// Base imports for primitive types
 import	dyvil.lang._
 import	java.lang._
+
+// Useful classes
 import	dyvil.collection._
-import	dyvil.function.Function1 => Function
 import	dyvil.io.Console
 import	dyvil.random.Random
+
+// Import Function1, Tuple2 and Tuple3 with more user-friendly names
+import	dyvil.function.Function1 => Function
 import	dyvil.tuple.Tuple2 => Tuple
 import	dyvil.tuple.Tuple2 => Pair
 import	dyvil.tuple.Tuple3 => Triple
 
+// Import the methods from Predef
 using	dyvil.lang.Predef._

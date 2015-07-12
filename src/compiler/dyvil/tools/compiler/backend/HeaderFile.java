@@ -10,6 +10,7 @@ import dyvil.collection.Map;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
+import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
@@ -57,50 +58,50 @@ public class HeaderFile
 		return null;
 	}
 	
-	private static void write(DataOutput dos, IDyvilHeader header) throws Throwable
+	private static void write(DataOutput writer, IDyvilHeader header) throws Throwable
 	{
-		dos.writeShort(FILE_VERSION);
+		writer.writeShort(FILE_VERSION);
 		
 		// Header Name
-		dos.writeUTF(header.getName());
+		writer.writeUTF(header.getName());
 		
 		// Include Declarations
-		/*
-		 * int includes = header.includeCount(); dos.writeShort(includes); for
-		 * (int i = 0; i < includes; i++) { header.getInclude(i).write(dos); }
-		 */
+		writer.writeShort(0);
 		
 		// Import Declarations
 		int imports = header.importCount();
-		dos.writeShort(imports);
+		writer.writeShort(imports);
 		for (int i = 0; i < imports; i++)
 		{
-			header.getImport(i).write(dos);
+			header.getImport(i).write(writer);
 		}
 		
 		// Using Declarations
 		int staticImports = header.usingCount();
-		dos.writeShort(staticImports);
+		writer.writeShort(staticImports);
 		for (int i = 0; i < staticImports; i++)
 		{
-			header.getUsing(i).write(dos);
+			header.getUsing(i).write(writer);
 		}
 		
 		// Operators Definitions
 		Map<Name, Operator> operators = header.getOperators();
-		dos.writeShort(operators.size());
+		writer.writeShort(operators.size());
 		for (Entry<Name, Operator> entry : operators)
 		{
-			entry.getValue().write(dos);
+			entry.getValue().write(writer);
 		}
 		
 		// Type Aliases
 		Map<Name, ITypeAlias> typeAliases = header.getTypeAliases();
-		dos.writeShort(typeAliases.size());
+		writer.writeShort(typeAliases.size());
 		for (Entry<Name, ITypeAlias> entry : typeAliases)
 		{
-			entry.getValue().write(dos);
+			entry.getValue().write(writer);
 		}
+		
+		// Classes
+		writer.writeShort(0);
 	}
 	
 	private static DyvilHeader read(ObjectReader reader) throws Throwable
@@ -115,11 +116,7 @@ public class HeaderFile
 		DyvilHeader header = new ExternalHeader(name);
 		
 		// Include Declarations
-		/*
-		 * int includes = dis.readShort(); for (int i = 0; i < includes; i++) {
-		 * IncludeDeclaration id = new IncludeDeclaration(null); id.read(dis);
-		 * header.addInclude(id); }
-		 */
+		reader.readShort();
 		
 		// Import Declarations
 		int imports = reader.readShort();
@@ -145,16 +142,15 @@ public class HeaderFile
 			header.addOperator(op);
 		}
 		
-		if (fileVersion >= 2)
+		int typeAliases = reader.readShort();
+		for (int i = 0; i < typeAliases; i++)
 		{
-			int typeAliases = reader.readShort();
-			for (int i = 0; i < typeAliases; i++)
-			{
-				TypeAlias ta = new TypeAlias();
-				ta.read(reader);
-				header.addTypeAlias(ta);
-			}
+			TypeAlias ta = new TypeAlias();
+			ta.read(reader);
+			header.addTypeAlias(ta);
 		}
+		
+		// int classes = reader.readShort();
 		
 		return header;
 	}

@@ -12,41 +12,44 @@ import dyvil.tools.compiler.lexer.CodeFile;
 
 public class FileTypes
 {
-	public static final Map<String, IFileType>	fileTypes		= new HashMap();
+	public static final String					CLASS_EXTENSION		= ".class";
+	public static final String					OBJECT_EXTENSION	= ".dyo";
 	
-	public static final IFileType				DYVIL_UNIT		= new IFileType()
-																{
-																	@Override
-																	public String getExtension()
-																	{
-																		return "dyv";
-																	}
-																	
-																	@Override
-																	public ICompilationUnit createUnit(Package pack, CodeFile inputFile, File outputFile)
-																	{
-																		DyvilUnit unit = new DyvilUnit(pack, inputFile, outputFile);
-																		pack.addHeader(unit);
-																		return unit;
-																	}
-																};
+	public static final Map<String, IFileType>	fileTypes			= new HashMap();
 	
-	public static final IFileType				DYVIL_HEADER	= new IFileType()
-																{
-																	@Override
-																	public String getExtension()
+	public static final IFileType				DYVIL_UNIT			= new IFileType()
 																	{
-																		return "dyh";
-																	}
-																	
-																	@Override
-																	public ICompilationUnit createUnit(Package pack, CodeFile inputFile, File outputFile)
+																		@Override
+																		public String getExtension()
+																		{
+																			return "dyv";
+																		}
+																		
+																		@Override
+																		public ICompilationUnit createUnit(Package pack, CodeFile inputFile, File outputFile)
+																		{
+																			DyvilUnit unit = new DyvilUnit(pack, inputFile, outputFile);
+																			pack.addHeader(unit);
+																			return unit;
+																		}
+																	};
+	
+	public static final IFileType				DYVIL_HEADER		= new IFileType()
 																	{
-																		DyvilHeader header = new DyvilHeader(pack, inputFile, outputFile);
-																		pack.addHeader(header);
-																		return header;
-																	}
-																};
+																		@Override
+																		public String getExtension()
+																		{
+																			return "dyh";
+																		}
+																		
+																		@Override
+																		public ICompilationUnit createUnit(Package pack, CodeFile inputFile, File outputFile)
+																		{
+																			DyvilHeader header = new DyvilHeader(pack, inputFile, outputFile);
+																			pack.addHeader(header);
+																			return header;
+																		}
+																	};
 	
 	static
 	{

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.Map;
@@ -88,22 +88,22 @@ public class IncludeDeclaration implements IASTNode
 		operatorMap.putAll(this.header.getOperators());
 	}
 	
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		dos.writeShort(this.namePartCount);
+		out.writeShort(this.namePartCount);
 		for (int i = 0; i < this.namePartCount; i++)
 		{
-			dos.writeUTF(this.nameParts[i].qualified);
+			out.writeUTF(this.nameParts[i].qualified);
 		}
 	}
 	
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		this.namePartCount = dis.readShort();
+		this.namePartCount = in.readShort();
 		this.nameParts = new Name[this.namePartCount];
 		for (int i = 0; i < this.namePartCount; i++)
 		{
-			this.nameParts[i] = Name.getQualified(dis.readUTF());
+			this.nameParts[i] = Name.getQualified(in.readUTF());
 		}
 	}
 	

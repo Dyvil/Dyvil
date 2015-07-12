@@ -58,7 +58,7 @@ public final class Operator
 	
 	public void write(DataOutput dos) throws IOException
 	{
-		dos.writeUTF(this.name.qualified);
+		dos.writeUTF(this.name.unqualified);
 		dos.writeByte(this.type);
 		if (this.type > PREFIX && this.type < POSTFIX)
 		{
@@ -68,7 +68,7 @@ public final class Operator
 	
 	public static Operator read(DataInput dis) throws IOException
 	{
-		Name name = Name.getQualified(dis.readUTF());
+		Name name = Name.get(dis.readUTF());
 		byte type = dis.readByte();
 		if (type > PREFIX && type < POSTFIX)
 		{

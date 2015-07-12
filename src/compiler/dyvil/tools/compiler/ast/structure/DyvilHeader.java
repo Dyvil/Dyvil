@@ -31,6 +31,7 @@ import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
+import dyvil.tools.compiler.sources.FileTypes;
 
 public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
@@ -80,7 +81,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		start = name.lastIndexOf('/');
 		end = name.lastIndexOf('.');
 		this.outputDirectory = new File(name.substring(0, start));
-		this.outputFile = new File(name.substring(0, end) + ".dyhbin");
+		this.outputFile = new File(name.substring(0, end) + FileTypes.OBJECT_EXTENSION);
 	}
 	
 	@Override
