@@ -468,6 +468,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
+			instance.getType().appendExtendedName(desc);
 		}
 		
 		for (IValue v : arguments)
