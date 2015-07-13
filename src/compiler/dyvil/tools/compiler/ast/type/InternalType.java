@@ -56,6 +56,12 @@ public class InternalType implements IType
 	@Override
 	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
+		switch (this.internalName)
+		{
+		case "dyvil/lang/Null":
+			return Types.NULL;
+		}
+		
 		IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
 		return new ClassType(iclass);
 	}

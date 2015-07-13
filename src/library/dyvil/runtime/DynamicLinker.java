@@ -86,6 +86,11 @@ public class DynamicLinker
 		}
 		
 		Object receiver = args[0];
+		if (receiver == null)
+		{
+			return null;
+		}
+		
 		Class<?> receiverClass = receiver.getClass();
 		Method m = findMethod(receiverClass, callSite.name, type.dropParameterTypes(0, 1).parameterArray());
 		
