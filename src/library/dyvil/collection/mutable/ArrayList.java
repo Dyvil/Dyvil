@@ -2,7 +2,6 @@ package dyvil.collection.mutable;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -63,44 +62,6 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	public ArrayList(Collection<E> collection)
 	{
 		super(collection);
-	}
-	
-	@Override
-	public Iterator<E> iterator()
-	{
-		return new Iterator<E>()
-		{
-			int	index;
-			
-			@Override
-			public boolean hasNext()
-			{
-				return this.index < ArrayList.this.size;
-			}
-			
-			@Override
-			public E next()
-			{
-				return (E) ArrayList.this.elements[this.index++];
-			}
-			
-			@Override
-			public void remove()
-			{
-				if (this.index <= 0)
-				{
-					throw new IllegalStateException();
-				}
-				ArrayList.this.removeAt(this.index - 1);
-				this.index--;
-			}
-			
-			@Override
-			public String toString()
-			{
-				return "ListIterator(" + ArrayList.this + ")";
-			}
-		};
 	}
 	
 	@Override

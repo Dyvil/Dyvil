@@ -85,6 +85,17 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			this.indexValid = false;
 			return this.index++;
 		}
+		
+		@Override
+		public void remove()
+		{
+			if (this.index == 0)
+			{
+				throw new IllegalStateException();
+			}
+			
+			AbstractEnumMap.this.removeAt(--this.index);
+		}
 	}
 	
 	protected Class<K>	type;
@@ -185,6 +196,8 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		};
 	}
 	
+	protected abstract void removeAt(int index);
+
 	@Override
 	public boolean containsKey(Object key)
 	{

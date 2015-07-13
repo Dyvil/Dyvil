@@ -330,6 +330,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public <U> Map<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
 	
+	public <U, R> Map<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper);
+	
+	public <U, R> Map<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper);
+	
 	public Map<K, V> filtered(BiPredicate<? super K, ? super V> condition);
 	
 	// Mutating Operations
@@ -390,30 +394,13 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public void clear();
 	
-	public default void subscript_$eq(K key, V value)
-	{
-		this.put(key, value);
-	}
+	public void subscript_$eq(K key, V value);
 	
 	public V put(K key, V value);
 	
-	public default V put(Entry<? extends K, ? extends V> entry)
-	{
-		return this.put(entry.getKey(), entry.getValue());
-	}
+	public V put(Entry<? extends K, ? extends V> entry);
 	
-	public default boolean putAll(Map<? extends K, ? extends V> map)
-	{
-		boolean added = false;
-		for (Entry<? extends K, ? extends V> entry : map)
-		{
-			if (this.put(entry) == null)
-			{
-				added = true;
-			}
-		}
-		return added;
-	}
+	public boolean putAll(Map<? extends K, ? extends V> map);
 	
 	public V removeKey(Object key);
 	
@@ -421,38 +408,17 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public boolean remove(Object key, Object value);
 	
-	public default boolean remove(Entry<?, ?> entry)
-	{
-		return this.remove(entry.getKey(), entry.getValue());
-	}
+	public boolean remove(Entry<?, ?> entry);
 	
-	public default boolean removeKeys(Collection<?> keys)
-	{
-		boolean removed = false;
-		for (Object key : keys)
-		{
-			if (this.removeKey(key) != null)
-			{
-				removed = true;
-			}
-		}
-		return removed;
-	}
+	public boolean removeKeys(Collection<?> keys);
 	
-	public default boolean removeAll(Map<?, ?> map)
-	{
-		boolean removed = false;
-		for (Entry<?, ?> entry : map)
-		{
-			if (this.remove(entry))
-			{
-				removed = true;
-			}
-		}
-		return removed;
-	}
+	public boolean removeAll(Map<?, ?> map);
 	
 	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);
+	
+	public void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
+	
+	public void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
 	
 	public void filter(BiPredicate<? super K, ? super V> condition);
 	

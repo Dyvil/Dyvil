@@ -2,7 +2,6 @@ package dyvil.collection.immutable;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -13,7 +12,6 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
 import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArrayList;
-import dyvil.collection.iterator.ArrayIterator;
 
 @ArrayConvertible
 public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<E>
@@ -51,12 +49,6 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	public ArrayList(Collection<E> collection)
 	{
 		super(collection);
-	}
-	
-	@Override
-	public Iterator<E> iterator()
-	{
-		return new ArrayIterator(this.elements, this.size);
 	}
 	
 	@Override

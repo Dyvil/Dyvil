@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -58,6 +59,45 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	{
 		return this.size;
 	}
+	
+	@Override
+	public Iterator<E> iterator()
+	{
+		return new Iterator<E>()
+		{
+			int	index;
+			
+			@Override
+			public boolean hasNext()
+			{
+				return this.index < AbstractArraySet.this.size;
+			}
+			
+			@Override
+			public E next()
+			{
+				return (E) AbstractArraySet.this.elements[this.index++];
+			}
+			
+			@Override
+			public void remove()
+			{
+				if (this.index <= 0)
+				{
+					throw new IllegalStateException();
+				}
+				AbstractArraySet.this.removeAt(--this.index);
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "SetIterator(" + AbstractArraySet.this + ")";
+			}
+		};
+	}
+	
+	protected abstract void removeAt(int index);
 	
 	@Override
 	public boolean contains(Object element)

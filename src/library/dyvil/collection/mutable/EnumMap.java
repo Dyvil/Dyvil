@@ -45,6 +45,13 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
+	protected void removeAt(int index)
+	{
+		this.values[index] = null;
+		this.size--;
+	}
+	
+	@Override
 	public MutableMap<K, V> $plus(K key, V value)
 	{
 		if (!this.checkType(key))

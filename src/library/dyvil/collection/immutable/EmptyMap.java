@@ -136,6 +136,18 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
+	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	{
+		return (ImmutableMap<U, R>) this;
+	}
+	
+	@Override
+	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	{
+		return (ImmutableMap<U, R>) this;
+	}
+	
+	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
 		return this;

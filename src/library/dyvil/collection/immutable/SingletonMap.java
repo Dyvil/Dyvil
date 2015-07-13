@@ -163,6 +163,24 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
+	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	{
+		Entry<? extends U, ? extends R> entry = mapper.apply(this.key, this.value);
+		return new SingletonMap(entry.getKey(), entry.getValue());
+	}
+	
+	@Override
+	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	{
+		dyvil.collection.mutable.ArrayMap<U, R> mutable = new dyvil.collection.mutable.ArrayMap();
+		for (Entry<? extends U, ? extends R> entry : mapper.apply(this.key, this.value))
+		{
+			mutable.put(entry.getKey(), entry.getValue());
+		}
+		return mutable.trustedImmutable();
+	}
+	
+	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
 		return condition.test(this.key, this.value) ? this : EmptyMap.instance;

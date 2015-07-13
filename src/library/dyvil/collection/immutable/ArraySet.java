@@ -1,6 +1,5 @@
 package dyvil.collection.immutable;
 
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -11,7 +10,7 @@ import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;
-import dyvil.collection.iterator.ArrayIterator;
+import dyvil.util.ImmutableException;
 
 @ArrayConvertible
 public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
@@ -47,9 +46,9 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public Iterator<E> iterator()
+	protected void removeAt(int index)
 	{
-		return new ArrayIterator<E>((E[]) this.elements, this.size);
+		throw new ImmutableException("removeAt() on Immutable Set");
 	}
 	
 	@Override

@@ -1,6 +1,7 @@
 package dyvil.collection.impl;
 
 import java.lang.reflect.Array;
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 import dyvil.collection.Collection;
@@ -75,6 +76,43 @@ public abstract class AbstractArrayList<E> implements List<E>
 		{
 			action.accept((E) this.elements[i]);
 		}
+	}
+	
+	@Override
+	public Iterator<E> iterator()
+	{
+		return new Iterator<E>()
+		{
+			int	index;
+			
+			@Override
+			public boolean hasNext()
+			{
+				return this.index < AbstractArrayList.this.size;
+			}
+			
+			@Override
+			public E next()
+			{
+				return (E) AbstractArrayList.this.elements[this.index++];
+			}
+			
+			@Override
+			public void remove()
+			{
+				if (this.index <= 0)
+				{
+					throw new IllegalStateException();
+				}
+				AbstractArrayList.this.removeAt(--this.index);
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "ListIterator(" + AbstractArrayList.this + ")";
+			}
+		};
 	}
 	
 	@Override

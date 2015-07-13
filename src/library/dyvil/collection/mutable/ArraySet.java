@@ -1,6 +1,5 @@
 package dyvil.collection.mutable;
 
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -50,44 +49,6 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 	}
 	
 	@Override
-	public Iterator<E> iterator()
-	{
-		return new Iterator<E>()
-		{
-			int	index;
-			
-			@Override
-			public boolean hasNext()
-			{
-				return this.index < ArraySet.this.size;
-			}
-			
-			@Override
-			public E next()
-			{
-				return (E) ArraySet.this.elements[this.index++];
-			}
-			
-			@Override
-			public void remove()
-			{
-				if (this.index <= 0)
-				{
-					throw new IllegalStateException();
-				}
-				ArraySet.this.removeAt(this.index - 1);
-				this.index--;
-			}
-			
-			@Override
-			public String toString()
-			{
-				return "SetIterator(" + ArraySet.this + ")";
-			}
-		};
-	}
-	
-	@Override
 	public void clear()
 	{
 		this.size = 0;
@@ -130,6 +91,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 		return false;
 	}
 	
+	@Override
 	protected void removeAt(int index)
 	{
 		int numMoved = --this.size - index;

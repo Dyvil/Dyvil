@@ -14,6 +14,7 @@ import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractEnumMap;
+import dyvil.util.ImmutableException;
 
 @ClassConvertible
 @TypeConvertible
@@ -42,6 +43,12 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	public EnumMap(Type<K> type)
 	{
 		super(type.getTheClass());
+	}
+	
+	@Override
+	protected void removeAt(int index)
+	{
+		throw new ImmutableException("Iterator.remove() on Immutable Map");
 	}
 	
 	@Override
@@ -161,8 +168,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
 	{
-		Object[] newValues = this.values.clone();
 		int len = this.values.length;
+		Object[] newValues = new Object[len];
 		
 		for (int i = 0; i < len; i++)
 		{
@@ -173,6 +180,45 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			}
 		}
 		return new EnumMap(this.type, this.keys, newValues, this.size);
+	}
+	
+	@Override
+	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	{
+		dyvil.collection.mutable.HashMap<U, R> hashMap = new dyvil.collection.mutable.HashMap(this.size);
+		
+		int len = this.values.length;
+		for (int i = 0; i < len; i++)
+		{
+			Object value = this.values[i];
+			if (value != null)
+			{
+				hashMap.put(mapper.apply(this.keys[i], (V) value));
+			}
+		}
+		
+		return hashMap.immutable();
+	}
+	
+	@Override
+	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	{
+		dyvil.collection.mutable.ArrayMap<U, R> hashMap = new dyvil.collection.mutable.ArrayMap(this.size);
+		
+		int len = this.values.length;
+		for (int i = 0; i < len; i++)
+		{
+			Object value = this.values[i];
+			if (value != null)
+			{
+				for (Entry<? extends U, ? extends R> entry : mapper.apply(this.keys[i], (V) value))
+				{
+					hashMap.put(entry);
+				}
+			}
+		}
+		
+		return hashMap.immutable();
 	}
 	
 	@Override
