@@ -61,36 +61,73 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public boolean containsValue(Object value);
 	
 	@Override
-	public boolean contains(Object key, Object value);
-	
-	@Override
 	public V get(Object key);
 	
 	// Non-mutating Operations
 	
 	@Override
-	public MutableMap<K, V> $plus(K key, V value);
+	public default MutableMap<K, V> $plus(K key, V value)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.subscript_$eq(key, value);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map);
+	public default MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$plus$plus$eq(map);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> $minus(Object key);
+	public default MutableMap<K, V> $minus(Object key)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$minus$eq(key);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> $minus(Object key, Object value);
+	public default MutableMap<K, V> $minus(Object key, Object value)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$minus$eq(key, value);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> $minus$colon(Object value);
+	public default MutableMap<K, V> $minus$colon(Object value)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$minus$colon$eq(value);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> $minus$minus(Map<? super K, ? super V> map);
+	public default MutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$minus$minus$eq(map);
+		return copy;
+	}
 	
 	@Override
-	public <U> MutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
+	public default <U> MutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	{
+		MutableMap<K, U> copy = (MutableMap<K, U>) this.copy();
+		copy.map((BiFunction) mapper);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition);
+	public default MutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.filter(condition);
+		return copy;
+	}
 	
 	// Mutating Operations
 	

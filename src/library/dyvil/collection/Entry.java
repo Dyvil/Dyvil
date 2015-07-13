@@ -1,5 +1,7 @@
 package dyvil.collection;
 
+import java.util.Comparator;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -27,6 +29,26 @@ public interface Entry<K, V>
 	 * @return the value
 	 */
 	public V getValue();
+	
+	public static <K extends Comparable<? super K>, V> Comparator<Entry<K, V>> comparingByKey()
+	{
+		return (c1, c2) -> c1.getKey().compareTo(c2.getKey());
+	}
+	
+	public static <K, V extends Comparable<? super V>> Comparator<Entry<K, V>> comparingByValue()
+	{
+		return (c1, c2) -> c1.getValue().compareTo(c2.getValue());
+	}
+	
+	public static <K, V> Comparator<Entry<K, V>> comparingByKey(Comparator<? super K> cmp)
+	{
+		return (c1, c2) -> cmp.compare(c1.getKey(), c2.getKey());
+	}
+	
+	public static <K, V> Comparator<Entry<K, V>> comparingByValue(Comparator<? super V> cmp)
+	{
+		return (c1, c2) -> cmp.compare(c1.getValue(), c2.getValue());
+	}
 	
 	public static <K, V> String entryToString(Entry<K, V> entry)
 	{

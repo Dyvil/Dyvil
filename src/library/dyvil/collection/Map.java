@@ -1,7 +1,6 @@
 package dyvil.collection;
 
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.BiConsumer;
@@ -335,6 +334,11 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	// Mutating Operations
 	
+	public default void $plus$eq(K key, V value)
+	{
+		this.subscript_$eq(key, value);
+	}
+	
 	public default void $plus$eq(Entry<? extends K, ? extends V> entry)
 	{
 		this.subscript_$eq(entry.getKey(), entry.getValue());
@@ -353,9 +357,14 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		this.removeKey(key);
 	}
 	
+	public default void $minus$eq(Object key, Object value)
+	{
+		this.remove(key, value);
+	}
+	
 	public default void $minus$eq(Entry<?, ?> entry)
 	{
-		this.remove(entry);
+		this.remove(entry.getKey(), entry.getValue());
 	}
 	
 	public default void $minus$colon$eq(Object value)
@@ -410,10 +419,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public boolean removeValue(Object value);
 	
-	public default boolean remove(Object key, Object value)
-	{
-		return Objects.equals(this.removeKey(key), value);
-	}
+	public boolean remove(Object key, Object value);
 	
 	public default boolean remove(Entry<?, ?> entry)
 	{

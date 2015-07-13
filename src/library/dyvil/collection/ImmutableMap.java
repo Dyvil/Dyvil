@@ -91,9 +91,6 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	public boolean containsValue(Object value);
 	
 	@Override
-	public boolean contains(Object key, Object value);
-	
-	@Override
 	public V get(Object key);
 	
 	// Non-mutating Operations

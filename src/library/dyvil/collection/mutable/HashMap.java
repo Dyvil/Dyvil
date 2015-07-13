@@ -2,6 +2,7 @@ package dyvil.collection.mutable;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -368,12 +369,6 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public boolean contains(Object key, Object value)
-	{
-		return value.equals(this.get(key));
-	}
-	
-	@Override
 	public boolean containsValue(Object value)
 	{
 		for (HashEntry<K, V> e : this.entries)
@@ -391,7 +386,13 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public V get(Object key)
+	public boolean contains(Object key, Object value)
+	{
+		HashEntry<K, V> entry = this.getEntry(key);
+		return entry == null ? false : Objects.equals(entry.value, value);
+	}
+	
+	protected HashEntry<K, V> getEntry(Object key)
 	{
 		if (key == null)
 		{
@@ -399,22 +400,29 @@ public class HashMap<K, V> implements MutableMap<K, V>
 			{
 				if (e.key == null)
 				{
-					return e.value;
+					return e;
 				}
 			}
 			return null;
 		}
 		
-		int hash = hash(key.hashCode());
+		int hash = hash(key);
 		for (HashEntry<K, V> e = this.entries[index(hash, this.entries.length)]; e != null; e = e.next)
 		{
 			Object k;
 			if (e.hash == hash && ((k = e.key) == key || key.equals(k)))
 			{
-				return e.value;
+				return e;
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public V get(Object key)
+	{
+		HashEntry<K, V> entry = this.getEntry(key);
+		return entry == null ? null : entry.value;
 	}
 	
 	@Override
@@ -509,30 +517,9 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		this.size++;
 	}
 	
-	private V putNull(V value)
-	{
-		for (HashEntry<K, V> e = this.entries[0]; e != null; e = e.next)
-		{
-			if (e.key == null)
-			{
-				V old = e.value;
-				e.value = value;
-				return old;
-			}
-		}
-		this.addEntry(0, null, value, 0);
-		return null;
-	}
-	
 	@Override
 	public void subscript_$eq(K key, V value)
 	{
-		if (key == null)
-		{
-			this.putNull(value);
-			return;
-		}
-		
 		int hash = hash(key);
 		int i = index(hash, this.entries.length);
 		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
@@ -551,11 +538,6 @@ public class HashMap<K, V> implements MutableMap<K, V>
 	@Override
 	public V put(K key, V value)
 	{
-		if (key == null)
-		{
-			return this.putNull(value);
-		}
-		
 		int hash = hash(key);
 		int i = index(hash, this.entries.length);
 		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
@@ -573,42 +555,9 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		return null;
 	}
 	
-	private V removeNull()
-	{
-		HashEntry<K, V> prev = this.entries[0];
-		HashEntry<K, V> e = prev;
-		
-		while (e != null)
-		{
-			HashEntry<K, V> next = e.next;
-			if (e.hash == 0 && e.key == null)
-			{
-				this.size--;
-				if (prev == e)
-				{
-					this.entries[0] = next;
-				}
-				else
-				{
-					prev.next = next;
-				}
-				return e.value;
-			}
-			prev = e;
-			e = next;
-		}
-		
-		return null;
-	}
-	
 	@Override
 	public V removeKey(Object key)
 	{
-		if (key == null)
-		{
-			return this.removeNull();
-		}
-		
 		int hash = hash(key);
 		int i = index(hash, this.entries.length);
 		HashEntry<K, V> prev = this.entries[i];
@@ -618,7 +567,7 @@ public class HashMap<K, V> implements MutableMap<K, V>
 		{
 			HashEntry<K, V> next = e.next;
 			Object k;
-			if (e.hash == hash && ((k = e.key) == key || key.equals(k)))
+			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
 			{
 				this.size--;
 				if (prev == e)
@@ -668,6 +617,44 @@ public class HashMap<K, V> implements MutableMap<K, V>
 				prev = e;
 				e = next;
 			}
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public boolean remove(Object key, Object value)
+	{
+		int hash = hash(key);
+		int i = index(hash, this.entries.length);
+		HashEntry<K, V> prev = this.entries[i];
+		HashEntry<K, V> e = prev;
+		
+		while (e != null)
+		{
+			HashEntry<K, V> next = e.next;
+			Object k;
+			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
+			{
+				if (!Objects.equals(value, e.value))
+				{
+					return false;
+				}
+				
+				this.size--;
+				if (prev == e)
+				{
+					this.entries[i] = next;
+				}
+				else
+				{
+					prev.next = next;
+				}
+				
+				return true;
+			}
+			prev = e;
+			e = next;
 		}
 		
 		return false;
