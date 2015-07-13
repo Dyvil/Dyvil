@@ -189,23 +189,14 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		if (this.valueCount == 1)
 		{
 			return this.values[0].getTypeMatch(type);
 		}
 		
-		IType type1 = this.getType();
-		if (type.equals(type1))
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(type1) || type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(this.getType());
 	}
 	
 	@Override

@@ -125,26 +125,6 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(PARTIALFUNCTION);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (type.getTheClass() == PARTIALFUNCTION_CLASS)
-		{
-			return 3;
-		}
-		if (this.isType(type))
-		{
-			return 2;
-		}
-		return 0;
-	}
-	
-	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;

@@ -73,6 +73,20 @@ public class TypeVarType implements IType
 	}
 	
 	@Override
+	public int getSubClassDistance(IType subtype)
+	{
+		int i = subtype.getTheClass().getSuperTypeDistance(this);
+		return i == 0 ? 0 : i + 100;
+	}
+	
+	@Override
+	public float getSubTypeDistance(IType subtype)
+	{
+		int i = subtype.getTheClass().getSuperTypeDistance(this);
+		return i == 0 ? 0 : i + 100;
+	}
+	
+	@Override
 	public boolean equals(IType type)
 	{
 		return this.typeVar.isSuperTypeOf(type);

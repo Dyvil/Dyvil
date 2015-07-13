@@ -81,17 +81,13 @@ public final class IntValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type == Types.INT)
+		if (type.getTheClass().getAnnotation(INT_CONVERTIBLE) != null)
 		{
-			return 3;
+			return CONVERSION_MATCH;
 		}
-		if (type.isSuperTypeOf(Types.INT) || type.getTheClass().getAnnotation(INT_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(Types.INT);
 	}
 	
 	@Override

@@ -6,10 +6,8 @@ import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -63,30 +61,6 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	public int valueTag()
 	{
 		return WHILE;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return Types.VOID;
-	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type == Types.VOID || type == Types.UNKNOWN ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID || type == Types.UNKNOWN;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
 	}
 	
 	@Override

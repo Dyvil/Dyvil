@@ -62,7 +62,7 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		return 0;
 	}

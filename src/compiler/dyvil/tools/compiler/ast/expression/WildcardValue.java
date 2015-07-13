@@ -53,9 +53,9 @@ public class WildcardValue implements IConstantValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return 3;
+		return 1;
 	}
 	
 	@Override

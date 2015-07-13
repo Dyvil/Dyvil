@@ -18,7 +18,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IConstructor extends IASTNode, IClassMember, ICallableMember, ITypeList, IContext
 {
-	public int getSignatureMatch(IArguments arguments);
+	public float getSignatureMatch(IArguments arguments);
 	
 	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
 	

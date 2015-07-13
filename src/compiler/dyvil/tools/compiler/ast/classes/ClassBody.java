@@ -245,7 +245,7 @@ public class ClassBody extends ASTNode implements IClassBody
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			IConstructor c = this.constructors[i];
-			int m = c.getSignatureMatch(arguments);
+			float m = c.getSignatureMatch(arguments);
 			if (m > 0)
 			{
 				list.add(new ConstructorMatch(c, m));
@@ -331,7 +331,7 @@ public class ClassBody extends ASTNode implements IClassBody
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			IMethod m = this.methods[i];
-			int match = m.getSignatureMatch(name, instance, arguments);
+			float match = m.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
 				list.add(new MethodMatch(m, match));

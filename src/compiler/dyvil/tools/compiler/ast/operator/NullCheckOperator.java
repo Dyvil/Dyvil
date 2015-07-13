@@ -37,21 +37,9 @@ public final class NullCheckOperator implements IValue
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.BOOLEAN;
-	}
-	
-	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return type == Types.BOOLEAN ? this : IValue.autoBox(this, Types.BOOLEAN, type);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return type == Types.BOOLEAN ? 3 : 0;
 	}
 	
 	@Override

@@ -148,9 +148,16 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 3 : 0;
+		if (this.elseThen == null)
+		{
+			return this.then.getTypeMatch(type);
+		}
+		
+		float f1 = this.then.getTypeMatch(type);
+		float f2 = this.elseThen.getTypeMatch(type);
+		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2;
 	}
 	
 	@Override

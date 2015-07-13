@@ -77,7 +77,7 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		if (this.value == null)
 		{

@@ -122,17 +122,30 @@ public final class MatchExpression extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
+		if (this.caseCount == 0)
+		{
+			return 0;
+		}
+		
+		float total = 0F;
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			IValue v = this.cases[i].value;
-			if (v != null && !v.isType(type))
+			if (v == null)
+			{
+				continue;
+			}
+			
+			float f = v.getTypeMatch(type);
+			if (f == 0)
 			{
 				return 0;
 			}
+			total += f;
 		}
-		return 3;
+		return 1 + total / this.caseCount;
 	}
 	
 	@Override

@@ -20,77 +20,79 @@ import org.objectweb.asm.Label;
 
 public interface IValue extends IASTNode, ITyped
 {
-	int	VOID				= 0;
-	int	NULL				= 1;
-	int	NIL					= 2;
-	int	WILDCARD			= 3;
-	int	BOOLEAN				= 4;
-	int	BYTE				= 5;
-	int	SHORT				= 6;
-	int	CHAR				= 7;
-	int	INT					= 8;
-	int	LONG				= 9;
-	int	FLOAT				= 10;
-	int	DOUBLE				= 11;
-	int	STRING				= 12;
-	int	FORMAT_STRING		= 13;
-	int	STRINGBUILDER		= 14;
+	int		VOID				= 0;
+	int		NULL				= 1;
+	int		NIL					= 2;
+	int		WILDCARD			= 3;
+	int		BOOLEAN				= 4;
+	int		BYTE				= 5;
+	int		SHORT				= 6;
+	int		CHAR				= 7;
+	int		INT					= 8;
+	int		LONG				= 9;
+	int		FLOAT				= 10;
+	int		DOUBLE				= 11;
+	int		STRING				= 12;
+	int		FORMAT_STRING		= 13;
+	int		STRINGBUILDER		= 14;
 	
-	int	THIS				= 16;
-	int	SUPER				= 17;
+	int		THIS				= 16;
+	int		SUPER				= 17;
 	
-	int	STATEMENT_LIST		= 24;
-	int	ARRAY				= 25;
-	int	TUPLE				= 26;
-	int	CASE_STATEMENT		= 27;
-	int	MATCH				= 28;
-	int	LAMBDA				= 29;
-	int	PARTIAL_FUNCTION	= 30;
-	int	BYTECODE			= 31;
+	int		STATEMENT_LIST		= 24;
+	int		ARRAY				= 25;
+	int		TUPLE				= 26;
+	int		CASE_STATEMENT		= 27;
+	int		MATCH				= 28;
+	int		LAMBDA				= 29;
+	int		PARTIAL_FUNCTION	= 30;
+	int		BYTECODE			= 31;
 	
-	int	CLASS_ACCESS		= 32;
-	int	ENUM				= 33;
-	int	FIELD_ACCESS		= 34;
-	int	FIELD_ASSIGN		= 35;
-	int	METHOD_CALL			= 36;
-	int	APPLY_CALL			= 37;
-	int	UPDATE_CALL			= 38;
-	int	SUBSCRIPT_GET		= 39;
-	int	SUBSCRIPT_SET		= 40;
-	int	CONSTRUCTOR_CALL	= 41;
-	int	INITIALIZER_CALL	= 42;
+	int		CLASS_ACCESS		= 32;
+	int		ENUM				= 33;
+	int		FIELD_ACCESS		= 34;
+	int		FIELD_ASSIGN		= 35;
+	int		METHOD_CALL			= 36;
+	int		APPLY_CALL			= 37;
+	int		UPDATE_CALL			= 38;
+	int		SUBSCRIPT_GET		= 39;
+	int		SUBSCRIPT_SET		= 40;
+	int		CONSTRUCTOR_CALL	= 41;
+	int		INITIALIZER_CALL	= 42;
 	
-	int	VARIABLE			= 43;
-	int	NESTED_METHOD		= 44;
+	int		VARIABLE			= 43;
+	int		NESTED_METHOD		= 44;
 	
-	int	CAST_OPERATOR		= 48;
-	int	ISOF_OPERATOR		= 49;
-	int	SWAP_OPERATOR		= 50;
-	int	BOOLEAN_AND			= 51;
-	int	BOOLEAN_OR			= 52;
-	int	BOOLEAN_NOT			= 53;
-	int	CLASS_OPERATOR		= 54;
-	int	TYPE_OPERATOR		= 55;
-	int	NULLCHECK			= 56;
-	int	RANGE_OPERATOR		= 57;
+	int		CAST_OPERATOR		= 48;
+	int		ISOF_OPERATOR		= 49;
+	int		SWAP_OPERATOR		= 50;
+	int		BOOLEAN_AND			= 51;
+	int		BOOLEAN_OR			= 52;
+	int		BOOLEAN_NOT			= 53;
+	int		CLASS_OPERATOR		= 54;
+	int		TYPE_OPERATOR		= 55;
+	int		NULLCHECK			= 56;
+	int		RANGE_OPERATOR		= 57;
 	
-	int	RETURN				= 70;
-	int	IF					= 71;
-	int	SWITCH				= 72;
-	int	FOR					= 73;
-	int	WHILE				= 74;
-	int	DO_WHILE			= 75;
-	int	TRY					= 76;
-	int	THROW				= 77;
-	int	SYNCHRONIZED		= 78;
+	int		RETURN				= 70;
+	int		IF					= 71;
+	int		SWITCH				= 72;
+	int		FOR					= 73;
+	int		WHILE				= 74;
+	int		DO_WHILE			= 75;
+	int		TRY					= 76;
+	int		THROW				= 77;
+	int		SYNCHRONIZED		= 78;
 	
-	int	BREAK				= 79;
-	int	CONTINUE			= 80;
-	int	GOTO				= 81;
+	int		BREAK				= 79;
+	int		CONTINUE			= 80;
+	int		GOTO				= 81;
 	
 	// Special Types only used by the compiler
-	int	REFERENCE			= 128;
-	int	BOXED				= 129;
+	int		REFERENCE			= 128;
+	int		BOXED				= 129;
+	
+	float	CONVERSION_MATCH	= 1000F;
 	
 	public int valueTag();
 	
@@ -151,9 +153,24 @@ public interface IValue extends IASTNode, ITyped
 	}
 	
 	@Override
-	public boolean isType(IType type);
+	public default boolean isType(IType type)
+	{
+		return type.isSuperTypeOf(this.getType());
+	}
 	
-	public int getTypeMatch(IType type);
+	/**
+	 * Returns how much the type of this value 'matches' the given type.
+	 * {@code 1} indicates a perfect match, while {@code 0} marks incompatible
+	 * types. A higher value means that the value is less suitable for the type.
+	 * 
+	 * @param type
+	 *            the type to match
+	 * @return the subtyping distance
+	 */
+	public default float getTypeMatch(IType type)
+	{
+		return type.getSubTypeDistance(this.getType());
+	}
 	
 	public void resolveTypes(MarkerList markers, IContext context);
 	

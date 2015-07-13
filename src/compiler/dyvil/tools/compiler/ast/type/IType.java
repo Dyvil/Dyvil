@@ -144,6 +144,16 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	
 	// Super Type
 	
+	public default float getSubTypeDistance(IType subtype)
+	{
+		return subtype.getTheClass().getSuperTypeDistance(this);
+	}
+	
+	public default int getSubClassDistance(IType subtype)
+	{
+		return subtype.getTheClass().getSuperTypeDistance(this);
+	}
+	
 	public default IType getSuperType()
 	{
 		IClass iclass = this.getTheClass();

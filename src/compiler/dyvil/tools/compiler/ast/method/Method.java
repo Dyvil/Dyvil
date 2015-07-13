@@ -508,13 +508,15 @@ public class Method extends Member implements IMethod
 		for (int i = body.methodCount() - 1; i >= 0; i--)
 		{
 			IMethod m = body.getMethod(i);
-			if (m != this && m.getName() == this.name)
+			if (m == this || m.getName() != this.name || m.parameterCount() != this.parameterCount)
 			{
-				if (m.getDescriptor().equals(desc))
-				{
-					markers.add(this.position, "method.duplicate", this.name, desc);
-				}
+				continue;
 			}
+			
+			if (m.getDescriptor().equals(desc))
+			{
+				markers.add(this.position, "method.duplicate", this.name, desc);
+			}			
 		}
 	}
 	
@@ -689,7 +691,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
+	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		if (name != null && name != this.name)
 		{
@@ -708,7 +710,7 @@ public class Method extends Member implements IMethod
 		
 		if (instance == null && this.modifiers == Modifiers.PREFIX)
 		{
-			int m = arguments.getFirstValue().getTypeMatch(this.theClass.getType());
+			float m = arguments.getFirstValue().getTypeMatch(this.theClass.getType());
 			if (m == 0)
 			{
 				return 0;
@@ -731,7 +733,7 @@ public class Method extends Member implements IMethod
 			else if (mod == Modifiers.INFIX)
 			{
 				IType t2 = this.parameters[0].getType();
-				int m = instance.getTypeMatch(t2);
+				float m = instance.getTypeMatch(t2);
 				if (m == 0)
 				{
 					return 0;
@@ -749,7 +751,7 @@ public class Method extends Member implements IMethod
 				return 0;
 			}
 			
-			int m;
+			float m;
 			IParameter varParam = this.parameters[parCount];
 			for (int i = parIndex; i < parCount; i++)
 			{
@@ -780,7 +782,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; parIndex < this.parameterCount; parIndex++, i++)
 		{
 			IParameter par = this.parameters[parIndex];
-			int m = arguments.getTypeMatch(i, par);
+			float m = arguments.getTypeMatch(i, par);
 			if (m == 0)
 			{
 				return 0;

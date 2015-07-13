@@ -81,17 +81,13 @@ public class LongValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type == Types.LONG)
+		if (type.getTheClass().getAnnotation(LONG_CONVERTIBLE) != null)
 		{
-			return 3;
+			return CONVERSION_MATCH;
 		}
-		if (type.isSuperTypeOf(Types.LONG) || type.getTheClass().getAnnotation(LONG_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(Types.LONG);
 	}
 	
 	@Override

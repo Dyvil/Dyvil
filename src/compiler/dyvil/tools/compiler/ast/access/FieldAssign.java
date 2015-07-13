@@ -82,7 +82,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		return this.value.getTypeMatch(type);
 	}

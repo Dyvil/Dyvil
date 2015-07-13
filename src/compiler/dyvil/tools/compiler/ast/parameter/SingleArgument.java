@@ -123,24 +123,27 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public int getTypeMatch(int index, IParameter param)
+	public float getTypeMatch(int index, IParameter param)
 	{
 		if (index == 0)
 		{
 			return this.value.getTypeMatch(param.getType());
 		}
-		return param.getValue() != null ? 3 : 0;
+		return param.getValue() != null ? DEFAULT_MATCH : 0;
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, IParameter param)
+	public float getVarargsTypeMatch(int index, IParameter param)
 	{
-		if (index != 0)
+		if (index == 1)
 		{
-			return 3;
+			return DEFAULT_MATCH;
+		}
+		if (index > 1) {
+			return 0;
 		}
 		
-		int m = this.value.getTypeMatch(param.getType());
+		float m = this.value.getTypeMatch(param.getType());
 		if (m != 0)
 		{
 			return m;

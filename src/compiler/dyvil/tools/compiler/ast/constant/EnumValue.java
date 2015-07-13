@@ -74,20 +74,6 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.type.equals(type))
-		{
-			return 3;
-		}
-		else if (this.type.getTheClass().isSubTypeOf(type))
-		{
-			return 2;
-		}
-		return 0;
-	}
-	
-	@Override
 	public void setName(Name name)
 	{
 		this.name = name;

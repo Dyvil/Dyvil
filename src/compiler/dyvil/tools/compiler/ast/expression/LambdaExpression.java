@@ -275,9 +275,9 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 3 : 0;
+		return this.isType(type) ? 1 : 0;
 	}
 	
 	@Override

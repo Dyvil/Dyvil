@@ -127,7 +127,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		if (this.valueCount > 0)
 		{

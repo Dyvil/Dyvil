@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -61,31 +60,7 @@ public class StringBuilderExpression implements IValue
 		{
 			return this;
 		}
-		if (type.getTheClass().getAnnotation(StringValue.STRING_CONVERTIBLE) != null)
-		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
-		}
 		return null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(StringValue.STRING_CONVERTIBLE) != null;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (type == Types.STRING)
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(StringValue.STRING_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
 	}
 	
 	@Override

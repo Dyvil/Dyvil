@@ -94,22 +94,24 @@ public final class FormatStringExpression extends ASTNode implements IValue
 			return true;
 		}
 		
+		return this.isConvertible(type);
+	}
+	
+	private boolean isConvertible(IType type)
+	{
 		IClass theClass = type.getTheClass();
 		return theClass.getAnnotation(StringValue.STRING_CONVERTIBLE) != null || theClass.getAnnotation(FORMAT_STRING_CONVERTIBLE) != null;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type.equals(Types.STRING))
+		float distance = type.getSubTypeDistance(Types.STRING);
+		if (distance != 0)
 		{
-			return 3;
+			return distance;
 		}
-		if (this.isType(type))
-		{
-			return 2;
-		}
-		return 0;
+		return this.isConvertible(type) ? CONVERSION_MATCH : 0;
 	}
 	
 	public void addString(String s)

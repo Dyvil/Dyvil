@@ -81,17 +81,13 @@ public class DoubleValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type == Types.DOUBLE)
+		if (type.getTheClass().getAnnotation(DOUBLE_CONVERTIBLE) != null)
 		{
-			return 3;
+			return CONVERSION_MATCH;
 		}
-		if (type.isSuperTypeOf(Types.DOUBLE) || type.getTheClass().getAnnotation(DOUBLE_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(Types.DOUBLE);
 	}
 	
 	@Override

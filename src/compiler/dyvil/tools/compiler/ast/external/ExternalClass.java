@@ -28,6 +28,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.visitor.*;
@@ -186,6 +187,16 @@ public final class ExternalClass extends CodeClass
 			this.resolveSuperTypes();
 		}
 		return super.isSubTypeOf(type);
+	}
+	
+	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		return super.getSuperTypeDistance(superType);
 	}
 	
 	@Override
@@ -424,7 +435,7 @@ public final class ExternalClass extends CodeClass
 			this.resolveSuperTypes();
 		}
 		
-		if (this.superType != null)
+		if (this.superType != null && this.superType.getTheClass() != Types.OBJECT_CLASS)
 		{
 			this.superType.getMethodMatches(list, instance, name, arguments);
 		}

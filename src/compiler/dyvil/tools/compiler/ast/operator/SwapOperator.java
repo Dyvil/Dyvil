@@ -49,13 +49,7 @@ public class SwapOperator extends ASTNode implements IValue
 	@Override
 	public IType getType()
 	{
-		return Types.UNKNOWN;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID;
+		return Types.VOID;
 	}
 	
 	@Override
@@ -65,9 +59,9 @@ public class SwapOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public boolean isType(IType type)
 	{
-		return 0;
+		return type == Types.VOID;
 	}
 	
 	@Override

@@ -165,7 +165,7 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
+	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		if (name != this.name)
 		{

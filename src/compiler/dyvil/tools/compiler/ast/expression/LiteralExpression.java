@@ -85,18 +85,6 @@ public final class LiteralExpression implements IValue
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.type);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return type.isSuperTypeOf(this.type) ? 3 : 0;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.arguments.resolveTypes(markers, context);

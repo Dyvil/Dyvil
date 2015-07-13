@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -65,24 +64,6 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 	public int valueTag()
 	{
 		return DO_WHILE;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return Types.VOID;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.classEquals(Types.VOID);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
 	}
 	
 	@Override

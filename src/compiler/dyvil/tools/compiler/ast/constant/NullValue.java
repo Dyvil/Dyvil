@@ -72,8 +72,12 @@ public final class NullValue implements IConstantValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
+		if (type == Types.NULL)
+		{
+			return 1;
+		}
 		return type.isPrimitive() ? 0 : 2;
 	}
 	

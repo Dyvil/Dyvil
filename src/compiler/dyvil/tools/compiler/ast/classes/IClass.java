@@ -42,6 +42,8 @@ public interface IClass extends IASTNode, IClassMember, IGeneric, IContext, IPar
 	
 	public boolean isAbstract();
 	
+	public boolean isInterface();
+	
 	// Full Name
 	
 	public void setFullName(String name);
@@ -55,6 +57,8 @@ public interface IClass extends IASTNode, IClassMember, IGeneric, IContext, IPar
 	public IType getSuperType();
 	
 	public boolean isSubTypeOf(IType type);
+	
+	public int getSuperTypeDistance(IType superType);
 	
 	// Interfaces
 	

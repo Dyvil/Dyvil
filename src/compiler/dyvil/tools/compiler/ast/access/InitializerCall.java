@@ -63,12 +63,6 @@ public class InitializerCall extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.arguments.resolveTypes(markers, context);

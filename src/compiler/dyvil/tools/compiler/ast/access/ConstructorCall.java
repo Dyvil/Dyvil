@@ -70,20 +70,6 @@ public class ConstructorCall extends ASTNode implements ICall
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.type.equals(type))
-		{
-			return 3;
-		}
-		else if (type.isSuperTypeOf(this.type))
-		{
-			return 2;
-		}
-		return 0;
-	}
-	
-	@Override
 	public void setArguments(IArguments arguments)
 	{
 		this.arguments = arguments;

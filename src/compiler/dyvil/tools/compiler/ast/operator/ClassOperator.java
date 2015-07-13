@@ -85,23 +85,14 @@ public final class ClassOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		if (type.getTheClass().getAnnotation(CLASS_CONVERTIBLE) != null)
 		{
 			return 2;
 		}
 		
-		IType thisType = this.getType();
-		if (type.equals(thisType))
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(thisType))
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(this.genericType);
 	}
 	
 	@Override

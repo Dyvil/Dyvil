@@ -58,7 +58,7 @@ public final class ThrowStatement implements IValue, IValued
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		return 0;
 	}

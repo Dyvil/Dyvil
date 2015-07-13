@@ -41,7 +41,7 @@ public class MethodStatement extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		return 0;
 	}

@@ -283,6 +283,12 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
+	public boolean isInterface()
+	{
+		return (this.modifiers & Modifiers.INTERFACE_CLASS) == Modifiers.INTERFACE_CLASS;
+	}
+	
+	@Override
 	public int getAccessLevel()
 	{
 		return this.modifiers & Modifiers.ACCESS_MODIFIERS;
@@ -454,13 +460,14 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public boolean isSubTypeOf(IType type)
 	{
-		if (this == type.getTheClass())
+		IClass iclass = type.getTheClass();
+		if (this == iclass || (this.superType != null && type.isSuperClassOf(this.superType)))
 		{
 			return true;
 		}
-		if (this.superType != null && type.isSuperClassOf(this.superType))
+		if (!iclass.isInterface())
 		{
-			return true;
+			return false;
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
@@ -470,6 +477,31 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		IClass iclass = superType.getTheClass();
+		if (this == iclass)
+		{
+			return 1;
+		}
+		
+		int max = this.superType != null ? superType.getSubClassDistance(this.superType) : 0;
+		if (!iclass.isInterface())
+		{
+			return max;
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			int m = superType.getSubClassDistance(this.interfaces[i]);
+			if (m > max)
+			{
+				max = m;
+			}
+		}
+		return max == 0 ? 0 : 1 + max;
 	}
 	
 	@Override

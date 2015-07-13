@@ -77,9 +77,9 @@ public final class NilValue implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 3 : 0;
+		return this.isType(type) ? 1 : 0;
 	}
 	
 	@Override

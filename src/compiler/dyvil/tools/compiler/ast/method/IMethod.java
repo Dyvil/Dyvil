@@ -20,7 +20,7 @@ import org.objectweb.asm.Label;
 
 public interface IMethod extends IASTNode, IClassMember, ICallableMember, IMethodSignature, IContext
 {
-	public int getSignatureMatch(Name name, IValue instance, IArguments arguments);
+	public float getSignatureMatch(Name name, IValue instance, IArguments arguments);
 	
 	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	

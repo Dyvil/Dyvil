@@ -177,7 +177,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public int getTypeMatch(int index, IParameter param)
+	public float getTypeMatch(int index, IParameter param)
 	{
 		Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
@@ -187,11 +187,11 @@ public final class ArgumentMap implements IArguments, IValueMap
 				return this.values[i].getTypeMatch(param.getType());
 			}
 		}
-		return param.getValue() != null ? 3 : 0;
+		return param.getValue() != null ? DEFAULT_MATCH : 0;
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, IParameter param)
+	public float getVarargsTypeMatch(int index, IParameter param)
 	{
 		return this.getTypeMatch(index, param);
 	}

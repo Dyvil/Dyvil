@@ -177,7 +177,7 @@ public final class SimpleImport extends Import
 		}
 		for (IMethod m : this.methods)
 		{
-			int match = m.getSignatureMatch(name, instance, arguments);
+			float match = m.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
 				list.add(new MethodMatch(m, match));

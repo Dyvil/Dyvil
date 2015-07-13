@@ -72,17 +72,13 @@ public final class StringValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type == Types.STRING)
+		if (type.getTheClass().getAnnotation(STRING_CONVERTIBLE) != null)
 		{
-			return 3;
+			return CONVERSION_MATCH;
 		}
-		if (type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(STRING_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(Types.STRING);
 	}
 	
 	@Override

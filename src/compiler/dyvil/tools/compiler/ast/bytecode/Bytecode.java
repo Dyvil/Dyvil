@@ -50,12 +50,6 @@ public final class Bytecode extends ASTNode implements IValue
 		return true;
 	}
 	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 3;
-	}
-	
 	public void addInstruction(IInstruction insn)
 	{
 		int index = this.instructionCount++;

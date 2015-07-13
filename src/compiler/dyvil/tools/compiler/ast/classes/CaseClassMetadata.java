@@ -115,7 +115,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		if (name == Name.apply && this.applyMethod != null)
 		{
-			int match = this.applyMethod.getSignatureMatch(name, instance, arguments);
+			float match = this.applyMethod.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
 				list.add(new MethodMatch(this.applyMethod, match));

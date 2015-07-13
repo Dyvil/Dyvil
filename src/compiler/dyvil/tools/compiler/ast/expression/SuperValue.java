@@ -59,26 +59,6 @@ public final class SuperValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.type);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.type.equals(type))
-		{
-			return 3;
-		}
-		else if (this.type.getTheClass().isSubTypeOf(type))
-		{
-			return 2;
-		}
-		return 0;
-	}
-	
-	@Override
 	public Object toObject()
 	{
 		return null;

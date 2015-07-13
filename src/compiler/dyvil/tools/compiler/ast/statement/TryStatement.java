@@ -144,9 +144,9 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 3 : 0;
+		return this.isType(type) ? 1 : 0; // TODO Fix this implementation
 	}
 	
 	public void addCatchBlock(CatchBlock block)

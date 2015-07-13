@@ -121,19 +121,24 @@ public class RangeOperator implements IValue
 		return this.firstValue.isType(elementType) && this.lastValue.isType(elementType);
 	}
 	
+	private static IType getElementType(IType type)
+	{
+		if (type.isArrayType())
+		{
+			return type.getElementType();
+		}
+		if (type.isSuperClassOf(RANGE))
+		{
+			return type.resolveType(IterableForStatement.ITERABLE_TYPE);
+		}
+		return null;
+	}
+	
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IType elementType;
-		if (type.isArrayType())
-		{
-			elementType = type.getElementType();
-		}
-		else if (type.isSuperClassOf(RANGE))
-		{
-			elementType = type.resolveType(IterableForStatement.ITERABLE_TYPE);
-		}
-		else
+		IType elementType = getElementType(type);
+		if (elementType == null)
 		{
 			return null;
 		}
@@ -150,23 +155,26 @@ public class RangeOperator implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type.isArrayType())
+		IType elementType = type.getElementType();
+		if (elementType == null)
 		{
-			IType elementType = type.getElementType();
-			return this.isElementType(elementType);
+			return false;
 		}
-		if (type.isSuperClassOf(RANGE))
-		{
-			IType iterableType = type.resolveType(IterableForStatement.ITERABLE_TYPE);
-			return this.isElementType(iterableType);
-		}
-		return false;
+		return this.isElementType(elementType);
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 3 : 0;
+		IType elementType = getElementType(type);
+		if (elementType == null)
+		{
+			return 0;
+		}
+		
+		float f1 = this.firstValue.getTypeMatch(elementType);
+		float f2 = this.lastValue.getTypeMatch(elementType);
+		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2F;
 	}
 	
 	@Override

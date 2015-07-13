@@ -508,12 +508,11 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public int getSignatureMatch(IArguments arguments)
+	public float getSignatureMatch(IArguments arguments)
 	{
 		int match = 1;
 		int len = arguments.size();
 		
-		// infix modifier implementation
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			int parCount = this.parameterCount - 1;
@@ -522,7 +521,7 @@ public class Constructor extends Member implements IConstructor
 				return 0;
 			}
 			
-			int m;
+			float m;
 			IParameter varParam = this.parameters[parCount];
 			for (int i = 0; i < parCount; i++)
 			{
@@ -553,7 +552,7 @@ public class Constructor extends Member implements IConstructor
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter par = this.parameters[i];
-			int m = arguments.getTypeMatch(i, par);
+			float m = arguments.getTypeMatch(i, par);
 			if (m == 0)
 			{
 				return 0;

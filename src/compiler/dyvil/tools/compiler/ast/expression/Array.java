@@ -200,18 +200,19 @@ public final class Array extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		if (!type.isArrayType())
 		{
 			IClass iclass = type.getTheClass();
-			return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null ? 2 : 0;
+			// For Object, also return CONVERSION_MATCH
+			return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null ? CONVERSION_MATCH : 0;
 		}
 		
 		// Skip getting the element type if this is an empty array
 		if (this.valueCount == 0)
 		{
-			return 3;
+			return 1;
 		}
 		
 		// If the type is an array type, get it's element type
@@ -221,7 +222,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 		// Get the type match for every value in the array
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			int m = this.values[i].getTypeMatch(type1);
+			float m = this.values[i].getTypeMatch(type1);
 			if (m == 0)
 			{
 				// If the type match for one value is zero, return 0

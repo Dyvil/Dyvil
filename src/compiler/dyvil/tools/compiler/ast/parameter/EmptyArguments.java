@@ -116,15 +116,15 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public int getTypeMatch(int index, IParameter param)
+	public float getTypeMatch(int index, IParameter param)
 	{
-		return param.getValue() != null ? 3 : 0;
+		return param.getValue() != null ? DEFAULT_MATCH : 0;
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, IParameter param)
+	public float getVarargsTypeMatch(int index, IParameter param)
 	{
-		return 3;
+		return DEFAULT_MATCH;
 	}
 	
 	@Override

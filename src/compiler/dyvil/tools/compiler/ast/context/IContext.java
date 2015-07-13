@@ -116,11 +116,11 @@ public interface IContext
 			return matches.get(0).method;
 		default:
 			MethodMatch bestMethod = matches.get(0);
-			int bestMatch = bestMethod.match;
+			float bestMatch = bestMethod.match;
 			for (int i = 1; i < size; i++)
 			{
 				MethodMatch m = matches.get(i);
-				if (m.match > bestMatch)
+				if (m.match < bestMatch)
 				{
 					bestMethod = m;
 					bestMatch = m.match;
@@ -141,16 +141,18 @@ public interface IContext
 		case 1:
 			return matches.get(0).constructor;
 		default:
-			ConstructorMatch bestMatch = matches.get(0);
+			ConstructorMatch bestConstructor = matches.get(0);
+			float bestMatch = bestConstructor.match;
 			for (int i = 1; i < size; i++)
 			{
 				ConstructorMatch m = matches.get(i);
-				if (m.match > bestMatch.match)
+				if (m.match < bestMatch)
 				{
-					bestMatch = m;
+					bestConstructor = m;
+					bestMatch = m.match;
 				}
 			}
-			return bestMatch.constructor;
+			return bestConstructor.constructor;
 		}
 	}
 }

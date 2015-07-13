@@ -79,7 +79,7 @@ public final class ExternalConstructor extends Constructor
 	}
 	
 	@Override
-	public int getSignatureMatch(IArguments arguments)
+	public float getSignatureMatch(IArguments arguments)
 	{
 		if (!this.parametersResolved)
 		{

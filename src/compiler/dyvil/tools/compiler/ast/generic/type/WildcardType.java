@@ -129,6 +129,20 @@ public final class WildcardType implements IType, ITyped
 	}
 	
 	@Override
+	public int getSubClassDistance(IType subtype)
+	{
+		int i = subtype.getTheClass().getSuperTypeDistance(this);
+		return i == 0 ? 0 : i + 100;
+	}
+	
+	@Override
+	public float getSubTypeDistance(IType subtype)
+	{
+		int i = subtype.getTheClass().getSuperTypeDistance(this);
+		return i == 0 ? 0 : i + 100;
+	}
+	
+	@Override
 	public boolean isResolved()
 	{
 		return true;

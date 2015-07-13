@@ -255,6 +255,12 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
+	public boolean isInterface()
+	{
+		return false;
+	}
+	
+	@Override
 	public void setFullName(String name)
 	{
 	}
@@ -280,6 +286,12 @@ public class REPLMemberClass implements IClass
 	public boolean isSubTypeOf(IType type)
 	{
 		return false;
+	}
+	
+	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		return 0;
 	}
 	
 	@Override

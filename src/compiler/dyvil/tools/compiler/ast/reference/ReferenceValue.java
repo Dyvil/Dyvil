@@ -59,7 +59,7 @@ public class ReferenceValue implements IValue, IValued
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		return this.value.getTypeMatch(type);
 	}

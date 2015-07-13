@@ -13,6 +13,8 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IArguments extends IASTNode, Iterable<IValue>
 {
+	public static final float	DEFAULT_MATCH	= 1000;
+	
 	public int size();
 	
 	public boolean isEmpty();
@@ -48,9 +50,9 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public IType getType(int index, IParameter param);
 	
-	public int getTypeMatch(int index, IParameter param);
+	public float getTypeMatch(int index, IParameter param);
 	
-	public int getVarargsTypeMatch(int index, IParameter param);
+	public float getVarargsTypeMatch(int index, IParameter param);
 	
 	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
 	

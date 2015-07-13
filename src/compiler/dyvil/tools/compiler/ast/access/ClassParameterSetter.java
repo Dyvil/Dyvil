@@ -66,12 +66,6 @@ public final class ClassParameterSetter implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}

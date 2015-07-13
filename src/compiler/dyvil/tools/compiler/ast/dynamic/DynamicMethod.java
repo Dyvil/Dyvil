@@ -407,7 +407,7 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
+	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		return 0;
 	}

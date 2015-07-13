@@ -95,26 +95,6 @@ public abstract class AbstractCall implements ICall, IValued
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.method == null)
-		{
-			return 0;
-		}
-		
-		IType type1 = this.getType();
-		if (type.equals(type1))
-		{
-			return 3;
-		}
-		else if (type.isSuperTypeOf(type1))
-		{
-			return 2;
-		}
-		return 0;
-	}
-	
-	@Override
 	public void setValue(IValue value)
 	{
 		this.instance = value;

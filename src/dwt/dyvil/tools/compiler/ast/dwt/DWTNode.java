@@ -96,7 +96,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		return 0;
 	}

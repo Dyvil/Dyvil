@@ -178,27 +178,31 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public int getTypeMatch(int index, IParameter param)
+	public float getTypeMatch(int index, IParameter param)
 	{
 		if (index >= this.size)
 		{
-			return param.getValue() != null ? 3 : 0;
+			return param.getValue() != null ? DEFAULT_MATCH : 0;
 		}
 		
 		return this.values[index].getTypeMatch(param.getType());
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, IParameter param)
+	public float getVarargsTypeMatch(int index, IParameter param)
 	{
-		if (index >= this.size)
+		if (index == this.size)
+		{
+			return DEFAULT_MATCH;
+		}
+		if (index > this.size)
 		{
 			return 0;
 		}
 		
 		IValue argument = this.values[index];
 		IType type = param.getType();
-		int m = argument.getTypeMatch(type);
+		float m = argument.getTypeMatch(type);
 		if (m != 0)
 		{
 			return m;

@@ -31,11 +31,11 @@ public interface IStatement extends IValue
 	@Override
 	public default boolean isType(IType type)
 	{
-		return type == Types.UNKNOWN || type == Types.VOID;
+		return type == Types.VOID;
 	}
 	
 	@Override
-	public default int getTypeMatch(IType type)
+	public default float getTypeMatch(IType type)
 	{
 		return 0;
 	}

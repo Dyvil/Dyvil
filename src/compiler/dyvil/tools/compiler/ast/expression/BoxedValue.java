@@ -46,18 +46,6 @@ public final class BoxedValue implements IValue
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.method.getType());
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return type.isSuperTypeOf(this.method.getType()) ? 3 : 0;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.boxed.resolveTypes(markers, context);

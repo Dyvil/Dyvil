@@ -70,17 +70,13 @@ public final class CharValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type == Types.CHAR)
+		if (type.getTheClass().getAnnotation(CHAR_CONVERTIBLE) != null)
 		{
-			return 3;
+			return CONVERSION_MATCH;
 		}
-		if (type.isSuperTypeOf(Types.CHAR) || type.getTheClass().getAnnotation(CHAR_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(Types.CHAR);
 	}
 	
 	@Override

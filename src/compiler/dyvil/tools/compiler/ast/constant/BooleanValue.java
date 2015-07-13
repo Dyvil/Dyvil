@@ -81,17 +81,13 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type == Types.BOOLEAN)
+		if (type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null)
 		{
-			return 3;
+			return CONVERSION_MATCH;
 		}
-		if (type.isSuperTypeOf(Types.BOOLEAN) || type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(Types.BOOLEAN);
 	}
 	
 	@Override

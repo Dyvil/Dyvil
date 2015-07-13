@@ -61,7 +61,7 @@ public final class SyncStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		return this.block.getTypeMatch(type);
 	}

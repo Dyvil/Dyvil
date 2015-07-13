@@ -67,26 +67,6 @@ public final class InstanceOfOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (type == Types.BOOLEAN)
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(Types.BOOLEAN))
-		{
-			return 2;
-		}
-		return 0;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context, TypePosition.CLASS);
