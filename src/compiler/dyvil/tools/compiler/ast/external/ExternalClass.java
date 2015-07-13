@@ -435,7 +435,7 @@ public final class ExternalClass extends CodeClass
 			this.resolveSuperTypes();
 		}
 		
-		if (this.superType != null && this.superType.getTheClass() != Types.OBJECT_CLASS)
+		if (this.superType != null)
 		{
 			this.superType.getMethodMatches(list, instance, name, arguments);
 		}

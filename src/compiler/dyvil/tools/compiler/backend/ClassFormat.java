@@ -143,10 +143,10 @@ public final class ClassFormat
 		}
 		
 		int len = desc.length();
-		i = readTyped(desc, i, iclass);
+		i = readTyped(desc, i, iclass::setSuperType);
 		while (i < len)
 		{
-			i = readTyped(desc, i, t -> iclass.addInterface(t));
+			i = readTyped(desc, i, iclass::addInterface);
 		}
 	}
 	
@@ -163,7 +163,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(i) != ')')
 		{
-			i = readTypeList(desc, i, method);
+			i = readTyped(desc, i, method::addType);
 		}
 		i++;
 		i = readTyped(desc, i, method);
@@ -181,7 +181,7 @@ public final class ClassFormat
 		int i = 1;
 		while (desc.charAt(i) != ')')
 		{
-			i = readTypeList(desc, i, constructor);
+			i = readTyped(desc, i, constructor::addType);
 		}
 		i += 2;
 		
@@ -239,7 +239,7 @@ public final class ClassFormat
 			
 			while (desc.charAt(index) != '>')
 			{
-				index = readTypeList(desc, index, type);
+				index = readTyped(desc, index, type);
 			}
 			return type;
 		}
@@ -331,90 +331,6 @@ public final class ClassFormat
 		return start;
 	}
 	
-	private static int readTypeList(String desc, int start, ITypeList list)
-	{
-		int array = 0;
-		char c;
-		while ((c = desc.charAt(start)) == '[')
-		{
-			array++;
-			start++;
-		}
-		
-		switch (c)
-		{
-		case 'V':
-			list.addType(ArrayType.getArrayType(Types.VOID, array));
-			return start + 1;
-		case 'Z':
-			list.addType(ArrayType.getArrayType(Types.BOOLEAN, array));
-			return start + 1;
-		case 'B':
-			list.addType(ArrayType.getArrayType(Types.BYTE, array));
-			return start + 1;
-		case 'C':
-			list.addType(ArrayType.getArrayType(Types.CHAR, array));
-			return start + 1;
-		case 'S':
-			list.addType(ArrayType.getArrayType(Types.SHORT, array));
-			return start + 1;
-		case 'I':
-			list.addType(ArrayType.getArrayType(Types.INT, array));
-			return start + 1;
-		case 'J':
-			list.addType(ArrayType.getArrayType(Types.LONG, array));
-			return start + 1;
-		case 'F':
-			list.addType(ArrayType.getArrayType(Types.FLOAT, array));
-			return start + 1;
-		case 'D':
-			list.addType(ArrayType.getArrayType(Types.DOUBLE, array));
-			return start + 1;
-		case 'L':
-		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			IType type = readReferenceType(desc, start + 1, end1);
-			if (array > 0)
-			{
-				type = ArrayType.getArrayType(type, array);
-			}
-			list.addType(type);
-			return end1 + 1;
-		}
-		case 'T':
-		{
-			int end1 = desc.indexOf(';', start);
-			IType type = new InternalTypeVarType(desc.substring(start + 1, end1));
-			if (array > 0)
-			{
-				type = ArrayType.getArrayType(type, array);
-			}
-			list.addType(type);
-			return end1 + 1;
-		}
-		case '*':
-			list.addType(new WildcardType(Variance.INVARIANT));
-			return start + 1;
-		case '+':
-		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType(Variance.COVARIANT);
-			var.setType(readType(desc, start + 1, end1));
-			list.addType(var);
-			return end1 + 1;
-		}
-		case '-':
-		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
-			var.setType(readType(desc, start + 1, end1));
-			list.addType(var);
-			return end1 + 1;
-		}
-		}
-		return start;
-	}
-	
 	private static int readGeneric(String desc, int start, IGeneric generic)
 	{
 		int index = desc.indexOf(':', start);
@@ -427,7 +343,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(index) == ':')
 		{
-			index = readTypeList(desc, index + 1, typeVar);
+			index = readTyped(desc, index + 1, typeVar::addUpperBound);
 		}
 		generic.addTypeVariable(typeVar);
 		return index;

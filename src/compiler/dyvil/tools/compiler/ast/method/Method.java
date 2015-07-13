@@ -954,7 +954,7 @@ public class Method extends Member implements IMethod
 		{
 			this.parameters[0].getType().inferTypes(instance.getType(), genericData);
 			
-			for (int i = 0; i < len - 1; i++)
+			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i + 1];
 				param.getType().inferTypes(arguments.getType(i, param), genericData);
