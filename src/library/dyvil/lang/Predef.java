@@ -56,6 +56,11 @@ public final class Predef
 		return ImmutableList.apply(element1, element2);
 	}
 	
+	public static @infix <E> Iterable<E> toIterable(E... array)
+	{
+		return ImmutableList.apply(array);
+	}
+	
 	// Strings
 	
 	public static @infix @inline void toString(Object o, StringBuilder builder)

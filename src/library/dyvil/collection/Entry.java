@@ -4,6 +4,8 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 
+import dyvil.tuple.Tuple2;
+
 /**
  * An <b>Entry</b> is a union of a Key and Value, as used in {@linkplain Map
  * maps}.
@@ -29,6 +31,11 @@ public interface Entry<K, V>
 	 * @return the value
 	 */
 	public V getValue();
+	
+	public default Tuple2<K, V> toTuple()
+	{
+		return new Tuple2<K, V>(this.getKey(), this.getValue());
+	}
 	
 	public static <K extends Comparable<? super K>, V> Comparator<Entry<K, V>> comparingByKey()
 	{

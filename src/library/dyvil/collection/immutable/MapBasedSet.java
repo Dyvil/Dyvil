@@ -31,7 +31,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	@Override
 	public ImmutableSet<E> $minus(Object element)
 	{
-		return new MapBasedSet(this.map.$minus(element));
+		return new MapBasedSet(this.map.$minus$at(element));
 	}
 	
 	@Override

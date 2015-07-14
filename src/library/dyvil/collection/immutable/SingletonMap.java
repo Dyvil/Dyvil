@@ -7,10 +7,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.collection.Entry;
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.Map;
-import dyvil.collection.MutableMap;
+import dyvil.collection.*;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.tuple.Tuple2;
 
@@ -133,7 +130,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key)
+	public ImmutableMap<K, V> $minus$at(Object key)
 	{
 		return Objects.equals(this.key, key) ? EmptyMap.instance : this;
 	}
@@ -151,9 +148,15 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
 		return map.contains(this.key, this.value) ? EmptyMap.instance : this;
+	}
+	
+	@Override
+	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
+	{
+		return keys.contains(this.key) ? EmptyMap.instance : this;
 	}
 	
 	@Override
@@ -166,7 +169,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
 	{
 		Entry<? extends U, ? extends R> entry = mapper.apply(this.key, this.value);
-		return new SingletonMap(entry.getKey(), entry.getValue());
+		return entry == null ? EmptyMap.instance : new SingletonMap(entry.getKey(), entry.getValue());
 	}
 	
 	@Override

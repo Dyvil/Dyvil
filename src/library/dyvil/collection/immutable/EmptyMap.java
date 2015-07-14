@@ -9,10 +9,7 @@ import java.util.function.Consumer;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.object;
-import dyvil.collection.Entry;
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.Map;
-import dyvil.collection.MutableMap;
+import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
 
 @NilConvertible
@@ -106,7 +103,7 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key)
+	public ImmutableMap<K, V> $minus$at(Object key)
 	{
 		return this;
 	}
@@ -124,7 +121,13 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
+	{
+		return this;
+	}
+	
+	@Override
+	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
 	{
 		return this;
 	}

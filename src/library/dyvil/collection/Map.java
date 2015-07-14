@@ -315,7 +315,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 */
 	public Map<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
-	public Map<K, V> $minus(Object key);
+	public Map<K, V> $minus$at(Object key);
 	
 	public Map<K, V> $minus(Object key, Object value);
 	
@@ -326,7 +326,22 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public Map<K, V> $minus$colon(Object value);
 	
-	public Map<K, V> $minus$minus(Map<? super K, ? super V> map);
+	/**
+	 * Returns a new map containing all entries of this map minus the entries of
+	 * the given {@code map}. An entry of this map is not retained if the given
+	 * map contains the exact entry, which means both key and value have to
+	 * match. If entries should be removed based on keys only (ignoring values),
+	 * {@link #$minus$minus(Collection) --} should be used instead.
+	 * 
+	 * @param map
+	 *            the map whose entries should not be present in the resulting
+	 *            map
+	 * @return a map that contains all entries of this map minus the entries of
+	 *         the given map
+	 */
+	public Map<K, V> $minus$minus(Map<?, ?> map);
+	
+	public Map<K, V> $minus$minus(Collection<?> keys);
 	
 	public <U> Map<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
 	
@@ -340,23 +355,23 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public default void $plus$eq(K key, V value)
 	{
-		this.subscript_$eq(key, value);
+		this.put(key, value);
 	}
 	
 	public default void $plus$eq(Entry<? extends K, ? extends V> entry)
 	{
-		this.subscript_$eq(entry.getKey(), entry.getValue());
+		this.put(entry.getKey(), entry.getValue());
 	}
 	
 	public default void $plus$plus$eq(Map<? extends K, ? extends V> map)
 	{
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
-			this.subscript_$eq(entry.getKey(), entry.getValue());
+			this.put(entry.getKey(), entry.getValue());
 		}
 	}
 	
-	public default void $minus$eq(Object key)
+	public default void $minus$at$eq(Object key)
 	{
 		this.removeKey(key);
 	}
@@ -380,7 +395,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	{
 		for (Object key : keys)
 		{
-			this.$minus$eq(key);
+			this.removeKey(key);
 		}
 	}
 	
@@ -388,7 +403,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	{
 		for (Entry<?, ?> entry : map)
 		{
-			this.$minus$eq(entry);
+			this.remove(entry);
 		}
 	}
 	

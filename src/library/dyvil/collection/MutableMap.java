@@ -83,10 +83,10 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	public default MutableMap<K, V> $minus(Object key)
+	public default MutableMap<K, V> $minus$at(Object key)
 	{
 		MutableMap<K, V> copy = this.copy();
-		copy.$minus$eq(key);
+		copy.$minus$at$eq(key);
 		return copy;
 	}
 	
@@ -107,10 +107,18 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	public default MutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
+	public default MutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
 		MutableMap<K, V> copy = this.copy();
 		copy.$minus$minus$eq(map);
+		return copy;
+	}
+	
+	@Override
+	public default Map<K, V> $minus$minus(Collection<?> keys)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$minus$minus$eq(keys);
 		return copy;
 	}
 	
@@ -132,7 +140,11 @@ public interface MutableMap<K, V> extends Map<K, V>
 		MutableMap<U, R> copy = this.emptyCopy();
 		for (Entry<K, V> entry : this)
 		{
-			copy.put(mapper.apply(entry.getKey(), entry.getValue()));
+			Entry<? extends U, ? extends R> newEntry = mapper.apply(entry.getKey(), entry.getValue());
+			if (newEntry != null)
+			{
+				copy.put(newEntry);
+			}
 		}
 		return copy;
 	}
@@ -245,7 +257,11 @@ public interface MutableMap<K, V> extends Map<K, V>
 		List<Entry<? extends K, ? extends V>> entryList = new LinkedList();
 		for (Entry<K, V> entry : this)
 		{
-			entryList.add(mapper.apply(entry.getKey(), entry.getValue()));
+			Entry<? extends K, ? extends V> newEntry = mapper.apply(entry.getKey(), entry.getValue());
+			if (newEntry != null)
+			{
+				entryList.add(entry);
+			}
 		}
 		
 		this.clear();

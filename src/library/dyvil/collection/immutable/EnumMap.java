@@ -9,10 +9,7 @@ import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.TypeConvertible;
 
 import dyvil.annotation.sealed;
-import dyvil.collection.Entry;
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.Map;
-import dyvil.collection.MutableMap;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractEnumMap;
 import dyvil.util.ImmutableException;
 
@@ -91,7 +88,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key)
+	public ImmutableMap<K, V> $minus$at(Object key)
 	{
 		if (!this.checkType(key))
 		{
@@ -147,20 +144,40 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
 		Object[] newValues = this.values.clone();
 		int newSize = this.size;
 		
-		for (Entry<? super K, ? super V> entry : map)
+		for (Entry<?, ?> entry : map)
 		{
 			Object key = entry.getKey();
 			int index = index(key);
-			if (newValues[index] != null)
+			V value = (V) newValues[index];
+			if (value != null && Objects.equals(value, entry.getValue()))
 			{
 				newSize--;
+				newValues[index] = null;
 			}
-			newValues[index] = null;
+		}
+		return new EnumMap(this.type, this.keys, newValues, newSize);
+	}
+	
+	@Override
+	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
+	{
+		Object[] newValues = this.values.clone();
+		int newSize = this.size;
+		
+		for (Object key : keys)
+		{
+			int index = index(key);
+			V value = (V) newValues[index];
+			if (value != null)
+			{
+				newSize--;
+				newValues[index] = null;
+			}
 		}
 		return new EnumMap(this.type, this.keys, newValues, newSize);
 	}
@@ -191,9 +208,15 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		for (int i = 0; i < len; i++)
 		{
 			Object value = this.values[i];
-			if (value != null)
+			if (value == null)
 			{
-				hashMap.put(mapper.apply(this.keys[i], (V) value));
+				continue;
+			}
+			
+			Entry<? extends U, ? extends R> entry = mapper.apply(this.keys[i], (V) value);
+			if (entry != null)
+			{
+				hashMap.put(entry);
 			}
 		}
 		
@@ -209,12 +232,14 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		for (int i = 0; i < len; i++)
 		{
 			Object value = this.values[i];
-			if (value != null)
+			if (value == null)
 			{
-				for (Entry<? extends U, ? extends R> entry : mapper.apply(this.keys[i], (V) value))
-				{
-					hashMap.put(entry);
-				}
+				continue;
+			}
+			
+			for (Entry<? extends U, ? extends R> entry : mapper.apply(this.keys[i], (V) value))
+			{
+				hashMap.put(entry);
 			}
 		}
 		

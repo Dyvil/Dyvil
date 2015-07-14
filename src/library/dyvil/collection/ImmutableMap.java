@@ -108,7 +108,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key);
+	public ImmutableMap<K, V> $minus$at(Object key);
 	
 	@Override
 	public ImmutableMap<K, V> $minus(Object key, Object value);
@@ -123,7 +123,10 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	public ImmutableMap<K, V> $minus$colon(Object value);
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map);
+	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map);
+	
+	@Override
+	public ImmutableMap<K, V> $minus$minus(Collection<?> keys);
 	
 	@Override
 	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
@@ -155,7 +158,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	
 	@Override
 	@mutating
-	public default void $minus$eq(Object key)
+	public default void $minus$at$eq(Object key)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}

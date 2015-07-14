@@ -11,7 +11,6 @@ import dyvil.lang.literal.TypeConvertible;
 
 import dyvil.annotation.sealed;
 import dyvil.collection.ImmutableMap;
-import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractEnumMap;
 
@@ -49,85 +48,6 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	{
 		this.values[index] = null;
 		this.size--;
-	}
-	
-	@Override
-	public MutableMap<K, V> $plus(K key, V value)
-	{
-		if (!this.checkType(key))
-		{
-			return this;
-		}
-		
-		MutableMap<K, V> copy = this.copy();
-		copy.subscript_$eq(key, value);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.$plus$plus$eq(map);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> $minus(Object key)
-	{
-		if (!this.checkType(key))
-		{
-			return this;
-		}
-		
-		MutableMap<K, V> copy = this.copy();
-		copy.$minus$eq(key);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> $minus(Object key, Object value)
-	{
-		if (!this.checkType(key))
-		{
-			return this;
-		}
-		
-		MutableMap<K, V> copy = this.copy();
-		copy.remove(key, value);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> $minus$colon(Object value)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.$minus$colon$eq(value);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.$minus$minus$eq(map);
-		return copy;
-	}
-	
-	@Override
-	public <U> MutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
-	{
-		MutableMap<K, U> copy = (MutableMap<K, U>) this.copy();
-		copy.map((BiFunction<? super K, ? super U, ? extends U>) mapper);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.filter(condition);
-		return copy;
 	}
 	
 	@Override

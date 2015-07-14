@@ -31,6 +31,12 @@ public class Tuple2<@Covariant A, @Covariant B> implements Entry<A, B>
 	}
 	
 	@Override
+	public Tuple2<A, B> toTuple()
+	{
+		return this;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return "(" + this._1 + ", " + this._2 + ")";
