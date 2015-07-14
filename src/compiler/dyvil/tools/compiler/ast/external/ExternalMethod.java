@@ -172,6 +172,10 @@ public final class ExternalMethod extends Method
 			return 0;
 		}
 		
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
 		if (!this.parametersResolved)
 		{
 			this.resolveParameters();

@@ -8,6 +8,8 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ArrayType;
@@ -124,11 +126,18 @@ public final class Array extends ASTNode implements IValue, IValueList
 			{
 				return new LiteralExpression(this).withType(arrayType, typeContext, markers, context);
 			}
-			if (iclass != Types.OBJECT_CLASS)
+			if (arrayType.classEquals(Types.ITERABLE))
+			{
+				return new LiteralExpression(this, getArrayToIterable()).withType(arrayType, typeContext, markers, context);
+			}
+			else if (iclass != Types.OBJECT_CLASS)
 			{
 				return null;
 			}
-			elementType = this.getElementType();
+			else
+			{
+				elementType = this.getElementType();
+			}
 		}
 		else
 		{
@@ -165,7 +174,25 @@ public final class Array extends ASTNode implements IValue, IValueList
 		
 		this.elementType = elementType;
 		this.requiredType = arrayType;
+		
 		return this;
+	}
+	
+	private static IMethod	ARRAY_TO_ITERABLE;
+	
+	private static IMethod getArrayToIterable()
+	{
+		if (ARRAY_TO_ITERABLE != null)
+		{
+			return ARRAY_TO_ITERABLE;
+		}
+		return ARRAY_TO_ITERABLE = Types.PREDEF_CLASS.getBody().getMethod(Name.getQualified("toIterable"));
+	}
+	
+	private boolean isConvertibleFrom(IType type)
+	{
+		IClass iclass = type.getTheClass();
+		return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null || Types.ITERABLE.isSuperClassOf(type);
 	}
 	
 	@Override
@@ -173,8 +200,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			IClass iclass = type.getTheClass();
-			return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null;
+			return this.isConvertibleFrom(type);
 		}
 		
 		// Skip getting the element type if this is an empty array
@@ -204,9 +230,9 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			IClass iclass = type.getTheClass();
-			// For Object, also return CONVERSION_MATCH
-			return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null ? CONVERSION_MATCH : 0;
+			// isConvertibleFrom also returns true for Object, but the
+			// CONVERSION_MATCH return value here is intentional.
+			return this.isConvertibleFrom(type) ? CONVERSION_MATCH : 0;
 		}
 		
 		// Skip getting the element type if this is an empty array

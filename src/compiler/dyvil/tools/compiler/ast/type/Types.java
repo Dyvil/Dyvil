@@ -64,6 +64,8 @@ public final class Types
 	public static final ClassType			RUNTIME_EXCEPTION		= new ClassType(RUNTIME_EXCEPTION_CLASS);
 	public static final ClassType			IMMUTABLE				= new ClassType(Package.dyvilUtil.resolveClass("Immutable"));
 	
+	public static final IClass				PREDEF_CLASS			= Package.dyvilLang.resolveClass("Predef");
+	
 	private static IClass					OBJECT_ARRAY_CLASS;
 	private static final IClass[]			PRIMITIVE_ARRAY_CLASS	= new IClass[16];
 	
